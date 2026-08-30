@@ -19,6 +19,7 @@
 		"src/game-session",
 		"src/game-persistence",
 		"src/item-interaction",
+		"src/item-query",
 		"src/game-start",
 		"src/game-event",
 		"src/item-line-detail",

@@ -5,7 +5,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { queryFx } from "~/engine/query/fx/queryFx";
+import { queryFx } from "~/item-query/fx/queryFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";

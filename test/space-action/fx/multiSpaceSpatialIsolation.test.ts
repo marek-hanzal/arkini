@@ -6,7 +6,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
-import { queryFx } from "~/engine/query/fx/queryFx";
+import { queryFx } from "~/item-query/fx/queryFx";
 import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";

@@ -193,6 +193,18 @@ module.exports = {
 			},
 		},
 		{
+			name: "item-query-dependencies-stay-upstream",
+			comment:
+				"Canonical Runtime, authored Item selection, and Location semantics provide facts to Item Query without importing query execution.",
+			severity: "error",
+			from: {
+				path: "^src/(?:game-runtime|item-definition|item-location)(?:/|$)",
+			},
+			to: {
+				path: "^src/item-query(?:/|$)",
+			},
+		},
+		{
 			name: "active-code-does-not-import-unpacked-game-resources",
 			comment:
 				"Application code consumes authored Game resources only through validated Arkpacks.",

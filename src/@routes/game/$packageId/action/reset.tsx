@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/reset")({
 	loader: async ({ context, params }) => {

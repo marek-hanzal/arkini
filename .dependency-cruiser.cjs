@@ -59,6 +59,11 @@ const itemAuthoringEffectAllowedDependencyPattern =
 	"(?:item-authoring/(?:fn|fx|schema|type)(?:/|$)|authoring-session/fx/publishEditorProjectFx[.]ts$|engine/editor/error/EditorProjectError[.]ts$|game-config/(?:diagnostic/schema/(?:DiagnosticCodeEnumSchema|DiagnosticRecordEntityEnumSchema)[.]ts$|schema/GameConfigSchema[.]ts$|validation/rule/fn/validateConfigReferencesFn[.]ts$)|item-definition/schema/ItemSchema[.]ts$|project-authoring/service/EditorProjectRepository[.]ts$)";
 const productionLineAuthoringAllowedSourceDependencyPattern =
 	"(?:production-line-authoring(?:/|$)|authoring-session/ui/useEditorProject[.]ts$|item-definition/(?:query/schema/QuerySchema|schema/(?:QuantitySchema|SelectorSchema))[.]ts$|production-action/schema/RuleSchema[.]ts$|production-condition/schema/WhenSchema[.]ts$|production-input/schema/InputSchema[.]ts$|production-line/schema/(?:LineSchema|rule/RuleSchema)[.]ts$|production-output/(?:schema/(?:DropSchema|OutputSchema|drop/rule/RuleSchema)[.]ts$|roll/schema/(?:RollSchema|SetSchema|WeightedDropSchema)[.]ts$)|ui/(?:button/Button[.]tsx$|form/(?:EditorCapabilityStatus|EditorCollectionSelector|EditorForm|EditorFormCard|EditorFormSectionDivider|EditorValueControls)[.]tsx$|item/(?:EditorItemAutocompleteField|useEditorItemSearchOptions)[.]tsx?$|overlay/Tooltip[.]tsx$))";
+const launcherPattern = "^src/launcher(?:/|$)";
+const launcherAllowedSourceDependencyPattern =
+	"(?:launcher(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|application-runtime/(?:atom/(?:RendererAtomRegistry|RendererLifecycleOwnerAtom)[.]ts$|fx/readRendererLifecycleFx[.]ts$|service/RendererRuntime[.]ts$)|arkpack/(?:artifact/schema/PayloadSchema[.]ts$|renderer/(?:ArkpackCatalogOwnerAtom|loadArkpackFx)[.]ts$)|renderer/(?:launcher/readLastPackageIdFx[.]ts$|window/(?:WindowModeAtom|WindowModeReadyAtom|readWindowModeFx)[.]ts$)|ui/(?:action/useExclusiveAction[.]ts$|appearance/(?:AppearanceAtom|readAppearanceAccentFx|readAppearanceThemeFx)[.]ts$|button/(?:BackButton|Button)[.]tsx$|cheat-availability/(?:applyCheatAvailabilityFx|readCheatAvailabilityFx)[.]ts$|cursor/CursorSemantic[.]ts$|navigation/RouteBackdrop[.]tsx$))";
+const launcherRetainedConsumerPattern =
+	"^src/(?:main[.]tsx$|@routes/(?:index[.]tsx$|_launcher/(?:about|arkpacks|main-menu|settings)[.]tsx$|action/-runActionRouteFx[.]ts$|action/(?:discard-failed-game|recover-game-save)[.]tsx$|action/load-game/[$]packageId[.]tsx$|editor/welcome[.]tsx$|game/[$]packageId/action/(?:exit|leave|reset)[.]tsx$)|project-version/ui/EditorVersionRestoreAction[.]tsx$|ui/game/GameEngineErrorView[.]tsx$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:type/ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
@@ -70,7 +75,7 @@ const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|${launcherPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -107,6 +112,7 @@ const boundaryRules = [
 				applicationRuntimePattern,
 				"^src/(?:@routes|authoring-mcp|item-detail-frame|project-authoring/atom|renderer/game|ui)(?:/|$)",
 				"^src/tile-interaction/atom/TileDefaultLineCommandAtom[.]ts$",
+				"^src/launcher/atom/MainMenuExitCommandAtom[.]ts$",
 			],
 		},
 		to: {
@@ -866,6 +872,34 @@ const boundaryRules = [
 		},
 		to: {
 			path: productionLineAuthoringPattern,
+		},
+	},
+	{
+		name: "launcher-has-exact-renderer-shell-dependencies",
+		comment:
+			"Launcher owns renderer-session bootstrap, Hero/About resources, splash coordination, and shell/action presentation through exact current capabilities without absorbing Settings, Appearance, routes, Game, or Electron runtime.",
+		severity: "error",
+		from: {
+			path: launcherPattern,
+		},
+		to: {
+			path: `^src/(?!${launcherAllowedSourceDependencyPattern})|^electron/(?!contract/(?:appearance/(?:AppearanceAccentSchema|AppearanceThemeSchema)|window/WindowModeSchema)[.]ts$)|^shared/(?!ArkiniAppMetadata[.]ts$)|^scripts(?:/|$)|^node_modules/(?!@effect/atom-react(?:/|$)|@tanstack/react-router(?:/|$)|effect(?:/|$)|motion(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "launcher-has-concrete-shell-consumers",
+		comment:
+			"Only the renderer root, exact route leaves, Project Version restore, and Game failure projection consume Launcher startup or full-shell surfaces.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				launcherPattern,
+				launcherRetainedConsumerPattern,
+			],
+		},
+		to: {
+			path: launcherPattern,
 		},
 	},
 	{

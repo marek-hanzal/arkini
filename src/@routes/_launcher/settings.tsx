@@ -5,7 +5,7 @@ import { match } from "ts-pattern";
 
 import { BackButton } from "~/ui/button/BackButton";
 import { ButtonLink } from "~/ui/button/Button";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 import { ModelProvider } from "~/ui/settings/ModelContext";
 import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
@@ -63,7 +63,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 		});
 
 		return (
-			<MainPageLayout
+			<LauncherPageLayout
 				labelledBy="settings-title"
 				page="settings"
 			>
@@ -195,7 +195,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 						/>
 					</section>
 				</ModelProvider>
-			</MainPageLayout>
+			</LauncherPageLayout>
 		);
 	},
 });

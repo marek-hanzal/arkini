@@ -9,7 +9,7 @@ import { selectEditorItemEstimateIndexFn } from "~/estimate/domain/fn/selectEdit
 import {
 	EditorItemEstimateCacheAtom,
 	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
-} from "~/estimate/ui/makeEditorItemEstimateCacheAtomFx";
+} from "~/estimate/ui/EditorItemEstimateCacheAtom";
 
 export type EditorItemEstimateIndexState =
 	| {

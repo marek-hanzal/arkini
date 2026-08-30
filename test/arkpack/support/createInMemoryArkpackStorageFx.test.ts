@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInMemoryArkpackStorageFx } from "~test/arkpack/support/createInMemoryArkpackStorageFx";
 
-const packageId = "package:test";
+const packageId = "package:\ud800";
 
 describe("createInMemoryArkpackStorageFx", () => {
 	it("returns isolated byte copies from both catalog and exact reads", async () => {
@@ -16,6 +16,7 @@ describe("createInMemoryArkpackStorageFx", () => {
 		expect(await Effect.runPromise(storage.listFx)).toEqual([
 			expect.objectContaining({
 				packageId,
+				filename: "package%3A%ED%A0%80.arkpack",
 				source: "user",
 			}),
 		]);

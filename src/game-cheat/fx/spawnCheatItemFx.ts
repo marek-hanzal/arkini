@@ -4,7 +4,7 @@ import { CheatItemNotSpawnableError } from "~/game-cheat/error/CheatItemNotSpawn
 import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledError";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";

@@ -229,6 +229,18 @@ module.exports = {
 			},
 		},
 		{
+			name: "item-resolution-dependencies-stay-upstream",
+			comment:
+				"Loaded config, authored Item definitions, and Location values provide facts to Item Resolution without importing its lookup operation or failure.",
+			severity: "error",
+			from: {
+				path: "^src/(?:game-config|item-definition|item-location)(?:/|$)",
+			},
+			to: {
+				path: "^src/item-resolution(?:/|$)",
+			},
+		},
+		{
 			name: "active-code-does-not-import-unpacked-game-resources",
 			comment:
 				"Application code consumes authored Game resources only through validated Arkpacks.",

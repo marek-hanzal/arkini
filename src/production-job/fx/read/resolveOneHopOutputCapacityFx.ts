@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";

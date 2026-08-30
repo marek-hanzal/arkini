@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 
 export namespace resolveItemFx {
 	export interface Props {

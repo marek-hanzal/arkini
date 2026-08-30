@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { isItemPureWithIndexFn } from "~/engine/item/fn/isItemPureWithIndexFn";
 import { readItemPurityIndexFn } from "~/engine/item/fn/readItemPurityIndexFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

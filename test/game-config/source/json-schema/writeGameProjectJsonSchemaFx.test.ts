@@ -7,7 +7,7 @@ import { z } from "zod";
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
 import { writeGameProjectJsonSchemaFx } from "~/game-config/source/json-schema/writeGameProjectJsonSchemaFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { expectNamedJsonSchemaGraph } from "~test/schema/expectNamedJsonSchemaGraph";
+import { expectNamedJsonSchemaGraph } from "~test/support/schema/expectNamedJsonSchemaGraph";
 
 describe("writeGameProjectJsonSchemaFx", () => {
 	it("exports resolvable named public schema graphs", () => {

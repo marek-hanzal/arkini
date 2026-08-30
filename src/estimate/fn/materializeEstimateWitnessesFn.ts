@@ -1,13 +1,18 @@
 import { Order } from "effect";
 
-import { groupEstimateRequirementsFn } from "~/estimate-demand/fn/groupEstimateRequirementsFn";
 import { projectEstimateWitnessFn } from "~/estimate-projection/fn/projectEstimateWitnessFn";
-import type { EstimateTopology } from "~/estimate/fn/createEstimateTopologyFn";
 import {
-	readEstimateExpectedRunsFn,
+	createEstimateRoutePolicyFn,
+	readEstimateRouteOptionsFn,
+	readEstimateRouteRequirementsFn,
+} from "~/estimate/fn/createEstimateRoutePolicyFn";
+import type { EstimateTopology } from "~/estimate/fn/createEstimateTopologyFn";
+import { readEstimateMissingQuantityFn } from "~/estimate/fn/readEstimateMissingQuantityFn";
+import {
 	readEstimateScalarExpectedRunsFn,
 	type EstimateExpectedRunsResult,
 } from "~/estimate/fn/readEstimateExpectedRunsFn";
+import { shareEstimateOperationRunsFn } from "~/estimate/fn/shareEstimateOperationRunsFn";
 import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
 import type { EditorItemEstimateDiagnostic } from "~/estimate/type/EditorItemEstimate";
 import type {
@@ -16,7 +21,6 @@ import type {
 } from "~/estimate-witness/type/EstimateWitness";
 import type {
 	EditorAcquisitionQuantityProbability,
-	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/flow/type/EditorAcquisitionGraph";
 
@@ -30,11 +34,7 @@ interface MaterializeEstimateWitnessesProps {
 	readonly topology: EstimateTopology;
 }
 
-/**
- * One globally compatible witness is returned for every forced top route whose bounded search can
- * prove a complete selection. Bounded output algebra and witness search report partial diagnostics.
- */
-export interface EstimateWitnessBatchEntry extends EstimateRequest {
+interface EstimateWitnessBatchEntry extends EstimateRequest {
 	readonly candidates: ReadonlyArray<EstimateWitness>;
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
 }
@@ -61,16 +61,7 @@ interface DemandSnapshot {
 	readonly sharedOperationIds: ReadonlySet<string>;
 }
 
-interface EstimatePolicyState {
-	readonly completeFactsByBlockedKey: Map<string, ReadonlySet<string>>;
-	readonly quantityCostMemo: Map<string, number>;
-	readonly scalarRunsByDistribution: Map<
-		ReadonlyArray<EditorAcquisitionQuantityProbability>,
-		Map<number, EstimateExpectedRunsResult>
-	>;
-	readonly topology: EstimateTopology;
-	readonly unitCost: Map<string, number>;
-}
+type EstimateRoutePolicy = ReturnType<typeof createEstimateRoutePolicyFn>;
 
 interface WitnessChoicePoint {
 	readonly key: string;
@@ -97,9 +88,6 @@ const isPartialDiagnosticFn = (diagnostic: EditorItemEstimateDiagnostic) =>
 	diagnostic.kind === "witness-search-exhausted";
 
 const routeChoiceKeyFn = (factId: string) => `route\u0000${factId}`;
-
-const requirementChoiceKeyFn = (routeId: string, clauseIndex: number) =>
-	`requirement\u0000${routeId}\u0000${clauseIndex}`;
 
 const recordChoiceFn = (
 	context: WitnessChoiceContext | undefined,
@@ -132,465 +120,15 @@ const equalQuantitiesFn = (left: ReadonlyMap<string, number>, right: ReadonlyMap
 		...left,
 	].every(([factId, quantity]) => Math.abs(quantity - (right.get(factId) ?? -1)) <= epsilon);
 
-const readRequirementQuantityFn = (requirement: EditorAcquisitionRequirement, actionRuns: number) =>
-	requirement.quantity * (requirement.usage === "consume" ? actionRuns : 1);
-
-const readRootQuantityFn = (topology: EstimateTopology, factId: string, quantity: number) => {
-	const root = topology.roots.get(factId);
-	return root === "unbounded" ? quantity : Math.min(root ?? 0, quantity);
-};
-
-const readMissingQuantityFn = (topology: EstimateTopology, factId: string, quantity: number) =>
-	quantity - readRootQuantityFn(topology, factId, quantity);
-
 const readScalarExpectedRunsFn = (
-	state: EstimatePolicyState,
 	distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
 	quantity: number,
-) => {
-	if (quantity > editorItemEstimateMaximumQuantity)
-		return {
-			status: "state-space-unsupported",
-		} satisfies EstimateExpectedRunsResult;
-	const cachedByQuantity = state.scalarRunsByDistribution.get(distribution);
-	const cached = cachedByQuantity?.get(quantity);
-	if (cached !== undefined) return cached;
-	const result = readEstimateScalarExpectedRunsFn(distribution, quantity);
-	const byQuantity = cachedByQuantity ?? new Map<number, EstimateExpectedRunsResult>();
-	byQuantity.set(quantity, result);
-	if (cachedByQuantity === undefined)
-		state.scalarRunsByDistribution.set(distribution, byQuantity);
-	return result;
-};
-
-const readCompleteFactsFn = (state: EstimatePolicyState, blockedFactIds: ReadonlySet<string>) => {
-	const key = [
-		...blockedFactIds,
-	]
-		.sort(Order.String)
-		.join("\u0000");
-	const cached = state.completeFactsByBlockedKey.get(key);
-	if (cached !== undefined) return cached;
-	const complete = new Set(state.topology.roots.keys());
-	let pending = [
-		...state.topology.routesByFact.values(),
-	]
-		.flatMap((routes) => routes)
-		.filter(
-			(route) =>
-				!blockedFactIds.has(route.output.factId) &&
-				!state.topology.unsupportedRoutes.has(route),
-		);
-	for (let iteration = 0; iteration < state.topology.factCount; iteration += 1) {
-		let changed = false;
-		const nextPending: EditorAcquisitionRoute[] = [];
-		for (const route of pending) {
-			const requirements = state.topology.requirementsByRoute.get(route);
-			if (
-				requirements === undefined ||
-				requirements.allOf.some(({ factId }) => !complete.has(factId)) ||
-				requirements.anyOf.some(
-					(clause) => !clause.some(({ factId }) => complete.has(factId)),
-				)
-			)
-				nextPending.push(route);
-			else if (!complete.has(route.output.factId)) {
-				complete.add(route.output.factId);
-				changed = true;
+): EstimateExpectedRunsResult =>
+	quantity > editorItemEstimateMaximumQuantity
+		? {
+				status: "state-space-unsupported",
 			}
-		}
-		if (!changed) break;
-		pending = nextPending;
-	}
-	state.completeFactsByBlockedKey.set(key, complete);
-	return complete;
-};
-
-const isCompleteRouteFn = (
-	state: EstimatePolicyState,
-	route: EditorAcquisitionRoute,
-	blockedFactIds: ReadonlySet<string>,
-) => {
-	if (state.topology.unsupportedRoutes.has(route)) return false;
-	const requirements = state.topology.requirementsByRoute.get(route);
-	if (requirements === undefined) return false;
-	const satisfiesFn = (complete: ReadonlySet<string>) =>
-		requirements.allOf.every(({ factId }) => complete.has(factId)) &&
-		requirements.anyOf.every((clause) => clause.some(({ factId }) => complete.has(factId)));
-	const complete = readCompleteFactsFn(state, blockedFactIds);
-	if (!satisfiesFn(complete)) return false;
-	const outputComponent =
-		state.topology.componentByFact.get(route.output.factId) ?? route.output.factId;
-	const mayReenterOutputComponent =
-		requirements.allOf.some(
-			({ factId }) =>
-				(state.topology.componentByFact.get(factId) ?? factId) === outputComponent,
-		) ||
-		requirements.anyOf.some((clause) =>
-			clause
-				.filter(({ factId }) => complete.has(factId))
-				.every(
-					({ factId }) =>
-						(state.topology.componentByFact.get(factId) ?? factId) === outputComponent,
-				),
-		);
-	return (
-		!mayReenterOutputComponent ||
-		satisfiesFn(
-			readCompleteFactsFn(
-				state,
-				new Set([
-					...blockedFactIds,
-					route.output.factId,
-				]),
-			),
-		)
-	);
-};
-
-const chooseRequirementsFn = (
-	state: EstimatePolicyState,
-	route: EditorAcquisitionRoute,
-	actionRuns: number,
-	activeComponentId = state.topology.componentByFact.get(route.output.factId) ??
-		route.output.factId,
-	blockedFactIds: ReadonlySet<string> = new Set(),
-	costMemo = state.quantityCostMemo,
-	choiceContext?: WitnessChoiceContext,
-) => {
-	const routeRequirements = state.topology.requirementsByRoute.get(route);
-	if (routeRequirements === undefined) return undefined;
-	const requirements = [
-		...routeRequirements.allOf,
-	];
-	for (const [clauseIndex, clause] of routeRequirements.anyOf.entries()) {
-		const options = clause
-			.map((requirement, index) => {
-				const reentersIncompleteComponent =
-					(state.topology.componentByFact.get(requirement.factId) ??
-						requirement.factId) === activeComponentId &&
-					!readCompleteFactsFn(
-						state,
-						new Set([
-							...blockedFactIds,
-							route.output.factId,
-						]),
-					).has(requirement.factId);
-				return {
-					cost: reentersIncompleteComponent
-						? Number.POSITIVE_INFINITY
-						: readFactCostFn(
-								state,
-								requirement.factId,
-								readRequirementQuantityFn(requirement, actionRuns),
-								activeComponentId,
-								blockedFactIds,
-								costMemo,
-							),
-					index,
-					requirement,
-				};
-			})
-			.filter(({ cost }) => Number.isFinite(cost))
-			.sort(
-				(left, right) =>
-					left.cost - right.cost ||
-					Order.String(left.requirement.factId, right.requirement.factId) ||
-					left.index - right.index,
-			);
-		const key = requirementChoiceKeyFn(route.id, clauseIndex);
-		const override = choiceContext?.overrides.get(key);
-		const selected =
-			override === undefined
-				? options[0]
-				: options.find(({ index }) => String(index) === override);
-		const selectedValue = selected === undefined ? override : String(selected.index);
-		if (selectedValue !== undefined)
-			recordChoiceFn(
-				choiceContext,
-				key,
-				selectedValue,
-				options.map(({ index }) => String(index)),
-			);
-		if (selected === undefined) return undefined;
-		requirements.push(selected.requirement);
-	}
-	return groupEstimateRequirementsFn(requirements, actionRuns);
-};
-
-const readRouteCostFn = (
-	state: EstimatePolicyState,
-	route: EditorAcquisitionRoute,
-	quantity: number,
-	activeComponentId = state.topology.componentByFact.get(route.output.factId) ??
-		route.output.factId,
-	blockedFactIds: ReadonlySet<string> = new Set(),
-	costMemo = state.quantityCostMemo,
-) => {
-	if (!isCompleteRouteFn(state, route, blockedFactIds)) return Number.POSITIVE_INFINITY;
-	const expected = readScalarExpectedRunsFn(state, route.output.quantityDistribution, quantity);
-	if (expected.status === "state-space-unsupported" || !Number.isFinite(expected.runs))
-		return Number.POSITIVE_INFINITY;
-	const outputRuns = expected.runs;
-	const actionRuns = outputRuns * route.runMultiplier;
-	const groups = chooseRequirementsFn(
-		state,
-		route,
-		actionRuns,
-		activeComponentId,
-		blockedFactIds,
-		costMemo,
-	);
-	if (groups === undefined) return Number.POSITIVE_INFINITY;
-	let dependencyCost = 0;
-	for (const group of groups) {
-		const groupCost = readFactCostFn(
-			state,
-			group.factId,
-			group.consumed + Math.max(group.oneTime, group.ongoing),
-			activeComponentId,
-			blockedFactIds,
-			costMemo,
-		);
-		if (!Number.isFinite(groupCost)) return groupCost;
-		dependencyCost = Math.max(dependencyCost, groupCost);
-	}
-	return route.durationMs * actionRuns + dependencyCost;
-};
-
-function readFactCostFn(
-	state: EstimatePolicyState,
-	factId: string,
-	quantity: number,
-	activeComponentId: string,
-	blockedFactIds: ReadonlySet<string>,
-	costMemo: Map<string, number>,
-): number {
-	const missing = readMissingQuantityFn(state.topology, factId, quantity);
-	if (missing <= epsilon) return 0;
-	if (blockedFactIds.has(factId)) return Number.POSITIVE_INFINITY;
-	const componentId = state.topology.componentByFact.get(factId) ?? factId;
-	if (componentId === activeComponentId)
-		return (state.unitCost.get(factId) ?? Number.POSITIVE_INFINITY) * missing;
-	const normalized = Math.round(missing * 1e9) / 1e9;
-	const blockedTop = blockedFactIds.values().next().value ?? "";
-	const key = `${factId}\u0000${normalized}\u0000${activeComponentId}\u0000${blockedTop}`;
-	const memoized = costMemo.get(key);
-	if (memoized !== undefined) return memoized;
-	const cost = Math.min(
-		...(state.topology.routesByFact.get(factId) ?? [])
-			.filter((route) => isCompleteRouteFn(state, route, blockedFactIds))
-			.map((route) =>
-				readRouteCostFn(state, route, missing, componentId, blockedFactIds, costMemo),
-			),
-	);
-	costMemo.set(key, cost);
-	return cost;
-}
-
-const readRouteOptionsFn = (state: EstimatePolicyState, factId: string, quantity: number) => {
-	const missing = readMissingQuantityFn(state.topology, factId, quantity);
-	return (state.topology.routesByFact.get(factId) ?? [])
-		.map((route) => ({
-			cost: readRouteCostFn(
-				state,
-				route,
-				missing,
-				state.topology.componentByFact.get(factId) ?? factId,
-				new Set(),
-				state.quantityCostMemo,
-			),
-			route,
-		}))
-		.filter(({ cost }) => Number.isFinite(cost))
-		.sort(
-			(left, right) => left.cost - right.cost || Order.String(left.route.id, right.route.id),
-		)
-		.map(({ route }) => route);
-};
-
-const createPolicyStateFn = (topology: EstimateTopology): EstimatePolicyState => {
-	const state: EstimatePolicyState = {
-		completeFactsByBlockedKey: new Map(),
-		quantityCostMemo: new Map(),
-		scalarRunsByDistribution: new Map(),
-		topology,
-		unitCost: new Map(),
-	};
-	for (const factId of topology.roots.keys()) state.unitCost.set(factId, 0);
-	for (let iteration = 0; iteration < topology.factCount; iteration += 1) {
-		let changed = false;
-		for (const routes of topology.routesByFact.values())
-			for (const route of routes) {
-				if (topology.unsupportedRoutes.has(route)) continue;
-				const expected = readScalarExpectedRunsFn(
-					state,
-					route.output.quantityDistribution,
-					1,
-				);
-				if (
-					expected.status === "state-space-unsupported" ||
-					!Number.isFinite(expected.runs)
-				)
-					continue;
-				const outputRuns = expected.runs;
-				const actionRuns = outputRuns * route.runMultiplier;
-				let dependencyCost = 0;
-				const requirements = topology.requirementsByRoute.get(route);
-				if (requirements === undefined) continue;
-				for (const requirement of requirements.allOf) {
-					const requirementCost = state.unitCost.get(requirement.factId);
-					if (requirementCost === undefined) {
-						dependencyCost = Number.POSITIVE_INFINITY;
-						break;
-					}
-					dependencyCost = Math.max(
-						dependencyCost,
-						requirementCost * readRequirementQuantityFn(requirement, actionRuns),
-					);
-				}
-				for (const clause of requirements.anyOf)
-					dependencyCost = Math.max(
-						dependencyCost,
-						Math.min(
-							...clause.map((requirement) => {
-								const requirementCost = state.unitCost.get(requirement.factId);
-								return requirementCost === undefined
-									? Number.POSITIVE_INFINITY
-									: requirementCost *
-											readRequirementQuantityFn(requirement, actionRuns);
-							}),
-						),
-					);
-				const cost = route.durationMs * actionRuns + dependencyCost;
-				const current = state.unitCost.get(route.output.factId);
-				if (Number.isFinite(cost) && (current === undefined || cost < current - epsilon)) {
-					state.unitCost.set(route.output.factId, cost);
-					changed = true;
-				}
-			}
-		if (!changed) break;
-	}
-	return state;
-};
-
-const shareOperationRunsFn = (
-	state: EstimatePolicyState,
-	factId: string,
-	selected: ReadonlyMap<string, EstimateSelectedRoute>,
-	topRouteId: string,
-	choiceContext?: WitnessChoiceContext,
-):
-	| CandidateFailure
-	| {
-			readonly selected: Map<string, EstimateSelectedRoute>;
-			readonly sharedOperationIds: ReadonlySet<string>;
-			readonly status: "success";
-	  } => {
-	const result = new Map(selected);
-	const selectedByOperationId = new Map<
-		string,
-		Array<
-			readonly [
-				string,
-				EstimateSelectedRoute,
-			]
-		>
-	>();
-	for (const entry of selected) {
-		const operationId = entry[1].route.operation?.id;
-		if (operationId === undefined) continue;
-		const entries = selectedByOperationId.get(operationId) ?? [];
-		entries.push(entry);
-		selectedByOperationId.set(operationId, entries);
-	}
-	const sharedOperationIds = new Set<string>();
-	for (const entries of selectedByOperationId.values()) {
-		if (entries.length < 2) continue;
-		const operation = entries[0]?.[1].route.operation;
-		if (operation?.outputDistribution === undefined) continue;
-		const demandByOutputGroupId = new Map<string, number>();
-		for (const [, plan] of entries) {
-			const outputGroupId = plan.route.output.operationOutputGroupId;
-			if (outputGroupId !== undefined)
-				demandByOutputGroupId.set(outputGroupId, plan.producedQuantity);
-		}
-		if (demandByOutputGroupId.size < 2) continue;
-		const expected = readEstimateExpectedRunsFn({
-			demandByOutputGroupId,
-			distribution: operation.outputDistribution,
-		});
-		if (expected.status === "state-space-unsupported")
-			return {
-				diagnostics: [
-					{
-						kind: "joint-output-accounting-unsupported",
-						reason: "state-space",
-						routeId: entries[0]?.[1].route.id ?? topRouteId,
-					},
-				],
-				status: "failure",
-			};
-		if (!Number.isFinite(expected.runs))
-			return {
-				diagnostics: [
-					{
-						factId: entries[0]?.[0] ?? factId,
-						kind: "zero-yield",
-						routeId: entries[0]?.[1].route.id ?? topRouteId,
-					},
-				],
-				status: "failure",
-			};
-		const actionRuns =
-			expected.runs * Math.max(...entries.map(([, plan]) => plan.route.runMultiplier));
-		sharedOperationIds.add(operation.id);
-		const groupsByFactId = new Map<string, EstimateSelectedRoute["groups"][number]>();
-		for (const [, plan] of entries) {
-			const groups = chooseRequirementsFn(
-				state,
-				plan.route,
-				actionRuns,
-				undefined,
-				undefined,
-				undefined,
-				choiceContext,
-			);
-			if (groups === undefined) continue;
-			for (const group of groups) {
-				const current = groupsByFactId.get(group.factId);
-				groupsByFactId.set(group.factId, {
-					...group,
-					consumed: Math.max(current?.consumed ?? 0, group.consumed),
-					distinctOneTime: Math.max(current?.distinctOneTime ?? 0, group.distinctOneTime),
-					oneTime: Math.max(current?.oneTime ?? 0, group.oneTime),
-					ongoing: Math.max(current?.ongoing ?? 0, group.ongoing),
-					sources: [
-						...new Set([
-							...(current?.sources ?? []),
-							...group.sources,
-						]),
-					].sort(),
-				});
-			}
-		}
-		const groups = [
-			...groupsByFactId.values(),
-		].sort((left, right) => Order.String(left.factId, right.factId));
-		for (const [id, plan] of entries)
-			result.set(id, {
-				...plan,
-				actionRuns,
-				groups,
-				outputRuns: expected.runs,
-			});
-	}
-	return {
-		selected: result,
-		sharedOperationIds,
-		status: "success",
-	};
-};
+		: readEstimateScalarExpectedRunsFn(distribution, quantity);
 
 const findCycleFn = (dependencies: ReadonlyMap<string, ReadonlySet<string>>) => {
 	const cycles: ReadonlyArray<string>[] = [];
@@ -637,7 +175,7 @@ const findCycleFn = (dependencies: ReadonlyMap<string, ReadonlySet<string>>) => 
 };
 
 const materializeCandidateSelectionFn = (
-	state: EstimatePolicyState,
+	policy: EstimateRoutePolicy,
 	factId: string,
 	quantity: number,
 	topRoute: EditorAcquisitionRoute,
@@ -650,7 +188,7 @@ const materializeCandidateSelectionFn = (
 		],
 	]);
 	let snapshot: DemandSnapshot | undefined;
-	const maximumIterations = Math.max(2, state.topology.factCount * 2);
+	const maximumIterations = Math.max(2, policy.topology.factCount * 2);
 
 	for (let iteration = 0; iteration < maximumIterations; iteration += 1) {
 		let selected = new Map<string, EstimateSelectedRoute>();
@@ -670,11 +208,13 @@ const materializeCandidateSelectionFn = (
 					],
 					status: "failure",
 				};
-			const rootQuantity = readRootQuantityFn(state.topology, id, requiredQuantity);
-			const missing = Math.max(0, requiredQuantity - rootQuantity);
+			const missing = Math.max(
+				0,
+				readEstimateMissingQuantityFn(policy.topology, id, requiredQuantity),
+			);
 			if (missing <= epsilon) continue;
-			const routes = state.topology.routesByFact.get(id) ?? [];
-			const routeOptions = readRouteOptionsFn(state, id, requiredQuantity);
+			const routes = policy.topology.routesByFact.get(id) ?? [];
+			const routeOptions = readEstimateRouteOptionsFn(policy, id, requiredQuantity);
 			const routeChoiceKey = routeChoiceKeyFn(id);
 			const routeOverride = choiceContext.overrides.get(routeChoiceKey);
 			const route =
@@ -709,7 +249,7 @@ const materializeCandidateSelectionFn = (
 					route.id,
 					routeOptions.map(({ id: routeId }) => routeId),
 				);
-			if (state.topology.unsupportedRoutes.has(route))
+			if (policy.topology.unsupportedRoutes.has(route))
 				return {
 					diagnostics: [
 						{
@@ -720,11 +260,7 @@ const materializeCandidateSelectionFn = (
 					],
 					status: "failure",
 				};
-			const expected = readScalarExpectedRunsFn(
-				state,
-				route.output.quantityDistribution,
-				missing,
-			);
+			const expected = readScalarExpectedRunsFn(route.output.quantityDistribution, missing);
 			if (expected.status === "state-space-unsupported")
 				return {
 					diagnostics: [
@@ -749,16 +285,13 @@ const materializeCandidateSelectionFn = (
 					status: "failure",
 				};
 			const actionRuns = outputRuns * route.runMultiplier;
-			const groups = chooseRequirementsFn(
-				state,
+			const requirementSelection = readEstimateRouteRequirementsFn(
+				policy,
 				route,
 				actionRuns,
-				undefined,
-				undefined,
-				undefined,
-				choiceContext,
+				choiceContext.overrides,
 			);
-			if (groups === undefined)
+			if (requirementSelection === undefined)
 				return {
 					diagnostics: [
 						{
@@ -770,9 +303,11 @@ const materializeCandidateSelectionFn = (
 					],
 					status: "failure",
 				};
+			for (const choice of requirementSelection.choices)
+				recordChoiceFn(choiceContext, choice.key, choice.selected, choice.options);
 			selected.set(id, {
 				actionRuns,
-				groups,
+				groups: requirementSelection.groups,
 				outputRuns,
 				producedQuantity: missing,
 				recurrenceFactIds: new Set(),
@@ -780,8 +315,16 @@ const materializeCandidateSelectionFn = (
 			});
 		}
 
-		const shared = shareOperationRunsFn(state, factId, selected, topRoute.id, choiceContext);
+		const shared = shareEstimateOperationRunsFn({
+			choiceOverrides: choiceContext.overrides,
+			factId,
+			policy,
+			selected,
+			topRouteId: topRoute.id,
+		});
 		if (shared.status === "failure") return shared;
+		for (const choice of shared.choices)
+			recordChoiceFn(choiceContext, choice.key, choice.selected, choice.options);
 		selected = shared.selected;
 
 		const consumed = new Map<string, number>();
@@ -818,8 +361,10 @@ const materializeCandidateSelectionFn = (
 			nextRequired.set(
 				id,
 				Math.max(
-					(nextRequired.get(id) ?? 0) + (consumed.get(id) ?? 0),
-					concurrent.get(id) ?? 0,
+					Math.max(
+						(nextRequired.get(id) ?? 0) + (consumed.get(id) ?? 0),
+						concurrent.get(id) ?? 0,
+					),
 				),
 			);
 		}
@@ -827,11 +372,13 @@ const materializeCandidateSelectionFn = (
 		const dependencies = new Map<string, Set<string>>();
 		const selectedWithRecurrence = new Map<string, EstimateSelectedRoute>();
 		for (const [id, plan] of selected) {
-			const seededComponent = state.topology.seededComponentByFact.get(id);
+			const seededComponent = policy.topology.seededComponentByFact.get(id);
 			const recurrenceFactIds = new Set<string>();
 			for (const group of plan.groups) {
-				const root = state.topology.roots.get(group.factId);
-				const groupSeededComponent = state.topology.seededComponentByFact.get(group.factId);
+				const root = policy.topology.roots.get(group.factId);
+				const groupSeededComponent = policy.topology.seededComponentByFact.get(
+					group.factId,
+				);
 				if (
 					group.consumed <= epsilon &&
 					(root === "unbounded" ||
@@ -932,14 +479,14 @@ const compareWitnessesFn = (left: EstimateWitness, right: EstimateWitness) =>
 	Order.String(readWitnessRouteIdentityFn(left), readWitnessRouteIdentityFn(right));
 
 const materializeCandidateAttemptFn = (
-	state: EstimatePolicyState,
+	policy: EstimateRoutePolicy,
 	factId: string,
 	quantity: number,
 	topRoute: EditorAcquisitionRoute,
 	overrides: ReadonlyMap<string, string>,
 ): CandidateAttempt => {
 	const choices = new Map<string, WitnessChoicePoint>();
-	const result = materializeCandidateSelectionFn(state, factId, quantity, topRoute, {
+	const result = materializeCandidateSelectionFn(policy, factId, quantity, topRoute, {
 		choices,
 		overrides,
 	});
@@ -952,13 +499,12 @@ const materializeCandidateAttemptFn = (
 };
 
 const materializeCandidateFn = (
-	state: EstimatePolicyState,
+	policy: EstimateRoutePolicy,
 	factId: string,
 	quantity: number,
 	topRoute: EditorAcquisitionRoute,
 ): CandidateResult => {
-	const baseline = materializeCandidateAttemptFn(state, factId, quantity, topRoute, new Map());
-
+	const baseline = materializeCandidateAttemptFn(policy, factId, quantity, topRoute, new Map());
 	const pending: Array<ReadonlyMap<string, string>> = [];
 	const seen = new Set<string>();
 	let attemptedStates = 1;
@@ -1005,7 +551,13 @@ const materializeCandidateFn = (
 			};
 		const overrides = pending.shift();
 		if (overrides === undefined) break;
-		const attempt = materializeCandidateAttemptFn(state, factId, quantity, topRoute, overrides);
+		const attempt = materializeCandidateAttemptFn(
+			policy,
+			factId,
+			quantity,
+			topRoute,
+			overrides,
+		);
 		attemptedStates += 1;
 		if (
 			attempt.result.status === "success" &&
@@ -1049,7 +601,7 @@ const makeRootWitnessFn = (request: EstimateRequest): EstimateWitness => ({
 });
 
 const materializeRequestFn = (
-	state: EstimatePolicyState,
+	policy: EstimateRoutePolicy,
 	request: EstimateRequest,
 ): EstimateWitnessBatchEntry => {
 	if (request.quantity > editorItemEstimateMaximumQuantity)
@@ -1066,7 +618,7 @@ const materializeRequestFn = (
 				},
 			],
 		};
-	if (!(request.quantity > 0) || !state.topology.factIds.has(request.factId))
+	if (!(request.quantity > 0) || !policy.topology.factIds.has(request.factId))
 		return {
 			...request,
 			candidates: [],
@@ -1078,7 +630,7 @@ const materializeRequestFn = (
 				},
 			],
 		};
-	if (readMissingQuantityFn(state.topology, request.factId, request.quantity) <= epsilon)
+	if (readEstimateMissingQuantityFn(policy.topology, request.factId, request.quantity) <= epsilon)
 		return {
 			...request,
 			candidates: [
@@ -1089,8 +641,8 @@ const materializeRequestFn = (
 
 	const candidates: EstimateWitness[] = [];
 	const diagnostics: EditorItemEstimateDiagnostic[] = [];
-	for (const topRoute of state.topology.routesByFact.get(request.factId) ?? []) {
-		const result = materializeCandidateFn(state, request.factId, request.quantity, topRoute);
+	for (const topRoute of policy.topology.routesByFact.get(request.factId) ?? []) {
+		const result = materializeCandidateFn(policy, request.factId, request.quantity, topRoute);
 		if (result.status === "success") candidates.push(result.witness);
 		else diagnostics.push(...result.diagnostics);
 	}
@@ -1106,6 +658,6 @@ export const materializeEstimateWitnessesFn = ({
 	requests,
 	topology,
 }: MaterializeEstimateWitnessesProps): ReadonlyArray<EstimateWitnessBatchEntry> => {
-	const state = createPolicyStateFn(topology);
-	return requests.map((request) => materializeRequestFn(state, request));
+	const policy = createEstimateRoutePolicyFn(topology);
+	return requests.map((request) => materializeRequestFn(policy, request));
 };

@@ -2,11 +2,11 @@ import { ListX, SearchX, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useLayoutEffect, useRef, type ReactNode } from "react";
 
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
-} from "~/item-detail-frame/ItemDetailMotion";
+} from "~/item-detail-frame/ui/ItemDetailMotion";
 import { ItemLineRow } from "~/item-line-detail/ui/ItemLineRow";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
@@ -160,7 +160,7 @@ export const ItemLinesTab = ({
 	readonly disabled?: boolean;
 	readonly initialQuery?: string;
 	readonly lines: Extract<
-		ItemDetailLines.Projection,
+		ItemDetailLinesProjection.Projection,
 		{
 			readonly kind: "available";
 		}

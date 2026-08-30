@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { Inventory } from "~/ui/inventory/Inventory";
-import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 
 /** Shared Inventory leaf with overlay-aware return behavior. */

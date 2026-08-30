@@ -1,15 +1,16 @@
 import { ArrowUpRight } from "lucide-react";
+import type { ComponentProps } from "react";
 
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
-import type { ItemDetailHeaderIdentityRenderProps } from "~/item-detail-frame/ItemDetailHeader";
+import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 
 /** Adds editor navigation around the shared gameplay Item Detail identity. */
 export const EditorBoardItemDetailLink = ({
 	children,
 	disabled,
 	itemId,
-}: ItemDetailHeaderIdentityRenderProps) => {
+}: ComponentProps<ItemDetailHeaderIdentityRenderer>) => {
 	const project = useEditorProject();
 	const item = project.config.items[itemId];
 	if (item === undefined) return children;

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-import type { ItemDetailState } from "~/item-detail-frame/ItemDetailControl";
+import type { ItemDetailState } from "~/item-detail-frame/type/ItemDetailControl";
 import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
 import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
 

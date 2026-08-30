@@ -2,16 +2,19 @@ import { AnimatePresence, motion } from "motion/react";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { ItemDetailReference } from "~/item-detail-frame/projectItemDetailReferenceFx";
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import type { ItemDetailReference } from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
-import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
-import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
-import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
-import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
+import {
+	itemDetailBadgeMotion,
+	itemDetailFadeMotion,
+} from "~/item-detail-frame/ui/ItemDetailMotion";
+import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
+import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
 
 interface ItemLineInputsWithdrawAction {
 	readonly disabled: boolean;
@@ -55,7 +58,7 @@ const MaterialInputWithdraw = ({
 }: {
 	readonly disabled: boolean;
 	readonly input: Extract<
-		ItemDetailLines.Input,
+		ItemDetailLinesProjection.Input,
 		{
 			readonly kind: "materials";
 		}
@@ -63,7 +66,6 @@ const MaterialInputWithdraw = ({
 	readonly lineId: string;
 	readonly ownerItemId: string;
 }) => {
-	const itemDetail = useItemDetailControl();
 	const pendingKey = JSON.stringify([
 		"line-input",
 		ownerItemId,
@@ -75,7 +77,6 @@ const MaterialInputWithdraw = ({
 		action: "withdraw",
 		failureMessage: "Inputs could not be withdrawn.",
 		pendingKey,
-		pendingOwner: itemDetail,
 		run: (game, command: withdrawLineInputFx.Props | withdrawLineInputsFx.Props) =>
 			game
 				.runFx(
@@ -119,7 +120,7 @@ export const ItemLineUnavailableWithdrawals = ({
 	withdraw,
 }: {
 	readonly disabled: boolean;
-	readonly input: readonly ItemDetailLines.Input[];
+	readonly input: readonly ItemDetailLinesProjection.Input[];
 	readonly lineId: string;
 	readonly ownerItemId: string;
 	readonly withdraw?: ItemLineInputsWithdrawAction;
@@ -128,7 +129,7 @@ export const ItemLineUnavailableWithdrawals = ({
 		(
 			candidate,
 		): candidate is Extract<
-			ItemDetailLines.Input,
+			ItemDetailLinesProjection.Input,
 			{
 				readonly kind: "materials";
 			}
@@ -187,7 +188,7 @@ const MaterialInputAutofillAvailability = ({
 }: {
 	readonly disabled: boolean;
 	readonly input: Extract<
-		ItemDetailLines.Input,
+		ItemDetailLinesProjection.Input,
 		{
 			readonly kind: "materials";
 		}
@@ -251,7 +252,7 @@ const inputSurfaceClassName = {
 } as const;
 
 const readItemLineInputStateFn = (
-	input: ItemDetailLines.Input,
+	input: ItemDetailLinesProjection.Input,
 ): keyof typeof inputSurfaceClassName =>
 	match(input)
 		.with(
@@ -291,7 +292,7 @@ const ItemLineInputRow = ({
 	suppressSurface,
 }: {
 	readonly disabled: boolean;
-	readonly input: ItemDetailLines.Input;
+	readonly input: ItemDetailLinesProjection.Input;
 	readonly lineId: string;
 	readonly ownerItemId: string;
 	readonly stale: boolean;
@@ -477,7 +478,7 @@ export const ItemLineInputs = ({
 	withdraw,
 }: {
 	readonly disabled: boolean;
-	readonly input: readonly ItemDetailLines.Input[];
+	readonly input: readonly ItemDetailLinesProjection.Input[];
 	readonly lineId: string;
 	readonly ownerItemId: string;
 	readonly stale?: boolean;

@@ -7,10 +7,10 @@ import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/DropItemResult";
-import { dropItemFx } from "~/item-interaction/write/dropItemFx";
+import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
+import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {

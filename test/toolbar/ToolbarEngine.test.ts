@@ -7,10 +7,10 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { readDropItemPreviewFx } from "~/item-interaction/read/readDropItemPreviewFx";
+import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { dropItemFx } from "~/item-interaction/write/dropItemFx";
-import { moveRuntimeItemForTestFx } from "~test/support/item-interaction/moveRuntimeItemForTestFx";
+import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
+import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
@@ -18,8 +18,8 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
-import { DropItemRejectedReason } from "~/item-interaction/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 
 const configInput = {
 	resources: {

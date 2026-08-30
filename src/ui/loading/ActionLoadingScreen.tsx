@@ -1,25 +1,76 @@
+import { useEffect, useState } from "react";
+
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { useController } from "~/ui/loading/useController";
+import { defaultLoadingMinimumDurationMs } from "~/ui/loading/defaultLoadingMinimumDurationMs";
 
 const pendingProgressTransitionMs = 220;
 const actionProgressViewTransitionName = "arkini-action-progress";
+const initialProgress = 12;
+const pendingStages = [
+	{
+		at: 0.08,
+		progress: 28,
+	},
+	{
+		at: 0.2,
+		progress: 46,
+	},
+	{
+		at: 0.38,
+		progress: 64,
+	},
+	{
+		at: 0.6,
+		progress: 78,
+	},
+	{
+		at: 0.82,
+		progress: 87,
+	},
+	{
+		at: 0.94,
+		progress: 94,
+	},
+] as const;
 
 export namespace ActionLoadingScreen {
-	export interface Props extends useController.Props {
+	export interface Props {
+		readonly completed?: boolean;
+		readonly durationMs?: number;
 		readonly label: string;
 	}
 }
 
-/** Presents one Action progress curve and keeps its terminal frame full until its owner settles. */
-export const ActionLoadingScreen = ({
-	completed,
-	durationMs,
-	label,
-}: ActionLoadingScreen.Props) => {
-	const controller = useController({
+const useProgress = (completed: boolean, durationMs: number) => {
+	const [progress, setProgress] = useState(completed ? 100 : initialProgress);
+
+	useEffect(() => {
+		if (completed) {
+			setProgress(100);
+			return;
+		}
+		setProgress(initialProgress);
+		const timers = pendingStages.map((stage) =>
+			window.setTimeout(() => setProgress(stage.progress), durationMs * stage.at),
+		);
+		return () => {
+			for (const timer of timers) window.clearTimeout(timer);
+		};
+	}, [
 		completed,
 		durationMs,
-	});
+	]);
+
+	return progress;
+};
+
+/** Presents one Action progress curve and keeps its terminal frame full until its owner settles. */
+export const ActionLoadingScreen = ({
+	completed = false,
+	durationMs = defaultLoadingMinimumDurationMs,
+	label,
+}: ActionLoadingScreen.Props) => {
+	const progress = useProgress(completed, durationMs);
 	return (
 		<LauncherScene
 			compactHero
@@ -42,7 +93,7 @@ export const ActionLoadingScreen = ({
 						className="size-full origin-left rounded-full bg-accent transition-transform ease-out"
 						data-ui="ActionLoadingScreenProgressFill"
 						style={{
-							transform: `scaleX(${controller.progress / 100})`,
+							transform: `scaleX(${progress / 100})`,
 							transitionDuration: `${pendingProgressTransitionMs}ms`,
 						}}
 					/>

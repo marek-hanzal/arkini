@@ -189,6 +189,21 @@ module.exports = {
 				],
 			},
 		},
+		{
+			name: "electron-contract-is-pure",
+			comment:
+				"The shared Electron contract owns schemas, transport types, and channel names without importing application or Electron runtime implementation.",
+			severity: "error",
+			from: {
+				path: electronContractPattern,
+			},
+			to: {
+				path: "^(?:src|electron)(?:/|$)|^node_modules/electron(?:/|$)",
+				pathNot: [
+					electronContractPattern,
+				],
+			},
+		},
 	],
 	options: {
 		doNotFollow: {

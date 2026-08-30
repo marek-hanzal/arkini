@@ -4,7 +4,7 @@ import { afterEach, beforeEach, vi } from "vitest";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 
@@ -349,7 +349,7 @@ vi.mock("~/ui/pixi/appearance/readScenePaletteFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/readTileActorsFx", () => ({
+vi.mock("~/tile-presentation/fx/readTileActorsFx", () => ({
 	readTileActorsFx: () => ({
 		type: "tile-actors",
 	}),

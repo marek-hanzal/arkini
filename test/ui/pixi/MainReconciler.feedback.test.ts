@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
 import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 
 import {

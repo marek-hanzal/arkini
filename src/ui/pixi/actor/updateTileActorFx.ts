@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Rectangle } from "pixi.js";
 import { match } from "ts-pattern";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { readParticleLightSurfaceFn } from "~/ui/pixi/appearance/fn/readParticleLightSurfaceFn";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";

@@ -1,8 +1,8 @@
 import { match, P } from "ts-pattern";
 
-import type { GameTransition } from "~/renderer/game/session/GameSession";
-import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
+import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
@@ -10,7 +10,9 @@ import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
  * Compiles exact committed facts into actor-local feedback without leaking choreography into the
  * engine event vocabulary.
  */
-export const readTileActorFeedbackCuesFn = (transition: GameTransition): TileActorFeedbackCue[] => {
+export const readTileActorFeedbackCuesFn = (
+	transition: CommittedTransitionSchema.Type,
+): TileActorFeedbackCue[] => {
 	const depletedActorIds = new Set(
 		transition.events.flatMap((event) =>
 			event.type === GameEventEnumSchema.enum.ItemDepleted

@@ -1,24 +1,20 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { TileActorVisual } from "~/ui/pixi/actor/TileActorVisual";
+import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-
-export namespace readTileActorVisualFx {
-	export interface Props {
-		readonly game: GameEngine;
-		readonly item: ItemSchema.Type;
-		readonly sourceIds?: AssetSchema.Type["default"];
-	}
-}
 
 /** Projects the immutable face of one canonical item for retained renderer motion. */
 export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function* ({
 	game,
 	item,
 	sourceIds: requestedSourceIds,
-}: readTileActorVisualFx.Props) {
+}: {
+	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly item: ItemSchema.Type;
+	readonly sourceIds?: AssetSchema.Type["default"];
+}) {
 	const sourceIds = requestedSourceIds ?? item.asset.default;
 	return {
 		itemId: item.id,

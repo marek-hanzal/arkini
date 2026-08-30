@@ -1,5 +1,5 @@
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 interface TileMotionCueBase {
 	readonly sequence: number;

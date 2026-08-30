@@ -9,7 +9,7 @@ import {
 	Texture,
 } from "pixi.js";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 

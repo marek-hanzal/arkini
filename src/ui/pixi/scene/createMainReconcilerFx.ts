@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
-import { readTileActorFeedbackCuesFn } from "~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn";
-import { readCommittedTileReplacementsFx } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
-import { readCommittedTileSwapMotionCueFn } from "~/ui/pixi/motion/fn/readCommittedTileSwapMotionCueFn";
-import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
-import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
+import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
+import { readTileActorFeedbackCuesFn } from "~/tile-presentation/fn/readTileActorFeedbackCuesFn";
+import { readCommittedTileReplacementsFx } from "~/tile-presentation/fx/readCommittedTileReplacementsFx";
+import { readCommittedTileSwapMotionCueFn } from "~/tile-presentation/fn/readCommittedTileSwapMotionCueFn";
+import { readTileMotionCuesFx } from "~/tile-presentation/fx/readTileMotionCuesFx";
+import { readTileActorsFx } from "~/tile-presentation/fx/readTileActorsFx";
 import { readTileDeliveriesFx } from "~/ui/pixi/delivery/readTileDeliveriesFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";

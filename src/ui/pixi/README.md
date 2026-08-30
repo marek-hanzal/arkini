@@ -1,12 +1,13 @@
 # Pixi renderer map
 
-Pixi is Arkini's retained gameplay presentation owner. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
+Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns the semantic actor, feedback, replacement, and committed-motion projections it consumes. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
 
 ## Owners
 
 | Area | Owner |
 | --- | --- |
 | Canvas, resize, demand rendering | `runtime/createApplicationOwnerFx.ts` |
+| Semantic actors, feedback, replacements, motion intents | `src/tile-presentation/{type,fn,fx}` |
 | Surface geometry, layers, masks, feedback | `scene/*Surface*` and `layout/` |
 | Retained identity within one canvas | `actor/*ActorStore*` |
 | Canonical reconciliation | `scene/createMainReconcilerFx.ts` |
@@ -49,13 +50,14 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Change | Start at |
 | --- | --- |
 | Scene composition/teardown | `scene/create*RuntimeFx.ts` |
-| Actor identity/appearance | `actor/` + main reconciler |
+| Actor identity/appearance | `src/tile-presentation` + `actor/` + main reconciler |
 | Click/drag/drop | `drag/` + `drop/` |
-| Spawn/swap/stack/replacement cues | `motion/` |
+| Spawn/swap/stack/replacement cue projection | `src/tile-presentation` |
+| Cue execution and interpolation | `motion/` |
 | Autofill delivery | `delivery/`; canonical behavior is `production-delivery/` + Tick |
 | Inventory handoff | `PixiInventorySurface.tsx` + main Inventory opener |
 | Geometry/hit testing | `scene/*Surface*`, `layout/`, `grid/` |
 | Magnetic response | `magnet/` |
 | Frame/interpolation | `runtime/` + `animation/` |
 
-Focused Pixi tests live under `test/ui/pixi`.
+Focused semantic projection tests live under `test/tile-presentation`; retained Pixi execution tests live under `test/ui/pixi`.

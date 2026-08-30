@@ -1,4 +1,4 @@
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 export const item = {
 	id: "runtime:water",

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { TileInputMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileInputMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";

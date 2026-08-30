@@ -1,10 +1,10 @@
 import { Effect, Option } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
-import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
-import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
+import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
+import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -98,7 +98,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 		const visual = yield* readTileActorVisualFx({
 			game,
 			item: current.item,
-			sourceIds: yield* readTileActorAssetSourceIdsFx({
+			sourceIds: readTileActorAssetSourceIdsFn({
 				item: current,
 				runtime,
 			}),

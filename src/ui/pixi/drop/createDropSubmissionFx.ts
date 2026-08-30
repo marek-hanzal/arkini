@@ -6,7 +6,7 @@ import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";

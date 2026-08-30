@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { PixiBoardToolbarSurface } from "~/ui/pixi/PixiBoardToolbarSurface";
 import type { createMainRuntimeFx } from "~/ui/pixi/scene/createMainRuntimeFx";
 

@@ -1,8 +1,8 @@
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { GameTransition } from "~/renderer/game/session/GameSession";
-import type { TileSwapMotionCue } from "~/ui/pixi/motion/TileMotionCue";
-import { readGridRuntimeItemFn } from "~/ui/pixi/motion/fn/readGridRuntimeItemFn";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
+import type { TileSwapMotionCue } from "~/tile-presentation/type/TileMotionCue";
+import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeItemFn";
 
 interface CapturedTileSwapActor {
 	readonly id: string;
@@ -10,20 +10,16 @@ interface CapturedTileSwapActor {
 	readonly location: GridLocationSchema.Type;
 }
 
-export namespace readCommittedTileSwapMotionCueFn {
-	export interface Props {
-		readonly source: CapturedTileSwapActor;
-		readonly target: CapturedTileSwapActor;
-		readonly transition: GameTransition;
-	}
-}
-
 /** Compiles the exchanged target only when one transition exactly commits both captured actors. */
 export const readCommittedTileSwapMotionCueFn = ({
 	source,
 	target,
 	transition,
-}: readCommittedTileSwapMotionCueFn.Props) => {
+}: {
+	readonly source: CapturedTileSwapActor;
+	readonly target: CapturedTileSwapActor;
+	readonly transition: CommittedTransitionSchema.Type;
+}) => {
 	const previousSource = readGridRuntimeItemFn({
 		itemId: source.id,
 		runtime: transition.previousRuntime,

@@ -1,8 +1,8 @@
 import type { Effect } from "effect";
 
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 
 export interface SwapCandidate {
 	readonly source: {

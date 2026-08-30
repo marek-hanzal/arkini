@@ -1,4 +1,4 @@
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 
 interface ReadUnsettledTileInputSourceQuantitiesProps {
 	readonly cues: ReadonlyArray<TileMotionCue>;

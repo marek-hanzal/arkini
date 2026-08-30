@@ -24,25 +24,23 @@ type ProjectedWork<
 	readonly identity?: ItemDetailReference;
 };
 
-export namespace projectItemDetailQueueFx {
-	export interface Props {
-		readonly game: GameEngine;
-		readonly itemId: IdSchema.Type;
-		readonly runtime: RuntimeSchema.Type;
-	}
-
-	export type Result =
-		| {
-				readonly kind: "available";
-				readonly itemId: EngineQueue["itemId"];
-				readonly capacity: EngineQueue["capacity"];
-				readonly active: readonly ProjectedWork<EngineQueue["active"][number]>[];
-				readonly request: readonly ProjectedWork<EngineQueue["request"][number]>[];
-		  }
-		| {
-				readonly kind: "unavailable";
-		  };
+interface Props {
+	readonly game: GameEngine;
+	readonly itemId: IdSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
 }
+
+type Result =
+	| {
+			readonly kind: "available";
+			readonly itemId: EngineQueue["itemId"];
+			readonly capacity: EngineQueue["capacity"];
+			readonly active: readonly ProjectedWork<EngineQueue["active"][number]>[];
+			readonly request: readonly ProjectedWork<EngineQueue["request"][number]>[];
+	  }
+	| {
+			readonly kind: "unavailable";
+	  };
 
 const projectWorkIdentityFx = Effect.fn("projectItemDetailQueueWorkIdentityFx")(function* <
 	Work extends {
@@ -81,7 +79,7 @@ export const projectItemDetailQueueFx = Effect.fn("projectItemDetailQueueFx")(fu
 	game,
 	itemId,
 	runtime,
-}: projectItemDetailQueueFx.Props) {
+}: Props) {
 	const queue = yield* readItemDetailQueueFx({
 		itemId,
 		runtime,
@@ -89,7 +87,7 @@ export const projectItemDetailQueueFx = Effect.fn("projectItemDetailQueueFx")(fu
 	if (queue.kind === "unavailable") {
 		return {
 			kind: "unavailable",
-		} satisfies projectItemDetailQueueFx.Result;
+		} satisfies Result;
 	}
 	const [active, request] = yield* Effect.all([
 		Effect.all(
@@ -117,5 +115,5 @@ export const projectItemDetailQueueFx = Effect.fn("projectItemDetailQueueFx")(fu
 		capacity: queue.capacity,
 		active,
 		request,
-	} satisfies projectItemDetailQueueFx.Result;
+	} satisfies Result;
 });

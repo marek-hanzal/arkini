@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
+import type { readItemDetailInfoFn } from "~/engine/item-detail/fn/readItemDetailInfoFn";
 import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 import { Fact, FactList } from "~/ui/fact/FactList";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
@@ -9,7 +9,7 @@ const LocationInfoFact = ({
 	location,
 }: {
 	readonly location: Extract<
-		useItemDetailInfo.Projection,
+		readItemDetailInfoFn.Result,
 		{
 			readonly kind: "available";
 		}
@@ -71,7 +71,7 @@ export const ItemInfoTab = ({
 	stale = false,
 }: {
 	readonly info: Extract<
-		useItemDetailInfo.Projection,
+		readItemDetailInfoFn.Result,
 		{
 			readonly kind: "available";
 		}

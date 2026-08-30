@@ -1,6 +1,6 @@
 # Pixi renderer map
 
-Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns semantic actor projections, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution against exact Pixi capabilities. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
+Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns semantic actor projections, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution against exact Pixi capabilities. The engine remains gameplay truth; React owns routes, pages, and menus, while `src/item-detail` owns Item Detail dialog composition. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
 
 ## Owners
 

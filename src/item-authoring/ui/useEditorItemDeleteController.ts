@@ -8,9 +8,9 @@ import { useCallback, useMemo, useState } from "react";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
-import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
-import { deleteEditorItemFx } from "~/item-authoring/ui/deleteEditorItemFx";
+import { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorItemFx";
+import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
+import { deleteEditorItemFx } from "~/item-authoring/fx/deleteEditorItemFx";
 import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
@@ -27,28 +27,26 @@ const deleteEditorItemCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-export namespace useEditorItemDeleteController {
-	export interface Props {
-		readonly item: ItemSchema.Type;
-	}
+interface UseEditorItemDeleteControllerProps {
+	readonly item: ItemSchema.Type;
+}
 
-	export interface Output {
-		readonly blockers: ReadonlyArray<readEditorItemDeleteBlockersFn.Blocker>;
-		readonly cancel: () => void;
-		readonly confirm: () => Promise<void>;
-		readonly confirming: "safe" | "force" | null;
-		readonly deleting: boolean;
-		readonly error: unknown;
-		readonly forceImpact: forceDeleteEditorItemFx.Impact;
-		readonly open: (force: boolean) => void;
-		readonly project: ReturnType<typeof useEditorProject>;
-	}
+interface UseEditorItemDeleteControllerOutput {
+	readonly blockers: ReadonlyArray<readEditorItemDeleteBlockersFn.Blocker>;
+	readonly cancel: () => void;
+	readonly confirm: () => Promise<void>;
+	readonly confirming: "safe" | "force" | null;
+	readonly deleting: boolean;
+	readonly error: unknown;
+	readonly forceImpact: forceDeleteEditorItemFx.Impact;
+	readonly open: (force: boolean) => void;
+	readonly project: ReturnType<typeof useEditorProject>;
 }
 
 /** Owns item-delete eligibility, confirmation, persistence, and terminal navigation. */
 export const useEditorItemDeleteController = ({
 	item,
-}: useEditorItemDeleteController.Props): useEditorItemDeleteController.Output => {
+}: UseEditorItemDeleteControllerProps): UseEditorItemDeleteControllerOutput => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
 	const historyBack = useEditorHistoryBack();

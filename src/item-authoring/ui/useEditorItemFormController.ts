@@ -10,15 +10,15 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import {
 	EditorItemFormSchema,
 	type EditorItemFormValues,
-} from "~/item-authoring/ui/EditorItemFormSchema";
+} from "~/item-authoring/schema/EditorItemFormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { saveEditorItemFx } from "~/item-authoring/ui/saveEditorItemFx";
+import { saveEditorItemFx } from "~/item-authoring/fx/saveEditorItemFx";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type {
 	EditorItemOptionalCapability,
 	EditorItemSectionId,
-} from "~/item-authoring/ui/EditorItemSections";
-import { readEditorItemSectionForPathFn } from "~/item-authoring/ui/fn/readEditorItemSectionForPathFn";
+} from "~/item-authoring/type/EditorItemSection";
+import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorItemSectionForPathFn";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
@@ -37,13 +37,11 @@ const saveEditorItemCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-export namespace useEditorItemFormController {
-	export interface Props {
-		readonly enableCapability?: EditorItemOptionalCapability;
-		readonly initialItem: ItemSchema.Type;
-		readonly onInvalidSection: (section: EditorItemSectionId) => void | Promise<void>;
-		readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
-	}
+interface UseEditorItemFormControllerProps {
+	readonly enableCapability?: EditorItemOptionalCapability;
+	readonly initialItem: ItemSchema.Type;
+	readonly onInvalidSection: (section: EditorItemSectionId) => void | Promise<void>;
+	readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
 }
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
@@ -52,7 +50,7 @@ export const useEditorItemFormController = ({
 	initialItem,
 	onInvalidSection,
 	onSaved,
-}: useEditorItemFormController.Props) => {
+}: UseEditorItemFormControllerProps) => {
 	const project = useEditorProject();
 	const canonicalItem = useMemo<EditorItemFormValues>(
 		() => ({
@@ -223,5 +221,3 @@ export const useEditorItemFormController = ({
 		save,
 	} as const;
 };
-
-export type EditorItemFormController = ReturnType<typeof useEditorItemFormController>;

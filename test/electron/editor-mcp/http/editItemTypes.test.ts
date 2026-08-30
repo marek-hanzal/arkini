@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,

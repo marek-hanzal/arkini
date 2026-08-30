@@ -13,9 +13,9 @@ import { EditorItemProductionDetail } from "~/item-authoring/ui/EditorItemProduc
 import {
 	type EditorItemSectionId,
 	EditorItemSectionIds,
-} from "~/item-authoring/ui/EditorItemSections";
+} from "~/item-authoring/type/EditorItemSection";
 import { EditorSpaceActionDetail } from "~/item-authoring/ui/EditorSpaceActionDetail";
-import { readEditorItemSectionsFn } from "~/item-authoring/ui/fn/readEditorItemSectionsFn";
+import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
 import { useEditorItemByUid } from "~/item-authoring/ui/useEditorItemByUid";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({

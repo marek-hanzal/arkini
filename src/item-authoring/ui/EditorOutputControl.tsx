@@ -9,7 +9,7 @@ import { useEditorItemOptionLabel } from "~/item-authoring/ui/useEditorItemOptio
 const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
-export interface EditorOutputControlProps {
+interface EditorOutputControlProps {
 	readonly onChange: (output: OutputSchema.Type | undefined) => void;
 	readonly value: OutputSchema.Type;
 }

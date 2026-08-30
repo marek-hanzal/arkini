@@ -4,7 +4,7 @@ import {
 	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 } from "~/authoring-shell/ui/EditorSectionTabs";
-import type { EditorItemSectionDescriptor } from "~/item-authoring/ui/EditorItemSections";
+import type { EditorItemSectionDescriptor } from "~/item-authoring/type/EditorItemSection";
 
 const activeProps = {
 	"aria-selected": true,

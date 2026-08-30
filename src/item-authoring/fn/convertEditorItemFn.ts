@@ -1,4 +1,4 @@
-import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";

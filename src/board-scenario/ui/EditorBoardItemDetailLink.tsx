@@ -5,7 +5,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 
-/** Adds editor navigation around the shared gameplay Item Detail identity. */
+/** Adds Editor navigation around the shared gameplay Item Detail identity. */
 export const EditorBoardItemDetailLink = ({
 	children,
 	disabled,

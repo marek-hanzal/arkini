@@ -7,7 +7,6 @@ import { removeCheatItemFx as removeEngineCheatItemFx } from "~/engine/cheat/wri
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
@@ -42,6 +41,7 @@ interface Props {
 	readonly animator: ActorAnimator;
 	readonly application: PixiApplicationOwner;
 	readonly cursorGrab: CursorGrabMotion;
+	readonly dragThreshold: number;
 	readonly dropSubmission: DropSubmission;
 	readonly game: GameEngine;
 	readonly magneticField: MagneticField;
@@ -504,6 +504,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	animator,
 	application,
 	cursorGrab,
+	dragThreshold,
 	dropSubmission,
 	game,
 	magneticField,
@@ -755,7 +756,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			return;
 		}
 		thresholdCrossed =
-			Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= PointerDragThreshold;
+			Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= dragThreshold;
 	};
 
 	const recoverPointerFailure = (cause: unknown, fallbackDrag?: ActiveDrag) => {

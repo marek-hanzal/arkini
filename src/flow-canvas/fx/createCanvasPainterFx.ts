@@ -16,7 +16,10 @@ import {
 } from "~/flow-layout/fn/readNodeMetricsFn";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 import type { Viewport } from "~/flow-canvas/type/Viewport";
-import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+
+type ItemTypeLabels = Readonly<
+	Record<Exclude<EditorItemOriginItemNode["type"], "missing">, string>
+>;
 
 const MaxCachedImages = 96;
 
@@ -370,6 +373,7 @@ const createDrawItemNode =
 	(
 		FlowTextPainter: Effect.Success<ReturnType<typeof createCanvasTextPainterFx>>,
 		FlowArtworkPainter: Effect.Success<ReturnType<typeof createCanvasArtworkPainterFx>>,
+		itemTypeLabels: ItemTypeLabels,
 	) =>
 	(
 		context: CanvasRenderingContext2D,
@@ -467,7 +471,7 @@ const createDrawItemNode =
 				? `Starter: ${node.starterScopes.join(", ")}`
 				: node.type === "missing"
 					? "Missing item"
-					: ItemTypeLabel[node.type];
+					: itemTypeLabels[node.type];
 		context.fillText(
 			FlowTextPainter.fitText(context, label.toUpperCase(), maxTextWidth),
 			textX,
@@ -578,11 +582,13 @@ const createDrawItemNode =
 	};
 
 /** Creates the token-aware Canvas painter for editor origin-flow item nodes. */
-const createCanvasNodePainterFx = Effect.fn("createCanvasNodePainterFx")(function* () {
+const createCanvasNodePainterFx = Effect.fn("createCanvasNodePainterFx")(function* (
+	itemTypeLabels: ItemTypeLabels,
+) {
 	const FlowTextPainter = yield* createCanvasTextPainterFx();
 	const FlowArtworkPainter = yield* createCanvasArtworkPainterFx();
 	return {
-		drawItemNode: createDrawItemNode(FlowTextPainter, FlowArtworkPainter),
+		drawItemNode: createDrawItemNode(FlowTextPainter, FlowArtworkPainter, itemTypeLabels),
 	} as const;
 });
 
@@ -777,8 +783,12 @@ const createCanvasRoutePainterFx = Effect.fn("createCanvasRoutePainterFx")(() =>
 );
 
 /** Assembles the Canvas node, route, and visual-emphasis painters. */
-export const createCanvasPainterFx = Effect.fn("createCanvasPainterFx")(function* () {
-	const nodePainter = yield* createCanvasNodePainterFx();
+export const createCanvasPainterFx = Effect.fn("createCanvasPainterFx")(function* ({
+	itemTypeLabels,
+}: {
+	readonly itemTypeLabels: ItemTypeLabels;
+}) {
+	const nodePainter = yield* createCanvasNodePainterFx(itemTypeLabels);
 	const palette = yield* createCanvasPaletteFx();
 	const routePainter = yield* createCanvasRoutePainterFx();
 	const highlight = yield* createCanvasHighlightFx();

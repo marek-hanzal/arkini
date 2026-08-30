@@ -609,6 +609,7 @@ export const mountScene = async ({
 	document.body.append(host);
 	const runtime = await Effect.runPromise(
 		createInventoryRuntimeFx({
+			dragThreshold: 6,
 			game,
 			host,
 			onActivate,

@@ -4,6 +4,7 @@ const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
 const fnOperationPattern = "^src/[^\\n]*(?:/fn/|Fn[.]tsx?$)";
 const fxOperationPattern = "^src/[^\\n]*(?:/fx/|Fx[.]tsx?$)";
+const uiModulePattern = "^src/(?:ui|[^\\n]*/ui)(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -136,6 +137,23 @@ module.exports = {
 				dependencyTypesNot: [
 					"type-only",
 				],
+			},
+		},
+		{
+			name: "non-ui-does-not-import-ui",
+			comment:
+				"UI consumes non-UI providers. Modules outside UI and application composition never import UI implementation.",
+			severity: "error",
+			from: {
+				path: activeCodePattern,
+				pathNot: [
+					uiModulePattern,
+					"^src/@routes(?:/|$)",
+					applicationEntrypointPattern,
+				],
+			},
+			to: {
+				path: uiModulePattern,
 			},
 		},
 	],

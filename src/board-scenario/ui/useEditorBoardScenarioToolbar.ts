@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { EditorBoardScenarioCommandAtoms } from "~/board-scenario/toolbar/EditorBoardScenarioCommandAtoms";
+import { EditorBoardScenarioCommandAtoms } from "~/board-scenario/atom/EditorBoardScenarioCommandAtoms";
 import type { EditorBoardScenarioDescriptorSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 
 const editorBoardScenarioDraftOptionId = "editor-board-scenario:draft";

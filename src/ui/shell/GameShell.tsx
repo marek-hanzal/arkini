@@ -1,14 +1,16 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import { type PropsWithChildren, type ReactNode, useEffect } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { usePackageGameEngine } from "~/ui/game/usePackageGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
-import { ItemDetailHigherOwnerGuard } from "~/item-detail-frame/ItemDetailHigherOwnerGuard";
-import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ItemDetailHeader";
+import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
+import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
+import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
+import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
-import { ItemDetailProvider } from "~/item-detail-frame/ItemDetailProvider";
+import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 
@@ -16,6 +18,32 @@ type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscre
 
 const gameBoardViewTransitionName = "arkini-game-board";
 const editorGameBoardViewTransitionName = "arkini-editor-game-board";
+
+/** Keeps the shell's higher overlay from competing with its owned Item Detail. */
+const ItemDetailOverlayPrecedence = () => {
+	const gameMenu = useGameMenuControl();
+	const itemDetail = useItemDetailControl();
+	const closeItemDetail = useCloseItemDetail();
+
+	useEffect(() => {
+		if (
+			gameMenu.phase === "closed" ||
+			gameMenu.phase === "exiting" ||
+			itemDetail.state.phase === "closed"
+		) {
+			return;
+		}
+		closeItemDetail({
+			restoreFocus: false,
+		});
+	}, [
+		closeItemDetail,
+		gameMenu.phase,
+		itemDetail.state.phase,
+	]);
+
+	return null;
+};
 
 const GameSceneBackdrop = ({
 	routePresentation,
@@ -83,7 +111,7 @@ const GameShellLayers = ({
 		<>
 			<ItemDetailProvider game={game}>
 				<PixiGameProvider>
-					<ItemDetailHigherOwnerGuard />
+					<ItemDetailOverlayPrecedence />
 					<GameTileScene routePresentation={routePresentation}>{children}</GameTileScene>
 					<ItemDetailModal
 						renderIdentity={itemDetailIdentityRenderer}
@@ -100,7 +128,8 @@ const GameShellLayers = ({
  * React owner for route composition, focusable overlays and their precedence
  * across Board/Inventory navigation. The provider order is intentional: Item
  * Detail stays attached to the renderer scene, while Game Menu is the higher
- * interaction owner and dismisses Detail through ItemDetailHigherOwnerGuard.
+ * interaction owner and the shell dismisses Detail before both overlays can
+ * compete for focus.
  *
  * Gameplay remains outside this shell. Pixi surfaces present canonical game
  * projections and issue commands; neither React nor Pixi may infer committed

@@ -117,7 +117,7 @@ vi.mock("~/space-action/write/activateSpaceItemFx", () => ({
 		),
 }));
 
-vi.mock("~/item-detail-frame/useItemDetailControl", () => ({
+vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		openItemDetailFx: (props: unknown) =>
 			Effect.sync(() => {

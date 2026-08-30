@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 
 import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import { useItemDefinitionDetail } from "~/ui/item-detail/useItemDefinitionDetail";
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { useItemDetailIdentity } from "~/ui/item-detail/useItemDetailIdentity";
 import { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
 import { useItemDetailLines } from "~/item-line-detail/ui/useItemDetailLines";
@@ -21,18 +21,18 @@ import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import {
 	ItemDetailHeader,
 	type ItemDetailHeaderIdentityRenderer,
-} from "~/item-detail-frame/ItemDetailHeader";
-import type { ItemDetailState, ItemDetailTarget } from "~/item-detail-frame/ItemDetailControl";
+} from "~/item-detail-frame/ui/ItemDetailHeader";
+import type { ItemDetailState, ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
 import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
-import { useCloseItemDetail } from "~/item-detail-frame/useCloseItemDetail";
-import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
+import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
+import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
 import { useItemDetailMotion } from "~/ui/item-detail/useItemDetailMotion";
-import { useRetainedItemDetailProjection } from "~/item-detail-frame/useRetainedItemDetailProjection";
+import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";
 
 const transition = {
 	duration: 0.22,
@@ -163,7 +163,7 @@ const ItemLinesContent = ({
 	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly initialQuery?: string;
-	readonly lines?: ItemDetailLines.Projection;
+	readonly lines?: ItemDetailLinesProjection.Projection;
 	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale: boolean;
 }) => {
@@ -270,7 +270,7 @@ const ItemDetailContent = ({
 	readonly identity?: useItemDetailIdentity.Projection;
 	readonly info?: useItemDetailInfo.Projection;
 	readonly linesSearchQuery?: string;
-	readonly lines?: ItemDetailLines.Projection;
+	readonly lines?: ItemDetailLinesProjection.Projection;
 	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly sources?: useItemDetailSources.Projection;
 	readonly stale: boolean;

@@ -82,6 +82,15 @@ describe("estimateEditorItemsFn", () => {
 				routeId: "make-target",
 			},
 		});
+		if (!result.obtainable) throw new Error("Expected shared co-product route.");
+		expect(
+			result.requirementSummary.consumed.filter(({ factId }) => factId === "fuel"),
+		).toEqual([
+			{
+				factId: "fuel",
+				quantity: 1,
+			},
+		]);
 	});
 
 	it("compares locally cheap co-product routes by their joint critical path", () => {

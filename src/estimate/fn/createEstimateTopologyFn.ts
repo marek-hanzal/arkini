@@ -6,7 +6,7 @@ import type {
 	EditorAcquisitionRoute,
 } from "~/flow/type/EditorAcquisitionGraph";
 
-export interface EstimateRouteRequirements {
+interface EstimateRouteRequirements {
 	readonly allOf: ReadonlyArray<EditorAcquisitionRequirement>;
 	readonly anyOf: ReadonlyArray<ReadonlyArray<EditorAcquisitionRequirement>>;
 }

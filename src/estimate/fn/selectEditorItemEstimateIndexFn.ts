@@ -8,7 +8,7 @@ import type { EditorItemEstimateSortSchema } from "~/estimate/schema/EditorItemE
 import { searchEditorItemsFn } from "~/item-authoring/fn/searchEditorItemsFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
-const compareRuntime = (
+const compareRuntimeFn = (
 	left: number | undefined,
 	right: number | undefined,
 	direction: EditorItemEstimateSortSchema.Type,
@@ -54,7 +54,7 @@ export const selectEditorItemEstimateIndexFn = ({
 			(left, right) =>
 				(sort === "demand"
 					? right.estimate.demand - left.estimate.demand
-					: compareRuntime(left.estimate.runtimeMs, right.estimate.runtimeMs, sort)) ||
+					: compareRuntimeFn(left.estimate.runtimeMs, right.estimate.runtimeMs, sort)) ||
 				Order.String(left.item.title, right.item.title),
 		);
 };

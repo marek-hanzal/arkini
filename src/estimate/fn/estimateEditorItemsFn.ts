@@ -7,6 +7,7 @@ import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
 } from "~/estimate/type/EditorItemEstimate";
+import type { EstimateWitness } from "~/estimate-witness/type/EstimateWitness";
 import type { EditorAcquisitionGraph } from "~/flow/type/EditorAcquisitionGraph";
 
 interface EstimateEditorItemsProps {
@@ -47,7 +48,7 @@ const makeEstimateFn = ({
 	readonly factId: string;
 	readonly graph: EditorAcquisitionGraph;
 	readonly quantity: number;
-	readonly witnesses: ReturnType<typeof materializeEstimateWitnessesFn>[number]["candidates"];
+	readonly witnesses: ReadonlyArray<EstimateWitness>;
 }): EditorItemEstimate => {
 	const uniqueDiagnostics = uniqueDiagnosticsFn(diagnostics);
 	const searchExhausted = uniqueDiagnostics.some(

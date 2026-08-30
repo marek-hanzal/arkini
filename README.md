@@ -31,6 +31,8 @@ src/game-start  initial-state schemas, exact placement planning and atomic runti
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-line-detail  line-detail reads, board/stored projections, inputs/outputs/autofill and Item Lines presentation
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
+src/tile-presentation  semantic tile actors, feedback, replacements and committed motion projection
+src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
 src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
@@ -62,7 +64,7 @@ src/estimate  static Estimate domain, projections, cache and worker
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
 src/renderer  installed Game, launcher/window, resource-validation and transport capabilities
-src/ui        cross-product primitives and reusable React/Pixi presentation
+src/ui        cross-product primitives plus retained React and Pixi scene execution
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

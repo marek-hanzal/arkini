@@ -13,11 +13,11 @@ import { startRemainderFeedbackFx } from "~/ui/pixi/animation/startRemainderFeed
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { DeliveryRuntime } from "~/ui/pixi/delivery/DeliveryRuntime";
 import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
-import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
-import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
-import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
-import { flashMotionTargetFx } from "~/ui/pixi/motion/flashMotionTargetFx";
-import { makeLiveContactPoseReaderFx } from "~/ui/pixi/motion/makeLiveContactPoseReaderFx";
+import type { MagneticField } from "~/tile-motion/service/MagneticField";
+import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
+import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";
+import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
+import { flashMotionTargetFx } from "~/tile-motion/fx/flashMotionTargetFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
@@ -81,7 +81,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 	surface,
 	textures,
 }: createDeliveryRuntimeFx.Props) {
-	const readLiveContactPose = yield* makeLiveContactPoseReaderFx();
+	const readLiveContactPose = yield* createLiveContactPoseReaderFx();
 	const activeByItemId = new Map<string, ActiveDelivery>();
 	let closed = false;
 

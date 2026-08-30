@@ -1,6 +1,6 @@
 # Pixi renderer map
 
-Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns the semantic actor, feedback, replacement, and committed-motion projections it consumes. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
+Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns the semantic actor, feedback, replacement, and committed-motion projections; `src/tile-motion` owns deterministic playback policy and lifecycle over exact Pixi capabilities. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
 
 ## Owners
 
@@ -14,7 +14,7 @@ Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns 
 | Pointer gesture and frozen release facts | `drag/*DragController*` |
 | Drop submission/presentation | `drop/` |
 | Engine-delivery presentation | `delivery/` |
-| Cue sequencing and handoffs | `motion/createMotionRuntimeFx.ts` |
+| Cue lanes, choreography, magnetic response and handoffs | `src/tile-motion/{service,type,fn,fx}` |
 | Interpolation/springs | `animation/createAnimationDriverFx.ts` |
 | Typed actor-channel writes | `animation/createActorAnimatorFx.ts` |
 
@@ -22,7 +22,7 @@ Main and Inventory actors are separate because display objects cannot cross canv
 
 ## Flows
 
-- Committed transition: game projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → motion/animation channels → demand-frame invalidation.
+- Committed transition: game projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → Tile Motion lanes/choreography → animation channels → demand-frame invalidation.
 - Pointer gesture: fresh engine preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
@@ -53,11 +53,11 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Actor identity/appearance | `src/tile-presentation` + `actor/` + main reconciler |
 | Click/drag/drop | `drag/` + `drop/` |
 | Spawn/swap/stack/replacement cue projection | `src/tile-presentation` |
-| Cue execution and interpolation | `motion/` |
+| Cue execution and playback lifecycle | `src/tile-motion` |
 | Autofill delivery | `delivery/`; canonical behavior is `production-delivery/` + Tick |
 | Inventory handoff | `PixiInventorySurface.tsx` + main Inventory opener |
 | Geometry/hit testing | `scene/*Surface*`, `layout/`, `grid/` |
-| Magnetic response | `magnet/` |
+| Magnetic response | `src/tile-motion` |
 | Frame/interpolation | `runtime/` + `animation/` |
 
-Focused semantic projection tests live under `test/tile-presentation`; retained Pixi execution tests live under `test/ui/pixi`.
+Focused semantic projection tests live under `test/tile-presentation`; playback policy and lifecycle tests live under `test/tile-motion`; retained Pixi scene-integration tests live under `test/ui/pixi`.

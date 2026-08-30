@@ -5,11 +5,11 @@ import { Data, Effect, type Semaphore } from "effect";
 
 import { ArkpackLimits } from "../../../../../shared/ArkpackLimits";
 import type { ProjectState } from "../ProjectState";
-import type { EditorBuildRepositoryService } from "~/editor-build/domain/EditorBuildRepository";
+import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
-} from "~/editor-build/domain/EditorProjectBuildSchema";
+} from "~/editor-build/schema/EditorProjectBuildSchema";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { packDirectoryFx } from "~/arkpack/artifact/fx/packDirectoryFx";
 import { readArkpackContentHashFx } from "~/arkpack/artifact/fx/readArkpackContentHashFx";

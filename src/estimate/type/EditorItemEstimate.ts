@@ -11,7 +11,7 @@ export interface EditorItemEstimateAmount {
 }
 
 /** Aggregate selected-route demand grouped by authored consumption semantics. */
-export interface EditorItemEstimateRequirementSummary {
+interface EditorItemEstimateRequirementSummary {
 	readonly consumed: ReadonlyArray<EditorItemEstimateAmount>;
 	readonly oneTime: ReadonlyArray<EditorItemEstimateAmount>;
 	readonly ongoing: ReadonlyArray<EditorItemEstimateAmount>;

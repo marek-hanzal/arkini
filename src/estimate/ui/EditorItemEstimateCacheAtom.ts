@@ -2,7 +2,7 @@ import { Cause, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 import { runEditorItemEstimateInWorkerFx } from "~/estimate/worker/runEditorItemEstimateInWorkerFx";
 
 export namespace EditorItemEstimateCacheAtom {

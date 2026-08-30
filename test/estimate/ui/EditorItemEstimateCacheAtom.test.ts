@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { EditorItemEstimateCacheAtom } from "~/estimate/ui/EditorItemEstimateCacheAtom";
 

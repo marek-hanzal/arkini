@@ -3,28 +3,26 @@ import { Context, type Effect } from "effect";
 import type {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
-} from "~/editor-build/domain/EditorProjectBuildSchema";
+} from "~/editor-build/schema/EditorProjectBuildSchema";
 import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
-export namespace EditorBuildRepository {
-	export interface BuildProps {
-		readonly expectedRevision: number;
-		readonly projectId: string;
-	}
+interface EditorBuildProps {
+	readonly expectedRevision: number;
+	readonly projectId: string;
+}
 
-	export interface ReadProps {
-		readonly contentHash: string;
-		readonly expectedRevision: number;
-		readonly projectId: string;
-	}
+interface ReadEditorBuildProps {
+	readonly contentHash: string;
+	readonly expectedRevision: number;
+	readonly projectId: string;
 }
 
 export interface EditorBuildRepositoryService {
 	readonly buildProjectFx: (
-		props: EditorBuildRepository.BuildProps,
+		props: EditorBuildProps,
 	) => Effect.Effect<EditorProjectBuildSchema.Type, EditorProjectRepositoryError>;
 	readonly readProjectBuildFx: (
-		props: EditorBuildRepository.ReadProps,
+		props: ReadEditorBuildProps,
 	) => Effect.Effect<EditorProjectBuildContentSchema.Type, EditorProjectRepositoryError>;
 }
 

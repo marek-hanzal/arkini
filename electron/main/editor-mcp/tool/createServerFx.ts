@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorItemEstimateQuantitySchema } from "~/estimate/domain/EditorItemEstimateQuantitySchema";
+import { EditorItemEstimateQuantitySchema } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchemas, type CreateItemInput } from "./CreateItemInputSchemas";

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProjectBuildSchema";
+import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 
 /** Saves one exact local Editor Build artifact through the privileged native dialog. */

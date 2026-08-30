@@ -11,7 +11,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import {
 	readEditorAssetDeleteBlockersFn,
 	type EditorAssetDeleteBlocker,
-} from "~/asset-authoring/domain/fn/readEditorAssetDeleteBlockersFn";
+} from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 interface DeleteEditorAssetCommandProps {

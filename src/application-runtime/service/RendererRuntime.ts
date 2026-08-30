@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { acquireGameEngineResourceFx } from "~/renderer/game/resource/acquireGameEngineResourceFx";
 import { createGameFx } from "~/renderer/game/createGameFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorBuildRepository } from "~/editor-build/domain/EditorBuildRepository";
+import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/renderer/createElectronEditorBuildRepositoryFx";
 import { createElectronEditorProjectRepositoryFx } from "~/project-authoring/fx/createElectronEditorProjectRepositoryFx";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";

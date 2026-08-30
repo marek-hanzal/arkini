@@ -6,7 +6,7 @@ import type {
 	EditorProjectRepositoryService,
 } from "~/project-authoring/service/EditorProjectRepository";
 import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import type { EditorBuildRepositoryService } from "~/editor-build/domain/EditorBuildRepository";
+import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 
 export interface OwnedEditorProjectRepository
 	extends EditorProjectRepositoryService,

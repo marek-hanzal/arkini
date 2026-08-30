@@ -6,8 +6,8 @@ import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
 	EditorItemEstimateRouteStep,
-} from "~/estimate/domain/EditorItemEstimate";
-import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
+} from "~/estimate/type/EditorItemEstimate";
+import { estimateEditorItemsFn } from "~/estimate/fn/estimateEditorItemsFn";
 
 const formatNumber = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");

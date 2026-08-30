@@ -3,8 +3,8 @@ import { Order } from "effect";
 import type {
 	EditorItemEstimateIndexEntry,
 	EditorItemEstimateIndexRow,
-} from "~/estimate/domain/EditorItemEstimateIndex";
-import type { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";
+} from "~/estimate/type/EditorItemEstimateIndex";
+import type { EditorItemEstimateSortSchema } from "~/estimate/schema/EditorItemEstimateSortSchema";
 import { searchEditorItemsFn } from "~/item-authoring/fn/searchEditorItemsFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 

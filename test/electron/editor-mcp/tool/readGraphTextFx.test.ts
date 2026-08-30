@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { readItemEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readItemEstimateTextFx";
 import { readItemRelationTextFx } from "../../../../electron/main/editor-mcp/tool/readItemRelationTextFx";
-import { editorItemEstimateMaximumQuantity } from "~/estimate/domain/EditorItemEstimateQuantitySchema";
+import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createGraphProject, createToolProject } from "./support/createToolProject";
 import { createRelationTraversalProject } from "./readGraphTextFx.test/fixture";

@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spendActionChargesFx } from "./spendActionChargesFx";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";

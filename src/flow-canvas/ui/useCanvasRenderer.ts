@@ -1,0 +1,382 @@
+import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef } from "react";
+
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import { createCanvasPainterFx } from "~/flow-canvas/fx/createCanvasPainterFx";
+import {
+	isOriginFlowEdgeVisibleFn,
+	isOriginFlowNodeVisibleFn,
+	clampOriginFlowViewportZoomFn,
+	readDefaultOriginFlowViewportFn,
+	readOriginFlowFitViewportFn,
+	readOriginFlowInitialFocusFn,
+	readOriginFlowNodeViewportFn,
+	readOriginFlowVisibleBoundsFn,
+} from "~/flow-canvas/fn/readOriginFlowViewportFn";
+import type { ConnectedPorts } from "~/flow-canvas/fn/readConnectedPortsFn";
+import type { CanvasPalette } from "~/flow-canvas/type/CanvasPalette";
+import type { Highlight, Selection } from "~/flow-canvas/type/Highlight";
+import type { Bounds, Viewport } from "~/flow-canvas/type/Viewport";
+import type { NodeMetrics } from "~/flow-layout/fn/readNodeMetricsFn";
+import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
+import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+
+type RenderState = Omit<useCanvasRenderer.Props, "relationFocusNodeIdRef">;
+
+const FlowEdgeCullPaddingPx = 64;
+const FlowSearchZoom = 1;
+const DefaultOriginFlowViewportZoom = readDefaultOriginFlowViewportFn().zoom;
+const FlowPainter = RendererRuntime.runSync(
+	createCanvasPainterFx({
+		itemTypeLabels: ItemTypeLabel,
+	}),
+);
+
+/** Owns the imperative Canvas painter, viewport, animation frame, and browser lifecycle. */
+export const useCanvasRenderer = ({
+	backbones,
+	connectedPorts,
+	edgeBounds,
+	fitContent,
+	focusNodeId,
+	flow,
+	highlight,
+	highlightedEdgeColors,
+	highlightedPortColors,
+	metroBackbones,
+	nodeMetrics,
+	positions,
+	relationFocusNodeIdRef,
+	resourceUrls,
+	selection,
+}: useCanvasRenderer.Props): useCanvasRenderer.Output => {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+	const scheduleDrawRef = useRef<() => void>(() => undefined);
+	const viewportRef = useRef<Viewport>(readDefaultOriginFlowViewportFn());
+	const frameRef = useRef<number | undefined>(undefined);
+	const resetViewportRef = useRef(true);
+	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
+	const renderStateRef = useRef<RenderState>({
+		backbones,
+		connectedPorts,
+		edgeBounds,
+		fitContent,
+		focusNodeId,
+		flow,
+		highlight,
+		highlightedEdgeColors,
+		highlightedPortColors,
+		metroBackbones,
+		nodeMetrics,
+		positions,
+		resourceUrls,
+		selection,
+	});
+	renderStateRef.current = {
+		backbones,
+		connectedPorts,
+		edgeBounds,
+		fitContent,
+		focusNodeId,
+		flow,
+		highlight,
+		highlightedEdgeColors,
+		highlightedPortColors,
+		metroBackbones,
+		nodeMetrics,
+		positions,
+		resourceUrls,
+		selection,
+	};
+
+	const draw = useCallback(() => {
+		frameRef.current = undefined;
+		const canvas = canvasRef.current;
+		if (canvas === null) return;
+		const context = canvas.getContext("2d");
+		if (context === null) return;
+		const rect = canvas.getBoundingClientRect();
+		if (rect.width <= 0 || rect.height <= 0) return;
+		const dpr = Math.max(1, window.devicePixelRatio || 1);
+		const pixelWidth = Math.max(1, Math.round(rect.width * dpr));
+		const pixelHeight = Math.max(1, Math.round(rect.height * dpr));
+		if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+			canvas.width = pixelWidth;
+			canvas.height = pixelHeight;
+		}
+		const state = renderStateRef.current;
+		if (resetViewportRef.current) {
+			const explicitFocusPosition =
+				state.focusNodeId === undefined
+					? undefined
+					: state.positions.get(state.focusNodeId);
+			const initialPosition = readOriginFlowInitialFocusFn(state.flow, state.positions);
+			viewportRef.current =
+				explicitFocusPosition !== undefined
+					? readOriginFlowNodeViewportFn(
+							explicitFocusPosition,
+							rect.width,
+							rect.height,
+							FlowSearchZoom,
+						)
+					: state.fitContent
+						? readOriginFlowFitViewportFn(state.positions, rect.width, rect.height)
+						: initialPosition === undefined
+							? readDefaultOriginFlowViewportFn()
+							: readOriginFlowNodeViewportFn(
+									initialPosition,
+									rect.width,
+									rect.height,
+									DefaultOriginFlowViewportZoom,
+								);
+			resetViewportRef.current = false;
+		}
+		const viewport = viewportRef.current;
+		const visibleNodes = readOriginFlowVisibleBoundsFn(viewport, rect.width, rect.height);
+		const visibleEdges = readOriginFlowVisibleBoundsFn(
+			viewport,
+			rect.width,
+			rect.height,
+			FlowEdgeCullPaddingPx,
+		);
+		const palette = paletteRef.current ?? FlowPainter.readPalette(canvas);
+		paletteRef.current = palette;
+		context.setTransform(dpr, 0, 0, dpr, 0, 0);
+		context.clearRect(0, 0, rect.width, rect.height);
+		FlowPainter.drawGrid(context, rect.width, rect.height, viewport, palette);
+
+		context.save();
+		context.translate(viewport.x, viewport.y);
+		context.scale(viewport.zoom, viewport.zoom);
+		for (const highlighted of [
+			false,
+			true,
+		]) {
+			for (const edge of state.flow.edges) {
+				const highlightColor = state.highlightedEdgeColors.get(edge.id);
+				if ((highlightColor !== undefined) !== highlighted) continue;
+				const routedBackbone = state.backbones.get(edge.id);
+				if (routedBackbone === undefined)
+					throw new Error(`Missing routed backbone for ${edge.id}.`);
+				const backbone =
+					highlightColor === undefined
+						? routedBackbone
+						: (state.metroBackbones.get(edge.id) ?? routedBackbone);
+				const bounds = state.edgeBounds.get(edge.id);
+				if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
+				if (!isOriginFlowEdgeVisibleFn(bounds, visibleEdges)) continue;
+				FlowPainter.drawEdge(
+					context,
+					backbone,
+					highlightColor,
+					FlowPainter.readEdgeOpacity(
+						edge.id,
+						highlighted,
+						state.selection,
+						state.highlight,
+					),
+					palette,
+				);
+			}
+		}
+		for (const node of state.flow.nodes) {
+			const position = state.positions.get(node.id);
+			if (position === undefined) throw new Error(`Missing layout for ${node.id}.`);
+			if (!isOriginFlowNodeVisibleFn(position, visibleNodes)) continue;
+			const metrics = state.nodeMetrics.get(node.id);
+			if (metrics === undefined) throw new Error(`Missing node metrics for ${node.id}.`);
+			const nodeHighlight = FlowPainter.readNodeHighlight(
+				node,
+				state.selection,
+				state.highlight,
+				relationFocusNodeIdRef.current,
+			);
+			FlowPainter.drawItemNode(
+				context,
+				node,
+				position,
+				metrics,
+				nodeHighlight,
+				FlowPainter.readNodeOpacity(
+					node.id,
+					state.selection,
+					state.highlight,
+					relationFocusNodeIdRef.current,
+				),
+				palette,
+				state.resourceUrls,
+				imageCacheRef.current,
+				scheduleDrawRef.current,
+				state.connectedPorts.get(node.id),
+				state.highlightedPortColors.get(node.id),
+			);
+		}
+		context.restore();
+	}, [
+		relationFocusNodeIdRef,
+	]);
+
+	const scheduleDraw = useCallback(() => {
+		if (frameRef.current !== undefined) return;
+		frameRef.current = requestAnimationFrame(draw);
+	}, [
+		draw,
+	]);
+	scheduleDrawRef.current = scheduleDraw;
+
+	const focusNode = useCallback(
+		(nodeId: string) => {
+			const canvas = canvasRef.current;
+			const position = positions.get(nodeId);
+			if (canvas === null || position === undefined) return false;
+			const rect = canvas.getBoundingClientRect();
+			if (rect.width <= 0 || rect.height <= 0) return false;
+			viewportRef.current = readOriginFlowNodeViewportFn(
+				position,
+				rect.width,
+				rect.height,
+				FlowSearchZoom,
+			);
+			resetViewportRef.current = false;
+			scheduleDraw();
+			return true;
+		},
+		[
+			positions,
+			scheduleDraw,
+		],
+	);
+
+	useLayoutEffect(() => {
+		resetViewportRef.current = true;
+		scheduleDraw();
+	}, [
+		fitContent,
+		positions,
+		scheduleDraw,
+	]);
+
+	useEffect(() => {
+		scheduleDraw();
+	}, [
+		backbones,
+		connectedPorts,
+		edgeBounds,
+		flow,
+		highlight,
+		highlightedEdgeColors,
+		highlightedPortColors,
+		metroBackbones,
+		nodeMetrics,
+		resourceUrls,
+		scheduleDraw,
+		selection,
+	]);
+
+	useEffect(() => {
+		const refreshPalette = () => {
+			paletteRef.current = undefined;
+			scheduleDraw();
+		};
+		const observer = new MutationObserver(refreshPalette);
+		observer.observe(document.documentElement, {
+			attributeFilter: [
+				"data-accent",
+				"data-theme",
+			],
+			attributes: true,
+		});
+		const scheme = matchMedia("(prefers-color-scheme: dark)");
+		scheme.addEventListener("change", refreshPalette);
+		return () => {
+			observer.disconnect();
+			scheme.removeEventListener("change", refreshPalette);
+		};
+	}, [
+		scheduleDraw,
+	]);
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (canvas === null) return;
+		const observer = new ResizeObserver(() => scheduleDraw());
+		observer.observe(canvas);
+		return () => observer.disconnect();
+	}, [
+		scheduleDraw,
+	]);
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (canvas === null) return;
+		const handleWheel = (event: WheelEvent) => {
+			event.preventDefault();
+			const rect = canvas.getBoundingClientRect();
+			const pointerX = event.clientX - rect.left;
+			const pointerY = event.clientY - rect.top;
+			const current = viewportRef.current;
+			const zoom = clampOriginFlowViewportZoomFn(
+				current.zoom * Math.exp(-event.deltaY * 0.0015),
+			);
+			if (zoom === current.zoom) return;
+			const worldX = (pointerX - current.x) / current.zoom;
+			const worldY = (pointerY - current.y) / current.zoom;
+			viewportRef.current = {
+				x: pointerX - worldX * zoom,
+				y: pointerY - worldY * zoom,
+				zoom,
+			};
+			scheduleDraw();
+		};
+		canvas.addEventListener("wheel", handleWheel, {
+			passive: false,
+		});
+		return () => canvas.removeEventListener("wheel", handleWheel);
+	}, [
+		scheduleDraw,
+	]);
+
+	useEffect(
+		() => () => {
+			if (frameRef.current !== undefined) cancelAnimationFrame(frameRef.current);
+			for (const image of imageCacheRef.current.values()) image.src = "";
+			imageCacheRef.current.clear();
+		},
+		[],
+	);
+
+	return {
+		canvasRef,
+		focusNode,
+		scheduleDraw,
+		viewportRef,
+	};
+};
+
+export namespace useCanvasRenderer {
+	export interface Props {
+		readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
+		readonly connectedPorts: ConnectedPorts;
+		readonly edgeBounds: ReadonlyMap<string, Bounds>;
+		readonly fitContent: boolean;
+		readonly focusNodeId: string | undefined;
+		readonly flow: EditorItemOriginFlow;
+		readonly highlight: Highlight | undefined;
+		readonly highlightedEdgeColors: ReadonlyMap<string, string>;
+		readonly highlightedPortColors: ReadonlyMap<string, ReadonlyMap<string, string>>;
+		readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
+		readonly nodeMetrics: ReadonlyMap<string, NodeMetrics>;
+		readonly positions: ReadonlyMap<string, LayoutNode>;
+		readonly relationFocusNodeIdRef: RefObject<string | undefined>;
+		readonly resourceUrls: ReadonlyMap<string, string>;
+		readonly selection: Selection | undefined;
+	}
+
+	export interface Output {
+		readonly canvasRef: RefObject<HTMLCanvasElement | null>;
+		readonly focusNode: (nodeId: string) => boolean;
+		readonly scheduleDraw: () => void;
+		readonly viewportRef: RefObject<Viewport>;
+	}
+}

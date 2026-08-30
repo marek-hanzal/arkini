@@ -41,6 +41,51 @@ describe("ItemLinesTab command boundary", () => {
 		});
 	});
 
+	it("wires enqueue to the exact owner and line", async () => {
+		await renderLines(projection);
+		const enqueue = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineEnqueueButton"]',
+		);
+
+		await act(async () => enqueue?.click());
+		expect(commands.enqueue).toHaveBeenCalledWith({
+			ownerItemId: projection.itemId,
+			lineId: projection.line[0]?.lineId,
+		});
+	});
+
+	it("wires whole-line withdrawal to the exact owner and line", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					actions: {
+						...projection.line[0].actions,
+						canWithdraw: true,
+					},
+					input: [
+						{
+							...input,
+							canWithdraw: true,
+							missingQuantity: 0,
+							storedQuantity: 1,
+						},
+					],
+				},
+			],
+		});
+		const withdraw = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineWithdrawButton"]',
+		);
+
+		await act(async () => withdraw?.click());
+		expect(commands.withdraw).toHaveBeenCalledWith({
+			lineId: projection.line[0]?.lineId,
+			ownerItemId: projection.itemId,
+		});
+	});
+
 	it("keeps exact buffered-input withdrawal available after a line becomes unavailable", async () => {
 		const { container } = await renderLines({
 			...projection,

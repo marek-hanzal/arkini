@@ -40,6 +40,87 @@ const point = (x: number, y: number): LayoutPoint => ({
 	x,
 	y,
 });
+const flow: EditorItemOriginFlow = {
+	edges: [
+		{
+			id: "ore-smelter-a",
+			operationId: "smelter-a",
+			role: "input",
+			source: "item:ore",
+			target: "item:smelter-a",
+		},
+		{
+			id: "ore-smelter-b",
+			operationId: "smelter-b",
+			role: "input",
+			source: "item:ore",
+			target: "item:smelter-b",
+		},
+	],
+	nodes: [
+		itemNode("ore"),
+		itemNode("smelter-a"),
+		itemNode("smelter-b"),
+	],
+};
+const positions = new Map<string, LayoutNode>([
+	[
+		"item:ore",
+		position(0, 0, 0),
+	],
+	[
+		"item:smelter-a",
+		position(1, 100, 0),
+	],
+	[
+		"item:smelter-b",
+		position(2, 100, 100),
+	],
+]);
+const backbone: ReadonlyArray<LayoutPoint> = [
+	point(0, 0),
+	point(96, 0),
+	point(96, 96),
+	point(192, 96),
+	point(192, 0),
+	point(288, 0),
+];
+const backbones = new Map([
+	[
+		"ore-smelter-a",
+		backbone,
+	],
+	[
+		"ore-smelter-b",
+		backbone,
+	],
+]);
+const selection = {
+	id: "item:ore",
+	kind: "node",
+} as const;
+
+const renderProjection = async () => {
+	const state: {
+		current?: ReturnType<typeof useProjection>;
+	} = {};
+	const Probe = () => {
+		state.current = useProjection({
+			backbones,
+			direction: "input",
+			flow,
+			positions,
+			selection,
+		});
+		return null;
+	};
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => root.render(createElement(Probe)));
+	return state;
+};
 
 afterEach(async () => {
 	await act(async () => {
@@ -50,82 +131,7 @@ afterEach(async () => {
 
 describe("useProjection", () => {
 	it("routes highlighted edge bundles through the metro projection boundary", async () => {
-		const flow: EditorItemOriginFlow = {
-			edges: [
-				{
-					id: "ore-smelter-a",
-					operationId: "smelter-a",
-					role: "input",
-					source: "item:ore",
-					target: "item:smelter-a",
-				},
-				{
-					id: "ore-smelter-b",
-					operationId: "smelter-b",
-					role: "input",
-					source: "item:ore",
-					target: "item:smelter-b",
-				},
-			],
-			nodes: [
-				itemNode("ore"),
-				itemNode("smelter-a"),
-				itemNode("smelter-b"),
-			],
-		};
-		const positions = new Map<string, LayoutNode>([
-			[
-				"item:ore",
-				position(0, 0, 0),
-			],
-			[
-				"item:smelter-a",
-				position(1, 100, 0),
-			],
-			[
-				"item:smelter-b",
-				position(2, 100, 100),
-			],
-		]);
-		const backbone: ReadonlyArray<LayoutPoint> = [
-			point(0, 0),
-			point(96, 0),
-			point(96, 96),
-			point(192, 96),
-			point(192, 0),
-			point(288, 0),
-		];
-		const state: {
-			current?: ReturnType<typeof useProjection>;
-		} = {};
-		const Probe = () => {
-			state.current = useProjection({
-				backbones: new Map([
-					[
-						"ore-smelter-a",
-						backbone,
-					],
-					[
-						"ore-smelter-b",
-						backbone,
-					],
-				]),
-				direction: "input",
-				flow,
-				positions,
-				selection: {
-					id: "item:ore",
-					kind: "node",
-				},
-			});
-			return null;
-		};
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () => root.render(createElement(Probe)));
+		const state = await renderProjection();
 
 		expect([
 			...state.current!.highlightedEdgeColors.keys(),
@@ -149,5 +155,26 @@ describe("useProjection", () => {
 			point(197, 0),
 			backbone[5],
 		]);
+	});
+
+	it("keeps relation and root traversal identities stable when visible depth changes", async () => {
+		const state = await renderProjection();
+		const inputNodeIds = state.current?.inputNavigationNodeIds;
+		const outputNodeIds = state.current?.outputNavigationNodeIds;
+		const rootNodeIds = state.current?.rootNavigationNodeIds;
+		const navigationNodeIds = state.current?.navigationNodeIds;
+
+		await act(async () =>
+			state.current?.setHighlightDepth({
+				direction: "input",
+				limit: 0,
+				nodeId: selection.id,
+			}),
+		);
+
+		expect(state.current?.navigationNodeIds).not.toBe(navigationNodeIds);
+		expect(state.current?.inputNavigationNodeIds).toBe(inputNodeIds);
+		expect(state.current?.outputNavigationNodeIds).toBe(outputNodeIds);
+		expect(state.current?.rootNavigationNodeIds).toBe(rootNodeIds);
 	});
 });

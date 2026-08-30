@@ -1,5 +1,3 @@
-import { useCallback, useMemo } from "react";
-
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import type { ItemDetailPendingAction } from "~/item-detail-frame/type/ItemDetailControl";
@@ -24,35 +22,16 @@ export const useItemDetailPendingCommand = <Props, Result, Failure>({
 }: UseItemDetailPendingCommandOptions<Props, Result, Failure>) => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();
-	const run = useCallback(
-		(command: Props) =>
+
+	return {
+		error: itemDetail.readActionError(pendingKey),
+		pending: itemDetail.readPendingAction(pendingKey) === action,
+		run: (command: Props) =>
 			itemDetail.runPendingAction({
 				key: pendingKey,
 				action,
 				failureMessage,
 				run: runCommand(game, command),
 			}),
-		[
-			action,
-			failureMessage,
-			game,
-			pendingKey,
-			itemDetail,
-			runCommand,
-		],
-	);
-
-	return useMemo(
-		() => ({
-			error: itemDetail.readActionError(pendingKey),
-			pending: itemDetail.readPendingAction(pendingKey) === action,
-			run,
-		}),
-		[
-			action,
-			pendingKey,
-			itemDetail,
-			run,
-		],
-	);
+	};
 };

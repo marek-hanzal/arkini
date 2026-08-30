@@ -13,7 +13,7 @@ import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planSpawnPlacementFx } from "~/item-placement/fx/planSpawnPlacementFx";
 import { assertRuntimeFx } from "~/game-runtime/check/assertRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { StartSchema } from "./StartSchema";
+import type { StartSchema } from "~/game-start/schema/StartSchema";
 
 type StartGridLocation =
 	| BoardLocationSchema.Type

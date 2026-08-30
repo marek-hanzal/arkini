@@ -6,8 +6,8 @@ import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx"
 import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { CurrentSpaceChangedGameEventSchema } from "~/game-event/schema/CurrentSpaceChangedGameEventSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -39,6 +39,13 @@ interface SpaceActionPlan {
 	readonly space: number;
 	readonly charges: ReadonlyArray<InputRun.ChargePlan>;
 }
+
+type CurrentSpaceChangedGameEvent = Extract<
+	GameEventSchema.Type,
+	{
+		readonly type: typeof GameEventEnumSchema.enum.CurrentSpaceChanged;
+	}
+>;
 
 const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 	itemId,
@@ -128,7 +135,7 @@ const setCurrentSpaceFn = ({
 }) => {
 	if (runtime.currentSpace === space) {
 		return {
-			events: [] as CurrentSpaceChangedGameEventSchema.Type[],
+			events: [] as CurrentSpaceChangedGameEvent[],
 			runtime,
 		};
 	}
@@ -138,7 +145,7 @@ const setCurrentSpaceFn = ({
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 				previousSpace: runtime.currentSpace,
 				currentSpace: space,
-			} satisfies CurrentSpaceChangedGameEventSchema.Type,
+			} satisfies CurrentSpaceChangedGameEvent,
 		],
 		runtime: {
 			...runtime,

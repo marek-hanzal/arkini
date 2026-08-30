@@ -4,7 +4,7 @@ import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
-import type { StartSchema } from "~/game-start/StartSchema";
+import type { StartSchema } from "~/game-start/schema/StartSchema";
 
 export const createSimpleItem = (id: string) =>
 	SimpleSchema.parse({

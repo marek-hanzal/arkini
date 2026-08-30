@@ -17,8 +17,8 @@ export interface EstimateRequirementSummary {
 }
 
 export interface EstimateRequirementStep {
-	/** Selected route occurrence that establishes this requirement. */
-	readonly acquisitionOccurrenceId?: string;
+	/** Canonical fact whose selected route establishes this requirement, when acquisition is needed. */
+	readonly acquisitionFactId?: string;
 	readonly factId: string;
 	readonly quantity: number;
 	/** Authored reasons that make this fact a prerequisite of the selected route. */
@@ -32,10 +32,6 @@ export interface EstimateRouteStep {
 	readonly durationMs: number;
 	readonly factId: string;
 	readonly metadata?: EditorAcquisitionRouteMetadata;
-	/** Equivalent independent occurrences compressed into this scalar witness node. */
-	readonly occurrenceCount: number;
-	/** Stable identity of this compressed occurrence group. */
-	readonly occurrenceId: string;
 	readonly outputRuns: number;
 	readonly quantity: number;
 	readonly requirements: ReadonlyArray<EstimateRequirementStep>;
@@ -44,8 +40,9 @@ export interface EstimateRouteStep {
 	readonly source: "root" | "route";
 }
 
-/** Public data projection of one stable quantity-specific estimate witness. */
+/** Public data projection of one normalized selected-route fact DAG. */
 export interface EstimateProjection {
+	readonly durationMs: number;
 	readonly requirementSummary: EstimateRequirementSummary;
 	readonly route: EstimateRouteStep;
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;

@@ -15,7 +15,7 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { compileEditorAcquisitionRootsFn } from "~/flow/fn/compileEditorAcquisitionRootsFn";
 
-const combineRequirements = (
+const combineRequirementsFn = (
 	...groups: ReadonlyArray<EditorAcquisitionRoute["requirements"]>
 ): EditorAcquisitionRoute["requirements"] => ({
 	allOf: groups.flatMap(({ allOf }) => allOf),
@@ -23,7 +23,7 @@ const combineRequirements = (
 	unsupported: groups.flatMap(({ unsupported }) => unsupported ?? []),
 });
 
-const makeChargeDepletionRequirements = (
+const makeChargeDepletionRequirementsFn = (
 	requirements: EditorAcquisitionRoute["requirements"],
 	chargedItemId: string,
 ): EditorAcquisitionRoute["requirements"] => ({
@@ -58,7 +58,7 @@ interface LineDescriptor {
 	readonly requirements: EditorAcquisitionRoute["requirements"];
 }
 
-const readLineOperationInputs = (line: LineSchema.Type) =>
+const readLineOperationInputsFn = (line: LineSchema.Type) =>
 	line.input.flatMap((input) => {
 		switch (input.type) {
 			case "simple":
@@ -94,7 +94,7 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 		},
 	];
 	const chargeCostsByItemId = new Map<string, ChargeCost[]>();
-	const addCharge = (itemId: string, cost: ChargeCost) => {
+	const addChargeFn = (itemId: string, cost: ChargeCost) => {
 		const costs = chargeCostsByItemId.get(itemId) ?? [];
 		costs.push(cost);
 		chargeCostsByItemId.set(itemId, costs);
@@ -117,12 +117,12 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 			});
 		if (input.charges === undefined) continue;
 		if (input.charges.from === "self")
-			addCharge(owner.id, {
+			addChargeFn(owner.id, {
 				cost: input.charges.cost,
 				from: "self",
 			});
 		else if (input.type === "deposit")
-			addCharge(input.query.selector.itemId, {
+			addChargeFn(input.query.selector.itemId, {
 				cost: input.charges.cost,
 				from: "target",
 			});
@@ -138,10 +138,10 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 		line,
 		operation: {
 			id: `source:${owner.id}:line:${line.id}`,
-			inputs: readLineOperationInputs(line),
+			inputs: readLineOperationInputsFn(line),
 		},
 		owner,
-		requirements: combineRequirements(
+		requirements: combineRequirementsFn(
 			{
 				allOf: requirements,
 				anyOf: [],
@@ -172,6 +172,15 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 		});
 	}
 	const outputModel = readEditorAcquisitionOutputOccurrencesFn(descriptor.line.output);
+	const operation = {
+		...descriptor.operation,
+		...(outputModel.compilation === "complete"
+			? {}
+			: {
+					outputCompilation: outputModel.compilation,
+				}),
+		outputDistribution: outputModel.outputDistribution,
+	};
 	for (const occurrence of outputModel.occurrences)
 		routes.push({
 			...(chargeUses.length === 0
@@ -187,13 +196,14 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 				lineTitle: descriptor.line.title,
 				ownerItemId: descriptor.owner.id,
 			},
-			operation: descriptor.operation,
+			operation,
 			output: {
 				annotation: occurrence.annotation,
-				expectedYield: occurrence.expectedYield,
 				factId: occurrence.factId,
+				operationOutputGroupId: occurrence.operationOutputGroupId,
+				quantityDistribution: occurrence.quantityDistribution,
 			},
-			requirements: combineRequirements(descriptor.requirements, occurrence.requirements),
+			requirements: combineRequirementsFn(descriptor.requirements, occurrence.requirements),
 			runMultiplier: 1,
 		});
 
@@ -219,14 +229,21 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 				operation: {
 					id: `source:${chargedItemId}:charges`,
 					inputs: [],
+					...(chargeOutputModel.compilation === "complete"
+						? {}
+						: {
+								outputCompilation: chargeOutputModel.compilation,
+							}),
+					outputDistribution: chargeOutputModel.outputDistribution,
 				},
 				output: {
 					annotation: occurrence.annotation,
-					expectedYield: occurrence.expectedYield,
 					factId: occurrence.factId,
+					operationOutputGroupId: occurrence.operationOutputGroupId,
+					quantityDistribution: occurrence.quantityDistribution,
 				},
-				requirements: combineRequirements(
-					makeChargeDepletionRequirements(descriptor.requirements, chargedItemId),
+				requirements: combineRequirementsFn(
+					makeChargeDepletionRequirementsFn(descriptor.requirements, chargedItemId),
 					occurrence.requirements,
 				),
 				runMultiplier,
@@ -286,6 +303,7 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 			targetItemId: merge.target.itemId,
 		} as const;
 		const outputModel = readEditorAcquisitionOutputOccurrencesFn(merge.output);
+		const replacementOutputGroupId = "output:replacement";
 		const operation = {
 			id: `source:${source.id}:merge:${mergeIndex}`,
 			inputs: [
@@ -297,7 +315,25 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 					},
 				},
 			],
-		};
+			...(outputModel.compilation === "complete"
+				? {}
+				: {
+						outputCompilation: outputModel.compilation,
+					}),
+			outputDistribution: outputModel.outputDistribution.map((outcome) => ({
+				...outcome,
+				quantities:
+					merge.effect === "replace"
+						? [
+								...outcome.quantities,
+								{
+									outputGroupId: replacementOutputGroupId,
+									quantity: 1,
+								},
+							]
+						: outcome.quantities,
+			})),
+		} satisfies EditorAcquisitionOperation;
 		if (merge.effect === "replace")
 			routes.push({
 				durationMs: 0,
@@ -314,8 +350,14 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 						},
 						selectionKind: "replace",
 					},
-					expectedYield: 1,
 					factId: merge.result,
+					operationOutputGroupId: replacementOutputGroupId,
+					quantityDistribution: [
+						{
+							probability: 1,
+							quantity: 1,
+						},
+					],
 				},
 				requirements,
 				runMultiplier: 1,
@@ -328,12 +370,11 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 				operation,
 				output: {
 					annotation: output.annotation,
-					expectedYield:
-						output.expectedYield +
-						(merge.effect === "replace" && output.factId === merge.result ? 1 : 0),
 					factId: output.factId,
+					operationOutputGroupId: output.operationOutputGroupId,
+					quantityDistribution: output.quantityDistribution,
 				},
-				requirements: combineRequirements(requirements, output.requirements),
+				requirements: combineRequirementsFn(requirements, output.requirements),
 				runMultiplier: 1,
 			});
 	}
@@ -363,11 +404,18 @@ const readTemporaryRoutesFn = (item: ItemSchema.Type) => {
 			operation: {
 				id: `source:${item.id}:expiry`,
 				inputs: [],
+				...(outputModel.compilation === "complete"
+					? {}
+					: {
+							outputCompilation: outputModel.compilation,
+						}),
+				outputDistribution: outputModel.outputDistribution,
 			},
 			output: {
 				annotation: output.annotation,
-				expectedYield: output.expectedYield,
 				factId: output.factId,
+				operationOutputGroupId: output.operationOutputGroupId,
+				quantityDistribution: output.quantityDistribution,
 			},
 			requirements: {
 				allOf: [

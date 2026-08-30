@@ -4,7 +4,7 @@ import type { EditorAcquisitionRequirement } from "~/flow/type/EditorAcquisition
 
 export interface EstimateRequirementGroup {
 	readonly consumed: number;
-	/** Preserves distinct one-time accumulation while an any-of demand state is still growing. */
+	/** Additive live identities which cannot be shared by sibling roles. */
 	readonly distinctOneTime: number;
 	readonly factId: string;
 	readonly oneTime: number;
@@ -12,7 +12,7 @@ export interface EstimateRequirementGroup {
 	readonly sources: ReadonlyArray<EditorAcquisitionRequirement["source"]>;
 }
 
-export const readEstimateRequirementQuantityFn = (
+const readEstimateRequirementQuantityFn = (
 	requirement: EditorAcquisitionRequirement,
 	actionRuns: number,
 ) => requirement.quantity * (requirement.usage === "consume" ? actionRuns : 1);

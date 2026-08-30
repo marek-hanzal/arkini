@@ -25,20 +25,33 @@ const requirement = (
 const route = ({
 	allOf = [],
 	anyOf = [],
+	chargeUses,
 	durationMs,
-	expectedYield = 1,
 	id,
+	operation,
+	operationOutputGroupId,
 	output,
+	outputQuantity = 1,
+	quantityDistribution,
 	runMultiplier = 1,
 }: {
 	readonly allOf?: ReadonlyArray<EditorAcquisitionRequirement>;
 	readonly anyOf?: ReadonlyArray<ReadonlyArray<EditorAcquisitionRequirement>>;
+	readonly chargeUses?: EditorAcquisitionRoute["chargeUses"];
 	readonly durationMs: number;
-	readonly expectedYield?: number;
 	readonly id: string;
+	readonly operation?: EditorAcquisitionRoute["operation"];
+	readonly operationOutputGroupId?: string;
 	readonly output: string;
+	readonly outputQuantity?: number;
+	readonly quantityDistribution?: EditorAcquisitionRoute["output"]["quantityDistribution"];
 	readonly runMultiplier?: number;
 }): EditorAcquisitionRoute => ({
+	...(chargeUses === undefined
+		? {}
+		: {
+				chargeUses,
+			}),
 	durationMs,
 	id,
 	metadata: {
@@ -47,18 +60,33 @@ const route = ({
 		lineTitle: id,
 		ownerItemId: "owner",
 	},
+	...(operation === undefined
+		? {}
+		: {
+				operation,
+			}),
 	output: {
 		annotation: {
 			alternativeSet: false,
 			placement: "drop",
 			quantity: {
-				max: expectedYield,
-				min: expectedYield,
+				max: outputQuantity,
+				min: outputQuantity,
 			},
 			selectionKind: "guaranteed",
 		},
-		expectedYield,
 		factId: output,
+		...(operationOutputGroupId === undefined
+			? {}
+			: {
+					operationOutputGroupId,
+				}),
+		quantityDistribution: quantityDistribution ?? [
+			{
+				probability: 1,
+				quantity: outputQuantity,
+			},
+		],
 	},
 	runMultiplier,
 	requirements: {

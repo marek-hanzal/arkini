@@ -77,4 +77,4 @@ Validate focused → affected → broad as risk requires, using `argc`; report h
 
 ## Product boundaries
 
-The Game loads an Arkpack and runs the canonical gameplay engine. The Editor authors portable projects and provides Item editing, Assets, Board scenarios, Flow, Estimate, Versions, Notes, Build, and a project-scoped MCP server. Flow is the authored relation graph; Estimate is optimistic static authored-dependency analysis using deterministic scalar expected-yield route choice and parallel critical-path timing, not runtime simulation.
+The Game loads an Arkpack and runs the canonical gameplay engine. The Editor authors portable projects and provides Item editing, Assets, Board scenarios, Flow, Estimate, Versions, Notes, Build, and a project-scoped MCP server. Flow is the authored relation graph; Estimate is optimistic static authored-dependency analysis using bounded output distributions, expected first-hitting time, deterministic complete-route choice, shared finite roots and co-products, and parallel critical-path timing, not runtime simulation.

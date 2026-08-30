@@ -17,10 +17,7 @@ export const createEditorItemEstimateIndexFn = ({
 	for (const estimate of estimates.values()) {
 		if (!estimate.obtainable) continue;
 		for (const step of estimate.routeSteps)
-			demandByItemId.set(
-				step.factId,
-				(demandByItemId.get(step.factId) ?? 0) + step.quantity * step.occurrenceCount,
-			);
+			demandByItemId.set(step.factId, (demandByItemId.get(step.factId) ?? 0) + step.quantity);
 	}
 
 	return itemIds

@@ -6,180 +6,206 @@ import type {
 	EstimateRequirementStep,
 	EstimateRouteStep,
 } from "~/estimate-projection/type/EstimateProjection";
-import type { EstimateWitnessNode } from "~/estimate-witness/type/EstimateWitnessNode";
-
-interface EstimateNodeGraph {
-	readonly nodes: ReadonlyArray<EstimateWitnessNode>;
-	readonly occurrenceCountByNode: ReadonlyMap<EstimateWitnessNode, number>;
-	readonly occurrenceIdByNode: ReadonlyMap<EstimateWitnessNode, string>;
-}
+import type { EstimateWitness } from "~/estimate-witness/type/EstimateWitness";
 
 const epsilon = 1e-9;
 
-const createEstimateNodeGraph = (root: EstimateWitnessNode): EstimateNodeGraph => {
-	const discovered = [
-		root,
-	];
-	const discoveryIndex = new Map<EstimateWitnessNode, number>([
-		[
-			root,
-			0,
-		],
-	]);
-	for (let index = 0; index < discovered.length; index += 1)
-		for (const { node: child } of discovered[index]!.children)
-			if (!discoveryIndex.has(child)) {
-				discoveryIndex.set(child, discovered.length);
-				discovered.push(child);
+const freezeAmountsFn = (quantities: ReadonlyMap<string, number>): ReadonlyArray<EstimateAmount> =>
+	[
+		...quantities,
+	]
+		.filter(([, quantity]) => quantity > epsilon)
+		.sort(([left], [right]) => Order.String(left, right))
+		.map(([factId, quantity]) => ({
+			factId,
+			quantity,
+		}));
+
+const projectRouteStepsFn = (witness: EstimateWitness): ReadonlyArray<EstimateRouteStep> => {
+	const stepsByFact = new Map<string, EstimateRouteStep>();
+	const unresolved = new Set(witness.selectedByFact.keys());
+	while (unresolved.size > 0) {
+		let progressed = false;
+		for (const factId of [
+			...unresolved,
+		].sort(Order.String)) {
+			const selected = witness.selectedByFact.get(factId);
+			if (
+				selected === undefined ||
+				[
+					...(witness.dependenciesByFact.get(factId) ?? []),
+				].some(
+					(dependencyFactId) =>
+						witness.selectedByFact.has(dependencyFactId) &&
+						!stepsByFact.has(dependencyFactId),
+				)
+			)
+				continue;
+			const requirements: EstimateRequirementStep[] = [];
+			for (const group of selected.groups) {
+				let first = true;
+				for (const [usage, quantity] of [
+					[
+						"consume",
+						group.consumed,
+					],
+					[
+						"one-time",
+						group.oneTime,
+					],
+					[
+						"ongoing",
+						group.ongoing,
+					],
+				] as const) {
+					if (quantity <= epsilon) continue;
+					requirements.push({
+						acquisitionFactId:
+							first && !selected.recurrenceFactIds.has(group.factId)
+								? stepsByFact.get(group.factId)?.factId
+								: undefined,
+						factId: group.factId,
+						quantity,
+						sources: group.sources,
+						usage,
+					});
+					first = false;
+				}
 			}
-
-	const incomingCount = new Map(
-		discovered.map((node) => [
-			node,
-			0,
-		]),
-	);
-	for (const node of discovered)
-		for (const { node: child } of node.children)
-			incomingCount.set(child, (incomingCount.get(child) ?? 0) + 1);
-	const ready = discovered.filter((node) => incomingCount.get(node) === 0);
-	const nodes: EstimateWitnessNode[] = [];
-	const occurrenceCountByNode = new Map<EstimateWitnessNode, number>([
-		[
-			root,
-			1,
-		],
-	]);
-	const consumedOccurrenceCountByNode = new Map<EstimateWitnessNode, number>();
-	const retainedNodes = new Set<EstimateWitnessNode>();
-	while (ready.length > 0) {
-		ready.sort((left, right) => discoveryIndex.get(left)! - discoveryIndex.get(right)!);
-		const node = ready.shift()!;
-		nodes.push(node);
-		const occurrenceCount = occurrenceCountByNode.get(node) ?? 0;
-		for (const { group, node: child } of node.children) {
-			// Consumed plans repeat per parent occurrence; retained prerequisites are reusable.
-			if (group.consumed > epsilon)
-				consumedOccurrenceCountByNode.set(
-					child,
-					(consumedOccurrenceCountByNode.get(child) ?? 0) + occurrenceCount,
-				);
-			else retainedNodes.add(child);
-			occurrenceCountByNode.set(
-				child,
-				(consumedOccurrenceCountByNode.get(child) ?? 0) +
-					(retainedNodes.has(child) ? 1 : 0),
-			);
-			const remaining = (incomingCount.get(child) ?? 0) - 1;
-			incomingCount.set(child, remaining);
-			if (remaining === 0) ready.push(child);
-		}
-	}
-	return {
-		nodes,
-		occurrenceCountByNode,
-		occurrenceIdByNode: new Map(
-			discovered.map((node, index) => [
-				node,
-				index === 0 ? "target" : `group:${index}:${node.factId}`,
-			]),
-		),
-	};
-};
-
-const projectRouteSteps = ({
-	nodes,
-	occurrenceCountByNode,
-	occurrenceIdByNode,
-}: EstimateNodeGraph): ReadonlyArray<EstimateRouteStep> =>
-	nodes.map((node) => {
-		const requirements: EstimateRequirementStep[] = [];
-		for (const { group, node: child } of node.children) {
-			let first = true;
-			for (const [usage, quantity] of [
-				[
-					"consume",
-					group.consumed,
-				],
-				[
-					"one-time",
-					group.oneTime,
-				],
-				[
-					"ongoing",
-					group.ongoing,
-				],
-			] as const) {
-				if (quantity <= epsilon) continue;
-				requirements.push({
-					acquisitionOccurrenceId: first ? occurrenceIdByNode.get(child) : undefined,
-					factId: group.factId,
-					quantity,
-					sources: group.sources,
-					usage,
-				});
-				first = false;
-			}
-		}
-		return {
-			actionRuns: node.actionRuns,
-			durationMs: node.route === undefined ? 0 : node.route.durationMs * node.actionRuns,
-			factId: node.factId,
-			...(node.route === undefined
-				? {}
-				: {
-						metadata: node.route.metadata,
-					}),
-			occurrenceCount: occurrenceCountByNode.get(node) ?? 1,
-			occurrenceId: occurrenceIdByNode.get(node)!,
-			outputRuns: node.outputRuns,
-			quantity: node.quantity,
-			requirements,
-			rootQuantity: node.rootQuantity,
-			routeId: node.route?.id ?? `root:${node.factId}`,
-			source: node.route === undefined ? "root" : "route",
-		};
-	});
-
-const readRequirementSummary = ({ nodes, occurrenceCountByNode }: EstimateNodeGraph) => {
-	const consumed = new Map<string, number>();
-	const oneTime = new Map<string, number>();
-	const ongoing = new Map<string, number>();
-	for (const node of nodes) {
-		const occurrenceCount = occurrenceCountByNode.get(node) ?? 1;
-		for (const { group } of node.children) {
-			consumed.set(
-				group.factId,
-				(consumed.get(group.factId) ?? 0) + group.consumed * occurrenceCount,
-			);
-			oneTime.set(group.factId, Math.max(oneTime.get(group.factId) ?? 0, group.oneTime));
-			ongoing.set(group.factId, Math.max(ongoing.get(group.factId) ?? 0, group.ongoing));
-		}
-	}
-	const freeze = (quantities: ReadonlyMap<string, number>): ReadonlyArray<EstimateAmount> =>
-		[
-			...quantities,
-		]
-			.filter(([, amount]) => amount > epsilon)
-			.sort(([left], [right]) => Order.String(left, right))
-			.map(([factId, quantity]) => ({
+			stepsByFact.set(factId, {
+				actionRuns: selected.actionRuns,
+				durationMs: selected.route.durationMs * selected.actionRuns,
 				factId,
-				quantity,
-			}));
-	return {
-		consumed: freeze(consumed),
-		oneTime: freeze(oneTime),
-		ongoing: freeze(ongoing),
-	};
+				metadata: selected.route.metadata,
+				outputRuns: selected.outputRuns,
+				quantity: witness.requiredQuantityByFact.get(factId) ?? 0,
+				requirements,
+				rootQuantity:
+					(witness.requiredQuantityByFact.get(factId) ?? 0) - selected.producedQuantity,
+				routeId: selected.route.id,
+				source: "route",
+			});
+			unresolved.delete(factId);
+			progressed = true;
+		}
+		// Materialization rejects dependency cycles. This fallback keeps projection total for a
+		// malformed external witness without fabricating partially ordered route steps.
+		if (!progressed) return [];
+	}
+
+	const route = stepsByFact.get(witness.factId);
+	if (route === undefined) {
+		const root: EstimateRouteStep = {
+			actionRuns: 0,
+			durationMs: 0,
+			factId: witness.factId,
+			outputRuns: 0,
+			quantity: witness.quantity,
+			requirements: [],
+			rootQuantity: witness.quantity,
+			routeId: `root:${witness.factId}`,
+			source: "root",
+		};
+		return [
+			root,
+		];
+	}
+	return [
+		route,
+		...[
+			...stepsByFact.values(),
+		]
+			.filter((step) => step.factId !== witness.factId)
+			.sort((left, right) => Order.String(left.factId, right.factId)),
+	];
 };
 
-/** Projects one stable witness into the route graph and aggregate requirement summary. */
-export const projectEstimateWitnessFn = (root: EstimateWitnessNode): EstimateProjection => {
-	const nodeGraph = createEstimateNodeGraph(root);
-	const routeSteps = projectRouteSteps(nodeGraph);
+const readParallelDurationFn = (witness: EstimateWitness): number => {
+	const unitByFactId = new Map<string, string>();
+	const durationByUnitId = new Map<string, number>();
+	for (const [factId, selected] of witness.selectedByFact) {
+		const operationId = selected.route.operation?.id;
+		const unitId =
+			operationId !== undefined && witness.sharedOperationIds.has(operationId)
+				? `operation:${operationId}`
+				: `fact:${factId}`;
+		unitByFactId.set(factId, unitId);
+		durationByUnitId.set(
+			unitId,
+			Math.max(
+				durationByUnitId.get(unitId) ?? 0,
+				selected.route.durationMs * selected.actionRuns,
+			),
+		);
+	}
+
+	const dependenciesByUnitId = new Map<string, Set<string>>();
+	for (const [factId, dependencyFactIds] of witness.dependenciesByFact) {
+		const unitId = unitByFactId.get(factId);
+		if (unitId === undefined) continue;
+		const dependencies = dependenciesByUnitId.get(unitId) ?? new Set<string>();
+		for (const dependencyFactId of dependencyFactIds) {
+			const dependencyUnitId = unitByFactId.get(dependencyFactId);
+			if (dependencyUnitId !== undefined && dependencyUnitId !== unitId)
+				dependencies.add(dependencyUnitId);
+		}
+		dependenciesByUnitId.set(unitId, dependencies);
+	}
+
+	const readyAtByUnitId = new Map<string, number>();
+	const pending = new Set(durationByUnitId.keys());
+	while (pending.size > 0) {
+		let progressed = false;
+		for (const unitId of [
+			...pending,
+		].sort(Order.String)) {
+			const dependencies = dependenciesByUnitId.get(unitId) ?? new Set();
+			if (
+				[
+					...dependencies,
+				].some((dependencyUnitId) => !readyAtByUnitId.has(dependencyUnitId))
+			)
+				continue;
+			readyAtByUnitId.set(
+				unitId,
+				(durationByUnitId.get(unitId) ?? 0) +
+					Math.max(
+						0,
+						...[
+							...dependencies,
+						].map((dependencyUnitId) => readyAtByUnitId.get(dependencyUnitId) ?? 0),
+					),
+			);
+			pending.delete(unitId);
+			progressed = true;
+		}
+		if (!progressed) return Number.POSITIVE_INFINITY;
+	}
+	return readyAtByUnitId.get(unitByFactId.get(witness.factId) ?? "") ?? 0;
+};
+
+/** Projects one selected-by-fact witness into its normalized route DAG and critical path. */
+export const projectEstimateWitnessFn = (witness: EstimateWitness): EstimateProjection => {
+	const routeSteps = projectRouteStepsFn(witness);
+	const route = routeSteps[0] ?? {
+		actionRuns: 0,
+		durationMs: 0,
+		factId: witness.factId,
+		outputRuns: 0,
+		quantity: witness.quantity,
+		requirements: [],
+		rootQuantity: witness.quantity,
+		routeId: `root:${witness.factId}`,
+		source: "root" as const,
+	};
 	return {
-		requirementSummary: readRequirementSummary(nodeGraph),
-		route: routeSteps[0]!,
+		durationMs: readParallelDurationFn(witness),
+		requirementSummary: {
+			consumed: freezeAmountsFn(witness.consumedByFact),
+			oneTime: freezeAmountsFn(witness.oneTimeByFact),
+			ongoing: freezeAmountsFn(witness.ongoingByFact),
+		},
+		route,
 		routeSteps,
 	};
 };

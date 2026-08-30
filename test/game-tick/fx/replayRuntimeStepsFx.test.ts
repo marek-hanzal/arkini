@@ -8,7 +8,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/game-tick/fx/replayRuntimeStepsFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const hourMs = 60 * 60 * 1_000;
@@ -89,7 +89,7 @@ describe("replayRuntimeStepsFx", () => {
 		expect(result.replay.events).toEqual([]);
 		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(1);
-		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - 1);
+		expect(result.replay.skippedSteps).toBe(hourMs / SimulationStepMs - 1);
 	});
 
 	it("fast-forwards a stable inventory-paused job after one domain step", () => {
@@ -121,11 +121,11 @@ describe("replayRuntimeStepsFx", () => {
 		expect(result.replay.runtime.jobs[0]?.remainingMs).toBe(1_000);
 		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(1);
-		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - 1);
+		expect(result.replay.skippedSteps).toBe(hourMs / SimulationStepMs - 1);
 	});
 
 	it("replays every changing step before fast-forwarding the stable remainder", () => {
-		const stepsUntilStable = 1_000 / TickStepMs + 1;
+		const stepsUntilStable = 1_000 / SimulationStepMs + 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
@@ -154,6 +154,6 @@ describe("replayRuntimeStepsFx", () => {
 		expect(result.replay.runtime.jobs).toEqual([]);
 		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(stepsUntilStable);
-		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - stepsUntilStable);
+		expect(result.replay.skippedSteps).toBe(hourMs / SimulationStepMs - stepsUntilStable);
 	});
 });

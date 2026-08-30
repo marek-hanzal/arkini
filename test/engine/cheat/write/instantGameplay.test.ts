@@ -7,7 +7,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const startProps = {
@@ -32,7 +32,7 @@ describe("Instant gameplay", () => {
 				yield* startLineFx(startProps);
 				const admittedInstantRuntime = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
-					elapsedMs: TickStepMs,
+					elapsedMs: SimulationStepMs,
 				});
 				const settledInstantRuntime = yield* readRuntimeFx();
 				yield* setCheatEnabledFx({

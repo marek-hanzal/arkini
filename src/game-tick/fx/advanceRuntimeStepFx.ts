@@ -13,7 +13,7 @@ import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineS
 import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
@@ -58,7 +58,7 @@ const advanceDeliveriesFx = Effect.fn("advanceDeliveriesFx")(function* (
 				...liveItem.location,
 				remainingDurationMs: instantGameplay
 					? 0
-					: Math.max(0, liveItem.location.remainingDurationMs - TickStepMs),
+					: Math.max(0, liveItem.location.remainingDurationMs - SimulationStepMs),
 			},
 		};
 		draft = {
@@ -188,7 +188,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (liveJob === undefined) continue;
 		draft = replaceJobFn(draft, {
 			...liveJob,
-			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - TickStepMs),
+			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - SimulationStepMs),
 		});
 	}
 

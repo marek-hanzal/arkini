@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 
 interface ReplayRuntimeStepsProps {
@@ -30,13 +30,13 @@ export const replayRuntimeStepsFx = Effect.fn("replayRuntimeStepsFx")(function* 
 	elapsedMs,
 	runtime,
 }: ReplayRuntimeStepsProps) {
-	if (elapsedMs % TickStepMs !== 0) {
+	if (elapsedMs % SimulationStepMs !== 0) {
 		return yield* Effect.die(
-			new Error(`Tick advancement ${elapsedMs}ms is not divisible by ${TickStepMs}ms.`),
+			new Error(`Tick advancement ${elapsedMs}ms is not divisible by ${SimulationStepMs}ms.`),
 		);
 	}
 
-	const totalSteps = elapsedMs / TickStepMs;
+	const totalSteps = elapsedMs / SimulationStepMs;
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
 	let processedSteps = 0;

@@ -5,7 +5,7 @@ import { vi } from "vitest";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { GameTransition } from "~/renderer/game/session/GameSession";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 
 (

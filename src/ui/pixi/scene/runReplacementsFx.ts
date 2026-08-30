@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { TileReplacement } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
+import type { readCommittedTileReplacementsFx } from "~/tile-presentation/fx/readCommittedTileReplacementsFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import {
 	visualCrossfadeDurationMs,
@@ -19,7 +19,7 @@ export namespace runReplacementsFx {
 		readonly application: PixiApplicationOwner;
 		readonly processedKeys: Set<string>;
 		readonly readPalette: () => PixiScenePalette;
-		readonly replacements: ReadonlyArray<TileReplacement>;
+		readonly replacements: Effect.Success<ReturnType<typeof readCommittedTileReplacementsFx>>;
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
 	}

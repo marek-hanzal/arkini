@@ -4,7 +4,7 @@ import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";

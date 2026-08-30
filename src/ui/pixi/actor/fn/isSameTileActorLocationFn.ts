@@ -1,4 +1,4 @@
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 /** Compares the complete physical identity of two renderer-visible grid locations. */
 export const isSameTileActorLocationFn = (

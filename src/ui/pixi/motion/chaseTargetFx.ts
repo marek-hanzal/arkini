@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorAnimator, PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
 import type { AnimationCurve } from "~/ui/pixi/animation/AnimationDriver";

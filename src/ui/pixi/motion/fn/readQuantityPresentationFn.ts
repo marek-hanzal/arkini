@@ -1,4 +1,4 @@
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 import { readUnsettledTileInputSourceQuantitiesFn } from "~/ui/tile/motion/fn/readUnsettledTileInputSourceQuantitiesFn";
 

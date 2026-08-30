@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
@@ -7,13 +6,6 @@ import { readRuntimeLineFillProgressFn } from "~/production-line/fn/readRuntimeL
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-export namespace readTileActorAssetSourceIdsFx {
-	export interface Props {
-		readonly item: RuntimeItemSchema.Type;
-		readonly runtime: RuntimeSchema.Type;
-	}
-}
-
 /**
  * Selects the complete authored tile composition for one committed runtime item.
  *
@@ -21,10 +13,13 @@ export namespace readTileActorAssetSourceIdsFx {
  * composition. Other item kinds keep their default until the engine gives them
  * an explicit progress projection.
  */
-export const readTileActorAssetSourceIdsFx = Effect.fn("readTileActorAssetSourceIdsFx")(function* ({
+export const readTileActorAssetSourceIdsFn = ({
 	item,
 	runtime,
-}: readTileActorAssetSourceIdsFx.Props) {
+}: {
+	readonly item: RuntimeItemSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+}) => {
 	const progressLine = match(item.item)
 		.with(
 			{
@@ -70,4 +65,4 @@ export const readTileActorAssetSourceIdsFx = Effect.fn("readTileActorAssetSource
 					source,
 				]
 	) satisfies AssetSchema.Type["default"];
-});
+};

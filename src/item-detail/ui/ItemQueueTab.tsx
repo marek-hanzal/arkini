@@ -1,8 +1,9 @@
 import { CircleOff, ListX } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import type { Effect } from "effect";
 
+import { projectItemDetailQueueFx } from "~/item-detail/fx/projectItemDetailQueueFx";
 import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
-import type { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import {
@@ -22,7 +23,7 @@ const statusLabel = {
 } as const;
 
 type QueueProjection = Extract<
-	useItemDetailQueue.Projection,
+	Effect.Success<ReturnType<typeof projectItemDetailQueueFx>>,
 	{
 		readonly kind: "available";
 	}

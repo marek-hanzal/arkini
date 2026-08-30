@@ -1,18 +1,29 @@
-import type { useItemDefinitionDetail } from "~/ui/item-detail/useItemDefinitionDetail";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 import { Fact, FactList } from "~/ui/fact/FactList";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
+
+type ItemDefinitionDetail = {
+	readonly itemId: IdSchema.Type;
+	readonly title: string;
+	readonly sourceUrl: string;
+	readonly compositeUrl?: string;
+	readonly description: string;
+	readonly itemType: TypeSchema.Type;
+	readonly storageScope: StorageSchema.Type;
+	readonly maxStackSize: number;
+	readonly ownedQuantity: number;
+	readonly maxCount?: number;
+	readonly totalCharges?: number;
+};
 
 /** Renders authored facts for a configured item reference without pretending a live stack exists. */
 export const ItemDefinitionInfoTab = ({
 	definition,
 }: {
-	readonly definition: Extract<
-		useItemDefinitionDetail.Projection,
-		{
-			readonly kind: "available";
-		}
-	>;
+	readonly definition: ItemDefinitionDetail;
 }) => {
 	return (
 		<Scrollable

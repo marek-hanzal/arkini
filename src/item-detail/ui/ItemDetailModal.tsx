@@ -1,38 +1,474 @@
+import { Effect, Equal } from "effect";
 import { motion } from "motion/react";
-import { type ReactNode, useEffect } from "react";
+import {
+	type ComponentProps,
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from "react";
 import { match } from "ts-pattern";
 
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import { useItemDefinitionDetail } from "~/ui/item-detail/useItemDefinitionDetail";
-import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import { useItemDetailIdentity } from "~/ui/item-detail/useItemDetailIdentity";
-import { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
-import { useItemDetailLines } from "~/item-line-detail/ui/useItemDetailLines";
-import { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
-import { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
-import { useItemDetailTabs } from "~/ui/item-detail/useItemDetailTabs";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { BadgeCount } from "~/ui/badge/BadgeCount";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
-import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readItemDetailInfoFn } from "~/engine/item-detail/fn/readItemDetailInfoFn";
+import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
+import { readItemDetailIdentityFx } from "~/engine/item-detail/read/readItemDetailIdentityFx";
+import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
+import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import {
 	ItemDetailHeader,
 	type ItemDetailHeaderIdentityRenderer,
 } from "~/item-detail-frame/ui/ItemDetailHeader";
 import type { ItemDetailState, ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
-import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
-import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
-import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
-import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
-import { useItemDetailMotion } from "~/ui/item-detail/useItemDetailMotion";
 import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
+import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
+import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
+import { useItemDetailLines } from "~/item-line-detail/ui/useItemDetailLines";
+import { projectItemDetailQueueFx } from "~/item-detail/fx/projectItemDetailQueueFx";
+import { ItemDefinitionInfoTab } from "~/item-detail/ui/ItemDefinitionInfoTab";
+import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";
+import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
+import { ItemSourcesTab } from "~/item-detail/ui/ItemSourcesTab";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { BadgeCount } from "~/ui/badge/BadgeCount";
+import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
+import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
+import { useGameEngine } from "~/ui/game/useGameEngine";
+import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
+
+import "./item-detail.css";
+
+type ItemDefinitionDetailProjection =
+	| (ComponentProps<typeof ItemDefinitionInfoTab>["definition"] & {
+			readonly kind: "available";
+	  })
+	| {
+			readonly kind: "unavailable";
+	  };
+
+type ItemDetailIdentityProjection =
+	| {
+			readonly kind: "available";
+			readonly definitionId: IdSchema.Type;
+			readonly itemId: IdSchema.Type;
+			readonly title: string;
+			readonly sourceUrl: string;
+			readonly compositeUrl?: string;
+	  }
+	| {
+			readonly kind: "unavailable";
+	  };
+
+type ItemDetailQueueProjection = Effect.Success<ReturnType<typeof projectItemDetailQueueFx>>;
+
+type ItemDetailSourcesProjection =
+	| ComponentProps<typeof ItemSourcesTab>["sources"]
+	| {
+			readonly kind: "unavailable";
+	  };
+
+type ItemDetailProjectionTarget =
+	| {
+			readonly kind: "runtime";
+			readonly itemId: IdSchema.Type;
+	  }
+	| {
+			readonly kind: "definition";
+			readonly itemId: IdSchema.Type;
+	  };
+
+const unavailable = {
+	kind: "unavailable",
+} as const;
+
+const useItemDefinitionDetail = (itemId: IdSchema.Type): ItemDefinitionDetailProjection => {
+	const game = useGameEngine();
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type): ItemDefinitionDetailProjection => {
+			const item = game.config.items[itemId];
+			if (item === undefined) return unavailable;
+			return {
+				kind: "available",
+				itemId: item.id,
+				title: item.title,
+				sourceUrl: game.getResourceUrl(item.asset.default[0]),
+				...(item.asset.default[1] === undefined
+					? {}
+					: {
+							compositeUrl: game.getResourceUrl(item.asset.default[1]),
+						}),
+				description: item.description,
+				itemType: item.type,
+				storageScope: item.scope,
+				maxStackSize: item.maxStackSize,
+				ownedQuantity: runtime.items.reduce(
+					(total, candidate) =>
+						candidate.item.id === item.id ? total + candidate.quantity : total,
+					0,
+				),
+				...(item.maxCount === undefined
+					? {}
+					: {
+							maxCount: item.maxCount,
+						}),
+				...(item.charges === undefined
+					? {}
+					: {
+							totalCharges: item.charges.amount,
+						}),
+			};
+		},
+		[
+			game,
+			itemId,
+		],
+	);
+	return useRuntimeSelector(game, selector, Equal.equals);
+};
+
+const useItemDetailIdentity = (itemId: IdSchema.Type): ItemDetailIdentityProjection => {
+	const game = useGameEngine();
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type): ItemDetailIdentityProjection => {
+			const identity = game.readOrThrow(
+				readItemDetailIdentityFx({
+					itemId,
+					runtime,
+				}),
+			);
+			if (identity.kind === "unavailable") return unavailable;
+			return {
+				kind: "available",
+				definitionId: identity.definitionId,
+				itemId: identity.itemId,
+				title: identity.title,
+				sourceUrl: game.getResourceUrl(identity.sourceResourceIds[0]),
+				...(identity.sourceResourceIds[1] === undefined
+					? {}
+					: {
+							compositeUrl: game.getResourceUrl(identity.sourceResourceIds[1]),
+						}),
+			};
+		},
+		[
+			game,
+			itemId,
+		],
+	);
+	return useRuntimeSelector(game, selector, Equal.equals);
+};
+
+const useItemDetailInfo = (itemId: IdSchema.Type): readItemDetailInfoFn.Result => {
+	const game = useGameEngine();
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type): readItemDetailInfoFn.Result =>
+			readItemDetailInfoFn({
+				itemId,
+				runtime,
+			}),
+		[
+			itemId,
+		],
+	);
+	return useRuntimeSelector(game, selector, (left, right) => {
+		if (left.kind !== right.kind) return false;
+		if (left.kind === "unavailable" || right.kind === "unavailable") return true;
+		return (
+			left.itemId === right.itemId &&
+			left.description === right.description &&
+			left.itemType === right.itemType &&
+			left.storageScope === right.storageScope &&
+			left.location.kind === right.location.kind &&
+			(left.location.kind !== "board" ||
+				right.location.kind !== "board" ||
+				left.location.space === right.location.space) &&
+			left.quantity === right.quantity &&
+			left.maxStackSize === right.maxStackSize &&
+			left.ownedQuantity === right.ownedQuantity &&
+			left.maxCount === right.maxCount &&
+			left.charges?.remaining === right.charges?.remaining &&
+			left.charges?.total === right.charges?.total
+		);
+	});
+};
+
+const useItemDetailQueue = (itemId: IdSchema.Type): ItemDetailQueueProjection => {
+	const game = useGameEngine();
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type): ItemDetailQueueProjection =>
+			game.readOrThrow(
+				projectItemDetailQueueFx({
+					game,
+					itemId,
+					runtime,
+				}),
+			),
+		[
+			game,
+			itemId,
+		],
+	);
+	return useRuntimeSelector(game, selector, Equal.equals);
+};
+
+const useItemDetailSources = (target: ItemDetailProjectionTarget): ItemDetailSourcesProjection => {
+	const game = useGameEngine();
+	const { itemId, kind } = target;
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type): ItemDetailSourcesProjection => {
+			const projection = game.readOrThrow(
+				readItemDetailSourcesFx({
+					target: {
+						kind,
+						itemId,
+					},
+					runtime,
+				}),
+			);
+			if (projection.kind === "unavailable") return unavailable;
+			const target = game.config.items[projection.targetDefinitionItemId];
+			if (target === undefined) return unavailable;
+			return {
+				kind: "available",
+				itemId: projection.itemId,
+				targetTitle: target.title,
+				source: projection.source.flatMap((source) => {
+					const configured = game.config.items[source.ownerDefinitionItemId];
+					if (configured === undefined) return [];
+					const owner = runtime.items.find(
+						(candidate) => candidate.id === source.ownerItemId,
+					);
+					if (owner === undefined) return [];
+					return [
+						{
+							ownerItemId: source.ownerItemId,
+							ownerDefinitionItemId: source.ownerDefinitionItemId,
+							title: configured.title,
+							sourceUrl: game.getResourceUrl(owner.item.asset.default[0]),
+							...(configured.asset.default[1] === undefined
+								? {}
+								: {
+										compositeUrl: game.getResourceUrl(
+											configured.asset.default[1],
+										),
+									}),
+							space: source.space,
+							line: source.line,
+						} satisfies ComponentProps<
+							typeof ItemSourcesTab
+						>["sources"]["source"][number],
+					];
+				}),
+			};
+		},
+		[
+			game,
+			itemId,
+			kind,
+		],
+	);
+	return useRuntimeSelector(game, selector, Equal.equals);
+};
+
+const useItemDetailTabs = (
+	target: ItemDetailProjectionTarget,
+	sources: ItemDetailSourcesProjection,
+): readonly ItemDetailTabEnumSchema.Type[] => {
+	const game = useGameEngine();
+	const { itemId, kind } = target;
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type) =>
+			readItemDetailTabsFn({
+				target:
+					kind === "runtime"
+						? {
+								kind,
+								item: runtime.items.find((item) => item.id === itemId),
+							}
+						: {
+								kind,
+							},
+				sources,
+			}),
+		[
+			game,
+			itemId,
+			kind,
+			sources,
+		],
+	);
+	return useRuntimeSelector(game, selector, Equal.equals);
+};
+
+const visibleDialog = {
+	opacity: 1,
+	y: 0,
+};
+
+const exitingDialog = {
+	opacity: 0,
+	y: 8,
+};
+
+const useItemDetailMotion = ({
+	state,
+}: {
+	readonly state: Exclude<
+		ItemDetailState,
+		{
+			readonly phase: "closed";
+		}
+	>;
+}) => {
+	const itemDetail = useItemDetailControl();
+	const completedPhaseRef = useRef<ItemDetailState["phase"] | null>(null);
+
+	useEffect(() => {
+		completedPhaseRef.current = null;
+	}, [
+		state.phase,
+		state.generation,
+	]);
+
+	const completeMotionPhase = () => {
+		if (completedPhaseRef.current === state.phase) return;
+		match(state)
+			.with(
+				{
+					phase: "entering",
+				},
+				({ generation }) => {
+					completedPhaseRef.current = state.phase;
+					RendererRuntime.runSync(itemDetail.completeEnterFx(generation));
+				},
+			)
+			.with(
+				{
+					phase: "open",
+				},
+				() => undefined,
+			)
+			.with(
+				{
+					phase: "exiting",
+				},
+				({ generation }) => {
+					completedPhaseRef.current = state.phase;
+					RendererRuntime.runSync(itemDetail.completeExitFx(generation));
+				},
+			)
+			.exhaustive();
+	};
+
+	const visual = match(state)
+		.with(
+			{
+				phase: "entering",
+			},
+			{
+				phase: "open",
+			},
+			() => ({
+				backdropOpacity: 1,
+				dialog: visibleDialog,
+			}),
+		)
+		.with(
+			{
+				phase: "exiting",
+			},
+			() => ({
+				backdropOpacity: 0,
+				dialog: exitingDialog,
+			}),
+		)
+		.exhaustive();
+
+	return {
+		...visual,
+		completeMotionPhase,
+	};
+};
+
+const useItemDetailFocus = ({
+	phase,
+	origin,
+	restoreFocus,
+	focusKey,
+}: {
+	readonly phase: Exclude<
+		ItemDetailState,
+		{
+			readonly phase: "closed";
+		}
+	>["phase"];
+	readonly origin: HTMLElement | null;
+	readonly restoreFocus: boolean;
+	readonly focusKey: string;
+}) => {
+	const dialogRef = useRef<HTMLDivElement>(null);
+	const originRef = useRef(origin);
+	const restoreFocusRef = useRef(restoreFocus);
+	useLayoutEffect(() => {
+		originRef.current = origin;
+		restoreFocusRef.current = restoreFocus;
+	}, [
+		origin,
+		restoreFocus,
+	]);
+
+	useEffect(() => {
+		dialogRef.current?.focus();
+		return () => {
+			if (!restoreFocusRef.current) return;
+			const latestOrigin = originRef.current;
+			if (
+				latestOrigin !== null &&
+				latestOrigin.isConnected &&
+				latestOrigin.matches(dialogFocusableSelector) &&
+				!latestOrigin.hidden &&
+				latestOrigin.closest("[inert]") === null &&
+				latestOrigin.style.display !== "none" &&
+				latestOrigin.style.visibility !== "hidden" &&
+				latestOrigin.style.pointerEvents !== "none"
+			) {
+				latestOrigin.focus();
+				return;
+			}
+			document.querySelector<HTMLElement>('[data-ui="GameShell"]')?.focus();
+		};
+	}, []);
+
+	useEffect(() => {
+		if (phase !== "open") return;
+		const dialog = dialogRef.current;
+		const selectedTab = dialog?.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailTabs"] button[aria-selected="true"]:not([disabled])',
+		);
+		(selectedTab ?? dialog?.querySelector<HTMLElement>(dialogFocusableSelector))?.focus();
+	}, [
+		focusKey,
+		phase,
+	]);
+
+	const keepFocusInside = useDialogFocusContainment({
+		dialogRef,
+	});
+
+	return {
+		dialogRef,
+		keepFocusInside,
+	};
+};
 
 const transition = {
 	duration: 0.22,
@@ -128,8 +564,8 @@ const ItemInfoContent = ({
 	stale,
 }: {
 	readonly disabled: boolean;
-	readonly identity?: useItemDetailIdentity.Projection;
-	readonly info?: useItemDetailInfo.Projection;
+	readonly identity?: ItemDetailIdentityProjection;
+	readonly info?: readItemDetailInfoFn.Result;
 	readonly stale: boolean;
 }) => {
 	if (identity?.kind !== "available" || info?.kind !== "available") {
@@ -232,7 +668,7 @@ const ItemSourcesContent = ({
 	stale = false,
 }: {
 	readonly disabled: boolean;
-	readonly sources?: useItemDetailSources.Projection;
+	readonly sources?: ItemDetailSourcesProjection;
 	readonly stale?: boolean;
 }) => {
 	if (sources?.kind !== "available" || sources.source.length === 0) {
@@ -267,12 +703,12 @@ const ItemDetailContent = ({
 	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly itemId: string;
-	readonly identity?: useItemDetailIdentity.Projection;
-	readonly info?: useItemDetailInfo.Projection;
+	readonly identity?: ItemDetailIdentityProjection;
+	readonly info?: readItemDetailInfoFn.Result;
 	readonly linesSearchQuery?: string;
 	readonly lines?: ItemDetailLinesProjection.Projection;
 	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
-	readonly sources?: useItemDetailSources.Projection;
+	readonly sources?: ItemDetailSourcesProjection;
 	readonly stale: boolean;
 	readonly tab: ItemDetailTabEnumSchema.Type;
 }) =>
@@ -679,7 +1115,7 @@ const ItemDetailDialog = ({
 };
 
 /** Renders the one active Item Detail modal over the unchanged tile scene. */
-export interface ItemDetailModalProps {
+interface ItemDetailModalProps {
 	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
 	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 }

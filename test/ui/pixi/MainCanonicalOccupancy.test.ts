@@ -1,7 +1,7 @@
 import { Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 
 const board = (x: number, y: number, space = 0) =>

@@ -1,5 +1,5 @@
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export interface VisibleActor {

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";

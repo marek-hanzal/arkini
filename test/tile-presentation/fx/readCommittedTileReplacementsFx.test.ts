@@ -1,10 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { GameTransition } from "~/renderer/game/session/GameSession";
-import { readCommittedTileReplacementsFx } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
+import { readCommittedTileReplacementsFx } from "~/tile-presentation/fx/readCommittedTileReplacementsFx";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
@@ -91,7 +90,7 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 
 const game = {
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
-} as GameEngine;
+};
 
 describe("readCommittedTileReplacementsFx", () => {
 	it("retains the outgoing face only for an exact same-slot replace merge", () => {
@@ -111,7 +110,7 @@ describe("readCommittedTileReplacementsFx", () => {
 					resultCanonicalItemId: "mud",
 				},
 			],
-		} satisfies GameTransition;
+		} satisfies CommittedTransitionSchema.Type;
 
 		expect(
 			Effect.runSync(
@@ -140,7 +139,7 @@ describe("readCommittedTileReplacementsFx", () => {
 			previousRuntime: runtime(config.items.stone),
 			runtime: runtime(config.items.mud),
 			events: [],
-		} satisfies GameTransition;
+		} satisfies CommittedTransitionSchema.Type;
 
 		expect(
 			Effect.runSync(

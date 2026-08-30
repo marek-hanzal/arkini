@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { GameTransition } from "~/renderer/game/session/GameSession";
-import { readTileActorFeedbackCuesFn } from "~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn";
+import { readTileActorFeedbackCuesFn } from "~/tile-presentation/fn/readTileActorFeedbackCuesFn";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 const boardLocation = {
 	scope: "board" as const,
@@ -100,7 +100,7 @@ describe("readTileActorFeedbackCuesFn", () => {
 				defaultLineByOwnerItemId: {},
 			},
 			sequence: 12,
-		} as GameTransition;
+		} as CommittedTransitionSchema.Type;
 
 		expect(readTileActorFeedbackCuesFn(transition)).toEqual([
 			{
@@ -162,7 +162,7 @@ describe("readTileActorFeedbackCuesFn", () => {
 				},
 			],
 			sequence: 13,
-		} as GameTransition;
+		} as CommittedTransitionSchema.Type;
 
 		expect(readTileActorFeedbackCuesFn(transition)).toEqual([]);
 	});

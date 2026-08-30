@@ -13,8 +13,8 @@ import {
 } from "pixi.js";
 import { vi } from "vitest";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";

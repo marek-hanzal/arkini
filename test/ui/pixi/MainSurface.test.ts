@@ -3,7 +3,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";

@@ -3,7 +3,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
 import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 import {
 	flushMicrotasks,

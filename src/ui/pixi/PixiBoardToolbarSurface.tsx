@@ -6,7 +6,7 @@ import { useGameEngine } from "~/ui/game/useGameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
 import { TileDefaultLineCommandAtom } from "~/ui/pixi/command/TileDefaultLineCommandAtom";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import { runTileSplitAtom } from "~/ui/pixi/command/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";

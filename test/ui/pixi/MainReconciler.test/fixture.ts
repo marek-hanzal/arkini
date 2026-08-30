@@ -1,6 +1,6 @@
 import { beforeEach, vi } from "vitest";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 
@@ -47,7 +47,7 @@ const projectionState = vi.hoisted(() => ({
 
 export const projectionProbeState = projectionState;
 
-vi.mock("~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn", () => ({
+vi.mock("~/tile-presentation/fn/readTileActorFeedbackCuesFn", () => ({
 	readTileActorFeedbackCuesFn: () => projectionState.feedback,
 }));
 
@@ -57,7 +57,7 @@ const createdVisualState = vi.hoisted(() => ({
 
 export const __fixture_createdVisualState = createdVisualState;
 
-vi.mock("~/ui/pixi/actor/readTileActorsFx", () => ({
+vi.mock("~/tile-presentation/fx/readTileActorsFx", () => ({
 	readTileActorsFx: ({ surface }: { readonly surface: "inventory" | "main" }) => ({
 		kind: "tile-actors",
 		surface,
@@ -70,14 +70,14 @@ vi.mock("~/ui/pixi/delivery/readTileDeliveriesFx", () => ({
 	}),
 }));
 
-vi.mock("~/ui/pixi/motion/readCommittedTileReplacementsFx", async () => {
+vi.mock("~/tile-presentation/fx/readCommittedTileReplacementsFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readCommittedTileReplacementsFx: () => EffectModule.succeed(projectionState.replacements),
 	};
 });
 
-vi.mock("~/ui/pixi/motion/readTileMotionCuesFx", async () => {
+vi.mock("~/tile-presentation/fx/readTileMotionCuesFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readTileMotionCuesFx: () => EffectModule.succeed(projectionState.cues),

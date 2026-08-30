@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Container, Graphics, Rectangle } from "pixi.js";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";

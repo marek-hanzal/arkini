@@ -2,7 +2,7 @@ import type { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readR
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { TileActorVisual } from "~/ui/pixi/actor/TileActorVisual";
+import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 
 /** One exact live grid identity projected for the shared Canvas tile actor layer. */
 export interface TileActorItem extends TileActorVisual {

@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 import type { MotionRedirect } from "~/ui/pixi/motion/MotionTarget";
 

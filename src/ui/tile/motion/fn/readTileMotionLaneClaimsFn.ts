@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 
 export type TileMotionLaneClaim =
 	| {

@@ -21,6 +21,7 @@
 		"src/game-event",
 		"src/item-line-detail",
 		"src/item-detail-frame",
+		"src/tile-presentation",
 		"src/item-definition",
 		"src/item-location",
 		"src/item-placement",

@@ -5,10 +5,9 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
-import {
-	EditorServiceReadinessTimeoutMs,
-	refreshEditorServiceStatusFx,
-} from "~/project-authoring/fx/refreshEditorServiceStatusFx";
+import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEditorServiceStatusFx";
+
+const EditorServiceReadinessTimeoutMs = 2_000;
 
 afterEach(() => {
 	vi.useRealTimers();

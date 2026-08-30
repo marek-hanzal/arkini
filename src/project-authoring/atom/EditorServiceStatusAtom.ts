@@ -2,7 +2,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 
-export type EditorServiceStatus =
+type EditorServiceStatus =
 	| {
 			readonly type: "starting";
 	  }

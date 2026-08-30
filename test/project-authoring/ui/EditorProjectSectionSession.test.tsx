@@ -199,7 +199,44 @@ describe("project section form session", () => {
 	});
 
 	it("submits one complete config without losing unrelated facts or exact start stacks", async () => {
-		state.project = boardSpaceProject;
+		const project = {
+			...boardSpaceProject,
+			config: {
+				...boardSpaceProject.config,
+				meta: {
+					...boardSpaceProject.config.meta,
+					toolbarSize: 2,
+				},
+				resources: {
+					hero: "hero",
+					"avatar-03": "item-water",
+				},
+				start: {
+					...boardSpaceProject.config.start,
+					inventory: [
+						{
+							itemId: "water",
+							position: {
+								x: 0,
+								y: 0,
+							},
+							quantity: 3,
+						},
+					],
+					toolbar: [
+						{
+							itemId: "water",
+							position: {
+								x: 1,
+								y: 0,
+							},
+							quantity: 4,
+						},
+					],
+				},
+			},
+		} satisfies EditorProject;
+		state.project = project;
 		state.section = <EditorProjectGeneralSection />;
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -225,12 +262,17 @@ describe("project section form session", () => {
 
 		expect(state.saveConfig).toHaveBeenCalledTimes(1);
 		const [{ config, expectedRevision }] = state.saveConfig.mock.calls[0] ?? [];
-		expect(expectedRevision).toBe(boardSpaceProject.revision);
-		expect(config.meta.title).toBe("Updated project");
-		expect(config.meta.id).toBe(boardSpaceProject.config.meta.id);
-		expect(config.items).toEqual(boardSpaceProject.config.items);
-		expect(config.resources).toEqual(boardSpaceProject.config.resources);
-		expect(config.start).toEqual(boardSpaceProject.config.start);
+		expect(expectedRevision).toBe(project.revision);
+		expect(config.meta).toEqual({
+			...project.config.meta,
+			title: "Updated project",
+		});
+		expect(config.items).toEqual(project.config.items);
+		expect(config.resources).toEqual({
+			hero: "hero",
+			"avatar-01": "item-water",
+		});
+		expect(config.start).toEqual(project.config.start);
 	});
 
 	it("edits initial Board cells in an explicitly selected zero-based space", async () => {

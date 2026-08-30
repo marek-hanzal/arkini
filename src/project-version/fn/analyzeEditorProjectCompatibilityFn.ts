@@ -5,11 +5,28 @@ import {
 	type EditorProjectCompatibilityPath,
 	type EditorProjectCompatibilityRule,
 } from "~/project-version/type/EditorProjectCompatibility";
-import type { EditorProjectSemanticDiff } from "~/project-version/type/EditorProjectSemanticDiff";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+
+type EditorProjectSemanticDiff =
+	| {
+			readonly after: unknown;
+			readonly operation: "add";
+			readonly path: EditorProjectCompatibilityPath;
+	  }
+	| {
+			readonly before: unknown;
+			readonly operation: "remove";
+			readonly path: EditorProjectCompatibilityPath;
+	  }
+	| {
+			readonly after: unknown;
+			readonly before: unknown;
+			readonly operation: "change";
+			readonly path: EditorProjectCompatibilityPath;
+	  };
 
 interface MissingDiffValue {
 	readonly type: "missing";

@@ -12,7 +12,7 @@ import type {
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-export interface EditorProjectVersionDiffSnapshot {
+interface EditorProjectVersionDiffSnapshot {
 	readonly config: GameConfigSchema.Type;
 	readonly arkpackVersion: string;
 	readonly resources: ReadonlyMap<string, string>;

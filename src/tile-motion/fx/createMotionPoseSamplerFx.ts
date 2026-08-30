@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PresentedPose } from "~/tile-rendering/service/ActorAnimator";
 import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
+import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 interface CreateMotionPoseSamplerProps {
 	readonly actorBaseSize: number;

@@ -14,7 +14,7 @@ import {
 } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
-import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
+import type { InventoryActorStore } from "~/game-scene/service/InventoryActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";

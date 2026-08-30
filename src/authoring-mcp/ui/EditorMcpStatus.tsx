@@ -1,10 +1,6 @@
-const statusClassNames = {
-	muted: "text-sm text-muted",
-	danger: "text-sm text-danger",
-	success: "text-sm text-success",
-} as const;
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
-export type EditorMcpStatusTone = keyof typeof statusClassNames;
+export type EditorMcpStatusTone = "danger" | "muted" | "success";
 
 export const EditorMcpStatus = ({
 	message,
@@ -12,4 +8,16 @@ export const EditorMcpStatus = ({
 }: {
 	readonly message: string;
 	readonly tone?: EditorMcpStatusTone;
-}) => <p className={statusClassNames[tone]}>{message}</p>;
+}) => (
+	<p
+		className="text-sm data-[ui-tone=danger]:text-danger data-[ui-tone=muted]:text-muted data-[ui-tone=success]:text-success"
+		{...readDataUiFn({
+			dataUi: "EditorMcpStatus",
+			state: {
+				tone,
+			},
+		})}
+	>
+		{message}
+	</p>
+);

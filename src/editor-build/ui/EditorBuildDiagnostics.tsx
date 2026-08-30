@@ -6,6 +6,7 @@ import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorIt
 import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
 import { ButtonLink } from "~/ui/button/Button";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 type EditorGameDiagnostic = GameDiagnosticSchema.Type;
 
@@ -227,7 +228,13 @@ export const EditorBuildDiagnostics = ({
 			return (
 				<li
 					key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${diagnostic.path.join(".")}-${index}`}
-					className={`rounded-xl border-l-2 p-4 ${diagnostic.severity === "error" ? "border-danger bg-danger/5" : "border-warning bg-warning/5"}`}
+					className="rounded-xl border-l-2 p-4 data-[ui-severity=error]:border-danger data-[ui-severity=error]:bg-danger/5 data-[ui-severity=warning]:border-warning data-[ui-severity=warning]:bg-warning/5"
+					{...readDataUiFn({
+						dataUi: "EditorBuildDiagnostic",
+						state: {
+							severity: diagnostic.severity,
+						},
+					})}
 				>
 					<div className="flex flex-wrap items-start justify-between gap-2">
 						<div>

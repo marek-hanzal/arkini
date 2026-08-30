@@ -5,7 +5,7 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
-import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
+import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 

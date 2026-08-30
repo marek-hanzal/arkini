@@ -7,7 +7,7 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
+import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";

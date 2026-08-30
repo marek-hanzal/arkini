@@ -7,7 +7,7 @@ import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSc
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { ToolbarLocationSchema } from "~/item-location/schema/ToolbarLocationSchema";
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planSpawnPlacementFx } from "~/item-placement/fx/planSpawnPlacementFx";

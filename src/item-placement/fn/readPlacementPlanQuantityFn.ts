@@ -1,4 +1,4 @@
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 interface ReadPlacementPlanQuantityProps {
 	readonly plan: PlacementPlan;

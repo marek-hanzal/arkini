@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";

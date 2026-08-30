@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
+import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";

@@ -1,7 +1,7 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";
 import { EditorProductionLineInputs } from "~/item-authoring/ui/EditorProductionLineInputs";

@@ -2,7 +2,7 @@ import { Deferred, Effect, Fiber, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";

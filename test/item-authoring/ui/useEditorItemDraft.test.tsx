@@ -2,16 +2,23 @@
 
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectContext } from "~/authoring-session/useEditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
 	editorTestConfig,
 	editorTestPayload,
 } from "~test/project-authoring/support/editorTestPayload";
+
+const state = vi.hoisted(() => ({
+	project: undefined as unknown as EditorProject,
+}));
+
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
+	useEditorProject: () => state.project,
+}));
 
 (
 	globalThis as {
@@ -46,21 +53,16 @@ afterEach(async () => {
 describe("useEditorItemDraft", () => {
 	it("binds the first project resource and preallocated UID into the local draft", async () => {
 		const uid = "draft-simple";
+		state.project = project;
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(
-					EditorProjectContext.Provider,
-					{
-						value: project,
-					},
-					createElement(DraftProbe, {
-						uid,
-					}),
-				),
+				createElement(DraftProbe, {
+					uid,
+				}),
 			);
 		});
 		const draft = JSON.parse(

@@ -12,7 +12,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import { EditorVersionHeadFileSchema } from "~/project-version/EditorVersionHeadFileSchema";
+import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";

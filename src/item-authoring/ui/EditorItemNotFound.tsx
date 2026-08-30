@@ -1,5 +1,5 @@
-import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 
 /** Presents one missing canonical item route without duplicating navigation chrome. */
 export const EditorItemNotFound = ({ uid }: { readonly uid: string }) => {

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 
-import { useEditorHistoryBack } from "~/authoring-shell/navigation/useEditorHistoryBack";
+import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
 import { PlayableInventory } from "~/ui/game/PlayableInventory";
 
 export const Route = createFileRoute("/editor/$projectId/board/inventory")({

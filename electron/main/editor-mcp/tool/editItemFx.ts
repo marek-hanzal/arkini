@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import { saveEditorItemWithRepositoryFx } from "~/item-authoring/domain/fx/saveEditorItemWithRepositoryFx";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";

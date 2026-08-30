@@ -7,7 +7,7 @@ import { ElectronMainError } from "../../../../electron/main/ElectronMainError";
 import type { EditorProjectServiceOwnership } from "../../../../electron/main/editor-project/EditorProjectServiceOwnership";
 import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createEditorProjectIpcRepository,

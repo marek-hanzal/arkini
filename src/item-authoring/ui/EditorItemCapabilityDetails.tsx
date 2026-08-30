@@ -2,7 +2,7 @@ import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import {
 	DetailFact,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { openEditorArkpackFx } from "~/arkpack/ui/editor/openEditorArkpackFx";
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 /** Keeps an admitted Editor open/import command alive through navigation. */

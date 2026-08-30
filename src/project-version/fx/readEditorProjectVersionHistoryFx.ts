@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 
 /** Reads the saved working-copy status and immutable tree after earlier writes settle. */
 export const readEditorProjectVersionHistoryFx = Effect.fn("readEditorProjectVersionHistoryFx")(

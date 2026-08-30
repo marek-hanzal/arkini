@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { EditorWelcome } from "~/project-authoring/welcome/EditorWelcome";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { EditorWelcome } from "~/project-authoring/ui/EditorWelcome";
 import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
 
 export const Route = createFileRoute("/editor/welcome")({

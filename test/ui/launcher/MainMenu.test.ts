@@ -21,7 +21,7 @@ import { createRendererLifecycleFx } from "~/application-runtime/fx/createRender
 import { Route as MainMenuRouteDefinition } from "~/@routes/_launcher/main-menu";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
-import { EditorServiceStatusAtom } from "~/project-authoring/welcome/EditorServiceStatusAtom";
+import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 
 (
 	globalThis as {

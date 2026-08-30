@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "../../../contract/editor/EditorProjectTransport";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 import type {
 	EditorProjectServiceOwnership,

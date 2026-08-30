@@ -24,15 +24,15 @@ vi.mock("~/asset-authoring/ui/useEditorAssetEditController", () => ({
 	}),
 }));
 
-vi.mock("~/authoring-shell/navigation/EditorHistoryBackButton", () => ({
+vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 	EditorHistoryBackButton: () => null,
 }));
 
-vi.mock("~/authoring-shell/navigation/EditorSectionNavigation", () => ({
+vi.mock("~/authoring-shell/ui/EditorSectionNavigation", () => ({
 	EditorSectionNavigation: ({ action }: { readonly action?: ReactNode }) => action,
 }));
 
-vi.mock("~/authoring-shell/navigation/EditorSectionPage", () => ({
+vi.mock("~/authoring-shell/ui/EditorSectionPage", () => ({
 	EditorSectionPage: ({
 		children,
 		tabs,

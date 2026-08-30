@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
 /** Resolves one canonical item reference into compact select-option copy. */
 export const useEditorItemOptionLabel = () => {

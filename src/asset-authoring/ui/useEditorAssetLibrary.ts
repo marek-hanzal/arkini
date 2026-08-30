@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 

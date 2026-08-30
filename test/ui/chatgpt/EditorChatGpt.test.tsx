@@ -40,11 +40,11 @@ vi.mock("@effect/atom-react", () => ({
 	}),
 }));
 
-vi.mock("~/authoring-session/useEditorProject", () => ({
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/project-authoring/repository/EditorProjectRepository", async () => {
+vi.mock("~/project-authoring/service/EditorProjectRepository", async () => {
 	const { Effect } = await import("effect");
 	return {
 		EditorProjectRepository: Effect.succeed({}),
@@ -69,7 +69,7 @@ vi.mock("~/ui/reactivity/readSettledAsyncResultErrorFx", async () => {
 	};
 });
 
-vi.mock("~/authoring-session/useEditorUnsavedChangesRegistration", () => ({
+vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
 	useEditorUnsavedChangesRegistration: (session: typeof state.unsavedSession) => {
 		state.unsavedSession = session;
 	},

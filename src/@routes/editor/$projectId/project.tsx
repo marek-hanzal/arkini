@@ -1,18 +1,18 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { EditorCompatibilityNotice } from "~/project-version/workspace/EditorCompatibilityNotice";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
-import { EditorSectionTabs } from "~/authoring-shell/navigation/EditorSectionTabs";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorCompatibilityNotice } from "~/project-version/ui/EditorCompatibilityNotice";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
-import { EditorProjectFormProvider } from "~/project-authoring/configuration/EditorProjectFormContext";
-import { EditorProjectSectionLink } from "~/project-authoring/configuration/EditorProjectSectionLink";
+import { EditorProjectFormProvider } from "~/project-authoring/ui/EditorProjectFormContext";
+import { EditorProjectSectionLink } from "~/project-authoring/ui/EditorProjectSectionLink";
 import {
 	EditorProjectSections,
 	type EditorProjectSectionId,
-} from "~/project-authoring/configuration/EditorProjectSections";
-import { useEditorProjectFormController } from "~/project-authoring/configuration/useEditorProjectFormController";
+} from "~/project-authoring/type/EditorProjectSections";
+import { useEditorProjectFormController } from "~/project-authoring/ui/useEditorProjectFormController";
 
 export const Route = createFileRoute("/editor/$projectId/project")({
 	component: () => {

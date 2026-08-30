@@ -3,8 +3,8 @@ import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { EditorSectionTabs } from "~/authoring-shell/navigation/EditorSectionTabs";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/item-authoring/ui/EditorItemFormContext";
 import { EditorItemSectionLink } from "~/item-authoring/ui/EditorItemSectionLink";
@@ -13,8 +13,8 @@ import type {
 	EditorItemSectionId,
 } from "~/item-authoring/ui/EditorItemSections";
 import { readEditorItemFormSectionsFn } from "~/item-authoring/ui/fn/readEditorItemFormSectionsFn";
-import { EditorCompatibilityNotice } from "~/project-version/workspace/EditorCompatibilityNotice";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { EditorCompatibilityNotice } from "~/project-version/ui/EditorCompatibilityNotice";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { useEditorItemFormController } from "~/item-authoring/ui/useEditorItemFormController";
 
 /** Owns navigation, controller state, tabs, and save presentation for one item form lifecycle. */

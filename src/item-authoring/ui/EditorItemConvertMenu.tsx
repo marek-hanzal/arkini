@@ -2,8 +2,8 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { FloatingPortal } from "@floating-ui/react";
 import { Replace } from "lucide-react";
 import { Button, ButtonLink } from "~/ui/button/Button";
-import { useEditorFloatingMenu } from "~/authoring-shell/navigation/useEditorFloatingMenu";
-import { editorSectionTabClassName } from "~/authoring-shell/navigation/EditorSectionTabs";
+import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
+import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorItemTypePresentation } from "~/item-authoring/ui/EditorItemTypePresentation";
 
 /** Selects a target discriminator before opening the standard explicit-save item form. */

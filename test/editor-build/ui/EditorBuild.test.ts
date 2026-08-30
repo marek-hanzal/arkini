@@ -93,7 +93,7 @@ vi.mock("~/arkpack/ui/ArkpackCatalogAtom", () => ({
 	},
 }));
 
-vi.mock("~/authoring-session/useEditorProject", () => ({
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
@@ -103,7 +103,7 @@ vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 	},
 }));
 
-vi.mock("~/authoring-shell/navigation/EditorHistoryBackButton", () => ({
+vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 	EditorHistoryBackButton: () => createElement("span"),
 }));
 
@@ -138,7 +138,7 @@ vi.mock("~/ui/button/Button", () => ({
 
 import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 const EditorBuild = EditorBuildRouteDefinition.options.component;
 if (EditorBuild === undefined) throw new Error("Editor Build route component is missing.");

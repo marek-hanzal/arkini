@@ -3,8 +3,8 @@ import { Effect, Order } from "effect";
 import { z } from "zod";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorItemEstimateQuantitySchema } from "~/estimate/domain/EditorItemEstimateQuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";

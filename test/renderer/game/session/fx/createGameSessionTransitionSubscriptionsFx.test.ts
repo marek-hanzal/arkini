@@ -1,0 +1,186 @@
+import { Effect } from "effect";
+import { describe, expect, it } from "vitest";
+
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+
+describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
+	it("does not publish events for a candidate runtime that fails validation", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const batchesBeforeBarrier: GameEventBatchSchema.Type[] = [];
+		let markBarrierDelivered: (() => void) | undefined;
+		const barrierDelivered = new Promise<void>((resolve) => {
+			markBarrierDelivered = resolve;
+		});
+		const unsubscribe = session.subscribeEvents((batch) => {
+			if (
+				batch.events.some(
+					(event) => "jobId" in event && event.jobId === "job:event:validation-barrier",
+				)
+			) {
+				markBarrierDelivered?.();
+				return;
+			}
+			batchesBeforeBarrier.push(batch);
+		});
+
+		try {
+			await session.run(
+				spawnItemFx({
+					id: "runtime:event:duplicate",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await expect(
+				session.run(
+					modifyRuntimeFx((runtime) =>
+						Effect.succeed([
+							runtime,
+							{
+								...runtime,
+								items: [
+									...runtime.items,
+									...runtime.items,
+								],
+							},
+							[
+								{
+									type: GameEventEnumSchema.enum.JobCompleted,
+									jobId: "job:fake",
+									ownerItemId: "owner:fake",
+									lineId: "line:fake",
+								},
+							],
+						] as const),
+					),
+				),
+			).rejects.toBeDefined();
+			await session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.succeed([
+						undefined,
+						runtime,
+						[
+							{
+								type: GameEventEnumSchema.enum.JobCompleted,
+								jobId: "job:event:validation-barrier",
+								ownerItemId: "owner:event:validation-barrier",
+								lineId: "line:event:validation-barrier",
+							},
+						],
+					] as const),
+				),
+			);
+			await barrierDelivered;
+			expect(batchesBeforeBarrier).toEqual([]);
+		} finally {
+			unsubscribe();
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+
+	it("delivers concurrent event metadata in committed transition order", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const jobIds: string[] = [];
+		let markEventsDelivered: ((deliveredJobIds: ReadonlyArray<string>) => void) | undefined;
+		const eventsDelivered = new Promise<ReadonlyArray<string>>((resolve) => {
+			markEventsDelivered = resolve;
+		});
+		const unsubscribe = session.subscribeEvents((batch) => {
+			jobIds.push(
+				...batch.events.flatMap((event) =>
+					"jobId" in event
+						? [
+								event.jobId,
+							]
+						: [],
+				),
+			);
+			if (jobIds.length === 2)
+				markEventsDelivered?.([
+					...jobIds,
+				]);
+		});
+		let markFirstEntered: (() => void) | undefined;
+		let releaseFirst: (() => void) | undefined;
+		const firstEntered = new Promise<void>((resolve) => {
+			markFirstEntered = resolve;
+		});
+		const firstGate = new Promise<void>((resolve) => {
+			releaseFirst = resolve;
+		});
+
+		try {
+			const first = session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.promise(async () => {
+						markFirstEntered?.();
+						await firstGate;
+						return [
+							undefined,
+							runtime,
+							[
+								{
+									type: GameEventEnumSchema.enum.JobCompleted,
+									jobId: "job:event:first",
+									ownerItemId: "owner:event:first",
+									lineId: "line:event:first",
+								},
+							],
+						] as const;
+					}),
+				),
+			);
+			await firstEntered;
+			const second = session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.succeed([
+						undefined,
+						runtime,
+						[
+							{
+								type: GameEventEnumSchema.enum.JobCompleted,
+								jobId: "job:event:second",
+								ownerItemId: "owner:event:second",
+								lineId: "line:event:second",
+							},
+						],
+					] as const),
+				),
+			);
+			releaseFirst?.();
+			await Promise.all([
+				first,
+				second,
+			]);
+			const deliveredJobIds = await eventsDelivered;
+
+			expect(deliveredJobIds).toEqual([
+				"job:event:first",
+				"job:event:second",
+			]);
+		} finally {
+			releaseFirst?.();
+			unsubscribe();
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+});

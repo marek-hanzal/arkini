@@ -5,7 +5,7 @@ import { Button } from "~/ui/button/Button";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
-export interface EditorCollectionSelectorProps {
+interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
 	readonly children: (activeIndex: number, selectIndex: (index: number) => void) => ReactNode;
 	readonly count: number;

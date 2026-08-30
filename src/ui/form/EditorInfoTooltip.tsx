@@ -3,7 +3,7 @@ import { Info } from "lucide-react";
 
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
-export interface EditorInfoTooltipProps {
+interface EditorInfoTooltipProps {
 	readonly content: ReactNode;
 }
 

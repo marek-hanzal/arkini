@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { ItemArtwork, type ItemArtworkProps } from "~/ui/item/ItemArtwork";
 
-export interface ItemIdentityProps {
+interface ItemIdentityProps {
 	readonly artworkClassName?: string;
 	readonly artworkDataUi?: string;
 	readonly artworkImageClassName?: string;

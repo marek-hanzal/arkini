@@ -1,16 +1,14 @@
 import type { RefObject } from "react";
 
-export namespace SpotlightSearchInput {
-	export interface Props {
-		readonly inputRef: RefObject<HTMLInputElement | null>;
-		readonly onEnter: () => void;
-		readonly onQueryChange: (query: string) => void;
-		readonly onSelectedIndexChange: (index: number) => void;
-		readonly placeholder?: string;
-		readonly query: string;
-		readonly resultCount: number;
-		readonly selectedIndex: number;
-	}
+interface SpotlightSearchInputProps {
+	readonly inputRef: RefObject<HTMLInputElement | null>;
+	readonly onEnter: () => void;
+	readonly onQueryChange: (query: string) => void;
+	readonly onSelectedIndexChange: (index: number) => void;
+	readonly placeholder?: string;
+	readonly query: string;
+	readonly resultCount: number;
+	readonly selectedIndex: number;
 }
 
 /** Shares the compact spotlight search field and result-keyboard navigation. */
@@ -23,7 +21,7 @@ export const SpotlightSearchInput = ({
 	query,
 	resultCount,
 	selectedIndex,
-}: SpotlightSearchInput.Props) => (
+}: SpotlightSearchInputProps) => (
 	<input
 		className="w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none"
 		placeholder={placeholder}

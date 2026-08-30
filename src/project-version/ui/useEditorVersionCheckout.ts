@@ -8,22 +8,20 @@ import type { EditorProjectVersionDescriptor } from "~/project-version/type/Edit
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { EditorVersionRestoreCommandAtom } from "~/project-version/atom/EditorVersionRestoreCommandAtom";
 
-export namespace useEditorVersionCheckout {
-	export interface Props {
-		readonly project: EditorProject;
-		readonly projectDirty: boolean;
-		readonly reportError: (error?: unknown) => void;
-		readonly selected?: EditorProjectVersionDescriptor;
-	}
+interface EditorVersionCheckoutProps {
+	readonly project: EditorProject;
+	readonly projectDirty: boolean;
+	readonly reportError: (error?: unknown) => void;
+	readonly selected?: EditorProjectVersionDescriptor;
+}
 
-	export interface Output {
-		readonly cancel: () => void;
-		readonly confirm: () => void;
-		readonly confirmVersion?: EditorProjectVersionDescriptor;
-		readonly goToCommit: () => void;
-		readonly pending: boolean;
-		readonly restoreSelected: () => void;
-	}
+interface EditorVersionCheckoutOutput {
+	readonly cancel: () => void;
+	readonly confirm: () => void;
+	readonly confirmVersion?: EditorProjectVersionDescriptor;
+	readonly goToCommit: () => void;
+	readonly pending: boolean;
+	readonly restoreSelected: () => void;
 }
 
 /** Owns destructive checkout admission and dirty-state confirmation. */
@@ -32,7 +30,7 @@ export const useEditorVersionCheckout = ({
 	projectDirty,
 	reportError,
 	selected,
-}: useEditorVersionCheckout.Props): useEditorVersionCheckout.Output => {
+}: EditorVersionCheckoutProps): EditorVersionCheckoutOutput => {
 	const router = useRouter();
 	const restoreAtom = EditorVersionRestoreCommandAtom(project.projectId);
 	const restoreState = useAtomValue(restoreAtom);

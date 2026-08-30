@@ -3,12 +3,10 @@ import { useRef } from "react";
 
 import { Button } from "~/ui/button/Button";
 
-export namespace EditorArkpackImportButton {
-	export interface Props {
-		readonly blocked: boolean;
-		readonly pending: boolean;
-		readonly onFile: (file: File | undefined) => void;
-	}
+interface EditorArkpackImportButtonProps {
+	readonly blocked: boolean;
+	readonly pending: boolean;
+	readonly onFile: (file: File | undefined) => void;
 }
 
 /** Opens the browser-native file picker for importing one arkpack. */
@@ -16,7 +14,7 @@ export const EditorArkpackImportButton = ({
 	blocked,
 	pending,
 	onFile,
-}: EditorArkpackImportButton.Props) => {
+}: EditorArkpackImportButtonProps) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	return (

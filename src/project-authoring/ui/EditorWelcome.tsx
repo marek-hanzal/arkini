@@ -14,10 +14,8 @@ import { EditorRecentProjects } from "~/project-authoring/ui/EditorRecentProject
 import { EditorProjectDeleteDialog } from "~/project-authoring/ui/EditorProjectDeleteDialog";
 import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";
 
-export namespace EditorWelcome {
-	export interface Props {
-		readonly recentProjects: ReadonlyArray<EditorProjectCandidate>;
-	}
+interface EditorWelcomeProps {
+	readonly recentProjects: ReadonlyArray<EditorProjectCandidate>;
 }
 
 interface ProjectToDelete {
@@ -26,7 +24,7 @@ interface ProjectToDelete {
 }
 
 /** Starts or reopens one local editor project. */
-export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
+export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 	const [projectToDelete, setProjectToDelete] = useState<ProjectToDelete | null>(null);
 	const [deleteRequested, setDeleteRequested] = useState(false);
 	const actions = useEditorWelcomeActions({

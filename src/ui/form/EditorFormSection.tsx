@@ -2,7 +2,7 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 
-export interface EditorFormSectionProps extends PropsWithChildren {
+interface EditorFormSectionProps extends PropsWithChildren {
 	readonly action?: ReactNode;
 	readonly description?: string;
 	readonly title: string;

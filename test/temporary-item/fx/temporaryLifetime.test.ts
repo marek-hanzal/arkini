@@ -14,7 +14,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
-import { createTemporaryLifetimeTestConfig } from "~test/engine/item/temporary/support/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/game-runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";

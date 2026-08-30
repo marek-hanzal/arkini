@@ -31,6 +31,7 @@
 		"src/game-version",
 		"src/filesystem-write",
 		"src/game-tick",
+		"src/temporary-item",
 		"src/game-runtime",
 		"src/game-session",
 		"src/game-persistence",

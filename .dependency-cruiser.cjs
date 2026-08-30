@@ -194,7 +194,7 @@ module.exports = {
 				"Production delivery/jobs and temporary-item lifecycle provide behavior to Game Tick and never import its clock, replay, or loop implementation.",
 			severity: "error",
 			from: {
-				path: "^src/(?:production-(?:delivery|job)|engine/item/temporary)(?:/|$)",
+				path: "^src/(?:production-(?:delivery|job)|temporary-item)(?:/|$)",
 			},
 			to: {
 				path: "^src/game-tick(?:/|$)",

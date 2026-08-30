@@ -132,8 +132,6 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	} satisfies OwnedEditorProjectRepository;
 });
 
-export type FilesystemEditorProjectRepository = OwnedEditorProjectRepository;
-
 /** Composes one filesystem-backed Editor repository with its Node platform services. */
 export const createFilesystemEditorProjectRepositoryFx = (
 	props: createFilesystemEditorProjectRepositoryFx.Props,

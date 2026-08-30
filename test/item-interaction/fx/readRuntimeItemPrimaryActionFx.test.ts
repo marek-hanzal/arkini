@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { startFx } from "~/game-start/fx/startFx";
 
 const config = GameConfigSchema.parse({

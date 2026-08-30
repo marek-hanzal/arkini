@@ -3,8 +3,8 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioSchema } from "~/board-scenario/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
+import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { EditorProjectNoteFileSchema } from "~/project-note/EditorProjectNoteFileSchema";
 import { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";

@@ -1,5 +1,5 @@
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 
 export namespace resolveInputMaterialFn {

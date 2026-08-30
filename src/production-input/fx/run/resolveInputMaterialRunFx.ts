@@ -2,7 +2,7 @@ import { Array, Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";

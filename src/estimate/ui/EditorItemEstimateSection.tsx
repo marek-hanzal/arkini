@@ -6,7 +6,7 @@ import type {
 	EditorItemEstimateDiagnostic,
 } from "~/estimate/domain/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/flow/domain/EditorAcquisitionGraph";
-import { formatDurationFn } from "~/ui/formatDurationFn";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { EditorItemEstimateRouteGraph } from "~/estimate/ui/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/estimate/ui/useEditorItemEstimate";
 import { Tooltip } from "~/ui/overlay/Tooltip";

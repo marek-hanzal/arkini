@@ -1,6 +1,6 @@
 import { Context } from "effect";
 
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 /**
  * Provides the loaded canonical game configuration to gameplay effects.

@@ -1,5 +1,5 @@
 import type { GameSession } from "~/renderer/game/session/GameSession";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 /** Package-independent live game consumed by shared gameplay presentation. */
 export interface PlayableGame extends GameSession {

@@ -2,7 +2,7 @@ import { Array, Effect, Option } from "effect";
 
 import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";

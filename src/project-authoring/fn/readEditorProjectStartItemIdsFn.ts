@@ -1,6 +1,6 @@
 import type { EditorProjectStartScope } from "~/project-authoring/EditorProjectStartScope";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 export namespace readEditorProjectStartItemIdsFn {
 	export interface Props {

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 

@@ -1,5 +1,5 @@
 import type { Effect, SubscriptionRef } from "effect";
-import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
+import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
 
 export namespace ArkpackCatalog {
 	export type State =

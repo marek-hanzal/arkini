@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import { resolveJobQueueFx } from "~/production-job/fx/read/resolveJobQueueFx";
 import type { JobQueueResolutionSchema } from "~/production-job/schema/read/JobQueueResolutionSchema";
-import type { LineRun } from "~/production-line/LineRun";
+import type { LineRun } from "~/production-line/type/LineRun";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

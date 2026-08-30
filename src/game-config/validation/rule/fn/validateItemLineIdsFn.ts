@@ -1,5 +1,5 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
 import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";

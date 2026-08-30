@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import type { EditorProjectVersionReference } from "~/project-version/EditorProjectVersion";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";

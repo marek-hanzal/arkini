@@ -14,7 +14,7 @@ import { EditorProjectRepositoryError } from "~/project-authoring/repository/Edi
 import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";

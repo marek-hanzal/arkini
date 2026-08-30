@@ -12,7 +12,7 @@ import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 

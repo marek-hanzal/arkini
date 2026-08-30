@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 /** Renames every canonical authored reference to one exact resource identity. */
 export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* ({

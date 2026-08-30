@@ -9,7 +9,7 @@ import {
 	createSimpleItem,
 } from "~test/game-config/validation/support/gameValidationTestSource";
 import { renameEditorItemFx } from "~/item-authoring/domain/fx/renameEditorItemFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 describe("renameEditorItemFx", () => {
 	it("rewrites exact references across start, selectors, inputs, and outputs", () => {

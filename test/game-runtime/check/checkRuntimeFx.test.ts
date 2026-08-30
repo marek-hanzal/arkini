@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 

@@ -18,7 +18,7 @@ import { GameProjectGameSchemaReference } from "~/game-config/source/GameProject
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 

@@ -1,5 +1,5 @@
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { formatByteSizeFn } from "~/ui/formatByteSizeFn";
+import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { Fact, FactList } from "~/ui/fact/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 

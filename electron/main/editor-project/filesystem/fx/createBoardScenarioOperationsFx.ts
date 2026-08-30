@@ -5,11 +5,11 @@ import { Effect, type Semaphore } from "effect";
 import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import {
 	EditorBoardScenarioNameSchema,
 	EditorBoardScenarioSchema,
-} from "~/board-scenario/EditorBoardScenarioSchema";
+} from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { withProjectLockFx } from "./withProjectLockFx";

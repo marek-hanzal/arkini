@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 
 export namespace makeAboutPortraitPayloadFx {

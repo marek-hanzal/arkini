@@ -8,9 +8,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
 import { createVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
 import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
-import { EditorBoardScenarioSchema } from "~/board-scenario/EditorBoardScenarioSchema";
+import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 

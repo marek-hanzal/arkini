@@ -7,7 +7,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { outputFx } from "~/production-output/fx/outputFx";
 
 const config = GameConfigSchema.parse({

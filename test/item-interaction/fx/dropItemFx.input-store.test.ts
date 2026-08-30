@@ -11,7 +11,7 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

@@ -6,7 +6,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";

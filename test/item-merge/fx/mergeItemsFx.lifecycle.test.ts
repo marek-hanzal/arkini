@@ -8,7 +8,7 @@ import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 const baseItem = ({ id }: { id: string }) => ({

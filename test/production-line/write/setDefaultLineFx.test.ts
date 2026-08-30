@@ -10,7 +10,7 @@ import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

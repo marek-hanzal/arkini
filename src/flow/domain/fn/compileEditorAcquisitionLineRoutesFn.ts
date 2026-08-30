@@ -9,7 +9,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const combineRequirements = (
 	...groups: ReadonlyArray<EditorAcquisitionRoute["requirements"]>

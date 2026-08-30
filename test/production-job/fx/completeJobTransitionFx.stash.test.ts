@@ -5,12 +5,12 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { fromStateFx } from "~/game-persistence/fromStateFx";
+import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
+import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { completeJobRuntimeForTestFx } from "~test/production-job/support/completeJobRuntimeForTestFx";
 

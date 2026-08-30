@@ -7,7 +7,7 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
 	uid: id,

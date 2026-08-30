@@ -1,6 +1,6 @@
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { TickStepMs } from "~/game-tick/TickStepMs";
+import { TickStepMs } from "~/game-tick/constant/TickStepMs";
 
 export namespace readDeliveryTravelDurationMsFn {
 	export interface Props {

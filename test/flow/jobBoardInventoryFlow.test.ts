@@ -8,7 +8,7 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { TickFx } from "~/game-tick/TickFx";
+import { TickFx } from "~/game-tick/service/TickFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 

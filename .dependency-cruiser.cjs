@@ -5,9 +5,9 @@ const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[
 const applicationDiagnosticsPattern = "^src/application-diagnostics(?:/|$)";
 const applicationRuntimePattern = "^src/application-runtime(?:/|$)";
 const applicationRuntimeLowerCapabilityPattern =
-	"^src/(?:renderer(?:/|$)|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:GameSaveStorage[.]ts$|electron/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$)";
+	"^src/(?:renderer(?:/|$)|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:service/GameSaveStorage[.]ts$|fx/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$)";
 const applicationRuntimeAllowedDependencyPattern =
-	"src/(?:application-runtime(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:GameSaveStorage[.]ts$|electron/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$|renderer/game/(?:createGameFx[.]ts$|resource/(?:acquireGameEngineResourceFx|GameEngineResourceFx|GameEngineResourceLayer)[.]ts$))";
+	"src/(?:application-runtime(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:service/GameSaveStorage[.]ts$|fx/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$|renderer/game/(?:createGameFx[.]ts$|resource/(?:acquireGameEngineResourceFx|GameEngineResourceFx|GameEngineResourceLayer)[.]ts$))";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameRuntimePattern = "^src/game-runtime(?:/|$)";
@@ -608,12 +608,12 @@ const boundaryRules = [
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/game-tick/GameLoopLayerFx[.]ts$",
+				"^src/game-tick/layer/GameLoopLayerFx[.]ts$",
 				"^src/renderer/game/session/createGameSessionFx[.]ts$",
 			],
 		},
 		to: {
-			path: "^src/game-tick/GameLoopFx[.]ts$",
+			path: "^src/game-tick/service/GameLoopFx[.]ts$",
 		},
 	},
 	{
@@ -623,11 +623,11 @@ const boundaryRules = [
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/game-tick/(?:GameLoopLayerFx|TickLayerFx)[.]ts$",
+				"^src/game-tick/layer/(?:GameLoopLayerFx|TickLayerFx)[.]ts$",
 			],
 		},
 		to: {
-			path: "^src/game-tick/TickFx[.]ts$",
+			path: "^src/game-tick/service/TickFx[.]ts$",
 		},
 	},
 	{
@@ -639,7 +639,7 @@ const boundaryRules = [
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
 				"^src/game-runtime/layer/GameRuntimeLayerFx[.]ts$",
-				"^src/game-persistence/RuntimeSaveLayerFx[.]ts$",
+				"^src/game-persistence/layer/RuntimeSaveLayerFx[.]ts$",
 				"^src/renderer/game/session/(?:createGameSessionFx|createGameSessionTransitionSubscriptionsFx)[.]ts$",
 			],
 		},

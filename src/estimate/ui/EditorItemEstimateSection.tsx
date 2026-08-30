@@ -19,10 +19,12 @@ const formatRuntime = (runtimeMs: number) => formatDurationFn(runtimeMs);
 
 const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "any-of-selection-limit-exceeded":
+			return `${diagnostic.routeId} exceeds the static any-of selection limit of ${diagnostic.maximumSelections} normalized demand states.`;
+		case "retained-demand-not-stable":
+			return `${diagnostic.factId} did not stabilize reusable prerequisite demand within ${diagnostic.maximumIterations} witness passes.`;
 		case "quantity-limit-exceeded":
 			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
-		case "quantity-specific-route-not-retried":
-			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds selected scalar route ${diagnostic.routeId}; quantity-specific alternatives were not retried.`;
 		case "cycle":
 			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
 		case "unreachable":
@@ -60,14 +62,14 @@ const EditorItemEstimateMethodDetails = ({
 			</div>
 		</header>
 		<p className="py-3 text-xs leading-relaxed text-muted">
-			Expands from authored starting facts and records the first locally ranked route when
-			each fact becomes reachable. Ranking uses scalar action time with stable route identity
-			as the tie-break; demand is divided by scalar expected yield. The materialized witness
-			is timed as an optimistic parallel critical path. Equivalent independent route
-			occurrences are compressed into one row; shared outputs, shared finite roots, runtime
-			rule effects, placement, charge capacity, renewal, and finite resource capacity are not
-			simulated. Route admission proves one scalar output unit; larger propagated demand can
-			return partial without retrying quantity-specific alternatives.
+			Expands from authored starting facts and ranks routes by complete scalar upstream cost
+			with stable route identity as the tie-break; demand is divided by scalar expected yield.
+			The materialized witness is timed as an optimistic parallel critical path. Equivalent
+			consumed route occurrences are compressed into one row; reusable one-time and ongoing
+			prerequisites remain one shared acquisition. Shared outputs, shared finite roots,
+			runtime rule effects, placement, charge capacity, renewal, and finite resource capacity
+			are not simulated. Any-of alternatives use bounded normalized demand states and return
+			partial before an incomparable alternative is discarded.
 		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			{estimate.obtainable ? (
@@ -163,7 +165,7 @@ const EditorItemEstimateResult = ({
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
 					{estimate.status === "partial"
-						? "The requested path exceeded either the static-analysis limit or its selected scalar-unit witness, so totals are indeterminate."
+						? "The bounded static analysis could not produce stable totals; see the diagnostic for the exact limit."
 						: "The authored dependency graph contains no complete route from the configured starting facts."}
 				</p>
 				<ul className="grid gap-2">

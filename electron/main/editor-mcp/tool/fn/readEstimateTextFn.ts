@@ -53,7 +53,7 @@ export const readEstimateTextFn = (project: EditorProject, input: EstimateInput)
 		"Global estimate",
 		"Method: approximate scalar authored dependency graph",
 		"Timing: approximate optimistic parallel critical path",
-		"Route choice: first locally ranked route when each fact becomes reachable; scalar action time with stable route identity ties",
+		"Route choice: complete upstream cost at each propagated scalar demand with stable route identity ties",
 		"Quantity: 1 of every item",
 		"Demand: aggregate approximate route-occurrence quantity across every obtainable item estimate",
 		`Incomplete only: ${input.incomplete}`,

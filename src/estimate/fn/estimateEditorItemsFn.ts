@@ -1,18 +1,21 @@
-import { Order } from "effect";
+import { Graph, Order } from "effect";
 
 import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/flow/type/EditorAcquisitionGraph";
+import {
+	groupEstimateRequirementsFn,
+	readEstimateRequirementQuantityFn,
+} from "~/estimate-demand/fn/groupEstimateRequirementsFn";
+import { projectEstimateWitnessFn } from "~/estimate-projection/fn/projectEstimateWitnessFn";
 import type {
 	EditorItemEstimate,
-	EditorItemEstimateAmount,
 	EditorItemEstimateDiagnostic,
-	EditorItemEstimateRequirementStep,
-	EditorItemEstimateRouteStep,
 } from "~/estimate/type/EditorItemEstimate";
 import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
+import type { EstimateWitnessNode } from "~/estimate-witness/type/EstimateWitnessNode";
 
 interface EstimateEditorItemsProps {
 	readonly graph: EditorAcquisitionGraph;
@@ -22,31 +25,9 @@ interface EstimateEditorItemsProps {
 	}>;
 }
 
-interface RequirementGroup {
-	readonly consumed: number;
-	readonly factId: string;
-	readonly oneTime: number;
-	readonly ongoing: number;
-	readonly sources: ReadonlyArray<EditorAcquisitionRequirement["source"]>;
-}
-
-interface EstimateNode {
-	readonly actionRuns: number;
-	readonly children: ReadonlyArray<{
-		readonly group: RequirementGroup;
-		readonly node: EstimateNode;
-	}>;
-	readonly durationMs: number;
-	readonly factId: string;
-	readonly outputRuns: number;
-	readonly quantity: number;
-	readonly rootQuantity: number;
-	readonly route?: EditorAcquisitionRoute;
-}
-
 interface EstimateSuccess {
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
-	readonly node: EstimateNode;
+	readonly node: EstimateWitnessNode;
 	readonly status: "success";
 }
 
@@ -57,16 +38,9 @@ interface EstimateFailure {
 
 type EstimateResult = EstimateFailure | EstimateSuccess;
 
-interface RouteSelectionSuccess {
-	readonly dependencyFactIds: ReadonlySet<string>;
-	readonly requirements: ReadonlyArray<EditorAcquisitionRequirement>;
-	readonly route: EditorAcquisitionRoute;
-	readonly status: "success";
-}
-
-type RouteSelectionResult = EstimateFailure | RouteSelectionSuccess;
-
 interface EstimateBaseIndex {
+	readonly componentByFact: ReadonlyMap<string, string>;
+	readonly factCount: number;
 	readonly factIds: ReadonlySet<string>;
 	readonly requirementsByRoute: ReadonlyMap<
 		EditorAcquisitionRoute,
@@ -81,15 +55,12 @@ interface EstimateBaseIndex {
 
 interface EstimateIndex extends EstimateBaseIndex {
 	readonly reachableFactIds: ReadonlySet<string>;
-	readonly routeSelections: ReadonlyMap<string, RouteSelectionSuccess>;
-}
-
-interface EstimateTopology {
-	readonly reachableFactIds: ReadonlySet<string>;
-	readonly routeSelections: ReadonlyMap<string, RouteSelectionSuccess>;
 }
 
 const maximumDiagnostics = 8;
+// States are normalized grouped demands. Exceeding this bound reports partial instead of
+// silently dropping an incomparable complete alternative and claiming a false optimum.
+const maximumAnyOfRequirementSelections = 64;
 const epsilon = 1e-9;
 
 const uniqueDiagnostics = (diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>) => {
@@ -114,6 +85,44 @@ const projectRequirement = (
 				usage: "one-time",
 			}
 		: requirement;
+
+const readComponentByFactFn = (
+	graph: EditorAcquisitionGraph,
+	requirementsByRoute: EstimateBaseIndex["requirementsByRoute"],
+) => {
+	const nodeByFact = new Map<string, Graph.NodeIndex>();
+	const factByNode = new Map<Graph.NodeIndex, string>();
+	const dependencyGraph = Graph.directed<string, void>((mutable) => {
+		for (const factId of [
+			...new Set(graph.factIds),
+		].sort(Order.String)) {
+			const node = Graph.addNode(mutable, factId);
+			nodeByFact.set(factId, node);
+			factByNode.set(node, factId);
+		}
+		for (const route of graph.routes)
+			for (const requirement of [
+				...(requirementsByRoute.get(route)?.allOf ?? []),
+				...(requirementsByRoute.get(route)?.anyOf ?? []).flat(),
+			]) {
+				const from = nodeByFact.get(route.output.factId);
+				const to = nodeByFact.get(requirement.factId);
+				if (from !== undefined && to !== undefined)
+					Graph.addEdge(mutable, from, to, undefined);
+			}
+	});
+	const componentByFact = new Map<string, string>();
+	for (const component of Graph.stronglyConnectedComponents(dependencyGraph)) {
+		const factIds = component
+			.map((node) => factByNode.get(node))
+			.filter((factId): factId is string => factId !== undefined)
+			.sort(Order.String);
+		const componentId = factIds[0];
+		if (componentId !== undefined)
+			for (const factId of factIds) componentByFact.set(factId, componentId);
+	}
+	return componentByFact;
+};
 
 const createIndex = (graph: EditorAcquisitionGraph): EstimateIndex => {
 	const requirementsByRoute = new Map(
@@ -162,6 +171,8 @@ const createIndex = (graph: EditorAcquisitionGraph): EstimateIndex => {
 		]),
 	);
 	const baseIndex: EstimateBaseIndex = {
+		componentByFact: readComponentByFactFn(graph, requirementsByRoute),
+		factCount: graph.factIds.length,
 		factIds: new Set(graph.factIds),
 		requirementsByRoute,
 		roots,
@@ -169,189 +180,50 @@ const createIndex = (graph: EditorAcquisitionGraph): EstimateIndex => {
 	};
 	return {
 		...baseIndex,
-		...createEstimateTopology(baseIndex, graph),
+		reachableFactIds: readCompleteFactIdsFn(baseIndex, graph),
 	};
-};
-
-const requirementQuantity = (requirement: EditorAcquisitionRequirement, actionRuns: number) =>
-	requirement.quantity * (requirement.usage === "consume" ? actionRuns : 1);
-
-const groupRequirements = (
-	requirements: ReadonlyArray<EditorAcquisitionRequirement>,
-	actionRuns: number,
-): ReadonlyArray<RequirementGroup> => {
-	const groups = new Map<
-		string,
-		{
-			consumed: number;
-			distinctOneTime: number;
-			factId: string;
-			oneTime: number;
-			ongoing: number;
-			sources: EditorAcquisitionRequirement["source"][];
-		}
-	>();
-	for (const requirement of requirements) {
-		const group = groups.get(requirement.factId) ?? {
-			consumed: 0,
-			distinctOneTime: 0,
-			factId: requirement.factId,
-			oneTime: 0,
-			ongoing: 0,
-			sources: [],
-		};
-		if (requirement.usage === "consume")
-			group.consumed += requirementQuantity(requirement, actionRuns);
-		if (requirement.usage === "one-time") {
-			if (requirement.identity === "distinct") group.distinctOneTime += requirement.quantity;
-			else group.oneTime = Math.max(group.oneTime, requirement.quantity);
-			group.oneTime = Math.max(group.oneTime, group.distinctOneTime);
-		}
-		if (requirement.usage === "ongoing")
-			group.ongoing = Math.max(group.ongoing, requirement.quantity);
-		if (!group.sources.includes(requirement.source)) {
-			group.sources.push(requirement.source);
-			group.sources.sort();
-		}
-		groups.set(group.factId, group);
-	}
-	return [
-		...groups.values(),
-	]
-		.sort((left, right) => Order.String(left.factId, right.factId))
-		.map(({ distinctOneTime: _distinctOneTime, ...group }) => group);
 };
 
 const readRankedRoutes = (index: EstimateBaseIndex, factId: string) =>
 	index.routesByFact.get(factId) ?? [];
 
-const createEstimateTopology = (
+function readCompleteFactIdsFn(
 	index: EstimateBaseIndex,
 	graph: EditorAcquisitionGraph,
-): EstimateTopology => {
-	const reachableFactIds = new Set(
-		[
-			...index.roots,
-		]
-			.filter(([, rootQuantity]) => rootQuantity === "unbounded" || rootQuantity > epsilon)
-			.map(([rootFactId]) => rootFactId),
+	blockedFactId?: string,
+) {
+	const complete = new Set(graph.roots.map(({ factId }) => factId));
+	let pending = graph.routes.filter(
+		(route) => route.output.factId !== blockedFactId && route.output.expectedYield > epsilon,
 	);
-	const routeSelections = new Map<string, RouteSelectionSuccess>();
-	const readReachableRequirements = (
-		route: EditorAcquisitionRoute,
-	):
-		| {
-				readonly dependencyFactIds: ReadonlySet<string>;
-				readonly requirements: ReadonlyArray<EditorAcquisitionRequirement>;
-		  }
-		| undefined => {
-		if (!(route.output.expectedYield > epsilon)) return undefined;
-		const requirements = index.requirementsByRoute.get(route)!;
-		const unitActionRuns = route.runMultiplier / route.output.expectedYield;
-		const rootCovers = (requirementFactId: string, requiredQuantity: number) => {
-			const root = index.roots.get(requirementFactId);
-			return root === "unbounded" || (root ?? 0) + epsilon >= requiredQuantity;
-		};
-		const readDependencies = (requirement: EditorAcquisitionRequirement) => {
-			if (!reachableFactIds.has(requirement.factId)) return undefined;
-			const requiredQuantity = requirementQuantity(requirement, unitActionRuns);
-			if (requirement.factId === route.output.factId)
-				return requirement.usage !== "consume" &&
-					rootCovers(requirement.factId, requiredQuantity)
-					? new Set<string>()
-					: undefined;
-			if (requirement.usage !== "consume" && rootCovers(requirement.factId, requiredQuantity))
-				return new Set<string>();
-			const dependencies = new Set([
-				requirement.factId,
-			]);
-			if (!rootCovers(requirement.factId, requiredQuantity)) {
-				const selection = routeSelections.get(requirement.factId);
-				if (selection === undefined) return undefined;
-				for (const dependencyFactId of selection.dependencyFactIds)
-					dependencies.add(dependencyFactId);
-			}
-			return dependencies.has(route.output.factId) ? undefined : dependencies;
-		};
-		const dependencyFactIds = new Set<string>();
-		for (const requirement of requirements.allOf) {
-			const dependencies = readDependencies(requirement);
-			if (dependencies === undefined) return undefined;
-			for (const dependencyFactId of dependencies) dependencyFactIds.add(dependencyFactId);
-		}
-		const selectedRequirements = [
-			...requirements.allOf,
-		];
-		for (const clause of requirements.anyOf) {
-			const selected = [
-				...clause,
-			]
-				.sort((left, right) => Order.String(left.factId, right.factId))
-				.map((requirement) => ({
-					dependencies: readDependencies(requirement),
-					requirement,
-				}))
-				.find(({ dependencies }) => dependencies !== undefined);
-			if (selected === undefined) return undefined;
-			selectedRequirements.push(selected.requirement);
-			for (const dependencyFactId of selected.dependencies!)
-				dependencyFactIds.add(dependencyFactId);
-		}
-		for (const group of groupRequirements(selectedRequirements, unitActionRuns)) {
-			const requiredQuantity = group.consumed + Math.max(group.oneTime, group.ongoing);
-			if (group.factId === route.output.factId) {
-				if (group.consumed > epsilon || !rootCovers(group.factId, requiredQuantity))
-					return undefined;
-				continue;
-			}
-			if (rootCovers(group.factId, requiredQuantity)) continue;
-			const selection = routeSelections.get(group.factId);
-			if (selection === undefined) return undefined;
-			dependencyFactIds.add(group.factId);
-			for (const dependencyFactId of selection.dependencyFactIds)
-				dependencyFactIds.add(dependencyFactId);
-			if (dependencyFactIds.has(route.output.factId)) return undefined;
-		}
-		return {
-			dependencyFactIds,
-			requirements: selectedRequirements,
-		};
-	};
-	for (let depth = 0; depth < graph.factIds.length; depth += 1) {
-		const additions = new Set<string>();
-		let selectedRoute = false;
-		for (const currentFactId of [
-			...graph.factIds,
-		].sort()) {
-			if (routeSelections.has(currentFactId)) continue;
-			for (const route of readRankedRoutes(index, currentFactId)) {
-				const reachable = readReachableRequirements(route);
-				if (reachable === undefined) continue;
-				routeSelections.set(currentFactId, {
-					dependencyFactIds: reachable.dependencyFactIds,
-					requirements: reachable.requirements,
-					route,
-					status: "success",
-				});
-				selectedRoute = true;
-				if (!reachableFactIds.has(currentFactId)) additions.add(currentFactId);
-				break;
+	for (let iteration = 0; iteration < index.factCount; iteration += 1) {
+		let changed = false;
+		const nextPending: EditorAcquisitionRoute[] = [];
+		for (const route of pending) {
+			const requirements = index.requirementsByRoute.get(route)!;
+			if (
+				requirements.allOf.some(({ factId }) => !complete.has(factId)) ||
+				requirements.anyOf.some(
+					(clause) => !clause.some(({ factId }) => complete.has(factId)),
+				)
+			)
+				nextPending.push(route);
+			else if (!complete.has(route.output.factId)) {
+				complete.add(route.output.factId);
+				changed = true;
 			}
 		}
-		if (additions.size === 0 && !selectedRoute) break;
-		for (const addedFactId of additions) reachableFactIds.add(addedFactId);
+		if (!changed) break;
+		pending = nextPending;
 	}
-	return {
-		reachableFactIds,
-		routeSelections,
-	};
-};
+	return complete;
+}
 
-const nodeProducesAnyFact = (root: EstimateNode, factIds: ReadonlySet<string>): boolean => {
+const nodeProducesAnyFact = (root: EstimateWitnessNode, factIds: ReadonlySet<string>): boolean => {
 	const pending = [
 		root,
 	];
-	const visited = new Set<EstimateNode>();
+	const visited = new Set<EstimateWitnessNode>();
 	while (pending.length > 0) {
 		const node = pending.pop()!;
 		if (visited.has(node)) continue;
@@ -362,166 +234,30 @@ const nodeProducesAnyFact = (root: EstimateNode, factIds: ReadonlySet<string>): 
 	return false;
 };
 
-interface EstimateNodeGraph {
-	readonly nodes: ReadonlyArray<EstimateNode>;
-	readonly occurrenceCountByNode: ReadonlyMap<EstimateNode, number>;
-	readonly occurrenceIdByNode: ReadonlyMap<EstimateNode, string>;
-}
-
-const createEstimateNodeGraph = (root: EstimateNode): EstimateNodeGraph => {
-	// solveFact seals parents after their children, so every edge targets an older immutable node.
-	const discovered = [
+const readRetainedQuantityByFactFn = (root: EstimateWitnessNode) => {
+	const retainedQuantityByFact = new Map<string, number>();
+	const pending = [
 		root,
 	];
-	const discoveryIndex = new Map<EstimateNode, number>([
-		[
-			root,
-			0,
-		],
-	]);
-	for (let index = 0; index < discovered.length; index += 1)
-		for (const { node: child } of discovered[index]!.children)
-			if (!discoveryIndex.has(child)) {
-				discoveryIndex.set(child, discovered.length);
-				discovered.push(child);
-			}
-
-	const incomingCount = new Map(
-		discovered.map((node) => [
-			node,
-			0,
-		]),
-	);
-	for (const node of discovered)
-		for (const { node: child } of node.children)
-			incomingCount.set(child, (incomingCount.get(child) ?? 0) + 1);
-	const ready = discovered.filter((node) => incomingCount.get(node) === 0);
-	const nodes: EstimateNode[] = [];
-	const occurrenceCountByNode = new Map<EstimateNode, number>([
-		[
-			root,
-			1,
-		],
-	]);
-	while (ready.length > 0) {
-		ready.sort((left, right) => discoveryIndex.get(left)! - discoveryIndex.get(right)!);
-		const node = ready.shift()!;
-		nodes.push(node);
-		const occurrenceCount = occurrenceCountByNode.get(node) ?? 0;
-		for (const { node: child } of node.children) {
-			occurrenceCountByNode.set(
-				child,
-				(occurrenceCountByNode.get(child) ?? 0) + occurrenceCount,
-			);
-			const remaining = (incomingCount.get(child) ?? 0) - 1;
-			incomingCount.set(child, remaining);
-			if (remaining === 0) ready.push(child);
-		}
-	}
-	return {
-		nodes,
-		occurrenceCountByNode,
-		occurrenceIdByNode: new Map(
-			discovered.map((node, index) => [
-				node,
-				index === 0 ? "target" : `group:${index}:${node.factId}`,
-			]),
-		),
-	};
-};
-
-const projectRouteSteps = ({
-	nodes,
-	occurrenceCountByNode,
-	occurrenceIdByNode,
-}: EstimateNodeGraph): ReadonlyArray<EditorItemEstimateRouteStep> =>
-	nodes.map((node) => {
-		const requirements: EditorItemEstimateRequirementStep[] = [];
+	const visited = new Set<EstimateWitnessNode>();
+	while (pending.length > 0) {
+		const node = pending.pop()!;
+		if (visited.has(node)) continue;
+		visited.add(node);
 		for (const { group, node: child } of node.children) {
-			let first = true;
-			for (const [usage, quantity] of [
-				[
-					"consume",
-					group.consumed,
-				],
-				[
-					"one-time",
-					group.oneTime,
-				],
-				[
-					"ongoing",
-					group.ongoing,
-				],
-			] as const) {
-				if (quantity <= epsilon) continue;
-				requirements.push({
-					acquisitionOccurrenceId: first ? occurrenceIdByNode.get(child) : undefined,
-					factId: group.factId,
-					quantity,
-					sources: group.sources,
-					usage,
-				});
-				first = false;
-			}
-		}
-		return {
-			actionRuns: node.actionRuns,
-			durationMs: node.route === undefined ? 0 : node.route.durationMs * node.actionRuns,
-			factId: node.factId,
-			...(node.route === undefined
-				? {}
-				: {
-						metadata: node.route.metadata,
-					}),
-			occurrenceCount: occurrenceCountByNode.get(node) ?? 1,
-			occurrenceId: occurrenceIdByNode.get(node)!,
-			outputRuns: node.outputRuns,
-			quantity: node.quantity,
-			requirements,
-			rootQuantity: node.rootQuantity,
-			routeId: node.route?.id ?? `root:${node.factId}`,
-			source: node.route === undefined ? "root" : "route",
-		};
-	});
-
-const readRequirementSummary = ({ nodes, occurrenceCountByNode }: EstimateNodeGraph) => {
-	const consumed = new Map<string, number>();
-	const oneTime = new Map<string, number>();
-	const ongoing = new Map<string, number>();
-	for (const node of nodes) {
-		const occurrenceCount = occurrenceCountByNode.get(node) ?? 1;
-		for (const { group } of node.children) {
-			consumed.set(
-				group.factId,
-				(consumed.get(group.factId) ?? 0) + group.consumed * occurrenceCount,
-			);
-			oneTime.set(
-				group.factId,
-				Math.max(oneTime.get(group.factId) ?? 0, group.oneTime * occurrenceCount),
-			);
-			ongoing.set(
-				group.factId,
-				Math.max(ongoing.get(group.factId) ?? 0, group.ongoing * occurrenceCount),
-			);
+			if (group.consumed <= epsilon)
+				retainedQuantityByFact.set(
+					group.factId,
+					Math.max(
+						retainedQuantityByFact.get(group.factId) ?? 0,
+						group.oneTime,
+						group.ongoing,
+					),
+				);
+			pending.push(child);
 		}
 	}
-	const freeze = (
-		quantities: ReadonlyMap<string, number>,
-	): ReadonlyArray<EditorItemEstimateAmount> =>
-		[
-			...quantities,
-		]
-			.filter(([, amount]) => amount > epsilon)
-			.sort(([left], [right]) => Order.String(left, right))
-			.map(([amountFactId, amount]) => ({
-				factId: amountFactId,
-				quantity: amount,
-			}));
-	return {
-		consumed: freeze(consumed),
-		oneTime: freeze(oneTime),
-		ongoing: freeze(ongoing),
-	};
+	return retainedQuantityByFact;
 };
 
 /** Builds one topology and projects deterministic scalar estimates for the requested authored facts. */
@@ -531,6 +267,173 @@ export const estimateEditorItemsFn = ({
 }: EstimateEditorItemsProps): ReadonlyArray<EditorItemEstimate> => {
 	if (requests.length === 0) return [];
 	const index = createIndex(graph);
+	const completeFactsByBlockedFactId = new Map<string, ReadonlySet<string>>();
+	const readCompleteFacts = (blockedFactId?: string) => {
+		const key = blockedFactId ?? "";
+		const memoized = completeFactsByBlockedFactId.get(key);
+		if (memoized !== undefined) return memoized;
+		const complete = readCompleteFactIdsFn(index, graph, blockedFactId);
+		completeFactsByBlockedFactId.set(key, complete);
+		return complete;
+	};
+	const isCompleteRoute = (route: EditorAcquisitionRoute) => {
+		if (!(route.output.expectedYield > epsilon)) return false;
+		const requirements = index.requirementsByRoute.get(route)!;
+		const satisfies = (complete: ReadonlySet<string>) =>
+			requirements.allOf.every(({ factId }) => complete.has(factId)) &&
+			requirements.anyOf.every((clause) => clause.some(({ factId }) => complete.has(factId)));
+		if (!satisfies(readCompleteFacts())) return false;
+		const outputComponent =
+			index.componentByFact.get(route.output.factId) ?? route.output.factId;
+		const mayReenterOutputComponent = [
+			...requirements.allOf,
+			...requirements.anyOf.flat(),
+		].some(({ factId }) => (index.componentByFact.get(factId) ?? factId) === outputComponent);
+		return !mayReenterOutputComponent || satisfies(readCompleteFacts(route.output.factId));
+	};
+	// Cyclic components need a finite scalar ordering hint; only materialized witnesses decide.
+	const unitCost = new Map<string, number>();
+	for (const { factId } of graph.roots) unitCost.set(factId, 0);
+	for (let iteration = 0; iteration < index.factCount; iteration += 1) {
+		let changed = false;
+		for (const route of graph.routes) {
+			if (!(route.output.expectedYield > epsilon)) continue;
+			const actionRuns = route.runMultiplier / route.output.expectedYield;
+			const requirements = index.requirementsByRoute.get(route)!;
+			const readUnitRequirementCost = (requirement: EditorAcquisitionRequirement) => {
+				const cost = unitCost.get(requirement.factId);
+				return cost === undefined
+					? Number.POSITIVE_INFINITY
+					: cost * readEstimateRequirementQuantityFn(requirement, actionRuns);
+			};
+			let dependencyCost = Math.max(0, ...requirements.allOf.map(readUnitRequirementCost));
+			for (const clause of requirements.anyOf)
+				dependencyCost = Math.max(
+					dependencyCost,
+					Math.min(...clause.map(readUnitRequirementCost)),
+				);
+			const cost = route.durationMs * actionRuns + dependencyCost;
+			const current = unitCost.get(route.output.factId);
+			if (Number.isFinite(cost) && (current === undefined || cost < current - epsilon)) {
+				unitCost.set(route.output.factId, cost);
+				changed = true;
+			}
+		}
+		if (!changed) break;
+	}
+	const quantityCostMemo = new Map<string, number>();
+	const readMissingQuantity = (factId: string, quantity: number) => {
+		const root = index.roots.get(factId);
+		return root === "unbounded" ? 0 : Math.max(0, quantity - (root ?? 0));
+	};
+	function readFactCost(factId: string, quantity: number, activeComponentId: string): number {
+		if (quantity > editorItemEstimateMaximumQuantity) return Number.POSITIVE_INFINITY;
+		const missingQuantity = readMissingQuantity(factId, quantity);
+		if (missingQuantity <= epsilon) return 0;
+		const componentId = index.componentByFact.get(factId) ?? factId;
+		if (componentId === activeComponentId)
+			return (unitCost.get(factId) ?? Number.POSITIVE_INFINITY) * missingQuantity;
+		const memoKey = JSON.stringify([
+			factId,
+			Math.round(missingQuantity * 1e9) / 1e9,
+			activeComponentId,
+		]);
+		const memoized = quantityCostMemo.get(memoKey);
+		if (memoized !== undefined) return memoized;
+		const cost = Math.min(
+			...readRankedRoutes(index, factId)
+				.filter(isCompleteRoute)
+				.map((route) => readRouteCost(route, missingQuantity, componentId).durationMs),
+		);
+		quantityCostMemo.set(memoKey, cost);
+		return cost;
+	}
+	function readSelectedRequirements(
+		route: EditorAcquisitionRoute,
+		actionRuns: number,
+		activeComponentId: string,
+	) {
+		const requirements = index.requirementsByRoute.get(route)!;
+		const selected = [
+			...requirements.allOf,
+		];
+		for (const clause of requirements.anyOf) {
+			const alternative = [
+				...clause,
+			].sort((left, right) => {
+				const leftCost = readFactCost(
+					left.factId,
+					readEstimateRequirementQuantityFn(left, actionRuns),
+					activeComponentId,
+				);
+				const rightCost = readFactCost(
+					right.factId,
+					readEstimateRequirementQuantityFn(right, actionRuns),
+					activeComponentId,
+				);
+				return leftCost - rightCost || Order.String(left.factId, right.factId);
+			})[0];
+			if (alternative === undefined) return undefined;
+			selected.push(alternative);
+		}
+		return selected;
+	}
+	function readRouteCost(
+		route: EditorAcquisitionRoute,
+		missingQuantity: number,
+		activeComponentId: string,
+	) {
+		if (!isCompleteRoute(route))
+			return {
+				durationMs: Number.POSITIVE_INFINITY,
+			};
+		const outputRuns = missingQuantity / route.output.expectedYield;
+		const actionRuns = outputRuns * route.runMultiplier;
+		const requirements = readSelectedRequirements(route, actionRuns, activeComponentId);
+		if (requirements === undefined)
+			return {
+				durationMs: Number.POSITIVE_INFINITY,
+			};
+		let dependencyDurationMs = 0;
+		for (const group of groupEstimateRequirementsFn(requirements, actionRuns)) {
+			const cost = readFactCost(
+				group.factId,
+				group.consumed + Math.max(group.oneTime, group.ongoing),
+				activeComponentId,
+			);
+			if (!Number.isFinite(cost))
+				return {
+					durationMs: cost,
+					requirements,
+				};
+			dependencyDurationMs = Math.max(dependencyDurationMs, cost);
+		}
+		return {
+			durationMs: route.durationMs * actionRuns + dependencyDurationMs,
+			requirements,
+		};
+	}
+	const readCostedRoutes = (factId: string, quantity: number) => {
+		const missingQuantity = readMissingQuantity(factId, quantity);
+		if (missingQuantity <= epsilon) return [];
+		const activeComponentId = index.componentByFact.get(factId) ?? factId;
+		const candidates: Array<{
+			readonly durationMs: number;
+			readonly route: EditorAcquisitionRoute;
+		}> = [];
+		for (const route of readRankedRoutes(index, factId)) {
+			const cost = readRouteCost(route, missingQuantity, activeComponentId);
+			if (cost.requirements === undefined) continue;
+			candidates.push({
+				durationMs: cost.durationMs,
+				route,
+			});
+		}
+		return candidates.sort(
+			(left, right) =>
+				left.durationMs - right.durationMs || Order.String(left.route.id, right.route.id),
+		);
+	};
 	return requests.map(({ factId, quantity = 1 }): EditorItemEstimate => {
 		if (quantity > editorItemEstimateMaximumQuantity)
 			return {
@@ -650,25 +553,18 @@ export const estimateEditorItemsFn = ({
 				return cycleFailure(missingRequirement.factId, branch, topRouteId);
 			return traceUnavailable(missingRequirement.factId, branch, topRouteId);
 		};
-		const selectProduction = (
-			currentFactId: string,
-			activeFactIds: ReadonlyArray<string>,
-			diagnosticRouteId?: string,
-		): RouteSelectionResult => {
-			const activeIndex = activeFactIds.indexOf(currentFactId);
-			if (activeIndex >= 0)
-				return cycleFailure(
-					currentFactId,
-					activeFactIds,
-					diagnosticRouteId ??
-						index.routesByFact.get(currentFactId)?.[0]?.id ??
-						`unreachable:${currentFactId}`,
-				);
-			const selected = index.routeSelections.get(currentFactId);
-			return selected ?? traceUnavailable(currentFactId, activeFactIds, diagnosticRouteId);
+		let retainedQuantityByFact = new Map<string, number>();
+		let materializedMemo = new Map<string, EstimateSuccess[]>();
+		const rememberMaterialized = (memoKey: string, success: EstimateSuccess) => {
+			const candidates = materializedMemo.get(memoKey) ?? [];
+			if (!candidates.some(({ node }) => node === success.node)) candidates.push(success);
+			candidates.sort(
+				(left, right) =>
+					left.node.durationMs - right.node.durationMs ||
+					Order.String(left.node.route?.id ?? "", right.node.route?.id ?? ""),
+			);
+			materializedMemo.set(memoKey, candidates);
 		};
-
-		const materializedMemo = new Map<string, EstimateSuccess>();
 		const solveFact = (
 			currentFactId: string,
 			currentQuantity: number,
@@ -692,12 +588,11 @@ export const estimateEditorItemsFn = ({
 				currentFactId,
 				currentQuantity,
 			]);
-			const memoized = materializedMemo.get(memoKey);
-			if (
-				memoized !== undefined &&
-				!nodeProducesAnyFact(memoized.node, new Set(activeFactIds))
-			)
-				return memoized;
+			const activeFactIdSet = new Set(activeFactIds);
+			const memoized = materializedMemo
+				.get(memoKey)
+				?.find(({ node }) => !nodeProducesAnyFact(node, activeFactIdSet));
+			if (memoized !== undefined) return memoized;
 			const root = index.roots.get(currentFactId);
 			const rootQuantity =
 				root === "unbounded" ? currentQuantity : Math.min(root ?? 0, currentQuantity);
@@ -716,7 +611,7 @@ export const estimateEditorItemsFn = ({
 					},
 					status: "success",
 				};
-				materializedMemo.set(memoKey, success);
+				rememberMaterialized(memoKey, success);
 				return success;
 			}
 			const cycleIndex = activeFactIds.indexOf(currentFactId);
@@ -728,70 +623,345 @@ export const estimateEditorItemsFn = ({
 						index.routesByFact.get(currentFactId)?.[0]?.id ??
 						`unreachable:${currentFactId}`,
 				);
-			const selection = selectProduction(currentFactId, activeFactIds, diagnosticRouteId);
-			if (selection.status === "failure") return selection;
-			const outputRuns = missingQuantity / selection.route.output.expectedYield;
-			const actionRuns = outputRuns * selection.route.runMultiplier;
-			const children: EstimateNode["children"][number][] = [];
-			const diagnostics: EditorItemEstimateDiagnostic[] = [];
-			for (const group of groupRequirements(selection.requirements, actionRuns)) {
-				const requiredQuantity = group.consumed + Math.max(group.oneTime, group.ongoing);
-				const branch = [
-					...activeFactIds,
-					currentFactId,
-				];
-				if (group.consumed > epsilon && branch.includes(group.factId))
-					return cycleFailure(
-						group.factId,
-						branch,
-						diagnosticRouteId ?? selection.route.id,
-					);
-				const child = solveFact(
-					group.factId,
-					requiredQuantity,
-					branch,
-					diagnosticRouteId ?? selection.route.id,
+			const branch = [
+				...activeFactIds,
+				currentFactId,
+			];
+			const selections = readCostedRoutes(currentFactId, currentQuantity);
+			if (selections.length === 0)
+				return traceUnavailable(currentFactId, activeFactIds, diagnosticRouteId);
+			const failures: EditorItemEstimateDiagnostic[] = [];
+			let best: EstimateSuccess | undefined;
+			let bestRequirementSelectionKey = "";
+			for (const selection of selections) {
+				const outputRuns = missingQuantity / selection.route.output.expectedYield;
+				const actionRuns = outputRuns * selection.route.runMultiplier;
+				const routeRequirements = index.requirementsByRoute.get(selection.route)!;
+				const activeComponentId = index.componentByFact.get(currentFactId) ?? currentFactId;
+				const rankedClauses = routeRequirements.anyOf.map((clause) =>
+					[
+						...clause,
+					].sort((left, right) => {
+						const leftCost = readFactCost(
+							left.factId,
+							readEstimateRequirementQuantityFn(left, actionRuns),
+							activeComponentId,
+						);
+						const rightCost = readFactCost(
+							right.factId,
+							readEstimateRequirementQuantityFn(right, actionRuns),
+							activeComponentId,
+						);
+						return leftCost - rightCost || Order.String(left.factId, right.factId);
+					}),
 				);
-				if (child.status === "failure")
+				function materializeRequirements(
+					requirements: ReadonlyArray<EditorAcquisitionRequirement>,
+				) {
+					const children: EstimateWitnessNode["children"][number][] = [];
+					const diagnostics: EditorItemEstimateDiagnostic[] = [];
+					for (const group of groupEstimateRequirementsFn(requirements, actionRuns)) {
+						if (group.consumed > epsilon && branch.includes(group.factId))
+							return {
+								diagnostics: cycleFailure(
+									group.factId,
+									branch,
+									diagnosticRouteId ?? selection.route.id,
+								).diagnostics,
+								failedFactId: group.factId,
+							};
+						// Consumed and retained demand have different sharing laws and cannot share one edge.
+						if (group.consumed > epsilon) {
+							const child = solveFact(
+								group.factId,
+								group.consumed,
+								branch,
+								diagnosticRouteId ?? selection.route.id,
+							);
+							if (child.status === "failure")
+								return {
+									diagnostics: child.diagnostics,
+									failedFactId: group.factId,
+								};
+							diagnostics.push(...child.diagnostics);
+							children.push({
+								group: {
+									...group,
+									oneTime: 0,
+									ongoing: 0,
+								},
+								node: child.node,
+							});
+						}
+						const retainedQuantity = Math.max(group.oneTime, group.ongoing);
+						if (retainedQuantity > epsilon) {
+							const child = solveFact(
+								group.factId,
+								Math.max(
+									retainedQuantity,
+									retainedQuantityByFact.get(group.factId) ?? 0,
+								),
+								branch,
+								diagnosticRouteId ?? selection.route.id,
+							);
+							if (child.status === "failure")
+								return {
+									diagnostics: child.diagnostics,
+									failedFactId: group.factId,
+								};
+							diagnostics.push(...child.diagnostics);
+							children.push({
+								group: {
+									...group,
+									consumed: 0,
+								},
+								node: child.node,
+							});
+						}
+					}
 					return {
-						diagnostics: uniqueDiagnostics([
-							...child.diagnostics,
-							{
-								factId: currentFactId,
-								kind: "quantity-specific-route-not-retried",
-								quantity: currentQuantity,
-								routeId: selection.route.id,
-							},
-						]),
+						children,
+						diagnostics,
+						failedFactId: undefined,
+					};
+				}
+				const readRequirementSelections = () => {
+					type RequirementSelection = {
+						readonly groups: ReturnType<typeof groupEstimateRequirementsFn>;
+						readonly key: string;
+						readonly requirements: ReadonlyArray<EditorAcquisitionRequirement>;
+					};
+					const readGroupsKey = (groups: RequirementSelection["groups"]) =>
+						JSON.stringify(
+							groups.map(
+								({ consumed, distinctOneTime, factId, oneTime, ongoing }) => [
+									factId,
+									consumed,
+									distinctOneTime,
+									oneTime,
+									ongoing,
+								],
+							),
+						);
+					const readSelectionKey = (
+						requirements: ReadonlyArray<EditorAcquisitionRequirement>,
+					) =>
+						JSON.stringify(
+							requirements.map(({ factId, identity, quantity, source, usage }) => [
+								factId,
+								identity,
+								quantity,
+								source,
+								usage,
+							]),
+						);
+					const dominates = (left: RequirementSelection, right: RequirementSelection) => {
+						const rightGroupByFact = new Map(
+							right.groups.map((group) => [
+								group.factId,
+								group,
+							]),
+						);
+						const leftGroupByFact = new Map(
+							left.groups.map((group) => [
+								group.factId,
+								group,
+							]),
+						);
+						let strictlyLower = false;
+						for (const factId of new Set([
+							...leftGroupByFact.keys(),
+							...rightGroupByFact.keys(),
+						])) {
+							const leftGroup = leftGroupByFact.get(factId);
+							const rightGroup = rightGroupByFact.get(factId);
+							for (const key of [
+								"consumed",
+								"distinctOneTime",
+								"oneTime",
+								"ongoing",
+							] as const) {
+								const leftQuantity = leftGroup?.[key] ?? 0;
+								const rightQuantity = rightGroup?.[key] ?? 0;
+								if (leftQuantity > rightQuantity + epsilon) return false;
+								if (leftQuantity < rightQuantity - epsilon) strictlyLower = true;
+							}
+						}
+						return strictlyLower;
+					};
+					const readRank = (selection: RequirementSelection) =>
+						Math.max(
+							0,
+							...selection.groups.map(({ consumed, factId, oneTime, ongoing }) =>
+								readFactCost(
+									factId,
+									consumed + Math.max(oneTime, ongoing),
+									activeComponentId,
+								),
+							),
+						);
+					let selections: ReadonlyArray<RequirementSelection> = [
+						{
+							groups: groupEstimateRequirementsFn(
+								routeRequirements.allOf,
+								actionRuns,
+							),
+							key: readSelectionKey(routeRequirements.allOf),
+							requirements: routeRequirements.allOf,
+						},
+					];
+					for (const clause of rankedClauses) {
+						const nextByGroupsKey = new Map<string, RequirementSelection>();
+						let exceededMaximum = false;
+						for (const current of selections) {
+							if (exceededMaximum) break;
+							for (const alternative of clause) {
+								const requirements = [
+									...current.requirements,
+									alternative,
+								];
+								const groups = groupEstimateRequirementsFn(
+									requirements,
+									actionRuns,
+								);
+								const candidate = {
+									groups,
+									key: readSelectionKey(requirements),
+									requirements,
+								};
+								const groupsKey = readGroupsKey(groups);
+								const currentCandidate = nextByGroupsKey.get(groupsKey);
+								if (
+									currentCandidate === undefined ||
+									candidate.key < currentCandidate.key
+								)
+									nextByGroupsKey.set(groupsKey, candidate);
+								if (nextByGroupsKey.size > maximumAnyOfRequirementSelections) {
+									exceededMaximum = true;
+									break;
+								}
+							}
+						}
+						if (exceededMaximum)
+							return {
+								exceededMaximum: true,
+								selections: [],
+							};
+						const candidates = [
+							...nextByGroupsKey.values(),
+						];
+						const nonDominated = candidates
+							.filter(
+								(candidate) =>
+									!candidates.some((other) => dominates(other, candidate)),
+							)
+							.sort(
+								(left, right) =>
+									readRank(left) - readRank(right) ||
+									Order.String(left.key, right.key),
+							);
+						if (nonDominated.length > maximumAnyOfRequirementSelections)
+							return {
+								exceededMaximum: true,
+								selections: [],
+							};
+						selections = nonDominated;
+					}
+					return {
+						exceededMaximum: false,
+						selections,
+					};
+				};
+				const requirementSelections = readRequirementSelections();
+				if (requirementSelections.exceededMaximum) {
+					failures.push({
+						factId: currentFactId,
+						kind: "any-of-selection-limit-exceeded",
+						maximumSelections: maximumAnyOfRequirementSelections,
+						routeId: selection.route.id,
+					});
+					continue;
+				}
+				for (const requirementSelection of requirementSelections.selections) {
+					const materialized = materializeRequirements(requirementSelection.requirements);
+					if (materialized.failedFactId !== undefined) {
+						failures.push(...materialized.diagnostics);
+						continue;
+					}
+					const { children, diagnostics } = materialized;
+					const success: EstimateSuccess = {
+						diagnostics: uniqueDiagnostics(diagnostics),
+						node: {
+							actionRuns,
+							children,
+							durationMs:
+								selection.route.durationMs * actionRuns +
+								Math.max(0, ...children.map(({ node }) => node.durationMs)),
+							factId: currentFactId,
+							outputRuns,
+							quantity: currentQuantity,
+							rootQuantity,
+							route: selection.route,
+						},
+						status: "success",
+					};
+					const isBetter =
+						best === undefined ||
+						success.node.durationMs < best.node.durationMs - epsilon ||
+						(Math.abs(success.node.durationMs - best.node.durationMs) <= epsilon &&
+							(Order.String(selection.route.id, best.node.route?.id ?? "") < 0 ||
+								(selection.route.id === best.node.route?.id &&
+									Order.String(
+										requirementSelection.key,
+										bestRequirementSelectionKey,
+									) < 0)));
+					if (isBetter) {
+						best = success;
+						bestRequirementSelectionKey = requirementSelection.key;
+					}
+				}
+			}
+			if (best !== undefined) {
+				rememberMaterialized(memoKey, best);
+				return best;
+			}
+			return failures.length === 0
+				? traceUnavailable(currentFactId, activeFactIds, diagnosticRouteId)
+				: {
+						diagnostics: uniqueDiagnostics(failures),
 						status: "failure",
 					};
-				diagnostics.push(...child.diagnostics);
-				children.push({
-					group,
-					node: child.node,
-				});
-			}
-			const success: EstimateSuccess = {
-				diagnostics: uniqueDiagnostics(diagnostics),
-				node: {
-					actionRuns,
-					children,
-					durationMs:
-						selection.route.durationMs * actionRuns +
-						Math.max(0, ...children.map(({ node }) => node.durationMs)),
-					factId: currentFactId,
-					outputRuns,
-					quantity: currentQuantity,
-					rootQuantity,
-					route: selection.route,
-				},
-				status: "success",
-			};
-			materializedMemo.set(memoKey, success);
-			return success;
 		};
 
-		const result = solveFact(factId, quantity, []);
+		let result: EstimateResult = traceUnavailable(factId, [], undefined);
+		// Upgrade every reusable fact to the witness-wide maximum before sealing time and demand.
+		for (let iteration = 0; iteration <= index.factCount; iteration += 1) {
+			materializedMemo = new Map();
+			result = solveFact(factId, quantity, []);
+			if (result.status === "failure") break;
+			const witnessRetainedQuantityByFact = readRetainedQuantityByFactFn(result.node);
+			let upgraded = false;
+			for (const [retainedFactId, retainedQuantity] of witnessRetainedQuantityByFact) {
+				const currentQuantity = retainedQuantityByFact.get(retainedFactId) ?? 0;
+				if (retainedQuantity <= currentQuantity + epsilon) continue;
+				retainedQuantityByFact.set(retainedFactId, retainedQuantity);
+				upgraded = true;
+			}
+			if (!upgraded) break;
+			if (iteration === index.factCount) {
+				result = {
+					diagnostics: [
+						{
+							factId,
+							kind: "retained-demand-not-stable",
+							maximumIterations: index.factCount + 1,
+						},
+					],
+					status: "failure",
+				};
+				break;
+			}
+		}
 		if (result.status === "failure") {
 			const diagnostics = uniqueDiagnostics(result.diagnostics).slice(0, maximumDiagnostics);
 			return {
@@ -802,15 +972,15 @@ export const estimateEditorItemsFn = ({
 				quantity,
 				status: diagnostics.some(
 					({ kind }) =>
+						kind === "any-of-selection-limit-exceeded" ||
 						kind === "quantity-limit-exceeded" ||
-						kind === "quantity-specific-route-not-retried",
+						kind === "retained-demand-not-stable",
 				)
 					? "partial"
 					: "unreachable",
 			};
 		}
-		const nodeGraph = createEstimateNodeGraph(result.node);
-		const routeSteps = projectRouteSteps(nodeGraph);
+		const projection = projectEstimateWitnessFn(result.node);
 		return {
 			diagnostics: uniqueDiagnostics(result.diagnostics).slice(0, maximumDiagnostics),
 			durationMs: result.node.durationMs,
@@ -818,9 +988,7 @@ export const estimateEditorItemsFn = ({
 			limitations: graph.limitations,
 			obtainable: true,
 			quantity,
-			requirementSummary: readRequirementSummary(nodeGraph),
-			route: routeSteps[0]!,
-			routeSteps,
+			...projection,
 			status: "complete",
 		};
 	});

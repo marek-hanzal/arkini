@@ -2,10 +2,10 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { createEditorAcquisitionGraphFn } from "~/flow/fn/createEditorAcquisitionGraphFn";
+import type { EstimateRouteStep } from "~/estimate-projection/type/EstimateProjection";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
-	EditorItemEstimateRouteStep,
 } from "~/estimate/type/EditorItemEstimate";
 import { estimateEditorItemsFn } from "~/estimate/fn/estimateEditorItemsFn";
 
@@ -19,10 +19,12 @@ const itemReference = (project: EditorProject, itemId: string) => {
 
 const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "any-of-selection-limit-exceeded":
+			return `${diagnostic.routeId} exceeds the static any-of selection limit of ${diagnostic.maximumSelections} normalized demand states`;
+		case "retained-demand-not-stable":
+			return `${diagnostic.factId} did not stabilize reusable prerequisite demand within ${diagnostic.maximumIterations} witness passes`;
 		case "quantity-limit-exceeded":
 			return `${diagnostic.factId} x ${formatNumber(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source})`;
-		case "quantity-specific-route-not-retried":
-			return `${diagnostic.factId} x ${formatNumber(diagnostic.quantity)} exceeds selected scalar route ${diagnostic.routeId}; quantity-specific alternatives were not retried`;
 		case "cycle":
 			return `cycle on ${diagnostic.routeId}: ${diagnostic.factIds.join(" -> ")}`;
 		case "unreachable":
@@ -63,7 +65,7 @@ const limitationText = (limitation: EditorItemEstimate["limitations"][number]) =
 
 const routeLines = (
 	project: EditorProject,
-	routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>,
+	routeSteps: ReadonlyArray<EstimateRouteStep>,
 ): ReadonlyArray<string> => {
 	const routeByOccurrenceId = new Map(
 		routeSteps.map((route) => [
@@ -102,8 +104,9 @@ const formatEstimate = (
 		"Timing: approximate optimistic parallel critical path",
 		"Start facts: authored board, inventory, and toolbar",
 		"Random output occurrences: demand divided by scalar expected yield",
-		"Route choice: first locally ranked route when each fact becomes reachable; scalar action time with stable route identity ties",
-		"Quantity boundary: route admission proves one scalar output unit; larger propagated demand can return partial without retrying alternatives",
+		"Route choice: complete scalar upstream cost with stable route identity ties",
+		"Quantity boundary: route choice is evaluated at each propagated scalar demand",
+		"Any-of boundary: bounded normalized demand states return partial before an incomparable alternative is discarded",
 		"Enable prerequisites: acquired and included in time",
 		"Independent occurrences: shared outputs and finite roots are not jointly accounted",
 		"Ignored: rule truth and disabling conditions, scope and placement, charge capacity and renewal, finite resource capacity",
@@ -119,7 +122,7 @@ const formatEstimate = (
 			...header,
 			`Status: ${estimate.status}`,
 			estimate.status === "partial"
-				? "The requested path exceeded either the static-analysis limit or its selected scalar-unit witness; duration is indeterminate."
+				? "The bounded static analysis could not produce stable totals; see the diagnostic for the exact limit."
 				: "No complete acquisition route reaches the target from the authored start facts.",
 			"Diagnostics:",
 			...(estimate.diagnostics.length === 0

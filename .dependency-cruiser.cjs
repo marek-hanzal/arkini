@@ -5,6 +5,8 @@ const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[
 const fnOperationPattern = "^src/[^\\n]*(?:/fn/|Fn[.]tsx?$)";
 const fxOperationPattern = "^src/[^\\n]*(?:/fx/|Fx[.]tsx?$)";
 const uiModulePattern = "^src/(?:ui|[^\\n]*/ui)(?:/|$)";
+const routeModulePattern = "^src/@routes(?:/|$)";
+const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -148,12 +150,27 @@ module.exports = {
 				path: activeCodePattern,
 				pathNot: [
 					uiModulePattern,
-					"^src/@routes(?:/|$)",
+					routeModulePattern,
 					applicationEntrypointPattern,
 				],
 			},
 			to: {
 				path: uiModulePattern,
+			},
+		},
+		{
+			name: "non-routes-do-not-import-routes",
+			comment:
+				"Routes are terminal application composition. Active code provides behavior to routes and never imports route registration or route-private helpers.",
+			severity: "error",
+			from: {
+				path: activeCodePattern,
+				pathNot: [
+					routeCompositionPattern,
+				],
+			},
+			to: {
+				path: routeModulePattern,
 			},
 		},
 	],

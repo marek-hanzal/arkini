@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 /**
  * Terminal renderer side of the native controlled-close handshake. This route

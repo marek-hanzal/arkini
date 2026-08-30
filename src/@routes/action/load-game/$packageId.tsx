@@ -6,7 +6,7 @@ import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releas
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { GameEngineErrorView } from "~/ui/game/GameEngineErrorView";
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	Effect.scoped(

@@ -20,9 +20,12 @@ import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/insta
 import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
-import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
-import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
-import { LauncherStartupHydrator } from "~/ui/launcher/LauncherStartupHydrator";
+import {
+	LauncherHeroAsset,
+	LauncherStartupConfigAtom,
+} from "~/launcher/atom/LauncherStartupConfigAtom";
+import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
+import "~/launcher/ui/launcher.css";
 import "~/ui/styles.css";
 
 const rootElement = document.getElementById("root");

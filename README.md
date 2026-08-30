@@ -74,8 +74,12 @@ src/game-audio  committed-event cue projection and route-scoped Web Audio lifecy
 src/game-cheat  save-scoped Cheat controls, commands and item-spawn spotlight
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
+src/application-settings  Appearance, Cheat availability and application Settings state, commands and presentation
+src/application-shell  renderer root context, fatal surface and shared route transition/navigation behavior
+src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
+src/authoring-form  shared Editor form registry and canonical authored Item-reference controls
 src/renderer  installed Game, launcher preferences, window, resource-validation and transport capabilities
-src/ui        cross-product primitives plus remaining application Settings and authoring leaves
+src/ui        cross-product primitives and general controls only
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

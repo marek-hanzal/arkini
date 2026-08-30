@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { Button } from "~/ui/button/Button";
 import type { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
 import type { updateGameCheatsAtom } from "~/game-cheat/atom/updateGameCheatsAtom";
-import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
+import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 
 const actionLabel = (action: updateGameCheatsAtom.Command["action"]) => {
 	if (action === "instant-gameplay") return "Instant gameplay";

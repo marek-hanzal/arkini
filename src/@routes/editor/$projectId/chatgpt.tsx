@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CloudOff, FileWarning, LoaderCircle } from "lucide-react";
 
 import { Button } from "~/ui/button/Button";
-import { EditorChatGptAssetConfirmation } from "~/ui/chatgpt/editor/EditorChatGptAssetConfirmation";
-import { useEditorChatGptController } from "~/ui/chatgpt/editor/useEditorChatGptController";
+import { EditorChatGptAssetConfirmation } from "~/chatgpt-asset-authoring/ui/EditorChatGptAssetConfirmation";
+import { useEditorChatGptController } from "~/chatgpt-asset-authoring/ui/useEditorChatGptController";
 import { Status } from "~/ui/status/Status";
 
 export const Route = createFileRoute("/editor/$projectId/chatgpt")({

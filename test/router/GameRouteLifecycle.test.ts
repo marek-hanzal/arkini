@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
-import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
+import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
 import type { Game } from "~/renderer/game/Game";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";

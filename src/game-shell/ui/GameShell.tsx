@@ -11,7 +11,7 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemDetailModal } from "~/item-detail/ui/ItemDetailModal";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
-import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
+import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 import { PixiGameProvider } from "~/game-scene/ui/PixiGameRuntime";
 
 type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscreen";

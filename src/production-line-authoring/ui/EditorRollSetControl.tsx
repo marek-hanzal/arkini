@@ -13,8 +13,8 @@ import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
-import { EditorItemReferenceControl } from "~/ui/item/EditorItemAutocompleteField";
-import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
+import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
+import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
 type EditorDropListValue = [

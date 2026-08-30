@@ -19,7 +19,7 @@ import { installRendererControlledCloseFx } from "~/application-runtime/fx/insta
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
 import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
-import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
+import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
 import {
 	LauncherHeroAsset,
 	LauncherStartupConfigAtom,

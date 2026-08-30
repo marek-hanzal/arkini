@@ -6,8 +6,8 @@ import { match } from "ts-pattern";
 import { BackButton } from "~/ui/button/BackButton";
 import { ButtonLink } from "~/ui/button/Button";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
-import { ModelProvider } from "~/ui/settings/ModelContext";
-import { useSettingsModel } from "~/ui/settings/useSettingsModel";
+import { ModelProvider } from "~/application-settings/ui/ModelContext";
+import { useSettingsModel } from "~/application-settings/ui/useSettingsModel";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 

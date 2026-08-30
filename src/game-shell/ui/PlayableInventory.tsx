@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "react";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { Inventory } from "~/game-shell/ui/Inventory";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
+import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
 
 /** Shared Inventory leaf with overlay-aware return behavior. */
 export const PlayableInventory = ({ onClose }: { readonly onClose: () => void }) => {

@@ -1,10 +1,10 @@
 import { useAtom } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { SettingsOpenActionRow } from "~/ui/settings/SettingsOpenActionRow";
-import { SettingsDiagnosticsCommandAtom } from "~/ui/settings/SettingsDiagnosticsCommandAtom";
-import { SettingsUserDataCommandAtom } from "~/ui/settings/SettingsUserDataCommandAtom";
-import { useCliModel } from "~/ui/settings/useCliModel";
+import { SettingsOpenActionRow } from "~/application-settings/ui/SettingsOpenActionRow";
+import { SettingsDiagnosticsCommandAtom } from "~/application-settings/atom/SettingsDiagnosticsCommandAtom";
+import { SettingsUserDataCommandAtom } from "~/application-settings/atom/SettingsUserDataCommandAtom";
+import { useCliModel } from "~/application-settings/ui/useCliModel";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 

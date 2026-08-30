@@ -1,8 +1,8 @@
 import { createRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { routeTree } from "~/_route";
-import type { RootContext } from "~/ui/root/RootContext";
-import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
+import type { RootContext } from "~/application-shell/context/RootContext";
+import { resolveRouteViewTransitionTypesFx } from "~/application-shell/fx/resolveRouteViewTransitionTypesFx";
 
 const isSkippedViewTransition = (error: unknown) =>
 	typeof error === "object" &&

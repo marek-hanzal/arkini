@@ -14,7 +14,7 @@ import { match, P } from "ts-pattern";
 
 import { useGameCheats } from "~/game-cheat/ui/useGameCheats";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
+import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { CheatItemSpawnContext } from "~/game-cheat/context/CheatItemSpawnContext";
 import { useCheatItemSpotlightSearch } from "~/game-cheat/ui/useCheatItemSpotlightSearch";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";

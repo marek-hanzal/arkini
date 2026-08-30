@@ -32,7 +32,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/ui/item/EditorItemThumbnail", () => ({
+vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
 	EditorItemThumbnail: () =>
 		createElement("span", {
 			"data-ui": "EditorItemThumbnail",

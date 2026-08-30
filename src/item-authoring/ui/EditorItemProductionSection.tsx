@@ -7,7 +7,7 @@ import { EditorLineFields } from "~/production-line-authoring/ui/EditorLineField
 import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { withFieldGroup } from "~/ui/form/EditorForm";
+import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 

@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
-import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
+import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 
 export namespace readActorCursorFn {
 	export interface Props {
@@ -9,7 +9,7 @@ export namespace readActorCursorFn {
 		readonly hasDropTarget?: boolean;
 		readonly phase: "dragging" | "idle" | "pending";
 		/** Drop semantics are intentionally ignored while dragging. */
-		readonly previewKind?: readTileDropPreviewFx.Result["kind"] | null;
+		readonly previewKind?: readDropItemPreviewFx.Result["kind"] | null;
 		readonly running: boolean;
 	}
 }

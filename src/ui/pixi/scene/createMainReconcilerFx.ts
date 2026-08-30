@@ -25,10 +25,10 @@ import { lifecycleDurationMs, runActorLifecycleFx } from "~/ui/pixi/animation/ru
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
+import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 import type { DeliveryRuntime } from "~/ui/pixi/delivery/DeliveryRuntime";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
-import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
+import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";

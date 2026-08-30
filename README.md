@@ -33,6 +33,7 @@ src/item-line-detail  line-detail reads, board/stored projections, inputs/output
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
 src/tile-presentation  semantic tile actors, feedback, replacements and committed motion projection
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
+src/tile-interaction  pointer gestures, drag/drop execution, gameplay command admission and cancellation
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
 src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
 src/item-placement  scope-aware stack, spawn, output and existing-item placement

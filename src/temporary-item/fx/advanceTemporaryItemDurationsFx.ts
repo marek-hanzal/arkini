@@ -3,19 +3,17 @@ import { Effect } from "effect";
 import { isInstantGameplayEnabledFn } from "~/game-runtime/read/fn/isInstantGameplayEnabledFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
-export namespace advanceTemporaryItemDurationsFx {
-	export interface Props {
-		items: readonly RuntimeItemSchema.Type[];
-		runtime: RuntimeSchema.Type;
-	}
+interface AdvanceTemporaryItemDurationsProps {
+	items: readonly RuntimeItemSchema.Type[];
+	runtime: RuntimeSchema.Type;
 }
 
 /** Decrements only temporary identities observed at the current step boundary. */
 export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDurationsFx")(
-	function* ({ items, runtime }: advanceTemporaryItemDurationsFx.Props) {
+	function* ({ items, runtime }: AdvanceTemporaryItemDurationsProps) {
 		let draft = runtime;
 		const instantGameplay = isInstantGameplayEnabledFn({
 			runtime,

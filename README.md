@@ -32,11 +32,12 @@ src/application-version  Arkini writer provenance, major-only admission and inco
 src/game-version  project-owned gameplay compatibility schema and major projection
 src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
+src/temporary-item  temporary lifetime advancement, expiry admission and atomic expiry output
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
 src/item-query  canonical Runtime Item query execution across authored reach, scope and distance
 src/item-resolution  canonical configured Item lookup and exact not-found rejection
 src/item-revision  opaque live Item revisions, fresh creation and stale-write rejection
-src/engine    remaining state-isolation, temporary expiry and CLI support owners
+src/engine    remaining state-isolation and CLI support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections

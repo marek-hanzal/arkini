@@ -6,7 +6,7 @@ import type {
 	TileMotionCue,
 	TileSpawnMotionCue,
 	TileSwapMotionCue,
-} from "~/ui/pixi/motion/TileMotionCue";
+} from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";

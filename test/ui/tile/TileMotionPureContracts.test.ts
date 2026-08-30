@@ -4,7 +4,7 @@ import type {
 	TileInputMotionCue,
 	TileMotionCue,
 	TileStackMotionCue,
-} from "~/ui/pixi/motion/TileMotionCue";
+} from "~/tile-presentation/type/TileMotionCue";
 import { readInteractionClaimsFn } from "~/ui/pixi/motion/fn/readInteractionClaimsFn";
 import { readTileMotionActorClaimsFn } from "~/ui/tile/motion/fn/readTileMotionActorClaimsFn";
 import { readTileMotionLaneClaimsFn } from "~/ui/tile/motion/fn/readTileMotionLaneClaimsFn";

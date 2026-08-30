@@ -2,15 +2,15 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { GameTransition } from "~/renderer/game/session/GameSession";
-import type { TileActorVisual } from "~/ui/pixi/actor/TileActorVisual";
-import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
+import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
+import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
-export interface TileReplacement {
+interface TileReplacement {
 	readonly actorId: string;
 	readonly key: string;
 	readonly previous: TileActorVisual;
@@ -23,8 +23,8 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 		game,
 		transition,
 	}: {
-		readonly game: GameEngine;
-		readonly transition: GameTransition;
+		readonly game: Pick<GameEngine, "getResourceUrl">;
+		readonly transition: CommittedTransitionSchema.Type;
 	}) {
 		if (transition.previousRuntime === null) return [];
 		const replacements = yield* Effect.forEach(transition.events, (event, eventIndex) =>

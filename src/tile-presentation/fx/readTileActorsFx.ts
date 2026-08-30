@@ -4,10 +4,10 @@ import { match, P } from "ts-pattern";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
-import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
-import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
+import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
+import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
@@ -15,14 +15,6 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-
-export namespace readTileActorsFx {
-	export interface Props {
-		readonly game: GameEngine;
-		readonly runtime: RuntimeSchema.Type;
-		readonly surface: "inventory" | "main";
-	}
-}
 
 const readQueueBadgeCountFn = ({
 	ownerItemId,
@@ -110,7 +102,11 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 	game,
 	runtime,
 	surface,
-}: readTileActorsFx.Props) {
+}: {
+	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly runtime: RuntimeSchema.Type;
+	readonly surface: "inventory" | "main";
+}) {
 	const activeJobs = new Map(
 		runtime.jobs.map((job) => [
 			job.ownerItemId,
@@ -138,7 +134,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			const visual = yield* readTileActorVisualFx({
 				game,
 				item: item.item,
-				sourceIds: yield* readTileActorAssetSourceIdsFx({
+				sourceIds: readTileActorAssetSourceIdsFn({
 					item,
 					runtime,
 				}),

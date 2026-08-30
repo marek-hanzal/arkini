@@ -1,12 +1,12 @@
 import { Effect, Option } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
-import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
-import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
-import { readGridRuntimeItemFn } from "~/ui/pixi/motion/fn/readGridRuntimeItemFn";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
+import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
+import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
+import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeItemFn";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
@@ -45,13 +45,6 @@ type UnstaggeredTileMotionCue =
 			>,
 			"staggerIndex"
 	  >;
-
-export namespace readTileMotionCuesFx {
-	export interface Props {
-		readonly game: GameEngine;
-		readonly transition: CommittedTransitionSchema.Type;
-	}
-}
 
 const readOriginLocation = ({
 	originItemId,
@@ -146,14 +139,14 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 	runtime,
 	source,
 }: {
-	readonly game: GameEngine;
+	readonly game: Pick<GameEngine, "getResourceUrl">;
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: GridRuntimeItemSchema.Type;
 }) {
 	const visual = yield* readTileActorVisualFx({
 		game,
 		item: source.item,
-		sourceIds: yield* readTileActorAssetSourceIdsFx({
+		sourceIds: readTileActorAssetSourceIdsFn({
 			item: source,
 			runtime,
 		}),
@@ -187,7 +180,7 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 }: {
 	readonly event: GameEventSchema.Type;
 	readonly eventIndex: number;
-	readonly game: GameEngine;
+	readonly game: Pick<GameEngine, "getResourceUrl">;
 	readonly transition: CommittedTransitionSchema.Type;
 }) {
 	if (event.type === GameEventEnumSchema.enum.ItemSpawned) {
@@ -315,7 +308,10 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 export const readTileMotionCuesFx = Effect.fn("readTileMotionCuesFx")(function* ({
 	game,
 	transition,
-}: readTileMotionCuesFx.Props) {
+}: {
+	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly transition: CommittedTransitionSchema.Type;
+}) {
 	const cues = yield* Effect.forEach(transition.events, (event, eventIndex) =>
 		readEventCueFx({
 			event,

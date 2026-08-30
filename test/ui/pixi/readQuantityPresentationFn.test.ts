@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import { readQuantityPresentationFn } from "~/ui/pixi/motion/fn/readQuantityPresentationFn";
 
 import { inputCue, stackCue } from "./readQuantityPresentationFn.test/fixture";

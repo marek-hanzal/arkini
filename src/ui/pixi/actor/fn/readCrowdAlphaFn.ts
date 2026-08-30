@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 const activeCraftAlpha = 0.6;
 const runningLineOwnerAlpha = 0.82;

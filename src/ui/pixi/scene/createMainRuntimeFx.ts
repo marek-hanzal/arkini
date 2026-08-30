@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 import { createParticleTexturesFx } from "~/ui/pixi/actor/createParticleTexturesFx";
 import { createAnimationDriverFx } from "~/ui/pixi/animation/createAnimationDriverFx";

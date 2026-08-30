@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";
 import type { TargetFacts } from "~/ui/pixi/scene/MainSurface";

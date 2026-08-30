@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import type { MotionRedirect } from "~/ui/pixi/motion/MotionTarget";
+import type { MotionRedirect } from "~/tile-motion/type/MotionTarget";
 
 /**
  * Projects one committed drop into a presentation-only ownership handoff.

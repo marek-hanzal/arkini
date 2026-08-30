@@ -15,8 +15,8 @@ import { createMainDragControllerFx } from "~/ui/pixi/drag/createMainDragControl
 import { createDeliveryRuntimeFx } from "~/ui/pixi/delivery/createDeliveryRuntimeFx";
 import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
 import { createDropSubmissionFx } from "~/ui/pixi/drop/createDropSubmissionFx";
-import { createMagneticFieldFx } from "~/ui/pixi/magnet/createMagneticFieldFx";
-import { createMotionRuntimeFx } from "~/ui/pixi/motion/createMotionRuntimeFx";
+import { createMagneticFieldFx } from "~/tile-motion/fx/createMagneticFieldFx";
+import { createMotionRuntimeFx } from "~/tile-motion/fx/createMotionRuntimeFx";
 import { createApplicationOwnerFx } from "~/ui/pixi/runtime/createApplicationOwnerFx";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainRuntime } from "~/ui/pixi/scene/MainRuntime";

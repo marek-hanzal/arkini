@@ -18,8 +18,8 @@ import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 import type { DropSubmission } from "~/ui/pixi/drop/DropSubmission";
-import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
-import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
+import type { MagneticField } from "~/tile-motion/service/MagneticField";
+import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import { readTargetRedirectFn } from "~/ui/pixi/motion/fn/readTargetRedirectFn";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 

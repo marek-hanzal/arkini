@@ -6,11 +6,11 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { moveRuntimeItemForTestFx } from "~test/support/item-interaction/moveRuntimeItemForTestFx";
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
-import { dropItemFx } from "~/item-interaction/write/dropItemFx";
-import { releaseInventoryItemFx } from "~/item-interaction/write/releaseInventoryItemFx";
-import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
+import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
+import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
+import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";

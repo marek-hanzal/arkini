@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 
 export namespace readAttractionActorIdFn {

@@ -9,7 +9,7 @@ import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn"
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

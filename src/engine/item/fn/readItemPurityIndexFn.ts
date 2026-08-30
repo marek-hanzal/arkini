@@ -8,7 +8,7 @@ export interface ItemPurityIndex {
 	readonly queueLineIdsByOwnerId: ReadonlyMap<IdSchema.Type, ReadonlySet<IdSchema.Type>>;
 }
 
-const addOwnedLine = (
+const addOwnedLineFn = (
 	index: Map<IdSchema.Type, Set<IdSchema.Type>>,
 	ownerItemId: IdSchema.Type,
 	lineId: IdSchema.Type,
@@ -33,14 +33,14 @@ export const readItemPurityIndexFn = (runtime: RuntimeSchema.Type) => {
 	const queueLineIdsByOwnerId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
 	for (const item of runtime.items) {
 		if (item.location.scope === LocationScopeEnumSchema.enum.Input) {
-			addOwnedLine(inputLineIdsByOwnerId, item.location.ownerItemId, item.location.lineId);
+			addOwnedLineFn(inputLineIdsByOwnerId, item.location.ownerItemId, item.location.lineId);
 			continue;
 		}
 		if (
 			item.location.scope === LocationScopeEnumSchema.enum.Delivery &&
 			item.location.phase === "outbound"
 		) {
-			addOwnedLine(
+			addOwnedLineFn(
 				inputLineIdsByOwnerId,
 				item.location.target.ownerItemId,
 				item.location.target.lineId,
@@ -48,10 +48,10 @@ export const readItemPurityIndexFn = (runtime: RuntimeSchema.Type) => {
 		}
 	}
 	for (const job of runtime.jobs) {
-		addOwnedLine(jobLineIdsByOwnerId, job.ownerItemId, job.lineId);
+		addOwnedLineFn(jobLineIdsByOwnerId, job.ownerItemId, job.lineId);
 	}
 	for (const request of runtime.jobQueue) {
-		addOwnedLine(queueLineIdsByOwnerId, request.ownerItemId, request.lineId);
+		addOwnedLineFn(queueLineIdsByOwnerId, request.ownerItemId, request.lineId);
 	}
 	return {
 		inputLineIdsByOwnerId,

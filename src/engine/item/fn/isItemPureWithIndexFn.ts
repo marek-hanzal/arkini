@@ -6,7 +6,7 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemPurityIndex } from "./readItemPurityIndexFn";
 
-const readOwnedLines = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[] =>
+const readOwnedLinesFn = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[] =>
 	match(item.item)
 		.with(
 			{
@@ -54,7 +54,7 @@ export const isItemPureWithIndexFn = ({
 	const inputLineIds = index.inputLineIdsByOwnerId.get(item.id);
 	const jobLineIds = index.jobLineIdsByOwnerId.get(item.id);
 	const queueLineIds = index.queueLineIdsByOwnerId.get(item.id);
-	return readOwnedLines(item).every(
+	return readOwnedLinesFn(item).every(
 		(line) =>
 			inputLineIds?.has(line.id) !== true &&
 			jobLineIds?.has(line.id) !== true &&

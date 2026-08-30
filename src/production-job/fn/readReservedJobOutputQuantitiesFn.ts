@@ -7,7 +7,7 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
-const addQuantities = (
+const addQuantitiesFn = (
 	target: Map<IdSchema.Type, number>,
 	source: ReadonlyMap<IdSchema.Type, number>,
 ) => {
@@ -16,7 +16,7 @@ const addQuantities = (
 	}
 };
 
-const subtractQuantity = (
+const subtractQuantityFn = (
 	quantities: Map<IdSchema.Type, number>,
 	itemId: IdSchema.Type,
 	quantity: number,
@@ -39,7 +39,7 @@ const readJobMaximumOutputQuantitiesFn = ({
 }) => {
 	const quantities = new Map<IdSchema.Type, number>();
 	if (line.output !== undefined) {
-		addQuantities(
+		addQuantitiesFn(
 			quantities,
 			readOutputMaximumQuantitiesFn({
 				output: line.output,
@@ -49,7 +49,7 @@ const readJobMaximumOutputQuantitiesFn = ({
 
 	const depleted = owner.item.charges !== undefined && owner.remainingCharges === 0;
 	if (depleted && owner.item.charges?.output !== undefined) {
-		addQuantities(
+		addQuantitiesFn(
 			quantities,
 			readOutputMaximumQuantitiesFn({
 				output: owner.item.charges.output,
@@ -62,12 +62,12 @@ const readJobMaximumOutputQuantitiesFn = ({
 			item.location.scope === LocationScopeEnumSchema.enum.Job &&
 			item.location.jobId === job.id
 		) {
-			subtractQuantity(quantities, item.item.id, item.quantity);
+			subtractQuantityFn(quantities, item.item.id, item.quantity);
 		}
 	}
 
 	if (depleted) {
-		subtractQuantity(quantities, owner.item.id, owner.quantity);
+		subtractQuantityFn(quantities, owner.item.id, owner.quantity);
 	}
 
 	return quantities;

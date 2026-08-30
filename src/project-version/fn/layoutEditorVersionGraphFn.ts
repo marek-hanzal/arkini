@@ -13,7 +13,7 @@ export interface EditorVersionGraphLayout {
 	readonly workingCopyLane: number;
 }
 
-const orderVersions = (
+const orderVersionsFn = (
 	versions: ReadonlyArray<EditorProjectVersionDescriptor>,
 ): ReadonlyArray<EditorProjectVersionDescriptor> =>
 	[
@@ -35,7 +35,7 @@ export const layoutEditorVersionGraphFn = (
 					currentBaseVersionId,
 				];
 	let laneCount = Math.max(1, active.length);
-	const rows = orderVersions(versions).map((version): EditorVersionGraphRow => {
+	const rows = orderVersionsFn(versions).map((version): EditorVersionGraphRow => {
 		let lane = active.indexOf(version.versionId);
 		if (lane < 0) {
 			const emptyLane = active.indexOf(undefined);

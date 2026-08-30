@@ -10,11 +10,11 @@ import type {
 	EditorItemOriginSourceReference,
 } from "~/flow/type/EditorItemOriginSource";
 
-const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
+const uniqueFn = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
 ];
 
-const readOwnerItemId = (route: EditorAcquisitionRoute) => {
+const readOwnerItemIdFn = (route: EditorAcquisitionRoute) => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return route.metadata.ownerItemId;
@@ -27,7 +27,7 @@ const readOwnerItemId = (route: EditorAcquisitionRoute) => {
 	}
 };
 
-const readReference = (route: EditorAcquisitionRoute): EditorItemOriginSourceReference => {
+const readReferenceFn = (route: EditorAcquisitionRoute): EditorItemOriginSourceReference => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return {
@@ -50,7 +50,7 @@ const readReference = (route: EditorAcquisitionRoute): EditorItemOriginSourceRef
 	}
 };
 
-const readInputOccurrences = (
+const readInputOccurrencesFn = (
 	routes: ReadonlyArray<EditorAcquisitionRoute>,
 ): EditorItemOriginInputOccurrence[] => {
 	const inputs =
@@ -67,7 +67,7 @@ const readInputOccurrences = (
 	});
 };
 
-const readRequirementOccurrence = (
+const readRequirementOccurrenceFn = (
 	requirement: EditorAcquisitionRoute["requirements"]["allOf"][number],
 ): EditorItemOriginRequirementOccurrence => ({
 	itemId: requirement.factId,
@@ -86,11 +86,11 @@ const readRequirementOccurrence = (
 	usage: requirement.usage,
 });
 
-const readOutputRequirements = (
+const readOutputRequirementsFn = (
 	route: EditorAcquisitionRoute,
 ): EditorItemOriginOutputRequirements => ({
-	allOf: route.requirements.allOf.map(readRequirementOccurrence),
-	anyOf: route.requirements.anyOf.map((clause) => clause.map(readRequirementOccurrence)),
+	allOf: route.requirements.allOf.map(readRequirementOccurrenceFn),
+	anyOf: route.requirements.anyOf.map((clause) => clause.map(readRequirementOccurrenceFn)),
 	...(route.requirements.unsupported === undefined
 		? {}
 		: {
@@ -102,7 +102,7 @@ const readOutputRequirements = (
 			}),
 });
 
-const readLabel = (route: EditorAcquisitionRoute) => {
+const readLabelFn = (route: EditorAcquisitionRoute) => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return route.metadata.lineTitle;
@@ -115,7 +115,7 @@ const readLabel = (route: EditorAcquisitionRoute) => {
 	}
 };
 
-const readKind = (route: EditorAcquisitionRoute): EditorItemOriginSource["kind"] => {
+const readKindFn = (route: EditorAcquisitionRoute): EditorItemOriginSource["kind"] => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return "line";
@@ -128,16 +128,16 @@ const readKind = (route: EditorAcquisitionRoute): EditorItemOriginSource["kind"]
 	}
 };
 
-const readRuntimeMs = (route: EditorAcquisitionRoute) =>
+const readRuntimeMsFn = (route: EditorAcquisitionRoute) =>
 	route.metadata.kind === "merge-output" || route.metadata.kind === "line-charge-depletion"
 		? undefined
 		: route.durationMs;
 
-const readRequirementItemIds = (
+const readRequirementItemIdsFn = (
 	ownerItemId: string,
 	routes: ReadonlyArray<EditorAcquisitionRoute>,
 ) =>
-	unique([
+	uniqueFn([
 		ownerItemId,
 		...routes.flatMap((route) => route.operation?.inputs.map(({ factId }) => factId) ?? []),
 		...routes.flatMap((route) =>
@@ -152,7 +152,7 @@ const readRequirementItemIds = (
 		),
 	]);
 
-const readOutputs = (routes: ReadonlyArray<EditorAcquisitionRoute>) => {
+const readOutputsFn = (routes: ReadonlyArray<EditorAcquisitionRoute>) => {
 	const seen = new Set<string>();
 	return routes.flatMap((route) => {
 		const output = {
@@ -160,7 +160,7 @@ const readOutputs = (routes: ReadonlyArray<EditorAcquisitionRoute>) => {
 			placement: route.output.annotation.placement,
 			quantity: route.output.annotation.quantity,
 			routeId: route.id,
-			requirements: readOutputRequirements(route),
+			requirements: readOutputRequirementsFn(route),
 			selectionKind: route.output.annotation.selectionKind,
 			weightedSet: route.output.annotation.alternativeSet,
 		};
@@ -178,19 +178,19 @@ type EditorAcquisitionRouteGroup = [
 	...EditorAcquisitionRoute[],
 ];
 
-const projectRoutes = (routes: EditorAcquisitionRouteGroup): EditorItemOriginSource => {
+const projectRoutesFn = (routes: EditorAcquisitionRouteGroup): EditorItemOriginSource => {
 	const route = routes[0];
-	const ownerItemId = readOwnerItemId(route);
-	const runtimeMs = readRuntimeMs(route);
+	const ownerItemId = readOwnerItemIdFn(route);
+	const runtimeMs = readRuntimeMsFn(route);
 	return {
 		id: route.operation?.id ?? route.id,
-		inputs: readInputOccurrences(routes),
-		kind: readKind(route),
-		label: readLabel(route),
-		outputs: readOutputs(routes),
+		inputs: readInputOccurrencesFn(routes),
+		kind: readKindFn(route),
+		label: readLabelFn(route),
+		outputs: readOutputsFn(routes),
 		ownerItemId,
-		reference: readReference(route),
-		requirementItemIds: readRequirementItemIds(ownerItemId, routes),
+		reference: readReferenceFn(route),
+		requirementItemIds: readRequirementItemIdsFn(ownerItemId, routes),
 		routeIds: routes.map(({ id }) => id),
 		...(runtimeMs === undefined
 			? {}
@@ -216,5 +216,5 @@ export const readEditorItemOriginSourcesFn = (graph: EditorAcquisitionGraph) => 
 	}
 	return [
 		...routesByOperationId.values(),
-	].map(projectRoutes);
+	].map(projectRoutesFn);
 };

@@ -29,7 +29,7 @@ export namespace readItemDetailTabsFn {
 	}
 }
 
-const withSources = (
+const withSourcesFn = (
 	tabs: readonly ItemDetailTabEnumSchema.Type[],
 	sources: readItemDetailTabsFn.SourcesAvailability | undefined,
 ): readonly ItemDetailTabEnumSchema.Type[] => {
@@ -59,9 +59,9 @@ const lineOwnerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 
 /** Classifies the finite Item Detail tabs supported by one exact runtime or definition target. */
 export const readItemDetailTabsFn = ({ sources, target }: readItemDetailTabsFn.Props) => {
-	if (target.kind === "definition") return withSources(infoTab, sources);
+	if (target.kind === "definition") return withSourcesFn(infoTab, sources);
 	if (target.item === undefined) return noTabs;
 	const lineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(target.item.item));
-	if (lineOwnerItem === undefined) return withSources(infoTab, sources);
-	return withSources(lineOwnerTabs, sources);
+	if (lineOwnerItem === undefined) return withSourcesFn(infoTab, sources);
+	return withSourcesFn(lineOwnerTabs, sources);
 };

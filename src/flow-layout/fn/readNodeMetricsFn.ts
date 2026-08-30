@@ -18,7 +18,7 @@ const PortLineHeight = 26;
 const NodeBottomPadding = 12;
 const ItemPortBaseY = 45;
 
-const readItemPortY = (headerHeight: number) =>
+const readItemPortYFn = (headerHeight: number) =>
 	ItemPortBaseY + (headerHeight - NodeHeaderHeight) / 2;
 
 interface OperationMetrics {
@@ -50,16 +50,16 @@ export interface NodeMetrics {
 	readonly width: number;
 }
 
-const readOperationBodyHeight = (operation: EditorItemOriginOperation) =>
+const readOperationBodyHeightFn = (operation: EditorItemOriginOperation) =>
 	Math.max(1, operation.inputs.length, operation.outputs.length) * PortLineHeight;
 
-const readOperationHeight = (operation: EditorItemOriginOperation) =>
+const readOperationHeightFn = (operation: EditorItemOriginOperation) =>
 	OperationContentPadding * 2 +
 	OperationHeaderHeight +
 	OperationHeaderGap +
-	readOperationBodyHeight(operation);
+	readOperationBodyHeightFn(operation);
 
-const readPortYs = (
+const readPortYsFn = (
 	ports: ReadonlyArray<{
 		readonly id: string;
 	}>,
@@ -89,7 +89,7 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 		return {
 			headerHeight: NodeMinHeight,
 			height: NodeMinHeight,
-			itemPortY: readItemPortY(NodeMinHeight),
+			itemPortY: readItemPortYFn(NodeMinHeight),
 			itemTextBounds,
 			operations: [],
 			portOffsets: new Map([
@@ -97,14 +97,14 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 					EditorItemOriginItemInputPortId,
 					{
 						x: -NodeWidth / 2,
-						y: readItemPortY(NodeMinHeight) - NodeMinHeight / 2,
+						y: readItemPortYFn(NodeMinHeight) - NodeMinHeight / 2,
 					},
 				],
 				[
 					EditorItemOriginItemOutputPortId,
 					{
 						x: NodeWidth / 2,
-						y: readItemPortY(NodeMinHeight) - NodeMinHeight / 2,
+						y: readItemPortYFn(NodeMinHeight) - NodeMinHeight / 2,
 					},
 				],
 			]),
@@ -115,14 +115,14 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 	let top = NodeHeaderHeight;
 	const operations: OperationMetrics[] = [];
 	for (const operation of node.operations) {
-		const height = readOperationHeight(operation);
-		const bodyHeight = readOperationBodyHeight(operation);
+		const height = readOperationHeightFn(operation);
+		const bodyHeight = readOperationBodyHeightFn(operation);
 		const bodyTop = top + OperationContentPadding + OperationHeaderHeight + OperationHeaderGap;
 		operations.push({
 			height,
 			id: operation.id,
-			inputPortYs: readPortYs(operation.inputs, bodyTop, bodyHeight),
-			outputPortYs: readPortYs(operation.outputs, bodyTop, bodyHeight),
+			inputPortYs: readPortYsFn(operation.inputs, bodyTop, bodyHeight),
+			outputPortYs: readPortYsFn(operation.outputs, bodyTop, bodyHeight),
 			top,
 		});
 		top += height + OperationGap;
@@ -137,11 +137,11 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 	>();
 	portOffsets.set(EditorItemOriginItemInputPortId, {
 		x: -NodeWidth / 2,
-		y: readItemPortY(NodeHeaderHeight) - height / 2,
+		y: readItemPortYFn(NodeHeaderHeight) - height / 2,
 	});
 	portOffsets.set(EditorItemOriginItemOutputPortId, {
 		x: NodeWidth / 2,
-		y: readItemPortY(NodeHeaderHeight) - height / 2,
+		y: readItemPortYFn(NodeHeaderHeight) - height / 2,
 	});
 	for (const operation of operations) {
 		for (const [portId, y] of operation.inputPortYs) {
@@ -160,7 +160,7 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 	return {
 		headerHeight: NodeHeaderHeight,
 		height,
-		itemPortY: readItemPortY(NodeHeaderHeight),
+		itemPortY: readItemPortYFn(NodeHeaderHeight),
 		itemTextBounds,
 		operations,
 		portOffsets,

@@ -44,7 +44,7 @@ interface ActorUpdatePlan {
 		  };
 }
 
-const isSameMainSceneVisual = (left: TileActorItem, right: TileActorItem) => {
+const isSameMainSceneVisualFn = (left: TileActorItem, right: TileActorItem) => {
 	if (left.revision !== right.revision) return false;
 	if (left.primaryAction.kind !== right.primaryAction.kind) return false;
 	if (
@@ -79,7 +79,7 @@ export const classifyActorUpdateFn = ({
 	preserveVisual,
 }: ClassifyActorUpdateProps): ActorUpdatePlan => {
 	const moved = !isSameTileActorLocationFn(actor.item.location, displayItem.location);
-	const visualChanged = !isSameMainSceneVisual(actor.currentVisual.item, displayItem);
+	const visualChanged = !isSameMainSceneVisualFn(actor.currentVisual.item, displayItem);
 	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 	const sizeChanged = actor.size !== pose.size;
 	const poseOwned = actor.dragging || deliveryRetained || motionClaimed || poseChannelActive;

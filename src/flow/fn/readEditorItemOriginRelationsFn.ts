@@ -5,14 +5,14 @@ import type {
 	EditorItemOriginSource,
 } from "~/flow/type/EditorItemOriginSource";
 
-const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
+const uniqueFn = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
 ];
 
-const projectEditorItemOriginRelations = (
+const projectEditorItemOriginRelationsFn = (
 	source: EditorItemOriginSource,
 ): EditorItemOriginRelation[] => [
-	...unique(source.requirementItemIds)
+	...uniqueFn(source.requirementItemIds)
 		.filter((itemId) => itemId !== source.ownerItemId)
 		.sort((left, right) => Order.String(left, right))
 		.map((itemId) => ({
@@ -32,4 +32,4 @@ const projectEditorItemOriginRelations = (
 
 /** Projects the exact item-to-item edges materialized by the editor origin flow. */
 export const readEditorItemOriginRelationsFn = (source: EditorItemOriginSource) =>
-	projectEditorItemOriginRelations(source);
+	projectEditorItemOriginRelationsFn(source);

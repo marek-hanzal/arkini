@@ -15,7 +15,7 @@ import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/EditorUnsaved
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/createEditorUnsavedChangesOwnerFx";
 import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { RendererAtomRegistry } from "~/application-runtime/RendererAtomRegistry";
+import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 

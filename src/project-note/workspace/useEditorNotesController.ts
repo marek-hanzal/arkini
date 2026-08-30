@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { EditorNotesCommandAtoms } from "~/project-note/workspace/EditorNotesCommandAtoms";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { EditorNoteContentMaxLength, type EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 

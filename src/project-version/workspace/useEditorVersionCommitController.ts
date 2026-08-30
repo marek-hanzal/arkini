@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { readEditorProjectVersionHistoryFx } from "~/project-version/fx/readEditorProjectVersionHistoryFx";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorProjectVersionStatus } from "~/project-version/EditorProjectVersion";
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));

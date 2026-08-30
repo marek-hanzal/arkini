@@ -2,7 +2,7 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import { readRendererLifecycleFx } from "~/application-runtime/lifecycle/readRendererLifecycleFx";
+import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 
 type MainMenuExitCommandState =
 	| {

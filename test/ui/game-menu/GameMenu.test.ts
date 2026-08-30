@@ -16,9 +16,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
 import type { Game } from "~/renderer/game/Game";
-import { createRendererLifecycleFx } from "~/application-runtime/lifecycle/createRendererLifecycleFx";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/lifecycle/readRendererLifecycleFx";
-import { RendererAtomRegistry } from "~/application-runtime/RendererAtomRegistry";
+import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";

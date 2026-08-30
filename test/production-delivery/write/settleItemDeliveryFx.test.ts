@@ -6,12 +6,12 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { fromStateFx } from "~/game-persistence/fromStateFx";
+import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/DropItemResult";
 import { dropItemFx } from "~/item-interaction/write/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
-import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
+import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,

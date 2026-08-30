@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { TickFx } from "~/game-tick/TickFx";
+import { TickFx } from "~/game-tick/service/TickFx";
 
 interface RunTickRuntimeByProps {
 	readonly elapsedMs: number;

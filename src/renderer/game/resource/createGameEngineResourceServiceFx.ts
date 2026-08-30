@@ -15,7 +15,7 @@ import type {
 	GameEngineResourceServiceState,
 } from "~/renderer/game/resource/internal/GameEngineResourceServiceState";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
+import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
 export namespace createGameEngineResourceServiceFx {
 	export interface Dependencies {

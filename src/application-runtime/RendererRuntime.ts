@@ -16,8 +16,8 @@ import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/createEdi
 import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { RendererAtomRegistry } from "~/application-runtime/RendererAtomRegistry";
-import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
-import { createElectronGameSaveStorageFx } from "~/game-persistence/electron/createElectronGameSaveStorageFx";
+import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
+import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 
 const RendererAtomRegistryLayer = Layer.succeed(AtomRegistry.AtomRegistry, RendererAtomRegistry);
 

@@ -7,7 +7,7 @@ import type {
 	GameSessionFatalError,
 	GameSessionFatalSource,
 } from "~/renderer/game/session/GameSessionFatalError";
-import type { RuntimeSaveFx } from "~/game-persistence/RuntimeSaveFx";
+import type { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import type { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";

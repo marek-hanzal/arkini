@@ -9,7 +9,7 @@ import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
 const baseItem = (id: string) =>

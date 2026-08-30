@@ -20,14 +20,14 @@ import {
 	type GameSessionTransitionSubscriptionCleanup,
 	createGameSessionTransitionSubscriptionsFx,
 } from "~/renderer/game/session/createGameSessionTransitionSubscriptionsFx";
-import { RuntimeSaveFx } from "~/game-persistence/RuntimeSaveFx";
-import { RuntimeSaveLayerFx } from "~/game-persistence/RuntimeSaveLayerFx";
-import { GameLoopFx } from "~/game-tick/GameLoopFx";
+import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
+import { RuntimeSaveLayerFx } from "~/game-persistence/layer/RuntimeSaveLayerFx";
+import { GameLoopFx } from "~/game-tick/service/GameLoopFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace createGameSessionFx {
 	export interface Props<SaveError = unknown> {

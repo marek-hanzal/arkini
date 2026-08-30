@@ -10,7 +10,7 @@ import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { TickStepMs } from "~/game-tick/TickStepMs";
+import { TickStepMs } from "~/game-tick/constant/TickStepMs";
 
 const lineId = "line:forge:run";
 

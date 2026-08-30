@@ -5,7 +5,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
+import type { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";

@@ -4,16 +4,16 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
-import { TileDefaultLineCommandAtom } from "~/ui/pixi/command/TileDefaultLineCommandAtom";
+import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";
+import { TileDefaultLineCommandAtom } from "~/tile-interaction/atom/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import { runTileSplitAtom } from "~/ui/pixi/command/runTileSplitAtom";
+import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import { runTileSplitAtom } from "~/tile-interaction/atom/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 import type { MainRuntime } from "~/ui/pixi/scene/MainRuntime";
-import type { MainActivationIntent } from "~/ui/pixi/scene/MainActivationIntent";
+import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainRuntimeFx } from "~/ui/pixi/scene/createMainRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 

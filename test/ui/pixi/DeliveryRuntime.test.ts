@@ -11,7 +11,7 @@ import type {
 	PresentationWrite,
 } from "~/ui/pixi/animation/ActorAnimator";
 import { createDeliveryRuntimeFx } from "~/ui/pixi/delivery/createDeliveryRuntimeFx";
-import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
+import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {

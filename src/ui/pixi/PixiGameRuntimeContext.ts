@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { GameInteractionControl } from "~/ui/pixi/runtime/createGameInteractionControlFx";
+import type { GameInteractionControl } from "~/tile-interaction/fx/createGameInteractionControlFx";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 export interface GameRuntimeCapabilities {

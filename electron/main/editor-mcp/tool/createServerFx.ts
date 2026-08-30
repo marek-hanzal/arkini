@@ -404,7 +404,7 @@ const createServer = (
 		"item_estimate",
 		{
 			description:
-				"Approximate one item against the authored dependency graph. The estimator expands from authored starting facts and records the first locally ranked route when each fact becomes reachable, using scalar action time with stable route-ID ties. Admission proves one scalar output unit; larger propagated demand can return partial without retrying quantity-specific alternatives. Demand is divided by scalar expected output yield, and the materialized witness is timed as an optimistic parallel critical path. Equivalent independent occurrences are compressed with an explicit count; shared outputs, shared finite roots, rule truth, runtime effects, placement, charges, renewal, and finite capacity are not simulated.",
+				"Approximate one item against the authored dependency graph. The estimator expands from authored starting facts and ranks routes at each propagated scalar demand by complete upstream cost with stable route-ID ties. Any-of alternatives use bounded normalized demand states and return partial instead of silently discarding an incomparable alternative. Demand is divided by scalar expected output yield, and the materialized witness is timed as an optimistic parallel critical path. Equivalent consumed occurrences are compressed with an explicit count; reusable one-time and ongoing prerequisites remain one shared acquisition. Shared outputs, shared finite roots, rule truth, runtime effects, placement, charges, renewal, and finite capacity are not simulated.",
 			inputSchema: ItemEstimateInputSchema,
 		},
 		async ({ itemId, quantity }) =>

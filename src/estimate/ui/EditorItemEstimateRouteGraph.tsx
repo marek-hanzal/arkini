@@ -1,5 +1,5 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorItemEstimateRouteStep } from "~/estimate/type/EditorItemEstimate";
+import type { EstimateRouteStep } from "~/estimate-projection/type/EstimateProjection";
 import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -23,7 +23,7 @@ export const EditorItemEstimateRouteGraph = ({
 	readonly config: EditorProject["config"];
 	readonly header: ReactNode;
 	readonly projectId: string;
-	readonly routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>;
+	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
 	const [sort, setSort] = useState<EditorItemEstimateSort>("time");
 	const requiredByOccurrenceId = new Map<string, Set<string>>();

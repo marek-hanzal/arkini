@@ -442,7 +442,7 @@ describe("estimateEditorItemsFn", () => {
 		});
 	});
 
-	it("returns partial when larger demand outgrows the scalar unit witness", () => {
+	it("retries route selection at the propagated scalar demand", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -481,14 +481,11 @@ describe("estimateEditorItemsFn", () => {
 		);
 
 		expect(result).toMatchObject({
-			obtainable: false,
-			status: "partial",
-		});
-		expect(result.diagnostics).toContainEqual({
-			factId: "target",
-			kind: "quantity-specific-route-not-retried",
-			quantity: 2,
-			routeId: "fast-unit-witness",
+			durationMs: 20,
+			obtainable: true,
+			route: {
+				routeId: "slow-quantity-route",
+			},
 		});
 	});
 

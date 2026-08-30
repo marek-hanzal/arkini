@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type {
-	EditorItemEstimate,
-	EditorItemEstimateRouteStep,
-} from "~/estimate/type/EditorItemEstimate";
+import type { EstimateRouteStep } from "~/estimate-projection/type/EstimateProjection";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 import { createEditorItemEstimateIndexFn } from "~/estimate/fn/createEditorItemEstimateIndexFn";
 
-const step = (factId: string, quantity: number): EditorItemEstimateRouteStep => ({
+const step = (factId: string, quantity: number): EstimateRouteStep => ({
 	actionRuns: quantity,
 	durationMs: quantity * 1_000,
 	factId,
@@ -22,7 +20,7 @@ const step = (factId: string, quantity: number): EditorItemEstimateRouteStep => 
 
 const complete = (
 	factId: string,
-	routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>,
+	routeSteps: ReadonlyArray<EstimateRouteStep>,
 ): EditorItemEstimate => ({
 	diagnostics: [],
 	durationMs: 1_000,

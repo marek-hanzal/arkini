@@ -15,11 +15,9 @@ import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSess
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
 import { Status } from "~/ui/status/Status";
 
-interface EditorAssetManagerProps {
-	readonly filter: "all" | "unused";
-	readonly onFilterChange: (filter: "all" | "unused") => void;
+interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
+	readonly onFilterChange: (filter: useEditorAssetManagerController.Filter) => void;
 	readonly onQueryChange: (query: string) => void;
-	readonly query: string;
 }
 
 interface EditorAssetImportMenuProps {

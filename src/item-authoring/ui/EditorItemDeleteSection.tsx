@@ -1,6 +1,5 @@
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
@@ -74,8 +73,10 @@ const EditorItemDeleteBlockerLink = ({
 	);
 };
 
+interface EditorItemDeleteSectionProps extends useEditorItemDeleteController.Props {}
+
 /** Explains item-delete eligibility and exposes the guarded destructive action. */
-export const EditorItemDeleteSection = ({ item }: { readonly item: ItemSchema.Type }) => {
+export const EditorItemDeleteSection = ({ item }: EditorItemDeleteSectionProps) => {
 	const controller = useEditorItemDeleteController({
 		item,
 	});

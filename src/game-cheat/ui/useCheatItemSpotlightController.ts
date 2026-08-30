@@ -25,38 +25,40 @@ const errorMessage = (error: unknown) =>
 		.with(P.instanceOf(Error), (current) => current.message)
 		.otherwise(String);
 
-interface CheatItemSpotlightControllerProps {
-	readonly alwaysAvailable?: boolean;
-	readonly game: PlayableGame;
-	readonly onBeforeOpen?: () => void;
-}
+export namespace useCheatItemSpotlightController {
+	export interface Props {
+		readonly alwaysAvailable?: boolean;
+		readonly game: PlayableGame;
+		readonly onBeforeOpen?: () => void;
+	}
 
-interface SelectItemProps {
-	readonly index: number;
-	readonly itemId: string;
-}
+	export interface SelectItemProps {
+		readonly index: number;
+		readonly itemId: string;
+	}
 
-interface CheatItemSpotlightControllerOutput {
-	readonly inputRef: RefObject<HTMLInputElement | null>;
-	readonly onBackdropPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
-	readonly onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
-	readonly onQueryChange: (query: string) => void;
-	readonly open: boolean;
-	readonly query: string;
-	readonly requestSelected: () => void;
-	readonly results: ReturnType<typeof useCheatItemSpotlightSearch>["results"];
-	readonly selectItem: (props: SelectItemProps) => void;
-	readonly selectedIndex: number;
-	readonly setSelectedIndex: (index: number) => void;
-	readonly spawnStatus: "error" | "idle" | "pending" | "success";
-	readonly spawnStatusMessage: string;
+	export interface Output {
+		readonly inputRef: RefObject<HTMLInputElement | null>;
+		readonly onBackdropPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
+		readonly onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+		readonly onQueryChange: (query: string) => void;
+		readonly open: boolean;
+		readonly query: string;
+		readonly requestSelected: () => void;
+		readonly results: ReturnType<typeof useCheatItemSpotlightSearch>["results"];
+		readonly selectItem: (props: SelectItemProps) => void;
+		readonly selectedIndex: number;
+		readonly setSelectedIndex: (index: number) => void;
+		readonly spawnStatus: "error" | "idle" | "pending" | "success";
+		readonly spawnStatusMessage: string;
+	}
 }
 
 export const useCheatItemSpotlightController = ({
 	alwaysAvailable = false,
 	game,
 	onBeforeOpen,
-}: CheatItemSpotlightControllerProps): CheatItemSpotlightControllerOutput => {
+}: useCheatItemSpotlightController.Props): useCheatItemSpotlightController.Output => {
 	const cheats = useGameCheats(game);
 	const cheatAvailability = useCheatAvailability();
 	const gameMenu = useGameMenuControl();
@@ -140,7 +142,7 @@ export const useCheatItemSpotlightController = ({
 		spawn.request,
 	]);
 	const selectItem = useCallback(
-		({ index, itemId }: SelectItemProps) => {
+		({ index, itemId }: useCheatItemSpotlightController.SelectItemProps) => {
 			search.setSelectedIndex(index);
 			spawn.request(itemId);
 		},

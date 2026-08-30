@@ -1,5 +1,4 @@
 import { useCheatItemSpotlightController } from "~/game-cheat/ui/useCheatItemSpotlightController";
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { SpotlightSearchInput } from "~/ui/search/SpotlightSearchInput";
 
 const statusClassName = {
@@ -7,13 +6,9 @@ const statusClassName = {
 	idle: "text-muted",
 	pending: "text-accent",
 	success: "text-muted",
-} satisfies Record<ReturnType<typeof useCheatItemSpotlightController>["spawnStatus"], string>;
+} satisfies Record<useCheatItemSpotlightController.Output["spawnStatus"], string>;
 
-interface CheatItemSpotlightProps {
-	readonly alwaysAvailable?: boolean;
-	readonly game: PlayableGame;
-	readonly onBeforeOpen?: () => void;
-}
+interface CheatItemSpotlightProps extends useCheatItemSpotlightController.Props {}
 
 export const CheatItemSpotlight = (props: CheatItemSpotlightProps) => {
 	const controller = useCheatItemSpotlightController(props);

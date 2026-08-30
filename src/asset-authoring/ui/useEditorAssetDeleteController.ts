@@ -32,21 +32,23 @@ const deleteEditorAssetCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-interface UseEditorAssetDeleteControllerProps {
-	readonly filter: "all" | "unused";
-	readonly query: string;
-	readonly resourceId: string;
-}
+export namespace useEditorAssetDeleteController {
+	export interface Props {
+		readonly filter: "all" | "unused";
+		readonly query: string;
+		readonly resourceId: string;
+	}
 
-interface UseEditorAssetDeleteControllerOutput {
-	readonly blockers: ReadonlyArray<EditorAssetDeleteBlocker>;
-	readonly cancel: () => void;
-	readonly confirm: () => Promise<void>;
-	readonly confirming: boolean;
-	readonly deleting: boolean;
-	readonly error: unknown;
-	readonly open: () => void;
-	readonly project: ReturnType<typeof useEditorProject>;
+	export interface Output {
+		readonly blockers: ReadonlyArray<EditorAssetDeleteBlocker>;
+		readonly cancel: () => void;
+		readonly confirm: () => Promise<void>;
+		readonly confirming: boolean;
+		readonly deleting: boolean;
+		readonly error: unknown;
+		readonly open: () => void;
+		readonly project: ReturnType<typeof useEditorProject>;
+	}
 }
 
 /** Owns asset-delete eligibility, confirmation, persistence, and terminal navigation. */
@@ -54,7 +56,7 @@ export const useEditorAssetDeleteController = ({
 	filter,
 	query,
 	resourceId,
-}: UseEditorAssetDeleteControllerProps): UseEditorAssetDeleteControllerOutput => {
+}: useEditorAssetDeleteController.Props): useEditorAssetDeleteController.Output => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
 	const commandAtom = deleteEditorAssetCommandAtom(project.projectId);

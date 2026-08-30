@@ -10,11 +10,7 @@ import { EditorFormContent } from "~/ui/form/EditorFormContent";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";
 import { Status } from "~/ui/status/Status";
 
-interface EditorAssetEditProps {
-	readonly filter: "all" | "unused";
-	readonly query: string;
-	readonly resourceId: string;
-}
+interface EditorAssetEditProps extends useEditorAssetEditController.Props {}
 
 const EditorAssetImageDropZone = ({
 	currentUrl,

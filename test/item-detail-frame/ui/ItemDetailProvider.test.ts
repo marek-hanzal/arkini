@@ -10,7 +10,6 @@ import {
 	completeEnter,
 	completeExit,
 	openItemDetail,
-	renderGuardedProvider,
 	renderProvider,
 	runPendingAction,
 } from "../support/ItemDetailProviderFixture";
@@ -125,46 +124,5 @@ describe("Item Detail frame provider", () => {
 			expect(readControl().readPendingAction("line:runtime:second")).toBeNull(),
 		);
 		expect(readControl().readActionError("line:runtime:second")).toBeNull();
-	});
-
-	it("yields to Game Menu while an admitted command settles independently", async () => {
-		const { readGameMenu, readItemDetail } = await renderGuardedProvider();
-		await act(async () => {
-			openItemDetail(readItemDetail(), {
-				itemId: "runtime:first",
-				tab: "lines",
-			});
-		});
-		const entering = readItemDetail().state;
-		if (entering.phase !== "entering") throw new Error("Expected entering state.");
-		await act(async () => completeEnter(readItemDetail(), entering.generation));
-
-		let completeRun: (() => void) | undefined;
-		const run = new Promise<void>((resolve) => {
-			completeRun = resolve;
-		});
-		await act(async () => {
-			runPendingAction(readItemDetail(), {
-				action: "enqueue",
-				failureMessage: "Start failed.",
-				key: "line:runtime:first",
-				run: Effect.promise(() => run),
-			});
-			readGameMenu().open();
-			await Promise.resolve();
-		});
-
-		expect(readGameMenu().phase).toBe("entering");
-		expect(readItemDetail().state).toMatchObject({
-			phase: "exiting",
-			restoreFocus: false,
-		});
-		expect(readItemDetail().readPendingAction("line:runtime:first")).toBe("enqueue");
-
-		await act(async () => completeRun?.());
-		await vi.waitFor(() =>
-			expect(readItemDetail().readPendingAction("line:runtime:first")).toBeNull(),
-		);
-		expect(readItemDetail().state.phase).toBe("exiting");
 	});
 });

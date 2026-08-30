@@ -98,19 +98,17 @@ const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 		}
 		if (active.size === 0) break;
 
-		let bestId: string | undefined;
-		let bestScore = Number.NEGATIVE_INFINITY;
+		const firstActiveId = active.values().next().value;
+		if (firstActiveId === undefined) break;
+		let bestId = firstActiveId;
+		let bestScore = (outDegree.get(bestId) ?? 0) - (inDegree.get(bestId) ?? 0);
 		for (const id of active) {
 			const score = (outDegree.get(id) ?? 0) - (inDegree.get(id) ?? 0);
-			if (
-				score > bestScore ||
-				(score === bestScore && (bestId === undefined || Order.String(id, bestId) < 0))
-			) {
+			if (score > bestScore || (score === bestScore && Order.String(id, bestId) < 0)) {
 				bestId = id;
 				bestScore = score;
 			}
 		}
-		if (bestId === undefined) throw new Error("Could not order the flow graph.");
 		remove(bestId, "left");
 	}
 

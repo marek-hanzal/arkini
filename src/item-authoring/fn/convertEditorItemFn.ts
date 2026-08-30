@@ -1,5 +1,5 @@
 import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
-import { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 
@@ -39,21 +39,17 @@ export const convertEditorItemFn = (
 				}),
 	};
 	const lines = readAuthoredItemLinesFn(item);
-	const fallbackLines = readAuthoredItemLinesFn(fallback);
-	const fallbackLine = fallbackLines[0];
-	const fallbackQueueSize =
-		fallback.type === "deposit" || fallback.type === "producer" ? fallback.maxQueueSize : 1;
-	const candidate = (() => {
-		switch (targetType) {
+	const candidate: ItemSchema.Type = (() => {
+		switch (fallback.type) {
 			case "simple":
 				return {
 					...common,
-					type: targetType,
+					type: fallback.type,
 				};
 			case "space":
 				return {
 					...common,
-					type: targetType,
+					type: fallback.type,
 					space: item.type === "space" ? item.space : 0,
 					enable: item.type === "space" ? item.enable : true,
 					input: item.type === "space" ? item.input : [],
@@ -62,7 +58,7 @@ export const convertEditorItemFn = (
 			case "inventory":
 				return {
 					...common,
-					type: targetType,
+					type: fallback.type,
 					scope: fallback.scope,
 					maxCount: fallback.maxCount,
 					maxStackSize: fallback.maxStackSize,
@@ -70,15 +66,10 @@ export const convertEditorItemFn = (
 			case "temporary":
 				return {
 					...common,
-					type: targetType,
+					type: fallback.type,
 					scope: fallback.scope,
 					maxStackSize: fallback.maxStackSize,
-					durationMs:
-						item.type === "temporary"
-							? item.durationMs
-							: fallback.type === "temporary"
-								? fallback.durationMs
-								: 500,
+					durationMs: item.type === "temporary" ? item.durationMs : fallback.durationMs,
 					...(item.type === "temporary" && item.output !== undefined
 						? {
 								output: item.output,
@@ -88,36 +79,45 @@ export const convertEditorItemFn = (
 			case "deposit":
 				return {
 					...common,
-					type: targetType,
+					type: fallback.type,
 					maxQueueSize:
 						item.type === "deposit" || item.type === "producer"
 							? item.maxQueueSize
-							: fallbackQueueSize,
+							: fallback.maxQueueSize,
 					...(lines.length === 0
 						? {}
 						: {
-								lines,
+								lines: [
+									lines[0],
+									...lines.slice(1),
+								],
 							}),
 				};
 			case "producer":
 				return {
 					...common,
-					type: targetType,
+					type: fallback.type,
 					maxQueueSize:
 						item.type === "deposit" || item.type === "producer"
 							? item.maxQueueSize
-							: fallbackQueueSize,
-					lines: lines.length === 0 ? fallbackLines : lines,
+							: fallback.maxQueueSize,
+					lines:
+						lines.length === 0
+							? fallback.lines
+							: [
+									lines[0],
+									...lines.slice(1),
+								],
 				};
 			case "blueprint":
 			case "craft":
 			case "stash":
 				return {
 					...common,
-					type: targetType,
-					line: lines[0] ?? fallbackLine,
+					type: fallback.type,
+					line: lines[0] ?? fallback.line,
 				};
 		}
 	})();
-	return ItemSchema.parse(candidate);
+	return candidate;
 };

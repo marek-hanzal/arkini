@@ -1,5 +1,5 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import {
 	DetailFact,
 	DetailFacts,

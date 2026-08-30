@@ -13,15 +13,15 @@ import {
 } from "~/editor-build/domain/fn/readEditorBuildInstallPlanFn";
 import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
 import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import {
 	EditorBuildRepository,
 	type EditorBuildRepository as EditorBuildRepositoryContract,
 } from "~/editor-build/domain/EditorBuildRepository";
 import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProjectBuildSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";

@@ -3,8 +3,8 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
-import type { EditorProjectVersionReference } from "~/project-version/EditorProjectVersion";
+import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { EditorProjectVersionReference } from "~/project-version/type/EditorProjectVersion";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";

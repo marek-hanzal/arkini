@@ -5,7 +5,7 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 
 const state = vi.hoisted(() => ({
 	historyBack: vi.fn(() => false),
@@ -29,11 +29,11 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	};
 });
 
-vi.mock("~/authoring-session/useEditorProject", () => ({
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/authoring-shell/navigation/useEditorHistoryBack", () => ({
+vi.mock("~/authoring-shell/ui/useEditorHistoryBack", () => ({
 	useEditorHistoryBack: () => state.historyBack,
 }));
 

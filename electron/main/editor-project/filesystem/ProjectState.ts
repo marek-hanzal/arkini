@@ -1,7 +1,7 @@
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import type { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
-import type { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
+import type { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
+import type { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
 import type { ProjectPaths } from "./ProjectPaths";
 import type { VersionHistory } from "./VersionHistory";
 

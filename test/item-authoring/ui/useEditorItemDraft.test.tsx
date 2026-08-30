@@ -4,8 +4,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectContext } from "~/authoring-session/useEditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectContext } from "~/authoring-session/ui/useEditorProject";
 import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {

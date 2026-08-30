@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
 /** Resolves one canonical project item by its immutable UID. */
 export const useEditorItemByUid = (uid: string) => {

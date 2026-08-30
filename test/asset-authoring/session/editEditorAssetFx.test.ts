@@ -3,13 +3,13 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/project-authoring/repository/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+} from "~/project-authoring/service/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { editEditorAssetFx } from "~/asset-authoring/session/editEditorAssetFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";

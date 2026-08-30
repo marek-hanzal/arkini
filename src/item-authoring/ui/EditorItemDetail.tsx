@@ -1,14 +1,14 @@
 import { LogIn, LogOut, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
-import { EditorSectionPage } from "~/authoring-shell/navigation/EditorSectionPage";
-import { EditorSectionTabs } from "~/authoring-shell/navigation/EditorSectionTabs";
-import { EditorRootCard } from "~/authoring-shell/navigation/EditorRootCard";
-import { useEditorEditShortcut } from "~/authoring-shell/navigation/useEditorEditShortcut";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
+import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
 import { EditorItemConvertMenu } from "~/item-authoring/ui/EditorItemConvertMenu";

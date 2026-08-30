@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useFieldContext } from "~/ui/form/EditorFormContexts";
 import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
 import { EditorSearchCombobox, type EditorSearchOption } from "~/ui/form/EditorSearchCombobox";

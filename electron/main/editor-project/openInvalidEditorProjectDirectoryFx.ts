@@ -2,7 +2,7 @@ import { shell } from "electron";
 import { Effect } from "effect";
 
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 /** Opens only an exact project root currently blocked by complete repository validation. */
 export const openInvalidEditorProjectDirectoryFx = Effect.fn("openInvalidEditorProjectDirectoryFx")(

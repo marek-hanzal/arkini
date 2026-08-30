@@ -8,8 +8,8 @@ import {
 	useState,
 } from "react";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
 type EditorResource = EditorProject["resources"][number];
 type ResourceUrlListener = () => void;

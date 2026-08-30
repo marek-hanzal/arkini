@@ -1,14 +1,14 @@
 import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
+import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorLineInputsControl } from "~/item-authoring/ui/EditorLineInputsControl";
-import { EditorOutputControl } from "~/item-authoring/ui/EditorOutputControl";
-import { EditorRulesControl } from "~/item-authoring/ui/EditorRulesControl";
+import { EditorLineInputsControl } from "~/production-line-authoring/ui/EditorLineInputsControl";
+import { EditorOutputControl } from "~/production-line-authoring/ui/EditorOutputControl";
+import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";
 
 const defaultLine: LineSchema.Type = {
 	id: "",
@@ -150,7 +150,9 @@ export const EditorLineFields = withFieldGroup({
 										onEnable={() =>
 											group.setFieldValue(
 												"output",
-												structuredClone(EditorItemDraftDefaults.output),
+												structuredClone(
+													EditorProductionDraftDefaults.output,
+												),
 											)
 										}
 										title="Line output is disabled"

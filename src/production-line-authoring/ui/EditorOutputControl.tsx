@@ -2,9 +2,9 @@ import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
-import { EditorRollSetControl } from "~/item-authoring/ui/EditorRollSetControl";
-import { useEditorItemOptionLabel } from "~/item-authoring/ui/useEditorItemOptionLabel";
+import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
+import { EditorRollSetControl } from "~/production-line-authoring/ui/EditorRollSetControl";
+import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
 
 const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
@@ -43,7 +43,7 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 							{
 								weight: 1,
 								roll: [
-									structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
+									structuredClone(EditorProductionDraftDefaults.rolls.guaranteed),
 								],
 							},
 						],

@@ -2,8 +2,8 @@ import type { LucideIcon } from "lucide-react";
 
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
-import { EditorOutputControl } from "~/item-authoring/ui/EditorOutputControl";
+import { EditorOutputControl } from "~/production-line-authoring/ui/EditorOutputControl";
+import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 
 interface EditorOptionalOutputControlProps {
 	readonly addLabel: string;
@@ -28,7 +28,7 @@ export const EditorOptionalOutputControl = ({
 			actionLabel={addLabel}
 			description={emptyDescription}
 			icon={emptyIcon}
-			onEnable={() => onChange(structuredClone(EditorItemDraftDefaults.output))}
+			onEnable={() => onChange(structuredClone(EditorProductionDraftDefaults.output))}
 			title={emptyTitle}
 		/>
 	) : (

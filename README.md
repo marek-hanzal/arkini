@@ -55,7 +55,9 @@ src/authoring-session  mounted project publication, refresh, replacement and uns
 src/authoring-shell  cross-product Editor shell and navigation composition
 src/asset-authoring  Asset catalog, validation, import/edit/delete sessions and product presentation
 src/item-authoring  authored Item domain and product UI
-src/flow      authored acquisition graph, global Flow and layout worker
+src/flow      canonical authored acquisition graph and origin projection
+src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
+src/flow-canvas  global Flow projection, painter policy and product UI
 src/estimate  static Estimate domain, projections, cache and worker
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle

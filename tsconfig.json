@@ -61,6 +61,8 @@
 		"src/authoring-shell",
 		"src/item-authoring",
 		"src/flow",
+		"src/flow-layout",
+		"src/flow-canvas",
 		"src/estimate",
 		"src/application-diagnostics",
 		"src/application-runtime",

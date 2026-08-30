@@ -40,13 +40,15 @@ const itemDefinitionPattern = "^src/item-definition(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:type/ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
-const productDomainPattern =
-	"^src/(?:asset-authoring|item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
+const flowPattern = "^src/flow(?:/|$)";
+const flowLayoutPattern = "^src/flow-layout(?:/|$)";
+const flowCanvasPattern = "^src/flow-canvas(?:/|$)";
+const productDomainPattern = `^src/(?:asset-authoring|item-authoring|estimate|editor-build)/domain(?:/|$)|${flowPattern}`;
 const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -372,7 +374,7 @@ const boundaryRules = [
 			path: boardSpatialPattern,
 		},
 		to: {
-			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|estimate|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|flow-layout|flow-canvas|estimate|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -435,7 +437,7 @@ const boundaryRules = [
 			],
 		},
 		to: {
-			path: `^src/(?:game-config|arkpack|asset-authoring|editor-build|item-authoring|flow|estimate|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-config|arkpack|asset-authoring|editor-build|item-authoring|flow|flow-layout|flow-canvas|estimate|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -696,13 +698,37 @@ const boundaryRules = [
 	{
 		name: "product-domain-no-presentation-imports",
 		comment:
-			"Asset Authoring, Item Authoring, Flow, Estimate, and Editor Build domain subtrees stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
+			"Asset Authoring, Item Authoring, Flow core, Estimate, and Editor Build domain owners stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
 		severity: "error",
 		from: {
 			path: productDomainPattern,
 		},
 		to: {
 			path: `^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "flow-layout-stays-upstream-of-flow-canvas",
+		comment:
+			"Flow Layout owns geometry and worker lifecycle consumed by Flow Canvas; it never imports canvas projection, painters, hooks, or React UI back.",
+		severity: "error",
+		from: {
+			path: flowLayoutPattern,
+		},
+		to: {
+			path: flowCanvasPattern,
+		},
+	},
+	{
+		name: "flow-core-stays-upstream-of-layout-and-canvas",
+		comment:
+			"Canonical authored acquisition truth never imports the layout worker or product Canvas consumers.",
+		severity: "error",
+		from: {
+			path: flowPattern,
+		},
+		to: {
+			path: `(?:${flowLayoutPattern}|${flowCanvasPattern})`,
 		},
 	},
 	{

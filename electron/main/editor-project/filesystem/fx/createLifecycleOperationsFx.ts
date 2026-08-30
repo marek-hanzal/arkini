@@ -25,7 +25,7 @@ import { readVersionHistoryFx } from "./readVersionHistoryFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
-export interface LifecycleOperations {
+interface LifecycleOperations {
 	readonly createProjectFx: (
 		props: EditorProjectRepository.CreateProjectProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;

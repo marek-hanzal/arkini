@@ -21,23 +21,21 @@ const decodeReference = (value: string): EditorProjectVersionReference =>
 				versionId: value,
 			};
 
-export namespace useEditorVersionComparison {
-	export interface Props {
-		readonly enabled: boolean;
-		readonly projectId: string;
-		readonly reportError: (error: unknown) => void;
-	}
+interface EditorVersionComparisonProps {
+	readonly enabled: boolean;
+	readonly projectId: string;
+	readonly reportError: (error: unknown) => void;
+}
 
-	export interface Output {
-		readonly compareFrom: string;
-		readonly compareTo: string;
-		readonly compareVersion: (version: EditorProjectVersionDescriptor) => void;
-		readonly diff?: EditorProjectVersionDiff;
-		readonly pending: boolean;
-		readonly resetToBase: (versionId?: string) => void;
-		readonly setCompareFrom: (value: string) => void;
-		readonly setCompareTo: (value: string) => void;
-	}
+interface EditorVersionComparisonOutput {
+	readonly compareFrom: string;
+	readonly compareTo: string;
+	readonly compareVersion: (version: EditorProjectVersionDescriptor) => void;
+	readonly diff?: EditorProjectVersionDiff;
+	readonly pending: boolean;
+	readonly resetToBase: (versionId?: string) => void;
+	readonly setCompareFrom: (value: string) => void;
+	readonly setCompareTo: (value: string) => void;
 }
 
 /** Owns the arbitrary saved-version versus working-copy comparison. */
@@ -45,7 +43,7 @@ export const useEditorVersionComparison = ({
 	enabled,
 	projectId,
 	reportError,
-}: useEditorVersionComparison.Props): useEditorVersionComparison.Output => {
+}: EditorVersionComparisonProps): EditorVersionComparisonOutput => {
 	const [compareFrom, setCompareFrom] = useState("current");
 	const [compareTo, setCompareTo] = useState("current");
 	const [diff, setDiff] = useState<EditorProjectVersionDiff>();

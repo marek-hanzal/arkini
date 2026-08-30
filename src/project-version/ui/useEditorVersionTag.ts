@@ -5,20 +5,18 @@ import { EditorProjectRepository } from "~/project-authoring/service/EditorProje
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorProjectVersionDescriptor } from "~/project-version/type/EditorProjectVersion";
 
-export namespace useEditorVersionTag {
-	export interface Props {
-		readonly reload: () => void;
-		readonly projectId: string;
-		readonly reportError: (error?: unknown) => void;
-		readonly selected?: EditorProjectVersionDescriptor;
-	}
+interface EditorVersionTagProps {
+	readonly reload: () => void;
+	readonly projectId: string;
+	readonly reportError: (error?: unknown) => void;
+	readonly selected?: EditorProjectVersionDescriptor;
+}
 
-	export interface Output {
-		readonly draft: string;
-		readonly pending: boolean;
-		readonly save: () => void;
-		readonly setDraft: (value: string) => void;
-	}
+interface EditorVersionTagOutput {
+	readonly draft: string;
+	readonly pending: boolean;
+	readonly save: () => void;
+	readonly setDraft: (value: string) => void;
 }
 
 /** Owns the editable user-only label for one selected immutable version. */
@@ -27,7 +25,7 @@ export const useEditorVersionTag = ({
 	projectId,
 	reportError,
 	selected,
-}: useEditorVersionTag.Props): useEditorVersionTag.Output => {
+}: EditorVersionTagProps): EditorVersionTagOutput => {
 	const [draft, setDraft] = useState("");
 	const [pending, setPending] = useState(false);
 

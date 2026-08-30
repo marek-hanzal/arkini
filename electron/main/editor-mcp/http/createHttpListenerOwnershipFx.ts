@@ -15,7 +15,7 @@ import { createServerFx } from "../tool/createServerFx";
 
 type NodeMcpHandler = (request: IncomingMessage, response: ServerResponse) => void;
 
-export interface HttpListenerOwnership {
+interface HttpListenerOwnership {
 	readonly ensureStartedFx: Effect.Effect<void, unknown>;
 	readonly readMcpHandler: () => NodeMcpHandler | undefined;
 	readonly setLocalEnabled: (enabled: boolean) => void;

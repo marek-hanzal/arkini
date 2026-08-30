@@ -21,7 +21,7 @@ const ItemPortBaseY = 45;
 const readItemPortY = (headerHeight: number) =>
 	ItemPortBaseY + (headerHeight - NodeHeaderHeight) / 2;
 
-export interface OperationMetrics {
+interface OperationMetrics {
 	readonly height: number;
 	readonly id: string;
 	readonly inputPortYs: ReadonlyMap<string, number>;

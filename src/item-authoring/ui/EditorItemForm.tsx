@@ -29,14 +29,12 @@ const useEditorItemDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type
 	);
 };
 
-export namespace EditorItemForm {
-	export interface Props extends PropsWithChildren {
-		readonly enableCapability?: EditorItemOptionalCapability;
-		readonly itemType?: TypeSchema.Type;
-		readonly productionLineId?: string;
-		readonly sectionId?: EditorItemSectionId;
-		readonly uid: string;
-	}
+interface EditorItemFormProps extends PropsWithChildren {
+	readonly enableCapability?: EditorItemOptionalCapability;
+	readonly itemType?: TypeSchema.Type;
+	readonly productionLineId?: string;
+	readonly sectionId?: EditorItemSectionId;
+	readonly uid: string;
 }
 
 /** Resolves a canonical item by UID or seeds its first local form from itemType. */
@@ -47,7 +45,7 @@ export const EditorItemForm = ({
 	productionLineId,
 	sectionId = "identity",
 	uid,
-}: EditorItemForm.Props) => {
+}: EditorItemFormProps) => {
 	const persistedItem = useEditorItemByUid(uid);
 	const draft = useEditorItemDraft(itemType ?? persistedItem?.type ?? "simple", uid);
 	if (persistedItem === undefined && itemType === undefined)

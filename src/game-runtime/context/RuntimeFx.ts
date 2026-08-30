@@ -2,7 +2,7 @@ import { Context, type Effect } from "effect";
 
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-export interface RuntimeFxService {
+interface RuntimeFxService {
 	/**
 	 * Reads the current runtime snapshot without exposing its mutable store.
 	 */

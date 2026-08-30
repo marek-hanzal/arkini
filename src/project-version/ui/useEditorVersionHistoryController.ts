@@ -22,36 +22,34 @@ interface HistoryState {
 	readonly versions: ReadonlyArray<EditorProjectVersionDescriptor>;
 }
 
-export namespace useEditorVersionHistoryController {
-	export interface Output {
-		readonly cancelCheckout: () => void;
-		readonly checkoutPending: boolean;
-		readonly compareFrom: string;
-		readonly compareTo: string;
-		readonly confirmCheckout: () => void;
-		readonly confirmVersion?: EditorProjectVersionDescriptor;
-		readonly diff?: ReturnType<typeof useEditorVersionComparison>["diff"];
-		readonly diffPending: boolean;
-		readonly error?: string;
-		readonly goToCommit: () => void;
-		readonly graph?: EditorVersionGraphLayout;
-		readonly history?: HistoryState;
-		readonly projectId: string;
-		readonly restoreSelected: () => void;
-		readonly saveTag: () => void;
-		readonly selectVersion: (versionId: string) => void;
-		readonly selectWorkingCopy: () => void;
-		readonly selected?: EditorProjectVersionDescriptor;
-		readonly setCompareFrom: (value: string) => void;
-		readonly setCompareTo: (value: string) => void;
-		readonly setTagDraft: (value: string) => void;
-		readonly tagDraft: string;
-		readonly tagPending: boolean;
-	}
+interface EditorVersionHistoryControllerOutput {
+	readonly cancelCheckout: () => void;
+	readonly checkoutPending: boolean;
+	readonly compareFrom: string;
+	readonly compareTo: string;
+	readonly confirmCheckout: () => void;
+	readonly confirmVersion?: EditorProjectVersionDescriptor;
+	readonly diff?: ReturnType<typeof useEditorVersionComparison>["diff"];
+	readonly diffPending: boolean;
+	readonly error?: string;
+	readonly goToCommit: () => void;
+	readonly graph?: EditorVersionGraphLayout;
+	readonly history?: HistoryState;
+	readonly projectId: string;
+	readonly restoreSelected: () => void;
+	readonly saveTag: () => void;
+	readonly selectVersion: (versionId: string) => void;
+	readonly selectWorkingCopy: () => void;
+	readonly selected?: EditorProjectVersionDescriptor;
+	readonly setCompareFrom: (value: string) => void;
+	readonly setCompareTo: (value: string) => void;
+	readonly setTagDraft: (value: string) => void;
+	readonly tagDraft: string;
+	readonly tagPending: boolean;
 }
 
 /** Owns history loading and selection while focused child hooks own each mutation surface. */
-export const useEditorVersionHistoryController = (): useEditorVersionHistoryController.Output => {
+export const useEditorVersionHistoryController = (): EditorVersionHistoryControllerOutput => {
 	const project = useEditorProject();
 	const [error, setError] = useState<string>();
 	const [history, setHistory] = useState<HistoryState>();

@@ -5,7 +5,7 @@ import type {
 } from "~/flow/type/EditorAcquisitionGraph";
 
 export type EditorItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
-export type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
+type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
 
 export interface EditorItemOriginOutputOccurrence {
 	readonly itemId: string;

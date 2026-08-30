@@ -1,16 +1,14 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-export namespace Status {
-	export interface Props {
-		readonly action?: ReactNode;
-		readonly dataUi?: string;
-		readonly description: string;
-		readonly icon: LucideIcon;
-		readonly iconSpin?: boolean;
-		readonly title: string;
-		readonly variant?: "card" | "flat";
-	}
+interface StatusProps {
+	readonly action?: ReactNode;
+	readonly dataUi?: string;
+	readonly description: string;
+	readonly icon: LucideIcon;
+	readonly iconSpin?: boolean;
+	readonly title: string;
+	readonly variant?: "card" | "flat";
 }
 
 /** Presents one deliberate empty or unavailable product state with an optional canonical action. */
@@ -22,7 +20,7 @@ export const Status = ({
 	iconSpin = false,
 	title,
 	variant = "card",
-}: Status.Props) => {
+}: StatusProps) => {
 	const Icon = icon;
 	return (
 		<section

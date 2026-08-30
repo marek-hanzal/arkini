@@ -5,7 +5,7 @@ import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createGameResourceUrlsFx } from "~/renderer/game/createGameResourceUrlsFx";
 import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/renderer/game/discardGameBootstrapFx";
-import { startFx } from "~/game-start/startFx";
+import { startFx } from "~/game-start/fx/startFx";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import type { StateSchema } from "~/game-persistence/StateSchema";
 

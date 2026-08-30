@@ -3,7 +3,7 @@ import { Effect, Result } from "effect";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
-import { planStartFx } from "~/game-start/planStartFx";
+import { planStartFx } from "~/game-start/fx/planStartFx";
 import type { StartInvalidDiagnosticSchema } from "~/game-config/diagnostic/schema/diagnostic/StartInvalidDiagnosticSchema";
 
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";

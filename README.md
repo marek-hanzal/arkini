@@ -22,7 +22,7 @@ Read the smallest entry point needed for the task:
 ## Repository map
 
 ```text
-src/game-runtime  canonical live Runtime schemas, cheat state, validation, identity, reads and atomic publication
+src/game-runtime  canonical live Runtime schemas, Item purity/stateful rejection, cheat state, validation, identity, reads and atomic publication
 src/game-session  package-independent Runtime/Tick/save execution, subscriptions, fail-stop and disposal lifecycle
 src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
 src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization and recovery
@@ -35,7 +35,7 @@ src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement 
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
 src/item-query  canonical Runtime Item query execution across authored reach, scope and distance
 src/item-resolution  canonical configured Item lookup and exact not-found rejection
-src/engine    remaining item purity/isolation, temporary expiry, revision and CLI support owners
+src/engine    remaining state-isolation, temporary expiry, revision and CLI support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections

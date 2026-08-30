@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";

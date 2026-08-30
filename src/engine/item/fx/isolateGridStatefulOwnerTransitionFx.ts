@@ -5,7 +5,7 @@ import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlace
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";

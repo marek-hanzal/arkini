@@ -1,7 +1,7 @@
 import { Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";

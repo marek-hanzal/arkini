@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

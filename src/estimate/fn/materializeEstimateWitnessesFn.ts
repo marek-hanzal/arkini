@@ -1,6 +1,7 @@
 import { Order } from "effect";
 
 import { groupEstimateRequirementsFn } from "~/estimate-demand/fn/groupEstimateRequirementsFn";
+import { projectEstimateWitnessFn } from "~/estimate-projection/fn/projectEstimateWitnessFn";
 import type { EstimateTopology } from "~/estimate/fn/createEstimateTopologyFn";
 import {
 	readEstimateExpectedRunsFn,
@@ -30,8 +31,8 @@ interface MaterializeEstimateWitnessesProps {
 }
 
 /**
- * All forced-top-route witnesses are returned. The set is complete for the authored routes in the
- * topology; bounded output algebra reports diagnostics instead of truncating candidates.
+ * One globally compatible witness is returned for every forced top route whose bounded search can
+ * prove a complete selection. Bounded output algebra and witness search report partial diagnostics.
  */
 export interface EstimateWitnessBatchEntry extends EstimateRequest {
 	readonly candidates: ReadonlyArray<EstimateWitness>;
@@ -71,7 +72,53 @@ interface EstimatePolicyState {
 	readonly unitCost: Map<string, number>;
 }
 
+interface WitnessChoicePoint {
+	readonly key: string;
+	readonly options: ReadonlyArray<string>;
+	readonly selected: string;
+}
+
+interface WitnessChoiceContext {
+	readonly choices: Map<string, WitnessChoicePoint>;
+	readonly overrides: ReadonlyMap<string, string>;
+}
+
+interface CandidateAttempt {
+	readonly choices: ReadonlyArray<WitnessChoicePoint>;
+	readonly result: CandidateResult;
+}
+
 const epsilon = 1e-9;
+const maximumWitnessSearchStates = 4_096;
+
+const isPartialDiagnosticFn = (diagnostic: EditorItemEstimateDiagnostic) =>
+	diagnostic.kind === "joint-output-accounting-unsupported" ||
+	diagnostic.kind === "quantity-limit-exceeded" ||
+	diagnostic.kind === "witness-search-exhausted";
+
+const routeChoiceKeyFn = (factId: string) => `route\u0000${factId}`;
+
+const requirementChoiceKeyFn = (routeId: string, clauseIndex: number) =>
+	`requirement\u0000${routeId}\u0000${clauseIndex}`;
+
+const recordChoiceFn = (
+	context: WitnessChoiceContext | undefined,
+	key: string,
+	selected: string,
+	options: ReadonlyArray<string>,
+) => {
+	if (
+		context === undefined ||
+		options.length === 0 ||
+		(options.length === 1 && options[0] === selected)
+	)
+		return;
+	context.choices.set(key, {
+		key,
+		options,
+		selected,
+	});
+};
 
 const addQuantityFn = (target: Map<string, number>, factId: string, quantity: number) =>
 	target.set(factId, (target.get(factId) ?? 0) + quantity);
@@ -209,18 +256,17 @@ const chooseRequirementsFn = (
 		route.output.factId,
 	blockedFactIds: ReadonlySet<string> = new Set(),
 	costMemo = state.quantityCostMemo,
+	choiceContext?: WitnessChoiceContext,
 ) => {
 	const routeRequirements = state.topology.requirementsByRoute.get(route);
 	if (routeRequirements === undefined) return undefined;
 	const requirements = [
 		...routeRequirements.allOf,
 	];
-	for (const clause of routeRequirements.anyOf) {
-		const selected = [
-			...clause,
-		].sort((left, right) => {
-			const readCostFn = (requirement: EditorAcquisitionRequirement) => {
-				if (
+	for (const [clauseIndex, clause] of routeRequirements.anyOf.entries()) {
+		const options = clause
+			.map((requirement, index) => {
+				const reentersIncompleteComponent =
 					(state.topology.componentByFact.get(requirement.factId) ??
 						requirement.factId) === activeComponentId &&
 					!readCompleteFactsFn(
@@ -229,35 +275,45 @@ const chooseRequirementsFn = (
 							...blockedFactIds,
 							route.output.factId,
 						]),
-					).has(requirement.factId)
-				)
-					return Number.POSITIVE_INFINITY;
-				return readFactCostFn(
-					state,
-					requirement.factId,
-					readRequirementQuantityFn(requirement, actionRuns),
-					activeComponentId,
-					blockedFactIds,
-					costMemo,
-				);
-			};
-			return readCostFn(left) - readCostFn(right) || Order.String(left.factId, right.factId);
-		})[0];
-		if (
-			selected === undefined ||
-			!Number.isFinite(
-				readFactCostFn(
-					state,
-					selected.factId,
-					readRequirementQuantityFn(selected, actionRuns),
-					activeComponentId,
-					blockedFactIds,
-					costMemo,
-				),
-			)
-		)
-			return undefined;
-		requirements.push(selected);
+					).has(requirement.factId);
+				return {
+					cost: reentersIncompleteComponent
+						? Number.POSITIVE_INFINITY
+						: readFactCostFn(
+								state,
+								requirement.factId,
+								readRequirementQuantityFn(requirement, actionRuns),
+								activeComponentId,
+								blockedFactIds,
+								costMemo,
+							),
+					index,
+					requirement,
+				};
+			})
+			.filter(({ cost }) => Number.isFinite(cost))
+			.sort(
+				(left, right) =>
+					left.cost - right.cost ||
+					Order.String(left.requirement.factId, right.requirement.factId) ||
+					left.index - right.index,
+			);
+		const key = requirementChoiceKeyFn(route.id, clauseIndex);
+		const override = choiceContext?.overrides.get(key);
+		const selected =
+			override === undefined
+				? options[0]
+				: options.find(({ index }) => String(index) === override);
+		const selectedValue = selected === undefined ? override : String(selected.index);
+		if (selectedValue !== undefined)
+			recordChoiceFn(
+				choiceContext,
+				key,
+				selectedValue,
+				options.map(({ index }) => String(index)),
+			);
+		if (selected === undefined) return undefined;
+		requirements.push(selected.requirement);
 	}
 	return groupEstimateRequirementsFn(requirements, actionRuns);
 };
@@ -332,7 +388,7 @@ function readFactCostFn(
 	return cost;
 }
 
-const chooseRouteFn = (state: EstimatePolicyState, factId: string, quantity: number) => {
+const readRouteOptionsFn = (state: EstimatePolicyState, factId: string, quantity: number) => {
 	const missing = readMissingQuantityFn(state.topology, factId, quantity);
 	return (state.topology.routesByFact.get(factId) ?? [])
 		.map((route) => ({
@@ -349,7 +405,8 @@ const chooseRouteFn = (state: EstimatePolicyState, factId: string, quantity: num
 		.filter(({ cost }) => Number.isFinite(cost))
 		.sort(
 			(left, right) => left.cost - right.cost || Order.String(left.route.id, right.route.id),
-		)[0]?.route;
+		)
+		.map(({ route }) => route);
 };
 
 const createPolicyStateFn = (topology: EstimateTopology): EstimatePolicyState => {
@@ -422,6 +479,7 @@ const shareOperationRunsFn = (
 	factId: string,
 	selected: ReadonlyMap<string, EstimateSelectedRoute>,
 	topRouteId: string,
+	choiceContext?: WitnessChoiceContext,
 ):
 	| CandidateFailure
 	| {
@@ -489,7 +547,15 @@ const shareOperationRunsFn = (
 		sharedOperationIds.add(operation.id);
 		const groupsByFactId = new Map<string, EstimateSelectedRoute["groups"][number]>();
 		for (const [, plan] of entries) {
-			const groups = chooseRequirementsFn(state, plan.route, actionRuns);
+			const groups = chooseRequirementsFn(
+				state,
+				plan.route,
+				actionRuns,
+				undefined,
+				undefined,
+				undefined,
+				choiceContext,
+			);
 			if (groups === undefined) continue;
 			for (const group of groups) {
 				const current = groupsByFactId.get(group.factId);
@@ -570,11 +636,12 @@ const findCycleFn = (dependencies: ReadonlyMap<string, ReadonlySet<string>>) => 
 	)[0];
 };
 
-const materializeCandidateFn = (
+const materializeCandidateSelectionFn = (
 	state: EstimatePolicyState,
 	factId: string,
 	quantity: number,
 	topRoute: EditorAcquisitionRoute,
+	choiceContext: WitnessChoiceContext,
 ): CandidateResult => {
 	let required = new Map([
 		[
@@ -607,10 +674,22 @@ const materializeCandidateFn = (
 			const missing = Math.max(0, requiredQuantity - rootQuantity);
 			if (missing <= epsilon) continue;
 			const routes = state.topology.routesByFact.get(id) ?? [];
+			const routeOptions = readRouteOptionsFn(state, id, requiredQuantity);
+			const routeChoiceKey = routeChoiceKeyFn(id);
+			const routeOverride = choiceContext.overrides.get(routeChoiceKey);
 			const route =
 				id === factId
 					? topRoute
-					: (chooseRouteFn(state, id, requiredQuantity) ?? routes[0]);
+					: routeOverride === undefined
+						? (routeOptions[0] ?? routes[0])
+						: routeOptions.find(({ id: routeId }) => routeId === routeOverride);
+			if (id !== factId && routeOverride !== undefined && route === undefined)
+				recordChoiceFn(
+					choiceContext,
+					routeChoiceKey,
+					routeOverride,
+					routeOptions.map(({ id: routeId }) => routeId),
+				);
 			if (route === undefined)
 				return {
 					diagnostics: [
@@ -623,6 +702,13 @@ const materializeCandidateFn = (
 					],
 					status: "failure",
 				};
+			if (id !== factId && routeOptions.includes(route))
+				recordChoiceFn(
+					choiceContext,
+					routeChoiceKey,
+					route.id,
+					routeOptions.map(({ id: routeId }) => routeId),
+				);
 			if (state.topology.unsupportedRoutes.has(route))
 				return {
 					diagnostics: [
@@ -663,7 +749,15 @@ const materializeCandidateFn = (
 					status: "failure",
 				};
 			const actionRuns = outputRuns * route.runMultiplier;
-			const groups = chooseRequirementsFn(state, route, actionRuns);
+			const groups = chooseRequirementsFn(
+				state,
+				route,
+				actionRuns,
+				undefined,
+				undefined,
+				undefined,
+				choiceContext,
+			);
 			if (groups === undefined)
 				return {
 					diagnostics: [
@@ -686,7 +780,7 @@ const materializeCandidateFn = (
 			});
 		}
 
-		const shared = shareOperationRunsFn(state, factId, selected, topRoute.id);
+		const shared = shareOperationRunsFn(state, factId, selected, topRoute.id, choiceContext);
 		if (shared.status === "failure") return shared;
 		selected = shared.selected;
 
@@ -812,6 +906,128 @@ const materializeCandidateFn = (
 			topRouteId: topRoute.id,
 		},
 	};
+};
+
+const readChoiceSignatureFn = (overrides: ReadonlyMap<string, string>) =>
+	JSON.stringify(
+		[
+			...overrides,
+		].sort(([left], [right]) => Order.String(left, right)),
+	);
+
+const readWitnessRouteIdentityFn = (witness: EstimateWitness) =>
+	JSON.stringify(
+		[
+			...witness.selectedByFact,
+		]
+			.sort(([left], [right]) => Order.String(left, right))
+			.map(([selectedFactId, selected]) => [
+				selectedFactId,
+				selected.route.id,
+			]),
+	);
+
+const compareWitnessesFn = (left: EstimateWitness, right: EstimateWitness) =>
+	projectEstimateWitnessFn(left).durationMs - projectEstimateWitnessFn(right).durationMs ||
+	Order.String(readWitnessRouteIdentityFn(left), readWitnessRouteIdentityFn(right));
+
+const materializeCandidateAttemptFn = (
+	state: EstimatePolicyState,
+	factId: string,
+	quantity: number,
+	topRoute: EditorAcquisitionRoute,
+	overrides: ReadonlyMap<string, string>,
+): CandidateAttempt => {
+	const choices = new Map<string, WitnessChoicePoint>();
+	const result = materializeCandidateSelectionFn(state, factId, quantity, topRoute, {
+		choices,
+		overrides,
+	});
+	return {
+		choices: [
+			...choices.values(),
+		],
+		result,
+	};
+};
+
+const materializeCandidateFn = (
+	state: EstimatePolicyState,
+	factId: string,
+	quantity: number,
+	topRoute: EditorAcquisitionRoute,
+): CandidateResult => {
+	const baseline = materializeCandidateAttemptFn(state, factId, quantity, topRoute, new Map());
+
+	const pending: Array<ReadonlyMap<string, string>> = [];
+	const seen = new Set<string>();
+	let attemptedStates = 1;
+	let best = baseline.result.status === "success" ? baseline.result.witness : undefined;
+	const partialDiagnostics: EditorItemEstimateDiagnostic[] =
+		baseline.result.status === "failure"
+			? baseline.result.diagnostics.filter(isPartialDiagnosticFn)
+			: [];
+
+	const enqueueAlternativesFn = (choices: ReadonlyArray<WitnessChoicePoint>) => {
+		const active = new Map(
+			choices.map(({ key, selected }) => [
+				key,
+				selected,
+			]),
+		);
+		seen.add(readChoiceSignatureFn(active));
+		for (const choice of [
+			...choices,
+		].sort((left, right) => Order.String(left.key, right.key)))
+			for (const option of choice.options) {
+				if (option === choice.selected) continue;
+				const alternative = new Map(active);
+				alternative.set(choice.key, option);
+				const signature = readChoiceSignatureFn(alternative);
+				if (seen.has(signature)) continue;
+				seen.add(signature);
+				pending.push(alternative);
+			}
+	};
+
+	enqueueAlternativesFn(baseline.choices);
+	while (pending.length > 0) {
+		if (attemptedStates >= maximumWitnessSearchStates)
+			return {
+				diagnostics: [
+					{
+						kind: "witness-search-exhausted",
+						maximumStates: maximumWitnessSearchStates,
+						routeId: topRoute.id,
+					},
+				],
+				status: "failure",
+			};
+		const overrides = pending.shift();
+		if (overrides === undefined) break;
+		const attempt = materializeCandidateAttemptFn(state, factId, quantity, topRoute, overrides);
+		attemptedStates += 1;
+		if (
+			attempt.result.status === "success" &&
+			(best === undefined || compareWitnessesFn(attempt.result.witness, best) < 0)
+		)
+			best = attempt.result.witness;
+		else if (attempt.result.status === "failure")
+			partialDiagnostics.push(...attempt.result.diagnostics.filter(isPartialDiagnosticFn));
+		enqueueAlternativesFn(attempt.choices);
+	}
+
+	return best === undefined
+		? partialDiagnostics.length === 0
+			? baseline.result
+			: {
+					diagnostics: partialDiagnostics,
+					status: "failure",
+				}
+		: {
+				status: "success",
+				witness: best,
+			};
 };
 
 const makeRootWitnessFn = (request: EstimateRequest): EstimateWitness => ({

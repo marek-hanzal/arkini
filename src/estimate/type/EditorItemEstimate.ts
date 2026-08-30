@@ -11,6 +11,11 @@ export type EditorItemEstimateDiagnostic =
 			readonly routeId: string;
 	  }
 	| {
+			readonly kind: "witness-search-exhausted";
+			readonly maximumStates: number;
+			readonly routeId: string;
+	  }
+	| {
 			readonly factId: string;
 			readonly kind: "quantity-limit-exceeded";
 			readonly maximumQuantity: number;

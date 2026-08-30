@@ -19,6 +19,11 @@ interface EstimateEditorItemsProps {
 
 const maximumDiagnostics = 8;
 
+const isPartialDiagnosticFn = (diagnostic: EditorItemEstimateDiagnostic) =>
+	diagnostic.kind === "joint-output-accounting-unsupported" ||
+	diagnostic.kind === "quantity-limit-exceeded" ||
+	diagnostic.kind === "witness-search-exhausted";
+
 const uniqueDiagnosticsFn = (
 	diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>,
 ): ReadonlyArray<EditorItemEstimateDiagnostic> => {
@@ -45,17 +50,22 @@ const makeEstimateFn = ({
 	readonly witnesses: ReturnType<typeof materializeEstimateWitnessesFn>[number]["candidates"];
 }): EditorItemEstimate => {
 	const uniqueDiagnostics = uniqueDiagnosticsFn(diagnostics);
-	const best = witnesses
-		.map((witness) => ({
-			projection: projectEstimateWitnessFn(witness),
-			witness,
-		}))
-		.filter(({ projection }) => Number.isFinite(projection.durationMs))
-		.sort(
-			(left, right) =>
-				left.projection.durationMs - right.projection.durationMs ||
-				Order.String(left.witness.topRouteId, right.witness.topRouteId),
-		)[0];
+	const searchExhausted = uniqueDiagnostics.some(
+		({ kind }) => kind === "witness-search-exhausted",
+	);
+	const best = searchExhausted
+		? undefined
+		: witnesses
+				.map((witness) => ({
+					projection: projectEstimateWitnessFn(witness),
+					witness,
+				}))
+				.filter(({ projection }) => Number.isFinite(projection.durationMs))
+				.sort(
+					(left, right) =>
+						left.projection.durationMs - right.projection.durationMs ||
+						Order.String(left.witness.topRouteId, right.witness.topRouteId),
+				)[0];
 	if (best !== undefined)
 		return {
 			diagnostics: uniqueDiagnostics.slice(0, maximumDiagnostics),
@@ -75,14 +85,7 @@ const makeEstimateFn = ({
 	]
 		.sort(
 			(left, right) =>
-				Number(
-					right.kind === "joint-output-accounting-unsupported" ||
-						right.kind === "quantity-limit-exceeded",
-				) -
-				Number(
-					left.kind === "joint-output-accounting-unsupported" ||
-						left.kind === "quantity-limit-exceeded",
-				),
+				Number(isPartialDiagnosticFn(right)) - Number(isPartialDiagnosticFn(left)),
 		)
 		.slice(0, maximumDiagnostics);
 	const resolvedDiagnostics =
@@ -101,13 +104,7 @@ const makeEstimateFn = ({
 		limitations: graph.limitations,
 		obtainable: false,
 		quantity,
-		status: resolvedDiagnostics.some(
-			({ kind }) =>
-				kind === "joint-output-accounting-unsupported" ||
-				kind === "quantity-limit-exceeded",
-		)
-			? "partial"
-			: "unreachable",
+		status: resolvedDiagnostics.some(isPartialDiagnosticFn) ? "partial" : "unreachable",
 	};
 };
 

@@ -16,6 +16,7 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 
 - One canonical runtime truth; React, Pixi, events, caches, and persistence never become mirrors.
 - Domain-first ownership; no generic junk drawers or speculative frameworks. Root `shared/` is limited to immutable cross-process build metadata/limits, never domain behavior.
+- Production modules default to `src/<domain>/<type>/<file>`, where `<type>` names the code grammar (`fn`, `fx`, `ui`, `schema`, `error`, `service`, `layer`, `atom`, or another equally exact kind). A deeper directory is a finer ownership boundary, not filing convenience: justify that independent policy, lifecycle, or capability in the owning contract. Repeated or deep nesting is evidence that the domain itself is too broad.
 - Engine decisions stay in engine/domain operations. UI binds controls and renders projections.
 - Use Effect where it clarifies operations, dependencies, concurrency, or lifecycle. Follow the mandatory grammar below.
 - Prefer a linear concrete flow over adapters, registries, synchronization, and forwarding introduced for hypothetical reuse.
@@ -40,6 +41,7 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 
 Tests are fast risk feedback, not a coverage project.
 
+- All tests and test-only support live under the top-level `test/` tree beside `src/`, never inside `src/`. Mirror the production domain/type path where it makes ownership easier to locate; do not invent deeper test-only topology for a single fixture.
 - Every test protects one named Arkini regression: a high-risk behavior, invariant, failure boundary, or lifecycle contract. If that regression cannot be stated, do not add the test.
 - Test the authoritative lower layer. A higher-layer test must prove a distinct boundary risk such as admission, exact identity wiring, cancellation, stale-result suppression, destructive navigation, or settlement—not repeat engine/schema/selector facts through React DOM.
 - Prioritize engine transactions, Tick, jobs, output, placement, merge ownership, persistence, compiler, and Arkpack integrity/trust/load/signing; then renderer-process concurrency; UI presentation last.

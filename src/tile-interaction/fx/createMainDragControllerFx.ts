@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
-import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { removeCheatItemFx as removeEngineCheatItemFx } from "~/game-cheat/fx/removeCheatItemFx";
@@ -13,16 +12,15 @@ import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
+import { createMainDragPreviewFx } from "~/tile-interaction/fx/createMainDragPreviewFx";
+import { createPointerFrameSamplerFx } from "~/tile-interaction/fx/createPointerFrameSamplerFx";
 import { readPointerOffsetFn } from "~/tile-interaction/fn/readPointerOffsetFn";
-import { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import { setDraggedActorPoseFx } from "~/tile-interaction/fx/setDraggedActorPoseFx";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 import type { DropSubmission } from "~/tile-interaction/fx/createDropSubmissionFx";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
-import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 
@@ -55,36 +53,15 @@ interface Props {
 	readonly surface: MainInteractionSurface;
 }
 
-type MainInteractionTargetFacts = Effect.Success<
-	ReturnType<MainInteractionSurface["readTargetFactsFx"]>
->;
-type MainInteractionDropTarget = NonNullable<MainInteractionTargetFacts["target"]>;
-
-interface ActiveDragBase {
-	readonly actor: PixiTileActor;
+interface ActiveDragBase extends createMainDragPreviewFx.State {
 	readonly activationIntent: MainActivationIntent;
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;
-	readonly sourceItem: TileActorItem;
 	readonly startX: number;
 	readonly startY: number;
-	attractionEligibilityByActorId: Map<
-		string,
-		{
-			readonly eligible: boolean;
-			readonly source: Pick<TileActorItem, "id" | "location" | "revision">;
-			readonly target: Pick<TileActorItem, "id" | "location" | "revision">;
-		}
-	>;
-	eligibleAttractionActorIds: ReadonlySet<string>;
 	lastPointerX: number;
 	lastPointerY: number;
-	previewKind: readTileDropPreviewFx.Result["kind"] | null;
-	previewSource: Pick<TileActorItem, "id" | "location" | "revision"> | null;
-	target: MainInteractionDropTarget | null;
-	targetKey: string;
-	targetItem: TileActorItem | null;
 }
 
 interface MotionHandoffGesture extends ActiveDragBase {
@@ -103,284 +80,8 @@ interface MovableGesture extends ActiveDragBase {
 }
 
 type ActiveDrag = ActivationOnlyGesture | MotionHandoffGesture | MovableGesture;
-
-interface DragPreview {
-	readonly previewTargetFx: (props: {
-		readonly drag: ActiveDrag;
-		readonly force?: boolean;
-		readonly targetFacts: MainInteractionTargetFacts;
-	}) => Effect.Effect<TileActorItem | null>;
-	readonly readCurrentSourceFx: (drag: ActiveDrag) => Effect.Effect<TileActorItem | null>;
-	readonly readPreviewKindFx: (props: {
-		readonly sourceItem: TileActorItem;
-		readonly targetFacts: MainInteractionTargetFacts;
-	}) => Effect.Effect<readTileDropPreviewFx.Result["kind"]>;
-	readonly refreshAttractionEligibilityFx: (props: {
-		readonly candidateActorIds: ReadonlyArray<string>;
-		readonly drag: ActiveDrag;
-		readonly sourceItem: TileActorItem;
-		readonly targetFacts: MainInteractionTargetFacts;
-	}) => Effect.Effect<void>;
-}
-
-const readAttractionActorIdFn = ({
-	previewKind,
-	targetItem,
-}: {
-	readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
-	readonly targetItem: TileActorItem | null;
-}): string | null => {
-	if (targetItem === null) return null;
-	return match(previewKind)
-		.with(null, () => null)
-		.with(
-			DropItemResultKind.Merge,
-			DropItemResultKind.Stack,
-			DropItemResultKind.StoreInput,
-			() => targetItem.id,
-		)
-		.with(
-			DropItemResultKind.Ignored,
-			DropItemResultKind.Move,
-			DropItemResultKind.Reject,
-			DropItemResultKind.StoreInventory,
-			DropItemResultKind.Swap,
-			() => null,
-		)
-		.exhaustive();
-};
-
-const createDragPreviewFx = Effect.fn("createMainDragControllerFx.createDragPreviewFx")(function* ({
-	actorStore,
-	game,
-	surface,
-}: Pick<Props, "actorStore" | "game" | "surface">) {
-	const readCurrentSourceFx: DragPreview["readCurrentSourceFx"] = Effect.fn(
-		"DragPreview.readCurrentSourceFx",
-	)(function* (drag) {
-		if (
-			drag.actor.container.destroyed ||
-			actorStore.actors.get(drag.sourceItem.id) !== drag.actor
-		) {
-			return null;
-		}
-		const canonical = actorStore.canonicalItems.get(drag.sourceItem.id);
-		if (
-			canonical === undefined ||
-			!isSameTileActorLocationFn(canonical.location, drag.sourceItem.location)
-		) {
-			return null;
-		}
-		return {
-			...drag.actor.item,
-			location: canonical.location,
-			revision: canonical.revision,
-		} satisfies TileActorItem;
-	});
-
-	const readPreviewKindFx: DragPreview["readPreviewKindFx"] = Effect.fn(
-		"DragPreview.readPreviewKindFx",
-	)(({ sourceItem, targetFacts }) =>
-		readTileDropPreviewFx({
-			game,
-			sourceItemId: sourceItem.id,
-			sourceLocation: sourceItem.location,
-			sourceRevision: sourceItem.revision,
-			target: targetFacts.commandTarget,
-		}).pipe(Effect.map(({ kind }) => kind)),
-	);
-
-	const refreshAttractionEligibilityFx: DragPreview["refreshAttractionEligibilityFx"] = Effect.fn(
-		"DragPreview.refreshAttractionEligibilityFx",
-	)(function* ({ candidateActorIds, drag, sourceItem, targetFacts }) {
-		const activeCandidateActorIds = new Set(candidateActorIds);
-		for (const actorId of drag.attractionEligibilityByActorId.keys()) {
-			if (activeCandidateActorIds.has(actorId)) continue;
-			drag.attractionEligibilityByActorId.delete(actorId);
-		}
-		const eligibleActorIds = new Set<string>();
-		for (const actorId of candidateActorIds) {
-			if (actorId === sourceItem.id) continue;
-			const actor = actorStore.actors.get(actorId);
-			const canonical = actorStore.canonicalItems.get(actorId);
-			if (actor === undefined || actor.container.destroyed) {
-				drag.attractionEligibilityByActorId.delete(actorId);
-				continue;
-			}
-			const targetItem = {
-				...actor.item,
-				location: canonical?.location ?? actor.item.location,
-				revision: canonical?.revision ?? actor.item.revision,
-			} satisfies TileActorItem;
-			const cached = drag.attractionEligibilityByActorId.get(actorId);
-			if (
-				cached !== undefined &&
-				cached.source.id === sourceItem.id &&
-				cached.source.revision === sourceItem.revision &&
-				isSameTileActorLocationFn(cached.source.location, sourceItem.location) &&
-				cached.target.id === targetItem.id &&
-				cached.target.revision === targetItem.revision &&
-				isSameTileActorLocationFn(cached.target.location, targetItem.location)
-			) {
-				if (cached.eligible) eligibleActorIds.add(actorId);
-				continue;
-			}
-			const previewKind =
-				targetFacts.occupant?.id === targetItem.id &&
-				targetFacts.occupant.revision === targetItem.revision &&
-				isSameTileActorLocationFn(targetFacts.occupant.location, targetItem.location)
-					? drag.previewKind
-					: (yield* readTileDropPreviewFx({
-							game,
-							sourceItemId: sourceItem.id,
-							sourceLocation: sourceItem.location,
-							sourceRevision: sourceItem.revision,
-							target: {
-								kind: "slot",
-								location: targetItem.location,
-								occupant: {
-									itemId: targetItem.id,
-									revision: targetItem.revision,
-								},
-							},
-						})).kind;
-			if (previewKind === null) continue;
-			const eligible =
-				readAttractionActorIdFn({
-					previewKind,
-					targetItem,
-				}) !== null;
-			drag.attractionEligibilityByActorId.set(actorId, {
-				eligible,
-				source: {
-					id: sourceItem.id,
-					location: sourceItem.location,
-					revision: sourceItem.revision,
-				},
-				target: {
-					id: targetItem.id,
-					location: targetItem.location,
-					revision: targetItem.revision,
-				},
-			});
-			if (eligible) eligibleActorIds.add(actorId);
-		}
-		drag.eligibleAttractionActorIds = eligibleActorIds;
-	});
-
-	const previewTargetFx: DragPreview["previewTargetFx"] = Effect.fn(
-		"DragPreview.previewTargetFx",
-	)(function* ({ drag, force = false, targetFacts }) {
-		const sourceItem = yield* readCurrentSourceFx(drag);
-		if (sourceItem === null) {
-			drag.target = targetFacts.target;
-			drag.targetKey = targetFacts.stableKey;
-			drag.targetItem = null;
-			drag.previewKind = null;
-			drag.previewSource = null;
-			yield* surface.renderDropFeedbackFx(null, null);
-			return null;
-		}
-		if (
-			!force &&
-			drag.targetKey === targetFacts.stableKey &&
-			drag.previewSource !== null &&
-			drag.previewSource.id === sourceItem.id &&
-			drag.previewSource.revision === sourceItem.revision &&
-			isSameTileActorLocationFn(drag.previewSource.location, sourceItem.location)
-		) {
-			return sourceItem;
-		}
-		const kind = yield* readPreviewKindFx({
-			sourceItem,
-			targetFacts,
-		});
-		drag.target = targetFacts.target;
-		drag.targetKey = targetFacts.stableKey;
-		drag.targetItem = targetFacts.occupant;
-		drag.previewKind = kind;
-		drag.previewSource = {
-			id: sourceItem.id,
-			location: sourceItem.location,
-			revision: sourceItem.revision,
-		};
-		drag.actor.container.cursor = readActorCursorFn({
-			dragPolicy: "main-target-presence",
-			hasDropTarget: targetFacts.target !== null,
-			phase: "dragging",
-			previewKind: kind,
-			running: sourceItem.running,
-		});
-		yield* surface.renderDropFeedbackFx(targetFacts.target, kind);
-		return sourceItem;
-	});
-
-	return {
-		previewTargetFx,
-		readCurrentSourceFx,
-		readPreviewKindFx,
-		refreshAttractionEligibilityFx,
-	} satisfies DragPreview;
-});
-
-interface PointerSample {
-	readonly pointerId: number;
-	readonly x: number;
-	readonly y: number;
-}
-
-const createPointerSamplerFx = Effect.fn("createMainDragControllerFx.createPointerSamplerFx")(
-	function* ({
-		frames,
-		onApply,
-	}: {
-		readonly frames: DemandFrameLoop;
-		readonly onApply: (sample: PointerSample) => void;
-	}) {
-		let cancelScheduled: (() => void) | null = null;
-		let pendingSample: PointerSample | null = null;
-
-		const cancel = () => {
-			pendingSample = null;
-			cancelScheduled?.();
-			cancelScheduled = null;
-		};
-
-		const requestFrameFx = Effect.gen(function* () {
-			if (cancelScheduled !== null) return;
-			cancelScheduled = yield* frames.scheduleFx(() => {
-				cancelScheduled = null;
-				const latest = pendingSample;
-				pendingSample = null;
-				if (latest !== null) onApply(latest);
-			});
-		});
-
-		return {
-			cancelFx: Effect.sync(cancel),
-			flushFx: Effect.fn("PointerSampler.flushFx")((sample?: PointerSample) =>
-				Effect.sync(() => {
-					const latest = sample ?? pendingSample;
-					cancel();
-					if (latest !== null) onApply(latest);
-				}),
-			),
-			scheduleFallbackFx: Effect.fn("PointerSampler.scheduleFallbackFx")(
-				(sample: PointerSample) =>
-					Effect.gen(function* () {
-						pendingSample ??= sample;
-						yield* requestFrameFx;
-					}),
-			),
-			scheduleFx: Effect.fn("PointerSampler.scheduleFx")((sample: PointerSample) =>
-				Effect.gen(function* () {
-					pendingSample = sample;
-					yield* requestFrameFx;
-				}),
-			),
-		};
-	},
-);
+type MainDragPreview = Effect.Success<ReturnType<typeof createMainDragPreviewFx>>;
+type PointerSample = createPointerFrameSamplerFx.Sample;
 
 const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInventoryShortcutFx")(
 	function* ({
@@ -391,7 +92,7 @@ const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInvent
 	}: {
 		readonly actorStore: MainActorStore;
 		readonly drag: ActiveDrag;
-		readonly preview: DragPreview;
+		readonly preview: MainDragPreview;
 		readonly surface: MainInteractionSurface;
 	}) {
 		const inventoryActor = Array.from(actorStore.actors.values()).find(
@@ -437,30 +138,24 @@ const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInvent
 const updateMagneticFieldFx = Effect.fn("createMainDragControllerFx.updateMagneticFieldFx")(
 	function* ({
 		actor,
+		attractedActorId,
 		candidateActorIds,
 		eligibleAttractionActorIds,
 		field,
-		previewKind,
 		sourceDirection,
 		sourceItem,
-		targetItem,
 	}: {
 		readonly actor: PixiTileActor;
+		readonly attractedActorId: string | null;
 		readonly candidateActorIds: ReadonlyArray<string>;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
 		readonly field: MagneticField;
-		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
 		readonly sourceDirection: {
 			readonly x: number;
 			readonly y: number;
 		} | null;
 		readonly sourceItem: TileActorItem;
-		readonly targetItem: TileActorItem | null;
 	}) {
-		const attractedActorId = readAttractionActorIdFn({
-			previewKind,
-			targetItem,
-		});
 		yield* field.updateFx({
 			attractedActorId,
 			candidateActorIds,
@@ -518,12 +213,12 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	let interactionBlocked = false;
 	let thresholdCrossed = false;
 
-	const dragPreview = yield* createDragPreviewFx({
+	const dragPreview = yield* createMainDragPreviewFx({
 		actorStore,
 		game,
 		surface,
 	});
-	const pointerSampler = yield* createPointerSamplerFx({
+	const pointerSampler = yield* createPointerFrameSamplerFx({
 		frames: application.frames,
 		onApply: (sample) => applyPointerMoveSafely(sample),
 	});
@@ -725,10 +420,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		RendererRuntime.runSync(
 			updateMagneticFieldFx({
 				actor: drag.actor,
+				attractedActorId: dragPreview.readAttractionActorIdFn({
+					previewKind: drag.previewKind,
+					targetItem: drag.targetItem,
+				}),
 				candidateActorIds,
 				eligibleAttractionActorIds: drag.eligibleAttractionActorIds,
 				field: magneticField,
-				previewKind: drag.previewKind,
 				sourceDirection:
 					pointerTravelMagnitude <= 0.001
 						? null
@@ -737,7 +435,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 								y: pointerTravel.y / pointerTravelMagnitude,
 							},
 				sourceItem,
-				targetItem: drag.targetItem,
 			}),
 		);
 		RendererRuntime.runSync(magneticField.flushFx);

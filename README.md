@@ -87,7 +87,7 @@ game/arkini   official portable game project
 test          focused behavioral feedback
 ```
 
-The enforced dependency graph and process/runtime ownership live in [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs). Do not infer architecture from directory names alone.
+The semantic dependency map and process/runtime ownership live in [`ARCHITECTURE.md`](ARCHITECTURE.md). [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) enforces only stable graph-wide directions stated directly by its named rules; it never catalogs exact current consumers. Directory grammar identifies the code layer, while the architecture contract identifies the semantic owner.
 
 ## Setup and commands
 

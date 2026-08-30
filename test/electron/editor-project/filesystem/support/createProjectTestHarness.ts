@@ -5,10 +5,8 @@ import { join } from "node:path";
 import { Effect, FileSystem } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
-import {
-	createFilesystemEditorProjectRepositoryFx,
-	type FilesystemEditorProjectRepository,
-} from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
+import type { OwnedEditorProjectRepository } from "../../../../../electron/main/editor-project/EditorProjectServiceOwnership";
+import { createFilesystemEditorProjectRepositoryFx } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { writeProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -18,7 +16,7 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 	const temporaryDirectory = await mkdtemp(join(tmpdir(), temporaryPrefix));
 	const catalogPath = join(temporaryDirectory, "user-data", "projects.json");
 	const projectsRoot = join(temporaryDirectory, "user-data", "projects");
-	const openRepositories = new Set<FilesystemEditorProjectRepository>();
+	const openRepositories = new Set<OwnedEditorProjectRepository>();
 	let externalSequence = 0;
 
 	const openRepository = async (fileSystem?: FileSystem.FileSystem) => {
@@ -36,7 +34,7 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 		openRepositories.add(repository);
 		return repository;
 	};
-	const closeRepository = async (repository: FilesystemEditorProjectRepository) => {
+	const closeRepository = async (repository: OwnedEditorProjectRepository) => {
 		await Effect.runPromise(repository.closeFx);
 		openRepositories.delete(repository);
 	};
@@ -47,7 +45,7 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 		projectsRoot,
 		openRepository,
 		closeRepository,
-		createProject: (repository: FilesystemEditorProjectRepository, projectId = "project-one") =>
+		createProject: (repository: OwnedEditorProjectRepository, projectId = "project-one") =>
 			Effect.runPromise(
 				repository.createProjectFx({
 					version: editorTestPayload.version,

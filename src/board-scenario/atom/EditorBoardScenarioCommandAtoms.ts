@@ -6,6 +6,7 @@ import { restoreEditorBoardScenarioFx } from "~/board-scenario/session/restoreEd
 import { saveEditorBoardScenarioFx } from "~/board-scenario/session/saveEditorBoardScenarioFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
+/** Board Scenario persistence commands bound to the mounted renderer repository. */
 export const EditorBoardScenarioCommandAtoms = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) => ({
 		list: Atom.family((projectId: string) =>

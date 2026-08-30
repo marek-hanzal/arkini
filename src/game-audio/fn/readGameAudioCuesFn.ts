@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import type { useGameEvents } from "~/game-presentation/ui/useGameEvents";
 
 export namespace readGameAudioCuesFn {
 	export type Kind =
@@ -26,7 +26,7 @@ export namespace readGameAudioCuesFn {
 	}
 }
 
-type GameEvent = useGameEvents.Batch["events"][number];
+type GameEvent = GameEventBatchSchema.Type["events"][number];
 
 const maximumBatchCues = 6;
 
@@ -172,7 +172,7 @@ const coalesceCues = (
 
 /** Projects one committed event batch into a small, readable set of audio intentions. */
 export const readGameAudioCuesFn = (
-	batch: useGameEvents.Batch,
+	batch: GameEventBatchSchema.Type,
 ): ReadonlyArray<readGameAudioCuesFn.Result> => {
 	const cues = coalesceCues(batch.events);
 	if (cues.length <= maximumBatchCues) return cues;

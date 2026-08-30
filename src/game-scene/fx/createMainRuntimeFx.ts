@@ -26,6 +26,7 @@ import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
 
 interface CreateMainRuntimeProps {
+	readonly dragThreshold: number;
 	readonly game: GameEngine;
 	readonly host: HTMLElement;
 	readonly onActivate: (
@@ -45,6 +46,7 @@ interface CreateMainRuntimeProps {
  * dependency order on both partial initialization failure and normal teardown.
  */
 export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
+	dragThreshold,
 	game,
 	host,
 	onActivate,
@@ -144,6 +146,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			animator,
 			application,
 			cursorGrab,
+			dragThreshold,
 			dropSubmission,
 			game,
 			magneticField,

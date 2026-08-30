@@ -30,6 +30,7 @@ import { useProjection } from "~/flow-canvas/ui/useProjection";
 import { useNavigation } from "~/flow-canvas/ui/useNavigation";
 import { useEditorResourceUrls } from "~/asset-authoring/ui/EditorResourceUrlSession";
 import { useDialogFocus } from "~/ui/focus/useDialogFocus";
+import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 
 interface ShortcutHelpProps {
 	readonly direction: OriginFlowDirection;
@@ -177,7 +178,11 @@ interface RenderState {
 const FlowEdgeCullPaddingPx = 64;
 const FlowSearchZoom = 1;
 const DefaultOriginFlowViewportZoom = readDefaultOriginFlowViewportFn().zoom;
-const FlowPainter = RendererRuntime.runSync(createCanvasPainterFx());
+const FlowPainter = RendererRuntime.runSync(
+	createCanvasPainterFx({
+		itemTypeLabels: ItemTypeLabel,
+	}),
+);
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const Canvas = ({

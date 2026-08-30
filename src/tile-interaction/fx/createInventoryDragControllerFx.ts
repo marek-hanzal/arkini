@@ -13,7 +13,6 @@ import {
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
 } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
-import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { InventoryActorStore } from "~/game-scene/service/InventoryActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
@@ -40,6 +39,7 @@ interface Props {
 	readonly actorStore: InventoryActorStore;
 	readonly animator: ActorAnimator;
 	readonly application: PixiApplicationOwner;
+	readonly dragThreshold: number;
 	readonly game: GameEngine;
 	readonly onActivate: (
 		item: TileActorItem,
@@ -96,6 +96,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 		actorStore,
 		animator,
 		application,
+		dragThreshold,
 		game,
 		onActivate,
 		onAcceptedDropFx,
@@ -339,8 +340,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			const pointer = readPointerOffsetFn(event, activeDrag);
 			if (pointer === null) return;
 			const { drag, offsetX, offsetY } = pointer;
-			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < PointerDragThreshold)
-				return;
+			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
 			if (drag.phase === "pressed" && drag.openDetail) {
 				releasePointerCapture(drag.pointerId);
 				activeDrag = null;

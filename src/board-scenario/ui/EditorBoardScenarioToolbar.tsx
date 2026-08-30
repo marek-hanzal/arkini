@@ -2,7 +2,7 @@ import { Plus, Save, Trash2 } from "lucide-react";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { useEditorBoardScenarioToolbar } from "~/board-scenario/toolbar/useEditorBoardScenarioToolbar";
+import { useEditorBoardScenarioToolbar } from "~/board-scenario/ui/useEditorBoardScenarioToolbar";
 import { Button } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";

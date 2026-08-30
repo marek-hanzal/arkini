@@ -24,6 +24,7 @@ import { createInventorySurfaceFx } from "~/game-scene/fx/createInventorySurface
 import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscriptionReplayGateFx";
 
 interface CreateInventoryRuntimeProps {
+	readonly dragThreshold: number;
 	readonly game: GameEngine;
 	readonly host: HTMLElement;
 	readonly onActivate: (
@@ -44,6 +45,7 @@ type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
  * surface, and application disappear. The same close path rolls back partial acquisition.
  */
 export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(function* ({
+	dragThreshold,
 	game,
 	host,
 	onActivate,
@@ -137,6 +139,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 			actorStore: createdActorStore,
 			animator,
 			application,
+			dragThreshold,
 			game,
 			onActivate,
 			onAcceptedDropFx: Effect.sync(() => replayCurrentTransition()),

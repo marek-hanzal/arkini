@@ -465,6 +465,7 @@ export const mountController = ({
 					stage: stageContainer,
 				} satisfies PixiApplicationOwner,
 				cursorGrab,
+				dragThreshold: 6,
 				dropSubmission,
 				game,
 				magneticField,

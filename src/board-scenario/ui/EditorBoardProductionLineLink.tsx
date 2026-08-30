@@ -6,7 +6,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { EditorProductionLineEditLink } from "~/production-line-authoring/ui/EditorProductionLineEditLink";
 
-/** Links a shared gameplay line summary to that exact authored production line. */
+/** Links a shared gameplay line summary to its exact authored production line. */
 export const EditorBoardProductionLineLink = ({
 	children,
 	disabled,

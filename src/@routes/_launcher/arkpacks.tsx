@@ -6,7 +6,7 @@ import { useArkpackSelectorActions } from "~/arkpack/ui/useArkpackSelectorAction
 import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/_launcher/arkpacks")({
 	component: () => {
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 		const blocked = actions.blocked;
 
 		return (
-			<MainPageLayout
+			<LauncherPageLayout
 				labelledBy="arkpack-selector-title"
 				page="arkpacks"
 			>
@@ -108,7 +108,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 						</BackButton>
 					</footer>
 				</div>
-			</MainPageLayout>
+			</LauncherPageLayout>
 		);
 	},
 });

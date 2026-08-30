@@ -68,6 +68,7 @@
 		"src/flow-layout",
 		"src/flow-canvas",
 		"src/estimate",
+		"src/launcher",
 		"src/application-diagnostics",
 		"src/application-runtime",
 		"src/renderer",

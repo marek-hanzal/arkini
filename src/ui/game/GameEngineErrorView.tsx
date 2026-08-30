@@ -1,6 +1,6 @@
 import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
 import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
-import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
+import { ActionErrorPage } from "~/launcher/ui/ActionErrorPage";
 import { DangerButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 
 export namespace GameEngineErrorView {

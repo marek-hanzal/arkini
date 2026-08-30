@@ -2,7 +2,7 @@ import { useAtomValue } from "@effect/atom-react";
 import { AnimatePresence, motion } from "motion/react";
 import { createPortal } from "react-dom";
 
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 import { EditorVersionRestoreCommandAtom } from "~/project-version/atom/EditorVersionRestoreCommandAtom";
 
 const transition = {

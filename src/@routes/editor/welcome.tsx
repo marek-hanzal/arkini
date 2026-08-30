@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorWelcome } from "~/project-authoring/ui/EditorWelcome";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/editor/welcome")({
 	loader: ({ abortController, context }) =>
@@ -14,11 +14,11 @@ export const Route = createFileRoute("/editor/welcome")({
 			},
 		),
 	component: () => (
-		<MainPageLayout
+		<LauncherPageLayout
 			labelledBy="editor-welcome-title"
 			page="editor-welcome"
 		>
 			<EditorWelcome recentProjects={Route.useLoaderData()} />
-		</MainPageLayout>
+		</LauncherPageLayout>
 	),
 });

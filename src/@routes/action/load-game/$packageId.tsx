@@ -5,7 +5,7 @@ import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { GameEngineErrorView } from "~/ui/game/GameEngineErrorView";
+import { GameEngineErrorView } from "~/game-presentation/ui/GameEngineErrorView";
 import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>

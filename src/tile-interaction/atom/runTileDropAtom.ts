@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
+import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 

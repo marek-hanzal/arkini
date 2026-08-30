@@ -21,6 +21,11 @@ const tileRenderingPattern = "^src/tile-rendering(?:/|$)";
 const tileMotionPattern = "^src/tile-motion(?:/|$)";
 const tileInteractionPattern = "^src/tile-interaction(?:/|$)";
 const gameScenePattern = "^src/game-scene(?:/|$)";
+const gamePresentationPattern = "^src/game-presentation(?:/|$)";
+const gameShellPattern = "^src/game-shell(?:/|$)";
+const gameMenuPattern = "^src/game-menu(?:/|$)";
+const gameAudioPattern = "^src/game-audio(?:/|$)";
+const gameCheatPattern = "^src/game-cheat(?:/|$)";
 const itemLineDetailReadPattern =
 	"^src/item-line-detail/(?:fx/(?:readItemDetailInputsFx|readItemDetailLinesFx|readItemDetailMaterialAutofillAvailabilityFx|readItemDetailOutputFx)[.]ts$|type/ItemDetailLines[.]ts$)";
 const itemLineDetailPresentationPattern =
@@ -30,9 +35,9 @@ const itemInteractionAllowedSourceDependencyPattern =
 const itemLineDetailReadAllowedSourceDependencyPattern =
 	"(?:item-line-detail/(?:fx/(?:readItemDetailInputsFx|readItemDetailLinesFx|readItemDetailMaterialAutofillAvailabilityFx|readItemDetailOutputFx)[.]ts$|type/ItemDetailLines[.]ts$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item-detail/read/readItemDetailSourcesFx[.]ts$|item/fn/readItemRemainingChargesFn[.]ts$|query/fx/queryFx[.]ts$)|game-runtime/(?:context/RuntimeFx[.]ts$|read/readBoardRuntimeItemByIdFx[.]ts$|schema/RuntimeSchema[.]ts$)|item-definition/(?:fn/matchesItemSelectorFn[.]ts$|schema/SelectorSchema[.]ts$)|item-location/schema/(?:BoardLocationSchema|DistanceSchema|LocationScopeEnumSchema)[.]ts$|production-condition/schema/WhenSchema[.]ts$|production-delivery/fn/readLineInputDeliveryClaimsFn[.]ts$|production-input/(?:type/InputRun[.]ts$|read/(?:fn/isMaterialInputEligibleFn|isLineInputAutofillSourceLocationFn)[.]ts$|schema/(?:ChargeSourceSchema|DepositSchema|InputSchema|ModeSchema|TypeSchema)[.]ts$)|production-job/(?:fx/(?:resolveActiveJobStatusFx|read/(?:resolveLineStartFx|resolveStartOutputCapacityFx))[.]ts$|schema/read/JobStatusEnumSchema[.]ts$)|production-line/(?:type/LineRun[.]ts$|fn/(?:isLineOwnerItemFn|readEffectiveDefaultLineFn|readLineOwnerLinesFn)[.]ts$|schema/(?:LineSchema|rule/TypeSchema)[.]ts$)|production-output/(?:fx/dropRulesFx[.]ts$|roll/schema/(?:RollSchema|TypeSchema)[.]ts$|schema/DropSchema[.]ts$))";
 const itemLineDetailPresentationAllowedSourceDependencyPattern =
-	"(?:item-line-detail(?:/|$)|item-detail-frame(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema)[.]ts$|item/fx/resolveItemFx[.]ts$)|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/schema/SelectorSchema[.]ts$|item-location/schema/DistanceSchema[.]ts$|production-condition/schema/(?:TypeSchema|WhenSchema)[.]ts$|production-input/(?:schema/(?:ChargeSourceSchema|ModeSchema)[.]ts$|write/(?:withdrawLineInputFx|withdrawLineInputsFx)[.]ts$)|production-job/(?:schema/read/JobStatusEnumSchema[.]ts$|ui/(?:ProductionJobRuntime[.]tsx|readActiveJobRuntimeFn[.]ts$)|write/enqueueLineFx[.]ts$)|production-line/write/(?:setDefaultLineFx|unsetDefaultLineFx)[.]ts$|renderer/game/GameEngine[.]ts$|ui/(?:button/(?:Button|LinkButton)[.]tsx$|fn/formatDurationFn[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]ts$|scrollable/Scrollable[.]tsx$|search/useFuseSearch[.]ts$))";
+	"(?:item-line-detail(?:/|$)|item-detail-frame(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema)[.]ts$|item/fx/resolveItemFx[.]ts$)|game-presentation/ui/(?:useGameEngine|useRuntimeSelector)[.]ts$|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/schema/SelectorSchema[.]ts$|item-location/schema/DistanceSchema[.]ts$|production-condition/schema/(?:TypeSchema|WhenSchema)[.]ts$|production-input/(?:schema/(?:ChargeSourceSchema|ModeSchema)[.]ts$|write/(?:withdrawLineInputFx|withdrawLineInputsFx)[.]ts$)|production-job/(?:schema/read/JobStatusEnumSchema[.]ts$|ui/(?:ProductionJobRuntime[.]tsx|readActiveJobRuntimeFn[.]ts$)|write/enqueueLineFx[.]ts$)|production-line/write/(?:setDefaultLineFx|unsetDefaultLineFx)[.]ts$|renderer/game/GameEngine[.]ts$|ui/(?:button/(?:Button|LinkButton)[.]tsx$|fn/formatDurationFn[.]ts$|scrollable/Scrollable[.]tsx$|search/useFuseSearch[.]ts$))";
 const itemDetailAllowedSourceDependencyPattern =
-	"(?:item-detail(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|engine/(?:common/schema/IdSchema[.]ts$|item-detail/(?:fn/(?:readItemDetailInfoFn|readItemDetailTabsFn)[.]ts$|read/(?:readItemDetailIdentityFx|readItemDetailQueueFx|readItemDetailSourcesFx)[.]ts$|schema/ItemDetailTabEnumSchema[.]ts$))|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/(?:schema/(?:StorageSchema|TypeSchema)[.]ts$|ui/ItemDefinitionLabels[.]ts$)|item-detail-frame/(?:fx/projectItemDetailReferenceFx[.]ts$|type/ItemDetailControl[.]ts$|ui/(?:ItemDetailHeader|ItemDetailMotion|useCloseItemDetail|useItemDetailControl|useItemDetailPendingCommand|useRetainedItemDetailProjection)[.]tsx?$)|item-line-detail/(?:type/ItemDetailLinesProjection[.]ts$|ui/(?:ItemLinesTab|ItemLineSummary|useItemDetailLines)[.]tsx?$)|production-job/(?:ui/(?:ProductionJobRuntime|readActiveJobRuntimeFn)[.]tsx?$|write/clearItemJobQueueFx[.]ts$)|renderer/game/GameEngine[.]ts$|ui/(?:badge/BadgeCount[.]tsx$|button/LinkButton[.]tsx$|fact/FactList[.]tsx$|focus/(?:dialogFocusableSelector|useDialogFocusContainment)[.]tsx?$|form/SelectableStateClassName[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]tsx?$|item/ItemIdentity[.]tsx$|scrollable/Scrollable[.]tsx$))";
+	"(?:item-detail(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|engine/(?:common/schema/IdSchema[.]ts$|item-detail/(?:fn/(?:readItemDetailInfoFn|readItemDetailTabsFn)[.]ts$|read/(?:readItemDetailIdentityFx|readItemDetailQueueFx|readItemDetailSourcesFx)[.]ts$|schema/ItemDetailTabEnumSchema[.]ts$))|game-presentation/ui/(?:useGameEngine|useRuntimeSelector)[.]ts$|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/(?:schema/(?:StorageSchema|TypeSchema)[.]ts$|ui/ItemDefinitionLabels[.]ts$)|item-detail-frame/(?:fx/projectItemDetailReferenceFx[.]ts$|type/ItemDetailControl[.]ts$|ui/(?:ItemDetailHeader|ItemDetailMotion|useCloseItemDetail|useItemDetailControl|useItemDetailPendingCommand|useRetainedItemDetailProjection)[.]tsx?$)|item-line-detail/(?:type/ItemDetailLinesProjection[.]ts$|ui/(?:ItemLinesTab|ItemLineSummary|useItemDetailLines)[.]tsx?$)|production-job/(?:ui/(?:ProductionJobRuntime|readActiveJobRuntimeFn)[.]tsx?$|write/clearItemJobQueueFx[.]ts$)|renderer/game/GameEngine[.]ts$|ui/(?:badge/BadgeCount[.]tsx$|button/LinkButton[.]tsx$|fact/FactList[.]tsx$|focus/(?:dialogFocusableSelector|useDialogFocusContainment)[.]tsx?$|form/SelectableStateClassName[.]ts$|item/ItemIdentity[.]tsx$|scrollable/Scrollable[.]tsx$))";
 const tilePresentationAllowedSourceDependencyPattern =
 	"(?:tile-presentation(?:/|$)|engine/item/fn/readItemRemainingChargesFn[.]ts$|game-event/schema/(?:GameEventEnumSchema|GameEventSchema)[.]ts$|game-runtime/(?:read/fn/isGridRuntimeItemFn[.]ts$|schema/(?:CommittedTransitionSchema|GridRuntimeItemSchema|RuntimeItemSchema|RuntimeSchema)[.]ts$)|item-definition/schema/(?:AssetSchema|ItemSchema|TypeSchema)[.]ts$|item-interaction/fx/(?:readRuntimeInventoryOpenerFx|readRuntimeItemPrimaryActionFx)[.]ts$|item-location/(?:fn/isSameGridLocationFn[.]ts$|schema/(?:GridLocationSchema|LocationScopeEnumSchema)[.]ts$)|item-merge/schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$|production-job/(?:fx/resolveActiveJobStatusFx[.]ts$|schema/(?:JobSchema|read/JobStatusEnumSchema)[.]ts$)|production-line/fn/readRuntimeLineFillProgressFn[.]ts$|renderer/game/GameEngine[.]ts$)";
 const tileRenderingAllowedSourceDependencyPattern =
@@ -40,12 +45,30 @@ const tileRenderingAllowedSourceDependencyPattern =
 const tileMotionAllowedSourceDependencyPattern =
 	"(?:tile-motion(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|game-scene/(?:service/MainSurface|type/ActorPose)[.]ts$|item-location/schema/LocationScopeEnumSchema[.]ts$|tile-presentation/type/(?:TileActorItem|TileMotionCue)[.]ts$|tile-rendering/(?:fn/readTravelDurationMsFn[.]ts$|fx/(?:burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|createTextureStoreFx|createTileActorFx|destroyTileActorFx|restoreActorExitFx|startActorEnterFx|startActorExitFx|startRemainderFeedbackFx|updateTileActorFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|MainActorStore|PixiApplicationOwner)[.]ts$|type/(?:PixiScenePalette|PixiTileActor)[.]ts$))";
 const tileInteractionAllowedSourceDependencyPattern =
-	"(?:tile-interaction(?:/|$)|application-diagnostics/(?:fn/toDiagnosticValueFn|fx/writeDiagnosticRecordFx)[.]ts$|application-runtime/service/RendererRuntime[.]ts$|engine/cheat/write/removeCheatItemFx[.]ts$|game-scene/(?:service/InventoryActorStore|type/SceneLayout)[.]ts$|item-interaction/(?:fx/(?:dropItemFx|readDropItemPreviewFx|releaseInventoryItemFx|splitBoardItemStackFx)[.]ts$|type/DropItemResult[.]ts$)|item-location/schema/LocationScopeEnumSchema[.]ts$|production-job/write/(?:enqueueDefaultLineFx|fillDefaultLineQueueFx)[.]ts$|renderer/game/GameEngine[.]ts$|space-action/fx/activateSpaceItemFx[.]ts$|tile-motion/(?:fn/readSettleDurationMsFn[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$|type/MotionTarget[.]ts$)|tile-presentation/type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readActorCursorFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|flashConsumedSourceFx|restoreActorExitFx|startActorExitFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|DemandFrameLoop|MainActorStore|PixiApplicationOwner)[.]ts$|type/PixiTileActor[.]ts$)|ui/(?:drag/PointerDragThreshold[.]ts$|game/(?:makeExactGameAtomFamilyFx|settleRendererCommandFailureFx)[.]ts$))";
+	"(?:tile-interaction(?:/|$)|application-diagnostics/(?:fn/toDiagnosticValueFn|fx/writeDiagnosticRecordFx)[.]ts$|application-runtime/service/RendererRuntime[.]ts$|engine/cheat/write/removeCheatItemFx[.]ts$|game-presentation/fx/(?:makeExactGameAtomFamilyFx|settleRendererCommandFailureFx)[.]ts$|game-scene/(?:service/InventoryActorStore|type/SceneLayout)[.]ts$|item-interaction/(?:fx/(?:dropItemFx|readDropItemPreviewFx|releaseInventoryItemFx|splitBoardItemStackFx)[.]ts$|type/DropItemResult[.]ts$)|item-location/schema/LocationScopeEnumSchema[.]ts$|production-job/write/(?:enqueueDefaultLineFx|fillDefaultLineQueueFx)[.]ts$|renderer/game/GameEngine[.]ts$|space-action/fx/activateSpaceItemFx[.]ts$|tile-motion/(?:fn/readSettleDurationMsFn[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$|type/MotionTarget[.]ts$)|tile-presentation/type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readActorCursorFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|flashConsumedSourceFx|restoreActorExitFx|startActorExitFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|DemandFrameLoop|MainActorStore|PixiApplicationOwner)[.]ts$|type/PixiTileActor[.]ts$)|ui/drag/PointerDragThreshold[.]ts$)";
 const gameSceneAllowedSourceDependencyPattern =
-	"(?:game-scene(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|game-event/schema/GameEventEnumSchema[.]ts$|game-runtime/(?:read/fn/isDeliveryRuntimeItemFn|schema/RuntimeSchema)[.]ts$|item-definition/schema/TypeSchema[.]ts$|item-detail-frame/ui/useItemDetailControl[.]ts$|item-interaction/type/DropItemResult[.]ts$|item-location/schema/(?:GridLocationSchema|LocationScopeEnumSchema)[.]ts$|renderer/game/(?:GameEngine|session/GameSession)[.]ts$|tile-interaction/(?:atom/(?:TileDefaultLineCommandAtom|runInventoryReleaseAtom|runSpaceActivationAtom|runTileDropAtom|runTileSplitAtom)[.]ts$|fx/(?:createCursorGrabMotionFx|createDropPresentationFx|createDropSubmissionFx|createGameInteractionControlFx|createInventoryDragControllerFx|createMainDragControllerFx|readTileDropPreviewFx)[.]ts$|type/(?:InventoryInteractionSurface|MainActivationIntent|MainInteractionSurface)[.]ts$)|tile-motion/(?:fn/(?:projectMotionItemFn|readSettleDurationMsFn)[.]ts$|fx/(?:chaseTargetFx|createLiveContactPoseReaderFx|createMagneticFieldFx|createMagneticProjectorFx|createMotionRuntimeFx|flashMotionTargetFx)[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$)|tile-presentation/(?:fn/(?:readCommittedTileSwapMotionCueFn|readTileActorAssetSourceIdsFn|readTileActorBadgeCountFn|readTileActorFeedbackCuesFn)[.]ts$|fx/(?:readCommittedTileReplacementsFx|readTileActorVisualFx|readTileActorsFx|readTileMotionCuesFx)[.]ts$|type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$)|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readCrowdAlphaFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createActorAnimatorFx|createAnimationDriverFx|createApplicationOwnerFx|createMainActorStoreFx|createParticleTexturesFx|createTextureStoreFx|createTileActorFx|destroyTileActorFx|flashConsumedSourceFx|readScenePaletteFx|restoreActorExitFx|runActivityParticlesFx|runActorLifecycleFx|startActivityParticlesFx|startActorEnterFx|startActorExitFx|startRemainderFeedbackFx|stopActivityParticlesFx|transitionActorVisualFx|updateActorProgressFx|updateTileActorFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|MainActorStore|ParticleTextures|PixiApplicationOwner)[.]ts$|type/(?:PixiScenePalette|PixiTileActor)[.]ts$)|ui/(?:game-menu/useGameMenuControl|game/useGameEngine|navigation/useInventoryShortcutKey)[.]ts$)";
+	"(?:game-scene(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|game-event/schema/GameEventEnumSchema[.]ts$|game-menu/ui/GameMenuProvider[.]tsx$|game-presentation/ui/useGameEngine[.]ts$|game-runtime/(?:read/fn/isDeliveryRuntimeItemFn|schema/RuntimeSchema)[.]ts$|item-definition/schema/TypeSchema[.]ts$|item-detail-frame/ui/useItemDetailControl[.]ts$|item-interaction/type/DropItemResult[.]ts$|item-location/schema/(?:GridLocationSchema|LocationScopeEnumSchema)[.]ts$|renderer/game/(?:GameEngine|session/GameSession)[.]ts$|tile-interaction/(?:atom/(?:TileDefaultLineCommandAtom|runInventoryReleaseAtom|runSpaceActivationAtom|runTileDropAtom|runTileSplitAtom)[.]ts$|fx/(?:createCursorGrabMotionFx|createDropPresentationFx|createDropSubmissionFx|createGameInteractionControlFx|createInventoryDragControllerFx|createMainDragControllerFx|readTileDropPreviewFx)[.]ts$|type/(?:InventoryInteractionSurface|MainActivationIntent|MainInteractionSurface)[.]ts$)|tile-motion/(?:fn/(?:projectMotionItemFn|readSettleDurationMsFn)[.]ts$|fx/(?:chaseTargetFx|createLiveContactPoseReaderFx|createMagneticFieldFx|createMagneticProjectorFx|createMotionRuntimeFx|flashMotionTargetFx)[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$)|tile-presentation/(?:fn/(?:readCommittedTileSwapMotionCueFn|readTileActorAssetSourceIdsFn|readTileActorBadgeCountFn|readTileActorFeedbackCuesFn)[.]ts$|fx/(?:readCommittedTileReplacementsFx|readTileActorVisualFx|readTileActorsFx|readTileMotionCuesFx)[.]ts$|type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$)|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readCrowdAlphaFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createActorAnimatorFx|createAnimationDriverFx|createApplicationOwnerFx|createMainActorStoreFx|createParticleTexturesFx|createTextureStoreFx|createTileActorFx|destroyTileActorFx|flashConsumedSourceFx|readScenePaletteFx|restoreActorExitFx|runActivityParticlesFx|runActorLifecycleFx|startActivityParticlesFx|startActorEnterFx|startActorExitFx|startRemainderFeedbackFx|stopActivityParticlesFx|transitionActorVisualFx|updateActorProgressFx|updateTileActorFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|MainActorStore|ParticleTextures|PixiApplicationOwner)[.]ts$|type/(?:PixiScenePalette|PixiTileActor)[.]ts$)|ui/navigation/useInventoryShortcutKey[.]ts$)";
 const tileMotionRetainedConsumerPattern = `${tileInteractionPattern}|^src/game-scene/fx/(?:createDeliveryRuntimeFx|createMainReconcilerFx|createMainRuntimeFx)[.]ts$`;
 const tileInteractionRetainedConsumerPattern =
 	"^src/game-scene/(?:fx/(?:createDeliveryRuntimeFx|createInventoryRuntimeFx|createInventorySurfaceFx|createMainReconcilerFx|createMainRuntimeFx|createMainSurfaceFx)[.]ts$|service/(?:InventorySurface|MainSurface)[.]ts$|ui/(?:PixiBoardToolbarSurface|PixiGameRuntime|PixiInventorySurface)[.]tsx$)";
+const gamePresentationAllowedSourceDependencyPattern =
+	"(?:game-presentation(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|game-event/schema/GameEventBatchSchema[.]ts$|game-runtime/schema/RuntimeSchema[.]ts$|launcher/ui/ActionErrorPage[.]tsx$|renderer/game/(?:GameEngine|GameSaveBootstrapError|PlayableGame)[.]ts$|renderer/game/resource/CriticalGameLifecycleError[.]ts$|ui/button/Button[.]tsx$)";
+const gamePresentationConsumerPattern =
+	"^src/(?:game-audio|game-cheat|game-menu|game-shell|tile-interaction)(?:/|$)|^src/(?:item-detail|item-detail-frame|item-line-detail)(?:/|$)|^src/game-scene/ui/(?:PixiBoardToolbarSurface|PixiInventorySurface)[.]tsx$|^src/@routes/(?:action/load-game/[$]packageId|editor/[$]projectId/board|game/[$]packageId(?:/cheats)?)[.]tsx$";
+const gameShellAllowedSourceDependencyPattern =
+	"(?:game-shell(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|game-audio/ui/GameAudio[.]tsx$|game-cheat/ui/(?:CheatItemSpawnProvider|CheatItemSpotlight)[.]tsx$|game-menu/ui/(?:GameMenu|GameMenuProvider)[.]tsx$|game-presentation/ui/useGameEngine[.]ts$|game-scene/ui/(?:PixiBoardToolbarSurface|PixiGameRuntime|PixiInventorySurface)[.]tsx$|item-detail/ui/ItemDetailModal[.]tsx$|item-detail-frame/ui/(?:ItemDetailHeader|ItemDetailProvider|useCloseItemDetail|useItemDetailControl)[.]tsx?$|item-line-detail/ui/ItemLineSummary[.]tsx$|ui/navigation/(?:RouteBackdrop[.]tsx$|useInventoryShortcutKey[.]ts$))";
+const gameShellConsumerPattern =
+	"^src/@routes/(?:editor/[$]projectId/board(?:/(?:index|inventory))?|game/[$]packageId/(?:cheats|_scene(?:/(?:board|inventory))?))[.]tsx$";
+const gameMenuAllowedSourceDependencyPattern =
+	"(?:game-menu(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|application-runtime/fx/readRendererLifecycleFx[.]ts$|game-persistence/service/RuntimeSaveFx[.]ts$|game-presentation/fx/makeExactGameAtomFamilyFx[.]ts$|renderer/game/Game[.]ts$|ui/button/Button[.]tsx$|ui/cheat-availability/useCheatAvailability[.]ts$|ui/focus/(?:dialogFocusableSelector|useDialogFocusContainment)[.]tsx?$)";
+const gameMenuConsumerPattern =
+	"^src/(?:game-cheat|game-shell)(?:/|$)|^src/game-scene/ui/PixiBoardToolbarSurface[.]tsx$";
+const gameAudioAllowedSourceDependencyPattern =
+	"(?:game-audio(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|game-event/schema/GameEventEnumSchema[.]ts$|game-presentation/ui/(?:useGameEngine|useGameEvents)[.]ts$)";
+const gameCheatAllowedSourceDependencyPattern =
+	"(?:game-cheat(?:/|$)|engine/cheat/(?:read/readCheatItemCatalogFx|write/(?:setCheatEnabledFx|setInstantGameplayFx|spawnCheatItemFx))[.]ts$|game-menu/ui/GameMenuProvider[.]tsx$|game-presentation/(?:fx/(?:makeExactGameAtomFamilyFx|settleRendererCommandFailureFx)[.]ts$|ui/useRuntimeSelector[.]ts$)|game-runtime/schema/RuntimeSchema[.]ts$|item-detail-frame/ui/useItemDetailControl[.]ts$|renderer/game/PlayableGame[.]ts$|ui/(?:button/Button[.]tsx$|cheat-availability/useCheatAvailability[.]ts$|navigation/RouteBackdrop[.]tsx$|search/(?:SpotlightSearchInput[.]tsx$|useFuseSearch[.]ts$)))";
+const gameCheatConsumerPattern =
+	"^src/game-shell(?:/|$)|^src/@routes/game/[$]packageId/cheats[.]tsx$";
 const gameRuntimeAllowedSourceDependencyPattern =
 	"(?:game-runtime(?:/|$)|game-config/schema/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
 const gamePersistenceAllowedSourceDependencyPattern =
@@ -69,7 +92,7 @@ const launcherPattern = "^src/launcher(?:/|$)";
 const launcherAllowedSourceDependencyPattern =
 	"(?:launcher(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|application-runtime/(?:atom/(?:RendererAtomRegistry|RendererLifecycleOwnerAtom)[.]ts$|fx/readRendererLifecycleFx[.]ts$|service/RendererRuntime[.]ts$)|arkpack/(?:artifact/schema/PayloadSchema[.]ts$|renderer/(?:ArkpackCatalogOwnerAtom|loadArkpackFx)[.]ts$)|renderer/(?:launcher/readLastPackageIdFx[.]ts$|window/(?:WindowModeAtom|WindowModeReadyAtom|readWindowModeFx)[.]ts$)|ui/(?:action/useExclusiveAction[.]ts$|appearance/(?:AppearanceAtom|readAppearanceAccentFx|readAppearanceThemeFx)[.]ts$|button/(?:BackButton|Button)[.]tsx$|cheat-availability/(?:applyCheatAvailabilityFx|readCheatAvailabilityFx)[.]ts$|cursor/CursorSemantic[.]ts$|navigation/RouteBackdrop[.]tsx$))";
 const launcherRetainedConsumerPattern =
-	"^src/(?:main[.]tsx$|@routes/(?:index[.]tsx$|_launcher/(?:about|arkpacks|main-menu|settings)[.]tsx$|action/-runActionRouteFx[.]ts$|action/(?:discard-failed-game|recover-game-save)[.]tsx$|action/load-game/[$]packageId[.]tsx$|editor/welcome[.]tsx$|game/[$]packageId/action/(?:exit|leave|reset)[.]tsx$)|project-version/ui/EditorVersionRestoreAction[.]tsx$|ui/game/GameEngineErrorView[.]tsx$)";
+	"^src/(?:main[.]tsx$|@routes/(?:index[.]tsx$|_launcher/(?:about|arkpacks|main-menu|settings)[.]tsx$|action/-runActionRouteFx[.]ts$|action/(?:discard-failed-game|recover-game-save)[.]tsx$|action/load-game/[$]packageId[.]tsx$|editor/welcome[.]tsx$|game/[$]packageId/action/(?:exit|leave|reset)[.]tsx$)|game-presentation/ui/GameEngineErrorView[.]tsx$|project-version/ui/EditorVersionRestoreAction[.]tsx$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:type/ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
@@ -81,7 +104,7 @@ const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|${launcherPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileRenderingPattern}|${tileMotionPattern}|${tileInteractionPattern}|${gameScenePattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|${launcherPattern}|${gamePresentationPattern}|${gameShellPattern}|${gameMenuPattern}|${gameAudioPattern}|${gameCheatPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileRenderingPattern}|${tileMotionPattern}|${tileInteractionPattern}|${gameScenePattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -116,6 +139,9 @@ const boundaryRules = [
 			pathNot: [
 				applicationDiagnosticsPattern,
 				applicationRuntimePattern,
+				gameAudioPattern,
+				gameMenuPattern,
+				gamePresentationPattern,
 				"^src/(?:@routes|authoring-mcp|item-detail-frame|project-authoring/atom|renderer/game|ui)(?:/|$)",
 				"^src/tile-interaction/atom/TileDefaultLineCommandAtom[.]ts$",
 				"^src/launcher/atom/MainMenuExitCommandAtom[.]ts$",
@@ -147,6 +173,144 @@ const boundaryRules = [
 		},
 		to: {
 			path: applicationRuntimePattern,
+		},
+	},
+	{
+		name: "game-presentation-is-the-low-level-react-game-capability",
+		comment:
+			"Game Presentation owns exact mounted-Game context, subscriptions, selectors, command settlement, and failure projection without absorbing scene, menu, audio, cheat, route, or gameplay authority.",
+		severity: "error",
+		from: {
+			path: gamePresentationPattern,
+		},
+		to: {
+			path: `^src/(?!${gamePresentationAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@effect/atom-react(?:/|$)|@tanstack/react-router(?:/|$)|effect(?:/|$)|react(?:/|$))`,
+		},
+	},
+	{
+		name: "game-presentation-has-exact-consumers",
+		comment:
+			"Only exact game routes and the concrete shell, menu, audio, cheat, detail, tile-command, and retained Pixi consumers use mounted-Game presentation capabilities.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gamePresentationPattern,
+				gamePresentationConsumerPattern,
+			],
+		},
+		to: {
+			path: gamePresentationPattern,
+		},
+	},
+	{
+		name: "game-shell-composes-only-concrete-game-surfaces",
+		comment:
+			"Game Shell owns Board, Inventory, overlay precedence, and exact route-resource composition over explicit presentation owners without implementing gameplay or platform lifecycle.",
+		severity: "error",
+		from: {
+			path: gameShellPattern,
+		},
+		to: {
+			path: `^src/(?!${gameShellAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!lucide-react(?:/|$)|react(?:/|$))`,
+		},
+	},
+	{
+		name: "game-shell-has-route-only-consumers",
+		comment:
+			"Only exact installed-game and Editor Board route leaves compose Game Shell surfaces.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gameShellPattern,
+				gameShellConsumerPattern,
+			],
+		},
+		to: {
+			path: gameShellPattern,
+		},
+	},
+	{
+		name: "game-menu-owns-only-overlay-and-menu-commands",
+		comment:
+			"Game Menu owns its overlay lifecycle, exact save/close commands, and navigation intent without absorbing shell composition, audio, cheats, or canonical gameplay state.",
+		severity: "error",
+		from: {
+			path: gameMenuPattern,
+		},
+		to: {
+			path: `^src/(?!${gameMenuAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@effect/atom-react(?:/|$)|@tanstack/react-router(?:/|$)|effect(?:/|$)|motion(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "game-menu-has-concrete-overlay-consumers",
+		comment:
+			"Only Game Shell, Game Cheat spotlight precedence, and the retained Board surface consume Game Menu control.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gameMenuPattern,
+				gameMenuConsumerPattern,
+			],
+		},
+		to: {
+			path: gameMenuPattern,
+		},
+	},
+	{
+		name: "game-audio-is-event-only-presentation",
+		comment:
+			"Game Audio projects committed events into one failure-isolated route resource and never owns gameplay truth, shell composition, menu, cheats, or platform transport.",
+		severity: "error",
+		from: {
+			path: gameAudioPattern,
+		},
+		to: {
+			path: `^src/(?!${gameAudioAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@effect/atom-react(?:/|$)|effect(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "game-audio-has-one-route-resource-composer",
+		comment: "Only the playable Game route resource boundary mounts Game Audio.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gameAudioPattern,
+				"^src/game-shell/ui/PlayableGameRoute[.]tsx$",
+			],
+		},
+		to: {
+			path: gameAudioPattern,
+		},
+	},
+	{
+		name: "game-cheat-owns-save-scoped-cheat-presentation",
+		comment:
+			"Game Cheat owns exact-Game cheat commands, screen model, and spawn spotlight lifecycle while consuming application cheat availability without taking ownership of that preference.",
+		severity: "error",
+		from: {
+			path: gameCheatPattern,
+		},
+		to: {
+			path: `^src/(?!${gameCheatAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@effect/atom-react(?:/|$)|@tanstack/react-hotkeys(?:/|$)|effect(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "game-cheat-has-concrete-shell-and-route-consumers",
+		comment: "Only Game Shell and the exact installed-game Cheats route consume Game Cheat UI.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gameCheatPattern,
+				gameCheatConsumerPattern,
+			],
+		},
+		to: {
+			path: gameCheatPattern,
 		},
 	},
 	{
@@ -238,7 +402,7 @@ const boundaryRules = [
 				"^src/renderer/game/resource/internal/createGameEngineFinalizationCapabilityFx[.]ts$",
 				"^src/renderer/game/session/GameSession[.]ts$",
 				"^src/renderer/game/session/createGameSessionFx[.]ts$",
-				"^src/ui/game-menu/gameMenuCommandAtom[.]ts$",
+				"^src/game-menu/atom/gameMenuCommandAtom[.]ts$",
 				"^electron/main/registerArkiniElectronIpcFx[.]ts$",
 			],
 		},
@@ -304,7 +468,7 @@ const boundaryRules = [
 			pathNot: [
 				itemLineDetailPattern,
 				"^src/item-detail/ui/ItemDetailModal[.]tsx$",
-				"^src/ui/shell/GameShell[.]tsx$",
+				"^src/game-shell/ui/GameShell[.]tsx$",
 				"^src/board-scenario/toolbar/EditorBoardProductionLineLink[.]tsx$",
 				"^src/item-authoring/ui/EditorProductionLineDetail[.]tsx$",
 			],
@@ -334,7 +498,7 @@ const boundaryRules = [
 			path: activeCodePattern,
 			pathNot: [
 				itemDetailPattern,
-				"^src/ui/shell/GameShell[.]tsx$",
+				"^src/game-shell/ui/GameShell[.]tsx$",
 			],
 		},
 		to: {
@@ -481,7 +645,7 @@ const boundaryRules = [
 				gameScenePattern,
 				tileMotionPattern,
 				tileInteractionPattern,
-				"^src/ui/(?:game/PlayableBoard|inventory/Inventory|shell/GameShell)[.]tsx$",
+				"^src/game-shell/ui/(?:GameShell|Inventory|PlayableBoard)[.]tsx$",
 			],
 		},
 		to: {

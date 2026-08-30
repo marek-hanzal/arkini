@@ -23,7 +23,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
-vi.mock("~/ui/game/useGameEngine", () => ({
+vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => ({
 		config: {
 			items: {},
@@ -33,7 +33,7 @@ vi.mock("~/ui/game/useGameEngine", () => ({
 	}),
 }));
 
-vi.mock("~/ui/game/useRuntimeSelector", () => ({
+vi.mock("~/game-presentation/ui/useRuntimeSelector", () => ({
 	useRuntimeSelector: (
 		_game: unknown,
 		selector: (runtime: { readonly items: readonly never[] }) => unknown,

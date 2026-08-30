@@ -42,7 +42,7 @@ vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
 
-vi.mock("~/ui/game/useGameEngine", () => ({
+vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));
 

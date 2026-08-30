@@ -67,10 +67,15 @@ src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
 src/flow-canvas  global Flow projection, painter policy and product UI
 src/estimate  static Estimate domain, projections, cache and worker
 src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and About motion
+src/game-presentation  mounted-Game React context, selectors, events, command settlement and failures
+src/game-shell  Board, Inventory, gameplay resources and overlay composition
+src/game-menu  Game Menu lifecycle, save/close commands and navigation intent
+src/game-audio  committed-event cue projection and route-scoped Web Audio lifecycle
+src/game-cheat  save-scoped Cheat controls, commands and item-spawn spotlight
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
 src/renderer  installed Game, launcher preferences, window, resource-validation and transport capabilities
-src/ui        cross-product primitives and remaining installed-Game shell composition
+src/ui        cross-product primitives plus remaining application Settings and authoring leaves
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

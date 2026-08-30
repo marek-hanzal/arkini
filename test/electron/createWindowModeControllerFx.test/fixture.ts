@@ -85,10 +85,14 @@ export const createHarness = (
 		emit: (event: string) => {
 			if (event === "enter-full-screen") isFullscreen = true;
 			if (event === "leave-full-screen") isFullscreen = false;
+			if (event === "maximize") isMaximized = true;
+			if (event === "unmaximize") isMaximized = false;
 			return windowEvents.emit(event);
 		},
+		emitWithoutStateChange: (event: string) => windowEvents.emit(event),
 		getShortcutListener: () =>
 			webContentsEvents.listeners("before-input-event")[0] as BeforeInputListener | undefined,
+		isMaximized: () => isMaximized,
 		maximize,
 		send,
 		setBounds,

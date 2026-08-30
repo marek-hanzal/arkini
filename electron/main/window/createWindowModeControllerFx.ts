@@ -19,7 +19,7 @@ interface PendingRequest {
 	readonly outcome: Deferred.Deferred<void, unknown>;
 }
 
-type NativeConfirmation = "enter-full-screen" | "leave-full-screen" | "maximize" | "unmaximize";
+type NativeConfirmation = "enter-full-screen" | "leave-full-screen";
 
 const NATIVE_TRANSITION_TIMEOUT_MS = 5_000;
 
@@ -54,27 +54,18 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 					candidate === request ? undefined : candidate,
 				);
 
-			const applyWindowedModeFx = (
-				mode: WindowedMode,
-				awaitConfirmationFx: (
-					confirmation: NativeConfirmation,
-				) => Effect.Effect<void> = () => Effect.void,
-			) =>
+			const applyWindowedModeFx = (mode: WindowedMode) =>
 				Effect.gen(function* () {
 					applyingWindowedMode = true;
 					if (mode === "bordered") {
-						const wasMaximized = window.isMaximized();
 						window.maximize();
-						if (!wasMaximized) yield* awaitConfirmationFx("maximize");
 						return;
 					}
 					const display = screen.getDisplayMatching(window.getBounds());
 					const { x, y, width, height } = calculateInitialWindowBoundsFn(
 						display.workArea,
 					);
-					const wasMaximized = window.isMaximized();
 					window.unmaximize();
-					if (wasMaximized) yield* awaitConfirmationFx("unmaximize");
 					yield* Effect.callback<void>((resume) => {
 						const immediate = setImmediate(() => resume(Effect.void));
 						return Effect.sync(() => clearImmediate(immediate));
@@ -164,15 +155,13 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 
 			const requestLifecycleFx = (request: PendingRequest) =>
 				Effect.gen(function* () {
-					const awaitConfirmationFx = (confirmation: NativeConfirmation) =>
-						awaitNativeConfirmationFx(request, confirmation);
 					yield* Effect.gen(function* () {
 						if (request.mode === "fullscreen") {
 							if (currentMode !== "fullscreen") previousWindowedMode = currentMode;
 							yield* applyFullscreenStateFx(request, true);
 						} else {
 							yield* applyFullscreenStateFx(request, false);
-							yield* applyWindowedModeFx(request.mode, awaitConfirmationFx);
+							yield* applyWindowedModeFx(request.mode);
 						}
 					}).pipe(
 						Effect.timeoutOrElse({
@@ -256,11 +245,12 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				void ElectronMainRuntime.runPromise(
 					Effect.gen(function* () {
 						const request = yield* readPendingRequestFx;
-						if (request !== undefined) {
-							yield* Queue.offer(request.nativeConfirmations, "maximize");
-							return;
+						if (request !== undefined) return;
+						if (!applyingWindowedMode) {
+							yield* settlePassiveModeFx(
+								window.isMaximized() ? "bordered" : "default",
+							);
 						}
-						if (!applyingWindowedMode) yield* settlePassiveModeFx("bordered");
 					}),
 				);
 			});
@@ -269,11 +259,12 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				void ElectronMainRuntime.runPromise(
 					Effect.gen(function* () {
 						const request = yield* readPendingRequestFx;
-						if (request !== undefined) {
-							yield* Queue.offer(request.nativeConfirmations, "unmaximize");
-							return;
+						if (request !== undefined) return;
+						if (!applyingWindowedMode) {
+							yield* settlePassiveModeFx(
+								window.isMaximized() ? "bordered" : "default",
+							);
 						}
-						if (!applyingWindowedMode) yield* settlePassiveModeFx("default");
 					}),
 				);
 			});

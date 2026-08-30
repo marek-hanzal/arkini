@@ -1,11 +1,11 @@
 import type { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type {
 	EditorProjectRepository,
 	EditorProjectRepositoryService,
-} from "~/project-authoring/repository/EditorProjectRepository";
-import type { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+} from "~/project-authoring/service/EditorProjectRepository";
+import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import type { EditorBuildRepositoryService } from "~/editor-build/domain/EditorBuildRepository";
 
 export interface OwnedEditorProjectRepository

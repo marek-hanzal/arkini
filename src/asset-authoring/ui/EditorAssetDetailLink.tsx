@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 
 /** Opens one asset while preserving an Assets-list search scoped to that resource. */

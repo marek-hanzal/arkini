@@ -2,7 +2,7 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { dialog, type BrowserWindow } from "electron";
 import { Effect } from "effect";
 
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";

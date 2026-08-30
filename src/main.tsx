@@ -13,8 +13,8 @@ import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerA
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { refreshEditorServiceStatusFx } from "~/project-authoring/welcome/refreshEditorServiceStatusFx";
-import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/installEditorMcpVersionCheckoutFx";
+import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEditorServiceStatusFx";
+import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/installEditorMcpVersionCheckoutFx";
 import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
 import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";

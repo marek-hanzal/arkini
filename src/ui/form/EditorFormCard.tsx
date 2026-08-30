@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import { EditorRootCard } from "~/authoring-shell/navigation/EditorRootCard";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 
 /** Provides a consistent root-object surface shared by editor forms. */
 export const EditorFormCard = ({ children }: PropsWithChildren) => (

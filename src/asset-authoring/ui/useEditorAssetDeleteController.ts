@@ -5,8 +5,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
 import { deleteEditorAssetFx } from "~/asset-authoring/session/deleteEditorAssetFx";
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import {
 	readEditorAssetDeleteBlockersFn,

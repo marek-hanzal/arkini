@@ -5,9 +5,9 @@ const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[
 const applicationDiagnosticsPattern = "^src/application-diagnostics(?:/|$)";
 const applicationRuntimePattern = "^src/application-runtime(?:/|$)";
 const applicationRuntimeLowerCapabilityPattern =
-	"^src/(?:renderer(?:/|$)|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:service/GameSaveStorage[.]ts$|fx/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$)";
+	"^src/(?:renderer(?:/|$)|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:service/EditorUnsavedChanges|atom/EditorUnsavedChangesOwnerAtom|fx/createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:service/GameSaveStorage[.]ts$|fx/createElectronGameSaveStorageFx[.]ts$)|project-authoring/(?:service/EditorProjectRepository|fx/createElectronEditorProjectRepositoryFx)[.]ts$)";
 const applicationRuntimeAllowedDependencyPattern =
-	"src/(?:application-runtime(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:service/GameSaveStorage[.]ts$|fx/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$|renderer/game/(?:createGameFx[.]ts$|resource/(?:acquireGameEngineResourceFx|GameEngineResourceFx|GameEngineResourceLayer)[.]ts$))";
+	"src/(?:application-runtime(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:service/EditorUnsavedChanges|atom/EditorUnsavedChangesOwnerAtom|fx/createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:service/GameSaveStorage[.]ts$|fx/createElectronGameSaveStorageFx[.]ts$)|project-authoring/(?:service/EditorProjectRepository|fx/createElectronEditorProjectRepositoryFx)[.]ts$|renderer/game/(?:createGameFx[.]ts$|resource/(?:acquireGameEngineResourceFx|GameEngineResourceFx|GameEngineResourceLayer)[.]ts$))";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameRuntimePattern = "^src/game-runtime(?:/|$)";
@@ -50,11 +50,11 @@ const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|flow|
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
-	"^src/(?:board-scenario/(?!session(?:/|$)|toolbar(?:/|$))|project-version/(?!workspace(?:/|$))|project-note/(?!workspace(?:/|$))|project-authoring/(?!configuration(?:/|$)|export(?:/|$)|welcome(?:/|$)|repository/(?:createElectronEditorProjectRepositoryFx|invokeEditorProjectTransportFx)[.]ts$))";
+	"^src/(?:board-scenario/(?!session(?:/|$)|toolbar(?:/|$))|project-version/(?:fn|schema|type)(?:/|$)|project-version/fx/readEditorProjectVersionHistoryFx[.]ts$|project-note/schema(?:/|$)|project-authoring/(?:error|fn|schema|service|type)(?:/|$)|project-authoring/fx/(?:createFreshEditorProjectFx|readEditorProjectFx)[.]ts$)";
 const authoringProductRuntimePattern =
-	"^src/(?:board-scenario/session(?:/|$)|project-authoring/repository/(?:createElectronEditorProjectRepositoryFx|invokeEditorProjectTransportFx)[.]ts$|authoring-session/(?:EditorProjectAtom|EditorProjectReplacementEpochAtom|EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx|publishEditorProjectFx|refreshEditorProjectFx)[.]ts$)";
+	"^src/(?:board-scenario/session(?:/|$)|project-authoring/fx/(?:createElectronEditorProjectRepositoryFx|invokeEditorProjectTransportFx)[.]ts$|authoring-session/(?:atom|fx|service)(?:/|$))";
 const authoringProductPresentationPattern =
-	"^src/(?:authoring-mcp|authoring-shell)(?:/|$)|^src/(?:board-scenario/toolbar|project-version/workspace|project-note/workspace|project-authoring/(?:configuration|export|welcome))(?:/|$)|^src/authoring-session/(?:EditorProjectProvider[.]tsx|EditorProjectReplacementBoundary[.]tsx|useEditorProject[.]ts|useEditorProjectRefreshController[.]ts|useEditorUnsavedChangesRegistration[.]ts)$";
+	"^src/(?:authoring-mcp|authoring-shell)(?:/|$)|^src/(?:board-scenario/toolbar|project-version/(?:atom|error|ui)|project-version/fx/checkoutEditorProjectVersionFx[.]ts$|project-note/(?:atom|fx|ui)|project-authoring/(?:atom|ui)|project-authoring/fx/(?:importEditorArkpackFileFx|refreshEditorServiceStatusFx|saveEditorProjectConfigFx)[.]ts$|authoring-session/ui)(?:/|$)";
 const reusablePresentationPattern = `^src/ui(?:/|$)|${productPresentationPattern}|${authoringProductPresentationPattern}`;
 
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
@@ -81,7 +81,7 @@ const boundaryRules = [
 			pathNot: [
 				applicationDiagnosticsPattern,
 				applicationRuntimePattern,
-				"^src/(?:@routes|authoring-mcp|item-detail-frame|project-authoring/welcome|renderer/game|ui)(?:/|$)",
+				"^src/(?:@routes|authoring-mcp|item-detail-frame|project-authoring/atom|renderer/game|ui)(?:/|$)",
 			],
 		},
 		to: {
@@ -723,7 +723,7 @@ const boundaryRules = [
 	{
 		name: "authoring-product-core-no-presentation-imports",
 		comment:
-			"Portable authoring schemas, policies, and repository contracts remain framework-neutral even when their product root also owns an explicit workspace, session, toolbar, configuration, import, export, or welcome surface.",
+			"Portable authoring schemas, policies, types, and repository contracts remain framework-neutral even when their product root also owns explicit UI, Atom, and renderer Effect layers.",
 		severity: "error",
 		from: {
 			path: authoringProductCorePattern,

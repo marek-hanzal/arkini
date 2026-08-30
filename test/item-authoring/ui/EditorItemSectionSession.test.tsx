@@ -28,7 +28,7 @@ vi.mock("~/ui/button/Button", () => ({
 		createElement("button", props, children),
 }));
 
-vi.mock("~/authoring-shell/navigation/EditorHistoryBackButton", () => ({
+vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 	EditorHistoryBackButton: ({ children }: { readonly children?: ReactNode }) =>
 		createElement("span", null, children),
 }));
@@ -46,13 +46,13 @@ const state = vi.hoisted(() => ({
 		| undefined,
 }));
 
-vi.mock("~/authoring-session/useEditorUnsavedChangesRegistration", () => ({
+vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
 	useEditorUnsavedChangesRegistration: (session: typeof state.unsavedSession) => {
 		state.unsavedSession = session;
 	},
 }));
 
-vi.mock("~/authoring-session/useEditorProject", () => ({
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "editor-test",
 		revision: "revision-1",

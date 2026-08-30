@@ -1,7 +1,7 @@
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectAvatarKeys } from "~/project-authoring/configuration/EditorProjectFormSchema";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectAvatarKeys } from "~/project-authoring/schema/EditorProjectFormSchema";
 import type { EditorAssetDeleteBlocker } from "~/asset-authoring/domain/fn/readEditorAssetDeleteBlockersFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";

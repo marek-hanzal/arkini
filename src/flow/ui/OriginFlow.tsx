@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { LoaderCircle, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { OriginFlowDirection, Selection } from "~/flow/ui/Highlight";
 import { Canvas } from "~/flow/ui/Canvas";
 import type { LayoutNode, LayoutPoint } from "~/flow/worker/Layout";

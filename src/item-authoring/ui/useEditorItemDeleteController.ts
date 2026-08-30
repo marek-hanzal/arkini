@@ -5,13 +5,13 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
 import { deleteEditorItemFx } from "~/item-authoring/ui/deleteEditorItemFx";
-import { useEditorHistoryBack } from "~/authoring-shell/navigation/useEditorHistoryBack";
+import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 const deleteEditorItemCommandAtom = RendererRuntime.runSync(

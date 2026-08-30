@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { z } from "zod";
 
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 /** Parses one untrusted editor IPC request into the canonical repository error contract. */
 export const parseEditorProjectIpcRequestFx = <Value>(

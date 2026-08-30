@@ -13,10 +13,10 @@ import { readProjectFilesFx } from "../../../../electron/main/editor-project/fil
 import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
 import { writeProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
+import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
-import { EditorVersionDescriptorFileSchema } from "~/project-version/EditorVersionDescriptorFileSchema";
+import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";

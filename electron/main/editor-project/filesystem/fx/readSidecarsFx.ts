@@ -5,8 +5,8 @@ import { Effect } from "effect";
 import type { ProjectPaths } from "../ProjectPaths";
 import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import { EditorProjectNoteFileSchema } from "~/project-note/EditorProjectNoteFileSchema";
-import { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
+import { EditorProjectNoteFileSchema } from "~/project-note/schema/EditorProjectNoteFileSchema";
+import { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
 const decodeNoteFileStemFn = (stem: string) => {

@@ -3,7 +3,7 @@ import { ButtonLink } from "~/ui/button/Button";
 import {
 	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
-} from "~/authoring-shell/navigation/EditorSectionTabs";
+} from "~/authoring-shell/ui/EditorSectionTabs";
 import type { EditorItemSectionDescriptor } from "~/item-authoring/ui/EditorItemSections";
 
 const activeProps = {

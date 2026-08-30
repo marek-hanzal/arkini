@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen, Pencil, Save, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { EditorNoteContentMaxLength } from "~/project-note/EditorNoteSchema";
+import { EditorNoteContentMaxLength } from "~/project-note/schema/EditorNoteSchema";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { EditorTextarea } from "~/ui/form/EditorTextarea";
 import { Tooltip } from "~/ui/overlay/Tooltip";
-import { useEditorNotesController } from "~/project-note/workspace/useEditorNotesController";
+import { useEditorNotesController } from "~/project-note/ui/useEditorNotesController";
 import { Status } from "~/ui/status/Status";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {

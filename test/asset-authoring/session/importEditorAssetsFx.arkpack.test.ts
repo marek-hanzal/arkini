@@ -4,12 +4,12 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorAssetsFx } from "~/asset-authoring/session/importEditorAssetsFx";
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/project-authoring/repository/EditorProjectRepository";
+} from "~/project-authoring/service/EditorProjectRepository";
 import { createTestArkpack } from "~test/arkpack/support/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";

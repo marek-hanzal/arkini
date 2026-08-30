@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { EditorBoardScenarioNameSchema } from "~/board-scenario/EditorBoardScenarioSchema";
+import { EditorBoardScenarioNameSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { EditorObjectHashSchema } from "./EditorObjectHashSchema";
 
 /** Complete logical snapshot referencing immutable full objects by content hash. */

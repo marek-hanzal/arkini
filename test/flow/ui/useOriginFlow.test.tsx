@@ -9,7 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorItemOriginFlow } from "~/flow/domain/EditorItemOriginFlow";
 import type { EditorItemOriginFlowRequest } from "~/flow/domain/fx/readEditorItemOriginFlowFx";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { Layout } from "~/flow/worker/Layout";
 
 const mocks = vi.hoisted(() => ({

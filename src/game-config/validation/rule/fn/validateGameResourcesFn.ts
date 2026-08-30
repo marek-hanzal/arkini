@@ -1,4 +1,4 @@
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
 import type { ResourceDescriptorSchema } from "~/game-config/resource/schema/ResourceDescriptorSchema";
 import { readGameResourceUsagesFn } from "~/game-config/resource/fn/readGameResourceUsagesFn";

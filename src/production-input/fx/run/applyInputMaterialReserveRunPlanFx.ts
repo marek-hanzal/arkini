@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/production-input/read/readInputRunItemFx";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";

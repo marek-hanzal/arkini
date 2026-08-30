@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 
 export namespace readGameResourceUsagesFn {

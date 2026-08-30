@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 

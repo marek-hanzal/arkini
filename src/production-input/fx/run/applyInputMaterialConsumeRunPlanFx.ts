@@ -6,7 +6,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/production-input/read/readInputRunItemFx";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";

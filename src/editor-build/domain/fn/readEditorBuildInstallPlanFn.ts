@@ -1,4 +1,4 @@
-import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
+import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
 import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProjectBuildSchema";
 import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";

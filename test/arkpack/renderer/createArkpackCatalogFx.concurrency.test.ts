@@ -1,6 +1,6 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Stream, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
-import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
+import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
 import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
 import { builtIn, imported } from "~test/arkpack/renderer/createArkpackCatalogFx.test/fixture";
 

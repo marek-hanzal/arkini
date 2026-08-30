@@ -11,7 +11,7 @@ import type { ItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/fx/readItemDetailMaterialAutofillAvailabilityFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";

@@ -8,7 +8,7 @@ import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransiti
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { splitBoardItemStackFx } from "~/item-interaction/fx/splitBoardItemStackFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const board = (x: number) => ({

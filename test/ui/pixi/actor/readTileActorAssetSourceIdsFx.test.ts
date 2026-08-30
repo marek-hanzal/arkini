@@ -5,7 +5,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
 	resources: {

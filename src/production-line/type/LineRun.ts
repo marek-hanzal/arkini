@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
-import type { InputRun } from "~/production-input/InputRun";
+import type { InputRun } from "~/production-input/type/InputRun";
 import type { lineRuleFx } from "~/production-line/fx/lineRuleFx";
 
 /** Internal snapshot-derived readiness and exact mutation plan for one product line. */

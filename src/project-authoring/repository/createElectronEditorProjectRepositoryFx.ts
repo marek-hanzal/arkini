@@ -11,7 +11,7 @@ import {
 import {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
-} from "~/board-scenario/EditorBoardScenarioSchema";
+} from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { admitEditorProjectWriteFx } from "~/project-authoring/repository/EditorProjectWriteAdmission";
 import {
 	EditorProjectCommitPayloadSchema,

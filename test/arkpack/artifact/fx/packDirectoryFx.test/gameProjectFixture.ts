@@ -2,7 +2,7 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 
 /** Smallest signature-bearing PNG fixture needed by artifact packing. */

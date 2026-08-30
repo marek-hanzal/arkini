@@ -5,7 +5,7 @@ import { GameLoopLayerFx } from "~/game-tick/layer/GameLoopLayerFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { TickLayerFx } from "~/game-tick/layer/TickLayerFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

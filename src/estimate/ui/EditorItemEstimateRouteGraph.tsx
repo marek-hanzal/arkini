@@ -1,7 +1,7 @@
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorItemEstimateRouteStep } from "~/estimate/domain/EditorItemEstimate";
 import { type ReactNode, useState } from "react";
-import { formatDurationFn } from "~/ui/formatDurationFn";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,

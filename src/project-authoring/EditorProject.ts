@@ -1,5 +1,5 @@
 import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 
 /** Canonical project-row commit excluding separately stored resource bodies. */

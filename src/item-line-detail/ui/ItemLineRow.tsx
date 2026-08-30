@@ -23,7 +23,7 @@ import {
 } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
-import { formatDurationFn } from "~/ui/formatDurationFn";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 

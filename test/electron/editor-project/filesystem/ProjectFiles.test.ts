@@ -7,7 +7,7 @@ import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
 } from "~/game-config/source/GameProjectReference";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
 

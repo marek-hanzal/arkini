@@ -1,4 +1,4 @@
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 

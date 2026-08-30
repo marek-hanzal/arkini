@@ -6,7 +6,7 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { isItemPureWithIndexFn } from "~/engine/item/fn/isItemPureWithIndexFn";
 import { readItemPurityIndexFn } from "~/engine/item/fn/readItemPurityIndexFn";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/game-runtime/schema/check/DuplicateItemIdIssueSchema";

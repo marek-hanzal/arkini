@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { GameConfigSchema as GameConfig } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { GameConfigSchema as GameConfig } from "~/game-config/schema/GameConfigSchema";
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
 
 type StartSurface = "board" | "inventory" | "toolbar";

@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
 import { writeGameProjectJsonSchemaFx } from "~/game-config/source/json-schema/writeGameProjectJsonSchemaFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { expectNamedJsonSchemaGraph } from "~test/schema/expectNamedJsonSchemaGraph";
 
 describe("writeGameProjectJsonSchemaFx", () => {

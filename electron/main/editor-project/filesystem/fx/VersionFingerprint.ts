@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import type { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
+import type { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import type { EditorVersionManifestSchema } from "~/project-version/EditorVersionManifestSchema";
 
 const encoder = new TextEncoder();

@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AboutPortraitAssetsAtom } from "~/ui/launcher/about/AboutPortraitAssetsAtom";
 import { ArkiniDefaultPackageId } from "../../../../shared/ArkiniAppMetadata";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 (
 	globalThis as {

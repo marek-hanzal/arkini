@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
 import type { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
-import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
+import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 import { Fact, FactList } from "~/ui/fact/FactList";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 

@@ -4,7 +4,7 @@ import type { EditorProjectCommit } from "~/project-authoring/EditorProject";
 import { EditorProjectDescriptorSchema } from "~/project-authoring/EditorProjectDescriptor";
 import { EditorProjectRecordSchema } from "~/project-authoring/EditorProjectRecordSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const projectTransportSchema = z
 	.object({

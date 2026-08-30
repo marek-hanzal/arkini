@@ -6,7 +6,7 @@ import { EditorProjectRepositoryError } from "~/project-authoring/repository/Edi
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type {
 	EditorProjectVersionCheckoutInput,

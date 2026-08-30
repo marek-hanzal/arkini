@@ -6,7 +6,7 @@ import { DiagnosticProviderEnumSchema } from "~/game-config/diagnostic/schema/Di
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticRecordEntityEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceSchema } from "~/game-config/source/schema/GameSourceSchema";
 import { validateGameConfigFx } from "~/game-config/validation/fx/validateGameConfigFx";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";

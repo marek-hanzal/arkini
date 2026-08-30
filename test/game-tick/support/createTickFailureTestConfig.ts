@@ -1,4 +1,4 @@
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 /** Creates one line whose output item can be removed after start to force a Tick failure. */

@@ -5,7 +5,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { GameTransition } from "~/renderer/game/session/GameSession";
 import { readCommittedTileReplacementsFx } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
 	resources: {

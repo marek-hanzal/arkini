@@ -8,7 +8,7 @@ import {
 import type { EditorProjectSemanticDiff } from "~/project-version/EditorProjectSemanticDiff";
 import { readEditorProjectSemanticDiffsFn } from "~/project-version/fn/readEditorProjectSemanticDiffsFn";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 interface CompatibilityDecision {
 	readonly message: string;

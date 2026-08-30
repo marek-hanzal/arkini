@@ -4,7 +4,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";

@@ -1,5 +1,5 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
+import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 import { Fact, FactList } from "~/ui/fact/FactList";
 
 /** Presents the authored identity and storage contract of one item. */

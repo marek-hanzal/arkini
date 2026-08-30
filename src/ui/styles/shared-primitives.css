@@ -44,6 +44,30 @@
 		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
 }
 
+.ak-line-input[data-ui-input-state="available"] {
+	background-color: var(--ak-list-row-active-surface);
+}
+
+.ak-line-input[data-ui-input-state="delivery"] {
+	background-color: var(--ak-line-input-delivery-surface);
+}
+
+.ak-line-input[data-ui-input-state="empty"] {
+	background-color: transparent;
+}
+
+.ak-line-input[data-ui-input-state="stored"] {
+	background-color: var(--ak-list-row-active-progress-surface);
+}
+
+.ak-line-input[data-ui-surface-suppressed="true"] {
+	background-color: transparent;
+}
+
+.ak-line-input-quantity[data-ui-delivery="true"] {
+	opacity: 0.7;
+}
+
 .ak-list-row-selected {
 	color: var(--ak-list-row-selected-foreground);
 	background-color: var(--ak-list-row-selected-surface);

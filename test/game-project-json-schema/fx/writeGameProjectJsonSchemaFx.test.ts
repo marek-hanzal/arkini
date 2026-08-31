@@ -4,8 +4,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { z } from "zod";
 
-import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
-import { writeGameProjectJsonSchemaFx } from "~/game-config/source/json-schema/writeGameProjectJsonSchemaFx";
+import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
+import { writeGameProjectJsonSchemaFx } from "~/game-project-json-schema/fx/writeGameProjectJsonSchemaFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { expectNamedJsonSchemaGraph } from "~test/support/schema/expectNamedJsonSchemaGraph";
 

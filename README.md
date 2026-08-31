@@ -67,6 +67,7 @@ src/game-config  authored value/config schemas, source admission, diagnostics an
 src/game-config-cli  schema generation and completed-project validation commands
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
 src/game-config-resource  authored resource schemas, references, source discovery, usage and rename semantics
+src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation
 src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows

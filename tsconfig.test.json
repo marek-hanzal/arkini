@@ -60,6 +60,7 @@
 		"src/game-config-cli",
 		"src/game-config-compiler",
 		"src/game-config-resource",
+		"src/game-project-json-schema",
 		"src/arkpack",
 		"src/asset-authoring",
 		"src/editor-build",

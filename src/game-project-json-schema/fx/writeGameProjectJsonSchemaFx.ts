@@ -1,7 +1,7 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
+import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
 
 export namespace writeGameProjectJsonSchemaFx {
 	export interface Props {

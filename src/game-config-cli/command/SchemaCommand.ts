@@ -1,6 +1,6 @@
 import { Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
-import { writeGameProjectJsonSchemaFx } from "~/game-config/source/json-schema/writeGameProjectJsonSchemaFx";
+import { writeGameProjectJsonSchemaFx } from "~/game-project-json-schema/fx/writeGameProjectJsonSchemaFx";
 
 export namespace SchemaCommand {
 	export interface Props {

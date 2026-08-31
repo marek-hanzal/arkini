@@ -9,7 +9,7 @@ import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
+import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
 import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";

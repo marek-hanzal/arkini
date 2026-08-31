@@ -29,7 +29,7 @@ export interface ServerOwnership {
 	readonly readProjectContext: () => string | undefined;
 	readonly setProjectContext: (
 		projectId: string,
-		requestVersionCheckoutFx?: (versionId: string) => Effect.Effect<void, unknown>,
+		requestVersionCheckoutFx?: (versionId: string) => Effect.Effect<void, unknown, never>,
 	) => void;
 	readonly clearProjectContext: (projectId: string) => void;
 	readonly resetProjectContext: () => void;
@@ -45,7 +45,9 @@ export namespace createEditorMcpOwnershipFx {
 		readonly notifyOverviewChanged: (overview: EditorMcpOverviewSchema.Type) => void;
 		readonly notifyProjectChanged: (projectId: string) => void;
 		readonly storage: McpStorage;
-		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
+		readonly runPromise: <Value, Error>(
+			effect: Effect.Effect<Value, Error, never>,
+		) => Promise<Value>;
 		readonly tunnel: McpTunnel;
 	}
 }
@@ -76,7 +78,9 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	};
 	let tunnelSession: McpTunnelSession | undefined;
 	let projectContext: string | undefined;
-	let versionCheckoutRequestFx: ((versionId: string) => Effect.Effect<void, unknown>) | undefined;
+	let versionCheckoutRequestFx:
+		| ((versionId: string) => Effect.Effect<void, unknown, never>)
+		| undefined;
 	const commandLock = yield* Semaphore.make(1);
 	const httpListener = yield* createHttpListenerOwnershipFx({
 		editor,

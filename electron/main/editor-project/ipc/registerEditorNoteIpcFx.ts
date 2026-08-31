@@ -42,7 +42,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 		Effect.sync(() => {
 			const handle = <Value>(
 				channel: string,
-				run: (candidate: unknown) => Effect.Effect<Value>,
+				run: (candidate: unknown) => Effect.Effect<Value, never, never>,
 			) =>
 				ipcMain.handle(channel, (event: IpcMainInvokeEvent, candidate) =>
 					ElectronMainRuntime.runPromise(

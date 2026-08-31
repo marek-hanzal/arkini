@@ -14,7 +14,7 @@ export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unk
 	readonly key: string;
 	readonly action: ItemDetailPendingAction;
 	readonly failureMessage: string;
-	readonly run: Effect.Effect<Result, Failure>;
+	readonly run: Effect.Effect<Result, Failure, never>;
 }
 
 export type ItemDetailTarget =

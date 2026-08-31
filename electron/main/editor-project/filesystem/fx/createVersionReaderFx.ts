@@ -14,7 +14,7 @@ export namespace createVersionReaderFx {
 	export interface Props {
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 	}
 }
 

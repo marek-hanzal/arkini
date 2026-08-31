@@ -153,7 +153,7 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseCreateProjectFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.CreateProjectProps, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectRepository.CreateProjectProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("create-project", createProjectSchema, candidate),
 			parseProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
@@ -167,19 +167,26 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseDeleteItemFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.DeleteItemProps, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectRepository.DeleteItemProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("delete-item", deleteItemSchema, candidate),
 			parseDeleteResourceFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.DeleteResourceProps, ProjectRepositoryError> =>
-				parseEditorProjectIpcRequestFx("delete-resource", deleteResourceSchema, candidate),
+			): Effect.Effect<
+				ProjectRepository.DeleteResourceProps,
+				ProjectRepositoryError,
+				never
+			> => parseEditorProjectIpcRequestFx("delete-resource", deleteResourceSchema, candidate),
 			parseReplaceConfigFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.ReplaceConfigProps, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectRepository.ReplaceConfigProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("replace-config", replaceConfigSchema, candidate),
 			parseReplaceResourceFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.ReplaceResourceProps, ProjectRepositoryError> =>
+			): Effect.Effect<
+				ProjectRepository.ReplaceResourceProps,
+				ProjectRepositoryError,
+				never
+			> =>
 				parseEditorProjectIpcRequestFx(
 					"replace-resource",
 					replaceResourceSchema,
@@ -187,15 +194,19 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseSaveResourceFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.SaveResourceProps, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectRepository.SaveResourceProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("save-resource", saveResourceSchema, candidate),
 			parseUpsertItemFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.UpsertItemProps, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectRepository.UpsertItemProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("upsert-item", upsertItemSchema, candidate),
 			parseUpsertResourcesFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectRepository.UpsertResourcesProps, ProjectRepositoryError> =>
+			): Effect.Effect<
+				ProjectRepository.UpsertResourcesProps,
+				ProjectRepositoryError,
+				never
+			> =>
 				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
 			parseVersionStatusProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-version-status", IdSchema, candidate),
@@ -203,11 +214,11 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("list-versions", IdSchema, candidate),
 			parseVersionCommitFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectVersionCommitInput, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionCommitInput, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("create-version", versionCommitSchema, candidate),
 			parseVersionCheckoutFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectVersionCheckoutInput, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionCheckoutInput, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx(
 					"checkout-version",
 					versionCheckoutSchema,
@@ -215,11 +226,11 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseVersionTagFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectVersionTagInput, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionTagInput, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("update-version-tag", versionTagSchema, candidate),
 			parseVersionDiffFx: (
 				candidate: unknown,
-			): Effect.Effect<ProjectVersionDiffInput, ProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionDiffInput, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("diff-versions", versionDiffSchema, candidate),
 		} as const),
 );

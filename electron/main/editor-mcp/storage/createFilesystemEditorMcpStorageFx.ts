@@ -277,7 +277,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 				}),
 			),
 		);
-	const runPromise = <Value>(effect: Effect.Effect<Value, unknown>) =>
+	const runPromise = <Value>(effect: Effect.Effect<Value, unknown, never>) =>
 		ElectronMainRuntime.runPromise(effect);
 	const model: OAuthServerModel = {
 		async getClient(clientId) {

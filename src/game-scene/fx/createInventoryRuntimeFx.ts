@@ -76,7 +76,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 	let closed = false;
 	const pendingProjectionResumes = new Set<() => void>();
 	const processedFeedbackKeys = new Set<string>();
-	const ignoreCleanupFailure = (cleanupFx: Effect.Effect<void>) =>
+	const ignoreCleanupFailure = (cleanupFx: Effect.Effect<void, never, never>) =>
 		cleanupFx.pipe(Effect.catchCause(() => Effect.void));
 	const closeFx = Effect.gen(function* () {
 		if (closed) return;

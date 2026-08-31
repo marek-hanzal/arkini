@@ -10,7 +10,7 @@ import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 interface Props<Error = unknown> {
 	debounceMs?: number;
 	onFatalError?: (cause: Cause.Cause<Error>) => void;
-	save: (state: StateSchema.Type) => Effect.Effect<void, Error>;
+	save: (state: StateSchema.Type) => Effect.Effect<void, Error, never>;
 }
 
 /**

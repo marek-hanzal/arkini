@@ -129,7 +129,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 			const awaitNativeConfirmationFx = (
 				request: PendingRequest,
 				expected: NativeConfirmation,
-			): Effect.Effect<void> =>
+			): Effect.Effect<void, never, never> =>
 				Effect.gen(function* () {
 					while ((yield* Queue.take(request.nativeConfirmations)) !== expected) {
 						// Electron can still deliver a superseded transition's native event.

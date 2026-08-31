@@ -138,7 +138,7 @@ export const registerGameplayDesignTools = ({
 	readonly notifyProjectChanged: (projectId: string) => void;
 	readonly readProjectFx: () => Effect.Effect<Project, unknown, never>;
 	readonly repository: ProjectRepositoryService;
-	readonly runTool: (effect: Effect.Effect<string, unknown>) => Promise<ToolResult>;
+	readonly runTool: (effect: Effect.Effect<string, unknown, never>) => Promise<ToolResult>;
 	readonly server: McpServer;
 }) => {
 	server.registerTool(

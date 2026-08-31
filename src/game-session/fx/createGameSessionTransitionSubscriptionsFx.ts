@@ -8,19 +8,19 @@ import {
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 export interface GameSessionTransitionSubscriptionCleanup {
-	readonly close: Effect.Effect<void>;
+	readonly close: Effect.Effect<void, never, never>;
 }
 
 interface GameSessionTransitionSubscriptions {
 	readonly subscribe: (
 		listener: () => void | PromiseLike<void>,
-	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup>;
+	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup, never, never>;
 	readonly subscribeTransitions: (
 		listener: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
-	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup>;
+	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup, never, never>;
 	readonly subscribeEvents: (
 		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
-	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup>;
+	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup, never, never>;
 }
 
 namespace openGameSessionTransitionSubscriptionFx {
@@ -28,7 +28,7 @@ namespace openGameSessionTransitionSubscriptionFx {
 		readonly committedTransitions: CommittedTransitionsFxService;
 		readonly delivery: (
 			changes: Stream.Stream<CommittedTransitionSchema.Type>,
-		) => Effect.Effect<void, unknown>;
+		) => Effect.Effect<void, unknown, never>;
 		readonly sessionScope: Scope.Scope;
 		readonly onFatalError: (cause: unknown) => void;
 	}

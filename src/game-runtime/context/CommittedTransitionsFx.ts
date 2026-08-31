@@ -4,7 +4,7 @@ import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedT
 
 export interface CommittedTransitionsFxService {
 	/** Latest exact canonical committed transition. */
-	readonly read: Effect.Effect<CommittedTransitionSchema.Type>;
+	readonly read: Effect.Effect<CommittedTransitionSchema.Type, never, never>;
 	/** Synchronous snapshot reserved for explicitly synchronous renderer boundaries. */
 	readonly readUnsafe: () => CommittedTransitionSchema.Type;
 	/** Replays the latest transition, then every later commit exactly once and in order. */

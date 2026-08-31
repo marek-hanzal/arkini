@@ -73,7 +73,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				};
 				const runAuthorized = <Value, Error>(
 					event: IpcMainInvokeEvent,
-					operation: Effect.Effect<Value, Error>,
+					operation: Effect.Effect<Value, Error, never>,
 				) =>
 					ElectronMainRuntime.runPromise(
 						trustedRenderer

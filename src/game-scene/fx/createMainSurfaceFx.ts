@@ -150,7 +150,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 
 			const readTargetFactsFromTarget = (
 				target: PixiSceneDropTarget | null,
-			): Effect.Effect<TargetFacts> =>
+			): Effect.Effect<TargetFacts, never, never> =>
 				Effect.gen(function* () {
 					if (target === null) {
 						return {

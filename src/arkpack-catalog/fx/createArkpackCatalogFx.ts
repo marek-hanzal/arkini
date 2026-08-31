@@ -68,8 +68,8 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 				}),
 			);
 			const runCatalogOperationFx = <Result>(
-				operationFx: Effect.Effect<Result, unknown>,
-				admissionFx: Effect.Effect<void, unknown> = Effect.void,
+				operationFx: Effect.Effect<Result, unknown, never>,
+				admissionFx: Effect.Effect<void, unknown, never> = Effect.void,
 				publishLoading = true,
 			) =>
 				lock.withPermits(1)(

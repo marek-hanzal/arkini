@@ -17,7 +17,7 @@ export namespace acquireGameEngineResourceFx {
 }
 
 const discardFailedAcquisitionFx = Effect.fn("discardFailedAcquisitionFx")(
-	(game: Game, acquisitionCause: Cause.Cause<unknown>): Effect.Effect<never, unknown> =>
+	(game: Game, acquisitionCause: Cause.Cause<unknown>): Effect.Effect<never, unknown, never> =>
 		Effect.exit(game.disposeWithoutSaveFx).pipe(
 			Effect.flatMap((disposeExit) =>
 				Effect.gen(function* () {
@@ -81,5 +81,5 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 					}),
 				),
 			),
-		) satisfies Effect.Effect<InstalledGameEngineResource, unknown>,
+		) satisfies Effect.Effect<InstalledGameEngineResource, unknown, never>,
 );

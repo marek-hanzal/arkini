@@ -297,7 +297,7 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 			const prepareEditorHandoffFx: GameEngineResourceFxService["prepareEditorHandoffFx"] =
 				Effect.fn("GameEngineResourceFx.prepareEditorHandoffFx")(() =>
 					Effect.suspend(() => {
-						const retryAfterFx = (operationFx: Effect.Effect<void, unknown>) =>
+						const retryAfterFx = (operationFx: Effect.Effect<void, unknown, never>) =>
 							Effect.exit(operationFx).pipe(Effect.andThen(prepareEditorHandoffFx));
 						return withLifecycleLockFx(
 							Ref.get(stateRef).pipe(
@@ -350,18 +350,20 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 						true,
 					),
 				).pipe(
-					Effect.flatMap((exit): Effect.Effect<GameEngineResourceFx.CloseResult> => {
-						if (Exit.isSuccess(exit)) {
+					Effect.flatMap(
+						(exit): Effect.Effect<GameEngineResourceFx.CloseResult, never, never> => {
+							if (Exit.isSuccess(exit)) {
+								return Effect.succeed({
+									type: "saved",
+								});
+							}
+							const failure = readExactCauseFailureFn(exit.cause);
 							return Effect.succeed({
-								type: "saved",
+								type: "finalization-failed" as const,
+								cause: Option.isSome(failure) ? failure.value : exit.cause,
 							});
-						}
-						const failure = readExactCauseFailureFn(exit.cause);
-						return Effect.succeed({
-							type: "finalization-failed" as const,
-							cause: Option.isSome(failure) ? failure.value : exit.cause,
-						});
-					}),
+						},
+					),
 				),
 			);
 

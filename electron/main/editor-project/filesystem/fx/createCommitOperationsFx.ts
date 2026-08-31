@@ -78,7 +78,7 @@ export namespace createCommitOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 		readonly states: Map<string, ProjectState>;
 	}
 }
@@ -341,7 +341,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ResourceSchema.Type>;
 			},
-			ProjectRepositoryError
+			ProjectRepositoryError,
+			never
 		>,
 	) =>
 		Effect.gen(function* () {

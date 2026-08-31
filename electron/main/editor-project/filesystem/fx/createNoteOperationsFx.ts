@@ -40,7 +40,7 @@ export namespace createNoteOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 		readonly states: Map<string, ProjectState>;
 	}
 }

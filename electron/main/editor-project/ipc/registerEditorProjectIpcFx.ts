@@ -66,7 +66,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 			yield* Effect.sync(() => {
 				const runAuthorized = <Value>(
 					event: IpcMainInvokeEvent,
-					operation: Effect.Effect<Value>,
+					operation: Effect.Effect<Value, never, never>,
 				) =>
 					ElectronMainRuntime.runPromise(
 						trustedRenderer
@@ -75,7 +75,10 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					);
 				const handle = <Value>(
 					channel: string,
-					run: (event: IpcMainInvokeEvent, candidate: unknown) => Effect.Effect<Value>,
+					run: (
+						event: IpcMainInvokeEvent,
+						candidate: unknown,
+					) => Effect.Effect<Value, never, never>,
 				) =>
 					ipcMain.handle(channel, (event, candidate) =>
 						runAuthorized(event, run(event, candidate)),

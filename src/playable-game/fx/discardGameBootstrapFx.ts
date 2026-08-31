@@ -4,7 +4,7 @@ import type { GameSession } from "~/game-session/type/GameSession";
 
 /** Discards a session plus any resources allocated before a Game could be published. */
 export const discardGameBootstrapFx = Effect.fn("discardGameBootstrapFx")(
-	(session: GameSession, releaseResourcesFx: Effect.Effect<void, unknown>) =>
+	(session: GameSession, releaseResourcesFx: Effect.Effect<void, unknown, never>) =>
 		session.disposeWithoutSaveFx.pipe(
 			Effect.ignore,
 			Effect.andThen(releaseResourcesFx),

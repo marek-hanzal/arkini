@@ -12,12 +12,12 @@ import type {
 export const executeEditorProjectRepositoryFx = <Request, Value>(
 	operation: EditorProjectTransport.Operation,
 	ownership: EditorProjectServiceOwnership,
-	requestFx: Effect.Effect<Request, ProjectRepositoryError>,
+	requestFx: Effect.Effect<Request, ProjectRepositoryError, never>,
 	run: (
 		repository: OwnedEditorProjectRepository,
 		request: Request,
-	) => Effect.Effect<Value, ProjectRepositoryError>,
-): Effect.Effect<EditorProjectTransport.Result<Value>> =>
+	) => Effect.Effect<Value, ProjectRepositoryError, never>,
+): Effect.Effect<EditorProjectTransport.Result<Value>, never, never> =>
 	requestFx.pipe(
 		Effect.flatMap((request) =>
 			ownership.type === "unavailable"

@@ -95,7 +95,9 @@ export namespace createRemoteHandlerFx {
 		readonly storage: Pick<McpStorage, "model" | "verifySecretFx">;
 		readonly mcpHandler: (request: IncomingMessage, response: ServerResponse) => void;
 		readonly origin: URL;
-		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
+		readonly runPromise: <Value, Error>(
+			effect: Effect.Effect<Value, Error, never>,
+		) => Promise<Value>;
 	}
 }
 

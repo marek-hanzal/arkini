@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 // @vitest-environment jsdom
 
-import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -24,7 +24,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	return {
 		...original,
 		Outlet: () => state.section,
-		useNavigate: () => vi.fn().mockResolvedValue(undefined),
+		useNavigate: () => state.navigate,
 	};
 });
 
@@ -56,6 +56,7 @@ vi.mock("~/ui/button/Button", () => ({
 }));
 
 const state = vi.hoisted(() => ({
+	navigate: vi.fn().mockResolvedValue(undefined),
 	project: undefined as unknown,
 	saveConfig: vi.fn().mockResolvedValue(undefined),
 	section: undefined as ReactNode,
@@ -118,6 +119,7 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project";
 import { EditorProjectBoardSection } from "~/project-authoring/ui/EditorProjectBoardSection";
 import { EditorProjectGeneralSection } from "~/project-authoring/ui/EditorProjectGeneralSection";
+import { useEditorProjectFormSession } from "~/project-authoring/ui/EditorProjectFormContext";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
 
@@ -154,6 +156,35 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("project section form session", () => {
+	it("does not republish the form Context when parent inputs are unchanged", async () => {
+		state.project = {
+			projectId: "project",
+			title: editorTestPayload.config.meta.title,
+			version: editorTestPayload.version,
+			createdAtMs: 1,
+			updatedAtMs: 2,
+			revision: 0,
+			config: editorTestPayload.config,
+			resources: editorTestPayload.resources,
+		} satisfies EditorProject;
+		let consumerRenders = 0;
+		const Probe = memo(() => {
+			useEditorProjectFormSession();
+			consumerRenders += 1;
+			return null;
+		});
+		state.section = <Probe />;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () => root.render(createElement(EditorProjectForm)));
+
+		expect(consumerRenders).toBe(1);
+	});
+
 	it("preserves one local project draft while routed section content changes", async () => {
 		state.project = {
 			projectId: "project",
@@ -181,14 +212,14 @@ describe("project section form session", () => {
 		const compatibility = container.querySelector<HTMLElement>(
 			'[data-ui="EditorCompatibilityNotice"]',
 		);
-		expect(compatibility?.dataset.result).toBe("noop");
+		expect(compatibility?.dataset.uiResult).toBe("noop");
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
 		await changeInput(title, "Changed project");
 		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBe(
 			compatibility,
 		);
-		expect(compatibility?.dataset.result).toBe("minor");
+		expect(compatibility?.dataset.uiResult).toBe("minor");
 		await renderSection(<div data-ui="AppearanceSection">Appearance</div>);
 		await renderSection(<EditorProjectGeneralSection />);
 

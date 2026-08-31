@@ -2,8 +2,8 @@ import { Effect, Layer, ManagedRuntime } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
-import { acquireGameEngineResourceFx } from "~/renderer/game/resource/acquireGameEngineResourceFx";
-import { createGameFx } from "~/renderer/game/createGameFx";
+import { acquireGameEngineResourceFx } from "~/installed-game/fx/acquireGameEngineResourceFx";
+import { createGameFx } from "~/installed-game/fx/createGameFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/renderer/createElectronEditorBuildRepositoryFx";
@@ -13,8 +13,8 @@ import { createEditorBoardGameResourceFx } from "~/board-scenario/session/create
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";
-import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceLayer } from "~/installed-game/layer/GameEngineResourceLayer";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";

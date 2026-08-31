@@ -8,7 +8,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { ActionErrorPage } from "~/launcher/ui/ActionErrorPage";
 import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 

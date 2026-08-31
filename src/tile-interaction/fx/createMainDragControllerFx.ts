@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 import { match } from "ts-pattern";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
-import { removeCheatItemFx as removeEngineCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
+import { removeCheatItemFx as removeEngineCheatItemFx } from "~/game-cheat/fx/removeCheatItemFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";

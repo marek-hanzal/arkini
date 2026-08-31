@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
+import { isInstantGameplayEnabledFn } from "~/game-runtime/read/fn/isInstantGameplayEnabledFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace advanceTemporaryItemDurationsFx {
@@ -17,7 +17,7 @@ export namespace advanceTemporaryItemDurationsFx {
 export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDurationsFx")(
 	function* ({ items, runtime }: advanceTemporaryItemDurationsFx.Props) {
 		let draft = runtime;
-		const instantGameplay = yield* isInstantGameplayEnabledFx({
+		const instantGameplay = isInstantGameplayEnabledFn({
 			runtime,
 		});
 
@@ -36,7 +36,7 @@ export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDu
 				...liveItem,
 				remainingDurationMs: instantGameplay
 					? 0
-					: Math.max(0, liveItem.remainingDurationMs - TickStepMs),
+					: Math.max(0, liveItem.remainingDurationMs - SimulationStepMs),
 			} satisfies RuntimeItemSchema.Type;
 			draft = {
 				...draft,

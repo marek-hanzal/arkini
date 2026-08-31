@@ -7,6 +7,7 @@ import type { OriginFlowDirection, Selection } from "~/flow-canvas/type/Highligh
 import { Canvas } from "~/flow-canvas/ui/Canvas";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 import { useOriginFlow } from "~/flow-canvas/ui/useOriginFlow";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const EmptyFlowBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>> = new Map();
 const EmptyFlowPositions: ReadonlyMap<string, LayoutNode> = new Map();
@@ -106,7 +107,13 @@ export const OriginFlow = ({
 				<div className="grid h-full place-items-center p-8">
 					<div className="flex max-w-md flex-col items-center gap-3 text-center">
 						<FlowStateIcon
-							className={`size-9 ${flowState.status === "error" ? "text-rose-600" : "animate-spin text-violet-700"}`}
+							className="size-9 data-[ui-status=error]:text-rose-600 data-[ui-status=loading]:animate-spin data-[ui-status=loading]:text-violet-700"
+							{...readDataUiFn({
+								dataUi: "EditorOriginFlowStatusIcon",
+								state: {
+									status: flowState.status,
+								},
+							})}
 						/>
 						<strong>
 							{flowState.status === "error" ? "Flow failed" : "Building flow"}

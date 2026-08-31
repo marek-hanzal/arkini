@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFn } from "~/tile-presentation/fn/readTileActorFeedbackCuesFn";

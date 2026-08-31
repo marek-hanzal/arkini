@@ -5,7 +5,7 @@ import { act, createElement, type ReactNode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameMenuControl } from "~/game-menu/type/GameMenuControl";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { GameEngineContext } from "~/game-presentation/context/GameEngineContext";
@@ -13,11 +13,11 @@ import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailContr
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 
-vi.mock("~/engine/item-detail/read/readItemDetailSourcesFx", () => ({
+vi.mock("~/item-detail-read/fx/readItemDetailSourcesFx", () => ({
 	readItemDetailSourcesFx: (props: unknown) => props,
 }));
 
-vi.mock("~/engine/item-detail/fn/resolveItemDetailTargetFn", () => ({
+vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 	resolveItemDetailTargetFn: ({
 		itemId,
 		requestedTab,

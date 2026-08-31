@@ -4,9 +4,9 @@ import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
+import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import {
@@ -17,14 +17,14 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 
 type CloseListener = () => Promise<void>;
 
-const createResource = (packageId: string): GameEngineResource => ({
+const createResource = (packageId: string): InstalledGameEngineResource => ({
 	game: {
 		arkpack: {
 			packageId,
 		},
 		disposeFx: Effect.void,
 		disposeWithoutSaveFx: Effect.void,
-	} as unknown as GameEngineResource["game"],
+	} as unknown as InstalledGameEngineResource["game"],
 	assertUsable: () => undefined,
 	getCriticalFailure: () => null,
 	markCriticalFailure: (operation, cause) =>
@@ -263,7 +263,7 @@ describe("installRendererControlledClose", () => {
 	it("joins pending singleton creation before selecting the exact exit route", async () => {
 		vi.useRealTimers();
 		const resource = createResource("package:pending");
-		const creation = Effect.runSync(Deferred.make<GameEngineResource>());
+		const creation = Effect.runSync(Deferred.make<InstalledGameEngineResource>());
 		const createResourceFx = vi.fn(() => Deferred.await(creation));
 		const { rendererRuntime } = createTestRendererRuntime({
 			createResourceFx,

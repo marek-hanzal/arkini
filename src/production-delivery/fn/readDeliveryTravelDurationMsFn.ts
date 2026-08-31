@@ -1,6 +1,6 @@
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 export namespace readDeliveryTravelDurationMsFn {
 	export interface Props {
@@ -26,5 +26,5 @@ export const readDeliveryTravelDurationMsFn = ({
 	if (!isSameSurface(from, to)) return crossSurfaceDurationMs;
 	const distance = Math.hypot(to.position.x - from.position.x, to.position.y - from.position.y);
 	const duration = Math.max(minimumSameSurfaceDurationMs, distance * millisecondsPerTile);
-	return Math.ceil(duration / TickStepMs) * TickStepMs;
+	return Math.ceil(duration / SimulationStepMs) * SimulationStepMs;
 };

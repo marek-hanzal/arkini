@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { GameTransition } from "~/renderer/game/session/GameSession";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import {
 	flushAfterRender,
 	flushMicrotasks,

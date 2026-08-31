@@ -43,7 +43,7 @@ describe("EditorVersionDiff", () => {
 
 		const markup = renderToStaticMarkup(<EditorVersionDiff diff={diff} />);
 
-		expect(markup.match(/data-bump="major"/g)).toHaveLength(1);
-		expect(markup.match(/data-bump="minor"/g)).toHaveLength(1);
+		expect(markup.match(/data-ui-bump="major"/g)).toHaveLength(1);
+		expect(markup.match(/data-ui-bump="minor"/g)).toHaveLength(1);
 	});
 });

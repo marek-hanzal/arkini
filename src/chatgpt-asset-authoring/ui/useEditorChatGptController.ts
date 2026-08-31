@@ -31,22 +31,24 @@ interface SaveEditorAssetCommandProps {
 	readonly resourceId: string;
 }
 
-interface UseEditorChatGptControllerOutput {
-	readonly candidate?: AssetCandidate;
-	readonly candidateError?: unknown;
-	readonly candidateValidating: boolean;
-	readonly collision: boolean;
-	readonly discard: () => void;
-	readonly error?: unknown;
-	readonly previewUrl?: string;
-	readonly replacementApproved: boolean;
-	readonly resourceId: string;
-	readonly retry: () => void;
-	readonly save: () => Promise<boolean>;
-	readonly saving: boolean;
-	readonly setResourceId: (resourceId: string) => void;
-	readonly surfaceRef: RefObject<HTMLDivElement | null>;
-	readonly viewState: ReturnType<typeof useEditorChatGptSurface>["viewState"];
+export namespace useEditorChatGptController {
+	export interface Output {
+		readonly candidate?: AssetCandidate;
+		readonly candidateError?: unknown;
+		readonly candidateValidating: boolean;
+		readonly collision: boolean;
+		readonly discard: () => void;
+		readonly error?: unknown;
+		readonly previewUrl?: string;
+		readonly replacementApproved: boolean;
+		readonly resourceId: string;
+		readonly retry: () => void;
+		readonly save: () => Promise<boolean>;
+		readonly saving: boolean;
+		readonly setResourceId: (resourceId: string) => void;
+		readonly surfaceRef: RefObject<HTMLDivElement | null>;
+		readonly viewState: ReturnType<typeof useEditorChatGptSurface>["viewState"];
+	}
 }
 
 const toFileFn = (filename: string, bytes: Uint8Array) =>
@@ -83,7 +85,7 @@ const saveEditorAssetCommandAtom = RendererRuntime.runSync(
 );
 
 /** Owns the declarative native surface and one explicit downloaded-asset decision. */
-export const useEditorChatGptController = (): UseEditorChatGptControllerOutput => {
+export const useEditorChatGptController = (): useEditorChatGptController.Output => {
 	const project = useEditorProject();
 	const [candidate, setCandidate] = useState<AssetCandidate>();
 	const candidateRef = useRef(candidate);
@@ -224,7 +226,7 @@ export const useEditorChatGptController = (): UseEditorChatGptControllerOutput =
 		resourceId,
 		result.waiting,
 	]);
-	const save = useCallback(async () => {
+	const save = async () => {
 		if (
 			candidateRef.current === undefined ||
 			candidateValidatingRef.current ||
@@ -240,18 +242,11 @@ export const useEditorChatGptController = (): UseEditorChatGptControllerOutput =
 			return false;
 		}
 		return persist();
-	}, [
-		collision,
-		persist,
-		project.revision,
-		replacementApproved,
-		resourceId,
-		result.waiting,
-	]);
-	const setResourceId = useCallback((next: string) => {
+	};
+	const setResourceId = (next: string) => {
 		setResourceIdState(next);
 		setReplacementApproval(undefined);
-	}, []);
+	};
 	useEditorUnsavedChangesRegistration({
 		discard,
 		id: `chatgpt-download:${project.projectId}`,

@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 
 import {
 	createGame,

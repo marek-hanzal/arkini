@@ -5,14 +5,14 @@ import { describe, expect, it } from "@effect/vitest";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { GameLoopFx } from "~/game-tick/service/GameLoopFx";
 import { GameLoopLayerFx } from "~/game-tick/layer/GameLoopLayerFx";
-import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
+import { GameSessionLayerFx } from "~/game-session/layer/GameSessionLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { TickFx } from "~/game-tick/service/TickFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createTickFailureTestConfig } from "~test/game-tick/support/createTickFailureTestConfig";
 
 describe("GameLoopLayerFx", () => {
@@ -72,14 +72,14 @@ describe("GameLoopLayerFx", () => {
 			});
 			yield* Effect.yieldNow;
 
-			yield* TestClock.adjust(TickStepMs * 2 - 1);
+			yield* TestClock.adjust(SimulationStepMs * 2 - 1);
 			const beforeBoundary = yield* readRuntimeFx();
 			const transitionBeforeBoundary = yield* (yield* CommittedTransitionsFx).read;
 			yield* TestClock.adjust(1);
 			const atBoundary = yield* readRuntimeFx();
 			const transitionAtBoundary = yield* (yield* CommittedTransitionsFx).read;
 
-			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(TickStepMs);
+			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(SimulationStepMs);
 			expect(beforeBoundary.items.some((item) => item.item.id === "inventoryOutput")).toBe(
 				false,
 			);

@@ -1,6 +1,6 @@
 import { Effect, Result } from "effect";
 
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
 import { planStartFx } from "~/game-start/fx/planStartFx";

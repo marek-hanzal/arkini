@@ -1,5 +1,5 @@
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";

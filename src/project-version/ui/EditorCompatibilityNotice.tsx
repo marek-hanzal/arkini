@@ -3,6 +3,7 @@ import { GitCompareArrows } from "lucide-react";
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
 import type { EditorProjectCompatibility } from "~/project-version/type/EditorProjectCompatibility";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export const EditorCompatibilityNotice = ({
 	compatibility,
@@ -16,23 +17,24 @@ export const EditorCompatibilityNotice = ({
 	const presentation =
 		result === "major"
 			? {
-					className: "border-danger bg-danger/5",
 					title: "Breaking gameplay change",
 				}
 			: result === "minor"
 				? {
-						className: "border-success bg-success/5",
 						title: "Save-compatible change",
 					}
 				: {
-						className: "border-line-strong bg-surface-raised/45",
 						title: "No gameplay change",
 					};
 	return (
 		<aside
-			className={`flex items-center gap-2 rounded-xl border-l-2 px-4 py-3 text-sm ${presentation.className}`}
-			data-result={result}
-			data-ui="EditorCompatibilityNotice"
+			className="flex items-center gap-2 rounded-xl border-l-2 px-4 py-3 text-sm data-[ui-result=major]:border-danger data-[ui-result=major]:bg-danger/5 data-[ui-result=minor]:border-success data-[ui-result=minor]:bg-success/5 data-[ui-result=noop]:border-line-strong data-[ui-result=noop]:bg-surface-raised/45"
+			{...readDataUiFn({
+				dataUi: "EditorCompatibilityNotice",
+				state: {
+					result,
+				},
+			})}
 		>
 			<GitCompareArrows className="size-4 shrink-0" />
 			<p className="min-w-0 truncate font-semibold">

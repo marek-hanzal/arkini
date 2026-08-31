@@ -7,25 +7,10 @@ const laneGap = 22;
 const readWorkingCopyState = (status: EditorProjectVersionStatus) =>
 	status.currentBaseVersionId === undefined ? "unversioned" : status.dirty ? "dirty" : "clean";
 
-const WorkingCopyPresentation = {
-	clean: {
-		backgroundClassName: "bg-success/10",
-		dotClassName: "bg-success",
-		label: "Clean",
-		textClassName: "text-success",
-	},
-	dirty: {
-		backgroundClassName: "bg-warning/12",
-		dotClassName: "bg-warning",
-		label: "Dirty",
-		textClassName: "text-warning",
-	},
-	unversioned: {
-		backgroundClassName: "bg-surface-raised/65",
-		dotClassName: "bg-muted",
-		label: "Unversioned",
-		textClassName: "text-muted",
-	},
+const WorkingCopyLabel = {
+	clean: "Clean",
+	dirty: "Dirty",
+	unversioned: "Unversioned",
 } as const;
 
 const VersionRails = ({
@@ -100,7 +85,7 @@ export const EditorVersionGraph = ({
 	readonly selectedReference: string;
 	readonly status: EditorProjectVersionStatus;
 }) => {
-	const workingCopy = WorkingCopyPresentation[readWorkingCopyState(status)];
+	const workingCopyStatus = readWorkingCopyState(status);
 	return (
 		<div
 			className="grid content-start"
@@ -108,12 +93,13 @@ export const EditorVersionGraph = ({
 		>
 			<button
 				type="button"
-				className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10 ${workingCopy.backgroundClassName}`}
+				className="group flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left enabled:hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10! data-[ui-status=clean]:bg-success/10 data-[ui-status=dirty]:bg-warning/12 data-[ui-status=unversioned]:bg-surface-raised/65"
 				onClick={onSelectWorkingCopy}
 				{...readDataUiFn({
 					dataUi: "EditorVersionWorkingCopy",
 					state: {
 						selected: selectedReference === "current",
+						status: workingCopyStatus,
 					},
 				})}
 			>
@@ -124,7 +110,7 @@ export const EditorVersionGraph = ({
 					}}
 				>
 					<div
-						className={`absolute top-[22px] h-2.5 w-2.5 rounded-full ${workingCopy.dotClassName}`}
+						className="absolute top-[22px] h-2.5 w-2.5 rounded-full group-data-[ui-status=clean]:bg-success group-data-[ui-status=dirty]:bg-warning group-data-[ui-status=unversioned]:bg-muted"
 						style={{
 							left: 6 + layout.workingCopyLane * laneGap,
 						}}
@@ -140,8 +126,8 @@ export const EditorVersionGraph = ({
 				</div>
 				<div className="min-w-0">
 					<div className="font-semibold">Working copy</div>
-					<div className={`text-xs font-medium ${workingCopy.textClassName}`}>
-						{workingCopy.label}
+					<div className="text-xs font-medium group-data-[ui-status=clean]:text-success group-data-[ui-status=dirty]:text-warning group-data-[ui-status=unversioned]:text-muted">
+						{WorkingCopyLabel[workingCopyStatus]}
 					</div>
 				</div>
 			</button>

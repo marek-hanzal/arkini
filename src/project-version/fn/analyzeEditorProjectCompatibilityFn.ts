@@ -43,26 +43,26 @@ const missingDiffValue: MissingDiffValue = {
 	type: "missing",
 };
 
-const presentDiffValue = (value: unknown): PresentDiffValue => ({
+const presentDiffValueFn = (value: unknown): PresentDiffValue => ({
 	type: "present",
 	value,
 });
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
+const isRecordFn = (value: unknown): value is Record<string, unknown> =>
 	typeof value === "object" && value !== null && !Array.isArray(value);
 
-const asRecord = (value: object): Record<string, unknown> =>
+const asRecordFn = (value: object): Record<string, unknown> =>
 	Object.fromEntries(Object.entries(value));
 
-const readObjectValue = (value: Record<string, unknown>, key: string): DiffValue =>
+const readObjectValueFn = (value: Record<string, unknown>, key: string): DiffValue =>
 	Object.hasOwn(value, key) && value[key] !== undefined
-		? presentDiffValue(value[key])
+		? presentDiffValueFn(value[key])
 		: missingDiffValue;
 
-const readSemanticValue = (value: DiffValue, path: EditorProjectCompatibilityPath): DiffValue => {
+const readSemanticValueFn = (value: DiffValue, path: EditorProjectCompatibilityPath): DiffValue => {
 	if (value.type === "present") return value;
 	if (path.length === 2 && path[0] === "meta" && path[1] === "toolbarSize")
-		return presentDiffValue(0);
+		return presentDiffValueFn(0);
 	if (
 		path.length === 4 &&
 		path[0] === "start" &&
@@ -70,11 +70,11 @@ const readSemanticValue = (value: DiffValue, path: EditorProjectCompatibilityPat
 		typeof path[2] === "number" &&
 		path[3] === "quantity"
 	)
-		return presentDiffValue(1);
+		return presentDiffValueFn(1);
 	return value;
 };
 
-const createLeafDiff = (
+const createLeafDiffFn = (
 	before: DiffValue,
 	after: DiffValue,
 	path: EditorProjectCompatibilityPath,
@@ -108,17 +108,17 @@ const createLeafDiff = (
 	];
 };
 
-const readValueDiffs = (
+const readValueDiffsFn = (
 	before: DiffValue,
 	after: DiffValue,
 	path: EditorProjectCompatibilityPath,
 ): ReadonlyArray<EditorProjectSemanticDiff> => {
-	before = readSemanticValue(before, path);
-	after = readSemanticValue(after, path);
+	before = readSemanticValueFn(before, path);
+	after = readSemanticValueFn(after, path);
 	if (before.type === "missing" || after.type === "missing")
-		return createLeafDiff(before, after, path);
-	if (isRecord(before.value) && isRecord(after.value))
-		return readRecordDiffs(before.value, after.value, path);
+		return createLeafDiffFn(before, after, path);
+	if (isRecordFn(before.value) && isRecordFn(after.value))
+		return readRecordDiffsFn(before.value, after.value, path);
 	if (Array.isArray(before.value) && Array.isArray(after.value)) {
 		const beforeArray = before.value;
 		const afterArray = after.value;
@@ -128,12 +128,12 @@ const readValueDiffs = (
 				length,
 			},
 			(_unused, index) =>
-				readValueDiffs(
+				readValueDiffsFn(
 					index < beforeArray.length
-						? presentDiffValue(beforeArray[index])
+						? presentDiffValueFn(beforeArray[index])
 						: missingDiffValue,
 					index < afterArray.length
-						? presentDiffValue(afterArray[index])
+						? presentDiffValueFn(afterArray[index])
 						: missingDiffValue,
 					[
 						...path,
@@ -142,10 +142,10 @@ const readValueDiffs = (
 				),
 		).flat();
 	}
-	return createLeafDiff(before, after, path);
+	return createLeafDiffFn(before, after, path);
 };
 
-const readRecordDiffs = (
+const readRecordDiffsFn = (
 	before: Record<string, unknown>,
 	after: Record<string, unknown>,
 	path: EditorProjectCompatibilityPath,
@@ -160,13 +160,13 @@ const readRecordDiffs = (
 		.filter((key) => !omittedKeys.has(key))
 		.sort()
 		.flatMap((key) =>
-			readValueDiffs(readObjectValue(before, key), readObjectValue(after, key), [
+			readValueDiffsFn(readObjectValueFn(before, key), readObjectValueFn(after, key), [
 				...path,
 				key,
 			]),
 		);
 
-const readLines = (item: ItemSchema.Type): ReadonlyArray<LineSchema.Type> => {
+const readLinesFn = (item: ItemSchema.Type): ReadonlyArray<LineSchema.Type> => {
 	if ("lines" in item) return item.lines ?? [];
 	if ("line" in item)
 		return [
@@ -175,13 +175,13 @@ const readLines = (item: ItemSchema.Type): ReadonlyArray<LineSchema.Type> => {
 	return [];
 };
 
-const readLineDiffs = (
+const readLineDiffsFn = (
 	itemId: string,
 	before: ItemSchema.Type,
 	after: ItemSchema.Type,
 ): ReadonlyArray<EditorProjectSemanticDiff> => {
-	const beforeLines = readLines(before);
-	const afterLines = readLines(after);
+	const beforeLines = readLinesFn(before);
+	const afterLines = readLinesFn(after);
 	const beforeById = new Map(
 		beforeLines.map((line) => [
 			line.id,
@@ -210,10 +210,10 @@ const readLineDiffs = (
 			lineId,
 		];
 		if (beforeLine === undefined)
-			return createLeafDiff(missingDiffValue, presentDiffValue(afterLine), path);
+			return createLeafDiffFn(missingDiffValue, presentDiffValueFn(afterLine), path);
 		if (afterLine === undefined)
-			return createLeafDiff(presentDiffValue(beforeLine), missingDiffValue, path);
-		return readRecordDiffs(asRecord(beforeLine), asRecord(afterLine), path);
+			return createLeafDiffFn(presentDiffValueFn(beforeLine), missingDiffValue, path);
+		return readRecordDiffsFn(asRecordFn(beforeLine), asRecordFn(afterLine), path);
 	});
 	const beforeOrder = beforeLines.map(({ id }) => id);
 	const afterOrder = afterLines.map(({ id }) => id);
@@ -239,7 +239,7 @@ const readLineDiffs = (
 		: diffs;
 };
 
-const readItemDiffs = (
+const readItemDiffsFn = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
 ): ReadonlyArray<EditorProjectSemanticDiff> => {
@@ -272,21 +272,21 @@ const readItemDiffs = (
 				itemId,
 			];
 			if (beforeItem === undefined)
-				return createLeafDiff(missingDiffValue, presentDiffValue(afterItem), path);
+				return createLeafDiffFn(missingDiffValue, presentDiffValueFn(afterItem), path);
 			if (afterItem === undefined)
-				return createLeafDiff(presentDiffValue(beforeItem), missingDiffValue, path);
+				return createLeafDiffFn(presentDiffValueFn(beforeItem), missingDiffValue, path);
 			const omittedLineKeys: ReadonlySet<string> = new Set([
 				"line",
 				"lines",
 			]);
 			return [
-				...readRecordDiffs(
-					asRecord(beforeItem),
-					asRecord(afterItem),
+				...readRecordDiffsFn(
+					asRecordFn(beforeItem),
+					asRecordFn(afterItem),
 					path,
 					omittedLineKeys,
 				),
-				...readLineDiffs(itemId, beforeItem, afterItem),
+				...readLineDiffsFn(itemId, beforeItem, afterItem),
 			];
 		});
 };
@@ -300,8 +300,8 @@ const readEditorProjectSemanticDiffsFn = (
 		"items",
 	]);
 	const diffs: ReadonlyArray<EditorProjectSemanticDiff> = [
-		...readRecordDiffs(asRecord(before), asRecord(after), [], omittedItems),
-		...readItemDiffs(before.items, after.items),
+		...readRecordDiffsFn(asRecordFn(before), asRecordFn(after), [], omittedItems),
+		...readItemDiffsFn(before.items, after.items),
 	];
 	return diffs;
 };

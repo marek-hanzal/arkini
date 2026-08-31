@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";

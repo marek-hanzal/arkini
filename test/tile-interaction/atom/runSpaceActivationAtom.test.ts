@@ -3,8 +3,8 @@ import { Effect, Exit } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { GameTransition } from "~/renderer/game/session/GameSession";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";
 
 const runtime = (currentSpace: number): GameTransition["runtime"] => ({

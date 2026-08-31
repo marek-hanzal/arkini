@@ -18,14 +18,16 @@ import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedC
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceLayer } from "~/installed-game/layer/GameEngineResourceLayer";
+import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 export interface TestRendererRuntimeProps {
 	readonly clearSaveFx?: Parameters<typeof GameEngineResourceLayer>[0]["clearSaveFx"];
-	readonly createResourceFx: (packageId: string) => Effect.Effect<GameEngineResource, unknown>;
+	readonly createResourceFx: (
+		packageId: string,
+	) => Effect.Effect<InstalledGameEngineResource, unknown>;
 	readonly editorBuildRepository?: EditorBuildRepositoryService;
 	readonly editorProjectRepository?: EditorProjectRepositoryService;
 }

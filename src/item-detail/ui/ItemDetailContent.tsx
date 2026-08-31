@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { match } from "ts-pattern";
 
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { ItemDefinitionInfoTab } from "~/item-detail/ui/ItemDefinitionInfoTab";
 import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";

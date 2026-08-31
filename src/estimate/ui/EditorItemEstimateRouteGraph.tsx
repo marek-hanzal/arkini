@@ -1,19 +1,19 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorItemEstimateRouteStep } from "~/estimate/type/EditorItemEstimate";
+import type { EstimateRouteStep } from "~/estimate-projection/type/EstimateProjection";
 import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 
-const formatQuantity = (quantity: number) =>
+const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const formatRuntime = (runtimeMs: number) => formatDurationFn(runtimeMs);
+const formatRuntimeFn = (runtimeMs: number) => formatDurationFn(runtimeMs);
 
 type EditorItemEstimateSort = "quantity" | "time";
 
-/** Presents compressed selected-route occurrence groups as compact, navigable item rows. */
+/** Presents the normalized selected-fact route DAG as compact, navigable item rows. */
 export const EditorItemEstimateRouteGraph = ({
 	config,
 	header,
@@ -23,18 +23,17 @@ export const EditorItemEstimateRouteGraph = ({
 	readonly config: EditorProject["config"];
 	readonly header: ReactNode;
 	readonly projectId: string;
-	readonly routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>;
+	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
 	const [sort, setSort] = useState<EditorItemEstimateSort>("time");
-	const requiredByOccurrenceId = new Map<string, Set<string>>();
+	const requiredByFactId = new Map<string, Set<string>>();
 	for (const route of routeSteps)
 		for (const requirement of route.requirements) {
-			if (requirement.acquisitionOccurrenceId === undefined) continue;
+			if (requirement.acquisitionFactId === undefined) continue;
 			const requiredBy =
-				requiredByOccurrenceId.get(requirement.acquisitionOccurrenceId) ??
-				new Set<string>();
+				requiredByFactId.get(requirement.acquisitionFactId) ?? new Set<string>();
 			requiredBy.add(route.factId);
-			requiredByOccurrenceId.set(requirement.acquisitionOccurrenceId, requiredBy);
+			requiredByFactId.set(requirement.acquisitionFactId, requiredBy);
 		}
 	const sortedRouteSteps = [
 		...routeSteps,
@@ -86,7 +85,7 @@ export const EditorItemEstimateRouteGraph = ({
 					return (
 						<article
 							className="ak-list-row ak-list-row-interactive flex min-h-16 min-w-0 items-center justify-between gap-4 rounded-xl p-3 text-sm"
-							key={route.occurrenceId}
+							key={route.factId}
 							{...readDataUiFn({
 								dataUi: "EditorItemEstimateRouteStep",
 								state: {
@@ -112,20 +111,14 @@ export const EditorItemEstimateRouteGraph = ({
 								)}
 								{route.rootQuantity > 0 ? (
 									<p className="mt-1 truncate text-xs text-muted">
-										{formatQuantity(route.rootQuantity)} from authored start
+										{formatQuantityFn(route.rootQuantity)} from authored start
 									</p>
 								) : null}
-								{route.occurrenceCount > 1 ? (
-									<p className="mt-1 truncate text-xs text-muted">
-										{formatQuantity(route.occurrenceCount)} equivalent
-										occurrences
-									</p>
-								) : null}
-								{requiredByOccurrenceId.get(route.occurrenceId)?.size ? (
+								{requiredByFactId.get(route.factId)?.size ? (
 									<p className="mt-1 truncate text-xs text-muted">
 										Required by:{" "}
 										{[
-											...requiredByOccurrenceId.get(route.occurrenceId)!,
+											...requiredByFactId.get(route.factId)!,
 										]
 											.map((factId) => config.items[factId]?.title ?? factId)
 											.sort()
@@ -135,17 +128,15 @@ export const EditorItemEstimateRouteGraph = ({
 							</div>
 							<dl className="pointer-events-none relative z-10 grid shrink-0 gap-1 text-right tabular-nums">
 								<div className="flex items-baseline justify-end gap-1.5">
-									<dt className="text-xs text-muted">
-										{route.occurrenceCount > 1 ? "Quantity each:" : "Quantity:"}
-									</dt>
+									<dt className="text-xs text-muted">Quantity:</dt>
 									<dd className="font-semibold text-foreground">
-										×{formatQuantity(route.quantity)}
+										×{formatQuantityFn(route.quantity)}
 									</dd>
 								</div>
 								<div className="flex items-baseline justify-end gap-1.5">
 									<dt className="text-xs text-muted">Time:</dt>
 									<dd className="font-semibold text-foreground">
-										{formatRuntime(route.durationMs)}
+										{formatRuntimeFn(route.durationMs)}
 									</dd>
 								</div>
 							</dl>

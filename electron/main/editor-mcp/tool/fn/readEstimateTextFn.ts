@@ -4,10 +4,10 @@ import { estimateEditorItemCatalogFn } from "~/estimate/fn/estimateEditorItemCat
 import { selectEditorItemEstimateIndexFn } from "~/estimate/fn/selectEditorItemEstimateIndexFn";
 import type { EstimateInput } from "../EstimateInputSchema";
 
-const formatNumber = (value: number) =>
+const formatNumberFn = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
-const estimateLabel = ({
+const estimateLabelFn = ({
 	runtimeMs,
 	status,
 }: {
@@ -16,10 +16,10 @@ const estimateLabel = ({
 }) => {
 	if (status === "partial") return "Partial";
 	if (status === "unreachable") return "No path";
-	return runtimeMs === undefined ? "—" : `~${formatNumber(runtimeMs / 1_000)} s`;
+	return runtimeMs === undefined ? "—" : `~${formatNumberFn(runtimeMs / 1_000)} s`;
 };
 
-const demandRatioLabel = (demand: number, maximumDemand: number) => {
+const demandRatioLabelFn = (demand: number, maximumDemand: number) => {
 	const percentage = maximumDemand <= 0 ? 0 : (demand / maximumDemand) * 100;
 	if (percentage <= 0.1) return "negligible";
 	return `${Number.isInteger(percentage) ? percentage : percentage.toFixed(1)}%`;
@@ -51,11 +51,11 @@ export const readEstimateTextFn = (project: EditorProject, input: EstimateInput)
 	const hasNextPage = input.page * input.pageSize < rows.length;
 	return [
 		"Global estimate",
-		"Method: approximate scalar authored dependency graph",
+		"Method: approximate bounded-distribution authored dependency graph",
 		"Timing: approximate optimistic parallel critical path",
-		"Route choice: first locally ranked route when each fact becomes reachable; scalar action time with stable route identity ties",
+		"Route choice: complete quantity-aware upstream critical-path cost with stable route identity ties",
 		"Quantity: 1 of every item",
-		"Demand: aggregate approximate route-occurrence quantity across every obtainable item estimate",
+		"Demand: aggregate selected-fact quantity across every obtainable item estimate",
 		`Incomplete only: ${input.incomplete}`,
 		`Sort: ${input.sort}`,
 		...(input.query === undefined
@@ -91,8 +91,8 @@ export const readEstimateTextFn = (project: EditorProject, input: EstimateInput)
 							`- ${item.title}`,
 							`  ID: ${item.id}`,
 							`  Status: ${estimate.status}`,
-							`  Estimate: ${estimateLabel(estimate)}`,
-							`  Demand: ${formatNumber(estimate.demand)} (${demandRatioLabel(estimate.demand, maximumDemand)})`,
+							`  Estimate: ${estimateLabelFn(estimate)}`,
+							`  Demand: ${formatNumberFn(estimate.demand)} (${demandRatioLabelFn(estimate.demand, maximumDemand)})`,
 						].join("\n"),
 					)
 					.join("\n\n"),

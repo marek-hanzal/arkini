@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 
-import type { Game } from "~/renderer/game/Game";
+import type { Game } from "~/installed-game/type/Game";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";

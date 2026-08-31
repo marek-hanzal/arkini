@@ -84,7 +84,7 @@ afterEach(() => {
 	vi.unstubAllGlobals();
 });
 
-describe("importEditorAssetsFx from PNG files", () => {
+describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
 	it("validates, atomically commits and publishes one PNG batch", async () => {
 		const fixture = createFixture();
 		const png = createPng();

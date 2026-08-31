@@ -37,7 +37,7 @@ afterEach(() => {
 	Reflect.deleteProperty(window, "arkini");
 });
 
-describe("createElectronEditorBuildRepositoryFx", () => {
+describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 	it("preserves structured Build diagnostics across the renderer IPC boundary", async () => {
 		const editor = installBuildApi();
 		const diagnostics = [

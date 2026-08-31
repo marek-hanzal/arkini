@@ -47,7 +47,7 @@ afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
 });
 
-describe("editEditorAssetFx", () => {
+describe("Asset Authoring editEditorAssetFx", () => {
 	it("plans the resource replacement from the canonical repository snapshot", async () => {
 		const registry = AtomRegistry.make({
 			scheduleTask,

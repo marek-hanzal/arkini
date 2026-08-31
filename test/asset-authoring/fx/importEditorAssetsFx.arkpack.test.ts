@@ -37,7 +37,7 @@ afterEach(() => {
 	vi.unstubAllGlobals();
 });
 
-describe("importEditorAssetsFx from Arkpack", () => {
+describe("Asset Authoring importEditorAssetsFx from Arkpack", () => {
 	it("upserts only the validated source resources into the current project", async () => {
 		const bytes = createTestArkpack();
 		const registry = AtomRegistry.make({

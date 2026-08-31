@@ -64,8 +64,8 @@ vi.mock("~/item-authoring/ui/useEditorItemByUid", () => ({
 	useEditorItemByUid: () => state.persisted,
 }));
 
-vi.mock("~/asset-authoring/ui/EditorAssetAutocompleteField", () => ({
-	EditorAssetAutocompleteField: ({ label }: { readonly label: string }) =>
+vi.mock("~/authoring-form/ui/AssetAutocompleteField", () => ({
+	AssetAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));
 

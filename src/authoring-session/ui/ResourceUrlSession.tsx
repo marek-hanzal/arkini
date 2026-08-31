@@ -11,7 +11,7 @@ import {
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
-type EditorResource = EditorProject["resources"][number];
+type Resource = EditorProject["resources"][number];
 type ResourceUrlListener = () => void;
 
 interface ResourceUrlEntry {
@@ -20,25 +20,25 @@ interface ResourceUrlEntry {
 	url: string;
 }
 
-interface EditorResourceUrlStore {
+interface ResourceUrlStore {
 	readonly read: (resourceId: string) => string | undefined;
 	readonly subscribe: (resourceId: string, listener: ResourceUrlListener) => () => void;
 	readonly sync: (resources: EditorProject["resources"]) => void;
 	readonly dispose: () => void;
 }
 
-const EditorResourceUrlContext = createContext<EditorResourceUrlStore | undefined>(undefined);
+const ResourceUrlContext = createContext<ResourceUrlStore | undefined>(undefined);
 const emptyResourceUrls: ReadonlyMap<string, string> = new Map();
 
-const EditorResourceUrlProvider = ({
+const ResourceUrlProvider = ({
 	children,
 	resources,
 }: PropsWithChildren<{
 	readonly resources: EditorProject["resources"];
 }>) => {
-	const storeRef = useRef<EditorResourceUrlStore | undefined>(undefined);
+	const storeRef = useRef<ResourceUrlStore | undefined>(undefined);
 	if (storeRef.current === undefined) {
-		let resourcesById = new Map<string, EditorResource>();
+		let resourcesById = new Map<string, Resource>();
 		const entries = new Map<string, ResourceUrlEntry>();
 		const listenersById = new Map<string, Set<ResourceUrlListener>>();
 		const revokeEntry = (resourceId: string) => {
@@ -47,7 +47,7 @@ const EditorResourceUrlProvider = ({
 			entries.delete(resourceId);
 			URL.revokeObjectURL(entry.url);
 		};
-		const createEntry = (resource: EditorResource) => {
+		const createEntry = (resource: Resource) => {
 			const entry: ResourceUrlEntry = {
 				bytes: resource.bytes,
 				mime: resource.mime,
@@ -147,18 +147,18 @@ const EditorResourceUrlProvider = ({
 			store,
 		],
 	);
-	return <EditorResourceUrlContext value={store}>{children}</EditorResourceUrlContext>;
+	return <ResourceUrlContext value={store}>{children}</ResourceUrlContext>;
 };
 
 /** Binds object-URL ownership to the current canonical project snapshot. */
-export const EditorProjectResourceUrlProvider = ({ children }: PropsWithChildren) => {
+export const ProjectResourceUrlProvider = ({ children }: PropsWithChildren) => {
 	const { resources } = useEditorProject();
-	return <EditorResourceUrlProvider resources={resources}>{children}</EditorResourceUrlProvider>;
+	return <ResourceUrlProvider resources={resources}>{children}</ResourceUrlProvider>;
 };
 
 /** Resolves one lazily acquired project-scoped resource URL. */
-export const useEditorResourceUrl = (resourceId: string | undefined) => {
-	const store = useContext(EditorResourceUrlContext);
+export const useResourceUrl = (resourceId: string | undefined) => {
+	const store = useContext(ResourceUrlContext);
 	const [url, setUrl] = useState<string>();
 	useLayoutEffect(() => {
 		if (store === undefined || resourceId === undefined) {
@@ -177,8 +177,8 @@ export const useEditorResourceUrl = (resourceId: string | undefined) => {
 };
 
 /** Resolves only the project-scoped resource URLs requested by one mounted consumer. */
-export const useEditorResourceUrls = (resourceIds: ReadonlyArray<string>) => {
-	const store = useContext(EditorResourceUrlContext);
+export const useResourceUrls = (resourceIds: ReadonlyArray<string>) => {
+	const store = useContext(ResourceUrlContext);
 	const requestedIds = useMemo(
 		() => [
 			...new Set(resourceIds),

@@ -1,6 +1,6 @@
 import { type Dispatch, type SetStateAction, useMemo } from "react";
 
-import { useEditorResourceUrls } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { useResourceUrls } from "~/authoring-session/ui/ResourceUrlSession";
 import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import { readConnectedPortsFn, type ConnectedPorts } from "~/flow-canvas/fn/readConnectedPortsFn";
 import { readOriginFlowBackboneBoundsFn } from "~/flow-canvas/fn/readOriginFlowViewportFn";
@@ -26,7 +26,7 @@ export const useCanvasRenderModel = ({
 			flow.nodes,
 		],
 	);
-	const resourceUrls = useEditorResourceUrls(resourceIds);
+	const resourceUrls = useResourceUrls(resourceIds);
 	const edgeBounds = useMemo(
 		() => readOriginFlowBackboneBoundsFn(backbones),
 		[

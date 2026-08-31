@@ -17,7 +17,7 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
-import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
 import { Status } from "~/ui/ui/Status";
 
@@ -167,7 +167,7 @@ const EditorAssetCard = ({
 	readonly resource: EditorProject["resources"][number];
 }) => {
 	const project = useEditorProject();
-	const url = useEditorResourceUrl(resource.id);
+	const url = useResourceUrl(resource.id);
 	return (
 		<ButtonLink
 			to="/editor/$projectId/assets/$resourceId/detail/overview"

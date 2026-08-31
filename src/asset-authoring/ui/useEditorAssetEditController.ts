@@ -14,7 +14,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
-import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
 interface EditEditorAssetCommandProps {
 	readonly currentId: string;
@@ -83,7 +83,7 @@ export const useEditorAssetEditController = ({
 }: useEditorAssetEditController.Props): useEditorAssetEditController.Output => {
 	const project = useEditorProject();
 	const resource = useEditorAssetById(resourceId);
-	const currentUrl = useEditorResourceUrl(resourceId);
+	const currentUrl = useResourceUrl(resourceId);
 	const navigate = useNavigate();
 	const commandAtom = editEditorAssetCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);

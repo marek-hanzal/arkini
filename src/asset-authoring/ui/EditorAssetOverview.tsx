@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
-import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
 export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: string }) => {
 	const resource = useEditorAssetById(resourceId);
-	const url = useEditorResourceUrl(resourceId);
+	const url = useResourceUrl(resourceId);
 	const [dimensions, setDimensions] = useState<{
 		readonly height: number;
 		readonly url: string;

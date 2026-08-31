@@ -3,7 +3,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RuleSchema as DropRuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import {

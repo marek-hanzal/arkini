@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BoardSchema } from "~/item-definition/query/schema/BoardSchema";
+import { BoardSchema } from "~/item-query/schema/BoardSchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";

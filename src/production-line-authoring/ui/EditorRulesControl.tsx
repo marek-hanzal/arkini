@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";

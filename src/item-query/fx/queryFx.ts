@@ -3,11 +3,11 @@ import { match } from "ts-pattern";
 
 import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
-import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/item-query/error/BoardQueryOriginUnavailableError";
-import { ScopeSchema } from "~/item-definition/query/schema/ScopeSchema";
+import { ScopeSchema } from "~/item-query/schema/ScopeSchema";
 import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";

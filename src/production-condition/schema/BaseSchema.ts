@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
+import { QuerySchema } from "~/item-query/schema/QuerySchema";
 
 /**
  * Fields shared by every item-query condition.

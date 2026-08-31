@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
+import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";

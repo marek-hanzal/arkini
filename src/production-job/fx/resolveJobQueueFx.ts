@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { JobQueueResolutionSchema } from "~/production-job/schema/read/JobQueueResolutionSchema";
+import type { JobQueueResolutionSchema } from "~/production-job/schema/JobQueueResolutionSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

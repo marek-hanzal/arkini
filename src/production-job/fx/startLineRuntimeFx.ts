@@ -10,7 +10,7 @@ import { applyInputRunPlanFx } from "~/production-input/fx/applyInputRunPlanFx";
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
 import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
-import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
+import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";

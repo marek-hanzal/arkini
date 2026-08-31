@@ -5,7 +5,7 @@ import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveInteger
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
-import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
+import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";

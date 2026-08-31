@@ -2,13 +2,13 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
-import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
+import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import {
 	clearItemJobQueueConfig,
 	clearItemJobQueueState,
-} from "~test/production-job/write/clearItemJobQueueFx.test/fixture";
+} from "~test/production-job/fx/clearItemJobQueueFx.test/fixture";
 
 describe("clearItemJobQueueFx", () => {
 	it("clears all and only the owner's pending requests without changing active work", () => {

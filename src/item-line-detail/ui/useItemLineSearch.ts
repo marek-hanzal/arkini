@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 type ItemLineAvailabilityFilter = "available" | "all";

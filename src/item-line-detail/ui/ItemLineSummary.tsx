@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 
-import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import {
 	itemDetailBadgeMotion,

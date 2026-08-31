@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
-import { resolveJobQueueFx } from "~/production-job/fx/read/resolveJobQueueFx";
-import type { JobQueueResolutionSchema } from "~/production-job/schema/read/JobQueueResolutionSchema";
+import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
+import type { JobQueueResolutionSchema } from "~/production-job/schema/JobQueueResolutionSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";

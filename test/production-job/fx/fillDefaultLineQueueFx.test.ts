@@ -2,8 +2,8 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { enqueueDefaultLineFx } from "~/production-job/write/enqueueDefaultLineFx";
-import { fillDefaultLineQueueFx } from "~/production-job/write/fillDefaultLineQueueFx";
+import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
+import { fillDefaultLineQueueFx } from "~/production-job/fx/fillDefaultLineQueueFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";

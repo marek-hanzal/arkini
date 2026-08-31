@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
-import { readPlannedOutputReservationFx } from "~/production-job/fx/read/readPlannedOutputReservationFx";
+import { readPlannedOutputReservationFx } from "~/production-job/fx/readPlannedOutputReservationFx";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
-import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
+import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

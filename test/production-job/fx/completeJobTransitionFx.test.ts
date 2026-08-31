@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
-import { makeJobCompletionRandomFx } from "~/production-job/random/makeJobCompletionRandomFx";
+import { makeJobCompletionRandomFx } from "~/production-job/fx/makeJobCompletionRandomFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {

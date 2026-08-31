@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 
-import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
 
 /** Renders the shared runtime value used by Lines and Queue cards. */

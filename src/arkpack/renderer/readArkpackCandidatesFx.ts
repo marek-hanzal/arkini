@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
-import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
+import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 
 /** Selects the first valid user-first candidate while keeping decode authority in the renderer. */

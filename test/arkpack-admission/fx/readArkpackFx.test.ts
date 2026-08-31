@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
-import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
+import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";

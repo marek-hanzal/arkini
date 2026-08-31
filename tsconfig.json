@@ -78,6 +78,7 @@
 		"src/game-config-source",
 		"src/game-config-validation",
 		"src/game-project-json-schema",
+		"src/arkpack-admission",
 		"src/arkpack-artifact",
 		"src/arkpack-cli",
 		"src/arkpack",

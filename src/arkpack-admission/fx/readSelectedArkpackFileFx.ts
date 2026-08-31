@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
+import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 
 export interface EditorArkpackFileInput {

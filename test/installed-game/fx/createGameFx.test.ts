@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
-import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
+import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { createGameFx as createGameFromPackageFx } from "~/installed-game/fx/createGameFx";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";

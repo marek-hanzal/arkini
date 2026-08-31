@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import {
 	type EditorArkpackFileInput,
 	readSelectedArkpackFileFx,
-} from "~/arkpack/renderer/readSelectedArkpackFileFx";
+} from "~/arkpack-admission/fx/readSelectedArkpackFileFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";

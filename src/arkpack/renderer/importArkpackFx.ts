@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
 import { createElectronArkpackStorageFx } from "~/arkpack/renderer/createElectronArkpackStorageFx";
-import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
+import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 
 export namespace importArkpackFx {
 	export interface Props {

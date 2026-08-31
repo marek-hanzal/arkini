@@ -5,8 +5,8 @@ import { Command } from "effect/unstable/cli";
 
 import { ArkpackCommand } from "~/arkpack/artifact/cli/ArkpackCommand";
 import { PackCommand } from "~/arkpack/artifact/cli/PackCommand";
-import { SchemaCommand } from "~/game-config/cli/SchemaCommand";
-import { ValidateCommand } from "~/game-config/cli/ValidateCommand";
+import { SchemaCommand } from "~/game-config-cli/command/SchemaCommand";
+import { ValidateCommand } from "~/game-config-cli/command/ValidateCommand";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 
 const GameCommand = Command.make("game")

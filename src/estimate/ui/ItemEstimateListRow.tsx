@@ -1,8 +1,8 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemEstimateIndexEntry } from "~/estimate/type/ItemEstimateIndex";
-import { ButtonLink } from "~/ui/ui/Button";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { ListRow } from "~/item-authoring/ui/ListRow";
 
 const runtimeLabelFn = (estimate: ItemEstimateIndexEntry) => {
 	if (estimate.status === "partial") return "Partial";
@@ -30,39 +30,29 @@ const demandLabelFn = (demand: number, maximumDemand: number) => {
 
 /** Presents one compact projection of the cached static estimate. */
 export const ItemEstimateListRow = ({
+	activeType,
 	estimate,
 	item,
 	maximumDemand,
+	onSelectTypeFn,
 	projectId,
 }: {
+	readonly activeType: TypeSchema.Type | undefined;
 	readonly estimate: ItemEstimateIndexEntry;
 	readonly item: ItemSchema.Type;
 	readonly maximumDemand: number;
+	readonly onSelectTypeFn: (type: TypeSchema.Type) => void;
 	readonly projectId: string;
 }) => (
-	<article
-		className="ak-list-row ak-list-row-interactive flex min-w-0 items-center gap-4 rounded-xl p-3"
-		data-estimate-method={estimate.method}
-		data-estimate-status={estimate.status}
-		data-item-id={item.id}
-		data-item-uid={item.uid}
-		data-ui="EditorItemEstimateRow"
-	>
-		<ButtonLink
-			to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-			params={{
-				projectId,
-				itemUid: item.uid,
-				sectionId: "estimate",
-			}}
-			className="min-h-0 min-w-0 flex-1 justify-start gap-4 border-0 bg-transparent p-0 text-left shadow-none before:absolute before:inset-0 before:content-[''] hover:bg-transparent"
-		>
-			<EditorItemThumbnail resourceIds={item.asset.default} />
-			<span className="min-w-0 flex-1">
-				<span className="block truncate text-base font-semibold">{item.title}</span>
-				<span className="mt-1 block truncate text-xs text-subtle">{item.id}</span>
-			</span>
-			<dl className="grid shrink-0 gap-1 text-right text-sm tabular-nums">
+	<ListRow
+		activeType={activeType}
+		dataUi="EditorItemEstimateRow"
+		item={item}
+		onSelectTypeFn={onSelectTypeFn}
+		projectId={projectId}
+		sectionId="estimate"
+		details={
+			<dl className="pointer-events-none grid shrink-0 gap-1 text-right text-sm tabular-nums">
 				<div className="flex items-baseline justify-end gap-1.5">
 					<dt className="text-muted">Estimate:</dt>
 					<dd className="font-semibold text-foreground">{runtimeLabelFn(estimate)}</dd>
@@ -74,6 +64,6 @@ export const ItemEstimateListRow = ({
 					</dd>
 				</div>
 			</dl>
-		</ButtonLink>
-	</article>
+		}
+	/>
 );

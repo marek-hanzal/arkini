@@ -6,6 +6,7 @@ import { createItemEstimateIndexFn } from "~/estimate/fn/createItemEstimateIndex
 import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
 import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndexFn";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import {
 	ItemEstimateCacheAtom,
 	type ItemEstimateCacheAtom as ItemEstimateCache,
@@ -38,9 +39,11 @@ const sameSnapshotFn = (
 export const useItemEstimateIndex = (
 	project: Project,
 	{
+		itemType,
 		query,
 		view,
 	}: {
+		readonly itemType?: TypeSchema.Type;
 		readonly query: string;
 		readonly view: ItemEstimateViewSchema.Type;
 	},
@@ -74,12 +77,14 @@ export const useItemEstimateIndex = (
 			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),
 			rows: selectItemEstimateIndexFn({
 				entries,
+				itemType,
 				items: Object.values(project.config.items),
 				query,
 				view,
 			}),
 		};
 	}, [
+		itemType,
 		project.config.items,
 		query,
 		view,

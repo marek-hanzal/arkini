@@ -1,4 +1,5 @@
 import { TriangleAlert } from "lucide-react";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
@@ -30,11 +31,15 @@ const EstimateViewOptions: ReadonlyArray<EditorSelectOption<ItemEstimateViewSche
 
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const ItemEstimateList = ({
+	itemType,
+	onItemTypeChangeFn,
 	onQueryChangeFn,
 	onViewChangeFn,
 	query,
 	view,
 }: {
+	readonly itemType?: TypeSchema.Type;
+	readonly onItemTypeChangeFn: (itemType: TypeSchema.Type | undefined) => void;
 	readonly onQueryChangeFn: (query: string) => void;
 	readonly onViewChangeFn: (view: ItemEstimateViewSchema.Type) => void;
 	readonly query: string;
@@ -42,6 +47,7 @@ export const ItemEstimateList = ({
 }) => {
 	const project = useEditorProject();
 	const state = useItemEstimateIndex(project, {
+		itemType,
 		query,
 		view,
 	});
@@ -65,6 +71,17 @@ export const ItemEstimateList = ({
 					placeholder="Search item title or ID…"
 					onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
 				/>
+				{itemType === undefined ? null : (
+					<button
+						type="button"
+						className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
+						data-ui="EditorItemTypeFilter"
+						onClick={() => onItemTypeChangeFn(undefined)}
+					>
+						{itemType}
+						<span>×</span>
+					</button>
+				)}
 				<EditorSelect
 					label="View item estimates"
 					onChangeFn={onViewChangeFn}
@@ -92,10 +109,12 @@ export const ItemEstimateList = ({
 				) : null}
 				{state.rows.map(({ estimate, item }) => (
 					<ItemEstimateListRow
+						activeType={itemType}
 						estimate={estimate}
 						item={item}
 						key={item.uid}
 						maximumDemand={state.maximumDemand}
+						onSelectTypeFn={onItemTypeChangeFn}
 						projectId={project.projectId}
 					/>
 				))}

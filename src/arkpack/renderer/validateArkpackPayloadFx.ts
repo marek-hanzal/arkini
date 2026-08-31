@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { validatePngResourceFx } from "~/renderer/resource/validatePngResourceFx";
 import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
-import { validateGameConfigFx } from "~/game-config/validation/fx/validateGameConfigFx";
-import { validateGameResourcesFn } from "~/game-config/validation/rule/fn/validateGameResourcesFn";
+import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";
+import { validateGameResourcesFn } from "~/game-config-validation/fn/validateGameResourcesFn";
 
 const createPackProvenanceFn = (
 	gameId: string,

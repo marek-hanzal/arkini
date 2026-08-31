@@ -6,7 +6,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/Diagno
 import {
 	createRootSource,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 const uidDiagnostics = async (items: Record<string, unknown>) =>
 	(

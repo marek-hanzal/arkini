@@ -11,7 +11,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
 
-import { readItemOutputEntriesFn } from "../../fn/readItemOutputEntriesFn";
+import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
 
 type OutputRecreationCertainty = "guaranteed" | "stochastic" | "none";
 

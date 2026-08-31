@@ -7,7 +7,7 @@ import {
 	createLine,
 	createOutput,
 	createProducerItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 const analyze = (previous: GameConfigSchema.Type, next: GameConfigSchema.Type) =>
 	analyzeEditorProjectCompatibilityFn(previous, next);

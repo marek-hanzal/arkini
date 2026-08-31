@@ -8,7 +8,7 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 describe("createEditorAcquisitionGraphFn output distributions", () => {
 	it("keeps authored occurrences and marks the shared operation when joint compilation overflows", async () => {

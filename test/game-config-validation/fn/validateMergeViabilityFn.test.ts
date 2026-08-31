@@ -5,7 +5,7 @@ import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourc
 import {
 	createRootSource,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { InvalidMergeReasonEnumSchema } from "~/game-config/diagnostic/schema/InvalidMergeReasonEnumSchema";
 

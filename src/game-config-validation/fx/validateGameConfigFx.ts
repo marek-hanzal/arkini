@@ -6,16 +6,16 @@ import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/Game
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticRecordEntityEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
-import { validateConfigReferencesFn } from "../rule/fn/validateConfigReferencesFn";
-import { validateInputAcceptanceCyclesFn } from "../rule/fn/validateInputAcceptanceCyclesFn";
-import { validateInputChargesFn } from "../rule/fn/validateInputChargesFn";
-import { validateItemLineIdsFn } from "../rule/fn/validateItemLineIdsFn";
-import { validateItemUidsFn } from "../rule/fn/validateItemUidsFn";
-import { validateMaterialInputEligibilityFn } from "../rule/fn/validateMaterialInputEligibilityFn";
-import { validateLimitedDepositsFn } from "../rule/fn/validateLimitedDepositsFn";
-import { validateLineInputCapacityFn } from "../rule/fn/validateLineInputCapacityFn";
-import { validateMergeViabilityFn } from "../rule/fn/validateMergeViabilityFn";
-import { validateStartStateFx } from "../rule/validateStartStateFx";
+import { validateConfigReferencesFn } from "../fn/validateConfigReferencesFn";
+import { validateInputAcceptanceCyclesFn } from "../fn/validateInputAcceptanceCyclesFn";
+import { validateInputChargesFn } from "../fn/validateInputChargesFn";
+import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
+import { validateItemUidsFn } from "../fn/validateItemUidsFn";
+import { validateMaterialInputEligibilityFn } from "../fn/validateMaterialInputEligibilityFn";
+import { validateLimitedDepositsFn } from "../fn/validateLimitedDepositsFn";
+import { validateLineInputCapacityFn } from "../fn/validateLineInputCapacityFn";
+import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
+import { validateStartStateFx } from "./validateStartStateFx";
 
 const validateCanonicalIdsFn = ({
 	config,

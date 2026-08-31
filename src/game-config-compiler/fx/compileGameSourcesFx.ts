@@ -8,7 +8,7 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/Di
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceSchema } from "~/game-config-source/schema/GameSourceSchema";
-import { validateGameConfigFx } from "~/game-config/validation/fx/validateGameConfigFx";
+import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 import type { GameCompilationResultSchema } from "../schema/GameCompilationResultSchema";
 import type { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";

@@ -14,7 +14,7 @@ import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 
-import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
+import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
 
 export namespace validateInputChargesFn {
 	export interface Props {

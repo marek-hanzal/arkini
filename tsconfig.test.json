@@ -61,6 +61,7 @@
 		"src/game-config-compiler",
 		"src/game-config-resource",
 		"src/game-config-source",
+		"src/game-config-validation",
 		"src/game-project-json-schema",
 		"src/arkpack",
 		"src/asset-authoring",

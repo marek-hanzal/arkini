@@ -9,7 +9,7 @@ import {
 	createLine,
 	createProducerItem,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 const analyze = (
 	previous: GameConfigSchema.Type,

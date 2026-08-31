@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import type { Project } from "~/project-authoring/type/Project";
 import { createItemEstimateIndexFn } from "~/estimate/fn/createItemEstimateIndexFn";
 import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
-import type { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
+import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndexFn";
 import {
 	ItemEstimateCacheAtom,
@@ -38,13 +38,11 @@ const sameSnapshotFn = (
 export const useItemEstimateIndex = (
 	project: Project,
 	{
-		incomplete,
 		query,
-		sort,
+		view,
 	}: {
-		readonly incomplete: boolean;
 		readonly query: string;
-		readonly sort: ItemEstimateSortSchema.Type;
+		readonly view: ItemEstimateViewSchema.Type;
 	},
 ): ItemEstimateIndexState => {
 	const snapshot = useMemo<ItemEstimateCache.Snapshot>(
@@ -76,17 +74,15 @@ export const useItemEstimateIndex = (
 			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),
 			rows: selectItemEstimateIndexFn({
 				entries,
-				incomplete,
 				items: Object.values(project.config.items),
 				query,
-				sort,
+				view,
 			}),
 		};
 	}, [
 		project.config.items,
-		incomplete,
 		query,
-		sort,
+		view,
 		state.estimates,
 	]);
 	if (!sameSnapshotFn(state.snapshot, snapshot))

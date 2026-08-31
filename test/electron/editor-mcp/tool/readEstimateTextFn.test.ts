@@ -4,20 +4,18 @@ import { readEstimateTextFn } from "~electron/main/editor-mcp/tool/fn/readEstima
 import { createGraphProject } from "./support/createToolProject";
 
 const readEstimate = (
-	sort: "demand" | "fastest" | "slowest",
+	view: "demand" | "fastest" | "incomplete" | "slowest",
 	options: {
-		readonly incomplete?: boolean;
 		readonly page?: number;
 		readonly pageSize?: number;
 		readonly query?: string;
 	} = {},
 ) =>
 	readEstimateTextFn(createGraphProject(), {
-		incomplete: options.incomplete ?? false,
 		page: options.page ?? 1,
 		pageSize: options.pageSize ?? 25,
 		query: options.query,
-		sort,
+		view,
 	});
 
 describe("readEstimateTextFn", () => {
@@ -26,8 +24,7 @@ describe("readEstimateTextFn", () => {
 			pageSize: 2,
 		});
 
-		expect(text).toContain("Incomplete only: false");
-		expect(text).toContain("Sort: slowest");
+		expect(text).toContain("View: slowest");
 		expect(text).toContain("Page: 1");
 		expect(text).toContain("Page size: 2");
 		expect(text).toContain("Returned items: 2");
@@ -35,18 +32,15 @@ describe("readEstimateTextFn", () => {
 	});
 
 	it("applies the same incomplete filter and fuzzy query as the Estimate UI", () => {
-		const incomplete = readEstimate("demand", {
-			incomplete: true,
-		});
-		const text = readEstimate("demand", {
-			incomplete: true,
+		const incomplete = readEstimate("incomplete");
+		const text = readEstimate("incomplete", {
 			query: "unused",
 		});
 
-		expect(incomplete).toContain("Incomplete only: true");
+		expect(incomplete).toContain("View: incomplete");
 		expect(incomplete).toContain("Status: unreachable");
 		expect(incomplete).not.toContain("Status: complete");
-		expect(text).toContain("Incomplete only: true");
+		expect(text).toContain("View: incomplete");
 		expect(text).toContain("Query: unused");
 		expect(text).toContain("Matched items: 1");
 		expect(text).toContain("- Unused\n  ID: unused");

@@ -104,19 +104,16 @@ describe("editor MCP server", () => {
 		expect(
 			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
 		).toMatchObject({
-			incomplete: {
-				default: false,
-				type: "boolean",
-			},
 			page: expect.any(Object),
 			pageSize: expect.any(Object),
 			query: expect.any(Object),
-			sort: {
+			view: {
 				default: "fastest",
 				enum: [
 					"fastest",
 					"slowest",
 					"demand",
+					"incomplete",
 				],
 			},
 		});
@@ -216,9 +213,8 @@ describe("editor MCP server", () => {
 		const globalEstimate = await client.callTool({
 			name: "estimate",
 			arguments: {
-				incomplete: true,
 				pageSize: 2,
-				sort: "demand",
+				view: "incomplete",
 			},
 		});
 		const estimate = await client.callTool({
@@ -245,7 +241,7 @@ describe("editor MCP server", () => {
 		expect(globalEstimate).not.toHaveProperty("structuredContent");
 		expect(globalEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("Incomplete only: true\nSort: demand"),
+				text: expect.stringContaining("View: incomplete"),
 			},
 		]);
 		expect(estimate.isError).not.toBe(true);

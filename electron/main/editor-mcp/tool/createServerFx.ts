@@ -320,7 +320,7 @@ const createServerFn = (
 		"estimate",
 		{
 			description:
-				"Read one page of the global approximate Estimate view for every item at quantity one. Supports the same incomplete-only filter, fastest, slowest, aggregate-demand ordering, and fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
+				"Read one page of the global approximate Estimate view for every item at quantity one. Supports the same mutually exclusive fastest, slowest, aggregate-demand, and incomplete display modes plus fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
 			inputSchema: EstimateInputSchema,
 		},
 		async (input) =>

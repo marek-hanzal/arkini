@@ -9,7 +9,7 @@ import { applyInputMaterialStorePlanFx } from "~/production-input/fx/applyInputM
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
+import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
@@ -212,7 +212,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 
 		const isolation =
 			acceptedQuantity > 0 && owner !== undefined
-				? yield* isolateStatefulOwnerTransitionFx({
+				? yield* isolateBoardStatefulOwnerTransitionFx({
 						ownerItemId: owner.id,
 						runtime: inputRuntime,
 					})

@@ -12,7 +12,7 @@ import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMateria
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/fx/readItemMaterialInputFx";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
+import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
@@ -251,7 +251,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				runtime: inputSourceRuntime,
 				source,
 			});
-			const isolation = yield* isolateStatefulOwnerTransitionFx({
+			const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
 				ownerItemId,
 				runtime: inputRuntime,
 			});

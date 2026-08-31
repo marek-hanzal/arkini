@@ -12,7 +12,7 @@ import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacity
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
+import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -189,7 +189,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		plan,
 		runtime: inputTransition.runtime,
 	});
-	const isolation = yield* isolateStatefulOwnerTransitionFx({
+	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
 		ownerItemId,
 		runtime: charged.runtime,
 	});

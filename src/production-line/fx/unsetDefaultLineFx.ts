@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
-import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
+import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -49,7 +49,7 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 					[ownerItemId]: null,
 				},
 			} satisfies RuntimeSchema.Type;
-			const isolation = yield* isolateStatefulOwnerTransitionFx({
+			const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
 				ownerItemId,
 				runtime: nextRuntime,
 			});

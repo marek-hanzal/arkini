@@ -150,7 +150,7 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 
 describe("line-owner delivery settlement boundary", () => {
 	it.each(ownerKinds)(
-		"keeps queued %s work blocked by engine-owned delivery travel until the next Tick",
+		"keeps queued %s work blocked by Delivery-owned travel until the next Tick",
 		(ownerKind) => {
 			const result = Effect.runSync(
 				Effect.gen(function* () {

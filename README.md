@@ -31,7 +31,7 @@ src/filesystem-write  Node-only canonical locking, path safety and durable singl
 src/application-version  Arkini writer provenance, major-only admission and incompatibility failure
 src/game-version  project-owned gameplay compatibility schema and major projection
 src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
-src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
+src/game-tick  fixed-step budgeting, replay, delivery/job/temporary orchestration and scoped loop
 src/temporary-item  temporary lifetime advancement, expiry admission and atomic expiry output
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
 src/item-query  authored Item query schemas and canonical Runtime execution across scope, reach and distance
@@ -62,7 +62,7 @@ src/production-line  production-line definitions, rules, reads and run planning
 src/production-authoring  controlled authored Line, Input, Rule and Output UI
 src/production-output  output, drop and roll schemas plus resolution policy
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
-src/production-delivery  outbound input delivery allocation, validation and settlement
+src/production-delivery  outbound input delivery allocation, travel advancement, validation and settlement
 src/game-config  authored value/config schemas, explicit non-item resource roles and loaded-config capability
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
 src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation projection and typed validation failure

@@ -8,7 +8,7 @@ import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeIt
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-export namespace isolateStatefulOwnerTransitionFx {
+export namespace isolateBoardStatefulOwnerTransitionFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
@@ -20,24 +20,24 @@ export namespace isolateStatefulOwnerTransitionFx {
 	}
 }
 
-/** Preserves the Line-owned Board admission before shared grid isolation. */
-export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerTransitionFx")(
-	function* ({ ownerItemId, runtime }: isolateStatefulOwnerTransitionFx.Props) {
-		const runtimeOwner = yield* readRuntimeItemByIdFx({
-			itemId: ownerItemId,
-			runtime,
-		});
-		if (Option.isNone(narrowBoardRuntimeItemFn(runtimeOwner))) {
-			return yield* Effect.fail(
-				new ItemNotOnBoardError({
-					itemId: runtimeOwner.id,
-					location: runtimeOwner.location,
-				}),
-			);
-		}
-		return yield* isolateGridStatefulOwnerTransitionFx({
-			ownerItemId,
-			runtime,
-		});
-	},
-);
+/** Preserves Board admission before shared grid isolation. */
+export const isolateBoardStatefulOwnerTransitionFx = Effect.fn(
+	"isolateBoardStatefulOwnerTransitionFx",
+)(function* ({ ownerItemId, runtime }: isolateBoardStatefulOwnerTransitionFx.Props) {
+	const runtimeOwner = yield* readRuntimeItemByIdFx({
+		itemId: ownerItemId,
+		runtime,
+	});
+	if (Option.isNone(narrowBoardRuntimeItemFn(runtimeOwner))) {
+		return yield* Effect.fail(
+			new ItemNotOnBoardError({
+				itemId: runtimeOwner.id,
+				location: runtimeOwner.location,
+			}),
+		);
+	}
+	return yield* isolateGridStatefulOwnerTransitionFx({
+		ownerItemId,
+		runtime,
+	});
+});

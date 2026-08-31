@@ -1,11 +1,11 @@
 import { Cause, Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import {
 	type DiagnosticRecord,
 	DiagnosticRecordSchema,
-} from "../../../electron/contract/diagnostics/DiagnosticRecord";
+} from "~electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { GameSession, GameTransition } from "~/game-session/type/GameSession";
 import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";

@@ -3,14 +3,14 @@ import { ipcMain, Menu } from "electron";
 import { EventEmitter } from "node:events";
 import { Cause, Effect, Exit, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import { createMainWindowFx } from "../../electron/main/createMainWindowFx";
-import { ElectronMainError } from "../../electron/main/ElectronMainError";
-import { createChatGptViewControllerOwnershipFx } from "../../electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
-import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
-import { createWindowModeControllerOwnershipFx } from "../../electron/main/window/createWindowModeControllerOwnershipFx";
-import type { WindowPreferences } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
+import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { createMainWindowFx } from "~electron/main/createMainWindowFx";
+import { ElectronMainError } from "~electron/main/ElectronMainError";
+import { createChatGptViewControllerOwnershipFx } from "~electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
+import { createWindowModeControllerOwnershipFx } from "~electron/main/window/createWindowModeControllerOwnershipFx";
+import type { WindowPreferences } from "~electron/main/window/createFilesystemWindowPreferencesFx";
 
 const electronState = vi.hoisted(() => ({
 	loadFailure: new Error("renderer unavailable"),

@@ -2,8 +2,8 @@ import { access, writeFile } from "node:fs/promises";
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import { ChatGptAssetCandidateMaxBytes } from "../../electron/contract/chatgpt/ChatGptSurfaceSchema";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ChatGptAssetCandidateMaxBytes } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 import {
 	chatGptElectronState,
 	createDownload,
@@ -20,7 +20,7 @@ vi.mock("electron", async () => {
 	};
 });
 
-import { createChatGptViewControllerFx } from "../../electron/main/chatgpt/createChatGptViewControllerFx";
+import { createChatGptViewControllerFx } from "~electron/main/chatgpt/createChatGptViewControllerFx";
 
 beforeEach(() => {
 	chatGptElectronState.views.length = 0;

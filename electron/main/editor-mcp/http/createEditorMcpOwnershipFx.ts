@@ -1,12 +1,12 @@
 import { Effect, Exit, Semaphore } from "effect";
 import { randomBytes } from "node:crypto";
 
-import type { EditorMcpCommandResultSchema } from "../../../contract/editor/EditorMcpCommandResultSchema";
-import type { EditorMcpConfigurationSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
-import type { EditorMcpOverviewSchema } from "../../../contract/editor/EditorMcpOverviewSchema";
-import type { EditorMcpRemoteStatusSchema } from "../../../contract/editor/EditorMcpRemoteStatusSchema";
-import type { EditorMcpStatus } from "../../../contract/editor/EditorMcpStatusSchema";
-import type { EditorProjectServiceOwnership } from "../../editor-project/EditorProjectServiceOwnership";
+import type { EditorMcpCommandResultSchema } from "~electron/contract/editor/EditorMcpCommandResultSchema";
+import type { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
+import type { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
+import type { EditorMcpRemoteStatusSchema } from "~electron/contract/editor/EditorMcpRemoteStatusSchema";
+import type { EditorMcpStatus } from "~electron/contract/editor/EditorMcpStatusSchema";
+import type { EditorProjectServiceOwnership } from "~electron/main/editor-project/EditorProjectServiceOwnership";
 import { createRemoteHandlerFx } from "../auth/createRemoteHandlerFx";
 import type { McpStorage } from "../storage/McpStorage";
 import type { McpTunnel, McpTunnelSession } from "../tunnel/McpTunnel";

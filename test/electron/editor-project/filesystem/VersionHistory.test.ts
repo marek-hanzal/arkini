@@ -5,9 +5,9 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
-import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { createProjectPathsFx } from "~electron/main/editor-project/filesystem/createProjectPathsFx";
+import { readVersionHistoryFx } from "~electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
 
 let root = "";
 

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
-import { editorTestPayload } from "../../project-authoring/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 describe("renameGameResourceFx", () => {
 	it("renames project and item references without changing unrelated identities", () => {

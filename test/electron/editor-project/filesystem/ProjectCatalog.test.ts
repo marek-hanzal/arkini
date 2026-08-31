@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { Effect, FileSystem } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createProjectCatalogFx } from "../../../../electron/main/editor-project/filesystem/fx/createProjectCatalogFx";
+import { createProjectCatalogFx } from "~electron/main/editor-project/filesystem/fx/createProjectCatalogFx";
 
 const temporaryDirectories: Array<string> = [];
 

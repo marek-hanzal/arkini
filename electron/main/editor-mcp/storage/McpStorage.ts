@@ -1,8 +1,8 @@
 import type { Effect } from "effect";
 import type { OAuthServerModel } from "mcp-oauth-server";
 
-import type { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
-import type { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
+import type { EditorMcpNgrokSettingsSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
+import type { EditorMcpPortSchema } from "~electron/contract/editor/EditorMcpPortSchema";
 
 export interface McpStorage {
 	readonly model: OAuthServerModel;

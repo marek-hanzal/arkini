@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { promisify } from "node:util";
 import { Effect, Semaphore } from "effect";
 
-import type { CompletionShell, CompletionStatus } from "../../contract/cli/CompletionStatus";
+import type { CompletionShell, CompletionStatus } from "~electron/contract/cli/CompletionStatus";
 import { ElectronMainError } from "../ElectronMainError";
 import { createManagedFileFx } from "./createManagedFileFx";
 

@@ -63,10 +63,10 @@ const StoredRefreshTokenSchema = StoredAccessTokenSchema.meta({
 	description: "One complete persisted MCP OAuth refresh token.",
 });
 
-import { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
-import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
+import { EditorMcpNgrokSettingsSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
+import { EditorMcpPortSchema } from "~electron/contract/editor/EditorMcpPortSchema";
 import type { McpStorage } from "./McpStorage";
-import { ElectronMainRuntime } from "../../ElectronMainRuntime";
+import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 export const DefaultPort = 32_310;

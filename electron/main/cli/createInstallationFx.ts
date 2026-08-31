@@ -3,7 +3,7 @@ import { access } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Effect, Semaphore } from "effect";
 
-import type { InstallationStatus } from "../../contract/cli/InstallationStatus";
+import type { InstallationStatus } from "~electron/contract/cli/InstallationStatus";
 import { ElectronMainError } from "../ElectronMainError";
 import { createManagedFileFx } from "./createManagedFileFx";
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 
 const EditorServiceReadinessTimeoutMs = 2_000;

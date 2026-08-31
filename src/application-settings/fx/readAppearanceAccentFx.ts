@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { AppearanceAccentSchema } from "../../../electron/contract/appearance/AppearanceAccentSchema";
+import { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
 import { AppearanceAccentError } from "~/application-settings/error/AppearanceAccentError";
 
 /** Reads the Electron-owned accent preference and validates the preload boundary. */

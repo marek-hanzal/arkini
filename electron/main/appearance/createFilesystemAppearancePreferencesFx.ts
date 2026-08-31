@@ -1,8 +1,8 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
-import { AppearanceThemeSchema } from "../../contract/appearance/AppearanceThemeSchema";
+import { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
+import { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";

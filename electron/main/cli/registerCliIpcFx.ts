@@ -1,7 +1,7 @@
 import { app, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 
-import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
 import type { Completion } from "./createCompletionFx";

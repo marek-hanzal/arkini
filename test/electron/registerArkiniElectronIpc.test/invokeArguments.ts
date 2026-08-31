@@ -1,4 +1,4 @@
-import { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 
 const placeholderPackageId = "a".repeat(64);
 export const saveKey = {

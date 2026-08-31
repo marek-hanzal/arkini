@@ -1,4 +1,4 @@
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 

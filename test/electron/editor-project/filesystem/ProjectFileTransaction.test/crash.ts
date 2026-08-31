@@ -3,9 +3,9 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem } from "effect";
 import { join } from "node:path";
 
-import { withProjectLockFx } from "../../../../../electron/main/editor-project/filesystem/fx/withProjectLockFx";
-import { writeProjectFileSetFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFileSetFx";
-import { createFilesystemWriteFx } from "../../../../../src/filesystem-write/fx/createFilesystemWriteFx";
+import { withProjectLockFx } from "~electron/main/editor-project/filesystem/fx/withProjectLockFx";
+import { writeProjectFileSetFx } from "~electron/main/editor-project/filesystem/fx/writeProjectFileSetFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 const [mode, root] = process.argv.slice(2);
 if (mode === undefined || root === undefined) throw new Error("Expected a mode and root.");

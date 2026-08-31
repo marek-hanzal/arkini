@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { ProjectPayloadSchema } from "~/project-authoring/schema/ProjectPayloadSchema";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";

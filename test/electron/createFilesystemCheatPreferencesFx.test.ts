@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
+import { createFilesystemCheatPreferencesFx } from "~electron/main/cheat/createFilesystemCheatPreferencesFx";
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");

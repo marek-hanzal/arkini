@@ -1,8 +1,8 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
-import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { writeArkpackFileFx } from "./writeArkpackFileFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";

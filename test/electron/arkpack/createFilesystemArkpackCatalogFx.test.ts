@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
-import { writeArkpackFileFx } from "../../../electron/main/arkpack/writeArkpackFileFx";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
+import { writeArkpackFileFx } from "~electron/main/arkpack/writeArkpackFileFx";
 import {
 	bundledBytes,
 	createCatalog,

@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
+import { ChatGptAssetCandidateSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";

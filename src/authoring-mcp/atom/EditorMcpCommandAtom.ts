@@ -2,10 +2,10 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import { EditorMcpCommandResultSchema } from "../../../electron/contract/editor/EditorMcpCommandResultSchema";
-import { EditorMcpCommandSchema } from "../../../electron/contract/editor/EditorMcpCommandSchema";
-import { EditorMcpConfigurationSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
-import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
+import { EditorMcpCommandResultSchema } from "~electron/contract/editor/EditorMcpCommandResultSchema";
+import { EditorMcpCommandSchema } from "~electron/contract/editor/EditorMcpCommandSchema";
+import { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
+import { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 type EditorMcpCommand = EditorMcpCommandSchema.Type;

@@ -1,5 +1,5 @@
 import { Effect, Semaphore } from "effect";
-import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import { AppearanceThemeError } from "~/application-settings/error/AppearanceThemeError";
 
 const writeSemaphore = Semaphore.makeUnsafe(1);

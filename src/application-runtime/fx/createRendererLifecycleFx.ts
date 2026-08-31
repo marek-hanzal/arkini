@@ -1,5 +1,5 @@
 import { Data, Effect } from "effect";
-import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 
 type RendererLifecycleOperation = "force-close" | "request-close" | "wait-until-visible";
 

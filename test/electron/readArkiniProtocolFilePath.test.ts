@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { readArkiniProtocolFilePathFx } from "../../electron/protocol/readArkiniProtocolFilePathFx";
+import { readArkiniProtocolFilePathFx } from "~electron/protocol/readArkiniProtocolFilePathFx";
 
 let rendererRoot = "";
 

@@ -6,7 +6,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
 import { CatalogAtom } from "~/arkpack-catalog/atom/CatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";

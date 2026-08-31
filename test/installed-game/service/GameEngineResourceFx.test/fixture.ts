@@ -3,7 +3,7 @@ import { Effect, Exit, Fiber, ManagedRuntime, Scope } from "effect";
 import { afterEach } from "vitest";
 
 import type { Game } from "~/installed-game/type/Game";
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 import { GameEngineResourceLayer } from "~/installed-game/layer/GameEngineResourceLayer";
 

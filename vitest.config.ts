@@ -5,6 +5,8 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"~": fileURLToPath(new URL("./src", import.meta.url)),
+			"~electron": fileURLToPath(new URL("./electron", import.meta.url)),
+			"~shared": fileURLToPath(new URL("./shared", import.meta.url)),
 			"~test": fileURLToPath(new URL("./test", import.meta.url)),
 		},
 	},

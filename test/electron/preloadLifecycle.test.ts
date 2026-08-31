@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import { ArkiniElectronApi as ArkiniElectronContract } from "../../electron/contract/ArkiniElectronApi";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ArkiniElectronApi as ArkiniElectronContract } from "~electron/contract/ArkiniElectronApi";
 
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (...args: Array<unknown>) => unknown>();
@@ -37,7 +37,7 @@ vi.mock("electron", () => ({
 
 const loadPreload = async () => {
 	vi.resetModules();
-	await import("../../electron/preload/index");
+	await import("~electron/preload/index");
 	return electron.readExposed();
 };
 

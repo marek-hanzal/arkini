@@ -2,7 +2,7 @@ import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
+import type { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
 import { EditorMcpCommandAtom } from "~/authoring-mcp/atom/EditorMcpCommandAtom";
 
 const mcpState = vi.hoisted(

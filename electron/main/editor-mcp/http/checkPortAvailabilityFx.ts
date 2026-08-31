@@ -1,8 +1,8 @@
 import { createServer } from "node:net";
 import { Effect } from "effect";
 
-import type { EditorMcpPortAvailability } from "../../../contract/editor/EditorMcpPortAvailability";
-import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
+import type { EditorMcpPortAvailability } from "~electron/contract/editor/EditorMcpPortAvailability";
+import { EditorMcpPortSchema } from "~electron/contract/editor/EditorMcpPortSchema";
 
 /** Performs an advisory loopback bind; the future MCP listener's real bind stays authoritative. */
 export const checkPortAvailabilityFx = Effect.fn("checkPortAvailabilityFx")((candidate: unknown) =>

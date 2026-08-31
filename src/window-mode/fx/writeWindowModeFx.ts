@@ -1,5 +1,5 @@
 import { Effect, Semaphore } from "effect";
-import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 
 const writeSemaphore = Semaphore.makeUnsafe(1);
 

@@ -2,9 +2,9 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
-import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
-import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import {
 	createEditorProjectIpcRepository,
 	editorProjectIpcNote,

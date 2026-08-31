@@ -4,8 +4,8 @@ import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
-import { createNgrokEditorMcpTunnelFx } from "../../../../electron/main/editor-mcp/tunnel/createNgrokEditorMcpTunnelFx";
-import { TunnelProvenanceHeader } from "../../../../electron/main/editor-mcp/tunnel/TunnelProvenanceHeader";
+import { createNgrokEditorMcpTunnelFx } from "~electron/main/editor-mcp/tunnel/createNgrokEditorMcpTunnelFx";
+import { TunnelProvenanceHeader } from "~electron/main/editor-mcp/tunnel/TunnelProvenanceHeader";
 
 const ReconnectGraceMs = 10_000;
 

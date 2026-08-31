@@ -1,7 +1,7 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { LastPackageIdSchema } from "../../contract/launcher/LastPackageIdSchema";
+import { LastPackageIdSchema } from "~electron/contract/launcher/LastPackageIdSchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";

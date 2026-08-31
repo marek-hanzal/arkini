@@ -2,12 +2,12 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import type { Completion } from "../../electron/main/cli/createCompletionFx";
-import type { Installation } from "../../electron/main/cli/createInstallationFx";
-import { registerCliIpcFx } from "../../electron/main/cli/registerCliIpcFx";
-import { ElectronMainError } from "../../electron/main/ElectronMainError";
-import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { Completion } from "~electron/main/cli/createCompletionFx";
+import type { Installation } from "~electron/main/cli/createInstallationFx";
+import { registerCliIpcFx } from "~electron/main/cli/registerCliIpcFx";
+import { ElectronMainError } from "~electron/main/ElectronMainError";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (event: unknown) => unknown>();

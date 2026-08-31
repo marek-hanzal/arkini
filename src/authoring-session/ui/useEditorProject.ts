@@ -8,7 +8,7 @@ import {
 	type PropsWithChildren,
 } from "react";
 
-import { EditorMcpProjectContextSchema } from "../../../electron/contract/editor/EditorMcpProjectContextSchema";
+import { EditorMcpProjectContextSchema } from "~electron/contract/editor/EditorMcpProjectContextSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";

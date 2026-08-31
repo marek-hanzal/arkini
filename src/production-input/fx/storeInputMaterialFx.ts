@@ -10,7 +10,7 @@ import { InputMaterialUnavailableError } from "~/production-input/error/InputMat
 import { applyInputMaterialStorePlanFx } from "~/production-input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
-import { readItemMaterialInputFx } from "~/production-input/read/readItemMaterialInputFx";
+import { readItemMaterialInputFx } from "~/production-input/fx/readItemMaterialInputFx";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";

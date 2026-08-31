@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { LineInputEmptyError } from "~/production-input/error/LineInputEmptyError";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
-import { readItemMaterialInputFx } from "~/production-input/read/readItemMaterialInputFx";
+import { readItemMaterialInputFx } from "~/production-input/fx/readItemMaterialInputFx";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";

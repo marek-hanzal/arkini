@@ -3,7 +3,7 @@ import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { queryFx } from "~/item-query/fx/queryFx";

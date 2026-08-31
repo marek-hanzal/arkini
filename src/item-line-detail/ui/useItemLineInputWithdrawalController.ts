@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
-import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
+import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
 
 export namespace useItemLineInputWithdrawalController {
 	export interface Props {

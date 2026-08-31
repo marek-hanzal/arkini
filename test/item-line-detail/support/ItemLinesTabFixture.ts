@@ -67,7 +67,7 @@ vi.mock("~/production-line/write/unsetDefaultLineFx", () => ({
 	},
 }));
 
-vi.mock("~/production-input/write/withdrawLineInputFx", () => ({
+vi.mock("~/production-input/fx/withdrawLineInputFx", () => ({
 	withdrawLineInputFx: (command: unknown) => {
 		commands.withdraw(command);
 		return {
@@ -76,7 +76,7 @@ vi.mock("~/production-input/write/withdrawLineInputFx", () => ({
 	},
 }));
 
-vi.mock("~/production-input/write/withdrawLineInputsFx", () => ({
+vi.mock("~/production-input/fx/withdrawLineInputsFx", () => ({
 	withdrawLineInputsFx: (command: unknown) => {
 		commands.withdraw(command);
 		return {

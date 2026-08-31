@@ -1,4 +1,4 @@
-import { readMaterialInputEligibilityFn } from "~/production-input/read/fn/readMaterialInputEligibilityFn";
+import { readMaterialInputEligibilityFn } from "~/production-input/fn/readMaterialInputEligibilityFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";

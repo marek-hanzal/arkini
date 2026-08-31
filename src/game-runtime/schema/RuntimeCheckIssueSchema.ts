@@ -10,11 +10,11 @@ import { JobQueueExceededIssueSchema } from "~/production-job/schema/JobQueueExc
 import { JobConsumedMaterialStateIssueSchema } from "~/production-job/schema/JobConsumedMaterialStateIssueSchema";
 import { JobMaterialOrphanIssueSchema } from "~/production-job/schema/JobMaterialOrphanIssueSchema";
 import { JobTimeInvalidIssueSchema } from "~/production-job/schema/JobTimeInvalidIssueSchema";
-import { InputCapacityExceededIssueSchema } from "~/production-input/schema/check/InputCapacityExceededIssueSchema";
-import { InputLineMissingIssueSchema } from "~/production-input/schema/check/InputLineMissingIssueSchema";
-import { InputOwnerMissingIssueSchema } from "~/production-input/schema/check/InputOwnerMissingIssueSchema";
-import { InputSelectorMismatchIssueSchema } from "~/production-input/schema/check/InputSelectorMismatchIssueSchema";
-import { InputSlotInvalidIssueSchema } from "~/production-input/schema/check/InputSlotInvalidIssueSchema";
+import { InputCapacityExceededIssueSchema } from "~/production-input/schema/InputCapacityExceededIssueSchema";
+import { InputLineMissingIssueSchema } from "~/production-input/schema/InputLineMissingIssueSchema";
+import { InputOwnerMissingIssueSchema } from "~/production-input/schema/InputOwnerMissingIssueSchema";
+import { InputSelectorMismatchIssueSchema } from "~/production-input/schema/InputSelectorMismatchIssueSchema";
+import { InputSlotInvalidIssueSchema } from "~/production-input/schema/InputSlotInvalidIssueSchema";
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
 import { ItemChargesIssueSchema } from "./ItemChargesIssueSchema";

@@ -1,9 +1,9 @@
 import { Cause, Effect, Exit, Semaphore, SubscriptionRef } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { type EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
-import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
+import { type EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";

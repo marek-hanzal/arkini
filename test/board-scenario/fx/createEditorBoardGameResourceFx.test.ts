@@ -3,9 +3,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
+import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -25,7 +25,7 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-describe("createEditorBoardGameResourceFx", () => {
+describe("Board Scenario createEditorBoardGameResourceFx", () => {
 	it.effect("publishes a replacement only after the exact previous revision is discarded", () =>
 		Effect.gen(function* () {
 			const releaseGate = yield* Deferred.make<void>();

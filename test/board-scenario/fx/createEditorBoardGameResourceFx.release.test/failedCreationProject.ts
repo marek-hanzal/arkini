@@ -1,6 +1,7 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
+/** Small project used to isolate failed Board game creation and release. */
 export const failedCreationProject: EditorProject = {
 	projectId: "failed-editor-board",
 	title: editorTestPayload.config.meta.title,

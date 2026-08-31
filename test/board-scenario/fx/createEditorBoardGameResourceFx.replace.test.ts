@@ -3,8 +3,8 @@ import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
+import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -49,7 +49,7 @@ const createResource = (
 	subscribeCriticalFailure: () => () => undefined,
 });
 
-describe("EditorBoardGameResource.replaceFx", () => {
+describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 	it.effect("disposes the live session before creating a same-revision scenario session", () =>
 		Effect.gen(function* () {
 			const events: string[] = [];

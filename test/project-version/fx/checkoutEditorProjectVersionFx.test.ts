@@ -8,8 +8,8 @@ import { EditorProjectRepository } from "~/project-authoring/service/EditorProje
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
-import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { EditorProjectVersionCheckoutConfirmationRequired } from "~/project-version/error/EditorProjectVersionCheckoutConfirmationRequired";
 import { checkoutEditorProjectVersionFx } from "~/project-version/fx/checkoutEditorProjectVersionFx";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";

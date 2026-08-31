@@ -2,7 +2,7 @@ import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useSyncExternalStore } from "react";
 
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { EditorBoardGameAtom } from "~/board-scenario/atom/EditorBoardGameAtom";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";

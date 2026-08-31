@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { createGameResourceUrlsFx } from "~/playable-game/fx/createGameResourceUrlsFx";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";

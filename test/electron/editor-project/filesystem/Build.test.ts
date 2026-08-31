@@ -9,7 +9,7 @@ import {
 } from "./support/createProjectTestHarness";
 import { decodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/decodeArkpackEnvelopeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 let harness: ProjectTestHarness;
 

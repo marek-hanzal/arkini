@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
 import { readGameSourceFilesFx } from "~/game-config-compiler/fx/readGameSourceFilesFx";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 

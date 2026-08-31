@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { validateGameResourcesFn } from "~/game-config-validation/fn/validateGameResourcesFn";
 import { startTestConfig } from "~test/game-start/support/startTestConfig";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const provenance = {
 	resources: "game.json",

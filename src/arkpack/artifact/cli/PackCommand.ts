@@ -3,8 +3,8 @@ import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/arkpack/artifact/fx/packDirectoryFx";
 import { signArkpackFileFx } from "~/arkpack/artifact/fx/signArkpackFileFx";
-import { printGameDiagnosticsForCliFx } from "~/game-config/diagnostic/printer/printGameDiagnosticsForCliFx";
-import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";
+import { printGameDiagnosticsForCliFx } from "~/game-config-diagnostic/fx/printGameDiagnosticsForCliFx";
+import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 
 export namespace PackCommand {
 	export interface Props {

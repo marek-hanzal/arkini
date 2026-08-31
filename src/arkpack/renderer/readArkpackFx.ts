@@ -6,8 +6,8 @@ import { decodeFx } from "~/arkpack/artifact/fx/decodeFx";
 import { decodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/decodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "~/arkpack/artifact/fx/readArkpackContentHashFx";
 import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
-import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";
-import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
+import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
+import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 
 export namespace readArkpackFx {
 	export interface Props {

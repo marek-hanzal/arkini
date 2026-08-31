@@ -142,7 +142,7 @@ vi.mock("~/ui/button/Button", () => ({
 
 import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
-import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
+import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 const EditorBuild = EditorBuildRouteDefinition.options.component;

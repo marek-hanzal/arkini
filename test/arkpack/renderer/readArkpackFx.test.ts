@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
-import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";
+import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { encodeFx } from "~/arkpack/artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
 import { createTestArkpack, testArkpackConfig } from "~test/arkpack/support/createTestArkpack";

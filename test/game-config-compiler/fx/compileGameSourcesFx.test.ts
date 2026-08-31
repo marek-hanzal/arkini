@@ -9,9 +9,9 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
-import { DiagnosticRecordEntityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticRecordEntityEnumSchema";
-import { DiagnosticProviderEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticProviderEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticRecordEntityEnumSchema";
+import { DiagnosticProviderEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticProviderEnumSchema";
 
 const compile = (...sources: GameSourceFileSchema.Type[]) =>
 	Effect.runPromise(compileGameSourcesFx(sources));

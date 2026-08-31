@@ -59,6 +59,7 @@
 		"src/game-config",
 		"src/game-config-cli",
 		"src/game-config-compiler",
+		"src/game-config-diagnostic",
 		"src/game-config-resource",
 		"src/game-config-source",
 		"src/game-config-validation",

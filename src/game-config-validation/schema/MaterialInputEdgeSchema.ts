@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
+import { DiagnosticPathSchema } from "~/game-config-diagnostic/schema/DiagnosticPathSchema";
 
 export const MaterialInputEdgeSchema = z
 	.object({

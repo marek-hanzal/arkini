@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { renameEditorItemFx } from "~/item-authoring/fx/renameEditorItemFx";
+import { renameFx } from "~/item-authoring/fx/renameFx";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 
 /** Renames an item through a revision-pinned whole-config commit. */
@@ -27,7 +27,7 @@ export const renameItemFx = Effect.fn("renameItemFx")(function* ({
 				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_config again before renaming the item.`,
 			),
 		);
-	const renamed = yield* renameEditorItemFx({
+	const renamed = yield* renameFx({
 		config: project.config,
 		itemId,
 		newItemId,

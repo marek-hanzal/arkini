@@ -1,26 +1,20 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { EditorItemArtworkDetail } from "~/item-authoring/ui/EditorItemArtworkDetail";
-import {
-	EditorItemChargesDetail,
-	EditorItemMergesDetail,
-} from "~/item-authoring/ui/EditorItemCapabilityDetails";
-import { EditorItemDeleteSection } from "~/item-authoring/ui/EditorItemDeleteSection";
+import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
+import { ChargesDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { DeleteSection } from "~/item-authoring/ui/DeleteSection";
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
-import { EditorItemIdentityDetail } from "~/item-authoring/ui/EditorItemIdentityDetail";
-import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
-import { EditorItemProductionDetail } from "~/item-authoring/ui/EditorItemProductionDetail";
-import {
-	type EditorItemSectionId,
-	EditorItemSectionIds,
-} from "~/item-authoring/type/EditorItemSection";
-import { EditorSpaceActionDetail } from "~/item-authoring/ui/EditorSpaceActionDetail";
-import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
-import { useEditorItemByUid } from "~/item-authoring/ui/useEditorItemByUid";
+import { IdentityDetail } from "~/item-authoring/ui/IdentityDetail";
+import { NotFound } from "~/item-authoring/ui/NotFound";
+import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
+import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
+import { SpaceActionDetail } from "~/item-authoring/ui/SpaceActionDetail";
+import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
+import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({
 	beforeLoad: ({ params }) => {
-		if (EditorItemSectionIds.some((section) => section === params.sectionId)) return;
+		if (SectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 			params: {
@@ -32,12 +26,10 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 	},
 	component: () => {
 		const { itemUid, sectionId } = Route.useParams();
-		const item = useEditorItemByUid(itemUid);
-		if (item === undefined) return <EditorItemNotFound uid={itemUid} />;
-		const section = sectionId as EditorItemSectionId;
-		const available = readEditorItemSectionsFn(item).some(
-			(candidate) => candidate.id === section,
-		);
+		const item = useItemByUid(itemUid);
+		if (item === undefined) return <NotFound uid={itemUid} />;
+		const section = sectionId as SectionId;
+		const available = readSectionsFn(item).some((candidate) => candidate.id === section);
 		if (!available)
 			return (
 				<section
@@ -52,21 +44,21 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 			);
 		switch (section) {
 			case "identity":
-				return <EditorItemIdentityDetail item={item} />;
+				return <IdentityDetail item={item} />;
 			case "artwork":
-				return <EditorItemArtworkDetail item={item} />;
+				return <ArtworkDetail item={item} />;
 			case "charges":
-				return <EditorItemChargesDetail item={item} />;
+				return <ChargesDetail item={item} />;
 			case "merges":
-				return <EditorItemMergesDetail item={item} />;
+				return <MergesDetail item={item} />;
 			case "action":
-				return <EditorSpaceActionDetail item={item} />;
+				return <SpaceActionDetail item={item} />;
 			case "production":
-				return <EditorItemProductionDetail item={item} />;
+				return <ProductionDetail item={item} />;
 			case "estimate":
 				return <ItemEstimateSection itemId={item.id} />;
 			case "delete":
-				return <EditorItemDeleteSection item={item} />;
+				return <DeleteSection item={item} />;
 		}
 	},
 });

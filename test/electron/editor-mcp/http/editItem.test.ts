@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
+import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
@@ -20,7 +20,7 @@ describe("editor MCP item editing", () => {
 		);
 		const water = editorTestPayload.config.items.water;
 		const producer = {
-			...createEditorItemDraftFn({
+			...createDraftFn({
 				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
 				type: "producer",
 				uid: "producer-uid",

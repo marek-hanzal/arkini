@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import { readFlowNavigationProjectionFn } from "~/flow-canvas/fn/readFlowNavigationProjectionFn";
 import { readHighlightFn } from "~/flow-canvas/fn/readHighlightFn";
 import { readMetroBackbonesFn } from "~/flow-canvas/fn/readMetroBackbonesFn";
@@ -197,7 +197,7 @@ export namespace useProjection {
 	export interface Props {
 		readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 		readonly direction: OriginFlowDirection;
-		readonly flow: EditorItemOriginFlow;
+		readonly flow: ItemOriginFlow;
 		readonly positions: ReadonlyMap<string, LayoutNode>;
 		readonly selection: Selection | undefined;
 	}

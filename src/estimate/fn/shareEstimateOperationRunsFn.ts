@@ -5,8 +5,8 @@ import {
 	readEstimateRouteRequirementsFn,
 } from "~/estimate/fn/createEstimateRoutePolicyFn";
 import { readEstimateExpectedRunsFn } from "~/estimate/fn/readEstimateExpectedRunsFn";
-import type { EditorItemEstimateDiagnostic } from "~/estimate/type/EditorItemEstimate";
-import type { EstimateSelectedRoute } from "~/estimate-witness/type/EstimateWitness";
+import type { ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
+import type { EstimateSelectedRoute } from "~/estimate/type/EstimateWitness";
 
 interface ShareEstimateOperationRunsProps {
 	readonly choiceOverrides: ReadonlyMap<string, string>;
@@ -17,7 +17,7 @@ interface ShareEstimateOperationRunsProps {
 }
 
 interface SharedOperationFailure {
-	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
+	readonly diagnostics: ReadonlyArray<ItemEstimateDiagnostic>;
 	readonly status: "failure";
 }
 

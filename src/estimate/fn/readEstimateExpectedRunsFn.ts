@@ -1,7 +1,7 @@
 import type {
-	EditorAcquisitionOperationOutcome,
-	EditorAcquisitionQuantityProbability,
-} from "~/flow/type/EditorAcquisitionGraph";
+	AcquisitionOperationOutcome,
+	AcquisitionQuantityProbability,
+} from "~/flow/type/AcquisitionGraph";
 
 const maximumExpectedRunStates = 10_000;
 const epsilon = 1e-12;
@@ -17,7 +17,7 @@ export type EstimateExpectedRunsResult =
 
 interface ReadEstimateExpectedRunsProps {
 	readonly demandByOutputGroupId: ReadonlyMap<string, number>;
-	readonly distribution: ReadonlyArray<EditorAcquisitionOperationOutcome>;
+	readonly distribution: ReadonlyArray<AcquisitionOperationOutcome>;
 }
 
 const readStateKeyFn = (remaining: ReadonlyArray<number>) => remaining.join("\u0000");
@@ -168,7 +168,7 @@ export const readEstimateExpectedRunsFn = ({
 
 /** Reads whole authored operation batches for one scalar output distribution. */
 export const readEstimateScalarExpectedRunsFn = (
-	distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
+	distribution: ReadonlyArray<AcquisitionQuantityProbability>,
 	demand: number,
 ): EstimateExpectedRunsResult =>
 	readEstimateExpectedRunsFn({

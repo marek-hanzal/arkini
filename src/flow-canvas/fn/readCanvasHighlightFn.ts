@@ -1,4 +1,4 @@
-import type { EditorItemOriginItemNode } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginItemNode } from "~/flow/type/ItemOriginFlow";
 import type { Highlight, Selection } from "~/flow-canvas/type/Highlight";
 
 const HighlightMinimumOpacity = 0.28;
@@ -10,7 +10,7 @@ const readHighlightOpacityFn = (level: number | undefined) =>
 		: Math.max(HighlightMinimumOpacity, 1 - Math.max(0, level) * HighlightOpacityStep);
 
 export const readCanvasNodeHighlightFn = (
-	node: EditorItemOriginItemNode,
+	node: ItemOriginItemNode,
 	selection: Selection | undefined,
 	highlight: Highlight | undefined,
 	navigationFocusNodeId: string | undefined,

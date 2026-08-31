@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EditorItemEstimateSortSchema } from "~/estimate/schema/EditorItemEstimateSortSchema";
+import { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
 
 export const EstimateInputSchema = z
 	.object({
@@ -20,7 +20,7 @@ export const EstimateInputSchema = z
 			.string()
 			.optional()
 			.describe("Optional fuzzy search across item title, ID, description, and type."),
-		sort: EditorItemEstimateSortSchema.default("fastest").describe(
+		sort: ItemEstimateSortSchema.default("fastest").describe(
 			"Global Estimate ordering: fastest, slowest, or highest aggregate demand first.",
 		),
 	})

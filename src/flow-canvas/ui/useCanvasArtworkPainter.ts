@@ -1,6 +1,6 @@
 import { type RefObject, useCallback, useEffect, useRef } from "react";
 
-import type { EditorItemOriginItemNode } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginItemNode } from "~/flow/type/ItemOriginFlow";
 import type { CanvasPalette } from "~/flow-canvas/type/CanvasPalette";
 
 const MaxCachedImages = 96;
@@ -28,7 +28,7 @@ export const useCanvasArtworkPainter = (onImageReadyRef: RefObject<() => void>) 
 	return useCallback(
 		(
 			context: CanvasRenderingContext2D,
-			node: EditorItemOriginItemNode,
+			node: ItemOriginItemNode,
 			resourceUrls: ReadonlyMap<string, string>,
 			x: number,
 			y: number,

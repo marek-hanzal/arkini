@@ -1,0 +1,218 @@
+import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
+
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
+import type { AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
+import { ItemEstimateRouteGraph } from "~/estimate/ui/ItemEstimateRouteGraph";
+import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import { Status } from "~/ui/ui/Status";
+
+const formatQuantityFn = (quantity: number) =>
+	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
+
+const formatRuntimeFn = (runtimeMs: number) => formatDurationFn(runtimeMs);
+
+const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
+	switch (diagnostic.kind) {
+		case "joint-output-accounting-unsupported":
+			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space.`;
+		case "witness-search-exhausted":
+			return `${diagnostic.routeId} exceeds the bounded complete-witness search of ${diagnostic.maximumStates} states.`;
+		case "quantity-limit-exceeded":
+			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
+		case "cycle":
+			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
+		case "unreachable":
+			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} has no complete acquisition route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}.`;
+		case "zero-yield":
+			return `Route ${diagnostic.routeId} can never yield ${diagnostic.factId}.`;
+	}
+};
+
+const limitationTextFn = (limitation: AcquisitionLimitation) => {
+	switch (limitation) {
+		case "conditional-runtime-adjustments-ignored":
+			return "Conditional runtime adjustments are ignored.";
+		case "negative-availability-constraints-ignored":
+			return "Positive enable prerequisites are acquired, but rule truth and disabling conditions are ignored.";
+		case "spatial-requirements-approximated":
+			return "Scope, distance, board capacity, and concrete placement are ignored.";
+	}
+};
+
+const ItemEstimateMethodDetails = ({ estimate }: { readonly estimate: ItemEstimate }) => (
+	<div
+		className="min-w-0"
+		data-ui="EditorItemEstimateMethod"
+	>
+		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
+			<Calculator className="mt-0.5 size-5 shrink-0 text-sky-700" />
+			<div>
+				<h3 className="font-semibold text-foreground">Approximate dependency estimator</h3>
+				<p className="mt-1 text-xs text-muted">Optimistic bounded-distribution analysis</p>
+			</div>
+		</header>
+		<p className="py-3 text-xs leading-relaxed text-muted">
+			Expands from authored starting facts and ranks complete routes by quantity-aware
+			upstream critical-path cost with stable route identity as the tie-break. Bounded output
+			distributions provide expected first-hitting time, including whole deterministic batches
+			and correlated co-products. Demand uses the larger of additive consumption and each
+			selected route's simultaneous consumed-plus-reusable need. Finite starting pools are
+			shared across the selected-fact witness. Runtime rule truth, concrete item identity
+			packing, placement, renewable capacity, and engine execution are not simulated.
+			Unsupported bounded state space returns a partial estimate.
+		</p>
+		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
+			{estimate.obtainable ? (
+				<>
+					<li>Selected route: {estimate.route.routeId}.</li>
+					<li>
+						Approximate action runs: {formatQuantityFn(estimate.route.actionRuns)};
+						output samples: {formatQuantityFn(estimate.route.outputRuns)}.
+					</li>
+				</>
+			) : (
+				<li>
+					{estimate.status === "partial"
+						? "No duration is claimed for this incomplete path."
+						: "No route satisfied every required dependency."}
+				</li>
+			)}
+			<li>Starting authored items contribute no acquisition time.</li>
+			<li>The normalized selected-fact DAG explains the deterministic approximation.</li>
+			{estimate.obtainable && estimate.diagnostics.length > 0 ? (
+				<li>
+					Rejected alternatives:{" "}
+					{estimate.diagnostics
+						.map((diagnostic) => diagnosticTextFn(diagnostic))
+						.join(" ")}
+				</li>
+			) : null}
+			{estimate.limitations.map((limitation) => (
+				<li key={limitation}>Limitation: {limitationTextFn(limitation)}</li>
+			))}
+		</ul>
+	</div>
+);
+
+const ItemEstimateHeading = ({ estimate }: { readonly estimate?: ItemEstimate }) => (
+	<header className="flex items-center gap-1">
+		<h2 className="text-lg font-semibold text-foreground">Approximate acquisition path</h2>
+		{estimate === undefined ? null : (
+			<Tooltip
+				content={<ItemEstimateMethodDetails estimate={estimate} />}
+				contentClassName="w-[min(40rem,calc(100vw-2rem))] max-w-none p-4"
+				placement="bottom-start"
+			>
+				<button
+					type="button"
+					data-ui="EditorInfoTooltip"
+					className="grid size-7 min-h-0 min-w-0 shrink-0 cursor-help place-items-center rounded-full border-0 bg-transparent p-0 text-muted hover:text-foreground"
+					onClick={(event) => {
+						event.preventDefault();
+						event.stopPropagation();
+					}}
+				>
+					<Info className="size-4" />
+				</button>
+			</Tooltip>
+		)}
+	</header>
+);
+
+const ItemEstimateSummary = ({ estimate }: { readonly estimate: ItemEstimate }) => (
+	<div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+		<ItemEstimateHeading estimate={estimate} />
+		<p className="shrink-0 font-semibold tabular-nums text-foreground">
+			{estimate.obtainable
+				? `≈ ${formatRuntimeFn(estimate.durationMs)}`
+				: estimate.status === "partial"
+					? "Indeterminate"
+					: "Unreachable"}
+		</p>
+	</div>
+);
+
+const ItemEstimateResult = ({
+	config,
+	estimate,
+	projectId,
+}: {
+	readonly config: ReturnType<typeof useEditorProject>["config"];
+	readonly estimate: ItemEstimate;
+	readonly projectId: string;
+}) =>
+	estimate.obtainable ? (
+		<ItemEstimateRouteGraph
+			config={config}
+			header={<ItemEstimateSummary estimate={estimate} />}
+			projectId={projectId}
+			routeSteps={estimate.routeSteps}
+		/>
+	) : (
+		<article
+			className="rounded-xl border border-line bg-surface-raised p-4"
+			data-ui="EditorItemEstimateHeader"
+		>
+			<ItemEstimateSummary estimate={estimate} />
+			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
+				<p className="font-medium text-foreground">
+					{estimate.status === "partial"
+						? "The bounded static analysis could not produce stable totals; see the diagnostic for the exact limit."
+						: "The authored dependency graph contains no complete route from the configured starting facts."}
+				</p>
+				<ul className="grid gap-2">
+					{estimate.diagnostics.map((diagnostic, index) => (
+						<li key={`${diagnostic.kind}:${index}`}>{diagnosticTextFn(diagnostic)}</li>
+					))}
+				</ul>
+			</div>
+		</article>
+	);
+
+/** Shows the shared static estimate in one item's read-only Estimate section. */
+export const ItemEstimateSection = ({ itemId }: { readonly itemId: string }) => {
+	const project = useEditorProject();
+	const state = useItemEstimate(project, itemId);
+	return (
+		<section
+			className="grid gap-4"
+			data-ui="EditorItemEstimateSection"
+		>
+			{state.status === "ready" ? null : (
+				<div
+					className="rounded-xl border border-line bg-surface-raised p-4"
+					data-ui="EditorItemEstimateHeader"
+				>
+					<ItemEstimateHeading />
+				</div>
+			)}
+			{state.status === "loading" ? (
+				<Status
+					dataUi="EditorItemEstimateLoading"
+					description="Analyzing authored routes and their requirements."
+					icon={LoaderCircle}
+					iconSpin
+					title="Calculating estimate"
+				/>
+			) : null}
+			{state.status === "error" ? (
+				<Status
+					dataUi="EditorItemEstimateError"
+					description={state.message}
+					icon={TriangleAlert}
+					title="Estimate calculation failed"
+				/>
+			) : null}
+			{state.status === "ready" ? (
+				<ItemEstimateResult
+					config={project.config}
+					estimate={state.estimate}
+					projectId={project.projectId}
+				/>
+			) : null}
+		</section>
+	);
+};

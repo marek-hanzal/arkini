@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { renameGameResourceFx } from "~/game-config/resource/renameGameResourceFx";
+import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
 import { editorTestPayload } from "../../project-authoring/support/editorTestPayload";
 
 describe("renameGameResourceFx", () => {

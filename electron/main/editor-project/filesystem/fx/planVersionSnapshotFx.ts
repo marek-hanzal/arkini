@@ -5,7 +5,7 @@ import { GameProjectGameSchemaReference } from "~/game-config/source/GameProject
 import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { createVersionFingerprint, hashVersionBytes, hashVersionJson } from "./VersionFingerprint";

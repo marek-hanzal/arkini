@@ -1,5 +1,5 @@
 import type { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
-import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 

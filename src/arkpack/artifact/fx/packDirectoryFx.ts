@@ -14,7 +14,7 @@ import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionS
 import { encodeFx } from "./encodeFx";
 import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
-import { readPngResourceFx } from "~/game-config/resource/fx/readPngResourceFx";
+import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 
 const gzipAsync = promisify(gzip);
 

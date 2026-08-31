@@ -6,7 +6,7 @@ import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoa
 import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";

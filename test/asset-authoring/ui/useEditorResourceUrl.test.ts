@@ -9,7 +9,7 @@ import {
 	useEditorResourceUrl,
 	useEditorResourceUrls,
 } from "~/asset-authoring/ui/EditorResourceUrlSession";
-import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 
 const state = vi.hoisted(() => ({
 	resources: [] as ReadonlyArray<ResourceSchema.Type>,

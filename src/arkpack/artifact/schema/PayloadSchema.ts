@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 

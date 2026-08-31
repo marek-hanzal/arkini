@@ -6,7 +6,7 @@ import {
 } from "~/arkpack/renderer/readSelectedArkpackFileFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
-import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import {
 	type EditorAssetFileInput,

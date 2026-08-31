@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "./compileGameSourcesFx";
 import { readGameSourceFilesFx } from "./readGameSourceFilesFx";
-import { readResourceDescriptorsFx } from "~/game-config/resource/fx/readResourceDescriptorsFx";
+import { readResourceDescriptorsFx } from "~/game-config-resource/fx/readResourceDescriptorsFx";
 import { validateGameResourcesFn } from "~/game-config/validation/rule/fn/validateGameResourcesFn";
 
 export namespace compileGameDirectoryFx {

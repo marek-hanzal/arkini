@@ -4,7 +4,7 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { RolesSchema } from "~/game-config/resource/schema/RolesSchema";
+import { RolesSchema } from "~/game-config-resource/schema/RolesSchema";
 
 /**
  * The root schema for a game's configuration.

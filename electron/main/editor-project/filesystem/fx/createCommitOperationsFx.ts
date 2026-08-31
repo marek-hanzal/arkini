@@ -17,7 +17,7 @@ import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn"
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";

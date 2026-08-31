@@ -8,7 +8,7 @@ import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationCla
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 

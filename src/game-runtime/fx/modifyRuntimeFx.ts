@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { modifyRuntimeWithTransitionFx } from "~/game-runtime/internal/modifyRuntimeWithTransitionFx";
+import { modifyRuntimeWithTransitionFx } from "~/game-runtime/fx/modifyRuntimeWithTransitionFx";
 
 /**
  * Runs one runtime mutation against the latest serialized snapshot.

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { removeItemRuntimeTransitionFx } from "~/item-interaction/fx/removeItemRuntimeTransitionFx";
 
 /** Commits canonical removal as setup for tests whose regression belongs elsewhere. */

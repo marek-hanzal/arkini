@@ -2,7 +2,7 @@ import { Cause, Deferred, Effect, Exit, Fiber, Option, Scope, Stream } from "eff
 import { describe, expect, it } from "@effect/vitest";
 
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
-import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
+import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 

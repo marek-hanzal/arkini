@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { settleInstantGameplayFx } from "~/game-cheat/fx/settleInstantGameplayFx";
 

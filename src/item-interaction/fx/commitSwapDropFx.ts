@@ -7,7 +7,7 @@ import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";

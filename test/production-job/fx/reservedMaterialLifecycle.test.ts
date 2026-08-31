@@ -5,7 +5,7 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
+import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

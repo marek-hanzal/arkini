@@ -14,7 +14,7 @@ import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readRuntimeInventoryOpenerFx } from "~/item-interaction/fx/readRuntimeInventoryOpenerFx";

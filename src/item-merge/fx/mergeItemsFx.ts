@@ -12,7 +12,7 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";

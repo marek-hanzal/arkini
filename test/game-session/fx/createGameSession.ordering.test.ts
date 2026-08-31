@@ -4,7 +4,7 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { Effect } from "effect";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 

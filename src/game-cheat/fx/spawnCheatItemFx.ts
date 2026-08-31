@@ -9,7 +9,7 @@ import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";

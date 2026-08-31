@@ -5,7 +5,7 @@ import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
+import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 
 type RuntimeUpdateResult<Result> =
 	| readonly [

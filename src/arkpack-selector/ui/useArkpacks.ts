@@ -1,6 +1,6 @@
 import { useAtomValue } from "@effect/atom-react";
 
-import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
+import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
 import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 
 export namespace useArkpacks {

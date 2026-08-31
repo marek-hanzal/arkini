@@ -1,7 +1,7 @@
 import { Play, Sparkles, Trash2 } from "lucide-react";
 import { match } from "ts-pattern";
 
-import type { useArkpacks } from "~/arkpack/ui/useArkpacks";
+import type { useArkpacks } from "~/arkpack-selector/ui/useArkpacks";
 import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";
 

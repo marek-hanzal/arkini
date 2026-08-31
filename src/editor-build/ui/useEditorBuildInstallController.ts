@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { useState } from "react";
 
-import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
+import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
 import {
 	type EditorBuildMajorUpdateConfirmation,
 	readEditorBuildInstallPlanFn,

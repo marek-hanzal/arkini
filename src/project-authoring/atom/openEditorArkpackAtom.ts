@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { openEditorArkpackFx } from "~/arkpack/ui/editor/openEditorArkpackFx";
+import { openEditorArkpackFx } from "~/project-authoring/fx/openEditorArkpackFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 

@@ -7,7 +7,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
+import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";

@@ -90,7 +90,7 @@ vi.mock("@effect/atom-react", () => ({
 						: AsyncResult.initial(),
 }));
 
-vi.mock("~/arkpack/ui/ArkpackCatalogAtom", () => ({
+vi.mock("~/arkpack-selector/atom/ArkpackCatalogAtom", () => ({
 	ArkpackCatalogAtom: {
 		kind: "catalog",
 		key: "canonical",

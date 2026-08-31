@@ -3,7 +3,7 @@ import { Option } from "effect";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
-export namespace isLineOwnerItemFn {
+export namespace narrowLineOwnerItemFn {
 	type DepositItem = Extract<
 		ItemSchema.Type,
 		{
@@ -28,10 +28,12 @@ export namespace isLineOwnerItemFn {
 }
 
 /** Narrows one canonical item to the exact variants that expose product lines. */
-export const isLineOwnerItemFn = (item: ItemSchema.Type): Option.Option<isLineOwnerItemFn.Result> =>
+export const narrowLineOwnerItemFn = (
+	item: ItemSchema.Type,
+): Option.Option<narrowLineOwnerItemFn.Result> =>
 	Option.liftPredicate(
 		item,
-		(candidate): candidate is isLineOwnerItemFn.Result =>
+		(candidate): candidate is narrowLineOwnerItemFn.Result =>
 			candidate.type === TypeSchema.enum.Producer ||
 			(candidate.type === TypeSchema.enum.Deposit && candidate.lines !== undefined) ||
 			candidate.type === TypeSchema.enum.Blueprint ||

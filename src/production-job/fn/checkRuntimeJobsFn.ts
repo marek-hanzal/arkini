@@ -13,7 +13,7 @@ import type { JobMaterialOrphanIssueSchema } from "~/production-job/schema/JobMa
 import type { JobTimeInvalidIssueSchema } from "~/production-job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
 import { readRuntimeItemOwnedStateFn } from "~/game-runtime/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -69,7 +69,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 			});
 			continue;
 		}
-		if (Option.isNone(isGridRuntimeItemFn(owner)))
+		if (Option.isNone(narrowGridRuntimeItemFn(owner)))
 			ownerGridIssues.push({
 				jobId: entry.id,
 				ownerItemId: owner.id,

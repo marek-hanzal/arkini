@@ -8,8 +8,8 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/item-query/error/BoardQueryOriginUnavailableError";
 import { ScopeSchema } from "~/item-query/schema/ScopeSchema";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
@@ -69,11 +69,11 @@ export const queryFx = Effect.fn("queryFx")(function* ({ origin, query }: Props)
 		const runtime = yield* readRuntimeFx();
 		const selected = Array.getSomes(
 			queryItemsFn({
-				items: Array.getSomes(runtime.items.map(isBoardRuntimeItemFn)).filter(
+				items: Array.getSomes(runtime.items.map(narrowBoardRuntimeItemFn)).filter(
 					(item) => item.location.space === origin.space,
 				),
 				selector: query.selector,
-			}).map(isBoardRuntimeItemFn),
+			}).map(narrowBoardRuntimeItemFn),
 		);
 
 		return selected.filter((item) =>
@@ -86,7 +86,7 @@ export const queryFx = Effect.fn("queryFx")(function* ({ origin, query }: Props)
 	}
 
 	const runtime = yield* readRuntimeFx();
-	const gridItems = Array.getSomes(runtime.items.map(isGridRuntimeItemFn));
+	const gridItems = Array.getSomes(runtime.items.map(narrowGridRuntimeItemFn));
 	const items = match(query.scope)
 		.with(ScopeSchema.enum.Inventory, () =>
 			gridItems.filter(

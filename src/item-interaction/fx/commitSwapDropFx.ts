@@ -8,8 +8,8 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
@@ -87,7 +87,7 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				entityId: runtimeSecond.id,
 				expectedRevision: secondItemRevision,
 			});
-			const first = Option.getOrUndefined(isGridRuntimeItemFn(runtimeFirst));
+			const first = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeFirst));
 			if (first === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -96,7 +96,7 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			const second = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSecond));
+			const second = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSecond));
 			if (second === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -105,8 +105,8 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			const boardFirst = Option.getOrUndefined(isBoardRuntimeItemFn(first));
-			const boardSecond = Option.getOrUndefined(isBoardRuntimeItemFn(second));
+			const boardFirst = Option.getOrUndefined(narrowBoardRuntimeItemFn(first));
+			const boardSecond = Option.getOrUndefined(narrowBoardRuntimeItemFn(second));
 			if (
 				boardFirst !== undefined &&
 				boardSecond !== undefined &&

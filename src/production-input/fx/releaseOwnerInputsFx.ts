@@ -4,7 +4,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -40,7 +40,7 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 			runtime,
 		} satisfies releaseOwnerInputsFx.Result;
 	}
-	const boardOwner = Option.getOrUndefined(isBoardRuntimeItemFn(owner));
+	const boardOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));
 	if (boardOwner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({

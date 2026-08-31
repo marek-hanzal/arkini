@@ -7,6 +7,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { ItemEstimateListRow } from "~/estimate/ui/ItemEstimateListRow";
+import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { Status } from "~/ui/ui/Status";
 
@@ -88,14 +89,7 @@ export const ItemEstimateList = ({
 				/>
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">
-				{state.status === "loading" ? (
-					<p
-						className="px-1 py-2 text-xs text-subtle"
-						data-ui="EditorItemEstimatesLoading"
-					>
-						Calculating all item estimates…
-					</p>
-				) : null}
+				{state.status === "loading" ? <ItemEstimateLoading catalog /> : null}
 				{state.status === "error" ? (
 					<Status
 						dataUi="EditorItemEstimatesError"

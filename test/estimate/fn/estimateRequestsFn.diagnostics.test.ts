@@ -64,17 +64,29 @@ describe("estimateRequestsFn", () => {
 	});
 
 	it("rejects a nested cyclic route without hiding its slower complete alternative", () => {
+		const sideOptionFactIds = Array.from(
+			{
+				length: 8,
+			},
+			(_, index) => [
+				`side-${index}-a`,
+				`side-${index}-b`,
+			],
+		).flat();
 		const result = estimate(
 			graph({
 				facts: [
+					...sideOptionFactIds,
+					"side",
 					"x",
 					"target",
 				],
-				roots: [],
+				roots: sideOptionFactIds,
 				routes: [
 					route({
 						allOf: [
 							requirement("x"),
+							requirement("side"),
 						],
 						durationMs: 1,
 						id: "make-target",
@@ -92,6 +104,20 @@ describe("estimateRequestsFn", () => {
 						durationMs: 20,
 						id: "z-complete-x",
 						output: "x",
+					}),
+					route({
+						anyOf: Array.from(
+							{
+								length: 8,
+							},
+							(_, index) => [
+								requirement(`side-${index}-a`),
+								requirement(`side-${index}-b`),
+							],
+						),
+						durationMs: 0,
+						id: "make-side",
+						output: "side",
 					}),
 				],
 			}),
@@ -237,7 +263,7 @@ describe("estimateRequestsFn", () => {
 		});
 	});
 
-	it("does not claim a slower top route when faster witness search exhausts its cap", () => {
+	it("keeps a complete deterministic witness without enumerating independent route combinations", () => {
 		const inputFactIds = Array.from(
 			{
 				length: 13,
@@ -280,16 +306,85 @@ describe("estimateRequestsFn", () => {
 		);
 
 		expect(result).toMatchObject({
-			diagnostics: [
-				{
-					kind: "witness-search-exhausted",
-					maximumStates: 4_096,
-					routeId: "complex-target",
-				},
-			],
-			obtainable: false,
-			status: "partial",
+			diagnostics: [],
+			durationMs: 1,
+			obtainable: true,
+			status: "complete",
 		});
+		if (!result.obtainable) throw new Error("Expected the deterministic complete witness.");
+		expect(result.route.routeId).toBe("complex-target");
+		expect(
+			result.routeSteps
+				.filter(({ factId }) => factId.startsWith("input-"))
+				.map(({ routeId }) => routeId),
+		).toEqual(
+			[
+				...inputFactIds,
+			]
+				.sort()
+				.map((factId) => `a-${factId}`),
+		);
+	});
+
+	it("repairs a finite-root conflict with the faster complete witness", () => {
+		const inputFactIds = Array.from(
+			{
+				length: 5,
+			},
+			(_, index) => `input-${index}`,
+		);
+		const result = estimate(
+			graph({
+				facts: [
+					"raw",
+					...inputFactIds,
+					"target",
+				],
+				roots: [
+					{
+						factId: "raw",
+						quantity: 1,
+					},
+				],
+				routes: [
+					...inputFactIds.flatMap((factId) => [
+						route({
+							allOf: [
+								requirement("raw"),
+							],
+							durationMs: 0,
+							id: `fast-${factId}`,
+							output: factId,
+						}),
+						route({
+							durationMs: 10,
+							id: `slow-${factId}`,
+							output: factId,
+						}),
+					]),
+					route({
+						allOf: inputFactIds.map((factId) => requirement(factId)),
+						durationMs: 0,
+						id: "complex-target",
+						output: "target",
+					}),
+					route({
+						durationMs: 100,
+						id: "direct-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			diagnostics: [],
+			durationMs: 10,
+			obtainable: true,
+			status: "complete",
+		});
+		if (!result.obtainable) throw new Error("Expected the complete global witness.");
+		expect(result.route.routeId).toBe("complex-target");
 	});
 
 	it("uses stable route identity to break complete-duration ties", () => {

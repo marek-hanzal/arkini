@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
-import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
+import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";

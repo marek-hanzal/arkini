@@ -5,7 +5,7 @@ import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLine
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import type { JobQueueResolutionSchema } from "~/production-job/schema/JobQueueResolutionSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
-import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
+import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

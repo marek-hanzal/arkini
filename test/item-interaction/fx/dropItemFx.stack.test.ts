@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~test/support/game/GameLayerFx";
-import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
+import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";

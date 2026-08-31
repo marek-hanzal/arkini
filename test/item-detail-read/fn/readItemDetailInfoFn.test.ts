@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readItemDetailIdentityFx } from "~/item-detail-read/fx/readItemDetailIdentityFx";
 import { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { lineRunRuntime } from "~test/production-line/fx/run/support/lineRunTestRuntime";
+import { lineRunRuntime } from "~test/production-line/support/lineRunTestRuntime";
 
 describe("tile identity and Info projections", () => {
 	it("separates shared shell identity from broad common item facts", () => {

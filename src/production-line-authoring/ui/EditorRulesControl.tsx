@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
-import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/RuleSchema";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 import { EditorBoardDistanceControl } from "~/production-line-authoring/ui/EditorBoardDistanceControl";
 import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";

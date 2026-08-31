@@ -13,7 +13,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
-import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";
+import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 import {
 	createFixedStepTestConfig,
 	prepareFixedStepRuntimeFx,

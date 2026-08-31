@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseRuleSchema } from "./BaseRuleSchema";
+import { RuleTypeSchema } from "./RuleTypeSchema";
 
 /**
  * A rule that adjusts a product line's runtime by a signed millisecond value.
@@ -9,10 +9,10 @@ import { TypeSchema } from "./TypeSchema";
  * Every applicable runtime adjustment stacks additively after the line's
  * active runtime multipliers have been applied.
  */
-export const RuntimeAdjustmentSchema = z
+export const RuntimeAdjustmentRuleSchema = z
 	.object({
-		...BaseSchema.shape,
-		type: TypeSchema.extract([
+		...BaseRuleSchema.shape,
+		type: RuleTypeSchema.extract([
 			"RuntimeAdjust",
 		]).describe("Identifies this rule as a product-line runtime adjustment."),
 		adjustMs: z
@@ -26,8 +26,8 @@ export const RuntimeAdjustmentSchema = z
 		description: "A rule that adjusts a product line's runtime by a signed millisecond value.",
 	});
 
-export type RuntimeAdjustmentSchema = typeof RuntimeAdjustmentSchema;
+export type RuntimeAdjustmentRuleSchema = typeof RuntimeAdjustmentRuleSchema;
 
-export namespace RuntimeAdjustmentSchema {
-	export type Type = z.infer<RuntimeAdjustmentSchema>;
+export namespace RuntimeAdjustmentRuleSchema {
+	export type Type = z.infer<RuntimeAdjustmentRuleSchema>;
 }

@@ -53,14 +53,14 @@ vi.mock("~/production-job/fx/enqueueLineFx", () => ({
 	},
 }));
 
-vi.mock("~/production-line/write/setDefaultLineFx", () => ({
+vi.mock("~/production-line/fx/setDefaultLineFx", () => ({
 	setDefaultLineFx: (command: unknown) => {
 		commands.setDefault(command);
 		return command;
 	},
 }));
 
-vi.mock("~/production-line/write/unsetDefaultLineFx", () => ({
+vi.mock("~/production-line/fx/unsetDefaultLineFx", () => ({
 	unsetDefaultLineFx: (command: unknown) => {
 		commands.unsetDefault(command);
 		return command;

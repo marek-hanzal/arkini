@@ -2,10 +2,10 @@ import { z } from "zod";
 
 import { DisableRuleSchema } from "~/production-action/schema/DisableRuleSchema";
 import { EnableRuleSchema } from "~/production-action/schema/EnableRuleSchema";
-import { HideSchema } from "./HideSchema";
-import { RuntimeAdjustmentSchema } from "./RuntimeAdjustmentSchema";
-import { RuntimeMultiplierSchema } from "./RuntimeMultiplierSchema";
-import { ShowSchema } from "./ShowSchema";
+import { HideRuleSchema } from "./HideRuleSchema";
+import { RuntimeAdjustmentRuleSchema } from "./RuntimeAdjustmentRuleSchema";
+import { RuntimeMultiplierRuleSchema } from "./RuntimeMultiplierRuleSchema";
+import { ShowRuleSchema } from "./ShowRuleSchema";
 
 /**
  * A rule evaluated for a product line.
@@ -15,12 +15,12 @@ import { ShowSchema } from "./ShowSchema";
  */
 export const RuleSchema = z
 	.discriminatedUnion("type", [
-		ShowSchema,
-		HideSchema,
+		ShowRuleSchema,
+		HideRuleSchema,
 		EnableRuleSchema,
 		DisableRuleSchema,
-		RuntimeAdjustmentSchema,
-		RuntimeMultiplierSchema,
+		RuntimeAdjustmentRuleSchema,
+		RuntimeMultiplierRuleSchema,
 	])
 	.meta({
 		id: "line.RuleSchema",

@@ -9,7 +9,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,
-} from "~test/production-line/fx/run/support/lineRunTestRuntime";
+} from "~test/production-line/support/lineRunTestRuntime";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 

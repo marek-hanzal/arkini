@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseRuleSchema } from "./BaseRuleSchema";
+import { RuleTypeSchema } from "./RuleTypeSchema";
 
 const PositiveNumberSchema = z.number().positive().meta({
 	id: "PositiveNumberSchema",
@@ -14,13 +14,13 @@ const PositiveNumberSchema = z.number().positive().meta({
  * Every applicable runtime multiplier stacks multiplicatively with the line's
  * base runtime and other applicable runtime multiplier rules.
  */
-export const RuntimeMultiplierSchema = z
+export const RuntimeMultiplierRuleSchema = z
 	.object({
-		...BaseSchema.shape,
+		...BaseRuleSchema.shape,
 		/**
 		 * Identifies this rule as a product-line runtime multiplier.
 		 */
-		type: TypeSchema.extract([
+		type: RuleTypeSchema.extract([
 			"RuntimeMultiplier",
 		]).describe("Identifies this rule as a product-line runtime multiplier."),
 		/**
@@ -36,8 +36,8 @@ export const RuntimeMultiplierSchema = z
 		description: "A rule that multiplies a product line's runtime when its conditions pass.",
 	});
 
-export type RuntimeMultiplierSchema = typeof RuntimeMultiplierSchema;
+export type RuntimeMultiplierRuleSchema = typeof RuntimeMultiplierRuleSchema;
 
-export namespace RuntimeMultiplierSchema {
-	export type Type = z.infer<RuntimeMultiplierSchema>;
+export namespace RuntimeMultiplierRuleSchema {
+	export type Type = z.infer<RuntimeMultiplierRuleSchema>;
 }

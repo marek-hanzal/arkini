@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseRuleSchema } from "./BaseRuleSchema";
+import { RuleTypeSchema } from "./RuleTypeSchema";
 
 /**
  * A rule that hides a product line.
@@ -9,13 +9,13 @@ import { TypeSchema } from "./TypeSchema";
  * When this rule applies, it takes precedence over the line's `show` default
  * and any applicable `show` rule.
  */
-export const HideSchema = z
+export const HideRuleSchema = z
 	.object({
-		...BaseSchema.shape,
+		...BaseRuleSchema.shape,
 		/**
 		 * Identifies this rule as a request to hide the line.
 		 */
-		type: TypeSchema.extract([
+		type: RuleTypeSchema.extract([
 			"Hide",
 		]).describe("Identifies this rule as a request to hide the product line."),
 	})
@@ -25,8 +25,8 @@ export const HideSchema = z
 		description: "A rule that hides a product line when its condition is satisfied.",
 	});
 
-export type HideSchema = typeof HideSchema;
+export type HideRuleSchema = typeof HideRuleSchema;
 
-export namespace HideSchema {
-	export type Type = z.infer<HideSchema>;
+export namespace HideRuleSchema {
+	export type Type = z.infer<HideRuleSchema>;
 }

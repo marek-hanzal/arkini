@@ -16,7 +16,7 @@ import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { TypeSchema } from "~/production-line/schema/rule/TypeSchema";
+import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 
 const unavailable = {
 	kind: "unavailable",
@@ -32,9 +32,9 @@ const readLineDisabledCauseFn = (
 	}
 >["cause"] => {
 	for (const [ruleIndex, result] of resolution.rules.entries()) {
-		if (result.type !== TypeSchema.enum.Disable || !result.active) continue;
+		if (result.type !== RuleTypeSchema.enum.Disable || !result.active) continue;
 		const rule = line.rules[ruleIndex];
-		if (rule?.type !== TypeSchema.enum.Disable) continue;
+		if (rule?.type !== RuleTypeSchema.enum.Disable) continue;
 		if (rule.hint === undefined)
 			return {
 				kind: "static",
@@ -47,9 +47,9 @@ const readLineDisabledCauseFn = (
 		};
 	}
 	for (const [ruleIndex, result] of resolution.rules.entries()) {
-		if (result.type !== TypeSchema.enum.Enable || result.active) continue;
+		if (result.type !== RuleTypeSchema.enum.Enable || result.active) continue;
 		const rule = line.rules[ruleIndex];
-		if (rule?.type !== TypeSchema.enum.Enable) continue;
+		if (rule?.type !== RuleTypeSchema.enum.Enable) continue;
 		if (rule.hint === undefined)
 			return {
 				kind: "static",

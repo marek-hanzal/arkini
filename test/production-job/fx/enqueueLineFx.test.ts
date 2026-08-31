@@ -9,7 +9,7 @@ import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
-import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";
+import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 

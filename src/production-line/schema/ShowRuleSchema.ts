@@ -1,18 +1,18 @@
 import { z } from "zod";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseRuleSchema } from "./BaseRuleSchema";
+import { RuleTypeSchema } from "./RuleTypeSchema";
 
 /**
  * A rule that makes an otherwise hidden product line visible.
  */
-export const ShowSchema = z
+export const ShowRuleSchema = z
 	.object({
-		...BaseSchema.shape,
+		...BaseRuleSchema.shape,
 		/**
 		 * Identifies this rule as a conditional request to show the line.
 		 */
-		type: TypeSchema.extract([
+		type: RuleTypeSchema.extract([
 			"Show",
 		]).describe("Identifies this rule as a request to show the product line."),
 	})
@@ -22,8 +22,8 @@ export const ShowSchema = z
 		description: "A rule that conditionally makes a product line visible.",
 	});
 
-export type ShowSchema = typeof ShowSchema;
+export type ShowRuleSchema = typeof ShowRuleSchema;
 
-export namespace ShowSchema {
-	export type Type = z.infer<ShowSchema>;
+export namespace ShowRuleSchema {
+	export type Type = z.infer<ShowRuleSchema>;
 }

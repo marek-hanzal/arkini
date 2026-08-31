@@ -8,7 +8,7 @@ import type { InputSelectorMismatchIssueSchema } from "~/production-input/schema
 import type { InputSlotInvalidIssueSchema } from "~/production-input/schema/InputSlotInvalidIssueSchema";
 import type { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
-import type { LineInputClosedIssueSchema } from "~/production-line/schema/check/LineInputClosedIssueSchema";
+import type { LineInputClosedIssueSchema } from "~/production-line/schema/LineInputClosedIssueSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

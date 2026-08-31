@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
@@ -103,7 +104,7 @@ const useItemLineSearchCandidates = (
 			item.title,
 		];
 		const readOutputRollSearchTermsFn = (
-			roll: ItemDetailLinesProjection.OutputRoll,
+			roll: OutputProjection.Roll<ItemDetailLinesProjection.OutputItem>,
 		): readonly string[] =>
 			match(roll)
 				.with(

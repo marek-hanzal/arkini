@@ -9,7 +9,7 @@ import { usePackageGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { Cheats } from "~/game-cheat/ui/Cheats";
 import { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
-import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
+import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
 
 export const Route = createFileRoute("/game/$packageId/cheats")({
 	beforeLoad: async ({ context, params }) => {
@@ -92,12 +92,12 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 		]);
 
 		return (
-			<PlayableGameRoute>
+			<PlayableGameResources>
 				<Cheats
 					model={model}
 					onBack={() => returnToBoard()}
 				/>
-			</PlayableGameRoute>
+			</PlayableGameResources>
 		);
 	},
 });

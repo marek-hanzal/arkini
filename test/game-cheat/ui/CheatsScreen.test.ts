@@ -38,10 +38,10 @@ vi.mock("@tanstack/react-router", () => ({
 		},
 	}),
 }));
-vi.mock("~/game-shell/ui/PlayableGameRoute", async () => {
+vi.mock("~/game-shell/ui/PlayableGameResources", async () => {
 	const { Fragment } = await import("react");
 	return {
-		PlayableGameRoute: Fragment,
+		PlayableGameResources: Fragment,
 	};
 });
 vi.mock("~/game-presentation/ui/useGameEngine", () => {

@@ -11,6 +11,7 @@ import { projectItemDetailReferenceFx } from "~/item-detail-frame/fx/projectItem
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
 
 type ProjectedLineDisabledCause = Extract<
 	ItemDetailLinesProjection.DisabledReason,
@@ -69,7 +70,7 @@ const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputRollFx")
 	roll,
 }: {
 	readonly game: GameEngine;
-	readonly roll: EngineItemDetailLines.LineOutputRoll;
+	readonly roll: OutputProjection.Roll<EngineItemDetailLines.OutputItem>;
 }) {
 	return yield* match(roll)
 		.with(

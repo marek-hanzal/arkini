@@ -84,6 +84,7 @@
 		"electron.vite.config.ts"
 	],
 	"exclude": [
-		"src/production-job/ui"
+		"src/production-job/ui",
+		"src/production-output/ui"
 	]
 }

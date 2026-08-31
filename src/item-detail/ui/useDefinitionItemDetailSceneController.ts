@@ -38,7 +38,7 @@ export namespace useDefinitionItemDetailSceneController {
 	export interface Output {
 		readonly definition: DefinitionProjection;
 		readonly sources: useItemDetailNavigationController.SourcesProjection;
-		readonly tabs: ReturnType<typeof useItemDetailNavigationController>["tabs"];
+		readonly tabs: useItemDetailNavigationController.Output["tabs"];
 	}
 }
 

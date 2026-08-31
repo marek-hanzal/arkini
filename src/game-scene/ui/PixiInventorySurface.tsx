@@ -1,5 +1,4 @@
 import { useAtomSet } from "@effect/atom-react";
-import type { Effect } from "effect";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
@@ -13,8 +12,7 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 import { createInventoryRuntimeFx } from "~/game-scene/fx/createInventoryRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
-
-type InventoryRuntime = Effect.Success<ReturnType<typeof createInventoryRuntimeFx>>;
+import type { InventoryRuntime } from "~/game-scene/service/InventoryRuntime";
 
 /**
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.

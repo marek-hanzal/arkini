@@ -3,6 +3,7 @@ import { Order } from "effect";
 import { projectEstimateWitnessFn } from "~/estimate/fn/projectEstimateWitnessFn";
 import {
 	createEstimateRoutePolicyFn,
+	type EstimateRoutePolicy,
 	readEstimateRouteOptionsFn,
 	readEstimateRouteRequirementsFn,
 } from "~/estimate/fn/createEstimateRoutePolicyFn";
@@ -57,8 +58,6 @@ interface DemandSnapshot {
 	readonly selected: Map<string, EstimateSelectedRoute>;
 	readonly sharedOperationIds: ReadonlySet<string>;
 }
-
-type EstimateRoutePolicy = ReturnType<typeof createEstimateRoutePolicyFn>;
 
 interface WitnessChoicePoint {
 	readonly key: string;

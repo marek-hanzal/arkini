@@ -9,9 +9,10 @@ import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
-import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
-
-type TargetFacts = Effect.Success<ReturnType<MainInteractionSurface["readTargetFactsFx"]>>;
+import type {
+	MainInteractionSurface,
+	MainInteractionTargetFacts as TargetFacts,
+} from "~/tile-interaction/type/MainInteractionSurface";
 
 export namespace createMainDragPreviewFx {
 	export interface State {
@@ -31,6 +32,31 @@ export namespace createMainDragPreviewFx {
 		target: NonNullable<TargetFacts["target"]> | null;
 		targetKey: string;
 		targetItem: TileActorItem | null;
+	}
+
+	export interface Output {
+		readonly previewTargetFx: (props: {
+			readonly drag: State;
+			readonly force?: boolean;
+			readonly targetFacts: TargetFacts;
+		}) => Effect.Effect<TileActorItem | null, never, never>;
+		readonly readAttractionActorIdFn: (props: {
+			readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
+			readonly targetItem: TileActorItem | null;
+		}) => string | null;
+		readonly readCurrentSourceFx: (
+			drag: State,
+		) => Effect.Effect<TileActorItem | null, never, never>;
+		readonly readPreviewKindFx: (props: {
+			readonly sourceItem: TileActorItem;
+			readonly targetFacts: TargetFacts;
+		}) => Effect.Effect<readTileDropPreviewFx.Result["kind"], never, never>;
+		readonly refreshAttractionEligibilityFx: (props: {
+			readonly candidateActorIds: ReadonlyArray<string>;
+			readonly drag: State;
+			readonly sourceItem: TileActorItem;
+			readonly targetFacts: TargetFacts;
+		}) => Effect.Effect<void, never, never>;
 	}
 }
 
@@ -260,5 +286,5 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 		readCurrentSourceFx,
 		readPreviewKindFx,
 		refreshAttractionEligibilityFx,
-	};
+	} satisfies createMainDragPreviewFx.Output;
 });

@@ -13,6 +13,7 @@ import {
 	type EditorAssetDeleteBlocker,
 } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
+import type { Project } from "~/project-authoring/type/Project";
 
 interface DeleteEditorAssetCommandProps {
 	readonly expectedRevision: number;
@@ -47,7 +48,7 @@ export namespace useEditorAssetDeleteController {
 		readonly deleting: boolean;
 		readonly error: unknown;
 		readonly open: () => void;
-		readonly project: ReturnType<typeof useEditorProject>;
+		readonly project: Project;
 	}
 }
 

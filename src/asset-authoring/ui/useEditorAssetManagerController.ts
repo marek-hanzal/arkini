@@ -9,6 +9,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
+import type { Project } from "~/project-authoring/type/Project";
 
 export namespace useEditorAssetManagerController {
 	export type CatalogState = "empty" | "no-matches" | "unused-empty";
@@ -30,7 +31,7 @@ export namespace useEditorAssetManagerController {
 		readonly onFilesChange: ChangeEventHandler<HTMLInputElement>;
 		readonly openArkpackImport: () => void;
 		readonly openFilesImport: () => void;
-		readonly resources: ReturnType<typeof useEditorAssetLibrary>["resources"];
+		readonly resources: ReadonlyArray<Project["resources"][number]>;
 	}
 }
 

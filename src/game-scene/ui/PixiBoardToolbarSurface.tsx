@@ -1,5 +1,4 @@
 import { useAtom, useAtomSet } from "@effect/atom-react";
-import type { Effect } from "effect";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
@@ -17,8 +16,7 @@ import type { MainActivationIntent } from "~/tile-interaction/type/MainActivatio
 import { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
-
-type MainRuntime = Effect.Success<ReturnType<typeof createMainRuntimeFx>>;
+import type { MainRuntime } from "~/game-scene/service/MainRuntime";
 
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.

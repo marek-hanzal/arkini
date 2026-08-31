@@ -8,7 +8,7 @@ import type { ChatGptSurfaceSchema } from "~electron/contract/chatgpt/ChatGptSur
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
-type ChatGptViewState = ChatGptViewStateSchemaType.Type;
+export type ChatGptViewState = ChatGptViewStateSchemaType.Type;
 
 const setChatGptSurfaceFx = Effect.fn("setChatGptSurfaceFx")(
 	(surface: ChatGptSurfaceSchema.Type | null) =>

@@ -4,7 +4,7 @@ import type { Container } from "pixi.js";
 import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
-interface InventoryInteractionDropTarget {
+export interface InventoryInteractionDropTarget {
 	readonly x: number;
 	readonly y: number;
 }

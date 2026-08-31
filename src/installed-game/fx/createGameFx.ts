@@ -4,7 +4,10 @@ import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { Game } from "~/installed-game/type/Game";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
-import { createGameResourceUrlsFx } from "~/playable-game/fx/createGameResourceUrlsFx";
+import {
+	createGameResourceUrlsFx,
+	type GameResourceUrls,
+} from "~/playable-game/fx/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
@@ -101,7 +104,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					}),
 		),
 	);
-	let resourceUrls: Effect.Success<ReturnType<typeof createGameResourceUrlsFx>> | undefined;
+	let resourceUrls: GameResourceUrls | undefined;
 	const discardFailedBootstrapFx = discardGameBootstrapFx(
 		session,
 		Effect.suspend(() => resourceUrls?.releaseFx ?? Effect.void),

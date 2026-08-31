@@ -3,10 +3,9 @@ import { useSyncExternalStore } from "react";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
+import type { EditorUnsavedChangesSnapshot } from "~/authoring-session/service/EditorUnsavedChanges";
 
-type UnsavedChangesState = ReturnType<
-	ReturnType<typeof useEditorUnsavedChangesOwner>["getSnapshot"]
->;
+type UnsavedChangesState = EditorUnsavedChangesSnapshot;
 
 const EditorUnsavedChangesPrompt = ({ state }: { readonly state: UnsavedChangesState }) => {
 	const owner = useEditorUnsavedChangesOwner();

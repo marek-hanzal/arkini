@@ -5,6 +5,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type {
 	ProjectVersionDescriptor,
+	ProjectVersionDiff,
 	ProjectVersionStatus,
 } from "~/project-version/type/ProjectVersion";
 import {
@@ -30,7 +31,7 @@ export namespace useVersionHistoryController {
 		readonly compareTo: string;
 		readonly confirmCheckout: () => void;
 		readonly confirmVersion?: ProjectVersionDescriptor;
-		readonly diff?: ReturnType<typeof useVersionComparison>["diff"];
+		readonly diff?: ProjectVersionDiff;
 		readonly diffPending: boolean;
 		readonly error?: string;
 		readonly goToCommit: () => void;

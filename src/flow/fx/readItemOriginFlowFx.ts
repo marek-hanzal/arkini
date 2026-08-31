@@ -26,7 +26,7 @@ const ProgressLabels: Record<ItemOriginFlowPhase, string> = {
 };
 
 /** Reports one normalized phase boundary for origin-flow construction. */
-const reportItemOriginFlowProgressFx = Effect.fn("reportItemOriginFlowProgressFx")(
+const reportItemOriginFlowProgressFx = Effect.fn("reportEditorItemOriginFlowProgressFx")(
 	(
 		onProgress: ((progress: ItemOriginFlowProgress) => void) | undefined,
 		phase: ItemOriginFlowPhase,
@@ -41,7 +41,7 @@ const reportItemOriginFlowProgressFx = Effect.fn("reportItemOriginFlowProgressFx
 );
 
 /** Cooperatively returns flow construction to the renderer and remains interruptible. */
-const yieldItemOriginFlowFx = Effect.fn("yieldItemOriginFlowFx")(() =>
+const yieldItemOriginFlowFx = Effect.fn("yieldEditorItemOriginFlowFx")(() =>
 	Effect.promise(async (signal) => {
 		const abortCause = () => signal.reason ?? new Error("Acquisition graph build interrupted.");
 		if (signal.aborted) throw abortCause();
@@ -87,7 +87,7 @@ interface ItemOriginSourceIndex {
 }
 
 /** Indexes authored items, starting scopes, and every concrete acquisition source. */
-const indexItemOriginSourcesFx = Effect.fn("indexItemOriginSourcesFx")(function* ({
+const indexItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSourcesFx")(function* ({
 	config,
 	onProgress,
 }: {
@@ -318,7 +318,7 @@ const readAcquisitionSourceByItem = (index: ItemOriginSourceIndex) =>
 	);
 
 /** Builds the item-origin graph cooperatively. Operations stay embedded in their owning item node. */
-export const readItemOriginFlowFx = Effect.fn("readItemOriginFlowFx")(function* ({
+export const readItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx")(function* ({
 	config,
 	onProgress,
 }: ItemOriginFlowRequest) {

@@ -21,23 +21,23 @@ export namespace isolateBoardStatefulOwnerTransitionFx {
 }
 
 /** Preserves Board admission before shared grid isolation. */
-export const isolateBoardStatefulOwnerTransitionFx = Effect.fn(
-	"isolateBoardStatefulOwnerTransitionFx",
-)(function* ({ ownerItemId, runtime }: isolateBoardStatefulOwnerTransitionFx.Props) {
-	const runtimeOwner = yield* readRuntimeItemByIdFx({
-		itemId: ownerItemId,
-		runtime,
-	});
-	if (Option.isNone(narrowBoardRuntimeItemFn(runtimeOwner))) {
-		return yield* Effect.fail(
-			new ItemNotOnBoardError({
-				itemId: runtimeOwner.id,
-				location: runtimeOwner.location,
-			}),
-		);
-	}
-	return yield* isolateGridStatefulOwnerTransitionFx({
-		ownerItemId,
-		runtime,
-	});
-});
+export const isolateBoardStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerTransitionFx")(
+	function* ({ ownerItemId, runtime }: isolateBoardStatefulOwnerTransitionFx.Props) {
+		const runtimeOwner = yield* readRuntimeItemByIdFx({
+			itemId: ownerItemId,
+			runtime,
+		});
+		if (Option.isNone(narrowBoardRuntimeItemFn(runtimeOwner))) {
+			return yield* Effect.fail(
+				new ItemNotOnBoardError({
+					itemId: runtimeOwner.id,
+					location: runtimeOwner.location,
+				}),
+			);
+		}
+		return yield* isolateGridStatefulOwnerTransitionFx({
+			ownerItemId,
+			runtime,
+		});
+	},
+);

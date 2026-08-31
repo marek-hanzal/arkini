@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateInitialWindowBoundsFn } from "../../electron/main/window/fn/calculateInitialWindowBoundsFn";
+import { calculateInitialWindowBoundsFn } from "~electron/main/window/fn/calculateInitialWindowBoundsFn";
 
 describe("calculateInitialWindowBoundsFn", () => {
 	it("centers a window at three quarters of the active display work area", () => {

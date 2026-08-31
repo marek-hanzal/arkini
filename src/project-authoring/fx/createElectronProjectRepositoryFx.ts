@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { ProjectCandidateSchema } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import {

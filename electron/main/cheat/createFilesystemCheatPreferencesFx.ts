@@ -1,7 +1,7 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
+import { CheatAvailabilitySchema } from "~electron/contract/cheat/CheatAvailabilitySchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";

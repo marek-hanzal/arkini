@@ -7,7 +7,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";

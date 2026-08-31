@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const state: StateSchema.Type = {
 	cheats: {

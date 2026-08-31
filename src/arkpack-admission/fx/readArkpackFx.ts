@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/arkpack-admission/fx/validateArkpackPayloadFx";
 import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
 import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";

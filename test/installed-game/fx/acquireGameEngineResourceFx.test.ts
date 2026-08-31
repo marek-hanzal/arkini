@@ -8,7 +8,7 @@ import type { Game } from "~/installed-game/type/Game";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/testGameRead";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const createGame = ({
 	packageId = "package:acquire",

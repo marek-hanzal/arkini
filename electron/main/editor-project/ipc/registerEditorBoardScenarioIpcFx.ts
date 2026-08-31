@@ -2,12 +2,12 @@ import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 
-import { ElectronMainRuntime } from "../../ElectronMainRuntime";
+import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { BoardScenarioNameSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import type { TrustedRenderer } from "../../security/TrustedRenderer";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";

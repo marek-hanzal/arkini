@@ -1,7 +1,7 @@
 import { MessageChannelMain, type WebContents } from "electron";
 import { Effect } from "effect";
 
-import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 
 const readResponse = (candidate: unknown): ArkiniElectronApi.EditorMcpVersionCheckoutResponse => {
 	if (typeof candidate !== "object" || candidate === null || !("type" in candidate))

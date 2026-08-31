@@ -5,9 +5,9 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
-import { createVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
-import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
+import { createProjectPathsFx } from "~electron/main/editor-project/filesystem/createProjectPathsFx";
+import { createVersionSnapshotFx } from "~electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
 import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

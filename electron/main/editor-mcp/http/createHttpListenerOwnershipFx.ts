@@ -7,7 +7,7 @@ import {
 import { createMcpHandler, type McpHttpHandler } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 
-import type { EditorProjectServiceOwnership } from "../../editor-project/EditorProjectServiceOwnership";
+import type { EditorProjectServiceOwnership } from "~electron/main/editor-project/EditorProjectServiceOwnership";
 import type { RemoteHandler } from "../auth/createRemoteHandlerFx";
 import type { McpStorage } from "../storage/McpStorage";
 import { TunnelProvenanceHeader } from "../tunnel/TunnelProvenanceHeader";

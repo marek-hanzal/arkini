@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RendererContentSecurityPolicy } from "../../electron/security/RendererContentSecurityPolicy";
+import { RendererContentSecurityPolicy } from "~electron/security/RendererContentSecurityPolicy";
 
 const netFetch = vi.hoisted(() => vi.fn());
 
@@ -13,7 +13,7 @@ vi.mock("electron", () => ({
 	},
 }));
 
-import { handleArkiniProtocolRequestFx } from "../../electron/main/handleArkiniProtocolRequestFx";
+import { handleArkiniProtocolRequestFx } from "~electron/main/handleArkiniProtocolRequestFx";
 
 let rendererRoot = "";
 

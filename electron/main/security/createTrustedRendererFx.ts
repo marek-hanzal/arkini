@@ -8,8 +8,8 @@ import type {
 	WebContentsWillRedirectEventParams,
 } from "electron";
 import { Effect } from "effect";
-import { RendererDevelopmentServer } from "../../security/RendererDevelopmentUrl";
-import { parseRendererDevelopmentUrlFx } from "../../security/parseRendererDevelopmentUrlFx";
+import { RendererDevelopmentServer } from "~electron/security/RendererDevelopmentUrl";
+import { parseRendererDevelopmentUrlFx } from "~electron/security/parseRendererDevelopmentUrlFx";
 import { ElectronMainError } from "../ElectronMainError";
 import type { TrustedRenderer } from "./TrustedRenderer";
 

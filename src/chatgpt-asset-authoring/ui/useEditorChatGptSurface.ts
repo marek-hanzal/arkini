@@ -3,8 +3,8 @@ import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useSta
 import {
 	ChatGptViewStateSchema,
 	type ChatGptViewStateSchema as ChatGptViewStateSchemaType,
-} from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
-import type { ChatGptSurfaceSchema } from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
+} from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
+import type { ChatGptSurfaceSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 

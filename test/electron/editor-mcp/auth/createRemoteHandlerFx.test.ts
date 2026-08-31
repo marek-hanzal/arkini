@@ -6,9 +6,9 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { RemoteHandler } from "../../../../electron/main/editor-mcp/auth/createRemoteHandlerFx";
-import { createRemoteHandlerFx } from "../../../../electron/main/editor-mcp/auth/createRemoteHandlerFx";
-import { createFilesystemEditorMcpStorageFx } from "../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
+import type { RemoteHandler } from "~electron/main/editor-mcp/auth/createRemoteHandlerFx";
+import { createRemoteHandlerFx } from "~electron/main/editor-mcp/auth/createRemoteHandlerFx";
+import { createFilesystemEditorMcpStorageFx } from "~electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 
 const cleanups: Array<() => Promise<void>> = [];
 

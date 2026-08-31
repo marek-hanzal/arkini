@@ -1,4 +1,4 @@
-import type { DiagnosticValue } from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import type { DiagnosticValue } from "~electron/contract/diagnostics/DiagnosticRecord";
 
 const maxDiagnosticScalarLength = 8_192;
 const maxDiagnosticSerializedLength = 48 * 1_024;

@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
-import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import { AppearanceThemeError } from "~/application-settings/error/AppearanceThemeError";
 import { setAppearanceThemeAtom } from "~/application-settings/atom/setAppearanceThemeAtom";
 

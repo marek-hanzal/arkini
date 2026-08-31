@@ -3,7 +3,7 @@ import { dialog, type BrowserWindow } from "electron";
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import type { EditorProjectTransport } from "../../contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";

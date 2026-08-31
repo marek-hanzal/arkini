@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { saveEditorProjectBuildFx } from "../../../electron/main/editor-project/saveEditorProjectBuildFx";
+import { saveEditorProjectBuildFx } from "~electron/main/editor-project/saveEditorProjectBuildFx";
 import { createEditorProjectIpcRepository } from "./ipc/support/createEditorProjectIpcRepository";
 
 const electron = vi.hoisted(() => ({

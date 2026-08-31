@@ -4,7 +4,7 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createProjectTestHarness,

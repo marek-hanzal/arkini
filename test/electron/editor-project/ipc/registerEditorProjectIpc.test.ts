@@ -2,11 +2,11 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
-import { ElectronMainError } from "../../../../electron/main/ElectronMainError";
-import type { EditorProjectServiceOwnership } from "../../../../electron/main/editor-project/EditorProjectServiceOwnership";
-import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
-import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ElectronMainError } from "~electron/main/ElectronMainError";
+import type { EditorProjectServiceOwnership } from "~electron/main/editor-project/EditorProjectServiceOwnership";
+import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
@@ -29,7 +29,7 @@ const completedSourceExport = {
 	root: "/tmp/source",
 };
 
-vi.mock("../../../../electron/main/editor-project/exportEditorJsonDirectoryFx", () => ({
+vi.mock("~electron/main/editor-project/exportEditorJsonDirectoryFx", () => ({
 	exportEditorJsonDirectoryFx: () => sourceExport.effect,
 }));
 

@@ -4,9 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 
-import type { ProjectFiles } from "../../../../../electron/main/editor-project/filesystem/fx/ProjectFiles";
-import { readProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
-import { writeProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
+import type { ProjectFiles } from "~electron/main/editor-project/filesystem/fx/ProjectFiles";
+import { readProjectFilesFx } from "~electron/main/editor-project/filesystem/fx/readProjectFilesFx";
+import { writeProjectFilesFx } from "~electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 
 export const createProjectFilesHarness = async () => {
 	const parent = await mkdtemp(join(tmpdir(), "arkini-editor-files-"));

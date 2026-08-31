@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { AppearanceThemeSchema } from "../../../../electron/contract/appearance/AppearanceThemeSchema";
-import type { WindowModeSchema } from "../../../../electron/contract/window/WindowModeSchema";
+import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { useModelContext } from "~/application-settings/ui/ModelContext";
 import { SettingsSegmentedChoice } from "~/application-settings/ui/SettingsSegmentedChoice";
 

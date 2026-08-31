@@ -3,7 +3,7 @@ import { connect } from "node:net";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
+import { createEditorMcpOwnershipFx } from "~electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import {
 	cleanupMcpHarnesses,
 	createMcpHarness,

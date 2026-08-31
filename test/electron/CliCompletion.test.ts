@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createCompletionFx } from "../../electron/main/cli/createCompletionFx";
+import { createCompletionFx } from "~electron/main/cli/createCompletionFx";
 
 const temporaryDirectories: string[] = [];
 

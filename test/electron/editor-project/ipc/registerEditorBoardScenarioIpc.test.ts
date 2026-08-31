@@ -2,10 +2,10 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
-import { ElectronMainError } from "../../../../electron/main/ElectronMainError";
-import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
-import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ElectronMainError } from "~electron/main/ElectronMainError";
+import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { createEditorProjectIpcRepository } from "./support/createEditorProjectIpcRepository";
 
 const electron = vi.hoisted(() => {

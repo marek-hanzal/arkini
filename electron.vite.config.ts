@@ -11,6 +11,8 @@ import { ArkpackDistributionChannelDefaults } from "./src/arkpack-artifact/const
 
 const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),
+	"~electron": fileURLToPath(new URL("./electron", import.meta.url)),
+	"~shared": fileURLToPath(new URL("./shared", import.meta.url)),
 };
 const releaseIssuer =
 	process.env.ARKINI_RELEASE_ISSUER ?? ArkpackDistributionChannelDefaults.issuer;

@@ -2,9 +2,9 @@ import type { BrowserWindow } from "electron";
 import { Effect } from "effect";
 import { EventEmitter } from "node:events";
 import { vi } from "vitest";
-import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
-import { createWindowModeControllerFx } from "../../../electron/main/window/createWindowModeControllerFx";
-import type { WindowPreferences } from "../../../electron/main/window/createFilesystemWindowPreferencesFx";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
+import { createWindowModeControllerFx } from "~electron/main/window/createWindowModeControllerFx";
+import type { WindowPreferences } from "~electron/main/window/createFilesystemWindowPreferencesFx";
 
 type BeforeInputListener = (
 	event: {

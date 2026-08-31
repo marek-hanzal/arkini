@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { Magic } from "~/arkpack-artifact/constant/Magic";
 
 export namespace encodeArkpackEnvelopeFx {

@@ -2,7 +2,7 @@ import { access, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promise
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,

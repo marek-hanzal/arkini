@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { CompletionStatus } from "../../../electron/contract/cli/CompletionStatus";
+import type { CompletionStatus } from "~electron/contract/cli/CompletionStatus";
 import { createCliCommandAtomFx } from "~/application-settings/fx/createCliCommandAtomFx";
 
 /** Owns the Settings command sequence for the current shell completion file. */

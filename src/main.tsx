@@ -6,7 +6,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ArkiniWindowTitle } from "../shared/ArkiniAppMetadata";
+import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
 import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";

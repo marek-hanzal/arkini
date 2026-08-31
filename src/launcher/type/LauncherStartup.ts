@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
-import type { AppearanceAccentSchema } from "../../../electron/contract/appearance/AppearanceAccentSchema";
-import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
-import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import type { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
+import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 
 export namespace LauncherStartup {
 	export interface Appearance {

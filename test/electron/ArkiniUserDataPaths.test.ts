@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { createArkiniUserDataPathsFn } from "../../electron/main/user-data/fn/createArkiniUserDataPathsFn";
+import { createArkiniUserDataPathsFn } from "~electron/main/user-data/fn/createArkiniUserDataPathsFn";
 
 describe("Arkini user data", () => {
 	it("separates canonical game persistence below one Arkini root", () => {

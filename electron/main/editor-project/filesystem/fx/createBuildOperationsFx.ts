@@ -3,7 +3,7 @@ import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Data, Effect, type Semaphore } from "effect";
 
-import { ArkpackLimits } from "../../../../../shared/ArkpackLimits";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import type { ProjectState } from "../ProjectState";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import {

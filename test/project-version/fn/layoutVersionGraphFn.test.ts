@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVersion";
 import { layoutVersionGraphFn } from "~/project-version/fn/layoutVersionGraphFn";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const version = (
 	versionId: string,

@@ -1,5 +1,5 @@
 import { encode } from "@msgpack/msgpack";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { ArkiniSaveSchema } from "~/game-persistence/schema/ArkiniSaveSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";

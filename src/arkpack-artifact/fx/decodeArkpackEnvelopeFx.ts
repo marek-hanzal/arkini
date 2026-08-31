@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { Magic } from "~/arkpack-artifact/constant/Magic";
 
 /** Splits one self-contained Arkpack without interpreting its optional proof. */

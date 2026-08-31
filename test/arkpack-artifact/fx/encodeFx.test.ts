@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const payload = {
 	version: "1.2",

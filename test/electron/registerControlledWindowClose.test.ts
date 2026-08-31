@@ -1,9 +1,9 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import { registerControlledWindowCloseFx } from "../../electron/main/registerControlledWindowCloseFx";
-import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { registerControlledWindowCloseFx } from "~electron/main/registerControlledWindowCloseFx";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 
 type CloseListener = (event: { preventDefault(): void }) => void;
 type IpcListener = (event: IpcMainEvent, ...args: unknown[]) => void;

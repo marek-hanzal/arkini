@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import { ArkiniAppVersion, ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion, ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
 import { useArkpacks } from "~/arkpack-selector/ui/useArkpacks";
 import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";

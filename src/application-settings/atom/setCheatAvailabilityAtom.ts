@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
 import { writeCheatAvailabilityFx } from "~/application-settings/fx/writeCheatAvailabilityFx";
-import type { CheatAvailabilitySchema } from "../../../electron/contract/cheat/CheatAvailabilitySchema";
+import type { CheatAvailabilitySchema } from "~electron/contract/cheat/CheatAvailabilitySchema";
 
 /**
  * Persists application cheat-tool availability before publishing the new renderer value.

@@ -4,7 +4,7 @@ import { gzip } from "node:zlib";
 import { FileSystem, Path } from "effect";
 import { Effect, Exit } from "effect";
 
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";

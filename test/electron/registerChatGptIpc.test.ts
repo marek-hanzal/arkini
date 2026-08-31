@@ -2,7 +2,7 @@ import type { BrowserWindow, IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 
 const electron = vi.hoisted(() => {
 	const app = {
@@ -30,9 +30,9 @@ const electron = vi.hoisted(() => {
 
 vi.mock("electron", () => electron);
 
-import { createChatGptViewControllerOwnershipFx } from "../../electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
-import { registerChatGptIpcFx } from "../../electron/main/chatgpt/registerChatGptIpcFx";
-import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
+import { createChatGptViewControllerOwnershipFx } from "~electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
+import { registerChatGptIpcFx } from "~electron/main/chatgpt/registerChatGptIpcFx";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 
 describe("ChatGPT surface IPC", () => {
 	it("admits only a trusted Arkini sender and never grants repository IPC to the foreign view", async () => {

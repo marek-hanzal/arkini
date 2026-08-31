@@ -5,20 +5,20 @@ import { join } from "node:path";
 import type { BrowserWindow, IpcMainInvokeEvent, WebContents, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { vi } from "vitest";
-import { ElectronMainError } from "../../../electron/main/ElectronMainError";
-import type { TrustedRenderer } from "../../../electron/main/security/TrustedRenderer";
+import { ElectronMainError } from "~electron/main/ElectronMainError";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { readElectronHarness } from "./electron";
 import { saveKey } from "./invokeArguments";
 
 export { invokeArguments } from "./invokeArguments";
 
-import { createFilesystemAppearancePreferencesFx } from "../../../electron/main/appearance/createFilesystemAppearancePreferencesFx";
-import { createFilesystemCheatPreferencesFx } from "../../../electron/main/cheat/createFilesystemCheatPreferencesFx";
-import { createFilesystemLauncherPreferencesFx } from "../../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
-import { registerArkiniElectronIpcFx } from "../../../electron/main/registerArkiniElectronIpcFx";
-import { createArkiniUserDataPathsFn } from "../../../electron/main/user-data/fn/createArkiniUserDataPathsFn";
-import { createFilesystemWindowPreferencesFx } from "../../../electron/main/window/createFilesystemWindowPreferencesFx";
-import { createWindowModeControllerOwnershipFx } from "../../../electron/main/window/createWindowModeControllerOwnershipFx";
+import { createFilesystemAppearancePreferencesFx } from "~electron/main/appearance/createFilesystemAppearancePreferencesFx";
+import { createFilesystemCheatPreferencesFx } from "~electron/main/cheat/createFilesystemCheatPreferencesFx";
+import { createFilesystemLauncherPreferencesFx } from "~electron/main/launcher/createFilesystemLauncherPreferencesFx";
+import { registerArkiniElectronIpcFx } from "~electron/main/registerArkiniElectronIpcFx";
+import { createArkiniUserDataPathsFn } from "~electron/main/user-data/fn/createArkiniUserDataPathsFn";
+import { createFilesystemWindowPreferencesFx } from "~electron/main/window/createFilesystemWindowPreferencesFx";
+import { createWindowModeControllerOwnershipFx } from "~electron/main/window/createWindowModeControllerOwnershipFx";
 
 const electronHarness = readElectronHarness();
 

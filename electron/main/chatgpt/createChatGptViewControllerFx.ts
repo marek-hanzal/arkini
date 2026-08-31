@@ -10,13 +10,13 @@ import { readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import {
 	ChatGptAssetCandidateFilenameMaxLength,
 	ChatGptAssetCandidateMaxBytes,
 	type ChatGptSurfaceSchema,
 	type ChatGptViewStateSchema,
-} from "../../contract/chatgpt/ChatGptSurfaceSchema";
+} from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 
 /** Owns the isolated ChatGPT WebContentsView attached to one Arkini window. */

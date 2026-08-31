@@ -1,7 +1,7 @@
 import { Deferred, Effect, Fiber, Result } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { createHarness } from "./createWindowModeControllerFx.test/fixture";
 
 const electronState = vi.hoisted(() => ({

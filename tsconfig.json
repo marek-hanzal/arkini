@@ -16,6 +16,12 @@
 		"paths": {
 			"~/*": [
 				"./src/*"
+			],
+			"~electron/*": [
+				"./electron/*"
+			],
+			"~shared/*": [
+				"./shared/*"
 			]
 		},
 		"resolveJsonModule": true,

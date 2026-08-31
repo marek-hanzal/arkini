@@ -4,7 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
+import type { ChatGptAssetCandidateSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 import { Route as EditorChatGptRouteDefinition } from "~/@routes/editor/$projectId/chatgpt";
 import { installChatGptDom, pngBytes } from "./EditorChatGpt.test/fixture";
 

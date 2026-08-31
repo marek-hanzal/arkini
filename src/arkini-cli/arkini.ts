@@ -7,7 +7,7 @@ import { ArkpackCommand } from "~/arkini-cli/command/ArkpackCommand";
 import { PackCommand } from "~/arkini-cli/command/PackCommand";
 import { SchemaCommand } from "~/arkini-cli/command/SchemaCommand";
 import { ValidateCommand } from "~/arkini-cli/command/ValidateCommand";
-import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const GameCommand = Command.make("game")
 	.pipe(

@@ -3,7 +3,7 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { readGameProjectManifestFx } from "~/game-config-source/fx/readGameProjectManifestFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";

@@ -11,7 +11,7 @@ import { Effect } from "effect";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-import type { DiagnosticRecord } from "../../contract/diagnostics/DiagnosticRecord";
+import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
 
 /** Process-owned bounded diagnostic log capability exposed to trusted renderer IPC. */
 export interface DiagnosticLog {

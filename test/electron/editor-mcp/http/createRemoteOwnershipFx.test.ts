@@ -2,9 +2,9 @@ import { request as requestHttp } from "node:http";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
-import type { McpTunnel } from "../../../../electron/main/editor-mcp/tunnel/McpTunnel";
-import { TunnelProvenanceHeader } from "../../../../electron/main/editor-mcp/tunnel/TunnelProvenanceHeader";
+import { createEditorMcpOwnershipFx } from "~electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
+import type { McpTunnel } from "~electron/main/editor-mcp/tunnel/McpTunnel";
+import { TunnelProvenanceHeader } from "~electron/main/editor-mcp/tunnel/TunnelProvenanceHeader";
 import {
 	createProjectRepository,
 	createTestStorage,

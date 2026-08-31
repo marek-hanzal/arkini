@@ -5,6 +5,12 @@
 			"~/*": [
 				"./src/*"
 			],
+			"~electron/*": [
+				"./electron/*"
+			],
+			"~shared/*": [
+				"./shared/*"
+			],
 			"~test/*": [
 				"./test/*"
 			]

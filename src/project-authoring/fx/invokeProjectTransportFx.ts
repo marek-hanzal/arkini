@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import {
 	ProjectRepositoryError,
 	type ProjectRepositoryOperation,

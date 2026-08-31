@@ -1,7 +1,7 @@
 import { screen, type BrowserWindow } from "electron";
 import { Deferred, Effect, Exit, Fiber, FiberHandle, Queue, Scope, SynchronizedRef } from "effect";
-import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
-import type { WindowModeSchema } from "../../contract/window/WindowModeSchema";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { WindowPreferences } from "./createFilesystemWindowPreferencesFx";
 import { calculateInitialWindowBoundsFn } from "./fn/calculateInitialWindowBoundsFn";

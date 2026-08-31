@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectCatalog } from "./createProjectCatalogFx";

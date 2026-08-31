@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
 	createFilesystemEditorMcpStorageFx,
 	DefaultPort,
-} from "../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
+} from "~electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 
 const directories: string[] = [];
 const encoder = new TextEncoder();

@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";

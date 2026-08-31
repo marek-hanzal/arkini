@@ -2,12 +2,12 @@ import { app, ipcMain, type IpcMainInvokeEvent, type WebContents } from "electro
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
-import { EditorMcpCommandSchema } from "../../../contract/editor/EditorMcpCommandSchema";
-import { EditorMcpConfigurationSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
-import { EditorMcpProjectContextSchema } from "../../../contract/editor/EditorMcpProjectContextSchema";
-import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import type { TrustedRenderer } from "../../security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { EditorMcpCommandSchema } from "~electron/contract/editor/EditorMcpCommandSchema";
+import { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
+import { EditorMcpProjectContextSchema } from "~electron/contract/editor/EditorMcpProjectContextSchema";
+import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import type { ServerOwnership } from "../http/createEditorMcpOwnershipFx";
 import { requestVersionCheckoutFx } from "./requestVersionCheckoutFx";
 

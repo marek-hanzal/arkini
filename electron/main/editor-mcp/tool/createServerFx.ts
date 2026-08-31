@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { Effect, Order } from "effect";
 import { z } from "zod";
 
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";

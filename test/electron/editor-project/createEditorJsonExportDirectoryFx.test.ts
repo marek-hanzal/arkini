@@ -2,7 +2,7 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Path } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import { createEditorJsonExportDirectoryFx } from "../../../electron/main/editor-project/createEditorJsonExportDirectoryFx";
+import { createEditorJsonExportDirectoryFx } from "~electron/main/editor-project/createEditorJsonExportDirectoryFx";
 import {
 	filesystemFailure,
 	readReimportableProjectFx,

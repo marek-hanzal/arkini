@@ -1,7 +1,7 @@
 import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";

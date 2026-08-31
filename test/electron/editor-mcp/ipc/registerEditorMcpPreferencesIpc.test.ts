@@ -2,8 +2,8 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
-import { registerEditorMcpPreferencesIpcFx } from "../../../../electron/main/editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { registerEditorMcpPreferencesIpcFx } from "~electron/main/editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
 import {
 	createEvent,
 	createOwnership,

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { importArkpackFx } from "~/arkpack-catalog/fx/importArkpackFx";
 

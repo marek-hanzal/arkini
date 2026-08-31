@@ -36,8 +36,8 @@ vi.mock("node:fs/promises", async (importOriginal) => {
 	};
 });
 
-import { createCompletionFx } from "../../electron/main/cli/createCompletionFx";
-import { createInstallationFx } from "../../electron/main/cli/createInstallationFx";
+import { createCompletionFx } from "~electron/main/cli/createCompletionFx";
+import { createInstallationFx } from "~electron/main/cli/createInstallationFx";
 
 const temporaryDirectories: string[] = [];
 

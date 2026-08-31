@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";

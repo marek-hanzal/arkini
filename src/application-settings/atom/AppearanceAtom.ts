@@ -1,5 +1,5 @@
-import type { AppearanceAccentSchema } from "../../../electron/contract/appearance/AppearanceAccentSchema";
-import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
+import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 /**

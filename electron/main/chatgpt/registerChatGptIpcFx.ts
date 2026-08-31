@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
-import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
-import { ChatGptSurfaceSchema } from "../../contract/chatgpt/ChatGptSurfaceSchema";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ChatGptSurfaceSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
 import type { ChatGptViewControllerOwnership } from "./createChatGptViewControllerOwnershipFx";

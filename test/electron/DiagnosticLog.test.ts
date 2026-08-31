@@ -14,7 +14,7 @@ vi.mock("electron", () => ({
 	},
 }));
 
-import { createDiagnosticLogFx } from "../../electron/main/diagnostics/createDiagnosticLogFx";
+import { createDiagnosticLogFx } from "~electron/main/diagnostics/createDiagnosticLogFx";
 
 const temporaryDirectories: string[] = [];
 

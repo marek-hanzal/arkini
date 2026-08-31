@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { importEditorJsonDirectoryFx } from "../../../electron/main/editor-project/importEditorJsonDirectoryFx";
+import { importEditorJsonDirectoryFx } from "~electron/main/editor-project/importEditorJsonDirectoryFx";
 import { createEditorProjectIpcRepository } from "./ipc/support/createEditorProjectIpcRepository";
 
 const electron = vi.hoisted(() => ({

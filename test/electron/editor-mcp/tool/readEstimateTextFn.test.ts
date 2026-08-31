@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { readEstimateTextFn } from "../../../../electron/main/editor-mcp/tool/fn/readEstimateTextFn";
+import { readEstimateTextFn } from "~electron/main/editor-mcp/tool/fn/readEstimateTextFn";
 import { createGraphProject } from "./support/createToolProject";
 
 const readEstimate = (

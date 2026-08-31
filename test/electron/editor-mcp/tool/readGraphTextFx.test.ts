@@ -1,8 +1,8 @@
 import { Cause, Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readItemEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readItemEstimateTextFx";
-import { readItemRelationTextFx } from "../../../../electron/main/editor-mcp/tool/readItemRelationTextFx";
+import { readItemEstimateTextFx } from "~electron/main/editor-mcp/tool/readItemEstimateTextFx";
+import { readItemRelationTextFx } from "~electron/main/editor-mcp/tool/readItemRelationTextFx";
 import { itemEstimateMaximumQuantity } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createGraphProject, createToolProject } from "./support/createToolProject";

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { InstallationStatus } from "../../../electron/contract/cli/InstallationStatus";
+import type { InstallationStatus } from "~electron/contract/cli/InstallationStatus";
 import { createCliCommandAtomFx } from "~/application-settings/fx/createCliCommandAtomFx";
 
 /** Owns the Settings command sequence for the packaged CLI launcher. */

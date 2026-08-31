@@ -2,7 +2,7 @@ import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
@@ -12,7 +12,7 @@ import {
 	createTestPngBytes,
 	installTestPngDecoder,
 } from "~test/arkpack-support/fn/createTestPngBytes";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 
 const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));

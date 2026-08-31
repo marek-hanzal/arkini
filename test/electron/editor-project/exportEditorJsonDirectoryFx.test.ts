@@ -4,7 +4,7 @@ import { Effect, FileSystem, Path } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
-import { exportEditorJsonDirectoryFx } from "../../../electron/main/editor-project/exportEditorJsonDirectoryFx";
+import { exportEditorJsonDirectoryFx } from "~electron/main/editor-project/exportEditorJsonDirectoryFx";
 import {
 	readReimportableProjectFx,
 	writeReimportableProjectFx,

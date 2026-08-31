@@ -9,10 +9,10 @@ import { writeLastPackageIdFx } from "~/installed-game/fx/writeLastPackageIdFx";
 
 export namespace acquireGameEngineResourceFx {
 	export interface Props {
-		readonly beforeCreateFx?: Effect.Effect<void, unknown>;
-		readonly createGameFx: (packageId: string) => Effect.Effect<Game, unknown>;
+		readonly beforeCreateFx?: Effect.Effect<void, unknown, never>;
+		readonly createGameFx: (packageId: string) => Effect.Effect<Game, unknown, never>;
 		readonly packageId: string;
-		readonly rememberPackageFx?: (packageId: string) => Effect.Effect<void, unknown>;
+		readonly rememberPackageFx?: (packageId: string) => Effect.Effect<void, unknown, never>;
 	}
 }
 

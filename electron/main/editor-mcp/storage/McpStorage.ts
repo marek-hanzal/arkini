@@ -6,13 +6,17 @@ import type { EditorMcpPortSchema } from "~electron/contract/editor/EditorMcpPor
 
 export interface McpStorage {
 	readonly model: OAuthServerModel;
-	readonly readPortFx: Effect.Effect<EditorMcpPortSchema.Type, unknown>;
-	readonly writePortFx: (port: EditorMcpPortSchema.Type) => Effect.Effect<void, unknown>;
-	readonly readNgrokFx: Effect.Effect<EditorMcpNgrokSettingsSchema.Type | undefined, unknown>;
+	readonly readPortFx: Effect.Effect<EditorMcpPortSchema.Type, unknown, never>;
+	readonly writePortFx: (port: EditorMcpPortSchema.Type) => Effect.Effect<void, unknown, never>;
+	readonly readNgrokFx: Effect.Effect<
+		EditorMcpNgrokSettingsSchema.Type | undefined,
+		unknown,
+		never
+	>;
 	readonly writeNgrokFx: (
 		configuration: EditorMcpNgrokSettingsSchema.Type,
-	) => Effect.Effect<void, unknown>;
-	readonly ensureSecretFx: Effect.Effect<string, unknown>;
-	readonly verifySecretFx: (candidate: string) => Effect.Effect<boolean, unknown>;
-	readonly resetFx: Effect.Effect<string, unknown>;
+	) => Effect.Effect<void, unknown, never>;
+	readonly ensureSecretFx: Effect.Effect<string, unknown, never>;
+	readonly verifySecretFx: (candidate: string) => Effect.Effect<boolean, unknown, never>;
+	readonly resetFx: Effect.Effect<string, unknown, never>;
 }

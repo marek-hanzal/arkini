@@ -8,6 +8,6 @@ export interface TrustedRenderer {
 	readonly isTrustedIpcSender: (event: IpcMainEvent | IpcMainInvokeEvent) => boolean;
 	readonly assertTrustedIpcSenderFx: (
 		event: IpcMainEvent | IpcMainInvokeEvent,
-	) => Effect.Effect<void, ElectronMainError>;
-	readonly registerWindowFx: (window: BrowserWindow) => Effect.Effect<void>;
+	) => Effect.Effect<void, ElectronMainError, never>;
+	readonly registerWindowFx: (window: BrowserWindow) => Effect.Effect<void, never, never>;
 }

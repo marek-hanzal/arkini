@@ -7,13 +7,13 @@ import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 export interface MainSurface extends MainInteractionSurface {
-	readonly closeFx: Effect.Effect<void>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly readLocationPoseFx: (
 		location: TileActorItem["location"],
-	) => Effect.Effect<ActorPose | null>;
-	readonly redrawFx: Effect.Effect<void>;
-	readonly setPaletteFx: (palette: PixiScenePalette) => Effect.Effect<void>;
+	) => Effect.Effect<ActorPose | null, never, never>;
+	readonly redrawFx: Effect.Effect<void, never, never>;
+	readonly setPaletteFx: (palette: PixiScenePalette) => Effect.Effect<void, never, never>;
 	readonly setTransitionFx: (
 		transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
-	) => Effect.Effect<void>;
+	) => Effect.Effect<void, never, never>;
 }

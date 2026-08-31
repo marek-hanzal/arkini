@@ -24,7 +24,7 @@ import type { MotionRedirect } from "~/tile-motion/type/MotionTarget";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 
 export interface DropSubmission {
-	readonly isPendingActorFx: (actorId: string) => Effect.Effect<boolean>;
+	readonly isPendingActorFx: (actorId: string) => Effect.Effect<boolean, never, never>;
 	readonly submitFx: (request: {
 		readonly actor: PixiTileActor;
 		readonly commandTarget: runTileDropAtom.Command["target"];
@@ -39,8 +39,8 @@ export interface DropSubmission {
 		};
 		readonly sourceItem: TileActorItem;
 		readonly targetItem: TileActorItem | null;
-	}) => Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
+	}) => Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
 interface Props {

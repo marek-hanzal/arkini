@@ -22,13 +22,20 @@ interface MainInteractionTargetFacts {
 
 export interface MainInteractionSurface {
 	readonly transientActorLayer: Container;
-	readonly readActorPoseFx: (item: TileActorItem) => Effect.Effect<{
-		readonly layer: Container;
-		readonly size: number;
-		readonly x: number;
-		readonly y: number;
-	} | null>;
-	readonly readTargetFactsFx: (x: number, y: number) => Effect.Effect<MainInteractionTargetFacts>;
+	readonly readActorPoseFx: (item: TileActorItem) => Effect.Effect<
+		{
+			readonly layer: Container;
+			readonly size: number;
+			readonly x: number;
+			readonly y: number;
+		} | null,
+		never,
+		never
+	>;
+	readonly readTargetFactsFx: (
+		x: number,
+		y: number,
+	) => Effect.Effect<MainInteractionTargetFacts, never, never>;
 	readonly readLocalActorIdsFx: (bounds: {
 		readonly excludeActorId?: string;
 		readonly height: number;
@@ -36,9 +43,9 @@ export interface MainInteractionSurface {
 		readonly width: number;
 		readonly x: number;
 		readonly y: number;
-	}) => Effect.Effect<ReadonlyArray<string>>;
+	}) => Effect.Effect<ReadonlyArray<string>, never, never>;
 	readonly renderDropFeedbackFx: (
 		target: MainInteractionDropTarget | null,
 		kind: readDropItemPreviewFx.Result["kind"] | null,
-	) => Effect.Effect<void>;
+	) => Effect.Effect<void, never, never>;
 }

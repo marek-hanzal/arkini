@@ -97,60 +97,70 @@ export namespace ProjectRepository {
 
 export interface ProjectRepositoryService extends ProjectVersionRepositoryService {
 	/** Joins every repository write admitted before this Effect acquires the write boundary. */
-	readonly awaitIdleFx: Effect.Effect<void, ProjectRepositoryError>;
+	readonly awaitIdleFx: Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly createProjectFx: (
 		props: ProjectRepository.CreateProjectProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
-	readonly deleteProjectFx: (projectId: string) => Effect.Effect<void, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
+	readonly deleteProjectFx: (
+		projectId: string,
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly createNoteFx: (
 		props: ProjectRepository.CreateNoteProps,
-	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError>;
+	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError, never>;
 	readonly deleteNoteFx: (
 		key: ProjectRepository.NoteKey,
-	) => Effect.Effect<void, ProjectRepositoryError>;
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly deleteItemFx: (
 		props: ProjectRepository.DeleteItemProps,
-	) => Effect.Effect<ProjectCommit, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectCommit, ProjectRepositoryError, never>;
 	readonly deleteResourceFx: (
 		props: ProjectRepository.DeleteResourceProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
-	readonly listProjectsFx: Effect.Effect<ReadonlyArray<ProjectCandidate>, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
+	readonly listProjectsFx: Effect.Effect<
+		ReadonlyArray<ProjectCandidate>,
+		ProjectRepositoryError,
+		never
+	>;
 	readonly listNotesFx: (
 		projectId: string,
-	) => Effect.Effect<ReadonlyArray<NoteSchema.Type>, ProjectRepositoryError>;
+	) => Effect.Effect<ReadonlyArray<NoteSchema.Type>, ProjectRepositoryError, never>;
 	readonly listBoardScenariosFx: (
 		projectId: string,
-	) => Effect.Effect<ReadonlyArray<BoardScenarioDescriptorSchema.Type>, ProjectRepositoryError>;
+	) => Effect.Effect<
+		ReadonlyArray<BoardScenarioDescriptorSchema.Type>,
+		ProjectRepositoryError,
+		never
+	>;
 	readonly readBoardScenarioFx: (
 		key: ProjectRepository.BoardScenarioKey,
-	) => Effect.Effect<BoardScenarioSchema.Type | null, ProjectRepositoryError>;
+	) => Effect.Effect<BoardScenarioSchema.Type | null, ProjectRepositoryError, never>;
 	readonly readProjectFx: (
 		projectId: string,
-	) => Effect.Effect<Project | null, ProjectRepositoryError>;
+	) => Effect.Effect<Project | null, ProjectRepositoryError, never>;
 	readonly replaceConfigFx: (
 		props: ProjectRepository.ReplaceConfigProps,
-	) => Effect.Effect<ProjectCommit, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectCommit, ProjectRepositoryError, never>;
 	readonly replaceResourceFx: (
 		props: ProjectRepository.ReplaceResourceProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly saveResourceFx: (
 		props: ProjectRepository.SaveResourceProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly upsertItemFx: (
 		props: ProjectRepository.UpsertItemProps,
-	) => Effect.Effect<ProjectCommit, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectCommit, ProjectRepositoryError, never>;
 	readonly upsertResourcesFx: (
 		props: ProjectRepository.UpsertResourcesProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly updateNoteFx: (
 		props: ProjectRepository.UpdateNoteProps,
-	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError>;
+	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError, never>;
 	readonly writeBoardScenarioFx: (
 		props: ProjectRepository.WriteBoardScenarioProps,
-	) => Effect.Effect<BoardScenarioSchema.Type, ProjectRepositoryError>;
+	) => Effect.Effect<BoardScenarioSchema.Type, ProjectRepositoryError, never>;
 	readonly deleteBoardScenarioFx: (
 		key: ProjectRepository.BoardScenarioKey,
-	) => Effect.Effect<void, ProjectRepositoryError>;
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
 }
 
 /** Sole canonical persistence authority for editor projects. */

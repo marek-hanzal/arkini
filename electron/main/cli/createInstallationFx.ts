@@ -12,10 +12,10 @@ const quoteShellArgument = (value: string) => `'${value.replaceAll("'", `'"'"'`)
 
 /** Main-process ownership of the one user-level arkini-cli command link. */
 export interface Installation {
-	readonly readStatusFx: Effect.Effect<InstallationStatus, ElectronMainError>;
-	readonly installFx: Effect.Effect<InstallationStatus, ElectronMainError>;
-	readonly replaceFx: Effect.Effect<InstallationStatus, ElectronMainError>;
-	readonly uninstallFx: Effect.Effect<InstallationStatus, ElectronMainError>;
+	readonly readStatusFx: Effect.Effect<InstallationStatus, ElectronMainError, never>;
+	readonly installFx: Effect.Effect<InstallationStatus, ElectronMainError, never>;
+	readonly replaceFx: Effect.Effect<InstallationStatus, ElectronMainError, never>;
+	readonly uninstallFx: Effect.Effect<InstallationStatus, ElectronMainError, never>;
 }
 
 export namespace createInstallationFx {

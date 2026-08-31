@@ -7,7 +7,7 @@ import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -65,7 +65,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 		itemId: ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOwner));
+	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined) {
 		return {
 			resolution: {
@@ -84,7 +84,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const boardCandidates = Array.getSomes(candidates.map(isBoardRuntimeItemFn)).sort(
+	const boardCandidates = Array.getSomes(candidates.map(narrowBoardRuntimeItemFn)).sort(
 		(left, right) => compareTarget(owner.location.position, left, right),
 	);
 

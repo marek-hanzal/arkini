@@ -5,7 +5,7 @@ import type { DeliveryRuntimeItemSchema } from "~/game-runtime/schema/DeliveryRu
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 /** Narrows one live runtime item to a canonical outbound or returning delivery. */
-export const isDeliveryRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
+export const narrowDeliveryRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
 	Option.liftPredicate(
 		item,
 		(candidate): candidate is DeliveryRuntimeItemSchema.Type =>

@@ -6,8 +6,8 @@ import { applyMergeRuntimeFx } from "~/item-merge/fx/applyMergeRuntimeFx";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
@@ -423,8 +423,8 @@ describe("mergeItemsFx participant lifecycle", () => {
 				if (runtimeSource === undefined || runtimeTarget === undefined) {
 					return yield* Effect.die(new Error("Expected merge participants."));
 				}
-				const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
-				const target = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeTarget));
+				const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+				const target = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTarget));
 				const rule = source?.item.merge?.[0];
 				if (source === undefined || target === undefined || rule === undefined) {
 					return yield* Effect.die(new Error("Expected Board merge participants."));

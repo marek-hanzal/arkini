@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -23,7 +23,7 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 			const ownerItem =
 				owner === undefined
 					? undefined
-					: Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+					: Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 			if (ownerItem === undefined) {
 				return yield* Effect.fail(
 					new ItemNotFoundError({

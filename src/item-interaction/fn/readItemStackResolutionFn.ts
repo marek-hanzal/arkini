@@ -7,8 +7,8 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/item-interaction/error/StackItemsUnavailableError";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -86,11 +86,11 @@ export const readItemStackResolutionFn = ({
 	if (runtimeTarget.revision !== targetRevision) {
 		return blockedFn(StackItemsUnavailableError.Reason.StaleTargetRevision);
 	}
-	const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
+	const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return blockedFn(StackItemsUnavailableError.Reason.SourceNotOnGrid);
 	}
-	const target = Option.getOrUndefined(isGridRuntimeItemFn(runtimeTarget));
+	const target = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTarget));
 	if (target === undefined) {
 		return blockedFn(StackItemsUnavailableError.Reason.TargetNotOnGrid);
 	}
@@ -111,8 +111,8 @@ export const readItemStackResolutionFn = ({
 		return blockedFn(StackItemsUnavailableError.Reason.StaleTargetLocation);
 	}
 
-	const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
-	const boardTarget = Option.getOrUndefined(isBoardRuntimeItemFn(target));
+	const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));
+	const boardTarget = Option.getOrUndefined(narrowBoardRuntimeItemFn(target));
 	if (
 		boardSource !== undefined &&
 		boardTarget !== undefined &&

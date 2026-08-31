@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -21,7 +21,7 @@ export const moveRuntimeItemForTestFx = Effect.fn("moveRuntimeItemForTestFx")(fu
 }) {
 	const runtime = yield* readRuntimeFx();
 	const source = Option.getOrUndefined(
-		isGridRuntimeItemFn(
+		narrowGridRuntimeItemFn(
 			yield* readRuntimeItemByIdFx({
 				itemId,
 				runtime,

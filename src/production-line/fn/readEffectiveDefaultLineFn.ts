@@ -1,5 +1,5 @@
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import type { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -7,7 +7,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace readEffectiveDefaultLineFn {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly ownerItem: isLineOwnerItemFn.Result;
+		readonly ownerItem: narrowLineOwnerItemFn.Result;
 		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId">;
 	}
 

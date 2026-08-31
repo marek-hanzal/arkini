@@ -5,7 +5,7 @@ import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeIte
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 /** Narrows one live runtime item to a board, inventory, or toolbar item. */
-export const isGridRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
+export const narrowGridRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
 	Option.liftPredicate(
 		item,
 		(candidate): candidate is GridRuntimeItemSchema.Type =>

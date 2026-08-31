@@ -13,8 +13,8 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -122,7 +122,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				entityId: runtimeTarget.id,
 				expectedRevision: targetRevision,
 			});
-			const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
+			const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -131,7 +131,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 					}),
 				);
 			}
-			const target = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeTarget));
+			const target = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTarget));
 			if (target === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnBoardError({
@@ -140,7 +140,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 					}),
 				);
 			}
-			const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
+			const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));
 			if (boardSource !== undefined && boardSource.location.space !== target.location.space) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({

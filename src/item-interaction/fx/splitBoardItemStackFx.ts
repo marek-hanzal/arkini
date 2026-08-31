@@ -11,12 +11,12 @@ import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { ItemStackSplitUnavailableError } from "~/item-interaction/error/ItemStackSplitUnavailableError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { readValidatedRuntimeItemFx } from "~/item-interaction/fx/readValidatedRuntimeItemFx";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { readRuntimeCommandTargetFx } from "~/game-runtime/fx/readRuntimeCommandTargetFx";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -45,12 +45,12 @@ export const splitBoardItemStackFx = Effect.fn("splitBoardItemStackFx")(function
 }: splitBoardItemStackFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			const validatedItem = yield* readValidatedRuntimeItemFx({
+			const validatedItem = yield* readRuntimeCommandTargetFx({
 				itemId,
 				revision,
 				runtime,
 			});
-			const sourceBefore = Option.getOrUndefined(isBoardRuntimeItemFn(validatedItem));
+			const sourceBefore = Option.getOrUndefined(narrowBoardRuntimeItemFn(validatedItem));
 			if (sourceBefore === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnBoardError({

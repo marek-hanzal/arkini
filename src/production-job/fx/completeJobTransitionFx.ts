@@ -13,7 +13,7 @@ import { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/production-job/fx/makeJobCompletionRandomFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -59,7 +59,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	const runtimeOwner = runtime.items.find((item) => item.id === job.ownerItemId);
 	if (runtimeOwner === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} owner is missing.`));
-	const owner = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOwner));
+	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined)
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({

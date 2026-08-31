@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { InputRunPlanInvalidError } from "~/production-input/error/InputRunPlanInvalidError";
-import { isInputRuntimeItemFn } from "~/production-input/fn/isInputRuntimeItemFn";
+import { narrowInputRuntimeItemFn } from "~/production-input/fn/narrowInputRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -33,7 +33,7 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 		itemId,
 		runtime,
 	});
-	const item = Option.getOrUndefined(isInputRuntimeItemFn(runtimeItem));
+	const item = Option.getOrUndefined(narrowInputRuntimeItemFn(runtimeItem));
 	const validLocation =
 		item !== undefined &&
 		item.location.ownerItemId === ownerItemId &&

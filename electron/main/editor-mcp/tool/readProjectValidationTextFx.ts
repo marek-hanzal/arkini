@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { validateGameConfigFx } from "~/game-config/validation/fx/validateGameConfigFx";
-import { validateGameResourcesFn } from "~/game-config/validation/rule/fn/validateGameResourcesFn";
+import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";
+import { validateGameResourcesFn } from "~/game-config-validation/fn/validateGameResourcesFn";
 
 /** Prints canonical saved-project semantic and resource-reference diagnostics. */
 export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextFx")(function* (

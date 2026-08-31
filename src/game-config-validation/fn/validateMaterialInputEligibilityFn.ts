@@ -6,7 +6,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
-import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
+import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
 import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 
 export namespace validateMaterialInputEligibilityFn {

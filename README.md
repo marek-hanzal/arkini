@@ -63,11 +63,12 @@ src/production-line-authoring  controlled Line, Input, Rule and Output editor UI
 src/production-output  output, drop and roll schemas plus resolution policy
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, validation and settlement
-src/game-config  authored value/config schemas, loaded-config capability, diagnostics and validation
+src/game-config  authored value/config schemas and loaded-config capability
 src/game-config-cli  schema generation and completed-project validation commands
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
 src/game-config-resource  authored resource schemas, references, source discovery, usage and rename semantics
 src/game-config-source  portable source layout, schemas, discovery, parsing and project admission
+src/game-config-validation  completed-config semantic validation and provenance-aware diagnostics
 src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation

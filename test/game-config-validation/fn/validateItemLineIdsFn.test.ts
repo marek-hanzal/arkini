@@ -6,7 +6,7 @@ import {
 	createLine,
 	createProducerItem,
 	createRootSource,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const lineDiagnostics = async (items: Record<string, unknown>) =>

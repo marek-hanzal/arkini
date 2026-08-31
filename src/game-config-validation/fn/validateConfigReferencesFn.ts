@@ -18,8 +18,8 @@ import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/Ty
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
-import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
-import { readItemOutputEntriesFn } from "../../fn/readItemOutputEntriesFn";
+import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
+import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
 
 const validateSelectorReferenceFn = ({
 	config,

@@ -7,7 +7,7 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 const createRuledOutput = (type: "disable" | "enable") =>
 	OutputSchema.parse({

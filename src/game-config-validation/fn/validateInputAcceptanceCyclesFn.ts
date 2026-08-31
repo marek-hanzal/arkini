@@ -4,8 +4,8 @@ import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/Game
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import type { MaterialInputEdgeSchema } from "../../schema/MaterialInputEdgeSchema";
-import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
+import type { MaterialInputEdgeSchema } from "../schema/MaterialInputEdgeSchema";
+import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
 
 export namespace validateInputAcceptanceCyclesFn {
 	export interface Props {

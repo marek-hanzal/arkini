@@ -7,7 +7,7 @@ import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameCon
 import {
 	createRootSource,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 

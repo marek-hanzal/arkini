@@ -16,7 +16,7 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
-} from "~test/game-config/validation/support/gameValidationTestSource";
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 const chargedDeposit = (itemId: string, cost = 1) => ({
 	charges: {

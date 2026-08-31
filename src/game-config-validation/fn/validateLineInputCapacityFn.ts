@@ -6,7 +6,7 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/Di
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { TypeSchema as ItemTypeSchema } from "~/item-definition/schema/TypeSchema";
 
-import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
+import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
 
 export namespace validateLineInputCapacityFn {
 	export interface Props {

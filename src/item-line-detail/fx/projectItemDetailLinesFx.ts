@@ -10,7 +10,7 @@ import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDeta
 import { projectItemDetailReferenceFx } from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 
 type ProjectedLineDisabledCause = Extract<
 	ItemDetailLinesProjection.DisabledReason,

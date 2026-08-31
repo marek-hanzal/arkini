@@ -1,7 +1,7 @@
 import { Effect, Equal, Hash } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 
 interface ExactGameIdentity<GameType extends PlayableGame> extends Equal.Equal {
 	readonly game: GameType;

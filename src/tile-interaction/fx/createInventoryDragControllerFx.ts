@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 import { match, P } from "ts-pattern";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";

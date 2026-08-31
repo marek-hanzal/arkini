@@ -9,9 +9,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { routeTree } from "~/_route";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
-import type { Game } from "~/renderer/game/Game";
-import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import type { Game } from "~/installed-game/type/Game";
+import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import {

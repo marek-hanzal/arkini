@@ -117,6 +117,66 @@ module.exports = {
 			},
 		},
 		{
+			name: "tick-lifecycle-owners-stay-upstream",
+			comment:
+				"Production delivery/jobs and temporary-item lifecycle provide behavior to Game Tick and never import its clock, replay, or loop implementation.",
+			severity: "error",
+			from: {
+				path: "^src/(?:production-(?:delivery|job)|engine/item/temporary)(?:/|$)",
+			},
+			to: {
+				path: "^src/game-tick(?:/|$)",
+			},
+		},
+		{
+			name: "game-session-stays-upstream-of-playable-game",
+			comment:
+				"The canonical session lifecycle provides runtime execution to playable and installed Game capabilities without importing their renderer/package ownership.",
+			severity: "error",
+			from: {
+				path: "^src/game-session(?:/|$)",
+			},
+			to: {
+				path: "^src/(?:playable-game|installed-game)(?:/|$)",
+			},
+		},
+		{
+			name: "playable-game-stays-package-independent",
+			comment:
+				"Package-independent live Game capabilities provide behavior to installed-game bootstrap and lifecycle without importing Arkpack/save ownership.",
+			severity: "error",
+			from: {
+				path: "^src/playable-game(?:/|$)",
+			},
+			to: {
+				path: "^src/installed-game(?:/|$)",
+			},
+		},
+		{
+			name: "item-detail-reads-stay-upstream",
+			comment:
+				"Shared Item Detail reads and projections provide facts to Frame, Lines, and presentation owners without importing those consumers.",
+			severity: "error",
+			from: {
+				path: "^src/item-detail-read(?:/|$)",
+			},
+			to: {
+				path: "^src/item-(?:detail|detail-frame|line-detail)(?:/|$)",
+			},
+		},
+		{
+			name: "runtime-and-tick-stay-upstream-of-game-cheat",
+			comment:
+				"Canonical Runtime and Tick consume persisted cheat facts directly; Game Cheat commands may compose them, but the dependency never reverses.",
+			severity: "error",
+			from: {
+				path: "^src/(?:game-runtime|game-tick)(?:/|$)",
+			},
+			to: {
+				path: "^src/game-cheat(?:/|$)",
+			},
+		},
+		{
 			name: "active-code-does-not-import-unpacked-game-resources",
 			comment:
 				"Application code consumes authored Game resources only through validated Arkpacks.",
@@ -126,6 +186,42 @@ module.exports = {
 			},
 			to: {
 				path: "^game/[^/]+/(?:assets|resources)(?:/|$)",
+			},
+		},
+		{
+			name: "estimate-demand-does-not-import-consumers",
+			comment:
+				"Estimate demand grouping is the lowest pure policy and never imports witness, projection, or orchestration owners.",
+			severity: "error",
+			from: {
+				path: "^src/estimate-demand(?:/|$)",
+			},
+			to: {
+				path: "^src/(?:estimate(?:/|$)|estimate-(?:projection|witness)(?:/|$))",
+			},
+		},
+		{
+			name: "estimate-witness-does-not-import-consumers",
+			comment:
+				"Estimate witness vocabulary may consume demand semantics but never projection or orchestration owners.",
+			severity: "error",
+			from: {
+				path: "^src/estimate-witness(?:/|$)",
+			},
+			to: {
+				path: "^src/(?:estimate(?:/|$)|estimate-projection(?:/|$))",
+			},
+		},
+		{
+			name: "estimate-projection-does-not-import-orchestration",
+			comment:
+				"Estimate projection consumes stable witnesses and owns its output contract without importing orchestration.",
+			severity: "error",
+			from: {
+				path: "^src/estimate-projection(?:/|$)",
+			},
+			to: {
+				path: "^src/estimate(?:/|$)",
 			},
 		},
 		{

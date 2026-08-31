@@ -2,11 +2,11 @@ import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/game-presentation/fx/settleRendererCommandFailureFx";
-import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
-import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx";
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
 
 type UpdateGameCheatsAction = "cheat-mode" | "instant-gameplay" | "exit";
 

@@ -3,7 +3,7 @@ import { Cause, Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/renderer/game/Game";
+import type { Game } from "~/installed-game/type/Game";
 import { TileDefaultLineCommandAtom } from "~/tile-interaction/atom/TileDefaultLineCommandAtom";
 
 const engineCommands = vi.hoisted(() => ({

@@ -328,18 +328,18 @@ describe("EditorBuild", () => {
 
 	it("does not expose an unknown Build failure cause", async () => {
 		state.buildResult = AsyncResult.fail(new Error("private filesystem detail"));
-		await renderController();
-		expect(controller?.buildFailure).toEqual({
-			type: "operational",
-			detail: "The Editor project could not be built because of an unknown error.",
-		});
+		const { container } = await renderBuild();
+		expect(container.textContent).toContain(
+			"The Editor project could not be built because of an unknown error.",
+		);
+		expect(container.textContent).not.toContain("private filesystem detail");
 	});
 
 	it("hides an artifact as soon as the canonical project revision changes", async () => {
 		state.buildResult = AsyncResult.success(createArtifact("a".repeat(64), 0));
 		const render = await renderController();
 		expect(controller?.buildStatus).toBe("valid");
-		expect(controller?.artifactSummary).toBeDefined();
+		expect(controller?.artifact).toBeDefined();
 
 		state.project = {
 			...(state.project as Record<string, unknown>),
@@ -347,7 +347,7 @@ describe("EditorBuild", () => {
 		};
 		await render();
 		expect(controller?.buildStatus).toBe("stale");
-		expect(controller?.artifactSummary).toBeUndefined();
+		expect(controller?.artifact).toBeUndefined();
 	});
 
 	it("does not show an install result from a different artifact hash", async () => {

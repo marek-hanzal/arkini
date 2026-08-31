@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { EditorBoardGameAtom } from "~/board-scenario/atom/EditorBoardGameAtom";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
+import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
 import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
 import { EditorBoardItemDetailLink } from "~/board-scenario/ui/EditorBoardItemDetailLink";

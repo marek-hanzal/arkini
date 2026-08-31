@@ -8,7 +8,7 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 const ownerKinds = [
 	"producer",
@@ -157,15 +157,15 @@ describe("line-owner delivery settlement boundary", () => {
 					const ids = yield* spawnScenarioFx(ownerKind);
 					const request = yield* enqueueLineFx(ids);
 					yield* runTickRuntimeByFx({
-						elapsedMs: TickStepMs,
+						elapsedMs: SimulationStepMs,
 					});
 					const traveling = yield* readRuntimeFx();
 					yield* runTickRuntimeByFx({
-						elapsedMs: TickStepMs * 2,
+						elapsedMs: SimulationStepMs * 2,
 					});
 					const settled = yield* readRuntimeFx();
 					yield* runTickRuntimeByFx({
-						elapsedMs: TickStepMs,
+						elapsedMs: SimulationStepMs,
 					});
 					return {
 						finished: yield* readRuntimeFx(),

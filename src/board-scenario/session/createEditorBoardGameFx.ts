@@ -2,11 +2,11 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { createGameResourceUrlsFx } from "~/renderer/game/createGameResourceUrlsFx";
-import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx";
-import { discardGameBootstrapFx } from "~/renderer/game/discardGameBootstrapFx";
+import { createGameResourceUrlsFx } from "~/playable-game/fx/createGameResourceUrlsFx";
+import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
+import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { startFx } from "~/game-start/fx/startFx";
-import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace createEditorBoardGameFx {

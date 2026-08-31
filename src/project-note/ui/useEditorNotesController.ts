@@ -1,6 +1,6 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { EditorNotesCommandAtoms } from "~/project-note/atom/EditorNotesCommandAtoms";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -11,28 +11,30 @@ import {
 } from "~/project-note/schema/EditorNoteSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
-interface EditorNotesControllerOutput {
-	readonly cancelEdit: () => void;
-	readonly canCreate: boolean;
-	readonly canSaveEdit: boolean;
-	readonly create: () => void;
-	readonly editContent: string;
-	readonly editingNoteId?: string;
-	readonly error?: unknown;
-	readonly loaded: boolean;
-	readonly loading: boolean;
-	readonly newContent: string;
-	readonly notes: ReadonlyArray<EditorNoteSchema.Type>;
-	readonly pending: boolean;
-	readonly remove: (noteId: string) => void;
-	readonly retry: () => void;
-	readonly saveEdit: () => void;
-	readonly setEditContent: (content: string) => void;
-	readonly setNewContent: (content: string) => void;
-	readonly startEdit: (note: EditorNoteSchema.Type) => void;
+export namespace useEditorNotesController {
+	export interface Output {
+		readonly cancelEdit: () => void;
+		readonly canCreate: boolean;
+		readonly canSaveEdit: boolean;
+		readonly create: () => void;
+		readonly editContent: string;
+		readonly editingNoteId?: string;
+		readonly error?: unknown;
+		readonly loaded: boolean;
+		readonly loading: boolean;
+		readonly newContent: string;
+		readonly notes: ReadonlyArray<EditorNoteSchema.Type>;
+		readonly pending: boolean;
+		readonly remove: (noteId: string) => void;
+		readonly retry: () => void;
+		readonly saveEdit: () => void;
+		readonly setEditContent: (content: string) => void;
+		readonly setNewContent: (content: string) => void;
+		readonly startEdit: (note: EditorNoteSchema.Type) => void;
+	}
 }
 
-export const useEditorNotesController = (): EditorNotesControllerOutput => {
+export const useEditorNotesController = (): useEditorNotesController.Output => {
 	const project = useEditorProject();
 	const commandAtom = EditorNotesCommandAtoms.command(project.projectId);
 	const streamAtom = EditorNotesCommandAtoms.stream(project.projectId);
@@ -69,7 +71,7 @@ export const useEditorNotesController = (): EditorNotesControllerOutput => {
 		newContentLength <= EditorNoteContentMaxLength;
 	const canSaveEdit =
 		!pending && editContentLength > 0 && editContentLength <= EditorNoteContentMaxLength;
-	const create = useCallback(() => {
+	const create = () => {
 		if (!canCreate) return;
 		void run({
 			action: "create",
@@ -77,23 +79,17 @@ export const useEditorNotesController = (): EditorNotesControllerOutput => {
 		})
 			.then(() => setNewContent(""))
 			.catch(() => undefined);
-	}, [
-		canCreate,
-		newContent,
-		run,
-	]);
-	const startEdit = useCallback((note: EditorNoteSchema.Type) => {
+	};
+	const startEdit = (note: EditorNoteSchema.Type) => {
 		setEditingNoteId(note.noteId);
 		setEditContent(note.content);
-	}, []);
-	const cancelEdit = useCallback(() => {
+	};
+	const cancelEdit = () => {
 		if (pending) return;
 		setEditingNoteId(undefined);
 		setEditContent("");
-	}, [
-		pending,
-	]);
-	const saveEdit = useCallback(() => {
+	};
+	const saveEdit = () => {
 		if (!canSaveEdit || editingNoteId === undefined) return;
 		void run({
 			action: "update",
@@ -105,81 +101,47 @@ export const useEditorNotesController = (): EditorNotesControllerOutput => {
 				setEditContent("");
 			})
 			.catch(() => undefined);
-	}, [
-		canSaveEdit,
-		editContent,
-		editingNoteId,
-		run,
-	]);
-	const remove = useCallback(
-		(noteId: string) => {
-			if (pending) return;
-			void run({
-				action: "delete",
-				noteId,
-			}).catch(() => undefined);
-		},
-		[
-			pending,
-			run,
-		],
-	);
-	const retry = useCallback(() => {
+	};
+	const remove = (noteId: string) => {
+		if (pending) return;
+		void run({
+			action: "delete",
+			noteId,
+		}).catch(() => undefined);
+	};
+	const retry = () => {
 		if (pending) return;
 		void run({
 			action: "load",
 		}).catch(() => undefined);
-	}, [
-		pending,
-		run,
-	]);
+	};
 
-	return useMemo(
-		() => ({
-			cancelEdit,
-			canCreate,
-			canSaveEdit,
-			create,
-			editContent,
-			...(editingNoteId === undefined
-				? {}
-				: {
-						editingNoteId,
-					}),
-			...(error === undefined
-				? {}
-				: {
-						error,
-					}),
-			loading,
-			loaded,
-			newContent,
-			notes: notes ?? [],
-			pending,
-			remove,
-			retry,
-			saveEdit,
-			setEditContent,
-			setNewContent,
-			startEdit,
-		}),
-		[
-			cancelEdit,
-			canCreate,
-			canSaveEdit,
-			create,
-			editContent,
-			editingNoteId,
-			error,
-			loading,
-			loaded,
-			newContent,
-			notes,
-			pending,
-			remove,
-			retry,
-			saveEdit,
-			startEdit,
-		],
-	);
+	return {
+		cancelEdit,
+		canCreate,
+		canSaveEdit,
+		create,
+		editContent,
+		...(editingNoteId === undefined
+			? {}
+			: {
+					editingNoteId,
+				}),
+		...(error === undefined
+			? {}
+			: {
+					error,
+				}),
+		loading,
+		loaded,
+		newContent,
+		notes: notes ?? [],
+		pending,
+		remove,
+		retry,
+		saveEdit,
+		setEditContent,
+		setNewContent,
+		startEdit,
+	};
 };

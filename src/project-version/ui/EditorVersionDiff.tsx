@@ -4,6 +4,7 @@ import type {
 	EditorProjectVersionValueChange,
 } from "~/project-version/type/EditorProjectVersion";
 import type { EditorProjectCompatibilityDiffResult } from "~/project-version/type/EditorProjectCompatibility";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const formatValue = (value: unknown) => {
 	if (value === undefined) return "—";
@@ -14,12 +15,13 @@ const formatValue = (value: unknown) => {
 const VersionBump = ({ bump }: { readonly bump?: EditorProjectCompatibilityDiffResult }) =>
 	bump === undefined ? null : (
 		<span
-			className={`shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider ${
-				bump === "major"
-					? "border-danger/40 bg-danger/10 text-danger"
-					: "border-success/40 bg-success/10 text-success"
-			}`}
-			data-bump={bump}
+			className="shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider data-[ui-bump=major]:border-danger/40 data-[ui-bump=major]:bg-danger/10 data-[ui-bump=major]:text-danger data-[ui-bump=minor]:border-success/40 data-[ui-bump=minor]:bg-success/10 data-[ui-bump=minor]:text-success"
+			{...readDataUiFn({
+				dataUi: "EditorVersionBump",
+				state: {
+					bump,
+				},
+			})}
 		>
 			{bump} bump
 		</span>

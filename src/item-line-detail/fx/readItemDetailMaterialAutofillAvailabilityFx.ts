@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
 import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterialInputEligibleFn";
 import { isLineInputAutofillSourceLocationFn } from "~/production-input/read/isLineInputAutofillSourceLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

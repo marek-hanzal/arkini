@@ -1,4 +1,4 @@
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 
 import { afterEach, beforeEach, vi } from "vitest";
 

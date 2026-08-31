@@ -2,7 +2,6 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { useCallback, useMemo } from "react";
 
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
@@ -34,23 +33,25 @@ const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 	}),
 );
 
-interface EditorProjectRefreshControllerProps {
-	readonly blocked: boolean;
-	readonly projectId: string;
-}
+export namespace useEditorProjectRefreshController {
+	export interface Props {
+		readonly blocked: boolean;
+		readonly projectId: string;
+	}
 
-interface EditorProjectRefreshControllerOutput {
-	readonly disabled: boolean;
-	readonly pending: boolean;
-	readonly refresh: () => void;
-	readonly tooltip: string;
+	export interface Output {
+		readonly disabled: boolean;
+		readonly pending: boolean;
+		readonly refresh: () => void;
+		readonly tooltip: string;
+	}
 }
 
 /** Owns hard-refresh command state; EditorShell only binds its presentation. */
 export const useEditorProjectRefreshController = ({
 	blocked,
 	projectId,
-}: EditorProjectRefreshControllerProps): EditorProjectRefreshControllerOutput => {
+}: useEditorProjectRefreshController.Props): useEditorProjectRefreshController.Output => {
 	const router = useRouter();
 	const commandAtom = refreshEditorProjectCommandAtom(projectId);
 	const result = useAtomValue(commandAtom);
@@ -60,7 +61,7 @@ export const useEditorProjectRefreshController = ({
 	const pending = result.waiting;
 	const disabled = blocked || pending;
 	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
-	const refresh = useCallback(() => {
+	const refresh = () => {
 		if (disabled) return;
 		void run(undefined)
 			.then((fresh) => {
@@ -76,28 +77,15 @@ export const useEditorProjectRefreshController = ({
 				});
 			})
 			.catch(() => undefined);
-	}, [
-		disabled,
-		projectId,
-		router,
-		run,
-	]);
+	};
 
-	return useMemo(
-		() => ({
-			disabled,
-			pending,
-			refresh,
-			tooltip:
-				error === undefined
-					? "Refresh from disk"
-					: `Refresh failed: ${readErrorMessageFn(error)}`,
-		}),
-		[
-			disabled,
-			error,
-			pending,
-			refresh,
-		],
-	);
+	return {
+		disabled,
+		pending,
+		refresh,
+		tooltip:
+			error === undefined
+				? "Refresh from disk"
+				: `Refresh failed: ${readErrorMessageFn(error)}`,
+	};
 };

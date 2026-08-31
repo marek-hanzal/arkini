@@ -4,8 +4,8 @@ import { Effect } from "effect";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import {
 	clearSaveMock,
 	clickControl,

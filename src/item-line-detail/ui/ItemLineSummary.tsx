@@ -7,6 +7,7 @@ import {
 	itemDetailBadgeMotion,
 	itemDetailFadeMotion,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemLineSummaryIdentityRenderProps {
 	readonly children: ReactNode;
@@ -33,15 +34,9 @@ export const ItemLineSummary = ({
 }) => {
 	const status =
 		line.activeJob?.status === JobStatusEnumSchema.enum.Paused
-			? {
-					className: "border-success/40 bg-success/12",
-					label: "Paused",
-				}
+			? "paused"
 			: line.activeJob === undefined && line.availability.kind === "unavailable"
-				? {
-						className: "border-danger/35 bg-danger/10",
-						label: "Disabled",
-					}
+				? "disabled"
 				: undefined;
 
 	const IdentityRenderer = renderIdentity;
@@ -64,13 +59,18 @@ export const ItemLineSummary = ({
 				<AnimatePresence initial={false}>
 					{stale || status === undefined ? null : (
 						<motion.span
-							key={status.label}
+							key={status}
 							layout
-							className={`rounded-full border px-2.5 py-1 text-xs font-semibold text-foreground ${status.className}`}
-							data-ui="TileLineStatusBadge"
+							className="rounded-full border px-2.5 py-1 text-xs font-semibold text-foreground data-[ui-status=disabled]:border-danger/35 data-[ui-status=disabled]:bg-danger/10 data-[ui-status=paused]:border-success/40 data-[ui-status=paused]:bg-success/12"
 							{...itemDetailBadgeMotion}
+							{...readDataUiFn({
+								dataUi: "TileLineStatusBadge",
+								state: {
+									status,
+								},
+							})}
 						>
-							{status.label}
+							{status === "paused" ? "Paused" : "Disabled"}
 						</motion.span>
 					)}
 				</AnimatePresence>

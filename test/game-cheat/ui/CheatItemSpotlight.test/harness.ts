@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
-import type { Game } from "~/renderer/game/Game";
+import type { Game } from "~/installed-game/type/Game";
 import { CheatItemSpotlight } from "~/game-cheat/ui/CheatItemSpotlight";
 import { CheatItemSpawnProvider } from "~/game-cheat/ui/CheatItemSpawnProvider";
 
@@ -33,7 +33,7 @@ vi.mock("~/game-cheat/ui/useGameCheats", () => ({
 		instantGameplay: false,
 	}),
 }));
-vi.mock("~/engine/cheat/write/spawnCheatItemFx", async () => {
+vi.mock("~/game-cheat/fx/spawnCheatItemFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		spawnCheatItemFx: ({ itemId }: { readonly itemId: string }) => {

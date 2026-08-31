@@ -1,4 +1,4 @@
-import type { GameTransition } from "~/renderer/game/session/GameSession";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 type SpaceActionPresentationPhase =

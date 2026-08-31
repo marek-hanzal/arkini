@@ -4,8 +4,8 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { type EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
-import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
+import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
+import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace createEditorBoardGameResourceFx {

@@ -2,7 +2,7 @@ import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createContext, useContext, type PropsWithChildren } from "react";
 import type { useEditorItemFormController } from "~/item-authoring/ui/useEditorItemFormController";
 
-type EditorItemFormSession = ReturnType<typeof useEditorItemFormController> & {
+type EditorItemFormSession = useEditorItemFormController.Output & {
 	readonly isNew: boolean;
 	readonly itemType?: TypeSchema.Type;
 	readonly productionLineId?: string;

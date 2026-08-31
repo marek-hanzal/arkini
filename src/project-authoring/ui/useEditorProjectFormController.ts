@@ -135,11 +135,17 @@ const analyzeEditorProjectStructuralCompatibilityFn = (
 	return compatibility.result === "major" ? compatibility : undefined;
 };
 
+export namespace useEditorProjectFormController {
+	export interface Props {
+		readonly onInvalidSection: (section: EditorProjectSectionId) => void | Promise<void>;
+	}
+
+	export type Output = ReturnType<typeof useEditorProjectFormController>;
+}
+
 export const useEditorProjectFormController = ({
 	onInvalidSection,
-}: {
-	readonly onInvalidSection: (section: EditorProjectSectionId) => void | Promise<void>;
-}) => {
+}: useEditorProjectFormController.Props) => {
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
 		() => readEditorProjectFormValuesFn(project),
@@ -233,16 +239,28 @@ export const useEditorProjectFormController = ({
 		ownsPathname: (pathname) => pathname.startsWith(`/editor/${project.projectId}/project`),
 		save,
 	});
-
-	return {
-		canonicalValues,
-		compatibility,
-		error:
-			RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError,
-		form,
-		isDirty: dirty,
-		isSaving: submitting,
-		project,
-		save,
-	} as const;
+	const error =
+		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError;
+	return useMemo(
+		() => ({
+			canonicalValues,
+			compatibility,
+			error,
+			form,
+			isDirty: dirty,
+			isSaving: submitting,
+			project,
+			save,
+		}),
+		[
+			canonicalValues,
+			compatibility,
+			dirty,
+			error,
+			form,
+			project,
+			save,
+			submitting,
+		],
+	);
 };

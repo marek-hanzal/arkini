@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { startFx } from "~/game-start/fx/startFx";

@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";

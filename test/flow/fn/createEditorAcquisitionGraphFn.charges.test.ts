@@ -199,7 +199,7 @@ describe("createEditorAcquisitionGraphFn", () => {
 		);
 	});
 
-	it("adds replacement and same-result output into one scalar merge yield", () => {
+	it("keeps replacement and authored output as correlated operation groups", () => {
 		const config = createMergeTestConfig({
 			rule: {
 				action: "consume",
@@ -216,14 +216,39 @@ describe("createEditorAcquisitionGraphFn", () => {
 			},
 		});
 		const graph = createEditorAcquisitionGraphFn(config);
-		const sameResultOutput = graph.routes.find(
-			(route) =>
-				route.metadata.kind === "merge-output" &&
-				route.id.startsWith("merge-output:") &&
-				route.output.factId === "result",
+		const resultRoutes = graph.routes.filter(
+			(route) => route.metadata.kind === "merge-output" && route.output.factId === "result",
 		);
 
-		expect(sameResultOutput?.output.expectedYield).toBe(3);
+		expect(resultRoutes).toHaveLength(2);
+		expect(resultRoutes.map(({ output }) => output.quantityDistribution)).toEqual([
+			[
+				{
+					probability: 1,
+					quantity: 2,
+				},
+			],
+			[
+				{
+					probability: 1,
+					quantity: 1,
+				},
+			],
+		]);
+		expect(resultRoutes[0]?.operation?.outputDistribution).toEqual([
+			{
+				probability: 1,
+				quantities: expect.arrayContaining([
+					expect.objectContaining({
+						quantity: 2,
+					}),
+					expect.objectContaining({
+						outputGroupId: "output:replacement",
+						quantity: 1,
+					}),
+				]),
+			},
+		]);
 	});
 
 	it("keeps a validator-valid route whose same canonical payer uses two identities", async () => {

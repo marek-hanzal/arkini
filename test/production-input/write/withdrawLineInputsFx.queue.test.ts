@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
-import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQueueFx";
+import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {

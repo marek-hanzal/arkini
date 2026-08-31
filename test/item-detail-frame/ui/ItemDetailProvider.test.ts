@@ -4,7 +4,7 @@ import { Deferred, Effect } from "effect";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import {
 	close,
 	completeEnter,

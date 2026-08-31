@@ -1,6 +1,7 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const formatProgress = (progress: number) =>
 	`${Number.isInteger(progress) ? progress : progress.toFixed(1)}%`;
@@ -113,12 +114,14 @@ export const EditorItemArtworkTimeline = ({
 										<button
 											type="button"
 											title={`Select progress asset ${index + 1}`}
-											className={`cursor-pointer rounded-lg border p-1 ${
-												selectedProgressIndex === index
-													? "border-accent bg-accent/10"
-													: "border-line bg-canvas"
-											}`}
+											className="cursor-pointer rounded-lg border p-1 data-[ui-selected=false]:border-line data-[ui-selected=false]:bg-canvas data-[ui-selected=true]:border-accent data-[ui-selected=true]:bg-accent/10"
 											onClick={() => onSelectProgress(index)}
+											{...readDataUiFn({
+												dataUi: "EditorItemArtworkProgressOption",
+												state: {
+													selected: selectedProgressIndex === index,
+												},
+											})}
 										>
 											{thumbnail}
 										</button>

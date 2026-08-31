@@ -12,27 +12,27 @@ import { useEditorItemEstimate } from "~/estimate/ui/useEditorItemEstimate";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 import { Status } from "~/ui/status/Status";
 
-const formatQuantity = (quantity: number) =>
+const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const formatRuntime = (runtimeMs: number) => formatDurationFn(runtimeMs);
+const formatRuntimeFn = (runtimeMs: number) => formatDurationFn(runtimeMs);
 
-const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
+const diagnosticTextFn = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "joint-output-accounting-unsupported":
+			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space.`;
 		case "quantity-limit-exceeded":
-			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
-		case "quantity-specific-route-not-retried":
-			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds selected scalar route ${diagnostic.routeId}; quantity-specific alternatives were not retried.`;
+			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
 		case "cycle":
 			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
 		case "unreachable":
-			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} has no complete acquisition route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}.`;
+			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} has no complete acquisition route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}.`;
 		case "zero-yield":
 			return `Route ${diagnostic.routeId} can never yield ${diagnostic.factId}.`;
 	}
 };
 
-const limitationText = (limitation: EditorAcquisitionLimitation) => {
+const limitationTextFn = (limitation: EditorAcquisitionLimitation) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
 			return "Conditional runtime adjustments are ignored.";
@@ -56,26 +56,26 @@ const EditorItemEstimateMethodDetails = ({
 			<Calculator className="mt-0.5 size-5 shrink-0 text-sky-700" />
 			<div>
 				<h3 className="font-semibold text-foreground">Approximate dependency estimator</h3>
-				<p className="mt-1 text-xs text-muted">Optimistic scalar authored-graph analysis</p>
+				<p className="mt-1 text-xs text-muted">Optimistic bounded-distribution analysis</p>
 			</div>
 		</header>
 		<p className="py-3 text-xs leading-relaxed text-muted">
-			Expands from authored starting facts and records the first locally ranked route when
-			each fact becomes reachable. Ranking uses scalar action time with stable route identity
-			as the tie-break; demand is divided by scalar expected yield. The materialized witness
-			is timed as an optimistic parallel critical path. Equivalent independent route
-			occurrences are compressed into one row; shared outputs, shared finite roots, runtime
-			rule effects, placement, charge capacity, renewal, and finite resource capacity are not
-			simulated. Route admission proves one scalar output unit; larger propagated demand can
-			return partial without retrying quantity-specific alternatives.
+			Expands from authored starting facts and ranks complete routes by quantity-aware
+			upstream critical-path cost with stable route identity as the tie-break. Bounded output
+			distributions provide expected first-hitting time, including whole deterministic batches
+			and correlated co-products. Demand uses the larger of additive consumption and each
+			selected route's simultaneous consumed-plus-reusable need. Finite starting pools are
+			shared across the selected-fact witness. Runtime rule truth, concrete item identity
+			packing, placement, renewable capacity, and engine execution are not simulated.
+			Unsupported bounded state space returns a partial estimate.
 		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			{estimate.obtainable ? (
 				<>
 					<li>Selected route: {estimate.route.routeId}.</li>
 					<li>
-						Approximate action runs: {formatQuantity(estimate.route.actionRuns)}; output
-						samples: {formatQuantity(estimate.route.outputRuns)}.
+						Approximate action runs: {formatQuantityFn(estimate.route.actionRuns)};
+						output samples: {formatQuantityFn(estimate.route.outputRuns)}.
 					</li>
 				</>
 			) : (
@@ -86,15 +86,17 @@ const EditorItemEstimateMethodDetails = ({
 				</li>
 			)}
 			<li>Starting authored items contribute no acquisition time.</li>
-			<li>Route occurrences provide the deterministic approximation explanation.</li>
+			<li>The normalized selected-fact DAG explains the deterministic approximation.</li>
 			{estimate.obtainable && estimate.diagnostics.length > 0 ? (
 				<li>
 					Rejected alternatives:{" "}
-					{estimate.diagnostics.map((diagnostic) => diagnosticText(diagnostic)).join(" ")}
+					{estimate.diagnostics
+						.map((diagnostic) => diagnosticTextFn(diagnostic))
+						.join(" ")}
 				</li>
 			) : null}
 			{estimate.limitations.map((limitation) => (
-				<li key={limitation}>Limitation: {limitationText(limitation)}</li>
+				<li key={limitation}>Limitation: {limitationTextFn(limitation)}</li>
 			))}
 		</ul>
 	</div>
@@ -130,7 +132,7 @@ const EditorItemEstimateSummary = ({ estimate }: { readonly estimate: EditorItem
 		<EditorItemEstimateHeading estimate={estimate} />
 		<p className="shrink-0 font-semibold tabular-nums text-foreground">
 			{estimate.obtainable
-				? `≈ ${formatRuntime(estimate.durationMs)}`
+				? `≈ ${formatRuntimeFn(estimate.durationMs)}`
 				: estimate.status === "partial"
 					? "Indeterminate"
 					: "Unreachable"}
@@ -163,12 +165,12 @@ const EditorItemEstimateResult = ({
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
 					{estimate.status === "partial"
-						? "The requested path exceeded either the static-analysis limit or its selected scalar-unit witness, so totals are indeterminate."
+						? "The bounded static analysis could not produce stable totals; see the diagnostic for the exact limit."
 						: "The authored dependency graph contains no complete route from the configured starting facts."}
 				</p>
 				<ul className="grid gap-2">
 					{estimate.diagnostics.map((diagnostic, index) => (
-						<li key={`${diagnostic.kind}:${index}`}>{diagnosticText(diagnostic)}</li>
+						<li key={`${diagnostic.kind}:${index}`}>{diagnosticTextFn(diagnostic)}</li>
 					))}
 				</ul>
 			</div>

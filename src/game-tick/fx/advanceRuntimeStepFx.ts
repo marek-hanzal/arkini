@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
-import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
+import { isInstantGameplayEnabledFn } from "~/game-runtime/read/fn/isInstantGameplayEnabledFn";
 import { settleItemDeliveryRuntimeFx } from "~/production-delivery/write/settleItemDeliveryRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -13,7 +13,7 @@ import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineS
 import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
@@ -40,7 +40,7 @@ const replaceJobFn = (runtime: RuntimeSchema.Type, job: JobSchema.Type): Runtime
 const advanceDeliveriesFx = Effect.fn("advanceDeliveriesFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
-	const instantGameplay = yield* isInstantGameplayEnabledFx({
+	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime,
 	});
 	const deliveryIds = runtime.items
@@ -58,7 +58,7 @@ const advanceDeliveriesFx = Effect.fn("advanceDeliveriesFx")(function* (
 				...liveItem.location,
 				remainingDurationMs: instantGameplay
 					? 0
-					: Math.max(0, liveItem.location.remainingDurationMs - TickStepMs),
+					: Math.max(0, liveItem.location.remainingDurationMs - SimulationStepMs),
 			},
 		};
 		draft = {
@@ -160,7 +160,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 ) {
 	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesFx(boundaryStart.runtime);
-	const instantGameplay = yield* isInstantGameplayEnabledFx({
+	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime: deliveryStart.runtime,
 	});
 	const jobs = sortJobsFn(deliveryStart.runtime.jobs);
@@ -188,7 +188,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (liveJob === undefined) continue;
 		draft = replaceJobFn(draft, {
 			...liveJob,
-			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - TickStepMs),
+			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - SimulationStepMs),
 		});
 	}
 

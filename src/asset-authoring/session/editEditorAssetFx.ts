@@ -5,7 +5,7 @@ import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProj
 import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
-import { renameGameResourceFx } from "~/game-config/resource/renameGameResourceFx";
+import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
 
 interface EditEditorAssetProps {
 	readonly currentId: string;

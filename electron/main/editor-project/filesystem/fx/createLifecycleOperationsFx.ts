@@ -15,7 +15,7 @@ import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProj
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";

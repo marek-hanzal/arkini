@@ -6,7 +6,7 @@ import type { ProjectPaths } from "../ProjectPaths";
 import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
-import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";

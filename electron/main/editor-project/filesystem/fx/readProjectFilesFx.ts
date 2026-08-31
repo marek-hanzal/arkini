@@ -4,8 +4,8 @@ import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { readPngResourceFx } from "~/game-config/resource/fx/readPngResourceFx";
-import { readResourceDescriptorsFx } from "~/game-config/resource/fx/readResourceDescriptorsFx";
+import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
+import { readResourceDescriptorsFx } from "~/game-config-resource/fx/readResourceDescriptorsFx";
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
 import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { ItemFileSchema } from "~/game-config/source/schema/ItemFileSchema";

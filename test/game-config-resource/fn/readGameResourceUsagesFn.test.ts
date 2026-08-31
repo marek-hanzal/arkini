@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { readGameResourceUsagesFn } from "~/game-config/resource/fn/readGameResourceUsagesFn";
+import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 
 describe("readGameResourceUsagesFn", () => {

@@ -7,7 +7,7 @@ import {
 } from "~/game-config/source/GameProjectReference";
 import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
-import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
 import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";

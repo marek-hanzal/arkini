@@ -71,6 +71,7 @@
 		"src/production-line-authoring",
 		"src/production-output",
 		"src/game-config",
+		"src/game-config-resource",
 		"src/arkpack",
 		"src/asset-authoring",
 		"src/editor-build",

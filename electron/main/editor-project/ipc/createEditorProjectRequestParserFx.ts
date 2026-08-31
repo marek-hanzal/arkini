@@ -5,7 +5,7 @@ import type { EditorProjectRepository } from "~/project-authoring/service/Editor
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import type {

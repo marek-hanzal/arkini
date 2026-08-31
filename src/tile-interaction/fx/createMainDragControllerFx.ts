@@ -25,13 +25,13 @@ import type { MainInteractionSurface } from "~/tile-interaction/type/MainInterac
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 
 export interface MainDragController {
-	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
-	readonly cancelInteractionFx: Effect.Effect<void>;
-	readonly detachActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
+	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
+	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
+	readonly detachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	/** Coalesces canonical/layout invalidation onto the current drag frame slot. */
-	readonly requestRefreshFx: Effect.Effect<void>;
-	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
+	readonly requestRefreshFx: Effect.Effect<void, never, never>;
+	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
 interface Props {

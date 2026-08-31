@@ -20,10 +20,10 @@ interface ReadEditorBuildProps {
 export interface EditorBuildRepositoryService {
 	readonly buildProjectFx: (
 		props: EditorBuildProps,
-	) => Effect.Effect<EditorProjectBuildSchema.Type, ProjectRepositoryError>;
+	) => Effect.Effect<EditorProjectBuildSchema.Type, ProjectRepositoryError, never>;
 	readonly readProjectBuildFx: (
 		props: ReadEditorBuildProps,
-	) => Effect.Effect<EditorProjectBuildContentSchema.Type, ProjectRepositoryError>;
+	) => Effect.Effect<EditorProjectBuildContentSchema.Type, ProjectRepositoryError, never>;
 }
 
 /** Renderer capability for building and rereading exact revision-pinned Editor artifacts. */

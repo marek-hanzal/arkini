@@ -12,7 +12,7 @@ import type {
 
 export namespace createGameEngineFinalizationCapabilityFx {
 	export interface Dependencies {
-		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown>;
+		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown, never>;
 		readonly lifecycle: Semaphore.Semaphore;
 		readonly operationScope: Scope.Scope;
 		readonly stateRef: Ref.Ref<GameEngineResourceServiceState>;
@@ -22,10 +22,10 @@ export namespace createGameEngineFinalizationCapabilityFx {
 		readonly finalizeFx: (
 			resource: InstalledGameEngineResource,
 			operation: Finalization["operation"],
-			actionFx: Effect.Effect<void, unknown>,
+			actionFx: Effect.Effect<void, unknown, never>,
 			allowAlreadyFinalized: boolean,
 			joinInFlightOperation?: boolean,
-		) => Effect.Effect<void, unknown>;
+		) => Effect.Effect<void, unknown, never>;
 		readonly releaseFx: GameEngineResourceFxService["releaseFx"];
 		readonly resetFx: GameEngineResourceFxService["resetFx"];
 	}

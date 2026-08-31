@@ -16,7 +16,7 @@ export namespace readArkpackFileFx {
 		readonly source: ArkiniElectronApi.ArkpackFile["source"];
 		readonly verifyProvenanceFx?: (props: {
 			readonly bytes: Uint8Array;
-		}) => Effect.Effect<ArkpackProvenanceSchema.Type>;
+		}) => Effect.Effect<ArkpackProvenanceSchema.Type, never, never>;
 	}
 }
 

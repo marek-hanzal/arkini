@@ -15,9 +15,9 @@ export interface FilesystemWrite {
 		readonly lock: string;
 		readonly target: string;
 		readonly bytes: Uint8Array;
-	}) => Effect.Effect<void, FilesystemWriteError>;
+	}) => Effect.Effect<void, FilesystemWriteError, never>;
 	readonly removeFileFx: (props: {
 		readonly lock: string;
 		readonly target: string;
-	}) => Effect.Effect<void, FilesystemWriteError>;
+	}) => Effect.Effect<void, FilesystemWriteError, never>;
 }

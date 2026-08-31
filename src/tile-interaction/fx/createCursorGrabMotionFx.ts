@@ -6,15 +6,15 @@ import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 
 export interface CursorGrabMotion {
-	readonly finishFx: (actor: PixiTileActor) => Effect.Effect<void>;
+	readonly finishFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly startFx: (
 		actor: PixiTileActor,
 		pointer: {
 			readonly x: number;
 			readonly y: number;
 		},
-	) => Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
+	) => Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
 interface Props {

@@ -2,8 +2,8 @@ import type { Effect } from "effect";
 
 export interface McpTunnelSession {
 	readonly url: URL;
-	readonly closedFx: Effect.Effect<void, unknown>;
-	readonly closeFx: Effect.Effect<void, unknown>;
+	readonly closedFx: Effect.Effect<void, unknown, never>;
+	readonly closeFx: Effect.Effect<void, unknown, never>;
 }
 
 export interface McpTunnel {
@@ -12,5 +12,5 @@ export interface McpTunnel {
 		readonly domain: string;
 		readonly port: number;
 		readonly provenance: string;
-	}) => Effect.Effect<McpTunnelSession, unknown>;
+	}) => Effect.Effect<McpTunnelSession, unknown, never>;
 }

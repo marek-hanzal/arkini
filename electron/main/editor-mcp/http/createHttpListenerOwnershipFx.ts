@@ -16,7 +16,7 @@ import { createServerFx } from "../tool/createServerFx";
 type NodeMcpHandler = (request: IncomingMessage, response: ServerResponse) => void;
 
 interface HttpListenerOwnership {
-	readonly ensureStartedFx: Effect.Effect<void, unknown>;
+	readonly ensureStartedFx: Effect.Effect<void, unknown, never>;
 	readonly readMcpHandler: () => NodeMcpHandler | undefined;
 	readonly setLocalEnabled: (enabled: boolean) => void;
 	readonly setRemoteHandler: (
@@ -27,7 +27,7 @@ interface HttpListenerOwnership {
 			  }
 			| undefined,
 	) => void;
-	readonly closeFx: Effect.Effect<void, unknown>;
+	readonly closeFx: Effect.Effect<void, unknown, never>;
 	readonly closeSync: () => void;
 }
 
@@ -40,7 +40,7 @@ export namespace createHttpListenerOwnershipFx {
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,
-		) => Effect.Effect<void, unknown>;
+		) => Effect.Effect<void, unknown, never>;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 	}
 }

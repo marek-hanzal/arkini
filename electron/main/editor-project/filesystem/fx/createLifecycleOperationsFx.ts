@@ -28,21 +28,27 @@ import { writeProjectFilesFx } from "./writeProjectFilesFx";
 interface LifecycleOperations {
 	readonly createProjectFx: (
 		props: ProjectRepository.CreateProjectProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
-	readonly deleteProjectFx: (projectId: string) => Effect.Effect<void, ProjectRepositoryError>;
-	readonly listProjectsFx: Effect.Effect<ReadonlyArray<ProjectCandidate>, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
+	readonly deleteProjectFx: (
+		projectId: string,
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
+	readonly listProjectsFx: Effect.Effect<
+		ReadonlyArray<ProjectCandidate>,
+		ProjectRepositoryError,
+		never
+	>;
 	readonly openProjectFx: (
 		props: ProjectRepository.OpenProjectProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly readProjectFx: (
 		projectId: string,
-	) => Effect.Effect<Project | null, ProjectRepositoryError>;
+	) => Effect.Effect<Project | null, ProjectRepositoryError, never>;
 	readonly readProjectRootFx: (
 		projectId: string,
-	) => Effect.Effect<string | null, ProjectRepositoryError>;
+	) => Effect.Effect<string | null, ProjectRepositoryError, never>;
 	readonly refreshProjectFx: (
 		projectId: string,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 }
 
 const cloneProject = (project: Project): Project => ({

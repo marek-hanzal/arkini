@@ -6,10 +6,10 @@ export interface WindowModeControllerOwnership {
 	readonly attachControllerFx: (
 		window: BrowserWindow,
 		controller: WindowModeController,
-	) => Effect.Effect<void>;
+	) => Effect.Effect<void, never, never>;
 	readonly readControllerFx: (
 		window: BrowserWindow,
-	) => Effect.Effect<WindowModeController, unknown>;
+	) => Effect.Effect<WindowModeController, unknown, never>;
 }
 
 /** Creates the Electron-main owner for controllers attached to BrowserWindow instances. */

@@ -28,11 +28,11 @@ import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicat
 import type { InventoryInteractionSurface } from "~/tile-interaction/type/InventoryInteractionSurface";
 
 export interface InventoryDragController {
-	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
-	readonly cancelInteractionFx: Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
-	readonly refreshPreviewFx: Effect.Effect<void>;
-	readonly removeActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
+	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
+	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
+	readonly refreshPreviewFx: Effect.Effect<void, never, never>;
+	readonly removeActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 }
 
 interface Props {
@@ -46,7 +46,7 @@ interface Props {
 		openDetail: boolean,
 		origin: HTMLElement,
 	) => void | PromiseLike<unknown>;
-	readonly onAcceptedDropFx: Effect.Effect<void>;
+	readonly onAcceptedDropFx: Effect.Effect<void, never, never>;
 	readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
 	readonly surface: InventoryInteractionSurface;
 }

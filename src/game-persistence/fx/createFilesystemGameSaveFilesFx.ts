@@ -23,12 +23,12 @@ class GameSaveFilesError extends Data.TaggedError("GameSaveFilesError")<{
 interface GameSaveFiles {
 	readonly readFx: (
 		key: GameSaveStorage.Key,
-	) => Effect.Effect<Uint8Array | null, GameSaveFilesError>;
+	) => Effect.Effect<Uint8Array | null, GameSaveFilesError, never>;
 	readonly writeFx: (
 		key: GameSaveStorage.Key,
 		bytes: Uint8Array,
-	) => Effect.Effect<void, GameSaveFilesError>;
-	readonly clearFx: (key: GameSaveStorage.Key) => Effect.Effect<void, GameSaveFilesError>;
+	) => Effect.Effect<void, GameSaveFilesError, never>;
+	readonly clearFx: (key: GameSaveStorage.Key) => Effect.Effect<void, GameSaveFilesError, never>;
 }
 
 interface Props {

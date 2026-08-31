@@ -220,8 +220,8 @@ export namespace createFilesystemEditorMcpStorageFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
-		readonly protectFx: (value: string) => Effect.Effect<Uint8Array, unknown>;
-		readonly unprotectFx: (value: Uint8Array) => Effect.Effect<string, unknown>;
+		readonly protectFx: (value: string) => Effect.Effect<Uint8Array, unknown, never>;
+		readonly unprotectFx: (value: Uint8Array) => Effect.Effect<string, unknown, never>;
 	}
 }
 

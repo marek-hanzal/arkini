@@ -18,6 +18,6 @@ export namespace LauncherStartup {
 
 	export interface Props {
 		readonly heroUrl: string;
-		readonly bootstrapFx?: Effect.Effect<Result, unknown>;
+		readonly bootstrapFx?: Effect.Effect<Result, unknown, never>;
 	}
 }

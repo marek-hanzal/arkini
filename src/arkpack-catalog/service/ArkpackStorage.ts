@@ -14,11 +14,14 @@ export namespace ArkpackStorage {
 
 /** Effect-native renderer capability for installed Arkpack persistence. */
 export interface ArkpackStorage {
-	readonly listFx: Effect.Effect<ReadonlyArray<ArkpackStorage.File>, unknown>;
+	readonly listFx: Effect.Effect<ReadonlyArray<ArkpackStorage.File>, unknown, never>;
 	readonly readFx: (
 		packageId: string,
-	) => Effect.Effect<ReadonlyArray<ArkpackStorage.File>, unknown>;
-	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown>;
-	readonly writeFx: (packageId: string, bytes: ArrayBuffer) => Effect.Effect<void, unknown>;
-	readonly openUserDirectoryFx: Effect.Effect<void, unknown>;
+	) => Effect.Effect<ReadonlyArray<ArkpackStorage.File>, unknown, never>;
+	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown, never>;
+	readonly writeFx: (
+		packageId: string,
+		bytes: ArrayBuffer,
+	) => Effect.Effect<void, unknown, never>;
+	readonly openUserDirectoryFx: Effect.Effect<void, unknown, never>;
 }

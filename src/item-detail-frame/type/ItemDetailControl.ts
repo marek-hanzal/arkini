@@ -83,19 +83,19 @@ export interface ItemDetailControl {
 	readonly runPendingAction: <Result, Failure>(
 		props: RunItemDetailPendingActionProps<Result, Failure>,
 	) => void;
-	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean>;
+	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean, never, never>;
 	readonly openItemDefinitionDetailFx: (
 		props: OpenItemDefinitionDetailProps,
-	) => Effect.Effect<boolean>;
+	) => Effect.Effect<boolean, never, never>;
 	/**
 	 * Changes only the presentation tab of the exact retained runtime target.
 	 * It never resolves or grants gameplay authority to a disappeared item.
 	 */
 	readonly selectRetainedItemDetailTabFx: (
 		props: SelectRetainedItemDetailTabProps,
-	) => Effect.Effect<boolean>;
+	) => Effect.Effect<boolean, never, never>;
 	readonly closeAtom: Atom.AtomResultFn<CloseItemDetailProps | undefined, void, never>;
-	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void>;
-	readonly completeEnterFx: (generation: number) => Effect.Effect<void>;
-	readonly completeExitFx: (generation: number) => Effect.Effect<void>;
+	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void, never, never>;
+	readonly completeEnterFx: (generation: number) => Effect.Effect<void, never, never>;
+	readonly completeExitFx: (generation: number) => Effect.Effect<void, never, never>;
 }

@@ -43,7 +43,8 @@ export interface GameEngineResourceFxService {
 	/** Reads only the adopted or currently finalizing renderer Game. */
 	readonly currentFx: Effect.Effect<
 		InstalledGameEngineResource | null,
-		CriticalGameLifecycleError
+		CriticalGameLifecycleError,
+		never
 	>;
 	/**
 	 * Joins every in-flight ownership transition before handing the renderer to
@@ -52,7 +53,8 @@ export interface GameEngineResourceFxService {
 	 */
 	readonly prepareEditorHandoffFx: Effect.Effect<
 		InstalledGameEngineResource | null,
-		CriticalGameLifecycleError
+		CriticalGameLifecycleError,
+		never
 	>;
 	/**
 	 * Acquires one scoped lease. Its Scope owns provisional cleanup until the
@@ -63,24 +65,29 @@ export interface GameEngineResourceFxService {
 	) => Effect.Effect<GameEngineLease, unknown, Scope.Scope>;
 	readonly adoptLeaseFx: (
 		lease: GameEngineLease,
-	) => Effect.Effect<InstalledGameEngineResource, unknown>;
+	) => Effect.Effect<InstalledGameEngineResource, unknown, never>;
 	/**
 	 * Claims a pending provisional resource for native close before route
 	 * interruption can release its final consumer.
 	 */
 	readonly claimForCloseFx: Effect.Effect<
 		InstalledGameEngineResource | null,
-		CriticalGameLifecycleError
+		CriticalGameLifecycleError,
+		never
 	>;
-	readonly releaseFx: (props: GameEngineResourceFx.ReleaseProps) => Effect.Effect<void, unknown>;
-	readonly resetFx: (props: GameEngineResourceFx.ResetProps) => Effect.Effect<void, unknown>;
+	readonly releaseFx: (
+		props: GameEngineResourceFx.ReleaseProps,
+	) => Effect.Effect<void, unknown, never>;
+	readonly resetFx: (
+		props: GameEngineResourceFx.ResetProps,
+	) => Effect.Effect<void, unknown, never>;
 	readonly closeFx: (
 		resource: InstalledGameEngineResource,
-	) => Effect.Effect<GameEngineResourceFx.CloseResult>;
-	readonly discardFailedFx: (packageId: string) => Effect.Effect<void, unknown>;
+	) => Effect.Effect<GameEngineResourceFx.CloseResult, never, never>;
+	readonly discardFailedFx: (packageId: string) => Effect.Effect<void, unknown, never>;
 	readonly recoverFailedSaveFx: (
 		props: GameEngineResourceFx.RecoverFailedSaveProps,
-	) => Effect.Effect<void, unknown>;
+	) => Effect.Effect<void, unknown, never>;
 }
 
 /** One Effect-owned renderer authority for Game acquisition and finalization. */

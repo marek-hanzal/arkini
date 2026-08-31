@@ -13,9 +13,9 @@ const encoder = new TextEncoder();
 type Entry = ProjectCatalogEntrySchema.Type;
 
 export interface ProjectCatalog {
-	readonly addFx: (entry: Entry) => Effect.Effect<void, ProjectRepositoryError>;
+	readonly addFx: (entry: Entry) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly list: () => ReadonlyArray<Entry>;
-	readonly removeFx: (root: string) => Effect.Effect<void, ProjectRepositoryError>;
+	readonly removeFx: (root: string) => Effect.Effect<void, ProjectRepositoryError, never>;
 }
 
 const createError = (message: string, cause?: unknown) =>

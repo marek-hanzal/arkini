@@ -28,10 +28,10 @@ export type GameTransition = CommittedTransitionSchema.Type;
  */
 export interface GameSession {
 	/** Saves and releases the session; a failed final save leaves it frozen and retryable. */
-	readonly disposeFx: Effect.Effect<void, unknown>;
+	readonly disposeFx: Effect.Effect<void, unknown, never>;
 	/** Destructive disposal for hard reset or an unpublished bootstrap. */
-	readonly disposeWithoutSaveFx: Effect.Effect<void, unknown>;
-	readonly flushSaveFx: Effect.Effect<void, unknown>;
+	readonly disposeWithoutSaveFx: Effect.Effect<void, unknown, never>;
+	readonly flushSaveFx: Effect.Effect<void, unknown, never>;
 	/** Read-only renderer projection of the authoritative committed transition source. */
 	readonly committedTransitionAtom: Atom.Atom<GameTransition>;
 	readonly getSnapshot: () => RuntimeSchema.Type;
@@ -53,7 +53,7 @@ export interface GameSession {
 	/** Runs one typed, interruptible command owned by this session's command scope. */
 	readonly runFx: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
-	) => Effect.Effect<Result, Error | GameSessionNotRunningError>;
+	) => Effect.Effect<Result, Error | GameSessionNotRunningError, never>;
 	/** Promise edge retained for non-Effect callers; implemented by `runFx`. */
 	readonly run: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,

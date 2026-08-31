@@ -97,17 +97,17 @@ export type PresentationWrite =
 	  };
 
 export interface ActorAnimator {
-	readonly animateFx: (animation: ActorAnimation) => Effect.Effect<void>;
-	readonly cancelActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
+	readonly animateFx: (animation: ActorAnimation) => Effect.Effect<void, never, never>;
+	readonly cancelActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly cancelChannelFx: (
 		actor: PixiTileActor,
 		channel: AnimationChannel,
-	) => Effect.Effect<void>;
-	readonly cancelFx: (ownerKey: string) => Effect.Effect<void>;
+	) => Effect.Effect<void, never, never>;
+	readonly cancelFx: (ownerKey: string) => Effect.Effect<void, never, never>;
 	readonly isChannelActiveFx: (
 		actor: PixiTileActor,
 		channel: AnimationChannel,
-	) => Effect.Effect<boolean>;
-	readonly setFx: (write: PresentationWrite) => Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
+	) => Effect.Effect<boolean, never, never>;
+	readonly setFx: (write: PresentationWrite) => Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }

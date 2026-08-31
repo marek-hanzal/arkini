@@ -8,7 +8,7 @@ import { calculateInitialWindowBoundsFn } from "./fn/calculateInitialWindowBound
 
 /** Sole per-BrowserWindow authority for requested and Electron-confirmed native modes. */
 export interface WindowModeController {
-	readonly requestModeFx: (mode: WindowModeSchema.Type) => Effect.Effect<void, unknown>;
+	readonly requestModeFx: (mode: WindowModeSchema.Type) => Effect.Effect<void, unknown, never>;
 }
 
 type WindowedMode = Exclude<WindowModeSchema.Type, "fullscreen">;

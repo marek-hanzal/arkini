@@ -11,16 +11,16 @@ import type { EditorBuildRepositoryService } from "~/editor-build/service/Editor
 export interface OwnedEditorProjectRepository
 	extends ProjectRepositoryService,
 		EditorBuildRepositoryService {
-	readonly closeFx: Effect.Effect<void>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly openProjectFx: (
 		props: ProjectRepository.OpenProjectProps,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly readProjectRootFx: (
 		projectId: string,
-	) => Effect.Effect<string | null, ProjectRepositoryError>;
+	) => Effect.Effect<string | null, ProjectRepositoryError, never>;
 	readonly refreshProjectFx: (
 		projectId: string,
-	) => Effect.Effect<Project, ProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 }
 
 /** Editor persistence may fail independently; gameplay must still boot. */

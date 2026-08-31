@@ -93,20 +93,20 @@ export interface ProjectVersionDiff {
 export interface ProjectVersionRepositoryService {
 	readonly checkoutVersionFx: (
 		props: ProjectVersionCheckoutInput,
-	) => Effect.Effect<void, ProjectRepositoryError>;
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly createVersionFx: (
 		props: ProjectVersionCommitInput,
-	) => Effect.Effect<ProjectVersionDescriptor, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectVersionDescriptor, ProjectRepositoryError, never>;
 	readonly diffVersionsFx: (
 		props: ProjectVersionDiffInput,
-	) => Effect.Effect<ProjectVersionDiff, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectVersionDiff, ProjectRepositoryError, never>;
 	readonly listVersionsFx: (
 		projectId: string,
-	) => Effect.Effect<ReadonlyArray<ProjectVersionDescriptor>, ProjectRepositoryError>;
+	) => Effect.Effect<ReadonlyArray<ProjectVersionDescriptor>, ProjectRepositoryError, never>;
 	readonly readVersionStatusFx: (
 		projectId: string,
-	) => Effect.Effect<ProjectVersionStatus, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectVersionStatus, ProjectRepositoryError, never>;
 	readonly updateVersionTagFx: (
 		props: ProjectVersionTagInput,
-	) => Effect.Effect<ProjectVersionDescriptor, ProjectRepositoryError>;
+	) => Effect.Effect<ProjectVersionDescriptor, ProjectRepositoryError, never>;
 }

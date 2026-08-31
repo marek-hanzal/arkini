@@ -22,7 +22,7 @@ export namespace updateGameCheatsAtom {
 		  }
 		| {
 				readonly action: "exit";
-				readonly runFx: Effect.Effect<void, unknown>;
+				readonly runFx: Effect.Effect<void, unknown, never>;
 		  };
 
 	export type State =

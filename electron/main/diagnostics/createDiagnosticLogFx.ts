@@ -16,9 +16,9 @@ import type { DiagnosticRecord } from "~electron/contract/diagnostics/Diagnostic
 /** Process-owned bounded diagnostic log capability exposed to trusted renderer IPC. */
 export interface DiagnosticLog {
 	readonly directoryPath: string;
-	readonly writeFx: (record: DiagnosticRecord) => Effect.Effect<void, unknown>;
-	readonly openDirectoryFx: Effect.Effect<void, unknown>;
-	readonly closeFx: Effect.Effect<void, unknown>;
+	readonly writeFx: (record: DiagnosticRecord) => Effect.Effect<void, unknown, never>;
+	readonly openDirectoryFx: Effect.Effect<void, unknown, never>;
+	readonly closeFx: Effect.Effect<void, unknown, never>;
 }
 
 const MAX_FILE_BYTES = 5 * 1_024 * 1_024;

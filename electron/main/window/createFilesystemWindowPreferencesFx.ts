@@ -9,8 +9,10 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 
 /** Effect-native main-process capability for the global native window mode. */
 export interface WindowPreferences {
-	readonly readModeFx: Effect.Effect<WindowModeSchema.Type, ElectronMainError>;
-	readonly writeModeFx: (mode: WindowModeSchema.Type) => Effect.Effect<void, ElectronMainError>;
+	readonly readModeFx: Effect.Effect<WindowModeSchema.Type, ElectronMainError, never>;
+	readonly writeModeFx: (
+		mode: WindowModeSchema.Type,
+	) => Effect.Effect<void, ElectronMainError, never>;
 }
 
 export namespace createFilesystemWindowPreferencesFx {

@@ -14,8 +14,8 @@ export interface InventoryDropTarget {
 }
 
 export interface InventorySurface extends InventoryInteractionSurface {
-	readonly closeFx: Effect.Effect<void>;
-	readonly readPaletteFx: Effect.Effect<PixiScenePalette>;
-	readonly redrawFx: Effect.Effect<void>;
-	readonly refreshPaletteFx: Effect.Effect<void>;
+	readonly closeFx: Effect.Effect<void, never, never>;
+	readonly readPaletteFx: Effect.Effect<PixiScenePalette, never, never>;
+	readonly redrawFx: Effect.Effect<void, never, never>;
+	readonly refreshPaletteFx: Effect.Effect<void, never, never>;
 }

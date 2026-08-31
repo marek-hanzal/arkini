@@ -18,20 +18,20 @@ export namespace createGameEngineAcquisitionCapabilityFx {
 		readonly beginCancellationFx: (
 			owner: AcquisitionOwner,
 			force: boolean,
-		) => Effect.Effect<void, CriticalGameLifecycleError>;
+		) => Effect.Effect<void, CriticalGameLifecycleError, never>;
 		readonly createResourceFx: (
 			packageId: string,
-		) => Effect.Effect<InstalledGameEngineResource, unknown>;
+		) => Effect.Effect<InstalledGameEngineResource, unknown, never>;
 		readonly finalizeFx: (
 			resource: InstalledGameEngineResource,
 			operation: Finalization["operation"],
-			actionFx: Effect.Effect<void, unknown>,
+			actionFx: Effect.Effect<void, unknown, never>,
 			allowAlreadyFinalized: boolean,
 			joinInFlightOperation?: boolean,
-		) => Effect.Effect<void, unknown>;
+		) => Effect.Effect<void, unknown, never>;
 		readonly lifecycle: Semaphore.Semaphore;
 		readonly operationScope: Scope.Scope;
-		readonly releaseLeaseRecordFx: (record: LeaseRecord) => Effect.Effect<void>;
+		readonly releaseLeaseRecordFx: (record: LeaseRecord) => Effect.Effect<void, never, never>;
 		readonly stateRef: Ref.Ref<GameEngineResourceServiceState>;
 	}
 

@@ -1,12 +1,12 @@
 import type { Effect } from "effect";
 
 export interface AnimationControl {
-	readonly stopFx: Effect.Effect<void>;
+	readonly stopFx: Effect.Effect<void, never, never>;
 }
 
 export interface AnimationSpring {
-	readonly closeFx: Effect.Effect<void>;
-	readonly setTargetFx: (value: number) => Effect.Effect<void>;
+	readonly closeFx: Effect.Effect<void, never, never>;
+	readonly setTargetFx: (value: number) => Effect.Effect<void, never, never>;
 }
 
 interface SpringOptions {
@@ -35,7 +35,7 @@ export interface AnimationDriver {
 		readonly initialValue: number;
 		readonly onUpdate: (value: number) => void;
 		readonly options: SpringOptions;
-	}) => Effect.Effect<AnimationSpring>;
+	}) => Effect.Effect<AnimationSpring, never, never>;
 	readonly startTweenFx: (props: {
 		readonly curve?: AnimationCurve;
 		readonly delayMs?: number;
@@ -45,6 +45,6 @@ export interface AnimationDriver {
 		readonly onUpdate: (value: number) => void;
 		readonly repeat?: number;
 		readonly to: number;
-	}) => Effect.Effect<AnimationControl>;
-	readonly closeFx: Effect.Effect<void>;
+	}) => Effect.Effect<AnimationControl, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }

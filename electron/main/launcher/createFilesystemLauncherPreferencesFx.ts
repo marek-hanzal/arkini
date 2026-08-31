@@ -9,10 +9,14 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 
 /** Effect-native main-process capability for application-wide launcher preferences. */
 export interface LauncherPreferences {
-	readonly readLastPackageIdFx: Effect.Effect<LastPackageIdSchema.Type | null, ElectronMainError>;
+	readonly readLastPackageIdFx: Effect.Effect<
+		LastPackageIdSchema.Type | null,
+		ElectronMainError,
+		never
+	>;
 	readonly writeLastPackageIdFx: (
 		packageId: LastPackageIdSchema.Type,
-	) => Effect.Effect<void, ElectronMainError>;
+	) => Effect.Effect<void, ElectronMainError, never>;
 }
 
 export namespace createFilesystemLauncherPreferencesFx {

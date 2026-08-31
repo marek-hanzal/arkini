@@ -18,12 +18,12 @@ interface ItemDetailController {
 	readonly subscribe: (listener: () => void) => () => void;
 	readonly readOrigin: (origin: HTMLElement | null) => HTMLElement | null;
 	readonly readOutcomeScope: () => string | undefined;
-	readonly openTargetFx: (target: ItemDetailTarget) => Effect.Effect<boolean>;
+	readonly openTargetFx: (target: ItemDetailTarget) => Effect.Effect<boolean, never, never>;
 	readonly closeAtom: Atom.AtomResultFn<CloseItemDetailProps | undefined, void, never>;
-	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void>;
-	readonly completeEnterFx: (generation: number) => Effect.Effect<void>;
-	readonly completeExitFx: (generation: number) => Effect.Effect<void>;
-	readonly resetFx: Effect.Effect<void>;
+	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void, never, never>;
+	readonly completeEnterFx: (generation: number) => Effect.Effect<void, never, never>;
+	readonly completeExitFx: (generation: number) => Effect.Effect<void, never, never>;
+	readonly resetFx: Effect.Effect<void, never, never>;
 }
 
 const closedState = {

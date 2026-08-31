@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
 export interface GameInteractionControl {
-	readonly cancelFx: Effect.Effect<void>;
-	readonly registerFx: (cancel: () => void) => Effect.Effect<() => void>;
-	readonly closeFx: Effect.Effect<void>;
+	readonly cancelFx: Effect.Effect<void, never, never>;
+	readonly registerFx: (cancel: () => void) => Effect.Effect<() => void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
 /** Owns the route-local cancellation edge into the currently mounted main Pixi scene. */

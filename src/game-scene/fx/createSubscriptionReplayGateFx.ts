@@ -3,7 +3,7 @@ import { Effect } from "effect";
 type TransitionDelivery = "hydrate" | "present";
 
 interface SubscriptionReplayGate {
-	readonly classifyFx: (sequence: number) => Effect.Effect<TransitionDelivery>;
+	readonly classifyFx: (sequence: number) => Effect.Effect<TransitionDelivery, never, never>;
 }
 
 /**

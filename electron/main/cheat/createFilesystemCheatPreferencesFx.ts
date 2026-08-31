@@ -9,10 +9,10 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 
 /** Effect-native main-process capability for application-wide cheat-tool availability. */
 export interface CheatPreferences {
-	readonly readAvailableFx: Effect.Effect<CheatAvailabilitySchema.Type, ElectronMainError>;
+	readonly readAvailableFx: Effect.Effect<CheatAvailabilitySchema.Type, ElectronMainError, never>;
 	readonly writeAvailableFx: (
 		available: CheatAvailabilitySchema.Type,
-	) => Effect.Effect<void, ElectronMainError>;
+	) => Effect.Effect<void, ElectronMainError, never>;
 }
 
 export namespace createFilesystemCheatPreferencesFx {

@@ -6,10 +6,10 @@ export interface ChatGptViewControllerOwnership {
 	readonly attachControllerFx: (
 		window: BrowserWindow,
 		controller: ChatGptViewController,
-	) => Effect.Effect<void>;
+	) => Effect.Effect<void, never, never>;
 	readonly readControllerFx: (
 		window: BrowserWindow,
-	) => Effect.Effect<ChatGptViewController, unknown>;
+	) => Effect.Effect<ChatGptViewController, unknown, never>;
 }
 
 /** Creates the Electron-main owner for ChatGPT controllers attached to exact windows. */

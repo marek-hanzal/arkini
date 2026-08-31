@@ -13,7 +13,7 @@ import { SettingsCommandAtom } from "~/application-settings/atom/SettingsCommand
 export const useSettingsModel = ({
 	onBackFx,
 }: {
-	readonly onBackFx: Effect.Effect<void, unknown>;
+	readonly onBackFx: Effect.Effect<void, unknown, never>;
 }) => {
 	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();

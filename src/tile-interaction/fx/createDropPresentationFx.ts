@@ -37,20 +37,20 @@ export interface DropPresentation {
 	readonly beginFx: (props: {
 		readonly sourceActorId: string;
 		readonly swapCandidate: SwapCandidate | null;
-	}) => Effect.Effect<number>;
-	readonly clearSwapFx: (generation: number) => Effect.Effect<void>;
-	readonly clearFeedbackFx: (generation: number) => Effect.Effect<void>;
+	}) => Effect.Effect<number, never, never>;
+	readonly clearSwapFx: (generation: number) => Effect.Effect<void, never, never>;
+	readonly clearFeedbackFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly completeFx: (props: {
 		readonly generation: number;
 		readonly result: runTileDropAtom.Result;
-	}) => Effect.Effect<void>;
-	readonly failFx: (generation: number) => Effect.Effect<void>;
-	readonly readSnapshotFx: Effect.Effect<DropSnapshot>;
+	}) => Effect.Effect<void, never, never>;
+	readonly failFx: (generation: number) => Effect.Effect<void, never, never>;
+	readonly readSnapshotFx: Effect.Effect<DropSnapshot, never, never>;
 	readonly reconcileActorIdsFx: (props: {
 		readonly inventoryActorIds: ReadonlySet<string>;
 		readonly mainActorIds: ReadonlySet<string>;
-	}) => Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
+	}) => Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
 interface PendingDrop {

@@ -12,14 +12,18 @@ import { removeUserArkpackFx } from "./removeUserArkpackFx";
 import { writeUserArkpackFx } from "./writeUserArkpackFx";
 
 interface ArkpackCatalog {
-	readonly listFx: Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError>;
+	readonly listFx: Effect.Effect<
+		ReadonlyArray<ArkiniElectronApi.ArkpackFile>,
+		ElectronMainError,
+		never
+	>;
 	readonly readFx: (
 		packageId: string,
-	) => Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError>;
+	) => Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError, never>;
 	readonly installFx: (
 		record: ArkiniElectronApi.ArkpackInstall,
-	) => Effect.Effect<void, ElectronMainError>;
-	readonly removeFx: (packageId: string) => Effect.Effect<void, ElectronMainError>;
+	) => Effect.Effect<void, ElectronMainError, never>;
+	readonly removeFx: (packageId: string) => Effect.Effect<void, ElectronMainError, never>;
 }
 
 export namespace createFilesystemArkpackCatalogFx {

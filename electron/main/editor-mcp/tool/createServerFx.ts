@@ -438,7 +438,7 @@ export const createServerFx = Effect.fn("createServerFx")(
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,
-		) => Effect.Effect<void, unknown>;
+		) => Effect.Effect<void, unknown, never>;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 	}) =>
 		Effect.succeed({

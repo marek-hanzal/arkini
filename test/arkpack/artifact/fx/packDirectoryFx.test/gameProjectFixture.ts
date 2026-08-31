@@ -1,7 +1,7 @@
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
+import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 

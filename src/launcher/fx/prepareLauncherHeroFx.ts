@@ -1,7 +1,7 @@
 import { Effect, Exit } from "effect";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
-import { readLastPackageIdFx } from "~/renderer/launcher/readLastPackageIdFx";
+import { readLastPackageIdFx } from "~/installed-game/fx/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/launcher/fx/preloadLauncherHeroFx";
 
 interface PrepareLauncherHeroProps {

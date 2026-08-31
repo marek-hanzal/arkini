@@ -15,7 +15,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
-import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
+import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import type { CompletionStatus } from "../../../../electron/contract/cli/CompletionStatus";
 import type { InstallationStatus } from "../../../../electron/contract/cli/InstallationStatus";
 import type { Game } from "~/installed-game/type/Game";

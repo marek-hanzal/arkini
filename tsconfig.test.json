@@ -92,10 +92,10 @@
 		"src/application-runtime",
 		"src/application-settings",
 		"src/application-shell",
+		"src/window-mode",
 		"src/game-shell",
 		"src/chatgpt-asset-authoring",
 		"src/authoring-form",
-		"src/renderer",
 		"src/ui",
 		"test",
 		"vitest.config.ts"

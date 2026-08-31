@@ -7,7 +7,9 @@ import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeI
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
+import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
 
 interface ItemDetailLineChargeCost {
 	readonly cost: number;
@@ -24,30 +26,6 @@ export namespace ItemDetailLines {
 	export interface QuantityBounds {
 		readonly min: number;
 		readonly max: number;
-	}
-
-	export type OutputRoll<Item> =
-		| {
-				readonly kind: "guaranteed";
-				readonly item: readonly Item[];
-		  }
-		| {
-				readonly kind: "chance";
-				readonly chance: number;
-				readonly item: readonly Item[];
-		  }
-		| {
-				readonly kind: "weight";
-				readonly selections: QuantityBounds;
-				readonly option: readonly {
-					readonly weight: number;
-					readonly item: readonly Item[];
-				}[];
-		  };
-
-	export interface OutputSet<Item> {
-		readonly weight: number;
-		readonly roll: readonly OutputRoll<Item>[];
 	}
 
 	export interface MaterialInput {
@@ -90,12 +68,9 @@ export namespace ItemDetailLines {
 
 	export interface OutputItem {
 		readonly itemId: IdSchema.Type;
-		readonly quantity: QuantityBounds;
+		readonly quantity: Readonly<QuantitySchema.Type>;
 		readonly activeRuleHints: readonly string[];
 	}
-
-	export type LineOutputRoll = OutputRoll<OutputItem>;
-	export type LineOutputSet = OutputSet<OutputItem>;
 
 	export type UnavailableReason =
 		| {
@@ -169,7 +144,7 @@ export namespace ItemDetailLines {
 			readonly canWithdraw: boolean;
 		};
 		readonly input: readonly Input[];
-		readonly output: readonly LineOutputSet[];
+		readonly output: readonly OutputProjection.Set<OutputItem>[];
 		readonly activeJob?: {
 			readonly status: JobStatusEnumSchema.Type;
 			readonly durationMs: TimeSchema.Type;

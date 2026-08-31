@@ -7,7 +7,7 @@ import { EditorBoardGameAtom } from "~/board-scenario/atom/EditorBoardGameAtom";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
-import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
+import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
 import { EditorBoardItemDetailLink } from "~/board-scenario/ui/EditorBoardItemDetailLink";
 import { EditorBoardProductionLineLink } from "~/board-scenario/ui/EditorBoardProductionLineLink";
 import { BoardScenarioToolbar } from "~/board-scenario/ui/BoardScenarioToolbar";
@@ -49,7 +49,7 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 	}
 	return (
 		<GameEngineProvider game={resource.game}>
-			<PlayableGameRoute>
+			<PlayableGameResources>
 				<PlayableGameShell
 					itemDetailIdentityRenderer={EditorBoardItemDetailLink}
 					itemDetailLineIdentityRenderer={EditorBoardProductionLineLink}
@@ -57,7 +57,7 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 				>
 					<Outlet />
 				</PlayableGameShell>
-			</PlayableGameRoute>
+			</PlayableGameResources>
 		</GameEngineProvider>
 	);
 };

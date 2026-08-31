@@ -5,13 +5,12 @@ import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
-import type { ItemDetailLines as ReadItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
+import type { ItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";
 
 /** Renderer-owned contract for one live Item Detail lines projection. */
 export namespace ItemDetailLinesProjection {
-	export type QuantityBounds = ReadItemDetailLines.QuantityBounds;
-
 	export interface ChargeCost {
 		readonly cost: number;
 		readonly from: ChargeSourceSchema.Type;
@@ -28,7 +27,7 @@ export namespace ItemDetailLinesProjection {
 				readonly inputIndex: NonNegativeIntegerSchema.Type;
 				readonly selector: Selector;
 				readonly mode: ModeSchema.Type;
-				readonly required: QuantityBounds;
+				readonly required: ItemDetailLines.QuantityBounds;
 				readonly storedQuantity: number;
 				readonly deliveryQuantity: number;
 				readonly autofillAvailableQuantity: number;
@@ -60,18 +59,11 @@ export namespace ItemDetailLinesProjection {
 				readonly charges: ChargeCost;
 		  };
 
-	export interface OutputItem {
-		readonly itemId: string;
-		readonly title: string;
-		readonly quantity: QuantityBounds;
-		readonly activeRuleHints: readonly string[];
+	export interface OutputItem extends OutputProjection.Item {
 		readonly sourceUrl?: string;
 		readonly compositeUrl?: string;
 		readonly definitionItemId?: string;
 	}
-
-	export type OutputRoll = ReadItemDetailLines.OutputRoll<OutputItem>;
-	export type OutputSet = ReadItemDetailLines.OutputSet<OutputItem>;
 
 	interface DisabledConditionContext {
 		readonly selector: Selector;
@@ -190,7 +182,7 @@ export namespace ItemDetailLinesProjection {
 		readonly queuedRequestCount: number;
 		readonly actions: LineActions;
 		readonly input: readonly Input[];
-		readonly output: readonly OutputSet[];
+		readonly output: readonly OutputProjection.Set<OutputItem>[];
 		readonly activeJob?: LineActiveJob;
 	}
 

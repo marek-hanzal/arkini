@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
-import { settleItemDeliveryRuntimeFx } from "~/production-delivery/fx/settleItemDeliveryRuntimeFx";
+import { advanceDeliveriesRuntimeFx } from "~/production-delivery/fx/advanceDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -13,7 +13,6 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { advanceTemporaryItemDurationsFx } from "~/temporary-item/fx/advanceTemporaryItemDurationsFx";
 import { attemptTemporaryItemExpiryFx } from "~/temporary-item/fx/attemptTemporaryItemExpiryFx";
 
@@ -35,59 +34,6 @@ const sortTemporaryItemsFn = (runtime: RuntimeSchema.Type) =>
 const replaceJobFn = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSchema.Type => ({
 	...runtime,
 	jobs: runtime.jobs.map((candidate) => (candidate.id === job.id ? job : candidate)),
-});
-
-const advanceDeliveriesFx = Effect.fn("advanceDeliveriesFx")(function* (
-	runtime: RuntimeSchema.Type,
-) {
-	const instantGameplay = isInstantGameplayEnabledFn({
-		runtime,
-	});
-	const deliveryIds = runtime.items
-		.filter((item) => item.location.scope === LocationScopeEnumSchema.enum.Delivery)
-		.map((item) => item.id)
-		.sort((first, second) => first.localeCompare(second));
-	let draft = runtime;
-	for (const itemId of deliveryIds) {
-		const liveItem = draft.items.find((item) => item.id === itemId);
-		if (liveItem?.location.scope !== LocationScopeEnumSchema.enum.Delivery) continue;
-		if (liveItem.location.remainingDurationMs === 0) continue;
-		const advanced = {
-			...liveItem,
-			location: {
-				...liveItem.location,
-				remainingDurationMs: instantGameplay
-					? 0
-					: Math.max(0, liveItem.location.remainingDurationMs - SimulationStepMs),
-			},
-		};
-		draft = {
-			...draft,
-			items: draft.items.map((item) => (item.id === itemId ? advanced : item)),
-		};
-	}
-
-	const events: GameEventSchema.Type[] = [];
-	for (const itemId of deliveryIds) {
-		const liveItem = draft.items.find((item) => item.id === itemId);
-		if (
-			liveItem?.location.scope !== LocationScopeEnumSchema.enum.Delivery ||
-			liveItem.location.remainingDurationMs !== 0
-		)
-			continue;
-		const [, settledRuntime, settledEvents = []] = yield* settleItemDeliveryRuntimeFx({
-			itemId,
-			generation: liveItem.location.generation,
-			runtime: draft,
-		});
-		draft = settledRuntime;
-		events.push(...settledEvents);
-	}
-
-	return {
-		events,
-		runtime: draft,
-	} satisfies RuntimeStepResult;
 });
 
 const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
@@ -159,7 +105,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	stepStart: RuntimeSchema.Type,
 ) {
 	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
-	const deliveryStart = yield* advanceDeliveriesFx(boundaryStart.runtime);
+	const deliveryStart = yield* advanceDeliveriesRuntimeFx(boundaryStart.runtime);
 	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime: deliveryStart.runtime,
 	});

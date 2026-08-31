@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
+import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createProjectTestHarness,

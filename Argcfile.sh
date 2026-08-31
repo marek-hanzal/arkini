@@ -332,7 +332,7 @@ platform-check() {
 		test/game-persistence/fx/createFilesystemGameSaveFilesFx.test.ts \
 		test/electron \
 		test/arkpack/artifact \
-		test/game-config/source \
+		test/game-config-source \
 		test/game-project-json-schema \
 		test/game-config-compiler/fx/readGameSourceFilesFx.test.ts
 }

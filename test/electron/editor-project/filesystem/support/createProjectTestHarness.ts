@@ -8,7 +8,7 @@ import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { OwnedEditorProjectRepository } from "../../../../../electron/main/editor-project/EditorProjectServiceOwnership";
 import { createFilesystemEditorProjectRepositoryFx } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { writeProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
-import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 /** Owns one temporary user-data catalog, its managed roots, and external test folders. */

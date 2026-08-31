@@ -11,8 +11,8 @@ import type { EditorProjectCandidate } from "~/project-authoring/schema/EditorPr
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
 import type { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
-import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
+import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";

@@ -1,4 +1,4 @@
-import { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
+import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
 import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";

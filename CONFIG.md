@@ -1,6 +1,6 @@
 # Arkini game authoring
 
-This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. Schemas under [`src/game-config`](src/game-config) own exact source fields; [`src/game-project-json-schema`](src/game-project-json-schema) owns the generated `schema.json`; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
+This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-config-source`](src/game-config-source) owns exact source files and schemas; [`src/game-config`](src/game-config) owns completed config values and semantic validation; [`src/game-project-json-schema`](src/game-project-json-schema) owns the generated `schema.json`; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
 
 ## Canonical project
 

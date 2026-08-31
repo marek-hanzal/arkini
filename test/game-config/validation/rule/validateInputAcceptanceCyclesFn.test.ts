@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
+import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import {
 	createProducerItem,

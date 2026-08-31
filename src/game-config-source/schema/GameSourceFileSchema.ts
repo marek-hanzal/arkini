@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GameSourceSchema } from "~/game-config/source/schema/GameSourceSchema";
+import { GameSourceSchema } from "~/game-config-source/schema/GameSourceSchema";
 
 export const GameSourceFileSchema = z
 	.object({

@@ -1,13 +1,13 @@
 import { Effect, FileSystem, Path } from "effect";
 
-import { collectSourceFilesFx } from "~/game-config/source/fx/collectSourceFilesFx";
-import { readGameProjectManifestFx } from "~/game-config/source/fx/readGameProjectManifestFx";
-import { readGameProjectSchemaFx } from "~/game-config/source/fx/readGameProjectSchemaFx";
-import { parseGameSourceFileFx } from "~/game-config/source/fx/parseGameSourceFileFx";
+import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
+import { readGameProjectManifestFx } from "~/game-config-source/fx/readGameProjectManifestFx";
+import { readGameProjectSchemaFx } from "~/game-config-source/fx/readGameProjectSchemaFx";
+import { parseGameSourceFileFx } from "~/game-config-source/fx/parseGameSourceFileFx";
 import {
 	GameProjectManifestFileName,
 	GameProjectSchemaFileName,
-} from "~/game-config/source/GameProjectReference";
+} from "~/game-config-source/constant/GameProjectReference";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";

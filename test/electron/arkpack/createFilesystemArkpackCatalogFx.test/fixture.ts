@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import type { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "../../../../electron/main/arkpack/createFilesystemArkpackCatalogFx";
-import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
+import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 
 export const bundledBytes = new Uint8Array([
 	1,

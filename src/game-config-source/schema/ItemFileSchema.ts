@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { GameProjectItemSchemaReference } from "~/game-config/source/GameProjectReference";
+import { GameProjectItemSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 
 /** One canonical UID-owned item fragment in a portable game project. */
 export const ItemFileSchema = z

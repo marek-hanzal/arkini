@@ -2,7 +2,7 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, Path } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import { collectSourceFilesFx } from "~/game-config/source/fx/collectSourceFilesFx";
+import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
 
 describe("collectSourceFilesFx", () => {
 	it.effect("collects only the current portable project allowlist", () =>

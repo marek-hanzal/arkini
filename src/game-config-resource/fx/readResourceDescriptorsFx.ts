@@ -1,7 +1,7 @@
 import { Path } from "effect";
 import { Effect } from "effect";
 
-import { collectSourceFilesFx } from "~/game-config/source/fx/collectSourceFilesFx";
+import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
 import type { ResourceDescriptorSchema } from "../schema/ResourceDescriptorSchema";
 
 export namespace readResourceDescriptorsFx {

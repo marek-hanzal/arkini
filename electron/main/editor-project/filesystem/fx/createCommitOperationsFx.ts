@@ -14,8 +14,8 @@ import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditor
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
-import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
-import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
+import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

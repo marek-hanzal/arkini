@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
+import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 /** Complete portable project root; item definitions live in separate files. */

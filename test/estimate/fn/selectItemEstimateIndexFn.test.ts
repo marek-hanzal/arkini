@@ -3,13 +3,14 @@ import { describe, expect, it } from "vitest";
 import type { ItemEstimateIndexEntry } from "~/estimate/type/ItemEstimateIndex";
 import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndexFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
-const item = (id: string, title: string) =>
+const item = (id: string, title: string, type: TypeSchema.Type = "simple") =>
 	({
 		description: `${title} description`,
 		id,
 		title,
-		type: "simple",
+		type,
 		uid: id,
 	}) as ItemSchema.Type;
 
@@ -43,15 +44,20 @@ const entries: ReadonlyArray<ItemEstimateIndexEntry> = [
 ];
 
 const items = [
-	item("bakery", "Bakery"),
+	item("bakery", "Bakery", "producer"),
 	item("water", "Water"),
-	item("well", "Well"),
+	item("well", "Well", "producer"),
 	item("unused", "Unused"),
 ];
 
-const readItemIds = (view: "demand" | "fastest" | "incomplete" | "slowest", query = "") =>
+const readItemIds = (
+	view: "demand" | "fastest" | "incomplete" | "slowest",
+	query = "",
+	itemType?: TypeSchema.Type,
+) =>
 	selectItemEstimateIndexFn({
 		entries,
+		itemType,
 		items,
 		query,
 		view,
@@ -81,6 +87,16 @@ describe("selectItemEstimateIndexFn", () => {
 
 	it("applies the authored-item fuzzy query before ordering", () => {
 		expect(readItemIds("demand", "wel")).toEqual([
+			"well",
+		]);
+	});
+
+	it("filters estimates by authored item type before ordering", () => {
+		expect(readItemIds("slowest", "", "producer")).toEqual([
+			"bakery",
+			"well",
+		]);
+		expect(readItemIds("incomplete", "", "producer")).toEqual([
 			"well",
 		]);
 	});

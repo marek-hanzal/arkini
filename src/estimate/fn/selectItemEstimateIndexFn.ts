@@ -7,6 +7,7 @@ import type {
 import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 const compareRuntimeFn = (
 	left: number | undefined,
@@ -21,11 +22,13 @@ const compareRuntimeFn = (
 /** Applies the global Estimate query and ordering shared by UI and MCP projections. */
 export const selectItemEstimateIndexFn = ({
 	entries,
+	itemType,
 	items,
 	query,
 	view,
 }: {
 	readonly entries: ReadonlyArray<ItemEstimateIndexEntry>;
+	readonly itemType?: TypeSchema.Type;
 	readonly items: ReadonlyArray<ItemSchema.Type>;
 	readonly query: string;
 	readonly view: ItemEstimateViewSchema.Type;
@@ -36,7 +39,10 @@ export const selectItemEstimateIndexFn = ({
 			entry,
 		]),
 	);
-	return searchFn(items, query)
+	return searchFn(
+		items.filter((item) => itemType === undefined || item.type === itemType),
+		query,
+	)
 		.flatMap((item): ReadonlyArray<ItemEstimateIndexRow> => {
 			const estimate = estimates.get(item.id);
 			return estimate === undefined ||

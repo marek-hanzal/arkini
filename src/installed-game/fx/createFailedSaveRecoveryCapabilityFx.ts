@@ -6,7 +6,7 @@ import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactC
 import type {
 	FailedSaveRecovery,
 	GameEngineResourceServiceState,
-} from "~/installed-game/fx/lifecycle/GameEngineResourceServiceState";
+} from "~/installed-game/type/GameEngineResourceServiceState";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
 export namespace createFailedSaveRecoveryCapabilityFx {

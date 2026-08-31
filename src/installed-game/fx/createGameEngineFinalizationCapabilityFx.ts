@@ -8,7 +8,7 @@ import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage
 import type {
 	Finalization,
 	GameEngineResourceServiceState,
-} from "~/installed-game/fx/lifecycle/GameEngineResourceServiceState";
+} from "~/installed-game/type/GameEngineResourceServiceState";
 
 export namespace createGameEngineFinalizationCapabilityFx {
 	export interface Dependencies {

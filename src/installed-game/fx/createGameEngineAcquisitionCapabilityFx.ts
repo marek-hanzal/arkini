@@ -10,8 +10,8 @@ import type {
 	GameEngineResourceServiceState,
 	InternalGameEngineLease,
 	LeaseRecord,
-} from "~/installed-game/fx/lifecycle/GameEngineResourceServiceState";
-import { LeaseRecordTypeId } from "~/installed-game/fx/lifecycle/GameEngineResourceServiceState";
+} from "~/installed-game/type/GameEngineResourceServiceState";
+import { LeaseRecordTypeId } from "~/installed-game/type/GameEngineResourceServiceState";
 
 export namespace createGameEngineAcquisitionCapabilityFx {
 	export interface Dependencies {

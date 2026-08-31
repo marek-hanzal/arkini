@@ -1,17 +1,15 @@
 import { TriangleAlert } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
+import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
-import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { ItemEstimateListRow } from "~/estimate/ui/ItemEstimateListRow";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { Status } from "~/ui/ui/Status";
 
-const EstimateSortOptions: ReadonlyArray<EditorSelectOption<ItemEstimateSortSchema.Type>> = [
+const EstimateViewOptions: ReadonlyArray<EditorSelectOption<ItemEstimateViewSchema.Type>> = [
 	{
 		label: "Fastest first",
 		value: "fastest",
@@ -24,29 +22,28 @@ const EstimateSortOptions: ReadonlyArray<EditorSelectOption<ItemEstimateSortSche
 		label: "Highest demand first",
 		value: "demand",
 	},
+	{
+		label: "Incomplete only",
+		value: "incomplete",
+	},
 ];
 
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const ItemEstimateList = ({
-	incomplete,
-	onIncompleteChangeFn,
 	onQueryChangeFn,
-	onSortChangeFn,
+	onViewChangeFn,
 	query,
-	sort,
+	view,
 }: {
-	readonly incomplete: boolean;
-	readonly onIncompleteChangeFn: (incomplete: boolean) => void;
 	readonly onQueryChangeFn: (query: string) => void;
-	readonly onSortChangeFn: (sort: ItemEstimateSortSchema.Type) => void;
+	readonly onViewChangeFn: (view: ItemEstimateViewSchema.Type) => void;
 	readonly query: string;
-	readonly sort: ItemEstimateSortSchema.Type;
+	readonly view: ItemEstimateViewSchema.Type;
 }) => {
 	const project = useEditorProject();
 	const state = useItemEstimateIndex(project, {
-		incomplete,
 		query,
-		sort,
+		view,
 	});
 	return (
 		<section
@@ -68,24 +65,11 @@ export const ItemEstimateList = ({
 					placeholder="Search item title or ID…"
 					onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
 				/>
-				<button
-					type="button"
-					className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${selectableClassName}`}
-					onClick={() => onIncompleteChangeFn(!incomplete)}
-					{...readDataUiFn({
-						dataUi: "EditorItemEstimateIncompleteFilter",
-						state: {
-							selected: incomplete,
-						},
-					})}
-				>
-					Incomplete
-				</button>
 				<EditorSelect
-					label="Sort item estimates"
-					onChangeFn={onSortChangeFn}
-					options={EstimateSortOptions}
-					value={sort}
+					label="View item estimates"
+					onChangeFn={onViewChangeFn}
+					options={EstimateViewOptions}
+					value={view}
 				/>
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">

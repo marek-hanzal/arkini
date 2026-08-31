@@ -39,10 +39,9 @@ export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 	});
 	const rows = selectItemEstimateIndexFn({
 		entries,
-		incomplete: input.incomplete,
 		items: Object.values(project.config.items),
 		query: input.query ?? "",
-		sort: input.sort,
+		view: input.view,
 	});
 	const maximumDemand = Math.max(0, ...entries.map(({ demand }) => demand));
 	const pageRows = rows.slice((input.page - 1) * input.pageSize, input.page * input.pageSize);
@@ -56,8 +55,7 @@ export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 		"Route choice: complete quantity-aware upstream critical-path cost with stable route identity ties",
 		"Quantity: 1 of every item",
 		"Demand: aggregate selected-fact quantity across every obtainable item estimate",
-		`Incomplete only: ${input.incomplete}`,
-		`Sort: ${input.sort}`,
+		`View: ${input.view}`,
 		...(input.query === undefined
 			? []
 			: [

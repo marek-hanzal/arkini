@@ -4,14 +4,14 @@ import type {
 	ItemEstimateIndexEntry,
 	ItemEstimateIndexRow,
 } from "~/estimate/type/ItemEstimateIndex";
-import type { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
+import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const compareRuntimeFn = (
 	left: number | undefined,
 	right: number | undefined,
-	direction: ItemEstimateSortSchema.Type,
+	direction: Exclude<ItemEstimateViewSchema.Type, "incomplete">,
 ) => {
 	if (left === undefined) return right === undefined ? 0 : 1;
 	if (right === undefined) return -1;
@@ -21,16 +21,14 @@ const compareRuntimeFn = (
 /** Applies the global Estimate query and ordering shared by UI and MCP projections. */
 export const selectItemEstimateIndexFn = ({
 	entries,
-	incomplete,
 	items,
 	query,
-	sort,
+	view,
 }: {
 	readonly entries: ReadonlyArray<ItemEstimateIndexEntry>;
-	readonly incomplete: boolean;
 	readonly items: ReadonlyArray<ItemSchema.Type>;
 	readonly query: string;
-	readonly sort: ItemEstimateSortSchema.Type;
+	readonly view: ItemEstimateViewSchema.Type;
 }) => {
 	const estimates = new Map(
 		entries.map((entry) => [
@@ -41,7 +39,8 @@ export const selectItemEstimateIndexFn = ({
 	return searchFn(items, query)
 		.flatMap((item): ReadonlyArray<ItemEstimateIndexRow> => {
 			const estimate = estimates.get(item.id);
-			return estimate === undefined || (incomplete && estimate.status === "complete")
+			return estimate === undefined ||
+				(view === "incomplete" && estimate.status === "complete")
 				? []
 				: [
 						{
@@ -52,9 +51,14 @@ export const selectItemEstimateIndexFn = ({
 		})
 		.sort(
 			(left, right) =>
-				(sort === "demand"
-					? right.estimate.demand - left.estimate.demand
-					: compareRuntimeFn(left.estimate.runtimeMs, right.estimate.runtimeMs, sort)) ||
-				Order.String(left.item.title, right.item.title),
+				(view === "incomplete"
+					? 0
+					: view === "demand"
+						? right.estimate.demand - left.estimate.demand
+						: compareRuntimeFn(
+								left.estimate.runtimeMs,
+								right.estimate.runtimeMs,
+								view,
+							)) || Order.String(left.item.title, right.item.title),
 		);
 };

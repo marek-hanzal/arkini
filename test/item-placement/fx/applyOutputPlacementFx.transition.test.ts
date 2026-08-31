@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { useGameFx } from "~test/support/game/useGameFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {

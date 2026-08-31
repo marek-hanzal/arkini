@@ -6,7 +6,7 @@ import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readOutputReservationFn } from "~/production-job/fn/readOutputReservationFn";

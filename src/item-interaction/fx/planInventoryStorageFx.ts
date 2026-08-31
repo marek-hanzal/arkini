@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
-import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";

@@ -5,7 +5,7 @@ import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeI
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { InputRunPlanInvalidError } from "~/production-input/error/InputRunPlanInvalidError";
 import { isInputRuntimeItemFn } from "~/production-input/read/fn/isInputRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

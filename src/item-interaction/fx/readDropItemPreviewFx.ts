@@ -11,11 +11,11 @@ import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationCl
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
-import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { planInventoryStorageFx } from "~/item-interaction/fx/planInventoryStorageFx";
 import { DropItemIgnoredReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";

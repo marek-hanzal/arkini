@@ -5,7 +5,7 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";

@@ -5,7 +5,7 @@ import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveInteger
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spendActionChargesFx } from "./spendActionChargesFx";
 

@@ -1,14 +1,14 @@
 import { Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/item-interaction/error/StackItemsUnavailableError";
-import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

@@ -7,7 +7,7 @@ import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/fx/readItemDetailMaterialAutofillAvailabilityFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";

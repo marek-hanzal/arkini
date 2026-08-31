@@ -8,7 +8,7 @@ import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisua
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { isDeliveryRuntimeItemFn } from "~/game-runtime/read/fn/isDeliveryRuntimeItemFn";
+import { isDeliveryRuntimeItemFn } from "~/game-runtime/fn/isDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface TileDelivery {

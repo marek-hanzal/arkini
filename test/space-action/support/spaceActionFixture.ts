@@ -3,7 +3,7 @@ import { Effect, type Layer } from "effect";
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";

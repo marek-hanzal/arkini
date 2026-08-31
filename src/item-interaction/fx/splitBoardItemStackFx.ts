@@ -7,7 +7,7 @@ import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSc
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
-import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
@@ -15,7 +15,7 @@ import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConf
 import { ItemStackSplitUnavailableError } from "~/item-interaction/error/ItemStackSplitUnavailableError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
 import { readValidatedRuntimeItemFx } from "~/item-interaction/fx/readValidatedRuntimeItemFx";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

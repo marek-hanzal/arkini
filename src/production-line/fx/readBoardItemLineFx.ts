@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads one board line together with its exact live owner. */

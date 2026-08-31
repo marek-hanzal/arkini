@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isInstantGameplayEnabledFn } from "~/game-runtime/read/fn/isInstantGameplayEnabledFn";
+import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import { lineRunRuntime } from "~test/production-line/fx/run/support/lineRunTestRuntime";
 
 describe("isInstantGameplayEnabledFn", () => {

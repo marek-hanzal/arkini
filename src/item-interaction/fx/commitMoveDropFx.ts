@@ -9,7 +9,7 @@ import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";

@@ -13,7 +13,7 @@ import { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/production-job/random/makeJobCompletionRandomFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

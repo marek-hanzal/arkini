@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Effect, Result } from "effect";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";

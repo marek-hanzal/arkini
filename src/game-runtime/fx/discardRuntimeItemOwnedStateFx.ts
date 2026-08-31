@@ -4,7 +4,7 @@ import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/r
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
-import { readRuntimeItemOwnedStateFn } from "~/game-runtime/read/fn/readRuntimeItemOwnedStateFn";
+import { readRuntimeItemOwnedStateFn } from "~/game-runtime/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 interface DiscardRuntimeItemOwnedStateProps {

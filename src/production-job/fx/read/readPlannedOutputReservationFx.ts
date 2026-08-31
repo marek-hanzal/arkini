@@ -7,7 +7,7 @@ import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemai
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
 import { adjustOutputReservationFx } from "./adjustOutputReservationFx";

@@ -7,7 +7,7 @@ import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";

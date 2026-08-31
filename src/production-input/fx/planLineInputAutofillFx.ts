@@ -10,7 +10,7 @@ import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";

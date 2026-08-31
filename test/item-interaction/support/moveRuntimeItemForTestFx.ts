@@ -2,9 +2,9 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";

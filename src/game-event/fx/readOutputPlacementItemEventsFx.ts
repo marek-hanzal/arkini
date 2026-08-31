@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 
 interface ReadOutputPlacementItemEventsProps {
 	readonly originItemId: IdSchema.Type;

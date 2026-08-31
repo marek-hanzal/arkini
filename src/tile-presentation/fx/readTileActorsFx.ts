@@ -12,7 +12,7 @@ import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntim
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

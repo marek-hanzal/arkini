@@ -7,7 +7,7 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { queryFx } from "~/item-query/fx/queryFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

@@ -4,6 +4,7 @@ import { projectEstimateWitnessFn } from "~/estimate/fn/projectEstimateWitnessFn
 import {
 	createEstimateRoutePolicyFn,
 	type EstimateRoutePolicy,
+	readEstimateRouteLowerBoundFn,
 	readEstimateRouteOptionsFn,
 	readEstimateRouteRequirementsFn,
 } from "~/estimate/fn/createEstimateRoutePolicyFn";
@@ -60,7 +61,9 @@ interface DemandSnapshot {
 }
 
 interface WitnessChoicePoint {
+	readonly factId: string;
 	readonly key: string;
+	readonly kind: "requirement" | "route";
 	readonly options: ReadonlyArray<string>;
 	readonly selected: string;
 }
@@ -76,7 +79,7 @@ interface CandidateAttempt {
 }
 
 const epsilon = 1e-9;
-const maximumWitnessSearchStates = 4_096;
+const maximumWitnessSearchStates = 8;
 
 const isPartialDiagnosticFn = (diagnostic: ItemEstimateDiagnostic) =>
 	diagnostic.kind === "joint-output-accounting-unsupported" ||
@@ -87,7 +90,9 @@ const routeChoiceKeyFn = (factId: string) => `route\u0000${factId}`;
 
 const recordChoiceFn = (
 	context: WitnessChoiceContext | undefined,
+	factId: string,
 	key: string,
+	kind: WitnessChoicePoint["kind"],
 	selected: string,
 	options: ReadonlyArray<string>,
 ) => {
@@ -98,7 +103,9 @@ const recordChoiceFn = (
 	)
 		return;
 	context.choices.set(key, {
+		factId,
 		key,
+		kind,
 		options,
 		selected,
 	});
@@ -222,7 +229,9 @@ const materializeCandidateSelectionFn = (
 			if (id !== factId && routeOverride !== undefined && route === undefined)
 				recordChoiceFn(
 					choiceContext,
+					id,
 					routeChoiceKey,
+					"route",
 					routeOverride,
 					routeOptions.map(({ id: routeId }) => routeId),
 				);
@@ -241,7 +250,9 @@ const materializeCandidateSelectionFn = (
 			if (id !== factId && routeOptions.includes(route))
 				recordChoiceFn(
 					choiceContext,
+					id,
 					routeChoiceKey,
+					"route",
 					route.id,
 					routeOptions.map(({ id: routeId }) => routeId),
 				);
@@ -300,7 +311,14 @@ const materializeCandidateSelectionFn = (
 					status: "failure",
 				};
 			for (const choice of requirementSelection.choices)
-				recordChoiceFn(choiceContext, choice.key, choice.selected, choice.options);
+				recordChoiceFn(
+					choiceContext,
+					choice.factId,
+					choice.key,
+					"requirement",
+					choice.selected,
+					choice.options,
+				);
 			selected.set(id, {
 				actionRuns,
 				groups: requirementSelection.groups,
@@ -320,7 +338,14 @@ const materializeCandidateSelectionFn = (
 		});
 		if (shared.status === "failure") return shared;
 		for (const choice of shared.choices)
-			recordChoiceFn(choiceContext, choice.key, choice.selected, choice.options);
+			recordChoiceFn(
+				choiceContext,
+				choice.factId,
+				choice.key,
+				"requirement",
+				choice.selected,
+				choice.options,
+			);
 		selected = shared.selected;
 
 		const consumed = new Map<string, number>();
@@ -474,6 +499,32 @@ const compareWitnessesFn = (left: EstimateWitness, right: EstimateWitness) =>
 	projectEstimateWitnessFn(left).durationMs - projectEstimateWitnessFn(right).durationMs ||
 	Order.String(readWitnessRouteIdentityFn(left), readWitnessRouteIdentityFn(right));
 
+const readRouteEstimateSignatureFn = (policy: EstimateRoutePolicy, route: AcquisitionRoute) =>
+	JSON.stringify({
+		durationMs: route.durationMs,
+		operation: route.operation,
+		operationOutputGroupId: route.output.operationOutputGroupId,
+		quantityDistribution: route.output.quantityDistribution,
+		requirements: policy.topology.requirementsByRoute.get(route),
+		runMultiplier: route.runMultiplier,
+	});
+
+const isStableEquivalentRouteChoiceFn = (
+	policy: EstimateRoutePolicy,
+	choice: WitnessChoicePoint,
+) => {
+	if (choice.kind !== "route" || choice.selected !== choice.options[0]) return false;
+	const routes = choice.options.map((routeId) =>
+		(policy.topology.routesByFact.get(choice.factId) ?? []).find(({ id }) => id === routeId),
+	);
+	const selected = routes[0];
+	if (selected === undefined || routes.some((route) => route === undefined)) return false;
+	const signature = readRouteEstimateSignatureFn(policy, selected);
+	return routes.every(
+		(route) => route !== undefined && readRouteEstimateSignatureFn(policy, route) === signature,
+	);
+};
+
 const materializeCandidateAttemptFn = (
 	policy: EstimateRoutePolicy,
 	factId: string,
@@ -501,25 +552,29 @@ const materializeCandidateFn = (
 	topRoute: AcquisitionRoute,
 ): CandidateResult => {
 	const baseline = materializeCandidateAttemptFn(policy, factId, quantity, topRoute, new Map());
+	const lowerBound = readEstimateRouteLowerBoundFn(policy, topRoute, quantity);
 	const pending: Array<ReadonlyMap<string, string>> = [];
+	const pendingCycleFallbacks: Array<ReadonlyMap<string, string>> = [];
 	const seen = new Set<string>();
 	let attemptedStates = 1;
-	let best = baseline.result.status === "success" ? baseline.result.witness : undefined;
 	const partialDiagnostics: ItemEstimateDiagnostic[] =
 		baseline.result.status === "failure"
 			? baseline.result.diagnostics.filter(isPartialDiagnosticFn)
 			: [];
 
-	const enqueueAlternativesFn = (choices: ReadonlyArray<WitnessChoicePoint>) => {
-		const active = new Map(
-			choices.map(({ key, selected }) => [
-				key,
-				selected,
-			]),
+	const enqueueAlternativesFn = (
+		choices: ReadonlyArray<WitnessChoicePoint>,
+		overrides: ReadonlyMap<string, string>,
+		cycleFallback = false,
+	) => {
+		const searchableChoices = choices.filter(
+			(choice) =>
+				!overrides.has(choice.key) && !isStableEquivalentRouteChoiceFn(policy, choice),
 		);
+		const active = new Map(overrides);
 		seen.add(readChoiceSignatureFn(active));
 		for (const choice of [
-			...choices,
+			...searchableChoices,
 		].sort((left, right) => Order.String(left.key, right.key)))
 			for (const option of choice.options) {
 				if (option === choice.selected) continue;
@@ -528,24 +583,40 @@ const materializeCandidateFn = (
 				const signature = readChoiceSignatureFn(alternative);
 				if (seen.has(signature)) continue;
 				seen.add(signature);
-				pending.push(alternative);
+				(cycleFallback ? pendingCycleFallbacks : pending).push(alternative);
 			}
 	};
-
-	enqueueAlternativesFn(baseline.choices);
-	while (pending.length > 0) {
-		if (attemptedStates >= maximumWitnessSearchStates)
-			return {
-				diagnostics: [
-					{
-						kind: "witness-search-exhausted",
-						maximumStates: maximumWitnessSearchStates,
-						routeId: topRoute.id,
-					},
-				],
-				status: "failure",
-			};
-		const overrides = pending.shift();
+	const readFailureChoicesFn = (
+		choices: ReadonlyArray<WitnessChoicePoint>,
+		failure: CandidateFailure,
+	) => {
+		const cycleFactIds = new Set(
+			failure.diagnostics.flatMap((diagnostic) =>
+				diagnostic.kind === "cycle" ? diagnostic.factIds : [],
+			),
+		);
+		return {
+			choices:
+				cycleFactIds.size === 0
+					? choices
+					: choices.filter((choice) => cycleFactIds.has(choice.factId)),
+			cycleFallback: cycleFactIds.size > 0,
+		};
+	};
+	let best = baseline.result.status === "success" ? baseline.result.witness : undefined;
+	if (best !== undefined && projectEstimateWitnessFn(best).durationMs <= lowerBound + epsilon)
+		return baseline.result;
+	const baselineSearch =
+		baseline.result.status === "failure"
+			? readFailureChoicesFn(baseline.choices, baseline.result)
+			: {
+					choices: baseline.choices,
+					cycleFallback: false,
+				};
+	enqueueAlternativesFn(baselineSearch.choices, new Map(), baselineSearch.cycleFallback);
+	while (pending.length > 0 || pendingCycleFallbacks.length > 0) {
+		if (attemptedStates >= maximumWitnessSearchStates) break;
+		const overrides = pendingCycleFallbacks.shift() ?? pending.pop();
 		if (overrides === undefined) break;
 		const attempt = materializeCandidateAttemptFn(
 			policy,
@@ -555,26 +626,38 @@ const materializeCandidateFn = (
 			overrides,
 		);
 		attemptedStates += 1;
-		if (
-			attempt.result.status === "success" &&
-			(best === undefined || compareWitnessesFn(attempt.result.witness, best) < 0)
-		)
-			best = attempt.result.witness;
-		else if (attempt.result.status === "failure")
+		if (attempt.result.status === "success") {
+			if (best === undefined || compareWitnessesFn(attempt.result.witness, best) < 0)
+				best = attempt.result.witness;
+			enqueueAlternativesFn(attempt.choices, overrides);
+		} else {
 			partialDiagnostics.push(...attempt.result.diagnostics.filter(isPartialDiagnosticFn));
-		enqueueAlternativesFn(attempt.choices);
+			const failureSearch = readFailureChoicesFn(attempt.choices, attempt.result);
+			enqueueAlternativesFn(failureSearch.choices, overrides, failureSearch.cycleFallback);
+		}
 	}
 
-	return best === undefined
-		? partialDiagnostics.length === 0
-			? baseline.result
-			: {
-					diagnostics: partialDiagnostics,
-					status: "failure",
-				}
+	if (best !== undefined)
+		return {
+			status: "success",
+			witness: best,
+		};
+	if (pending.length > 0 || pendingCycleFallbacks.length > 0)
+		return {
+			diagnostics: [
+				{
+					kind: "witness-search-exhausted",
+					maximumStates: maximumWitnessSearchStates,
+					routeId: topRoute.id,
+				},
+			],
+			status: "failure",
+		};
+	return partialDiagnostics.length === 0
+		? baseline.result
 		: {
-				status: "success",
-				witness: best,
+				diagnostics: partialDiagnostics,
+				status: "failure",
 			};
 };
 

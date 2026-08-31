@@ -31,6 +31,7 @@ interface EstimateRouteCostContext {
 }
 
 export interface EstimateRouteChoicePoint {
+	readonly factId: string;
 	readonly key: string;
 	readonly options: ReadonlyArray<string>;
 	readonly selected: string;
@@ -222,6 +223,7 @@ const selectRouteRequirementsFn = (
 			(choiceOptions.length > 1 || choiceOptions[0] !== selectedValue)
 		)
 			choices.push({
+				factId: route.output.factId,
 				key,
 				options: choiceOptions,
 				selected: selectedValue,
@@ -347,6 +349,18 @@ export const readEstimateRouteOptionsFn = (
 		)
 		.map(({ route }) => route);
 };
+
+/** Reads the optimistic standalone lower bound for one forced top route. */
+export const readEstimateRouteLowerBoundFn = (
+	policy: EstimateRoutePolicy,
+	route: AcquisitionRoute,
+	quantity: number,
+) =>
+	readRouteCostFn(
+		policy,
+		route,
+		readEstimateMissingQuantityFn(policy.topology, route.output.factId, quantity),
+	);
 
 /** Creates call-local scratch for exact quantity-aware route ordering. */
 export const createEstimateRoutePolicyFn = (topology: EstimateTopology): EstimateRoutePolicy => {

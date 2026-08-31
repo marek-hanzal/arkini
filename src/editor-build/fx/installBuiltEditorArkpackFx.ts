@@ -18,7 +18,7 @@ const matchesConfirmationFn = (
 	candidate.targetContentHash === actual.targetContentHash &&
 	candidate.targetVersion === actual.targetVersion;
 
-/** Admits, rereads, and installs one exact Editor build against current catalog truth. */
+/** Admits, rereads, and installs one exact Editor Build against current catalog truth. */
 export const installBuiltEditorArkpackFx = Effect.fn("installBuiltEditorArkpackFx")(function* ({
 	artifact,
 	catalog,

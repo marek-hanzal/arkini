@@ -9,7 +9,7 @@ import { RollSchema } from "./RollSchema";
  * An output selects exactly one roll set according to the relative weights of
  * its sets, then evaluates every roll in the selected set.
  */
-export const SetSchema = z
+export const RollSetSchema = z
 	.object({
 		/**
 		 * Relative likelihood of selecting this roll set.
@@ -37,8 +37,8 @@ export const SetSchema = z
 		description: "An alternative non-empty collection of output rolls.",
 	});
 
-export type SetSchema = typeof SetSchema;
+export type RollSetSchema = typeof RollSetSchema;
 
-export namespace SetSchema {
-	export type Type = z.infer<SetSchema>;
+export namespace RollSetSchema {
+	export type Type = z.infer<RollSetSchema>;
 }

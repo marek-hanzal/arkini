@@ -5,10 +5,10 @@ import { WhenSchema } from "~/production-condition/schema/WhenSchema";
 /**
  * Fields shared by every rule evaluated for a selected drop.
  *
- * Specialized drop-rule schemas spread `BaseSchema.shape` to preserve this
+ * Specialized drop-rule schemas spread `BaseDropRuleSchema.shape` to preserve this
  * common contract while adding their discriminator and rule-specific fields.
  */
-export const BaseSchema = z
+export const BaseDropRuleSchema = z
 	.object({
 		/**
 		 * Optional player-facing explanation shown while this rule applies.
@@ -35,8 +35,8 @@ export const BaseSchema = z
 		description: "The common fields shared by every selected-drop rule.",
 	});
 
-export type BaseSchema = typeof BaseSchema;
+export type BaseDropRuleSchema = typeof BaseDropRuleSchema;
 
-export namespace BaseSchema {
-	export type Type = z.infer<BaseSchema>;
+export namespace BaseDropRuleSchema {
+	export type Type = z.infer<BaseDropRuleSchema>;
 }

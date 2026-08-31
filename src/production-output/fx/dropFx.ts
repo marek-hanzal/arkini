@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { TypeSchema } from "~/production-output/schema/drop/rule/TypeSchema";
+import { DropRuleTypeSchema } from "~/production-output/schema/DropRuleTypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
@@ -42,13 +42,13 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: Props) {
 				match(result)
 					.with(
 						{
-							type: TypeSchema.enum.Enable,
+							type: DropRuleTypeSchema.enum.Enable,
 						},
 						({ active }) => active,
 					)
 					.with(
 						{
-							type: TypeSchema.enum.Disable,
+							type: DropRuleTypeSchema.enum.Disable,
 						},
 						({ active }) => !active,
 					)

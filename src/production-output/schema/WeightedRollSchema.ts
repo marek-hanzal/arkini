@@ -2,17 +2,17 @@ import { z } from "zod";
 
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseRollSchema } from "./BaseRollSchema";
+import { RollTypeSchema } from "./RollTypeSchema";
 import { WeightedDropSchema } from "./WeightedDropSchema";
 
 /**
  * An output roll that will select its output according to relative item weights.
  */
-export const WeightSchema = z
+export const WeightedRollSchema = z
 	.object({
-		...BaseSchema.shape,
-		type: TypeSchema.extract([
+		...BaseRollSchema.shape,
+		type: RollTypeSchema.extract([
 			"Weight",
 		]),
 		/**
@@ -43,8 +43,8 @@ export const WeightSchema = z
 		description: "A roll that selects its output according to relative item weights.",
 	});
 
-export type WeightSchema = typeof WeightSchema;
+export type WeightedRollSchema = typeof WeightedRollSchema;
 
-export namespace WeightSchema {
-	export type Type = z.infer<WeightSchema>;
+export namespace WeightedRollSchema {
+	export type Type = z.infer<WeightedRollSchema>;
 }

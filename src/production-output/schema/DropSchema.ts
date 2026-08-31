@@ -4,7 +4,7 @@ import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
-import { RuleSchema } from "./drop/rule/RuleSchema";
+import { DropRuleSchema } from "./DropRuleSchema";
 
 /**
  * A quantity of a canonical game item emitted by a successful roll.
@@ -40,7 +40,7 @@ export const DropSchema = z
 		 * this drop from being emitted. Rejection does not reroll or replace it.
 		 */
 		rules: z
-			.array(RuleSchema)
+			.array(DropRuleSchema)
 			.describe("Rules evaluated after this drop is selected by a successful roll."),
 	})
 	.strict()

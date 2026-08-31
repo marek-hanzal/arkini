@@ -2,16 +2,16 @@ import { Array, Effect, Option, pipe, Random } from "effect";
 import { match } from "ts-pattern";
 
 import { rollQuantityFx } from "~/production-output/fx/rollQuantityFx";
-import type { ChanceSchema } from "~/production-output/roll/schema/ChanceSchema";
-import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
-import type { RollResultSchema } from "~/production-output/roll/schema/RollResultSchema";
-import { TypeSchema } from "~/production-output/roll/schema/TypeSchema";
-import type { WeightSchema } from "~/production-output/roll/schema/WeightSchema";
+import type { ChanceRollSchema } from "~/production-output/schema/ChanceRollSchema";
+import type { RollSchema } from "~/production-output/schema/RollSchema";
+import type { RollResultSchema } from "~/production-output/schema/RollResultSchema";
+import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
+import type { WeightedRollSchema } from "~/production-output/schema/WeightedRollSchema";
 
 const resolveChanceRollFx = Effect.fn("resolveChanceRollFx")(function* ({
 	roll,
 }: {
-	readonly roll: ChanceSchema.Type;
+	readonly roll: ChanceRollSchema.Type;
 }) {
 	const passed = (yield* Random.next) < roll.chance;
 	return {
@@ -22,7 +22,7 @@ const resolveChanceRollFx = Effect.fn("resolveChanceRollFx")(function* ({
 const selectWeightedDropFx = Effect.fn("selectWeightedDropFx")(function* ({
 	drop,
 }: {
-	readonly drop: WeightSchema.Type["drop"];
+	readonly drop: WeightedRollSchema.Type["drop"];
 }) {
 	const [totalWeight, weightedDrop] = Array.mapAccum(drop, 0, (accumulatedWeight, candidate) => {
 		const maximumWeight = accumulatedWeight + candidate.weight;
@@ -46,7 +46,7 @@ const selectWeightedDropFx = Effect.fn("selectWeightedDropFx")(function* ({
 const resolveWeightedRollFx = Effect.fn("resolveWeightedRollFx")(function* ({
 	roll,
 }: {
-	readonly roll: WeightSchema.Type;
+	readonly roll: WeightedRollSchema.Type;
 }) {
 	const quantity = yield* rollQuantityFx({
 		quantity: roll.quantity,
@@ -74,7 +74,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: Props) {
 	return yield* match(roll)
 		.with(
 			{
-				type: TypeSchema.enum.Guaranteed,
+				type: RollTypeSchema.enum.Guaranteed,
 			},
 			(roll) =>
 				Effect.succeed({
@@ -83,7 +83,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: Props) {
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Chance,
+				type: RollTypeSchema.enum.Chance,
 			},
 			(roll) => {
 				return resolveChanceRollFx({
@@ -93,7 +93,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: Props) {
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Weight,
+				type: RollTypeSchema.enum.Weight,
 			},
 			(roll) => {
 				return resolveWeightedRollFx({

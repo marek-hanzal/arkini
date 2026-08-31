@@ -2,8 +2,8 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readDropMaximumQuantitiesFn } from "~/production-output/fn/readDropMaximumQuantitiesFn";
-import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
-import { TypeSchema } from "~/production-output/roll/schema/TypeSchema";
+import type { RollSchema } from "~/production-output/schema/RollSchema";
+import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 
 export namespace readRollMaximumQuantitiesFn {
 	export interface Props {
@@ -16,7 +16,7 @@ export const readRollMaximumQuantitiesFn = ({ roll }: readRollMaximumQuantitiesF
 	return match(roll)
 		.with(
 			{
-				type: TypeSchema.enum.Guaranteed,
+				type: RollTypeSchema.enum.Guaranteed,
 			},
 			({ drop }) =>
 				readDropMaximumQuantitiesFn({
@@ -25,7 +25,7 @@ export const readRollMaximumQuantitiesFn = ({ roll }: readRollMaximumQuantitiesF
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Chance,
+				type: RollTypeSchema.enum.Chance,
 			},
 			({ chance, drop }) =>
 				chance === 0
@@ -36,7 +36,7 @@ export const readRollMaximumQuantitiesFn = ({ roll }: readRollMaximumQuantitiesF
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Weight,
+				type: RollTypeSchema.enum.Weight,
 			},
 			(roll) => {
 				const selectionCount = roll.quantity.max;

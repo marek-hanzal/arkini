@@ -2,10 +2,10 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { SetSchema } from "~/production-output/roll/schema/SetSchema";
-import { selectRollSetFx } from "~/production-output/roll/fx/selectRollSetFx";
+import { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import { selectRollSetFx } from "~/production-output/fx/selectRollSetFx";
 
-const createSet = (itemId: string, weight = 1): SetSchema.Type => {
+const createSet = (itemId: string, weight = 1): RollSetSchema.Type => {
 	return {
 		weight,
 		roll: [
@@ -31,7 +31,7 @@ describe("selectRollSetFx", () => {
 	it("normalizes authored shorthand to the canonical weight one", () => {
 		const { weight: _weight, ...source } = createSet("item:first");
 
-		expect(SetSchema.parse(source).weight).toBe(1);
+		expect(RollSetSchema.parse(source).weight).toBe(1);
 	});
 
 	it("selects a candidate from the middle cumulative weight range", () => {

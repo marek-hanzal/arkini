@@ -8,8 +8,8 @@ import {
 } from "~/production-line-authoring/ui/EditorQuantityControl";
 import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
-import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
+import type { RollSchema } from "~/production-output/schema/RollSchema";
+import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
@@ -445,8 +445,8 @@ export const EditorRollSetControl = ({
 	value,
 }: {
 	readonly index: number;
-	readonly onChange: (set: SetSchema.Type | undefined) => void;
-	readonly value: SetSchema.Type;
+	readonly onChange: (set: RollSetSchema.Type | undefined) => void;
+	readonly value: RollSetSchema.Type;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (

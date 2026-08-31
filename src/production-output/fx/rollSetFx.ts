@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import type { RollSetResultSchema } from "~/production-output/roll/schema/RollSetResultSchema";
-import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
+import type { RollSetResultSchema } from "~/production-output/schema/RollSetResultSchema";
+import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
 import { rollFx } from "./rollFx";
 
 export namespace rollSetFx {
 	export interface Props {
-		rollSet: SetSchema.Type;
+		rollSet: RollSetSchema.Type;
 	}
 }
 

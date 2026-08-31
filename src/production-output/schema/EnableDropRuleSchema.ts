@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseDropRuleSchema } from "./BaseDropRuleSchema";
+import { DropRuleTypeSchema } from "./DropRuleTypeSchema";
 
 /**
  * A rule that enables a selected drop only when all of its conditions pass.
@@ -9,13 +9,13 @@ import { TypeSchema } from "./TypeSchema";
  * Every configured enable rule is a positive emission gate. A failed gate
  * discards the selected drop without rerolling or choosing a replacement.
  */
-export const EnableSchema = z
+export const EnableDropRuleSchema = z
 	.object({
-		...BaseSchema.shape,
+		...BaseDropRuleSchema.shape,
 		/**
 		 * Identifies this rule as an enable gate for the selected drop.
 		 */
-		type: TypeSchema.extract([
+		type: DropRuleTypeSchema.extract([
 			"Enable",
 		]).describe("Identifies this rule as an enable gate for the selected drop."),
 	})
@@ -25,8 +25,8 @@ export const EnableSchema = z
 		description: "A rule that enables a selected drop when its conditions pass.",
 	});
 
-export type EnableSchema = typeof EnableSchema;
+export type EnableDropRuleSchema = typeof EnableDropRuleSchema;
 
-export namespace EnableSchema {
-	export type Type = z.infer<EnableSchema>;
+export namespace EnableDropRuleSchema {
+	export type Type = z.infer<EnableDropRuleSchema>;
 }

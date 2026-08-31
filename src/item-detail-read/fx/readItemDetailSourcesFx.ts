@@ -13,7 +13,7 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
+import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailSourcesFx {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { DeliveryTargetIssueSchema } from "~/production-delivery/schema/check/DeliveryTargetIssueSchema";
+import { DeliveryTargetIssueSchema } from "~/production-delivery/schema/DeliveryTargetIssueSchema";
 import { DuplicateJobIdIssueSchema } from "~/production-job/schema/DuplicateJobIdIssueSchema";
 import { JobLineMissingIssueSchema } from "~/production-job/schema/JobLineMissingIssueSchema";
 import { JobOwnerMissingIssueSchema } from "~/production-job/schema/JobOwnerMissingIssueSchema";

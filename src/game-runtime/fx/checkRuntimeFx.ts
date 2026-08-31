@@ -27,7 +27,7 @@ import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationCla
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { checkRuntimeDeliveriesFn } from "~/production-delivery/check/checkRuntimeDeliveriesFn";
+import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
 import { checkRuntimeInputLocationsFn } from "~/production-input/check/checkRuntimeInputLocationsFn";
 import { checkRuntimeJobsFn } from "~/production-job/check/checkRuntimeJobsFn";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";

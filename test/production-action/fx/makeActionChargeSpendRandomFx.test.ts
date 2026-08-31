@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { makeActionChargeSpendRandomFx } from "~/production-action/random/makeActionChargeSpendRandomFx";
+import { makeActionChargeSpendRandomFx } from "~/production-action/fx/makeActionChargeSpendRandomFx";
 
 const sampleFx = () =>
 	makeActionChargeSpendRandomFx({

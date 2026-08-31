@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import { settleItemDeliveryRuntimeFx } from "~/production-delivery/write/settleItemDeliveryRuntimeFx";
+import { settleItemDeliveryRuntimeFx } from "~/production-delivery/fx/settleItemDeliveryRuntimeFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 
 export namespace settleItemDeliveryFx {

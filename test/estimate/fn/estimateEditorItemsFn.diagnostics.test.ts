@@ -185,6 +185,113 @@ describe("estimateEditorItemsFn", () => {
 		});
 	});
 
+	it("returns partial when an alternate witness exceeds bounded authored demand", () => {
+		const result = estimate(
+			graph({
+				facts: [
+					"x",
+					"y",
+					"target",
+				],
+				roots: [
+					{
+						factId: "x",
+						quantity: 1,
+					},
+					{
+						factId: "y",
+						quantity: 4_000,
+					},
+				],
+				routes: [
+					route({
+						anyOf: Array.from(
+							{
+								length: 3,
+							},
+							() => [
+								requirement("x"),
+								requirement("y", "consume", 4_000),
+							],
+						),
+						durationMs: 0,
+						id: "make-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			diagnostics: [
+				{
+					factId: "y",
+					kind: "quantity-limit-exceeded",
+					maximumQuantity: 10_000,
+					quantity: 12_000,
+					source: "authored-demand",
+				},
+			],
+			obtainable: false,
+			status: "partial",
+		});
+	});
+
+	it("does not claim a slower top route when faster witness search exhausts its cap", () => {
+		const inputFactIds = Array.from(
+			{
+				length: 13,
+			},
+			(_, index) => `input-${index}`,
+		);
+		const result = estimate(
+			graph({
+				facts: [
+					...inputFactIds,
+					"target",
+				],
+				roots: [],
+				routes: [
+					...inputFactIds.flatMap((factId) => [
+						route({
+							durationMs: 1,
+							id: `a-${factId}`,
+							output: factId,
+						}),
+						route({
+							durationMs: 1,
+							id: `b-${factId}`,
+							output: factId,
+						}),
+					]),
+					route({
+						allOf: inputFactIds.map((factId) => requirement(factId)),
+						durationMs: 0,
+						id: "complex-target",
+						output: "target",
+					}),
+					route({
+						durationMs: 100,
+						id: "direct-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			diagnostics: [
+				{
+					kind: "witness-search-exhausted",
+					maximumStates: 4_096,
+					routeId: "complex-target",
+				},
+			],
+			obtainable: false,
+			status: "partial",
+		});
+	});
+
 	it("uses stable route identity to break complete-duration ties", () => {
 		const result = estimate(
 			graph({

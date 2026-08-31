@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 export namespace enqueueLineRuntimeFx {

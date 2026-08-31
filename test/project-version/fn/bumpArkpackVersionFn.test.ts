@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 
 describe("bumpArkpackVersionFn", () => {

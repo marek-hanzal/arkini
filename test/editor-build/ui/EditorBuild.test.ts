@@ -23,6 +23,10 @@ const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 }));
 
+type MockButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+	readonly cursorIntent?: string;
+};
+
 vi.mock("effect/unstable/reactivity/Atom", async (importOriginal) => {
 	const original = await importOriginal<typeof import("effect/unstable/reactivity/Atom")>();
 	const familyKinds = [
@@ -108,11 +112,11 @@ vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 }));
 
 vi.mock("~/ui/button/Button", () => ({
-	Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
-	PrimaryButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+	PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
-	DangerButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+	DangerButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
 	ButtonLink: ({
 		children,

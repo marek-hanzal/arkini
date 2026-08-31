@@ -2,7 +2,7 @@ import { basename, dirname, join } from "node:path";
 import * as NodePath from "@effect/platform-node/NodePath";
 import { Effect, FileSystem } from "effect";
 
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 export const readCanonicalArkpackPathFx = Effect.fn("readCanonicalArkpackPathFx")(function* (
 	fileSystem: FileSystem.FileSystem,

@@ -67,7 +67,7 @@ import { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcp
 import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
 import type { McpStorage } from "./McpStorage";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 export const DefaultPort = 32_310;
 const MaxClients = 100;

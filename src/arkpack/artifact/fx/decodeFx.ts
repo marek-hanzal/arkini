@@ -5,7 +5,7 @@ import { ArkpackDecodeError } from "~/arkpack/artifact/error/ArkpackDecodeError"
 import { Magic } from "~/arkpack/artifact/Magic";
 import { ManifestSchema } from "~/arkpack/artifact/schema/ManifestSchema";
 import { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
-import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
+import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 
 export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 	const payload = yield* Effect.try({

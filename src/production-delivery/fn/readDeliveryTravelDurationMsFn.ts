@@ -13,7 +13,7 @@ const minimumSameSurfaceDurationMs = 300;
 const millisecondsPerTile = 120;
 const crossSurfaceDurationMs = 500;
 
-const isSameSurface = (from: GridLocationSchema.Type, to: GridLocationSchema.Type) =>
+const isSameSurfaceFn = (from: GridLocationSchema.Type, to: GridLocationSchema.Type) =>
 	from.scope === to.scope &&
 	(from.scope !== LocationScopeEnumSchema.enum.Board ||
 		(to.scope === LocationScopeEnumSchema.enum.Board && from.space === to.space));
@@ -23,7 +23,7 @@ export const readDeliveryTravelDurationMsFn = ({
 	from,
 	to,
 }: readDeliveryTravelDurationMsFn.Props) => {
-	if (!isSameSurface(from, to)) return crossSurfaceDurationMs;
+	if (!isSameSurfaceFn(from, to)) return crossSurfaceDurationMs;
 	const distance = Math.hypot(to.position.x - from.position.x, to.position.y - from.position.y);
 	const duration = Math.max(minimumSameSurfaceDurationMs, distance * millisecondsPerTile);
 	return Math.ceil(duration / SimulationStepMs) * SimulationStepMs;

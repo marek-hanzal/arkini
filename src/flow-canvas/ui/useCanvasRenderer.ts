@@ -1,8 +1,11 @@
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
-import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
-import { createCanvasPainterFx } from "~/flow-canvas/fx/createCanvasPainterFx";
+import {
+	readCanvasEdgeOpacityFn,
+	readCanvasNodeHighlightFn,
+	readCanvasNodeOpacityFn,
+} from "~/flow-canvas/fn/readCanvasHighlightFn";
 import {
 	isOriginFlowEdgeVisibleFn,
 	isOriginFlowNodeVisibleFn,
@@ -14,23 +17,20 @@ import {
 	readOriginFlowVisibleBoundsFn,
 } from "~/flow-canvas/fn/readOriginFlowViewportFn";
 import type { ConnectedPorts } from "~/flow-canvas/fn/readConnectedPortsFn";
-import type { CanvasPalette } from "~/flow-canvas/type/CanvasPalette";
 import type { Highlight, Selection } from "~/flow-canvas/type/Highlight";
 import type { Bounds, Viewport } from "~/flow-canvas/type/Viewport";
+import { useCanvasArtworkPainter } from "~/flow-canvas/ui/useCanvasArtworkPainter";
+import { useCanvasItemNodePainter } from "~/flow-canvas/ui/useCanvasItemNodePainter";
+import { useCanvasPalette } from "~/flow-canvas/ui/useCanvasPalette";
+import { useCanvasRoutePainter } from "~/flow-canvas/ui/useCanvasRoutePainter";
 import type { NodeMetrics } from "~/flow-layout/fn/readNodeMetricsFn";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
-import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 
 type RenderState = Omit<useCanvasRenderer.Props, "relationFocusNodeIdRef">;
 
 const FlowEdgeCullPaddingPx = 64;
 const FlowSearchZoom = 1;
 const DefaultOriginFlowViewportZoom = readDefaultOriginFlowViewportFn().zoom;
-const FlowPainter = RendererRuntime.runSync(
-	createCanvasPainterFx({
-		itemTypeLabels: ItemTypeLabel,
-	}),
-);
 
 /** Owns the imperative Canvas painter, viewport, animation frame, and browser lifecycle. */
 export const useCanvasRenderer = ({
@@ -51,12 +51,14 @@ export const useCanvasRenderer = ({
 	selection,
 }: useCanvasRenderer.Props): useCanvasRenderer.Output => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
+	const drawItemArtwork = useCanvasArtworkPainter(scheduleDrawRef);
+	const drawItemNode = useCanvasItemNodePainter(drawItemArtwork);
+	const readCanvasPalette = useCanvasPalette(scheduleDrawRef);
+	const routePainter = useCanvasRoutePainter();
 	const viewportRef = useRef<Viewport>(readDefaultOriginFlowViewportFn());
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
-	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
 	const renderStateRef = useRef<RenderState>({
 		backbones,
 		connectedPorts,
@@ -140,11 +142,10 @@ export const useCanvasRenderer = ({
 			rect.height,
 			FlowEdgeCullPaddingPx,
 		);
-		const palette = paletteRef.current ?? FlowPainter.readPalette(canvas);
-		paletteRef.current = palette;
+		const palette = readCanvasPalette(canvas);
 		context.setTransform(dpr, 0, 0, dpr, 0, 0);
 		context.clearRect(0, 0, rect.width, rect.height);
-		FlowPainter.drawGrid(context, rect.width, rect.height, viewport, palette);
+		routePainter.drawGrid(context, rect.width, rect.height, viewport, palette);
 
 		context.save();
 		context.translate(viewport.x, viewport.y);
@@ -166,16 +167,11 @@ export const useCanvasRenderer = ({
 				const bounds = state.edgeBounds.get(edge.id);
 				if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
 				if (!isOriginFlowEdgeVisibleFn(bounds, visibleEdges)) continue;
-				FlowPainter.drawEdge(
+				routePainter.drawEdge(
 					context,
 					backbone,
 					highlightColor,
-					FlowPainter.readEdgeOpacity(
-						edge.id,
-						highlighted,
-						state.selection,
-						state.highlight,
-					),
+					readCanvasEdgeOpacityFn(edge.id, highlighted, state.selection, state.highlight),
 					palette,
 				);
 			}
@@ -186,35 +182,36 @@ export const useCanvasRenderer = ({
 			if (!isOriginFlowNodeVisibleFn(position, visibleNodes)) continue;
 			const metrics = state.nodeMetrics.get(node.id);
 			if (metrics === undefined) throw new Error(`Missing node metrics for ${node.id}.`);
-			const nodeHighlight = FlowPainter.readNodeHighlight(
+			const nodeHighlight = readCanvasNodeHighlightFn(
 				node,
 				state.selection,
 				state.highlight,
 				relationFocusNodeIdRef.current,
 			);
-			FlowPainter.drawItemNode(
+			drawItemNode({
+				connectedPortIds: state.connectedPorts.get(node.id),
 				context,
-				node,
-				position,
+				highlight: nodeHighlight,
+				highlightedPortColors: state.highlightedPortColors.get(node.id),
 				metrics,
-				nodeHighlight,
-				FlowPainter.readNodeOpacity(
+				node,
+				opacity: readCanvasNodeOpacityFn(
 					node.id,
 					state.selection,
 					state.highlight,
 					relationFocusNodeIdRef.current,
 				),
 				palette,
-				state.resourceUrls,
-				imageCacheRef.current,
-				scheduleDrawRef.current,
-				state.connectedPorts.get(node.id),
-				state.highlightedPortColors.get(node.id),
-			);
+				position,
+				resourceUrls: state.resourceUrls,
+			});
 		}
 		context.restore();
 	}, [
+		drawItemNode,
+		readCanvasPalette,
 		relationFocusNodeIdRef,
+		routePainter,
 	]);
 
 	const scheduleDraw = useCallback(() => {
@@ -275,29 +272,6 @@ export const useCanvasRenderer = ({
 	]);
 
 	useEffect(() => {
-		const refreshPalette = () => {
-			paletteRef.current = undefined;
-			scheduleDraw();
-		};
-		const observer = new MutationObserver(refreshPalette);
-		observer.observe(document.documentElement, {
-			attributeFilter: [
-				"data-accent",
-				"data-theme",
-			],
-			attributes: true,
-		});
-		const scheme = matchMedia("(prefers-color-scheme: dark)");
-		scheme.addEventListener("change", refreshPalette);
-		return () => {
-			observer.disconnect();
-			scheme.removeEventListener("change", refreshPalette);
-		};
-	}, [
-		scheduleDraw,
-	]);
-
-	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (canvas === null) return;
 		const observer = new ResizeObserver(() => scheduleDraw());
@@ -340,8 +314,6 @@ export const useCanvasRenderer = ({
 	useEffect(
 		() => () => {
 			if (frameRef.current !== undefined) cancelAnimationFrame(frameRef.current);
-			for (const image of imageCacheRef.current.values()) image.src = "";
-			imageCacheRef.current.clear();
 		},
 		[],
 	);

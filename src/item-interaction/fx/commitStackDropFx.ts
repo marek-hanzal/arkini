@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";

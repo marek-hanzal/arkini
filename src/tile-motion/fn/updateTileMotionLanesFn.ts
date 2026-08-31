@@ -13,23 +13,25 @@ type TileMotionLaneClaim =
 			readonly batchKey: string;
 	  };
 
+const readTileMotionBatchClaimFn = (
+	cue: TileMotionCue,
+	actorId: string,
+	batchKey = `${cue.sequence}:${cue.originActorId}`,
+): TileMotionLaneClaim => ({
+	kind: "delivery-batch",
+	actorId,
+	batchKey,
+});
+
 /** Separates exclusive actor motion from shareable deliveries in one producer batch. */
 const readTileMotionLaneClaimsFn = (cue: TileMotionCue) => {
-	const batchClaim = (
-		actorId: string,
-		batchKey = `${cue.sequence}:${cue.originActorId}`,
-	): TileMotionLaneClaim => ({
-		kind: "delivery-batch",
-		actorId,
-		batchKey,
-	});
 	return match(cue)
 		.with(
 			{
 				kind: "spawn",
 			},
 			(spawn): ReadonlyArray<TileMotionLaneClaim> => [
-				batchClaim(spawn.originActorId),
+				readTileMotionBatchClaimFn(cue, spawn.originActorId),
 				{
 					kind: "exclusive",
 					actorId: spawn.actorId,
@@ -41,8 +43,8 @@ const readTileMotionLaneClaimsFn = (cue: TileMotionCue) => {
 				kind: "stack",
 			},
 			(stack): ReadonlyArray<TileMotionLaneClaim> => [
-				batchClaim(stack.originActorId),
-				batchClaim(stack.targetActorId),
+				readTileMotionBatchClaimFn(cue, stack.originActorId),
+				readTileMotionBatchClaimFn(cue, stack.targetActorId),
 			],
 		)
 		.with(
@@ -54,7 +56,11 @@ const readTileMotionLaneClaimsFn = (cue: TileMotionCue) => {
 					kind: "exclusive",
 					actorId: input.sourceActorId,
 				},
-				batchClaim(input.targetActorId, `input:${input.targetActorId}`),
+				readTileMotionBatchClaimFn(
+					cue,
+					input.targetActorId,
+					`input:${input.targetActorId}`,
+				),
 			],
 		)
 		.with(
@@ -100,7 +106,7 @@ export namespace updateTileMotionLanesFn {
 	}
 }
 
-const readTileMotionCueKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
+const readTileMotionCueKeyFn = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
 
 interface TileMotionLaneSettlement {
 	readonly active: TileMotionCue[];
@@ -109,14 +115,14 @@ interface TileMotionLaneSettlement {
 	readonly pendingClaims: TileMotionLaneClaim[];
 }
 
-const readTileMotionClaims = (cues: ReadonlyArray<TileMotionCue>) =>
+const readTileMotionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) =>
 	cues.flatMap(readTileMotionLaneClaimsFn);
 
-const tileMotionLaneClaimsConflict = (left: TileMotionLaneClaim, right: TileMotionLaneClaim) =>
+const tileMotionLaneClaimsConflictFn = (left: TileMotionLaneClaim, right: TileMotionLaneClaim) =>
 	left.actorId === right.actorId &&
 	(left.kind === "exclusive" || right.kind === "exclusive" || left.batchKey !== right.batchKey);
 
-const canActivateTileMotionCue = (
+const canActivateTileMotionCueFn = (
 	settlement: TileMotionLaneSettlement,
 	cueClaims: ReadonlyArray<TileMotionLaneClaim>,
 ) =>
@@ -124,27 +130,27 @@ const canActivateTileMotionCue = (
 	cueClaims.every(
 		(cueClaim) =>
 			settlement.claims.every(
-				(activeClaim) => !tileMotionLaneClaimsConflict(cueClaim, activeClaim),
+				(activeClaim) => !tileMotionLaneClaimsConflictFn(cueClaim, activeClaim),
 			) &&
 			settlement.pendingClaims.every(
-				(pendingClaim) => !tileMotionLaneClaimsConflict(cueClaim, pendingClaim),
+				(pendingClaim) => !tileMotionLaneClaimsConflictFn(cueClaim, pendingClaim),
 			),
 	);
 
-const settleTileMotionLanes = (
+const settleTileMotionLanesFn = (
 	state: updateTileMotionLanesFn.State,
 ): updateTileMotionLanesFn.State => {
 	const settlement: TileMotionLaneSettlement = {
 		active: [
 			...state.active,
 		],
-		claims: readTileMotionClaims(state.active),
+		claims: readTileMotionClaimsFn(state.active),
 		pending: [],
 		pendingClaims: [],
 	};
 	for (const cue of state.pending) {
 		const cueClaims = readTileMotionLaneClaimsFn(cue);
-		if (canActivateTileMotionCue(settlement, cueClaims)) {
+		if (canActivateTileMotionCueFn(settlement, cueClaims)) {
 			settlement.active.push(cue);
 			settlement.claims.push(...cueClaims);
 		} else {
@@ -158,23 +164,23 @@ const settleTileMotionLanes = (
 	};
 };
 
-const completeTileMotionCue = ({
+const completeTileMotionCueFn = ({
 	cue,
 	state,
 }: {
 	readonly cue: TileMotionCue;
 	readonly state: updateTileMotionLanesFn.State;
 }) => {
-	const completedKey = readTileMotionCueKey(cue);
-	return settleTileMotionLanes({
+	const completedKey = readTileMotionCueKeyFn(cue);
+	return settleTileMotionLanesFn({
 		active: state.active.filter(
-			(activeCue) => readTileMotionCueKey(activeCue) !== completedKey,
+			(activeCue) => readTileMotionCueKeyFn(activeCue) !== completedKey,
 		),
 		pending: state.pending,
 	});
 };
 
-const readUniqueIncomingCues = ({
+const readUniqueIncomingCuesFn = ({
 	cues,
 	state,
 }: {
@@ -185,28 +191,28 @@ const readUniqueIncomingCues = ({
 		[
 			...state.active,
 			...state.pending,
-		].map(readTileMotionCueKey),
+		].map(readTileMotionCueKeyFn),
 	);
 	return cues.filter((cue) => {
-		const key = readTileMotionCueKey(cue);
+		const key = readTileMotionCueKeyFn(cue);
 		if (knownKeys.has(key)) return false;
 		knownKeys.add(key);
 		return true;
 	});
 };
 
-const enqueueTileMotionCues = ({
+const enqueueTileMotionCuesFn = ({
 	cues,
 	state,
 }: {
 	readonly cues: ReadonlyArray<TileMotionCue>;
 	readonly state: updateTileMotionLanesFn.State;
 }) => {
-	return settleTileMotionLanes({
+	return settleTileMotionLanesFn({
 		active: state.active,
 		pending: [
 			...state.pending,
-			...readUniqueIncomingCues({
+			...readUniqueIncomingCuesFn({
 				cues,
 				state,
 			}),
@@ -222,7 +228,7 @@ export const updateTileMotionLanesFn = ({ state, action }: updateTileMotionLanes
 				type: "complete",
 			},
 			({ cue }) =>
-				completeTileMotionCue({
+				completeTileMotionCueFn({
 					cue,
 					state,
 				}),
@@ -232,7 +238,7 @@ export const updateTileMotionLanesFn = ({ state, action }: updateTileMotionLanes
 				type: "enqueue",
 			},
 			({ cues }) =>
-				enqueueTileMotionCues({
+				enqueueTileMotionCuesFn({
 					cues,
 					state,
 				}),

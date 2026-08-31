@@ -9,6 +9,8 @@ const routeModulePattern = "^src/@routes(?:/|$)";
 const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
+const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
+const itemRevisionPattern = "^src/item-revision(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -29,7 +31,7 @@ module.exports = {
 				orphan: true,
 				pathNot: [
 					applicationEntrypointPattern,
-					"^src/engine/cli/arkini[.]ts$",
+					"^src/arkini-cli/arkini[.]ts$",
 					"^electron/(?:main|preload)/index[.]ts$",
 					"^scripts/[^/]+[.]ts$",
 					"^test/setup[.]ts$",
@@ -47,6 +49,30 @@ module.exports = {
 			from: {},
 			to: {
 				circular: true,
+			},
+		},
+		{
+			name: "application-version-does-not-import-game-version",
+			comment:
+				"Application writer admission is independent from project-owned gameplay compatibility.",
+			severity: "error",
+			from: {
+				path: "^src/application-version(?:/|$)",
+			},
+			to: {
+				path: "^src/game-version(?:/|$)",
+			},
+		},
+		{
+			name: "game-version-does-not-import-application-version",
+			comment:
+				"Project-owned gameplay compatibility does not depend on Arkini application releases.",
+			severity: "error",
+			from: {
+				path: "^src/game-version(?:/|$)",
+			},
+			to: {
+				path: "^src/application-version(?:/|$)",
 			},
 		},
 		{
@@ -117,12 +143,58 @@ module.exports = {
 			},
 		},
 		{
+			name: "filesystem-write-stays-mechanical",
+			comment:
+				"The shared Node-only write capability owns lock and durable single-file mechanics without importing its product consumers.",
+			severity: "error",
+			from: {
+				path: filesystemWritePattern,
+			},
+			to: {
+				path: "^(?:src|electron|shared)(?:/|$)",
+				pathNot: [
+					filesystemWritePattern,
+				],
+			},
+		},
+		{
+			name: "item-revision-stays-upstream",
+			comment:
+				"Item Revision owns opaque optimistic-concurrency tokens and stale-write rejection without importing its Runtime or command consumers.",
+			severity: "error",
+			from: {
+				path: itemRevisionPattern,
+			},
+			to: {
+				path: activeCodePattern,
+				pathNot: [
+					itemRevisionPattern,
+					"^src/game-config/schema/IdSchema[.]ts$",
+				],
+			},
+		},
+		{
+			name: "item-revision-uses-id-schema-as-type-only",
+			comment:
+				"Revision conflict payloads share exact entity identity as a type contract without coupling Item Revision to Game Config runtime values.",
+			severity: "error",
+			from: {
+				path: itemRevisionPattern,
+			},
+			to: {
+				path: "^src/game-config/schema/IdSchema[.]ts$",
+				dependencyTypesNot: [
+					"type-only",
+				],
+			},
+		},
+		{
 			name: "tick-lifecycle-owners-stay-upstream",
 			comment:
 				"Production delivery/jobs and temporary-item lifecycle provide behavior to Game Tick and never import its clock, replay, or loop implementation.",
 			severity: "error",
 			from: {
-				path: "^src/(?:production-(?:delivery|job)|engine/item/temporary)(?:/|$)",
+				path: "^src/(?:production-(?:delivery|job)|temporary-item)(?:/|$)",
 			},
 			to: {
 				path: "^src/game-tick(?:/|$)",
@@ -174,6 +246,42 @@ module.exports = {
 			},
 			to: {
 				path: "^src/game-cheat(?:/|$)",
+			},
+		},
+		{
+			name: "item-query-dependencies-stay-upstream",
+			comment:
+				"Canonical Runtime, authored Item selection, and Location semantics provide facts to Item Query without importing query execution.",
+			severity: "error",
+			from: {
+				path: "^src/(?:game-runtime|item-definition|item-location)(?:/|$)",
+			},
+			to: {
+				path: "^src/item-query(?:/|$)",
+			},
+		},
+		{
+			name: "item-resolution-dependencies-stay-upstream",
+			comment:
+				"Loaded config, authored Item definitions, and Location values provide facts to Item Resolution without importing its lookup operation or failure.",
+			severity: "error",
+			from: {
+				path: "^src/(?:game-config|item-definition|item-location)(?:/|$)",
+			},
+			to: {
+				path: "^src/item-resolution(?:/|$)",
+			},
+		},
+		{
+			name: "item-state-isolation-stays-upstream-of-production",
+			comment:
+				"Shared stateful-owner stack isolation provides candidate transitions to production without importing its consumers.",
+			severity: "error",
+			from: {
+				path: "^src/item-state-isolation(?:/|$)",
+			},
+			to: {
+				path: "^src/production-(?:action|delivery|input|job|line)(?:/|$)",
 			},
 		},
 		{

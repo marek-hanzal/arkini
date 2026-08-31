@@ -2,7 +2,7 @@ import { basename, dirname, join } from "node:path";
 import * as NodePath from "@effect/platform-node/NodePath";
 import { Effect, FileSystem } from "effect";
 
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { readCanonicalArkpackPathFx } from "./withArkpackFileLockFx";
 
 /** Atomically publishes one self-contained Arkpack. */

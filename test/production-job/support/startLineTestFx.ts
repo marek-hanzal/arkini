@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";

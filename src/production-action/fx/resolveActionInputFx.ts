@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
 import { resolveActionDepositInputFx } from "~/production-action/fx/resolveActionDepositInputFx";
 import type { InputSchema } from "~/production-action/schema/InputSchema";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

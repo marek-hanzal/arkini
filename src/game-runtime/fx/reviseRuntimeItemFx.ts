@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
+import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 interface ReviseRuntimeItemProps<Item extends RuntimeItemSchema.Type> {

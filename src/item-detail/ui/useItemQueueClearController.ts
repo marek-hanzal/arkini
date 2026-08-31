@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
 import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
 

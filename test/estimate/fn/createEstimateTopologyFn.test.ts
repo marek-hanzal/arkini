@@ -1,78 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { createEstimateTopologyFn } from "~/estimate/fn/createEstimateTopologyFn";
-import type {
-	EditorAcquisitionGraph,
-	EditorAcquisitionRequirement,
-	EditorAcquisitionRoute,
-} from "~/flow/type/EditorAcquisitionGraph";
 
-const routeFn = ({
-	allOf = [],
-	anyOf = [],
-	id,
-	output,
-	outputCompilation,
-	quantity = 1,
-}: {
-	readonly allOf?: ReadonlyArray<EditorAcquisitionRequirement>;
-	readonly anyOf?: ReadonlyArray<ReadonlyArray<EditorAcquisitionRequirement>>;
-	readonly id: string;
-	readonly output: string;
-	readonly outputCompilation?: "state-space-unsupported";
-	readonly quantity?: number;
-}): EditorAcquisitionRoute => ({
-	durationMs: 1,
-	id,
-	metadata: {
-		kind: "line-output",
-		lineId: id,
-		lineTitle: id,
-		ownerItemId: "owner",
-	},
-	...(outputCompilation === undefined
-		? {}
-		: {
-				operation: {
-					id: `${id}:operation`,
-					inputs: [],
-					outputCompilation,
-				},
-			}),
-	output: {
-		annotation: {
-			alternativeSet: false,
-			placement: "drop",
-			quantity: {
-				max: quantity,
-				min: quantity,
-			},
-			selectionKind: "guaranteed",
-		},
-		factId: output,
-		quantityDistribution: [
-			{
-				probability: 1,
-				quantity,
-			},
-		],
-	},
-	requirements: {
-		allOf,
-		anyOf,
-	},
-	runMultiplier: 1,
-});
+import { editorItemEstimateTestFixture } from "~test/estimate/fn/editorItemEstimateTestFixture";
 
-const requirementFn = (
-	factId: string,
-	source: EditorAcquisitionRequirement["source"] = "material-input",
-): EditorAcquisitionRequirement => ({
-	factId,
-	quantity: 3,
-	source,
-	usage: "consume",
-});
+const { graph, requirement, route } = editorItemEstimateTestFixture;
 
 describe("createEstimateTopologyFn", () => {
 	it("keeps component identity and seeded projection independent of insertion order", () => {
@@ -85,52 +17,59 @@ describe("createEstimateTopologyFn", () => {
 			"dag-a",
 		];
 		const routes = [
-			routeFn({
+			route({
 				allOf: [
-					requirementFn("cycle-a"),
+					requirement("cycle-a"),
 				],
+				durationMs: 1,
 				id: "cycle-z:a",
 				output: "cycle-z",
 			}),
-			routeFn({
+			route({
 				allOf: [
-					requirementFn("dag-b"),
+					requirement("dag-b"),
 				],
+				durationMs: 1,
 				id: "dag-a:b",
 				output: "dag-a",
 			}),
-			routeFn({
+			route({
 				allOf: [
-					requirementFn("self"),
+					requirement("self"),
 				],
+				durationMs: 1,
 				id: "self:self",
 				output: "self",
 			}),
-			routeFn({
+			route({
 				allOf: [
-					requirementFn("cycle-z"),
+					requirement("cycle-z"),
 				],
+				durationMs: 1,
 				id: "cycle-a:z",
 				output: "cycle-a",
 			}),
 		];
-		const readTopologyFn = (
-			orderedFactIds: ReadonlyArray<string>,
-			orderedRoutes: ReadonlyArray<EditorAcquisitionRoute>,
-		) =>
-			createEstimateTopologyFn({
-				factIds: orderedFactIds,
-				limitations: [],
-				roots: [
-					"cycle-z",
-					"dag-b",
-					"self",
-				].map((factId) => ({
-					factId,
-					quantity: "unbounded" as const,
-				})),
-				routes: orderedRoutes,
-			});
+		const readTopologyFn = (reverse: boolean) =>
+			createEstimateTopologyFn(
+				graph({
+					facts: reverse
+						? [
+								...factIds,
+							].reverse()
+						: factIds,
+					roots: [
+						"cycle-z",
+						"dag-b",
+						"self",
+					],
+					routes: reverse
+						? [
+								...routes,
+							].reverse()
+						: routes,
+				}),
+			);
 
 		const expectedComponentEntries = [
 			[
@@ -176,109 +115,83 @@ describe("createEstimateTopologyFn", () => {
 				"self",
 			],
 		];
-		const forward = readTopologyFn(factIds, routes);
-		const reversed = readTopologyFn(
-			[
-				...factIds,
-			].reverse(),
-			[
-				...routes,
-			].reverse(),
-		);
-
-		expect([
-			...forward.componentByFact,
-		]).toEqual(expectedComponentEntries);
-		expect([
-			...forward.seededComponentByFact,
-		]).toEqual(expectedSeededEntries);
-		expect([
-			...reversed.componentByFact,
-		]).toEqual(expectedComponentEntries);
-		expect([
-			...reversed.seededComponentByFact,
-		]).toEqual(expectedSeededEntries);
+		for (const topology of [
+			readTopologyFn(false),
+			readTopologyFn(true),
+		]) {
+			expect([
+				...topology.componentByFact,
+			]).toEqual(expectedComponentEntries);
+			expect([
+				...topology.seededComponentByFact,
+			]).toEqual(expectedSeededEntries);
+		}
 	});
 
-	it("projects authored requirements and reaches only finite-yield supported routes", () => {
-		const charged = requirementFn("tool", "charged-item");
-		const positiveCondition = requirementFn("enabled", "line-condition");
-		const graph: EditorAcquisitionGraph = {
-			factIds: [
-				"root",
-				"tool",
-				"enabled",
-				"target",
-				"unsupported",
-				"zero",
-			],
-			limitations: [],
-			roots: [
-				{
-					factId: "root",
-					quantity: "unbounded",
-				},
-				{
-					factId: "tool",
-					quantity: "unbounded",
-				},
-			],
-			routes: [
-				routeFn({
-					allOf: [
-						charged,
-					],
-					anyOf: [
-						[
-							positiveCondition,
-							requirementFn("root"),
-						],
-					],
-					id: "z:target",
-					output: "target",
-				}),
-				routeFn({
-					id: "a:target",
-					output: "target",
-				}),
-				routeFn({
-					id: "unsupported",
-					output: "unsupported",
-					outputCompilation: "state-space-unsupported",
-				}),
-				routeFn({
-					id: "zero",
-					output: "zero",
-					quantity: 0,
-				}),
-			],
-		};
-
-		const topology = createEstimateTopologyFn(graph);
-		const projected = topology.requirementsByRoute.get(graph.routes[0]!);
-
-		expect(
-			[
-				...topology.routesByFact.get("target")!,
-			].map(({ id }) => id),
-		).toEqual([
-			"a:target",
-			"z:target",
-		]);
-		expect(projected).toEqual({
-			allOf: [
-				{
-					...charged,
-					quantity: 1,
-					usage: "one-time",
-				},
-			],
-			anyOf: [
-				[
-					requirementFn("root"),
+	it("excludes ignored disable-condition and charge edges from component membership", () => {
+		const topology = createEstimateTopologyFn(
+			graph({
+				facts: [
+					"condition-root",
+					"condition-dependent",
+					"charge-root",
+					"charge-dependent",
 				],
-			],
-		});
-		expect(topology.unsupportedRoutes.has(graph.routes[2]!)).toBe(true);
+				roots: [
+					"condition-root",
+					"charge-root",
+				],
+				routes: [
+					route({
+						anyOf: [
+							[
+								{
+									factId: "condition-dependent",
+									quantity: 1,
+									source: "line-condition",
+									usage: "ongoing",
+								},
+							],
+						],
+						durationMs: 1,
+						id: "condition-edge",
+						output: "condition-root",
+					}),
+					route({
+						allOf: [
+							requirement("condition-root"),
+						],
+						durationMs: 1,
+						id: "condition-back-edge",
+						output: "condition-dependent",
+					}),
+					route({
+						chargeUses: [
+							{
+								accounting: "single-payer-exact",
+								payerFactId: "charge-dependent",
+								usableActionRuns: 1,
+							},
+						],
+						durationMs: 1,
+						id: "charge-edge",
+						output: "charge-root",
+					}),
+					route({
+						allOf: [
+							requirement("charge-root"),
+						],
+						durationMs: 1,
+						id: "charge-back-edge",
+						output: "charge-dependent",
+					}),
+				],
+			}),
+		);
+
+		expect(topology.seededComponentByFact.get("condition-root")).toBeDefined();
+		expect(topology.seededComponentByFact.get("charge-root")).toBeDefined();
+		expect(topology.seededComponentByFact.get("condition-dependent")).toBeUndefined();
+		expect(topology.seededComponentByFact.get("charge-dependent")).toBeUndefined();
 	});
 });

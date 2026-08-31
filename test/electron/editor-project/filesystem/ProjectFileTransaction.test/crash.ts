@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import { withProjectLockFx } from "../../../../../electron/main/editor-project/filesystem/fx/withProjectLockFx";
 import { writeProjectFileSetFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFileSetFx";
-import { createFilesystemWriteFx } from "../../../../../src/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "../../../../../src/filesystem-write/fx/createFilesystemWriteFx";
 
 const [mode, root] = process.argv.slice(2);
 if (mode === undefined || root === undefined) throw new Error("Expected a mode and root.");

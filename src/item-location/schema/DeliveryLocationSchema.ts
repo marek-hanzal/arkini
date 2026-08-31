@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { TimeSchema } from "~/game-config/schema/TimeSchema";
 import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPhaseEnumSchema";
 import { LineInputDeliveryTargetSchema } from "~/production-delivery/schema/LineInputDeliveryTargetSchema";
 import { GridLocationSchema } from "./GridLocationSchema";

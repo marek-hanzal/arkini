@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemSchema as CanonicalItemSchema } from "~/item-definition/schema/ItemSchema";
 

@@ -42,7 +42,7 @@ export default defineConfig(({ command }) => {
 					],
 					input: {
 						index: resolve("electron/main/index.ts"),
-						"cli/arkini": resolve("src/engine/cli/arkini.ts"),
+						"cli/arkini": resolve("src/arkini-cli/arkini.ts"),
 					},
 				},
 			},

@@ -1,11 +1,11 @@
 import { Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/item-interaction/error/StackItemsUnavailableError";
 import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
@@ -43,7 +43,7 @@ export namespace readItemStackResolutionFn {
 		  };
 }
 
-const blocked = (
+const blockedFn = (
 	reason: Exclude<
 		StackItemsUnavailableError.Reason,
 		typeof StackItemsUnavailableError.Reason.DifferentCanonicalItem
@@ -69,30 +69,30 @@ export const readItemStackResolutionFn = ({
 	targetLocation,
 }: readItemStackResolutionFn.Props) => {
 	if (sourceItemId === targetItemId) {
-		return blocked(StackItemsUnavailableError.Reason.SameItem);
+		return blockedFn(StackItemsUnavailableError.Reason.SameItem);
 	}
 
 	const runtimeSource = runtime.items.find((item) => item.id === sourceItemId);
 	if (runtimeSource === undefined) {
-		return blocked(StackItemsUnavailableError.Reason.SourceNotFound);
+		return blockedFn(StackItemsUnavailableError.Reason.SourceNotFound);
 	}
 	const runtimeTarget = runtime.items.find((item) => item.id === targetItemId);
 	if (runtimeTarget === undefined) {
-		return blocked(StackItemsUnavailableError.Reason.TargetNotFound);
+		return blockedFn(StackItemsUnavailableError.Reason.TargetNotFound);
 	}
 	if (runtimeSource.revision !== sourceRevision) {
-		return blocked(StackItemsUnavailableError.Reason.StaleSourceRevision);
+		return blockedFn(StackItemsUnavailableError.Reason.StaleSourceRevision);
 	}
 	if (runtimeTarget.revision !== targetRevision) {
-		return blocked(StackItemsUnavailableError.Reason.StaleTargetRevision);
+		return blockedFn(StackItemsUnavailableError.Reason.StaleTargetRevision);
 	}
 	const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
-		return blocked(StackItemsUnavailableError.Reason.SourceNotOnGrid);
+		return blockedFn(StackItemsUnavailableError.Reason.SourceNotOnGrid);
 	}
 	const target = Option.getOrUndefined(isGridRuntimeItemFn(runtimeTarget));
 	if (target === undefined) {
-		return blocked(StackItemsUnavailableError.Reason.TargetNotOnGrid);
+		return blockedFn(StackItemsUnavailableError.Reason.TargetNotOnGrid);
 	}
 	if (
 		!isSameGridLocationFn({
@@ -100,7 +100,7 @@ export const readItemStackResolutionFn = ({
 			right: sourceLocation,
 		})
 	) {
-		return blocked(StackItemsUnavailableError.Reason.StaleSourceLocation);
+		return blockedFn(StackItemsUnavailableError.Reason.StaleSourceLocation);
 	}
 	if (
 		!isSameGridLocationFn({
@@ -108,7 +108,7 @@ export const readItemStackResolutionFn = ({
 			right: targetLocation,
 		})
 	) {
-		return blocked(StackItemsUnavailableError.Reason.StaleTargetLocation);
+		return blockedFn(StackItemsUnavailableError.Reason.StaleTargetLocation);
 	}
 
 	const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
@@ -118,7 +118,7 @@ export const readItemStackResolutionFn = ({
 		boardTarget !== undefined &&
 		boardSource.location.space !== boardTarget.location.space
 	) {
-		return blocked(StackItemsUnavailableError.Reason.CrossSpace);
+		return blockedFn(StackItemsUnavailableError.Reason.CrossSpace);
 	}
 	const sourceOnBoard = boardSource !== undefined;
 	const targetOnBoard = boardTarget !== undefined;
@@ -128,7 +128,7 @@ export const readItemStackResolutionFn = ({
 		boardItem !== undefined &&
 		boardItem.location.space !== runtime.currentSpace
 	) {
-		return blocked(StackItemsUnavailableError.Reason.CrossSpace);
+		return blockedFn(StackItemsUnavailableError.Reason.CrossSpace);
 	}
 	if (source.item.id !== target.item.id) {
 		return {
@@ -142,19 +142,19 @@ export const readItemStackResolutionFn = ({
 		runtime,
 	});
 	if (!sourcePure) {
-		return blocked(StackItemsUnavailableError.Reason.SourceStateful);
+		return blockedFn(StackItemsUnavailableError.Reason.SourceStateful);
 	}
 	const targetPure = isItemPureFn({
 		item: target,
 		runtime,
 	});
 	if (!targetPure) {
-		return blocked(StackItemsUnavailableError.Reason.TargetStateful);
+		return blockedFn(StackItemsUnavailableError.Reason.TargetStateful);
 	}
 
 	const availableQuantity = target.item.maxStackSize - target.quantity;
 	if (availableQuantity <= 0) {
-		return blocked(StackItemsUnavailableError.Reason.TargetFull);
+		return blockedFn(StackItemsUnavailableError.Reason.TargetFull);
 	}
 
 	return {

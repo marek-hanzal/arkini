@@ -10,7 +10,7 @@ import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProj
 import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { ItemFileSchema } from "~/game-config/source/schema/ItemFileSchema";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
-import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
+import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 import type { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectFiles } from "./ProjectFiles";

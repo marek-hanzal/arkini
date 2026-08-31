@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /** An active job owner no longer occupies a concrete board or inventory grid. */

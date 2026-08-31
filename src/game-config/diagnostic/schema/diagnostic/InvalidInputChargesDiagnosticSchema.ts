@@ -4,7 +4,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { InvalidInputChargesReasonEnumSchema } from "~/game-config/diagnostic/schema/InvalidInputChargesReasonEnumSchema";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 /** One authored input charge contract cannot resolve a valid payer. */

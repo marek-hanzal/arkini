@@ -4,7 +4,7 @@ import { Effect, FileSystem, Path, Semaphore } from "effect";
 import type { OwnedEditorProjectRepository } from "../../EditorProjectServiceOwnership";
 import type { ProjectState } from "../ProjectState";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createBoardScenarioOperationsFx } from "./createBoardScenarioOperationsFx";
 import { createNoteOperationsFx } from "./createNoteOperationsFx";
 import { createProjectCatalogFx } from "./createProjectCatalogFx";

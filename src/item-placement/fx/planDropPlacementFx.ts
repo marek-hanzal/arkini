@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";

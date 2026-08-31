@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 
 /** One FIFO request to start a line later through the canonical start pipeline. */
 export const JobQueueRequestSchema = z

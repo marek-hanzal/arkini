@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
 import { readRuntimeItemOwnedStateFn } from "~/game-runtime/read/fn/readRuntimeItemOwnedStateFn";

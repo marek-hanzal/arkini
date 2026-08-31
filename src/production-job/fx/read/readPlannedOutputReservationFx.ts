@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ModeSchema } from "~/production-input/schema/ModeSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";

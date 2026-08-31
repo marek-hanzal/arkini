@@ -180,7 +180,7 @@ llm:cache() {
 
 # @cmd Regenerate the portable game-project JSON Schema
 game:schema() {
-	tsx src/engine/cli/arkini.ts game schema --output game/arkini/schema.json
+	tsx src/arkini-cli/arkini.ts game schema --output game/arkini/schema.json
 }
 
 # @cmd Set the repository package version without creating a Git tag
@@ -328,7 +328,7 @@ test() {
 platform-check() {
 	build
 	run_tests \
-		test/engine/filesystem \
+		test/filesystem-write \
 		test/game-persistence/fx/createFilesystemGameSaveFilesFx.test.ts \
 		test/electron \
 		test/arkpack/artifact \

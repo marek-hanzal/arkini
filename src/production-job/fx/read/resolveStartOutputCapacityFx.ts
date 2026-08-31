@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { LineRun } from "~/production-line/type/LineRun";

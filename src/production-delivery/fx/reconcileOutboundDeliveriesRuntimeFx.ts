@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readDeliveryTravelDurationMsFn } from "~/production-delivery/fn/readDeliveryTravelDurationMsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterialInputEligibleFn";

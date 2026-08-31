@@ -21,6 +21,8 @@ const diagnosticTextFn = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
 		case "joint-output-accounting-unsupported":
 			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space.`;
+		case "witness-search-exhausted":
+			return `${diagnostic.routeId} exceeds the bounded complete-witness search of ${diagnostic.maximumStates} states.`;
 		case "quantity-limit-exceeded":
 			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
 		case "cycle":

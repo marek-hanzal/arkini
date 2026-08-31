@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledError";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { removeItemRuntimeTransitionFx } from "~/item-interaction/fx/removeItemRuntimeTransitionFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 

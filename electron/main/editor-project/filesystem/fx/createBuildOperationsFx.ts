@@ -19,9 +19,9 @@ import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArti
 import { withProjectLockFx } from "./withProjectLockFx";
 import { readProjectFilesFx } from "./readProjectFilesFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
+import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 type Operations = EditorBuildRepositoryService;
 

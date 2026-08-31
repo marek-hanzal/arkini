@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
@@ -11,8 +11,8 @@ import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnava
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";

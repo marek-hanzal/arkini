@@ -1,10 +1,10 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { TimeSchema } from "~/game-config/schema/TimeSchema";
 import { resolveInputRunFx } from "~/production-input/fx/run/resolveInputRunFx";
 import type { InputRun } from "~/production-input/type/InputRun";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";

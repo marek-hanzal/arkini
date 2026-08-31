@@ -13,7 +13,7 @@ import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
-import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
+import { readArkpackVersionFn } from "~/game-version/fn/readArkpackVersionFn";
 
 export namespace createGameFx {
 	export interface Props {

@@ -1,5 +1,5 @@
 import { Effect, Option, Result } from "effect";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";

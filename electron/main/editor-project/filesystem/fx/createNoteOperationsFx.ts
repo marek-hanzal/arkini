@@ -7,9 +7,9 @@ import type { EditorProjectRepositoryService } from "~/project-authoring/service
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { EditorProjectNoteFileSchema } from "~/project-note/schema/EditorProjectNoteFileSchema";
 import { EditorNoteContentSchema, EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();

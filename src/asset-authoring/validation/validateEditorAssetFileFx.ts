@@ -5,8 +5,8 @@ import {
 	validatePngResourceFx,
 } from "~/renderer/resource/validatePngResourceFx";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 
 export interface EditorAssetFileInput {
 	readonly name: string;

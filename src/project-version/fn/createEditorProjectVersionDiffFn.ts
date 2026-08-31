@@ -19,7 +19,7 @@ interface EditorProjectVersionDiffSnapshot {
 	readonly scenarios: ReadonlyMap<string, string>;
 }
 
-const materializeContext = (
+const materializeContextFn = (
 	context: EditorProjectCompatibilityContext,
 	path: string,
 ): EditorProjectVersionValueChange => {
@@ -44,7 +44,7 @@ const materializeContext = (
 	};
 };
 
-const readContextItemUid = (
+const readContextItemUidFn = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
 	context: EditorProjectCompatibilityContext,
@@ -55,7 +55,7 @@ const readContextItemUid = (
 	return after[itemId]?.uid ?? before[itemId]?.uid ?? itemId;
 };
 
-const readItemDiffs = (
+const readItemDiffsFn = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
 	contexts: ReadonlyArray<EditorProjectCompatibilityContext>,
@@ -76,9 +76,9 @@ const readItemDiffs = (
 	for (const context of contexts) {
 		if (context.path[0] !== "items" || typeof context.path[1] !== "string") continue;
 		const itemId = context.path[1];
-		const uid = readContextItemUid(before, after, context, itemId);
+		const uid = readContextItemUidFn(before, after, context, itemId);
 		const values = changesByUid.get(uid) ?? [];
-		values.push(materializeContext(context, context.path.slice(2).join(".")));
+		values.push(materializeContextFn(context, context.path.slice(2).join(".")));
 		changesByUid.set(uid, values);
 	}
 	return Array.from(changesByUid, ([uid, values]) => ({
@@ -93,7 +93,7 @@ const readItemDiffs = (
 	}));
 };
 
-const readBinaryDiffs = (
+const readBinaryDiffsFn = (
 	before: ReadonlyMap<string, string>,
 	after: ReadonlyMap<string, string>,
 	bump?: EditorProjectCompatibilityDiffResult,
@@ -148,7 +148,7 @@ export const createEditorProjectVersionDiffFn = (
 		...compatibility.context
 			.filter(({ path }) => path[0] !== "items")
 			.map((context) =>
-				materializeContext(
+				materializeContextFn(
 					context,
 					[
 						"config",
@@ -157,9 +157,9 @@ export const createEditorProjectVersionDiffFn = (
 				),
 			),
 	];
-	const items = readItemDiffs(before.config.items, after.config.items, compatibility.context);
-	const resources = readBinaryDiffs(before.resources, after.resources, "minor");
-	const scenarios = readBinaryDiffs(before.scenarios, after.scenarios);
+	const items = readItemDiffsFn(before.config.items, after.config.items, compatibility.context);
+	const resources = readBinaryDiffsFn(before.resources, after.resources, "minor");
+	const scenarios = readBinaryDiffsFn(before.scenarios, after.scenarios);
 	return {
 		from,
 		to,

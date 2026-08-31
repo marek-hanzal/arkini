@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { TimeSchema } from "~/game-config/schema/TimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
@@ -12,7 +12,7 @@ import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacity
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

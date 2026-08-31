@@ -10,7 +10,7 @@ import {
 } from "~/project-authoring/service/ProjectRepository";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 	loadArkpackFx: vi.fn(),

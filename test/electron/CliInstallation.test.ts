@@ -6,7 +6,7 @@ import { promisify } from "node:util";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createInstallationFx } from "../../electron/main/cli/createInstallationFx";
+import { createInstallationFx } from "~electron/main/cli/createInstallationFx";
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);

@@ -7,7 +7,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 export const testArkpackConfig = GameConfigSchema.parse({
 	resources: {

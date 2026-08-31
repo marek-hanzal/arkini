@@ -1,9 +1,9 @@
 import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent, type WebContents } from "electron";
 import { Effect, Semaphore } from "effect";
 
-import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
-import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import type { TrustedRenderer } from "../../security/TrustedRenderer";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
+import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";

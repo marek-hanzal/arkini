@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, Menu, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
-import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
+import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";

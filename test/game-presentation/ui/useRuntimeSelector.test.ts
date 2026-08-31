@@ -13,7 +13,7 @@ import { useGameFx } from "~test/support/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import {
 	type TestGameTransitionFields,
 	makeTestGameTransitionFieldsFx,

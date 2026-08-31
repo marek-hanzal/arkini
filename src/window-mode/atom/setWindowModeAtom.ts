@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { writeWindowModeFx } from "~/window-mode/fx/writeWindowModeFx";
 

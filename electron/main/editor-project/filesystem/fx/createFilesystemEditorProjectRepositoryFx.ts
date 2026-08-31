@@ -1,7 +1,7 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, Path, Semaphore } from "effect";
 
-import type { OwnedEditorProjectRepository } from "../../EditorProjectServiceOwnership";
+import type { OwnedEditorProjectRepository } from "~electron/main/editor-project/EditorProjectServiceOwnership";
 import type { ProjectState } from "../ProjectState";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";

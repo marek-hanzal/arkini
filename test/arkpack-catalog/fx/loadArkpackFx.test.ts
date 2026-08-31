@@ -7,7 +7,7 @@ import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 
 beforeEach(installTestPngDecoder);

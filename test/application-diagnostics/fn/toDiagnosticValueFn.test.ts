@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DiagnosticRecordSchema } from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import { DiagnosticRecordSchema } from "~electron/contract/diagnostics/DiagnosticRecord";
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 
 describe("toDiagnosticValueFn", () => {

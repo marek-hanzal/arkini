@@ -7,8 +7,8 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
-import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";

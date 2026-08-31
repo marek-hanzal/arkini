@@ -3,12 +3,12 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { createElectronProjectRepositoryFx } from "~/project-authoring/fx/createElectronProjectRepositoryFx";
 import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => ({
 	type: "success",

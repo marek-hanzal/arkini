@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createFilesystemWriteFx } from "../../src/filesystem-write/fx/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 const helper = join(import.meta.dirname, "FilesystemWrite.test", "lock-holder.ts");
 const tsx = join(process.cwd(), "node_modules", "tsx", "dist", "cli.mjs");

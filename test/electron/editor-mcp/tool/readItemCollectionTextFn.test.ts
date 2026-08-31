@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { readItemCollectionTextFn } from "../../../../electron/main/editor-mcp/tool/fn/readItemCollectionTextFn";
+import { readItemCollectionTextFn } from "~electron/main/editor-mcp/tool/fn/readItemCollectionTextFn";
 import { createGraphProject } from "./support/createToolProject";
 
 describe("readItemCollectionTextFn", () => {

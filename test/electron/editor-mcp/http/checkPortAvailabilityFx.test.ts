@@ -2,7 +2,7 @@ import { createServer, type Server } from "node:net";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { checkPortAvailabilityFx } from "../../../../electron/main/editor-mcp/http/checkPortAvailabilityFx";
+import { checkPortAvailabilityFx } from "~electron/main/editor-mcp/http/checkPortAvailabilityFx";
 
 const servers = new Set<Server>();
 

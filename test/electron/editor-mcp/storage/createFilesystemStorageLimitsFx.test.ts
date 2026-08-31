@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createFilesystemEditorMcpStorageFx } from "../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
+import { createFilesystemEditorMcpStorageFx } from "~electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 
 const directories: string[] = [];
 

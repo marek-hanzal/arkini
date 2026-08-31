@@ -1,5 +1,5 @@
 import { Effect, Semaphore } from "effect";
-import { CheatAvailabilitySchema } from "../../../electron/contract/cheat/CheatAvailabilitySchema";
+import { CheatAvailabilitySchema } from "~electron/contract/cheat/CheatAvailabilitySchema";
 
 const writeSemaphore = Semaphore.makeUnsafe(1);
 

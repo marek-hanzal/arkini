@@ -1,7 +1,7 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { WindowModeSchema } from "../../contract/window/WindowModeSchema";
+import { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";

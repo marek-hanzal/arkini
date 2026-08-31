@@ -9,10 +9,10 @@ import { Effect } from "effect";
 import {
 	createEditorMcpOwnershipFx,
 	type ServerOwnership,
-} from "../../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
-import { createFilesystemEditorMcpStorageFx } from "../../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
-import { createFilesystemEditorProjectRepositoryFx } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
-import type { OwnedEditorProjectRepository } from "../../../../../electron/main/editor-project/EditorProjectServiceOwnership";
+} from "~electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
+import { createFilesystemEditorMcpStorageFx } from "~electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
+import { createFilesystemEditorProjectRepositoryFx } from "~electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
+import type { OwnedEditorProjectRepository } from "~electron/main/editor-project/EditorProjectServiceOwnership";
 
 const cleanups: Array<() => Promise<void> | void> = [];
 

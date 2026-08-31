@@ -4,8 +4,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { FolderOutput } from "lucide-react";
 import { useCallback, useRef } from "react";
 
-import { EditorSourceExportSchema } from "../../../electron/contract/editor/EditorSourceExportSchema";
-import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import { EditorSourceExportSchema } from "~electron/contract/editor/EditorSourceExportSchema";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { Button, PrimaryButton } from "~/ui/ui/Button";

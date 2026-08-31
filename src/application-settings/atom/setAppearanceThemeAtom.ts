@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
-import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import { writeAppearanceThemeFx } from "~/application-settings/fx/writeAppearanceThemeFx";
 
 const rollbackAppearanceThemeFx = Effect.fn("rollbackAppearanceThemeFx")(

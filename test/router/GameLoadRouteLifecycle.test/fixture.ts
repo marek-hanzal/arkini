@@ -6,8 +6,8 @@ import { createRoot } from "react-dom/client";
 import { expect, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import type { Game } from "~/installed-game/type/Game";

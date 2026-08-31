@@ -3,7 +3,7 @@ import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
-import { checkRemoteEndpointFx } from "../../../../electron/main/editor-mcp/http/checkRemoteEndpointFx";
+import { checkRemoteEndpointFx } from "~electron/main/editor-mcp/http/checkRemoteEndpointFx";
 
 afterEach(() => vi.unstubAllGlobals());
 

@@ -5,7 +5,7 @@ import { importArkpackFx } from "~/arkpack-catalog/fx/importArkpackFx";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import {
 	createTestPngBytes,

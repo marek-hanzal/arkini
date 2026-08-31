@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { RendererDevelopmentServer } from "../../electron/security/RendererDevelopmentUrl";
-import { parseRendererDevelopmentUrlFx } from "../../electron/security/parseRendererDevelopmentUrlFx";
+import { RendererDevelopmentServer } from "~electron/security/RendererDevelopmentUrl";
+import { parseRendererDevelopmentUrlFx } from "~electron/security/parseRendererDevelopmentUrlFx";
 
 describe("RendererDevelopmentUrl", () => {
 	it("derives the exact HTTP and HMR endpoints from one configured URL", () => {

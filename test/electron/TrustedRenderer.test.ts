@@ -1,7 +1,7 @@
 import type { BrowserWindow, IpcMainEvent, Session, WebContents, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { createTrustedRendererFx } from "../../electron/main/security/createTrustedRendererFx";
+import { createTrustedRendererFx } from "~electron/main/security/createTrustedRendererFx";
 
 const createWindowHarness = (mainFrameUrl: string) => {
 	const listeners = new Map<string, Set<(event: never) => void>>();

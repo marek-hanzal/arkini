@@ -1,4 +1,4 @@
-import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
+import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { afterEach, describe, expect, it } from "vitest";
 import {
 	cleanupRegisteredIpcHarnesses,

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 export const JobQueueExceededIssueSchema = z

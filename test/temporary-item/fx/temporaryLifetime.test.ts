@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
-import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
@@ -16,8 +16,8 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/game-runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
+import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/game-runtime/schema/ItemTemporaryDurationIssueReasonEnumSchema";
 
 const config = createTemporaryLifetimeTestConfig();
 

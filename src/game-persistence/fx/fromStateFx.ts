@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { assertRuntimeFx } from "~/game-runtime/check/assertRuntimeFx";
+import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";

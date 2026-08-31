@@ -6,8 +6,8 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 const config = GameConfigSchema.parse({
 	resources: {

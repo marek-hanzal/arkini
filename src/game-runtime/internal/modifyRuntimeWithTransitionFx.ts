@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { assertRuntimeFx } from "~/game-runtime/check/assertRuntimeFx";
+import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

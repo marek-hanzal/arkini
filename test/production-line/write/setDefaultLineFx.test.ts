@@ -6,7 +6,7 @@ import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLines
 import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
-import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
@@ -14,7 +14,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/check/DefaultLineIssueReasonEnumSchema";
 
 const line = (id: string, title: string, isDefault = false) => ({

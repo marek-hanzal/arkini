@@ -5,7 +5,7 @@ import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
-import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -16,8 +16,8 @@ import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { ItemChargesIssueReasonEnumSchema } from "~/game-runtime/schema/check/ItemChargesIssueReasonEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
+import { ItemChargesIssueReasonEnumSchema } from "~/game-runtime/schema/ItemChargesIssueReasonEnumSchema";
 
 export {
 	Effect,

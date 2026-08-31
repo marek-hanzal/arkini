@@ -1,6 +1,6 @@
 import { Option } from "effect";
 
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { DuplicateJobIdIssueSchema } from "~/production-job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/production-job/schema/JobLineMissingIssueSchema";

@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { RuntimeCheckResultSchema } from "~/game-runtime/schema/check/RuntimeCheckResultSchema";
+import type { RuntimeCheckResultSchema } from "~/game-runtime/schema/RuntimeCheckResultSchema";
 
 /**
  * A candidate runtime snapshot violates one or more explicit runtime rules.

@@ -2,7 +2,7 @@ import { Effect, Layer } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { assertRuntimeFx } from "~/game-runtime/check/assertRuntimeFx";
+import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { fromConfigFx } from "~/game-runtime/fx/fromConfigFx";

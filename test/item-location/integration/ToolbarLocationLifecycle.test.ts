@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
@@ -17,7 +17,7 @@ import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 

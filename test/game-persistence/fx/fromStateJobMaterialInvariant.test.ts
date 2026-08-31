@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 const config = createJobTestConfig();
 const job = {

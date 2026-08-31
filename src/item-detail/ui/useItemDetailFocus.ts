@@ -1,7 +1,7 @@
 import { type RefObject, useEffect, useLayoutEffect, useRef } from "react";
 
 import type { ItemDetailState } from "~/item-detail-frame/type/ItemDetailControl";
-import { overlayFocusableSelector } from "~/ui/focus/overlayFocusableSelector";
+import { overlayFocusableSelector } from "~/ui/constant/overlayFocusableSelector";
 
 export namespace useItemDetailFocus {
 	export interface Props {

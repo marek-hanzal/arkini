@@ -106,7 +106,8 @@ src/application-shell  renderer root context, fatal surface and shared route tra
 src/window-mode  native window-mode state, persistence and Electron-confirmed synchronization
 src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
 src/authoring-form  shared Editor form registry and canonical authored Item-reference controls
-src/ui        cross-product primitives and general controls only
+src/editor-control  shared Editor field, form-section and value controls
+src/ui        cross-product presentation primitives only
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

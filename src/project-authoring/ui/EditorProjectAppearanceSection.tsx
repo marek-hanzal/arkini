@@ -1,9 +1,9 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { EditorProjectAvatarKeys } from "~/project-authoring/schema/EditorProjectFormSchema";
-import { Button } from "~/ui/button/Button";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
+import { Button } from "~/ui/ui/Button";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useEditorProjectFormSession } from "~/project-authoring/ui/EditorProjectFormContext";
 
 export const EditorProjectAppearanceSection = ({

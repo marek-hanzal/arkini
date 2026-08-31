@@ -1,6 +1,6 @@
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorLineInput } from "~/production-line-authoring/ui/EditorLineInput";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";

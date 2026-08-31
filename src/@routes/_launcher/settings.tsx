@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 
-import { BackButton } from "~/ui/button/BackButton";
-import { ButtonLink } from "~/ui/button/Button";
+import { BackButton } from "~/ui/ui/BackButton";
+import { ButtonLink } from "~/ui/ui/Button";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 import { ModelProvider } from "~/application-settings/ui/ModelContext";
 import { useSettingsModel } from "~/application-settings/ui/useSettingsModel";

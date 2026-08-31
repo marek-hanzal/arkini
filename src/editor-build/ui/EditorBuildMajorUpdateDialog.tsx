@@ -1,5 +1,5 @@
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
-import { Button, DangerButton } from "~/ui/button/Button";
+import { Button, DangerButton } from "~/ui/ui/Button";
 
 /** Warns before replacing an installed package across its save compatibility boundary. */
 export const EditorBuildMajorUpdateDialog = ({

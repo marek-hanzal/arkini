@@ -2,7 +2,7 @@ import { RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
 import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 
-import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
+import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 import { EditorMcpCopyableUrl, EditorMcpCopyButton } from "./EditorMcpCopy";
 import { EditorMcpStatus, type EditorMcpStatusTone } from "./EditorMcpStatus";
 

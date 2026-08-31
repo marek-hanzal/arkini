@@ -7,9 +7,9 @@ import type {
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/project-authoring/ui/EditorArkpackImportButton";
-import { BackButton } from "~/ui/button/BackButton";
-import { Button } from "~/ui/button/Button";
-import { LinkButton } from "~/ui/button/LinkButton";
+import { BackButton } from "~/ui/ui/BackButton";
+import { Button } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { EditorRecentProjects } from "~/project-authoring/ui/EditorRecentProjects";
 import { EditorProjectDeleteDialog } from "~/project-authoring/ui/EditorProjectDeleteDialog";
 import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";

@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/react-form";
 
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorProjectStartGrid } from "~/project-authoring/ui/EditorProjectStartGrid";
 import { useEditorProjectFormSession } from "~/project-authoring/ui/EditorProjectFormContext";
 

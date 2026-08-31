@@ -1,6 +1,6 @@
 import { useCheatItemSpotlightController } from "~/game-cheat/ui/useCheatItemSpotlightController";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { ItemSpotlight } from "~/ui/search/ItemSpotlight";
+import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
 
 interface CheatItemSpotlightProps extends useCheatItemSpotlightController.Props {}
 

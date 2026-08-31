@@ -1,13 +1,16 @@
 import { X } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { type EditorSearchOption, EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
+import {
+	type EditorSearchOption,
+	EditorSearchCombobox,
+} from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import { useEffect, useState } from "react";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { OriginFlow } from "~/flow-canvas/ui/OriginFlow";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";

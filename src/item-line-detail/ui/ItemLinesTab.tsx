@@ -11,7 +11,7 @@ import { ItemLineRow } from "~/item-line-detail/ui/ItemLineRow";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { Scrollable } from "~/ui/scrollable/Scrollable";
+import { Scrollable } from "~/ui/ui/Scrollable";
 
 const autoFocusPadding = 12;
 const autoFocusLayoutAttempts = 24;

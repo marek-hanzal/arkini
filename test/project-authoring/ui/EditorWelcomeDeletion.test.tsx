@@ -32,8 +32,8 @@ vi.mock("~/project-authoring/ui/useEditorWelcomeActions", () => ({
 	useEditorWelcomeActions: () => actions,
 }));
 
-vi.mock("~/ui/button/Button", async (importOriginal) => {
-	const original = await importOriginal<typeof import("~/ui/button/Button")>();
+vi.mock("~/ui/ui/Button", async (importOriginal) => {
+	const original = await importOriginal<typeof import("~/ui/ui/Button")>();
 	return {
 		...original,
 		ButtonLink: ({

@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorOutputControl } from "~/production-line-authoring/ui/EditorOutputControl";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 

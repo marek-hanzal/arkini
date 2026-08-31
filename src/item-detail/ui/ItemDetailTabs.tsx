@@ -3,7 +3,7 @@ import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDeta
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 
 const tabLabel = {
 	info: "Info",

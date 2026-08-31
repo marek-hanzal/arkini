@@ -2,7 +2,7 @@ import type { AnyRouter, RegisteredRouter } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { ButtonLink, type ButtonLinkProps } from "~/ui/button/Button";
+import { ButtonLink, type ButtonLinkProps } from "~/ui/ui/Button";
 import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
 
 const editorBackLinkClassName =

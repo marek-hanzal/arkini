@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
-import { useOverlayFocus } from "~/ui/focus/useOverlayFocus";
+import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
+import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 
 type UnsavedChangesState = ReturnType<
 	ReturnType<typeof useEditorUnsavedChangesOwner>["getSnapshot"]

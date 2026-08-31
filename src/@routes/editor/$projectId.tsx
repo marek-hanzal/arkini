@@ -6,7 +6,7 @@ import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectProvider } from "~/authoring-session/ui/useEditorProject";
 import { readEditorProjectFx } from "~/project-authoring/fx/readEditorProjectFx";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/ui/EditorShell";
 import { EditorProjectResourceUrlProvider } from "~/asset-authoring/ui/EditorResourceUrlSession";

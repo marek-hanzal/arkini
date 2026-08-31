@@ -1,6 +1,6 @@
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
-import { Fact, FactList } from "~/ui/fact/FactList";
+import { Fact, FactList } from "~/ui/ui/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 
 export const EditorAssetTechnical = ({ resourceId }: { readonly resourceId: string }) => {

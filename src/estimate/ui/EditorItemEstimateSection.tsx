@@ -9,8 +9,8 @@ import type { EditorAcquisitionLimitation } from "~/flow/type/EditorAcquisitionG
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { EditorItemEstimateRouteGraph } from "~/estimate/ui/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/estimate/ui/useEditorItemEstimate";
-import { Tooltip } from "~/ui/overlay/Tooltip";
-import { Status } from "~/ui/status/Status";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import { Status } from "~/ui/ui/Status";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");

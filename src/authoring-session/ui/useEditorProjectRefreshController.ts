@@ -7,7 +7,7 @@ import { EditorProjectRepository } from "~/project-authoring/service/EditorProje
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const readErrorMessageFn = (error: unknown) =>
 	error instanceof Error ? error.message : String(error);

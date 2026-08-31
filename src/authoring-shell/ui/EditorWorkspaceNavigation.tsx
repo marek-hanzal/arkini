@@ -6,9 +6,9 @@ import {
 	EditorWorkspaceRoutes,
 	type EditorWorkspaceId,
 } from "~/authoring-shell/ui/useEditorActiveWorkspace";
-import { Button, ButtonLink } from "~/ui/button/Button";
+import { Button, ButtonLink } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { Tooltip } from "~/ui/ui/Tooltip";
 
 const tabClassName =
 	"ak-editor-workspace-tab size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none transition-none hover:bg-surface-raised";

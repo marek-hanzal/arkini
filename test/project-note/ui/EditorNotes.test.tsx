@@ -19,7 +19,7 @@ vi.mock("~/project-note/atom/EditorNotesCommandAtoms", async () => {
 		EditorNotesCommandAtoms: EditorNotesTestCommandAtoms,
 	};
 });
-vi.mock("~/ui/overlay/Tooltip", () => ({
+vi.mock("~/ui/ui/Tooltip", () => ({
 	Tooltip: ({
 		children,
 		content,

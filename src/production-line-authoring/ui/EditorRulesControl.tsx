@@ -8,14 +8,14 @@ import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/Ed
 import { EditorBoardDistanceControl } from "~/production-line-authoring/ui/EditorBoardDistanceControl";
 import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import {
 	EditorChoiceControl,
 	EditorNumberControl,
 	EditorSecondsControl,
 	EditorTextControl,
-} from "~/ui/form/EditorValueControls";
+} from "~/editor-control/ui/EditorValueControls";
 
 type EditorRule = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type EditorRuleType = LineRuleSchema.Type["type"];

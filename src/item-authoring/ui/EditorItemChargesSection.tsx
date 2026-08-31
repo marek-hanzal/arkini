@@ -1,12 +1,12 @@
 import { BatteryCharging, PackagePlus, Trash2 } from "lucide-react";
 
-import { Button } from "~/ui/button/Button";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { Button } from "~/ui/ui/Button";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
 import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { Tooltip } from "~/ui/ui/Tooltip";
 
 export const EditorItemChargesSection = () => {
 	const { form } = useEditorItemFormSession();

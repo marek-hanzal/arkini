@@ -4,7 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorItemTypePresentation } from "~/item-authoring/ui/EditorItemTypePresentation";
 

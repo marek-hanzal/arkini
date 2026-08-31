@@ -2,8 +2,8 @@ import { ChevronRight } from "lucide-react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
-import { ItemIdentity } from "~/ui/item/ItemIdentity";
-import { Scrollable } from "~/ui/scrollable/Scrollable";
+import { ItemIdentity } from "~/ui/ui/ItemIdentity";
+import { Scrollable } from "~/ui/ui/Scrollable";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 
 interface ItemDetailSource {

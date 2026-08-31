@@ -10,7 +10,7 @@ import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRu
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { ItemIdentity } from "~/ui/item/ItemIdentity";
+import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 
 type QueueProjection = Extract<
 	useRuntimeItemDetailSceneController.QueueProjection,

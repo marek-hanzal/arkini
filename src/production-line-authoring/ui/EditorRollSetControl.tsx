@@ -10,12 +10,12 @@ import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesCo
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { Tooltip } from "~/ui/ui/Tooltip";
 
 type EditorDropListValue = [
 	DropSchema.Type,

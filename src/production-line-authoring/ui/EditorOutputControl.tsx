@@ -1,7 +1,7 @@
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 import { EditorRollSetControl } from "~/production-line-authoring/ui/EditorRollSetControl";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";

@@ -1,5 +1,5 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 

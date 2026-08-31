@@ -1,5 +1,5 @@
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
-import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 
 const boardDistanceOptions = [
 	{

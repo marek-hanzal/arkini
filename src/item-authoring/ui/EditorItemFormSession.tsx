@@ -5,7 +5,7 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
-import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
+import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/item-authoring/ui/EditorItemFormContext";
 import { EditorItemSectionLink } from "~/item-authoring/ui/EditorItemSectionLink";
 import type {

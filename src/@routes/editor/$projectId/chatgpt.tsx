@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CloudOff, FileWarning, LoaderCircle } from "lucide-react";
 
-import { Button } from "~/ui/button/Button";
+import { Button } from "~/ui/ui/Button";
 import { EditorChatGptAssetConfirmation } from "~/chatgpt-asset-authoring/ui/EditorChatGptAssetConfirmation";
 import { useEditorChatGptController } from "~/chatgpt-asset-authoring/ui/useEditorChatGptController";
-import { Status } from "~/ui/status/Status";
+import { Status } from "~/ui/ui/Status";
 
 export const Route = createFileRoute("/editor/$projectId/chatgpt")({
 	component: () => {

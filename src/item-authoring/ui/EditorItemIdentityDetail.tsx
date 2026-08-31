@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
-import { Fact, FactList } from "~/ui/fact/FactList";
+import { Fact, FactList } from "~/ui/ui/FactList";
 
 /** Presents the authored identity and storage contract of one item. */
 export const EditorItemIdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => (

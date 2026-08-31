@@ -10,7 +10,7 @@ import {
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";
 
 const readErrorMessageFn = (error: unknown) =>

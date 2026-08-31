@@ -20,7 +20,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { createItemDetailControllerFx } from "~/item-detail-frame/fx/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/item-detail-frame/context/ItemDetailContext";
 import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailControl";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and

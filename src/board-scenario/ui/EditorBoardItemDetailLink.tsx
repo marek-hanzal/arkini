@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 
 /** Adds Editor navigation around the shared gameplay Item Detail identity. */

@@ -7,8 +7,8 @@ import {
 import { ItemQueueActiveSlot, ItemQueueRequestList } from "~/item-detail/ui/ItemQueueWork";
 import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
-import { LinkButton } from "~/ui/button/LinkButton";
-import { Scrollable } from "~/ui/scrollable/Scrollable";
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { Scrollable } from "~/ui/ui/Scrollable";
 
 type QueueProjection = Extract<
 	useRuntimeItemDetailSceneController.QueueProjection,

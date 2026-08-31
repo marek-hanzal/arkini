@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import { Fragment } from "react";
 
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
-import { useOverlayFocus } from "~/ui/focus/useOverlayFocus";
+import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 
 interface CanvasShortcutHelpProps {
 	readonly direction: OriginFlowDirection;

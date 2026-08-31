@@ -8,7 +8,7 @@ import { openUserArkpackDirectoryAtom } from "~/arkpack-selector/atom/openUserAr
 import { refreshArkpackCatalogAtom } from "~/arkpack-selector/atom/refreshArkpackCatalogAtom";
 import { removeArkpackAtom } from "~/arkpack-selector/atom/removeArkpackAtom";
 import { useArkpacks } from "~/arkpack-selector/ui/useArkpacks";
-import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
+import { useExclusiveAction } from "~/ui/ui/useExclusiveAction";
 
 type BusyAction = "editor" | "import" | "open-directory" | "refresh" | "remove";
 type ActiveAction = BusyAction | "exit";

@@ -1,6 +1,6 @@
-import { useFieldContext } from "~/ui/form/EditorFormContexts";
-import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
-import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
+import { useFieldContext } from "~/editor-control/ui/EditorFormContexts";
+import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
+import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 

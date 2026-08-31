@@ -1,10 +1,10 @@
 import { Combine } from "lucide-react";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorItemMergeDraftDefault } from "~/item-authoring/ui/EditorItemMergeDraftDefault";
 import { EditorMergeField } from "~/item-authoring/ui/EditorMergeField";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";

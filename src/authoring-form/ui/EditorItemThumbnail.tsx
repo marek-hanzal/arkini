@@ -1,5 +1,5 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ItemArtwork } from "~/ui/item/ItemArtwork";
+import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 import { twMerge } from "tailwind-merge";
 

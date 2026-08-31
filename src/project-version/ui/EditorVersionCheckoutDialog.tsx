@@ -1,5 +1,5 @@
 import type { EditorProjectVersionDescriptor } from "~/project-version/type/EditorProjectVersion";
-import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
+import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 
 export const EditorVersionCheckoutDialog = ({
 	onCancel,

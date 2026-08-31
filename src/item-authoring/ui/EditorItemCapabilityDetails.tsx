@@ -3,7 +3,7 @@ import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { PrimaryButtonLink } from "~/ui/button/Button";
+import { PrimaryButtonLink } from "~/ui/ui/Button";
 import {
 	DetailFact,
 	DetailFacts,
@@ -12,7 +12,7 @@ import {
 import { OutputDetail } from "~/item-authoring/ui/EditorItemOutputDetail";
 import { EditorSelectorDetail } from "~/item-authoring/ui/EditorSelectorDetail";
 import type { EditorItemOptionalCapability } from "~/item-authoring/type/EditorItemSection";
-import { Status } from "~/ui/status/Status";
+import { Status } from "~/ui/ui/Status";
 
 const DisabledCapabilityDetail = ({
 	actionLabel,

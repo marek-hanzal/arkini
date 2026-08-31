@@ -1,7 +1,7 @@
 import { PackageOpen } from "lucide-react";
 import { useRef } from "react";
 
-import { Button } from "~/ui/button/Button";
+import { Button } from "~/ui/ui/Button";
 
 interface EditorArkpackImportButtonProps {
 	readonly blocked: boolean;

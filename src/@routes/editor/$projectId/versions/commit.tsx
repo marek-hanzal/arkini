@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CircleCheckBig } from "lucide-react";
 
-import { PrimaryButton } from "~/ui/button/Button";
-import { editorInputClassName } from "~/ui/form/EditorInputClassName";
-import { Status } from "~/ui/status/Status";
+import { PrimaryButton } from "~/ui/ui/Button";
+import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
+import { Status } from "~/ui/ui/Status";
 import { useEditorVersionCommitController } from "~/project-version/ui/useEditorVersionCommitController";
 
 interface EditorVersionCommitSearch {

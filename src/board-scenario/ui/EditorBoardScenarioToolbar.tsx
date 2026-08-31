@@ -3,9 +3,9 @@ import { Plus, Save, Trash2 } from "lucide-react";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { useEditorBoardScenarioToolbar } from "~/board-scenario/ui/useEditorBoardScenarioToolbar";
-import { Button } from "~/ui/button/Button";
+import { Button } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
+import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 
 /** Presents the explicit named scenario selector without owning persistence rules. */
 export const EditorBoardScenarioToolbar = ({

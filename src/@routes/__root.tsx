@@ -1,5 +1,5 @@
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
-import { Canvas } from "~/ui/canvas/Canvas";
+import { Canvas } from "~/ui/ui/Canvas";
 import { RootFatalErrorView } from "~/application-shell/ui/RootFatalErrorView";
 import type { RootContext } from "~/application-shell/context/RootContext";
 

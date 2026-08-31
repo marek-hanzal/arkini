@@ -1,16 +1,16 @@
 import { createFormHook } from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
 
-import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
-import { fieldContext, formContext, useFieldContext } from "~/ui/form/EditorFormContexts";
+import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
+import { fieldContext, formContext, useFieldContext } from "~/editor-control/ui/EditorFormContexts";
 import {
 	EditorChoiceControl,
 	EditorNumberControl,
 	EditorSecondsControl,
 	EditorTextAreaControl,
 	EditorTextControl,
-} from "~/ui/form/EditorValueControls";
-import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
+} from "~/editor-control/ui/EditorValueControls";
+import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { EditorItemAutocompleteField } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { EditorAssetAutocompleteField } from "~/asset-authoring/ui/EditorAssetAutocompleteField";
 

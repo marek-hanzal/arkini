@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
+import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobox";
 
 /** Builds one canonical-item Fuse corpus used by every item reference picker. */
 export const useEditorItemSearchOptions = () => {

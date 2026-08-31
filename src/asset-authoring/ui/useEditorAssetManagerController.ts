@@ -7,7 +7,7 @@ import { type ChangeEventHandler, type RefObject, useRef } from "react";
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
 
 export namespace useEditorAssetManagerController {

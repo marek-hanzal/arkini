@@ -20,7 +20,7 @@ import { saveEditorProjectConfigFx } from "~/project-authoring/fx/saveEditorProj
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 

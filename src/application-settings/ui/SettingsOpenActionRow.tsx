@@ -1,4 +1,4 @@
-import { Button } from "~/ui/button/Button";
+import { Button } from "~/ui/ui/Button";
 
 interface SettingsOpenActionRowProps {
 	readonly dataUi: string;

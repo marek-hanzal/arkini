@@ -32,7 +32,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	};
 });
 
-vi.mock("~/ui/button/Button", () => ({
+vi.mock("~/ui/ui/Button", () => ({
 	Button: ({
 		children,
 		cursorIntent: _cursorIntent,
@@ -83,7 +83,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/ui/reactivity/readSettledAsyncResultErrorFx", () => ({
+vi.mock("~/ui/fx/readSettledAsyncResultErrorFx", () => ({
 	readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),
 }));
 

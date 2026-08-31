@@ -1,4 +1,4 @@
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
 
 const scopeOptions = [

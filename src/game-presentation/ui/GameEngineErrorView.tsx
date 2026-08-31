@@ -1,7 +1,7 @@
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { ActionErrorPage } from "~/launcher/ui/ActionErrorPage";
-import { DangerButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import { DangerButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
 
 interface GameEngineErrorViewProps {
 	readonly error: unknown;

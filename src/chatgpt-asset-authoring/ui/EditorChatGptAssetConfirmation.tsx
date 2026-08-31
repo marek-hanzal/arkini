@@ -1,5 +1,5 @@
-import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
-import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
+import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import type { useEditorChatGptController } from "~/chatgpt-asset-authoring/ui/useEditorChatGptController";
 
 export const EditorChatGptAssetConfirmation = ({

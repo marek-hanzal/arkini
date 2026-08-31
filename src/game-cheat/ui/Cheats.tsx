@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import { Button } from "~/ui/button/Button";
+import { Button } from "~/ui/ui/Button";
 import type { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
 import type { updateGameCheatsAtom } from "~/game-cheat/atom/updateGameCheatsAtom";
 import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";

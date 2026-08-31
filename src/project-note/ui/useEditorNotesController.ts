@@ -9,7 +9,7 @@ import {
 	EditorNoteContentMaxLength,
 	type EditorNoteSchema,
 } from "~/project-note/schema/EditorNoteSchema";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 export namespace useEditorNotesController {
 	export interface Output {

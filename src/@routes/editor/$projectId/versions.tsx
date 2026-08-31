@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import {
 	editorSectionTabClassName,

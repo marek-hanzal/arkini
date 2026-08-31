@@ -2,8 +2,8 @@ import { Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
-import { ButtonLink } from "~/ui/button/Button";
-import { Status } from "~/ui/status/Status";
+import { ButtonLink } from "~/ui/ui/Button";
+import { Status } from "~/ui/ui/Status";
 
 export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }) => {
 	const project = useEditorProject();

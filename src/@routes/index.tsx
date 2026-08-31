@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import { PrimaryButton } from "~/ui/button/Button";
+import { PrimaryButton } from "~/ui/ui/Button";
 import { LauncherSplashCompletedAtom } from "~/launcher/atom/LauncherSplashCompletedAtom";
 import { LauncherScene } from "~/launcher/ui/LauncherScene";
 import { useStartupSplashLifecycle } from "~/launcher/ui/useStartupSplashLifecycle";

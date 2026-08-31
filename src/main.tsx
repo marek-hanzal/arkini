@@ -26,7 +26,7 @@ import {
 } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
 import "~/launcher/ui/launcher.css";
-import "~/ui/styles.css";
+import "~/main.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

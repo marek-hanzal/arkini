@@ -3,11 +3,11 @@ import { Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
 import type { EditorProjectVersionDescriptor } from "~/project-version/type/EditorProjectVersion";
-import { Button, DangerButton } from "~/ui/button/Button";
-import { LinkButton } from "~/ui/button/LinkButton";
-import { editorInputClassName } from "~/ui/form/EditorInputClassName";
-import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { Button, DangerButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
+import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import { EditorVersionCheckoutDialog } from "~/project-version/ui/EditorVersionCheckoutDialog";
 import { EditorVersionDiff } from "~/project-version/ui/EditorVersionDiff";
 import { EditorVersionGraph } from "~/project-version/ui/EditorVersionGraph";

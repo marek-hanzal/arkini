@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
-import { useFuseSearch } from "~/ui/search/useFuseSearch";
+import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
 type ItemLineAvailabilityFilter = "available" | "all";
 

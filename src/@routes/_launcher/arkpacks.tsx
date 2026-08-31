@@ -3,9 +3,9 @@ import { FolderOpen, PackageOpen, RefreshCw } from "lucide-react";
 
 import { ArkpackCatalogList } from "~/arkpack-selector/ui/ArkpackCatalogList";
 import { useArkpackSelectorActions } from "~/arkpack-selector/ui/useArkpackSelectorActions";
-import { BackButton } from "~/ui/button/BackButton";
-import { Button } from "~/ui/button/Button";
-import { LinkButton } from "~/ui/button/LinkButton";
+import { BackButton } from "~/ui/ui/BackButton";
+import { Button } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/_launcher/arkpacks")({

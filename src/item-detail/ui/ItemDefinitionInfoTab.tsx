@@ -2,8 +2,8 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
-import { Fact, FactList } from "~/ui/fact/FactList";
-import { Scrollable } from "~/ui/scrollable/Scrollable";
+import { Fact, FactList } from "~/ui/ui/FactList";
+import { Scrollable } from "~/ui/ui/Scrollable";
 
 type ItemDefinitionDetail = {
 	readonly itemId: IdSchema.Type;

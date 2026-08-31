@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Fact, FactList } from "~/ui/fact/FactList";
+import { Fact, FactList } from "~/ui/ui/FactList";
 
 export const DetailSection = ({
 	children,

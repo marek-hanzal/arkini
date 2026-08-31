@@ -1,9 +1,12 @@
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { useFieldContext } from "~/ui/form/EditorFormContexts";
-import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
-import { EditorSearchCombobox, type EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
+import { useFieldContext } from "~/editor-control/ui/EditorFormContexts";
+import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
+import {
+	EditorSearchCombobox,
+	type EditorSearchOption,
+} from "~/editor-control/ui/EditorSearchCombobox";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 
 interface EditorAssetAutocompleteFieldProps {

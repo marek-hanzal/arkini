@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Fact, FactList } from "~/ui/fact/FactList";
+import { Fact, FactList } from "~/ui/ui/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 

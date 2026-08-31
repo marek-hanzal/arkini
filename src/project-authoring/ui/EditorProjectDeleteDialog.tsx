@@ -1,6 +1,6 @@
 import type { EditorProjectOwnership } from "~/project-authoring/schema/EditorProjectCandidateSchema";
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
-import { Button, DangerButton } from "~/ui/button/Button";
+import { Button, DangerButton } from "~/ui/ui/Button";
 
 interface EditorProjectDeleteDialogProps {
 	readonly error?: unknown;

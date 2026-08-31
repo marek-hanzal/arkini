@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ChargeSchema } from "~/production-input/schema/ChargeSchema";
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

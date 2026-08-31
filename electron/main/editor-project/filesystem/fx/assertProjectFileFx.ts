@@ -1,6 +1,6 @@
 import { Effect, FileSystem } from "effect";
 
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 export const assertProjectFileFx = Effect.fn("assertProjectFileFx")(function* (
 	fileSystem: FileSystem.FileSystem,

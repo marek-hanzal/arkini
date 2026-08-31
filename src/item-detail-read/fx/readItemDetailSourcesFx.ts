@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";

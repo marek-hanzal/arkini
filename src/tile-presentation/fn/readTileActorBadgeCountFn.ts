@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 

@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
 import { editProjectFx } from "./editProjectFx";

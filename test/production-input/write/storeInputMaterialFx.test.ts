@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
-import { queryFx } from "~/engine/query/fx/queryFx";
+import { queryFx } from "~/item-query/fx/queryFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";

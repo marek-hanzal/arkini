@@ -1,15 +1,15 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
-import { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
-import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { ItemChargesUnavailableError } from "~/production-action/error/ItemChargesUnavailableError";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
+import { isolateGridStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx";
+import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";

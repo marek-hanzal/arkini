@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { completeJobTransitionFx } from "~/production-job/fx/completeJobTransitionFx";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";

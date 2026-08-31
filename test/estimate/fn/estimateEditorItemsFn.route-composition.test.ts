@@ -71,6 +71,165 @@ describe("estimateEditorItemsFn", () => {
 		});
 	});
 
+	it("selects globally compatible sibling routes against one finite root pool", () => {
+		const result = estimate(
+			graph({
+				facts: [
+					"raw",
+					"a",
+					"b",
+					"target",
+				],
+				roots: [
+					{
+						factId: "raw",
+						quantity: 1,
+					},
+				],
+				routes: [
+					route({
+						allOf: [
+							requirement("raw"),
+						],
+						durationMs: 0,
+						id: "a-fast",
+						output: "a",
+					}),
+					route({
+						durationMs: 11,
+						id: "a-slow",
+						output: "a",
+					}),
+					route({
+						allOf: [
+							requirement("raw"),
+						],
+						durationMs: 0,
+						id: "b-fast",
+						output: "b",
+					}),
+					route({
+						durationMs: 13,
+						id: "b-slow",
+						output: "b",
+					}),
+					route({
+						allOf: [
+							requirement("a"),
+							requirement("b"),
+						],
+						durationMs: 0,
+						id: "make-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 11,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected a globally compatible witness.");
+		expect(result.requirementSummary.consumed.filter(({ factId }) => factId === "raw")).toEqual(
+			[
+				{
+					factId: "raw",
+					quantity: 1,
+				},
+			],
+		);
+		expect(
+			result.routeSteps.map(({ factId, routeId }) => ({
+				factId,
+				routeId,
+			})),
+		).toEqual([
+			{
+				factId: "target",
+				routeId: "make-target",
+			},
+			{
+				factId: "a",
+				routeId: "a-slow",
+			},
+			{
+				factId: "b",
+				routeId: "b-fast",
+			},
+		]);
+	});
+
+	it("keeps bounded route states distinct for every valid exact route ID", () => {
+		const bChoiceKey = "route\u0000B";
+		const aFastRouteId = `P\u0002${bChoiceKey}\u0001Q`;
+		const bFastRouteId = `Q\u0002${bChoiceKey}\u0001R`;
+		const result = estimate(
+			graph({
+				facts: [
+					"raw",
+					"A",
+					"B",
+					"target",
+				],
+				roots: [
+					{
+						factId: "raw",
+						quantity: 1,
+					},
+				],
+				routes: [
+					route({
+						allOf: [
+							requirement("raw"),
+						],
+						durationMs: 0,
+						id: aFastRouteId,
+						output: "A",
+					}),
+					route({
+						allOf: [
+							requirement("raw"),
+						],
+						durationMs: 100,
+						id: "P",
+						output: "A",
+					}),
+					route({
+						allOf: [
+							requirement("raw"),
+						],
+						durationMs: 0,
+						id: bFastRouteId,
+						output: "B",
+					}),
+					route({
+						durationMs: 1,
+						id: "R",
+						output: "B",
+					}),
+					route({
+						allOf: [
+							requirement("A"),
+							requirement("B"),
+						],
+						durationMs: 0,
+						id: "make-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 1,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected collision-free route selection.");
+		expect(result.routeSteps.find(({ factId }) => factId === "A")?.routeId).toBe(aFastRouteId);
+		expect(result.routeSteps.find(({ factId }) => factId === "B")?.routeId).toBe("R");
+	});
+
 	it("selects one complete alternative in an any-of requirement", () => {
 		const result = estimate(
 			graph({

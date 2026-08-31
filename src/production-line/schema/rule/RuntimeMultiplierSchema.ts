@@ -1,9 +1,12 @@
 import { z } from "zod";
 
-import { PositiveNumberSchema } from "~/engine/common/schema/PositiveNumberSchema";
-
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
+
+const PositiveNumberSchema = z.number().positive().meta({
+	id: "PositiveNumberSchema",
+	description: "A number greater than zero.",
+});
 
 /**
  * A rule that multiplies a product line's runtime when its conditions pass.

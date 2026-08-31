@@ -1,12 +1,12 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readDeliveryTravelDurationMsFn } from "~/production-delivery/fn/readDeliveryTravelDurationMsFn";
 import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPhaseEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";

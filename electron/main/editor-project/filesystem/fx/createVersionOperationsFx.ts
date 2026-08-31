@@ -28,8 +28,8 @@ import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 
 type Operations = EditorProjectVersionRepositoryService;
 type Operation = EditorProjectRepositoryError["operation"];

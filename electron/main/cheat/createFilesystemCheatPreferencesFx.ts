@@ -5,7 +5,7 @@ import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilityS
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 /** Effect-native main-process capability for application-wide cheat-tool availability. */
 export interface CheatPreferences {

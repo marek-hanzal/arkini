@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 export const ArkiniSaveSchema = z
 	.object({

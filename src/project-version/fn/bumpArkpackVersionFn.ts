@@ -1,5 +1,5 @@
 import type { EditorProjectCompatibilityResult } from "~/project-version/type/EditorProjectCompatibility";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 const incrementDecimalDigitsFn = (digits: string) => {
 	const result = Array.from(digits);

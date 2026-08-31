@@ -44,6 +44,15 @@ describe("estimateEditorItemsFn", () => {
 			durationMs: 35,
 			obtainable: true,
 		});
+		if (!result.obtainable) throw new Error("Expected deterministic batch route.");
+		expect(result.requirementSummary.consumed).toContainEqual({
+			factId: "ore",
+			quantity: 9,
+		});
+		expect(result.routeSteps.find(({ factId }) => factId === "ingot")).toMatchObject({
+			actionRuns: 3,
+			outputRuns: 3,
+		});
 	});
 
 	it("charges shared one-time prerequisites once across selected siblings", () => {

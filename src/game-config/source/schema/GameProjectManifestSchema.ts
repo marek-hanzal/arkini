@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 
 /** Root marker required before a directory can be opened as a game project. */
 export const GameProjectManifestSchema = z

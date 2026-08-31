@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 /** A write targeted an item that no longer owns the expected grid location. */

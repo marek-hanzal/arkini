@@ -1,6 +1,6 @@
 import { Array, Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { isInputRuntimeItemFn } from "~/production-input/read/fn/isInputRuntimeItemFn";

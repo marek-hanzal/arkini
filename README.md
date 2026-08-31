@@ -22,15 +22,23 @@ Read the smallest entry point needed for the task:
 ## Repository map
 
 ```text
-src/game-runtime  canonical live Runtime schemas, cheat state, validation, identity, reads and atomic publication
+src/game-runtime  canonical live Runtime schemas, Item purity/stateful rejection, cheat state, validation, identity, reads and atomic publication
 src/game-session  package-independent Runtime/Tick/save execution, subscriptions, fail-stop and disposal lifecycle
 src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
 src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization and recovery
 src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
+src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
+src/application-version  Arkini writer provenance, major-only admission and incompatibility failure
+src/game-version  project-owned gameplay compatibility schema and major projection
 src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
+src/temporary-item  temporary lifetime advancement, expiry admission and atomic expiry output
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
-src/engine    remaining common values, item/temporary/query, filesystem, revision/version and CLI support owners
+src/item-query  canonical Runtime Item query execution across authored reach, scope and distance
+src/item-resolution  canonical configured Item lookup and exact not-found rejection
+src/item-revision  opaque live Item revisions, fresh creation and stale-write rejection
+src/item-state-isolation  atomic stateful-owner stack isolation and pure-remainder placement
+src/arkini-cli  product CLI process composition and its one Node runtime root
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections
@@ -43,11 +51,11 @@ src/tile-rendering  Pixi application/frame/texture lifecycle, native actors, vis
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
 src/tile-interaction  pointer gestures, drag/drop execution, gameplay command admission and cancellation
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
-src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
+src/item-location  grid coordinates, distance, runtime locations, claims and Board/grid location rejections
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
 src/item-merge  directional merge contracts, admission and atomic source/target lifecycle
 src/space-action  authored Space items and atomic activation/navigation
-src/production-action  immediate action admission, rules and charge settlement
+src/production-action  immediate action admission, rules, remaining-charge reads and settlement
 src/production-condition  authored runtime condition evaluation
 src/production-input  line-input schemas, material planning and storage lifecycle
 src/production-line  production-line definitions, rules, reads and run planning
@@ -55,10 +63,10 @@ src/production-line-authoring  controlled Line, Input, Rule and Output editor UI
 src/production-output  output, drop and roll schemas plus resolution policy
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, validation and settlement
-src/game-config  authored config, source, diagnostics, validation, resources and compiler
+src/game-config  authored value/config schemas, source, diagnostics, validation, resources and compiler
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation
-src/project-authoring  portable project model, repository contract, configuration and catalog workflows
+src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows
 src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls
 src/project-version  immutable version graph, compatibility policies and checkout workspace
 src/project-note  ordered project Notes contracts and workspace

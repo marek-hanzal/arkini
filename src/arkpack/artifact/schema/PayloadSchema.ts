@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 export const PayloadSchema = z
 	.object({

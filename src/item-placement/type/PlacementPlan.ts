@@ -1,5 +1,5 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 /** Every internal runtime mutation required to place one resolved drop atomically. */

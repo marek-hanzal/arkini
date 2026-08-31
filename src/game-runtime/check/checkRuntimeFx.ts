@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { isItemPureWithIndexFn } from "~/engine/item/fn/isItemPureWithIndexFn";
-import { readItemPurityIndexFn } from "~/engine/item/fn/readItemPurityIndexFn";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
+import { isItemPureWithIndexFn } from "~/game-runtime/read/fn/isItemPureWithIndexFn";
+import { readItemPurityIndexFn } from "~/game-runtime/read/fn/readItemPurityIndexFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

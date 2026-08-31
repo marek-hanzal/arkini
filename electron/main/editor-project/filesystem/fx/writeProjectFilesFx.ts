@@ -10,10 +10,10 @@ import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProje
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
 import { addGitignoreRulesFn } from "../fn/addGitignoreRulesFn";

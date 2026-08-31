@@ -5,7 +5,7 @@ import { WindowModeSchema } from "../../contract/window/WindowModeSchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 /** Effect-native main-process capability for the global native window mode. */
 export interface WindowPreferences {

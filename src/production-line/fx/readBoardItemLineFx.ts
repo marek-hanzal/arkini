@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";

@@ -1,10 +1,10 @@
 import { Array, Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobCompletionOwner } from "~/production-job/completion/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/production-job/completion/fx/completeLineJobRuntimeFx";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";

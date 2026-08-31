@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 
 /**
  * An operation requiring a fresh runtime received an already populated runtime.

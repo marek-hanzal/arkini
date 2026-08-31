@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
-import type { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { ItemChargesUnavailableError } from "~/production-action/error/ItemChargesUnavailableError";
+import type { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";

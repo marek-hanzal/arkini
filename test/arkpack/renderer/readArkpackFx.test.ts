@@ -13,7 +13,7 @@ import {
 	installTestPngDecoder,
 } from "~test/arkpack/support/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
+import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 
 const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 

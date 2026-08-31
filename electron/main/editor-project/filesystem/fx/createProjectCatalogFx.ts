@@ -4,9 +4,9 @@ import { Effect } from "effect";
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
 import { EditorProjectCatalogSchema } from "~/project-authoring/schema/EditorProjectCatalogSchema";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
-import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
+import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 const encoder = new TextEncoder();
 

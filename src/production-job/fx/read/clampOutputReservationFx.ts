@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 
 /** Removes non-positive entries after one complete output-reservation fold. */
 export const clampOutputReservationFx = Effect.fnUntraced(function* (

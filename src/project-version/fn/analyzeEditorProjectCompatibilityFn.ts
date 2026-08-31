@@ -383,7 +383,7 @@ const minorPathRules: ReadonlyArray<MinorPathRule> = [
 	},
 ];
 
-const matchesPath = (
+const matchesPathFn = (
 	path: EditorProjectCompatibilityPath,
 	pattern: ReadonlyArray<PathPatternSegment>,
 ) =>
@@ -395,7 +395,7 @@ const matchesPath = (
 			: segment === expected;
 	});
 
-const readChangedValues = (
+const readChangedValuesFn = (
 	diff: EditorProjectSemanticDiff,
 ): {
 	readonly after: unknown;
@@ -405,7 +405,7 @@ const readChangedValues = (
 	before: diff.operation === "add" ? undefined : diff.before,
 });
 
-const readSurfaceDecision = (
+const readSurfaceDecisionFn = (
 	diff: EditorProjectSemanticDiff,
 ): CompatibilityDecision | undefined => {
 	const surfacePaths: ReadonlyArray<ReadonlyArray<PathPatternSegment>> = [
@@ -434,8 +434,8 @@ const readSurfaceDecision = (
 			"toolbarSize",
 		],
 	];
-	if (!surfacePaths.some((path) => matchesPath(diff.path, path))) return undefined;
-	const { before, after } = readChangedValues(diff);
+	if (!surfacePaths.some((path) => matchesPathFn(diff.path, path))) return undefined;
+	const { before, after } = readChangedValuesFn(diff);
 	const beforeSize = typeof before === "number" ? before : 0;
 	const afterSize = typeof after === "number" ? after : 0;
 	return afterSize >= beforeSize
@@ -451,7 +451,7 @@ const readSurfaceDecision = (
 			};
 };
 
-const readTemporaryDurationDecision = (
+const readTemporaryDurationDecisionFn = (
 	diff: EditorProjectSemanticDiff,
 	previous: GameConfigSchema.Type,
 	next: GameConfigSchema.Type,
@@ -476,12 +476,12 @@ const readTemporaryDurationDecision = (
 	};
 };
 
-const classifyDiff = (
+const classifyDiffFn = (
 	diff: EditorProjectSemanticDiff,
 	previous: GameConfigSchema.Type,
 	next: GameConfigSchema.Type,
 ): CompatibilityDecision => {
-	const pathRule = minorPathRules.find((rule) => matchesPath(diff.path, rule.path));
+	const pathRule = minorPathRules.find((rule) => matchesPathFn(diff.path, rule.path));
 	if (pathRule !== undefined)
 		return {
 			message: pathRule.message,
@@ -489,8 +489,8 @@ const classifyDiff = (
 			rule: pathRule.rule,
 		};
 	return (
-		readTemporaryDurationDecision(diff, previous, next) ??
-		readSurfaceDecision(diff) ?? {
+		readTemporaryDurationDecisionFn(diff, previous, next) ??
+		readSurfaceDecisionFn(diff) ?? {
 			message: "No explicit minor compatibility rule admits this change.",
 			result: "major",
 			rule: "unclassified-change",
@@ -498,7 +498,7 @@ const classifyDiff = (
 	);
 };
 
-const attachDecision = (
+const attachDecisionFn = (
 	diff: EditorProjectSemanticDiff,
 	decision: CompatibilityDecision,
 ): EditorProjectCompatibilityContext => {
@@ -534,7 +534,9 @@ export const analyzeEditorProjectCompatibilityFn = (
 	next: GameConfigSchema.Type,
 ) => {
 	const diffs = readEditorProjectSemanticDiffsFn(previous, next);
-	const context = diffs.map((diff) => attachDecision(diff, classifyDiff(diff, previous, next)));
+	const context = diffs.map((diff) =>
+		attachDecisionFn(diff, classifyDiffFn(diff, previous, next)),
+	);
 	const compatibility: EditorProjectCompatibility = {
 		context,
 		result:

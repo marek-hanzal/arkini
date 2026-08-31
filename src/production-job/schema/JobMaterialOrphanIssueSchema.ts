@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
 import { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 

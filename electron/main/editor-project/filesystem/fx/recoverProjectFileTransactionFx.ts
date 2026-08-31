@@ -2,10 +2,10 @@ import { Effect, FileSystem, Path } from "effect";
 import { rmdir } from "node:fs/promises";
 import { z } from "zod";
 
-import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
-import { prepareFilesystemWriteTargetFx } from "~/engine/filesystem/prepareFilesystemWriteTargetFx";
+import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
+import { prepareFilesystemWriteTargetFx } from "~/filesystem-write/fx/prepareFilesystemWriteTargetFx";
 
 const recordSchema = z
 	.object({

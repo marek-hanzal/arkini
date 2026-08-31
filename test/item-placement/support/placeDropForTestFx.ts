@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { placeOutputForTestFx } from "~test/item-placement/support/placeOutputForTestFx";

@@ -1,8 +1,8 @@
 import { Data, Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -11,15 +11,15 @@ import { applyInputMaterialStorePlanFx } from "~/production-input/fx/applyInputM
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/read/readItemMaterialInputFx";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";

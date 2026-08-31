@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { TimeSchema } from "~/game-config/schema/TimeSchema";
 
 /** One active product-line run owned by one live runtime item. */
 export const JobSchema = z

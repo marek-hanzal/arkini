@@ -5,9 +5,9 @@ import {
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
 } from "~/project-version/schema/EditorProjectVersionMetadataSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { EditorObjectHashSchema } from "./EditorObjectHashSchema";
 
 /** User-authored metadata for one immutable version manifest. */

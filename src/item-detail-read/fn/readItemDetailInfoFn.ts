@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -63,7 +63,7 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies readItemDetailInfoFn.Result;
 
-const readLocation = (location: LocationSchema.Type): readItemDetailInfoFn.Location =>
+const readLocationFn = (location: LocationSchema.Type): readItemDetailInfoFn.Location =>
 	match(location)
 		.with(
 			{
@@ -138,7 +138,7 @@ export const readItemDetailInfoFn = ({
 		description: item.item.description,
 		itemType: item.item.type,
 		storageScope: item.item.scope,
-		location: readLocation(item.location),
+		location: readLocationFn(item.location),
 		quantity: item.quantity,
 		maxStackSize: item.item.maxStackSize,
 		ownedQuantity: runtime.items.reduce(

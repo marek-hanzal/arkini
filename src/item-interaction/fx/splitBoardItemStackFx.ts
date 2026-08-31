@@ -1,16 +1,16 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
+import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { ItemStackSplitUnavailableError } from "~/item-interaction/error/ItemStackSplitUnavailableError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";

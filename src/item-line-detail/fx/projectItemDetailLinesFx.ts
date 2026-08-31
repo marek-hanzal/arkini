@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { ItemDetailLines as EngineItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";

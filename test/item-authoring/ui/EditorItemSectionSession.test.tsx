@@ -5,6 +5,10 @@ import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } f
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+type MockButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+	readonly cursorIntent?: string;
+};
+
 vi.mock("@effect/atom-react", () => ({
 	scheduleTask: vi.fn(),
 	useAtomSet: () => state.saveItem,
@@ -20,11 +24,11 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 vi.mock("~/ui/button/Button", () => ({
-	Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
 	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
 		createElement("a", null, children),
-	PrimaryButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+	PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
 }));
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { PositionSchema } from "~/item-location/schema/PositionSchema";
 
 /** Defines one item instance at an explicit slot in the initial toolbar. */

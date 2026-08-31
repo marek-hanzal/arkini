@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";

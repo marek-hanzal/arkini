@@ -82,6 +82,113 @@ describe("estimateEditorItemsFn", () => {
 				routeId: "make-target",
 			},
 		});
+		if (!result.obtainable) throw new Error("Expected shared co-product route.");
+		expect(
+			result.requirementSummary.consumed.filter(({ factId }) => factId === "fuel"),
+		).toEqual([
+			{
+				factId: "fuel",
+				quantity: 1,
+			},
+		]);
+	});
+
+	it("compares locally cheap co-product routes by their joint critical path", () => {
+		const operation = {
+			id: "alternating-a-or-b",
+			inputs: [],
+			outputDistribution: [
+				{
+					probability: 0.5,
+					quantities: [
+						{
+							outputGroupId: "a",
+							quantity: 1,
+						},
+						{
+							outputGroupId: "b",
+							quantity: 0,
+						},
+					],
+				},
+				{
+					probability: 0.5,
+					quantities: [
+						{
+							outputGroupId: "a",
+							quantity: 0,
+						},
+						{
+							outputGroupId: "b",
+							quantity: 1,
+						},
+					],
+				},
+			],
+		} as const;
+		const makeSharedOutput = (factId: "a" | "b") =>
+			route({
+				durationMs: 1,
+				id: `z-shared-${factId}`,
+				operation,
+				operationOutputGroupId: factId,
+				output: factId,
+				quantityDistribution: [
+					{
+						probability: 0.5,
+						quantity: 0,
+					},
+					{
+						probability: 0.5,
+						quantity: 1,
+					},
+				],
+			});
+		const result = estimate(
+			graph({
+				facts: [
+					"a",
+					"b",
+					"target",
+				],
+				roots: [],
+				routes: [
+					makeSharedOutput("a"),
+					makeSharedOutput("b"),
+					route({
+						durationMs: 2.5,
+						id: "standalone-a",
+						output: "a",
+					}),
+					route({
+						durationMs: 2.5,
+						id: "standalone-b",
+						output: "b",
+					}),
+					route({
+						allOf: [
+							requirement("a"),
+							requirement("b"),
+						],
+						durationMs: 0,
+						id: "make-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 2.5,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected standalone sibling routes.");
+		expect(result.routeSteps.find(({ factId }) => factId === "a")?.routeId).toBe(
+			"standalone-a",
+		);
+		expect(result.routeSteps.find(({ factId }) => factId === "b")?.routeId).toBe(
+			"standalone-b",
+		);
 	});
 
 	it("ignores charge capacity while sharing co-product work", () => {

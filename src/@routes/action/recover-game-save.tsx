@@ -9,8 +9,8 @@ import { z } from "zod";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { ActionErrorPage } from "~/launcher/ui/ActionErrorPage";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 const GameSaveRecoverySearchSchema = z
 	.object({

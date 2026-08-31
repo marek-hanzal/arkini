@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
-import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorItemFx";
+import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 
 export const readItemDeleteImpactFx = Effect.fn("readItemDeleteImpactFx")(function* (
 	project: EditorProject,
@@ -10,7 +10,7 @@ export const readItemDeleteImpactFx = Effect.fn("readItemDeleteImpactFx")(functi
 ) {
 	const item = project.config.items[itemId];
 	if (item === undefined) return yield* Effect.fail(new Error(`Item ${itemId} does not exist.`));
-	const blockers = yield* readEditorItemDeleteBlockersFx({
+	const blockers = readEditorItemDeleteBlockersFn({
 		config: project.config,
 		itemId,
 	});

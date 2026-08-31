@@ -1,0 +1,76 @@
+import { Effect } from "effect";
+
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import type { PresentedPose } from "~/tile-rendering/service/ActorAnimator";
+import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
+import type { ActorPose } from "~/game-scene/type/ActorPose";
+
+interface CreateMotionPoseSamplerProps {
+	readonly actorBaseSize: number;
+	readonly from: Required<PresentedPose>;
+	readonly readLiveTarget?: () => Required<PresentedPose> | null;
+	readonly surface: MainSurface;
+	readonly target: ActorPose;
+	readonly targetLocation: Parameters<MainSurface["readLocationPoseFx"]>[0];
+}
+
+interface MotionPoseSampler {
+	readonly needsCompletionSettle: () => boolean;
+	readonly readPose: (progress: number) => PresentedPose;
+}
+
+const samePose = (left: Required<PresentedPose>, right: Required<PresentedPose>) =>
+	left.x === right.x && left.y === right.y && left.scale === right.scale;
+
+/**
+ * Retargets travel from its live presentation toward the latest semantic destination.
+ *
+ * A geometry change first advances along the previous segment, then makes that exact presentation
+ * the origin of the remaining segment. Repeated resize frames therefore keep moving instead of
+ * continually restarting, while progress 1 always publishes the latest canonical destination.
+ */
+export const createMotionPoseSamplerFx = Effect.fn("createMotionPoseSamplerFx")(
+	(props: CreateMotionPoseSamplerProps) =>
+		Effect.gen(function* (): Effect.fn.Return<MotionPoseSampler> {
+			let sampleProgress = 0;
+			let completionRetargeted = false;
+			let previousTarget: Required<PresentedPose> = {
+				scale: props.target.size / Math.max(1, props.actorBaseSize),
+				x: props.target.x,
+				y: props.target.y,
+			};
+			const readCurrentTarget = () => {
+				const liveTarget = props.readLiveTarget?.();
+				if (liveTarget !== null && liveTarget !== undefined) return liveTarget;
+				const currentTarget =
+					RendererRuntime.runSync(
+						props.surface.readLocationPoseFx(props.targetLocation),
+					) ?? props.target;
+				return {
+					scale: currentTarget.size / Math.max(1, props.actorBaseSize),
+					x: currentTarget.x,
+					y: currentTarget.y,
+				};
+			};
+			const readPose = yield* createRetargetablePoseSamplerFx({
+				from: props.from,
+				readTarget: () => {
+					const nextTarget = readCurrentTarget();
+					if (sampleProgress >= 1 && !samePose(previousTarget, nextTarget)) {
+						completionRetargeted = true;
+					}
+					previousTarget = nextTarget;
+					return nextTarget;
+				},
+			});
+			return {
+				needsCompletionSettle: () =>
+					completionRetargeted || !samePose(previousTarget, readCurrentTarget()),
+				readPose: (progress) => {
+					sampleProgress = progress;
+					return readPose(progress);
+				},
+			};
+		}),
+);

@@ -2,11 +2,11 @@ import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/r
 
 import { Cause, Effect, Exit, Option } from "effect";
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { releaseCurrentEditorBoardGameFx } from "~/renderer/editor/board/releaseCurrentEditorBoardGameFx";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { GameEngineErrorView } from "~/ui/game/GameEngineErrorView";
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { GameEngineErrorView } from "~/game-presentation/ui/GameEngineErrorView";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	Effect.scoped(

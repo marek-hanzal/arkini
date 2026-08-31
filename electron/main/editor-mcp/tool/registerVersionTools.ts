@@ -2,18 +2,18 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionDiff,
 	EditorProjectVersionReference,
-} from "~/editor/version/EditorProjectVersion";
+} from "~/project-version/type/EditorProjectVersion";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
-} from "~/editor/version/EditorProjectVersionMetadataSchema";
+} from "~/project-version/schema/EditorProjectVersionMetadataSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 type ToolResult = {

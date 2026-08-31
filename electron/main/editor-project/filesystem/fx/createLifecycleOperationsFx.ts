@@ -6,15 +6,16 @@ import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectCatalog } from "./createProjectCatalogFx";
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectCandidate } from "~/editor/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
-import type { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
-import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectCandidate } from "~/project-authoring/schema/EditorProjectCandidateSchema";
+import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
+import type { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
@@ -24,7 +25,7 @@ import { readVersionHistoryFx } from "./readVersionHistoryFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
-export interface LifecycleOperations {
+interface LifecycleOperations {
 	readonly createProjectFx: (
 		props: EditorProjectRepository.CreateProjectProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
@@ -74,6 +75,9 @@ const materializeDescriptor = ({
 
 const readValidationError = (cause: unknown) =>
 	cause instanceof Error ? cause.message : String(cause);
+
+const encodeManagedProjectDirectoryStemFn = (projectId: string) =>
+	encodeGameProjectFileStemFn(projectId).replaceAll("%2E", ".");
 
 const error = (
 	operation:
@@ -330,7 +334,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 						Effect.gen(function* () {
 							const root = path.join(
 								projectsRoot,
-								`${encodeURIComponent(projectId)}-${createId()}`,
+								`${encodeManagedProjectDirectoryStemFn(projectId)}-${createId()}`,
 							);
 							return yield* Effect.gen(function* () {
 								yield* fileSystem.makeDirectory(root, {

@@ -1,16 +1,16 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { BaseSchema } from "~/engine/item/schema/BaseSchema";
-import { BlueprintSchema } from "~/engine/item/schema/BlueprintSchema";
-import { CraftSchema } from "~/engine/item/schema/CraftSchema";
-import { DepositSchema } from "~/engine/item/schema/DepositSchema";
-import { InventorySchema } from "~/engine/item/schema/InventorySchema";
-import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
-import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
-import { SpaceSchema } from "~/engine/item/schema/SpaceSchema";
-import { StashSchema } from "~/engine/item/schema/StashSchema";
-import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
+import { BaseSchema } from "~/item-definition/schema/BaseSchema";
+import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
+import { CraftSchema } from "~/item-definition/schema/CraftSchema";
+import { DepositSchema } from "~/item-definition/schema/DepositSchema";
+import { InventorySchema } from "~/item-definition/schema/InventorySchema";
+import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
+import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
+import { StashSchema } from "~/item-definition/schema/StashSchema";
+import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 
 const requireReplacement = <Schema extends z.ZodType<Record<string, unknown>>>(patch: Schema) =>
 	patch.refine(

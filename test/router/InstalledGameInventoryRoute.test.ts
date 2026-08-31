@@ -32,19 +32,21 @@ const GameInventoryRoute = GameInventoryRouteDefinition.options.component;
 if (GameInventoryRoute === undefined)
 	throw new Error("Installed Game Inventory route component is missing.");
 
-vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
+vi.mock("~/game-menu/ui/GameMenuProvider", () => ({
 	useGameMenuControl: () => ({
-		isOpen: pageState.menuOpen,
+		phase: pageState.menuOpen ? "open" : "closed",
 	}),
 }));
 
-vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
+vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
-		isOpen: pageState.detailOpen,
+		state: {
+			phase: pageState.detailOpen ? "open" : "closed",
+		},
 	}),
 }));
 
-vi.mock("~/ui/inventory/Inventory", async () => {
+vi.mock("~/game-shell/ui/Inventory", async () => {
 	const { createElement: createReactElement } = await import("react");
 	return {
 		Inventory: ({ onClose }: { readonly onClose: () => void }) =>

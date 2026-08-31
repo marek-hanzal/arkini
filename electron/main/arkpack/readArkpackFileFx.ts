@@ -4,9 +4,9 @@ import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
-import { verifyArkpackProvenanceFx } from "~/engine/pack/fx/verifyArkpackProvenanceFx";
-import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { verifyArkpackProvenanceFx } from "~/arkpack/artifact/fx/verifyArkpackProvenanceFx";
+import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
 
 export namespace readArkpackFileFx {
 	export interface Props {
@@ -31,8 +31,7 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 	}: readArkpackFileFx.Props) =>
 		Effect.gen(function* () {
 			if (packageId.length === 0) return null;
-			const stem = encodeGameProjectFileStem(packageId);
-			const filename = `${stem}.arkpack`;
+			const filename = readArkpackArtifactNameFn(packageId);
 			const path = join(root, filename);
 			if (!(yield* fileSystem.exists(path))) return null;
 			const info = yield* fileSystem.stat(path);

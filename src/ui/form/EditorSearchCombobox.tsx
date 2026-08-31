@@ -9,10 +9,11 @@ import {
 	size,
 	useFloating,
 } from "@floating-ui/react";
-import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export interface EditorSearchOption {
 	readonly id: string;
@@ -21,23 +22,21 @@ export interface EditorSearchOption {
 	readonly terms: readonly string[];
 }
 
-export namespace EditorSearchCombobox {
-	export interface Props {
-		readonly displaySelectedLabel?: boolean;
-		readonly label: string;
-		readonly labelVisible?: boolean;
-		readonly description?: string;
-		readonly emptyLabel: string;
-		readonly error?: string;
-		readonly options: readonly EditorSearchOption[];
-		readonly placeholder?: string;
-		readonly value: string;
-		readonly onBlur?: () => void;
-		readonly onChange: (value: string) => void;
-		readonly onInputChange?: (value: string) => void;
-		readonly renderPreview: (option: EditorSearchOption) => ReactNode;
-		readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
-	}
+interface EditorSearchComboboxProps {
+	readonly displaySelectedLabel?: boolean;
+	readonly label: string;
+	readonly labelVisible?: boolean;
+	readonly description?: string;
+	readonly emptyLabel: string;
+	readonly error?: string;
+	readonly options: readonly EditorSearchOption[];
+	readonly placeholder?: string;
+	readonly value: string;
+	readonly onBlur?: () => void;
+	readonly onChange: (value: string) => void;
+	readonly onInputChange?: (value: string) => void;
+	readonly renderPreview: (option: EditorSearchOption) => ReactNode;
+	readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
 }
 
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
@@ -56,7 +55,7 @@ export const EditorSearchCombobox = ({
 	renderPreview,
 	renderSelectedPreview,
 	value,
-}: EditorSearchCombobox.Props) => {
+}: EditorSearchComboboxProps) => {
 	const selectedOption = options.find((option) => option.id === value);
 	const selectedPreview =
 		selectedOption === undefined ? undefined : renderSelectedPreview?.(selectedOption);
@@ -66,7 +65,6 @@ export const EditorSearchCombobox = ({
 	const [query, setQuery] = useState(selectedLabel);
 	const [open, setOpen] = useState(false);
 	const [activeIndex, setActiveIndex] = useState(0);
-	const listboxId = useId();
 	const { floatingStyles, refs } = useFloating({
 		open,
 		onOpenChange: setOpen,
@@ -164,18 +162,8 @@ export const EditorSearchCombobox = ({
 					<Search className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
 					<input
 						type="search"
-						role="combobox"
 						value={query}
 						autoComplete="off"
-						aria-expanded={open}
-						aria-controls={listboxId}
-						aria-invalid={error === undefined ? undefined : true}
-						aria-activedescendant={
-							open && matches[activeIndex] !== undefined
-								? `${listboxId}-option-${activeIndex}`
-								: undefined
-						}
-						aria-label={label}
 						className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
@@ -216,6 +204,12 @@ export const EditorSearchCombobox = ({
 								choose(matches[activeIndex]);
 							}
 						}}
+						{...readDataUiFn({
+							dataUi: "EditorSearchComboboxInput",
+							state: {
+								invalid: error !== undefined,
+							},
+						})}
 					/>
 					{query.length === 0 ? null : (
 						<button
@@ -241,8 +235,6 @@ export const EditorSearchCombobox = ({
 				<FloatingPortal>
 					<span
 						ref={refs.setFloating}
-						role="listbox"
-						id={listboxId}
 						style={floatingStyles}
 						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
 					>
@@ -254,16 +246,18 @@ export const EditorSearchCombobox = ({
 						{matches.map((option, index) => (
 							<button
 								key={option.id}
-								id={`${listboxId}-option-${index}`}
 								type="button"
-								role="option"
-								aria-selected={option.id === value}
-								className={`flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised ${
-									index === activeIndex ? "bg-surface-raised" : ""
-								}`}
+								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised data-[ui-active=true]:bg-surface-raised"
 								onMouseDown={(event) => event.preventDefault()}
 								onMouseEnter={() => setActiveIndex(index)}
 								onClick={() => choose(option)}
+								{...readDataUiFn({
+									dataUi: "EditorSearchComboboxOption",
+									state: {
+										active: index === activeIndex,
+										selected: option.id === value,
+									},
+								})}
 							>
 								{renderPreview(option)}
 								<span className="min-w-0 flex-1">

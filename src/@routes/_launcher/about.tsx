@@ -1,11 +1,32 @@
+import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import { useEffect, useState } from "react";
 
-import { useAboutPortraitAssets } from "~/ui/launcher/about/useAboutPortraitAssets";
-import { About } from "~/ui/launcher/About";
-import { AboutEasterEgg } from "~/ui/launcher/AboutEasterEgg";
-import { AboutJumpscare } from "~/ui/launcher/AboutJumpscare";
-import { useAboutEasterEggDelay } from "~/ui/launcher/useAboutEasterEggDelay";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { About } from "~/launcher/ui/About";
+import { AboutEasterEgg } from "~/launcher/ui/AboutEasterEgg";
+import { AboutJumpscare } from "~/launcher/ui/AboutJumpscare";
+import { AboutPortraitAssetsAtom } from "~/launcher/atom/AboutPortraitAssetsAtom";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
+
+const aboutEasterEggDelayMs = 2_000;
+
+/** Delays the route-only easter egg until the settled About page has remained visible. */
+const useAboutEasterEggDelay = () => {
+	const [active, setActive] = useState(false);
+
+	useEffect(() => {
+		const timeout = window.setTimeout(() => setActive(true), aboutEasterEggDelayMs);
+		return () => window.clearTimeout(timeout);
+	}, []);
+
+	return active;
+};
+
+const useAboutPortraitAssets = (): readonly string[] => {
+	const result = useAtomValue(AboutPortraitAssetsAtom);
+	return AsyncResult.isSuccess(result) ? result.value : [];
+};
 
 export const Route = createFileRoute("/_launcher/about")({
 	component: () => {
@@ -13,7 +34,7 @@ export const Route = createFileRoute("/_launcher/about")({
 		const easterEggActive = useAboutEasterEggDelay() && portraitUrls.length > 0;
 
 		return (
-			<MainPageLayout
+			<LauncherPageLayout
 				foregroundOverlay={
 					portraitUrls.length === 0 ? undefined : (
 						<AboutJumpscare
@@ -22,7 +43,6 @@ export const Route = createFileRoute("/_launcher/about")({
 						/>
 					)
 				}
-				labelledBy="about-title"
 				overlay={
 					portraitUrls.length === 0 ? undefined : (
 						<AboutEasterEgg
@@ -34,7 +54,7 @@ export const Route = createFileRoute("/_launcher/about")({
 				page="about"
 			>
 				<About />
-			</MainPageLayout>
+			</LauncherPageLayout>
 		);
 	},
 });

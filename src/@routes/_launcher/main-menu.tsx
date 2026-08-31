@@ -4,12 +4,12 @@ import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { ArkiniAppVersion, ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import { useArkpacks } from "~/ui/arkpack/useArkpacks";
-import { EditorServiceStatusAtom } from "~/ui/editor/EditorServiceStatusAtom";
+import { useArkpacks } from "~/arkpack/ui/useArkpacks";
+import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
-import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
-import { MainMenuExitCommandAtom } from "~/ui/launcher/MainMenuExitCommandAtom";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
+import { MainMenuExitCommandAtom } from "~/launcher/atom/MainMenuExitCommandAtom";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/_launcher/main-menu")({
 	component: () => {
@@ -30,10 +30,9 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			(catalogState.type === "ready" && AsyncResult.isSuccess(startup) && !startup.waiting);
 
 		return (
-			<MainPageLayout page="main-menu">
+			<LauncherPageLayout page="main-menu">
 				<nav
 					className="grid w-full gap-4"
-					aria-label="Main menu"
 					data-ui="MainMenu"
 				>
 					{defaultPackageAvailable ? (
@@ -127,7 +126,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						<p className="text-center text-sm text-muted">Exit requested.</p>
 					) : null}
 				</nav>
-			</MainPageLayout>
+			</LauncherPageLayout>
 		);
 	},
 });

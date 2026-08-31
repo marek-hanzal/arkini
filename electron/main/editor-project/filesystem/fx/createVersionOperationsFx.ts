@@ -5,23 +5,23 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import type { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
-import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
-import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
+import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
 import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionRepositoryService,
-} from "~/editor/version/EditorProjectVersion";
-import { createEditorProjectVersionDiffFn } from "~/editor/version/fn/createEditorProjectVersionDiffFn";
+} from "~/project-version/type/EditorProjectVersion";
+import { createEditorProjectVersionDiffFn } from "~/project-version/fn/createEditorProjectVersionDiffFn";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
-} from "~/editor/version/EditorProjectVersionMetadataSchema";
+} from "~/project-version/schema/EditorProjectVersionMetadataSchema";
 import { createVersionReaderFx } from "./createVersionReaderFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";

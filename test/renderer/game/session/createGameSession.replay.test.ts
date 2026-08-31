@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { Effect } from "effect";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 

@@ -1,10 +1,24 @@
+import { useAtom } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { SettingsOpenActionRow } from "~/ui/settings/SettingsOpenActionRow";
-import { useCliModel } from "~/ui/settings/useCliModel";
-import { useSettingsDirectoriesModel } from "~/ui/settings/useSettingsDirectoriesModel";
+import { SettingsOpenActionRow } from "~/application-settings/ui/SettingsOpenActionRow";
+import { SettingsDiagnosticsCommandAtom } from "~/application-settings/atom/SettingsDiagnosticsCommandAtom";
+import { SettingsUserDataCommandAtom } from "~/application-settings/atom/SettingsUserDataCommandAtom";
+import { useCliModel } from "~/application-settings/ui/useCliModel";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+const useSettingsDirectoriesModel = () => {
+	const [diagnosticsStatus, openDiagnosticsCommand] = useAtom(SettingsDiagnosticsCommandAtom);
+	const [userDataStatus, openUserDataCommand] = useAtom(SettingsUserDataCommandAtom);
+
+	return {
+		diagnosticsStatus,
+		userDataStatus,
+		openDiagnostics: () => openDiagnosticsCommand(undefined),
+		openUserData: () => openUserDataCommand(undefined),
+	};
+};
 
 export const Route = createFileRoute("/_launcher/settings/dev")({
 	component: () => {

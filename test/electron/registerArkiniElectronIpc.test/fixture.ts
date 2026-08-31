@@ -19,7 +19,6 @@ import { registerArkiniElectronIpcFx } from "../../../electron/main/registerArki
 import { createArkiniUserDataPathsFn } from "../../../electron/main/user-data/fn/createArkiniUserDataPathsFn";
 import { createFilesystemWindowPreferencesFx } from "../../../electron/main/window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "../../../electron/main/window/createWindowModeControllerOwnershipFx";
-import { registerWindowModeControllerFx } from "../../../electron/main/window/registerWindowModeControllerFx";
 
 const electronHarness = readElectronHarness();
 
@@ -90,10 +89,9 @@ export const createRegisteredIpcHarness = async () => {
 				root: userDataPaths.game.preferences,
 			});
 			const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
-			yield* registerWindowModeControllerFx({
-				window: electronHarness.browserWindow as unknown as BrowserWindow,
-				ownership: windowModeControllerOwnership,
-				controller: {
+			yield* windowModeControllerOwnership.attachControllerFx(
+				electronHarness.browserWindow as unknown as BrowserWindow,
+				{
 					requestModeFx: (mode) =>
 						windowPreferences
 							.writeModeFx(mode)
@@ -103,7 +101,7 @@ export const createRegisteredIpcHarness = async () => {
 								),
 							),
 				},
-			});
+			);
 			yield* registerArkiniElectronIpcFx({
 				bundledArkpacksRoot: join(userDataPath, "bundled-arkpacks"),
 				trustedRenderer,

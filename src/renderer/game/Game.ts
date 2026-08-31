@@ -1,6 +1,6 @@
-import type { ArkpackDescriptor } from "~/engine/pack/Arkpack";
+import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
+import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
 /** One loaded game instance exclusively owned by its package route resource. */
 export interface Game extends PlayableGame {

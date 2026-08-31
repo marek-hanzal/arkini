@@ -5,15 +5,15 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
-import { createEditorBoardGameFx } from "~/renderer/editor/board/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/renderer/editor/board/createEditorBoardGameResourceFx";
-import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
+import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createGame,
 	createGameFxMock,

@@ -1,12 +1,16 @@
 import { Effect } from "effect";
 
 import { CheatModeDisabledError } from "~/engine/cheat/error/CheatModeDisabledError";
-import { removeItemRuntimeTransitionFx } from "~/engine/runtime/fx/removeItemRuntimeTransitionFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import type { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { removeItemRuntimeTransitionFx } from "~/item-interaction/fx/removeItemRuntimeTransitionFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 
 export namespace removeCheatItemFx {
-	export type Props = removeItemFx.Props;
+	export interface Props {
+		readonly itemId: IdSchema.Type;
+		readonly revision: RevisionSchema.Type;
+	}
 }
 
 /** Authorizes one cheat removal before delegating to the canonical item-removal command. */

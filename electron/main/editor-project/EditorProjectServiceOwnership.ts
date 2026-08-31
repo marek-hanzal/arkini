@@ -1,13 +1,16 @@
 import type { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type {
 	EditorProjectRepository,
 	EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
-import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+} from "~/project-authoring/service/EditorProjectRepository";
+import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 
-export interface OwnedEditorProjectRepository extends EditorProjectRepositoryService {
+export interface OwnedEditorProjectRepository
+	extends EditorProjectRepositoryService,
+		EditorBuildRepositoryService {
 	readonly closeFx: Effect.Effect<void>;
 	readonly openProjectFx: (
 		props: EditorProjectRepository.OpenProjectProps,

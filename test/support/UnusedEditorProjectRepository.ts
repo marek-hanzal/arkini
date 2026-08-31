@@ -1,10 +1,9 @@
 import { Effect } from "effect";
 
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 
 /** Explicitly unavailable repository domains for focused tests outside their ownership. */
 export const UnusedEditorProjectRepository = {
-	buildProjectFx: () => Effect.die("Unexpected editor project build."),
 	checkoutVersionFx: () => Effect.die("Unexpected editor version checkout."),
 	createVersionFx: () => Effect.die("Unexpected editor version commit."),
 	createNoteFx: () => Effect.die("Unexpected editor note create."),
@@ -19,14 +18,12 @@ export const UnusedEditorProjectRepository = {
 	updateNoteFx: () => Effect.die("Unexpected editor note update."),
 	listBoardScenariosFx: () => Effect.die("Unexpected Board scenario list."),
 	readBoardScenarioFx: () => Effect.die("Unexpected Board scenario read."),
-	readProjectBuildFx: () => Effect.die("Unexpected editor project build read."),
 	saveResourceFx: () => Effect.die("Unexpected single resource save."),
 	writeBoardScenarioFx: () => Effect.die("Unexpected Board scenario write."),
 	deleteBoardScenarioFx: () => Effect.die("Unexpected Board scenario delete."),
 } satisfies Pick<
 	EditorProjectRepositoryService,
 	| "deleteProjectFx"
-	| "buildProjectFx"
 	| "deleteResourceFx"
 	| "checkoutVersionFx"
 	| "createVersionFx"
@@ -40,7 +37,6 @@ export const UnusedEditorProjectRepository = {
 	| "updateNoteFx"
 	| "listBoardScenariosFx"
 	| "readBoardScenarioFx"
-	| "readProjectBuildFx"
 	| "saveResourceFx"
 	| "writeBoardScenarioFx"
 	| "deleteBoardScenarioFx"

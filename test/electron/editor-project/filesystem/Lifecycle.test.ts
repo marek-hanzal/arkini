@@ -5,7 +5,7 @@ import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -30,9 +30,10 @@ afterEach(async () => harness.close());
 describe("filesystem Editor project lifecycle", () => {
 	it("reopens managed projects from the user-data catalog", async () => {
 		const repository = await harness.openRepository();
-		const created = await harness.createProject(repository);
+		const created = await harness.createProject(repository, "managed.\ud800");
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		expect(root).toContain(harness.projectsRoot);
+		expect(root).toContain("managed.%ED%A0%80-");
 		expect(JSON.parse(await readFile(join(root ?? "", "project.json"), "utf8"))).toMatchObject({
 			arkini: ArkiniAppVersion,
 			revision: expect.any(Number),

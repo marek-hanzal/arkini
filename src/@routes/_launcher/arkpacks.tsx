@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FolderOpen, PackageOpen, RefreshCw } from "lucide-react";
 
-import { ArkpackCatalogList } from "~/ui/arkpack/ArkpackCatalogList";
-import { useArkpackSelectorActions } from "~/ui/arkpack/useArkpackSelectorActions";
+import { ArkpackCatalogList } from "~/arkpack/ui/ArkpackCatalogList";
+import { useArkpackSelectorActions } from "~/arkpack/ui/useArkpackSelectorActions";
 import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/_launcher/arkpacks")({
 	component: () => {
@@ -14,10 +14,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 		const blocked = actions.blocked;
 
 		return (
-			<MainPageLayout
-				labelledBy="arkpack-selector-title"
-				page="arkpacks"
-			>
+			<LauncherPageLayout page="arkpacks">
 				<div
 					className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)_auto] gap-[var(--ak-viewport-gap)]"
 					data-ui="ArkpackSelector"
@@ -48,10 +45,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 								</LinkButton>
 							</div>
 						</div>
-						<h1
-							id="arkpack-selector-title"
-							className="mt-2 text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold"
-						>
+						<h1 className="mt-2 text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold">
 							Choose a game package
 						</h1>
 						<p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
@@ -108,7 +102,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 						</BackButton>
 					</footer>
 				</div>
-			</MainPageLayout>
+			</LauncherPageLayout>
 		);
 	},
 });

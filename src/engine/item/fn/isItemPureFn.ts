@@ -1,5 +1,5 @@
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { isItemPureWithIndexFn } from "./isItemPureWithIndexFn";
 import { readItemPurityIndexFn } from "./readItemPurityIndexFn";
 

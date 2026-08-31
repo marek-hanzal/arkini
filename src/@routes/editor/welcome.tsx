@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorWelcome } from "~/ui/editor/EditorWelcome";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { EditorWelcome } from "~/project-authoring/ui/EditorWelcome";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/editor/welcome")({
 	loader: ({ abortController, context }) =>
@@ -14,11 +14,8 @@ export const Route = createFileRoute("/editor/welcome")({
 			},
 		),
 	component: () => (
-		<MainPageLayout
-			labelledBy="editor-welcome-title"
-			page="editor-welcome"
-		>
+		<LauncherPageLayout page="editor-welcome">
 			<EditorWelcome recentProjects={Route.useLoaderData()} />
-		</MainPageLayout>
+		</LauncherPageLayout>
 	),
 });

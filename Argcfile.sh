@@ -52,9 +52,8 @@ format_check() {
 
 dependency_check() {
 	depcruise \
-		src/engine src/editor src/renderer src/ui src/@routes \
-		src/main.tsx src/createArkiniRouterFx.tsx src/_route.ts \
-		electron electron.vite.config.ts test \
+		src electron shared scripts test \
+		electron.vite.config.ts vitest.config.ts \
 		--output-type err-long
 }
 
@@ -306,6 +305,11 @@ typecheck() {
 	tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters
 }
 
+# @cmd Validate the complete active dependency graph
+dc() {
+	dependency_check
+}
+
 run_tests() {
 	vitest run --no-color "$@"
 }
@@ -325,10 +329,11 @@ platform-check() {
 	build
 	run_tests \
 		test/engine/filesystem \
+		test/game-persistence/fx/createFilesystemGameSaveFilesFx.test.ts \
 		test/electron \
-		test/pack \
-		test/schema/fx \
-		test/source
+		test/arkpack/artifact \
+		test/game-config/source \
+		test/game-config/compiler/fx/readGameSourceFilesFx.test.ts
 }
 
 # @cmd Run the complete repository gate

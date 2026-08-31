@@ -5,14 +5,18 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/service/EditorProjectRepository";
+import {
+	EditorBuildRepository,
+	type EditorBuildRepositoryService,
+} from "~/editor-build/service/EditorBuildRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
-import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
-import { EditorUnsavedChangesOwnerAtom } from "~/renderer/editor/unsaved/EditorUnsavedChangesOwnerAtom";
-import { createEditorUnsavedChangesOwnerFx } from "~/renderer/editor/unsaved/createEditorUnsavedChangesOwnerFx";
+} from "~/project-authoring/error/EditorProjectRepositoryError";
+import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
+import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
+import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
@@ -22,6 +26,7 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 export interface TestRendererRuntimeProps {
 	readonly clearSaveFx?: Parameters<typeof GameEngineResourceLayer>[0]["clearSaveFx"];
 	readonly createResourceFx: (packageId: string) => Effect.Effect<GameEngineResource, unknown>;
+	readonly editorBuildRepository?: EditorBuildRepositoryService;
 	readonly editorProjectRepository?: EditorProjectRepositoryService;
 }
 
@@ -47,10 +52,16 @@ const UnavailableEditorProjectRepository: EditorProjectRepositoryService = {
 	upsertResourcesFx: () => unavailableEditorProjectRepositoryFx("upsert-resource"),
 };
 
+const UnavailableEditorBuildRepository: EditorBuildRepositoryService = {
+	buildProjectFx: () => Effect.die("This test did not provide an Editor Build repository."),
+	readProjectBuildFx: () => Effect.die("This test did not provide an Editor Build repository."),
+};
+
 /** Creates one isolated renderer runtime with fresh Atom and Game lifecycle authorities. */
 export const createTestRendererRuntime = ({
 	clearSaveFx = () => Effect.void,
 	createResourceFx,
+	editorBuildRepository = UnavailableEditorBuildRepository,
 	editorProjectRepository = UnavailableEditorProjectRepository,
 }: TestRendererRuntimeProps) => {
 	const atomRegistry = AtomRegistry.make({
@@ -59,6 +70,7 @@ export const createTestRendererRuntime = ({
 	const rendererRuntime = ManagedRuntime.make(
 		Layer.mergeAll(
 			Layer.succeed(AtomRegistry.AtomRegistry, atomRegistry),
+			Layer.succeed(EditorBuildRepository, editorBuildRepository),
 			Layer.succeed(EditorProjectRepository, editorProjectRepository),
 			Layer.effect(
 				EditorUnsavedChanges,

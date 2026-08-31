@@ -3,22 +3,22 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject, EditorProjectCommit } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
-import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
-import { readEditorAssetDeleteBlockersFn } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
-import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
-import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
-import { bumpArkpackVersionFn } from "~/editor/version/fn/bumpArkpackVersionFn";
-import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+} from "~/project-authoring/error/EditorProjectRepositoryError";
+import { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorItemFx";
+import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
+import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
+import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
+import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
+import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
@@ -253,7 +253,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							error("delete-item", `Item UID ${itemUid} does not exist.`),
 						);
 					const [itemId] = entry;
-					const blockers = yield* readEditorItemDeleteBlockersFx({
+					const blockers = readEditorItemDeleteBlockersFn({
 						config: state.project.config,
 						itemId,
 					});

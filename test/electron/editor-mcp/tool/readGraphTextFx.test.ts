@@ -3,13 +3,14 @@ import { describe, expect, it } from "vitest";
 
 import { readItemEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readItemEstimateTextFx";
 import { readItemRelationTextFx } from "../../../../electron/main/editor-mcp/tool/readItemRelationTextFx";
-import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createGraphProject, createToolProject } from "./support/createToolProject";
+import { createRelationTraversalProject } from "./readGraphTextFx.test/fixture";
 
 describe("editor MCP graph tool text", () => {
 	it("formats directional relation depth and every operation field", () => {
-		const project = createGraphProject();
+		const project = createRelationTraversalProject();
 		const inputText = Effect.runSync(
 			readItemRelationTextFx(project, {
 				itemId: "water",
@@ -19,18 +20,34 @@ describe("editor MCP graph tool text", () => {
 		);
 		const outputText = Effect.runSync(
 			readItemRelationTextFx(project, {
-				itemId: "ingot",
-				level: 1,
+				itemId: "plate",
+				level: 2,
 				role: "output",
 			}),
 		);
 
 		expect(inputText).toContain("Item input\nItem ID: water");
 		expect(inputText).toContain("Level: 2");
-		expect(inputText).toContain('Level 1: line "Run"');
+		expect(inputText.match(/^- Level \d+:.*$/gm)).toEqual([
+			'- Level 1: line "Run"',
+			'- Level 2: line "Mill Run"',
+		]);
+		expect(inputText.match(/^    - .* -> .*$/gm)).toEqual([
+			"    - water [water; simple] -> forge [forge; producer]",
+			"    - forge [forge; producer] -> mill [Mill; producer]",
+		]);
 		expect(inputText).toContain("Inputs:\n    - tool");
 		expect(inputText).toContain("Outputs:\n    - ingot");
-		expect(outputText).toContain("forge [forge; producer] -> ingot [Ingot; simple]");
+		expect(outputText.match(/^- Level \d+:.*$/gm)).toEqual([
+			'- Level 1: line "Ingot Run"',
+			'- Level 2: line "Run"',
+			'- Level 2: line "Kiln Run"',
+		]);
+		expect(outputText.match(/^    - .* -> .*$/gm)).toEqual([
+			"    - ingot [Ingot; producer] -> plate [Plate; simple]",
+			"    - forge [forge; producer] -> ingot [Ingot; producer]",
+			"    - kiln [Kiln; producer] -> ingot [Ingot; producer]",
+		]);
 	});
 
 	it("preserves unsupported output requirement reason and source", () => {

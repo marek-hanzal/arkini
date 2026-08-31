@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { ArkpackDescriptor } from "~/engine/pack/Arkpack";
-import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
-import { writeDiagnosticRecordFx } from "~/renderer/diagnostics/writeDiagnosticRecordFx";
+import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
+import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
+import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import type { GameSession, GameTransition } from "~/renderer/game/session/GameSession";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type GameDiagnosticsSession = Pick<
 	GameSession,

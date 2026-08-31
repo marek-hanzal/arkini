@@ -6,6 +6,7 @@ import {
 	type RegisteredRouter,
 } from "@tanstack/react-router";
 import {
+	createElement,
 	forwardRef,
 	type AnchorHTMLAttributes,
 	type ButtonHTMLAttributes,
@@ -14,16 +15,17 @@ import {
 import { twMerge } from "tailwind-merge";
 
 import { CursorClassName, type CursorSemantic } from "~/ui/cursor/CursorSemantic";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const ButtonBaseClassName =
-	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors disabled:opacity-60 aria-disabled:opacity-60";
+	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors disabled:opacity-60 data-[ui-disabled=true]:opacity-60";
 
 const ButtonVariantClassNames = {
 	default:
-		"border border-line bg-surface/75 text-foreground shadow-lg hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 aria-disabled:hover:border-line aria-disabled:hover:bg-surface/75 aria-disabled:active:bg-surface/75",
+		"border border-line bg-surface/75 text-foreground shadow-lg hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 data-[ui-disabled=true]:hover:border-line data-[ui-disabled=true]:hover:bg-surface/75 data-[ui-disabled=true]:active:bg-surface/75",
 	primary:
-		"bg-accent text-accent-contrast shadow-lg hover:bg-accent-hover active:bg-accent-hover disabled:hover:bg-accent disabled:active:bg-accent aria-disabled:hover:bg-accent aria-disabled:active:bg-accent",
-	danger: "bg-danger text-danger-contrast shadow-lg hover:opacity-90 active:opacity-80 disabled:hover:opacity-60 disabled:active:opacity-60 aria-disabled:hover:opacity-60 aria-disabled:active:opacity-60",
+		"bg-accent text-accent-contrast shadow-lg hover:bg-accent-hover active:bg-accent-hover disabled:hover:bg-accent disabled:active:bg-accent data-[ui-disabled=true]:hover:bg-accent data-[ui-disabled=true]:active:bg-accent",
+	danger: "bg-danger text-danger-contrast shadow-lg hover:opacity-90 active:opacity-80 disabled:hover:opacity-60 disabled:active:opacity-60 data-[ui-disabled=true]:hover:opacity-60 data-[ui-disabled=true]:active:opacity-60",
 } as const;
 
 type ButtonVariant = keyof typeof ButtonVariantClassNames;
@@ -35,26 +37,27 @@ interface ControlCursorProps {
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & ControlCursorProps;
 
-type ButtonAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & ControlCursorProps;
+type ButtonAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> &
+	ControlCursorProps & {
+		readonly "data-ui"?: string;
+		readonly linkDisabled?: boolean;
+	};
 
-const readControlCursorSemantic = ({
-	ariaDisabled = false,
+const readControlCursorSemanticFn = ({
 	disabled = false,
 	intent = "pointer",
 }: {
-	readonly ariaDisabled?: boolean;
 	readonly disabled?: boolean;
 	readonly intent?: ControlCursorIntent;
 }): ControlCursorIntent => {
-	if (!ariaDisabled && !disabled) return intent;
+	if (!disabled) return intent;
 	return intent === "progress" || intent === "wait" ? intent : "not-allowed";
 };
 
 const createButton = (displayName: string, variant: ButtonVariant) => {
 	const Component = forwardRef<HTMLButtonElement, ButtonProps>(
 		({ className, cursorIntent, disabled, type = "button", ...props }, ref) => {
-			const cursor = readControlCursorSemantic({
-				ariaDisabled: props["aria-disabled"] === true || props["aria-disabled"] === "true",
+			const cursor = readControlCursorSemanticFn({
 				disabled,
 				intent: cursorIntent,
 			});
@@ -80,14 +83,13 @@ const createButton = (displayName: string, variant: ButtonVariant) => {
 
 const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
 	const Component = forwardRef<HTMLAnchorElement, ButtonAnchorProps>(
-		({ className, cursorIntent, onClick, ...props }, ref) => {
-			const disabled = props["aria-disabled"] === true || props["aria-disabled"] === "true";
-			const cursor = readControlCursorSemantic({
-				ariaDisabled: disabled,
+		({ className, cursorIntent, linkDisabled = false, onClick, ...props }, ref) => {
+			const cursor = readControlCursorSemanticFn({
+				disabled: linkDisabled,
 				intent: cursorIntent,
 			});
 			const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
-				if (disabled) {
+				if (linkDisabled) {
 					event.preventDefault();
 					return;
 				}
@@ -95,6 +97,7 @@ const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
 			};
 			return (
 				<a
+					{...props}
 					ref={ref}
 					className={twMerge(
 						ButtonBaseClassName,
@@ -103,7 +106,12 @@ const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
 						className,
 					)}
 					onClick={handleClick}
-					{...props}
+					{...readDataUiFn({
+						dataUi: props["data-ui"] ?? displayName,
+						state: {
+							disabled: linkDisabled,
+						},
+					})}
 				/>
 			);
 		},
@@ -137,26 +145,20 @@ export type ButtonLinkProps<
 	TMaskTo extends string = "",
 > = LinkComponentProps<typeof ButtonAnchor, TRouter, TFrom, TTo, TMaskFrom, TMaskTo>;
 
+const createButtonLinkFn = (CreatedLink: LinkComponent<typeof ButtonAnchor>) =>
+	((props: ButtonLinkProps) =>
+		createElement(CreatedLink, {
+			...props,
+			disabled: undefined,
+			linkDisabled: props.disabled,
+			preload: props.preload ?? "intent",
+		} as never)) as LinkComponent<typeof ButtonAnchor>;
+
 /** Renders the canonical neutral game action with TanStack Router Link semantics. */
-export const ButtonLink: LinkComponent<typeof ButtonAnchor> = (props) => (
-	<CreatedButtonLink
-		preload="intent"
-		{...props}
-	/>
-);
+export const ButtonLink = createButtonLinkFn(CreatedButtonLink);
 
 /** Renders the canonical primary game action with TanStack Router Link semantics. */
-export const PrimaryButtonLink: LinkComponent<typeof PrimaryButtonAnchor> = (props) => (
-	<CreatedPrimaryButtonLink
-		preload="intent"
-		{...props}
-	/>
-);
+export const PrimaryButtonLink = createButtonLinkFn(CreatedPrimaryButtonLink);
 
 /** Renders the canonical destructive game action with TanStack Router Link semantics. */
-export const DangerButtonLink: LinkComponent<typeof DangerButtonAnchor> = (props) => (
-	<CreatedDangerButtonLink
-		preload="intent"
-		{...props}
-	/>
-);
+export const DangerButtonLink = createButtonLinkFn(CreatedDangerButtonLink);

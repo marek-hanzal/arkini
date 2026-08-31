@@ -1,0 +1,68 @@
+import { match, P } from "ts-pattern";
+
+import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { readRuntimeLineFillProgressFn } from "~/production-line/fn/readRuntimeLineFillProgressFn";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+
+/**
+ * Selects the complete authored tile composition for one committed runtime item.
+ *
+ * Craft and blueprint progress states are evenly distributed after the default
+ * composition. Other item kinds keep their default until the engine gives them
+ * an explicit progress projection.
+ */
+export const readTileActorAssetSourceIdsFn = ({
+	item,
+	runtime,
+}: {
+	readonly item: RuntimeItemSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+}) => {
+	const progressLine = match(item.item)
+		.with(
+			{
+				type: P.union(TypeSchema.enum.Blueprint, TypeSchema.enum.Craft),
+			},
+			({ line }) => line,
+		)
+		.with(
+			{
+				type: P.union(
+					TypeSchema.enum.Deposit,
+					TypeSchema.enum.Inventory,
+					TypeSchema.enum.Producer,
+					TypeSchema.enum.Simple,
+					TypeSchema.enum.Space,
+					TypeSchema.enum.Stash,
+					TypeSchema.enum.Temporary,
+				),
+			},
+			() => null,
+		)
+		.exhaustive();
+	const defaultAssetIds = item.item.asset.default;
+	if (progressLine === null || item.item.asset.sources === undefined) {
+		return defaultAssetIds;
+	}
+
+	const progress = readRuntimeLineFillProgressFn({
+		line: progressLine,
+		ownerItemId: item.id,
+		runtime,
+	});
+	const stateIndex = Math.min(
+		item.item.asset.sources.length,
+		Math.floor(progress * item.item.asset.sources.length),
+	);
+	if (stateIndex === 0) return defaultAssetIds;
+	const source = item.item.asset.sources[stateIndex - 1];
+	return (
+		source === undefined
+			? defaultAssetIds
+			: [
+					source,
+				]
+	) satisfies AssetSchema.Type["default"];
+};

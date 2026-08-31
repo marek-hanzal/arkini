@@ -1,22 +1,37 @@
 import { Info } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { Tooltip } from "~/ui/overlay/Tooltip";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
+
+interface EditorValueControlProps {
+	readonly description?: ReactNode;
+	readonly error?: string;
+	readonly label: string;
+}
+
+interface EditorNamedValueControlProps extends EditorValueControlProps {
+	readonly name?: string;
+	readonly onBlur?: () => void;
+}
+
+interface EditorNumericControlProps extends EditorNamedValueControlProps {
+	readonly children?: ReactNode;
+	readonly max?: number;
+	readonly min?: number;
+	readonly onChange: (value: number) => void;
+	readonly step: number;
+	readonly value: number;
+}
 
 export const EditorValueLabel = ({
 	description,
 	label,
-}: {
-	readonly description?: ReactNode;
-	readonly label: string;
-}) => (
+}: Pick<EditorValueControlProps, "description" | "label">) => (
 	<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
 		<span className="font-semibold text-foreground">{label}</span>
 		{description === undefined ? null : <EditorInfoTooltip content={description} />}
@@ -26,117 +41,193 @@ export const EditorValueLabel = ({
 const EditorValueField = ({
 	children,
 	description,
+	error,
+	fill = false,
 	label,
 }: {
 	readonly children: ReactNode;
-	readonly description?: string;
-	readonly label: string;
-}) => (
-	<label className="grid min-w-0 content-start gap-1.5 text-sm">
+	readonly fill?: boolean;
+} & EditorValueControlProps) => (
+	<label
+		className={`grid min-w-0 gap-1.5 text-sm ${fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : "content-start"}`}
+	>
 		<EditorValueLabel
 			description={description}
 			label={label}
 		/>
 		{children}
+		{error === undefined ? null : (
+			<span className="text-xs leading-5 text-danger">{error}</span>
+		)}
 	</label>
 );
 
-export const EditorTextControl = ({
-	label,
-	onChange,
-	placeholder,
-	value,
-}: {
-	readonly label: string;
-	readonly onChange: (value: string) => void;
-	readonly placeholder?: string;
-	readonly value: string;
-}) => (
-	<EditorValueField label={label}>
-		<input
-			type="text"
-			value={value}
-			className={editorInputClassName}
-			placeholder={placeholder}
-			onChange={(event) => onChange(event.currentTarget.value)}
-		/>
-	</EditorValueField>
-);
-
-export const EditorNumberControl = ({
+const EditorNumericControl = ({
+	children,
 	description,
+	error,
 	label,
 	max,
 	min,
+	name,
+	onBlur,
 	onChange,
-	step = 1,
+	step,
 	value,
-}: {
-	readonly description?: string;
-	readonly label: string;
-	readonly max?: number;
-	readonly min?: number;
-	readonly onChange: (value: number) => void;
-	readonly step?: number;
-	readonly value: number;
-}) => (
+}: EditorNumericControlProps) => (
 	<EditorValueField
 		description={description}
+		error={error}
 		label={label}
 	>
 		<input
 			type="number"
+			name={name}
 			value={Number.isNaN(value) ? "" : value}
 			className={editorInputClassName}
 			max={max}
 			min={min}
 			step={step}
+			onBlur={onBlur}
 			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+			{...readDataUiFn({
+				dataUi: "EditorNumericControlInput",
+				state: {
+					invalid: error !== undefined,
+				},
+			})}
 		/>
+		{children}
 	</EditorValueField>
 );
 
-export const EditorSecondsControl = ({
+export const EditorTextControl = ({
+	autoComplete,
 	description,
+	error,
 	label,
-	max,
-	min,
+	name,
+	onBlur,
 	onChange,
+	placeholder,
+	readOnly,
 	value,
 }: {
-	readonly description?: string;
-	readonly label: string;
-	readonly max?: number;
-	readonly min?: number;
-	readonly onChange: (value: number) => void;
-	readonly value: number;
-}) => (
+	readonly autoComplete?: string;
+	readonly onChange: (value: string) => void;
+	readonly placeholder?: string;
+	readonly readOnly?: boolean;
+	readonly value: string;
+} & EditorNamedValueControlProps) => (
 	<EditorValueField
 		description={description}
+		error={error}
 		label={label}
 	>
 		<input
-			type="number"
-			value={Number.isNaN(value) ? "" : value}
+			type="text"
+			name={name}
+			value={value}
+			autoComplete={autoComplete}
 			className={editorInputClassName}
-			max={max}
-			min={min}
-			step={0.001}
-			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+			placeholder={placeholder}
+			readOnly={readOnly}
+			onBlur={onBlur}
+			onChange={(event) => onChange(event.currentTarget.value)}
+			{...readDataUiFn({
+				dataUi: "EditorTextControlInput",
+				state: {
+					invalid: error !== undefined,
+				},
+			})}
 		/>
-		<EditorDurationHint seconds={value} />
 	</EditorValueField>
 );
 
-export const EditorChoiceControl = <Value extends string>({
+export const EditorTextAreaControl = ({
 	description,
+	error,
+	fill = false,
+	label,
+	name,
+	onBlur,
+	onChange,
+	placeholder,
+	rows = 4,
+	value,
+}: {
+	readonly fill?: boolean;
+	readonly onChange: (value: string) => void;
+	readonly placeholder?: string;
+	readonly rows?: number;
+	readonly value: string;
+} & EditorNamedValueControlProps) => (
+	<EditorValueField
+		description={description}
+		error={error}
+		fill={fill}
+		label={label}
+	>
+		<textarea
+			name={name}
+			value={value}
+			className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
+			placeholder={placeholder}
+			rows={rows}
+			onBlur={onBlur}
+			onChange={(event) => onChange(event.currentTarget.value)}
+			{...readDataUiFn({
+				dataUi: "EditorTextAreaControlInput",
+				state: {
+					invalid: error !== undefined,
+				},
+			})}
+		/>
+	</EditorValueField>
+);
+
+export const EditorNumberControl = ({
+	step = 1,
+	...props
+}: {
+	readonly max?: number;
+	readonly min?: number;
+	readonly onChange: (value: number) => void;
+	readonly step?: number;
+	readonly value: number;
+} & EditorNamedValueControlProps) => (
+	<EditorNumericControl
+		{...props}
+		step={step}
+	/>
+);
+
+export const EditorSecondsControl = (
+	props: {
+		readonly max?: number;
+		readonly min?: number;
+		readonly onChange: (value: number) => void;
+		readonly value: number;
+	} & EditorNamedValueControlProps,
+) => (
+	<EditorNumericControl
+		{...props}
+		step={0.001}
+	>
+		<EditorDurationHint seconds={props.value} />
+	</EditorNumericControl>
+);
+
+export const EditorChoiceControl = <Value extends string>({
+	compact = false,
+	description,
+	error,
 	label,
 	onChange,
 	options,
 	value,
 }: {
-	readonly description?: string;
-	readonly label: string;
+	readonly compact?: boolean;
 	readonly onChange: (value: Value) => void;
 	readonly options: ReadonlyArray<{
 		readonly description?: ReactNode;
@@ -144,25 +235,36 @@ export const EditorChoiceControl = <Value extends string>({
 		readonly value: Value;
 	}>;
 	readonly value: Value;
-}) => (
-	<div className="grid min-w-0 content-start gap-1.5 text-sm">
-		<EditorValueLabel
-			description={description}
-			label={label}
-		/>
+} & EditorValueControlProps) => (
+	<fieldset
+		className="grid min-w-0 content-start gap-1.5 text-sm"
+		{...readDataUiFn({
+			dataUi: "EditorChoiceControl",
+			state: {
+				invalid: error !== undefined,
+			},
+		})}
+	>
+		<legend>
+			<EditorValueLabel
+				description={description}
+				label={label}
+			/>
+		</legend>
 		<div className="flex min-w-0 flex-wrap gap-2">
 			{options.map((option) => {
 				const button = (
 					<button
 						key={option.value}
 						type="button"
-						aria-pressed={option.value === value}
-						className={`inline-flex min-h-[var(--ak-control-min-height)] cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-							option.value === value
-								? selectableActiveClassName
-								: selectableInactiveClassName
-						}`}
+						className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${compact ? "min-h-9" : "min-h-[var(--ak-control-min-height)]"} ${selectableClassName}`}
 						onClick={() => onChange(option.value)}
+						{...readDataUiFn({
+							dataUi: "EditorChoiceControlOption",
+							state: {
+								selected: option.value === value,
+							},
+						})}
 					>
 						{option.label}
 						{option.description === undefined ? null : (
@@ -182,5 +284,8 @@ export const EditorChoiceControl = <Value extends string>({
 				);
 			})}
 		</div>
-	</div>
+		{error === undefined ? null : (
+			<span className="text-xs leading-5 text-danger">{error}</span>
+		)}
+	</fieldset>
 );

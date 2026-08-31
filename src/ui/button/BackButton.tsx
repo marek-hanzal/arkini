@@ -13,10 +13,7 @@ export const BackButton = forwardRef<HTMLButtonElement, BackButtonProps>(
 			className={twMerge("mx-auto gap-2", className)}
 			{...props}
 		>
-			<ArrowLeft
-				className="size-4"
-				aria-hidden="true"
-			/>
+			<ArrowLeft className="size-4" />
 			{children}
 		</PrimaryButton>
 	),

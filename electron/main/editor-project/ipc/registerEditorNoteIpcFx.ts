@@ -1,12 +1,33 @@
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
+import { z } from "zod";
 
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
+import { EditorNoteContentSchema } from "~/project-note/schema/EditorNoteSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
-import { createEditorNoteRequestParserFx } from "./createEditorNoteRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
+import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
+
+const createNoteSchema = z
+	.object({
+		projectId: IdSchema,
+		content: EditorNoteContentSchema,
+	})
+	.strict();
+const noteKeySchema = z
+	.object({
+		projectId: IdSchema,
+		noteId: IdSchema,
+	})
+	.strict();
+const updateNoteSchema = noteKeySchema
+	.extend({
+		content: EditorNoteContentSchema,
+	})
+	.strict();
 
 export namespace registerEditorNoteIpcFx {
 	export interface Props {
@@ -18,60 +39,57 @@ export namespace registerEditorNoteIpcFx {
 /** Registers project-note IPC over the canonical editor-project repository. */
 export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 	({ ownership, trustedRenderer }: registerEditorNoteIpcFx.Props) =>
-		Effect.gen(function* () {
-			const requestParser = yield* createEditorNoteRequestParserFx();
-			return yield* Effect.sync(() => {
-				const handle = <Value>(
-					channel: string,
-					run: (candidate: unknown) => Effect.Effect<Value>,
-				) =>
-					ipcMain.handle(channel, (event: IpcMainInvokeEvent, candidate) =>
-						ElectronMainRuntime.runPromise(
-							trustedRenderer
-								.assertTrustedIpcSenderFx(event)
-								.pipe(Effect.andThen(run(candidate))),
-						),
-					);
-
-				handle(ArkiniElectronApi.channels.editorNoteList, (candidate) =>
-					executeEditorProjectRepositoryFx(
-						"list-notes",
-						ownership,
-						requestParser.parseProjectIdFx(candidate),
-						(repository, projectId) => repository.listNotesFx(projectId),
-					),
-				);
-				handle(ArkiniElectronApi.channels.editorNoteCreate, (candidate) =>
-					executeEditorProjectRepositoryFx(
-						"create-note",
-						ownership,
-						requestParser.parseCreateFx(candidate),
-						(repository, request) => repository.createNoteFx(request),
-					),
-				);
-				handle(ArkiniElectronApi.channels.editorNoteUpdate, (candidate) =>
-					executeEditorProjectRepositoryFx(
-						"update-note",
-						ownership,
-						requestParser.parseUpdateFx(candidate),
-						(repository, request) => repository.updateNoteFx(request),
-					),
-				);
-				handle(ArkiniElectronApi.channels.editorNoteDelete, (candidate) =>
-					executeEditorProjectRepositoryFx(
-						"delete-note",
-						ownership,
-						requestParser.parseDeleteFx(candidate),
-						(repository, request) => repository.deleteNoteFx(request),
+		Effect.sync(() => {
+			const handle = <Value>(
+				channel: string,
+				run: (candidate: unknown) => Effect.Effect<Value>,
+			) =>
+				ipcMain.handle(channel, (event: IpcMainInvokeEvent, candidate) =>
+					ElectronMainRuntime.runPromise(
+						trustedRenderer
+							.assertTrustedIpcSenderFx(event)
+							.pipe(Effect.andThen(run(candidate))),
 					),
 				);
 
-				return [
-					ArkiniElectronApi.channels.editorNoteList,
-					ArkiniElectronApi.channels.editorNoteCreate,
-					ArkiniElectronApi.channels.editorNoteUpdate,
-					ArkiniElectronApi.channels.editorNoteDelete,
-				];
-			});
+			handle(ArkiniElectronApi.channels.editorNoteList, (candidate) =>
+				executeEditorProjectRepositoryFx(
+					"list-notes",
+					ownership,
+					parseEditorProjectIpcRequestFx("list-notes", IdSchema, candidate),
+					(repository, projectId) => repository.listNotesFx(projectId),
+				),
+			);
+			handle(ArkiniElectronApi.channels.editorNoteCreate, (candidate) =>
+				executeEditorProjectRepositoryFx(
+					"create-note",
+					ownership,
+					parseEditorProjectIpcRequestFx("create-note", createNoteSchema, candidate),
+					(repository, request) => repository.createNoteFx(request),
+				),
+			);
+			handle(ArkiniElectronApi.channels.editorNoteUpdate, (candidate) =>
+				executeEditorProjectRepositoryFx(
+					"update-note",
+					ownership,
+					parseEditorProjectIpcRequestFx("update-note", updateNoteSchema, candidate),
+					(repository, request) => repository.updateNoteFx(request),
+				),
+			);
+			handle(ArkiniElectronApi.channels.editorNoteDelete, (candidate) =>
+				executeEditorProjectRepositoryFx(
+					"delete-note",
+					ownership,
+					parseEditorProjectIpcRequestFx("delete-note", noteKeySchema, candidate),
+					(repository, request) => repository.deleteNoteFx(request),
+				),
+			);
+
+			return [
+				ArkiniElectronApi.channels.editorNoteList,
+				ArkiniElectronApi.channels.editorNoteCreate,
+				ArkiniElectronApi.channels.editorNoteUpdate,
+				ArkiniElectronApi.channels.editorNoteDelete,
+			];
 		}),
 );

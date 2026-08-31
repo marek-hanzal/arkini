@@ -1,18 +1,18 @@
 import { Effect } from "effect";
-import type { ArkpackStorage } from "~/renderer/arkpack/ArkpackStorage";
-import { loadArkpackFx } from "~/renderer/arkpack/loadArkpackFx";
+import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
+import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
 import type { Game } from "~/renderer/game/Game";
 import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx";
 import { createGameResourceUrlsFx } from "~/renderer/game/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/renderer/game/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/renderer/game/diagnostics/installGameDiagnosticsFx";
-import { createElectronGameSaveStorageFx } from "~/renderer/save/createElectronGameSaveStorageFx";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
-import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
-import { decodeArkiniSaveFx } from "~/engine/save/fx/decodeArkiniSaveFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { startFx } from "~/engine/start/write/startFx";
+import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
+import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
+import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
+import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
+import { startFx } from "~/game-start/fx/startFx";
 import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
 
 export namespace createGameFx {

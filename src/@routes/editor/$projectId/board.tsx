@@ -2,16 +2,16 @@ import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useSyncExternalStore } from "react";
 
-import type { EditorBoardGame } from "~/renderer/editor/board/EditorBoardGame";
-import { EditorBoardGameAtom } from "~/ui/board/editor/EditorBoardGameAtom";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
+import { EditorBoardGameAtom } from "~/board-scenario/atom/EditorBoardGameAtom";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
-import { GameEngineProvider } from "~/ui/game/GameEngineProvider";
-import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
-import { EditorBoardItemDetailLink } from "~/ui/board/editor/EditorBoardItemDetailLink";
-import { EditorBoardProductionLineLink } from "~/ui/board/editor/EditorBoardProductionLineLink";
-import { EditorBoardScenarioToolbar } from "~/ui/board/editor/EditorBoardScenarioToolbar";
-import { PlayableGameShell } from "~/ui/shell/GameShell";
+import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
+import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
+import { EditorBoardItemDetailLink } from "~/board-scenario/ui/EditorBoardItemDetailLink";
+import { EditorBoardProductionLineLink } from "~/board-scenario/ui/EditorBoardProductionLineLink";
+import { EditorBoardScenarioToolbar } from "~/board-scenario/ui/EditorBoardScenarioToolbar";
+import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 
 type EditorGameResource = GameEngineResource<EditorBoardGame>;
 

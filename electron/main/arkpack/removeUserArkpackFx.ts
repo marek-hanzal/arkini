@@ -2,7 +2,7 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { ElectronMainError } from "../ElectronMainError";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 
 export namespace removeUserArkpackFx {
@@ -17,8 +17,7 @@ export namespace removeUserArkpackFx {
 export const removeUserArkpackFx = Effect.fn("removeUserArkpackFx")(
 	({ root, fileSystem, packageId }: removeUserArkpackFx.Props) =>
 		Effect.gen(function* () {
-			const stem = encodeGameProjectFileStem(packageId);
-			const path = join(root, `${stem}.arkpack`);
+			const path = join(root, readArkpackArtifactNameFn(packageId));
 			yield* fileSystem.makeDirectory(root, {
 				recursive: true,
 			});

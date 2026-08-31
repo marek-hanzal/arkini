@@ -6,8 +6,8 @@ import { Effect } from "effect";
 import type { EditorProjectTransport } from "../../contract/editor/EditorProjectTransport";
 import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 
 /** Saves the exact current local Editor build through one native file choice. */
 export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
@@ -26,7 +26,7 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 					dialog.showSaveDialog(window, {
 						title: "Save Arkpack",
 						buttonLabel: "Save Arkpack",
-						defaultPath: `${encodeGameProjectFileStem(request.projectId)}.arkpack`,
+						defaultPath: readArkpackArtifactNameFn(request.projectId),
 						filters: [
 							{
 								name: "Arkini package",

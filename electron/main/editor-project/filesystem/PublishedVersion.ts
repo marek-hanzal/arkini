@@ -1,5 +1,5 @@
-import type { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
-import type { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
+import type { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
+import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
 
 export interface PublishedVersion {
 	readonly descriptor: EditorVersionDescriptorFileSchema.Type;

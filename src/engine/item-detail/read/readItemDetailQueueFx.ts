@@ -1,17 +1,17 @@
 import { Effect, Option, Result } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
-import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
-import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
-import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { assertOutputCapacityFx } from "~/engine/job/fx/assertOutputCapacityFx";
-import { assertLineEnqueueConditionsFx } from "~/engine/job/fx/assertLineEnqueueConditionsFx";
+import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
+import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
+import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
+import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
+import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 
 interface ItemDetailQueueRequest {
 	readonly requestId: IdSchema.Type;
@@ -70,7 +70,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 	if (owner === undefined) return unavailable;
 	const lineOwner = isLineOwnerItemFn(owner.item);
 	if (Option.isNone(lineOwner)) return unavailable;
-	const capacity = yield* readItemQueueSizeFx({
+	const capacity = readItemQueueSizeFn({
 		item: lineOwner.value,
 	});
 	if (capacity === undefined) return unavailable;

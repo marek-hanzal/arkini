@@ -3,7 +3,7 @@ import { Effect, FileSystem, Path, Semaphore } from "effect";
 
 import type { OwnedEditorProjectRepository } from "../../EditorProjectServiceOwnership";
 import type { ProjectState } from "../ProjectState";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { createBoardScenarioOperationsFx } from "./createBoardScenarioOperationsFx";
 import { createNoteOperationsFx } from "./createNoteOperationsFx";
@@ -131,8 +131,6 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		closeFx: provide(repository.closeFx),
 	} satisfies OwnedEditorProjectRepository;
 });
-
-export type FilesystemEditorProjectRepository = OwnedEditorProjectRepository;
 
 /** Composes one filesystem-backed Editor repository with its Node platform services. */
 export const createFilesystemEditorProjectRepositoryFx = (

@@ -3,13 +3,13 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import type { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
-} from "~test/schema/expectNamedJsonSchemaGraph";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+} from "~test/support/schema/expectNamedJsonSchemaGraph";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,

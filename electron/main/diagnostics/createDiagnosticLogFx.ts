@@ -12,7 +12,14 @@ import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 import type { DiagnosticRecord } from "../../contract/diagnostics/DiagnosticRecord";
-import type { DiagnosticLog } from "./DiagnosticLog";
+
+/** Process-owned bounded diagnostic log capability exposed to trusted renderer IPC. */
+export interface DiagnosticLog {
+	readonly directoryPath: string;
+	readonly writeFx: (record: DiagnosticRecord) => Effect.Effect<void, unknown>;
+	readonly openDirectoryFx: Effect.Effect<void, unknown>;
+	readonly closeFx: Effect.Effect<void, unknown>;
+}
 
 const MAX_FILE_BYTES = 5 * 1_024 * 1_024;
 const MAX_FILES = 4;

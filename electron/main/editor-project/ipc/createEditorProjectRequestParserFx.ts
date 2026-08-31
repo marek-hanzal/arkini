@@ -1,24 +1,24 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type {
 	EditorProjectVersionCheckoutInput,
 	EditorProjectVersionCommitInput,
 	EditorProjectVersionDiffInput,
 	EditorProjectVersionTagInput,
-} from "~/editor/version/EditorProjectVersion";
+} from "~/project-version/type/EditorProjectVersion";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
-} from "~/editor/version/EditorProjectVersionMetadataSchema";
+} from "~/project-version/schema/EditorProjectVersionMetadataSchema";
 
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 

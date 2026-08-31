@@ -32,7 +32,6 @@ vi.mock("electron", () => electron);
 
 import { createChatGptViewControllerOwnershipFx } from "../../electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
 import { registerChatGptIpcFx } from "../../electron/main/chatgpt/registerChatGptIpcFx";
-import { registerChatGptViewControllerFx } from "../../electron/main/chatgpt/registerChatGptViewControllerFx";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
 
 describe("ChatGPT surface IPC", () => {
@@ -44,12 +43,8 @@ describe("ChatGPT surface IPC", () => {
 		electron.setOwner(window);
 		const ownership = Effect.runSync(createChatGptViewControllerOwnershipFx());
 		Effect.runSync(
-			registerChatGptViewControllerFx({
-				controller: {
-					setSurfaceFx,
-				},
-				ownership,
-				window,
+			ownership.attachControllerFx(window, {
+				setSurfaceFx,
 			}),
 		);
 		let trusted = false;

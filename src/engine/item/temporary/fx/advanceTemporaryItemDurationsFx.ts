@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace advanceTemporaryItemDurationsFx {
 	export interface Props {

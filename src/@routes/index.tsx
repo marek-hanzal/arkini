@@ -4,14 +4,14 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
 import { PrimaryButton } from "~/ui/button/Button";
-import { LauncherSplashCompletedAtom } from "~/ui/launcher/LauncherSplashCompletedAtom";
-import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { useStartupSplashLifecycle } from "~/ui/launcher/useStartupSplashLifecycle";
-import { startupContentViewTransitionName } from "~/ui/navigation/startupContentViewTransitionName";
+import { LauncherSplashCompletedAtom } from "~/launcher/atom/LauncherSplashCompletedAtom";
+import { LauncherScene } from "~/launcher/ui/LauncherScene";
+import { useStartupSplashLifecycle } from "~/launcher/ui/useStartupSplashLifecycle";
 
 const readLauncherSplashCompletedFx = Effect.fn("readLauncherSplashCompletedFx")(() =>
 	Atom.get(LauncherSplashCompletedAtom),
 );
+const startupContentViewTransitionName = "arkini-startup-content";
 
 export const Route = createFileRoute("/")({
 	beforeLoad: ({ context }) => {
@@ -73,7 +73,6 @@ export const Route = createFileRoute("/")({
 					>
 						<div
 							className="min-h-14 text-center text-sm text-muted"
-							aria-live="polite"
 							data-ui="StartupSplashContent"
 							style={{
 								viewTransitionName: startupContentViewTransitionName,

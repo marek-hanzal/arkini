@@ -1,0 +1,105 @@
+import { Array, Data, Effect, Option, pipe } from "effect";
+
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
+
+class ItemAlreadyExistsError extends Data.TaggedError("ItemAlreadyExistsError")<{
+	itemId: IdSchema.Type;
+}> {}
+
+class TestLocationOccupiedError extends Data.TaggedError("TestLocationOccupiedError")<{
+	itemId: IdSchema.Type;
+	location: GridLocationSchema.Type;
+}> {}
+
+export namespace spawnItemFx {
+	export interface Props {
+		id: IdSchema.Type;
+		itemId: IdSchema.Type;
+		location: GridLocationSchema.Type;
+		quantity: PositiveIntegerSchema.Type;
+	}
+}
+
+/**
+ * Atomically creates one new live item at an unoccupied location.
+ */
+export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
+	id,
+	itemId,
+	location,
+	quantity,
+}: spawnItemFx.Props) {
+	const item = yield* resolveItemFx({
+		itemId,
+	});
+	const runtimeItem = yield* createRuntimeItemFx({
+		id,
+		item,
+		location,
+		quantity,
+	});
+	return yield* modifyRuntimeFx((runtime) => {
+		return Effect.gen(function* () {
+			const duplicate = pipe(
+				runtime.items,
+				Array.findFirst((candidate) => candidate.id === id),
+				Option.getOrUndefined,
+			);
+			if (duplicate !== undefined) {
+				return yield* Effect.fail(
+					new ItemAlreadyExistsError({
+						itemId: id,
+					}),
+				);
+			}
+
+			const claim = readGridLocationClaimAtFn({
+				claims: readGridLocationClaimsFn({
+					runtime,
+				}),
+				location,
+			});
+			if (claim !== undefined) {
+				return yield* Effect.fail(
+					new TestLocationOccupiedError({
+						itemId: claim.itemId,
+						location,
+					}),
+				);
+			}
+
+			yield* assertPlacementMaxCountFx({
+				drop: {
+					itemId,
+					placement: PlacementSchema.enum.Drop,
+					quantity,
+				},
+				item,
+				runtime,
+			});
+
+			const nextRuntime = {
+				...runtime,
+				items: [
+					...runtime.items,
+					runtimeItem,
+				],
+			} satisfies RuntimeSchema.Type;
+
+			return [
+				runtimeItem,
+				nextRuntime,
+			] as const;
+		});
+	});
+});

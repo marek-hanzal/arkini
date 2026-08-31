@@ -5,7 +5,7 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { writeArkpackFileFx } from "./writeArkpackFileFx";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 
 export namespace writeUserArkpackFx {
 	export interface Props {
@@ -27,9 +27,8 @@ export const writeUserArkpackFx = Effect.fn("writeUserArkpackFx")(
 					new Error(`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`),
 				);
 			}
-			const stem = encodeGameProjectFileStem(record.packageId);
 			yield* writeArkpackFileFx({
-				arkpackPath: join(root, `${stem}.arkpack`),
+				arkpackPath: join(root, readArkpackArtifactNameFn(record.packageId)),
 				bytes: record.bytes,
 				fileSystem,
 			});

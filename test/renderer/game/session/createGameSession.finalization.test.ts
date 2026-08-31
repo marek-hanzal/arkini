@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { Effect } from "effect";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 
 import { waitFor } from "./createGameSession.test/fixture";
 

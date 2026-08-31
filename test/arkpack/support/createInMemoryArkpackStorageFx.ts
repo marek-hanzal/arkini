@@ -1,0 +1,48 @@
+import { Effect } from "effect";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
+
+/** Creates an explicit in-memory Arkpack capability for tests only. */
+export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackStorageFx")(() =>
+	Effect.sync(() => {
+		const files = new Map<string, ArkpackStorage.File>();
+		return {
+			listFx: Effect.sync(() =>
+				Array.from(files.values(), (file) => ({
+					...file,
+					bytes: file.bytes.slice(0),
+				})).sort((left, right) => left.packageId.localeCompare(right.packageId)),
+			),
+			readFx: (packageId) =>
+				Effect.sync(() => {
+					const file = files.get(packageId);
+					return file === undefined
+						? []
+						: [
+								{
+									...file,
+									bytes: file.bytes.slice(0),
+								},
+							];
+				}),
+			removeFx: (packageId) =>
+				Effect.sync(() => {
+					files.delete(packageId);
+				}),
+			writeFx: (packageId, bytes) =>
+				Effect.sync(() => {
+					files.set(packageId, {
+						packageId,
+						filename: readArkpackArtifactNameFn(packageId),
+						bytes: bytes.slice(0),
+						provenance: {
+							type: "community",
+						},
+						source: "user",
+						overridesBundled: false,
+					});
+				}),
+			openUserDirectoryFx: Effect.void,
+		} satisfies ArkpackStorage;
+	}),
+);

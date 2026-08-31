@@ -1,17 +1,17 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
-import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace isolateGridStatefulOwnerTransitionFx {
 	export interface Props {

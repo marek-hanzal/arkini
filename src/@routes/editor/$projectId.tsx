@@ -3,17 +3,17 @@ import { Effect } from "effect";
 
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectProvider } from "~/authoring-session/ui/useEditorProject";
-import { readEditorProjectFx } from "~/project-authoring/fx/readEditorProjectFx";
+import { readProjectFx } from "~/project-authoring/fx/readProjectFx";
 import { ButtonLink } from "~/ui/ui/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/ui/EditorShell";
 import { ProjectResourceUrlProvider } from "~/authoring-session/ui/ResourceUrlSession";
-import { EditorVersionRestoreAction } from "~/project-version/ui/EditorVersionRestoreAction";
+import { VersionRestoreAction } from "~/project-version/ui/VersionRestoreAction";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
-	(project: EditorProject | undefined) =>
+	(project: Project | undefined) =>
 		project === undefined ? releaseCurrentEditorBoardGameFx : syncEditorBoardGameFx(project),
 );
 
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/editor/$projectId")({
 	loader: {
 		handler: ({ abortController, context, params }) =>
 			context.rendererRuntime.runPromise(
-				readEditorProjectFx({
+				readProjectFx({
 					projectId: params.projectId,
 				}),
 				{
@@ -66,7 +66,7 @@ export const Route = createFileRoute("/editor/$projectId")({
 		const project = Route.useLoaderData();
 		return (
 			<EditorProjectProvider loaded={project}>
-				<EditorVersionRestoreAction projectId={project.projectId} />
+				<VersionRestoreAction projectId={project.projectId} />
 				<EditorProjectReplacementBoundary>
 					<ProjectResourceUrlProvider>
 						<EditorShell>

@@ -1,10 +1,10 @@
 import { ChevronRight, FolderKanban, FolderX, Trash2 } from "lucide-react";
 
 import type {
-	EditorProjectCandidate,
-	EditorProjectOwnership,
-} from "~/project-authoring/schema/EditorProjectCandidateSchema";
-import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
+	ProjectCandidate,
+	ProjectOwnership,
+} from "~/project-authoring/schema/ProjectCandidateSchema";
+import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import { Button, ButtonLink } from "~/ui/ui/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
@@ -14,12 +14,9 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 
 interface EditorRecentProjectsProps {
 	readonly blocked: boolean;
-	readonly onDeleteProject: (
-		project: EditorProjectDescriptor,
-		ownership: EditorProjectOwnership,
-	) => void;
+	readonly onDeleteProject: (project: ProjectDescriptor, ownership: ProjectOwnership) => void;
 	readonly onOpenProjectFolder: (root: string) => void;
-	readonly projects: ReadonlyArray<EditorProjectCandidate>;
+	readonly projects: ReadonlyArray<ProjectCandidate>;
 }
 
 /** Renders canonical projects in repository-supplied recent order. */

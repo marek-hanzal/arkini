@@ -143,7 +143,7 @@ vi.mock("~/ui/ui/Button", () => ({
 import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 const EditorBuild = EditorBuildRouteDefinition.options.component;
 if (EditorBuild === undefined) throw new Error("Editor Build route component is missing.");
@@ -297,7 +297,7 @@ describe("EditorBuild", () => {
 			],
 		};
 		state.buildResult = AsyncResult.fail(
-			new EditorProjectRepositoryError({
+			new ProjectRepositoryError({
 				operation: "build-project",
 				message: "Editor project validation failed.",
 				diagnostics,

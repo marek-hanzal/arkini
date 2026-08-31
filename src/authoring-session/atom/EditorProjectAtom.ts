@@ -1,26 +1,26 @@
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProject, EditorProjectCommit } from "~/project-authoring/type/EditorProject";
+import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
 
 export namespace EditorProjectAtom {
 	export interface State {
-		readonly project: EditorProject | undefined;
-		readonly pendingCommits: ReadonlyMap<number, EditorProjectCommit>;
+		readonly project: Project | undefined;
+		readonly pendingCommits: ReadonlyMap<number, ProjectCommit>;
 	}
 
 	export type Command =
 		| {
-				readonly project: EditorProject;
+				readonly project: Project;
 				readonly commit?: never;
 				readonly replacement?: never;
 		  }
 		| {
-				readonly commit: EditorProjectCommit;
+				readonly commit: ProjectCommit;
 				readonly project?: never;
 				readonly replacement?: never;
 		  }
 		| {
-				readonly replacement: EditorProject;
+				readonly replacement: Project;
 				readonly commit?: never;
 				readonly project?: never;
 		  };
@@ -32,10 +32,7 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 		project: undefined,
 		pendingCommits: new Map(),
 	});
-	const applyPendingCommits = (
-		initial: EditorProject,
-		pendingCommits: Map<number, EditorProjectCommit>,
-	) => {
+	const applyPendingCommits = (initial: Project, pendingCommits: Map<number, ProjectCommit>) => {
 		let project = initial;
 		for (const [previousRevision, commit] of pendingCommits) {
 			if (commit.revision <= project.revision) pendingCommits.delete(previousRevision);

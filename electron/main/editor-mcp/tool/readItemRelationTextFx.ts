@@ -1,6 +1,6 @@
 import { Effect, Order } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
 import type {
@@ -117,7 +117,7 @@ const readItemOriginRelationSubgraphFn = ({
 	};
 };
 
-const itemReference = (project: EditorProject, itemId: string) => {
+const itemReference = (project: Project, itemId: string) => {
 	const item = project.config.items[itemId];
 	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
 };
@@ -141,7 +141,7 @@ const outputAnnotation = (output: ItemOriginOutputOccurrence) =>
 				]),
 	].join(", ");
 
-const outputRequirementLines = (project: EditorProject, output: ItemOriginOutputOccurrence) => [
+const outputRequirementLines = (project: Project, output: ItemOriginOutputOccurrence) => [
 	...output.requirements.allOf.map(
 		(requirement) =>
 			`      requires all: ${itemReference(project, requirement.itemId)} (quantity ${formatQuantity(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
@@ -159,7 +159,7 @@ const outputRequirementLines = (project: EditorProject, output: ItemOriginOutput
 	),
 ];
 
-const sourceReferenceLines = (project: EditorProject, source: ItemOriginSource) => [
+const sourceReferenceLines = (project: Project, source: ItemOriginSource) => [
 	`  Source item: ${itemReference(project, source.ownerItemId)}`,
 	...(() => {
 		switch (source.reference.type) {
@@ -185,7 +185,7 @@ const sourceReferenceLines = (project: EditorProject, source: ItemOriginSource) 
 
 /** Reads and formats one directional item-relation view. */
 export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(function* (
-	project: EditorProject,
+	project: Project,
 	{
 		itemId,
 		level,

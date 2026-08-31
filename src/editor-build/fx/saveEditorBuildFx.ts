@@ -2,12 +2,12 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
+import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 
 /** Saves one exact Editor Build artifact through the privileged native dialog. */
 export const saveEditorBuildFx = Effect.fn("saveEditorBuildFx")(
 	(artifact: EditorProjectBuildSchema.Type) =>
-		invokeEditorProjectTransportFx({
+		invokeProjectTransportFx({
 			call: () =>
 				window.arkini.editor.saveProjectBuild({
 					projectId: artifact.projectId,

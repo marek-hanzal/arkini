@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 
 /** Opens an existing matching Editor project or creates it from the installed Arkpack. */
 export const openEditorArkpackFx = Effect.fn("openEditorArkpackFx")(function* (packageId: string) {
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	const existing = yield* repository.readProjectFx(packageId);
-	if (existing !== null) return existing satisfies EditorProjectDescriptor;
+	if (existing !== null) return existing satisfies ProjectDescriptor;
 
 	const { payload } = yield* loadArkpackFx({
 		packageId,
@@ -18,5 +18,5 @@ export const openEditorArkpackFx = Effect.fn("openEditorArkpackFx")(function* (p
 		config: payload.config,
 		resources: payload.resources,
 	});
-	return project satisfies EditorProjectDescriptor;
+	return project satisfies ProjectDescriptor;
 });

@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 
@@ -11,7 +11,7 @@ const indentText = (value: string) =>
 		.join("\n");
 
 /** Filters, pages, and formats one item_collection response. */
-export const readItemCollectionTextFn = (project: EditorProject, input: ItemCollectionInput) => {
+export const readItemCollectionTextFn = (project: Project, input: ItemCollectionInput) => {
 	const items = Object.values(project.config.items).sort((left, right) =>
 		Order.String(left.title, right.title),
 	);

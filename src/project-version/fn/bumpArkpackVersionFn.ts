@@ -1,4 +1,4 @@
-import type { EditorProjectCompatibilityResult } from "~/project-version/type/EditorProjectCompatibility";
+import type { ProjectCompatibilityResult } from "~/project-version/type/ProjectCompatibility";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 const incrementDecimalDigitsFn = (digits: string) => {
@@ -15,7 +15,7 @@ const incrementDecimalDigitsFn = (digits: string) => {
 /** Applies one classified editor commit to its persisted gameplay compatibility version. */
 export const bumpArkpackVersionFn = (
 	version: GameVersionSchema.Type,
-	result: EditorProjectCompatibilityResult,
+	result: ProjectCompatibilityResult,
 ) => {
 	const separator = version.indexOf(".");
 	if (separator < 0) return version;

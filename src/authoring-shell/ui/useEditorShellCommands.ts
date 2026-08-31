@@ -8,10 +8,10 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { useEditorProjectRefreshController } from "~/authoring-session/ui/useEditorProjectRefreshController";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 
 const waitForEditorProjectWritesCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.fn((_, get) => {
 			const catalog = get(ArkpackCatalogOwnerAtom);
 			return Effect.all([

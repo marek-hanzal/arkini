@@ -1,21 +1,21 @@
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
+import type { Project } from "~/project-authoring/type/Project";
 import { ButtonLink, DangerButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { DeleteDialog } from "~/item-authoring/ui/DeleteDialog";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useDeleteController } from "~/item-authoring/ui/useDeleteController";
-import { EditorProjectSections } from "~/project-authoring/type/EditorProjectSections";
-import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
+import { ProjectSections } from "~/project-authoring/type/ProjectSections";
+import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
 
 const DeleteBlockerLink = ({
 	blocker,
 	project,
 }: {
 	readonly blocker: readDeleteBlockersFn.Blocker;
-	readonly project: EditorProject;
+	readonly project: Project;
 }) => {
 	if (
 		blocker.path[0] === "items" &&
@@ -50,8 +50,8 @@ const DeleteBlockerLink = ({
 		);
 	}
 
-	const sectionId = readEditorProjectSectionForPathFn(blocker.path);
-	const section = EditorProjectSections.find((candidate) => candidate.id === sectionId);
+	const sectionId = readProjectSectionForPathFn(blocker.path);
+	const section = ProjectSections.find((candidate) => candidate.id === sectionId);
 	return (
 		<ButtonLink
 			to="/editor/$projectId/project/$sectionId"

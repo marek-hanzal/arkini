@@ -2,7 +2,7 @@ import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
@@ -19,7 +19,7 @@ afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
 });
 
-const createProject = (revision: number): EditorProject => ({
+const createProject = (revision: number): Project => ({
 	projectId: "project",
 	title: "Project",
 	version: "1.0",

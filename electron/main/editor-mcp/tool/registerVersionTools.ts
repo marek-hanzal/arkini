@@ -2,18 +2,18 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
 import type {
-	EditorProjectVersionDescriptor,
-	EditorProjectVersionDiff,
-	EditorProjectVersionReference,
-} from "~/project-version/type/EditorProjectVersion";
+	ProjectVersionDescriptor,
+	ProjectVersionDiff,
+	ProjectVersionReference,
+} from "~/project-version/type/ProjectVersion";
 import {
-	EditorProjectVersionBodySchema,
-	EditorProjectVersionSubjectSchema,
-	EditorProjectVersionTagSchema,
-} from "~/project-version/schema/EditorProjectVersionMetadataSchema";
+	ProjectVersionBodySchema,
+	ProjectVersionSubjectSchema,
+	ProjectVersionTagSchema,
+} from "~/project-version/schema/ProjectVersionMetadataSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 
 type ToolResult = {
@@ -68,9 +68,9 @@ const VersionDiffInputSchema = z
 
 const VersionCommitInputSchema = z
 	.object({
-		message: EditorProjectVersionSubjectSchema,
-		body: EditorProjectVersionBodySchema.optional(),
-		tag: EditorProjectVersionTagSchema.optional(),
+		message: ProjectVersionSubjectSchema,
+		body: ProjectVersionBodySchema.optional(),
+		tag: ProjectVersionTagSchema.optional(),
 	})
 	.strict()
 	.meta({
@@ -98,7 +98,7 @@ const VersionCheckoutInputSchema = z
 const VersionTagInputSchema = z
 	.object({
 		versionId: IdSchema,
-		tag: EditorProjectVersionTagSchema.optional(),
+		tag: ProjectVersionTagSchema.optional(),
 	})
 	.strict()
 	.meta({
@@ -107,7 +107,7 @@ const VersionTagInputSchema = z
 		description: "The saved version and optional replacement tag.",
 	});
 
-const decodeReference = (value: string): EditorProjectVersionReference =>
+const decodeReference = (value: string): ProjectVersionReference =>
 	value === "current"
 		? {
 				type: "current",
@@ -117,7 +117,7 @@ const decodeReference = (value: string): EditorProjectVersionReference =>
 				versionId: value,
 			};
 
-const describeVersion = (version: EditorProjectVersionDescriptor) =>
+const describeVersion = (version: ProjectVersionDescriptor) =>
 	[
 		`${version.versionId} · ${version.subject}`,
 		`  ${new Date(version.createdAtMs).toISOString()} · Arkini ${version.arkini}`,
@@ -133,7 +133,7 @@ const describeVersion = (version: EditorProjectVersionDescriptor) =>
 				]),
 	].join("\n");
 
-const formatDiff = (diff: EditorProjectVersionDiff) => {
+const formatDiff = (diff: ProjectVersionDiff) => {
 	const formatBump = (bump: "major" | "minor" | undefined) =>
 		bump === undefined ? "" : ` · ${bump} bump`;
 	const lines = [
@@ -157,8 +157,8 @@ const formatDiff = (diff: EditorProjectVersionDiff) => {
 export namespace registerVersionTools {
 	export interface Props {
 		readonly notifyProjectChanged: (projectId: string) => void;
-		readonly readProjectFx: () => Effect.Effect<EditorProject, unknown>;
-		readonly repository: EditorProjectRepositoryService;
+		readonly readProjectFx: () => Effect.Effect<Project, unknown>;
+		readonly repository: ProjectRepositoryService;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,

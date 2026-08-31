@@ -3,9 +3,9 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import type { EditorProjectVersionReference } from "~/project-version/type/EditorProjectVersion";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import type { ProjectVersionReference } from "~/project-version/type/ProjectVersion";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
@@ -14,7 +14,7 @@ export namespace createVersionReaderFx {
 	export interface Props {
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
 	}
 }
 
@@ -66,7 +66,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 	) {
 		const state = yield* readState(projectId);
 		const scenarios = state.scenarios.map((scenario) =>
-			EditorBoardScenarioFileSchema.parse({
+			BoardScenarioFileSchema.parse({
 				name: scenario.name,
 				revision: scenario.projectRevision,
 				version: scenario.version,
@@ -97,7 +97,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 
 	const readDiffSnapshotFx = Effect.fn("readVersionDiffSnapshotFx")(function* (
 		state: ProjectState,
-		reference: EditorProjectVersionReference,
+		reference: ProjectVersionReference,
 	) {
 		if (reference.type === "current")
 			return {

@@ -1,8 +1,8 @@
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
 
 export interface ItemEstimateWorkerRequest {
-	readonly config: EditorProject["config"];
+	readonly config: Project["config"];
 }
 
 export interface ItemEstimateWorkerResult {

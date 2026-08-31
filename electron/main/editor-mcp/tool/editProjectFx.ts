@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import type { EditProjectInput } from "./EditProjectInputSchema";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 
@@ -14,8 +14,8 @@ export const editProjectFx = Effect.fn("editProjectFx")(function* ({
 }: {
 	readonly input: EditProjectInput;
 	readonly notifyProjectChanged: (projectId: string) => void;
-	readonly project: EditorProject;
-	readonly repository: EditorProjectRepositoryService;
+	readonly project: Project;
+	readonly repository: ProjectRepositoryService;
 }) {
 	if (input.revision !== undefined && input.revision !== project.revision)
 		return yield* Effect.fail(

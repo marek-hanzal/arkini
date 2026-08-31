@@ -7,7 +7,7 @@ import { ElectronMainError } from "../../../../electron/main/ElectronMainError";
 import type { EditorProjectServiceOwnership } from "../../../../electron/main/editor-project/EditorProjectServiceOwnership";
 import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createEditorProjectIpcRepository,
@@ -528,7 +528,7 @@ describe("registerEditorProjectIpcFx", () => {
 		const repository = {
 			...createEditorProjectIpcRepository(),
 			listProjectsFx: Effect.fail(
-				new EditorProjectRepositoryError({
+				new ProjectRepositoryError({
 					operation: "list-projects",
 					message: "Editor storage read failed.",
 					cause: new Error("private storage detail"),

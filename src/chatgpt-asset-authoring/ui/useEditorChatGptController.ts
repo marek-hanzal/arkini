@@ -5,7 +5,7 @@ import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } fro
 import { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { saveEditorAssetFx } from "~/asset-authoring/fx/saveEditorAssetFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
@@ -72,13 +72,13 @@ const subscribeChatGptAssetCandidateFx = Effect.fn("subscribeChatGptAssetCandida
 );
 
 const saveEditorAssetCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
 			Atom.fn((props: SaveEditorAssetCommandProps) =>
 				saveEditorAssetFx({
 					...props,
 					projectId,
-				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+				}).pipe(Effect.provideService(ProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),
 		),
 	),

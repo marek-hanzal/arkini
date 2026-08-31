@@ -3,16 +3,16 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject, EditorProjectCommit } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import {
-	EditorProjectRepositoryError,
-	type EditorProjectRepositoryOperation,
-} from "~/project-authoring/error/EditorProjectRepositoryError";
+	ProjectRepositoryError,
+	type ProjectRepositoryOperation,
+} from "~/project-authoring/error/ProjectRepositoryError";
 import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
-import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
+import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
@@ -23,7 +23,7 @@ import { withFilesystemWriteRecovery } from "~/filesystem-write/error/Filesystem
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
 type Operations = Pick<
-	EditorProjectRepositoryService,
+	ProjectRepositoryService,
 	| "deleteItemFx"
 	| "deleteResourceFx"
 	| "replaceConfigFx"
@@ -33,16 +33,16 @@ type Operations = Pick<
 	| "upsertResourcesFx"
 >;
 
-const error = (operation: EditorProjectRepositoryOperation, message: string, cause?: unknown) =>
-	cause instanceof EditorProjectRepositoryError && cause.operation === operation
+const error = (operation: ProjectRepositoryOperation, message: string, cause?: unknown) =>
+	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
-		: new EditorProjectRepositoryError({
+		: new ProjectRepositoryError({
 				operation,
 				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
-const cloneProject = (project: EditorProject): EditorProject => ({
+const cloneProject = (project: Project): Project => ({
 	...project,
 	resources: project.resources.map((resource) => ({
 		...resource,
@@ -51,9 +51,9 @@ const cloneProject = (project: EditorProject): EditorProject => ({
 });
 
 const asCommit = (
-	{ resources: _resources, ...project }: EditorProject,
+	{ resources: _resources, ...project }: Project,
 	previousRevision: number,
-): EditorProjectCommit => ({
+): ProjectCommit => ({
 	...project,
 	previousRevision,
 });
@@ -61,7 +61,7 @@ const asCommit = (
 const assertExpectedRevision = (
 	state: ProjectState,
 	expectedRevision: number,
-	operation: EditorProjectRepositoryOperation,
+	operation: ProjectRepositoryOperation,
 ) => {
 	return state.project.revision === expectedRevision
 		? Effect.void
@@ -78,7 +78,7 @@ export namespace createCommitOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
 		readonly states: Map<string, ProjectState>;
 	}
 }
@@ -118,10 +118,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			return yield* Effect.fail(
 				new Error("The Editor project ID can only change through Refresh from disk."),
 			);
-		const compatibility = analyzeEditorProjectCompatibilityFn(
-			state.project.config,
-			canonicalConfig,
-		);
+		const compatibility = analyzeProjectCompatibilityFn(state.project.config, canonicalConfig);
 		const result =
 			minimumResult === "minor" && compatibility.result === "noop"
 				? "minor"
@@ -132,7 +129,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			arkini: ArkiniAppVersion,
 			revision: updatedAtMs,
 		});
-		const nextProject: EditorProject = {
+		const nextProject: Project = {
 			...state.project,
 			title: canonicalConfig.meta.title,
 			version,
@@ -336,7 +333,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		);
 
 	const commitResourcesFx = (
-		operation: EditorProjectRepositoryOperation,
+		operation: ProjectRepositoryOperation,
 		projectId: string,
 		expectedRevision: number | undefined,
 		change: (state: ProjectState) => Effect.Effect<
@@ -344,7 +341,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ResourceSchema.Type>;
 			},
-			EditorProjectRepositoryError
+			ProjectRepositoryError
 		>,
 	) =>
 		Effect.gen(function* () {

@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
 import {
 	ItemEstimateCacheAtom,
@@ -27,7 +27,7 @@ const sameSnapshot = (
 ) => left?.projectId === right.projectId && left.revision === right.revision;
 
 /** Reads a cached estimate or requests one from the renderer-owned estimate authority. */
-export const useItemEstimate = (project: EditorProject, itemId: string): ItemEstimateState => {
+export const useItemEstimate = (project: Project, itemId: string): ItemEstimateState => {
 	const snapshot = useMemo<ItemEstimateCache.Snapshot>(
 		() => ({
 			config: project.config,

@@ -3,20 +3,20 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { editEditorAssetFx } from "~/asset-authoring/fx/editEditorAssetFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
-const createProject = (revision = 3): EditorProject => ({
+const createProject = (revision = 3): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,
@@ -28,9 +28,9 @@ const createProject = (revision = 3): EditorProject => ({
 });
 
 const createRepository = (
-	replaceResourceFx: EditorProjectRepositoryService["replaceResourceFx"],
+	replaceResourceFx: ProjectRepositoryService["replaceResourceFx"],
 	project = createProject(),
-): EditorProjectRepositoryService => ({
+): ProjectRepositoryService => ({
 	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected create."),
@@ -62,7 +62,7 @@ describe("Asset Authoring editEditorAssetFx", () => {
 				revision: project.revision - 1,
 			},
 		});
-		const replaceResourceFx = vi.fn<EditorProjectRepositoryService["replaceResourceFx"]>(
+		const replaceResourceFx = vi.fn<ProjectRepositoryService["replaceResourceFx"]>(
 			({ config, resource }) =>
 				Effect.succeed({
 					...project,
@@ -82,7 +82,7 @@ describe("Asset Authoring editEditorAssetFx", () => {
 				projectId: project.projectId,
 				resourceId: "new-hero",
 			}).pipe(
-				Effect.provideService(EditorProjectRepository, createRepository(replaceResourceFx)),
+				Effect.provideService(ProjectRepository, createRepository(replaceResourceFx)),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
 			),
 		);
@@ -112,9 +112,9 @@ describe("Asset Authoring editEditorAssetFx", () => {
 		registry.set(projectAtom, {
 			project,
 		});
-		const replaceResourceFx: EditorProjectRepositoryService["replaceResourceFx"] = () =>
+		const replaceResourceFx: ProjectRepositoryService["replaceResourceFx"] = () =>
 			Effect.fail(
-				new EditorProjectRepositoryError({
+				new ProjectRepositoryError({
 					operation: "replace-resource",
 					message: "stale revision",
 				}),
@@ -127,10 +127,7 @@ describe("Asset Authoring editEditorAssetFx", () => {
 					projectId: project.projectId,
 					resourceId: "new-hero",
 				}).pipe(
-					Effect.provideService(
-						EditorProjectRepository,
-						createRepository(replaceResourceFx),
-					),
+					Effect.provideService(ProjectRepository, createRepository(replaceResourceFx)),
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
 				),
 			),

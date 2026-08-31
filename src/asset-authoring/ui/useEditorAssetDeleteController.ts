@@ -5,7 +5,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
 import { deleteEditorAssetFx } from "~/asset-authoring/fx/deleteEditorAssetFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import {
@@ -20,13 +20,13 @@ interface DeleteEditorAssetCommandProps {
 }
 
 const deleteEditorAssetCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
 			Atom.fn((props: DeleteEditorAssetCommandProps) =>
 				deleteEditorAssetFx({
 					...props,
 					projectId,
-				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+				}).pipe(Effect.provideService(ProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),
 		),
 	),

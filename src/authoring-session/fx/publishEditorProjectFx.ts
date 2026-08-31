@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 
-const publishEditorBoardGameFx = Effect.fn("publishEditorBoardGameFx")((project: EditorProject) =>
+const publishEditorBoardGameFx = Effect.fn("publishEditorBoardGameFx")((project: Project) =>
 	Atom.get(EditorBoardGameResourceOwnerAtom).pipe(
 		Effect.flatMap((owner) => (owner === undefined ? Effect.void : owner.publishFx(project))),
 	),

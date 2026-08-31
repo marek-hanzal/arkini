@@ -4,7 +4,7 @@ import type {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 interface EditorBuildProps {
 	readonly expectedRevision: number;
@@ -20,10 +20,10 @@ interface ReadEditorBuildProps {
 export interface EditorBuildRepositoryService {
 	readonly buildProjectFx: (
 		props: EditorBuildProps,
-	) => Effect.Effect<EditorProjectBuildSchema.Type, EditorProjectRepositoryError>;
+	) => Effect.Effect<EditorProjectBuildSchema.Type, ProjectRepositoryError>;
 	readonly readProjectBuildFx: (
 		props: ReadEditorBuildProps,
-	) => Effect.Effect<EditorProjectBuildContentSchema.Type, EditorProjectRepositoryError>;
+	) => Effect.Effect<EditorProjectBuildContentSchema.Type, ProjectRepositoryError>;
 }
 
 /** Renderer capability for building and rereading exact revision-pinned Editor artifacts. */

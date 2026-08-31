@@ -8,10 +8,10 @@ import {
 	useState,
 } from "react";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
-type Resource = EditorProject["resources"][number];
+type Resource = Project["resources"][number];
 type ResourceUrlListener = () => void;
 
 interface ResourceUrlEntry {
@@ -23,7 +23,7 @@ interface ResourceUrlEntry {
 interface ResourceUrlStore {
 	readonly read: (resourceId: string) => string | undefined;
 	readonly subscribe: (resourceId: string, listener: ResourceUrlListener) => () => void;
-	readonly sync: (resources: EditorProject["resources"]) => void;
+	readonly sync: (resources: Project["resources"]) => void;
 	readonly dispose: () => void;
 }
 
@@ -34,7 +34,7 @@ const ResourceUrlProvider = ({
 	children,
 	resources,
 }: PropsWithChildren<{
-	readonly resources: EditorProject["resources"];
+	readonly resources: Project["resources"];
 }>) => {
 	const storeRef = useRef<ResourceUrlStore | undefined>(undefined);
 	if (storeRef.current === undefined) {

@@ -2,14 +2,14 @@ import { Effect, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
-const project: EditorProject = {
+const project: Project = {
 	projectId: "editor-board",
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,
@@ -33,7 +33,7 @@ const state: StateSchema.Type = {
 };
 
 const createResource = (
-	ownedProject: EditorProject,
+	ownedProject: Project,
 	disposeWithoutSaveFx: Effect.Effect<void>,
 ): GameEngineResource<EditorBoardGame> => ({
 	game: {
@@ -53,19 +53,18 @@ describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 	it.effect("disposes the live session before creating a same-revision scenario session", () =>
 		Effect.gen(function* () {
 			const events: string[] = [];
-			const createResourceFx = vi.fn(
-				(ownedProject: EditorProject, restored?: StateSchema.Type) =>
-					Effect.sync(() => {
-						events.push(restored === undefined ? "create-fresh" : "create-restored");
-						return createResource(
-							ownedProject,
-							Effect.sync(() => {
-								events.push(
-									restored === undefined ? "dispose-fresh" : "dispose-restored",
-								);
-							}),
-						);
-					}),
+			const createResourceFx = vi.fn((ownedProject: Project, restored?: StateSchema.Type) =>
+				Effect.sync(() => {
+					events.push(restored === undefined ? "create-fresh" : "create-restored");
+					return createResource(
+						ownedProject,
+						Effect.sync(() => {
+							events.push(
+								restored === undefined ? "dispose-fresh" : "dispose-restored",
+							);
+						}),
+					);
+				}),
 			);
 			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
@@ -89,7 +88,7 @@ describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 	it.effect("rejects a stale restore without replacing the newer routed revision", () =>
 		Effect.gen(function* () {
 			const events: string[] = [];
-			const createResourceFx = vi.fn((ownedProject: EditorProject) =>
+			const createResourceFx = vi.fn((ownedProject: Project) =>
 				Effect.succeed(
 					createResource(
 						ownedProject,
@@ -127,7 +126,7 @@ describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 
 	it.effect("rejects restore after route release without recreating the editor game", () =>
 		Effect.gen(function* () {
-			const createResourceFx = vi.fn((ownedProject: EditorProject) =>
+			const createResourceFx = vi.fn((ownedProject: Project) =>
 				Effect.succeed(createResource(ownedProject, Effect.void)),
 			);
 			const owner = yield* createEditorBoardGameResourceFx({

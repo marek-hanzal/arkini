@@ -1,6 +1,6 @@
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import {
@@ -29,7 +29,7 @@ export namespace useEditorBuildController {
 		readonly installError?: string;
 		readonly installPending: boolean;
 		readonly installedPackageId?: string;
-		readonly project: EditorProject;
+		readonly project: Project;
 		readonly saveArtifact: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;

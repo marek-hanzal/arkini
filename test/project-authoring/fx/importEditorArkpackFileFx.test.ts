@@ -3,11 +3,11 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorArkpackFileFx } from "~/project-authoring/fx/importEditorArkpackFileFx";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
@@ -37,8 +37,8 @@ const createArkpackBytes = (payload = validPayload) =>
 	);
 
 const createRepository = (
-	createProjectFx: EditorProjectRepositoryService["createProjectFx"],
-): EditorProjectRepositoryService => ({
+	createProjectFx: ProjectRepositoryService["createProjectFx"],
+): ProjectRepositoryService => ({
 	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx,
@@ -53,12 +53,10 @@ const createRepository = (
 
 const runImport = (
 	props: Parameters<typeof importEditorArkpackFileFx>[0],
-	repository: EditorProjectRepositoryService,
+	repository: ProjectRepositoryService,
 ) =>
 	Effect.runPromise(
-		importEditorArkpackFileFx(props).pipe(
-			Effect.provideService(EditorProjectRepository, repository),
-		),
+		importEditorArkpackFileFx(props).pipe(Effect.provideService(ProjectRepository, repository)),
 	);
 
 beforeEach(() => {
@@ -73,8 +71,8 @@ describe("importEditorArkpackFileFx", () => {
 	it("validates an arkpack and atomically delegates its canonical payload", async () => {
 		const bytes = createArkpackBytes();
 		const createProjectFx = vi.fn(
-			({ version, config, resources }: EditorProjectRepository.CreateProjectProps) =>
-				Effect.succeed<EditorProject>({
+			({ version, config, resources }: ProjectRepository.CreateProjectProps) =>
+				Effect.succeed<Project>({
 					projectId: config.meta.id,
 					title: config.meta.title,
 					version,

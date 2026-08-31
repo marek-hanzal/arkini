@@ -2,8 +2,8 @@ import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
@@ -78,7 +78,7 @@ const DeleteItemInputSchema = z
 		description: "A revision-guarded safe or forced item deletion request.",
 	});
 
-const readProjectConfigTextFn = (project: EditorProject) =>
+const readProjectConfigTextFn = (project: Project) =>
 	JSON.stringify(
 		{
 			projectId: project.projectId,
@@ -98,7 +98,7 @@ const formatListFn = (values: ReadonlyArray<string>) =>
 	values.length === 0 ? "none" : values.join(", ");
 
 const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(function* (
-	project: EditorProject,
+	project: Project,
 	itemId: string,
 ) {
 	const { blockers, impact, item } = yield* readItemDeleteImpactFx(project, itemId);
@@ -136,8 +136,8 @@ export const registerGameplayDesignTools = ({
 	server,
 }: {
 	readonly notifyProjectChanged: (projectId: string) => void;
-	readonly readProjectFx: () => Effect.Effect<EditorProject, unknown>;
-	readonly repository: EditorProjectRepositoryService;
+	readonly readProjectFx: () => Effect.Effect<Project, unknown>;
+	readonly repository: ProjectRepositoryService;
 	readonly runTool: (effect: Effect.Effect<string, unknown>) => Promise<ToolResult>;
 	readonly server: McpServer;
 }) => {

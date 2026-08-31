@@ -5,7 +5,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
@@ -30,7 +30,7 @@ afterEach(tearDownGameLoadRouteTest);
 
 describe("game load editor handoff", () => {
 	it("rejects a delayed Editor publication after installed Play owns the process", async () => {
-		const project: EditorProject = {
+		const project: Project = {
 			projectId: "delayed-editor-project",
 			title: editorTestPayload.config.meta.title,
 			version: editorTestPayload.version,
@@ -43,7 +43,7 @@ describe("game load editor handoff", () => {
 		const installedGame = createGame();
 		createGameFxMock.mockReturnValue(Effect.succeed(installedGame));
 		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
-		const createEditorResourceFx = vi.fn((candidate: EditorProject) =>
+		const createEditorResourceFx = vi.fn((candidate: Project) =>
 			createEditorBoardGameFx({
 				project: candidate,
 			}).pipe(Effect.flatMap((game) => createGameEngineResourceFx(game))),

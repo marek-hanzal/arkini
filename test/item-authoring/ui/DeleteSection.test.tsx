@@ -5,12 +5,12 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 
 const state = vi.hoisted(() => ({
 	historyBack: vi.fn(() => false),
 	navigate: vi.fn().mockResolvedValue(undefined),
-	project: undefined as EditorProject | undefined,
+	project: undefined as Project | undefined,
 	remove: vi.fn().mockResolvedValue(undefined),
 	result: undefined as unknown,
 }));

@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit, Semaphore, SubscriptionRef } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { type EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
 import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
@@ -11,17 +11,17 @@ import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 export namespace createEditorBoardGameResourceFx {
 	export interface Dependencies {
 		readonly createResourceFx?: (
-			project: EditorProject,
+			project: Project,
 			state?: StateSchema.Type,
 		) => Effect.Effect<EditorBoardGameResource.Resource, unknown>;
 	}
 }
 
-const ownsRevision = (resource: GameEngineResource<EditorBoardGame>, project: EditorProject) =>
+const ownsRevision = (resource: GameEngineResource<EditorBoardGame>, project: Project) =>
 	resource.game.projectId === project.projectId &&
 	resource.game.projectRevision === project.revision;
 
-const ownsNewerRevision = (state: EditorBoardGameResource.State, project: EditorProject) => {
+const ownsNewerRevision = (state: EditorBoardGameResource.State, project: Project) => {
 	if (state.type === "idle") return false;
 	if (state.type === "ready") {
 		return (
@@ -32,7 +32,7 @@ const ownsNewerRevision = (state: EditorBoardGameResource.State, project: Editor
 	return state.projectId === project.projectId && state.projectRevision > project.revision;
 };
 
-const ownsExactRevision = (state: EditorBoardGameResource.State, project: EditorProject) => {
+const ownsExactRevision = (state: EditorBoardGameResource.State, project: Project) => {
 	if (state.type === "idle") return false;
 	if (state.type === "ready") return ownsRevision(state.resource, project);
 	return state.projectId === project.projectId && state.projectRevision === project.revision;
@@ -50,7 +50,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 			let routedProjectId: string | undefined;
 			const createResourceFx =
 				dependencies.createResourceFx ??
-				((project: EditorProject, state?: StateSchema.Type) =>
+				((project: Project, state?: StateSchema.Type) =>
 					createEditorBoardGameFx({
 						project,
 						...(state === undefined
@@ -59,7 +59,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 									state,
 								}),
 					}).pipe(Effect.flatMap((game) => createGameEngineResourceFx(game))));
-			const publishFailureFx = (project: EditorProject, cause: Cause.Cause<unknown>) =>
+			const publishFailureFx = (project: Project, cause: Cause.Cause<unknown>) =>
 				SubscriptionRef.set(state, {
 					type: "failed",
 					projectId: project.projectId,
@@ -67,7 +67,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 					error: Cause.squash(cause),
 				});
 
-			const syncOwnedProjectFx = (project: EditorProject) =>
+			const syncOwnedProjectFx = (project: Project) =>
 				Effect.gen(function* () {
 					const snapshot = yield* SubscriptionRef.get(state);
 					if (ownsNewerRevision(snapshot, project)) return;

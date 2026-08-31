@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { createItemEstimateIndexFn } from "~/estimate/fn/createItemEstimateIndexFn";
 import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
 import type { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
@@ -36,7 +36,7 @@ const sameSnapshot = (
 
 /** Reads the shared result of one full-snapshot estimate batch. */
 export const useItemEstimateIndex = (
-	project: EditorProject,
+	project: Project,
 	{
 		incomplete,
 		query,

@@ -1,13 +1,13 @@
 import { Cause, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
 import { runItemEstimateInWorkerFx } from "~/estimate/worker/runItemEstimateInWorkerFx";
 
 export namespace ItemEstimateCacheAtom {
 	export interface Snapshot {
-		readonly config: EditorProject["config"];
+		readonly config: Project["config"];
 		readonly projectId: string;
 		readonly revision: number;
 	}

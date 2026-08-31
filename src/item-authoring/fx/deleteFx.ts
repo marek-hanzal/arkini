@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 
 export namespace deleteFx {
@@ -14,7 +14,7 @@ export namespace deleteFx {
 
 /** Deletes one item under the requested safe or force contract and publishes the commit. */
 export const deleteFx = Effect.fn("deleteFx")(function* (props: deleteFx.Props) {
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {

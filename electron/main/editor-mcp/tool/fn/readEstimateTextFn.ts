@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { createItemEstimateIndexFn } from "~/estimate/fn/createItemEstimateIndexFn";
 import { estimateItemCatalogFn } from "~/estimate/fn/estimateItemCatalogFn";
 import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndexFn";
@@ -26,7 +26,7 @@ const demandRatioLabelFn = (demand: number, maximumDemand: number) => {
 };
 
 /** Computes, selects, pages, and formats the global Estimate projection for MCP. */
-export const readEstimateTextFn = (project: EditorProject, input: EstimateInput) => {
+export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 	const estimates = estimateItemCatalogFn(project.config);
 	const entries = createItemEstimateIndexFn({
 		estimates: new Map(

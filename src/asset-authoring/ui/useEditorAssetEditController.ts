@@ -6,10 +6,10 @@ import { useCallback, useRef, useState } from "react";
 
 import { editEditorAssetFx } from "~/asset-authoring/fx/editEditorAssetFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
+import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
@@ -32,7 +32,7 @@ const validateEditorAssetDraftFx = Effect.fn("validateEditorAssetDraftFx")(funct
 	const resourceId = yield* Effect.try({
 		try: () => IdSchema.parse(candidateId.trim()),
 		catch: (cause) =>
-			new EditorProjectError({
+			new ProjectOperationError({
 				reason: "invalid-resource-id",
 				message: "Asset ID must not be empty.",
 				cause,
@@ -42,13 +42,13 @@ const validateEditorAssetDraftFx = Effect.fn("validateEditorAssetDraftFx")(funct
 });
 
 const editEditorAssetCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
 			Atom.fn((props: EditEditorAssetCommandProps) =>
 				editEditorAssetFx({
 					...props,
 					projectId,
-				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+				}).pipe(Effect.provideService(ProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),
 		),
 	),

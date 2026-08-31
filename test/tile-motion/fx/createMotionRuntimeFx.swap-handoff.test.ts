@@ -60,7 +60,7 @@ describe("swap interaction handoff", () => {
 		});
 
 		samplePoseAnimation(sourceTravel, 1);
-		sourceTravel.onComplete?.();
+		sourceTravel.onCompleteFn?.();
 		expect(magneticReleases).toContainEqual({
 			sourceActorId: source.item.id,
 			sourceKind: "motion",

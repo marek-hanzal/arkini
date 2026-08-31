@@ -31,11 +31,11 @@ export const FormSession = ({
 	readonly productionLineId?: string;
 	readonly sectionId: SectionId;
 }>) => {
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const project = useEditorProject();
-	const onInvalidSection = useCallback(
+	const onInvalidSectionFn = useCallback(
 		(nextSectionId: SectionId) =>
-			navigate({
+			navigateFn({
 				to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
 				params: {
 					projectId: project.projectId,
@@ -52,16 +52,16 @@ export const FormSession = ({
 		[
 			initialItem.uid,
 			itemType,
-			navigate,
+			navigateFn,
 			project.projectId,
 		],
 	);
 	const controller = useFormController({
 		enableCapability,
 		initialItem,
-		onInvalidSection,
-		onSaved: (saved) =>
-			navigate({
+		onInvalidSectionFn,
+		onSavedFn: (saved) =>
+			navigateFn({
 				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 				params: {
 					projectId: project.projectId,
@@ -113,7 +113,7 @@ export const FormSession = ({
 						sectionId !== "merges" &&
 						sectionId !== "production"
 					}
-					save={controller.save}
+					saveFn={controller.saveFn}
 					saving={controller.isSaving}
 					leading={
 						isNew ? (

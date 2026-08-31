@@ -25,7 +25,7 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 		const game = usePackageGameEngine();
 		const cheatAvailability = useCheatAvailability();
 		const router = useRouter();
-		const navigate = useNavigate();
+		const navigateFn = useNavigate();
 		const model = useCheatsModel(game);
 		const unavailableExitRequestedRef = useRef(false);
 
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 				}
 				return Effect.tryPromise({
 					try: () =>
-						navigate({
+						navigateFn({
 							to: "/game/$packageId/board",
 							params: {
 								packageId: game.arkpack.packageId,
@@ -51,15 +51,15 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 			},
 			[
 				game.arkpack.packageId,
-				navigate,
+				navigateFn,
 				router,
 			],
 		);
-		const returnToBoard = useCallback(
+		const returnToBoardFn = useCallback(
 			(options?: { readonly replace?: boolean }) =>
-				model.requestExit(returnToBoardFx(options)),
+				model.requestExitFn(returnToBoardFx(options)),
 			[
-				model.requestExit,
+				model.requestExitFn,
 				returnToBoardFx,
 			],
 		);
@@ -71,31 +71,31 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 			}
 			if (unavailableExitRequestedRef.current) return;
 			unavailableExitRequestedRef.current = true;
-			returnToBoard({
+			returnToBoardFn({
 				replace: true,
 			});
 		}, [
 			cheatAvailability.available,
-			returnToBoard,
+			returnToBoardFn,
 		]);
 
 		useEffect(() => {
-			const onKeyDown = (event: KeyboardEvent) => {
+			const onKeyDownFn = (event: KeyboardEvent) => {
 				if (event.key !== "Escape" || event.defaultPrevented) return;
 				event.preventDefault();
-				returnToBoard();
+				returnToBoardFn();
 			};
-			window.addEventListener("keydown", onKeyDown);
-			return () => window.removeEventListener("keydown", onKeyDown);
+			window.addEventListener("keydown", onKeyDownFn);
+			return () => window.removeEventListener("keydown", onKeyDownFn);
 		}, [
-			returnToBoard,
+			returnToBoardFn,
 		]);
 
 		return (
 			<PlayableGameResources>
 				<Cheats
 					model={model}
-					onBack={() => returnToBoard()}
+					onBackFn={() => returnToBoardFn()}
 				/>
 			</PlayableGameResources>
 		);

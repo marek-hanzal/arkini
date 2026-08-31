@@ -3,7 +3,7 @@ import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "l
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
-import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
+import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
@@ -27,7 +27,7 @@ const defaultLine: LineSchema.Type = {
 };
 
 /** Edits one line through registered leaf fields while preserving authored rules. */
-export const LineFields = withFieldGroup({
+export const LineFields = withFieldGroupFn({
 	defaultValues: defaultLine,
 	props: {
 		label: undefined as string | null | undefined,
@@ -115,7 +115,7 @@ export const LineFields = withFieldGroup({
 								"runtime:adjust",
 								"runtime:multiplier",
 							]}
-							onChange={(next) =>
+							onChangeFn={(next) =>
 								group.setFieldValue("rules", next as LineSchema.Type["rules"])
 							}
 						/>
@@ -131,7 +131,7 @@ export const LineFields = withFieldGroup({
 						{(input) => (
 							<InputsControl
 								value={input}
-								onChange={(next) =>
+								onChangeFn={(next) =>
 									group.setFieldValue("input", next as LineSchema.Type["input"])
 								}
 							/>
@@ -147,7 +147,7 @@ export const LineFields = withFieldGroup({
 										actionLabel="Enable line output"
 										description="This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes."
 										icon={PackagePlus}
-										onEnable={() =>
+										onEnableFn={() =>
 											group.setFieldValue(
 												"output",
 												structuredClone(DraftDefaults.output),
@@ -164,7 +164,9 @@ export const LineFields = withFieldGroup({
 										/>
 										<OutputControl
 											value={output}
-											onChange={(next) => group.setFieldValue("output", next)}
+											onChangeFn={(next) =>
+												group.setFieldValue("output", next)
+											}
 										/>
 									</>
 								)}

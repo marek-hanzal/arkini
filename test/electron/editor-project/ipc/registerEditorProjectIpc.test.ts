@@ -81,8 +81,8 @@ const event = {
 	},
 } as IpcMainInvokeEvent;
 const createTrustedRenderer = (trusted = true): TrustedRenderer => ({
-	isTrustedUrl: () => trusted,
-	isTrustedIpcSender: () => trusted,
+	isTrustedUrlFn: () => trusted,
+	isTrustedIpcSenderFn: () => trusted,
 	assertTrustedIpcSenderFx: () =>
 		trusted
 			? Effect.void

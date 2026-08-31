@@ -6,7 +6,10 @@ import { Effect, type Semaphore } from "effect";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import {
+	ProjectRepositoryError,
+	type ProjectRepositoryOperation,
+} from "~/project-authoring/error/ProjectRepositoryError";
 import type { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
@@ -31,12 +34,9 @@ import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 
-type Operations = ProjectVersionRepositoryService;
-type Operation = ProjectRepositoryError["operation"];
-type DescriptorFile = VersionDescriptorFileSchema.Type;
 const encoder = new TextEncoder();
 
-const error = (operation: Operation, message: string, cause?: unknown) =>
+const errorFn = (operation: ProjectRepositoryOperation, message: string, cause?: unknown) =>
 	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
 		: new ProjectRepositoryError({
@@ -45,7 +45,7 @@ const error = (operation: Operation, message: string, cause?: unknown) =>
 				cause,
 			});
 
-const cloneProject = (project: Project): Project => ({
+const cloneProjectFn = (project: Project): Project => ({
 	...project,
 	resources: project.resources.map((resource) => ({
 		...resource,
@@ -53,10 +53,10 @@ const cloneProject = (project: Project): Project => ({
 	})),
 });
 
-const materializeDescriptor = (
+const materializeDescriptorFn = (
 	projectId: string,
 	versionId: string,
-	file: DescriptorFile,
+	file: VersionDescriptorFileSchema.Type,
 ): ProjectVersionDescriptor => ({
 	arkini: file.arkini,
 	arkpackVersion: file.version,
@@ -82,8 +82,8 @@ const materializeDescriptor = (
 	versionId,
 });
 
-const sameCommit = (
-	file: DescriptorFile,
+const sameCommitFn = (
+	file: VersionDescriptorFileSchema.Type,
 	metadata: {
 		readonly body?: string;
 		readonly subject: string;
@@ -96,7 +96,7 @@ const sameCommit = (
 	file.body === metadata.body &&
 	file.tag === metadata.tag;
 
-const toScenario = (
+const toScenarioFn = (
 	projectId: string,
 	file: BoardScenarioFileSchema.Type,
 ): BoardScenarioSchema.Type => ({
@@ -113,7 +113,7 @@ export namespace createVersionOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
-		readonly readState: (
+		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 		readonly states: Map<string, ProjectState>;
@@ -124,12 +124,12 @@ export namespace createVersionOperationsFx {
 export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(function* ({
 	filesystemWrite,
 	operations,
-	readState,
+	readStateFx,
 	states,
 }: createVersionOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const pathService = yield* Path.Path;
-	const providePlatform = <Value, Failure, Requirements>(
+	const providePlatformFx = <Value, Failure, Requirements>(
 		effect: Effect.Effect<Value, Failure, Requirements>,
 	) =>
 		effect.pipe(
@@ -143,7 +143,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
 		});
 	const assertVersionDirectoryFx = (state: ProjectState) =>
-		providePlatform(
+		providePlatformFx(
 			Effect.gen(function* () {
 				yield* fileSystem.makeDirectory(state.paths.versions, {
 					recursive: true,
@@ -161,13 +161,13 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 		readHeadFx,
 		readPublishedVersionFx,
 	} = yield* createVersionReaderFx({
-		readState,
+		readStateFx,
 	});
 
-	const listVersionsFx: Operations["listVersionsFx"] = (projectId) =>
+	const listVersionsFx: ProjectVersionRepositoryService["listVersionsFx"] = (projectId) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
-				const state = yield* readState(projectId);
+				const state = yield* readStateFx(projectId);
 				const head = yield* readHeadFx(state);
 				if (head === undefined) return [];
 				const descriptors = yield* Effect.forEach(head.versions, (versionId) =>
@@ -185,11 +185,11 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							left.versionId.localeCompare(right.versionId),
 					)
 					.map(({ descriptor, versionId }) =>
-						materializeDescriptor(projectId, versionId, descriptor),
+						materializeDescriptorFn(projectId, versionId, descriptor),
 					);
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"list-versions",
 						`Versions for project ${projectId} could not be listed.`,
 						cause,
@@ -198,7 +198,9 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			),
 		);
 
-	const readVersionStatusFx: Operations["readVersionStatusFx"] = (projectId) =>
+	const readVersionStatusFx: ProjectVersionRepositoryService["readVersionStatusFx"] = (
+		projectId,
+	) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const current = yield* readCurrentSnapshotFx(projectId);
@@ -221,7 +223,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				};
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"read-version-status",
 						`Version status for project ${projectId} could not be read.`,
 						cause,
@@ -230,7 +232,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			),
 		);
 
-	const createVersionFx: Operations["createVersionFx"] = ({
+	const createVersionFx: ProjectVersionRepositoryService["createVersionFx"] = ({
 		body: bodyCandidate,
 		expectedFingerprint,
 		projectId,
@@ -253,7 +255,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							}),
 				}),
 				catch: (cause) =>
-					error("create-version", "The Editor version metadata is invalid.", cause),
+					errorFn("create-version", "The Editor version metadata is invalid.", cause),
 			});
 			const clockMs = yield* Clock.currentTimeMillis;
 			return yield* operations
@@ -265,7 +267,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							expectedFingerprint !== current.contentFingerprint
 						)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"create-version",
 									"The Editor project changed after its version preview was read.",
 								),
@@ -278,12 +280,12 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						if (
 							head !== undefined &&
 							base !== undefined &&
-							sameCommit(base, metadata, current.contentFingerprint)
+							sameCommitFn(base, metadata, current.contentFingerprint)
 						)
-							return materializeDescriptor(projectId, head.current, base);
+							return materializeDescriptorFn(projectId, head.current, base);
 						if (base?.contentFingerprint === current.contentFingerprint)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"create-version",
 									"The Editor project has no changes to commit.",
 								),
@@ -341,7 +343,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							current.state.paths.root,
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(current.state);
-								const snapshot = yield* providePlatform(
+								const snapshot = yield* providePlatformFx(
 									createVersionSnapshotFx({
 										arkpack: current.state.project.version,
 										config: current.state.project.config,
@@ -392,12 +394,12 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 								versions,
 							},
 						});
-						return materializeDescriptor(projectId, versionId, descriptor);
+						return materializeDescriptorFn(projectId, versionId, descriptor);
 					}),
 				)
 				.pipe(
 					Effect.mapError((cause) =>
-						error(
+						errorFn(
 							"create-version",
 							`Project ${projectId} could not create a version.`,
 							cause,
@@ -406,7 +408,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				);
 		});
 
-	const checkoutVersionFx: Operations["checkoutVersionFx"] = ({
+	const checkoutVersionFx: ProjectVersionRepositoryService["checkoutVersionFx"] = ({
 		expectedFingerprint,
 		projectId,
 		versionId,
@@ -424,12 +426,12 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							version.descriptor.contentFingerprint !== current.contentFingerprint
 						)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"checkout-version",
 									"The Editor project changed after its checkout preview was read.",
 								),
 							);
-						const snapshot = yield* providePlatform(
+						const snapshot = yield* providePlatformFx(
 							readVersionSnapshotFx({
 								manifest: version.manifest,
 								paths: current.state.paths,
@@ -437,21 +439,21 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						);
 						if (snapshot.contentFingerprint !== version.descriptor.contentFingerprint)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"checkout-version",
 									`Version ${versionId} content does not match its descriptor.`,
 								),
 							);
 						if (snapshot.arkpack !== version.descriptor.version)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"checkout-version",
 									`Version ${versionId} Arkpack version does not match its descriptor.`,
 								),
 							);
 						if (snapshot.config.meta.id !== current.state.project.projectId)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"checkout-version",
 									`Version ${versionId} belongs to Editor project ${snapshot.config.meta.id}, not ${current.state.project.projectId}.`,
 								),
@@ -464,13 +466,13 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							}),
 						);
 						const restoredScenarios = restoredScenarioFiles.map((scenario) =>
-							toScenario(projectId, scenario),
+							toScenarioFn(projectId, scenario),
 						);
 						const marker = GameProjectManifestSchema.parse({
 							arkini: ArkiniAppVersion,
 							revision: updatedAtMs,
 						});
-						const nextProject = cloneProject({
+						const nextProject = cloneProjectFn({
 							...current.state.project,
 							title: snapshot.config.meta.title,
 							version: snapshot.arkpack,
@@ -482,7 +484,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						const head = yield* readHeadFx(current.state);
 						if (head === undefined)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"checkout-version",
 									"The Editor project has no published versions.",
 								),
@@ -493,7 +495,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						});
 
 						yield* assertVersionDirectoryFx(current.state);
-						yield* providePlatform(
+						yield* providePlatformFx(
 							writeProjectFilesFx({
 								root: current.state.paths.root,
 								previous: {
@@ -531,7 +533,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				)
 				.pipe(
 					Effect.mapError((cause) =>
-						error(
+						errorFn(
 							"checkout-version",
 							`Version ${versionId} could not be checked out.`,
 							cause,
@@ -540,7 +542,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				);
 		});
 
-	const updateVersionTagFx: Operations["updateVersionTagFx"] = ({
+	const updateVersionTagFx: ProjectVersionRepositoryService["updateVersionTagFx"] = ({
 		projectId,
 		tag: tagCandidate,
 		versionId,
@@ -552,7 +554,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 					: yield* Effect.try({
 							try: () => ProjectVersionTagSchema.parse(tagCandidate),
 							catch: (cause) =>
-								error(
+								errorFn(
 									"update-version-tag",
 									"The Editor version tag is invalid.",
 									cause,
@@ -561,7 +563,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			return yield* operations
 				.withPermits(1)(
 					Effect.gen(function* () {
-						const state = yield* readState(projectId);
+						const state = yield* readStateFx(projectId);
 						const version = yield* readPublishedVersionFx(state, versionId);
 						const descriptor = VersionDescriptorFileSchema.parse({
 							...version.descriptor,
@@ -598,12 +600,12 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 								versions,
 							},
 						});
-						return materializeDescriptor(projectId, versionId, descriptor);
+						return materializeDescriptorFn(projectId, versionId, descriptor);
 					}),
 				)
 				.pipe(
 					Effect.mapError((cause) =>
-						error(
+						errorFn(
 							"update-version-tag",
 							`Version ${versionId} could not update its tag.`,
 							cause,
@@ -612,10 +614,14 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				);
 		});
 
-	const diffVersionsFx: Operations["diffVersionsFx"] = ({ from, projectId, to }) =>
+	const diffVersionsFx: ProjectVersionRepositoryService["diffVersionsFx"] = ({
+		from,
+		projectId,
+		to,
+	}) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
-				const state = yield* readState(projectId);
+				const state = yield* readStateFx(projectId);
 				return createProjectVersionDiffFn(
 					from,
 					to,
@@ -624,7 +630,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				);
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"diff-versions",
 						`Versions for project ${projectId} could not be compared.`,
 						cause,
@@ -640,5 +646,5 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 		listVersionsFx,
 		readVersionStatusFx,
 		updateVersionTagFx,
-	} satisfies Operations;
+	} satisfies ProjectVersionRepositoryService;
 });

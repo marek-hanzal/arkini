@@ -13,11 +13,11 @@ describe("fromRuntimeFn", () => {
 			tickIntervalMs: 60_000,
 		});
 		try {
-			await first.run(startFx());
+			await first.runFn(startFx());
 			const state = fromRuntimeFn({
-				runtime: first.getSnapshot(),
+				runtime: first.getSnapshotFn(),
 			});
-			await first.run(
+			await first.runFn(
 				spawnItemFx({
 					id: "runtime:later",
 					itemId: "water",
@@ -39,9 +39,9 @@ describe("fromRuntimeFn", () => {
 				tickIntervalMs: 60_000,
 			});
 			try {
-				expect(restored.getSnapshot().items.map(({ id }) => id)).toEqual(
+				expect(restored.getSnapshotFn().items.map(({ id }) => id)).toEqual(
 					first
-						.getSnapshot()
+						.getSnapshotFn()
 						.items.filter(({ id }) => id !== "runtime:later")
 						.map(({ id }) => id),
 				);

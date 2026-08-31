@@ -82,7 +82,7 @@ describe("spawn interaction handoff", () => {
 		Effect.runSync(runtime.startFx);
 		const spawnTravel = readPoseAnimation(animations, spawned);
 		samplePoseAnimation(spawnTravel, 1);
-		spawnTravel.onComplete?.();
+		spawnTravel.onCompleteFn?.();
 
 		expect(magneticReleases).toEqual([
 			{
@@ -145,7 +145,7 @@ describe("spawn interaction handoff", () => {
 		expect(snapshot.interactionClaimByActorId.get(blocker.item.id)).toBe("handoff");
 
 		const blockerTravel = readPoseAnimation(animations, blocker);
-		blockerTravel.onComplete?.();
+		blockerTravel.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
 	});
 });

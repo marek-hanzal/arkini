@@ -28,9 +28,9 @@ export namespace runSwapMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly magneticField: MagneticField;
-		readonly onComplete: () => void;
-		readonly onSwapLegSettled: (actorId: string) => void;
-		readonly onSwapLegStarted: (actorId: string) => void;
+		readonly onCompleteFn: () => void;
+		readonly onSwapLegSettledFn: (actorId: string) => void;
+		readonly onSwapLegStartedFn: (actorId: string) => void;
 		readonly origin: ActorPose;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -45,9 +45,9 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	magneticField,
-	onComplete,
-	onSwapLegSettled,
-	onSwapLegStarted,
+	onCompleteFn,
+	onSwapLegSettledFn,
+	onSwapLegStartedFn,
 	origin,
 	surface,
 	target,
@@ -77,7 +77,7 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 				]),
 	];
 	if (legs.length === 0) {
-		onComplete();
+		onCompleteFn();
 		return;
 	}
 	const pendingActorIds = new Set(legs.map(({ actor }) => actor.item.id));
@@ -121,7 +121,7 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 			magneticField,
 			surface,
 		});
-		onSwapLegStarted(leg.actor.item.id);
+		onSwapLegStartedFn(leg.actor.item.id);
 		yield* animator.animateFx({
 			actor: leg.actor,
 			channel: "pose",
@@ -132,11 +132,11 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 			delayMs,
 			durationMs,
 			ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
-			onCancel: magneticProjector.release,
-			onComplete: () => {
-				const settle = () => {
+			onCancelFn: magneticProjector.releaseFn,
+			onCompleteFn: () => {
+				const settleFn = () => {
 					if (!pendingActorIds.delete(leg.actor.item.id)) return;
-					magneticProjector.release();
+					magneticProjector.releaseFn();
 					if (!leg.actor.container.destroyed) {
 						const canonical = actorStore.canonicalItems.get(leg.actor.item.id);
 						const currentTarget =
@@ -146,11 +146,11 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 						const settledTarget = currentTarget ?? leg.target;
 						settledTarget.layer.addChild(leg.actor.container);
 					}
-					onSwapLegSettled(leg.actor.item.id);
-					if (pendingActorIds.size === 0) onComplete();
+					onSwapLegSettledFn(leg.actor.item.id);
+					if (pendingActorIds.size === 0) onCompleteFn();
 				};
-				if (!poseSampler.needsCompletionSettle()) {
-					settle();
+				if (!poseSampler.needsCompletionSettleFn()) {
+					settleFn();
 					return;
 				}
 				RendererRuntime.runSync(
@@ -158,17 +158,17 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 						actor: leg.actor,
 						animator,
 						fallbackTarget: leg.target,
-						onPose: magneticProjector.projectPose,
-						onSettled: settle,
+						onPoseFn: magneticProjector.projectPoseFn,
+						onSettledFn: settleFn,
 						ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
 						surface,
 						targetLocation: leg.targetLocation,
 					}),
 				);
 			},
-			readPose: (progress) => {
-				const pose = poseSampler.readPose(progress);
-				magneticProjector.projectPose(pose);
+			readPoseFn: (progress) => {
+				const pose = poseSampler.readPoseFn(progress);
+				magneticProjector.projectPoseFn(pose);
 				return pose;
 			},
 		});

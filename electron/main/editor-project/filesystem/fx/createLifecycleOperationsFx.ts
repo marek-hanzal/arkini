@@ -51,7 +51,7 @@ interface LifecycleOperations {
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 }
 
-const cloneProject = (project: Project): Project => ({
+const cloneProjectFn = (project: Project): Project => ({
 	...project,
 	config: GameConfigSchema.parse(project.config),
 	resources: project.resources.map((resource) => ({
@@ -60,7 +60,7 @@ const cloneProject = (project: Project): Project => ({
 	})),
 });
 
-const materializeDescriptor = ({
+const materializeDescriptorFn = ({
 	projectId,
 	title,
 	version,
@@ -74,13 +74,13 @@ const materializeDescriptor = ({
 	updatedAtMs,
 });
 
-const readValidationError = (cause: unknown) =>
+const readValidationErrorFn = (cause: unknown) =>
 	cause instanceof Error ? cause.message : String(cause);
 
 const encodeManagedProjectDirectoryStemFn = (projectId: string) =>
 	encodeGameProjectFileStemFn(projectId).replaceAll("%2E", ".");
 
-const error = (
+const errorFn = (
 	operation:
 		| "create-project"
 		| "delete-project"
@@ -177,7 +177,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				root,
 			});
 		});
-	const providePlatform = <Value, Failure, Requirements>(
+	const providePlatformFx = <Value, Failure, Requirements>(
 		effect: Effect.Effect<Value, Failure, Requirements>,
 	) =>
 		effect.pipe(
@@ -187,15 +187,15 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 	const materializeFx = (entry: ProjectCatalogEntrySchema.Type) =>
 		assertSafeCatalogEntryFx(entry).pipe(
 			Effect.flatMap((safeEntry) =>
-				providePlatform(materializeProjectFx(safeEntry, filesystemWrite)),
+				providePlatformFx(materializeProjectFx(safeEntry, filesystemWrite)),
 			),
 		);
 	const writeProjectFx = (props: Parameters<typeof writeProjectFilesFx>[0]) =>
-		providePlatform(writeProjectFilesFx(props));
+		providePlatformFx(writeProjectFilesFx(props));
 	const readCandidatesFx = Effect.gen(function* () {
 		const candidates: Array<ProjectCandidate> = [];
 		const listedRoots = new Set<string>();
-		for (const entry of catalog.list()) {
+		for (const entry of catalog.listFn()) {
 			const mounted = [
 				...states.values(),
 			].find(
@@ -212,7 +212,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				candidates.push({
 					type: "valid",
 					ownership: mounted.catalog.ownership,
-					project: materializeDescriptor(mounted.project),
+					project: materializeDescriptorFn(mounted.project),
 				});
 				continue;
 			}
@@ -237,7 +237,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				candidates.push({
 					type: "valid",
 					ownership: existing.catalog.ownership,
-					project: materializeDescriptor(existing.project),
+					project: materializeDescriptorFn(existing.project),
 				});
 				continue;
 			}
@@ -258,7 +258,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 					type: "invalid",
 					root: entry.root,
 					title: path.basename(entry.root) || entry.root,
-					validationError: readValidationError(materialized.cause),
+					validationError: readValidationErrorFn(materialized.cause),
 				});
 				continue;
 			}
@@ -283,7 +283,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			candidates.push({
 				type: "valid",
 				ownership: state.catalog.ownership,
-				project: materializeDescriptor(state.project),
+				project: materializeDescriptorFn(state.project),
 			});
 		}
 		return candidates.sort((left, right) => {
@@ -299,7 +299,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 		});
 	}).pipe(
 		Effect.mapError((cause) =>
-			error("list-projects", "The Editor project catalog could not be refreshed.", cause),
+			errorFn("list-projects", "The Editor project catalog could not be refreshed.", cause),
 		),
 	);
 
@@ -321,14 +321,18 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 						resources: ResourceSchema.array().parse(candidateResources),
 					};
 				},
-				catch: (cause) => error("create-project", "The Editor project is invalid.", cause),
+				catch: (cause) =>
+					errorFn("create-project", "The Editor project is invalid.", cause),
 			});
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
 					if (states.has(projectId))
 						return yield* Effect.fail(
-							error("create-project", `Editor project ${projectId} already exists.`),
+							errorFn(
+								"create-project",
+								`Editor project ${projectId} already exists.`,
+							),
 						);
 					return yield* filesystemWrite.withLockFx(
 						lifecycleLock,
@@ -362,7 +366,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 								const state = yield* materializeFx(entry);
 								yield* catalog.addFx(entry);
 								states.set(projectId, state);
-								return cloneProject(state.project);
+								return cloneProjectFn(state.project);
 							}).pipe(
 								Effect.onError(() =>
 									fileSystem
@@ -379,7 +383,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error("create-project", "The Editor project could not be created.", cause),
+				errorFn("create-project", "The Editor project could not be created.", cause),
 			),
 		);
 
@@ -390,7 +394,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				const existing = [
 					...states.values(),
 				].find((state) => state.catalog.root === root);
-				if (existing !== undefined) return cloneProject(existing.project);
+				if (existing !== undefined) return cloneProjectFn(existing.project);
 				const provisionalEntry = ProjectCatalogEntrySchema.parse({
 					root,
 					ownership: "external",
@@ -400,7 +404,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				const projectId = provisionalState.project.projectId;
 				if (states.has(projectId))
 					return yield* Effect.fail(
-						error(
+						errorFn(
 							"import-json-directory",
 							`Editor project ID ${projectId} is already open from another folder.`,
 						),
@@ -419,10 +423,10 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				};
 				yield* catalog.addFx(entry);
 				states.set(projectId, state);
-				return cloneProject(state.project);
+				return cloneProjectFn(state.project);
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"import-json-directory",
 						"The selected Editor project folder could not be opened.",
 						cause,
@@ -438,7 +442,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 		operations.withPermits(1)(
 			Effect.sync(() => {
 				const state = states.get(projectId);
-				return state === undefined ? null : cloneProject(state.project);
+				return state === undefined ? null : cloneProjectFn(state.project);
 			}),
 		);
 
@@ -451,7 +455,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				const current = states.get(projectId);
 				if (current === undefined)
 					return yield* Effect.fail(
-						error("refresh-project", `Editor project ${projectId} does not exist.`),
+						errorFn("refresh-project", `Editor project ${projectId} does not exist.`),
 					);
 				const refreshed = yield* materializeFx(current.catalog);
 				if (
@@ -459,17 +463,17 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 					states.has(refreshed.project.projectId)
 				)
 					return yield* Effect.fail(
-						error(
+						errorFn(
 							"refresh-project",
 							`Editor project ID ${refreshed.project.projectId} is already open from another folder.`,
 						),
 					);
 				states.delete(projectId);
 				states.set(refreshed.project.projectId, refreshed);
-				return cloneProject(refreshed.project);
+				return cloneProjectFn(refreshed.project);
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"refresh-project",
 						`Editor project ${projectId} could not be refreshed from disk.`,
 						cause,
@@ -484,7 +488,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				const state = states.get(projectId);
 				if (state === undefined)
 					return yield* Effect.fail(
-						error("delete-project", `Editor project ${projectId} does not exist.`),
+						errorFn("delete-project", `Editor project ${projectId} does not exist.`),
 					);
 				if (state.catalog.ownership === "managed")
 					yield* filesystemWrite.withLockFx(
@@ -510,7 +514,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				}
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"delete-project",
 						`Editor project ${projectId} could not be deleted.`,
 						cause,

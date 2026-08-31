@@ -27,10 +27,10 @@ export const Tooltip = ({
 	contentClassName,
 	placement = "top",
 }: TooltipProps) => {
-	const [open, setOpen] = useState(false);
+	const [open, setOpenFn] = useState(false);
 	const { context, floatingStyles, refs } = useFloating({
 		open,
-		onOpenChange: setOpen,
+		onOpenChange: setOpenFn,
 		placement,
 		middleware: [
 			offset(8),
@@ -50,16 +50,17 @@ export const Tooltip = ({
 		move: false,
 	});
 	const dismiss = useDismiss(context);
-	const { getFloatingProps, getReferenceProps } = useInteractions([
-		hover,
-		dismiss,
-	]);
+	const { getFloatingProps: getFloatingPropsFn, getReferenceProps: getReferencePropsFn } =
+		useInteractions([
+			hover,
+			dismiss,
+		]);
 
 	return (
 		<>
 			{cloneElement(
 				children,
-				getReferenceProps({
+				getReferencePropsFn({
 					ref: refs.setReference,
 				}),
 			)}
@@ -72,7 +73,7 @@ export const Tooltip = ({
 							"z-10 max-w-72 rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 text-foreground shadow-xl",
 							contentClassName,
 						)}
-						{...getFloatingProps()}
+						{...getFloatingPropsFn()}
 					>
 						{content}
 					</div>

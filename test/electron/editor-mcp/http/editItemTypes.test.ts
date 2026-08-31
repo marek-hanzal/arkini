@@ -156,7 +156,7 @@ beforeAll(async () => {
 		}),
 	);
 	revision = created.revision;
-	harness.ownership.setProjectContext(projectId);
+	harness.ownership.setProjectContextFn(projectId);
 	await Effect.runPromise(harness.ownership.startLocalFx);
 	client = await connectMcpClient(harness.port);
 });

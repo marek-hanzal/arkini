@@ -242,5 +242,5 @@ export const createTemporaryProgressRuntime = () =>
 	});
 
 export const progressAssetGame = {
-	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+	getResourceUrlFn: (resourceId: string) => `resource:${resourceId}`,
 };

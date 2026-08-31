@@ -78,7 +78,7 @@ describe("main reconciliation / work and consumption", () => {
 			ownerKey: `actor-alpha:${actor.instanceId}`,
 		});
 
-		dip?.onComplete?.();
+		dip?.onCompleteFn?.();
 		expect(harness.animations).toContainEqual(
 			expect.objectContaining({
 				actor,

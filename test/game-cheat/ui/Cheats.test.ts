@@ -41,8 +41,8 @@ const CheatsHarness = ({
 	const model = useCheatsModel(game);
 	return createElement(Cheats, {
 		model,
-		onBack: () =>
-			model.requestExit(
+		onBackFn: () =>
+			model.requestExitFn(
 				Effect.sync(() => {
 					onExit(true);
 				}),
@@ -63,8 +63,8 @@ const CheatsAdmissionHarness = ({
 		{
 			type: "button",
 			onClick: () => {
-				model.setEnabled(true);
-				model.requestExit(
+				model.setEnabledFn(true);
+				model.requestExitFn(
 					Effect.sync(() => {
 						onExit(true);
 					}),
@@ -107,7 +107,7 @@ describe("Cheats", () => {
 				source: "user",
 			},
 			config,
-			getResourceUrl: () => "blob:test",
+			getResourceUrlFn: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats",
 			},
@@ -143,19 +143,19 @@ describe("Cheats", () => {
 		expect(instant.disabled).toBe(true);
 
 		await act(async () => enable.click());
-		await vi.waitFor(() => expect(session.getSnapshot().cheats.enabled).toBe(true));
-		expect(session.getSnapshot().cheats.everEnabled).toBe(true);
+		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.enabled).toBe(true));
+		expect(session.getSnapshotFn().cheats.everEnabled).toBe(true);
 		expect(instant.disabled).toBe(false);
 		expect(container.textContent).toContain("Cheat mode saved.");
 
 		await act(async () => instant.click());
-		await vi.waitFor(() => expect(session.getSnapshot().cheats.instantGameplay).toBe(true));
+		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.instantGameplay).toBe(true));
 		expect(instant.checked).toBe(true);
 		expect(container.textContent).toContain("Instant gameplay saved.");
 
 		await act(async () => enable.click());
-		await vi.waitFor(() => expect(session.getSnapshot().cheats.enabled).toBe(false));
-		expect(session.getSnapshot().cheats).toEqual({
+		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.enabled).toBe(false));
+		expect(session.getSnapshotFn().cheats).toEqual({
 			enabled: false,
 			everEnabled: true,
 			instantGameplay: true,
@@ -184,7 +184,7 @@ describe("Cheats", () => {
 				source: "user",
 			},
 			config,
-			getResourceUrl: () => "blob:test",
+			getResourceUrlFn: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats-race",
 			},

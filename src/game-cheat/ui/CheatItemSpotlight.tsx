@@ -27,9 +27,9 @@ export const CheatItemSpotlight = (props: CheatItemSpotlightProps) => {
 					</p>
 				</div>
 			}
-			onClose={controller.close}
-			onQueryChange={controller.resetSpawnStatus}
-			onSelectItem={controller.selectItem}
+			onCloseFn={controller.closeFn}
+			onQueryChangeFn={controller.resetSpawnStatusFn}
+			onSelectItemFn={controller.selectItemFn}
 			options={controller.items.map((item) => ({
 				artwork: (
 					<img

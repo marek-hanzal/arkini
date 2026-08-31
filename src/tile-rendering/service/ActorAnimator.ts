@@ -18,8 +18,8 @@ interface AnimationBase {
 	readonly curve?: AnimationCurve;
 	readonly delayMs?: number;
 	readonly durationMs: number;
-	readonly onCancel?: () => void;
-	readonly onComplete?: () => void;
+	readonly onCancelFn?: () => void;
+	readonly onCompleteFn?: () => void;
 	readonly ownerKey?: string;
 	readonly repeat?: number;
 }
@@ -33,7 +33,7 @@ export interface PresentedPose {
 export type ActorAnimation =
 	| (AnimationBase & {
 			readonly channel: "pose";
-			readonly readPose?: (progress: number) => PresentedPose;
+			readonly readPoseFn?: (progress: number) => PresentedPose;
 			readonly toScale?: number;
 			readonly toX?: number;
 			readonly toY?: number;
@@ -52,7 +52,7 @@ export type ActorAnimation =
 	  })
 	| (AnimationBase & {
 			readonly channel: "activity-particles";
-			readonly render: (progress: number) => void;
+			readonly renderFn: (progress: number) => void;
 	  })
 	| (AnimationBase & {
 			readonly channel: "visual-mix";

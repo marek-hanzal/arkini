@@ -142,7 +142,7 @@ describe("GameSession.runFx", () => {
 				tickIntervalMs: 60_000,
 				save: {
 					debounceMs: 60_000,
-					write: () =>
+					writeFx: () =>
 						Deferred.succeed(saveEntered, undefined).pipe(
 							Effect.andThen(Deferred.await(releaseSave)),
 						),

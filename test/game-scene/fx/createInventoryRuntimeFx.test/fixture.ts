@@ -60,7 +60,7 @@ export interface FakeContainer {
 	on: (event: string, listener: (payload: FakePointerEvent) => void) => void;
 }
 
-export type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
+export type GameTransition = ReturnType<GameEngine["getTransitionSnapshotFn"]>;
 
 const sceneState = vi.hoisted(() => ({
 	actors: [] as PixiTileActor[],
@@ -281,40 +281,40 @@ vi.mock("~/tile-rendering/fx/createAnimationDriverFx", async () => {
 				closeFx: EffectModule.void,
 				createSpringFx: ({
 					initialValue,
-					onUpdate,
+					onUpdateFn,
 				}: {
 					readonly initialValue: number;
-					readonly onUpdate: (value: number) => void;
+					readonly onUpdateFn: (value: number) => void;
 				}) =>
 					EffectModule.sync(() => {
-						onUpdate(initialValue);
+						onUpdateFn(initialValue);
 						return {
 							closeFx: EffectModule.void,
 							setTargetFx: (value: number) =>
-								EffectModule.sync(() => onUpdate(value)),
+								EffectModule.sync(() => onUpdateFn(value)),
 						};
 					}),
 				startTweenFx: ({
 					durationMs,
-					onComplete,
-					onUpdate,
+					onCompleteFn,
+					onUpdateFn,
 					to,
 				}: {
 					readonly durationMs: number;
-					readonly onComplete?: () => void;
-					readonly onUpdate: (value: number) => void;
+					readonly onCompleteFn?: () => void;
+					readonly onUpdateFn: (value: number) => void;
 					readonly to: number;
 				}) =>
 					EffectModule.sync(() => {
 						const deferred = durationMs === 1_760 || sceneState.deferFiniteTweens;
-						onUpdate(
+						onUpdateFn(
 							durationMs === 1_760 || durationMs === feedbackDurationMs ? 0.5 : to,
 						);
 						let active = true;
 						const complete = () => {
 							if (!active) return;
 							active = false;
-							onComplete?.();
+							onCompleteFn?.();
 						};
 						if (deferred) {
 							sceneState.pendingTweenCompletions.push(complete);
@@ -572,18 +572,18 @@ export const createGame = ({ subscribeError }: { readonly subscribeError?: Error
 				toolbarSize: 8,
 			},
 		},
-		getTransitionSnapshot: () => {
+		getTransitionSnapshotFn: () => {
 			const transition = sceneState.transition;
 			if (transition === null) throw new Error("Test transition is missing.");
 			return transition;
 		},
-		readOrThrow: () => sceneState.items,
-		reportCriticalFailure: vi.fn(),
-		subscribeTransitions: (listener: (transition: GameTransition) => void) => {
+		readOrThrowFn: () => sceneState.items,
+		reportCriticalFailureFn: vi.fn(),
+		subscribeTransitionsFn: (listenerFn: (transition: GameTransition) => void) => {
 			if (subscribeError !== undefined) throw subscribeError;
-			sceneState.transitionListener = listener;
+			sceneState.transitionListener = listenerFn;
 			return () => {
-				if (sceneState.transitionListener === listener) {
+				if (sceneState.transitionListener === listenerFn) {
 					sceneState.transitionListener = null;
 				}
 			};
@@ -602,8 +602,8 @@ export const mountScene = async ({
 	}),
 }: {
 	readonly game?: GameEngine;
-	readonly onActivate?: CreateInventoryRuntimeProps["onActivate"];
-	readonly onDrop?: CreateInventoryRuntimeProps["onDrop"];
+	readonly onActivate?: CreateInventoryRuntimeProps["onActivateFn"];
+	readonly onDrop?: CreateInventoryRuntimeProps["onDropFn"];
 } = {}) => {
 	const host = document.createElement("div");
 	document.body.append(host);
@@ -612,8 +612,8 @@ export const mountScene = async ({
 			dragThreshold: 6,
 			game,
 			host,
-			onActivate,
-			onDrop,
+			onActivateFn: onActivate,
+			onDropFn: onDrop,
 			textures: {} as never,
 		}),
 	);

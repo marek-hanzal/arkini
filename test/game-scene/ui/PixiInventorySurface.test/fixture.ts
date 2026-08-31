@@ -18,7 +18,7 @@ const hoistedSurfaceState = vi.hoisted(() => ({
 	activationGate: Promise.resolve(),
 	activateSpace: vi.fn(),
 	createProps: null as {
-		readonly onActivate: (
+		readonly onActivateFn: (
 			item: TileActorItem,
 			openDetail: boolean,
 			origin: HTMLElement,
@@ -76,7 +76,7 @@ const game = {
 			toolbarSize: 8,
 		},
 	},
-	getTransitionSnapshot: () => unrelatedTransition,
+	getTransitionSnapshotFn: () => unrelatedTransition,
 	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
 } as GameEngine;
 
@@ -183,7 +183,7 @@ export const renderPixiInventorySurface = async () => {
 	await act(async () => {
 		root.render(
 			createElement(PixiInventorySurface, {
-				onSpaceActivated: surfaceState.spaceActivated,
+				onSpaceActivatedFn: surfaceState.spaceActivated,
 			}),
 		);
 		await Promise.resolve();
@@ -201,7 +201,7 @@ export const replacePixiInventorySurfaceRuntime = async (root: ReturnType<typeof
 	await act(async () => {
 		root.render(
 			createElement(PixiInventorySurface, {
-				onSpaceActivated: surfaceState.spaceActivated,
+				onSpaceActivatedFn: surfaceState.spaceActivated,
 			}),
 		);
 		await Promise.resolve();

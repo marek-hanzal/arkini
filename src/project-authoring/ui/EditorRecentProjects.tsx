@@ -1,10 +1,8 @@
 import { ChevronRight, FolderKanban, FolderX, Trash2 } from "lucide-react";
 
-import type {
-	ProjectCandidate,
-	ProjectOwnership,
-} from "~/project-authoring/schema/ProjectCandidateSchema";
+import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
+import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
 import { Button, ButtonLink } from "~/ui/ui/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
@@ -14,16 +12,19 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 
 interface EditorRecentProjectsProps {
 	readonly blocked: boolean;
-	readonly onDeleteProject: (project: ProjectDescriptor, ownership: ProjectOwnership) => void;
-	readonly onOpenProjectFolder: (root: string) => void;
+	readonly onDeleteProjectFn: (
+		project: ProjectDescriptor,
+		ownership: ProjectOwnershipSchema.Type,
+	) => void;
+	readonly onOpenProjectFolderFn: (root: string) => void;
 	readonly projects: ReadonlyArray<ProjectCandidate>;
 }
 
 /** Renders canonical projects in repository-supplied recent order. */
 export const EditorRecentProjects = ({
 	blocked,
-	onDeleteProject,
-	onOpenProjectFolder,
+	onDeleteProjectFn,
+	onOpenProjectFolderFn,
 	projects,
 }: EditorRecentProjectsProps) => {
 	if (projects.length === 0) return null;
@@ -61,7 +62,7 @@ export const EditorRecentProjects = ({
 							<Button
 								disabled={blocked}
 								className="min-h-0 shrink-0 px-3 py-2"
-								onClick={() => onOpenProjectFolder(candidate.root)}
+								onClick={() => onOpenProjectFolderFn(candidate.root)}
 							>
 								Open folder
 							</Button>
@@ -106,7 +107,7 @@ export const EditorRecentProjects = ({
 								data-ui="EditorRecentProjectDelete"
 								title={`Delete ${candidate.project.title}`}
 								onClick={() =>
-									onDeleteProject(candidate.project, candidate.ownership)
+									onDeleteProjectFn(candidate.project, candidate.ownership)
 								}
 							>
 								<Trash2 className="size-4" />

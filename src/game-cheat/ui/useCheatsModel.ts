@@ -12,9 +12,9 @@ export namespace useCheatsModel {
 		readonly enabled: boolean;
 		readonly instantGameplay: boolean;
 		readonly status: updateGameCheatsAtom.State;
-		readonly requestExit: (runFx: Effect.Effect<void, unknown, never>) => void;
-		readonly setEnabled: (enabled: boolean) => void;
-		readonly setInstantGameplay: (enabled: boolean) => void;
+		readonly requestExitFn: (runFx: Effect.Effect<void, unknown, never>) => void;
+		readonly setEnabledFn: (enabled: boolean) => void;
+		readonly setInstantGameplayFn: (enabled: boolean) => void;
 	}
 }
 
@@ -22,38 +22,38 @@ export namespace useCheatsModel {
 export const useCheatsModel = (game: PlayableGame): useCheatsModel.Model => {
 	const cheats = useGameCheats(game);
 	const commandAtom = updateGameCheatsAtom(game);
-	const [commandState, runCommand] = useAtom(commandAtom);
-	const requestExit = useCallback(
+	const [commandState, runCommandFn] = useAtom(commandAtom);
+	const requestExitFn = useCallback(
 		(runFx: Effect.Effect<void, unknown, never>) => {
-			runCommand({
+			runCommandFn({
 				action: "exit",
 				runFx,
 			});
 		},
 		[
-			runCommand,
+			runCommandFn,
 		],
 	);
-	const setEnabled = useCallback(
+	const setEnabledFn = useCallback(
 		(enabled: boolean) => {
-			runCommand({
+			runCommandFn({
 				action: "cheat-mode",
 				enabled,
 			});
 		},
 		[
-			runCommand,
+			runCommandFn,
 		],
 	);
-	const setInstantGameplay = useCallback(
+	const setInstantGameplayFn = useCallback(
 		(enabled: boolean) => {
-			runCommand({
+			runCommandFn({
 				action: "instant-gameplay",
 				enabled,
 			});
 		},
 		[
-			runCommand,
+			runCommandFn,
 		],
 	);
 	return useMemo(
@@ -62,17 +62,17 @@ export const useCheatsModel = (game: PlayableGame): useCheatsModel.Model => {
 			enabled: cheats.enabled,
 			instantGameplay: cheats.instantGameplay,
 			status: commandState,
-			requestExit,
-			setEnabled,
-			setInstantGameplay,
+			requestExitFn,
+			setEnabledFn,
+			setInstantGameplayFn,
 		}),
 		[
 			cheats.enabled,
 			cheats.instantGameplay,
 			commandState,
-			requestExit,
-			setEnabled,
-			setInstantGameplay,
+			requestExitFn,
+			setEnabledFn,
+			setInstantGameplayFn,
 		],
 	);
 };

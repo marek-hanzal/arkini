@@ -25,19 +25,19 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 			className={`${backdropPositionClassName[props.placement]} inset-0 z-[80] grid cursor-default place-items-start overflow-hidden bg-overlay/75 p-[var(--ak-viewport-padding)] pt-[12vh] text-overlay-foreground`}
 			data-ui={`${props.dataUi}Backdrop`}
 			onPointerDown={(event) => {
-				if (event.currentTarget === event.target) props.onClose();
+				if (event.currentTarget === event.target) props.onCloseFn();
 			}}
 		>
 			<div
 				className="mx-auto grid w-[38rem] max-w-full gap-3 rounded-2xl border border-line-strong bg-surface-raised p-4 text-foreground shadow-2xl"
 				data-ui={props.dataUi}
-				onKeyDown={controller.onKeyDown}
+				onKeyDown={controller.onKeyDownFn}
 			>
 				<SpotlightSearchInput
 					inputRef={controller.inputRef}
-					onEnter={controller.requestSelected}
-					onQueryChange={controller.updateQuery}
-					onSelectedIndexChange={controller.setSelectedIndex}
+					onEnterFn={controller.requestSelectedFn}
+					onQueryChangeFn={controller.updateQueryFn}
+					onSelectedIndexChangeFn={controller.setSelectedIndexFn}
 					placeholder={props.placeholder}
 					query={controller.query}
 					resultCount={controller.results.length}
@@ -58,12 +58,12 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 								data-item-id={option.itemId}
 								key={option.itemId}
 								onClick={() =>
-									controller.selectItem({
+									controller.selectItemFn({
 										index,
 										itemId: option.itemId,
 									})
 								}
-								onMouseEnter={() => controller.setSelectedIndex(index)}
+								onMouseEnter={() => controller.setSelectedIndexFn(index)}
 								type="button"
 								{...readDataUiFn({
 									dataUi: "ItemSpotlightOption",

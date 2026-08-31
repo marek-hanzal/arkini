@@ -4,7 +4,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 
-const indentText = (value: string) =>
+const indentTextFn = (value: string) =>
 	value
 		.split("\n")
 		.map((line) => `    ${line}`)
@@ -31,7 +31,7 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 				`  ID: ${item.id}`,
 				`  Type: ${item.type}`,
 				"  Description:",
-				indentText(item.description),
+				indentTextFn(item.description),
 			].join("\n"),
 		)
 		.join("\n\n");

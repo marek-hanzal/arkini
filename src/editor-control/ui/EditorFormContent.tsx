@@ -6,11 +6,11 @@ export const EditorFormContent = ({
 	children,
 	error,
 	rootCard = true,
-	save,
+	saveFn,
 }: PropsWithChildren<{
 	readonly error: unknown;
 	readonly rootCard?: boolean;
-	readonly save: () => Promise<boolean>;
+	readonly saveFn: () => Promise<boolean>;
 }>) => (
 	<form
 		className="min-h-0 flex-1"
@@ -18,7 +18,7 @@ export const EditorFormContent = ({
 		onSubmit={(event) => {
 			event.preventDefault();
 			event.stopPropagation();
-			void save().catch(() => undefined);
+			void saveFn().catch(() => undefined);
 		}}
 	>
 		{rootCard ? (

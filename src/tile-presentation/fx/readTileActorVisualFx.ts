@@ -11,7 +11,7 @@ export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function
 	item,
 	sourceIds: requestedSourceIds,
 }: {
-	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly item: ItemSchema.Type;
 	readonly sourceIds?: AssetSchema.Type["default"];
 }) {
@@ -19,11 +19,11 @@ export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function
 	return {
 		itemId: item.id,
 		title: item.title,
-		sourceUrl: game.getResourceUrl(sourceIds[0]),
+		sourceUrl: game.getResourceUrlFn(sourceIds[0]),
 		...(sourceIds[1] === undefined
 			? {}
 			: {
-					compositeUrl: game.getResourceUrl(sourceIds[1]),
+					compositeUrl: game.getResourceUrlFn(sourceIds[1]),
 				}),
 	} satisfies TileActorVisual;
 });

@@ -8,22 +8,22 @@ import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobo
 
 export namespace useProjectStartItemPickerController {
 	export interface Props {
-		readonly onClose: () => void;
-		readonly onSelect: (itemId: string) => void;
+		readonly onCloseFn: () => void;
+		readonly onSelectFn: (itemId: string) => void;
 		readonly scope: ProjectStartScope;
 	}
 
 	export interface Output {
 		readonly items: GameConfigSchema.Type["items"];
 		readonly options: ReadonlyArray<EditorSearchOption>;
-		readonly selectItem: (itemId: string) => void;
+		readonly selectItemFn: (itemId: string) => void;
 	}
 }
 
 /** Owns allowed-item admission and selection for one initial grid scope. */
 export const useProjectStartItemPickerController = ({
-	onClose,
-	onSelect,
+	onCloseFn,
+	onSelectFn,
 	scope,
 }: useProjectStartItemPickerController.Props): useProjectStartItemPickerController.Output => {
 	const { items, options } = useEditorItemSearchOptions();
@@ -45,14 +45,14 @@ export const useProjectStartItemPickerController = ({
 			options,
 		],
 	);
-	const selectItem = (itemId: string) => {
-		onSelect(itemId);
-		onClose();
+	const selectItemFn = (itemId: string) => {
+		onSelectFn(itemId);
+		onCloseFn();
 	};
 
 	return {
 		items,
 		options: allowedOptions,
-		selectItem,
+		selectItemFn,
 	};
 };

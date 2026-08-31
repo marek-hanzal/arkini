@@ -48,29 +48,29 @@ export const useStartupSplashLifecycle = () => {
 	const startup = useAtomValue(LauncherStartupAtom);
 	const visualReady = useAtomValue(LauncherVisualReadyAtom);
 	const lifecycle = useAtomValue(RendererLifecycleOwnerAtom);
-	const completeSplash = useAtomSet(completeLauncherSplashAtom);
-	const retryStartup = useAtomSet(retryLauncherStartupAtom);
-	const navigate = useNavigate();
-	const [visibleAtMs, setVisibleAtMs] = useState<number | null>(null);
-	const [blackHoldComplete, setBlackHoldComplete] = useState(false);
-	const [minimumSplashComplete, setMinimumSplashComplete] = useState(false);
-	const [visibilityError, setVisibilityError] = useState<unknown | null>(null);
-	const [visibilityAttempt, setVisibilityAttempt] = useState(0);
-	const [navigationError, setNavigationError] = useState<unknown | null>(null);
+	const completeSplashFn = useAtomSet(completeLauncherSplashAtom);
+	const retryStartupFn = useAtomSet(retryLauncherStartupAtom);
+	const navigateFn = useNavigate();
+	const [visibleAtMs, setVisibleAtMsFn] = useState<number | null>(null);
+	const [blackHoldComplete, setBlackHoldCompleteFn] = useState(false);
+	const [minimumSplashComplete, setMinimumSplashCompleteFn] = useState(false);
+	const [visibilityError, setVisibilityErrorFn] = useState<unknown | null>(null);
+	const [visibilityAttempt, setVisibilityAttemptFn] = useState(0);
+	const [navigationError, setNavigationErrorFn] = useState<unknown | null>(null);
 	const navigationStartedRef = useRef(false);
 	const canContinue =
 		startup._tag === "Success" && !startup.waiting && blackHoldComplete && visualReady;
 
 	useEffect(() => {
 		if (lifecycle === undefined) {
-			setVisibilityError(new RendererLifecycleUnavailableError());
+			setVisibilityErrorFn(new RendererLifecycleUnavailableError());
 			return;
 		}
 		const fiber = RendererRuntime.runFork(
 			lifecycle.waitUntilVisibleFx.pipe(
 				Effect.match({
-					onFailure: (error) => setVisibilityError(error),
-					onSuccess: (nextVisibleAtMs) => setVisibleAtMs(nextVisibleAtMs),
+					onFailure: (error) => setVisibilityErrorFn(error),
+					onSuccess: (nextVisibleAtMs) => setVisibleAtMsFn(nextVisibleAtMs),
 				}),
 			),
 		);
@@ -86,11 +86,11 @@ export const useStartupSplashLifecycle = () => {
 		if (visibleAtMs === null) return;
 		const elapsedMs = performance.now() - visibleAtMs;
 		const blackTimer = window.setTimeout(
-			() => setBlackHoldComplete(true),
+			() => setBlackHoldCompleteFn(true),
 			Math.max(0, blackHoldMs - elapsedMs),
 		);
 		const minimumTimer = window.setTimeout(
-			() => setMinimumSplashComplete(true),
+			() => setMinimumSplashCompleteFn(true),
 			Math.max(0, minimumSplashMs - elapsedMs),
 		);
 		return () => {
@@ -101,63 +101,63 @@ export const useStartupSplashLifecycle = () => {
 		visibleAtMs,
 	]);
 
-	const complete = useCallback(() => {
+	const completeFn = useCallback(() => {
 		if (!canContinue || navigationStartedRef.current) return;
 		navigationStartedRef.current = true;
-		setNavigationError(null);
-		void navigate({
+		setNavigationErrorFn(null);
+		void navigateFn({
 			to: "/main-menu",
 			replace: true,
 		})
 			.then(() => {
-				completeSplash();
+				completeSplashFn();
 			})
 			.catch((error) => {
 				navigationStartedRef.current = false;
-				setNavigationError(error);
+				setNavigationErrorFn(error);
 			});
 	}, [
 		canContinue,
-		completeSplash,
-		navigate,
+		completeSplashFn,
+		navigateFn,
 	]);
 
 	useEffect(() => {
-		if (minimumSplashComplete) complete();
+		if (minimumSplashComplete) completeFn();
 	}, [
-		complete,
+		completeFn,
 		minimumSplashComplete,
 	]);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || !canContinue || minimumSplashComplete) return;
 			event.preventDefault();
-			complete();
+			completeFn();
 		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, [
 		canContinue,
-		complete,
+		completeFn,
 		minimumSplashComplete,
 	]);
 
-	const retry = useCallback(() => {
+	const retryFn = useCallback(() => {
 		if (visibilityError !== null) {
-			setVisibilityError(null);
-			setVisibilityAttempt((attempt) => attempt + 1);
+			setVisibilityErrorFn(null);
+			setVisibilityAttemptFn((attempt) => attempt + 1);
 			return;
 		}
 		if (navigationError !== null) {
-			complete();
+			completeFn();
 			return;
 		}
-		retryStartup();
+		retryStartupFn();
 	}, [
-		complete,
+		completeFn,
 		navigationError,
-		retryStartup,
+		retryStartupFn,
 		visibilityError,
 	]);
 
@@ -297,8 +297,8 @@ export const useStartupSplashLifecycle = () => {
 				};
 
 	return {
-		skip: complete,
+		skipFn: completeFn,
 		view,
-		retry,
+		retryFn,
 	};
 };

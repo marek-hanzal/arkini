@@ -11,7 +11,6 @@ import {
 import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
-type Resource = Project["resources"][number];
 type ResourceUrlListener = () => void;
 
 interface ResourceUrlEntry {
@@ -21,10 +20,10 @@ interface ResourceUrlEntry {
 }
 
 interface ResourceUrlStore {
-	readonly read: (resourceId: string) => string | undefined;
-	readonly subscribe: (resourceId: string, listener: ResourceUrlListener) => () => void;
-	readonly sync: (resources: Project["resources"]) => void;
-	readonly dispose: () => void;
+	readonly readFn: (resourceId: string) => string | undefined;
+	readonly subscribeFn: (resourceId: string, listenerFn: ResourceUrlListener) => () => void;
+	readonly syncFn: (resources: Project["resources"]) => void;
+	readonly disposeFn: () => void;
 }
 
 const ResourceUrlContext = createContext<ResourceUrlStore | undefined>(undefined);
@@ -38,16 +37,16 @@ const ResourceUrlProvider = ({
 }>) => {
 	const storeRef = useRef<ResourceUrlStore | undefined>(undefined);
 	if (storeRef.current === undefined) {
-		let resourcesById = new Map<string, Resource>();
+		let resourcesById = new Map<string, Project.Resource>();
 		const entries = new Map<string, ResourceUrlEntry>();
 		const listenersById = new Map<string, Set<ResourceUrlListener>>();
-		const revokeEntry = (resourceId: string) => {
+		const revokeEntryFn = (resourceId: string) => {
 			const entry = entries.get(resourceId);
 			if (entry === undefined) return;
 			entries.delete(resourceId);
 			URL.revokeObjectURL(entry.url);
 		};
-		const createEntry = (resource: Resource) => {
+		const createEntryFn = (resource: Project.Resource) => {
 			const entry: ResourceUrlEntry = {
 				bytes: resource.bytes,
 				mime: resource.mime,
@@ -66,27 +65,27 @@ const ResourceUrlProvider = ({
 			return entry;
 		};
 		storeRef.current = {
-			read: (resourceId) => entries.get(resourceId)?.url,
-			subscribe: (resourceId, listener) => {
+			readFn: (resourceId) => entries.get(resourceId)?.url,
+			subscribeFn: (resourceId, listenerFn) => {
 				let listeners = listenersById.get(resourceId);
 				if (listeners === undefined) {
 					listeners = new Set();
 					listenersById.set(resourceId, listeners);
 				}
-				listeners.add(listener);
+				listeners.add(listenerFn);
 				if (!entries.has(resourceId)) {
 					const resource = resourcesById.get(resourceId);
-					if (resource !== undefined) createEntry(resource);
+					if (resource !== undefined) createEntryFn(resource);
 				}
 				return () => {
 					const currentListeners = listenersById.get(resourceId);
-					currentListeners?.delete(listener);
+					currentListeners?.delete(listenerFn);
 					if (currentListeners !== undefined && currentListeners.size > 0) return;
 					listenersById.delete(resourceId);
-					revokeEntry(resourceId);
+					revokeEntryFn(resourceId);
 				};
 			},
-			sync: (nextResources) => {
+			syncFn: (nextResources) => {
 				resourcesById = new Map(
 					nextResources.map((resource) => [
 						resource.id,
@@ -99,13 +98,13 @@ const ResourceUrlProvider = ({
 					const entry = entries.get(resourceId);
 					if (resource === undefined) {
 						if (entry === undefined) continue;
-						revokeEntry(resourceId);
-						for (const listener of listeners) changedListeners.add(listener);
+						revokeEntryFn(resourceId);
+						for (const listenerFn of listeners) changedListeners.add(listenerFn);
 						continue;
 					}
 					if (entry === undefined) {
-						createEntry(resource);
-						for (const listener of listeners) changedListeners.add(listener);
+						createEntryFn(resource);
+						for (const listenerFn of listeners) changedListeners.add(listenerFn);
 						continue;
 					}
 					const equalBytes =
@@ -116,17 +115,17 @@ const ResourceUrlProvider = ({
 						entry.bytes = resource.bytes;
 						continue;
 					}
-					revokeEntry(resourceId);
-					createEntry(resource);
-					for (const listener of listeners) changedListeners.add(listener);
+					revokeEntryFn(resourceId);
+					createEntryFn(resource);
+					for (const listenerFn of listeners) changedListeners.add(listenerFn);
 				}
-				for (const listener of changedListeners) listener();
+				for (const listenerFn of changedListeners) listenerFn();
 			},
-			dispose: () => {
+			disposeFn: () => {
 				for (const resourceId of [
 					...entries.keys(),
 				])
-					revokeEntry(resourceId);
+					revokeEntryFn(resourceId);
 				listenersById.clear();
 				resourcesById.clear();
 			},
@@ -134,14 +133,14 @@ const ResourceUrlProvider = ({
 	}
 	const store = storeRef.current;
 	useLayoutEffect(() => {
-		store.sync(resources);
+		store.syncFn(resources);
 	}, [
 		resources,
 		store,
 	]);
 	useLayoutEffect(
 		() => () => {
-			store.dispose();
+			store.disposeFn();
 		},
 		[
 			store,
@@ -159,16 +158,16 @@ export const ProjectResourceUrlProvider = ({ children }: PropsWithChildren) => {
 /** Resolves one lazily acquired project-scoped resource URL. */
 export const useResourceUrl = (resourceId: string | undefined) => {
 	const store = useContext(ResourceUrlContext);
-	const [url, setUrl] = useState<string>();
+	const [url, setUrlFn] = useState<string>();
 	useLayoutEffect(() => {
 		if (store === undefined || resourceId === undefined) {
-			setUrl(undefined);
+			setUrlFn(undefined);
 			return;
 		}
-		const update = () => setUrl(store.read(resourceId));
-		const release = store.subscribe(resourceId, update);
-		update();
-		return release;
+		const updateFn = () => setUrlFn(store.readFn(resourceId));
+		const releaseFn = store.subscribeFn(resourceId, updateFn);
+		updateFn();
+		return releaseFn;
 	}, [
 		resourceId,
 		store,
@@ -187,7 +186,7 @@ export const useResourceUrls = (resourceIds: ReadonlyArray<string>) => {
 			resourceIds,
 		],
 	);
-	const [snapshot, setSnapshot] = useState<{
+	const [snapshot, setSnapshotFn] = useState<{
 		readonly ids: ReadonlyArray<string>;
 		readonly urls: ReadonlyMap<string, string>;
 	}>({
@@ -196,30 +195,30 @@ export const useResourceUrls = (resourceIds: ReadonlyArray<string>) => {
 	});
 	useLayoutEffect(() => {
 		if (store === undefined || requestedIds.length === 0) {
-			setSnapshot({
+			setSnapshotFn({
 				ids: requestedIds,
 				urls: emptyResourceUrls,
 			});
 			return;
 		}
 		let active = true;
-		const update = () => {
+		const updateFn = () => {
 			if (!active) return;
 			const urls = new Map<string, string>();
 			for (const resourceId of requestedIds) {
-				const url = store.read(resourceId);
+				const url = store.readFn(resourceId);
 				if (url !== undefined) urls.set(resourceId, url);
 			}
-			setSnapshot({
+			setSnapshotFn({
 				ids: requestedIds,
 				urls,
 			});
 		};
-		const releases = requestedIds.map((resourceId) => store.subscribe(resourceId, update));
-		update();
+		const releases = requestedIds.map((resourceId) => store.subscribeFn(resourceId, updateFn));
+		updateFn();
 		return () => {
 			active = false;
-			for (const release of releases) release();
+			for (const releaseFn of releases) releaseFn();
 		};
 	}, [
 		requestedIds,

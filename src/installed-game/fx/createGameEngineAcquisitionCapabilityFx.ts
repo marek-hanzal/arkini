@@ -131,7 +131,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 						return yield* Exit.isSuccess(disposeExit)
 							? Effect.fail(identityFailure)
 							: Effect.fail(
-									resource.markCriticalFailure(
+									resource.markCriticalFailureFn(
 										"engine-ownership",
 										Option.isSome(disposeFailure)
 											? disposeFailure.value
@@ -161,7 +161,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 				"GameEngineResourceFx.acquireLeaseFx",
 			)(({ packageId }) =>
 				Effect.suspend(() =>
-					Effect.uninterruptibleMask((restore) =>
+					Effect.uninterruptibleMask((restoreFx) =>
 						withLifecycleLockFx(
 							Effect.gen(function* () {
 								const state = yield* Ref.get(stateRef);
@@ -241,7 +241,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 										owner,
 									});
 									owner.fiber = yield* Effect.forkIn(
-										restore(runAcquisitionFx(owner)),
+										restoreFx(runAcquisitionFx(owner)),
 										operationScope,
 									);
 								}

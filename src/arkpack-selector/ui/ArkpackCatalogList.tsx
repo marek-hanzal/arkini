@@ -1,23 +1,23 @@
 import { Play, Sparkles, Trash2 } from "lucide-react";
 import { match } from "ts-pattern";
 
-import type { useArkpacks } from "~/arkpack-selector/ui/useArkpacks";
+import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import { DangerButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 interface ArkpackCatalogListProps {
 	readonly blocked?: boolean;
-	readonly state: useArkpacks.State;
-	readonly onOpenEditor: (packageId: string) => void;
-	readonly onRemove: (packageId: string) => void;
+	readonly state: ArkpackCatalog.State;
+	readonly onOpenEditorFn: (packageId: string) => void;
+	readonly onRemoveFn: (packageId: string) => void;
 }
 
 /** Exhaustively renders the current Arkpack catalog projection. */
 export const ArkpackCatalogList = ({
 	blocked = false,
 	state,
-	onOpenEditor,
-	onRemove,
+	onOpenEditorFn,
+	onRemoveFn,
 }: ArkpackCatalogListProps) =>
 	match(state)
 		.with(
@@ -86,7 +86,7 @@ export const ArkpackCatalogList = ({
 										className="min-h-0 px-3 py-2 text-xs shadow-none"
 										cursorIntent={blocked ? "progress" : undefined}
 										disabled={blocked}
-										onClick={() => onRemove(arkpack.packageId)}
+										onClick={() => onRemoveFn(arkpack.packageId)}
 									>
 										<Trash2 className="mr-1.5 size-4" />
 										{arkpack.overridesBundled ? "Remove override" : "Remove"}
@@ -96,7 +96,7 @@ export const ArkpackCatalogList = ({
 									className="inline-flex items-center gap-1.5 text-xs"
 									cursorIntent={blocked ? "progress" : undefined}
 									disabled={blocked}
-									onClick={() => onOpenEditor(arkpack.packageId)}
+									onClick={() => onOpenEditorFn(arkpack.packageId)}
 								>
 									<Sparkles className="size-4" />
 									Editor

@@ -13,7 +13,7 @@ const HorizontalScale = 2.2;
 const VerticalScale = 0.95;
 const RankShift = 280;
 
-const seededRandom = (seed: number) => {
+const seededRandomFn = (seed: number) => {
 	let state = seed >>> 0;
 	return () => {
 		state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
@@ -122,8 +122,8 @@ export const placeFx = Effect.fn("placeFx")(
 				],
 				styleEnabled: true,
 			});
-			const previousRandom = Math.random;
-			Math.random = seededRandom(RandomSeed);
+			const previousRandomFn = Math.random;
+			Math.random = seededRandomFn(RandomSeed);
 			try {
 				graph
 					.layout({
@@ -161,7 +161,7 @@ export const placeFx = Effect.fn("placeFx")(
 					} as cytoscape.LayoutOptions)
 					.run();
 			} finally {
-				Math.random = previousRandom;
+				Math.random = previousRandomFn;
 			}
 
 			try {

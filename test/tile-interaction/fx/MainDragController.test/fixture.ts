@@ -3,7 +3,7 @@ import { Application, Container } from "pixi.js";
 import { vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type {
 	ActorAnimation,
@@ -53,7 +53,7 @@ vi.mock("~/game-cheat/fx/removeCheatItemFx", () => ({
 }));
 
 vi.mock("~/tile-interaction/fx/readTileDropPreviewFx", () => ({
-	readTileDropPreviewFx: ({ target }: { readonly target: runTileDropAtom.Command["target"] }) =>
+	readTileDropPreviewFx: ({ target }: { readonly target: DropItemCommand["target"] }) =>
 		Effect.sync(() => {
 			previewState.reads += 1;
 			const actorId =
@@ -216,7 +216,7 @@ export const mountController = ({
 		actors.set(targetItem.id, createDragActor(targetItem));
 		canonicalItems.set(targetItem.id, targetItem);
 	}
-	let currentCommandTarget: runTileDropAtom.Command["target"] = {
+	let currentCommandTarget: DropItemCommand["target"] = {
 		kind: "unsupported" as const,
 	};
 	let currentActorPose = {
@@ -237,7 +237,7 @@ export const mountController = ({
 	const targetRedirects: Array<Parameters<MotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
 	const onAcceptedDrop = vi.fn();
-	const reportCriticalFailure = vi.fn();
+	const reportCriticalFailureFn = vi.fn();
 	const beginInteractionHandoff = vi.fn((_actorId: string) => true);
 	const releasePointerCapture = vi.fn();
 	const dropPresentation = Effect.runSync(createDropPresentationFx());
@@ -328,12 +328,12 @@ export const mountController = ({
 		startFx: (actor, pointer) => Effect.sync(() => startCursorGrab(actor, pointer)),
 	} satisfies CursorGrabMotion;
 	const game = {
-		getSnapshot: () => ({
+		getSnapshotFn: () => ({
 			cheats: {
 				enabled: cheatsEnabled,
 			},
 		}),
-		reportCriticalFailure,
+		reportCriticalFailureFn,
 		runFx: (effect: Effect.Effect<unknown, unknown>) => effect,
 	} as never;
 	const magneticField = {
@@ -426,8 +426,8 @@ export const mountController = ({
 			game,
 			magneticField,
 			motion,
-			onAcceptedDrop,
-			onDrop: onDrop as never,
+			onAcceptedDropFn: onAcceptedDrop,
+			onDropFn: onDrop as never,
 			surface,
 		}),
 	);
@@ -452,7 +452,7 @@ export const mountController = ({
 					frames: {
 						closeFx: Effect.void,
 						invalidateFx: Effect.void,
-						reportCriticalFailure: () => {},
+						reportCriticalFailureFn: () => {},
 						scheduleAfterRenderFx: () => Effect.succeed(() => {}),
 						scheduleFx: (work: () => void) =>
 							Effect.sync(() => {
@@ -470,8 +470,8 @@ export const mountController = ({
 				game,
 				magneticField,
 				motion,
-				onActivate,
-				readAckTint: () => 0x57d7b2,
+				onActivateFn: onActivate,
+				readAckTintFn: () => 0x57d7b2,
 				surface,
 			}),
 		);
@@ -511,7 +511,7 @@ export const mountController = ({
 		onDrop,
 		presentationWrites,
 		releasePointerCapture,
-		reportCriticalFailure,
+		reportCriticalFailureFn,
 		removeDraggedItem: removalState.remove,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
@@ -580,10 +580,10 @@ export const flushMicrotasks = async () => {
 };
 
 export const samplePoseAnimation = (animation: ActorAnimation, progress: number) => {
-	if (animation.channel !== "pose" || animation.readPose === undefined) {
+	if (animation.channel !== "pose" || animation.readPoseFn === undefined) {
 		throw new Error("Expected a semantic pose animation.");
 	}
-	const pose = animation.readPose(progress);
+	const pose = animation.readPoseFn(progress);
 	animation.actor.container.position.set(pose.x, pose.y);
 	if (pose.scale !== undefined) animation.actor.container.scale.set(pose.scale);
 	return pose;

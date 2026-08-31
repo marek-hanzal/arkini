@@ -59,7 +59,7 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 						selected={model.windowMode}
 						pending={model.blocked}
 						dataUi="SettingsWindowModeOptions"
-						onChange={model.selectWindowMode}
+						onChangeFn={model.selectWindowModeFn}
 					/>
 					<p className="text-sm leading-6 text-muted">
 						Default uses the standard window size. Bordered fills the screen with its
@@ -77,7 +77,7 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 						selected={model.theme}
 						pending={model.blocked}
 						dataUi="SettingsThemeOptions"
-						onChange={model.selectTheme}
+						onChangeFn={model.selectThemeFn}
 					/>
 					<p className="text-sm leading-6 text-muted">
 						System follows the operating-system appearance. Light and Dark override it.

@@ -11,8 +11,8 @@ import { modifyRuntimeWithTransitionFx } from "~/game-runtime/fx/modifyRuntimeWi
  * together with the transient events describing that exact mutation.
  */
 export const modifyRuntimeFx = Effect.fn("modifyRuntimeFx")(function* <Result, Error, Requirements>(
-	update: modifyRuntimeWithTransitionFx.Update<Result, Error, Requirements>,
+	updateFx: modifyRuntimeWithTransitionFx.Update<Result, Error, Requirements>,
 ) {
-	const modification = yield* modifyRuntimeWithTransitionFx(update);
+	const modification = yield* modifyRuntimeWithTransitionFx(updateFx);
 	return modification.result;
 });

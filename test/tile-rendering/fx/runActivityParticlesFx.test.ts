@@ -42,7 +42,7 @@ describe("activity particles", () => {
 			ownerKey,
 			repeat: Number.POSITIVE_INFINITY,
 		});
-		expect(animations[0]?.onComplete).toBeUndefined();
+		expect(animations[0]?.onCompleteFn).toBeUndefined();
 	});
 
 	it("drains a stopped running owner before releasing its shared pool", () => {
@@ -70,7 +70,7 @@ describe("activity particles", () => {
 			channel: "activity-particles",
 			ownerKey,
 		});
-		animations[0]?.onComplete?.();
+		animations[0]?.onCompleteFn?.();
 		expect(actor.activityParticles.container.visible).toBe(false);
 		expect(actor.activityParticles.feedbackPhase).toBeNull();
 	});
@@ -106,7 +106,7 @@ describe("activity particles", () => {
 			ownerKey,
 		]);
 		expect(actor.activityParticles.feedbackPhase).toBe("burst");
-		animations[0]?.onComplete?.();
+		animations[0]?.onCompleteFn?.();
 		expect(animations).toHaveLength(2);
 		expect(animations[1]).toMatchObject({
 			channel: "activity-particles",
@@ -143,7 +143,7 @@ describe("activity particles", () => {
 			ownerKey,
 		]);
 		expect(actor.activityParticles.feedbackPhase).toBe("burst");
-		animations[0]?.onComplete?.();
+		animations[0]?.onCompleteFn?.();
 		expect(actor.activityParticles.container.visible).toBe(false);
 	});
 });

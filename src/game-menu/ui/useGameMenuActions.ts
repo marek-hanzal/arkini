@@ -10,7 +10,7 @@ import type { GameMenuAction, GameMenuPhase } from "~/game-menu/type/GameMenuCon
 import { gameMenuCommandAtom } from "~/game-menu/atom/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const errorMessageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /**
  * Orchestrates menu intent without taking Game lifecycle ownership. Local save
@@ -27,11 +27,11 @@ export const useGameMenuActions = ({
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
 	const menu = useGameMenuControl();
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const commandAtom = gameMenuCommandAtom(game);
-	const [commandResult, runCommand] = useAtom(commandAtom);
-	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
-	const [navigationError, setNavigationError] = useState<unknown>();
+	const [commandResult, runCommandFn] = useAtom(commandAtom);
+	const [confirmingDestroy, setConfirmingDestroyFn] = useState(false);
+	const [navigationError, setNavigationErrorFn] = useState<unknown>();
 	const savePending = menu.activeAction === "save";
 	const saveAndExitPending = menu.activeAction === "save-and-exit";
 	const pending = menu.activeAction !== null || commandResult.waiting;
@@ -50,7 +50,7 @@ export const useGameMenuActions = ({
 		}
 		const failure = readExactCauseFailureFn(settledCommand.exit.cause);
 		if (Option.isNone(failure)) {
-			game.failStop("ui", settledCommand.exit.cause);
+			game.failStopFn("ui", settledCommand.exit.cause);
 			throw settledCommand.exit.cause;
 		}
 		return {
@@ -65,12 +65,12 @@ export const useGameMenuActions = ({
 
 	useEffect(
 		() => () => {
-			menu.completeAction("save");
-			menu.completeAction("save-and-exit");
+			menu.completeActionFn("save");
+			menu.completeActionFn("save-and-exit");
 		},
 		[
 			commandAtom,
-			menu.completeAction,
+			menu.completeActionFn,
 		],
 	);
 
@@ -82,36 +82,36 @@ export const useGameMenuActions = ({
 		) {
 			return;
 		}
-		menu.completeAction(menu.activeAction);
+		menu.completeActionFn(menu.activeAction);
 	}, [
 		commandResult,
 		menu.activeAction,
-		menu.completeAction,
+		menu.completeActionFn,
 	]);
 
-	const requestNavigation = (
+	const requestNavigationFn = (
 		action: Exclude<GameMenuAction, "save" | "save-and-exit">,
-		request: () => Promise<unknown>,
+		requestFn: () => Promise<unknown>,
 	) => {
-		if (!menu.beginAction(action)) return;
-		setNavigationError(undefined);
-		void request()
-			.catch(setNavigationError)
+		if (!menu.beginActionFn(action)) return;
+		setNavigationErrorFn(undefined);
+		void requestFn()
+			.catch(setNavigationErrorFn)
 			.finally(() => {
-				menu.completeAction(action);
+				menu.completeActionFn(action);
 			});
 	};
 
-	const requestSettings = () =>
-		requestNavigation("settings", () =>
-			navigate({
+	const requestSettingsFn = () =>
+		requestNavigationFn("settings", () =>
+			navigateFn({
 				to: "/settings",
 			}),
 		);
 
-	const requestCheats = () =>
-		requestNavigation("cheats", () =>
-			navigate({
+	const requestCheatsFn = () =>
+		requestNavigationFn("cheats", () =>
+			navigateFn({
 				to: "/game/$packageId/cheats",
 				params: {
 					packageId: game.arkpack.packageId,
@@ -119,9 +119,9 @@ export const useGameMenuActions = ({
 			}),
 		);
 
-	const requestMainMenu = () =>
-		requestNavigation("main-menu", () =>
-			navigate({
+	const requestMainMenuFn = () =>
+		requestNavigationFn("main-menu", () =>
+			navigateFn({
 				to: "/game/$packageId/action/leave",
 				params: {
 					packageId: game.arkpack.packageId,
@@ -132,19 +132,19 @@ export const useGameMenuActions = ({
 			}),
 		);
 
-	const requestSave = () => {
-		if (!menu.beginAction("save")) return;
-		runCommand("save");
+	const requestSaveFn = () => {
+		if (!menu.beginActionFn("save")) return;
+		runCommandFn("save");
 	};
 
-	const requestSaveAndExit = () => {
-		if (!menu.beginAction("save-and-exit")) return;
-		runCommand("save-and-exit");
+	const requestSaveAndExitFn = () => {
+		if (!menu.beginActionFn("save-and-exit")) return;
+		runCommandFn("save-and-exit");
 	};
 
-	const requestHardReset = () =>
-		requestNavigation("hard-reset", () =>
-			navigate({
+	const requestHardResetFn = () =>
+		requestNavigationFn("hard-reset", () =>
+			navigateFn({
 				to: "/game/$packageId/action/reset",
 				params: {
 					packageId: game.arkpack.packageId,
@@ -157,10 +157,10 @@ export const useGameMenuActions = ({
 		if (savePending) return "Saving…";
 		if (commandFailure !== undefined) {
 			const label = commandFailure.command === "save-and-exit" ? "Save and exit" : "Save";
-			return `${label} failed: ${errorMessage(commandFailure.error)}`;
+			return `${label} failed: ${errorMessageFn(commandFailure.error)}`;
 		}
 		if (navigationError !== undefined) {
-			return `Navigation failed: ${errorMessage(navigationError)}`;
+			return `Navigation failed: ${errorMessageFn(navigationError)}`;
 		}
 		if (
 			menu.activeAction === "settings" ||
@@ -180,13 +180,13 @@ export const useGameMenuActions = ({
 		pending,
 		actionDisabled,
 		confirmingDestroy,
-		setConfirmingDestroy,
-		close: menu.close,
-		requestSettings,
-		requestCheats,
-		requestMainMenu,
-		requestSave,
-		requestSaveAndExit,
-		requestHardReset,
+		setConfirmingDestroyFn,
+		closeFn: menu.closeFn,
+		requestSettingsFn,
+		requestCheatsFn,
+		requestMainMenuFn,
+		requestSaveFn,
+		requestSaveAndExitFn,
+		requestHardResetFn,
 	};
 };

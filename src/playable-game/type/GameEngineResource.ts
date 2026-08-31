@@ -9,13 +9,13 @@ import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 export interface GameEngineResource<GameType extends PlayableGame = PlayableGame> {
 	readonly game: GameEngine<GameType>;
 	/** Returns the exact first critical failure, or null while this resource is usable. */
-	readonly getCriticalFailure: () => CriticalGameLifecycleError | null;
+	readonly getCriticalFailureFn: () => CriticalGameLifecycleError | null;
 	/** Notifies exactly once when this resource first becomes critically unusable. */
-	readonly subscribeCriticalFailure: (listener: () => void) => () => void;
+	readonly subscribeCriticalFailureFn: (listenerFn: () => void) => () => void;
 	/** Throws the first critical ownership failure once this resource can no longer publish gameplay. */
-	readonly assertUsable: () => void;
+	readonly assertUsableFn: () => void;
 	/** Permanently marks this resource unusable and returns the canonical fatal error. */
-	readonly markCriticalFailure: (
+	readonly markCriticalFailureFn: (
 		operation: CriticalGameLifecycleOperation,
 		cause: unknown,
 	) => CriticalGameLifecycleError;

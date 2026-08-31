@@ -37,13 +37,13 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 		toX: pose.x,
 		toY: pose.y,
 	});
-	const readPose = yield* createRetargetablePoseSamplerFx({
+	const readPoseFn = yield* createRetargetablePoseSamplerFx({
 		from: {
 			scale: actor.container.scale.x,
 			x: actor.container.x,
 			y: actor.container.y,
 		},
-		readTarget: () => {
+		readTargetFn: () => {
 			const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
 			return {
 				scale: latest.size / Math.max(1, actor.size),
@@ -60,11 +60,11 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 			kind: "spring",
 		},
 		durationMs,
-		onComplete: () => {
+		onCompleteFn: () => {
 			if (actor.container.destroyed) return;
 			const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
 			latest.layer.addChild(actor.container);
 		},
-		readPose,
+		readPoseFn,
 	});
 });

@@ -36,7 +36,7 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
 		);
 		if (resource === null) return;
-		resource.assertUsable();
+		resource.assertUsableFn();
 		if (resource.game.arkpack.packageId === params.packageId) return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 				replace: true,
 			});
 		}
-		resource.assertUsable();
+		resource.assertUsableFn();
 		throw redirect({
 			to: "/game/$packageId/board",
 			params,

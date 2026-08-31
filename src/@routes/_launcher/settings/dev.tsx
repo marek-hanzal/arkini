@@ -6,17 +6,17 @@ import { SettingsDiagnosticsCommandAtom } from "~/application-settings/atom/Sett
 import { SettingsUserDataCommandAtom } from "~/application-settings/atom/SettingsUserDataCommandAtom";
 import { useCliModel } from "~/application-settings/ui/useCliModel";
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const errorMessageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 const useSettingsDirectoriesModel = () => {
-	const [diagnosticsStatus, openDiagnosticsCommand] = useAtom(SettingsDiagnosticsCommandAtom);
-	const [userDataStatus, openUserDataCommand] = useAtom(SettingsUserDataCommandAtom);
+	const [diagnosticsStatus, openDiagnosticsCommandFn] = useAtom(SettingsDiagnosticsCommandAtom);
+	const [userDataStatus, openUserDataCommandFn] = useAtom(SettingsUserDataCommandAtom);
 
 	return {
 		diagnosticsStatus,
 		userDataStatus,
-		openDiagnostics: () => openDiagnosticsCommand(undefined),
-		openUserData: () => openUserDataCommand(undefined),
+		openDiagnosticsFn: () => openDiagnosticsCommandFn(undefined),
+		openUserDataFn: () => openUserDataCommandFn(undefined),
 	};
 };
 
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_launcher/settings/dev")({
 					pending={cli.installationPending}
 					disabled={cli.installationDisabled}
 					idleLabel={cli.installationActionLabel}
-					onClick={cli.toggleInstallation}
+					onClickFn={cli.toggleInstallationFn}
 				/>
 				<SettingsOpenActionRow
 					dataUi="SettingsCliCompletion"
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/_launcher/settings/dev")({
 					pending={cli.completionPending}
 					disabled={cli.completionDisabled}
 					idleLabel={cli.completionActionLabel}
-					onClick={cli.toggleCompletion}
+					onClickFn={cli.toggleCompletionFn}
 				/>
 				<SettingsOpenActionRow
 					dataUi="SettingsDiagnostics"
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/_launcher/settings/dev")({
 					description="Open the bounded rotating logs used to investigate crashes and broken gameplay sessions."
 					pending={directories.diagnosticsStatus.kind === "pending"}
 					idleLabel="Open logs"
-					onClick={directories.openDiagnostics}
+					onClickFn={directories.openDiagnosticsFn}
 				/>
 				<SettingsOpenActionRow
 					dataUi="SettingsUserData"
@@ -61,16 +61,17 @@ export const Route = createFileRoute("/_launcher/settings/dev")({
 					description="Open Arkini's data root containing editor projects, Arkpacks, saves, preferences, and logs."
 					pending={directories.userDataStatus.kind === "pending"}
 					idleLabel="Open data folder"
-					onClick={directories.openUserData}
+					onClickFn={directories.openUserDataFn}
 				/>
 				{directories.diagnosticsStatus.kind === "error" ? (
 					<p className="text-center text-sm text-danger">
-						Diagnostics failed: {errorMessage(directories.diagnosticsStatus.error)}
+						Diagnostics failed: {errorMessageFn(directories.diagnosticsStatus.error)}
 					</p>
 				) : null}
 				{directories.userDataStatus.kind === "error" ? (
 					<p className="text-center text-sm text-danger">
-						Opening data folder failed: {errorMessage(directories.userDataStatus.error)}
+						Opening data folder failed:{" "}
+						{errorMessageFn(directories.userDataStatus.error)}
 					</p>
 				) : null}
 				{cli.installationStatus.kind === "error" ? (

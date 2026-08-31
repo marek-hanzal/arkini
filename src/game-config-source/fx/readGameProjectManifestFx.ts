@@ -15,7 +15,7 @@ export const readGameProjectManifestFx = Effect.fn("readGameProjectManifestFx")(
 		path,
 		missingIssueCode: "game-project-manifest-missing",
 		missingMessage: "The required game project manifest could not be read.",
-		validate: (json) => {
+		validateFn: (json) => {
 			const parsed = GameProjectManifestSchema.safeParse(json);
 			if (!parsed.success) return gameSourceSchemaDiagnosticsFn(path, parsed.error);
 			const incompatibility = readArkiniVersionIncompatibilityFn(

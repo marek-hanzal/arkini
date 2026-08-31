@@ -30,7 +30,7 @@ describe("GameLoopLayerFx", () => {
 				Effect.provide(
 					GameLoopLayerFx({
 						intervalMs: 1,
-						onFatalError: () => {
+						onFatalErrorFn: () => {
 							fatalFailures += 1;
 						},
 					}),

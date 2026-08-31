@@ -46,7 +46,7 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 				target: currentPath,
 				value: packageId,
 				operation: "persist the last package preference",
-				serialize: (value) => JSON.stringify(LastPackageIdSchema.parse(value)),
+				serializeFn: (value) => JSON.stringify(LastPackageIdSchema.parse(value)),
 			}),
 	);
 	return {
@@ -55,7 +55,7 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 			path: currentPath,
 			fallback: null,
 			operation: "read the last package preference",
-			parse: (stored) => {
+			parseFn: (stored) => {
 				try {
 					return LastPackageIdSchema.safeParse(JSON.parse(stored)).data;
 				} catch {

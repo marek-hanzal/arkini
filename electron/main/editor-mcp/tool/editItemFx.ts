@@ -11,13 +11,13 @@ import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 /** Applies one strict top-level replace patch to a revision-pinned canonical item. */
 export const editItemFx = Effect.fn("editItemFx")(function* ({
 	input,
-	notifyProjectChanged,
+	notifyProjectChangedFn,
 	project,
 	repository,
 	type,
 }: {
 	readonly input: EditItemInput;
-	readonly notifyProjectChanged: (projectId: string) => void;
+	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 	readonly type: TypeSchema.Type;
@@ -48,7 +48,7 @@ export const editItemFx = Effect.fn("editItemFx")(function* ({
 		projectId: project.projectId,
 		repository,
 	});
-	yield* notifyProjectChangedFx(notifyProjectChanged, project.projectId);
+	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		`Edited ${item.type} item.`,
 		`ID: ${item.id}`,

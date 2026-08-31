@@ -17,8 +17,8 @@ interface EditorWorkspaceNavigationProps {
 	readonly activeWorkspace: EditorWorkspaceId | undefined;
 	readonly exitDisabled: boolean;
 	readonly exitPending: boolean;
-	readonly onExit: () => void;
-	readonly onRefresh: () => void;
+	readonly onExitFn: () => void;
+	readonly onRefreshFn: () => void;
 	readonly projectId: string;
 	readonly refreshDisabled: boolean;
 	readonly refreshPending: boolean;
@@ -31,8 +31,8 @@ export const EditorWorkspaceNavigation = ({
 	activeWorkspace,
 	exitDisabled,
 	exitPending,
-	onExit,
-	onRefresh,
+	onExitFn,
+	onRefreshFn,
 	projectId,
 	refreshDisabled,
 	refreshPending,
@@ -90,7 +90,7 @@ export const EditorWorkspaceNavigation = ({
 				data-ui="EditorProjectRefresh"
 				disabled={refreshDisabled}
 				cursorIntent={refreshPending ? "progress" : undefined}
-				onClick={onRefresh}
+				onClick={onRefreshFn}
 			>
 				<RefreshCw className="size-5" />
 			</Button>
@@ -104,7 +104,7 @@ export const EditorWorkspaceNavigation = ({
 				data-ui="EditorExit"
 				disabled={exitDisabled}
 				cursorIntent={exitPending ? "progress" : undefined}
-				onClick={onExit}
+				onClick={onExitFn}
 			>
 				<LogOut className="size-5" />
 			</Button>

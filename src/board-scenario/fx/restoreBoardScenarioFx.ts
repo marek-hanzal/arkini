@@ -30,7 +30,7 @@ const replaceGameFx = (project: Project, state?: StateSchema.Type) =>
 		),
 	);
 
-const errorMessage = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+const errorMessageFn = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
 /** Strictly validates one persisted scenario before replacing the live editor session. */
 export const restoreBoardScenarioFx = Effect.fn("restoreEditorBoardScenarioFx")(function* ({
@@ -77,7 +77,7 @@ export const restoreBoardScenarioFx = Effect.fn("restoreEditorBoardScenarioFx")(
 			type: "restored",
 		} satisfies restoreBoardScenarioFx.Result;
 	}
-	const reason = errorMessage(validated.failure);
+	const reason = errorMessageFn(validated.failure);
 	return {
 		type: "rejected",
 		reason,

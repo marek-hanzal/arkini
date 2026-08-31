@@ -13,17 +13,17 @@ describe("createGameSessionFx / unsubscribe and async delivery", () => {
 			tickIntervalMs: 60_000,
 		});
 		let notifications = 0;
-		const unsubscribe = session.subscribeEvents(() => {
+		const unsubscribe = session.subscribeEventsFn(() => {
 			notifications += 1;
 		});
 		const healthyDelivered = Effect.runSync(Deferred.make<void>());
-		const unsubscribeHealthy = session.subscribeEvents(() => {
+		const unsubscribeHealthy = session.subscribeEventsFn(() => {
 			Effect.runSync(Deferred.succeed(healthyDelivered, undefined));
 		});
 
 		try {
 			unsubscribe();
-			await session.run(emitCompletedEventFx("job:after-unsubscribe"));
+			await session.runFn(emitCompletedEventFx("job:after-unsubscribe"));
 			await Effect.runPromise(Deferred.await(healthyDelivered));
 			expect(notifications).toBe(0);
 		} finally {
@@ -42,18 +42,18 @@ describe("createGameSessionFx / unsubscribe and async delivery", () => {
 		});
 		let healthyNotifications = 0;
 		let eventNotifications = 0;
-		const unsubscribePending = session.subscribe(async () => {
+		const unsubscribePending = session.subscribeFn(async () => {
 			await pending;
 		});
-		const unsubscribeHealthy = session.subscribe(() => {
+		const unsubscribeHealthy = session.subscribeFn(() => {
 			healthyNotifications += 1;
 		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
+		const unsubscribeEvents = session.subscribeEventsFn(() => {
 			eventNotifications += 1;
 		});
 
 		try {
-			const item = await session.run(
+			const item = await session.runFn(
 				spawnItemFx({
 					id: "runtime:water:pending-listener",
 					itemId: "water",
@@ -68,9 +68,9 @@ describe("createGameSessionFx / unsubscribe and async delivery", () => {
 				}),
 			);
 
-			expect(session.getSnapshot().items.some((candidate) => candidate.id === item.id)).toBe(
-				true,
-			);
+			expect(
+				session.getSnapshotFn().items.some((candidate) => candidate.id === item.id),
+			).toBe(true);
 			await waitFor(() => healthyNotifications === 1);
 			expect(eventNotifications).toBe(0);
 		} finally {

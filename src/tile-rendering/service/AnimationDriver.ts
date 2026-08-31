@@ -33,7 +33,7 @@ export type AnimationCurve =
 export interface AnimationDriver {
 	readonly createSpringFx: (props: {
 		readonly initialValue: number;
-		readonly onUpdate: (value: number) => void;
+		readonly onUpdateFn: (value: number) => void;
 		readonly options: SpringOptions;
 	}) => Effect.Effect<AnimationSpring, never, never>;
 	readonly startTweenFx: (props: {
@@ -41,8 +41,8 @@ export interface AnimationDriver {
 		readonly delayMs?: number;
 		readonly durationMs: number;
 		readonly from: number;
-		readonly onComplete?: () => void;
-		readonly onUpdate: (value: number) => void;
+		readonly onCompleteFn?: () => void;
+		readonly onUpdateFn: (value: number) => void;
 		readonly repeat?: number;
 		readonly to: number;
 	}) => Effect.Effect<AnimationControl, never, never>;

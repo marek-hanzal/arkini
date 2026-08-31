@@ -9,15 +9,15 @@ export const Route = createFileRoute("/editor/$projectId/assets/")({
 		const search = useSearch({
 			from: assetsRouteId,
 		});
-		const navigate = useNavigate({
+		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
 		return (
 			<EditorAssetManager
 				filter={search.filter ?? "all"}
 				query={search.query ?? ""}
-				onFilterChange={(filter) =>
-					void navigate({
+				onFilterChangeFn={(filter) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,
@@ -25,8 +25,8 @@ export const Route = createFileRoute("/editor/$projectId/assets/")({
 						}),
 					})
 				}
-				onQueryChange={(query) =>
-					void navigate({
+				onQueryChangeFn={(query) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,

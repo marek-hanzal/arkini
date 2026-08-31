@@ -9,7 +9,7 @@ import type { CompletionShell, CompletionStatus } from "~electron/contract/cli/C
 import { ElectronMainError } from "../ElectronMainError";
 import { createManagedFileFx } from "./createManagedFileFx";
 
-const execFileAsync = promisify(execFile);
+const execFileAsyncFn = promisify(execFile);
 const managedCompletionPrefix = "# arkini-cli managed completion\n";
 
 /** Main-process ownership of one user-level shell completion file. */
@@ -39,9 +39,9 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 }: createCompletionFx.Props) {
 	const semaphore = yield* Semaphore.make(1);
 	const resolvedLauncherPath = resolve(launcherPath);
-	const readGeneratedContents = async () => {
+	const readGeneratedContentsFn = async () => {
 		if (completion === undefined) throw new Error("The current shell is unsupported.");
-		const { stdout } = await execFileAsync(
+		const { stdout } = await execFileAsyncFn(
 			resolvedLauncherPath,
 			[
 				"--completions",
@@ -62,14 +62,14 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 				managedPrefix: managedCompletionPrefix,
 				mode: 0o644,
 				subject: "Shell completion",
-				readExpectedContents: readGeneratedContents,
+				readExpectedContentsFn: readGeneratedContentsFn,
 			});
-	const requireManagedFile = () => {
+	const requireManagedFileFn = () => {
 		if (managedFile === undefined) throw new Error("The current shell is unsupported.");
 		return managedFile;
 	};
 
-	const readStatus = async (): Promise<CompletionStatus> => {
+	const readStatusFn = async (): Promise<CompletionStatus> => {
 		if (unavailableMessage !== undefined) {
 			return {
 				type: "unavailable",
@@ -90,7 +90,7 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 				message: `The packaged arkini-cli launcher is unavailable: ${String(cause)}`,
 			};
 		}
-		const inspection = await requireManagedFile().inspect();
+		const inspection = await requireManagedFileFn().inspectFn();
 		if (inspection.type === "conflict") {
 			return {
 				type: "conflict",
@@ -115,9 +115,9 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 		};
 	};
 
-	const operation = (name: string, run: () => Promise<CompletionStatus>) =>
+	const operationFx = (name: string, runFn: () => Promise<CompletionStatus>) =>
 		Effect.tryPromise({
-			try: run,
+			try: runFn,
 			catch: (cause) =>
 				new ElectronMainError({
 					operation: name,
@@ -125,43 +125,43 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 				}),
 		});
 
-	const readStatusFx = operation("read the CLI completion installation", readStatus);
+	const readStatusFx = operationFx("read the CLI completion installation", readStatusFn);
 	const installFx = semaphore.withPermits(1)(
-		operation("install CLI shell completion", async () => {
-			const status = await readStatus();
+		operationFx("install CLI shell completion", async () => {
+			const status = await readStatusFn();
 			if (status.type === "installed") return status;
 			if (status.type !== "not-installed" && status.type !== "repairable") {
 				throw new Error(status.message);
 			}
 			if (status.type === "repairable") {
-				await requireManagedFile().repair();
+				await requireManagedFileFn().repairFn();
 			} else {
-				await requireManagedFile().publish(false);
+				await requireManagedFileFn().publishFn(false);
 			}
-			return readStatus();
+			return readStatusFn();
 		}),
 	);
 	const replaceFx = semaphore.withPermits(1)(
-		operation("replace CLI shell completion", async () => {
-			const status = await readStatus();
+		operationFx("replace CLI shell completion", async () => {
+			const status = await readStatusFn();
 			if (status.type === "installed") return status;
 			if (status.type === "unavailable") throw new Error(status.message);
 			if (status.type === "conflict" && !status.replaceable) {
 				throw new Error(status.message);
 			}
-			await requireManagedFile().publish(status.type !== "not-installed");
-			return readStatus();
+			await requireManagedFileFn().publishFn(status.type !== "not-installed");
+			return readStatusFn();
 		}),
 	);
 	const uninstallFx = semaphore.withPermits(1)(
-		operation("uninstall CLI shell completion", async () => {
-			const status = await readStatus();
+		operationFx("uninstall CLI shell completion", async () => {
+			const status = await readStatusFn();
 			if (status.type === "not-installed") return status;
 			if (status.type !== "installed" && status.type !== "repairable") {
 				throw new Error(status.message);
 			}
-			await requireManagedFile().remove();
-			return readStatus();
+			await requireManagedFileFn().removeFn();
+			return readStatusFn();
 		}),
 	);
 

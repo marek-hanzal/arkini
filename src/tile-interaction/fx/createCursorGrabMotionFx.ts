@@ -39,7 +39,7 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 			let springs: ReadonlyArray<AnimationSpring> = [];
 			let closed = false;
 
-			const stop = () => {
+			const stopFn = () => {
 				const failures: unknown[] = [];
 				for (const spring of springs) {
 					try {
@@ -54,10 +54,10 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 				}
 			};
 
-			const finish = (actor: PixiTileActor) => {
+			const finishFn = (actor: PixiTileActor) => {
 				let cleanupFailure: unknown = null;
 				try {
-					stop();
+					stopFn();
 				} catch (cause) {
 					cleanupFailure = cause;
 				}
@@ -83,12 +83,12 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 
 			return {
 				finishFx: Effect.fn("CursorGrabMotion.finishFx")((actor) =>
-					Effect.sync(() => finish(actor)),
+					Effect.sync(() => finishFn(actor)),
 				),
 				startFx: Effect.fn("CursorGrabMotion.startFx")((actor, pointer) =>
 					Effect.sync(() => {
 						if (closed) return;
-						stop();
+						stopFn();
 						const localPointerX =
 							(pointer.x - actor.container.x) /
 							Math.max(Number.EPSILON, actor.container.scale.x);
@@ -100,7 +100,7 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 						const x = RendererRuntime.runSync(
 							animationDriver.createSpringFx({
 								initialValue: actor.container.pivot.x,
-								onUpdate: (value) => {
+								onUpdateFn: (value) => {
 									if (closed || actor.container.destroyed) return;
 									RendererRuntime.runSync(
 										animator.setFx({
@@ -119,7 +119,7 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 							y = RendererRuntime.runSync(
 								animationDriver.createSpringFx({
 									initialValue: actor.container.pivot.y,
-									onUpdate: (value) => {
+									onUpdateFn: (value) => {
 										if (closed || actor.container.destroyed) return;
 										RendererRuntime.runSync(
 											animator.setFx({
@@ -147,7 +147,7 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 				),
 				closeFx: Effect.sync(() => {
 					closed = true;
-					stop();
+					stopFn();
 				}),
 			};
 		}),

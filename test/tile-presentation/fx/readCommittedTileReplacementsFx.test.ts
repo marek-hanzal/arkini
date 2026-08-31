@@ -89,7 +89,7 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 	});
 
 const game = {
-	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+	getResourceUrlFn: (resourceId: string) => `resource:${resourceId}`,
 };
 
 describe("readCommittedTileReplacementsFx", () => {

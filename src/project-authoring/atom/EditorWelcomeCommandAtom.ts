@@ -132,9 +132,9 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			if (command.action === "open-project-folder") {
 				const result = yield* Effect.exit(
 					invokeProjectTransportFx({
-						call: () => window.arkini.editor.openProjectDirectory(command.root),
+						callFn: () => window.arkini.editor.openProjectDirectoryFn(command.root),
 						operation: "open-project-directory",
-						parse: () => undefined,
+						parseFn: () => undefined,
 						requestMessage: "The invalid Editor project folder request failed.",
 						responseMessage: "The invalid Editor project folder response is invalid.",
 					}),
@@ -157,9 +157,9 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 								Effect.provideService(ProjectRepository, editorProjectRepository),
 							)
 						: invokeProjectTransportFx({
-								call: () => window.arkini.editor.importJsonDirectory(),
+								callFn: () => window.arkini.editor.importJsonDirectoryFn(),
 								operation: "import-json-directory",
-								parse: (value) =>
+								parseFn: (value) =>
 									value === null ? null : ProjectDescriptorSchema.parse(value),
 								requestMessage: "The editor JSON import request failed.",
 								responseMessage: "The editor JSON import response is invalid.",
@@ -183,7 +183,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 	},
 ).pipe(Atom.keepAlive);
 
-const isCommandActive = (state: EditorWelcomeCommandAtom.State) =>
+const isCommandActiveFn = (state: EditorWelcomeCommandAtom.State) =>
 	state.kind === "pending" || state.kind === "ready" || state.kind === "navigating";
 
 /** Owns one synchronous editor-welcome command across React remounts. */
@@ -214,7 +214,7 @@ export const EditorWelcomeCommandAtom = Atom.writable(
 			});
 			return;
 		}
-		if (isCommandActive(state)) return;
+		if (isCommandActiveFn(state)) return;
 		context.set(EditorWelcomeCommandStateAtom, {
 			kind: "pending",
 			action: input.action,

@@ -30,7 +30,7 @@ describe("editor MCP project configuration", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("project-config");
+		ownership.setProjectContextFn("project-config");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 

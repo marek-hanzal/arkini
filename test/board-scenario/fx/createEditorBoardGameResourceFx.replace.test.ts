@@ -41,12 +41,12 @@ const createResource = (
 		projectRevision: ownedProject.revision,
 		disposeWithoutSaveFx,
 	} as unknown as GameEngineResource<EditorBoardGame>["game"],
-	assertUsable: () => undefined,
-	getCriticalFailure: () => null,
-	markCriticalFailure: () => {
+	assertUsableFn: () => undefined,
+	getCriticalFailureFn: () => null,
+	markCriticalFailureFn: () => {
 		throw new Error("Unexpected critical failure.");
 	},
-	subscribeCriticalFailure: () => () => undefined,
+	subscribeCriticalFailureFn: () => () => undefined,
 });
 
 describe("Board Scenario EditorBoardGameResource.replaceFx", () => {

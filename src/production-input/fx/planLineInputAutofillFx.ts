@@ -37,7 +37,7 @@ export namespace planLineInputAutofillFx {
 	}
 }
 
-const candidateRank = ({
+const candidateRankFn = ({
 	candidate,
 	owner,
 }: {
@@ -60,13 +60,13 @@ const candidateRank = ({
 	};
 };
 
-const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
+const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 	return (left: GridRuntimeItemSchema.Type, right: GridRuntimeItemSchema.Type) => {
-		const leftRank = candidateRank({
+		const leftRank = candidateRankFn({
 			candidate: left,
 			owner,
 		});
-		const rightRank = candidateRank({
+		const rightRank = candidateRankFn({
 			candidate: right,
 			owner,
 		});
@@ -117,7 +117,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		}
 		candidates.push(gridCandidate);
 	}
-	candidates.sort(compareCandidates(owner));
+	candidates.sort(compareCandidatesFn(owner));
 	const eligibleCandidateItems = readMaterialInputEligibilityFn({
 		items: candidates.map((candidate) => candidate.item),
 	}).eligibleItems;
@@ -184,7 +184,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		});
 	}
 
-	const allocateTo = (slot: (typeof slots)[number], targetQuantity: number) => {
+	const allocateToFn = (slot: (typeof slots)[number], targetQuantity: number) => {
 		let requestedQuantity = Math.max(0, targetQuantity - slot.plannedQuantity);
 		for (const candidate of candidates) {
 			if (requestedQuantity === 0) break;
@@ -221,7 +221,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 
 	// Preserve line readiness first when multiple compatible slots compete for one source.
 	for (const slot of slots) {
-		if (!slot.closed) allocateTo(slot, slot.minQuantity);
+		if (!slot.closed) allocateToFn(slot, slot.minQuantity);
 	}
 	const remainingMissingQuantity = slots.reduce(
 		(total, slot) => total + Math.max(0, slot.minQuantity - slot.plannedQuantity),
@@ -230,7 +230,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	// Only material still unclaimed after every minimum may optimize range inputs toward max.
 	for (const slot of slots) {
 		if (!slot.closed && slot.maxQuantity > slot.minQuantity) {
-			allocateTo(slot, slot.maxQuantity);
+			allocateToFn(slot, slot.maxQuantity);
 		}
 	}
 

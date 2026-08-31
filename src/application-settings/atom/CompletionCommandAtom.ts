@@ -8,22 +8,22 @@ export const CompletionCommandAtom = Effect.runSync(
 	createCliCommandAtomFx({
 		readFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.status(),
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.statusFn(),
 				catch: (cause) => cause,
 			}),
 		installFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.install(),
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.installFn(),
 				catch: (cause) => cause,
 			}),
 		replaceFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.replace(),
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.replaceFn(),
 				catch: (cause) => cause,
 			}),
 		uninstallFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.uninstall(),
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.uninstallFn(),
 				catch: (cause) => cause,
 			}),
 	}),

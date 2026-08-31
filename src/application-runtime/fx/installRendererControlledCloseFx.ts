@@ -19,7 +19,10 @@ interface ExitRouter {
 }
 
 interface Props {
-	readonly lifecycle: Pick<Window["arkini"]["lifecycle"], "onBeforeClose" | "onBeforeCloseReady">;
+	readonly lifecycle: Pick<
+		Window["arkini"]["lifecycle"],
+		"onBeforeCloseFn" | "onBeforeCloseReadyFn"
+	>;
 	readonly rendererRuntime: typeof RendererRuntime;
 	readonly requestEditorLeaveFx?: Effect.Effect<boolean, never, EditorUnsavedChanges>;
 	readonly router: ExitRouter;
@@ -29,14 +32,14 @@ const actionLoadingCompletionHoldMs = 150;
 
 const waitForActionLoadingCompletionFrameFx = () =>
 	Effect.promise(async () => {
-		await new Promise<void>((resolve) => {
-			window.requestAnimationFrame(() => resolve());
+		await new Promise<void>((resolveFn) => {
+			window.requestAnimationFrame(() => resolveFn());
 		});
-		await new Promise<void>((resolve) => {
-			window.requestAnimationFrame(() => resolve());
+		await new Promise<void>((resolveFn) => {
+			window.requestAnimationFrame(() => resolveFn());
 		});
-		await new Promise<void>((resolve) => {
-			window.setTimeout(resolve, actionLoadingCompletionHoldMs);
+		await new Promise<void>((resolveFn) => {
+			window.setTimeout(resolveFn, actionLoadingCompletionHoldMs);
 		});
 	});
 
@@ -53,14 +56,14 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 	({
 		lifecycle,
 		requestEditorLeaveFx = Effect.flatMap(EditorUnsavedChanges, (owner) =>
-			Effect.promise(() => owner.requestLeave()),
+			Effect.promise(() => owner.requestLeaveFn()),
 		),
 		rendererRuntime,
 		router,
 	}: Props) =>
 		Effect.sync(() => {
 			let exitPresentationRequired = false;
-			const awaitEditorOperations = async () => {
+			const awaitEditorOperationsFn = async () => {
 				await rendererRuntime.runPromise(
 					Effect.flatMap(ProjectRepository, (repository) => repository.awaitIdleFx),
 				);
@@ -68,7 +71,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 				if (catalog !== undefined) await rendererRuntime.runPromise(catalog.awaitIdleFx);
 			};
 
-			const removeBeforeClose = lifecycle.onBeforeClose(async () => {
+			const removeBeforeCloseFn = lifecycle.onBeforeCloseFn(async () => {
 				exitPresentationRequired = false;
 				const exit = await rendererRuntime.runPromiseExit(
 					GameEngineResourceFx.pipe(Effect.flatMap((service) => service.claimForCloseFx)),
@@ -84,10 +87,10 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 							"Native close was canceled because the editor has unsaved changes.",
 						);
 					}
-					await awaitEditorOperations();
+					await awaitEditorOperationsFn();
 					return;
 				}
-				await awaitEditorOperations();
+				await awaitEditorOperationsFn();
 				exitPresentationRequired = true;
 				// Route ownership keeps finalization identical for UI-requested and native close.
 				await router.navigate({
@@ -98,15 +101,15 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 					replace: true,
 				});
 			});
-			const removeBeforeCloseReady = lifecycle.onBeforeCloseReady(async () => {
+			const removeBeforeCloseReadyFn = lifecycle.onBeforeCloseReadyFn(async () => {
 				if (!exitPresentationRequired) return;
 				// Native close may continue only after the completed route has painted once.
 				await rendererRuntime.runPromise(waitForActionLoadingCompletionFrameFx());
 			});
 
 			return () => {
-				removeBeforeClose();
-				removeBeforeCloseReady();
+				removeBeforeCloseFn();
+				removeBeforeCloseReadyFn();
 			};
 		}),
 );

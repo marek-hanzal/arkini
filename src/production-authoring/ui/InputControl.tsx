@@ -52,10 +52,10 @@ type MaterialInput = Extract<
 
 const InputCharges = ({
 	input,
-	onChange,
+	onChangeFn,
 }: {
 	readonly input: LineInputSchema.Type;
-	readonly onChange: (input: LineInputSchema.Type) => void;
+	readonly onChangeFn: (input: LineInputSchema.Type) => void;
 }) => {
 	const charges = input.charges;
 	return (
@@ -70,8 +70,8 @@ const InputCharges = ({
 					actionLabel="Enable charge cost"
 					description="This input currently settles without spending charges. Enable a cost to charge its owner or selected target when the action starts."
 					icon={BatteryMedium}
-					onEnable={() =>
-						onChange({
+					onEnableFn={() =>
+						onChangeFn({
 							...input,
 							charges: {
 								cost: 1,
@@ -100,8 +100,8 @@ const InputCharges = ({
 								value: "target",
 							},
 						]}
-						onChange={(from) =>
-							onChange({
+						onChangeFn={(from) =>
+							onChangeFn({
 								...input,
 								charges: {
 									...charges,
@@ -115,8 +115,8 @@ const InputCharges = ({
 							label="Cost"
 							value={charges.cost}
 							min={1}
-							onChange={(cost) =>
-								onChange({
+							onChangeFn={(cost) =>
+								onChangeFn({
 									...input,
 									charges: {
 										...charges,
@@ -130,7 +130,7 @@ const InputCharges = ({
 								className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 								data-ui="EditorInputChargeDisableButton"
 								onClick={() =>
-									onChange({
+									onChangeFn({
 										...input,
 										charges: undefined,
 									})
@@ -148,10 +148,10 @@ const InputCharges = ({
 
 const MaterialModeControl = ({
 	input,
-	onChange,
+	onChangeFn,
 }: {
 	readonly input: MaterialInput;
-	readonly onChange: (input: MaterialInput) => void;
+	readonly onChangeFn: (input: MaterialInput) => void;
 }) => (
 	<EditorChoiceControl
 		label="Material mode"
@@ -170,8 +170,8 @@ const MaterialModeControl = ({
 				value: "reserve",
 			},
 		]}
-		onChange={(mode) =>
-			onChange({
+		onChangeFn={(mode) =>
+			onChangeFn({
 				...input,
 				mode,
 			})
@@ -181,16 +181,16 @@ const MaterialModeControl = ({
 
 const MaterialInputControl = ({
 	input,
-	onChange,
+	onChangeFn,
 }: {
 	readonly input: MaterialInput;
-	readonly onChange: (input: MaterialInput) => void;
+	readonly onChangeFn: (input: MaterialInput) => void;
 }) => (
 	<div className="grid gap-4">
 		<SelectorControl
 			value={input.selector}
-			onChange={(selector) =>
-				onChange({
+			onChangeFn={(selector) =>
+				onChangeFn({
 					...input,
 					selector,
 				})
@@ -201,8 +201,8 @@ const MaterialInputControl = ({
 				minimumDescription="Minimum matching material quantity required before this line can start. If this amount is available, the run becomes ready."
 				maximumDescription="Maximum matching material quantity one run consumes or reserves. A ready run uses what is currently stored, capped at this amount."
 				value={input.quantity}
-				onChange={(quantity) =>
-					onChange({
+				onChangeFn={(quantity) =>
+					onChangeFn({
 						...input,
 						quantity,
 					})
@@ -213,8 +213,8 @@ const MaterialInputControl = ({
 				label="Buffer"
 				value={input.capacity}
 				min={0}
-				onChange={(capacity) =>
-					onChange({
+				onChangeFn={(capacity) =>
+					onChangeFn({
 						...input,
 						capacity,
 					})
@@ -226,15 +226,15 @@ const MaterialInputControl = ({
 
 const DepositInputControl = ({
 	input,
-	onChange,
+	onChangeFn,
 }: {
 	readonly input: DepositInput;
-	readonly onChange: (input: DepositInput) => void;
+	readonly onChangeFn: (input: DepositInput) => void;
 }) => (
 	<SelectorControl
 		value={input.query.selector}
-		onChange={(selector) =>
-			onChange({
+		onChangeFn={(selector) =>
+			onChangeFn({
 				...input,
 				query: {
 					...input.query,
@@ -248,11 +248,11 @@ const DepositInputControl = ({
 export const InputControl = ({
 	allowMaterials = true,
 	input,
-	onChange,
+	onChangeFn,
 }: {
 	readonly allowMaterials?: boolean;
 	readonly input: LineInputSchema.Type;
-	readonly onChange: (input: LineInputSchema.Type) => void;
+	readonly onChangeFn: (input: LineInputSchema.Type) => void;
 }) => (
 	<article className="grid gap-4">
 		<div className="flex flex-wrap items-start justify-between gap-4">
@@ -267,7 +267,7 @@ export const InputControl = ({
 				options={inputTypeOptions.filter(
 					(option) => allowMaterials || option.value !== "materials",
 				)}
-				onChange={(type) => onChange(structuredClone(DraftDefaults.inputs[type]))}
+				onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.inputs[type]))}
 			/>
 			{match(input)
 				.with(
@@ -277,7 +277,7 @@ export const InputControl = ({
 					(material) => (
 						<MaterialModeControl
 							input={material}
-							onChange={onChange}
+							onChangeFn={onChangeFn}
 						/>
 					),
 				)
@@ -288,9 +288,9 @@ export const InputControl = ({
 					(deposit) => (
 						<BoardDistanceControl
 							value={deposit.query}
-							onChange={(query) => {
+							onChangeFn={(query) => {
 								if (query.scope === "board")
-									onChange({
+									onChangeFn({
 										...deposit,
 										query,
 									});
@@ -314,7 +314,7 @@ export const InputControl = ({
 				(material) => (
 					<MaterialInputControl
 						input={material}
-						onChange={onChange}
+						onChangeFn={onChangeFn}
 					/>
 				),
 			)
@@ -325,14 +325,14 @@ export const InputControl = ({
 				(deposit) => (
 					<DepositInputControl
 						input={deposit}
-						onChange={onChange}
+						onChangeFn={onChangeFn}
 					/>
 				),
 			)
 			.exhaustive()}
 		<InputCharges
 			input={input}
-			onChange={onChange}
+			onChangeFn={onChangeFn}
 		/>
 	</article>
 );

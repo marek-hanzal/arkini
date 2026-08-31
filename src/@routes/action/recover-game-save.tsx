@@ -47,7 +47,7 @@ export const Route = createFileRoute("/action/recover-game-save")({
 			<ActionErrorPage
 				{...props}
 				description="Arkini could not delete the exact verified save. No other save was changed, and automatic Game loading will not resume."
-				reset={() => {
+				resetFn={() => {
 					void router.invalidate().catch(() => undefined);
 				}}
 				resetLabel="Retry cleanup"

@@ -125,7 +125,7 @@ describe("filesystem Editor project versions", () => {
 				const versions = yield* createVersionOperationsFx({
 					filesystemWrite,
 					operations,
-					readState: (id) => {
+					readStateFx: (id) => {
 						const found = states.get(id);
 						return found === undefined
 							? Effect.die(`Missing project ${id}.`)

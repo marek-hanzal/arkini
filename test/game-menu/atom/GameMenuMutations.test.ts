@@ -14,7 +14,7 @@ import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransi
 import { testGameRead } from "~test/support/testGameRead";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
-const failStop = vi.fn<Game["failStop"]>();
+const failStop = vi.fn<Game["failStopFn"]>();
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
@@ -50,14 +50,14 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.die("Lifecycle flushSaveFx must not own an explicit UI save."),
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	failStop,
-	read: testGameRead,
+	getResourceUrlFn: () => "blob:test",
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
+	failStopFn: failStop,
+	readFn: testGameRead,
 	runFx: ((_effect) => explicitSaveFx) as Game["runFx"],
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn: () => () => undefined,
 });
 
 const runCommand = <Value, Error, Input>(
@@ -179,9 +179,9 @@ describe("game menu command atoms", () => {
 			RendererLifecycleOwnerAtom,
 			Effect.runSync(
 				createRendererLifecycleFx({
-					forceClose: () => undefined,
-					requestClose,
-					waitUntilVisible: () => Promise.resolve(0),
+					forceCloseFn: () => undefined,
+					requestCloseFn: requestClose,
+					waitUntilVisibleFn: () => Promise.resolve(0),
 				}),
 			),
 		);

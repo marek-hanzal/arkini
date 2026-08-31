@@ -34,17 +34,17 @@ beforeEach(() => {
 		configurable: true,
 		value: {
 			editor: {
-				onProjectChanged: (listener: (projectId: string) => void) => {
+				onProjectChangedFn: (listener: (projectId: string) => void) => {
 					projectChangedListener = listener;
 					return () => {
 						projectChangedListener = undefined;
 					};
 				},
-				readProject,
+				readProjectFn: readProject,
 			},
 			editorMcp: {
-				setProjectContext,
-				clearProjectContext,
+				setProjectContextFn: setProjectContext,
+				clearProjectContextFn: clearProjectContext,
 			},
 		},
 	});

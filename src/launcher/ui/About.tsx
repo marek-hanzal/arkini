@@ -6,12 +6,12 @@ import { BackButton } from "~/ui/ui/BackButton";
 
 /** Renders project and authorship credits for the normalized About page. */
 export const About = () => {
-	const errorMessage = (error: unknown) =>
+	const errorMessageFn = (error: unknown) =>
 		error instanceof Error ? error.message : String(error);
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const mountedRef = useRef(false);
-	const [navigationError, setNavigationError] = useState<unknown>();
-	const { active, claim, release } = useExclusiveAction<"exit">();
+	const [navigationError, setNavigationErrorFn] = useState<unknown>();
+	const { active, claimFn, releaseFn } = useExclusiveAction<"exit">();
 	const exitPending = active === "exit";
 
 	useEffect(() => {
@@ -21,36 +21,36 @@ export const About = () => {
 		};
 	}, []);
 
-	const requestMainMenu = useCallback(() => {
-		if (!claim("exit")) return;
-		setNavigationError(undefined);
+	const requestMainMenuFn = useCallback(() => {
+		if (!claimFn("exit")) return;
+		setNavigationErrorFn(undefined);
 		void (async () => {
 			try {
-				await navigate({
+				await navigateFn({
 					to: "/main-menu",
 				});
 			} catch (error) {
-				if (mountedRef.current) setNavigationError(error);
+				if (mountedRef.current) setNavigationErrorFn(error);
 			} finally {
-				release("exit");
+				releaseFn("exit");
 			}
 		})();
 	}, [
-		claim,
-		navigate,
-		release,
+		claimFn,
+		navigateFn,
+		releaseFn,
 	]);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (event.key !== "Escape") return;
 			event.preventDefault();
-			requestMainMenu();
+			requestMainMenuFn();
 		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, [
-		requestMainMenu,
+		requestMainMenuFn,
 	]);
 
 	return (
@@ -78,13 +78,13 @@ export const About = () => {
 				</section>
 				{navigationError === undefined ? null : (
 					<p className="text-sm text-danger">
-						Navigation failed: {errorMessage(navigationError)}
+						Navigation failed: {errorMessageFn(navigationError)}
 					</p>
 				)}
 				<BackButton
 					cursorIntent={exitPending ? "progress" : undefined}
 					disabled={exitPending}
-					onClick={requestMainMenu}
+					onClick={requestMainMenuFn}
 				/>
 			</div>
 		</div>

@@ -28,26 +28,26 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 		Effect.sync(() => {
 			if (registered) return;
 			registered = true;
-			const runAuthorized = <Value, Error>(
+			const runAuthorizedFn = <Value, Error>(
 				event: IpcMainInvokeEvent,
 				operation: Effect.Effect<Value, Error, never>,
 			) =>
 				ElectronMainRuntime.runPromise(
 					trustedRenderer.assertTrustedIpcSenderFx(event).pipe(Effect.andThen(operation)),
 				);
-			const watchProjectContextSender = (sender: WebContents) => {
+			const watchProjectContextSenderFn = (sender: WebContents) => {
 				if (watchedProjectContextSenders.has(sender)) return;
 				watchedProjectContextSenders.add(sender);
 				sender.on("did-start-navigation", (_event, _url, isInPlace, isMainFrame) => {
-					if (isMainFrame && !isInPlace) ownership.resetProjectContext();
+					if (isMainFrame && !isInPlace) ownership.resetProjectContextFn();
 				});
-				sender.once("destroyed", ownership.resetProjectContext);
+				sender.once("destroyed", ownership.resetProjectContextFn);
 			};
 			ipcMain.handle(ArkiniElectronApi.channels.editorMcpOverviewRead, (event) =>
-				runAuthorized(event, ownership.readOverviewFx),
+				runAuthorizedFn(event, ownership.readOverviewFx),
 			);
 			ipcMain.handle(ArkiniElectronApi.channels.editorMcpConfigure, (event, candidate) =>
-				runAuthorized(
+				runAuthorizedFn(
 					event,
 					Effect.try({
 						try: () => EditorMcpConfigurationSchema.parse(candidate),
@@ -56,7 +56,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 				),
 			);
 			ipcMain.handle(ArkiniElectronApi.channels.editorMcpCommand, (event, candidate) =>
-				runAuthorized(
+				runAuthorizedFn(
 					event,
 					Effect.try({
 						try: () => EditorMcpCommandSchema.parse(candidate),
@@ -77,7 +77,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			ipcMain.handle(
 				ArkiniElectronApi.channels.editorMcpProjectContextSet,
 				(event, candidate) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.try({
 							try: () => EditorMcpProjectContextSchema.parse(candidate),
@@ -85,8 +85,8 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 						}).pipe(
 							Effect.tap((projectId) =>
 								Effect.sync(() => {
-									watchProjectContextSender(event.sender);
-									ownership.setProjectContext(projectId, (versionId) =>
+									watchProjectContextSenderFn(event.sender);
+									ownership.setProjectContextFn(projectId, (versionId) =>
 										requestVersionCheckoutFx(event.sender, {
 											projectId,
 											versionId,
@@ -101,14 +101,14 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			ipcMain.handle(
 				ArkiniElectronApi.channels.editorMcpProjectContextClear,
 				(event, candidate) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.try({
 							try: () => EditorMcpProjectContextSchema.parse(candidate),
 							catch: (cause) => cause,
 						}).pipe(
 							Effect.tap((projectId) =>
-								Effect.sync(() => ownership.clearProjectContext(projectId)),
+								Effect.sync(() => ownership.clearProjectContextFn(projectId)),
 							),
 							Effect.asVoid,
 						),

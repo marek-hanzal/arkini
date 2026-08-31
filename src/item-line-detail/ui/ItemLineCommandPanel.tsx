@@ -5,20 +5,20 @@ import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 /** Renders the commands and runtime status for one live production line. */
 export const ItemLineCommandPanel = ({
 	disabled,
-	enqueue,
+	enqueueFn,
 	line,
 	pendingDefault,
 	pendingEnqueue,
-	setDefault,
-	unsetDefault,
+	setDefaultFn,
+	unsetDefaultFn,
 }: {
 	readonly disabled: boolean;
-	readonly enqueue: () => void;
+	readonly enqueueFn: () => void;
 	readonly line: ItemDetailLinesProjection.Line;
 	readonly pendingDefault: boolean;
 	readonly pendingEnqueue: boolean;
-	readonly setDefault: () => void;
-	readonly unsetDefault: () => void;
+	readonly setDefaultFn: () => void;
+	readonly unsetDefaultFn: () => void;
 }) => {
 	const activeJob = line.activeJob;
 	const unavailable = line.availability.kind === "unavailable";
@@ -34,10 +34,10 @@ export const ItemLineCommandPanel = ({
 					disabled={disabled || pendingDefault || unavailable}
 					onClick={() => {
 						if (line.isDefault) {
-							unsetDefault();
+							unsetDefaultFn();
 							return;
 						}
-						setDefault();
+						setDefaultFn();
 					}}
 				>
 					{line.isDefault ? "Unset default" : "Set default"}
@@ -46,7 +46,7 @@ export const ItemLineCommandPanel = ({
 					cursorIntent={pendingEnqueue ? "progress" : undefined}
 					data-ui="TileLineEnqueueButton"
 					disabled={disabled || pendingEnqueue || !line.actions.enqueue.enabled}
-					onClick={enqueue}
+					onClick={enqueueFn}
 				>
 					Enqueue
 				</PrimaryButton>

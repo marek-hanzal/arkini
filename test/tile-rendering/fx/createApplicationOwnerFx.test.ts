@@ -73,13 +73,13 @@ describe("Pixi application owner", () => {
 		const first = Effect.runPromise(
 			createApplicationOwnerFx({
 				host,
-				reportCriticalFailure: vi.fn(),
+				reportCriticalFailureFn: vi.fn(),
 			}),
 		);
 		const second = Effect.runPromise(
 			createApplicationOwnerFx({
 				host,
-				reportCriticalFailure: vi.fn(),
+				reportCriticalFailureFn: vi.fn(),
 			}),
 		);
 		const firstApp = applicationState.instances.at(-2);

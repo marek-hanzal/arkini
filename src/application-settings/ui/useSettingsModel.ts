@@ -19,10 +19,10 @@ export namespace useSettingsModel {
 		readonly status: SettingsCommandState;
 		readonly theme: AppearanceThemeSchema.Type;
 		readonly windowMode: WindowModeSchema.Type;
-		readonly goBack: () => void;
-		readonly selectTheme: (theme: AppearanceThemeSchema.Type) => void;
-		readonly selectWindowMode: (mode: WindowModeSchema.Type) => void;
-		readonly setCheatToolsAvailable: (available: boolean) => void;
+		readonly goBackFn: () => void;
+		readonly selectThemeFn: (theme: AppearanceThemeSchema.Type) => void;
+		readonly selectWindowModeFn: (mode: WindowModeSchema.Type) => void;
+		readonly setCheatToolsAvailableFn: (available: boolean) => void;
 	}
 }
 
@@ -35,28 +35,28 @@ export const useSettingsModel = ({
 	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);
-	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
+	const [commandState, runCommandFn] = useAtom(SettingsCommandAtom);
 	const blocked = commandState.kind === "pending";
-	const goBack = useCallback(() => {
-		runCommand({
+	const goBackFn = useCallback(() => {
+		runCommandFn({
 			action: "exit",
 			runFx: onBackFx,
 		});
 	}, [
 		onBackFx,
-		runCommand,
+		runCommandFn,
 	]);
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || blocked) return;
 			event.preventDefault();
-			goBack();
+			goBackFn();
 		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, [
 		blocked,
-		goBack,
+		goBackFn,
 	]);
 
 	return {
@@ -65,21 +65,21 @@ export const useSettingsModel = ({
 		status: commandState,
 		theme: appearance.theme,
 		windowMode,
-		goBack,
-		selectTheme: (theme: AppearanceThemeSchema.Type) => {
-			runCommand({
+		goBackFn,
+		selectThemeFn: (theme: AppearanceThemeSchema.Type) => {
+			runCommandFn({
 				action: "theme",
 				theme,
 			});
 		},
-		selectWindowMode: (mode: WindowModeSchema.Type) => {
-			runCommand({
+		selectWindowModeFn: (mode: WindowModeSchema.Type) => {
+			runCommandFn({
 				action: "window-mode",
 				mode,
 			});
 		},
-		setCheatToolsAvailable: (available: boolean) => {
-			runCommand({
+		setCheatToolsAvailableFn: (available: boolean) => {
+			runCommandFn({
 				action: "cheat-tools",
 				available,
 			});

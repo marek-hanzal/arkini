@@ -82,7 +82,7 @@ interface DrawCanvasItemNodeProps {
 }
 
 /** Owns the stable item-card drawing callback and icon cache for one Flow Canvas renderer. */
-export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork) => {
+export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwork) => {
 	const textPainter = useCanvasTextPainter();
 	const sourceIconPathCacheRef = useRef<Map<ItemOriginOperationKind, Path2D>>(new Map());
 
@@ -144,7 +144,15 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 			const artworkSize = 68;
 			const artworkX = position.x + 16;
 			const artworkY = position.y + (metrics.headerHeight - artworkSize) / 2;
-			drawItemArtwork(context, node, resourceUrls, artworkX, artworkY, artworkSize, palette);
+			drawItemArtworkFn(
+				context,
+				node,
+				resourceUrls,
+				artworkX,
+				artworkY,
+				artworkSize,
+				palette,
+			);
 
 			const textX = position.x + metrics.itemTextBounds.x;
 			const maxTextWidth = metrics.itemTextBounds.width;
@@ -155,9 +163,9 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 			context.textBaseline = "top";
 			context.fillStyle = palette.foreground;
 			context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-			const titleLines = textPainter.wrapText(context, node.title, maxTextWidth, 2);
+			const titleLines = textPainter.wrapTextFn(context, node.title, maxTextWidth, 2);
 			context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-			const idLines = textPainter.wrapIdentifier(context, node.itemId, maxTextWidth, 2);
+			const idLines = textPainter.wrapIdentifierFn(context, node.itemId, maxTextWidth, 2);
 			const textHeight =
 				titleLines.length * titleLineHeight +
 				blockGap +
@@ -168,12 +176,12 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 
 			context.fillStyle = palette.foreground;
 			context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-			textPainter.drawLines(context, titleLines, textX, textY, titleLineHeight);
+			textPainter.drawLinesFn(context, titleLines, textX, textY, titleLineHeight);
 			textY += titleLines.length * titleLineHeight + blockGap;
 
 			context.fillStyle = palette.muted;
 			context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-			textPainter.drawLines(context, idLines, textX, textY, idLineHeight);
+			textPainter.drawLinesFn(context, idLines, textX, textY, idLineHeight);
 			textY += idLines.length * idLineHeight + blockGap;
 
 			context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
@@ -184,7 +192,7 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 						? "Missing item"
 						: ItemTypeLabel[node.type];
 			context.fillText(
-				textPainter.fitText(context, label.toUpperCase(), maxTextWidth),
+				textPainter.fitTextFn(context, label.toUpperCase(), maxTextWidth),
 				textX,
 				textY,
 			);
@@ -254,7 +262,7 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 				context.textBaseline = "middle";
 				context.textAlign = "left";
 				context.fillText(
-					textPainter.fitText(
+					textPainter.fitTextFn(
 						context,
 						operation.label,
 						rowWidth - OperationContentPadding * 2 - iconSize - 8,
@@ -282,7 +290,7 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 					context.textAlign = "left";
 					context.textBaseline = "middle";
 					context.fillText(
-						textPainter.fitText(context, input.label, 104),
+						textPainter.fitTextFn(context, input.label, 104),
 						rowX + OperationContentPadding,
 						worldY,
 					);
@@ -306,7 +314,7 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 					context.textAlign = "right";
 					context.textBaseline = "middle";
 					context.fillText(
-						textPainter.fitText(context, output.label, 104),
+						textPainter.fitTextFn(context, output.label, 104),
 						rowX + rowWidth - OperationContentPadding,
 						worldY,
 					);
@@ -316,7 +324,7 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 			context.restore();
 		},
 		[
-			drawItemArtwork,
+			drawItemArtworkFn,
 			textPainter,
 		],
 	);

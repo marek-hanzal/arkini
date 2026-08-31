@@ -5,14 +5,13 @@ import { match, P } from "ts-pattern";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
-import {
-	readTileDropPreviewFx,
-	type readTileDropPreviewFx as ReadTileDropPreviewFx,
-} from "~/tile-interaction/fx/readTileDropPreviewFx";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import type { InventoryActorStore } from "~/game-scene/service/InventoryActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
@@ -44,13 +43,13 @@ interface Props {
 	readonly application: PixiApplicationOwner;
 	readonly dragThreshold: number;
 	readonly game: GameEngine;
-	readonly onActivate: (
+	readonly onActivateFn: (
 		item: TileActorItem,
 		openDetail: boolean,
 		origin: HTMLElement,
 	) => void | PromiseLike<unknown>;
 	readonly onAcceptedDropFx: Effect.Effect<void, never, never>;
-	readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
+	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly surface: InventoryInteractionSurface;
 }
 
@@ -97,16 +96,16 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 		application,
 		dragThreshold,
 		game,
-		onActivate,
+		onActivateFn,
 		onAcceptedDropFx,
-		onDrop,
+		onDropFn,
 		surface,
 	}: Props) {
 		const removalFeedbackGenerationByActorId = new Map<string, number>();
 		let activeDrag: ActiveInventoryDrag | null = null;
 		let closed = false;
 
-		const releasePointerCapture = (pointerId: number) => {
+		const releasePointerCaptureFn = (pointerId: number) => {
 			try {
 				application.app.canvas.releasePointerCapture(pointerId);
 			} catch {
@@ -114,7 +113,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			}
 		};
 
-		const readCommandTarget = (target: InventoryInteractionDropTarget | null) => {
+		const readCommandTargetFn = (target: InventoryInteractionDropTarget | null) => {
 			if (target === null) {
 				return {
 					kind: "unsupported" as const,
@@ -140,7 +139,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			};
 		};
 
-		const flashReceiver = (result: runTileDropAtom.Result) => {
+		const flashReceiverFn = (result: DropItemResult) => {
 			const receiverActorId = match(result)
 				.with(
 					{
@@ -172,7 +171,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			);
 		};
 
-		const flashSurvivingSource = (result: runTileDropAtom.Result) => {
+		const flashSurvivingSourceFn = (result: DropItemResult) => {
 			const sourceActorId = match(result)
 				.with(
 					{
@@ -199,7 +198,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			);
 		};
 
-		const activateActor = (actor: PixiTileActor, openDetail: boolean) => {
+		const activateActorFn = (actor: PixiTileActor, openDetail: boolean) => {
 			const item = actor.item;
 			const presentsOptimisticRemoval =
 				!openDetail && item.primaryAction.kind !== "activate-space";
@@ -226,12 +225,12 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
-					return onActivate(item, openDetail, application.app.canvas);
+					return onActivateFn(item, openDetail, application.app.canvas);
 				})
 				.catch((cause) => {
 					if (closed) return;
 					if (!isExpectedActivationFailureFn(cause)) {
-						game.reportCriticalFailure("game-presentation", cause);
+						game.reportCriticalFailureFn("game-presentation", cause);
 					}
 				})
 				.finally(() => {
@@ -261,7 +260,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				});
 		};
 
-		const previewTarget = (
+		const previewTargetFn = (
 			drag: ActiveInventoryDrag,
 			target: InventoryInteractionDropTarget | null,
 			force = false,
@@ -273,7 +272,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				current.container.destroyed ||
 				!isSameTileActorLocationFn(current.item.location, drag.sourceItem.location)
 			) {
-				cancelInteraction();
+				cancelInteractionFn();
 				return null;
 			}
 			const sourceItem = current.item;
@@ -281,7 +280,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				return sourceItem;
 			}
 			drag.target = target;
-			let kind: ReadTileDropPreviewFx.Result["kind"] | null = null;
+			let kind: readDropItemPreviewFx.Result["kind"] | null = null;
 			try {
 				kind = RendererRuntime.runSync(
 					readTileDropPreviewFx({
@@ -289,11 +288,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 						sourceItemId: sourceItem.id,
 						sourceLocation: sourceItem.location,
 						sourceRevision: sourceItem.revision,
-						target: readCommandTarget(target),
+						target: readCommandTargetFn(target),
 					}),
 				).kind;
 			} catch (cause) {
-				game.reportCriticalFailure("game-presentation", cause);
+				game.reportCriticalFailureFn("game-presentation", cause);
 			}
 			drag.actor.container.cursor = readActorCursorFn({
 				phase: "dragging",
@@ -304,7 +303,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			return sourceItem;
 		};
 
-		const settleActor = (actor: PixiTileActor) => {
+		const settleActorFn = (actor: PixiTileActor) => {
 			const pose = RendererRuntime.runSync(surface.readActorPoseFx(actor.item));
 			if (pose === null || actor.container.destroyed) return;
 			surface.actorLayer.addChild(actor.container);
@@ -319,29 +318,30 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				animateRetargetablePoseFx({
 					actor,
 					animator,
-					readSize: () => RendererRuntime.runSync(surface.readActorSizeFx),
-					readTarget: () => RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
+					readSizeFn: () => RendererRuntime.runSync(surface.readActorSizeFx),
+					readTargetFn: () =>
+						RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
 					target: pose,
 				}),
 			);
 		};
 
-		const cancelInteraction = () => {
+		const cancelInteractionFn = () => {
 			const drag = activeDrag;
 			if (drag === null || drag.phase === "submitting") return;
-			releasePointerCapture(drag.pointerId);
+			releasePointerCaptureFn(drag.pointerId);
 			activeDrag = null;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-			settleActor(drag.actor);
+			settleActorFn(drag.actor);
 		};
 
-		const onPointerMove = (event: FederatedPointerEvent) => {
+		const onPointerMoveFn = (event: FederatedPointerEvent) => {
 			const pointer = readPointerOffsetFn(event, activeDrag);
 			if (pointer === null) return;
 			const { drag, offsetX, offsetY } = pointer;
 			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
 			if (drag.phase === "pressed" && drag.openDetail) {
-				releasePointerCapture(drag.pointerId);
+				releasePointerCaptureFn(drag.pointerId);
 				activeDrag = null;
 				return;
 			}
@@ -361,13 +361,13 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					y: drag.startY + offsetY,
 				}),
 			);
-			previewTarget(
+			previewTargetFn(
 				drag,
 				RendererRuntime.runSync(surface.readDropTargetFx(event.global.x, event.global.y)),
 			);
 		};
 
-		const finishPointer = (event: FederatedPointerEvent) => {
+		const finishPointerFn = (event: FederatedPointerEvent) => {
 			const drag = activeDrag;
 			if (
 				drag === null ||
@@ -376,17 +376,17 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			) {
 				return;
 			}
-			releasePointerCapture(event.pointerId);
+			releasePointerCaptureFn(event.pointerId);
 			if (drag.phase === "pressed") {
 				activeDrag = null;
-				activateActor(drag.actor, drag.openDetail);
+				activateActorFn(drag.actor, drag.openDetail);
 				return;
 			}
 			const target = RendererRuntime.runSync(
 				surface.readDropTargetFx(event.global.x, event.global.y),
 			);
 			// The occupant may have changed while the pointer remained over this slot.
-			const sourceItem = previewTarget(drag, target, true);
+			const sourceItem = previewTargetFn(drag, target, true);
 			if (sourceItem === null) return;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			drag.phase = "submitting";
@@ -399,11 +399,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				sourceItemId: sourceItem.id,
 				sourceLocation: sourceItem.location,
 				sourceRevision: sourceItem.revision,
-				target: readCommandTarget(target),
-			} satisfies runTileDropAtom.Command;
-			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
+				target: readCommandTargetFn(target),
+			} satisfies DropItemCommand;
+			let submittedDrop: PromiseLike<DropItemResult | null>;
 			try {
-				submittedDrop = closed ? Promise.resolve(null) : onDrop(command);
+				submittedDrop = closed ? Promise.resolve(null) : onDropFn(command);
 			} catch (cause) {
 				submittedDrop = Promise.reject(cause);
 			}
@@ -429,14 +429,14 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 							result.kind !== DropItemResultKind.Reject &&
 							result.kind !== DropItemResultKind.Ignored
 						) {
-							flashSurvivingSource(result);
-							flashReceiver(result);
+							flashSurvivingSourceFn(result);
+							flashReceiverFn(result);
 							RendererRuntime.runSync(onAcceptedDropFx);
 							return;
 						}
-						if (current !== null) settleActor(current);
+						if (current !== null) settleActorFn(current);
 					} catch (cause) {
-						game.reportCriticalFailure("game-presentation", cause);
+						game.reportCriticalFailureFn("game-presentation", cause);
 					}
 				})
 				.catch((cause) => {
@@ -447,13 +447,13 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					);
 					if (current === drag.actor) {
 						current.dragging = false;
-						settleActor(current);
+						settleActorFn(current);
 					}
-					game.reportCriticalFailure("game-presentation", cause);
+					game.reportCriticalFailureFn("game-presentation", cause);
 				});
 		};
 
-		const cancelPointer = (event: FederatedPointerEvent) => {
+		const cancelPointerFn = (event: FederatedPointerEvent) => {
 			const drag = activeDrag;
 			if (
 				drag === null ||
@@ -464,18 +464,18 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			}
 			activeDrag = null;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-			settleActor(drag.actor);
+			settleActorFn(drag.actor);
 		};
 
-		application.stage.on("globalpointermove", onPointerMove);
-		application.stage.on("pointerup", finishPointer);
-		application.stage.on("pointerupoutside", finishPointer);
-		application.stage.on("pointercancel", cancelPointer);
+		application.stage.on("globalpointermove", onPointerMoveFn);
+		application.stage.on("pointerup", finishPointerFn);
+		application.stage.on("pointerupoutside", finishPointerFn);
+		application.stage.on("pointercancel", cancelPointerFn);
 
 		return {
 			attachActorFx: Effect.fn("InventoryDragController.attachActorFx")((actor) =>
 				Effect.sync(() => {
-					const onPointerDown = (event: FederatedPointerEvent) => {
+					const onPointerDownFn = (event: FederatedPointerEvent) => {
 						if (
 							closed ||
 							activeDrag !== null ||
@@ -503,8 +503,8 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 							target: null,
 						};
 					};
-					actor.onPointerDown = onPointerDown;
-					actor.container.on("pointerdown", onPointerDown);
+					actor.onPointerDownFn = onPointerDownFn;
+					actor.container.on("pointerdown", onPointerDownFn);
 					actor.container.eventMode = "static";
 					actor.container.cursor = readActorCursorFn({
 						phase: "idle",
@@ -513,34 +513,34 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					});
 				}),
 			),
-			cancelInteractionFx: Effect.sync(cancelInteraction),
+			cancelInteractionFx: Effect.sync(cancelInteractionFn),
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;
-				if (activeDrag !== null) releasePointerCapture(activeDrag.pointerId);
+				if (activeDrag !== null) releasePointerCaptureFn(activeDrag.pointerId);
 				activeDrag = null;
 				removalFeedbackGenerationByActorId.clear();
-				application.stage.off("globalpointermove", onPointerMove);
-				application.stage.off("pointerup", finishPointer);
-				application.stage.off("pointerupoutside", finishPointer);
-				application.stage.off("pointercancel", cancelPointer);
+				application.stage.off("globalpointermove", onPointerMoveFn);
+				application.stage.off("pointerup", finishPointerFn);
+				application.stage.off("pointerupoutside", finishPointerFn);
+				application.stage.off("pointercancel", cancelPointerFn);
 			}),
 			refreshPreviewFx: Effect.sync(() => {
 				const drag = activeDrag;
 				if (drag === null || drag.phase !== "dragging") return;
-				previewTarget(drag, drag.target, true);
+				previewTargetFn(drag, drag.target, true);
 			}),
 			removeActorFx: Effect.fn("InventoryDragController.removeActorFx")((actor) =>
 				Effect.sync(() => {
 					removalFeedbackGenerationByActorId.delete(actor.item.id);
-					if (actor.onPointerDown !== null) {
-						actor.container.off("pointerdown", actor.onPointerDown);
-						actor.onPointerDown = null;
+					if (actor.onPointerDownFn !== null) {
+						actor.container.off("pointerdown", actor.onPointerDownFn);
+						actor.onPointerDownFn = null;
 					}
 					actor.container.eventMode = "none";
 					actor.container.cursor = "default";
 					if (activeDrag?.actor !== actor) return;
-					releasePointerCapture(activeDrag.pointerId);
+					releasePointerCaptureFn(activeDrag.pointerId);
 					activeDrag = null;
 					RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 					actor.dragging = false;

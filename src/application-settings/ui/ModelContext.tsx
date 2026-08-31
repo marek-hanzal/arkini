@@ -2,15 +2,13 @@ import { createContext, type PropsWithChildren, useContext } from "react";
 
 import type { useSettingsModel } from "~/application-settings/ui/useSettingsModel";
 
-type SettingsModel = useSettingsModel.Output;
-
-const ModelContext = createContext<SettingsModel | undefined>(undefined);
+const ModelContext = createContext<useSettingsModel.Output | undefined>(undefined);
 
 export const ModelProvider = ({
 	children,
 	model,
 }: PropsWithChildren<{
-	readonly model: SettingsModel;
+	readonly model: useSettingsModel.Output;
 }>) => <ModelContext value={model}>{children}</ModelContext>;
 
 export const useModelContext = () => {

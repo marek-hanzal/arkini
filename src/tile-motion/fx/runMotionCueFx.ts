@@ -26,14 +26,14 @@ export namespace runMotionCueFx {
 		readonly cue: TileMotionCue;
 		readonly cueKey: string;
 		readonly magneticField: MagneticField;
-		readonly onComplete: () => void;
-		readonly onSwapLegSettled: (actorId: string) => void;
-		readonly onSwapLegStarted: (actorId: string) => void;
-		readonly onPayloadCreated: (actor: PixiTileActor) => void;
-		readonly onInputRemainderRevealed: () => void;
-		readonly readPalette: () => PixiScenePalette;
-		readonly readSourceSurvives: () => boolean;
-		readonly readTargetRoute: (
+		readonly onCompleteFn: () => void;
+		readonly onSwapLegSettledFn: (actorId: string) => void;
+		readonly onSwapLegStartedFn: (actorId: string) => void;
+		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
+		readonly onInputRemainderRevealedFn: () => void;
+		readonly readPaletteFn: () => PixiScenePalette;
+		readonly readSourceSurvivesFn: () => boolean;
+		readonly readTargetRouteFn: (
 			actorId: string,
 			location: TargetRoute["location"],
 		) => TargetRoute;
@@ -82,14 +82,14 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	cue,
 	cueKey,
 	magneticField,
-	onComplete,
-	onSwapLegSettled,
-	onSwapLegStarted,
-	onPayloadCreated,
-	onInputRemainderRevealed,
-	readPalette,
-	readSourceSurvives,
-	readTargetRoute,
+	onCompleteFn,
+	onSwapLegSettledFn,
+	onSwapLegStartedFn,
+	onPayloadCreatedFn,
+	onInputRemainderRevealedFn,
+	readPaletteFn,
+	readSourceSurvivesFn,
+	readTargetRouteFn,
 	surface,
 	textures,
 }: runMotionCueFx.Props) {
@@ -125,7 +125,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cueKey,
 									delayMs,
 									magneticField,
-									onComplete,
+									onCompleteFn,
 									origin,
 									surface,
 									target,
@@ -144,11 +144,11 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cueKey,
 									delayMs,
 									magneticField,
-									onComplete,
-									onPayloadCreated,
+									onCompleteFn,
+									onPayloadCreatedFn,
 									origin,
-									readPalette,
-									readTargetRoute,
+									readPaletteFn,
+									readTargetRouteFn,
 									surface,
 									target,
 									textures,
@@ -167,12 +167,12 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cueKey,
 									delayMs,
 									magneticField,
-									onComplete,
-									onRemainderRevealed: onInputRemainderRevealed,
-									onPayloadCreated,
+									onCompleteFn,
+									onRemainderRevealedFn: onInputRemainderRevealedFn,
+									onPayloadCreatedFn,
 									origin,
-									readPalette,
-									readSourceSurvives,
+									readPaletteFn,
+									readSourceSurvivesFn,
 									surface,
 									target,
 									textures,
@@ -190,9 +190,9 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cueKey,
 									delayMs,
 									magneticField,
-									onComplete,
-									onSwapLegSettled,
-									onSwapLegStarted,
+									onCompleteFn,
+									onSwapLegSettledFn,
+									onSwapLegStartedFn,
 									origin,
 									surface,
 									target,
@@ -254,14 +254,14 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 							() => {},
 						)
 						.exhaustive();
-					onComplete();
+					onCompleteFn();
 				}),
 		)
 		.with(
 			{
 				target: null,
 			},
-			() => Effect.sync(onComplete),
+			() => Effect.sync(onCompleteFn),
 		)
 		.exhaustive();
 });

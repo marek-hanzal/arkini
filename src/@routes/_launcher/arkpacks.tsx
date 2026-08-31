@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 									disabled={blocked}
 									cursorIntent={blocked ? "progress" : undefined}
 									className="inline-flex items-center gap-1.5"
-									onClick={actions.openArkpackDirectory}
+									onClick={actions.openArkpackDirectoryFn}
 								>
 									<FolderOpen className="size-4" />
 									Open Arkpack folder
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 									disabled={blocked}
 									cursorIntent={blocked ? "progress" : undefined}
 									className="inline-flex items-center gap-1.5"
-									onClick={actions.refreshArkpacks}
+									onClick={actions.refreshArkpacksFn}
 								>
 									<RefreshCw className="size-4" />
 									Refresh
@@ -67,7 +67,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 							className="hidden"
 							disabled={blocked}
 							onChange={(event) =>
-								void actions.upload(event.currentTarget.files?.[0])
+								void actions.uploadFn(event.currentTarget.files?.[0])
 							}
 						/>
 						<Button
@@ -87,8 +87,8 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 						<ArkpackCatalogList
 							blocked={blocked}
 							state={actions.state}
-							onOpenEditor={actions.openArkpackInEditor}
-							onRemove={actions.removeArkpack}
+							onOpenEditorFn={actions.openArkpackInEditorFn}
+							onRemoveFn={actions.removeArkpackFn}
 						/>
 					</section>
 
@@ -96,7 +96,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 						<BackButton
 							cursorIntent={blocked ? "progress" : undefined}
 							disabled={blocked}
-							onClick={actions.requestMainMenu}
+							onClick={actions.requestMainMenuFn}
 						>
 							Back
 						</BackButton>

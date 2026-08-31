@@ -20,7 +20,7 @@ describe("PixiInventorySurface Space activation", () => {
 		const { scene } = await renderPixiInventorySurface();
 
 		surfaceState.spaceActivationSucceeds = false;
-		await scene.onActivate(spaceItem, false, document.createElement("canvas"));
+		await scene.onActivateFn(spaceItem, false, document.createElement("canvas"));
 
 		expect(surfaceState.activateSpace).toHaveBeenCalledWith({
 			currentSpace: 0,
@@ -42,7 +42,7 @@ describe("PixiInventorySurface Space activation", () => {
 			acknowledgeProjectionStart = resolve;
 		});
 		surfaceState.projectSpaceActivation.mockImplementationOnce(acknowledgeProjectionStart);
-		const activation = scene.onActivate(spaceItem, false, document.createElement("canvas"));
+		const activation = scene.onActivateFn(spaceItem, false, document.createElement("canvas"));
 		await projectionStarted;
 
 		expect(surfaceState.projectSpaceActivation).toHaveBeenCalledWith(spaceTransition);
@@ -58,7 +58,7 @@ describe("PixiInventorySurface Space activation", () => {
 		const { scene } = await renderPixiInventorySurface();
 		surfaceState.spaceActivationTransition = null;
 
-		await scene.onActivate(spaceItem, false, document.createElement("canvas"));
+		await scene.onActivateFn(spaceItem, false, document.createElement("canvas"));
 
 		expect(surfaceState.projectSpaceActivation).not.toHaveBeenCalled();
 		expect(surfaceState.spaceActivated).toHaveBeenCalledOnce();
@@ -71,7 +71,7 @@ describe("PixiInventorySurface Space activation", () => {
 			releaseActivation = resolve;
 		});
 
-		const activation = scene.onActivate(spaceItem, false, document.createElement("canvas"));
+		const activation = scene.onActivateFn(spaceItem, false, document.createElement("canvas"));
 		await vi.waitFor(() => expect(surfaceState.activateSpace).toHaveBeenCalledOnce());
 
 		await replacePixiInventorySurfaceRuntime(root);

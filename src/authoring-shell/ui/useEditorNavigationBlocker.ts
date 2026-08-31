@@ -12,12 +12,12 @@ export namespace useEditorNavigationBlocker {
 /** Admits navigation only after every dirty Editor session accepts its destination. */
 export const useEditorNavigationBlocker = (): useEditorNavigationBlocker.Output => {
 	const owner = useEditorUnsavedChangesOwner();
-	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
+	const state = useSyncExternalStore(owner.subscribeFn, owner.getSnapshotFn, owner.getSnapshotFn);
 
 	useBlocker({
 		disabled: !state.hasDirtySession,
 		enableBeforeUnload: false,
-		shouldBlockFn: async ({ next }) => !(await owner.requestLeave(next.pathname)),
+		shouldBlockFn: async ({ next }) => !(await owner.requestLeaveFn(next.pathname)),
 	});
 
 	return {

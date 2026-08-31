@@ -22,8 +22,6 @@ import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
 export namespace readDropItemPreviewFx {
-	export type Props = DropItemCommand;
-
 	export type Result =
 		| {
 				readonly kind:
@@ -49,7 +47,7 @@ export namespace readDropItemPreviewFx {
 		  };
 }
 
-const rejected = (reason: DropItemRejectedReason): readDropItemPreviewFx.Result => ({
+const rejectedFn = (reason: DropItemRejectedReason): readDropItemPreviewFx.Result => ({
 	kind: DropItemResultKind.Reject,
 	reason,
 });
@@ -71,9 +69,9 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	sourceRevision,
 	sourceLocation,
 	target,
-}: readDropItemPreviewFx.Props) {
+}: DropItemCommand) {
 	if (target.kind === "unsupported") {
-		return rejected(DropItemRejectedReason.UnsupportedTarget);
+		return rejectedFn(DropItemRejectedReason.UnsupportedTarget);
 	}
 	if (
 		isSameGridLocationFn({
@@ -89,11 +87,11 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	const runtime = yield* readRuntimeFx();
 	const runtimeSource = runtime.items.find((item) => item.id === sourceItemId);
 	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
-		return rejected(DropItemRejectedReason.StaleSource);
+		return rejectedFn(DropItemRejectedReason.StaleSource);
 	}
 	const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
-		return rejected(DropItemRejectedReason.InvalidSource);
+		return rejectedFn(DropItemRejectedReason.InvalidSource);
 	}
 	if (
 		!isSameGridLocationFn({
@@ -101,7 +99,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			right: sourceLocation,
 		})
 	) {
-		return rejected(DropItemRejectedReason.StaleSource);
+		return rejectedFn(DropItemRejectedReason.StaleSource);
 	}
 	if (target.occupant === null) {
 		const claim = readGridLocationClaimAtFn({
@@ -111,7 +109,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			location: target.location,
 		});
 		if (claim !== undefined) {
-			return rejected(DropItemRejectedReason.Occupied);
+			return rejectedFn(DropItemRejectedReason.Occupied);
 		}
 		if (
 			!isItemLocationScopeAllowedFn({
@@ -119,7 +117,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 				locationScope: target.location.scope,
 			})
 		) {
-			return rejected(DropItemRejectedReason.InvalidTarget);
+			return rejectedFn(DropItemRejectedReason.InvalidTarget);
 		}
 		const config = yield* GameConfigFx;
 		const targetSize = match(target.location.scope)
@@ -134,10 +132,10 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			target.location.position.x >= targetSize.width ||
 			target.location.position.y >= targetSize.height
 		) {
-			return rejected(DropItemRejectedReason.InvalidTarget);
+			return rejectedFn(DropItemRejectedReason.InvalidTarget);
 		}
 		if (target.inputStore !== undefined) {
-			return rejected(DropItemRejectedReason.Blocked);
+			return rejectedFn(DropItemRejectedReason.Blocked);
 		}
 		return {
 			kind: DropItemResultKind.Move,
@@ -147,11 +145,11 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	const targetOccupant = target.occupant;
 	const runtimeTargetItem = runtime.items.find((item) => item.id === targetOccupant.itemId);
 	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
-		return rejected(DropItemRejectedReason.StaleTarget);
+		return rejectedFn(DropItemRejectedReason.StaleTarget);
 	}
 	const targetItem = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTargetItem));
 	if (targetItem === undefined) {
-		return rejected(DropItemRejectedReason.InvalidTarget);
+		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	if (
 		!isSameGridLocationFn({
@@ -159,7 +157,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			right: target.location,
 		})
 	) {
-		return rejected(DropItemRejectedReason.StaleTarget);
+		return rejectedFn(DropItemRejectedReason.StaleTarget);
 	}
 	const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));
 	const boardTarget = Option.getOrUndefined(narrowBoardRuntimeItemFn(targetItem));
@@ -168,7 +166,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		boardTarget !== undefined &&
 		boardSource.location.space !== boardTarget.location.space
 	) {
-		return rejected(DropItemRejectedReason.InvalidTarget);
+		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	const oneBoardItem = (boardSource === undefined) !== (boardTarget === undefined);
 	const boardItem = boardSource ?? boardTarget;
@@ -177,7 +175,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		boardItem !== undefined &&
 		boardItem.location.space !== runtime.currentSpace
 	) {
-		return rejected(DropItemRejectedReason.InvalidTarget);
+		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	if (target.inputStore !== undefined) {
 		const inputStore = resolveLineInputStoreFn({
@@ -189,7 +187,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			source,
 		});
 		return inputStore === undefined
-			? rejected(DropItemRejectedReason.Blocked)
+			? rejectedFn(DropItemRejectedReason.Blocked)
 			: storeInputPreviewFn(inputStore);
 	}
 	if (targetItem.item.type === TypeSchema.enum.Inventory) {
@@ -200,7 +198,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 				locationScope: LocationScopeEnumSchema.enum.Inventory,
 			})
 		) {
-			return rejected(DropItemRejectedReason.InvalidTarget);
+			return rejectedFn(DropItemRejectedReason.InvalidTarget);
 		}
 		const storagePlan = yield* planInventoryStorageFx({
 			item: source,
@@ -210,7 +208,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			? {
 					kind: DropItemResultKind.StoreInventory,
 				}
-			: rejected(DropItemRejectedReason.Blocked);
+			: rejectedFn(DropItemRejectedReason.Blocked);
 	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({
@@ -246,7 +244,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		} satisfies readDropItemPreviewFx.Result;
 	}
 	if (stackResolution.kind === "blocked") {
-		return rejected(
+		return rejectedFn(
 			readDropItemStackRejectedReasonFn({
 				reason: stackResolution.reason,
 			}),
@@ -261,7 +259,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		locationScope: source.location.scope,
 	});
 	if (!sourceScopeAllowed || !targetScopeAllowed) {
-		return rejected(DropItemRejectedReason.InvalidTarget);
+		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	return {
 		kind: DropItemResultKind.Swap,

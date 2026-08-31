@@ -23,7 +23,7 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 		game,
 		transition,
 	}: {
-		readonly game: Pick<GameEngine, "getResourceUrl">;
+		readonly game: Pick<GameEngine, "getResourceUrlFn">;
 		readonly transition: CommittedTransitionSchema.Type;
 	}) {
 		if (transition.previousRuntime === null) return [];

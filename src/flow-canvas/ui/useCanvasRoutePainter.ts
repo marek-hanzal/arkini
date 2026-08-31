@@ -5,14 +5,14 @@ import type { Viewport } from "~/flow-canvas/type/Viewport";
 import type { LayoutPoint } from "~/flow-layout/type/Layout";
 
 interface CanvasRoutePainter {
-	readonly drawEdge: (
+	readonly drawEdgeFn: (
 		context: CanvasRenderingContext2D,
 		backbone: ReadonlyArray<LayoutPoint>,
 		highlightColor: string | undefined,
 		opacity: number,
 		palette: CanvasPalette,
 	) => void;
-	readonly drawGrid: (
+	readonly drawGridFn: (
 		context: CanvasRenderingContext2D,
 		width: number,
 		height: number,
@@ -25,7 +25,7 @@ interface CanvasRoutePainter {
 export const useCanvasRoutePainter = (): CanvasRoutePainter =>
 	useMemo(
 		() => ({
-			drawEdge: (context, backbone, highlightColor, opacity, palette) => {
+			drawEdgeFn: (context, backbone, highlightColor, opacity, palette) => {
 				const first = backbone[0];
 				if (first === undefined) return;
 				const emphasized = highlightColor !== undefined;
@@ -61,7 +61,7 @@ export const useCanvasRoutePainter = (): CanvasRoutePainter =>
 				context.fill();
 				context.restore();
 			},
-			drawGrid: (context, width, height, viewport, palette) => {
+			drawGridFn: (context, width, height, viewport, palette) => {
 				let worldGap = 24;
 				while (worldGap * viewport.zoom < 12) worldGap *= 2;
 				const gap = worldGap * viewport.zoom;

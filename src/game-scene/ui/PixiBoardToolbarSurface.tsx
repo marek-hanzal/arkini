@@ -26,26 +26,26 @@ import type { MainRuntime } from "~/game-scene/service/MainRuntime";
  * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
 interface PixiBoardToolbarSurfaceProps {
-	readonly onOpenInventory: () => void | PromiseLike<void>;
+	readonly onOpenInventoryFn: () => void | PromiseLike<void>;
 }
 
-export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSurfaceProps) => {
+export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarSurfaceProps) => {
 	const game = useGameEngine();
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const { interaction, textures } = usePixiGameRuntime();
-	const [enqueueLineState, enqueueLine] = useAtom(TileDefaultLineCommandAtom(game));
-	const runDrop = useAtomSet(runTileDropAtom(game), {
+	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
+	const runDropFn = useAtomSet(runTileDropAtom(game), {
 		mode: "promise",
 	});
-	const runSplit = useAtomSet(runTileSplitAtom(game), {
+	const runSplitFn = useAtomSet(runTileSplitAtom(game), {
 		mode: "promise",
 	});
-	const runSpaceActivation = useAtomSet(runSpaceActivationAtom(game), {
+	const runSpaceActivationFn = useAtomSet(runSpaceActivationAtom(game), {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
-	const isInventoryShortcutKey = useInventoryShortcutKey();
+	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
 	const runtimeRef = useRef<MainRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
 	const interactionBlocked = gameMenu.phase !== "closed" || itemDetail.state.phase !== "closed";
@@ -57,7 +57,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 		itemDetail,
 	};
 
-	const activate = useCallback(
+	const activateFn = useCallback(
 		async (item: TileActorItem, intent: MainActivationIntent, origin: HTMLElement) => {
 			const { itemDetail: currentItemDetail } = controlsRef.current;
 			if (intent === "detail") {
@@ -71,7 +71,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 			}
 			if (intent === "split-stack") {
 				if (item.location.scope !== "board" || item.quantity < 2) return;
-				await runSplit({
+				await runSplitFn({
 					itemId: item.id,
 					location: item.location,
 					revision: item.revision,
@@ -85,7 +85,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 				) {
 					return;
 				}
-				enqueueLine({
+				enqueueLineFn({
 					kind: "fill",
 					ownerItemId: item.id,
 				});
@@ -103,7 +103,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 						kind: "activate-space",
 					},
 					(primaryAction) =>
-						runSpaceActivation({
+						runSpaceActivationFn({
 							currentSpace: primaryAction.currentSpace,
 							itemId: item.id,
 							location: item.location,
@@ -114,14 +114,14 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 					{
 						kind: "open-inventory",
 					},
-					() => onOpenInventory(),
+					() => onOpenInventoryFn(),
 				)
 				.with(
 					{
 						kind: "enqueue-default-line",
 					},
 					() => {
-						enqueueLine({
+						enqueueLineFn({
 							kind: "enqueue",
 							ownerItemId: item.id,
 						});
@@ -130,39 +130,39 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 				.exhaustive();
 		},
 		[
-			enqueueLine,
-			onOpenInventory,
-			runSpaceActivation,
-			runSplit,
+			enqueueLineFn,
+			onOpenInventoryFn,
+			runSpaceActivationFn,
+			runSplitFn,
 		],
 	);
 
 	useEffect(() => {
 		if (enqueueLineState.kind !== "error") return;
-		enqueueLine({
+		enqueueLineFn({
 			kind: "reset",
 		});
 	}, [
-		enqueueLine,
+		enqueueLineFn,
 		enqueueLineState,
 	]);
 
 	useEffect(() => {
-		const openInventoryFromKeyboard = (event: KeyboardEvent) => {
-			if (event.defaultPrevented || interactionBlocked || !isInventoryShortcutKey(event)) {
+		const openInventoryFromKeyboardFn = (event: KeyboardEvent) => {
+			if (event.defaultPrevented || interactionBlocked || !isInventoryShortcutKeyFn(event)) {
 				return;
 			}
 			event.preventDefault();
 			event.stopPropagation();
-			void Promise.resolve(onOpenInventory()).catch((cause) => {
+			void Promise.resolve(onOpenInventoryFn()).catch((cause) => {
 				console.error("Inventory failed to open from the Board.", cause);
 			});
 		};
-		window.addEventListener("keydown", openInventoryFromKeyboard);
-		return () => window.removeEventListener("keydown", openInventoryFromKeyboard);
+		window.addEventListener("keydown", openInventoryFromKeyboardFn);
+		return () => window.removeEventListener("keydown", openInventoryFromKeyboardFn);
 	}, [
 		interactionBlocked,
-		onOpenInventory,
+		onOpenInventoryFn,
 	]);
 
 	useLayoutEffect(() => {
@@ -170,14 +170,14 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 		if (host === null) return;
 		let cancelled = false;
 		let runtime: MainRuntime | null = null;
-		let unregisterInteraction: () => void = () => undefined;
+		let unregisterInteractionFn: () => void = () => undefined;
 		void RendererRuntime.runPromise(
 			createMainRuntimeFx({
 				dragThreshold: PointerDragThreshold,
 				game,
 				host,
-				onActivate: activate,
-				onDrop: runDrop,
+				onActivateFn: activateFn,
+				onDropFn: runDropFn,
 				textures,
 			}),
 		)
@@ -190,7 +190,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 				RendererRuntime.runSync(
 					created.setInteractionBlockedFx(interactionBlockedRef.current),
 				);
-				unregisterInteraction = RendererRuntime.runSync(
+				unregisterInteractionFn = RendererRuntime.runSync(
 					interaction.registerFx(() =>
 						RendererRuntime.runSync(created.cancelInteractionFx),
 					),
@@ -198,12 +198,12 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 			})
 			.catch((cause) => {
 				if (cancelled) return;
-				game.reportCriticalFailure("game-presentation", cause);
+				game.reportCriticalFailureFn("game-presentation", cause);
 			});
 
 		return () => {
 			cancelled = true;
-			unregisterInteraction();
+			unregisterInteractionFn();
 			if (runtimeRef.current === runtime) runtimeRef.current = null;
 			if (runtime !== null) {
 				void RendererRuntime.runPromise(runtime.closeFx).catch((cause) => {
@@ -212,10 +212,10 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 			}
 		};
 	}, [
-		activate,
+		activateFn,
 		game,
 		interaction,
-		runDrop,
+		runDropFn,
 		textures,
 	]);
 

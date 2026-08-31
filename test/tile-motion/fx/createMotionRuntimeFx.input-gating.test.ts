@@ -102,7 +102,7 @@ describe("input-gated owner output", () => {
 		const transient = travel.actor;
 		expect(transient).toBe(source);
 		samplePoseAnimation(travel, 1);
-		travel.onComplete?.();
+		travel.onCompleteFn?.();
 		const removal = animations.find(
 			(animation) =>
 				animation.actor === transient &&
@@ -129,7 +129,7 @@ describe("input-gated owner output", () => {
 					animation.ownerKey === "motion:43:0",
 			),
 		).toBe(false);
-		removal.onComplete?.();
+		removal.onCompleteFn?.();
 
 		expect(actors.has(source.item.id)).toBe(false);
 		expect(source.container.destroyed).toBe(true);
@@ -166,7 +166,7 @@ describe("input-gated owner output", () => {
 		});
 
 		samplePoseAnimation(outputTravel, 1);
-		outputTravel.onComplete?.();
+		outputTravel.onCompleteFn?.();
 
 		expect(actors.get(output.item.id)).toBe(output);
 		expect(output.container).toMatchObject({
@@ -199,7 +199,7 @@ describe("input-gated owner output", () => {
 		}
 		expect(ownerExitOpacity.durationMs).toBe(lifecycleDurationMs);
 		expect(owner.container.destroyed).toBe(false);
-		ownerExitOpacity.onComplete?.();
+		ownerExitOpacity.onCompleteFn?.();
 		expect(owner.container.destroyed).toBe(true);
 		Effect.runSync(runtime.closeFx);
 	});

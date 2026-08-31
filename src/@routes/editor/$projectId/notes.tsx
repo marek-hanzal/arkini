@@ -67,14 +67,14 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 							disabled={controller.pending}
 							value={controller.newContent}
 							onChange={(event) =>
-								controller.setNewContent(event.currentTarget.value)
+								controller.setNewContentFn(event.currentTarget.value)
 							}
 						/>
 						<div className="flex items-center justify-end">
 							<PrimaryButton
 								disabled={!controller.canCreate}
 								cursorIntent={controller.pending ? "progress" : undefined}
-								onClick={controller.create}
+								onClick={controller.createFn}
 							>
 								Create note
 							</PrimaryButton>
@@ -92,7 +92,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 							<p className="text-sm text-muted">Loading notes…</p>
 						) : !controller.loaded ? (
 							<div className="flex justify-end">
-								<Button onClick={controller.retry}>Retry loading notes</Button>
+								<Button onClick={controller.retryFn}>Retry loading notes</Button>
 							</div>
 						) : (
 							<AnimatePresence
@@ -142,7 +142,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			controller.pending
 																		}
 																		onClick={
-																			controller.cancelEdit
+																			controller.cancelEditFn
 																		}
 																	>
 																		<ArrowLeft className="size-4" />
@@ -165,7 +165,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																				: undefined
 																		}
 																		onClick={
-																			controller.saveEdit
+																			controller.saveEditFn
 																		}
 																	>
 																		<Save className="size-4" />
@@ -188,7 +188,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			controller.pending
 																		}
 																		onClick={() =>
-																			controller.startEdit(
+																			controller.startEditFn(
 																				note,
 																			)
 																		}
@@ -208,7 +208,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			controller.pending
 																		}
 																		onClick={() =>
-																			controller.remove(
+																			controller.removeFn(
 																				note.noteId,
 																			)
 																		}
@@ -228,7 +228,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 														disabled={controller.pending}
 														value={controller.editContent}
 														onChange={(event) =>
-															controller.setEditContent(
+															controller.setEditContentFn(
 																event.currentTarget.value,
 															)
 														}

@@ -16,13 +16,13 @@ export const ProjectStartGridSlot = ({
 	isDragSource,
 	isDragTarget,
 	itemResourceIds,
-	onDecrement,
-	onDelete,
-	onIncrement,
-	onMove,
-	onOpen,
+	onDecrementFn,
+	onDeleteFn,
+	onIncrementFn,
+	onMoveFn,
+	onOpenFn,
 	position,
-	startDrag,
+	startDragFn,
 	suppressClickRef,
 }: {
 	readonly cell: ProjectStartGridCell | undefined;
@@ -30,13 +30,13 @@ export const ProjectStartGridSlot = ({
 	readonly isDragSource: boolean;
 	readonly isDragTarget: boolean;
 	readonly itemResourceIds: ItemSchema.Type["asset"]["default"] | undefined;
-	readonly onDecrement: () => void;
-	readonly onDelete: () => void;
-	readonly onIncrement: () => void;
-	readonly onMove: (offset: ProjectStartGridPosition) => void;
-	readonly onOpen: () => void;
+	readonly onDecrementFn: () => void;
+	readonly onDeleteFn: () => void;
+	readonly onIncrementFn: () => void;
+	readonly onMoveFn: (offset: ProjectStartGridPosition) => void;
+	readonly onOpenFn: () => void;
 	readonly position: ProjectStartGridPosition;
-	readonly startDrag: (
+	readonly startDragFn: (
 		event: ReactPointerEvent<HTMLButtonElement>,
 		source: ProjectStartGridCell,
 	) => void;
@@ -56,23 +56,23 @@ export const ProjectStartGridSlot = ({
 		})}
 		onClick={(event) => {
 			if (suppressClickRef.current || event.altKey || event.metaKey) return;
-			if (cell === undefined) onOpen();
-			else if (!full) onIncrement();
+			if (cell === undefined) onOpenFn();
+			else if (!full) onIncrementFn();
 		}}
 		onContextMenu={(event) => {
 			event.preventDefault();
-			if (cell !== undefined) onDecrement();
+			if (cell !== undefined) onDecrementFn();
 		}}
 		onKeyDown={(event) => {
 			if (cell === undefined) return;
 			if (event.key === "Delete" || event.key === "Backspace") {
 				event.preventDefault();
-				onDelete();
+				onDeleteFn();
 				return;
 			}
 			if (event.key === "-" || event.key === "_") {
 				event.preventDefault();
-				onDecrement();
+				onDecrementFn();
 				return;
 			}
 			if (!event.altKey && !event.metaKey) return;
@@ -100,10 +100,10 @@ export const ProjectStartGridSlot = ({
 								: undefined;
 			if (offset === undefined) return;
 			event.preventDefault();
-			onMove(offset);
+			onMoveFn(offset);
 		}}
 		onPointerDown={(event) => {
-			if (cell !== undefined) startDrag(event, cell);
+			if (cell !== undefined) startDragFn(event, cell);
 		}}
 		type="button"
 	>

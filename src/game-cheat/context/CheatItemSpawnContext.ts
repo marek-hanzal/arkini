@@ -4,8 +4,8 @@ import type { CheatItemSpawnCommandAtom } from "~/game-cheat/atom/CheatItemSpawn
 
 export interface CheatItemSpawnControl {
 	readonly pending: boolean;
-	readonly request: (itemId: string) => void;
-	readonly reset: () => void;
+	readonly requestFn: (itemId: string) => void;
+	readonly resetFn: () => void;
 	readonly state: CheatItemSpawnCommandAtom.State;
 }
 

@@ -7,9 +7,9 @@ export const Route = createFileRoute("/game/$packageId/_scene/inventory")({
 	/** The parent scene keeps the exact Game alive; this leaf owns return navigation. */
 	component: () => {
 		const { packageId } = Route.useParams();
-		const navigate = useNavigate();
-		const onClose = useCallback(() => {
-			void navigate({
+		const navigateFn = useNavigate();
+		const onCloseFn = useCallback(() => {
+			void navigateFn({
 				to: "/game/$packageId/board",
 				params: {
 					packageId,
@@ -19,10 +19,10 @@ export const Route = createFileRoute("/game/$packageId/_scene/inventory")({
 				console.error("Inventory failed to return to the Board.", cause);
 			});
 		}, [
-			navigate,
+			navigateFn,
 			packageId,
 		]);
 
-		return <PlayableInventory onClose={onClose} />;
+		return <PlayableInventory onCloseFn={onCloseFn} />;
 	},
 });

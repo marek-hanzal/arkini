@@ -17,13 +17,13 @@ interface RunReplacementsProps {
 	readonly animator: ActorAnimator;
 	readonly application: PixiApplicationOwner;
 	readonly processedKeys: Set<string>;
-	readonly readPalette: () => PixiScenePalette;
+	readonly readPaletteFn: () => PixiScenePalette;
 	readonly replacements: ReadonlyArray<TileReplacement>;
 	readonly surface: MainSurface;
 	readonly textures: TextureStore;
 }
 
-const retainNewestKeys = (keys: Set<string>, maximumSize = 256) => {
+const retainNewestKeysFn = (keys: Set<string>, maximumSize = 256) => {
 	while (keys.size > maximumSize) {
 		const oldest = keys.values().next().value;
 		if (oldest === undefined) return;
@@ -42,7 +42,7 @@ export const runReplacementsFx = Effect.fn("runReplacementsFx")(function* ({
 	animator,
 	application,
 	processedKeys,
-	readPalette,
+	readPaletteFn,
 	replacements,
 	surface,
 	textures,
@@ -61,16 +61,16 @@ export const runReplacementsFx = Effect.fn("runReplacementsFx")(function* ({
 			continue;
 		}
 		processedKeys.add(replacement.key);
-		retainNewestKeys(processedKeys);
+		retainNewestKeysFn(processedKeys);
 		yield* transitionActorVisualFx({
 			actor,
 			animator,
 			durationMs: visualCrossfadeDurationMs,
 			frames: application.frames,
 			item: canonical,
-			onDiscard: () => processedKeys.delete(replacement.key),
+			onDiscardFn: () => processedKeys.delete(replacement.key),
 			ownerKey: `replacement:${replacement.key}`,
-			palette: readPalette(),
+			palette: readPaletteFn(),
 			size: pose.size,
 			textures,
 		});

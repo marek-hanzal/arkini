@@ -11,83 +11,83 @@ import { VersionRestoreCommandAtom } from "~/project-version/atom/VersionRestore
 interface VersionCheckoutProps {
 	readonly project: Project;
 	readonly projectDirty: boolean;
-	readonly reportError: (error?: unknown) => void;
+	readonly reportErrorFn: (error?: unknown) => void;
 	readonly selected?: ProjectVersionDescriptor;
 }
 
 interface VersionCheckoutOutput {
-	readonly cancel: () => void;
-	readonly confirm: () => void;
+	readonly cancelFn: () => void;
+	readonly confirmFn: () => void;
 	readonly confirmVersion?: ProjectVersionDescriptor;
-	readonly goToCommit: () => void;
+	readonly goToCommitFn: () => void;
 	readonly pending: boolean;
-	readonly restoreSelected: () => void;
+	readonly restoreSelectedFn: () => void;
 }
 
 /** Owns destructive checkout admission and dirty-state confirmation. */
 export const useVersionCheckout = ({
 	project,
 	projectDirty,
-	reportError,
+	reportErrorFn,
 	selected,
 }: VersionCheckoutProps): VersionCheckoutOutput => {
 	const router = useRouter();
 	const restoreAtom = VersionRestoreCommandAtom(project.projectId);
 	const restoreState = useAtomValue(restoreAtom);
-	const restore = useAtomSet(restoreAtom);
+	const restoreFn = useAtomSet(restoreAtom);
 	const unsavedOwner = useEditorUnsavedChangesOwner();
 	const unsaved = useSyncExternalStore(
-		unsavedOwner.subscribe,
-		unsavedOwner.getSnapshot,
-		unsavedOwner.getSnapshot,
+		unsavedOwner.subscribeFn,
+		unsavedOwner.getSnapshotFn,
+		unsavedOwner.getSnapshotFn,
 	);
-	const [confirmVersion, setConfirmVersion] = useState<ProjectVersionDescriptor>();
+	const [confirmVersion, setConfirmVersionFn] = useState<ProjectVersionDescriptor>();
 
-	const runCheckout = useCallback(
+	const runCheckoutFn = useCallback(
 		(version: ProjectVersionDescriptor, confirmDiscardCurrentChanges: boolean) => {
 			if (restoreState.kind === "restoring") return;
-			reportError();
-			restore({
+			reportErrorFn();
+			restoreFn({
 				confirmDiscardCurrentChanges,
-				onFailure: (cause) => {
+				onFailureFn: (cause) => {
 					if (cause instanceof ProjectVersionCheckoutConfirmationRequired) {
-						setConfirmVersion(version);
+						setConfirmVersionFn(version);
 						return;
 					}
-					reportError(cause);
-					setConfirmVersion(undefined);
+					reportErrorFn(cause);
+					setConfirmVersionFn(undefined);
 				},
 				subject: version.subject,
 				versionId: version.versionId,
 			});
 		},
 		[
-			reportError,
-			restore,
+			reportErrorFn,
+			restoreFn,
 			restoreState.kind,
 		],
 	);
-	const restoreSelected = useCallback(() => {
+	const restoreSelectedFn = useCallback(() => {
 		if (selected === undefined) return;
 		if (projectDirty || unsaved.hasDirtySession) {
-			setConfirmVersion(selected);
+			setConfirmVersionFn(selected);
 			return;
 		}
-		runCheckout(selected, false);
+		runCheckoutFn(selected, false);
 	}, [
 		projectDirty,
-		runCheckout,
+		runCheckoutFn,
 		selected,
 		unsaved.hasDirtySession,
 	]);
-	const confirm = useCallback(() => {
-		if (confirmVersion !== undefined) runCheckout(confirmVersion, true);
+	const confirmFn = useCallback(() => {
+		if (confirmVersion !== undefined) runCheckoutFn(confirmVersion, true);
 	}, [
 		confirmVersion,
-		runCheckout,
+		runCheckoutFn,
 	]);
-	const goToCommit = useCallback(() => {
-		setConfirmVersion(undefined);
+	const goToCommitFn = useCallback(() => {
+		setConfirmVersionFn(undefined);
 		void router.navigate({
 			to: "/editor/$projectId/versions/commit",
 			params: {
@@ -103,15 +103,15 @@ export const useVersionCheckout = ({
 	]);
 
 	return {
-		cancel: () => setConfirmVersion(undefined),
-		confirm,
+		cancelFn: () => setConfirmVersionFn(undefined),
+		confirmFn,
 		...(confirmVersion === undefined
 			? {}
 			: {
 					confirmVersion,
 				}),
-		goToCommit,
+		goToCommitFn,
 		pending: restoreState.kind === "restoring",
-		restoreSelected,
+		restoreSelectedFn,
 	};
 };

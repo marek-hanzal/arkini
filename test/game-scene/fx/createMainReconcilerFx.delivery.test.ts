@@ -177,7 +177,7 @@ describe("main reconciliation / delivery retention", () => {
 		if (travel?.channel !== "pose") throw new Error("Expected a canonical pose travel.");
 		expect(actor.container.parent).not.toBe(harness.layer);
 
-		travel.onComplete?.();
+		travel.onCompleteFn?.();
 		expect(actor.container.parent).toBe(harness.layer);
 	});
 });

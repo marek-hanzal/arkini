@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 
-const readResponse = (candidate: unknown): ArkiniElectronApi.EditorMcpVersionCheckoutResponse => {
+const readResponseFn = (candidate: unknown): ArkiniElectronApi.EditorMcpVersionCheckoutResponse => {
 	if (typeof candidate !== "object" || candidate === null || !("type" in candidate))
 		throw new Error("The editor returned an invalid version checkout response.");
 	if (candidate.type === "success")
@@ -25,34 +25,36 @@ const readResponse = (candidate: unknown): ArkiniElectronApi.EditorMcpVersionChe
 /** Requests the renderer-owned destructive checkout and waits for its terminal reload. */
 export const requestVersionCheckoutFx = Effect.fn("requestVersionCheckoutFx")(
 	(sender: WebContents, request: ArkiniElectronApi.EditorMcpVersionCheckoutRequest) =>
-		Effect.callback<void, Error>((resume) => {
+		Effect.callback<void, Error>((resumeFn) => {
 			if (sender.isDestroyed()) {
-				resume(Effect.fail(new Error("The open editor renderer is unavailable.")));
+				resumeFn(Effect.fail(new Error("The open editor renderer is unavailable.")));
 				return;
 			}
 			const { port1, port2 } = new MessageChannelMain();
 			let settled = false;
-			let onDestroyed: () => void = () => undefined;
-			const finish = (result: Effect.Effect<void, Error, never>) => {
+			let onDestroyedFn: () => void = () => undefined;
+			const finishFn = (result: Effect.Effect<void, Error, never>) => {
 				if (settled) return;
 				settled = true;
-				sender.removeListener("destroyed", onDestroyed);
+				sender.removeListener("destroyed", onDestroyedFn);
 				port1.close();
-				resume(result);
+				resumeFn(result);
 			};
-			onDestroyed = () =>
-				finish(Effect.fail(new Error("The open editor renderer was closed.")));
-			sender.once("destroyed", onDestroyed);
+			onDestroyedFn = () =>
+				finishFn(Effect.fail(new Error("The open editor renderer was closed.")));
+			sender.once("destroyed", onDestroyedFn);
 			port1.once("message", ({ data }) => {
 				try {
-					const response = readResponse(data);
-					finish(
+					const response = readResponseFn(data);
+					finishFn(
 						response.type === "success"
 							? Effect.void
 							: Effect.fail(new Error(response.message)),
 					);
 				} catch (cause) {
-					finish(Effect.fail(cause instanceof Error ? cause : new Error(String(cause))));
+					finishFn(
+						Effect.fail(cause instanceof Error ? cause : new Error(String(cause))),
+					);
 				}
 			});
 			port1.start();
@@ -65,12 +67,12 @@ export const requestVersionCheckoutFx = Effect.fn("requestVersionCheckoutFx")(
 					],
 				);
 			} catch (cause) {
-				finish(Effect.fail(cause instanceof Error ? cause : new Error(String(cause))));
+				finishFn(Effect.fail(cause instanceof Error ? cause : new Error(String(cause))));
 			}
 			return Effect.sync(() => {
 				if (settled) return;
 				settled = true;
-				sender.removeListener("destroyed", onDestroyed);
+				sender.removeListener("destroyed", onDestroyedFn);
 				port1.close();
 			});
 		}),

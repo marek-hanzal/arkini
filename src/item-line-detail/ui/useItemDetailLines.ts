@@ -11,9 +11,9 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 /** Projects the current visible product lines and authoritative action readiness of one exact line owner. */
 export const useItemDetailLines = (itemId: IdSchema.Type): ItemDetailLinesProjection.Projection => {
 	const game = useGameEngine();
-	const selector = useCallback(
+	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) =>
-			game.readOrThrow(
+			game.readOrThrowFn(
 				projectItemDetailLinesFx({
 					game,
 					itemId,
@@ -25,5 +25,5 @@ export const useItemDetailLines = (itemId: IdSchema.Type): ItemDetailLinesProjec
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, Equal.equals);
+	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };

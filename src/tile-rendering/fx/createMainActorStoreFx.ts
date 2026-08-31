@@ -4,7 +4,7 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 
-const readCanonicalSlotKey = (location: PixiTileActor["item"]["location"]) => {
+const readCanonicalSlotKeyFn = (location: PixiTileActor["item"]["location"]) => {
 	switch (location.scope) {
 		case "board":
 			return `board:${location.space}:${location.position.x}:${location.position.y}`;
@@ -49,7 +49,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 			readCanonicalOccupantFx: Effect.fn("MainActorStore.readCanonicalOccupantFx")(
 				(location) =>
 					Effect.sync(() => {
-						const key = readCanonicalSlotKey(location);
+						const key = readCanonicalSlotKeyFn(location);
 						return key === null ? null : (canonicalOccupants.get(key) ?? null);
 					}),
 			),
@@ -59,7 +59,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 						const seen = new Set<string>();
 						const occupants: PixiTileActor["item"][] = [];
 						for (const location of locations) {
-							const key = readCanonicalSlotKey(location);
+							const key = readCanonicalSlotKeyFn(location);
 							if (key === null) continue;
 							const occupant = canonicalOccupants.get(key);
 							if (occupant === undefined || seen.has(occupant.id)) continue;
@@ -81,7 +81,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 							);
 						}
 						nextCanonicalItems.set(item.id, item);
-						const key = readCanonicalSlotKey(item.location);
+						const key = readCanonicalSlotKeyFn(item.location);
 						if (key === null) continue;
 						const existing = nextCanonicalOccupants.get(key);
 						if (existing !== undefined && existing.id !== item.id) {
@@ -106,9 +106,9 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 					const actor = actors.get(actorId) ?? null;
 					actors.delete(actorId);
 					if (actor !== null && !actor.container.destroyed) {
-						if (actor.onPointerDown !== null) {
-							actor.container.off("pointerdown", actor.onPointerDown);
-							actor.onPointerDown = null;
+						if (actor.onPointerDownFn !== null) {
+							actor.container.off("pointerdown", actor.onPointerDownFn);
+							actor.onPointerDownFn = null;
 						}
 						actor.container.eventMode = "none";
 						actor.container.cursor = "default";

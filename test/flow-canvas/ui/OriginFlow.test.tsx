@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
 	canvasProps: undefined as
 		| {
-				readonly onItemOpen: (itemId: string) => void;
+				readonly onItemOpenFn: (itemId: string) => void;
 		  }
 		| undefined,
 	navigate: vi.fn(),
@@ -89,7 +89,7 @@ describe("OriginFlow", () => {
 		await act(async () => root?.render(createElement(OriginFlow, {})));
 		if (state.canvasProps === undefined) throw new Error("Missing Flow canvas binding.");
 
-		await act(async () => state.canvasProps?.onItemOpen("tool"));
+		await act(async () => state.canvasProps?.onItemOpenFn("tool"));
 
 		expect(state.navigate).toHaveBeenCalledWith({
 			params: {

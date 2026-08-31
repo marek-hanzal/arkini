@@ -13,10 +13,10 @@ const aboutEasterEggDelayMs = 2_000;
 
 /** Delays the route-only easter egg until the settled About page has remained visible. */
 const useAboutEasterEggDelay = () => {
-	const [active, setActive] = useState(false);
+	const [active, setActiveFn] = useState(false);
 
 	useEffect(() => {
-		const timeout = window.setTimeout(() => setActive(true), aboutEasterEggDelayMs);
+		const timeout = window.setTimeout(() => setActiveFn(true), aboutEasterEggDelayMs);
 		return () => window.clearTimeout(timeout);
 	}, []);
 

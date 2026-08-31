@@ -18,8 +18,8 @@ type RunEstimate = (
 ) => Promise<ItemEstimateWorkerResult>;
 
 interface RunItemEstimateInWorkerOptions {
-	readonly runEstimate?: RunEstimate;
-	readonly spawn?: () => Worker;
+	readonly runEstimateFn?: RunEstimate;
+	readonly spawnFn?: () => Worker;
 }
 
 /** Runs one cancellable estimate request off the renderer thread. */
@@ -27,7 +27,7 @@ export const runItemEstimateInWorkerFx = Effect.fn("runEditorItemEstimateInWorke
 	(request: ItemEstimateWorkerRequest, options: RunItemEstimateInWorkerOptions = {}) =>
 		Effect.acquireUseRelease(
 			Effect.try({
-				try: options.spawn ?? (() => new EstimateWorker()),
+				try: options.spawnFn ?? (() => new EstimateWorker()),
 				catch: (cause) =>
 					new ItemEstimateWorkerError({
 						cause,
@@ -38,31 +38,31 @@ export const runItemEstimateInWorkerFx = Effect.fn("runEditorItemEstimateInWorke
 				Effect.tryPromise({
 					try: () =>
 						(
-							options.runEstimate ??
+							options.runEstimateFn ??
 							((request, worker) =>
-								new Promise((resolve, reject) => {
-									const cleanUp = () => {
-										worker.removeEventListener("message", handleMessage);
-										worker.removeEventListener("error", handleError);
+								new Promise((resolveFn, rejectFn) => {
+									const cleanUpFn = () => {
+										worker.removeEventListener("message", handleMessageFn);
+										worker.removeEventListener("error", handleErrorFn);
 									};
-									const handleMessage = ({
+									const handleMessageFn = ({
 										data,
 									}: MessageEvent<ItemEstimateWorkerResponse>) => {
-										cleanUp();
-										if (data.status === "success") resolve(data.result);
-										else reject(new Error(data.message));
+										cleanUpFn();
+										if (data.status === "success") resolveFn(data.result);
+										else rejectFn(new Error(data.message));
 									};
-									const handleError = (event: ErrorEvent) => {
-										cleanUp();
-										reject(
+									const handleErrorFn = (event: ErrorEvent) => {
+										cleanUpFn();
+										rejectFn(
 											event.error ??
 												new Error(
 													event.message || "Estimate worker failed.",
 												),
 										);
 									};
-									worker.addEventListener("message", handleMessage);
-									worker.addEventListener("error", handleError);
+									worker.addEventListener("message", handleMessageFn);
+									worker.addEventListener("error", handleErrorFn);
 									worker.postMessage(request);
 								}))
 						)(request, worker),

@@ -1,4 +1,4 @@
-const formatSecondsPart = (seconds: number) =>
+const formatSecondsPartFn = (seconds: number) =>
 	seconds.toLocaleString("en-US", {
 		maximumFractionDigits: 3,
 		useGrouping: false,
@@ -23,7 +23,7 @@ const formatEditorDurationFn = (seconds: number) => {
 		minutes === 0 ? undefined : `${minutes}m`,
 		remainingSeconds === 0 && (days !== 0 || hours !== 0 || minutes !== 0)
 			? undefined
-			: `${formatSecondsPart(remainingSeconds)}s`,
+			: `${formatSecondsPartFn(remainingSeconds)}s`,
 	].filter((part): part is string => part !== undefined);
 
 	return `${sign}${parts.join(" ")}`;

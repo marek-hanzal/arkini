@@ -17,7 +17,7 @@ export namespace updateActorProgressFx {
 
 const tileToSlotRatio = 0.8;
 
-const updateProgressBar = ({
+const updateProgressBarFn = ({
 	actor,
 	palette,
 	size,
@@ -57,7 +57,7 @@ export const updateActorProgressFx = Effect.fnUntraced(function* ({
 	size,
 }: updateActorProgressFx.Props) {
 	actor.item = item;
-	updateProgressBar({
+	updateProgressBarFn({
 		actor,
 		palette,
 		size,

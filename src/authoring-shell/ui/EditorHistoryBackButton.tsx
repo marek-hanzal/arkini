@@ -20,7 +20,7 @@ export const EditorHistoryBackButton = <
 		readonly children?: ReactNode;
 	},
 ) => {
-	const historyBack = useEditorHistoryBack();
+	const historyBackFn = useEditorHistoryBack();
 	return (
 		<ButtonLink<TRouter, TFrom, TTo, TMaskFrom, TMaskTo>
 			{...props}
@@ -39,7 +39,7 @@ export const EditorHistoryBackButton = <
 					props.onClick?.(event);
 					return;
 				}
-				if (historyBack(() => props.onClick?.(event))) event.preventDefault();
+				if (historyBackFn(() => props.onClick?.(event))) event.preventDefault();
 			}}
 			preload={false}
 			replace

@@ -35,10 +35,10 @@ export const BoardScenarioToolbar = ({
 				emptyLabel="No scenarios match this search."
 				label="Board scenario"
 				labelVisible={false}
-				onChange={(value) => void controller.selectScenario(value)}
-				onInputChange={controller.draft ? controller.setName : undefined}
+				onChangeFn={(value) => void controller.selectScenarioFn(value)}
+				onInputChangeFn={controller.draft ? controller.setNameFn : undefined}
 				options={controller.options}
-				renderPreview={() => null}
+				renderPreviewFn={() => null}
 				value={controller.value}
 			/>
 			<div className="flex items-center gap-1">
@@ -46,7 +46,7 @@ export const BoardScenarioToolbar = ({
 					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 					disabled={controller.pending}
 					title="New scenario slot"
-					onClick={controller.createDraft}
+					onClick={controller.createDraftFn}
 				>
 					<Plus className="size-5" />
 				</Button>
@@ -54,7 +54,7 @@ export const BoardScenarioToolbar = ({
 					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 					disabled={controller.draft || controller.pending}
 					title="Delete selected scenario"
-					onClick={() => void controller.deleteScenario()}
+					onClick={() => void controller.deleteScenarioFn()}
 				>
 					<Trash2 className="size-4" />
 				</Button>
@@ -62,7 +62,7 @@ export const BoardScenarioToolbar = ({
 					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 					disabled={!controller.canSave}
 					title="Save current Board state"
-					onClick={() => void controller.saveScenario()}
+					onClick={() => void controller.saveScenarioFn()}
 				>
 					<Save className="size-4" />
 				</Button>

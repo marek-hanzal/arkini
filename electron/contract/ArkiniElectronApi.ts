@@ -11,6 +11,7 @@ import type {
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
+import type { EditorSourceExportSchema } from "./editor/EditorSourceExportSchema";
 import type { EditorMcpCommandResultSchema } from "./editor/EditorMcpCommandResultSchema";
 import type { EditorMcpCommandSchema } from "./editor/EditorMcpCommandSchema";
 import type { EditorMcpConfigurationSchema } from "./editor/EditorMcpConfigurationSchema";
@@ -144,205 +145,207 @@ export namespace ArkiniElectronApi {
 
 	export interface Api {
 		readonly arkpack: {
-			readonly list: () => Promise<ReadonlyArray<ArkpackFile>>;
-			readonly read: (packageId: string) => Promise<ReadonlyArray<ArkpackFile>>;
-			readonly install: (record: ArkpackInstall) => Promise<void>;
-			readonly remove: (packageId: string) => Promise<void>;
-			readonly openUserDirectory: () => Promise<void>;
+			readonly listFn: () => Promise<ReadonlyArray<ArkpackFile>>;
+			readonly readFn: (packageId: string) => Promise<ReadonlyArray<ArkpackFile>>;
+			readonly installFn: (record: ArkpackInstall) => Promise<void>;
+			readonly removeFn: (packageId: string) => Promise<void>;
+			readonly openUserDirectoryFn: () => Promise<void>;
 		};
 		readonly appearance: {
-			readonly read: () => Promise<AppearanceThemeSchema.Type>;
-			readonly write: (theme: AppearanceThemeSchema.Type) => Promise<void>;
-			readonly readAccent: () => Promise<AppearanceAccentSchema.Type>;
-			readonly writeAccent: (accent: AppearanceAccentSchema.Type) => Promise<void>;
+			readonly readFn: () => Promise<AppearanceThemeSchema.Type>;
+			readonly writeFn: (theme: AppearanceThemeSchema.Type) => Promise<void>;
+			readonly readAccentFn: () => Promise<AppearanceAccentSchema.Type>;
+			readonly writeAccentFn: (accent: AppearanceAccentSchema.Type) => Promise<void>;
 		};
 		readonly cheats: {
-			readonly readAvailable: () => Promise<CheatAvailabilitySchema.Type>;
-			readonly writeAvailable: (available: CheatAvailabilitySchema.Type) => Promise<void>;
+			readonly readAvailableFn: () => Promise<CheatAvailabilitySchema.Type>;
+			readonly writeAvailableFn: (available: CheatAvailabilitySchema.Type) => Promise<void>;
 		};
 		readonly chatGpt: {
-			readonly setSurface: (surface: ChatGptSurfaceSchema.Type | null) => Promise<void>;
-			readonly onStateChanged: (
-				listener: (state: ChatGptViewStateSchema.Type) => void,
+			readonly setSurfaceFn: (surface: ChatGptSurfaceSchema.Type | null) => Promise<void>;
+			readonly onStateChangedFn: (
+				listenerFn: (state: ChatGptViewStateSchema.Type) => void,
 			) => () => void;
-			readonly onAssetCandidate: (
-				listener: (candidate: ChatGptAssetCandidateSchema.Type) => void,
+			readonly onAssetCandidateFn: (
+				listenerFn: (candidate: ChatGptAssetCandidateSchema.Type) => void,
 			) => () => void;
 		};
 		readonly clipboard: {
-			readonly writeText: (text: string) => Promise<void>;
+			readonly writeTextFn: (text: string) => Promise<void>;
 		};
 		readonly cli: {
-			readonly status: () => Promise<InstallationStatus>;
-			readonly install: () => Promise<InstallationStatus>;
-			readonly replace: () => Promise<InstallationStatus>;
-			readonly uninstall: () => Promise<InstallationStatus>;
+			readonly statusFn: () => Promise<InstallationStatus>;
+			readonly installFn: () => Promise<InstallationStatus>;
+			readonly replaceFn: () => Promise<InstallationStatus>;
+			readonly uninstallFn: () => Promise<InstallationStatus>;
 			readonly completion: {
-				readonly status: () => Promise<CompletionStatus>;
-				readonly install: () => Promise<CompletionStatus>;
-				readonly replace: () => Promise<CompletionStatus>;
-				readonly uninstall: () => Promise<CompletionStatus>;
+				readonly statusFn: () => Promise<CompletionStatus>;
+				readonly installFn: () => Promise<CompletionStatus>;
+				readonly replaceFn: () => Promise<CompletionStatus>;
+				readonly uninstallFn: () => Promise<CompletionStatus>;
 			};
 		};
 		readonly launcher: {
-			readonly readLastPackageId: () => Promise<LastPackageIdSchema.Type | null>;
-			readonly writeLastPackageId: (packageId: LastPackageIdSchema.Type) => Promise<void>;
+			readonly readLastPackageIdFn: () => Promise<LastPackageIdSchema.Type | null>;
+			readonly writeLastPackageIdFn: (packageId: LastPackageIdSchema.Type) => Promise<void>;
 		};
 		readonly editor: {
-			readonly status: () => Promise<EditorProjectTransport.ServiceStatus>;
-			readonly awaitIdle: () => Promise<EditorProjectTransport.Result<void>>;
-			readonly buildProject: (
+			readonly statusFn: () => Promise<EditorProjectTransport.ServiceStatus>;
+			readonly awaitIdleFn: () => Promise<EditorProjectTransport.Result<void>>;
+			readonly buildProjectFn: (
 				request: EditorProjectTransport.BuildRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Build>>;
-			readonly readProjectBuild: (
+			readonly readProjectBuildFn: (
 				request: EditorProjectTransport.ReadBuildRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BuildContent>>;
-			readonly saveProjectBuild: (
+			readonly saveProjectBuildFn: (
 				request: EditorProjectTransport.ReadBuildRequest,
 			) => Promise<EditorProjectTransport.Result<boolean>>;
-			readonly createProject: (
+			readonly createProjectFn: (
 				request: EditorProjectTransport.CreateProjectRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly deleteProject: (
+			readonly deleteProjectFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly deleteItem: (
+			readonly deleteItemFn: (
 				request: EditorProjectTransport.DeleteItemRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
-			readonly deleteResource: (
+			readonly deleteResourceFn: (
 				request: EditorProjectTransport.DeleteResourceRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly importJsonDirectory: () => Promise<
+			readonly importJsonDirectoryFn: () => Promise<
 				EditorProjectTransport.Result<EditorProjectTransport.Descriptor | null>
 			>;
-			readonly exportJsonDirectory: (
+			readonly exportJsonDirectoryFn: (
 				projectId: string,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.SourceExport | null>>;
-			readonly listProjects: () => Promise<
+			) => Promise<EditorProjectTransport.Result<EditorSourceExportSchema.Type | null>>;
+			readonly listProjectsFn: () => Promise<
 				EditorProjectTransport.Result<
 					ReadonlyArray<EditorProjectTransport.ProjectCandidate>
 				>
 			>;
-			readonly openExportDirectory: () => Promise<EditorProjectTransport.Result<void>>;
-			readonly openProjectDirectory: (
+			readonly openExportDirectoryFn: () => Promise<EditorProjectTransport.Result<void>>;
+			readonly openProjectDirectoryFn: (
 				root: string,
 			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly readProject: (
+			readonly readProjectFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project | null>>;
-			readonly refreshProject: (
+			readonly refreshProjectFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly onProjectChanged: (listener: (projectId: string) => void) => () => void;
-			readonly replaceConfig: (
+			readonly onProjectChangedFn: (listenerFn: (projectId: string) => void) => () => void;
+			readonly replaceConfigFn: (
 				request: EditorProjectTransport.ReplaceConfigRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
-			readonly replaceResource: (
+			readonly replaceResourceFn: (
 				request: EditorProjectTransport.ReplaceResourceRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly saveResource: (
+			readonly saveResourceFn: (
 				request: EditorProjectTransport.SaveResourceRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly upsertItem: (
+			readonly upsertItemFn: (
 				request: EditorProjectTransport.UpsertItemRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
-			readonly upsertResources: (
+			readonly upsertResourcesFn: (
 				request: EditorProjectTransport.UpsertResourcesRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly listNotes: (
+			readonly listNotesFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.Note>>>;
-			readonly createNote: (
+			readonly createNoteFn: (
 				request: EditorProjectTransport.CreateNoteRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Note>>;
-			readonly updateNote: (
+			readonly updateNoteFn: (
 				request: EditorProjectTransport.UpdateNoteRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Note>>;
-			readonly deleteNote: (
+			readonly deleteNoteFn: (
 				request: EditorProjectTransport.NoteKeyRequest,
 			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly listBoardScenarios: (
+			readonly listBoardScenariosFn: (
 				projectId: string,
 			) => Promise<
 				EditorProjectTransport.Result<
 					ReadonlyArray<EditorProjectTransport.BoardScenarioDescriptor>
 				>
 			>;
-			readonly readBoardScenario: (
+			readonly readBoardScenarioFn: (
 				request: EditorProjectTransport.BoardScenarioKeyRequest,
 			) => Promise<
 				EditorProjectTransport.Result<EditorProjectTransport.BoardScenario | null>
 			>;
-			readonly writeBoardScenario: (
+			readonly writeBoardScenarioFn: (
 				request: EditorProjectTransport.WriteBoardScenarioRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BoardScenario>>;
-			readonly deleteBoardScenario: (
+			readonly deleteBoardScenarioFn: (
 				request: EditorProjectTransport.BoardScenarioKeyRequest,
 			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly readVersionStatus: (
+			readonly readVersionStatusFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionStatus>>;
-			readonly listVersions: (
+			readonly listVersionsFn: (
 				projectId: string,
 			) => Promise<
 				EditorProjectTransport.Result<
 					ReadonlyArray<EditorProjectTransport.VersionDescriptor>
 				>
 			>;
-			readonly diffVersions: (
+			readonly diffVersionsFn: (
 				request: EditorProjectTransport.VersionDiffRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDiff>>;
-			readonly createVersion: (
+			readonly createVersionFn: (
 				request: EditorProjectTransport.VersionCommitRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
-			readonly checkoutVersion: (
+			readonly checkoutVersionFn: (
 				request: EditorProjectTransport.VersionCheckoutRequest,
 			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly updateVersionTag: (
+			readonly updateVersionTagFn: (
 				request: EditorProjectTransport.VersionTagRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
 		};
 		readonly editorMcp: {
-			readonly readOverview: () => Promise<EditorMcpOverviewSchema.Type>;
-			readonly configure: (
+			readonly readOverviewFn: () => Promise<EditorMcpOverviewSchema.Type>;
+			readonly configureFn: (
 				configuration: EditorMcpConfigurationSchema.Type,
 			) => Promise<EditorMcpOverviewSchema.Type>;
-			readonly command: (
+			readonly commandFn: (
 				command: EditorMcpCommandSchema.Type,
 			) => Promise<EditorMcpCommandResultSchema.Type>;
-			readonly onOverviewChanged: (
-				listener: (overview: EditorMcpOverviewSchema.Type) => void,
+			readonly onOverviewChangedFn: (
+				listenerFn: (overview: EditorMcpOverviewSchema.Type) => void,
 			) => () => void;
-			readonly setProjectContext: (projectId: string) => Promise<void>;
-			readonly clearProjectContext: (projectId: string) => Promise<void>;
-			readonly onVersionCheckoutRequested: (
-				listener: (request: EditorMcpVersionCheckoutRequest) => Promise<void>,
+			readonly setProjectContextFn: (projectId: string) => Promise<void>;
+			readonly clearProjectContextFn: (projectId: string) => Promise<void>;
+			readonly onVersionCheckoutRequestedFn: (
+				listenerFn: (request: EditorMcpVersionCheckoutRequest) => Promise<void>,
 			) => () => void;
 		};
 		readonly save: {
-			readonly read: (key: SaveKey) => Promise<Uint8Array | null>;
-			readonly write: (key: SaveKey, bytes: Uint8Array) => Promise<void>;
-			readonly clear: (key: SaveKey) => Promise<void>;
+			readonly readFn: (key: SaveKey) => Promise<Uint8Array | null>;
+			readonly writeFn: (key: SaveKey, bytes: Uint8Array) => Promise<void>;
+			readonly clearFn: (key: SaveKey) => Promise<void>;
 		};
 		readonly diagnostics: {
-			readonly write: (record: DiagnosticRecord) => Promise<void>;
-			readonly openDirectory: () => Promise<void>;
+			readonly writeFn: (record: DiagnosticRecord) => Promise<void>;
+			readonly openDirectoryFn: () => Promise<void>;
 		};
 		readonly userData: {
-			readonly openDirectory: () => Promise<void>;
+			readonly openDirectoryFn: () => Promise<void>;
 		};
 		readonly window: {
-			readonly readMode: () => Promise<WindowModeSchema.Type>;
-			readonly writeMode: (mode: WindowModeSchema.Type) => Promise<void>;
-			readonly onModeChanged: (listener: (mode: WindowModeSchema.Type) => void) => () => void;
+			readonly readModeFn: () => Promise<WindowModeSchema.Type>;
+			readonly writeModeFn: (mode: WindowModeSchema.Type) => Promise<void>;
+			readonly onModeChangedFn: (
+				listenerFn: (mode: WindowModeSchema.Type) => void,
+			) => () => void;
 		};
 		readonly lifecycle: {
-			readonly waitUntilVisible: () => Promise<number>;
-			readonly onBeforeClose: (listener: () => Promise<void>) => () => void;
-			readonly onBeforeCloseReady: (listener: () => Promise<void>) => () => void;
-			readonly onCloseFailed: (listener: (error: unknown) => void) => () => void;
-			readonly requestClose: () => Promise<void>;
-			readonly forceClose: () => void;
+			readonly waitUntilVisibleFn: () => Promise<number>;
+			readonly onBeforeCloseFn: (listenerFn: () => Promise<void>) => () => void;
+			readonly onBeforeCloseReadyFn: (listenerFn: () => Promise<void>) => () => void;
+			readonly onCloseFailedFn: (listenerFn: (error: unknown) => void) => () => void;
+			readonly requestCloseFn: () => Promise<void>;
+			readonly forceCloseFn: () => void;
 		};
 	}
 }

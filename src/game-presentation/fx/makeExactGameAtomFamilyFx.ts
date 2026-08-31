@@ -12,16 +12,16 @@ interface ExactGameIdentity<GameType extends PlayableGame> extends Equal.Equal {
  * The explicit identity key prevents Effect Hash from traversing the live Game object.
  */
 export const makeExactGameAtomFamilyFx = Effect.fn("makeExactGameAtomFamilyFx")(
-	<GameType extends PlayableGame, Result extends object>(make: (game: GameType) => Result) =>
+	<GameType extends PlayableGame, Result extends object>(makeFn: (game: GameType) => Result) =>
 		Effect.sync(() => {
 			const identities = new WeakMap<GameType, ExactGameIdentity<GameType>>();
-			const family = Atom.family((identity: ExactGameIdentity<GameType>) =>
-				make(identity.game),
+			const familyFn = Atom.family((identity: ExactGameIdentity<GameType>) =>
+				makeFn(identity.game),
 			);
 
 			return (game: GameType) => {
 				const current = identities.get(game);
-				if (current !== undefined) return family(current);
+				if (current !== undefined) return familyFn(current);
 				const identity: ExactGameIdentity<GameType> = {
 					game,
 					[Equal.symbol](that) {
@@ -32,7 +32,7 @@ export const makeExactGameAtomFamilyFx = Effect.fn("makeExactGameAtomFamilyFx")(
 					},
 				};
 				identities.set(game, identity);
-				return family(identity);
+				return familyFn(identity);
 			};
 		}),
 );

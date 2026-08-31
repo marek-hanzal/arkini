@@ -4,14 +4,14 @@ import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
+import type { ItemDetailQueueProjection } from "~/item-detail/fx/projectItemDetailQueueFx";
 import { ItemQueueActiveSlot, ItemQueueRequestList } from "~/item-detail/ui/ItemQueueWork";
-import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Scrollable } from "~/ui/ui/Scrollable";
 
 type QueueProjection = Extract<
-	useRuntimeItemDetailSceneController.QueueProjection,
+	ItemDetailQueueProjection,
 	{
 		readonly kind: "available";
 	}
@@ -62,7 +62,7 @@ export const ItemQueueTab = ({ disabled = false, queue }: ItemQueueTabProps) => 
 									data-ui="ItemQueueClearButton"
 									disabled={disabled || controller.pending}
 									cursorIntent={controller.pending ? "progress" : undefined}
-									onClick={controller.clearQueue}
+									onClick={controller.clearQueueFn}
 								>
 									Clear queue
 								</LinkButton>

@@ -15,12 +15,12 @@ import { useVersionHistoryController } from "~/project-version/ui/useVersionHist
 
 const EditorVersionReferenceSelect = ({
 	label,
-	onChange,
+	onChangeFn,
 	value,
 	versions,
 }: {
 	readonly label: string;
-	readonly onChange: (value: string) => void;
+	readonly onChangeFn: (value: string) => void;
 	readonly value: string;
 	readonly versions: ReadonlyArray<ProjectVersionDescriptor>;
 }) => {
@@ -39,7 +39,7 @@ const EditorVersionReferenceSelect = ({
 			{label}
 			<EditorSelect
 				label={label}
-				onChange={onChange}
+				onChangeFn={onChangeFn}
 				options={options}
 				value={value}
 			/>
@@ -70,8 +70,8 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 					) : (
 						<VersionGraph
 							layout={controller.graph}
-							onSelect={controller.selectVersion}
-							onSelectWorkingCopy={controller.selectWorkingCopy}
+							onSelectFn={controller.selectVersionFn}
+							onSelectWorkingCopyFn={controller.selectWorkingCopyFn}
 							selectedReference={controller.compareTo}
 							status={controller.history.status}
 						/>
@@ -133,7 +133,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 															<LinkButton
 																className="block max-w-full truncate text-left"
 																onClick={() =>
-																	controller.selectVersion(
+																	controller.selectVersionFn(
 																		selectedParent.versionId,
 																	)
 																}
@@ -151,7 +151,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 										cursorIntent={
 											controller.checkoutPending ? "progress" : undefined
 										}
-										onClick={controller.restoreSelected}
+										onClick={controller.restoreSelectedFn}
 									>
 										Restore version
 									</DangerButton>
@@ -173,7 +173,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 											placeholder="No tag"
 											value={controller.tagDraft}
 											onChange={(event) =>
-												controller.setTagDraft(event.currentTarget.value)
+												controller.setTagDraftFn(event.currentTarget.value)
 											}
 										/>
 										<Button
@@ -182,7 +182,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 												controller.tagPending ? "progress" : undefined
 											}
 											disabled={controller.tagPending}
-											onClick={controller.saveTag}
+											onClick={controller.saveTagFn}
 										>
 											<Save className="size-4" />
 											Save
@@ -201,13 +201,13 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 							<div className="grid gap-3 sm:grid-cols-2">
 								<EditorVersionReferenceSelect
 									label="Before"
-									onChange={controller.setCompareFrom}
+									onChangeFn={controller.setCompareFromFn}
 									value={controller.compareFrom}
 									versions={versions}
 								/>
 								<EditorVersionReferenceSelect
 									label="After"
-									onChange={controller.setCompareTo}
+									onChangeFn={controller.setCompareToFn}
 									value={controller.compareTo}
 									versions={versions}
 								/>
@@ -222,9 +222,9 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 				</section>
 				{controller.confirmVersion === undefined ? null : (
 					<VersionCheckoutDialog
-						onCancel={controller.cancelCheckout}
-						onCommit={controller.goToCommit}
-						onRestore={controller.confirmCheckout}
+						onCancelFn={controller.cancelCheckoutFn}
+						onCommitFn={controller.goToCommitFn}
+						onRestoreFn={controller.confirmCheckoutFn}
 						pending={controller.checkoutPending}
 						version={controller.confirmVersion}
 					/>

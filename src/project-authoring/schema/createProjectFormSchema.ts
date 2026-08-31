@@ -65,7 +65,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			seenAvatars.add(avatar);
 		});
 
-		const validateItem = (
+		const validateItemFn = (
 			itemId: string,
 			quantity: number,
 			scope:
@@ -106,7 +106,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				"board",
 				index,
 			];
-			validateItem(
+			validateItemFn(
 				startItem.itemId,
 				startItem.quantity,
 				LocationScopeEnumSchema.enum.Board,
@@ -137,7 +137,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				"toolbar",
 				index,
 			];
-			validateItem(
+			validateItemFn(
 				startItem.itemId,
 				startItem.quantity,
 				LocationScopeEnumSchema.enum.Toolbar,
@@ -167,7 +167,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				"inventory",
 				index,
 			];
-			validateItem(
+			validateItemFn(
 				startItem.itemId,
 				startItem.quantity,
 				LocationScopeEnumSchema.enum.Inventory,

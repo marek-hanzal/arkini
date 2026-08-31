@@ -10,7 +10,7 @@ import type {
 
 interface ItemDetailCommandAtomDependencies {
 	readonly game: PlayableGame;
-	readonly readOutcomeScope: () => string | undefined;
+	readonly readOutcomeScopeFn: () => string | undefined;
 }
 
 interface ItemDetailCommandState {
@@ -57,7 +57,7 @@ const initialState = {
  */
 export const createItemDetailCommandAtom = ({
 	game,
-	readOutcomeScope,
+	readOutcomeScopeFn,
 }: ItemDetailCommandAtomDependencies) => {
 	const stateAtom = Atom.make<ItemDetailCommandState>(initialState).pipe(Atom.setIdleTTL(0));
 	const runnerAtom = Atom.fn(
@@ -82,14 +82,14 @@ export const createItemDetailCommandAtom = ({
 								};
 							}
 							if (Option.isNone(failure)) {
-								game.failStop("ui", exit.cause);
+								game.failStopFn("ui", exit.cause);
 								return {
 									...state,
 									pendingActions,
 									fatalCause: exit.cause,
 								};
 							}
-							if (readOutcomeScope() !== command.outcomeScope) {
+							if (readOutcomeScopeFn() !== command.outcomeScope) {
 								return {
 									...state,
 									pendingActions,
@@ -143,7 +143,7 @@ export const createItemDetailCommandAtom = ({
 				return;
 			}
 			if (state.pendingActions.has(command.key)) return;
-			const outcomeScope = readOutcomeScope();
+			const outcomeScope = readOutcomeScopeFn();
 			if (outcomeScope === undefined) return;
 			const token = Symbol(command.key);
 			const pendingActions = new Map(state.pendingActions);

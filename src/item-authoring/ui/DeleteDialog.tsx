@@ -10,7 +10,7 @@ const DeleteError = ({ error }: { readonly error: unknown }) =>
 		</p>
 	);
 
-const readItemTitle = (project: Project, itemId: string) =>
+const readItemTitleFn = (project: Project, itemId: string) =>
 	project.config.items[itemId]?.title || itemId;
 
 const startSurfaceTitles = {
@@ -34,28 +34,30 @@ const ForceDeleteImpactList = ({
 			);
 	}
 	for (const { ownerItemId, ruleNumber } of impact.removedMergeRules)
-		entries.push(`Remove merge rule ${ruleNumber} from ${readItemTitle(project, ownerItemId)}`);
+		entries.push(
+			`Remove merge rule ${ruleNumber} from ${readItemTitleFn(project, ownerItemId)}`,
+		);
 	for (const { ownerItemId, inputNumber } of impact.removedActionInputs)
 		entries.push(
-			`Remove action input ${inputNumber} from ${readItemTitle(project, ownerItemId)}`,
+			`Remove action input ${inputNumber} from ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const { ownerItemId, ruleNumber } of impact.removedActionRules)
 		entries.push(
-			`Remove action rule ${ruleNumber} from ${readItemTitle(project, ownerItemId)}`,
+			`Remove action rule ${ruleNumber} from ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const { ownerItemId, title } of impact.removedLines)
 		entries.push(
-			`Remove production line “${title}” from ${readItemTitle(project, ownerItemId)}`,
+			`Remove production line “${title}” from ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const ownerItemId of impact.removedChargeOutputOwnerIds)
 		entries.push(
-			`Remove the charge depletion output from ${readItemTitle(project, ownerItemId)}`,
+			`Remove the charge depletion output from ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const ownerItemId of impact.removedExpiryOutputOwnerIds)
-		entries.push(`Remove the expiry output from ${readItemTitle(project, ownerItemId)}`);
+		entries.push(`Remove the expiry output from ${readItemTitleFn(project, ownerItemId)}`);
 	for (const ownerItemId of impact.deletedOwnerItemIds)
 		entries.push(
-			`Delete ${readItemTitle(project, ownerItemId)} because its required production structure is removed`,
+			`Delete ${readItemTitleFn(project, ownerItemId)} because its required production structure is removed`,
 		);
 	return (
 		<div className="mt-4 rounded-xl border border-line bg-surface/70 p-4">
@@ -76,8 +78,8 @@ export const DeleteDialog = ({
 	item,
 	pending,
 	project,
-	onCancel,
-	onConfirm,
+	onCancelFn,
+	onConfirmFn,
 }: {
 	readonly error: unknown;
 	readonly force: boolean;
@@ -85,8 +87,8 @@ export const DeleteDialog = ({
 	readonly item: ItemSchema.Type;
 	readonly pending: boolean;
 	readonly project: Project;
-	readonly onCancel: () => void;
-	readonly onConfirm: () => void;
+	readonly onCancelFn: () => void;
+	readonly onConfirmFn: () => void;
 }) => (
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
@@ -143,7 +145,7 @@ export const DeleteDialog = ({
 				</ButtonLink>
 				<Button
 					disabled={pending}
-					onClick={onCancel}
+					onClick={onCancelFn}
 				>
 					Cancel
 				</Button>
@@ -151,7 +153,7 @@ export const DeleteDialog = ({
 					disabled={pending}
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorItemDeleteConfirm"
-					onClick={onConfirm}
+					onClick={onConfirmFn}
 				>
 					{force ? "Force delete item" : "Delete item"}
 				</DangerButton>

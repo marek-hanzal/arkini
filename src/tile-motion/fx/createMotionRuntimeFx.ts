@@ -37,7 +37,7 @@ export namespace createMotionRuntimeFx {
 		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly magneticField: MagneticField;
-		readonly readPalette: () => PixiScenePalette;
+		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
 	}
@@ -275,7 +275,7 @@ interface CueLifecycle {
 	started: boolean;
 }
 
-const createCueLifecycle = (): CueLifecycle => ({
+const createCueLifecycleFn = (): CueLifecycle => ({
 	activeSwapLegActorIds: new Set(),
 	inputRemainderRevealed: false,
 	payloadActor: null,
@@ -294,7 +294,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	animator,
 	application,
 	magneticField,
-	readPalette,
+	readPaletteFn,
 	surface,
 	textures,
 }: createMotionRuntimeFx.Props) {
@@ -305,13 +305,13 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	const detachedSwapLegByActorId = new Map<string, DetachedSwapLeg>();
 	const targetRedirectByActorId = new Map<string, MotionRedirect>();
 
-	const readCueKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
-	const readCues = () => [
+	const readCueKeyFn = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
+	const readCuesFn = () => [
 		...motionLanes.active,
 		...motionLanes.pending,
 	];
 
-	const retainNewestCueKeys = () => {
+	const retainNewestCueKeysFn = () => {
 		while (knownCueKeys.size > maximumRememberedCueKeys) {
 			const oldest = knownCueKeys.values().next().value;
 			if (oldest === undefined) return;
@@ -319,7 +319,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		}
 	};
 
-	const retainNewestTargetRedirects = () => {
+	const retainNewestTargetRedirectsFn = () => {
 		while (targetRedirectByActorId.size > maximumRememberedTargetRedirects) {
 			const oldest = targetRedirectByActorId.keys().next().value;
 			if (oldest === undefined) return;
@@ -327,7 +327,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		}
 	};
 
-	const readTargetRoute = (actorId: string, location: TargetRoute["location"]): TargetRoute => {
+	const readTargetRouteFn = (actorId: string, location: TargetRoute["location"]): TargetRoute => {
 		let currentActorId = actorId;
 		let currentLocation = location;
 		let redirected = false;
@@ -347,17 +347,17 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		};
 	};
 
-	const readInteractionClaims = () => {
-		const claims = readInteractionClaimsFn(readCues());
+	const readCurrentInteractionClaimsFn = () => {
+		const claims = readInteractionClaimsFn(readCuesFn());
 		for (const actorId of detachedSwapLegByActorId.keys()) {
 			claims.set(actorId, "handoff");
 		}
 		return claims;
 	};
 
-	const readRetainedActorIds = () => {
+	const readRetainedActorIdsFn = () => {
 		const actorIds = new Set(detachedSwapLegByActorId.keys());
-		for (const cue of readCues()) {
+		for (const cue of readCuesFn()) {
 			for (const actorId of readTileMotionActorClaimsFn(cue)) {
 				actorIds.add(actorId);
 			}
@@ -365,8 +365,8 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		return actorIds;
 	};
 
-	const readQuantityPresentation = () => {
-		const cues = readCues();
+	const readCurrentQuantityPresentationFn = () => {
+		const cues = readCuesFn();
 		const revealedInputCueKeys = new Set(
 			[
 				...cueLifecycleByKey.entries(),
@@ -385,8 +385,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					cue.kind === "stack"
 						? [
 								[
-									readCueKey(cue),
-									readTargetRoute(cue.targetActorId, cue.targetLocation).actorId,
+									readCueKeyFn(cue),
+									readTargetRouteFn(cue.targetActorId, cue.targetLocation)
+										.actorId,
 								],
 							]
 						: [],
@@ -396,21 +397,21 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		});
 	};
 
-	const syncPresentation = () => {
+	const syncPresentationFn = () => {
 		RendererRuntime.runSync(
 			syncMotionPresentationFx({
 				actorStore,
 				animator,
 				application,
-				quantityPresentationByActorId: readQuantityPresentation(),
-				readPalette,
+				quantityPresentationByActorId: readCurrentQuantityPresentationFn(),
+				readPaletteFn,
 				surface,
 				textures,
 			}),
 		);
 	};
 
-	const releaseDetachedCueLifecycleIfSettled = (cueKey: string) => {
+	const releaseDetachedCueLifecycleIfSettledFn = (cueKey: string) => {
 		const lifecycle = cueLifecycleByKey.get(cueKey);
 		if (lifecycle === undefined || lifecycle.activeSwapLegActorIds.size > 0) return;
 		const hasDetachedLeg = [
@@ -420,7 +421,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	};
 
 	function completeCue(cue: TileMotionCue) {
-		const cueKey = readCueKey(cue);
+		const cueKey = readCueKeyFn(cue);
 		const lifecycle = cueLifecycleByKey.get(cueKey);
 		if (closed || lifecycle?.started !== true) return;
 		cueLifecycleByKey.delete(cueKey);
@@ -433,7 +434,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			detachedSwapLegByActorId.size > 0
 				? {
 						active: motionLanes.active.filter(
-							(activeCue) => readCueKey(activeCue) !== readCueKey(cue),
+							(activeCue) => readCueKeyFn(activeCue) !== readCueKeyFn(cue),
 						),
 						pending: motionLanes.pending,
 					}
@@ -444,20 +445,20 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 						},
 						state: motionLanes,
 					});
-		const stillClaimedActorIds = readRetainedActorIds();
+		const stillClaimedActorIds = readRetainedActorIdsFn();
 		RendererRuntime.runSync(
 			finalizeMotionActorsFx({
 				actorIds: readTileMotionActorClaimsFn(cue),
 				actorStore,
 				animator,
 				application,
-				readPalette,
+				readPaletteFn,
 				stillClaimedActorIds,
 				surface,
 				textures,
 			}),
 		);
-		syncPresentation();
+		syncPresentationFn();
 		if (
 			cue.kind === "input" &&
 			!stillClaimedActorIds.has(cue.sourceActorId) &&
@@ -489,7 +490,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		const detached = detachedSwapLegByActorId.get(actorId);
 		if (detached?.cueKey !== cueKey) return;
 		detachedSwapLegByActorId.delete(actorId);
-		releaseDetachedCueLifecycleIfSettled(cueKey);
+		releaseDetachedCueLifecycleIfSettledFn(cueKey);
 		RendererRuntime.runSync(
 			finalizeMotionActorsFx({
 				actorIds: new Set([
@@ -498,8 +499,8 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				actorStore,
 				animator,
 				application,
-				readPalette,
-				stillClaimedActorIds: readRetainedActorIds(),
+				readPaletteFn,
+				stillClaimedActorIds: readRetainedActorIdsFn(),
 				surface,
 				textures,
 			}),
@@ -512,18 +513,18 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			},
 			state: motionLanes,
 		});
-		syncPresentation();
+		syncPresentationFn();
 		startCues();
 	}
 
 	function startCue(cue: TileMotionCue) {
-		const cueKey = readCueKey(cue);
-		const readSourceSurvives = () => {
+		const cueKey = readCueKeyFn(cue);
+		const readSourceSurvivesFn = () => {
 			if (cue.kind !== "input") return false;
 			if (cue.sourceItem === undefined) {
 				return actorStore.canonicalItems.has(cue.sourceActorId);
 			}
-			const latest = readCues()
+			const latest = readCuesFn()
 				.filter(
 					(candidate) =>
 						candidate.kind === "input" && candidate.sourceActorId === cue.sourceActorId,
@@ -539,26 +540,26 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				cue,
 				cueKey,
 				magneticField,
-				onComplete: () => completeCue(cue),
-				onSwapLegSettled: (actorId) => {
+				onCompleteFn: () => completeCue(cue),
+				onSwapLegSettledFn: (actorId) => {
 					settleSwapLeg(cueKey, actorId);
 				},
-				onSwapLegStarted: (actorId) => {
+				onSwapLegStartedFn: (actorId) => {
 					startSwapLeg(cueKey, actorId);
 				},
-				onPayloadCreated: (actor) => {
+				onPayloadCreatedFn: (actor) => {
 					const lifecycle = cueLifecycleByKey.get(cueKey);
 					if (lifecycle !== undefined) lifecycle.payloadActor = actor;
 				},
-				onInputRemainderRevealed: () => {
+				onInputRemainderRevealedFn: () => {
 					const lifecycle = cueLifecycleByKey.get(cueKey);
 					if (lifecycle === undefined) return;
 					lifecycle.inputRemainderRevealed = true;
-					syncPresentation();
+					syncPresentationFn();
 				},
-				readPalette,
-				readSourceSurvives,
-				readTargetRoute,
+				readPaletteFn,
+				readSourceSurvivesFn,
+				readTargetRouteFn,
 				surface,
 				textures,
 			}),
@@ -567,7 +568,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 
 	function startCues() {
 		for (const cue of motionLanes.active) {
-			const cueKey = readCueKey(cue);
+			const cueKey = readCueKeyFn(cue);
 			const lifecycle = cueLifecycleByKey.get(cueKey);
 			if (lifecycle === undefined || lifecycle.started) continue;
 			lifecycle.started = true;
@@ -575,7 +576,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		}
 	}
 
-	const settleReleasedActor = (actorId: string) =>
+	const settleReleasedActorFx = (actorId: string) =>
 		Effect.gen(function* () {
 			const actor = actorStore.actors.get(actorId);
 			const canonical = actorStore.canonicalItems.get(actorId);
@@ -586,7 +587,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				actor,
 				animator,
 				fallbackTarget: target,
-				onSettled: () => {
+				onSettledFn: () => {
 					if (actor.container.destroyed) return;
 					const latest = actorStore.canonicalItems.get(actorId);
 					if (latest === undefined) return;
@@ -599,7 +600,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			});
 		});
 
-	const isInterruptibleCueForActor = (
+	const isInterruptibleCueForActorFn = (
 		cue: TileMotionCue,
 		actorId: string,
 	): cue is TileSpawnMotionCue | TileSwapMotionCue =>
@@ -641,12 +642,12 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					detachedSwapLegByActorId.delete(actorId);
 					const lifecycle = cueLifecycleByKey.get(detached.cueKey);
 					lifecycle?.activeSwapLegActorIds.delete(actorId);
-					releaseDetachedCueLifecycleIfSettled(detached.cueKey);
+					releaseDetachedCueLifecycleIfSettledFn(detached.cueKey);
 				}
-				const cues = readCues();
+				const cues = readCuesFn();
 				const superseded = cues.filter(
 					(cue): cue is TileSpawnMotionCue | TileSwapMotionCue =>
-						isInterruptibleCueForActor(cue, actorId),
+						isInterruptibleCueForActorFn(cue, actorId),
 				);
 				if (superseded.length === 0) {
 					if (!handedOffDetached) return false;
@@ -658,15 +659,15 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 							},
 							state: motionLanes,
 						});
-						syncPresentation();
+						syncPresentationFn();
 						startCues();
 					}
 					return true;
 				}
-				const supersededCueKeys = new Set(superseded.map(readCueKey));
+				const supersededCueKeys = new Set(superseded.map(readCueKeyFn));
 				const hasBlockingClaim = cues.some(
 					(cue) =>
-						!supersededCueKeys.has(readCueKey(cue)) &&
+						!supersededCueKeys.has(readCueKeyFn(cue)) &&
 						readTileMotionActorClaimsFn(cue).has(actorId),
 				);
 				if (hasBlockingClaim) return false;
@@ -677,7 +678,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				const activeSpawnActorIds = new Set<string>();
 				const pendingSpawnActorIds = new Set<string>();
 				for (const cue of superseded) {
-					const cueKey = readCueKey(cue);
+					const cueKey = readCueKeyFn(cue);
 					const lifecycle = cueLifecycleByKey.get(cueKey);
 					const started = lifecycle?.started === true;
 					if (lifecycle !== undefined) lifecycle.started = false;
@@ -730,10 +731,10 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				}
 				const filteredMotionLanes = {
 					active: motionLanes.active.filter(
-						(cue) => !supersededCueKeys.has(readCueKey(cue)),
+						(cue) => !supersededCueKeys.has(readCueKeyFn(cue)),
 					),
 					pending: motionLanes.pending.filter(
-						(cue) => !supersededCueKeys.has(readCueKey(cue)),
+						(cue) => !supersededCueKeys.has(readCueKeyFn(cue)),
 					),
 				};
 				motionLanes =
@@ -747,10 +748,10 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 								state: filteredMotionLanes,
 							});
 				for (const cueKey of supersededCueKeys) {
-					releaseDetachedCueLifecycleIfSettled(cueKey);
+					releaseDetachedCueLifecycleIfSettledFn(cueKey);
 				}
 
-				const stillClaimedActorIds = readRetainedActorIds();
+				const stillClaimedActorIds = readRetainedActorIdsFn();
 				const settleActorIds = new Set(
 					[
 						...pendingCounterpartIds,
@@ -768,12 +769,12 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 						actorStore,
 						animator,
 						application,
-						readPalette,
+						readPaletteFn,
 						stillClaimedActorIds,
 						surface,
 						textures,
 					});
-					yield* Effect.forEach(settleActorIds, settleReleasedActor, {
+					yield* Effect.forEach(settleActorIds, settleReleasedActorFx, {
 						discard: true,
 					});
 				}
@@ -788,7 +789,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 						animator,
 					});
 				}
-				syncPresentation();
+				syncPresentationFn();
 				if (detachedSwapLegByActorId.size === 0) startCues();
 				return true;
 			}),
@@ -797,13 +798,13 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			Effect.sync(() => {
 				if (closed || cues.length === 0) return;
 				const uniqueCues = cues.filter((cue) => {
-					const cueKey = readCueKey(cue);
+					const cueKey = readCueKeyFn(cue);
 					if (knownCueKeys.has(cueKey)) return false;
 					knownCueKeys.add(cueKey);
-					cueLifecycleByKey.set(cueKey, createCueLifecycle());
+					cueLifecycleByKey.set(cueKey, createCueLifecycleFn());
 					return true;
 				});
-				retainNewestCueKeys();
+				retainNewestCueKeysFn();
 				if (uniqueCues.length === 0) return;
 				motionLanes =
 					detachedSwapLegByActorId.size > 0
@@ -830,15 +831,15 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				}
 				targetRedirectByActorId.delete(redirect.sourceActorId);
 				targetRedirectByActorId.set(redirect.sourceActorId, redirect);
-				retainNewestTargetRedirects();
+				retainNewestTargetRedirectsFn();
 			}),
 		),
 		readSnapshotFx: Effect.sync(
 			(): MotionSnapshot => ({
-				interactionClaimByActorId: readInteractionClaims(),
-				retainedActorIds: readRetainedActorIds(),
+				interactionClaimByActorId: readCurrentInteractionClaimsFn(),
+				retainedActorIds: readRetainedActorIdsFn(),
 				spawnCueByActorId: new Map(
-					readCues().flatMap((cue) =>
+					readCuesFn().flatMap((cue) =>
 						cue.kind === "spawn"
 							? [
 									[
@@ -849,16 +850,16 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 							: [],
 					),
 				),
-				quantityPresentationByActorId: readQuantityPresentation(),
+				quantityPresentationByActorId: readCurrentQuantityPresentationFn(),
 			}),
 		),
 		startFx: Effect.sync(() => startCues()),
-		syncPresentationFx: Effect.sync(() => syncPresentation()),
+		syncPresentationFx: Effect.sync(() => syncPresentationFn()),
 		closeFx: Effect.gen(function* () {
 			if (closed) return;
 			closed = true;
 			for (const cue of motionLanes.active) {
-				const cueKey = readCueKey(cue);
+				const cueKey = readCueKeyFn(cue);
 				if (cueLifecycleByKey.get(cueKey)?.started !== true) continue;
 				const animationKeys = readMotionAnimationKeysFn({
 					cue,

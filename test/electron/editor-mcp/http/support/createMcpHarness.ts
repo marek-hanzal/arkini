@@ -112,7 +112,7 @@ export interface McpHarness {
 }
 
 export const createMcpHarness = async (
-	runPromise: createEditorMcpOwnershipFx.Props["runPromise"] = Effect.runPromise,
+	runPromiseFn: createEditorMcpOwnershipFx.Props["runPromiseFn"] = Effect.runPromise,
 	notifyProjectChanged: (projectId: string) => void = () => undefined,
 ): Promise<McpHarness> => {
 	const repository = await createProjectRepository();
@@ -124,10 +124,10 @@ export const createMcpHarness = async (
 				type: "ready",
 				repository,
 			},
-			notifyOverviewChanged: () => undefined,
-			notifyProjectChanged,
+			notifyOverviewChangedFn: () => undefined,
+			notifyProjectChangedFn: notifyProjectChanged,
 			storage,
-			runPromise,
+			runPromiseFn,
 			tunnel: {
 				openFx: () =>
 					Effect.fail(new Error("Remote MCP is unavailable in the local harness.")),

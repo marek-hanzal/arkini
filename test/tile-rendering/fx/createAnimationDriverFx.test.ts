@@ -134,17 +134,17 @@ const createDriver = () => {
 	const frameCallbacks = new Map<number, FrameRequestCallback>();
 	let nextFrameId = 0;
 	const invalidate = vi.fn();
-	const reportCriticalFailure = vi.fn();
+	const reportCriticalFailureFn = vi.fn();
 	const driver = Effect.runSync(
 		createAnimationDriverFx({
-			cancelFrame: (frameId) => {
+			cancelFrameFn: (frameId) => {
 				frameCallbacks.delete(frameId);
 			},
 			frames: {
 				invalidateFx: Effect.sync(invalidate),
-				reportCriticalFailure,
+				reportCriticalFailureFn,
 			} as unknown as DemandFrameLoop,
-			requestFrame: (callback) => {
+			requestFrameFn: (callback) => {
 				nextFrameId += 1;
 				frameCallbacks.set(nextFrameId, callback);
 				return nextFrameId;
@@ -162,7 +162,7 @@ const createDriver = () => {
 		},
 		frameCallbacks,
 		invalidate,
-		reportCriticalFailure,
+		reportCriticalFailureFn,
 	};
 };
 
@@ -186,8 +186,8 @@ describe("animation driver", () => {
 				delayMs: 120,
 				durationMs: 450,
 				from: 0,
-				onComplete,
-				onUpdate,
+				onCompleteFn: onComplete,
+				onUpdateFn: onUpdate,
 				to: 1,
 			}),
 		);
@@ -223,7 +223,7 @@ describe("animation driver", () => {
 				},
 				durationMs: 1_760,
 				from: 0,
-				onUpdate: vi.fn(),
+				onUpdateFn: vi.fn(),
 				repeat: Number.POSITIVE_INFINITY,
 				to: 1,
 			}),
@@ -258,7 +258,7 @@ describe("animation driver", () => {
 				},
 				durationMs: 160,
 				from: 0,
-				onUpdate: vi.fn(),
+				onUpdateFn: vi.fn(),
 				to: 1,
 			}),
 		);
@@ -280,8 +280,8 @@ describe("animation driver", () => {
 			driver.startTweenFx({
 				durationMs: 300,
 				from: 0,
-				onComplete,
-				onUpdate: vi.fn(),
+				onCompleteFn: onComplete,
+				onUpdateFn: vi.fn(),
 				to: 1,
 			}),
 		);
@@ -298,15 +298,15 @@ describe("animation driver", () => {
 	});
 
 	it("reports consumer callback failures while containing Motion callbacks", () => {
-		const { driver, flushFrames, invalidate, reportCriticalFailure } = createDriver();
+		const { driver, flushFrames, invalidate, reportCriticalFailureFn } = createDriver();
 		Effect.runSync(
 			driver.startTweenFx({
 				durationMs: 300,
 				from: 0,
-				onComplete: () => {
+				onCompleteFn: () => {
 					throw new Error("complete failed");
 				},
-				onUpdate: () => {
+				onUpdateFn: () => {
 					throw new Error("update failed");
 				},
 				to: 1,
@@ -317,7 +317,7 @@ describe("animation driver", () => {
 		expect(() => motionState.tweens[0]?.onComplete()).not.toThrow();
 		expect(() => flushFrames()).not.toThrow();
 		expect(invalidate).toHaveBeenCalledOnce();
-		expect(reportCriticalFailure).toHaveBeenCalledTimes(2);
+		expect(reportCriticalFailureFn).toHaveBeenCalledTimes(2);
 	});
 
 	it("cancels presentation completion while the final frame is pending", () => {
@@ -327,8 +327,8 @@ describe("animation driver", () => {
 			driver.startTweenFx({
 				durationMs: 300,
 				from: 0,
-				onComplete,
-				onUpdate: vi.fn(),
+				onCompleteFn: onComplete,
+				onUpdateFn: vi.fn(),
 				to: 1,
 			}),
 		);
@@ -348,7 +348,7 @@ describe("animation driver", () => {
 		const spring = Effect.runSync(
 			driver.createSpringFx({
 				initialValue: 0,
-				onUpdate,
+				onUpdateFn: onUpdate,
 				options: {
 					damping: 30,
 					mass: 1,
@@ -386,14 +386,14 @@ describe("animation driver", () => {
 			driver.startTweenFx({
 				durationMs: 300,
 				from: 0,
-				onUpdate: vi.fn(),
+				onUpdateFn: vi.fn(),
 				to: 1,
 			}),
 		);
 		Effect.runSync(
 			driver.createSpringFx({
 				initialValue: 0,
-				onUpdate: vi.fn(),
+				onUpdateFn: vi.fn(),
 				options: {
 					damping: 30,
 					mass: 1,
@@ -416,14 +416,14 @@ describe("animation driver", () => {
 			driver.startTweenFx({
 				durationMs: 300,
 				from: 0,
-				onUpdate: vi.fn(),
+				onUpdateFn: vi.fn(),
 				to: 1,
 			}),
 		);
 		Effect.runSync(
 			driver.createSpringFx({
 				initialValue: 0,
-				onUpdate: vi.fn(),
+				onUpdateFn: vi.fn(),
 				options: {
 					damping: 30,
 					mass: 1,
@@ -444,7 +444,7 @@ describe("animation driver", () => {
 		const { driver } = createDriver();
 		const props = {
 			initialValue: 0,
-			onUpdate: vi.fn(),
+			onUpdateFn: vi.fn(),
 			options: {
 				damping: 30,
 				mass: 1,
@@ -473,7 +473,7 @@ describe("animation driver", () => {
 				driver.startTweenFx({
 					durationMs: 300,
 					from: 0,
-					onUpdate: vi.fn(),
+					onUpdateFn: vi.fn(),
 					to: 1,
 				}),
 			),
@@ -489,7 +489,7 @@ describe("animation driver", () => {
 				driver.startTweenFx({
 					durationMs: 300,
 					from: 0,
-					onUpdate: vi.fn(),
+					onUpdateFn: vi.fn(),
 					to: 1,
 				}),
 			);

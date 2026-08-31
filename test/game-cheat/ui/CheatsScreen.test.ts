@@ -92,7 +92,7 @@ vi.mock("~/game-cheat/ui/useCheatsModel", async () => {
 				blocked,
 				enabled: true,
 				instantGameplay: false,
-				requestExit: (runFx: import("effect").Effect.Effect<void, unknown>) => {
+				requestExitFn: (runFx: import("effect").Effect.Effect<void, unknown>) => {
 					if (state.blocked) return;
 					state.publishBlocked(true);
 					void Effect.runPromise(runFx)
@@ -102,8 +102,8 @@ vi.mock("~/game-cheat/ui/useCheatsModel", async () => {
 				status: {
 					kind: "idle" as const,
 				},
-				setEnabled: vi.fn(),
-				setInstantGameplay: vi.fn(),
+				setEnabledFn: vi.fn(),
+				setInstantGameplayFn: vi.fn(),
 			};
 		},
 	};
@@ -113,18 +113,18 @@ vi.mock("~/game-cheat/ui/Cheats", async () => {
 	return {
 		Cheats: ({
 			model,
-			onBack,
+			onBackFn,
 		}: {
 			readonly model: {
 				readonly blocked: boolean;
 			};
-			readonly onBack: () => void;
+			readonly onBackFn: () => void;
 		}) => {
 			return createElement(
 				"button",
 				{
 					disabled: model.blocked,
-					onClick: onBack,
+					onClick: onBackFn,
 					type: "button",
 				},
 				"Back to game",

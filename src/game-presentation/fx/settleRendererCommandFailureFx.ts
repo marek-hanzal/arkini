@@ -8,15 +8,15 @@ export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFa
 	function* <FailureError, FailureRequirements, FatalError, FatalRequirements>({
 		cause,
 		game,
-		onFailure,
-		setFatalCause,
+		onFailureFx,
+		setFatalCauseFx,
 	}: {
 		readonly cause: Cause.Cause<unknown>;
 		readonly game: PlayableGame;
-		readonly onFailure: (
+		readonly onFailureFx: (
 			failure: unknown,
 		) => Effect.Effect<void, FailureError, FailureRequirements>;
-		readonly setFatalCause: (
+		readonly setFatalCauseFx: (
 			cause: Cause.Cause<unknown>,
 		) => Effect.Effect<void, FatalError, FatalRequirements>;
 	}) {
@@ -25,10 +25,10 @@ export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFa
 		}
 		const failure = readExactCauseFailureFn(cause);
 		if (Option.isSome(failure)) {
-			return yield* onFailure(failure.value);
+			return yield* onFailureFx(failure.value);
 		}
-		game.failStop("ui", cause);
-		yield* setFatalCause(cause);
+		game.failStopFn("ui", cause);
+		yield* setFatalCauseFx(cause);
 		return yield* Effect.failCause(cause);
 	},
 );

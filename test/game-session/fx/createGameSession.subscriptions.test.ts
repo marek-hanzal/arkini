@@ -17,8 +17,8 @@ describe("createGameSessionFx / subscription visibility", () => {
 		const afterSubscribeDelivered = Effect.runSync(Deferred.make<void>());
 
 		try {
-			await session.run(emitCompletedEventFx("job:event:before-subscribe"));
-			const unsubscribe = session.subscribeEvents((batch) => {
+			await session.runFn(emitCompletedEventFx("job:event:before-subscribe"));
+			const unsubscribe = session.subscribeEventsFn((batch) => {
 				jobIds.push(
 					...batch.events.flatMap((event) =>
 						"jobId" in event
@@ -36,7 +36,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 			try {
 				expect(jobIds).toEqual([]);
 
-				await session.run(emitCompletedEventFx("job:event:after-subscribe"));
+				await session.runFn(emitCompletedEventFx("job:event:after-subscribe"));
 				await Effect.runPromise(Deferred.await(afterSubscribeDelivered));
 				expect(jobIds).toEqual([
 					"job:event:after-subscribe",
@@ -60,7 +60,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:before-subscribe",
 					itemId: "water",
@@ -74,11 +74,11 @@ describe("createGameSessionFx / subscription visibility", () => {
 					quantity: 1,
 				}),
 			);
-			const unsubscribe = session.subscribe(() => {
+			const unsubscribe = session.subscribeFn(() => {
 				notifications += 1;
 				if (
 					session
-						.getSnapshot()
+						.getSnapshotFn()
 						.items.some((item) => item.id === "runtime:after-subscribe")
 				) {
 					markAfterSubscribeDelivered?.();
@@ -88,7 +88,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 			try {
 				expect(notifications).toBe(0);
 
-				await session.run(
+				await session.runFn(
 					spawnItemFx({
 						id: "runtime:after-subscribe",
 						itemId: "water",
@@ -122,18 +122,18 @@ describe("createGameSessionFx / subscription visibility", () => {
 		const eventDelivered = new Promise<void>((resolve) => {
 			markEventDelivered = resolve;
 		});
-		const unsubscribeRuntime = session.subscribe(() => {
+		const unsubscribeRuntime = session.subscribeFn(() => {
 			runtimeNotifications += 1;
 		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
+		const unsubscribeEvents = session.subscribeEventsFn(() => {
 			eventNotifications += 1;
 			markEventDelivered?.();
 		});
 
 		try {
-			const before = session.getSnapshot();
-			await session.run(emitCompletedEventFx("job:event-only"));
-			expect(session.getSnapshot()).toBe(before);
+			const before = session.getSnapshotFn();
+			await session.runFn(emitCompletedEventFx("job:event-only"));
+			expect(session.getSnapshotFn()).toBe(before);
 			await eventDelivered;
 			expect(eventNotifications).toBe(1);
 			expect(runtimeNotifications).toBe(0);
@@ -153,22 +153,24 @@ describe("createGameSessionFx / subscription visibility", () => {
 		const markerDelivered = new Promise<void>((resolve) => {
 			markMarkerDelivered = resolve;
 		});
-		const unsubscribe = session.subscribe(() => {
+		const unsubscribe = session.subscribeFn(() => {
 			notifications += 1;
 			if (
-				session.getSnapshot().items.some((item) => item.id === "runtime:no-op-tick:marker")
+				session
+					.getSnapshotFn()
+					.items.some((item) => item.id === "runtime:no-op-tick:marker")
 			) {
 				markMarkerDelivered?.();
 			}
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				advanceRuntimeElapsedFx({
 					elapsedMs: 100,
 				}),
 			);
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:no-op-tick:marker",
 					itemId: "water",

@@ -5,61 +5,61 @@ const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 const closeFailedListeners = new Set<(error: unknown) => void>();
 const chatGptStateListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["chatGpt"]["onStateChanged"]>[0]
+	Parameters<ArkiniElectronApi.Api["chatGpt"]["onStateChangedFn"]>[0]
 >();
 const chatGptAssetCandidateListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["chatGpt"]["onAssetCandidate"]>[0]
+	Parameters<ArkiniElectronApi.Api["chatGpt"]["onAssetCandidateFn"]>[0]
 >();
 const editorProjectChangedListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChanged"]>[0]
+	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChangedFn"]>[0]
 >();
 const editorMcpVersionCheckoutListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editorMcp"]["onVersionCheckoutRequested"]>[0]
+	Parameters<ArkiniElectronApi.Api["editorMcp"]["onVersionCheckoutRequestedFn"]>[0]
 >();
 const editorMcpOverviewListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editorMcp"]["onOverviewChanged"]>[0]
+	Parameters<ArkiniElectronApi.Api["editorMcp"]["onOverviewChangedFn"]>[0]
 >();
 const windowModeListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["window"]["onModeChanged"]>[0]
+	Parameters<ArkiniElectronApi.Api["window"]["onModeChangedFn"]>[0]
 >();
 let closing = false;
 let requestedClose:
 	| {
 			readonly promise: Promise<void>;
-			readonly resolve: () => void;
-			readonly reject: (error: unknown) => void;
+			readonly resolveFn: () => void;
+			readonly rejectFn: (error: unknown) => void;
 	  }
 	| undefined;
 let visibleAtMs: number | undefined;
-let resolveVisible!: (visibleAtMs: number) => void;
-const visiblePromise = new Promise<number>((resolve) => {
-	resolveVisible = resolve;
+let resolveVisibleFn!: (visibleAtMs: number) => void;
+const visiblePromise = new Promise<number>((resolveFn) => {
+	resolveVisibleFn = resolveFn;
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.windowVisible, () => {
 	if (visibleAtMs !== undefined) return;
 	visibleAtMs = performance.now();
-	resolveVisible(visibleAtMs);
+	resolveVisibleFn(visibleAtMs);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.windowModeChanged, (_event, mode) => {
-	for (const listener of Array.from(windowModeListeners)) listener(mode);
+	for (const listenerFn of Array.from(windowModeListeners)) listenerFn(mode);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.editorProjectChanged, (_event, projectId) => {
-	for (const listener of Array.from(editorProjectChangedListeners)) listener(projectId);
+	for (const listenerFn of Array.from(editorProjectChangedListeners)) listenerFn(projectId);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.editorMcpOverviewChanged, (_event, overview) => {
-	for (const listener of Array.from(editorMcpOverviewListeners)) listener(overview);
+	for (const listenerFn of Array.from(editorMcpOverviewListeners)) listenerFn(overview);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.chatGptStateChanged, (_event, state) => {
-	for (const listener of Array.from(chatGptStateListeners)) listener(state);
+	for (const listenerFn of Array.from(chatGptStateListeners)) listenerFn(state);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.chatGptAssetCandidate, (_event, candidate) => {
-	for (const listener of Array.from(chatGptAssetCandidateListeners)) listener(candidate);
+	for (const listenerFn of Array.from(chatGptAssetCandidateListeners)) listenerFn(candidate);
 });
 
 ipcRenderer.on(
@@ -91,223 +91,228 @@ ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
 	closing = true;
 	try {
-		await Promise.all(Array.from(beforeCloseListeners, (listener) => listener()));
-		await Promise.all(Array.from(beforeCloseReadyListeners, (listener) => listener()));
-		requestedClose?.resolve();
+		await Promise.all(Array.from(beforeCloseListeners, (listenerFn) => listenerFn()));
+		await Promise.all(Array.from(beforeCloseReadyListeners, (listenerFn) => listenerFn()));
+		requestedClose?.resolveFn();
 		requestedClose = undefined;
 		ipcRenderer.send(ArkiniElectronApi.channels.closeReady);
 	} catch (error) {
 		closing = false;
-		for (const listener of Array.from(closeFailedListeners)) listener(error);
+		for (const listenerFn of Array.from(closeFailedListeners)) listenerFn(error);
 		ipcRenderer.send(ArkiniElectronApi.channels.closeFailed, String(error));
-		requestedClose?.reject(error);
+		requestedClose?.rejectFn(error);
 		requestedClose = undefined;
 	}
 });
 
 const api: ArkiniElectronApi.Api = {
 	appearance: {
-		read: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceRead),
-		write: (theme) => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceWrite, theme),
-		readAccent: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentRead),
-		writeAccent: (accent) =>
+		readFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceRead),
+		writeFn: (theme) => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceWrite, theme),
+		readAccentFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentRead),
+		writeAccentFn: (accent) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentWrite, accent),
 	},
 	cheats: {
-		readAvailable: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityRead),
-		writeAvailable: (available) =>
+		readAvailableFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityRead),
+		writeAvailableFn: (available) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
 	},
 	chatGpt: {
-		setSurface: (surface) =>
+		setSurfaceFn: (surface) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.chatGptSurfaceSet, surface),
-		onStateChanged: (listener) => {
-			chatGptStateListeners.add(listener);
-			return () => chatGptStateListeners.delete(listener);
+		onStateChangedFn: (listenerFn) => {
+			chatGptStateListeners.add(listenerFn);
+			return () => chatGptStateListeners.delete(listenerFn);
 		},
-		onAssetCandidate: (listener) => {
-			chatGptAssetCandidateListeners.add(listener);
-			return () => chatGptAssetCandidateListeners.delete(listener);
+		onAssetCandidateFn: (listenerFn) => {
+			chatGptAssetCandidateListeners.add(listenerFn);
+			return () => chatGptAssetCandidateListeners.delete(listenerFn);
 		},
 	},
 	clipboard: {
-		writeText: (text) =>
+		writeTextFn: (text) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.clipboardWriteText, text),
 	},
 	cli: {
-		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
-		install: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliInstall),
-		replace: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliReplace),
-		uninstall: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliUninstall),
+		statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
+		installFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliInstall),
+		replaceFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliReplace),
+		uninstallFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliUninstall),
 		completion: {
-			status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionStatus),
-			install: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionInstall),
-			replace: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionReplace),
-			uninstall: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionUninstall),
+			statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionStatus),
+			installFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionInstall),
+			replaceFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionReplace),
+			uninstallFn: () =>
+				ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionUninstall),
 		},
 	},
 	launcher: {
-		readLastPackageId: () =>
+		readLastPackageIdFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead),
-		writeLastPackageId: (packageId) =>
+		writeLastPackageIdFn: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
 	editor: {
-		buildProject: (request) =>
+		buildProjectFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuild, request),
-		readProjectBuild: (request) =>
+		readProjectBuildFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildRead, request),
-		saveProjectBuild: (request) =>
+		saveProjectBuildFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildSave, request),
-		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
-		awaitIdle: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
-		createProject: (request) =>
+		statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
+		awaitIdleFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
+		createProjectFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, request),
-		deleteProject: (projectId) =>
+		deleteProjectFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDelete, projectId),
-		deleteItem: (request) =>
+		deleteItemFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, request),
-		deleteResource: (request) =>
+		deleteResourceFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteResource, request),
-		exportJsonDirectory: (projectId) =>
+		exportJsonDirectoryFn: (projectId) =>
 			ipcRenderer.invoke(
 				ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 				projectId,
 			),
-		importJsonDirectory: () =>
+		importJsonDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportJsonDirectory),
-		listProjects: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
-		openExportDirectory: () =>
+		listProjectsFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
+		openExportDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
-		openProjectDirectory: (root) =>
+		openProjectDirectoryFn: (root) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, root),
-		readProject: (projectId) =>
+		readProjectFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
-		refreshProject: (projectId) =>
+		refreshProjectFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRefresh, projectId),
-		onProjectChanged: (listener) => {
-			editorProjectChangedListeners.add(listener);
-			return () => editorProjectChangedListeners.delete(listener);
+		onProjectChangedFn: (listenerFn) => {
+			editorProjectChangedListeners.add(listenerFn);
+			return () => editorProjectChangedListeners.delete(listenerFn);
 		},
-		replaceConfig: (request) =>
+		replaceConfigFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
-		replaceResource: (request) =>
+		replaceResourceFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceResource, request),
-		saveResource: (request) =>
+		saveResourceFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectSaveResource, request),
-		upsertItem: (request) =>
+		upsertItemFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
-		upsertResources: (request) =>
+		upsertResourcesFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertResources, request),
-		listNotes: (projectId) =>
+		listNotesFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteList, projectId),
-		createNote: (request) =>
+		createNoteFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteCreate, request),
-		updateNote: (request) =>
+		updateNoteFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteUpdate, request),
-		deleteNote: (request) =>
+		deleteNoteFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteDelete, request),
-		listBoardScenarios: (projectId) =>
+		listBoardScenariosFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioList, projectId),
-		readBoardScenario: (request) =>
+		readBoardScenarioFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioRead, request),
-		writeBoardScenario: (request) =>
+		writeBoardScenarioFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioWrite, request),
-		deleteBoardScenario: (request) =>
+		deleteBoardScenarioFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioDelete, request),
-		readVersionStatus: (projectId) =>
+		readVersionStatusFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionStatus, projectId),
-		listVersions: (projectId) =>
+		listVersionsFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionList, projectId),
-		diffVersions: (request) =>
+		diffVersionsFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionDiff, request),
-		createVersion: (request) =>
+		createVersionFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCommit, request),
-		checkoutVersion: (request) =>
+		checkoutVersionFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCheckout, request),
-		updateVersionTag: (request) =>
+		updateVersionTagFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionTag, request),
 	},
 	editorMcp: {
-		readOverview: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpOverviewRead),
-		configure: (configuration) =>
+		readOverviewFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpOverviewRead),
+		configureFn: (configuration) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpConfigure, configuration),
-		command: (command) =>
+		commandFn: (command) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpCommand, command),
-		onOverviewChanged: (listener) => {
-			editorMcpOverviewListeners.add(listener);
-			return () => editorMcpOverviewListeners.delete(listener);
+		onOverviewChangedFn: (listenerFn) => {
+			editorMcpOverviewListeners.add(listenerFn);
+			return () => editorMcpOverviewListeners.delete(listenerFn);
 		},
-		setProjectContext: (projectId) =>
+		setProjectContextFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextSet, projectId),
-		clearProjectContext: (projectId) =>
+		clearProjectContextFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextClear, projectId),
-		onVersionCheckoutRequested: (listener) => {
-			editorMcpVersionCheckoutListeners.add(listener);
-			return () => editorMcpVersionCheckoutListeners.delete(listener);
+		onVersionCheckoutRequestedFn: (listenerFn) => {
+			editorMcpVersionCheckoutListeners.add(listenerFn);
+			return () => editorMcpVersionCheckoutListeners.delete(listenerFn);
 		},
 	},
 	arkpack: {
-		list: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
-		read: (packageId) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),
-		install: (record) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstall, record),
-		remove: (packageId) =>
+		listFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
+		readFn: (packageId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),
+		installFn: (record) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstall, record),
+		removeFn: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRemove, packageId),
-		openUserDirectory: () =>
+		openUserDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackOpenUserDirectory),
 	},
 	save: {
-		read: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveRead, key),
-		write: (key, bytes) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveWrite, key, bytes),
-		clear: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveClear, key),
+		readFn: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveRead, key),
+		writeFn: (key, bytes) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.saveWrite, key, bytes),
+		clearFn: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveClear, key),
 	},
 	diagnostics: {
-		write: (record) => ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWrite, record),
-		openDirectory: () =>
+		writeFn: (record) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWrite, record),
+		openDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
 	},
 	userData: {
-		openDirectory: () => ipcRenderer.invoke(ArkiniElectronApi.channels.userDataOpenDirectory),
+		openDirectoryFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.userDataOpenDirectory),
 	},
 	window: {
-		readMode: () => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeRead),
-		writeMode: (mode) => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeWrite, mode),
-		onModeChanged: (listener) => {
-			windowModeListeners.add(listener);
-			return () => windowModeListeners.delete(listener);
+		readModeFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeRead),
+		writeModeFn: (mode) => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeWrite, mode),
+		onModeChangedFn: (listenerFn) => {
+			windowModeListeners.add(listenerFn);
+			return () => windowModeListeners.delete(listenerFn);
 		},
 	},
 	lifecycle: {
-		waitUntilVisible: () => visiblePromise,
-		onBeforeClose: (listener) => {
-			beforeCloseListeners.add(listener);
-			return () => beforeCloseListeners.delete(listener);
+		waitUntilVisibleFn: () => visiblePromise,
+		onBeforeCloseFn: (listenerFn) => {
+			beforeCloseListeners.add(listenerFn);
+			return () => beforeCloseListeners.delete(listenerFn);
 		},
-		onBeforeCloseReady: (listener) => {
-			beforeCloseReadyListeners.add(listener);
-			return () => beforeCloseReadyListeners.delete(listener);
+		onBeforeCloseReadyFn: (listenerFn) => {
+			beforeCloseReadyListeners.add(listenerFn);
+			return () => beforeCloseReadyListeners.delete(listenerFn);
 		},
-		onCloseFailed: (listener) => {
-			closeFailedListeners.add(listener);
-			return () => closeFailedListeners.delete(listener);
+		onCloseFailedFn: (listenerFn) => {
+			closeFailedListeners.add(listenerFn);
+			return () => closeFailedListeners.delete(listenerFn);
 		},
-		requestClose: () => {
+		requestCloseFn: () => {
 			if (requestedClose !== undefined) return requestedClose.promise;
-			let resolveRequest: () => void = () => undefined;
-			let rejectRequest: (error: unknown) => void = () => undefined;
-			const promise = new Promise<void>((resolve, reject) => {
-				resolveRequest = resolve;
-				rejectRequest = reject;
+			let resolveRequestFn: () => void = () => undefined;
+			let rejectRequestFn: (error: unknown) => void = () => undefined;
+			const promise = new Promise<void>((resolveFn, rejectFn) => {
+				resolveRequestFn = resolveFn;
+				rejectRequestFn = rejectFn;
 			});
 			requestedClose = {
 				promise,
-				resolve: resolveRequest,
-				reject: rejectRequest,
+				resolveFn: resolveRequestFn,
+				rejectFn: rejectRequestFn,
 			};
 			ipcRenderer.send(ArkiniElectronApi.channels.requestClose);
 			return promise;
 		},
-		forceClose: () => ipcRenderer.send(ArkiniElectronApi.channels.forceClose),
+		forceCloseFn: () => ipcRenderer.send(ArkiniElectronApi.channels.forceClose),
 	},
 };
 

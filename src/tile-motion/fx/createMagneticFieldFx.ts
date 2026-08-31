@@ -16,10 +16,10 @@ export namespace createMagneticFieldFx {
 		readonly actorStore: MainActorStore;
 		readonly animationDriver: AnimationDriver;
 		/** Injectable structural counters for focused performance tests. */
-		readonly onApply?: () => void;
-		readonly onDisplacementEvaluation?: (actorId: string, sourceActorId: string) => void;
-		readonly onSpringTargetWrite?: (actorId: string) => void;
-		readonly scheduleApply: (apply: () => void) => () => void;
+		readonly onApplyFn?: () => void;
+		readonly onDisplacementEvaluationFn?: (actorId: string, sourceActorId: string) => void;
+		readonly onSpringTargetWriteFn?: (actorId: string) => void;
+		readonly scheduleApplyFn: (applyFn: () => void) => () => void;
 	}
 }
 
@@ -48,7 +48,7 @@ const influenceRadiusRatio = 1.5;
 const minimumDirectionMagnitude = 0.001;
 const repulsionDisplacementRatio = 0.14;
 
-const readStableDirection = (actorId: string, sourceActorId: string) => {
+const readStableDirectionFn = (actorId: string, sourceActorId: string) => {
 	let hash = 2166136261;
 	for (const character of `${sourceActorId}\u0000${actorId}`) {
 		hash ^= character.charCodeAt(0);
@@ -61,7 +61,7 @@ const readStableDirection = (actorId: string, sourceActorId: string) => {
 	};
 };
 
-const readMagneticDisplacement = ({
+const readMagneticDisplacementFn = ({
 	actorId,
 	actorRect,
 	attractedActorId,
@@ -106,7 +106,7 @@ const readMagneticDisplacement = ({
 						x: 0,
 						y: 0,
 					}
-				: (sourceDirection ?? readStableDirection(actorId, sourceActorId));
+				: (sourceDirection ?? readStableDirectionFn(actorId, sourceActorId));
 	const proximity = 1 - distance / influenceRadius;
 	const smoothProximity = proximity * proximity * (3 - 2 * proximity);
 	const maximumDisplacement =
@@ -139,14 +139,14 @@ interface ActiveMagneticSample extends MagneticSample {
 	readonly sourceKind: MagneticSourceKind;
 }
 
-const compareText = (left: string, right: string) => (left < right ? -1 : left > right ? 1 : 0);
+const compareTextFn = (left: string, right: string) => (left < right ? -1 : left > right ? 1 : 0);
 
-const compareSource = (left: ActiveMagneticSample, right: ActiveMagneticSample) =>
-	compareText(left.sourceKind, right.sourceKind) ||
-	compareText(left.sourceActorId, right.sourceActorId) ||
-	compareText(left.sourceInstanceId, right.sourceInstanceId);
+const compareSourceFn = (left: ActiveMagneticSample, right: ActiveMagneticSample) =>
+	compareTextFn(left.sourceKind, right.sourceKind) ||
+	compareTextFn(left.sourceActorId, right.sourceActorId) ||
+	compareTextFn(left.sourceInstanceId, right.sourceInstanceId);
 
-const readSourceKey = (
+const readSourceKeyFn = (
 	sourceKind: MagneticSourceKind,
 	sourceActorId: string,
 	sourceInstanceId: string,
@@ -168,22 +168,22 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 	({
 		actorStore,
 		animationDriver,
-		onApply,
-		onDisplacementEvaluation,
-		onSpringTargetWrite,
-		scheduleApply,
+		onApplyFn,
+		onDisplacementEvaluationFn,
+		onSpringTargetWriteFn,
+		scheduleApplyFn,
 	}: createMagneticFieldFx.Props) =>
 		Effect.sync((): MagneticField => {
 			const springs = new Map<string, ActorSpring>();
 			const samples = new Map<string, ActiveMagneticSample>();
 			const sourceMembershipListeners = new Set<(sourceKind: MagneticSourceKind) => void>();
 			let affectedActorIds = new Set<string>();
-			let cancelScheduledApply: (() => void) | null = null;
+			let cancelScheduledApplyFn: (() => void) | null = null;
 			let closed = false;
 			let dirty = false;
 			let scheduleGeneration = 0;
 
-			const closeSpring = (spring: ActorSpring) => {
+			const closeSpringFn = (spring: ActorSpring) => {
 				const failures: unknown[] = [];
 				for (const closeFx of [
 					spring.x.closeFx,
@@ -201,17 +201,17 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				}
 			};
 
-			const readSpring = (actor: PixiTileActor) => {
+			const readSpringFn = (actor: PixiTileActor) => {
 				const existing = springs.get(actor.item.id);
 				if (existing?.actor === actor) return existing;
 				if (existing !== undefined) {
 					springs.delete(actor.item.id);
-					closeSpring(existing);
+					closeSpringFn(existing);
 				}
 				const x = RendererRuntime.runSync(
 					animationDriver.createSpringFx({
 						initialValue: 0,
-						onUpdate: (value) => {
+						onUpdateFn: (value) => {
 							if (closed || actor.container.destroyed) return;
 							actor.offsetLayer.x = value;
 						},
@@ -223,7 +223,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 					y = RendererRuntime.runSync(
 						animationDriver.createSpringFx({
 							initialValue: 0,
-							onUpdate: (value) => {
+							onUpdateFn: (value) => {
 								if (closed || actor.container.destroyed) return;
 								actor.offsetLayer.y = value;
 							},
@@ -245,17 +245,17 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				return spring;
 			};
 
-			const removeStaleSprings = () => {
+			const removeStaleSpringsFn = () => {
 				for (const [actorId, spring] of springs) {
 					if (actorStore.actors.get(actorId) === spring.actor) continue;
 					springs.delete(actorId);
 					affectedActorIds.delete(actorId);
-					closeSpring(spring);
+					closeSpringFn(spring);
 				}
 			};
 
-			const reset = () => {
-				removeStaleSprings();
+			const resetFn = () => {
+				removeStaleSpringsFn();
 				let released = false;
 				for (const [key, sample] of samples) {
 					if (sample.sourceKind !== "drag") continue;
@@ -265,7 +265,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				if (released) requestApply();
 			};
 
-			const readActorRect = (actor: PixiTileActor) => {
+			const readActorRectFn = (actor: PixiTileActor) => {
 				const scale = actor.container.scale.x;
 				return {
 					height: actor.size * scale,
@@ -275,7 +275,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				};
 			};
 
-			const readSourceRect = (sample: ActiveMagneticSample) => {
+			const readSourceRectFn = (sample: ActiveMagneticSample) => {
 				const sourceActor = actorStore.actors.get(sample.sourceActorId);
 				const sourceSize =
 					sample.sourceSize ??
@@ -292,13 +292,13 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 						};
 			};
 
-			const setSpringTarget = (
+			const setSpringTargetFn = (
 				spring: ActorSpring,
 				displacementX: number,
 				displacementY: number,
 			) => {
 				if (spring.targetX !== displacementX || spring.targetY !== displacementY) {
-					onSpringTargetWrite?.(spring.actor.item.id);
+					onSpringTargetWriteFn?.(spring.actor.item.id);
 				}
 				if (spring.targetX !== displacementX) {
 					spring.targetX = displacementX;
@@ -311,12 +311,12 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 			};
 
 			function applySamples() {
-				onApply?.();
+				onApplyFn?.();
 				const activeSamples = Array.from(samples.values())
-					.sort(compareSource)
+					.sort(compareSourceFn)
 					.map((sample) => ({
 						sample,
-						sourceRect: readSourceRect(sample),
+						sourceRect: readSourceRectFn(sample),
 					}))
 					.filter(
 						(
@@ -356,11 +356,11 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 						}
 						let actorRect = actorRects.get(actorId);
 						if (actorRect === undefined) {
-							actorRect = readActorRect(actor);
+							actorRect = readActorRectFn(actor);
 							actorRects.set(actorId, actorRect);
 						}
-						onDisplacementEvaluation?.(actorId, sample.sourceActorId);
-						const displacement = readMagneticDisplacement({
+						onDisplacementEvaluationFn?.(actorId, sample.sourceActorId);
+						const displacement = readMagneticDisplacementFn({
 							actorId,
 							actorRect,
 							attractedActorId: sample.attractedActorId,
@@ -382,13 +382,13 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				for (const actorId of affectedActorIds) {
 					if (displacements.has(actorId)) continue;
 					const spring = springs.get(actorId);
-					if (spring !== undefined) setSpringTarget(spring, 0, 0);
+					if (spring !== undefined) setSpringTargetFn(spring, 0, 0);
 				}
 				const nextAffectedActorIds = new Set<string>();
 				for (const [actorId, displacement] of displacements) {
 					const actor = actorStore.actors.get(actorId);
 					if (actor === undefined) continue;
-					setSpringTarget(readSpring(actor), displacement.x, displacement.y);
+					setSpringTargetFn(readSpringFn(actor), displacement.x, displacement.y);
 					nextAffectedActorIds.add(actorId);
 				}
 				affectedActorIds = nextAffectedActorIds;
@@ -397,49 +397,49 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 			function requestApply() {
 				if (closed) return;
 				dirty = true;
-				if (cancelScheduledApply !== null) return;
+				if (cancelScheduledApplyFn !== null) return;
 				const generation = ++scheduleGeneration;
 				let ranSynchronously = false;
 				try {
-					const cancel = scheduleApply(() => {
+					const cancelFn = scheduleApplyFn(() => {
 						ranSynchronously = true;
 						if (generation !== scheduleGeneration) return;
-						cancelScheduledApply = null;
+						cancelScheduledApplyFn = null;
 						if (!closed && dirty) {
 							dirty = false;
 							applySamples();
 						}
 					});
 					if (!ranSynchronously && generation === scheduleGeneration && !closed) {
-						cancelScheduledApply = cancel;
+						cancelScheduledApplyFn = cancelFn;
 					}
 				} catch (cause) {
-					cancelScheduledApply = null;
+					cancelScheduledApplyFn = null;
 					throw cause;
 				}
 			}
 
-			const flush = () => {
+			const flushFn = () => {
 				if (closed || !dirty) return;
 				scheduleGeneration += 1;
-				cancelScheduledApply?.();
-				cancelScheduledApply = null;
+				cancelScheduledApplyFn?.();
+				cancelScheduledApplyFn = null;
 				dirty = false;
 				applySamples();
 			};
 
-			const release = (
+			const releaseFn = (
 				sourceKind: MagneticSourceKind,
 				sourceActorId: string,
 				sourceInstanceId: string,
 			) => {
-				if (samples.delete(readSourceKey(sourceKind, sourceActorId, sourceInstanceId))) {
-					for (const listen of sourceMembershipListeners) listen(sourceKind);
+				if (samples.delete(readSourceKeyFn(sourceKind, sourceActorId, sourceInstanceId))) {
+					for (const listenFn of sourceMembershipListeners) listenFn(sourceKind);
 					requestApply();
 				}
 			};
 
-			const releaseSources = (sourceKind: MagneticSourceKind) => {
+			const releaseSourcesFn = (sourceKind: MagneticSourceKind) => {
 				let released = false;
 				for (const [key, sample] of samples) {
 					if (sample.sourceKind !== sourceKind) continue;
@@ -447,17 +447,17 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 					released = true;
 				}
 				if (released) {
-					for (const listen of sourceMembershipListeners) listen(sourceKind);
+					for (const listenFn of sourceMembershipListeners) listenFn(sourceKind);
 					requestApply();
 				}
 			};
 
-			const update = (sample: MagneticSample) => {
+			const updateFn = (sample: MagneticSample) => {
 				const activeSample = {
 					...sample,
 					sourceKind: sample.sourceKind ?? "drag",
 				} satisfies ActiveMagneticSample;
-				const sourceKey = readSourceKey(
+				const sourceKey = readSourceKeyFn(
 					activeSample.sourceKind,
 					activeSample.sourceActorId,
 					activeSample.sourceInstanceId,
@@ -465,17 +465,18 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				const entered = !samples.has(sourceKey);
 				samples.set(sourceKey, activeSample);
 				if (entered) {
-					for (const listen of sourceMembershipListeners) listen(activeSample.sourceKind);
+					for (const listenFn of sourceMembershipListeners)
+						listenFn(activeSample.sourceKind);
 				}
 				requestApply();
 			};
 
-			const close = () => {
+			const closeFn = () => {
 				if (closed) return;
 				closed = true;
 				scheduleGeneration += 1;
-				cancelScheduledApply?.();
-				cancelScheduledApply = null;
+				cancelScheduledApplyFn?.();
+				cancelScheduledApplyFn = null;
 				dirty = false;
 				samples.clear();
 				sourceMembershipListeners.clear();
@@ -483,7 +484,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				const failures: unknown[] = [];
 				for (const spring of springs.values()) {
 					try {
-						closeSpring(spring);
+						closeSpringFn(spring);
 					} catch (cause) {
 						failures.push(cause);
 					}
@@ -495,40 +496,40 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 			};
 
 			return {
-				flushFx: Effect.sync(flush),
-				pruneFx: Effect.sync(() => removeStaleSprings()),
+				flushFx: Effect.sync(flushFn),
+				pruneFx: Effect.sync(() => removeStaleSpringsFn()),
 				readActiveSourceActorIdsFx: Effect.sync(() =>
 					Array.from(samples.values())
-						.sort(compareSource)
+						.sort(compareSourceFn)
 						.map(({ sourceActorId }) => sourceActorId),
 				),
 				releaseFx: Effect.fn("MagneticField.releaseFx")(
 					({ sourceActorId, sourceInstanceId, sourceKind }) =>
 						Effect.sync(() => {
 							if (closed) return;
-							release(sourceKind, sourceActorId, sourceInstanceId);
+							releaseFn(sourceKind, sourceActorId, sourceInstanceId);
 						}),
 				),
 				releaseSourcesFx: Effect.fn("MagneticField.releaseSourcesFx")((sourceKind) =>
 					Effect.sync(() => {
 						if (closed) return;
-						releaseSources(sourceKind);
+						releaseSourcesFn(sourceKind);
 					}),
 				),
-				resetFx: Effect.sync(() => reset()),
-				subscribeSourceMembershipFx: (listen) =>
+				resetFx: Effect.sync(() => resetFn()),
+				subscribeSourceMembershipFx: (listenFn) =>
 					Effect.sync(() => {
 						if (closed) return () => {};
-						sourceMembershipListeners.add(listen);
+						sourceMembershipListeners.add(listenFn);
 						return () => {
-							sourceMembershipListeners.delete(listen);
+							sourceMembershipListeners.delete(listenFn);
 						};
 					}),
 				updateFx: Effect.fnUntraced(function* (sample) {
 					if (closed) return;
-					update(sample);
+					updateFn(sample);
 				}),
-				closeFx: Effect.sync(close),
+				closeFx: Effect.sync(closeFn),
 			};
 		}),
 );

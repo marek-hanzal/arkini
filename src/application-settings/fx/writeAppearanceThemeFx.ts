@@ -9,7 +9,7 @@ export const writeAppearanceThemeFx = Effect.fn("writeAppearanceThemeFx")(
 	(theme: AppearanceThemeSchema.Type) =>
 		writeSemaphore.withPermits(1)(
 			Effect.tryPromise({
-				try: () => window.arkini.appearance.write(theme),
+				try: () => window.arkini.appearance.writeFn(theme),
 				catch: (cause) =>
 					new AppearanceThemeError({
 						operation: "write",

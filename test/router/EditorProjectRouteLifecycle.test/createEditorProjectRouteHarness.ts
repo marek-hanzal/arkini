@@ -23,13 +23,13 @@ export const setUpEditorProjectRouteTest = () => {
 		configurable: true,
 		value: {
 			editor: {
-				status: () =>
+				statusFn: () =>
 					Promise.resolve({
 						type: "ready" as const,
 					}),
 			},
 			editorMcp: {
-				activate: () =>
+				activateFn: () =>
 					Promise.resolve({
 						type: "ready" as const,
 						port: 32_310,

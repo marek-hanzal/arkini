@@ -6,10 +6,10 @@ const actionPanelViewTransitionName = "arkini-action-panel";
 
 interface ActionErrorPageProps extends PropsWithChildren {
 	readonly error: unknown;
-	readonly reset?: () => void;
+	readonly resetFn?: () => void;
 	readonly resetLabel?: string;
 	readonly description: string;
-	readonly onBack?: () => void;
+	readonly onBackFn?: () => void;
 	readonly title: string;
 }
 
@@ -17,8 +17,8 @@ interface ActionErrorPageProps extends PropsWithChildren {
 export const ActionErrorPage = ({
 	description,
 	error,
-	onBack,
-	reset,
+	onBackFn,
+	resetFn,
 	resetLabel = "Retry",
 	title,
 	children,
@@ -42,10 +42,10 @@ export const ActionErrorPage = ({
 				<p className="text-xs text-danger">{errorMessage}</p>
 				<div className="flex flex-wrap justify-center gap-2">
 					{children}
-					{reset === undefined ? null : (
-						<PrimaryButton onClick={reset}>{resetLabel}</PrimaryButton>
+					{resetFn === undefined ? null : (
+						<PrimaryButton onClick={resetFn}>{resetLabel}</PrimaryButton>
 					)}
-					{onBack === undefined ? null : <Button onClick={onBack}>Back</Button>}
+					{onBackFn === undefined ? null : <Button onClick={onBackFn}>Back</Button>}
 				</div>
 			</section>
 		</LauncherScene>

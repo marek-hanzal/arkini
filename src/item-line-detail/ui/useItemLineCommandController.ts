@@ -15,16 +15,16 @@ export namespace useItemLineCommandController {
 	}
 
 	export interface Output {
-		readonly enqueue: () => void;
+		readonly enqueueFn: () => void;
 		readonly error: string | null;
 		readonly pending: {
 			readonly default: boolean;
 			readonly enqueue: boolean;
 			readonly withdraw: boolean;
 		};
-		readonly setDefault: () => void;
-		readonly unsetDefault: () => void;
-		readonly withdraw: () => void;
+		readonly setDefaultFn: () => void;
+		readonly unsetDefaultFn: () => void;
+		readonly withdrawFn: () => void;
 	}
 }
 
@@ -57,25 +57,25 @@ export const useItemLineCommandController = ({
 		action: "default",
 		failureMessage: "Default line could not be changed.",
 		pendingKey: pendingKeys.default,
-		run: (game, command: setDefaultLineFx.Props) => game.runFx(setDefaultLineFx(command)),
+		runFx: (game, command: setDefaultLineFx.Props) => game.runFx(setDefaultLineFx(command)),
 	});
 	const enqueueLine = useItemDetailPendingCommand({
 		action: "enqueue",
 		failureMessage: "Work could not be queued.",
 		pendingKey: pendingKeys.enqueue,
-		run: (game, command: enqueueLineFx.Props) => game.runFx(enqueueLineFx(command)),
+		runFx: (game, command: enqueueLineFx.Props) => game.runFx(enqueueLineFx(command)),
 	});
 	const unsetDefaultLine = useItemDetailPendingCommand({
 		action: "default",
 		failureMessage: "Default line could not be changed.",
 		pendingKey: pendingKeys.default,
-		run: (game, command: unsetDefaultLineFx.Props) => game.runFx(unsetDefaultLineFx(command)),
+		runFx: (game, command: unsetDefaultLineFx.Props) => game.runFx(unsetDefaultLineFx(command)),
 	});
 	const withdrawLine = useItemDetailPendingCommand({
 		action: "withdraw",
 		failureMessage: "Inputs could not be withdrawn.",
 		pendingKey: pendingKeys.withdraw,
-		run: (game, command: withdrawLineInputFx.Props | withdrawLineInputsFx.Props) =>
+		runFx: (game, command: withdrawLineInputFx.Props | withdrawLineInputsFx.Props) =>
 			game
 				.runFx(
 					"inputIndex" in command
@@ -86,8 +86,8 @@ export const useItemLineCommandController = ({
 	});
 
 	return {
-		enqueue: () =>
-			enqueueLine.run({
+		enqueueFn: () =>
+			enqueueLine.runFn({
 				ownerItemId,
 				lineId: line.lineId,
 			}),
@@ -103,17 +103,17 @@ export const useItemLineCommandController = ({
 			enqueue: enqueueLine.pending,
 			withdraw: withdrawLine.pending,
 		},
-		setDefault: () =>
-			setDefaultLine.run({
+		setDefaultFn: () =>
+			setDefaultLine.runFn({
 				ownerItemId,
 				lineId: line.lineId,
 			}),
-		unsetDefault: () =>
-			unsetDefaultLine.run({
+		unsetDefaultFn: () =>
+			unsetDefaultLine.runFn({
 				ownerItemId,
 			}),
-		withdraw: () =>
-			withdrawLine.run({
+		withdrawFn: () =>
+			withdrawLine.runFn({
 				ownerItemId,
 				lineId: line.lineId,
 			}),

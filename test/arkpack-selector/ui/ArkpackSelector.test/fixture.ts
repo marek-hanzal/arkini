@@ -54,11 +54,11 @@ export const renderArkpackSelector = async ({
 		configurable: true,
 		value: {
 			arkpack: {
-				install: vi.fn(),
-				list: vi.fn(),
-				openUserDirectory,
-				read: vi.fn(),
-				remove: vi.fn(),
+				installFn: vi.fn(),
+				listFn: vi.fn(),
+				openUserDirectoryFn: openUserDirectory,
+				readFn: vi.fn(),
+				removeFn: vi.fn(),
 			},
 		} satisfies Pick<Window["arkini"], "arkpack">,
 	});

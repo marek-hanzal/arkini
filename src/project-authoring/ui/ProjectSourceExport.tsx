@@ -5,7 +5,6 @@ import { FolderOutput } from "lucide-react";
 import { useCallback, useRef } from "react";
 
 import { EditorSourceExportSchema } from "~electron/contract/editor/EditorSourceExportSchema";
-import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
@@ -14,9 +13,9 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 const exportProjectSourceAtom = Atom.family((projectId: string) =>
 	Atom.fn(() =>
 		invokeProjectTransportFx({
-			call: () => window.arkini.editor.exportJsonDirectory(projectId),
+			callFn: () => window.arkini.editor.exportJsonDirectoryFn(projectId),
 			operation: "export-json-directory",
-			parse: (value) => (value === null ? null : EditorSourceExportSchema.parse(value)),
+			parseFn: (value) => (value === null ? null : EditorSourceExportSchema.parse(value)),
 			requestMessage: "The editor JSON export request failed.",
 			responseMessage: "The editor JSON export response is invalid.",
 		}),
@@ -25,9 +24,9 @@ const exportProjectSourceAtom = Atom.family((projectId: string) =>
 
 const openProjectExportAtom = Atom.fn(() =>
 	invokeProjectTransportFx({
-		call: () => window.arkini.editor.openExportDirectory(),
+		callFn: () => window.arkini.editor.openExportDirectoryFn(),
 		operation: "open-export-directory",
-		parse: () => undefined,
+		parseFn: () => undefined,
 		requestMessage: "The Editor project export folder request failed.",
 		responseMessage: "The Editor project export folder response is invalid.",
 	}),
@@ -40,7 +39,7 @@ const readErrorMessageFn = (error: unknown) =>
 export const ProjectSourceExport = ({ projectId }: { readonly projectId: string }) => {
 	const exportAtom = exportProjectSourceAtom(projectId);
 	const exportResult = useAtomValue(exportAtom);
-	const runExport = useAtomSet(exportAtom);
+	const runExportFn = useAtomSet(exportAtom);
 	const exportError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(exportResult));
 	const completedExport =
 		AsyncResult.isSuccess(exportResult) && !exportResult.waiting
@@ -49,7 +48,7 @@ export const ProjectSourceExport = ({ projectId }: { readonly projectId: string 
 	const sourceExportRef = useRef<
 		| {
 				readonly projectId: string;
-				readonly value: EditorProjectTransport.SourceExport;
+				readonly value: EditorSourceExportSchema.Type;
 		  }
 		| undefined
 	>(undefined);
@@ -61,18 +60,18 @@ export const ProjectSourceExport = ({ projectId }: { readonly projectId: string 
 		};
 	const sourceExport = sourceExportRef.current?.value;
 	const openResult = useAtomValue(openProjectExportAtom);
-	const runOpen = useAtomSet(openProjectExportAtom);
+	const runOpenFn = useAtomSet(openProjectExportAtom);
 	const openError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(openResult));
-	const exportSource = useCallback(
-		() => runExport(undefined),
+	const exportSourceFn = useCallback(
+		() => runExportFn(undefined),
 		[
-			runExport,
+			runExportFn,
 		],
 	);
-	const openSourceExport = useCallback(() => {
-		if (sourceExport !== undefined) runOpen(undefined);
+	const openSourceExportFn = useCallback(() => {
+		if (sourceExport !== undefined) runOpenFn(undefined);
 	}, [
-		runOpen,
+		runOpenFn,
 		sourceExport,
 	]);
 	const summary =
@@ -92,7 +91,7 @@ export const ProjectSourceExport = ({ projectId }: { readonly projectId: string 
 					data-ui="EditorProjectExport"
 					disabled={exportResult.waiting}
 					cursorIntent={exportResult.waiting ? "progress" : undefined}
-					onClick={exportSource}
+					onClick={exportSourceFn}
 				>
 					<FolderOutput className="mr-2 size-4" />
 					Export
@@ -102,7 +101,7 @@ export const ProjectSourceExport = ({ projectId }: { readonly projectId: string 
 						data-ui="EditorProjectOpenExport"
 						disabled={openResult.waiting}
 						cursorIntent={openResult.waiting ? "progress" : undefined}
-						onClick={openSourceExport}
+						onClick={openSourceExportFn}
 					>
 						Open folder
 					</Button>

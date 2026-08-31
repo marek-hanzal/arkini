@@ -61,7 +61,7 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			disposeWithoutSaveFx: disposeFx,
 			projectId: project.projectId,
 			projectRevision: project.revision,
-			getResourceUrl: liveResourceUrls.get,
+			getResourceUrlFn: liveResourceUrls.getFn,
 		};
 		return game;
 	}).pipe(Effect.onError(() => discardFailedBootstrapFx));

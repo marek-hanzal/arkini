@@ -9,14 +9,14 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 /** Shared Board + Toolbar gameplay leaf with its exact cheat presentation. */
 export const PlayableBoard = ({
 	cheatAlwaysAvailable,
-	onOpenInventory,
+	onOpenInventoryFn,
 }: {
 	readonly cheatAlwaysAvailable?: boolean;
-	readonly onOpenInventory: () => void | PromiseLike<void>;
+	readonly onOpenInventoryFn: () => void | PromiseLike<void>;
 }) => {
 	const game = useGameEngine();
 	const { interaction } = usePixiGameRuntime();
-	const cancelInteraction = useCallback(() => {
+	const cancelInteractionFn = useCallback(() => {
 		RendererRuntime.runSync(interaction.cancelFx);
 	}, [
 		interaction.cancelFx,
@@ -28,12 +28,12 @@ export const PlayableBoard = ({
 				className="size-full min-h-0 min-w-0"
 				data-ui="GameBoardLayout"
 			>
-				<PixiBoardToolbarSurface onOpenInventory={onOpenInventory} />
+				<PixiBoardToolbarSurface onOpenInventoryFn={onOpenInventoryFn} />
 			</div>
 			<CheatItemSpotlight
 				alwaysAvailable={cheatAlwaysAvailable}
 				game={game}
-				onBeforeOpen={cancelInteraction}
+				onBeforeOpenFn={cancelInteractionFn}
 			/>
 		</>
 	);

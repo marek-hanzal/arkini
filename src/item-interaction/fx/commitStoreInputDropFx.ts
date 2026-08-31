@@ -23,8 +23,6 @@ export namespace commitStoreInputDropFx {
 		readonly inputIndex: number;
 		readonly quantity: number;
 	}
-
-	export type Result = DropItemResult;
 }
 
 /** Commits one exact default-line input store and normalizes both actor identities. */
@@ -75,7 +73,7 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 				revision: stored.ownerItem.revision,
 				location: stored.ownerItem.location,
 			},
-		} satisfies commitStoreInputDropFx.Result;
+		} satisfies DropItemResult;
 	}).pipe(
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>

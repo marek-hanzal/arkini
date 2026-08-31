@@ -30,18 +30,18 @@ describe("CheatItemSpotlight", () => {
 	});
 
 	it("opens through Mod+P and spawns the keyboard-selected catalog item", async () => {
-		const onBeforeOpen = vi.fn(() => {
+		const onBeforeOpenFn = vi.fn(() => {
 			expect(document.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
 		});
 		const { container } = await renderSpotlight({
-			onBeforeOpen,
+			onBeforeOpenFn,
 		});
 		const previousFocus = document.createElement("button");
 		document.body.append(previousFocus);
 		previousFocus.focus();
 
 		await toggleSpotlight();
-		expect(onBeforeOpen).toHaveBeenCalledOnce();
+		expect(onBeforeOpenFn).toHaveBeenCalledOnce();
 		const input = readSearchInput(container);
 		expect(document.activeElement).toBe(input);
 		await act(async () => {

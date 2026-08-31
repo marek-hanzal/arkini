@@ -41,7 +41,7 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 				try: (): TrustedRenderer => {
 					const trustedOrigin = new URL(developmentRendererUrl ?? "arkini://app/");
 					const trustedWebContents = new Map<number, WebContents>();
-					const isTrustedUrl = (candidate: string) => {
+					const isTrustedUrlFn = (candidate: string) => {
 						try {
 							const parsed = new URL(candidate);
 							if (parsed.username !== "" || parsed.password !== "") return false;
@@ -61,7 +61,7 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							return false;
 						}
 					};
-					const isTrustedIpcSender = (event: IpcMainEvent | IpcMainInvokeEvent) => {
+					const isTrustedIpcSenderFn = (event: IpcMainEvent | IpcMainInvokeEvent) => {
 						const expected = trustedWebContents.get(event.sender.id);
 						const frame = event.senderFrame;
 						return (
@@ -69,12 +69,12 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							!event.sender.isDestroyed() &&
 							frame !== null &&
 							frame === event.sender.mainFrame &&
-							isTrustedUrl(frame.url)
+							isTrustedUrlFn(frame.url)
 						);
 					};
 					const assertTrustedIpcSenderFx: TrustedRenderer["assertTrustedIpcSenderFx"] =
 						Effect.fn("TrustedRenderer.assertTrustedIpcSenderFx")(function* (event) {
-							if (isTrustedIpcSender(event)) return;
+							if (isTrustedIpcSenderFn(event)) return;
 							return yield* Effect.fail(
 								new ElectronMainError({
 									operation: "authorize privileged IPC from the Arkini renderer",
@@ -93,37 +93,37 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							const { session } = webContents;
 							trustedWebContents.set(webContents.id, webContents);
 
-							const preventUntrustedMainFrameNavigation = (
+							const preventUntrustedMainFrameNavigationFn = (
 								event: Event<
 									| WebContentsWillNavigateEventParams
 									| WebContentsWillRedirectEventParams
 								>,
 							) => {
-								if (!event.isMainFrame || !isTrustedUrl(event.url))
+								if (!event.isMainFrame || !isTrustedUrlFn(event.url))
 									event.preventDefault();
 							};
-							const preventSubframeOrUntrustedNavigation = (
+							const preventSubframeOrUntrustedNavigationFn = (
 								event: Event<WebContentsWillFrameNavigateEventParams>,
 							) => {
-								if (!event.isMainFrame || !isTrustedUrl(event.url))
+								if (!event.isMainFrame || !isTrustedUrlFn(event.url))
 									event.preventDefault();
 							};
-							const preventWebview = (event: Event) => event.preventDefault();
+							const preventWebviewFn = (event: Event) => event.preventDefault();
 
 							webContents.setWindowOpenHandler(() => ({
 								action: "deny",
 							}));
-							webContents.on("will-navigate", preventUntrustedMainFrameNavigation);
-							webContents.on("will-redirect", preventUntrustedMainFrameNavigation);
+							webContents.on("will-navigate", preventUntrustedMainFrameNavigationFn);
+							webContents.on("will-redirect", preventUntrustedMainFrameNavigationFn);
 							webContents.on(
 								"will-frame-navigate",
-								preventSubframeOrUntrustedNavigation,
+								preventSubframeOrUntrustedNavigationFn,
 							);
-							webContents.on("will-attach-webview", preventWebview);
+							webContents.on("will-attach-webview", preventWebviewFn);
 							session.setPermissionCheckHandler(() => false);
 							session.setPermissionRequestHandler(
-								(_contents, _permission, callback) => {
-									callback(false);
+								(_contents, _permission, callbackFn) => {
+									callbackFn(false);
 								},
 							);
 
@@ -134,19 +134,19 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 								if (!webContents.isDestroyed()) {
 									webContents.removeListener(
 										"will-navigate",
-										preventUntrustedMainFrameNavigation,
+										preventUntrustedMainFrameNavigationFn,
 									);
 									webContents.removeListener(
 										"will-redirect",
-										preventUntrustedMainFrameNavigation,
+										preventUntrustedMainFrameNavigationFn,
 									);
 									webContents.removeListener(
 										"will-frame-navigate",
-										preventSubframeOrUntrustedNavigation,
+										preventSubframeOrUntrustedNavigationFn,
 									);
 									webContents.removeListener(
 										"will-attach-webview",
-										preventWebview,
+										preventWebviewFn,
 									);
 								}
 								session.setPermissionCheckHandler(null);
@@ -157,8 +157,8 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 
 					return {
 						developmentRendererUrl,
-						isTrustedUrl,
-						isTrustedIpcSender,
+						isTrustedUrlFn,
+						isTrustedIpcSenderFn,
 						assertTrustedIpcSenderFx,
 						registerWindowFx,
 					};

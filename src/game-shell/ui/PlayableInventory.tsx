@@ -6,18 +6,18 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
 
 /** Shared Inventory leaf with overlay-aware return behavior. */
-export const PlayableInventory = ({ onClose }: { readonly onClose: () => void }) => {
-	const isInventoryShortcutKey = useInventoryShortcutKey();
+export const PlayableInventory = ({ onCloseFn }: { readonly onCloseFn: () => void }) => {
+	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const returnToBoard = useCallback(onClose, [
-		onClose,
+	const returnToBoardFn = useCallback(onCloseFn, [
+		onCloseFn,
 	]);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (
-				(event.key !== "Escape" && !isInventoryShortcutKey(event)) ||
+				(event.key !== "Escape" && !isInventoryShortcutKeyFn(event)) ||
 				event.defaultPrevented ||
 				gameMenu.phase !== "closed" ||
 				itemDetail.state.phase !== "closed"
@@ -26,15 +26,15 @@ export const PlayableInventory = ({ onClose }: { readonly onClose: () => void })
 			}
 			event.preventDefault();
 			event.stopPropagation();
-			returnToBoard();
+			returnToBoardFn();
 		};
-		window.addEventListener("keydown", onKeyDown, true);
-		return () => window.removeEventListener("keydown", onKeyDown, true);
+		window.addEventListener("keydown", onKeyDownFn, true);
+		return () => window.removeEventListener("keydown", onKeyDownFn, true);
 	}, [
 		gameMenu.phase,
 		itemDetail.state.phase,
-		returnToBoard,
+		returnToBoardFn,
 	]);
 
-	return <Inventory onClose={returnToBoard} />;
+	return <Inventory onCloseFn={returnToBoardFn} />;
 };

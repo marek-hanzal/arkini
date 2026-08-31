@@ -4,35 +4,35 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 export const useExclusiveAction = <Action extends string>() => {
 	const activeRef = useRef<Action | null>(null);
 	const mountedRef = useRef(false);
-	const [active, setActive] = useState<Action | null>(null);
+	const [active, setActiveFn] = useState<Action | null>(null);
 	useEffect(() => {
 		mountedRef.current = true;
 		return () => {
 			mountedRef.current = false;
 		};
 	}, []);
-	const claim = useCallback((action: Action) => {
+	const claimFn = useCallback((action: Action) => {
 		if (activeRef.current !== null) return false;
 		activeRef.current = action;
-		if (mountedRef.current) setActive(action);
+		if (mountedRef.current) setActiveFn(action);
 		return true;
 	}, []);
-	const release = useCallback((action: Action) => {
+	const releaseFn = useCallback((action: Action) => {
 		if (activeRef.current !== action) return;
 		activeRef.current = null;
-		if (mountedRef.current) setActive(null);
+		if (mountedRef.current) setActiveFn(null);
 	}, []);
 
 	return useMemo(
 		() => ({
 			active,
-			claim,
-			release,
+			claimFn,
+			releaseFn,
 		}),
 		[
 			active,
-			claim,
-			release,
+			claimFn,
+			releaseFn,
 		],
 	);
 };

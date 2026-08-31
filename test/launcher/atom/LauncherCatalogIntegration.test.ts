@@ -59,9 +59,9 @@ describe("Launcher catalog integration", () => {
 			RendererLifecycleOwnerAtom,
 			Effect.runSync(
 				createRendererLifecycleFx({
-					forceClose: () => undefined,
-					requestClose: () => Promise.resolve(),
-					waitUntilVisible: () => Promise.resolve(performance.now()),
+					forceCloseFn: () => undefined,
+					requestCloseFn: () => Promise.resolve(),
+					waitUntilVisibleFn: () => Promise.resolve(performance.now()),
 				}),
 			),
 		);

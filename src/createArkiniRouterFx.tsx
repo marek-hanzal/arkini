@@ -4,15 +4,15 @@ import { routeTree } from "~/_route";
 import type { RootContext } from "~/application-shell/context/RootContext";
 import { resolveRouteViewTransitionTypesFx } from "~/application-shell/fx/resolveRouteViewTransitionTypesFx";
 
-const isSkippedViewTransition = (error: unknown) =>
+const isSkippedViewTransitionFn = (error: unknown) =>
 	typeof error === "object" &&
 	error !== null &&
 	"name" in error &&
 	(error.name === "AbortError" || error.name === "InvalidStateError");
 
-const observeSkippedViewTransition = (transition: ViewTransition) => {
+const observeSkippedViewTransitionFn = (transition: ViewTransition) => {
 	void transition.ready.catch((error: unknown) => {
-		if (!isSkippedViewTransition(error)) throw error;
+		if (!isSkippedViewTransitionFn(error)) throw error;
 	});
 };
 
@@ -45,35 +45,35 @@ export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: 
 				'[data-scroll-restoration-id="editor-section-page"]',
 			],
 		});
-		const startRouterViewTransition = router.startViewTransition.bind(router);
-		router.startViewTransition = (update) => {
+		const startRouterViewTransitionFn = router.startViewTransition.bind(router);
+		router.startViewTransition = (updateFn) => {
 			if (
 				typeof document === "undefined" ||
 				typeof document.startViewTransition !== "function"
 			) {
-				startRouterViewTransition(update);
+				startRouterViewTransitionFn(updateFn);
 				return;
 			}
-			const startNativeViewTransition = document.startViewTransition;
+			const startNativeViewTransitionFn = document.startViewTransition;
 			const ownStartViewTransition = Object.getOwnPropertyDescriptor(
 				document,
 				"startViewTransition",
 			);
-			const guardedStartViewTransition = ((
+			const guardedStartViewTransitionFn = ((
 				...args: Parameters<typeof document.startViewTransition>
 			) => {
-				const transition = Reflect.apply(startNativeViewTransition, document, args);
-				observeSkippedViewTransition(transition);
+				const transition = Reflect.apply(startNativeViewTransitionFn, document, args);
+				observeSkippedViewTransitionFn(transition);
 				return transition;
 			}) as typeof document.startViewTransition;
 			Object.defineProperty(document, "startViewTransition", {
 				configurable: true,
-				value: guardedStartViewTransition,
+				value: guardedStartViewTransitionFn,
 			});
 			try {
-				startRouterViewTransition(update);
+				startRouterViewTransitionFn(updateFn);
 			} finally {
-				if (document.startViewTransition === guardedStartViewTransition) {
+				if (document.startViewTransition === guardedStartViewTransitionFn) {
 					if (ownStartViewTransition === undefined) {
 						Reflect.deleteProperty(document, "startViewTransition");
 					} else {

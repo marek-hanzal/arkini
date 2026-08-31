@@ -40,10 +40,10 @@ const createOwnership = async (
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
 			editor,
-			notifyOverviewChanged: () => undefined,
-			notifyProjectChanged: () => undefined,
+			notifyOverviewChangedFn: () => undefined,
+			notifyProjectChangedFn: () => undefined,
 			storage,
-			runPromise: Effect.runPromise,
+			runPromiseFn: Effect.runPromise,
 			tunnel: {
 				openFx: () => Effect.fail(new Error("Unexpected Remote MCP tunnel start.")),
 			},
@@ -56,7 +56,7 @@ const createOwnership = async (
 describe("createEditorMcpOwnershipFx", () => {
 	it("starts local MCP explicitly once, stops it, and releases its port", async () => {
 		const { ownership, port } = await createMcpHarness();
-		expect(ownership.readLocalStatus()).toEqual({
+		expect(ownership.readLocalStatusFn()).toEqual({
 			type: "inactive",
 		});
 		await expect(fetch(`http://127.0.0.1:${port}/editor/mcp`)).rejects.toThrow();
@@ -171,8 +171,8 @@ describe("createEditorMcpOwnershipFx", () => {
 					type: "ready",
 					repository,
 				},
-				notifyOverviewChanged: () => undefined,
-				notifyProjectChanged: () => undefined,
+				notifyOverviewChangedFn: () => undefined,
+				notifyProjectChangedFn: () => undefined,
 				storage: {
 					...storage,
 					readPortFx: Effect.sync(() => currentPort),
@@ -183,7 +183,7 @@ describe("createEditorMcpOwnershipFx", () => {
 							currentPort = port;
 						}),
 				},
-				runPromise: Effect.runPromise,
+				runPromiseFn: Effect.runPromise,
 				tunnel: {
 					openFx: () => Effect.fail(new Error("Unexpected Remote MCP tunnel start.")),
 				},

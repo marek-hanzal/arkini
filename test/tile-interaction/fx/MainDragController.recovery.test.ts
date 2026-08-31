@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 import {
 	createItem,
@@ -29,7 +29,7 @@ describe("main drag controller: recovery", () => {
 		releaseOrdinaryDrag(mounted);
 		await flushMicrotasks();
 
-		expect(mounted.reportCriticalFailure).toHaveBeenCalledWith("game-presentation", cause);
+		expect(mounted.reportCriticalFailureFn).toHaveBeenCalledWith("game-presentation", cause);
 		expect(mounted.actor.lifecycleTargetAlpha).toBe(1);
 		expect(mounted.animations).toContainEqual(
 			expect.objectContaining({
@@ -58,9 +58,9 @@ describe("main drag controller: recovery", () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const mounted = mountController();
 		setOrdinaryInventoryTarget(mounted, inventory);
-		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		let resolveDrop!: (result: DropItemResult) => void;
 		mounted.onDrop.mockReturnValueOnce(
-			new Promise<runTileDropAtom.Result>((resolve) => {
+			new Promise<DropItemResult>((resolve) => {
 				resolveDrop = resolve;
 			}) as never,
 		);
@@ -72,7 +72,7 @@ describe("main drag controller: recovery", () => {
 		Effect.runSync(mounted.dropSubmission.closeFx);
 		resolveDrop({
 			kind: "reject",
-		} as runTileDropAtom.Result);
+		} as DropItemResult);
 		await flushMicrotasks();
 
 		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe("main drag controller: recovery", () => {
 		);
 		expect(canonicalLayer.addChild).not.toHaveBeenCalled();
 		samplePoseAnimation(settleAnimation, 1);
-		settleAnimation.onComplete?.();
+		settleAnimation.onCompleteFn?.();
 		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
 		expect(canonicalLayer.addChild).toHaveBeenCalledOnce();
 		expect(canonicalLayer.addChild).toHaveBeenCalledWith(mounted.actor.container);
@@ -194,7 +194,7 @@ describe("main drag controller: recovery", () => {
 			x: 200,
 			y: 100,
 		});
-		settleAnimation.onComplete?.();
+		settleAnimation.onCompleteFn?.();
 		expect(mounted.actor.container).toMatchObject({
 			x: destination.x,
 			y: destination.y,
@@ -213,7 +213,7 @@ describe("main drag controller: recovery", () => {
 		mounted.stage.emit("pointerup", pointer(45, 20));
 		await flushMicrotasks();
 
-		expect(mounted.reportCriticalFailure).toHaveBeenCalledWith("game-presentation", failure);
+		expect(mounted.reportCriticalFailureFn).toHaveBeenCalledWith("game-presentation", failure);
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
 	});
 });

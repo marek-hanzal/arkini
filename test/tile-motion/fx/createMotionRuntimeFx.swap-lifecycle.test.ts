@@ -106,7 +106,7 @@ describe("detached swap lifecycle", () => {
 
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(target.item.id))).toBe(true);
 		samplePoseAnimation(independentTravel, 1);
-		independentTravel.onComplete?.();
+		independentTravel.onCompleteFn?.();
 
 		expect(
 			animations.some(
@@ -118,7 +118,7 @@ describe("detached swap lifecycle", () => {
 		).toBe("handoff");
 
 		samplePoseAnimation(sourceTravel, 1);
-		sourceTravel.onComplete?.();
+		sourceTravel.onCompleteFn?.();
 
 		expect(
 			animations.some(
@@ -143,7 +143,7 @@ describe("detached swap lifecycle", () => {
 		canonicalItems.delete(source.item.id);
 
 		samplePoseAnimation(sourceTravel, 1);
-		sourceTravel.onComplete?.();
+		sourceTravel.onCompleteFn?.();
 
 		expect(
 			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.has(source.item.id),
@@ -171,7 +171,7 @@ describe("detached swap lifecycle", () => {
 		const sourceTravel = readPoseAnimation(animations, source);
 		samplePoseAnimation(sourceTravel, 1);
 		canonicalItems.delete(source.item.id);
-		sourceTravel.onComplete?.();
+		sourceTravel.onCompleteFn?.();
 
 		expect(actors.has(source.item.id)).toBe(true);
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(target.item.id))).toBe(true);

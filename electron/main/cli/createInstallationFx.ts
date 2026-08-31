@@ -8,7 +8,7 @@ import { ElectronMainError } from "../ElectronMainError";
 import { createManagedFileFx } from "./createManagedFileFx";
 
 const managedCommandPrefix = "#!/bin/sh\n# arkini-cli managed launcher\n";
-const quoteShellArgument = (value: string) => `'${value.replaceAll("'", `'"'"'`)}'`;
+const quoteShellArgumentFn = (value: string) => `'${value.replaceAll("'", `'"'"'`)}'`;
 
 /** Main-process ownership of the one user-level arkini-cli command link. */
 export interface Installation {
@@ -34,17 +34,17 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 }: createInstallationFx.Props) {
 	const semaphore = yield* Semaphore.make(1);
 	const resolvedLauncherPath = resolve(launcherPath);
-	const commandContents = `${managedCommandPrefix}exec ${quoteShellArgument(resolvedLauncherPath)} "$@"\n`;
+	const commandContents = `${managedCommandPrefix}exec ${quoteShellArgumentFn(resolvedLauncherPath)} "$@"\n`;
 	const managedFile = yield* createManagedFileFx({
 		path: commandPath,
 		managedPrefix: managedCommandPrefix,
 		mode: 0o755,
 		subject: "The CLI command",
-		readExpectedContents: () => Promise.resolve(commandContents),
+		readExpectedContentsFn: () => Promise.resolve(commandContents),
 		executable: true,
 	});
 
-	const readStatus = async (): Promise<InstallationStatus> => {
+	const readStatusFn = async (): Promise<InstallationStatus> => {
 		if (unavailableMessage !== undefined) {
 			return {
 				type: "unavailable",
@@ -62,7 +62,7 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 			};
 		}
 
-		const inspection = await managedFile.inspect();
+		const inspection = await managedFile.inspectFn();
 		if (inspection.type === "conflict") {
 			return {
 				type: "conflict",
@@ -85,9 +85,9 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 		};
 	};
 
-	const operation = (name: string, run: () => Promise<InstallationStatus>) =>
+	const operationFx = (name: string, runFn: () => Promise<InstallationStatus>) =>
 		Effect.tryPromise({
-			try: run,
+			try: runFn,
 			catch: (cause) =>
 				new ElectronMainError({
 					operation: name,
@@ -95,43 +95,43 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 				}),
 		});
 
-	const readStatusFx = operation("read the CLI installation", readStatus);
+	const readStatusFx = operationFx("read the CLI installation", readStatusFn);
 	const installFx = semaphore.withPermits(1)(
-		operation("install the CLI command", async () => {
-			const status = await readStatus();
+		operationFx("install the CLI command", async () => {
+			const status = await readStatusFn();
 			if (status.type === "installed") return status;
 			if (status.type !== "not-installed" && status.type !== "repairable") {
 				throw new Error(status.message);
 			}
 			if (status.type === "repairable") {
-				await managedFile.repair();
+				await managedFile.repairFn();
 			} else {
-				await managedFile.publish(false);
+				await managedFile.publishFn(false);
 			}
-			return readStatus();
+			return readStatusFn();
 		}),
 	);
 	const replaceFx = semaphore.withPermits(1)(
-		operation("replace the CLI command", async () => {
-			const status = await readStatus();
+		operationFx("replace the CLI command", async () => {
+			const status = await readStatusFn();
 			if (status.type === "installed") return status;
 			if (status.type === "unavailable") throw new Error(status.message);
 			if (status.type === "conflict" && !status.replaceable) {
 				throw new Error(status.message);
 			}
-			await managedFile.publish(status.type !== "not-installed");
-			return readStatus();
+			await managedFile.publishFn(status.type !== "not-installed");
+			return readStatusFn();
 		}),
 	);
 	const uninstallFx = semaphore.withPermits(1)(
-		operation("uninstall the CLI command", async () => {
-			const status = await readStatus();
+		operationFx("uninstall the CLI command", async () => {
+			const status = await readStatusFn();
 			if (status.type === "not-installed") return status;
 			if (status.type !== "installed" && status.type !== "repairable") {
 				throw new Error(status.message);
 			}
-			await managedFile.remove();
-			return readStatus();
+			await managedFile.removeFn();
+			return readStatusFn();
 		}),
 	);
 

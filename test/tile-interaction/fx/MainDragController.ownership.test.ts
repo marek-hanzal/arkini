@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { createDragActor } from "~test/tile-interaction/fx/MainDragController.test/actors";
 import {
@@ -75,9 +75,9 @@ describe("main drag controller: ownership", () => {
 			],
 		});
 		setOrdinaryInventoryTarget(mounted, inventory);
-		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		let resolveDrop!: (result: DropItemResult) => void;
 		mounted.onDrop.mockReturnValueOnce(
-			new Promise<runTileDropAtom.Result>((resolve) => {
+			new Promise<DropItemResult>((resolve) => {
 				resolveDrop = resolve;
 			}) as never,
 		);
@@ -91,7 +91,7 @@ describe("main drag controller: ownership", () => {
 		mounted.actors.set(item.id, replacement);
 		resolveDrop({
 			kind: "reject",
-		} as runTileDropAtom.Result);
+		} as DropItemResult);
 		await flushMicrotasks();
 
 		expect(replacement.dragging).toBe(true);

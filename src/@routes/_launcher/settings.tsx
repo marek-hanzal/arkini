@@ -9,7 +9,7 @@ import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 import { ModelProvider } from "~/application-settings/ui/ModelContext";
 import { useSettingsModel } from "~/application-settings/ui/useSettingsModel";
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const errorMessageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 const sections = [
 	{
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 	/** Composes standalone Settings with history-aware route navigation. */
 	component: () => {
 		const router = useRouter();
-		const navigate = useNavigate();
+		const navigateFn = useNavigate();
 		const onBackFx = useMemo(() => {
 			return Effect.suspend(() => {
 				if (router.history.canGoBack()) {
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 				}
 				return Effect.tryPromise({
 					try: () =>
-						navigate({
+						navigateFn({
 							to: "/main-menu",
 							replace: true,
 						}),
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 				}).pipe(Effect.asVoid);
 			});
 		}, [
-			navigate,
+			navigateFn,
 			router,
 		]);
 		const model = useSettingsModel({
@@ -122,7 +122,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 									},
 									({ error }) => (
 										<p className="text-danger">
-											Navigation failed: {errorMessage(error)}
+											Navigation failed: {errorMessageFn(error)}
 										</p>
 									),
 								)
@@ -153,7 +153,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 									},
 									({ error, label }) => (
 										<p className="text-danger">
-											{label} update failed: {errorMessage(error)}
+											{label} update failed: {errorMessageFn(error)}
 										</p>
 									),
 								)
@@ -175,7 +175,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 						<BackButton
 							cursorIntent={model.blocked ? "progress" : undefined}
 							disabled={model.blocked}
-							onClick={model.goBack}
+							onClick={model.goBackFn}
 						/>
 					</section>
 				</ModelProvider>

@@ -3,8 +3,8 @@ import type { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 export interface VisualReadyListener {
-	readonly onCancel?: () => void;
-	readonly onReady: () => void;
+	readonly onCancelFn?: () => void;
+	readonly onReadyFn: () => void;
 }
 
 /**
@@ -23,7 +23,7 @@ export interface ActorVisual {
 	readonly quantityBackground: Graphics;
 	readonly titleStyle: TextStyle;
 	readonly readyListeners: Set<VisualReadyListener>;
-	readonly reportCriticalFailure: (cause: unknown) => void;
+	readonly reportCriticalFailureFn: (cause: unknown) => void;
 	item: TileActorItem;
 	size: number;
 	textureGeneration: number;

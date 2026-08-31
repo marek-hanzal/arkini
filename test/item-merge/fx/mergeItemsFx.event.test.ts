@@ -25,10 +25,10 @@ const captureNextPublication = (session: GameSession) => {
 	}>((resolve) => {
 		publish = resolve;
 	});
-	const unsubscribe = session.subscribeEvents((batch) => {
+	const unsubscribe = session.subscribeEventsFn((batch) => {
 		publish?.({
 			batch,
-			runtime: session.getSnapshot(),
+			runtime: session.getSnapshotFn(),
 		});
 	});
 	return {
@@ -93,14 +93,14 @@ describe("mergeItemsFx events", () => {
 		const publication = captureNextPublication(session);
 
 		try {
-			const before = session.getSnapshot();
+			const before = session.getSnapshotFn();
 			const source = before.items.find((item) => item.id === "runtime:source");
 			const target = before.items.find((item) => item.id === "runtime:target");
 			if (source === undefined || target === undefined) {
 				throw new Error("Expected merge participants.");
 			}
 
-			const { event } = await session.run(
+			const { event } = await session.runFn(
 				mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,
@@ -187,14 +187,14 @@ describe("mergeItemsFx events", () => {
 		const publication = captureNextPublication(session);
 
 		try {
-			const before = session.getSnapshot();
+			const before = session.getSnapshotFn();
 			const source = before.items.find((item) => item.id === "runtime:source");
 			const target = before.items.find((item) => item.id === "runtime:target");
 			if (source === undefined || target === undefined) {
 				throw new Error("Expected merge participants.");
 			}
 
-			const { event } = await session.run(
+			const { event } = await session.runFn(
 				mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,
@@ -290,14 +290,14 @@ describe("mergeItemsFx events", () => {
 		const publication = captureNextPublication(session);
 
 		try {
-			const before = session.getSnapshot();
+			const before = session.getSnapshotFn();
 			const source = before.items.find((item) => item.id === "runtime:source");
 			const target = before.items.find((item) => item.id === "runtime:target");
 			if (source === undefined || target === undefined) {
 				throw new Error("Expected merge participants.");
 			}
 
-			const { event } = await session.run(
+			const { event } = await session.runFn(
 				mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,

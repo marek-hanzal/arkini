@@ -21,7 +21,7 @@ export type ItemEstimateState =
 			readonly status: "error";
 	  };
 
-const sameSnapshot = (
+const sameSnapshotFn = (
 	left: ItemEstimateCache.Snapshot | undefined,
 	right: ItemEstimateCache.Snapshot,
 ) => left?.projectId === right.projectId && left.revision === right.revision;
@@ -40,16 +40,16 @@ export const useItemEstimate = (project: Project, itemId: string): ItemEstimateS
 			project.revision,
 		],
 	);
-	const [state, requestEstimate] = useAtom(ItemEstimateCacheAtom);
+	const [state, requestEstimateFn] = useAtom(ItemEstimateCacheAtom);
 
 	useEffect(() => {
-		requestEstimate(snapshot);
+		requestEstimateFn(snapshot);
 	}, [
-		requestEstimate,
+		requestEstimateFn,
 		snapshot,
 	]);
 
-	if (!sameSnapshot(state.snapshot, snapshot))
+	if (!sameSnapshotFn(state.snapshot, snapshot))
 		return {
 			status: "loading",
 		};

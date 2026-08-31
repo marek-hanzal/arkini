@@ -75,7 +75,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 		const uninstall = rendererRuntime.runSync(
 			installEditorMcpVersionCheckoutFx({
 				editorMcp: {
-					onVersionCheckoutRequested: (next) => {
+					onVersionCheckoutRequestedFn: (next) => {
 						listener = next;
 						return remove;
 					},

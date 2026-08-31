@@ -20,7 +20,7 @@ export const Route = createFileRoute("/editor/$projectId/flow")({
 	component: () => {
 		const { projectId } = Route.useParams();
 		const search = Route.useSearch();
-		const navigate = useNavigate({
+		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
 		return (
@@ -28,8 +28,8 @@ export const Route = createFileRoute("/editor/$projectId/flow")({
 				direction={search.direction}
 				itemId={search.itemId}
 				projectId={projectId}
-				onDirectionChange={(direction) =>
-					navigate({
+				onDirectionChangeFn={(direction) =>
+					navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,
@@ -37,8 +37,8 @@ export const Route = createFileRoute("/editor/$projectId/flow")({
 						}),
 					})
 				}
-				onItemIdChange={(itemId) =>
-					navigate({
+				onItemIdChangeFn={(itemId) =>
+					navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,

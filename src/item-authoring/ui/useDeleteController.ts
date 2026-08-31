@@ -35,13 +35,13 @@ export namespace useDeleteController {
 
 	export interface Output {
 		readonly blockers: ReadonlyArray<readDeleteBlockersFn.Blocker>;
-		readonly cancel: () => void;
-		readonly confirm: () => Promise<void>;
+		readonly cancelFn: () => void;
+		readonly confirmFn: () => Promise<void>;
 		readonly confirming: "safe" | "force" | null;
 		readonly deleting: boolean;
 		readonly error: unknown;
 		readonly forceImpact: forceDeleteFx.Impact;
-		readonly open: (force: boolean) => void;
+		readonly openFn: (force: boolean) => void;
 		readonly project: Project;
 	}
 }
@@ -51,14 +51,14 @@ export const useDeleteController = ({
 	item,
 }: useDeleteController.Props): useDeleteController.Output => {
 	const project = useEditorProject();
-	const navigate = useNavigate();
-	const historyBack = useEditorHistoryBack();
+	const navigateFn = useNavigate();
+	const historyBackFn = useEditorHistoryBack();
 	const commandAtom = deleteCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
-	const remove = useAtomSet(commandAtom, {
+	const removeFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
-	const [confirming, setConfirming] = useState<"safe" | "force" | null>(null);
+	const [confirming, setConfirmingFn] = useState<"safe" | "force" | null>(null);
 	const blockers = useMemo(
 		() =>
 			readDeleteBlockersFn({
@@ -83,32 +83,32 @@ export const useDeleteController = ({
 			project.config,
 		],
 	);
-	const cancel = useCallback(() => {
-		if (!result.waiting) setConfirming(null);
+	const cancelFn = useCallback(() => {
+		if (!result.waiting) setConfirmingFn(null);
 	}, [
 		result.waiting,
 	]);
-	const open = useCallback(
+	const openFn = useCallback(
 		(force: boolean) => {
 			if ((force || blockers.length === 0) && !result.waiting)
-				setConfirming(force ? "force" : "safe");
+				setConfirmingFn(force ? "force" : "safe");
 		},
 		[
 			blockers.length,
 			result.waiting,
 		],
 	);
-	const confirm = useCallback(async () => {
+	const confirmFn = useCallback(async () => {
 		if (confirming === null || (confirming === "safe" && blockers.length > 0) || result.waiting)
 			return;
 		try {
-			await remove({
+			await removeFn({
 				expectedRevision: project.revision,
 				force: confirming === "force",
 				itemUid: item.uid,
 			});
-			if (historyBack(() => undefined)) return;
-			await navigate({
+			if (historyBackFn(() => undefined)) return;
+			await navigateFn({
 				to: "/editor/$projectId/editor/items/list",
 				params: {
 					projectId: project.projectId,
@@ -121,24 +121,24 @@ export const useDeleteController = ({
 	}, [
 		blockers.length,
 		confirming,
-		historyBack,
+		historyBackFn,
 		item.uid,
-		navigate,
+		navigateFn,
 		project.projectId,
 		project.revision,
-		remove,
+		removeFn,
 		result.waiting,
 	]);
 
 	return {
 		blockers,
-		cancel,
-		confirm,
+		cancelFn,
+		confirmFn,
 		confirming,
 		deleting: result.waiting,
 		error: RendererRuntime.runSync(readSettledAsyncResultErrorFx(result)),
 		forceImpact,
-		open,
+		openFn,
 		project,
 	};
 };

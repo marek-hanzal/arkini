@@ -31,7 +31,7 @@ describe("GameEngineResourceFx / provisional cleanup", () => {
 		expect(successorFailure).toMatchObject({
 			operation: "engine-ownership",
 		});
-		expect(() => firstResource.assertUsable()).toThrow(successorFailure);
+		expect(() => firstResource.assertUsableFn()).toThrow(successorFailure);
 		expect(createResourceFx).toHaveBeenCalledOnce();
 	});
 	it("preserves a mixed provisional cleanup Cause inside the sticky critical failure", async () => {
@@ -60,7 +60,7 @@ describe("GameEngineResourceFx / provisional cleanup", () => {
 			expect(Cause.hasDies(preservedCause)).toBe(true);
 			expect(Cause.findErrorOption(preservedCause)).toEqual(Option.some(cleanupFailure));
 		}
-		expect(() => resource.assertUsable()).toThrow(successorFailure);
+		expect(() => resource.assertUsableFn()).toThrow(successorFailure);
 	});
 	it("preserves a mismatched resource's mixed cleanup Cause as the ownership failure", async () => {
 		const cleanupFailure = new Error("mismatch cleanup failure");

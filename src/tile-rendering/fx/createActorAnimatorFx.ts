@@ -21,7 +21,7 @@ export namespace createActorAnimatorFx {
 interface ActiveAnimation {
 	readonly actor: PixiTileActor;
 	readonly channel: AnimationChannel;
-	readonly onCancel?: () => void;
+	readonly onCancelFn?: () => void;
 	readonly ownerKey: string;
 	control: AnimationControl | null;
 }
@@ -43,7 +43,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 			>();
 			let closed = false;
 
-			const readActorChannels = (actor: PixiTileActor) => {
+			const readActorChannelsFn = (actor: PixiTileActor) => {
 				const existing = channelsByActor.get(actor);
 				if (existing !== undefined) return existing;
 				const created = new Map<AnimationChannel, ActiveAnimation>();
@@ -51,7 +51,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 				return created;
 			};
 
-			const release = (animation: ActiveAnimation) => {
+			const releaseFn = (animation: ActiveAnimation) => {
 				activeAnimations.delete(animation);
 				if (animationsByOwner.get(animation.ownerKey) === animation) {
 					animationsByOwner.delete(animation.ownerKey);
@@ -62,18 +62,18 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 				}
 			};
 
-			const cancel = (animation: ActiveAnimation | undefined) => {
+			const cancelFn = (animation: ActiveAnimation | undefined) => {
 				if (animation === undefined) return;
-				release(animation);
+				releaseFn(animation);
 				if (animation.control !== null) RendererRuntime.runSync(animation.control.stopFx);
-				animation.onCancel?.();
+				animation.onCancelFn?.();
 			};
 
-			const cancelChannel = (actor: PixiTileActor, channel: AnimationChannel) => {
-				cancel(channelsByActor.get(actor)?.get(channel));
+			const cancelChannelFn = (actor: PixiTileActor, channel: AnimationChannel) => {
+				cancelFn(channelsByActor.get(actor)?.get(channel));
 			};
 
-			const applyWrite = (write: PresentationWrite) => {
+			const applyWriteFn = (write: PresentationWrite) => {
 				if (write.actor.container.destroyed) return;
 				switch (write.channel) {
 					case "activity-particles":
@@ -111,8 +111,8 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					if (actor.container.destroyed) return;
 					const ownerKey =
 						animation.ownerKey ?? `${actor.instanceId ?? actor.item.id}:${channel}`;
-					cancelChannel(actor, channel);
-					cancel(animationsByOwner.get(ownerKey));
+					cancelChannelFn(actor, channel);
+					cancelFn(animationsByOwner.get(ownerKey));
 					// Cancellation callbacks are allowed to retire the actor synchronously. Pixi
 					// destroys its transform internals at that point, so even reading the old pose
 					// would be a use-after-destroy.
@@ -131,13 +131,13 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const active: ActiveAnimation = {
 						actor,
 						channel,
-						onCancel: animation.onCancel,
+						onCancelFn: animation.onCancelFn,
 						ownerKey,
 						control: null,
 					};
 					activeAnimations.add(active);
 					animationsByOwner.set(ownerKey, active);
-					readActorChannels(actor).set(channel, active);
+					readActorChannelsFn(actor).set(channel, active);
 
 					try {
 						active.control = RendererRuntime.runSync(
@@ -146,14 +146,14 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 								delayMs: animation.delayMs,
 								durationMs: animation.durationMs,
 								from: 0,
-								onUpdate: (progress) => {
+								onUpdateFn: (progress) => {
 									if (closed || actor.container.destroyed) return;
 									switch (animation.channel) {
 										case "activity-particles":
-											animation.render(progress);
+											animation.renderFn(progress);
 											break;
 										case "pose": {
-											const pose = animation.readPose?.(progress);
+											const pose = animation.readPoseFn?.(progress);
 											actor.container.x =
 												pose?.x ??
 												fromX +
@@ -197,22 +197,22 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 											break;
 									}
 								},
-								onComplete: () => {
+								onCompleteFn: () => {
 									if (
 										channelsByActor.get(actor)?.get(channel) !== active ||
 										animationsByOwner.get(ownerKey) !== active
 									) {
 										return;
 									}
-									release(active);
-									animation.onComplete?.();
+									releaseFn(active);
+									animation.onCompleteFn?.();
 								},
 								repeat: animation.repeat,
 								to: 1,
 							}),
 						);
 					} catch (cause) {
-						release(active);
+						releaseFn(active);
 						throw cause;
 					}
 				}),
@@ -225,23 +225,23 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 						for (const animation of [
 							...(channelsByActor.get(actor)?.values() ?? []),
 						]) {
-							cancel(animation);
+							cancelFn(animation);
 						}
 					}),
 				),
 				cancelChannelFx: Effect.fn("ActorAnimator.cancelChannelFx")((actor, channel) =>
-					Effect.sync(() => cancelChannel(actor, channel)),
+					Effect.sync(() => cancelChannelFn(actor, channel)),
 				),
 				cancelFx: Effect.fn("ActorAnimator.cancelFx")((ownerKey) =>
-					Effect.sync(() => cancel(animationsByOwner.get(ownerKey))),
+					Effect.sync(() => cancelFn(animationsByOwner.get(ownerKey))),
 				),
 				isChannelActiveFx: Effect.fn("ActorAnimator.isChannelActiveFx")((actor, channel) =>
 					Effect.sync(() => channelsByActor.get(actor)?.has(channel) === true),
 				),
 				setFx: Effect.fn("ActorAnimator.setFx")((write) =>
 					Effect.gen(function* () {
-						cancelChannel(write.actor, write.channel);
-						applyWrite(write);
+						cancelChannelFn(write.actor, write.channel);
+						applyWriteFn(write);
 						yield* frames.invalidateFx;
 					}),
 				),
@@ -253,7 +253,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 						...activeAnimations,
 					]) {
 						try {
-							cancel(animation);
+							cancelFn(animation);
 						} catch (cause) {
 							failures.push(cause);
 						}

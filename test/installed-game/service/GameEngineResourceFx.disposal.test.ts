@@ -35,7 +35,7 @@ describe("GameEngineResourceFx / reset and disposal", () => {
 			cause: clearFailure,
 		});
 		await expect(harness.current()).rejects.toBe(firstFailure);
-		expect(() => resource.assertUsable()).toThrow(firstFailure);
+		expect(() => resource.assertUsableFn()).toThrow(firstFailure);
 		await expect(harness.claimForClose()).resolves.toBe(resource);
 
 		await expect(harness.reset(resource)).rejects.toBe(firstFailure);

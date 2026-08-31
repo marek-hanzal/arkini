@@ -99,7 +99,7 @@ describe("Electron preload lifecycle", () => {
 
 	it("publishes one renderer-clock timestamp after the main window becomes visible", async () => {
 		const api = await loadPreload();
-		const visible = api.lifecycle.waitUntilVisible();
+		const visible = api.lifecycle.waitUntilVisibleFn();
 		let settled = false;
 		void visible.then(() => {
 			settled = true;
@@ -110,15 +110,15 @@ describe("Electron preload lifecycle", () => {
 		reportWindowVisible();
 		const visibleAtMs = await visible;
 		expect(visibleAtMs).toBeTypeOf("number");
-		expect(await api.lifecycle.waitUntilVisible()).toBe(visibleAtMs);
+		expect(await api.lifecycle.waitUntilVisibleFn()).toBe(visibleAtMs);
 	});
 
 	it("routes the mounted editor project context through dedicated MCP IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();
 
-		await expect(api.editorMcp.setProjectContext("project-one")).resolves.toBeUndefined();
-		await expect(api.editorMcp.clearProjectContext("project-one")).resolves.toBeUndefined();
+		await expect(api.editorMcp.setProjectContextFn("project-one")).resolves.toBeUndefined();
+		await expect(api.editorMcp.clearProjectContextFn("project-one")).resolves.toBeUndefined();
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			1,
 			ArkiniElectronContract.channels.editorMcpProjectContextSet,
@@ -135,7 +135,7 @@ describe("Electron preload lifecycle", () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();
 		const listener = vi.fn();
-		const unsubscribe = api.chatGpt.onStateChanged(listener);
+		const unsubscribe = api.chatGpt.onStateChangedFn(listener);
 		const surface = {
 			projectId: "project-one",
 			bounds: {
@@ -146,7 +146,7 @@ describe("Electron preload lifecycle", () => {
 			},
 		};
 
-		await expect(api.chatGpt.setSurface(surface)).resolves.toBeUndefined();
+		await expect(api.chatGpt.setSurfaceFn(surface)).resolves.toBeUndefined();
 		reportChatGptState({
 			type: "ready",
 		});
@@ -166,7 +166,7 @@ describe("Electron preload lifecycle", () => {
 	it("subscribes the renderer to main-process editor project mutations", async () => {
 		const api = await loadPreload();
 		const listener = vi.fn();
-		const unsubscribe = api.editor.onProjectChanged(listener);
+		const unsubscribe = api.editor.onProjectChangedFn(listener);
 
 		reportEditorProjectChanged("project-one");
 		unsubscribe();
@@ -178,7 +178,7 @@ describe("Electron preload lifecycle", () => {
 	it("returns renderer MCP version checkout completion through its private port", async () => {
 		const api = await loadPreload();
 		const listener = vi.fn(() => Promise.resolve());
-		const unsubscribe = api.editorMcp.onVersionCheckoutRequested(listener);
+		const unsubscribe = api.editorMcp.onVersionCheckoutRequestedFn(listener);
 		const request = {
 			projectId: "project-one",
 			versionId: "version-one",
@@ -196,8 +196,8 @@ describe("Electron preload lifecycle", () => {
 
 	it("shares one pending native close request", async () => {
 		const api = await loadPreload();
-		const first = api.lifecycle.requestClose();
-		const second = api.lifecycle.requestClose();
+		const first = api.lifecycle.requestCloseFn();
+		const second = api.lifecycle.requestCloseFn();
 
 		expect(second).toBe(first);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledTimes(1);
@@ -209,8 +209,8 @@ describe("Electron preload lifecycle", () => {
 	it("rejects failed close work and permits one truthful retry", async () => {
 		const api = await loadPreload();
 		const failure = new Error("save failed");
-		api.lifecycle.onBeforeClose(() => Promise.reject(failure));
-		const first = api.lifecycle.requestClose();
+		api.lifecycle.onBeforeCloseFn(() => Promise.reject(failure));
+		const first = api.lifecycle.requestCloseFn();
 
 		await requestBeforeClose();
 		await expect(first).rejects.toBe(failure);
@@ -219,7 +219,7 @@ describe("Electron preload lifecycle", () => {
 			"Error: save failed",
 		);
 
-		const retry = api.lifecycle.requestClose();
+		const retry = api.lifecycle.requestCloseFn();
 		expect(retry).not.toBe(first);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledTimes(3);
 		expect(electron.ipcRenderer.send).toHaveBeenLastCalledWith(
@@ -230,13 +230,13 @@ describe("Electron preload lifecycle", () => {
 	it("runs final save before presentation and resolves only before close readiness", async () => {
 		const api = await loadPreload();
 		const order: Array<string> = [];
-		api.lifecycle.onBeforeClose(async () => {
+		api.lifecycle.onBeforeCloseFn(async () => {
 			order.push("save");
 		});
-		api.lifecycle.onBeforeCloseReady(async () => {
+		api.lifecycle.onBeforeCloseReadyFn(async () => {
 			order.push("presentation");
 		});
-		const request = api.lifecycle.requestClose();
+		const request = api.lifecycle.requestCloseFn();
 
 		await requestBeforeClose();
 		await expect(request).resolves.toBeUndefined();

@@ -23,10 +23,10 @@ export namespace useEditorBuildInstallController {
 	}
 
 	export interface Output {
-		readonly cancelInstall: () => void;
-		readonly confirmInstall: () => void;
+		readonly cancelInstallFn: () => void;
+		readonly confirmInstallFn: () => void;
 		readonly installAction: "install" | "update";
-		readonly installArtifact: () => void;
+		readonly installArtifactFn: () => void;
 		readonly installAvailable: boolean;
 		readonly installConfirmation?: EditorBuildMajorUpdateConfirmation;
 		readonly installError?: string;
@@ -51,7 +51,7 @@ export const useEditorBuildInstallController = ({
 			: undefined;
 	const installAtom = BuildCommandAtoms.install(artifact?.contentHash ?? "unbuilt");
 	const installResult = useAtomValue(installAtom);
-	const runInstall = useAtomSet(installAtom, {
+	const runInstallFn = useAtomSet(installAtom, {
 		mode: "promise",
 	});
 	const installError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(installResult));
@@ -59,17 +59,17 @@ export const useEditorBuildInstallController = ({
 		AsyncResult.isSuccess(installResult) && !installResult.waiting
 			? installResult.value.packageId
 			: undefined;
-	const [requestedConfirmation, setRequestedConfirmation] =
+	const [requestedConfirmation, setRequestedConfirmationFn] =
 		useState<EditorBuildMajorUpdateConfirmation>();
 	const installConfirmation =
 		requestedConfirmation?.targetContentHash === artifact?.contentHash
 			? requestedConfirmation
 			: undefined;
 
-	const runArtifactInstall = async (confirmation?: EditorBuildMajorUpdateConfirmation) => {
+	const runArtifactInstallFn = async (confirmation?: EditorBuildMajorUpdateConfirmation) => {
 		if (artifact === undefined) return;
 		try {
-			await runInstall({
+			await runInstallFn({
 				artifact,
 				...(confirmation === undefined
 					? {}
@@ -79,7 +79,7 @@ export const useEditorBuildInstallController = ({
 				targetVersion,
 			});
 			if (confirmation !== undefined)
-				setRequestedConfirmation((current) =>
+				setRequestedConfirmationFn((current) =>
 					current === confirmation ? undefined : current,
 				);
 		} catch {
@@ -88,24 +88,24 @@ export const useEditorBuildInstallController = ({
 	};
 
 	return {
-		cancelInstall: () => {
+		cancelInstallFn: () => {
 			if (!installResult.waiting && installConfirmation !== undefined)
-				setRequestedConfirmation((current) =>
+				setRequestedConfirmationFn((current) =>
 					current === installConfirmation ? undefined : current,
 				);
 		},
-		confirmInstall: () => {
+		confirmInstallFn: () => {
 			if (!installResult.waiting && installConfirmation !== undefined)
-				void runArtifactInstall(installConfirmation);
+				void runArtifactInstallFn(installConfirmation);
 		},
 		installAction: installPlan?.action ?? "install",
-		installArtifact: () => {
+		installArtifactFn: () => {
 			if (installResult.waiting || installPlan === undefined) return;
 			if (installPlan.confirmation !== undefined) {
-				setRequestedConfirmation(installPlan.confirmation);
+				setRequestedConfirmationFn(installPlan.confirmation);
 				return;
 			}
-			void runArtifactInstall();
+			void runArtifactInstallFn();
 		},
 		installAvailable: installPlan !== undefined,
 		installConfirmation,

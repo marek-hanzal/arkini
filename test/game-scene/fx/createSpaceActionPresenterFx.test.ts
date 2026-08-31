@@ -62,7 +62,7 @@ describe("Space Action presenter", () => {
 		}> = [];
 		const presenter = Effect.runSync(
 			createSpaceActionPresenterFx({
-				applyTransition: (transition) => {
+				applyTransitionFn: (transition) => {
 					applied.push(
 						`${transition.sequence}:${transition.runtime.currentSpace}:${transition.events
 							.map((event) => event.type)
@@ -70,7 +70,7 @@ describe("Space Action presenter", () => {
 					);
 				},
 				initialSequence: 0,
-				scheduleAfterRender: (work) => {
+				scheduleAfterRenderFn: (work) => {
 					const frame = {
 						active: true,
 						work,
@@ -80,7 +80,7 @@ describe("Space Action presenter", () => {
 						frame.active = false;
 					};
 				},
-				setInteractionBlocked: (blocked) => interactionBlocks.push(blocked),
+				setInteractionBlockedFn: (blocked) => interactionBlocks.push(blocked),
 			}),
 		);
 		const runFrame = (index: number) => {
@@ -90,9 +90,9 @@ describe("Space Action presenter", () => {
 		};
 
 		Effect.runSync(presenter.setInteractionBlockedFx(true));
-		presenter.present(spaceTransition(1, 0, 1), "present");
-		presenter.present(ordinaryTransition(2, 1), "present");
-		presenter.present(spaceTransition(3, 1, 2), "present");
+		presenter.presentFn(spaceTransition(1, 0, 1), "present");
+		presenter.presentFn(ordinaryTransition(2, 1), "present");
+		presenter.presentFn(spaceTransition(3, 1, 2), "present");
 
 		expect(applied).toEqual([
 			"1:0:item:charge-spent",
@@ -113,7 +113,7 @@ describe("Space Action presenter", () => {
 		expect(interactionBlocks.at(-1)).toBe(false);
 		expect(applied.at(-1)).toBe("3:2:current-space:changed");
 
-		presenter.present(spaceTransition(4, 2, 3), "present");
+		presenter.presentFn(spaceTransition(4, 2, 3), "present");
 		const appliedBeforeClose = [
 			...applied,
 		];
@@ -129,19 +129,19 @@ describe("Space Action presenter", () => {
 		let renderAcknowledgment: () => void = () => undefined;
 		const presenter = Effect.runSync(
 			createSpaceActionPresenterFx({
-				applyTransition: (transition) => applied.push(transition),
+				applyTransitionFn: (transition) => applied.push(transition),
 				initialSequence: 0,
-				scheduleAfterRender: (work) => {
+				scheduleAfterRenderFn: (work) => {
 					renderAcknowledgment = work;
 					return () => undefined;
 				},
-				setInteractionBlocked: () => undefined,
+				setInteractionBlockedFn: () => undefined,
 			}),
 		);
 		const overtakingSpace = spaceTransition(1, 0, 1);
 
-		presenter.refresh(overtakingSpace);
-		presenter.present(overtakingSpace, "present");
+		presenter.refreshFn(overtakingSpace);
+		presenter.presentFn(overtakingSpace, "present");
 		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
 			[
 				"item:charge-spent",
@@ -149,7 +149,7 @@ describe("Space Action presenter", () => {
 		]);
 
 		renderAcknowledgment();
-		presenter.refresh(overtakingSpace);
+		presenter.refreshFn(overtakingSpace);
 
 		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
 			[
@@ -166,7 +166,7 @@ describe("Space Action presenter", () => {
 		let renderAcknowledgment: () => void = () => undefined;
 		const presenter = Effect.runSync(
 			createSpaceActionPresenterFx({
-				applyTransition: (transition) => {
+				applyTransitionFn: (transition) => {
 					applied.push(
 						`${transition.sequence}:${transition.runtime.currentSpace}:${transition.events
 							.map((event) => event.type)
@@ -174,17 +174,17 @@ describe("Space Action presenter", () => {
 					);
 				},
 				initialSequence: 0,
-				scheduleAfterRender: (work) => {
+				scheduleAfterRenderFn: (work) => {
 					renderAcknowledgment = work;
 					return () => undefined;
 				},
-				setInteractionBlocked: () => undefined,
+				setInteractionBlockedFn: () => undefined,
 			}),
 		);
 
-		presenter.refresh(ordinaryTransition(2, 1));
-		presenter.present(spaceTransition(1, 0, 1), "present");
-		presenter.present(ordinaryTransition(2, 1), "present");
+		presenter.refreshFn(ordinaryTransition(2, 1));
+		presenter.presentFn(spaceTransition(1, 0, 1), "present");
+		presenter.presentFn(ordinaryTransition(2, 1), "present");
 
 		expect(applied).toEqual([
 			"1:0:item:charge-spent",

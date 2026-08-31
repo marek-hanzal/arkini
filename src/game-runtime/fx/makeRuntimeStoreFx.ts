@@ -8,9 +8,9 @@ export const makeRuntimeStoreFx = Effect.fn("makeRuntimeStoreFx")(function* (
 	initial: CommittedTransitionSchema.Type,
 ) {
 	const ref = yield* SubscriptionRef.make(initial);
-	const modifyEffect: RuntimeStoreFxService["modifyEffect"] = (update) =>
+	const modifyEffectFx: RuntimeStoreFxService["modifyEffectFx"] = (updateFx) =>
 		SubscriptionRef.modifySomeEffect(ref, (transition) =>
-			update(transition).pipe(
+			updateFx(transition).pipe(
 				Effect.map(([result, nextTransition]) => [
 					result,
 					nextTransition === transition ? Option.none() : Option.some(nextTransition),
@@ -21,8 +21,8 @@ export const makeRuntimeStoreFx = Effect.fn("makeRuntimeStoreFx")(function* (
 	return {
 		ref,
 		read: SubscriptionRef.get(ref),
-		readUnsafe: () => SubscriptionRef.getUnsafe(ref),
+		readUnsafeFn: () => SubscriptionRef.getUnsafe(ref),
 		changes: SubscriptionRef.changes(ref),
-		modifyEffect,
+		modifyEffectFx,
 	} satisfies RuntimeStoreFxService;
 });

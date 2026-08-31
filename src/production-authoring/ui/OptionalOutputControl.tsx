@@ -10,7 +10,7 @@ interface OptionalOutputControlProps {
 	readonly emptyDescription: string;
 	readonly emptyIcon: LucideIcon;
 	readonly emptyTitle: string;
-	readonly onChange: (output: OutputSchema.Type | undefined) => void;
+	readonly onChangeFn: (output: OutputSchema.Type | undefined) => void;
 	readonly value: OutputSchema.Type | undefined;
 }
 
@@ -20,7 +20,7 @@ export const OptionalOutputControl = ({
 	emptyDescription,
 	emptyIcon,
 	emptyTitle,
-	onChange,
+	onChangeFn,
 	value,
 }: OptionalOutputControlProps) =>
 	value === undefined ? (
@@ -28,14 +28,14 @@ export const OptionalOutputControl = ({
 			actionLabel={addLabel}
 			description={emptyDescription}
 			icon={emptyIcon}
-			onEnable={() => onChange(structuredClone(DraftDefaults.output))}
+			onEnableFn={() => onChangeFn(structuredClone(DraftDefaults.output))}
 			title={emptyTitle}
 		/>
 	) : (
 		<div className="grid gap-3">
 			<OutputControl
 				value={value}
-				onChange={onChange}
+				onChangeFn={onChangeFn}
 			/>
 		</div>
 	);

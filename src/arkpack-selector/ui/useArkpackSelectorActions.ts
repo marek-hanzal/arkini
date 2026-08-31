@@ -20,26 +20,26 @@ export const useArkpackSelectorActions = () => {
 	// semantics; keep it only while this mounted selector owns the complete async action.
 	// Promise-mode command results are atom-wide, so the selector claims one exclusive action
 	// before invoking a setter and never overlaps awaited catalog or storage calls.
-	const importFile = useAtomSet(importArkpackFileAtom, {
+	const importFileFn = useAtomSet(importArkpackFileAtom, {
 		mode: "promise",
 	});
-	const openEditor = useAtomSet(openEditorArkpackAtom, {
+	const openEditorFn = useAtomSet(openEditorArkpackAtom, {
 		mode: "promise",
 	});
-	const remove = useAtomSet(removeArkpackAtom, {
+	const removeFn = useAtomSet(removeArkpackAtom, {
 		mode: "promise",
 	});
-	const refresh = useAtomSet(refreshArkpackCatalogAtom, {
+	const refreshFn = useAtomSet(refreshArkpackCatalogAtom, {
 		mode: "promise",
 	});
-	const openUserDirectory = useAtomSet(openUserArkpackDirectoryAtom, {
+	const openUserDirectoryFn = useAtomSet(openUserArkpackDirectoryAtom, {
 		mode: "promise",
 	});
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const mountedRef = useRef(false);
-	const [actionError, setActionError] = useState<unknown>();
-	const { active, claim, release } = useExclusiveAction<ActiveAction>();
+	const [actionError, setActionErrorFn] = useState<unknown>();
+	const { active, claimFn, releaseFn } = useExclusiveAction<ActiveAction>();
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -48,117 +48,117 @@ export const useArkpackSelectorActions = () => {
 		};
 	}, []);
 
-	const requestMainMenu = useCallback(() => {
-		if (state.type === "loading" || !claim("exit")) return;
-		setActionError(undefined);
+	const requestMainMenuFn = useCallback(() => {
+		if (state.type === "loading" || !claimFn("exit")) return;
+		setActionErrorFn(undefined);
 		void (async () => {
 			try {
-				await navigate({
+				await navigateFn({
 					to: "/main-menu",
 				});
 			} catch (error) {
-				if (mountedRef.current) setActionError(error);
+				if (mountedRef.current) setActionErrorFn(error);
 			} finally {
-				release("exit");
+				releaseFn("exit");
 			}
 		})();
 	}, [
-		claim,
-		navigate,
-		release,
+		claimFn,
+		navigateFn,
+		releaseFn,
 		state.type,
 	]);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (event.key !== "Escape") return;
 			event.preventDefault();
-			requestMainMenu();
+			requestMainMenuFn();
 		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, [
-		requestMainMenu,
+		requestMainMenuFn,
 	]);
 
-	const upload = useCallback(
+	const uploadFn = useCallback(
 		async (file: File | undefined) => {
-			if (file === undefined || state.type === "loading" || !claim("import")) {
+			if (file === undefined || state.type === "loading" || !claimFn("import")) {
 				return;
 			}
-			setActionError(undefined);
+			setActionErrorFn(undefined);
 			try {
-				const arkpack = await importFile(file);
-				await navigate({
+				const arkpack = await importFileFn(file);
+				await navigateFn({
 					to: "/action/load-game/$packageId",
 					params: {
 						packageId: arkpack.packageId,
 					},
 				});
 			} catch (error) {
-				if (mountedRef.current) setActionError(error);
+				if (mountedRef.current) setActionErrorFn(error);
 			} finally {
-				release("import");
+				releaseFn("import");
 				if (mountedRef.current) {
 					if (inputRef.current !== null) inputRef.current.value = "";
 				}
 			}
 		},
 		[
-			claim,
-			importFile,
-			navigate,
-			release,
+			claimFn,
+			importFileFn,
+			navigateFn,
+			releaseFn,
 			state.type,
 		],
 	);
 
-	const runBusyAction = useCallback(
-		(action: Exclude<BusyAction, "import">, operation: () => Promise<unknown>) => {
-			if (state.type === "loading" || !claim(action)) return;
-			setActionError(undefined);
-			void operation()
+	const runBusyActionFn = useCallback(
+		(action: Exclude<BusyAction, "import">, operationFn: () => Promise<unknown>) => {
+			if (state.type === "loading" || !claimFn(action)) return;
+			setActionErrorFn(undefined);
+			void operationFn()
 				.catch((error: unknown) => {
-					if (mountedRef.current) setActionError(error);
+					if (mountedRef.current) setActionErrorFn(error);
 				})
-				.finally(() => release(action));
+				.finally(() => releaseFn(action));
 		},
 		[
-			claim,
-			release,
+			claimFn,
+			releaseFn,
 			state.type,
 		],
 	);
 
-	const removeArkpack = useCallback(
-		(packageId: string) => runBusyAction("remove", () => remove(packageId)),
+	const removeArkpackFn = useCallback(
+		(packageId: string) => runBusyActionFn("remove", () => removeFn(packageId)),
 		[
-			remove,
-			runBusyAction,
+			removeFn,
+			runBusyActionFn,
 		],
 	);
 
-	const refreshArkpacks = useCallback(
-		() => runBusyAction("refresh", () => refresh()),
+	const refreshArkpacksFn = useCallback(
+		() => runBusyActionFn("refresh", () => refreshFn()),
 		[
-			refresh,
-			runBusyAction,
+			refreshFn,
+			runBusyActionFn,
 		],
 	);
 
-	const openArkpackDirectory = useCallback(
-		() => runBusyAction("open-directory", () => openUserDirectory()),
+	const openArkpackDirectoryFn = useCallback(
+		() => runBusyActionFn("open-directory", () => openUserDirectoryFn()),
 		[
-			openUserDirectory,
-			runBusyAction,
+			openUserDirectoryFn,
+			runBusyActionFn,
 		],
 	);
 
-	const openArkpackInEditor = useCallback(
+	const openArkpackInEditorFn = useCallback(
 		(packageId: string) =>
-			runBusyAction("editor", async () => {
-				const project = await openEditor(packageId);
-				await navigate({
+			runBusyActionFn("editor", async () => {
+				const project = await openEditorFn(packageId);
+				await navigateFn({
 					to: "/editor/$projectId/editor/items/list",
 					params: {
 						projectId: project.projectId,
@@ -166,9 +166,9 @@ export const useArkpackSelectorActions = () => {
 				});
 			}),
 		[
-			navigate,
-			openEditor,
-			runBusyAction,
+			navigateFn,
+			openEditorFn,
+			runBusyActionFn,
 		],
 	);
 
@@ -177,11 +177,11 @@ export const useArkpackSelectorActions = () => {
 		inputRef,
 		blocked: active !== null || state.type === "loading",
 		actionError,
-		upload,
-		removeArkpack,
-		openArkpackInEditor,
-		refreshArkpacks,
-		openArkpackDirectory,
-		requestMainMenu,
+		uploadFn,
+		removeArkpackFn,
+		openArkpackInEditorFn,
+		refreshArkpacksFn,
+		openArkpackDirectoryFn,
+		requestMainMenuFn,
 	};
 };

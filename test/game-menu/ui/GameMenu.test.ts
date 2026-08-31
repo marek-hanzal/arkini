@@ -93,19 +93,19 @@ const createGame = (
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
-	getResourceUrl: () => "blob:test",
+	getResourceUrlFn: () => "blob:test",
 	...Effect.runSync(
 		makeTestGameTransitionFieldsFx(
 			(cheatEnabled ? gameSnapshots.enabled : gameSnapshots.disabled) as ReturnType<
-				Game["getSnapshot"]
+				Game["getSnapshotFn"]
 			>,
 		),
 	),
-	read: testGameRead,
+	readFn: testGameRead,
 	runFx: ((_effect) => flushSaveFx) as Game["runFx"],
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn: () => () => undefined,
 });
 
 beforeEach(() => {
@@ -170,9 +170,9 @@ const renderMenu = async ({
 		RendererLifecycleOwnerAtom,
 		Effect.runSync(
 			createRendererLifecycleFx({
-				forceClose: () => undefined,
-				requestClose,
-				waitUntilVisible: () => Promise.resolve(performance.now()),
+				forceCloseFn: () => undefined,
+				requestCloseFn: requestClose,
+				waitUntilVisibleFn: () => Promise.resolve(performance.now()),
 			}),
 		),
 	);

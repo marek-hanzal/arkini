@@ -20,57 +20,57 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 			let closeAllowed = false;
 			let closeRequested = false;
 
-			const removeResponseListeners = () => {
-				ipc.removeListener(ArkiniElectronApi.channels.closeReady, onCloseReady);
-				ipc.removeListener(ArkiniElectronApi.channels.closeFailed, onCloseFailed);
+			const removeResponseListenersFn = () => {
+				ipc.removeListener(ArkiniElectronApi.channels.closeReady, onCloseReadyFn);
+				ipc.removeListener(ArkiniElectronApi.channels.closeFailed, onCloseFailedFn);
 			};
-			const removeAllListeners = () => {
-				removeResponseListeners();
-				ipc.removeListener(ArkiniElectronApi.channels.requestClose, onRequestClose);
-				ipc.removeListener(ArkiniElectronApi.channels.forceClose, onForceClose);
+			const removeAllListenersFn = () => {
+				removeResponseListenersFn();
+				ipc.removeListener(ArkiniElectronApi.channels.requestClose, onRequestCloseFn);
+				ipc.removeListener(ArkiniElectronApi.channels.forceClose, onForceCloseFn);
 			};
-			const ownsTrustedWindow = (event: IpcMainEvent) =>
-				trustedRenderer.isTrustedIpcSender(event) &&
+			const ownsTrustedWindowFn = (event: IpcMainEvent) =>
+				trustedRenderer.isTrustedIpcSenderFn(event) &&
 				event.sender.id === window.webContents.id;
-			const onCloseReady = (event: IpcMainEvent) => {
-				if (!ownsTrustedWindow(event)) return;
+			const onCloseReadyFn = (event: IpcMainEvent) => {
+				if (!ownsTrustedWindowFn(event)) return;
 				closeAllowed = true;
-				removeAllListeners();
+				removeAllListenersFn();
 				if (!window.isDestroyed()) window.close();
 			};
-			const onCloseFailed = (event: IpcMainEvent, message: string) => {
-				if (!ownsTrustedWindow(event)) return;
+			const onCloseFailedFn = (event: IpcMainEvent, message: string) => {
+				if (!ownsTrustedWindowFn(event)) return;
 				closeRequested = false;
-				removeResponseListeners();
+				removeResponseListenersFn();
 				console.error("Arkini renderer controlled-close orchestration failed:", message);
 			};
-			const onRequestClose = (event: IpcMainEvent) => {
-				if (!ownsTrustedWindow(event) || window.isDestroyed()) return;
+			const onRequestCloseFn = (event: IpcMainEvent) => {
+				if (!ownsTrustedWindowFn(event) || window.isDestroyed()) return;
 				window.close();
 			};
-			const onForceClose = (event: IpcMainEvent) => {
-				if (!ownsTrustedWindow(event)) return;
+			const onForceCloseFn = (event: IpcMainEvent) => {
+				if (!ownsTrustedWindowFn(event)) return;
 				closeAllowed = true;
-				removeAllListeners();
+				removeAllListenersFn();
 				if (!window.isDestroyed()) window.close();
 			};
 
-			ipc.on(ArkiniElectronApi.channels.requestClose, onRequestClose);
-			ipc.on(ArkiniElectronApi.channels.forceClose, onForceClose);
+			ipc.on(ArkiniElectronApi.channels.requestClose, onRequestCloseFn);
+			ipc.on(ArkiniElectronApi.channels.forceClose, onForceCloseFn);
 			window.on("close", (event) => {
 				if (closeAllowed || window.webContents.isDestroyed()) return;
 				event.preventDefault();
 				if (closeRequested) return;
 				closeRequested = true;
-				ipc.on(ArkiniElectronApi.channels.closeReady, onCloseReady);
-				ipc.on(ArkiniElectronApi.channels.closeFailed, onCloseFailed);
+				ipc.on(ArkiniElectronApi.channels.closeReady, onCloseReadyFn);
+				ipc.on(ArkiniElectronApi.channels.closeFailed, onCloseFailedFn);
 				window.webContents.send(ArkiniElectronApi.channels.beforeClose);
 			});
 			window.webContents.once("render-process-gone", () => {
 				closeAllowed = true;
-				removeAllListeners();
+				removeAllListenersFn();
 				if (!window.isDestroyed()) window.destroy();
 			});
-			window.once("closed", removeAllListeners);
+			window.once("closed", removeAllListenersFn);
 		}),
 );

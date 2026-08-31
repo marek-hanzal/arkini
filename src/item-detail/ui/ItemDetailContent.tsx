@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
+import type { ItemDetailQueueProjection } from "~/item-detail/fx/projectItemDetailQueueFx";
 import { ItemDefinitionInfoTab } from "~/item-detail/ui/ItemDefinitionInfoTab";
 import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";
 import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
@@ -23,7 +24,7 @@ interface RuntimeItemDetailContentProps {
 	readonly info?: useRuntimeItemDetailSceneController.Output["info"];
 	readonly linesSearchQuery?: string;
 	readonly lines?: useRuntimeItemDetailSceneController.Output["lines"];
-	readonly queue?: useRuntimeItemDetailSceneController.QueueProjection;
+	readonly queue?: ItemDetailQueueProjection;
 	readonly queueStale: boolean;
 	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly sources?: useItemDetailNavigationController.SourcesProjection;
@@ -133,7 +134,7 @@ const ItemQueueContent = ({
 	stale,
 }: {
 	readonly disabled: boolean;
-	readonly queue?: useRuntimeItemDetailSceneController.QueueProjection;
+	readonly queue?: ItemDetailQueueProjection;
 	readonly stale: boolean;
 }) => {
 	if (stale) {

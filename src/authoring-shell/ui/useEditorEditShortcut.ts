@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const isEditingText = (target: EventTarget | null) =>
+const isEditingTextFn = (target: EventTarget | null) =>
 	target instanceof HTMLElement &&
 	(target.matches("input, textarea, select") ||
 		target.closest('[contenteditable]:not([contenteditable="false"])') !== null);
@@ -10,7 +10,7 @@ export const useEditorEditShortcut = () => {
 	const editActionRef = useRef<HTMLAnchorElement>(null);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (
 				event.defaultPrevented ||
 				event.repeat ||
@@ -20,7 +20,7 @@ export const useEditorEditShortcut = () => {
 				event.ctrlKey ||
 				event.metaKey ||
 				event.shiftKey ||
-				isEditingText(event.target) ||
+				isEditingTextFn(event.target) ||
 				editActionRef.current === null
 			)
 				return;
@@ -29,8 +29,8 @@ export const useEditorEditShortcut = () => {
 			editActionRef.current.click();
 		};
 
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, []);
 
 	return editActionRef;

@@ -18,7 +18,7 @@ export const withArkpackFileLockFx = <Value, Error, Requirements>(
 		readonly arkpackPath: string;
 		readonly fileSystem: FileSystem.FileSystem;
 	},
-	effect: (arkpackPath: string) => Effect.Effect<Value, Error, Requirements>,
+	effectFx: (arkpackPath: string) => Effect.Effect<Value, Error, Requirements>,
 ) =>
 	Effect.gen(function* () {
 		const filesystemWrite = yield* createFilesystemWriteFx().pipe(
@@ -28,6 +28,6 @@ export const withArkpackFileLockFx = <Value, Error, Requirements>(
 		const arkpackPath = yield* readCanonicalArkpackPathFx(props.fileSystem, props.arkpackPath);
 		return yield* filesystemWrite.withLockFx(
 			join(dirname(arkpackPath), `.${basename(arkpackPath)}.lock`),
-			effect(arkpackPath),
+			effectFx(arkpackPath),
 		);
 	});

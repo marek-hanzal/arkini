@@ -41,7 +41,7 @@ export const createFilesystemWindowPreferencesFx = Effect.fn("createFilesystemWi
 					target: path,
 					value: mode,
 					operation: "persist the window mode preference",
-					serialize: (value) => JSON.stringify(WindowModeSchema.parse(value)),
+					serializeFn: (value) => JSON.stringify(WindowModeSchema.parse(value)),
 				}),
 		);
 
@@ -51,7 +51,7 @@ export const createFilesystemWindowPreferencesFx = Effect.fn("createFilesystemWi
 				path,
 				fallback: "default" as const,
 				operation: "read the window mode preference",
-				parse: (stored) => {
+				parseFn: (stored) => {
 					try {
 						return WindowModeSchema.safeParse(JSON.parse(stored)).data;
 					} catch {

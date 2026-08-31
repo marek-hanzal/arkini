@@ -78,9 +78,9 @@ interface SelectRetainedItemDetailTabProps {
 /** Canvas-local owner for one exact capability-tabbed Item Detail modal. */
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
-	readonly readActionError: (key: string) => string | null;
-	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
-	readonly runPendingAction: <Result, Failure>(
+	readonly readActionErrorFn: (key: string) => string | null;
+	readonly readPendingActionFn: (key: string) => ItemDetailPendingAction | null;
+	readonly runPendingActionFn: <Result, Failure>(
 		props: RunItemDetailPendingActionProps<Result, Failure>,
 	) => void;
 	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean, never, never>;

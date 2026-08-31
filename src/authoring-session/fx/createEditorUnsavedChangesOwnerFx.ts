@@ -25,19 +25,19 @@ export const createEditorUnsavedChangesOwnerFx = Effect.fn("createEditorUnsavedC
 			let prompt:
 				| {
 						readonly sessions: ReadonlyArray<EditorUnsavedChangesSession>;
-						readonly resolve: (allow: boolean) => void;
+						readonly resolveFn: (allow: boolean) => void;
 				  }
 				| undefined;
 
-			const dirtySessions = (pathname?: string) =>
+			const dirtySessionsFn = (pathname?: string) =>
 				[
 					...sessions.values(),
 				].filter(
 					(session) =>
-						session.isDirty() &&
-						(pathname === undefined || !session.ownsPathname(pathname)),
+						session.isDirtyFn() &&
+						(pathname === undefined || !session.ownsPathnameFn(pathname)),
 				);
-			const publish = (next: EditorUnsavedChangesSnapshot) => {
+			const publishFn = (next: EditorUnsavedChangesSnapshot) => {
 				if (
 					snapshot.canSave === next.canSave &&
 					Object.is(snapshot.error, next.error) &&
@@ -47,93 +47,93 @@ export const createEditorUnsavedChangesOwnerFx = Effect.fn("createEditorUnsavedC
 				)
 					return;
 				snapshot = next;
-				for (const listener of listeners) listener();
+				for (const listenerFn of listeners) listenerFn();
 			};
-			const publishIdle = () =>
-				publish({
+			const publishIdleFn = () =>
+				publishFn({
 					...idleSnapshot,
-					hasDirtySession: dirtySessions().length > 0,
+					hasDirtySession: dirtySessionsFn().length > 0,
 				});
-			const refresh = () => {
-				if (prompt === undefined) publishIdle();
+			const refreshFn = () => {
+				if (prompt === undefined) publishIdleFn();
 			};
-			const settle = (allow: boolean) => {
+			const settleFn = (allow: boolean) => {
 				const current = prompt;
 				prompt = undefined;
-				publishIdle();
-				current?.resolve(allow);
+				publishIdleFn();
+				current?.resolveFn(allow);
 			};
 
 			return {
-				decide: async (decision) => {
+				decideFn: async (decision) => {
 					const current = prompt;
 					if (current === undefined || snapshot.saving) return;
 					if (decision === "cancel") {
-						settle(false);
+						settleFn(false);
 						return;
 					}
 					if (decision === "discard") {
-						for (const session of current.sessions) session.discard();
-						settle(true);
+						for (const session of current.sessions) session.discardFn();
+						settleFn(true);
 						return;
 					}
 					if (!snapshot.canSave) return;
-					publish({
+					publishFn({
 						...snapshot,
 						error: undefined,
 						saving: true,
 					});
 					try {
 						for (const session of current.sessions) {
-							if (!(await session.save()))
+							if (!(await session.saveFn()))
 								throw new Error("The editor draft could not be saved.");
 						}
-						settle(true);
+						settleFn(true);
 					} catch (error) {
-						publish({
+						publishFn({
 							...snapshot,
 							error,
 							saving: false,
 						});
 					}
 				},
-				discardAll: () => {
-					for (const session of dirtySessions()) session.discard();
-					if (prompt === undefined) publishIdle();
-					else settle(true);
+				discardAllFn: () => {
+					for (const session of dirtySessionsFn()) session.discardFn();
+					if (prompt === undefined) publishIdleFn();
+					else settleFn(true);
 				},
-				getSnapshot: () => snapshot,
-				refresh,
-				register: (id, session) => {
+				getSnapshotFn: () => snapshot,
+				refreshFn,
+				registerFn: (id, session) => {
 					sessions.set(id, session);
-					refresh();
+					refreshFn();
 					return () => {
 						if (sessions.get(id) !== session) return;
 						sessions.delete(id);
-						refresh();
+						refreshFn();
 					};
 				},
-				requestLeave: (pathname) => {
+				requestLeaveFn: (pathname) => {
 					if (activeRequest !== undefined) return activeRequest;
-					const leaving = dirtySessions(pathname);
+					const leaving = dirtySessionsFn(pathname);
 					if (leaving.length === 0) return Promise.resolve(true);
-					let resolveLeave: (allow: boolean) => void = () => undefined;
-					const decision = new Promise<boolean>((resolve) => {
-						resolveLeave = resolve;
+					let resolveLeaveFn: (allow: boolean) => void = () => undefined;
+					const decision = new Promise<boolean>((resolveFn) => {
+						resolveLeaveFn = resolveFn;
 					});
 					activeRequest = decision.finally(() => {
 						activeRequest = undefined;
 					});
 					void Promise.all(
 						leaving.map((session) =>
-							Promise.resolve(session.isValid()).catch(() => false),
+							Promise.resolve(session.isValidFn()).catch(() => false),
 						),
 					).then((validity) => {
 						prompt = {
-							resolve: resolveLeave,
+							resolveFn: resolveLeaveFn,
 							sessions: leaving,
 						};
-						publish({
+						publishFn({
 							canSave: validity.every(Boolean),
 							error: undefined,
 							hasDirtySession: true,
@@ -143,9 +143,9 @@ export const createEditorUnsavedChangesOwnerFx = Effect.fn("createEditorUnsavedC
 					});
 					return activeRequest;
 				},
-				subscribe: (listener) => {
-					listeners.add(listener);
-					return () => listeners.delete(listener);
+				subscribeFn: (listenerFn) => {
+					listeners.add(listenerFn);
+					return () => listeners.delete(listenerFn);
 				},
 			};
 		}),

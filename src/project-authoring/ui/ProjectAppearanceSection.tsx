@@ -37,18 +37,18 @@ export const ProjectAppearanceSection = ({
 								addLabel="Add avatar"
 								count={avatars.length}
 								initialSelectedIndex={initialAvatarIndex}
-								itemLabel={(index) => avatars[index] || `Avatar ${index + 1}`}
+								itemLabelFn={(index) => avatars[index] || `Avatar ${index + 1}`}
 								key={initialAvatarIndex}
 								label="About avatars"
-								onAdd={
+								onAddFn={
 									avatars.length >= ProjectAvatarKeys.length
 										? undefined
 										: () => avatarsField.pushValue("")
 								}
-								onRemove={(index) => avatarsField.removeValue(index)}
+								onRemoveFn={(index) => avatarsField.removeValue(index)}
 								removeLabel="Remove avatar"
 							>
-								{(index, selectIndex) => (
+								{(index, selectIndexFn) => (
 									<div className="grid items-end gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
 										<form.AppField name={`avatars[${index}]`}>
 											{(field) => <field.AssetField label="Asset" />}
@@ -58,7 +58,7 @@ export const ProjectAppearanceSection = ({
 												disabled={index === 0}
 												onClick={() => {
 													avatarsField.swapValues(index, index - 1);
-													selectIndex(index - 1);
+													selectIndexFn(index - 1);
 												}}
 											>
 												<ArrowUp className="size-4" />
@@ -67,7 +67,7 @@ export const ProjectAppearanceSection = ({
 												disabled={index === avatars.length - 1}
 												onClick={() => {
 													avatarsField.swapValues(index, index + 1);
-													selectIndex(index + 1);
+													selectIndexFn(index + 1);
 												}}
 											>
 												<ArrowDown className="size-4" />

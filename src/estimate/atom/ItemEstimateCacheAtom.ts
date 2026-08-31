@@ -25,12 +25,12 @@ const initialState: ItemEstimateCacheAtom.State = {
 	status: "idle",
 };
 
-const sameSnapshot = (
+const sameSnapshotFn = (
 	left: ItemEstimateCacheAtom.Snapshot | undefined,
 	right: ItemEstimateCacheAtom.Snapshot,
 ) => left?.projectId === right.projectId && left.revision === right.revision;
 
-const readCauseMessage = (cause: Cause.Cause<unknown>) => {
+const readCauseMessageFn = (cause: Cause.Cause<unknown>) => {
 	const error = Cause.findErrorOption(cause);
 	return error._tag === "Some" && error.value instanceof Error
 		? error.value.message
@@ -47,7 +47,7 @@ const runnerAtom = Atom.fn((snapshot: ItemEstimateCacheAtom.Snapshot) =>
 		);
 		if (exit._tag === "Success") {
 			yield* Atom.update(stateAtom, (state) =>
-				sameSnapshot(state.snapshot, snapshot)
+				sameSnapshotFn(state.snapshot, snapshot)
 					? ({
 							estimates: new Map(
 								exit.value.estimates.map((estimate) => [
@@ -64,10 +64,10 @@ const runnerAtom = Atom.fn((snapshot: ItemEstimateCacheAtom.Snapshot) =>
 		}
 		if (Cause.hasInterruptsOnly(exit.cause)) return yield* Effect.failCause(exit.cause);
 		yield* Atom.update(stateAtom, (state) =>
-			sameSnapshot(state.snapshot, snapshot)
+			sameSnapshotFn(state.snapshot, snapshot)
 				? ({
 						estimates: new Map<string, ItemEstimate>(),
-						message: readCauseMessage(exit.cause),
+						message: readCauseMessageFn(exit.cause),
 						snapshot,
 						status: "error",
 					} satisfies ItemEstimateCacheAtom.State)
@@ -82,7 +82,7 @@ export const ItemEstimateCacheAtom = Atom.writable(
 	(context, snapshot: ItemEstimateCacheAtom.Snapshot) => {
 		const state = context.get(stateAtom);
 		if (
-			sameSnapshot(state.snapshot, snapshot) &&
+			sameSnapshotFn(state.snapshot, snapshot) &&
 			(state.status === "loading" || state.status === "ready")
 		)
 			return;

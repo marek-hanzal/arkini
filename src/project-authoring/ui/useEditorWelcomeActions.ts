@@ -6,30 +6,30 @@ import { EditorWelcomeCommandAtom } from "~/project-authoring/atom/EditorWelcome
 
 /** Owns editor-welcome navigation composition and Escape lifecycle. */
 export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const router = useRouter();
-	const [state, runCommand] = useAtom(EditorWelcomeCommandAtom);
-	const [deletedProjectIds, setDeletedProjectIds] = useState<ReadonlySet<string>>(
+	const [state, runCommandFn] = useAtom(EditorWelcomeCommandAtom);
+	const [deletedProjectIds, setDeletedProjectIdsFn] = useState<ReadonlySet<string>>(
 		() => new Set(),
 	);
-	const [projectRefreshError, setProjectRefreshError] = useState<unknown>();
-	const [refreshingProjects, setRefreshingProjects] = useState(false);
+	const [projectRefreshError, setProjectRefreshErrorFn] = useState<unknown>();
+	const [refreshingProjects, setRefreshingProjectsFn] = useState(false);
 	const active =
 		state.kind === "pending" || state.kind === "ready" || state.kind === "navigating"
 			? state.action
 			: null;
 	const blocked = active !== null || refreshingProjects;
 
-	const refreshProjects = useCallback(async () => {
-		setRefreshingProjects(true);
+	const refreshProjectsFn = useCallback(async () => {
+		setRefreshingProjectsFn(true);
 		try {
 			await router.invalidate();
-			setDeletedProjectIds(new Set());
-			setProjectRefreshError(undefined);
+			setDeletedProjectIdsFn(new Set());
+			setProjectRefreshErrorFn(undefined);
 		} catch (error) {
-			setProjectRefreshError(error);
+			setProjectRefreshErrorFn(error);
 		} finally {
-			setRefreshingProjects(false);
+			setRefreshingProjectsFn(false);
 		}
 	}, [
 		router,
@@ -37,13 +37,13 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 
 	useEffect(() => {
 		if (state.kind !== "ready") return;
-		runCommand({
+		runCommandFn({
 			action: "navigation-started",
 		});
 		if (state.action === "delete-project") {
-			setDeletedProjectIds((current) => new Set(current).add(state.projectId));
-			void refreshProjects().finally(() =>
-				runCommand({
+			setDeletedProjectIdsFn((current) => new Set(current).add(state.projectId));
+			void refreshProjectsFn().finally(() =>
+				runCommandFn({
 					action: "navigation-complete",
 				}),
 			);
@@ -51,18 +51,18 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		}
 		const navigation =
 			state.action === "exit"
-				? navigate({
+				? navigateFn({
 						to: "/main-menu",
 					})
 				: state.action === "create"
-					? navigate({
+					? navigateFn({
 							to: "/editor/$projectId/project/$sectionId",
 							params: {
 								projectId: state.project.projectId,
 								sectionId: "general",
 							},
 						})
-					: navigate({
+					: navigateFn({
 							to: "/editor/$projectId/editor/items/list",
 							params: {
 								projectId: state.project.projectId,
@@ -70,121 +70,121 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 						});
 		void navigation.then(
 			() =>
-				runCommand({
+				runCommandFn({
 					action: "navigation-complete",
 				}),
 			(error: unknown) =>
-				runCommand({
+				runCommandFn({
 					action: "navigation-failed",
 					error,
 				}),
 		);
 	}, [
-		navigate,
-		refreshProjects,
-		runCommand,
+		navigateFn,
+		refreshProjectsFn,
+		runCommandFn,
 		state,
 	]);
 
-	const createProject = useCallback(() => {
+	const createProjectFn = useCallback(() => {
 		if (blocked) return;
-		runCommand({
+		runCommandFn({
 			action: "create",
 		});
 	}, [
 		blocked,
-		runCommand,
+		runCommandFn,
 	]);
 
-	const importArkpackFile = useCallback(
+	const importArkpackFileFn = useCallback(
 		(file: File | undefined) => {
 			if (file === undefined || blocked) return;
-			runCommand({
+			runCommandFn({
 				action: "import-arkpack",
 				file,
 			});
 		},
 		[
 			blocked,
-			runCommand,
+			runCommandFn,
 		],
 	);
 
-	const importJsonDirectory = useCallback(() => {
+	const importJsonDirectoryFn = useCallback(() => {
 		if (blocked) return;
-		runCommand({
+		runCommandFn({
 			action: "import-json",
 		});
 	}, [
 		blocked,
-		runCommand,
+		runCommandFn,
 	]);
 
-	const deleteProject = useCallback(
+	const deleteProjectFn = useCallback(
 		(projectId: string) => {
 			if (blocked) return;
-			runCommand({
+			runCommandFn({
 				action: "delete-project",
 				projectId,
 			});
 		},
 		[
 			blocked,
-			runCommand,
+			runCommandFn,
 		],
 	);
 
-	const openProjectFolder = useCallback(
+	const openProjectFolderFn = useCallback(
 		(root: string) => {
 			if (blocked) return;
-			runCommand({
+			runCommandFn({
 				action: "open-project-folder",
 				root,
 			});
 		},
 		[
 			blocked,
-			runCommand,
+			runCommandFn,
 		],
 	);
 
-	const exit = useCallback(() => {
+	const exitFn = useCallback(() => {
 		if (blocked) return;
-		runCommand({
+		runCommandFn({
 			action: "exit",
 		});
 	}, [
 		blocked,
-		runCommand,
+		runCommandFn,
 	]);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || blocked || exitBlocked) return;
 			event.preventDefault();
-			exit();
+			exitFn();
 		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, [
 		blocked,
-		exit,
+		exitFn,
 		exitBlocked,
 	]);
 
 	return {
 		active,
 		blocked,
-		createProject,
+		createProjectFn,
 		deletedProjectIds,
-		deleteProject,
+		deleteProjectFn,
 		error: state.kind === "error" ? state.error : undefined,
-		exit,
-		importArkpackFile,
-		importJsonDirectory,
-		openProjectFolder,
+		exitFn,
+		importArkpackFileFn,
+		importJsonDirectoryFn,
+		openProjectFolderFn,
 		projectRefreshError,
 		refreshingProjects,
-		refreshProjects,
+		refreshProjectsFn,
 	};
 };

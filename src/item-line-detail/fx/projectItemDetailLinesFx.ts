@@ -54,11 +54,11 @@ const projectOutputItemFx = Effect.fn("projectOutputItemFx")(function* ({
 			title: configured.title,
 			quantity: item.quantity,
 			activeRuleHints: item.activeRuleHints,
-			sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+			sourceUrl: game.getResourceUrlFn(sourceAssetIds[0]),
 			...(sourceAssetIds[1] === undefined
 				? {}
 				: {
-						compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
+						compositeUrl: game.getResourceUrlFn(sourceAssetIds[1]),
 					}),
 			definitionItemId: configured.id,
 		} satisfies ItemDetailLinesProjection.OutputItem;

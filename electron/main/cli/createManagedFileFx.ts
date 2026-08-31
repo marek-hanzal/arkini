@@ -27,7 +27,7 @@ type ManagedFileInspection =
 			readonly replaceable: boolean;
 	  };
 
-const isMissing = (cause: unknown) =>
+const isMissingFn = (cause: unknown) =>
 	typeof cause === "object" && cause !== null && "code" in cause && cause.code === "ENOENT";
 
 export namespace createManagedFileFx {
@@ -36,7 +36,7 @@ export namespace createManagedFileFx {
 		readonly managedPrefix: string;
 		readonly mode: number;
 		readonly subject: string;
-		readonly readExpectedContents: () => Promise<string>;
+		readonly readExpectedContentsFn: () => Promise<string>;
 		readonly executable?: boolean;
 	}
 }
@@ -47,10 +47,10 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	managedPrefix,
 	mode,
 	subject,
-	readExpectedContents,
+	readExpectedContentsFn,
 	executable = false,
 }: createManagedFileFx.Props) {
-	const assertManagedHandle = async (handle: FileHandle) => {
+	const assertManagedHandleFn = async (handle: FileHandle) => {
 		const opened = await handle.stat();
 		const contents = await handle.readFile("utf8");
 		if (!opened.isFile() || !contents.startsWith(managedPrefix)) {
@@ -59,12 +59,12 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		return opened;
 	};
 
-	const inspect = async (): Promise<ManagedFileInspection> => {
+	const inspectFn = async (): Promise<ManagedFileInspection> => {
 		let file;
 		try {
 			file = await lstat(path);
 		} catch (cause) {
-			if (isMissing(cause)) {
+			if (isMissingFn(cause)) {
 				return {
 					type: "missing",
 				};
@@ -82,7 +82,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 			};
 		}
 		const existingContents = await readFile(path, "utf8");
-		if (existingContents === (await readExpectedContents())) {
+		if (existingContents === (await readExpectedContentsFn())) {
 			if (!executable) {
 				return {
 					type: "installed",
@@ -111,19 +111,19 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		};
 	};
 
-	const repair = async () => {
+	const repairFn = async () => {
 		const handle = await open(path, constants.O_RDWR | constants.O_NOFOLLOW);
 		try {
-			await assertManagedHandle(handle);
+			await assertManagedHandleFn(handle);
 			await handle.truncate(0);
-			await handle.write(await readExpectedContents(), 0, "utf8");
+			await handle.write(await readExpectedContentsFn(), 0, "utf8");
 			if (executable) await handle.chmod(mode);
 		} finally {
 			await handle.close();
 		}
 	};
 
-	const publish = async (replaceExisting: boolean) => {
+	const publishFn = async (replaceExisting: boolean) => {
 		const directory = dirname(path);
 		await mkdir(directory, {
 			recursive: true,
@@ -131,7 +131,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		const temporaryDirectory = await mkdtemp(join(directory, ".arkini-cli-"));
 		const temporaryPath = join(temporaryDirectory, basename(path));
 		try {
-			await writeFile(temporaryPath, await readExpectedContents(), {
+			await writeFile(temporaryPath, await readExpectedContentsFn(), {
 				encoding: "utf8",
 				flag: "wx",
 				mode,
@@ -150,10 +150,10 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		}
 	};
 
-	const remove = async () => {
+	const removeFn = async () => {
 		const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);
 		try {
-			const opened = await assertManagedHandle(handle);
+			const opened = await assertManagedHandleFn(handle);
 			const directory = dirname(path);
 			const claimDirectory = await mkdtemp(join(directory, ".arkini-cli-removal-"));
 			const claimedPath = join(claimDirectory, basename(path));
@@ -183,9 +183,9 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	};
 
 	return {
-		inspect,
-		publish,
-		remove,
-		repair,
+		inspectFn,
+		publishFn,
+		removeFn,
+		repairFn,
 	} as const;
 });

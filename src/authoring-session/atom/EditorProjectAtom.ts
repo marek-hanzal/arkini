@@ -32,7 +32,10 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 		project: undefined,
 		pendingCommits: new Map(),
 	});
-	const applyPendingCommits = (initial: Project, pendingCommits: Map<number, ProjectCommit>) => {
+	const applyPendingCommitsFn = (
+		initial: Project,
+		pendingCommits: Map<number, ProjectCommit>,
+	) => {
 		let project = initial;
 		for (const [previousRevision, commit] of pendingCommits) {
 			if (commit.revision <= project.revision) pendingCommits.delete(previousRevision);
@@ -69,7 +72,7 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 				)
 					return;
 				context.set(stateAtom, {
-					project: applyPendingCommits(command.project, pendingCommits),
+					project: applyPendingCommitsFn(command.project, pendingCommits),
 					pendingCommits,
 				});
 				return;
@@ -82,7 +85,7 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 				project:
 					state.project === undefined
 						? undefined
-						: applyPendingCommits(state.project, pendingCommits),
+						: applyPendingCommitsFn(state.project, pendingCommits),
 				pendingCommits,
 			});
 		},

@@ -8,7 +8,7 @@ interface SettingsSegmentedChoiceProps<Value extends string> {
 	readonly selected: Value;
 	readonly pending: boolean;
 	readonly dataUi: string;
-	readonly onChange: (value: Value) => void;
+	readonly onChangeFn: (value: Value) => void;
 }
 
 /** Settings-only segmented choice; its owner supplies the authoritative selection. */
@@ -17,7 +17,7 @@ export const SettingsSegmentedChoice = <Value extends string>({
 	selected,
 	pending,
 	dataUi,
-	onChange,
+	onChangeFn,
 }: SettingsSegmentedChoiceProps<Value>) => (
 	<div
 		className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
@@ -30,7 +30,7 @@ export const SettingsSegmentedChoice = <Value extends string>({
 					key={option.value}
 					className="ak-segmented-option relative cursor-pointer rounded-lg px-3 py-2.5 text-center text-sm font-semibold"
 					disabled={pending}
-					onClick={() => onChange(option.value)}
+					onClick={() => onChangeFn(option.value)}
 					type="button"
 					{...readDataUiFn({
 						dataUi: "SettingsSegmentedChoiceOption",

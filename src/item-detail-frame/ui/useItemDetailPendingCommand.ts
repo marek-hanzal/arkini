@@ -7,7 +7,7 @@ interface UseItemDetailPendingCommandOptions<Props, Result, Failure> {
 	readonly action: ItemDetailPendingAction;
 	readonly failureMessage: string;
 	readonly pendingKey: string;
-	readonly run: (
+	readonly runFx: (
 		game: PlayableGame,
 		props: Props,
 	) => import("effect").Effect.Effect<Result, Failure>;
@@ -18,20 +18,20 @@ export const useItemDetailPendingCommand = <Props, Result, Failure>({
 	action,
 	failureMessage,
 	pendingKey,
-	run: runCommand,
+	runFx: runCommandFx,
 }: UseItemDetailPendingCommandOptions<Props, Result, Failure>) => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();
 
 	return {
-		error: itemDetail.readActionError(pendingKey),
-		pending: itemDetail.readPendingAction(pendingKey) === action,
-		run: (command: Props) =>
-			itemDetail.runPendingAction({
+		error: itemDetail.readActionErrorFn(pendingKey),
+		pending: itemDetail.readPendingActionFn(pendingKey) === action,
+		runFn: (command: Props) =>
+			itemDetail.runPendingActionFn({
 				key: pendingKey,
 				action,
 				failureMessage,
-				run: runCommand(game, command),
+				run: runCommandFx(game, command),
 			}),
 	};
 };

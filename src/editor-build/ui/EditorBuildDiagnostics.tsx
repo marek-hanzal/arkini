@@ -8,8 +8,6 @@ import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectS
 import { ButtonLink } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
-type EditorGameDiagnostic = GameDiagnosticSchema.Type;
-
 type EditorDiagnosticTarget =
 	| {
 			readonly kind: "item";
@@ -29,8 +27,8 @@ type EditorDiagnosticTarget =
 	  };
 
 interface EditorGameDiagnosticPresentation {
-	readonly code: EditorGameDiagnostic["code"];
-	readonly severity: EditorGameDiagnostic["severity"];
+	readonly code: GameDiagnosticSchema.Type["code"];
+	readonly severity: GameDiagnosticSchema.Type["severity"];
 	readonly title: string;
 	readonly detail: string;
 	readonly context?: string;
@@ -41,7 +39,7 @@ interface EditorGameDiagnosticPresentation {
 const readItemIdFromPathFn = (path: ReadonlyArray<PropertyKey>) =>
 	path[0] === "items" && typeof path[1] === "string" ? path[1] : undefined;
 
-const readDiagnosticItemIdsFn = (diagnostic: EditorGameDiagnostic): ReadonlyArray<string> => {
+const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): ReadonlyArray<string> => {
 	switch (diagnostic.code) {
 		case "input:capacity-unsupported":
 		case "input:material-ineligible":
@@ -75,7 +73,7 @@ const readDiagnosticItemIdsFn = (diagnostic: EditorGameDiagnostic): ReadonlyArra
 	}
 };
 
-const readOwnedItemSectionFn = (diagnostic: EditorGameDiagnostic): SectionId | undefined => {
+const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionId | undefined => {
 	switch (diagnostic.code) {
 		case "merge:invalid":
 			return "merges";
@@ -96,7 +94,7 @@ const readOwnedItemSectionFn = (diagnostic: EditorGameDiagnostic): SectionId | u
 };
 
 const readEditorGameDiagnosticTargetsFn = (
-	diagnostic: EditorGameDiagnostic,
+	diagnostic: GameDiagnosticSchema.Type,
 	project: Pick<Project, "config" | "resources">,
 ): ReadonlyArray<EditorDiagnosticTarget> => {
 	const itemSection =
@@ -139,7 +137,7 @@ const readEditorGameDiagnosticTargetsFn = (
 };
 
 const printEditorGameDiagnosticFn = (
-	diagnostic: EditorGameDiagnostic,
+	diagnostic: GameDiagnosticSchema.Type,
 	project: Pick<Project, "config" | "resources">,
 ): EditorGameDiagnosticPresentation => {
 	const presentation = readGameDiagnosticPresentationFn(diagnostic);
@@ -216,7 +214,7 @@ export const EditorBuildDiagnostics = ({
 	diagnostics,
 	project,
 }: {
-	readonly diagnostics: ReadonlyArray<EditorGameDiagnostic>;
+	readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
 	readonly project: Pick<Project, "projectId" | "config" | "resources">;
 }) => (
 	<ul className="mt-4 grid gap-3">

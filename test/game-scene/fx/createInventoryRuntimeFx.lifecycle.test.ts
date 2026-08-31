@@ -81,7 +81,7 @@ describe("Inventory runtime / close and failures", () => {
 		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenCalledTimes(2);
-		expect(game.reportCriticalFailure).toHaveBeenCalledWith(
+		expect(game.reportCriticalFailureFn).toHaveBeenCalledWith(
 			"game-presentation",
 			expect.any(Error),
 		);
@@ -103,7 +103,7 @@ describe("Inventory runtime / close and failures", () => {
 		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenCalledOnce();
-		expect(game.reportCriticalFailure).not.toHaveBeenCalled();
+		expect(game.reportCriticalFailureFn).not.toHaveBeenCalled();
 		expect(actor.container.alpha).toBe(1);
 		await Effect.runPromise(runtime.closeFx);
 	});
@@ -125,7 +125,7 @@ describe("Inventory runtime / close and failures", () => {
 
 		expect(onDrop).toHaveBeenCalledOnce();
 		expect(actor.container.x).toBe(initialX);
-		expect(game.reportCriticalFailure).toHaveBeenCalledWith(
+		expect(game.reportCriticalFailureFn).toHaveBeenCalledWith(
 			"game-presentation",
 			expect.any(Error),
 		);

@@ -9,7 +9,7 @@ interface EditorBooleanToggleBadgeProps {
 	readonly checkedIcon: LucideIcon;
 	readonly description: string;
 	readonly label: string;
-	readonly onChange: (checked: boolean) => void;
+	readonly onChangeFn: (checked: boolean) => void;
 	readonly uncheckedIcon: LucideIcon;
 }
 
@@ -19,7 +19,7 @@ export const EditorBooleanToggleBadge = ({
 	checkedIcon,
 	description,
 	label,
-	onChange,
+	onChangeFn,
 	uncheckedIcon,
 }: EditorBooleanToggleBadgeProps) => {
 	const Icon = checked ? checkedIcon : uncheckedIcon;
@@ -36,7 +36,7 @@ export const EditorBooleanToggleBadge = ({
 			<button
 				type="button"
 				className="inline-flex min-h-9 cursor-pointer items-center gap-2 py-1.5 pl-3 pr-1 text-xs font-semibold text-inherit"
-				onClick={() => onChange(!checked)}
+				onClick={() => onChangeFn(!checked)}
 			>
 				<Icon className="size-4" />
 				{label}

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 export interface GameInteractionControl {
 	readonly cancelFx: Effect.Effect<void, never, never>;
-	readonly registerFx: (cancel: () => void) => Effect.Effect<() => void, never, never>;
+	readonly registerFx: (cancelFn: () => void) => Effect.Effect<() => void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
@@ -13,13 +13,13 @@ export const createGameInteractionControlFx = Effect.fn("createGameInteractionCo
 		let closed = false;
 		return {
 			cancelFx: Effect.sync(() => {
-				for (const cancel of cancellations) cancel();
+				for (const cancelFn of cancellations) cancelFn();
 			}),
-			registerFx: Effect.fn("GameInteractionControl.registerFx")((cancel) =>
+			registerFx: Effect.fn("GameInteractionControl.registerFx")((cancelFn) =>
 				Effect.sync(() => {
 					if (closed) return () => undefined;
-					cancellations.add(cancel);
-					return () => cancellations.delete(cancel);
+					cancellations.add(cancelFn);
+					return () => cancellations.delete(cancelFn);
 				}),
 			),
 			closeFx: Effect.sync(() => {

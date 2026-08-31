@@ -116,7 +116,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						return yield* settleRendererCommandFailureFx({
 							cause: exit.cause,
 							game,
-							onFailure: (failure) =>
+							onFailureFx: (failure) =>
 								command.generation !== latestCommandGeneration
 									? Effect.void
 									: Atom.set(stateAtom, {
@@ -124,7 +124,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 											error: failure,
 											ownerItemId: command.ownerItemId,
 										}),
-							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
+							setFatalCauseFx: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
 					}
 					if (Exit.isFailure(exit.value.commandExit)) {
@@ -146,7 +146,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						return yield* settleRendererCommandFailureFx({
 							cause: exit.value.commandExit.cause,
 							game,
-							onFailure: (failure) =>
+							onFailureFx: (failure) =>
 								command.generation !== latestCommandGeneration
 									? Effect.void
 									: Atom.set(stateAtom, {
@@ -154,7 +154,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 											error: failure,
 											ownerItemId: command.ownerItemId,
 										}),
-							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
+							setFatalCauseFx: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
 					}
 					yield* writeDiagnosticRecordFx({

@@ -18,8 +18,6 @@ export namespace commitMergeDropFx {
 		readonly targetItemId: IdSchema.Type;
 		readonly targetRevision: RevisionSchema.Type;
 	}
-
-	export type Result = DropItemResult;
 }
 
 /** Commits one exact authored merge and normalizes both actor identities. */
@@ -43,7 +41,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 		targetItemId,
 		targetRevision,
 	}).pipe(
-		Effect.map((result): commitMergeDropFx.Result => {
+		Effect.map((result): DropItemResult => {
 			const sourceCurrent = projectDropActorCurrentFn(result.sourceAfter);
 			const target = projectDropTransferActorFn({
 				after: result.targetAfter,

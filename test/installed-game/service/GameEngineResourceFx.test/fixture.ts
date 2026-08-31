@@ -50,17 +50,17 @@ export const makeResource = ({
 			disposeFx,
 			disposeWithoutSaveFx,
 			flushSaveFx: Effect.void,
-			getResourceUrl: () => "blob:test",
+			getResourceUrlFn: () => "blob:test",
 			...Effect.runSync(
-				makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>),
+				makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>),
 			),
-			read: testGameRead,
-			run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+			readFn: testGameRead,
+			runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 			saveKey: {
 				packageId,
 			},
-			subscribe: () => () => undefined,
-			subscribeEvents: () => () => undefined,
+			subscribeFn: () => () => undefined,
+			subscribeEventsFn: () => () => undefined,
 		}),
 	);
 

@@ -6,10 +6,10 @@ import { DetailReference } from "~/item-authoring/ui/DetailReference";
 
 type ItemRegistry = Record<string, ItemSchema.Type>;
 
-const formatQuantity = (quantity: QuantitySchema.Type) =>
+const formatQuantityFn = (quantity: QuantitySchema.Type) =>
 	quantity.min === quantity.max ? String(quantity.min) : quantity.min + "–" + quantity.max;
 
-const formatChargeCost = (input: LineInputSchema.Type) => {
+const formatChargeCostFn = (input: LineInputSchema.Type) => {
 	if (input.charges === undefined) return "";
 	return (
 		" · " +
@@ -77,12 +77,12 @@ const LineInput = ({
 							? "Consumed"
 							: "Reserved"
 						: "Board · " + input.query.distance}
-					{formatChargeCost(input)}
+					{formatChargeCostFn(input)}
 				</p>
 			</div>
 			<p className="text-right font-medium text-foreground">
 				{input.type === "materials"
-					? "×" + formatQuantity(input.quantity) + " required"
+					? "×" + formatQuantityFn(input.quantity) + " required"
 					: "Required"}
 			</p>
 		</div>

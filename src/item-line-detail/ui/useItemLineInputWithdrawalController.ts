@@ -15,7 +15,7 @@ export namespace useItemLineInputWithdrawalController {
 	export interface Output {
 		readonly error: string | null;
 		readonly pending: boolean;
-		readonly withdraw: () => void;
+		readonly withdrawFn: () => void;
 	}
 }
 
@@ -35,15 +35,15 @@ export const useItemLineInputWithdrawalController = ({
 			input.inputIndex,
 			"withdraw",
 		]),
-		run: (game, props: withdrawLineInputFx.Props) =>
+		runFx: (game, props: withdrawLineInputFx.Props) =>
 			game.runFx(withdrawLineInputFx(props)).pipe(Effect.asVoid),
 	});
 
 	return {
 		error: command.error,
 		pending: command.pending,
-		withdraw: () =>
-			command.run({
+		withdrawFn: () =>
+			command.runFn({
 				inputIndex: input.inputIndex,
 				lineId,
 				ownerItemId,

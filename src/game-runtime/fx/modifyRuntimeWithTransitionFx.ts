@@ -35,11 +35,11 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 	Result,
 	Error,
 	Requirements,
->(update: modifyRuntimeWithTransitionFx.Update<Result, Error, Requirements>) {
+>(updateFx: modifyRuntimeWithTransitionFx.Update<Result, Error, Requirements>) {
 	const store = yield* RuntimeStoreFx;
 
-	return yield* store.modifyEffect((transition) =>
-		update(transition.runtime).pipe(
+	return yield* store.modifyEffectFx((transition) =>
+		updateFx(transition.runtime).pipe(
 			Effect.provideService(RuntimeFx, {
 				read: Effect.succeed(transition.runtime),
 			}),

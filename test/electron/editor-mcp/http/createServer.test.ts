@@ -152,11 +152,11 @@ describe("editor MCP server", () => {
 
 	it("serves the active project and clears only the matching context", async () => {
 		let runtimeCalls = 0;
-		const runPromise: createEditorMcpOwnershipFx.Props["runPromise"] = (effect) => {
+		const runPromiseFn: createEditorMcpOwnershipFx.Props["runPromiseFn"] = (effect) => {
 			runtimeCalls += 1;
 			return Effect.runPromise(effect);
 		};
-		const { ownership, port, repository } = await createMcpHarness(runPromise);
+		const { ownership, port, repository } = await createMcpHarness(runPromiseFn);
 		await Effect.runPromise(
 			repository.createProjectFx({
 				version: "1.0",
@@ -170,8 +170,8 @@ describe("editor MCP server", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("project-context");
-		ownership.clearProjectContext("another-project");
+		ownership.setProjectContextFn("project-context");
+		ownership.clearProjectContextFn("another-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 		const project = await client.callTool({
@@ -184,8 +184,8 @@ describe("editor MCP server", () => {
 			},
 		]);
 		expect(runtimeCalls).toBe(1);
-		ownership.clearProjectContext("project-context");
-		expect(ownership.readProjectContext()).toBeUndefined();
+		ownership.clearProjectContextFn("project-context");
+		expect(ownership.readProjectContextFn()).toBeUndefined();
 	});
 
 	it("routes relation and estimate requests through the active project", async () => {
@@ -203,7 +203,7 @@ describe("editor MCP server", () => {
 				resources: [],
 			}),
 		);
-		ownership.setProjectContext("tool-project");
+		ownership.setProjectContextFn("tool-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 		const relation = await client.callTool({
@@ -286,7 +286,7 @@ describe("editor MCP server", () => {
 			}),
 		);
 		const checkoutRequests: string[] = [];
-		ownership.setProjectContext("version-project", (versionId) =>
+		ownership.setProjectContextFn("version-project", (versionId) =>
 			Effect.gen(function* () {
 				checkoutRequests.push(versionId);
 				const status = yield* repository.readVersionStatusFx("version-project");

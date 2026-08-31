@@ -66,7 +66,7 @@ describe("editor MCP item creation", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("create-item-project");
+		ownership.setProjectContextFn("create-item-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 
@@ -147,7 +147,7 @@ describe("editor MCP item creation", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext(projectId);
+		ownership.setProjectContextFn(projectId);
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 
@@ -229,7 +229,7 @@ describe("editor MCP item creation", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("notification-project");
+		ownership.setProjectContextFn("notification-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 

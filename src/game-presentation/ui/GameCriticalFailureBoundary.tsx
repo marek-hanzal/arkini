@@ -16,9 +16,9 @@ export const GameCriticalFailureBoundary = ({ children }: PropsWithChildren) => 
 		select: (location) => location.pathname.endsWith("/action/exit"),
 	});
 	const failure = useSyncExternalStore(
-		resource.subscribeCriticalFailure,
-		resource.getCriticalFailure,
-		resource.getCriticalFailure,
+		resource.subscribeCriticalFailureFn,
+		resource.getCriticalFailureFn,
+		resource.getCriticalFailureFn,
 	);
 	if (!controlledClose && failure !== null) throw failure;
 	return children;

@@ -9,8 +9,8 @@ import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 
 interface Props<Error = unknown> {
 	debounceMs?: number;
-	onFatalError?: (cause: Cause.Cause<Error>) => void;
-	save: (state: StateSchema.Type) => Effect.Effect<void, Error, never>;
+	onFatalErrorFn?: (cause: Cause.Cause<Error>) => void;
+	saveFx: (state: StateSchema.Type) => Effect.Effect<void, Error, never>;
 }
 
 /**
@@ -22,8 +22,8 @@ interface Props<Error = unknown> {
  */
 export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
-	onFatalError = () => undefined,
-	save,
+	onFatalErrorFn = () => undefined,
+	saveFx,
 }: Props<Error>) =>
 	Layer.effect(
 		RuntimeSaveFx,
@@ -43,7 +43,7 @@ export const RuntimeSaveLayerFx = <Error>({
 						Effect.flatMap(([runtime, saved]) =>
 							runtime === saved
 								? Effect.void
-								: save(
+								: saveFx(
 										fromRuntimeFn({
 											runtime,
 										}),
@@ -62,7 +62,7 @@ export const RuntimeSaveLayerFx = <Error>({
 						Effect.onError((cause) =>
 							Cause.hasInterruptsOnly(cause)
 								? Effect.void
-								: Effect.sync(() => onFatalError(cause)),
+								: Effect.sync(() => onFatalErrorFn(cause)),
 						),
 					),
 				),
@@ -87,7 +87,7 @@ export const RuntimeSaveLayerFx = <Error>({
 									Effect.catchCause((cause) =>
 										Cause.hasInterruptsOnly(cause)
 											? Effect.void
-											: Effect.sync(() => onFatalError(cause)),
+											: Effect.sync(() => onFatalErrorFn(cause)),
 									),
 								),
 					),

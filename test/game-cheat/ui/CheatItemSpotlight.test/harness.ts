@@ -61,8 +61,8 @@ let registry: AtomRegistry.AtomRegistry;
 
 export const createGame = (): Game =>
 	({
-		getResourceUrl: (resourceId: string) => `blob:${resourceId}`,
-		read: () =>
+		getResourceUrlFn: (resourceId: string) => `blob:${resourceId}`,
+		readFn: () =>
 			Exit.succeed([
 				{
 					itemId: "item:alpha",
@@ -117,13 +117,13 @@ export const setCheatAvailability = (available: boolean) => {
 export interface RenderSpotlightProps {
 	readonly alwaysAvailable?: boolean;
 	readonly game?: Game;
-	readonly onBeforeOpen?: () => void;
+	readonly onBeforeOpenFn?: () => void;
 }
 
 export const renderSpotlight = async ({
 	alwaysAvailable,
 	game = createGame(),
-	onBeforeOpen,
+	onBeforeOpenFn,
 }: RenderSpotlightProps = {}) => {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -146,7 +146,7 @@ export const renderSpotlight = async ({
 							? createElement(CheatItemSpotlight, {
 									alwaysAvailable,
 									game,
-									onBeforeOpen,
+									onBeforeOpenFn,
 								})
 							: null,
 					),

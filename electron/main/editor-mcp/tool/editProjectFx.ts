@@ -8,12 +8,12 @@ import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 /** Replaces supplied whole project sections and exact-pins the read-to-commit revision. */
 export const editProjectFx = Effect.fn("editProjectFx")(function* ({
 	input,
-	notifyProjectChanged,
+	notifyProjectChangedFn,
 	project,
 	repository,
 }: {
 	readonly input: EditProjectInput;
-	readonly notifyProjectChanged: (projectId: string) => void;
+	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 }) {
@@ -39,7 +39,7 @@ export const editProjectFx = Effect.fn("editProjectFx")(function* ({
 		expectedRevision: input.revision ?? project.revision,
 		projectId: project.projectId,
 	});
-	yield* notifyProjectChangedFx(notifyProjectChanged, project.projectId);
+	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		"Edited project configuration.",
 		`Project ID: ${project.projectId}`,

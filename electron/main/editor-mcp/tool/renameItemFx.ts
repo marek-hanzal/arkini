@@ -9,14 +9,14 @@ import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 export const renameItemFx = Effect.fn("renameItemFx")(function* ({
 	itemId,
 	newItemId,
-	notifyProjectChanged,
+	notifyProjectChangedFn,
 	project,
 	repository,
 	revision,
 }: {
 	readonly itemId: string;
 	readonly newItemId: string;
-	readonly notifyProjectChanged: (projectId: string) => void;
+	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 	readonly revision?: number;
@@ -37,7 +37,7 @@ export const renameItemFx = Effect.fn("renameItemFx")(function* ({
 		expectedRevision: revision ?? project.revision,
 		projectId: project.projectId,
 	});
-	yield* notifyProjectChangedFx(notifyProjectChanged, project.projectId);
+	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	const item = renamed.config.items[newItemId];
 	if (item === undefined) return yield* Effect.die(new Error("Renamed item is missing."));
 	return [

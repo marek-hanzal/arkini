@@ -4,8 +4,8 @@ import { Container, Graphics, Rectangle } from "pixi.js";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import { readScenePaletteFx } from "~/tile-rendering/fx/readScenePaletteFx";
 import type { DropFeedback } from "~/game-scene/service/DropFeedback";
 import { drawMaskFx } from "~/game-scene/fx/drawMaskFx";
@@ -54,7 +54,7 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 	application.stage.eventMode = "static";
 	let closed = false;
 
-	const createLayout = () => {
+	const createLayoutFn = () => {
 		const width = Math.max(1, application.app.screen.width);
 		const height = Math.max(1, application.app.screen.height);
 		const preferredCellSize = readMainLayoutFn({
@@ -73,7 +73,7 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 		});
 	};
 
-	let layout: InventoryLayout = createLayout();
+	let layout: InventoryLayout = createLayoutFn();
 
 	const readActorPoseFx = Effect.fn("InventorySurface.readActorPoseFx")((item: TileActorItem) =>
 		Effect.sync((): InventoryActorPose | null => {
@@ -99,7 +99,7 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 	);
 
 	const renderDropFeedbackFx = Effect.fn("InventorySurface.renderDropFeedbackFx")(
-		(target: InventoryDropTarget | null, kind: readTileDropPreviewFx.Result["kind"] | null) =>
+		(target: InventoryDropTarget | null, kind: readDropItemPreviewFx.Result["kind"] | null) =>
 			Effect.gen(function* () {
 				const accepted =
 					kind !== null &&
@@ -115,7 +115,7 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 	);
 
 	const redrawFx = Effect.gen(function* () {
-		layout = createLayout();
+		layout = createLayoutFn();
 		application.stage.hitArea = new Rectangle(
 			0,
 			0,

@@ -94,7 +94,7 @@ describe("sequential stack contact", () => {
 		samplePoseAnimation(firstTravel, 1);
 		expect(stacked.item.quantity).toBe(1);
 		expect(stacked.item.badgeCount).toBeUndefined();
-		firstTravel.onComplete?.();
+		firstTravel.onCompleteFn?.();
 		advanceStackMergeVanish({
 			actor: firstTransient,
 			animations,
@@ -122,7 +122,7 @@ describe("sequential stack contact", () => {
 		samplePoseAnimation(secondTravel, 1);
 		expect(stacked.item.quantity).toBe(2);
 		expect(stacked.item.badgeCount).toBe(2);
-		secondTravel.onComplete?.();
+		secondTravel.onCompleteFn?.();
 		advanceStackMergeVanish({
 			actor: secondTransient,
 			animations,
@@ -201,7 +201,7 @@ describe("sequential stack contact", () => {
 		);
 		if (stackTravel?.channel !== "pose") throw new Error("Expected the stack contact.");
 		samplePoseAnimation(stackTravel, 1);
-		stackTravel.onComplete?.();
+		stackTravel.onCompleteFn?.();
 		advanceStackMergeVanish({
 			actor: stackTravel.actor,
 			animations,
@@ -216,7 +216,7 @@ describe("sequential stack contact", () => {
 		);
 		if (inputTravel?.channel !== "pose") throw new Error("Expected the input contact.");
 		samplePoseAnimation(inputTravel, 1);
-		inputTravel.onComplete?.();
+		inputTravel.onCompleteFn?.();
 		advanceInputRemainderFlash({
 			actor: inputTravel.actor,
 			animations,

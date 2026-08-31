@@ -154,7 +154,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const editorMcpTunnel = yield* createNgrokEditorMcpTunnelFx;
 	const editorMcpOwnership = yield* createEditorMcpOwnershipFx({
 		editor: editorProjectServiceOwnership,
-		notifyOverviewChanged: (overview) => {
+		notifyOverviewChangedFn: (overview) => {
 			for (const window of BrowserWindow.getAllWindows()) {
 				if (window.isDestroyed()) continue;
 				window.webContents.send(
@@ -163,17 +163,17 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 				);
 			}
 		},
-		notifyProjectChanged: (projectId) => {
+		notifyProjectChangedFn: (projectId) => {
 			for (const window of BrowserWindow.getAllWindows()) {
 				if (window.isDestroyed()) continue;
 				window.webContents.send(ArkiniElectronApi.channels.editorProjectChanged, projectId);
 			}
 		},
 		storage: editorMcpStorage,
-		runPromise: ElectronMainRuntime.runPromise,
+		runPromiseFn: ElectronMainRuntime.runPromise,
 		tunnel: editorMcpTunnel,
 	});
-	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSync));
+	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSyncFn));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
 	const chatGptViewControllerOwnership = yield* createChatGptViewControllerOwnershipFx();
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;

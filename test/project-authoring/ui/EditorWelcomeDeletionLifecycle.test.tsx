@@ -109,7 +109,7 @@ describe("editor project deletion lifecycle", () => {
 					"button",
 					{
 						id: "delete-project",
-						onClick: () => actions.deleteProject("project-one"),
+						onClick: () => actions.deleteProjectFn("project-one"),
 						type: "button",
 					},
 					"Delete",
@@ -118,7 +118,7 @@ describe("editor project deletion lifecycle", () => {
 					"button",
 					{
 						id: "delete-second-project",
-						onClick: () => actions.deleteProject("project-two"),
+						onClick: () => actions.deleteProjectFn("project-two"),
 						type: "button",
 					},
 					"Delete second",
@@ -128,7 +128,7 @@ describe("editor project deletion lifecycle", () => {
 					{
 						disabled: actions.refreshingProjects,
 						id: "refresh-projects",
-						onClick: () => void actions.refreshProjects(),
+						onClick: () => void actions.refreshProjectsFn(),
 						type: "button",
 					},
 					"Refresh",

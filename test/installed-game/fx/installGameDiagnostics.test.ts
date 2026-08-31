@@ -13,7 +13,7 @@ import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalErro
 import { RuntimeInvalidError } from "~/game-runtime/error/RuntimeInvalidError";
 
 const originalWindow = globalThis.window;
-const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
+const runRendererEffectFn = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
 
 const testArkpack = {
 	packageId: "package:test",
@@ -57,8 +57,8 @@ describe("Game diagnostics", () => {
 			value: {
 				arkini: {
 					diagnostics: {
-						write,
-						openDirectory: () => Promise.resolve(),
+						writeFn: write,
+						openDirectoryFn: () => Promise.resolve(),
 					},
 				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
 			},
@@ -67,8 +67,8 @@ describe("Game diagnostics", () => {
 		let fatalListener: (() => void) | undefined;
 		let fatal: GameSessionFatalError | null = null;
 		const session = {
-			subscribeTransitions: (
-				listener: Parameters<GameSession["subscribeTransitions"]>[0],
+			subscribeTransitionsFn: (
+				listener: Parameters<GameSession["subscribeTransitionsFn"]>[0],
 			) => {
 				transitionListener = listener;
 				listener(createTransition(0));
@@ -76,22 +76,24 @@ describe("Game diagnostics", () => {
 					transitionListener = undefined;
 				};
 			},
-			subscribeFatalError: (listener: Parameters<GameSession["subscribeFatalError"]>[0]) => {
+			subscribeFatalErrorFn: (
+				listener: Parameters<GameSession["subscribeFatalErrorFn"]>[0],
+			) => {
 				fatalListener = listener;
 				return () => {
 					fatalListener = undefined;
 				};
 			},
-			getFatalError: () => fatal,
+			getFatalErrorFn: () => fatal,
 		} satisfies Pick<
 			GameSession,
-			"getFatalError" | "subscribeFatalError" | "subscribeTransitions"
+			"getFatalErrorFn" | "subscribeFatalErrorFn" | "subscribeTransitionsFn"
 		>;
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
 				restored: true,
-				runRendererEffect,
+				runRendererEffectFn,
 				session,
 			}),
 		);

@@ -70,7 +70,7 @@ export const checkoutProjectVersionFx = Effect.fn("checkoutEditorProjectVersionF
 									),
 								);
 							yield* Effect.gen(function* () {
-								yield* Effect.sync(() => unsavedChanges.discardAll());
+								yield* Effect.sync(() => unsavedChanges.discardAllFn());
 								const fresh = yield* readProjectFx({
 									projectId,
 								});

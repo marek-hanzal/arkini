@@ -7,7 +7,7 @@ interface SettingsOpenActionRowProps {
 	readonly pending: boolean;
 	readonly disabled?: boolean;
 	readonly idleLabel: string;
-	readonly onClick: () => void;
+	readonly onClickFn: () => void;
 }
 
 /** Settings-only row for a platform-owned directory open action. */
@@ -18,7 +18,7 @@ export const SettingsOpenActionRow = ({
 	pending,
 	disabled = false,
 	idleLabel,
-	onClick,
+	onClickFn,
 }: SettingsOpenActionRowProps) => (
 	<div
 		className="ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3"
@@ -32,7 +32,7 @@ export const SettingsOpenActionRow = ({
 			className="shrink-0"
 			cursorIntent={pending ? "progress" : undefined}
 			disabled={pending || disabled}
-			onClick={onClick}
+			onClick={onClickFn}
 		>
 			{idleLabel}
 		</Button>

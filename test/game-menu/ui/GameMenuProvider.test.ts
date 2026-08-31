@@ -46,21 +46,21 @@ describe("GameMenuProvider", () => {
 		if (menu === undefined) throw new Error("Expected game menu control.");
 
 		await act(async () => {
-			menu?.open();
-			expect(menu?.beginAction("save")).toBe(false);
-			menu?.completeEnter();
-			expect(menu?.beginAction("save")).toBe(true);
-			expect(menu?.beginAction("settings")).toBe(false);
-			menu?.close();
+			menu?.openFn();
+			expect(menu?.beginActionFn("save")).toBe(false);
+			menu?.completeEnterFn();
+			expect(menu?.beginActionFn("save")).toBe(true);
+			expect(menu?.beginActionFn("settings")).toBe(false);
+			menu?.closeFn();
 		});
 		expect(menu.phase).toBe("open");
 		expect(menu.activeAction).toBe("save");
 
 		await act(async () => {
-			menu?.completeAction("settings");
-			expect(menu?.beginAction("settings")).toBe(false);
-			menu?.completeAction("save");
-			menu?.close();
+			menu?.completeActionFn("settings");
+			expect(menu?.beginActionFn("settings")).toBe(false);
+			menu?.completeActionFn("save");
+			menu?.closeFn();
 		});
 		expect(menu.phase).toBe("exiting");
 		expect(menu.activeAction).toBeNull();

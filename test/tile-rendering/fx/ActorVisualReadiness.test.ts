@@ -106,17 +106,17 @@ const createControlledTextures = () => {
 
 const createFrames = () => {
 	const invalidate = vi.fn();
-	const reportCriticalFailure = vi.fn();
+	const reportCriticalFailureFn = vi.fn();
 	return {
 		frames: {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
-			reportCriticalFailure,
+			reportCriticalFailureFn,
 			scheduleAfterRenderFx: () => Effect.succeed(() => {}),
 			scheduleFx: () => Effect.succeed(() => {}),
 		},
 		invalidate,
-		reportCriticalFailure,
+		reportCriticalFailureFn,
 	};
 };
 
@@ -183,9 +183,9 @@ describe("texture readiness", () => {
 		rejects.get("resource:old")?.(failure);
 
 		await vi.waitFor(() => {
-			expect(frames.reportCriticalFailure).toHaveBeenCalledOnce();
+			expect(frames.reportCriticalFailureFn).toHaveBeenCalledOnce();
 		});
-		expect(frames.reportCriticalFailure).toHaveBeenCalledWith(failure);
+		expect(frames.reportCriticalFailureFn).toHaveBeenCalledWith(failure);
 		expect(actor.currentVisual.textureState).toBe("failed");
 	});
 
@@ -266,7 +266,7 @@ describe("texture readiness", () => {
 		expect(oldVisual.container.destroyed).toBe(false);
 		expect(actor.pendingVisual?.primary.texture).toBe(nextTexture);
 
-		visualMix?.onComplete?.();
+		visualMix?.onCompleteFn?.();
 		expect(actor.currentVisual.primary.texture).toBe(nextTexture);
 		expect(actor.currentVisual.container.alpha).toBe(1);
 		expect(actor.pendingVisual).toBeNull();
@@ -326,7 +326,7 @@ describe("texture readiness", () => {
 		const lifecycleScale = animations.find(({ channel }) => channel === "lifecycle-scale");
 		const visualMix = animations.find(({ channel }) => channel === "visual-mix");
 		expect(actor.currentVisual).toBe(originalVisual);
-		visualMix?.onComplete?.();
+		visualMix?.onCompleteFn?.();
 		expect(originalVisual.container.destroyed).toBe(true);
 		expect(actor.lifecycleTargetAlpha).toBe(1);
 		expect(actor.lifecycleTransitionStarted).toBe(true);

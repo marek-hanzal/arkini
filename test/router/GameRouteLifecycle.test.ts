@@ -25,7 +25,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const createGame = (
 	disposeFx: Game["disposeFx"] = Effect.void,
-	subscribeEvents: Game["subscribeEvents"] = () => () => undefined,
+	subscribeEventsFn: Game["subscribeEventsFn"] = () => () => undefined,
 ): Game => ({
 	arkpack: {
 		packageId: "package-route",
@@ -42,15 +42,15 @@ const createGame = (
 	disposeFx,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	read: testGameRead,
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	getResourceUrlFn: () => "blob:test",
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
+	readFn: testGameRead,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 	saveKey: {
 		packageId: "package-route",
 	},
-	subscribe: () => () => undefined,
-	subscribeEvents,
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn,
 });
 
 const createHarness = async (
@@ -124,13 +124,13 @@ describe("game route lifecycle", () => {
 		const disposeGate = new Promise<void>((resolve) => {
 			resolveDispose = resolve;
 		});
-		const subscribeEvents = vi.fn(() => () => undefined);
+		const subscribeEventsFn = vi.fn(() => () => undefined);
 		const game = createGame(
 			Effect.promise(async () => {
 				disposeStarted();
 				await disposeGate;
 			}),
-			subscribeEvents,
+			subscribeEventsFn,
 		);
 		const { router } = await createHarness("/game/package-route/action/exit", game);
 		const loading = router.load();
@@ -149,12 +149,12 @@ describe("game route lifecycle", () => {
 		});
 		await vi.waitFor(() => expect(disposeStarted).toHaveBeenCalledOnce());
 
-		expect(subscribeEvents).not.toHaveBeenCalled();
+		expect(subscribeEventsFn).not.toHaveBeenCalled();
 
 		resolveDispose();
 		await vi.advanceTimersByTimeAsync(2_500);
 		await loading;
-		expect(subscribeEvents).not.toHaveBeenCalled();
+		expect(subscribeEventsFn).not.toHaveBeenCalled();
 	});
 
 	it("gates the save-scoped Cheats route only through application availability", async () => {
@@ -238,13 +238,13 @@ describe("game route lifecycle", () => {
 			configurable: true,
 			value: {
 				editor: {
-					status: () =>
+					statusFn: () =>
 						Promise.resolve({
 							type: "ready" as const,
 						}),
 				},
 				editorMcp: {
-					activate: () =>
+					activateFn: () =>
 						Promise.resolve({
 							type: "ready" as const,
 							port: 32_310,

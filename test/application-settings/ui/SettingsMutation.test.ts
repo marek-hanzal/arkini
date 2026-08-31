@@ -211,7 +211,7 @@ describe("Settings mutation authority", () => {
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
 		await vi.waitFor(() => expect(registry.get(CheatAvailabilityAtom)).toBe(true));
-		expect(game.getSnapshot().cheats).toEqual({
+		expect(game.getSnapshotFn().cheats).toEqual({
 			enabled: false,
 			everEnabled: false,
 			instantGameplay: false,

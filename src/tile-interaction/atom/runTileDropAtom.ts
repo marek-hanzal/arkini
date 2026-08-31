@@ -4,11 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-
-export namespace runTileDropAtom {
-	export type Command = dropItemFx.Props;
-	export type Result = dropItemFx.Result;
-}
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 
 /**
  * Owns mounted-screen tile-drop execution for one exact live Game.
@@ -21,7 +17,7 @@ export namespace runTileDropAtom {
 export const runTileDropAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
-			(command: runTileDropAtom.Command) =>
+			(command: DropItemCommand) =>
 				Effect.yieldNow.pipe(Effect.andThen(game.runFx(dropItemFx(command)))),
 			{
 				concurrent: true,

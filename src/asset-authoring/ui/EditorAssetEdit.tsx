@@ -16,31 +16,31 @@ interface EditorAssetEditProps extends useEditorAssetEditController.Props {}
 const EditorAssetImageDropZone = ({
 	currentUrl,
 	file,
-	onFile,
+	onFileFn,
 }: {
 	readonly currentUrl?: string;
 	readonly file?: File;
-	readonly onFile: (file: File | undefined) => void;
+	readonly onFileFn: (file: File | undefined) => void;
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [dragging, setDragging] = useState(false);
-	const [selectedUrl, setSelectedUrl] = useState<string>();
+	const [dragging, setDraggingFn] = useState(false);
+	const [selectedUrl, setSelectedUrlFn] = useState<string>();
 	useLayoutEffect(() => {
 		if (file === undefined) {
-			setSelectedUrl(undefined);
+			setSelectedUrlFn(undefined);
 			return;
 		}
 		const url = URL.createObjectURL(file);
-		setSelectedUrl(url);
+		setSelectedUrlFn(url);
 		return () => URL.revokeObjectURL(url);
 	}, [
 		file,
 	]);
-	const select = (next: File | undefined) => onFile(next);
-	const drop = (event: DragEvent<HTMLButtonElement>) => {
+	const selectFn = (next: File | undefined) => onFileFn(next);
+	const dropFn = (event: DragEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-		setDragging(false);
-		select(event.dataTransfer.files.item(0) ?? undefined);
+		setDraggingFn(false);
+		selectFn(event.dataTransfer.files.item(0) ?? undefined);
 	};
 	const previewUrl = selectedUrl ?? currentUrl;
 	return (
@@ -50,7 +50,7 @@ const EditorAssetImageDropZone = ({
 				type="file"
 				accept="image/png,.png"
 				className="hidden"
-				onChange={(event) => select(event.currentTarget.files?.[0])}
+				onChange={(event) => selectFn(event.currentTarget.files?.[0])}
 			/>
 			<button
 				type="button"
@@ -58,14 +58,14 @@ const EditorAssetImageDropZone = ({
 				onClick={() => inputRef.current?.click()}
 				onDragEnter={(event) => {
 					event.preventDefault();
-					setDragging(true);
+					setDraggingFn(true);
 				}}
 				onDragLeave={(event) => {
 					event.preventDefault();
-					setDragging(false);
+					setDraggingFn(false);
 				}}
 				onDragOver={(event) => event.preventDefault()}
-				onDrop={drop}
+				onDrop={dropFn}
 				{...readDataUiFn({
 					dataUi: "EditorAssetImageDropZone",
 					state: {
@@ -144,7 +144,7 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 							disabled={!controller.dirty || controller.saving}
 							cursorIntent={controller.saving ? "progress" : undefined}
 							className="min-h-0 px-4 py-2 text-sm"
-							onClick={() => void controller.save()}
+							onClick={() => void controller.saveFn()}
 						>
 							Save
 						</PrimaryButton>
@@ -155,20 +155,20 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 			<div className="mx-auto w-full max-w-3xl">
 				<EditorFormContent
 					error={controller.error}
-					save={controller.save}
+					saveFn={controller.saveFn}
 				>
 					<label className="grid gap-1.5 text-sm font-semibold">
 						Asset ID
 						<input
 							className={editorInputClassName}
 							value={controller.nextId}
-							onChange={(event) => controller.setNextId(event.currentTarget.value)}
+							onChange={(event) => controller.setNextIdFn(event.currentTarget.value)}
 						/>
 					</label>
 					<EditorAssetImageDropZone
 						currentUrl={controller.currentUrl}
 						file={controller.file}
-						onFile={controller.setFile}
+						onFileFn={controller.setFileFn}
 					/>
 				</EditorFormContent>
 			</div>

@@ -29,7 +29,7 @@ export type ItemEstimateIndexState =
 			readonly status: "error";
 	  };
 
-const sameSnapshot = (
+const sameSnapshotFn = (
 	left: ItemEstimateCache.Snapshot | undefined,
 	right: ItemEstimateCache.Snapshot,
 ) => left?.projectId === right.projectId && left.revision === right.revision;
@@ -59,12 +59,12 @@ export const useItemEstimateIndex = (
 			project.revision,
 		],
 	);
-	const [state, requestIndex] = useAtom(ItemEstimateCacheAtom);
+	const [state, requestIndexFn] = useAtom(ItemEstimateCacheAtom);
 
 	useEffect(() => {
-		requestIndex(snapshot);
+		requestIndexFn(snapshot);
 	}, [
-		requestIndex,
+		requestIndexFn,
 		snapshot,
 	]);
 	const selection = useMemo(() => {
@@ -89,7 +89,7 @@ export const useItemEstimateIndex = (
 		sort,
 		state.estimates,
 	]);
-	if (!sameSnapshot(state.snapshot, snapshot))
+	if (!sameSnapshotFn(state.snapshot, snapshot))
 		return {
 			maximumDemand: 0,
 			rows: [],

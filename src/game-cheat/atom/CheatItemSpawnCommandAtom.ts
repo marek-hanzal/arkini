@@ -78,14 +78,14 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 						return yield* settleRendererCommandFailureFx({
 							cause: exit.cause,
 							game,
-							onFailure: (failure) =>
+							onFailureFx: (failure) =>
 								command.generation !== latestCommandGeneration
 									? Effect.void
 									: Atom.set(stateAtom, {
 											kind: "error",
 											error: failure,
 										}),
-							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
+							setFatalCauseFx: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
 					}
 					if (command.generation !== latestCommandGeneration) return;

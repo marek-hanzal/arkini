@@ -14,7 +14,7 @@ export namespace flashConsumedSourceFx {
 const consumedFadeDurationMs = 130;
 const consumedRestoreDurationMs = 360;
 const consumedSourceAlpha = 0.42;
-const readActorAlphaAnimationKey = (actor: Pick<PixiTileActor, "instanceId">) =>
+const readActorAlphaAnimationKeyFn = (actor: Pick<PixiTileActor, "instanceId">) =>
 	`actor-alpha:${actor.instanceId}`;
 
 /**
@@ -31,8 +31,8 @@ export const flashConsumedSourceFx = Effect.fn("flashConsumedSourceFx")(function
 		actor,
 		channel: "lifecycle-opacity",
 		durationMs: consumedFadeDurationMs,
-		ownerKey: readActorAlphaAnimationKey(actor),
-		onComplete: () => {
+		ownerKey: readActorAlphaAnimationKeyFn(actor),
+		onCompleteFn: () => {
 			if (
 				actor.container.destroyed ||
 				actor.lifecycleIntentGeneration !== intentGeneration ||
@@ -45,7 +45,7 @@ export const flashConsumedSourceFx = Effect.fn("flashConsumedSourceFx")(function
 					actor,
 					channel: "lifecycle-opacity",
 					durationMs: consumedRestoreDurationMs,
-					ownerKey: readActorAlphaAnimationKey(actor),
+					ownerKey: readActorAlphaAnimationKeyFn(actor),
 					toAlpha: 1,
 				}),
 			);

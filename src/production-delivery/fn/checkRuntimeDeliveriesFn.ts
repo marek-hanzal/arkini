@@ -37,7 +37,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 		const current = delivery.value;
 		if (current.location.phase !== "outbound") continue;
 		const { target } = current.location;
-		const issue = (
+		const issueFn = (
 			reason: DeliveryTargetIssueReasonEnumSchema.Type,
 		): DeliveryTargetIssueSchema.Type => ({
 			itemIds: [
@@ -52,21 +52,23 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 			0,
 		);
 		if (allocationQuantity > current.quantity) {
-			issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.AllocationExceedsQuantity));
+			issues.push(
+				issueFn(DeliveryTargetIssueReasonEnumSchema.enum.AllocationExceedsQuantity),
+			);
 		}
 		if (
 			new Set(target.input.map(({ inputIndex }) => inputIndex)).size !== target.input.length
 		) {
-			issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.AllocationDuplicate));
+			issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.AllocationDuplicate));
 		}
 
 		const owner = runtime.items.find((candidate) => candidate.id === target.ownerItemId);
 		if (owner === undefined) {
-			issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.OwnerMissing));
+			issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.OwnerMissing));
 			continue;
 		}
 		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
-			issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.OwnerNotOnBoard));
+			issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.OwnerNotOnBoard));
 			continue;
 		}
 		const line = readItemLineFn({
@@ -74,14 +76,14 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 			lineId: target.lineId,
 		});
 		if (line === undefined) {
-			issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.LineMissing));
+			issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.LineMissing));
 			continue;
 		}
 
 		for (const allocation of target.input) {
 			const input = line.input[allocation.inputIndex];
 			if (input === undefined || input.type !== TypeSchema.enum.Materials) {
-				issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.SlotInvalid));
+				issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.SlotInvalid));
 				continue;
 			}
 			if (
@@ -91,7 +93,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 					selector: input.selector,
 				})
 			) {
-				issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.SelectorMismatch));
+				issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.SelectorMismatch));
 				continue;
 			}
 			if (
@@ -102,7 +104,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 					runtime,
 				})
 			) {
-				issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.SlotClosed));
+				issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.SlotClosed));
 				continue;
 			}
 			validClaims.push({

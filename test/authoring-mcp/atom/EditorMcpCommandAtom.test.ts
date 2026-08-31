@@ -28,11 +28,11 @@ beforeEach(() => {
 	vi.stubGlobal("window", {
 		arkini: {
 			editorMcp: {
-				command: async () => ({
+				commandFn: async () => ({
 					overview: mcpState.overview,
 				}),
-				configure: async () => mcpState.overview,
-				readOverview: async () => mcpState.overview,
+				configureFn: async () => mcpState.overview,
+				readOverviewFn: async () => mcpState.overview,
 			},
 		},
 	});

@@ -3,8 +3,8 @@ import { match } from "ts-pattern";
 
 import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 
 interface SwapCandidate {
 	readonly source: {
@@ -42,7 +42,7 @@ export interface DropPresentation {
 	readonly clearFeedbackFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly completeFx: (props: {
 		readonly generation: number;
-		readonly result: runTileDropAtom.Result;
+		readonly result: DropItemResult;
 	}) => Effect.Effect<void, never, never>;
 	readonly failFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly readSnapshotFx: Effect.Effect<DropSnapshot, never, never>;
@@ -70,7 +70,7 @@ interface PendingFeedback {
 
 const readFeedbackCuesFn = (
 	generation: number,
-	result: runTileDropAtom.Result,
+	result: DropItemResult,
 ): ReadonlyArray<TileActorFeedbackCue> =>
 	match(result)
 		.with(
@@ -146,7 +146,7 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 		const pending = new Map<number, PendingDrop>();
 		const swaps = new Map<number, PendingSwap>();
 
-		const clearGeneration = (generation: number) => {
+		const clearGenerationFn = (generation: number) => {
 			pending.delete(generation);
 			swaps.delete(generation);
 			feedback.delete(generation);
@@ -210,7 +210,7 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 			failFx: Effect.fn("DropPresentation.failFx")((generation) =>
 				Effect.sync(() => {
 					if (closed) return;
-					clearGeneration(generation);
+					clearGenerationFn(generation);
 				}),
 			),
 			readSnapshotFx: Effect.sync(

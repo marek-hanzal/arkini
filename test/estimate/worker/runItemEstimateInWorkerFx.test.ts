@@ -33,12 +33,12 @@ describe("runItemEstimateInWorkerFx", () => {
 		Effect.gen(function* () {
 			const worker = new TestWorker();
 			const result = yield* runItemEstimateInWorkerFx(request, {
-				runEstimate: async () => ({
+				runEstimateFn: async () => ({
 					estimates: [
 						estimate,
 					],
 				}),
-				spawn: () => asWorker(worker),
+				spawnFn: () => asWorker(worker),
 			});
 
 			expect(result.estimates).toEqual([
@@ -52,8 +52,8 @@ describe("runItemEstimateInWorkerFx", () => {
 		Effect.gen(function* () {
 			const worker = new TestWorker();
 			const running = yield* runItemEstimateInWorkerFx(request, {
-				runEstimate: () => new Promise(() => undefined),
-				spawn: () => asWorker(worker),
+				runEstimateFn: () => new Promise(() => undefined),
+				spawnFn: () => asWorker(worker),
 			}).pipe(Effect.forkChild);
 
 			yield* Effect.yieldNow;
@@ -70,8 +70,8 @@ describe("runItemEstimateInWorkerFx", () => {
 			const worker = new TestWorker();
 			const exit = yield* Effect.exit(
 				runItemEstimateInWorkerFx(request, {
-					runEstimate: () => Promise.reject(new Error("estimate exploded")),
-					spawn: () => asWorker(worker),
+					runEstimateFn: () => Promise.reject(new Error("estimate exploded")),
+					spawnFn: () => asWorker(worker),
 				}),
 			);
 

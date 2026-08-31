@@ -13,7 +13,7 @@ import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesys
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
-const encodeJson = (value: unknown) =>
+const encodeJsonFn = (value: unknown) =>
 	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 
 type Operations = Pick<
@@ -21,7 +21,7 @@ type Operations = Pick<
 	"listNotesFx" | "createNoteFx" | "updateNoteFx" | "deleteNoteFx"
 >;
 
-const error = (
+const errorFn = (
 	operation: "list-notes" | "create-note" | "update-note" | "delete-note",
 	message: string,
 	cause?: unknown,
@@ -38,7 +38,7 @@ export namespace createNoteOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
-		readonly readState: (
+		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 		readonly states: Map<string, ProjectState>;
@@ -49,18 +49,18 @@ export namespace createNoteOperationsFx {
 export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(function* ({
 	filesystemWrite,
 	operations,
-	readState,
+	readStateFx,
 	states,
 }: createNoteOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 
 	const readNotesFx = (projectId: string) =>
-		readState(projectId).pipe(
+		readStateFx(projectId).pipe(
 			Effect.map((state) => [
 				...state.notes,
 			]),
 		);
-	const publishNotes = (state: ProjectState, notes: ReadonlyArray<NoteSchema.Type>) =>
+	const publishNotesFn = (state: ProjectState, notes: ReadonlyArray<NoteSchema.Type>) =>
 		states.set(state.project.projectId, {
 			...state,
 			notes: [
@@ -82,7 +82,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 					),
 				),
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"list-notes",
 						`Notes for project ${projectId} could not be listed.`,
 						cause,
@@ -96,12 +96,12 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 			const content = yield* Effect.try({
 				try: () => NoteContentSchema.parse(candidate),
 				catch: (cause) =>
-					error("create-note", "The Editor project note is invalid.", cause),
+					errorFn("create-note", "The Editor project note is invalid.", cause),
 			});
 			const clockMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
+					const state = yield* readStateFx(projectId);
 					const notes = yield* readNotesFx(projectId);
 					const latest = notes[0]?.updatedAtMs;
 					const createdAtMs =
@@ -120,7 +120,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 						filesystemWrite.replaceFileFx({
 							lock: state.paths.lockFile,
 							target,
-							bytes: encodeJson(
+							bytes: encodeJsonFn(
 								NoteFileSchema.parse({
 									content: note.content,
 									createdAtMs: note.createdAtMs,
@@ -129,7 +129,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 							),
 						}),
 					);
-					publishNotes(state, [
+					publishNotesFn(state, [
 						note,
 						...notes,
 					]);
@@ -138,7 +138,11 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error("create-note", `A note could not be created in project ${projectId}.`, cause),
+				errorFn(
+					"create-note",
+					`A note could not be created in project ${projectId}.`,
+					cause,
+				),
 			),
 		);
 
@@ -154,17 +158,17 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 					content: NoteContentSchema.parse(candidate),
 				}),
 				catch: (cause) =>
-					error("update-note", "The Editor project note is invalid.", cause),
+					errorFn("update-note", "The Editor project note is invalid.", cause),
 			});
 			const clockMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
+					const state = yield* readStateFx(projectId);
 					const notes = yield* readNotesFx(projectId);
 					const previous = notes.find((note) => note.noteId === noteId);
 					if (previous === undefined)
 						return yield* Effect.fail(
-							error(
+							errorFn(
 								"update-note",
 								`Editor note ${noteId} does not exist in project ${projectId}.`,
 							),
@@ -182,14 +186,14 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 						filesystemWrite.replaceFileFx({
 							lock: state.paths.lockFile,
 							target,
-							bytes: encodeJson({
+							bytes: encodeJsonFn({
 								content: note.content,
 								createdAtMs: note.createdAtMs,
 								updatedAtMs: note.updatedAtMs,
 							}),
 						}),
 					);
-					publishNotes(state, [
+					publishNotesFn(state, [
 						note,
 						...notes.filter((candidate) => candidate.noteId !== noteId),
 					]);
@@ -198,7 +202,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"update-note",
 					`Editor note ${candidateId} could not be updated in project ${projectId}.`,
 					cause,
@@ -210,15 +214,15 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 		Effect.gen(function* () {
 			const noteId = yield* Effect.try({
 				try: () => IdSchema.parse(candidateId),
-				catch: (cause) => error("delete-note", "The Editor note key is invalid.", cause),
+				catch: (cause) => errorFn("delete-note", "The Editor note key is invalid.", cause),
 			});
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
+					const state = yield* readStateFx(projectId);
 					const target = yield* state.paths.noteFileFx(noteId);
 					if (!(yield* fileSystem.exists(target)))
 						return yield* Effect.fail(
-							error(
+							errorFn(
 								"delete-note",
 								`Editor note ${noteId} does not exist in project ${projectId}.`,
 							),
@@ -231,7 +235,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 							target,
 						}),
 					);
-					publishNotes(
+					publishNotesFn(
 						state,
 						state.notes.filter((note) => note.noteId !== noteId),
 					);
@@ -239,7 +243,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"delete-note",
 					`Editor note ${candidateId} could not be deleted from project ${projectId}.`,
 					cause,

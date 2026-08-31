@@ -40,7 +40,7 @@ const installDesktopAppearance = (write: (theme: AppearanceThemeSchema.Type) => 
 		value: {
 			arkini: {
 				appearance: {
-					write,
+					writeFn: write,
 				},
 			},
 		},

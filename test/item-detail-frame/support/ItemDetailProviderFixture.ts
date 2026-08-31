@@ -48,9 +48,9 @@ const providerGame = {
 	config: {
 		items: {},
 	},
-	getSnapshot: () => ({}),
+	getSnapshotFn: () => ({}),
 	id: "game:item-detail-provider",
-	readOrThrow: (request: {
+	readOrThrowFn: (request: {
 		readonly target?: {
 			readonly kind?: string;
 		};
@@ -80,8 +80,8 @@ export const close = (
 
 export const runPendingAction = (
 	control: ItemDetailControl,
-	props: Parameters<ItemDetailControl["runPendingAction"]>[0],
-) => control.runPendingAction(props);
+	props: Parameters<ItemDetailControl["runPendingActionFn"]>[0],
+) => control.runPendingActionFn(props);
 
 afterEach(async () => {
 	await act(async () => {

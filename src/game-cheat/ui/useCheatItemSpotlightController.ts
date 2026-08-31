@@ -11,7 +11,7 @@ import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { readCheatItemCatalogFx } from "~/game-cheat/fx/readCheatItemCatalogFx";
 
-const errorMessage = (error: unknown) =>
+const errorMessageFn = (error: unknown) =>
 	match(error)
 		.with(P.instanceOf(Error), (current) => current.message)
 		.otherwise(String);
@@ -26,15 +26,15 @@ export namespace useCheatItemSpotlightController {
 	export interface Props {
 		readonly alwaysAvailable?: boolean;
 		readonly game: PlayableGame;
-		readonly onBeforeOpen?: () => void;
+		readonly onBeforeOpenFn?: () => void;
 	}
 
 	export interface Output {
-		readonly close: () => void;
+		readonly closeFn: () => void;
 		readonly items: ReadonlyArray<Item>;
 		readonly open: boolean;
-		readonly resetSpawnStatus: () => void;
-		readonly selectItem: (itemId: string) => void;
+		readonly resetSpawnStatusFn: () => void;
+		readonly selectItemFn: (itemId: string) => void;
 		readonly spawnStatus: "error" | "idle" | "pending" | "success";
 		readonly spawnStatusMessage: string;
 	}
@@ -43,7 +43,7 @@ export namespace useCheatItemSpotlightController {
 export const useCheatItemSpotlightController = ({
 	alwaysAvailable = false,
 	game,
-	onBeforeOpen,
+	onBeforeOpenFn,
 }: useCheatItemSpotlightController.Props): useCheatItemSpotlightController.Output => {
 	const cheats = useGameCheats(game);
 	const cheatAvailability = useCheatAvailability();
@@ -52,34 +52,34 @@ export const useCheatItemSpotlightController = ({
 	const spawn = use(CheatItemSpawnContext);
 	if (spawn === null) throw new Error("CheatItemSpawnProvider is not mounted.");
 	const items = useMemo(() => {
-		const exit = game.read(readCheatItemCatalogFx());
+		const exit = game.readFn(readCheatItemCatalogFx());
 		if (Exit.isFailure(exit)) throw exit.cause;
 		return exit.value.map(({ itemId, sourceResourceId, title }) => ({
 			itemId,
-			sourceUrl: game.getResourceUrl(sourceResourceId),
+			sourceUrl: game.getResourceUrlFn(sourceResourceId),
 			title,
 		}));
 	}, [
 		game,
 	]);
 	const preserveSpawnOutcomeRef = useRef(false);
-	const [open, setOpen] = useState(false);
+	const [open, setOpenFn] = useState(false);
 	const blockedByHigherOwner = gameMenu.phase !== "closed" || itemDetail.state.phase !== "closed";
 	const admitted = alwaysAvailable || cheatAvailability.available;
 	const available = admitted && cheats.enabled && !blockedByHigherOwner;
-	const close = useCallback(() => {
+	const closeFn = useCallback(() => {
 		if (spawn.pending) preserveSpawnOutcomeRef.current = true;
-		setOpen(false);
+		setOpenFn(false);
 	}, [
 		spawn.pending,
 	]);
-	const toggle = () => {
+	const toggleFn = () => {
 		if (open) {
-			close();
+			closeFn();
 			return;
 		}
 		if (!available) return;
-		onBeforeOpen?.();
+		onBeforeOpenFn?.();
 		match({
 			preserveSpawnOutcome: preserveSpawnOutcomeRef.current,
 			spawnPending: spawn.pending,
@@ -97,7 +97,7 @@ export const useCheatItemSpotlightController = ({
 					preserveSpawnOutcome: false,
 					spawnPending: false,
 				},
-				spawn.reset,
+				spawn.resetFn,
 			)
 			.with(
 				{
@@ -107,25 +107,25 @@ export const useCheatItemSpotlightController = ({
 				() => undefined,
 			)
 			.exhaustive();
-		setOpen(true);
+		setOpenFn(true);
 	};
-	const selectItem = (itemId: string) => {
-		spawn.request(itemId);
+	const selectItemFn = (itemId: string) => {
+		spawn.requestFn(itemId);
 	};
 
-	useHotkey("Mod+P", toggle, {
+	useHotkey("Mod+P", toggleFn, {
 		enabled: admitted && cheats.enabled,
 		preventDefault: true,
 	});
 
 	useEffect(() => {
 		if (!open) return;
-		if (blockedByHigherOwner || !admitted || !cheats.enabled) close();
+		if (blockedByHigherOwner || !admitted || !cheats.enabled) closeFn();
 	}, [
 		admitted,
 		blockedByHigherOwner,
 		cheats.enabled,
-		close,
+		closeFn,
 		open,
 	]);
 
@@ -141,7 +141,7 @@ export const useCheatItemSpotlightController = ({
 			{
 				kind: "error",
 			},
-			({ error }) => `Spawn failed: ${errorMessage(error)}`,
+			({ error }) => `Spawn failed: ${errorMessageFn(error)}`,
 		)
 		.with(
 			{
@@ -158,11 +158,11 @@ export const useCheatItemSpotlightController = ({
 		.exhaustive();
 
 	return {
-		close,
+		closeFn,
 		items,
 		open,
-		resetSpawnStatus: spawn.reset,
-		selectItem,
+		resetSpawnStatusFn: spawn.resetFn,
+		selectItemFn,
 		spawnStatus,
 		spawnStatusMessage,
 	};

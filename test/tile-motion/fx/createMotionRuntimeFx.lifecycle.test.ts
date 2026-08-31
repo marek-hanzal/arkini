@@ -21,11 +21,11 @@ describe("motion runtime lifecycle", () => {
 		);
 		Effect.runSync(runtime.startFx);
 
-		animations[0]?.onComplete?.();
-		animations[0]?.onComplete?.();
+		animations[0]?.onCompleteFn?.();
+		animations[0]?.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
-		animations[1]?.onComplete?.();
-		animations[1]?.onComplete?.();
+		animations[1]?.onCompleteFn?.();
+		animations[1]?.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(0);
 
 		Effect.runSync(
@@ -80,7 +80,7 @@ describe("motion runtime lifecycle", () => {
 		samplePoseAnimation(readPoseAnimation(animations, source), 0.4);
 
 		Effect.runSync(runtime.closeFx);
-		for (const animation of animations) animation.onComplete?.();
+		for (const animation of animations) animation.onCompleteFn?.();
 
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
 		expect(canceledAnimationKeys).toContain(`motion:9:0:${cue.actorId}`);

@@ -8,19 +8,19 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ProjectVersionStatus } from "~/project-version/type/ProjectVersion";
 
-const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const messageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 export namespace useVersionCommitController {
 	export interface Output {
 		readonly body: string;
 		readonly canCommit: boolean;
-		readonly commit: () => void;
+		readonly commitFn: () => void;
 		readonly error?: string;
 		readonly pending: boolean;
 		readonly projectId: string;
-		readonly setBody: (value: string) => void;
-		readonly setSubject: (value: string) => void;
-		readonly setTag: (value: string) => void;
+		readonly setBodyFn: (value: string) => void;
+		readonly setSubjectFn: (value: string) => void;
+		readonly setTagFn: (value: string) => void;
 		readonly status?: ProjectVersionStatus;
 		readonly subject: string;
 		readonly tag: string;
@@ -33,21 +33,21 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 	const { returnTo } = useSearch({
 		from: "/editor/$projectId/versions/commit",
 	});
-	const [body, setBody] = useState("");
-	const [error, setError] = useState<string>();
-	const [pending, setPending] = useState(false);
-	const [status, setStatus] = useState<ProjectVersionStatus>();
-	const [subject, setSubject] = useState("");
-	const [tag, setTag] = useState("");
+	const [body, setBodyFn] = useState("");
+	const [error, setErrorFn] = useState<string>();
+	const [pending, setPendingFn] = useState(false);
+	const [status, setStatusFn] = useState<ProjectVersionStatus>();
+	const [subject, setSubjectFn] = useState("");
+	const [tag, setTagFn] = useState("");
 
-	const loadStatus = useCallback(() => {
+	const loadStatusFn = useCallback(() => {
 		let mounted = true;
 		void RendererRuntime.runPromise(readProjectVersionHistoryFx(project.projectId))
 			.then((history) => {
-				if (mounted) setStatus(history.status);
+				if (mounted) setStatusFn(history.status);
 			})
 			.catch((cause) => {
-				if (mounted) setError(message(cause));
+				if (mounted) setErrorFn(messageFn(cause));
 			});
 		return () => {
 			mounted = false;
@@ -56,27 +56,27 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 		project.projectId,
 	]);
 	useEffect(() => {
-		let disposeLoad = loadStatus();
-		const unsubscribe = window.arkini.editor.onProjectChanged((projectId) => {
+		let disposeLoadFn = loadStatusFn();
+		const unsubscribeFn = window.arkini.editor.onProjectChangedFn((projectId) => {
 			if (projectId !== project.projectId) return;
-			disposeLoad();
-			disposeLoad = loadStatus();
+			disposeLoadFn();
+			disposeLoadFn = loadStatusFn();
 		});
 		return () => {
-			disposeLoad();
-			unsubscribe();
+			disposeLoadFn();
+			unsubscribeFn();
 		};
 	}, [
-		loadStatus,
+		loadStatusFn,
 		project.projectId,
 	]);
 
 	const canCommit =
 		status?.canCommit === true && subject.trim().length > 0 && subject.trim().length <= 120;
-	const commit = () => {
+	const commitFn = () => {
 		if (!canCommit || status === undefined || pending) return;
-		setPending(true);
-		setError(undefined);
+		setPendingFn(true);
+		setErrorFn(undefined);
 		void RendererRuntime.runPromise(
 			Effect.flatMap(ProjectRepository, (repository) =>
 				repository.createVersionFx({
@@ -112,15 +112,15 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 				});
 			})
 			.catch((cause) => {
-				setError(message(cause));
-				setPending(false);
+				setErrorFn(messageFn(cause));
+				setPendingFn(false);
 			});
 	};
 
 	return {
 		body,
 		canCommit,
-		commit,
+		commitFn,
 		...(error === undefined
 			? {}
 			: {
@@ -128,9 +128,9 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 				}),
 		pending,
 		projectId: project.projectId,
-		setBody,
-		setSubject,
-		setTag,
+		setBodyFn,
+		setSubjectFn,
+		setTagFn,
 		...(status === undefined
 			? {}
 			: {

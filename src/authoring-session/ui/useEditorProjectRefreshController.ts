@@ -45,7 +45,7 @@ export namespace useEditorProjectRefreshController {
 	export interface Output {
 		readonly disabled: boolean;
 		readonly pending: boolean;
-		readonly refresh: () => void;
+		readonly refreshFn: () => void;
 		readonly tooltip: string;
 	}
 }
@@ -58,15 +58,15 @@ export const useEditorProjectRefreshController = ({
 	const router = useRouter();
 	const commandAtom = refreshEditorProjectCommandAtom(projectId);
 	const result = useAtomValue(commandAtom);
-	const run = useAtomSet(commandAtom, {
+	const runFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
 	const pending = result.waiting;
 	const disabled = blocked || pending;
 	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
-	const refresh = () => {
+	const refreshFn = () => {
 		if (disabled) return;
-		void run(undefined)
+		void runFn(undefined)
 			.then((fresh) => {
 				if (fresh.projectId === projectId) return;
 				const currentRoot = `/editor/${encodeURIComponent(projectId)}`;
@@ -85,7 +85,7 @@ export const useEditorProjectRefreshController = ({
 	return {
 		disabled,
 		pending,
-		refresh,
+		refreshFn,
 		tooltip:
 			error === undefined
 				? "Refresh from disk"

@@ -12,7 +12,7 @@ class ExpectedCommandFailure extends Data.TaggedError("ExpectedCommandFailure")<
 
 const makeGame = () =>
 	({
-		failStop: vi.fn(),
+		failStopFn: vi.fn(),
 	}) as unknown as Game;
 
 const makeRegistry = () =>
@@ -28,7 +28,7 @@ describe("Item Detail frame command authority", () => {
 		const run = vi.fn();
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => undefined,
+			readOutcomeScopeFn: () => undefined,
 		});
 		const unmount = registry.mount(atom);
 
@@ -52,7 +52,7 @@ describe("Item Detail frame command authority", () => {
 		const run = vi.fn();
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => "runtime:first",
+			readOutcomeScopeFn: () => "runtime:first",
 		});
 		const unmount = registry.mount(atom);
 
@@ -81,7 +81,7 @@ describe("Item Detail frame command authority", () => {
 		const secondRun = vi.fn();
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => "runtime:first",
+			readOutcomeScopeFn: () => "runtime:first",
 		});
 		const unmount = registry.mount(atom);
 
@@ -130,7 +130,7 @@ describe("Item Detail frame command authority", () => {
 		const registry = makeRegistry();
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => "runtime:first",
+			readOutcomeScopeFn: () => "runtime:first",
 		});
 		const unmount = registry.mount(atom);
 
@@ -149,7 +149,7 @@ describe("Item Detail frame command authority", () => {
 				"Exact typed failure.",
 			),
 		);
-		expect(game.failStop).not.toHaveBeenCalled();
+		expect(game.failStopFn).not.toHaveBeenCalled();
 
 		const retry = Effect.runSync(Deferred.make<void>());
 		registry.set(atom, {
@@ -172,7 +172,7 @@ describe("Item Detail frame command authority", () => {
 		let outcomeScope = "runtime:first";
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => outcomeScope,
+			readOutcomeScopeFn: () => outcomeScope,
 		});
 		const unmount = registry.mount(atom);
 		registry.set(atom, {
@@ -203,7 +203,7 @@ describe("Item Detail frame command authority", () => {
 		const interrupted = Effect.runSync(Deferred.make<void>());
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => "runtime:first",
+			readOutcomeScopeFn: () => "runtime:first",
 		});
 		const unmount = registry.mount(atom);
 		registry.set(atom, {
@@ -222,7 +222,7 @@ describe("Item Detail frame command authority", () => {
 		unmount();
 		await Effect.runPromise(Deferred.await(interrupted));
 
-		expect(game.failStop).not.toHaveBeenCalled();
+		expect(game.failStopFn).not.toHaveBeenCalled();
 		registry.dispose();
 	});
 
@@ -245,7 +245,7 @@ describe("Item Detail frame command authority", () => {
 		const defectCause = Cause.die(new Error("Item Detail command defect"));
 		const atom = createItemDetailCommandAtom({
 			game,
-			readOutcomeScope: () => "runtime:first",
+			readOutcomeScopeFn: () => "runtime:first",
 		});
 		const unmount = registry.mount(atom);
 		registry.set(atom, {
@@ -255,8 +255,8 @@ describe("Item Detail frame command authority", () => {
 			run: Effect.failCause(defectCause),
 		});
 
-		await vi.waitFor(() => expect(game.failStop).toHaveBeenCalledOnce());
-		expect(game.failStop).toHaveBeenCalledWith("ui", defectCause);
+		await vi.waitFor(() => expect(game.failStopFn).toHaveBeenCalledOnce());
+		expect(game.failStopFn).toHaveBeenCalledWith("ui", defectCause);
 		await vi.waitFor(() => expect(scheduledFailures).toContain(defectCause));
 		let renderedFailure: unknown;
 		try {

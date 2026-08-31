@@ -77,7 +77,7 @@ describe("main reconciliation / replacement visuals", () => {
 		expect(mix?.channel === "visual-mix" ? mix.outgoing.alpha : null).toBe(1);
 		expect(oldVisual.container.destroyed).toBe(false);
 
-		mix?.onComplete?.();
+		mix?.onCompleteFn?.();
 		expect(actor.currentVisual).toBe(incoming);
 		expect(actor.pendingVisual).toBeNull();
 		expect(incoming.container.alpha).toBe(1);
@@ -192,7 +192,7 @@ describe("main reconciliation / replacement visuals", () => {
 		expect(harness.animations.some(({ channel }) => channel === "visual-mix")).toBe(false);
 		expect(actor.currentVisual.item.revision).toBe("revision:first");
 
-		exit?.onComplete?.();
+		exit?.onCompleteFn?.();
 		expect(actor.container.destroyed).toBe(true);
 		expect(actor.visuals.size).toBe(0);
 		expect(pendingSecond.container.destroyed).toBe(true);

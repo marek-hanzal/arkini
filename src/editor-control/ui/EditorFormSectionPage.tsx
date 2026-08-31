@@ -8,18 +8,18 @@ import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
 const EditorFormSaveButton = ({
 	dirty,
 	saving,
-	save,
+	saveFn,
 }: {
 	readonly dirty: boolean;
 	readonly saving: boolean;
-	readonly save: () => Promise<boolean>;
+	readonly saveFn: () => Promise<boolean>;
 }) => (
 	<PrimaryButton
 		type="button"
 		className="min-h-0 px-4 py-2"
 		disabled={!dirty || saving}
 		cursorIntent={saving ? "progress" : undefined}
-		onClick={() => void save().catch(() => undefined)}
+		onClick={() => void saveFn().catch(() => undefined)}
 	>
 		Save
 	</PrimaryButton>
@@ -33,7 +33,7 @@ export const EditorFormSectionPage = ({
 	leading,
 	notice,
 	rootCard,
-	save,
+	saveFn,
 	saving,
 	tabs,
 	title,
@@ -43,7 +43,7 @@ export const EditorFormSectionPage = ({
 	readonly leading?: ReactNode;
 	readonly notice?: ReactNode;
 	readonly rootCard?: boolean;
-	readonly save: () => Promise<boolean>;
+	readonly saveFn: () => Promise<boolean>;
 	readonly saving: boolean;
 	readonly tabs: ReactNode;
 	readonly title?: ReactNode;
@@ -58,7 +58,7 @@ export const EditorFormSectionPage = ({
 					<EditorFormSaveButton
 						dirty={dirty}
 						saving={saving}
-						save={save}
+						saveFn={saveFn}
 					/>
 				}
 			/>
@@ -69,7 +69,7 @@ export const EditorFormSectionPage = ({
 			<EditorFormContent
 				error={error}
 				rootCard={rootCard}
-				save={save}
+				saveFn={saveFn}
 			>
 				{children}
 			</EditorFormContent>

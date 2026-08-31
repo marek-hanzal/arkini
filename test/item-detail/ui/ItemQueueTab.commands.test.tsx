@@ -13,9 +13,9 @@ import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const control = vi.hoisted(() => ({
-	readActionError: vi.fn(() => null),
-	readPendingAction: vi.fn(() => null),
-	runPendingAction: vi.fn(),
+	readActionErrorFn: vi.fn(() => null),
+	readPendingActionFn: vi.fn(() => null),
+	runPendingActionFn: vi.fn(),
 }));
 const clearQueue = vi.hoisted(() => vi.fn((command: unknown) => command));
 const game = vi.hoisted(() => ({
@@ -40,8 +40,8 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 
 beforeEach(() => {
 	for (const mock of Object.values(control)) mock.mockReset();
-	control.readActionError.mockReturnValue(null);
-	control.readPendingAction.mockReturnValue(null);
+	control.readActionErrorFn.mockReturnValue(null);
+	control.readPendingActionFn.mockReturnValue(null);
 	clearQueue.mockClear();
 	game.runFx.mockClear();
 });
@@ -88,7 +88,7 @@ describe("ItemQueueTab command boundary", () => {
 		expect(clearQueue).toHaveBeenCalledWith({
 			ownerItemId: "runtime:owner",
 		});
-		expect(control.runPendingAction).toHaveBeenCalledWith(
+		expect(control.runPendingActionFn).toHaveBeenCalledWith(
 			expect.objectContaining({
 				action: "clear-queue",
 				key: JSON.stringify([

@@ -52,7 +52,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				},
 			});
 
-			const onReadyToShow = () => {
+			const onReadyToShowFn = () => {
 				window.show();
 				window.webContents.send(ArkiniElectronApi.channels.windowVisible);
 			};
@@ -81,7 +81,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 					ipc: ipcMain,
 					trustedRenderer,
 				});
-				window.once("ready-to-show", onReadyToShow);
+				window.once("ready-to-show", onReadyToShowFn);
 
 				yield* Effect.tryPromise({
 					try: async () => {
@@ -106,7 +106,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 					Exit.isSuccess(exit)
 						? Effect.void
 						: Effect.sync(() => {
-								window.removeListener("ready-to-show", onReadyToShow);
+								window.removeListener("ready-to-show", onReadyToShowFn);
 								if (!window.isDestroyed()) window.destroy();
 							}),
 				),

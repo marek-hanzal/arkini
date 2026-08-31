@@ -8,7 +8,7 @@ import { createDemandFrameLoopFx } from "~/tile-rendering/fx/createDemandFrameLo
 export namespace createApplicationOwnerFx {
 	export interface Props {
 		readonly host: HTMLElement;
-		readonly reportCriticalFailure: (cause: unknown) => void;
+		readonly reportCriticalFailureFn: (cause: unknown) => void;
 	}
 }
 
@@ -28,12 +28,12 @@ Ticker.system.stop();
  * boundary and must happen only after children release their display objects and listeners.
  */
 export const createApplicationOwnerFx = Effect.fn("createApplicationOwnerFx")(
-	({ host, reportCriticalFailure }: createApplicationOwnerFx.Props) => {
+	({ host, reportCriticalFailureFn }: createApplicationOwnerFx.Props) => {
 		const app = new Application();
 		const hostGeneration = (hostGenerations.get(host) ?? 0) + 1;
 		hostGenerations.set(host, hostGeneration);
 		let destroyed = false;
-		const destroyApplication = () => {
+		const destroyApplicationFn = () => {
 			if (destroyed) return;
 			destroyed = true;
 			try {
@@ -81,11 +81,11 @@ export const createApplicationOwnerFx = Effect.fn("createApplicationOwnerFx")(
 			host.replaceChildren(app.canvas);
 
 			const frames = yield* createDemandFrameLoopFx({
-				reportCriticalFailure,
-				render: () => app.render(),
+				reportCriticalFailureFn,
+				renderFn: () => app.render(),
 			});
 			const resizeListeners = new Set<() => void>();
-			const resize = () => {
+			const resizeFn = () => {
 				const width = Math.max(1, host.clientWidth);
 				const height = Math.max(1, host.clientHeight);
 				if (app.screen.width === width && app.screen.height === height) return;
@@ -94,13 +94,13 @@ export const createApplicationOwnerFx = Effect.fn("createApplicationOwnerFx")(
 					height,
 					Math.min(maximumResolution, window.devicePixelRatio || 1),
 				);
-				for (const listener of resizeListeners) listener();
+				for (const listenerFn of resizeListeners) listenerFn();
 				RendererRuntime.runSync(frames.invalidateFx);
 			};
 			const resizeObserver =
-				typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize);
+				typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resizeFn);
 			resizeObserver?.observe(host);
-			window.addEventListener("resize", resize);
+			window.addEventListener("resize", resizeFn);
 			yield* frames.invalidateFx;
 
 			let closed = false;
@@ -108,25 +108,25 @@ export const createApplicationOwnerFx = Effect.fn("createApplicationOwnerFx")(
 				app,
 				stage: app.stage,
 				frames,
-				addResizeListenerFx: (listener) =>
+				addResizeListenerFx: (listenerFn) =>
 					Effect.sync(() => {
-						resizeListeners.add(listener);
-						return () => resizeListeners.delete(listener);
+						resizeListeners.add(listenerFn);
+						return () => resizeListeners.delete(listenerFn);
 					}),
 				closeFx: Effect.gen(function* () {
 					if (closed) return;
 					closed = true;
 					resizeObserver?.disconnect();
-					window.removeEventListener("resize", resize);
+					window.removeEventListener("resize", resizeFn);
 					resizeListeners.clear();
 					yield* frames.closeFx;
-					destroyApplication();
+					destroyApplicationFn();
 				}),
 			} satisfies PixiApplicationOwner;
 		}).pipe(
 			Effect.onError(() =>
 				Effect.sync(() => {
-					destroyApplication();
+					destroyApplicationFn();
 				}),
 			),
 		);

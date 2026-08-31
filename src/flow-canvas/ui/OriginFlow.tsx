@@ -16,7 +16,7 @@ interface OriginFlowProps {
 	readonly direction?: OriginFlowDirection;
 	readonly focusItemId?: string;
 	readonly focusRequestKey?: number;
-	readonly onFocusItemChange?: (itemId: string) => Promise<void>;
+	readonly onFocusItemChangeFn?: (itemId: string) => Promise<void>;
 }
 
 /** Renders the complete authored game graph and focuses one existing item node. */
@@ -24,17 +24,17 @@ export const OriginFlow = ({
 	direction = "input",
 	focusItemId,
 	focusRequestKey,
-	onFocusItemChange,
+	onFocusItemChangeFn,
 }: OriginFlowProps) => {
 	const project = useEditorProject();
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const flowState = useOriginFlow(project.config);
 	const flow = flowState.flow;
 	const backbones = flowState.status === "ready" ? flowState.backbones : EmptyFlowBackbones;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
-	const [selection, setSelection] = useState<Selection>();
+	const [selection, setSelectionFn] = useState<Selection>();
 	useEffect(() => {
-		setSelection(undefined);
+		setSelectionFn(undefined);
 	}, [
 		flow,
 	]);
@@ -48,7 +48,7 @@ export const OriginFlow = ({
 		isReady,
 	]);
 	useEffect(() => {
-		setSelection(
+		setSelectionFn(
 			focusNodeId === undefined
 				? undefined
 				: {
@@ -60,12 +60,12 @@ export const OriginFlow = ({
 		focusNodeId,
 		focusRequestKey,
 	]);
-	const openItem = useCallback(
+	const openItemFn = useCallback(
 		async (itemId: string) => {
 			const item = project.config.items[itemId];
 			if (item === undefined) return;
-			await onFocusItemChange?.(itemId);
-			await navigate({
+			await onFocusItemChangeFn?.(itemId);
+			await navigateFn({
 				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 				params: {
 					itemUid: item.uid,
@@ -75,8 +75,8 @@ export const OriginFlow = ({
 			});
 		},
 		[
-			navigate,
-			onFocusItemChange,
+			navigateFn,
+			onFocusItemChangeFn,
 			project.config.items,
 			project.projectId,
 		],
@@ -97,8 +97,8 @@ export const OriginFlow = ({
 						flow={flow}
 						focusNodeId={focusNodeId}
 						focusRequestKey={focusRequestKey}
-						onSelectionChange={setSelection}
-						onItemOpen={openItem}
+						onSelectionChangeFn={setSelectionFn}
+						onItemOpenFn={openItemFn}
 						positions={positions}
 						selection={selection}
 					/>

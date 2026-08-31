@@ -53,7 +53,7 @@ export const GameRuntimeLayerFx = ({ config, initialRuntime }: GameRuntimeLayerP
 			Effect.map((store) => ({
 				changes: store.changes,
 				read: store.read,
-				readUnsafe: store.readUnsafe,
+				readUnsafeFn: store.readUnsafeFn,
 				ref: store.ref,
 			})),
 		),

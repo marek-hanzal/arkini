@@ -1,25 +1,25 @@
 import { useMemo } from "react";
 
 interface CanvasTextPainter {
-	readonly drawLines: (
+	readonly drawLinesFn: (
 		context: CanvasRenderingContext2D,
 		lines: ReadonlyArray<string>,
 		x: number,
 		y: number,
 		lineHeight: number,
 	) => void;
-	readonly fitText: (
+	readonly fitTextFn: (
 		context: CanvasRenderingContext2D,
 		value: string,
 		maxWidth: number,
 	) => string;
-	readonly wrapIdentifier: (
+	readonly wrapIdentifierFn: (
 		context: CanvasRenderingContext2D,
 		value: string,
 		maxWidth: number,
 		maxLines: number,
 	) => ReadonlyArray<string>;
-	readonly wrapText: (
+	readonly wrapTextFn: (
 		context: CanvasRenderingContext2D,
 		value: string,
 		maxWidth: number,
@@ -31,11 +31,11 @@ interface CanvasTextPainter {
 export const useCanvasTextPainter = (): CanvasTextPainter =>
 	useMemo(() => {
 		const painter: CanvasTextPainter = {
-			drawLines: (context, lines, x, y, lineHeight) => {
+			drawLinesFn: (context, lines, x, y, lineHeight) => {
 				for (const [index, line] of lines.entries())
 					context.fillText(line, x, y + index * lineHeight);
 			},
-			fitText: (context, value, maxWidth) => {
+			fitTextFn: (context, value, maxWidth) => {
 				if (context.measureText(value).width <= maxWidth) return value;
 				let lower = 0;
 				let upper = value.length;
@@ -47,7 +47,7 @@ export const useCanvasTextPainter = (): CanvasTextPainter =>
 				}
 				return lower === 0 ? "" : `${value.slice(0, lower)}…`;
 			},
-			wrapIdentifier: (context, value, maxWidth, maxLines) => {
+			wrapIdentifierFn: (context, value, maxWidth, maxLines) => {
 				const lines: string[] = [];
 				let remaining = value.trim();
 				while (remaining.length > 0 && lines.length < maxLines) {
@@ -66,7 +66,7 @@ export const useCanvasTextPainter = (): CanvasTextPainter =>
 					}
 					const end = Math.max(1, lower);
 					if (lines.length === maxLines - 1) {
-						lines.push(painter.fitText(context, remaining, maxWidth));
+						lines.push(painter.fitTextFn(context, remaining, maxWidth));
 						break;
 					}
 
@@ -82,7 +82,7 @@ export const useCanvasTextPainter = (): CanvasTextPainter =>
 				}
 				return lines;
 			},
-			wrapText: (context, value, maxWidth, maxLines) => {
+			wrapTextFn: (context, value, maxWidth, maxLines) => {
 				const words = value.trim().split(/\s+/).filter(Boolean);
 				if (words.length === 0) return [];
 				const lines: string[] = [];
@@ -98,7 +98,7 @@ export const useCanvasTextPainter = (): CanvasTextPainter =>
 						lines.push(current);
 						current = word;
 					} else {
-						lines.push(painter.fitText(context, word, maxWidth));
+						lines.push(painter.fitTextFn(context, word, maxWidth));
 						current = "";
 					}
 					if (lines.length === maxLines) {
@@ -109,7 +109,7 @@ export const useCanvasTextPainter = (): CanvasTextPainter =>
 							.filter(Boolean)
 							.join(" ");
 						if (remainder.length > 0)
-							lines[maxLines - 1] = painter.fitText(
+							lines[maxLines - 1] = painter.fitTextFn(
 								context,
 								`${lines[maxLines - 1]} ${remainder}`,
 								maxWidth,

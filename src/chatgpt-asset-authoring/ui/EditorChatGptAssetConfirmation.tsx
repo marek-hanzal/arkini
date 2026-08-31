@@ -42,7 +42,7 @@ export const EditorChatGptAssetConfirmation = ({
 						className={editorInputClassName}
 						value={controller.resourceId}
 						disabled={controller.candidateValidating || controller.saving}
-						onChange={(event) => controller.setResourceId(event.currentTarget.value)}
+						onChange={(event) => controller.setResourceIdFn(event.currentTarget.value)}
 					/>
 				</label>
 				{controller.collision ? (
@@ -66,7 +66,7 @@ export const EditorChatGptAssetConfirmation = ({
 				<div className="flex flex-wrap gap-2 pt-1">
 					<Button
 						disabled={controller.saving}
-						onClick={controller.discard}
+						onClick={controller.discardFn}
 					>
 						Discard &amp; return
 					</Button>
@@ -78,7 +78,7 @@ export const EditorChatGptAssetConfirmation = ({
 								controller.resourceId.trim().length === 0
 							}
 							cursorIntent={controller.saving ? "progress" : undefined}
-							onClick={() => void controller.save()}
+							onClick={() => void controller.saveFn()}
 						>
 							Replace asset
 						</DangerButton>
@@ -90,7 +90,7 @@ export const EditorChatGptAssetConfirmation = ({
 								controller.resourceId.trim().length === 0
 							}
 							cursorIntent={controller.saving ? "progress" : undefined}
-							onClick={() => void controller.save()}
+							onClick={() => void controller.saveFn()}
 						>
 							Save &amp; return
 						</PrimaryButton>

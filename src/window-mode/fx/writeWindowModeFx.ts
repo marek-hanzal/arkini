@@ -7,7 +7,7 @@ const writeSemaphore = Semaphore.makeUnsafe(1);
 export const writeWindowModeFx = Effect.fn("writeWindowModeFx")((mode: WindowModeSchema.Type) =>
 	writeSemaphore.withPermits(1)(
 		Effect.tryPromise({
-			try: () => window.arkini.window.writeMode(mode),
+			try: () => window.arkini.window.writeModeFn(mode),
 			catch: (cause) => cause,
 		}),
 	),

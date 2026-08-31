@@ -16,7 +16,7 @@ import { useVersionCheckout } from "~/project-version/ui/useVersionCheckout";
 import { useVersionComparison } from "~/project-version/ui/useVersionComparison";
 import { useVersionTag } from "~/project-version/ui/useVersionTag";
 
-const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const messageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 interface HistoryState {
 	readonly status: ProjectVersionStatus;
@@ -25,27 +25,27 @@ interface HistoryState {
 
 export namespace useVersionHistoryController {
 	export interface Output {
-		readonly cancelCheckout: () => void;
+		readonly cancelCheckoutFn: () => void;
 		readonly checkoutPending: boolean;
 		readonly compareFrom: string;
 		readonly compareTo: string;
-		readonly confirmCheckout: () => void;
+		readonly confirmCheckoutFn: () => void;
 		readonly confirmVersion?: ProjectVersionDescriptor;
 		readonly diff?: ProjectVersionDiff;
 		readonly diffPending: boolean;
 		readonly error?: string;
-		readonly goToCommit: () => void;
+		readonly goToCommitFn: () => void;
 		readonly graph?: VersionGraphLayout;
 		readonly history?: HistoryState;
 		readonly projectId: string;
-		readonly restoreSelected: () => void;
-		readonly saveTag: () => void;
-		readonly selectVersion: (versionId: string) => void;
-		readonly selectWorkingCopy: () => void;
+		readonly restoreSelectedFn: () => void;
+		readonly saveTagFn: () => void;
+		readonly selectVersionFn: (versionId: string) => void;
+		readonly selectWorkingCopyFn: () => void;
 		readonly selected?: ProjectVersionDescriptor;
-		readonly setCompareFrom: (value: string) => void;
-		readonly setCompareTo: (value: string) => void;
-		readonly setTagDraft: (value: string) => void;
+		readonly setCompareFromFn: (value: string) => void;
+		readonly setCompareToFn: (value: string) => void;
+		readonly setTagDraftFn: (value: string) => void;
 		readonly tagDraft: string;
 		readonly tagPending: boolean;
 	}
@@ -54,38 +54,38 @@ export namespace useVersionHistoryController {
 /** Owns history loading and selection while focused child hooks own each mutation surface. */
 export const useVersionHistoryController = (): useVersionHistoryController.Output => {
 	const project = useEditorProject();
-	const [error, setError] = useState<string>();
-	const [history, setHistory] = useState<HistoryState>();
-	const reportError = useCallback(
-		(cause?: unknown) => setError(cause === undefined ? undefined : message(cause)),
+	const [error, setErrorFn] = useState<string>();
+	const [history, setHistoryFn] = useState<HistoryState>();
+	const reportErrorFn = useCallback(
+		(cause?: unknown) => setErrorFn(cause === undefined ? undefined : messageFn(cause)),
 		[],
 	);
 	const comparison = useVersionComparison({
 		enabled: history !== undefined,
 		projectId: project.projectId,
-		reportError,
+		reportErrorFn,
 	});
-	const loadHistory = useCallback(() => {
-		reportError();
+	const loadHistoryFn = useCallback(() => {
+		reportErrorFn();
 		void RendererRuntime.runPromise(readProjectVersionHistoryFx(project.projectId))
 			.then((next) => {
-				setHistory(next);
-				comparison.resetToBase(next.status.currentBaseVersionId);
+				setHistoryFn(next);
+				comparison.resetToBaseFn(next.status.currentBaseVersionId);
 			})
-			.catch(reportError);
+			.catch(reportErrorFn);
 	}, [
-		comparison.resetToBase,
+		comparison.resetToBaseFn,
 		project.projectId,
-		reportError,
+		reportErrorFn,
 	]);
 
 	useEffect(() => {
-		loadHistory();
-		return window.arkini.editor.onProjectChanged((projectId) => {
-			if (projectId === project.projectId) loadHistory();
+		loadHistoryFn();
+		return window.arkini.editor.onProjectChangedFn((projectId) => {
+			if (projectId === project.projectId) loadHistoryFn();
 		});
 	}, [
-		loadHistory,
+		loadHistoryFn,
 		project.projectId,
 	]);
 	const selected = history?.versions.find(
@@ -103,7 +103,7 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 	const checkout = useVersionCheckout({
 		project,
 		projectDirty: history?.status.dirty === true,
-		reportError,
+		reportErrorFn,
 		...(selected === undefined
 			? {}
 			: {
@@ -111,30 +111,30 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 				}),
 	});
 	const tag = useVersionTag({
-		reload: loadHistory,
+		reloadFn: loadHistoryFn,
 		projectId: project.projectId,
-		reportError,
+		reportErrorFn,
 		...(selected === undefined
 			? {}
 			: {
 					selected,
 				}),
 	});
-	const selectVersion = (versionId: string) => {
+	const selectVersionFn = (versionId: string) => {
 		const version = history?.versions.find((candidate) => candidate.versionId === versionId);
 		if (version === undefined) return;
-		comparison.compareVersion(version);
+		comparison.compareVersionFn(version);
 	};
-	const selectWorkingCopy = () => {
-		comparison.resetToBase(history?.status.currentBaseVersionId);
+	const selectWorkingCopyFn = () => {
+		comparison.resetToBaseFn(history?.status.currentBaseVersionId);
 	};
 
 	return {
-		cancelCheckout: checkout.cancel,
+		cancelCheckoutFn: checkout.cancelFn,
 		checkoutPending: checkout.pending,
 		compareFrom: comparison.compareFrom,
 		compareTo: comparison.compareTo,
-		confirmCheckout: checkout.confirm,
+		confirmCheckoutFn: checkout.confirmFn,
 		...(checkout.confirmVersion === undefined
 			? {}
 			: {
@@ -151,7 +151,7 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 			: {
 					error,
 				}),
-		goToCommit: checkout.goToCommit,
+		goToCommitFn: checkout.goToCommitFn,
 		...(graph === undefined
 			? {}
 			: {
@@ -163,18 +163,18 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 					history,
 				}),
 		projectId: project.projectId,
-		restoreSelected: checkout.restoreSelected,
-		saveTag: tag.save,
-		selectVersion,
-		selectWorkingCopy,
+		restoreSelectedFn: checkout.restoreSelectedFn,
+		saveTagFn: tag.saveFn,
+		selectVersionFn,
+		selectWorkingCopyFn,
 		...(selected === undefined
 			? {}
 			: {
 					selected,
 				}),
-		setCompareFrom: comparison.setCompareFrom,
-		setCompareTo: comparison.setCompareTo,
-		setTagDraft: tag.setDraft,
+		setCompareFromFn: comparison.setCompareFromFn,
+		setCompareToFn: comparison.setCompareToFn,
+		setTagDraftFn: tag.setDraftFn,
 		tagDraft: tag.draft,
 		tagPending: tag.pending,
 	};

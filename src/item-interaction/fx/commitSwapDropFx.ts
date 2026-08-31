@@ -173,8 +173,6 @@ export namespace commitSwapDropFx {
 		readonly targetRevision: RevisionSchema.Type;
 		readonly targetLocation: GridLocationSchema.Type;
 	}
-
-	export type Result = DropItemResult;
 }
 
 /** Commits one exact grid swap and normalizes both actor identities. */
@@ -193,7 +191,7 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 		secondItemRevision: targetRevision,
 	}).pipe(
 		Effect.map(
-			(result): commitSwapDropFx.Result => ({
+			(result): DropItemResult => ({
 				kind: DropItemResultKind.Swap,
 				source: {
 					itemId: result.first.id,

@@ -14,7 +14,7 @@ export namespace useEditorBuildSaveController {
 	}
 
 	export interface Output {
-		readonly saveArtifact: () => void;
+		readonly saveArtifactFn: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;
 	}
@@ -26,12 +26,12 @@ export const useEditorBuildSaveController = ({
 }: useEditorBuildSaveController.Props): useEditorBuildSaveController.Output => {
 	const saveAtom = BuildCommandAtoms.save(artifact?.contentHash ?? "unbuilt");
 	const saveResult = useAtomValue(saveAtom);
-	const runSave = useAtomSet(saveAtom);
+	const runSaveFn = useAtomSet(saveAtom);
 	const saveError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult));
 
 	return {
-		saveArtifact: () => {
-			if (artifact !== undefined) runSave(artifact);
+		saveArtifactFn: () => {
+			if (artifact !== undefined) runSaveFn(artifact);
 		},
 		saveError: readErrorMessageFn(saveError),
 		savePending: saveResult.waiting,

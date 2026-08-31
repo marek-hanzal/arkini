@@ -36,11 +36,11 @@ export const projectItemDetailReferenceFx = Effect.fn("projectItemDetailReferenc
 	return {
 		itemId,
 		title: configured.title,
-		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+		sourceUrl: game.getResourceUrlFn(sourceAssetIds[0]),
 		...(sourceAssetIds[1] === undefined
 			? {}
 			: {
-					compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
+					compositeUrl: game.getResourceUrlFn(sourceAssetIds[1]),
 				}),
 		...(live === undefined
 			? {}

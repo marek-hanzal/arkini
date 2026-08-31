@@ -99,7 +99,7 @@ describe("spawn lifecycle", () => {
 					animations,
 				}),
 				application: createApplication(),
-				readPalette: () => palette,
+				readPaletteFn: () => palette,
 				stillClaimedActorIds: new Set(),
 				surface: createSurface(),
 				textures: {} as never,
@@ -122,7 +122,7 @@ describe("spawn lifecycle", () => {
 			}),
 		]);
 		expect(actor.container.destroyed).toBe(false);
-		animations.find((animation) => animation.channel === "lifecycle-opacity")?.onComplete?.();
+		animations.find((animation) => animation.channel === "lifecycle-opacity")?.onCompleteFn?.();
 		expect(actor.container.destroyed).toBe(true);
 	});
 });

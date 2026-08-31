@@ -16,7 +16,7 @@ import {
 } from "~test/production-input/support/inputRuntimeTestConfig";
 
 const game = {
-	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+	getResourceUrlFn: (resourceId: string) => `resource:${resourceId}`,
 } as GameEngine;
 
 describe("readTileDeliveriesFx", () => {

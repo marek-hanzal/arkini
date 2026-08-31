@@ -32,7 +32,7 @@ interface CreateInventoryActorStoreProps {
 	readonly textures: TextureStore;
 }
 
-const sameVisual = (left: TileActorItem, right: TileActorItem) =>
+const sameVisualFn = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
 	left.title === right.title &&
 	left.badgeCount === right.badgeCount &&
@@ -60,7 +60,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 			let closed = false;
 			let hydrated = false;
 
-			const updateActor = (actor: PixiTileActor, item: TileActorItem, size: number) => {
+			const updateActorFn = (actor: PixiTileActor, item: TileActorItem, size: number) => {
 				RendererRuntime.runSync(
 					updateTileActorFx({
 						actor,
@@ -104,7 +104,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 								yield* startActorExitFx({
 									actor,
 									animator,
-									onComplete: () => {
+									onCompleteFn: () => {
 										if (exitingActors.get(actorId) !== actor) return;
 										exitingActors.delete(actorId);
 										RendererRuntime.runSync(animator.cancelActorFx(actor));
@@ -148,7 +148,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 						let changed = false;
 						const created: PixiTileActor[] = [];
 						const removed: PixiTileActor[] = [];
-						const nextItems = game.readOrThrow(
+						const nextItems = game.readOrThrowFn(
 							readTileActorsFx({
 								game,
 								runtime: transition.runtime,
@@ -209,11 +209,11 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 							const previousDisplayedSize = actor.size * actor.container.scale.x;
 							const reconciledSize = actor.dragging ? actor.size : actorSize;
 							if (
-								!sameVisual(actor.currentVisual.item, item) ||
+								!sameVisualFn(actor.currentVisual.item, item) ||
 								actor.size !== reconciledSize
 							) {
 								changed = true;
-								updateActor(actor, item, reconciledSize);
+								updateActorFn(actor, item, reconciledSize);
 							} else {
 								actor.item = item;
 							}
@@ -290,9 +290,9 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 									animateRetargetablePoseFx({
 										actor,
 										animator,
-										readSize: () =>
+										readSizeFn: () =>
 											RendererRuntime.runSync(surface.readActorSizeFx),
-										readTarget: () =>
+										readTargetFn: () =>
 											RendererRuntime.runSync(
 												surface.readActorPoseFx(actor.item),
 											),
@@ -313,7 +313,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 				refreshAppearanceFx: Effect.gen(function* () {
 					const actorSize = yield* surface.readActorSizeFx;
 					for (const actor of actors.values()) {
-						updateActor(actor, actor.item, actorSize);
+						updateActorFn(actor, actor.item, actorSize);
 					}
 				}),
 			};

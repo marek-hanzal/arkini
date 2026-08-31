@@ -15,7 +15,7 @@ export const readGameProjectSchemaFx = Effect.fn("readGameProjectSchemaFx")(func
 		path,
 		missingIssueCode: "game-project-schema-missing",
 		missingMessage: "The required game project schema could not be read.",
-		validate: (json) =>
+		validateFn: (json) =>
 			isDeepStrictEqual(json, GameProjectJsonSchema)
 				? []
 				: ([

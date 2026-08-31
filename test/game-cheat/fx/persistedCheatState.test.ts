@@ -17,7 +17,7 @@ describe("persisted cheat state", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: (state) =>
+				writeFx: (state) =>
 					Effect.sync(() => {
 						saved = state;
 					}),
@@ -25,17 +25,17 @@ describe("persisted cheat state", () => {
 		});
 
 		try {
-			expect(session.getSnapshot().cheats).toEqual({
+			expect(session.getSnapshotFn().cheats).toEqual({
 				enabled: false,
 				everEnabled: false,
 				instantGameplay: false,
 			});
-			await session.run(
+			await session.runFn(
 				setInstantGameplayFx({
 					enabled: true,
 				}),
 			);
-			await session.run(
+			await session.runFn(
 				setCheatEnabledFx({
 					enabled: true,
 				}),
@@ -57,13 +57,13 @@ describe("persisted cheat state", () => {
 			tickIntervalMs: 60_000,
 		});
 		try {
-			expect(restored.getSnapshot().cheats).toEqual(saved.cheats);
-			await restored.run(
+			expect(restored.getSnapshotFn().cheats).toEqual(saved.cheats);
+			await restored.runFn(
 				setCheatEnabledFx({
 					enabled: false,
 				}),
 			);
-			expect(restored.getSnapshot().cheats).toEqual({
+			expect(restored.getSnapshotFn().cheats).toEqual({
 				enabled: false,
 				everEnabled: true,
 				instantGameplay: true,

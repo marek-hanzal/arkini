@@ -7,11 +7,11 @@ export interface RuntimeStoreFxService {
 	readonly ref: SubscriptionRef.SubscriptionRef<CommittedTransitionSchema.Type>;
 	readonly read: Effect.Effect<CommittedTransitionSchema.Type, never, never>;
 	/** Synchronous snapshot reserved for explicitly synchronous renderer boundaries. */
-	readonly readUnsafe: () => CommittedTransitionSchema.Type;
+	readonly readUnsafeFn: () => CommittedTransitionSchema.Type;
 	/** Replays the latest transition, then every later commit in order. */
 	readonly changes: Stream.Stream<CommittedTransitionSchema.Type>;
-	readonly modifyEffect: <Result, Error, Requirements>(
-		update: (transition: CommittedTransitionSchema.Type) => Effect.Effect<
+	readonly modifyEffectFx: <Result, Error, Requirements>(
+		updateFx: (transition: CommittedTransitionSchema.Type) => Effect.Effect<
 			readonly [
 				Result,
 				CommittedTransitionSchema.Type,

@@ -10,7 +10,7 @@ export namespace useItemQueueClearController {
 	}
 
 	export interface Output {
-		readonly clearQueue: () => void;
+		readonly clearQueueFn: () => void;
 		readonly error: string | null;
 		readonly pending: boolean;
 	}
@@ -27,12 +27,12 @@ export const useItemQueueClearController = ({
 			"queue",
 			queue.itemId,
 		]),
-		run: (game, props: clearItemJobQueueFx.Props) => game.runFx(clearItemJobQueueFx(props)),
+		runFx: (game, props: clearItemJobQueueFx.Props) => game.runFx(clearItemJobQueueFx(props)),
 	});
 
 	return {
-		clearQueue: () =>
-			command.run({
+		clearQueueFn: () =>
+			command.runFn({
 				ownerItemId: queue.itemId,
 			}),
 		error: command.error,

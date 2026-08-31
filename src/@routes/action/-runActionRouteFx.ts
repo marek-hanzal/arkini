@@ -11,8 +11,8 @@ export const runActionRouteFx = Effect.fn("runActionRouteFx")(
 				waitForActiveViewTransitionFx().pipe(Effect.andThen(action)),
 				Effect.promise(
 					() =>
-						new Promise<void>((resolve) => {
-							window.setTimeout(resolve, ActionLoadingMinimumDurationMs);
+						new Promise<void>((resolveFn) => {
+							window.setTimeout(resolveFn, ActionLoadingMinimumDurationMs);
 						}),
 				),
 			],

@@ -66,7 +66,7 @@ describe("motion target redirection", () => {
 		);
 		canonicalItems.delete(target.item.id);
 		samplePoseAnimation(travel, 1);
-		travel.onComplete?.();
+		travel.onCompleteFn?.();
 		const redirectedTravel = animations
 			.filter(
 				(animation) =>
@@ -83,7 +83,7 @@ describe("motion target redirection", () => {
 			x: 640,
 			y: 320,
 		});
-		redirectedTravel.onComplete?.();
+		redirectedTravel.onCompleteFn?.();
 
 		expect(magneticUpdates.length).toBeGreaterThan(0);
 		expect(magneticUpdates.at(-1)).toMatchObject({
@@ -106,7 +106,7 @@ describe("motion target redirection", () => {
 		}
 		expect(vanishOpacity.durationMs).toBe(lifecycleDurationMs);
 		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId.size).toBe(1);
-		vanishOpacity.onComplete?.();
+		vanishOpacity.onCompleteFn?.();
 
 		expect(transient.container.destroyed).toBe(true);
 		expect(destroy).toHaveBeenCalledOnce();
@@ -147,7 +147,7 @@ describe("motion target redirection", () => {
 		samplePoseAnimation(travel, 0.6);
 		actors.set(target.item.id, replacement);
 		samplePoseAnimation(travel, 1);
-		travel.onComplete?.();
+		travel.onCompleteFn?.();
 		const contact = animations
 			.filter((animation) => animation.actor === transient && animation.channel === "pose")
 			.at(-1);
@@ -158,7 +158,7 @@ describe("motion target redirection", () => {
 			x: 480,
 			y: 140,
 		});
-		contact.onComplete?.();
+		contact.onCompleteFn?.();
 		advanceStackMergeVanish({
 			actor: transient,
 			animations,

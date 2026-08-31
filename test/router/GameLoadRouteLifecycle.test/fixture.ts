@@ -47,15 +47,15 @@ export const createGame = ({
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	read: testGameRead,
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	getResourceUrlFn: () => "blob:test",
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
+	readFn: testGameRead,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 	saveKey: {
 		packageId,
 	},
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn: () => () => undefined,
 });
 
 export const createHarness = (initialPath: string) => {
@@ -169,12 +169,12 @@ export const setUpGameLoadRouteTest = () => {
 		configurable: true,
 		value: {
 			lifecycle: {
-				forceClose: vi.fn(),
+				forceCloseFn: vi.fn(),
 			},
 			save: {
-				clear: clearSaveMock,
-				read: vi.fn(() => Promise.resolve(null)),
-				write: vi.fn(() => Promise.resolve()),
+				clearFn: clearSaveMock,
+				readFn: vi.fn(() => Promise.resolve(null)),
+				writeFn: vi.fn(() => Promise.resolve()),
 			},
 		} as unknown as ArkiniElectronApi.Api,
 	});

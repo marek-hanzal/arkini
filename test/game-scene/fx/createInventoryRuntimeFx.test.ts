@@ -118,7 +118,7 @@ describe("Inventory runtime / feedback and hydration", () => {
 		const baseGame = createGame();
 		const replayingGame = {
 			...baseGame,
-			subscribeTransitions: (listener: (transition: GameTransition) => void) => {
+			subscribeTransitionsFn: (listener: (transition: GameTransition) => void) => {
 				sceneState.transitionListener = listener;
 				if (sceneState.transition !== null) listener(sceneState.transition);
 				return () => {

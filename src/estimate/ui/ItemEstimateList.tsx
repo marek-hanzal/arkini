@@ -28,16 +28,16 @@ const EstimateSortOptions: ReadonlyArray<EditorSelectOption<ItemEstimateSortSche
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const ItemEstimateList = ({
 	incomplete,
-	onIncompleteChange,
-	onQueryChange,
-	onSortChange,
+	onIncompleteChangeFn,
+	onQueryChangeFn,
+	onSortChangeFn,
 	query,
 	sort,
 }: {
 	readonly incomplete: boolean;
-	readonly onIncompleteChange: (incomplete: boolean) => void;
-	readonly onQueryChange: (query: string) => void;
-	readonly onSortChange: (sort: ItemEstimateSortSchema.Type) => void;
+	readonly onIncompleteChangeFn: (incomplete: boolean) => void;
+	readonly onQueryChangeFn: (query: string) => void;
+	readonly onSortChangeFn: (sort: ItemEstimateSortSchema.Type) => void;
 	readonly query: string;
 	readonly sort: ItemEstimateSortSchema.Type;
 }) => {
@@ -65,12 +65,12 @@ export const ItemEstimateList = ({
 					value={query}
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title or ID…"
-					onChange={(event) => onQueryChange(event.currentTarget.value)}
+					onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
 				/>
 				<button
 					type="button"
 					className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${selectableClassName}`}
-					onClick={() => onIncompleteChange(!incomplete)}
+					onClick={() => onIncompleteChangeFn(!incomplete)}
 					{...readDataUiFn({
 						dataUi: "EditorItemEstimateIncompleteFilter",
 						state: {
@@ -82,7 +82,7 @@ export const ItemEstimateList = ({
 				</button>
 				<EditorSelect
 					label="Sort item estimates"
-					onChange={onSortChange}
+					onChangeFn={onSortChangeFn}
 					options={EstimateSortOptions}
 					value={sort}
 				/>

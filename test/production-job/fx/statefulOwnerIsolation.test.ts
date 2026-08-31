@@ -253,8 +253,8 @@ describe("line start state owner isolation", () => {
 		const eventBatches: unknown[] = [];
 
 		try {
-			await session.run(spawnOwnerFx(2));
-			await session.run(
+			await session.runFn(spawnOwnerFx(2));
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:blocker:inventory",
 					itemId: "blocker",
@@ -268,14 +268,14 @@ describe("line start state owner isolation", () => {
 					quantity: 1,
 				}),
 			);
-			const observed = session.getSnapshot();
+			const observed = session.getSnapshotFn();
 			expect(
 				observed.items.some(
 					(item) => item.location.scope === "board" && item.location.position.x === 1,
 				),
 			).toBe(false);
 
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:blocker:board",
 					itemId: "blocker",
@@ -290,14 +290,14 @@ describe("line start state owner isolation", () => {
 					quantity: 1,
 				}),
 			);
-			const before = session.getSnapshot();
-			const unsubscribe = session.subscribeEvents((batch) => {
+			const before = session.getSnapshotFn();
+			const unsubscribe = session.subscribeEventsFn((batch) => {
 				eventBatches.push(batch);
 			});
 
 			try {
 				await expect(
-					session.run(
+					session.runFn(
 						startLineFx({
 							ownerItemId: "runtime:producer",
 							lineId: "line:producer",
@@ -307,7 +307,7 @@ describe("line start state owner isolation", () => {
 					_tag: "PlacementUnavailableError",
 				});
 				await new Promise((resolve) => setTimeout(resolve, 20));
-				expect(session.getSnapshot()).toEqual(before);
+				expect(session.getSnapshotFn()).toEqual(before);
 				expect(eventBatches).toEqual([]);
 			} finally {
 				unsubscribe();

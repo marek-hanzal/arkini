@@ -47,7 +47,7 @@ export const ProjectInventorySection = () => {
 				<ProjectStartGrid
 					cells={cells}
 					height={height}
-					onCellsChange={(nextCells) =>
+					onCellsChangeFn={(nextCells) =>
 						form.setFieldValue(
 							"start.inventory",
 							nextCells.map(({ x, y, ...cell }) => ({

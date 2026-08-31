@@ -16,7 +16,7 @@ export const createElectronGameSaveStorageFx = Effect.fn("createElectronGameSave
 		Effect.succeed({
 			readFx: Effect.fn("GameSaveStorage.readFx")((key: GameSaveStorage.Key) =>
 				Effect.tryPromise({
-					try: () => api.read(key),
+					try: () => api.readFn(key),
 					catch: (cause) =>
 						new GameSaveStorageError({
 							operation: "read",
@@ -26,7 +26,7 @@ export const createElectronGameSaveStorageFx = Effect.fn("createElectronGameSave
 			),
 			clearFx: Effect.fn("GameSaveStorage.clearFx")((key: GameSaveStorage.Key) =>
 				Effect.tryPromise({
-					try: () => api.clear(key),
+					try: () => api.clearFn(key),
 					catch: (cause) =>
 						new GameSaveStorageError({
 							operation: "clear",
@@ -37,7 +37,7 @@ export const createElectronGameSaveStorageFx = Effect.fn("createElectronGameSave
 			writeFx: Effect.fn("GameSaveStorage.writeFx")(
 				(key: GameSaveStorage.Key, bytes: Uint8Array) =>
 					Effect.tryPromise({
-						try: () => api.write(key, bytes),
+						try: () => api.writeFn(key, bytes),
 						catch: (cause) =>
 							new GameSaveStorageError({
 								operation: "write",

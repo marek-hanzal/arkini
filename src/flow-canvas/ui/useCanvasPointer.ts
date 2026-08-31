@@ -27,7 +27,7 @@ type Hit =
 			readonly kind: "item-detail";
 	  };
 
-const distanceToSegment = (x: number, y: number, start: LayoutPoint, end: LayoutPoint) => {
+const distanceToSegmentFn = (x: number, y: number, start: LayoutPoint, end: LayoutPoint) => {
 	const dx = end.x - start.x;
 	const dy = end.y - start.y;
 	if (dx === 0 && dy === 0) return Math.hypot(x - start.x, y - start.y);
@@ -38,10 +38,13 @@ const distanceToSegment = (x: number, y: number, start: LayoutPoint, end: Layout
 	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
 };
 
-const distanceToRoute = (x: number, y: number, points: ReadonlyArray<LayoutPoint>) => {
+const distanceToRouteFn = (x: number, y: number, points: ReadonlyArray<LayoutPoint>) => {
 	let distance = Number.POSITIVE_INFINITY;
 	for (let index = 1; index < points.length; index += 1)
-		distance = Math.min(distance, distanceToSegment(x, y, points[index - 1]!, points[index]!));
+		distance = Math.min(
+			distance,
+			distanceToSegmentFn(x, y, points[index - 1]!, points[index]!),
+		);
 	return distance;
 };
 
@@ -71,19 +74,19 @@ const readHitFn = ({
 	readonly y: number;
 	readonly zoom: number;
 }): Hit | undefined => {
-	const isNodeRelevant = (nodeId: string) =>
+	const isNodeRelevantFn = (nodeId: string) =>
 		selection?.kind !== "node" || highlight?.nodeIds.has(nodeId) === true;
-	const isEdgeRelevant = (edgeId: string) =>
+	const isEdgeRelevantFn = (edgeId: string) =>
 		selection?.kind !== "node" || highlight?.edgeIds.has(edgeId) === true;
 	const portTolerance = 11 / zoom;
 	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
 		const node = flow.nodes[index]!;
-		if (!isNodeRelevant(node.id)) continue;
+		if (!isNodeRelevantFn(node.id)) continue;
 		const position = positions.get(node.id);
 		const metrics = nodeMetrics.get(node.id);
 		if (position === undefined || metrics === undefined) continue;
 		const connectedPortIds = connectedPorts.get(node.id);
-		const readItemPortTarget = (portId: string) =>
+		const readItemPortTargetFn = (portId: string) =>
 			flow.edges
 				.filter((edge) =>
 					portId === ItemOriginItemInputPortId
@@ -97,7 +100,7 @@ const readHitFn = ({
 			connectedPortIds?.has(ItemOriginItemInputPortId) === true &&
 			Math.hypot(x - position.x, y - (position.y + metrics.itemPortY)) <= portTolerance
 		) {
-			const targetNodeId = readItemPortTarget(ItemOriginItemInputPortId);
+			const targetNodeId = readItemPortTargetFn(ItemOriginItemInputPortId);
 			if (targetNodeId !== undefined)
 				return {
 					kind: "port",
@@ -109,7 +112,7 @@ const readHitFn = ({
 			Math.hypot(x - (position.x + position.width), y - (position.y + metrics.itemPortY)) <=
 				portTolerance
 		) {
-			const targetNodeId = readItemPortTarget(ItemOriginItemOutputPortId);
+			const targetNodeId = readItemPortTargetFn(ItemOriginItemOutputPortId);
 			if (targetNodeId !== undefined)
 				return {
 					kind: "port",
@@ -163,7 +166,7 @@ const readHitFn = ({
 		const node = flow.nodes[index]!;
 		const position = positions.get(node.id);
 		if (
-			isNodeRelevant(node.id) &&
+			isNodeRelevantFn(node.id) &&
 			position !== undefined &&
 			x >= position.x &&
 			x <= position.x + position.width &&
@@ -181,11 +184,11 @@ const readHitFn = ({
 		false,
 	]) {
 		for (const edge of flow.edges) {
-			if (!isEdgeRelevant(edge.id)) continue;
+			if (!isEdgeRelevantFn(edge.id)) continue;
 			const metroBackbone = metroBackbones.get(edge.id);
 			if ((metroBackbone !== undefined) !== metroFirst) continue;
 			const backbone = metroBackbone ?? backbones.get(edge.id);
-			if (backbone !== undefined && distanceToRoute(x, y, backbone) <= tolerance)
+			if (backbone !== undefined && distanceToRouteFn(x, y, backbone) <= tolerance)
 				return {
 					id: edge.id,
 					kind: "edge",
@@ -223,11 +226,11 @@ export const useCanvasPointer = ({
 	highlight,
 	metroBackbones,
 	nodeMetrics,
-	onSelectionChange,
-	onItemOpen,
+	onSelectionChangeFn,
+	onItemOpenFn,
 	positions,
-	resetNavigation,
-	scheduleDraw,
+	resetNavigationFn,
+	scheduleDrawFn,
 	selection,
 	viewportRef,
 	visitHistoryRef,
@@ -238,17 +241,17 @@ export const useCanvasPointer = ({
 	readonly highlight: Highlight | undefined;
 	readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 	readonly nodeMetrics: ReadonlyMap<string, NodeMetrics>;
-	readonly onSelectionChange: (selection: Selection | undefined) => void;
-	readonly onItemOpen: (itemId: string) => void;
+	readonly onSelectionChangeFn: (selection: Selection | undefined) => void;
+	readonly onItemOpenFn: (itemId: string) => void;
 	readonly positions: ReadonlyMap<string, LayoutNode>;
-	readonly resetNavigation: () => void;
-	readonly scheduleDraw: () => void;
+	readonly resetNavigationFn: () => void;
+	readonly scheduleDrawFn: () => void;
 	readonly selection: Selection | undefined;
 	readonly viewportRef: RefObject<Viewport>;
 	readonly visitHistoryRef: RefObject<ReadonlyArray<string>>;
 }) => {
 	const panRef = useRef<CanvasPan | undefined>(undefined);
-	const readWorldPoint = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+	const readWorldPointFn = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		const rect = event.currentTarget.getBoundingClientRect();
 		const viewport = viewportRef.current;
 		return {
@@ -256,8 +259,8 @@ export const useCanvasPointer = ({
 			y: (event.clientY - rect.top - viewport.y) / viewport.zoom,
 		};
 	};
-	const readHit = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-		const point = readWorldPoint(event);
+	const readCanvasHitFn = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+		const point = readWorldPointFn(event);
 		return readHitFn({
 			backbones,
 			connectedPorts,
@@ -272,8 +275,8 @@ export const useCanvasPointer = ({
 			zoom: viewportRef.current.zoom,
 		});
 	};
-	const isOverNode = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-		const point = readWorldPoint(event);
+	const isOverNodeFn = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+		const point = readWorldPointFn(event);
 		for (const [nodeId, position] of positions)
 			if (
 				(selection?.kind !== "node" || highlight?.nodeIds.has(nodeId) === true) &&
@@ -286,20 +289,20 @@ export const useCanvasPointer = ({
 		return false;
 	};
 
-	const finishPan = (event: ReactPointerEvent<HTMLCanvasElement>, cancelled: boolean) => {
+	const finishPanFn = (event: ReactPointerEvent<HTMLCanvasElement>, cancelled: boolean) => {
 		const pan = panRef.current;
 		if (pan === undefined || pan.pointerId !== event.pointerId) return;
 		panRef.current = undefined;
-		event.currentTarget.style.cursor = isOverNode(event) ? "pointer" : "grab";
+		event.currentTarget.style.cursor = isOverNodeFn(event) ? "pointer" : "grab";
 		if (event.currentTarget.hasPointerCapture(event.pointerId))
 			event.currentTarget.releasePointerCapture(event.pointerId);
 		if (cancelled || pan.moved) return;
 
 		const rect = event.currentTarget.getBoundingClientRect();
 		const viewport = viewportRef.current;
-		const hit = readHit(event);
+		const hit = readCanvasHitFn(event);
 		if (hit?.kind === "item-detail") {
-			onItemOpen(hit.itemId);
+			onItemOpenFn(hit.itemId);
 			return;
 		}
 		if (hit?.kind === "port") {
@@ -311,15 +314,15 @@ export const useCanvasPointer = ({
 				rect.height,
 				Math.max(viewport.zoom, DefaultOriginFlowViewportZoom),
 			);
-			resetNavigation();
+			resetNavigationFn();
 			let visitHistory = visitHistoryRef.current;
 			if (selection?.kind === "node") visitHistory = pushVisitFn(visitHistory, selection.id);
 			visitHistoryRef.current = pushVisitFn(visitHistory, hit.targetNodeId);
-			onSelectionChange({
+			onSelectionChangeFn({
 				id: hit.targetNodeId,
 				kind: "node",
 			});
-			scheduleDraw();
+			scheduleDrawFn();
 			return;
 		}
 		if (hit?.kind === "node") {
@@ -333,11 +336,11 @@ export const useCanvasPointer = ({
 			hit.kind === selection.kind &&
 			hit.id === selection.id
 		)
-			onSelectionChange(undefined);
-		else onSelectionChange(hit);
+			onSelectionChangeFn(undefined);
+		else onSelectionChangeFn(hit);
 	};
 
-	const handlePointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+	const handlePointerDownFn = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		if (event.button !== 0) return;
 		panRef.current = {
 			moved: false,
@@ -350,10 +353,10 @@ export const useCanvasPointer = ({
 		event.currentTarget.setPointerCapture(event.pointerId);
 	};
 
-	const handlePointerMove = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+	const handlePointerMoveFn = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		const pan = panRef.current;
 		if (pan === undefined) {
-			event.currentTarget.style.cursor = isOverNode(event) ? "pointer" : "grab";
+			event.currentTarget.style.cursor = isOverNodeFn(event) ? "pointer" : "grab";
 			return;
 		}
 		if (pan.pointerId !== event.pointerId) return;
@@ -365,14 +368,15 @@ export const useCanvasPointer = ({
 			y: pan.startViewport.y + deltaY,
 			zoom: pan.startViewport.zoom,
 		};
-		scheduleDraw();
+		scheduleDrawFn();
 	};
 
 	return {
-		handlePointerCancel: (event: ReactPointerEvent<HTMLCanvasElement>) =>
-			finishPan(event, true),
-		handlePointerDown,
-		handlePointerMove,
-		handlePointerUp: (event: ReactPointerEvent<HTMLCanvasElement>) => finishPan(event, false),
+		handlePointerCancelFn: (event: ReactPointerEvent<HTMLCanvasElement>) =>
+			finishPanFn(event, true),
+		handlePointerDownFn,
+		handlePointerMoveFn,
+		handlePointerUpFn: (event: ReactPointerEvent<HTMLCanvasElement>) =>
+			finishPanFn(event, false),
 	};
 };

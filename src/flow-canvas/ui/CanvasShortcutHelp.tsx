@@ -6,7 +6,7 @@ import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 
 interface CanvasShortcutHelpProps {
 	readonly direction: OriginFlowDirection;
-	readonly onClose: () => void;
+	readonly onCloseFn: () => void;
 }
 
 const readShortcutRowsFn = (direction: OriginFlowDirection) =>
@@ -58,17 +58,17 @@ const readShortcutRowsFn = (direction: OriginFlowDirection) =>
 	] as const;
 
 /** Explains the keyboard navigation available on the Game Flow canvas. */
-export const CanvasShortcutHelp = ({ direction, onClose }: CanvasShortcutHelpProps) => {
-	const { onKeyDown, overlayRef } = useOverlayFocus({
-		onClose,
+export const CanvasShortcutHelp = ({ direction, onCloseFn }: CanvasShortcutHelpProps) => {
+	const { onKeyDownFn, overlayRef } = useOverlayFocus({
+		onCloseFn,
 	});
 	return (
 		<div
 			className="absolute inset-0 z-20 grid place-items-center bg-black/20 p-6 backdrop-blur-[1px]"
 			data-ui="EditorOriginFlowShortcutHelp"
-			onKeyDown={onKeyDown}
+			onKeyDown={onKeyDownFn}
 			onPointerDown={(event) => {
-				if (event.currentTarget === event.target) onClose();
+				if (event.currentTarget === event.target) onCloseFn();
 			}}
 			ref={overlayRef}
 		>
@@ -82,7 +82,7 @@ export const CanvasShortcutHelp = ({ direction, onClose }: CanvasShortcutHelpPro
 					</div>
 					<button
 						className="grid size-8 shrink-0 place-items-center rounded-md border border-line text-muted hover:bg-surface hover:text-foreground"
-						onClick={onClose}
+						onClick={onCloseFn}
 						type="button"
 					>
 						<X className="size-4" />

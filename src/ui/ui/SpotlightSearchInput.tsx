@@ -2,9 +2,9 @@ import type { RefObject } from "react";
 
 interface SpotlightSearchInputProps {
 	readonly inputRef: RefObject<HTMLInputElement | null>;
-	readonly onEnter: () => void;
-	readonly onQueryChange: (query: string) => void;
-	readonly onSelectedIndexChange: (index: number) => void;
+	readonly onEnterFn: () => void;
+	readonly onQueryChangeFn: (query: string) => void;
+	readonly onSelectedIndexChangeFn: (index: number) => void;
 	readonly placeholder?: string;
 	readonly query: string;
 	readonly resultCount: number;
@@ -14,9 +14,9 @@ interface SpotlightSearchInputProps {
 /** Shares the compact spotlight search field and result-keyboard navigation. */
 export const SpotlightSearchInput = ({
 	inputRef,
-	onEnter,
-	onQueryChange,
-	onSelectedIndexChange,
+	onEnterFn,
+	onQueryChangeFn,
+	onSelectedIndexChangeFn,
 	placeholder = "Search item title or ID…",
 	query,
 	resultCount,
@@ -28,23 +28,23 @@ export const SpotlightSearchInput = ({
 		ref={inputRef}
 		type="search"
 		value={query}
-		onChange={(event) => onQueryChange(event.currentTarget.value)}
+		onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
 		onKeyDown={(event) => {
 			if (event.key === "ArrowDown") {
 				event.preventDefault();
-				onSelectedIndexChange(resultCount === 0 ? 0 : (selectedIndex + 1) % resultCount);
+				onSelectedIndexChangeFn(resultCount === 0 ? 0 : (selectedIndex + 1) % resultCount);
 				return;
 			}
 			if (event.key === "ArrowUp") {
 				event.preventDefault();
-				onSelectedIndexChange(
+				onSelectedIndexChangeFn(
 					resultCount === 0 ? 0 : (selectedIndex - 1 + resultCount) % resultCount,
 				);
 				return;
 			}
 			if (event.key === "Enter") {
 				event.preventDefault();
-				onEnter();
+				onEnterFn();
 			}
 		}}
 	/>

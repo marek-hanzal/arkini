@@ -11,10 +11,10 @@ import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutoco
 /** Edits the target, effects, replacement, and optional output of one merge definition. */
 export const MergeField = ({
 	merge,
-	onChange,
+	onChangeFn,
 }: {
 	readonly merge: MergeSchema.Type;
-	readonly onChange: (merge: MergeSchema.Type) => void;
+	readonly onChangeFn: (merge: MergeSchema.Type) => void;
 }) => (
 	<div className="grid gap-[var(--ak-viewport-gap)]">
 		<EditorFormCard>
@@ -36,8 +36,8 @@ export const MergeField = ({
 							value: "consume",
 						},
 					]}
-					onChange={(action) =>
-						onChange({
+					onChangeFn={(action) =>
+						onChangeFn({
 							...merge,
 							action,
 						})
@@ -45,8 +45,8 @@ export const MergeField = ({
 				/>
 				<SelectorControl
 					value={merge.target}
-					onChange={(target) =>
-						onChange({
+					onChangeFn={(target) =>
+						onChangeFn({
 							...merge,
 							target,
 						})
@@ -75,8 +75,8 @@ export const MergeField = ({
 							value: "replace",
 						},
 					]}
-					onChange={(effect) =>
-						onChange(
+					onChangeFn={(effect) =>
+						onChangeFn(
 							effect === "replace"
 								? {
 										...merge,
@@ -96,8 +96,8 @@ export const MergeField = ({
 					<EditorItemReferenceControl
 						label="Replacement item"
 						value={merge.result}
-						onChange={(result) =>
-							onChange({
+						onChangeFn={(result) =>
+							onChangeFn({
 								...merge,
 								result,
 							})
@@ -117,8 +117,8 @@ export const MergeField = ({
 				emptyIcon={PackagePlus}
 				emptyTitle="No merge output"
 				value={merge.output}
-				onChange={(output) =>
-					onChange({
+				onChangeFn={(output) =>
+					onChangeFn({
 						...merge,
 						output,
 					})

@@ -8,7 +8,7 @@ import type { BoardScenarioDescriptorSchema } from "~/board-scenario/schema/Boar
 
 const boardScenarioDraftOptionId = "editor-board-scenario:draft";
 
-const nextScenarioName = (
+const nextScenarioNameFn = (
 	scenarios: ReadonlyArray<{
 		readonly name: string;
 	}>,
@@ -19,7 +19,7 @@ const nextScenarioName = (
 	return `Scenario ${index}`;
 };
 
-const sortScenarios = (scenarios: ReadonlyArray<BoardScenarioDescriptorSchema.Type>) =>
+const sortScenariosFn = (scenarios: ReadonlyArray<BoardScenarioDescriptorSchema.Type>) =>
 	[
 		...scenarios,
 	].sort(
@@ -27,7 +27,7 @@ const sortScenarios = (scenarios: ReadonlyArray<BoardScenarioDescriptorSchema.Ty
 			right.updatedAtMs - left.updatedAtMs || left.name.localeCompare(right.name),
 	);
 
-const errorMessage = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+const errorMessageFn = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
 /** Owns the selector draft and every explicit scenario persistence command. */
 export const useBoardScenarioToolbar = ({
@@ -37,49 +37,49 @@ export const useBoardScenarioToolbar = ({
 	readonly game?: EditorBoardGame;
 	readonly project: Project;
 }) => {
-	const list = useAtomSet(BoardScenarioCommandAtoms.list(project.projectId), {
+	const listFn = useAtomSet(BoardScenarioCommandAtoms.list(project.projectId), {
 		mode: "promise",
 	});
-	const save = useAtomSet(BoardScenarioCommandAtoms.save, {
+	const saveFn = useAtomSet(BoardScenarioCommandAtoms.save, {
 		mode: "promise",
 	});
-	const restore = useAtomSet(BoardScenarioCommandAtoms.restore, {
+	const restoreFn = useAtomSet(BoardScenarioCommandAtoms.restore, {
 		mode: "promise",
 	});
-	const remove = useAtomSet(BoardScenarioCommandAtoms.remove(project.projectId), {
+	const removeFn = useAtomSet(BoardScenarioCommandAtoms.remove(project.projectId), {
 		mode: "promise",
 	});
-	const [scenarios, setScenarios] = useState<ReadonlyArray<BoardScenarioDescriptorSchema.Type>>(
+	const [scenarios, setScenariosFn] = useState<ReadonlyArray<BoardScenarioDescriptorSchema.Type>>(
 		[],
 	);
-	const [name, setName] = useState("Scenario 1");
-	const [draft, setDraft] = useState(true);
-	const [pending, setPending] = useState(false);
-	const [message, setMessage] = useState("Scenarios are saved only when you press Save.");
+	const [name, setNameFn] = useState("Scenario 1");
+	const [draft, setDraftFn] = useState(true);
+	const [pending, setPendingFn] = useState(false);
+	const [message, setMessageFn] = useState("Scenarios are saved only when you press Save.");
 
 	useEffect(() => {
 		let active = true;
-		setPending(true);
-		void list(undefined)
+		setPendingFn(true);
+		void listFn(undefined)
 			.then((loaded) => {
 				if (!active) return;
-				const sorted = sortScenarios(loaded);
-				setScenarios(sorted);
-				setName(nextScenarioName(sorted));
-				setDraft(true);
-				setMessage("Scenarios are saved only when you press Save.");
+				const sorted = sortScenariosFn(loaded);
+				setScenariosFn(sorted);
+				setNameFn(nextScenarioNameFn(sorted));
+				setDraftFn(true);
+				setMessageFn("Scenarios are saved only when you press Save.");
 			})
 			.catch((cause) => {
-				if (active) setMessage(errorMessage(cause));
+				if (active) setMessageFn(errorMessageFn(cause));
 			})
 			.finally(() => {
-				if (active) setPending(false);
+				if (active) setPendingFn(false);
 			});
 		return () => {
 			active = false;
 		};
 	}, [
-		list,
+		listFn,
 		project.revision,
 	]);
 
@@ -113,92 +113,92 @@ export const useBoardScenarioToolbar = ({
 		],
 	);
 
-	const createDraft = () => {
-		setName(nextScenarioName(scenarios));
-		setDraft(true);
-		setMessage("New slot prepared. Press Save to persist the current Board state.");
+	const createDraftFn = () => {
+		setNameFn(nextScenarioNameFn(scenarios));
+		setDraftFn(true);
+		setMessageFn("New slot prepared. Press Save to persist the current Board state.");
 	};
-	const selectScenario = async (value: string) => {
+	const selectScenarioFn = async (value: string) => {
 		if (value === boardScenarioDraftOptionId || pending) return;
-		setName(value);
-		setDraft(false);
-		setPending(true);
-		setMessage(`Restoring ${value}…`);
+		setNameFn(value);
+		setDraftFn(false);
+		setPendingFn(true);
+		setMessageFn(`Restoring ${value}…`);
 		try {
-			const result = await restore({
+			const result = await restoreFn({
 				project,
 				name: value,
 			});
 			if (result.type === "restored") {
-				setMessage(`${value} restored.`);
+				setMessageFn(`${value} restored.`);
 				return;
 			}
-			setMessage(`${value} could not be restored. ${result.reason}`);
+			setMessageFn(`${value} could not be restored. ${result.reason}`);
 		} catch (cause) {
-			setMessage(errorMessage(cause));
+			setMessageFn(errorMessageFn(cause));
 		} finally {
-			setPending(false);
+			setPendingFn(false);
 		}
 	};
-	const saveScenario = async () => {
+	const saveScenarioFn = async () => {
 		const normalizedName = name.trim();
 		if (game === undefined || normalizedName.length === 0 || pending) return;
 		if (draft && scenarios.some((scenario) => scenario.name === normalizedName)) {
-			setMessage(`${normalizedName} already exists. Select it to overwrite that scenario.`);
+			setMessageFn(`${normalizedName} already exists. Select it to overwrite that scenario.`);
 			return;
 		}
-		setPending(true);
-		setMessage(`Saving ${normalizedName}…`);
+		setPendingFn(true);
+		setMessageFn(`Saving ${normalizedName}…`);
 		try {
-			const written = await save({
+			const written = await saveFn({
 				game,
 				project,
 				name: normalizedName,
 			});
-			setScenarios((current) =>
-				sortScenarios([
+			setScenariosFn((current) =>
+				sortScenariosFn([
 					written,
 					...current.filter((scenario) => scenario.name !== written.name),
 				]),
 			);
-			setName(written.name);
-			setDraft(false);
-			setMessage(`${written.name} saved.`);
+			setNameFn(written.name);
+			setDraftFn(false);
+			setMessageFn(`${written.name} saved.`);
 		} catch (cause) {
-			setMessage(errorMessage(cause));
+			setMessageFn(errorMessageFn(cause));
 		} finally {
-			setPending(false);
+			setPendingFn(false);
 		}
 	};
-	const deleteScenario = async () => {
+	const deleteScenarioFn = async () => {
 		if (draft || pending) return;
-		setPending(true);
-		setMessage(`Deleting ${name}…`);
+		setPendingFn(true);
+		setMessageFn(`Deleting ${name}…`);
 		try {
-			await remove(name);
+			await removeFn(name);
 			const remaining = scenarios.filter((scenario) => scenario.name !== name);
-			setScenarios(remaining);
-			setName(nextScenarioName(remaining));
-			setDraft(true);
-			setMessage("Scenario deleted. The current Board state is still live and unsaved.");
+			setScenariosFn(remaining);
+			setNameFn(nextScenarioNameFn(remaining));
+			setDraftFn(true);
+			setMessageFn("Scenario deleted. The current Board state is still live and unsaved.");
 		} catch (cause) {
-			setMessage(errorMessage(cause));
+			setMessageFn(errorMessageFn(cause));
 		} finally {
-			setPending(false);
+			setPendingFn(false);
 		}
 	};
 
 	return {
 		canSave: game !== undefined && name.trim().length > 0 && !pending,
-		createDraft,
-		deleteScenario,
+		createDraftFn,
+		deleteScenarioFn,
 		draft,
 		message,
 		options,
 		pending,
-		saveScenario,
-		selectScenario,
-		setName,
+		saveScenarioFn,
+		selectScenarioFn,
+		setNameFn,
 		value: draft ? boardScenarioDraftOptionId : name,
 	};
 };

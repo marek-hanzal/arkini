@@ -8,5 +8,5 @@ export interface PlayableGame extends GameSession {
 	/** Immutable completed configuration owned by this exact session. */
 	readonly config: GameConfigSchema.Type;
 	/** Resolves one validated session resource to its renderer object URL. */
-	readonly getResourceUrl: (resourceId: string) => string;
+	readonly getResourceUrlFn: (resourceId: string) => string;
 }

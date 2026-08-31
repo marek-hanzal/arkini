@@ -110,7 +110,7 @@ const versionDiffSchema = z
 	})
 	.strict();
 
-const parseBoardScenario = (candidate: unknown) => {
+const parseBoardScenarioFn = (candidate: unknown) => {
 	const scenario = BoardScenarioSchema.parse(candidate);
 	return {
 		...scenario,
@@ -118,18 +118,18 @@ const parseBoardScenario = (candidate: unknown) => {
 	};
 };
 
-const parseCommit = (candidate: unknown) => ProjectCommitPayloadSchema.parse(candidate);
-const parseProject = (candidate: unknown) => ProjectPayloadSchema.parse(candidate);
+const parseCommitFn = (candidate: unknown) => ProjectCommitPayloadSchema.parse(candidate);
+const parseProjectFn = (candidate: unknown) => ProjectPayloadSchema.parse(candidate);
 
 const callFx = <Value, Parsed>(
 	operation: ProjectRepositoryOperation,
-	call: () => Promise<EditorProjectTransport.Result<Value>>,
-	parse: (value: Value) => Parsed,
+	callFn: () => Promise<EditorProjectTransport.Result<Value>>,
+	parseFn: (value: Value) => Parsed,
 ) =>
 	invokeProjectTransportFx({
-		call,
+		callFn,
 		operation,
-		parse,
+		parseFn,
 		requestMessage: "The editor IPC request failed.",
 		responseMessage: "The editor IPC response is invalid.",
 	});
@@ -144,7 +144,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 	return {
 		awaitIdleFx: callFx(
 			"await-idle",
-			() => window.arkini.editor.awaitIdle(),
+			() => window.arkini.editor.awaitIdleFn(),
 			() => undefined,
 		),
 		createProjectFx: (request) =>
@@ -152,8 +152,8 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"create-project",
 				callFx(
 					"create-project",
-					() => window.arkini.editor.createProject(request),
-					parseProject,
+					() => window.arkini.editor.createProjectFn(request),
+					parseProjectFn,
 				),
 			),
 		deleteProjectFx: (projectId) =>
@@ -161,7 +161,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-project",
 				callFx(
 					"delete-project",
-					() => window.arkini.editor.deleteProject(projectId),
+					() => window.arkini.editor.deleteProjectFn(projectId),
 					() => undefined,
 				),
 			),
@@ -170,7 +170,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"create-note",
 				callFx(
 					"create-note",
-					() => window.arkini.editor.createNote(request),
+					() => window.arkini.editor.createNoteFn(request),
 					(value) => {
 						const note = NoteSchema.parse(value);
 						if (note.projectId !== request.projectId)
@@ -186,7 +186,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-note",
 				callFx(
 					"delete-note",
-					() => window.arkini.editor.deleteNote(request),
+					() => window.arkini.editor.deleteNoteFn(request),
 					() => undefined,
 				),
 			),
@@ -195,45 +195,49 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"create-version",
 				callFx(
 					"create-version",
-					() => window.arkini.editor.createVersion(request),
+					() => window.arkini.editor.createVersionFn(request),
 					(value) => versionDescriptorSchema.parse(value),
 				),
 			),
 		checkoutVersionFx: (request) =>
 			callFx(
 				"checkout-version",
-				() => window.arkini.editor.checkoutVersion(request),
+				() => window.arkini.editor.checkoutVersionFn(request),
 				() => undefined,
 			),
 		deleteItemFx: (request) =>
 			writeFx(
 				"delete-item",
-				callFx("delete-item", () => window.arkini.editor.deleteItem(request), parseCommit),
+				callFx(
+					"delete-item",
+					() => window.arkini.editor.deleteItemFn(request),
+					parseCommitFn,
+				),
 			),
 		deleteResourceFx: (request) =>
 			writeFx(
 				"delete-resource",
 				callFx(
 					"delete-resource",
-					() => window.arkini.editor.deleteResource(request),
-					parseProject,
+					() => window.arkini.editor.deleteResourceFn(request),
+					parseProjectFn,
 				),
 			),
 		diffVersionsFx: (request) =>
 			callFx(
 				"diff-versions",
-				() => window.arkini.editor.diffVersions(request),
+				() => window.arkini.editor.diffVersionsFn(request),
 				(value) => versionDiffSchema.parse(value),
 			),
 		listProjectsFx: callFx(
 			"list-projects",
-			() => window.arkini.editor.listProjects(),
+			() => window.arkini.editor.listProjectsFn(),
 			(value) => ProjectCandidateSchema.array().parse(value),
 		),
 		listNotesFx: (projectId) =>
 			callFx(
 				"list-notes",
-				() => window.arkini.editor.listNotes(projectId),
+				() => window.arkini.editor.listNotesFn(projectId),
 				(value) => {
 					const notes = NoteSchema.array().parse(value);
 					if (notes.some((note) => note.projectId !== projectId))
@@ -244,31 +248,31 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 		listVersionsFx: (projectId) =>
 			callFx(
 				"list-versions",
-				() => window.arkini.editor.listVersions(projectId),
+				() => window.arkini.editor.listVersionsFn(projectId),
 				(value) => versionDescriptorSchema.array().parse(value),
 			),
 		listBoardScenariosFx: (projectId) =>
 			callFx(
 				"list-board-scenarios",
-				() => window.arkini.editor.listBoardScenarios(projectId),
+				() => window.arkini.editor.listBoardScenariosFn(projectId),
 				(value) => BoardScenarioDescriptorSchema.array().parse(value),
 			),
 		readBoardScenarioFx: (request) =>
 			callFx(
 				"read-board-scenario",
-				() => window.arkini.editor.readBoardScenario(request),
-				(value) => (value === null ? null : parseBoardScenario(value)),
+				() => window.arkini.editor.readBoardScenarioFn(request),
+				(value) => (value === null ? null : parseBoardScenarioFn(value)),
 			),
 		readProjectFx: (projectId) =>
 			callFx(
 				"read-project",
-				() => window.arkini.editor.readProject(projectId),
-				(value) => (value === null ? null : parseProject(value)),
+				() => window.arkini.editor.readProjectFn(projectId),
+				(value) => (value === null ? null : parseProjectFn(value)),
 			),
 		readVersionStatusFx: (projectId) =>
 			callFx(
 				"read-version-status",
-				() => window.arkini.editor.readVersionStatus(projectId),
+				() => window.arkini.editor.readVersionStatusFn(projectId),
 				(value) => versionStatusSchema.parse(value),
 			),
 		replaceConfigFx: (request) =>
@@ -276,8 +280,8 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"replace-config",
 				callFx(
 					"replace-config",
-					() => window.arkini.editor.replaceConfig(request),
-					parseCommit,
+					() => window.arkini.editor.replaceConfigFn(request),
+					parseCommitFn,
 				),
 			),
 		replaceResourceFx: (request) =>
@@ -285,8 +289,8 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"replace-resource",
 				callFx(
 					"replace-resource",
-					() => window.arkini.editor.replaceResource(request),
-					parseProject,
+					() => window.arkini.editor.replaceResourceFn(request),
+					parseProjectFn,
 				),
 			),
 		saveResourceFx: (request) =>
@@ -294,22 +298,26 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"save-resource",
 				callFx(
 					"save-resource",
-					() => window.arkini.editor.saveResource(request),
-					parseProject,
+					() => window.arkini.editor.saveResourceFn(request),
+					parseProjectFn,
 				),
 			),
 		upsertItemFx: (request) =>
 			writeFx(
 				"upsert-item",
-				callFx("upsert-item", () => window.arkini.editor.upsertItem(request), parseCommit),
+				callFx(
+					"upsert-item",
+					() => window.arkini.editor.upsertItemFn(request),
+					parseCommitFn,
+				),
 			),
 		upsertResourcesFx: (request) =>
 			writeFx(
 				"upsert-resource",
 				callFx(
 					"upsert-resource",
-					() => window.arkini.editor.upsertResources(request),
-					parseProject,
+					() => window.arkini.editor.upsertResourcesFn(request),
+					parseProjectFn,
 				),
 			),
 		updateVersionTagFx: (request) =>
@@ -317,7 +325,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"update-version-tag",
 				callFx(
 					"update-version-tag",
-					() => window.arkini.editor.updateVersionTag(request),
+					() => window.arkini.editor.updateVersionTagFn(request),
 					(value) => versionDescriptorSchema.parse(value),
 				),
 			),
@@ -326,7 +334,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"update-note",
 				callFx(
 					"update-note",
-					() => window.arkini.editor.updateNote(request),
+					() => window.arkini.editor.updateNoteFn(request),
 					(value) => {
 						const note = NoteSchema.parse(value);
 						if (note.projectId !== request.projectId || note.noteId !== request.noteId)
@@ -340,8 +348,8 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"write-board-scenario",
 				callFx(
 					"write-board-scenario",
-					() => window.arkini.editor.writeBoardScenario(request),
-					parseBoardScenario,
+					() => window.arkini.editor.writeBoardScenarioFn(request),
+					parseBoardScenarioFn,
 				),
 			),
 		deleteBoardScenarioFx: (request) =>
@@ -349,7 +357,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-board-scenario",
 				callFx(
 					"delete-board-scenario",
-					() => window.arkini.editor.deleteBoardScenario(request),
+					() => window.arkini.editor.deleteBoardScenarioFn(request),
 					() => undefined,
 				),
 			),

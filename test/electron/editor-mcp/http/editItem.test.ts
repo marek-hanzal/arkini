@@ -50,7 +50,7 @@ describe("editor MCP item editing", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("edit-simple-project");
+		ownership.setProjectContextFn("edit-simple-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 		const readConfig = async (itemId: string) => {

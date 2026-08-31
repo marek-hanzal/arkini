@@ -15,17 +15,17 @@ import { EditorWelcome } from "~/project-authoring/ui/EditorWelcome";
 const actions = vi.hoisted(() => ({
 	active: null as null | string,
 	blocked: false,
-	createProject: vi.fn(),
+	createProjectFn: vi.fn(),
 	deletedProjectIds: new Set<string>() as ReadonlySet<string>,
-	deleteProject: vi.fn(),
+	deleteProjectFn: vi.fn(),
 	error: undefined as unknown,
-	exit: vi.fn(),
-	importArkpackFile: vi.fn(),
-	importJsonDirectory: vi.fn(),
-	openProjectFolder: vi.fn(),
+	exitFn: vi.fn(),
+	importArkpackFileFn: vi.fn(),
+	importJsonDirectoryFn: vi.fn(),
+	openProjectFolderFn: vi.fn(),
 	projectRefreshError: undefined as unknown,
 	refreshingProjects: false,
-	refreshProjects: vi.fn(),
+	refreshProjectsFn: vi.fn(),
 }));
 
 vi.mock("~/project-authoring/ui/useEditorWelcomeActions", () => ({
@@ -57,9 +57,9 @@ afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
-	actions.deleteProject.mockReset();
-	actions.openProjectFolder.mockReset();
-	actions.refreshProjects.mockReset();
+	actions.deleteProjectFn.mockReset();
+	actions.openProjectFolderFn.mockReset();
+	actions.refreshProjectsFn.mockReset();
 	document.body.replaceChildren();
 });
 
@@ -124,11 +124,11 @@ describe("EditorWelcome project rows", () => {
 		expect(dialog?.textContent).toContain("Arkini");
 		expect(dialog?.textContent).toContain("project-one");
 		expect(dialog?.getAttribute("data-project-ownership")).toBe("managed");
-		expect(actions.deleteProject).not.toHaveBeenCalled();
+		expect(actions.deleteProjectFn).not.toHaveBeenCalled();
 
 		await act(async () => findButton(container, "Cancel").click());
 		expect(container.querySelector('[data-ui="EditorProjectDeleteDialog"]')).toBeNull();
-		expect(actions.deleteProject).not.toHaveBeenCalled();
+		expect(actions.deleteProjectFn).not.toHaveBeenCalled();
 
 		await act(async () => externalDelete.click());
 		expect(
@@ -140,8 +140,8 @@ describe("EditorWelcome project rows", () => {
 
 		await act(async () => managedDelete.click());
 		await act(async () => findButton(container, "Remove project").click());
-		expect(actions.deleteProject).toHaveBeenCalledOnce();
-		expect(actions.deleteProject).toHaveBeenCalledWith("project-one");
+		expect(actions.deleteProjectFn).toHaveBeenCalledOnce();
+		expect(actions.deleteProjectFn).toHaveBeenCalledWith("project-one");
 	});
 
 	it("blocks invalid project entry and exposes only its exact folder plus list refresh", async () => {
@@ -171,8 +171,8 @@ describe("EditorWelcome project rows", () => {
 		expect(invalidRow?.querySelector('[data-ui="EditorRecentProjectDelete"]')).toBeNull();
 
 		await act(async () => findButton(invalidRow!, "Open folder").click());
-		expect(actions.openProjectFolder).toHaveBeenCalledWith("/projects/broken");
+		expect(actions.openProjectFolderFn).toHaveBeenCalledWith("/projects/broken");
 		await act(async () => findButton(container, "Refresh").click());
-		expect(actions.refreshProjects).toHaveBeenCalledOnce();
+		expect(actions.refreshProjectsFn).toHaveBeenCalledOnce();
 	});
 });

@@ -28,7 +28,7 @@ const isEditorBoardLeafTransitionFn = (from: string, to: string) =>
 	(editorBoardPattern.test(from) && editorBoardInventoryPattern.test(to)) ||
 	(editorBoardInventoryPattern.test(from) && editorBoardPattern.test(to));
 
-const resolveVisualRouteId = (pathname: string): VisualRouteId => {
+const resolveVisualRouteIdFn = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
 	if (pathname === "/main-menu") return "main-menu";
 	if (settingsPattern.test(pathname)) return "settings";
@@ -62,8 +62,8 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 		Effect.sync(() => {
 			if (fromLocation === undefined || fromLocation.pathname === toLocation.pathname)
 				return false;
-			const from = resolveVisualRouteId(fromLocation.pathname);
-			const to = resolveVisualRouteId(toLocation.pathname);
+			const from = resolveVisualRouteIdFn(fromLocation.pathname);
+			const to = resolveVisualRouteIdFn(toLocation.pathname);
 			const sceneRelationship = match({
 				fromHero: isHeroRouteFn(from),
 				toHero: isHeroRouteFn(to),

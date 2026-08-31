@@ -41,7 +41,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		projectsRoot,
 		states,
 	});
-	const readState = (projectId: string) => {
+	const readStateFx = (projectId: string) => {
 		const state = states.get(projectId);
 		return state === undefined
 			? Effect.fail(
@@ -54,30 +54,30 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	};
 	const commits = yield* createCommitOperationsFx({
 		operations,
-		readState,
+		readStateFx,
 		states,
 	});
 	const builds = yield* createBuildOperationsFx({
 		filesystemWrite,
 		operations,
-		readState,
+		readStateFx,
 	});
 	const boardScenarios = yield* createBoardScenarioOperationsFx({
 		filesystemWrite,
 		operations,
-		readState,
+		readStateFx,
 		states,
 	});
 	const notes = yield* createNoteOperationsFx({
 		filesystemWrite,
 		operations,
-		readState,
+		readStateFx,
 		states,
 	});
 	const versions = yield* createVersionOperationsFx({
 		filesystemWrite,
 		operations,
-		readState,
+		readStateFx,
 		states,
 	});
 	const repository = {
@@ -90,45 +90,45 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		...versions,
 		closeFx: operations.withPermits(1)(Effect.void),
 	} satisfies OwnedEditorProjectRepository;
-	const provide = <Value, Failure>(effect: Effect.Effect<Value, Failure, never>) =>
+	const provideFx = <Value, Failure>(effect: Effect.Effect<Value, Failure, never>) =>
 		effect.pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
 
 	return {
-		awaitIdleFx: provide(repository.awaitIdleFx),
-		buildProjectFx: (props) => provide(repository.buildProjectFx(props)),
-		createProjectFx: (props) => provide(repository.createProjectFx(props)),
-		deleteProjectFx: (projectId) => provide(repository.deleteProjectFx(projectId)),
-		openProjectFx: (props) => provide(repository.openProjectFx(props)),
-		readProjectFx: (projectId) => provide(repository.readProjectFx(projectId)),
-		readProjectBuildFx: (props) => provide(repository.readProjectBuildFx(props)),
-		readProjectRootFx: (projectId) => provide(repository.readProjectRootFx(projectId)),
-		refreshProjectFx: (projectId) => provide(repository.refreshProjectFx(projectId)),
-		listProjectsFx: provide(repository.listProjectsFx),
-		deleteItemFx: (props) => provide(repository.deleteItemFx(props)),
-		deleteResourceFx: (props) => provide(repository.deleteResourceFx(props)),
-		replaceConfigFx: (props) => provide(repository.replaceConfigFx(props)),
-		replaceResourceFx: (props) => provide(repository.replaceResourceFx(props)),
-		saveResourceFx: (props) => provide(repository.saveResourceFx(props)),
-		upsertItemFx: (props) => provide(repository.upsertItemFx(props)),
-		upsertResourcesFx: (props) => provide(repository.upsertResourcesFx(props)),
-		listBoardScenariosFx: (projectId) => provide(repository.listBoardScenariosFx(projectId)),
-		readBoardScenarioFx: (key) => provide(repository.readBoardScenarioFx(key)),
-		writeBoardScenarioFx: (props) => provide(repository.writeBoardScenarioFx(props)),
-		deleteBoardScenarioFx: (key) => provide(repository.deleteBoardScenarioFx(key)),
-		listNotesFx: (projectId) => provide(repository.listNotesFx(projectId)),
-		createNoteFx: (props) => provide(repository.createNoteFx(props)),
-		updateNoteFx: (props) => provide(repository.updateNoteFx(props)),
-		deleteNoteFx: (key) => provide(repository.deleteNoteFx(key)),
-		checkoutVersionFx: (props) => provide(repository.checkoutVersionFx(props)),
-		createVersionFx: (props) => provide(repository.createVersionFx(props)),
-		diffVersionsFx: (props) => provide(repository.diffVersionsFx(props)),
-		listVersionsFx: (projectId) => provide(repository.listVersionsFx(projectId)),
-		readVersionStatusFx: (projectId) => provide(repository.readVersionStatusFx(projectId)),
-		updateVersionTagFx: (props) => provide(repository.updateVersionTagFx(props)),
-		closeFx: provide(repository.closeFx),
+		awaitIdleFx: provideFx(repository.awaitIdleFx),
+		buildProjectFx: (props) => provideFx(repository.buildProjectFx(props)),
+		createProjectFx: (props) => provideFx(repository.createProjectFx(props)),
+		deleteProjectFx: (projectId) => provideFx(repository.deleteProjectFx(projectId)),
+		openProjectFx: (props) => provideFx(repository.openProjectFx(props)),
+		readProjectFx: (projectId) => provideFx(repository.readProjectFx(projectId)),
+		readProjectBuildFx: (props) => provideFx(repository.readProjectBuildFx(props)),
+		readProjectRootFx: (projectId) => provideFx(repository.readProjectRootFx(projectId)),
+		refreshProjectFx: (projectId) => provideFx(repository.refreshProjectFx(projectId)),
+		listProjectsFx: provideFx(repository.listProjectsFx),
+		deleteItemFx: (props) => provideFx(repository.deleteItemFx(props)),
+		deleteResourceFx: (props) => provideFx(repository.deleteResourceFx(props)),
+		replaceConfigFx: (props) => provideFx(repository.replaceConfigFx(props)),
+		replaceResourceFx: (props) => provideFx(repository.replaceResourceFx(props)),
+		saveResourceFx: (props) => provideFx(repository.saveResourceFx(props)),
+		upsertItemFx: (props) => provideFx(repository.upsertItemFx(props)),
+		upsertResourcesFx: (props) => provideFx(repository.upsertResourcesFx(props)),
+		listBoardScenariosFx: (projectId) => provideFx(repository.listBoardScenariosFx(projectId)),
+		readBoardScenarioFx: (key) => provideFx(repository.readBoardScenarioFx(key)),
+		writeBoardScenarioFx: (props) => provideFx(repository.writeBoardScenarioFx(props)),
+		deleteBoardScenarioFx: (key) => provideFx(repository.deleteBoardScenarioFx(key)),
+		listNotesFx: (projectId) => provideFx(repository.listNotesFx(projectId)),
+		createNoteFx: (props) => provideFx(repository.createNoteFx(props)),
+		updateNoteFx: (props) => provideFx(repository.updateNoteFx(props)),
+		deleteNoteFx: (key) => provideFx(repository.deleteNoteFx(key)),
+		checkoutVersionFx: (props) => provideFx(repository.checkoutVersionFx(props)),
+		createVersionFx: (props) => provideFx(repository.createVersionFx(props)),
+		diffVersionsFx: (props) => provideFx(repository.diffVersionsFx(props)),
+		listVersionsFx: (projectId) => provideFx(repository.listVersionsFx(projectId)),
+		readVersionStatusFx: (projectId) => provideFx(repository.readVersionStatusFx(projectId)),
+		updateVersionTagFx: (props) => provideFx(repository.updateVersionTagFx(props)),
+		closeFx: provideFx(repository.closeFx),
 	} satisfies OwnedEditorProjectRepository;
 });
 

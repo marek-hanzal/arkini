@@ -16,14 +16,14 @@ interface EditorValueControlProps {
 
 interface EditorNamedValueControlProps extends EditorValueControlProps {
 	readonly name?: string;
-	readonly onBlur?: () => void;
+	readonly onBlurFn?: () => void;
 }
 
 interface EditorNumericControlProps extends EditorNamedValueControlProps {
 	readonly children?: ReactNode;
 	readonly max?: number;
 	readonly min?: number;
-	readonly onChange: (value: number) => void;
+	readonly onChangeFn: (value: number) => void;
 	readonly step: number;
 	readonly value: number;
 }
@@ -70,8 +70,8 @@ const EditorNumericControl = ({
 	max,
 	min,
 	name,
-	onBlur,
-	onChange,
+	onBlurFn,
+	onChangeFn,
 	step,
 	value,
 }: EditorNumericControlProps) => (
@@ -88,8 +88,8 @@ const EditorNumericControl = ({
 			max={max}
 			min={min}
 			step={step}
-			onBlur={onBlur}
-			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+			onBlur={onBlurFn}
+			onChange={(event) => onChangeFn(event.currentTarget.valueAsNumber)}
 			{...readDataUiFn({
 				dataUi: "EditorNumericControlInput",
 				state: {
@@ -107,14 +107,14 @@ export const EditorTextControl = ({
 	error,
 	label,
 	name,
-	onBlur,
-	onChange,
+	onBlurFn,
+	onChangeFn,
 	placeholder,
 	readOnly,
 	value,
 }: {
 	readonly autoComplete?: string;
-	readonly onChange: (value: string) => void;
+	readonly onChangeFn: (value: string) => void;
 	readonly placeholder?: string;
 	readonly readOnly?: boolean;
 	readonly value: string;
@@ -132,8 +132,8 @@ export const EditorTextControl = ({
 			className={editorInputClassName}
 			placeholder={placeholder}
 			readOnly={readOnly}
-			onBlur={onBlur}
-			onChange={(event) => onChange(event.currentTarget.value)}
+			onBlur={onBlurFn}
+			onChange={(event) => onChangeFn(event.currentTarget.value)}
 			{...readDataUiFn({
 				dataUi: "EditorTextControlInput",
 				state: {
@@ -150,14 +150,14 @@ export const EditorTextAreaControl = ({
 	fill = false,
 	label,
 	name,
-	onBlur,
-	onChange,
+	onBlurFn,
+	onChangeFn,
 	placeholder,
 	rows = 4,
 	value,
 }: {
 	readonly fill?: boolean;
-	readonly onChange: (value: string) => void;
+	readonly onChangeFn: (value: string) => void;
 	readonly placeholder?: string;
 	readonly rows?: number;
 	readonly value: string;
@@ -174,8 +174,8 @@ export const EditorTextAreaControl = ({
 			className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
 			placeholder={placeholder}
 			rows={rows}
-			onBlur={onBlur}
-			onChange={(event) => onChange(event.currentTarget.value)}
+			onBlur={onBlurFn}
+			onChange={(event) => onChangeFn(event.currentTarget.value)}
 			{...readDataUiFn({
 				dataUi: "EditorTextAreaControlInput",
 				state: {
@@ -192,7 +192,7 @@ export const EditorNumberControl = ({
 }: {
 	readonly max?: number;
 	readonly min?: number;
-	readonly onChange: (value: number) => void;
+	readonly onChangeFn: (value: number) => void;
 	readonly step?: number;
 	readonly value: number;
 } & EditorNamedValueControlProps) => (
@@ -206,7 +206,7 @@ export const EditorSecondsControl = (
 	props: {
 		readonly max?: number;
 		readonly min?: number;
-		readonly onChange: (value: number) => void;
+		readonly onChangeFn: (value: number) => void;
 		readonly value: number;
 	} & EditorNamedValueControlProps,
 ) => (
@@ -223,12 +223,12 @@ export const EditorChoiceControl = <Value extends string>({
 	description,
 	error,
 	label,
-	onChange,
+	onChangeFn,
 	options,
 	value,
 }: {
 	readonly compact?: boolean;
-	readonly onChange: (value: Value) => void;
+	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<{
 		readonly description?: ReactNode;
 		readonly label: string;
@@ -258,7 +258,7 @@ export const EditorChoiceControl = <Value extends string>({
 						key={option.value}
 						type="button"
 						className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${compact ? "min-h-9" : "min-h-[var(--ak-control-min-height)]"} ${selectableClassName}`}
-						onClick={() => onChange(option.value)}
+						onClick={() => onChangeFn(option.value)}
 						{...readDataUiFn({
 							dataUi: "EditorChoiceControlOption",
 							state: {

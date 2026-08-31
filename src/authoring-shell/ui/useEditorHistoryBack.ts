@@ -5,12 +5,12 @@ import { useCallback } from "react";
 export const useEditorHistoryBack = () => {
 	const router = useRouter();
 	return useCallback(
-		(onFallback: () => void) => {
+		(onFallbackFn: () => void) => {
 			if (router.history.canGoBack()) {
 				router.history.back();
 				return true;
 			}
-			onFallback();
+			onFallbackFn();
 			return false;
 		},
 		[

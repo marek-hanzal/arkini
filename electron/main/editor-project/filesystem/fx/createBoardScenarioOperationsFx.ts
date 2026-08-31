@@ -15,7 +15,7 @@ import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesys
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
-const encodeJson = (value: unknown) =>
+const encodeJsonFn = (value: unknown) =>
 	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 
 type Operations = Pick<
@@ -32,7 +32,7 @@ type Operation =
 	| "write-board-scenario"
 	| "delete-board-scenario";
 
-const error = (operation: Operation, message: string, cause?: unknown) =>
+const errorFn = (operation: Operation, message: string, cause?: unknown) =>
 	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
 		: new ProjectRepositoryError({
@@ -45,7 +45,7 @@ export namespace createBoardScenarioOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
-		readonly readState: (
+		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 		readonly states: Map<string, ProjectState>;
@@ -57,11 +57,11 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 	function* ({
 		filesystemWrite,
 		operations,
-		readState,
+		readStateFx,
 		states,
 	}: createBoardScenarioOperationsFx.Props) {
 		const readScenariosFx = (projectId: string) =>
-			readState(projectId).pipe(
+			readStateFx(projectId).pipe(
 				Effect.map((state) =>
 					state.scenarios.map((scenario) => ({
 						...scenario,
@@ -69,7 +69,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 					})),
 				),
 			);
-		const publishScenarios = (
+		const publishScenariosFn = (
 			state: ProjectState,
 			scenarios: ReadonlyArray<BoardScenarioSchema.Type>,
 		) =>
@@ -102,7 +102,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 							.map(({ bytes: _bytes, ...descriptor }) => descriptor),
 					),
 					Effect.mapError((cause) =>
-						error(
+						errorFn(
 							"list-board-scenarios",
 							`Board scenarios for project ${projectId} could not be listed.`,
 							cause,
@@ -118,7 +118,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 						(scenarios) => scenarios.find((scenario) => scenario.name === name) ?? null,
 					),
 					Effect.mapError((cause) =>
-						error(
+						errorFn(
 							"read-board-scenario",
 							`Board scenario ${name} in project ${projectId} could not be read.`,
 							cause,
@@ -140,7 +140,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 						bytes: new Uint8Array(candidateBytes),
 					}),
 					catch: (cause) =>
-						error(
+						errorFn(
 							"write-board-scenario",
 							"The Editor Board scenario is invalid.",
 							cause,
@@ -148,15 +148,15 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 				});
 				if (bytes.byteLength === 0)
 					return yield* Effect.fail(
-						error("write-board-scenario", "The Editor Board scenario is empty."),
+						errorFn("write-board-scenario", "The Editor Board scenario is empty."),
 					);
 				const clockMs = yield* Clock.currentTimeMillis;
 				return yield* operations.withPermits(1)(
 					Effect.gen(function* () {
-						const state = yield* readState(projectId);
+						const state = yield* readStateFx(projectId);
 						if (state.project.revision !== expectedRevision)
 							return yield* Effect.fail(
-								error(
+								errorFn(
 									"write-board-scenario",
 									`Editor project ${projectId} changed from revision ${expectedRevision} to ${state.project.revision} before this write could commit.`,
 								),
@@ -182,7 +182,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 							filesystemWrite.replaceFileFx({
 								lock: state.paths.lockFile,
 								target,
-								bytes: encodeJson(
+								bytes: encodeJsonFn(
 									BoardScenarioFileSchema.parse({
 										name: written.name,
 										revision: written.projectRevision,
@@ -194,7 +194,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 								),
 							}),
 						);
-						publishScenarios(state, [
+						publishScenariosFn(state, [
 							written,
 							...scenarios.filter((scenario) => scenario.name !== name),
 						]);
@@ -203,7 +203,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 				);
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					errorFn(
 						"write-board-scenario",
 						`Board scenario ${candidateName} could not be saved in project ${projectId}.`,
 						cause,
@@ -214,7 +214,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 		const deleteBoardScenarioFx: Operations["deleteBoardScenarioFx"] = ({ projectId, name }) =>
 			operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
+					const state = yield* readStateFx(projectId);
 					const target = yield* state.paths.scenarioFileFx(name);
 					yield* withProjectLockFx(
 						filesystemWrite,
@@ -224,13 +224,13 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 							target,
 						}),
 					);
-					publishScenarios(
+					publishScenariosFn(
 						state,
 						state.scenarios.filter((scenario) => scenario.name !== name),
 					);
 				}).pipe(
 					Effect.mapError((cause) =>
-						error(
+						errorFn(
 							"delete-board-scenario",
 							`Board scenario ${name} could not be deleted from project ${projectId}.`,
 							cause,

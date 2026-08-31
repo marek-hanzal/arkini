@@ -15,7 +15,7 @@ export namespace syncMotionPresentationFx {
 		readonly actorStore: MainActorStore;
 		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly readPalette: () => PixiScenePalette;
+		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
 		readonly quantityPresentationByActorId: ReadonlyMap<string, QuantityPresentation>;
@@ -27,7 +27,7 @@ export const syncMotionPresentationFx = Effect.fn("syncMotionPresentationFx")(fu
 	actorStore,
 	animator,
 	application,
-	readPalette,
+	readPaletteFn,
 	surface,
 	textures,
 	quantityPresentationByActorId,
@@ -51,7 +51,7 @@ export const syncMotionPresentationFx = Effect.fn("syncMotionPresentationFx")(fu
 			animator,
 			frames: application.frames,
 			item,
-			palette: readPalette(),
+			palette: readPaletteFn(),
 			size,
 			textures,
 		});

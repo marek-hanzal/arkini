@@ -38,7 +38,7 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 					target: currentPath,
 					value: available,
 					operation: "persist the cheat availability preference",
-					serialize: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
+					serializeFn: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
 				}),
 		);
 		return {
@@ -47,7 +47,7 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 				path: currentPath,
 				fallback: false,
 				operation: "read the cheat availability preference",
-				parse: (stored) => {
+				parseFn: (stored) => {
 					try {
 						return CheatAvailabilitySchema.safeParse(JSON.parse(stored)).data;
 					} catch {

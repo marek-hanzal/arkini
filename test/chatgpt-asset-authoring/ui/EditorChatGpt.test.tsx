@@ -24,11 +24,11 @@ const state = vi.hoisted(() => ({
 	stateListeners: new Set<(state: { readonly type: "loading" | "ready" }) => void>(),
 	unsavedSession: undefined as
 		| {
-				readonly discard: () => void;
-				readonly isDirty: () => boolean;
-				readonly isValid: () => Promise<boolean>;
-				readonly ownsPathname: (pathname: string) => boolean;
-				readonly save: () => Promise<boolean>;
+				readonly discardFn: () => void;
+				readonly isDirtyFn: () => boolean;
+				readonly isValidFn: () => Promise<boolean>;
+				readonly ownsPathnameFn: (pathname: string) => boolean;
+				readonly saveFn: () => Promise<boolean>;
 		  }
 		| undefined,
 }));
@@ -100,14 +100,14 @@ beforeEach(() => {
 		configurable: true,
 		value: {
 			chatGpt: {
-				setSurface,
-				onAssetCandidate: (
+				setSurfaceFn: setSurface,
+				onAssetCandidateFn: (
 					listener: (candidate: ChatGptAssetCandidateSchema.Type) => void,
 				) => {
 					state.assetListeners.add(listener);
 					return () => state.assetListeners.delete(listener);
 				},
-				onStateChanged: (
+				onStateChangedFn: (
 					listener: (next: { readonly type: "loading" | "ready" }) => void,
 				) => {
 					state.stateListeners.add(listener);
@@ -179,8 +179,8 @@ describe("Editor ChatGPT asset confirmation", () => {
 		const container = await renderChatGpt();
 		await emitCandidate("Pending Image.png");
 
-		expect(state.unsavedSession?.isDirty()).toBe(true);
-		await expect(state.unsavedSession?.isValid()).resolves.toBe(false);
+		expect(state.unsavedSession?.isDirtyFn()).toBe(true);
+		await expect(state.unsavedSession?.isValidFn()).resolves.toBe(false);
 		expect(readButton(container, "Save & return").disabled).toBe(true);
 
 		await act(async () => {
@@ -200,8 +200,8 @@ describe("Editor ChatGPT asset confirmation", () => {
 		expect(
 			container.querySelector('[data-ui="EditorChatGptAssetConfirmation"]'),
 		).not.toBeNull();
-		expect(state.unsavedSession?.isDirty()).toBe(true);
-		expect(state.unsavedSession?.ownsPathname("/editor/project-one/chatgpt")).toBe(true);
+		expect(state.unsavedSession?.isDirtyFn()).toBe(true);
+		expect(state.unsavedSession?.ownsPathnameFn("/editor/project-one/chatgpt")).toBe(true);
 
 		await act(async () => readButton(container, "Save & return").click());
 		expect(state.mutate).toHaveBeenCalledWith(
@@ -220,7 +220,7 @@ describe("Editor ChatGPT asset confirmation", () => {
 		await act(async () => readButton(container, "Discard & return").click());
 
 		expect(state.mutate).not.toHaveBeenCalled();
-		expect(state.unsavedSession?.isDirty()).toBe(false);
+		expect(state.unsavedSession?.isDirtyFn()).toBe(false);
 		expect(setSurface).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				projectId: "project-one",

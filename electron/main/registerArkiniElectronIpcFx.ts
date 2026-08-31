@@ -65,13 +65,13 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				root: userDataPaths.game.saves,
 			});
 			yield* Effect.sync(() => {
-				const synchronizeWindowBackgrounds = () => {
+				const synchronizeWindowBackgroundsFn = () => {
 					const color = nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff";
 					for (const window of BrowserWindow.getAllWindows()) {
 						window.setBackgroundColor(color);
 					}
 				};
-				const runAuthorized = <Value, Error>(
+				const runAuthorizedFn = <Value, Error>(
 					event: IpcMainInvokeEvent,
 					operation: Effect.Effect<Value, Error, never>,
 				) =>
@@ -81,37 +81,37 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 							.pipe(Effect.andThen(operation)),
 					);
 
-				nativeTheme.on("updated", synchronizeWindowBackgrounds);
+				nativeTheme.on("updated", synchronizeWindowBackgroundsFn);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceRead, (event) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.sync(() => nativeTheme.themeSource),
 					),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceWrite, (event, theme) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						appearancePreferences.writeThemeFx(theme).pipe(
 							Effect.tap(() =>
 								Effect.sync(() => {
 									nativeTheme.themeSource = theme;
-									synchronizeWindowBackgrounds();
+									synchronizeWindowBackgroundsFn();
 								}),
 							),
 						),
 					),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceAccentRead, (event) =>
-					runAuthorized(event, appearancePreferences.readAccentFx),
+					runAuthorizedFn(event, appearancePreferences.readAccentFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceAccentWrite, (event, accent) =>
-					runAuthorized(event, appearancePreferences.writeAccentFx(accent)),
+					runAuthorizedFn(event, appearancePreferences.writeAccentFx(accent)),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.cheatAvailabilityRead, (event) =>
-					runAuthorized(event, cheatPreferences.readAvailableFx),
+					runAuthorizedFn(event, cheatPreferences.readAvailableFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.clipboardWriteText, (event, candidate) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.try({
 							try: () => {
@@ -130,13 +130,13 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(
 					ArkiniElectronApi.channels.cheatAvailabilityWrite,
 					(event, available) =>
-						runAuthorized(event, cheatPreferences.writeAvailableFx(available)),
+						runAuthorizedFn(event, cheatPreferences.writeAvailableFx(available)),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.launcherLastPackageIdRead, (event) =>
-					runAuthorized(event, launcherPreferences.readLastPackageIdFx),
+					runAuthorizedFn(event, launcherPreferences.readLastPackageIdFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsWrite, (event, record) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.sync(() => DiagnosticRecordSchema.parse(record)).pipe(
 							Effect.flatMap(diagnostics.writeFx),
@@ -144,10 +144,10 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsOpenDirectory, (event) =>
-					runAuthorized(event, diagnostics.openDirectoryFx),
+					runAuthorizedFn(event, diagnostics.openDirectoryFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.userDataOpenDirectory, (event) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.tryPromise({
 							try: async () => {
@@ -161,13 +161,13 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(
 					ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 					(event, packageId) =>
-						runAuthorized(event, launcherPreferences.writeLastPackageIdFx(packageId)),
+						runAuthorizedFn(event, launcherPreferences.writeLastPackageIdFx(packageId)),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.windowModeRead, (event) =>
-					runAuthorized(event, windowPreferences.readModeFx),
+					runAuthorizedFn(event, windowPreferences.readModeFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.windowModeWrite, (event, candidate) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.gen(function* () {
 							const mode = yield* Effect.try({
@@ -188,23 +188,23 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				);
 
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackList, (event) =>
-					runAuthorized(event, arkpacks.listFx),
+					runAuthorizedFn(event, arkpacks.listFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackRead, (event, packageId: string) =>
-					runAuthorized(event, arkpacks.readFx(packageId)),
+					runAuthorizedFn(event, arkpacks.readFx(packageId)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackInstall,
 					(event, record: ArkiniElectronApi.ArkpackInstall) =>
-						runAuthorized(event, arkpacks.installFx(record)),
+						runAuthorizedFn(event, arkpacks.installFx(record)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackRemove,
 					(event, packageId: string) =>
-						runAuthorized(event, arkpacks.removeFx(packageId)),
+						runAuthorizedFn(event, arkpacks.removeFx(packageId)),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackOpenUserDirectory, (event) =>
-					runAuthorized(
+					runAuthorizedFn(
 						event,
 						Effect.tryPromise({
 							try: async () => {
@@ -221,21 +221,21 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveRead,
 					(event, key: ArkiniElectronApi.SaveKey) =>
-						runAuthorized(event, saves.readFx(key)),
+						runAuthorizedFn(event, saves.readFx(key)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveWrite,
 					(event, key: ArkiniElectronApi.SaveKey, bytes: Uint8Array) =>
-						runAuthorized(event, saves.writeFx(key, bytes)),
+						runAuthorizedFn(event, saves.writeFx(key, bytes)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveClear,
 					(event, key: ArkiniElectronApi.SaveKey) =>
-						runAuthorized(event, saves.clearFx(key)),
+						runAuthorizedFn(event, saves.clearFx(key)),
 				);
 
-				const cleanup = () => {
-					nativeTheme.removeListener("updated", synchronizeWindowBackgrounds);
+				const cleanupFn = () => {
+					nativeTheme.removeListener("updated", synchronizeWindowBackgroundsFn);
 					for (const channel of [
 						ArkiniElectronApi.channels.appearanceRead,
 						ArkiniElectronApi.channels.appearanceWrite,
@@ -264,7 +264,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					}
 					registered = false;
 				};
-				app.once("will-quit", cleanup);
+				app.once("will-quit", cleanupFn);
 			});
 		}),
 );

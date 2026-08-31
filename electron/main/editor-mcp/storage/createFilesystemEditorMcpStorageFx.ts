@@ -97,34 +97,34 @@ interface State {
 	readonly refreshTokens: Map<string, RefreshToken>;
 }
 
-const createPassword = () => `arkini_mcp_${createId()}`;
+const createPasswordFn = () => `arkini_mcp_${createId()}`;
 
-const createState = (port = DefaultPort, ngrok?: StoredNgrok): State => ({
+const createStateFn = (port = DefaultPort, ngrok?: StoredNgrok): State => ({
 	port,
 	...(ngrok === undefined
 		? {}
 		: {
 				ngrok,
 			}),
-	password: createPassword(),
+	password: createPasswordFn(),
 	clients: new Map(),
 	authorizationCodes: new Map(),
 	accessTokens: new Map(),
 	refreshTokens: new Map(),
 });
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
+const isRecordFn = (value: unknown): value is Record<string, unknown> =>
 	typeof value === "object" && value !== null && !Array.isArray(value);
 
-const indexedMap = <Value>(
+const indexedMapFn = <Value>(
 	values: ReadonlyArray<Value>,
-	readId: (value: Value) => string,
+	readIdFn: (value: Value) => string,
 	label: string,
 ) => {
 	const entries = values.map(
 		(value) =>
 			[
-				readId(value),
+				readIdFn(value),
 				value,
 			] as const,
 	);
@@ -133,10 +133,10 @@ const indexedMap = <Value>(
 	return new Map(entries);
 };
 
-const parseState = (stored: string): State => {
+const parseStateFn = (stored: string): State => {
 	const value: unknown = JSON.parse(stored);
 	if (
-		!isRecord(value) ||
+		!isRecordFn(value) ||
 		typeof value.password !== "string" ||
 		value.password === "" ||
 		!Array.isArray(value.clients) ||
@@ -149,7 +149,7 @@ const parseState = (stored: string): State => {
 	let ngrok: StoredNgrok | undefined;
 	if (value.ngrok !== undefined) {
 		if (
-			!isRecord(value.ngrok) ||
+			!isRecordFn(value.ngrok) ||
 			typeof value.ngrok.authtoken !== "string" ||
 			typeof value.ngrok.domain !== "string" ||
 			value.ngrok.authtoken === "" ||
@@ -175,18 +175,18 @@ const parseState = (stored: string): State => {
 					ngrok,
 				}),
 		password: value.password,
-		clients: indexedMap(clients, (client) => client.client_id, "OAuth client"),
-		authorizationCodes: indexedMap(
+		clients: indexedMapFn(clients, (client) => client.client_id, "OAuth client"),
+		authorizationCodes: indexedMapFn(
 			authorizationCodes,
 			(code) => code.authorizationCode,
 			"authorization code",
 		),
-		accessTokens: indexedMap(accessTokens, (token) => token.token, "access token"),
-		refreshTokens: indexedMap(refreshTokens, (token) => token.token, "refresh token"),
+		accessTokens: indexedMapFn(accessTokens, (token) => token.token, "access token"),
+		refreshTokens: indexedMapFn(refreshTokens, (token) => token.token, "refresh token"),
 	};
 };
 
-const serializeState = (state: State): StoredState => ({
+const serializeStateFn = (state: State): StoredState => ({
 	port: state.port,
 	...(state.ngrok === undefined
 		? {}
@@ -208,7 +208,7 @@ const serializeState = (state: State): StoredState => ({
 	],
 });
 
-const cloneState = (state: State): State => ({
+const cloneStateFn = (state: State): State => ({
 	...state,
 	clients: new Map(state.clients),
 	authorizationCodes: new Map(state.authorizationCodes),
@@ -243,7 +243,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 		filesystemWrite.replaceFileFx({
 			lock,
 			target: path,
-			bytes: new TextEncoder().encode(JSON.stringify(serializeState(next))),
+			bytes: new TextEncoder().encode(JSON.stringify(serializeStateFn(next))),
 		});
 	const readDiskFx = Effect.gen(function* () {
 		const stored = (yield* fileSystem.exists(path))
@@ -252,9 +252,9 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 		let rewrite = stored === undefined;
 		let loaded: State;
 		try {
-			loaded = stored === undefined ? createState() : parseState(stored);
+			loaded = stored === undefined ? createStateFn() : parseStateFn(stored);
 		} catch {
-			loaded = createState();
+			loaded = createStateFn();
 			rewrite = true;
 		}
 		if (rewrite) yield* writeStateFx(loaded);
@@ -265,27 +265,27 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 		state === undefined ? filesystemWrite.withLockFx(lock, readDiskFx) : Effect.succeed(state),
 	);
 	const readStateFx = operations.withPermits(1)(loadFx);
-	const mutateFx = (change: (next: State) => void) =>
+	const mutateFx = (changeFn: (next: State) => void) =>
 		operations.withPermits(1)(
 			filesystemWrite.withLockFx(
 				lock,
 				Effect.gen(function* () {
-					const next = cloneState(yield* readDiskFx);
-					yield* Effect.sync(() => change(next));
+					const next = cloneStateFn(yield* readDiskFx);
+					yield* Effect.sync(() => changeFn(next));
 					yield* writeStateFx(next);
 					state = next;
 				}),
 			),
 		);
-	const runPromise = <Value>(effect: Effect.Effect<Value, unknown, never>) =>
+	const runPromiseFn = <Value>(effect: Effect.Effect<Value, unknown, never>) =>
 		ElectronMainRuntime.runPromise(effect);
 	const model: OAuthServerModel = {
 		async getClient(clientId) {
-			return (await runPromise(readStateFx)).clients.get(clientId);
+			return (await runPromiseFn(readStateFx)).clients.get(clientId);
 		},
 		async registerClient(client: OAuthClientMetadata) {
 			const registered = OAuthClientInformationFullSchema.parse(client);
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => {
 					if (!next.clients.has(registered.client_id) && next.clients.size >= MaxClients)
 						throw new Error("Remote MCP client limit reached. Reset auth to clear it.");
@@ -295,13 +295,13 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			return registered;
 		},
 		async saveAuthorizationCode(code) {
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => next.authorizationCodes.set(code.authorizationCode, code)),
 			);
 		},
 		async consumeAuthorizationCode(token, clientId) {
 			let consumed: AuthorizationCode | undefined;
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => {
 					const code = next.authorizationCodes.get(token);
 					if (code?.clientId !== clientId) return;
@@ -312,17 +312,17 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			return consumed;
 		},
 		async revokeAuthorizationCode(token) {
-			await runPromise(mutateFx((next) => next.authorizationCodes.delete(token)));
+			await runPromiseFn(mutateFx((next) => next.authorizationCodes.delete(token)));
 		},
 		async saveAccessToken(token) {
-			await runPromise(mutateFx((next) => next.accessTokens.set(token.token, token)));
+			await runPromiseFn(mutateFx((next) => next.accessTokens.set(token.token, token)));
 		},
 		async getAccessToken(token) {
-			return (await runPromise(readStateFx)).accessTokens.get(token);
+			return (await runPromiseFn(readStateFx)).accessTokens.get(token);
 		},
 		async revokeAccessToken(token, clientId) {
 			let revoked: AccessToken | undefined;
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => {
 					const accessToken = next.accessTokens.get(token);
 					if (accessToken?.clientId !== clientId) return;
@@ -333,11 +333,11 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			return revoked;
 		},
 		async saveRefreshToken(token) {
-			await runPromise(mutateFx((next) => next.refreshTokens.set(token.token, token)));
+			await runPromiseFn(mutateFx((next) => next.refreshTokens.set(token.token, token)));
 		},
 		async consumeRefreshToken(token, clientId) {
 			let consumed: RefreshToken | undefined;
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => {
 					const refreshToken = next.refreshTokens.get(token);
 					if (refreshToken?.clientId !== clientId) return;
@@ -349,7 +349,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 		},
 		async revokeRefreshToken(token, clientId) {
 			let revoked: RefreshToken | undefined;
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => {
 					const refreshToken = next.refreshTokens.get(token);
 					if (refreshToken?.clientId !== clientId) return;
@@ -360,7 +360,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			return revoked;
 		},
 		async revokeGrant(grantId) {
-			await runPromise(
+			await runPromiseFn(
 				mutateFx((next) => {
 					for (const token of next.accessTokens.values())
 						if (token.grantId === grantId) next.accessTokens.delete(token.token);
@@ -436,7 +436,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 				lock,
 				Effect.gen(function* () {
 					const current = yield* readDiskFx;
-					const next = createState(current.port, current.ngrok);
+					const next = createStateFn(current.port, current.ngrok);
 					yield* writeStateFx(next);
 					state = next;
 					return next.password;

@@ -1,8 +1,8 @@
 import type { Effect } from "effect";
 import type { Container } from "pixi.js";
 
-import type { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
@@ -14,7 +14,7 @@ export interface MainInteractionDropTarget {
 }
 
 export interface MainInteractionTargetFacts {
-	readonly commandTarget: dropItemFx.Props["target"];
+	readonly commandTarget: DropItemCommand["target"];
 	readonly occupant: TileActorItem | null;
 	readonly stableKey: string;
 	readonly target: MainInteractionDropTarget | null;

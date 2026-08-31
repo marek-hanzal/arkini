@@ -6,13 +6,13 @@ import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
-import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
+import type { ItemDetailQueueProjection } from "~/item-detail/fx/projectItemDetailQueueFx";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 
 type QueueProjection = Extract<
-	useRuntimeItemDetailSceneController.QueueProjection,
+	ItemDetailQueueProjection,
 	{
 		readonly kind: "available";
 	}

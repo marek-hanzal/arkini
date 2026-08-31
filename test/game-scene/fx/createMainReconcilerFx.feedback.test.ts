@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 
@@ -69,7 +69,7 @@ describe("main reconciliation / feedback acknowledgements", () => {
 				revision: "revision:backpack",
 				location: boardLocation,
 			},
-		} satisfies runTileDropAtom.Result;
+		} satisfies DropItemResult;
 		Effect.runSync(
 			harness.dropPresentation.completeFx({
 				generation: dropGeneration,
@@ -118,8 +118,8 @@ describe("main reconciliation / feedback acknowledgements", () => {
 				animation.toAlpha === 0,
 		);
 		const destroy = vi.spyOn(actor.container, "destroy");
-		exit?.onComplete?.();
-		exit?.onComplete?.();
+		exit?.onCompleteFn?.();
+		exit?.onCompleteFn?.();
 		expect(destroy).toHaveBeenCalledOnce();
 		expect(actor.container.destroyed).toBe(true);
 		expect(actor.visuals.size).toBe(0);

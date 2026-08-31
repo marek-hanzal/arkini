@@ -182,31 +182,31 @@ export const renderSettings = async (
 		configurable: true,
 		value: {
 			cli: {
-				status: readCliStatus,
-				install: vi.fn(),
-				replace: replaceCli,
-				uninstall: vi.fn(),
+				statusFn: readCliStatus,
+				installFn: vi.fn(),
+				replaceFn: replaceCli,
+				uninstallFn: vi.fn(),
 				completion: {
-					status: readCompletionStatus,
-					install: vi.fn(),
-					replace: vi.fn(),
-					uninstall: uninstallCompletion,
+					statusFn: readCompletionStatus,
+					installFn: vi.fn(),
+					replaceFn: vi.fn(),
+					uninstallFn: uninstallCompletion,
 				},
 			},
 			appearance: {
-				write,
+				writeFn: write,
 			},
 			cheats: {
-				writeAvailable: writeCheatAvailability,
+				writeAvailableFn: writeCheatAvailability,
 			},
 			diagnostics: {
-				openDirectory: openDiagnostics,
+				openDirectoryFn: openDiagnostics,
 			},
 			userData: {
-				openDirectory: openUserData,
+				openDirectoryFn: openUserData,
 			},
 			window: {
-				writeMode: writeWindowMode,
+				writeModeFn: writeWindowMode,
 			},
 		},
 	});
@@ -231,7 +231,7 @@ export const renderSettings = async (
 				source: "user",
 			},
 			config,
-			getResourceUrl: () => "blob:test",
+			getResourceUrlFn: () => "blob:test",
 			saveKey: {
 				packageId: "package:settings",
 			},

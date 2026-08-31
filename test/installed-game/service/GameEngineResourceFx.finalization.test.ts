@@ -76,7 +76,7 @@ describe("GameEngineResourceFx / finalization", () => {
 		});
 		expect(failedDispose).toHaveBeenCalledOnce();
 		await expect(failedHarness.current()).rejects.toBe(firstFailure);
-		expect(() => failedResource.assertUsable()).toThrow(firstFailure);
+		expect(() => failedResource.assertUsableFn()).toThrow(firstFailure);
 		await expect(failedHarness.claimForClose()).resolves.toBe(failedResource);
 		await expect(failedHarness.release(failedResource)).rejects.toBe(firstFailure);
 		await expect(failedHarness.reset(failedResource)).rejects.toBe(firstFailure);
@@ -121,7 +121,7 @@ describe("GameEngineResourceFx / finalization", () => {
 			expect(Cause.hasDies(preservedCause)).toBe(true);
 			expect(Cause.findErrorOption(preservedCause)).toEqual(Option.some(finalSaveFailure));
 		}
-		expect(() => resource.assertUsable()).toThrow(releaseFailure);
+		expect(() => resource.assertUsableFn()).toThrow(releaseFailure);
 		await expect(harness.close(resource)).resolves.toEqual({
 			type: "finalization-failed",
 			cause: releaseFailure,
@@ -212,7 +212,7 @@ describe("GameEngineResourceFx / finalization", () => {
 			if (Cause.isCause(criticalCause)) {
 				expect(Cause.squash(criticalCause)).toBe(disposeDefect);
 			}
-			expect(() => resource.assertUsable()).toThrow(closeResult.cause);
+			expect(() => resource.assertUsableFn()).toThrow(closeResult.cause);
 		}
 		await expect(harness.runtime.dispose()).resolves.toBeUndefined();
 		runtimes.splice(runtimes.indexOf(harness.runtime), 1);

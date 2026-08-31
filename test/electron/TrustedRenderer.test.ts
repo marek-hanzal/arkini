@@ -94,13 +94,13 @@ describe("trusted Electron renderer policy", () => {
 			}),
 		);
 
-		expect(policy.isTrustedUrl("arkini://app/")).toBe(true);
-		expect(policy.isTrustedUrl("arkini://app/game/arkini?x=1#tile")).toBe(true);
-		expect(policy.isTrustedUrl("arkini://other/")).toBe(false);
-		expect(policy.isTrustedUrl("https://example.com/")).toBe(false);
-		expect(policy.isTrustedUrl("file:///tmp/index.html")).toBe(false);
-		expect(policy.isTrustedUrl("data:text/html,Arkini")).toBe(false);
-		expect(policy.isTrustedUrl("arkini://user@app/")).toBe(false);
+		expect(policy.isTrustedUrlFn("arkini://app/")).toBe(true);
+		expect(policy.isTrustedUrlFn("arkini://app/game/arkini?x=1#tile")).toBe(true);
+		expect(policy.isTrustedUrlFn("arkini://other/")).toBe(false);
+		expect(policy.isTrustedUrlFn("https://example.com/")).toBe(false);
+		expect(policy.isTrustedUrlFn("file:///tmp/index.html")).toBe(false);
+		expect(policy.isTrustedUrlFn("data:text/html,Arkini")).toBe(false);
+		expect(policy.isTrustedUrlFn("arkini://user@app/")).toBe(false);
 	});
 
 	it("allows only the exact configured development origin", async () => {
@@ -111,11 +111,11 @@ describe("trusted Electron renderer policy", () => {
 			}),
 		);
 
-		expect(policy.isTrustedUrl("http://127.0.0.1:4040/game/arkini")).toBe(true);
-		expect(policy.isTrustedUrl("http://127.0.0.1:4041/")).toBe(false);
-		expect(policy.isTrustedUrl("http://localhost:4040/")).toBe(false);
-		expect(policy.isTrustedUrl("https://127.0.0.1:4040/")).toBe(false);
-		expect(policy.isTrustedUrl("arkini://app/")).toBe(false);
+		expect(policy.isTrustedUrlFn("http://127.0.0.1:4040/game/arkini")).toBe(true);
+		expect(policy.isTrustedUrlFn("http://127.0.0.1:4041/")).toBe(false);
+		expect(policy.isTrustedUrlFn("http://localhost:4040/")).toBe(false);
+		expect(policy.isTrustedUrlFn("https://127.0.0.1:4040/")).toBe(false);
+		expect(policy.isTrustedUrlFn("arkini://app/")).toBe(false);
 	});
 
 	it("rejects development URLs outside the exact configured loopback origin", async () => {
@@ -186,17 +186,17 @@ describe("trusted Electron renderer policy", () => {
 		Effect.runSync(policy.registerWindowFx(harness.window));
 
 		expect(
-			policy.isTrustedIpcSender(createIpcEvent(harness.webContents, harness.mainFrame)),
+			policy.isTrustedIpcSenderFn(createIpcEvent(harness.webContents, harness.mainFrame)),
 		).toBe(true);
 		expect(
-			policy.isTrustedIpcSender(
+			policy.isTrustedIpcSenderFn(
 				createIpcEvent(harness.webContents, {
 					url: "arkini://app/",
 				} as WebFrameMain),
 			),
 		).toBe(false);
 		expect(
-			policy.isTrustedIpcSender(
+			policy.isTrustedIpcSenderFn(
 				createIpcEvent(
 					{
 						...harness.webContents,
@@ -209,7 +209,7 @@ describe("trusted Electron renderer policy", () => {
 
 		harness.setMainFrameUrl("https://example.com/");
 		expect(
-			policy.isTrustedIpcSender(createIpcEvent(harness.webContents, harness.mainFrame)),
+			policy.isTrustedIpcSenderFn(createIpcEvent(harness.webContents, harness.mainFrame)),
 		).toBe(false);
 	});
 
@@ -222,10 +222,10 @@ describe("trusted Electron renderer policy", () => {
 		const harness = createWindowHarness("arkini://app/");
 		Effect.runSync(policy.registerWindowFx(harness.window));
 		const event = createIpcEvent(harness.webContents, harness.mainFrame);
-		expect(policy.isTrustedIpcSender(event)).toBe(true);
+		expect(policy.isTrustedIpcSenderFn(event)).toBe(true);
 
 		harness.close();
-		expect(policy.isTrustedIpcSender(event)).toBe(false);
+		expect(policy.isTrustedIpcSenderFn(event)).toBe(false);
 		expect(harness.permissionCheckHandlers.at(-1)).toBeNull();
 		expect(harness.permissionRequestHandlers.at(-1)).toBeNull();
 	});

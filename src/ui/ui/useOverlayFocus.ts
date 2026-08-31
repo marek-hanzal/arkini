@@ -3,7 +3,7 @@ import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef } from "rea
 import { overlayFocusableSelector } from "~/ui/constant/overlayFocusableSelector";
 
 /** Owns first-control focus, Escape, and focus return for one mounted overlay. */
-export const useOverlayFocus = ({ onClose }: { readonly onClose: () => void }) => {
+export const useOverlayFocus = ({ onCloseFn }: { readonly onCloseFn: () => void }) => {
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -17,15 +17,15 @@ export const useOverlayFocus = ({ onClose }: { readonly onClose: () => void }) =
 		};
 	}, []);
 
-	const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+	const onKeyDownFn = (event: ReactKeyboardEvent<HTMLDivElement>) => {
 		if (event.key !== "Escape") return;
 		event.preventDefault();
 		event.stopPropagation();
-		onClose();
+		onCloseFn();
 	};
 
 	return {
 		overlayRef,
-		onKeyDown,
+		onKeyDownFn,
 	};
 };

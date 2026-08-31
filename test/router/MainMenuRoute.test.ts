@@ -103,9 +103,9 @@ describe("MainMenu", () => {
 			RendererLifecycleOwnerAtom,
 			Effect.runSync(
 				createRendererLifecycleFx({
-					forceClose: () => undefined,
-					requestClose,
-					waitUntilVisible: () => Promise.resolve(performance.now()),
+					forceCloseFn: () => undefined,
+					requestCloseFn: requestClose,
+					waitUntilVisibleFn: () => Promise.resolve(performance.now()),
 				}),
 			),
 		);

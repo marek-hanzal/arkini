@@ -31,7 +31,7 @@ export const Route = createFileRoute("/editor/$projectId/chatgpt")({
 							icon={FileWarning}
 							title="Downloaded image was rejected"
 							action={
-								<Button onClick={controller.discard}>Discard &amp; return</Button>
+								<Button onClick={controller.discardFn}>Discard &amp; return</Button>
 							}
 						/>
 					</div>
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/editor/$projectId/chatgpt")({
 							description={controller.viewState.message}
 							icon={CloudOff}
 							title="ChatGPT is unavailable"
-							action={<Button onClick={controller.retry}>Retry</Button>}
+							action={<Button onClick={controller.retryFn}>Retry</Button>}
 						/>
 					</div>
 				) : null}

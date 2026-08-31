@@ -7,9 +7,9 @@ import { PlayableInventory } from "~/game-shell/ui/PlayableInventory";
 export const Route = createFileRoute("/editor/$projectId/board/inventory")({
 	component: () => {
 		const { projectId } = Route.useParams();
-		const navigate = useNavigate();
-		const returnToBoard = useCallback(() => {
-			void navigate({
+		const navigateFn = useNavigate();
+		const returnToBoardFn = useCallback(() => {
+			void navigateFn({
 				to: "/editor/$projectId/board",
 				params: {
 					projectId,
@@ -19,17 +19,17 @@ export const Route = createFileRoute("/editor/$projectId/board/inventory")({
 				console.error("Editor Inventory failed to return to the Board.", cause);
 			});
 		}, [
-			navigate,
+			navigateFn,
 			projectId,
 		]);
-		const historyBack = useEditorHistoryBack();
-		const onClose = useCallback(
-			() => historyBack(returnToBoard),
+		const historyBackFn = useEditorHistoryBack();
+		const onCloseFn = useCallback(
+			() => historyBackFn(returnToBoardFn),
 			[
-				historyBack,
-				returnToBoard,
+				historyBackFn,
+				returnToBoardFn,
 			],
 		);
-		return <PlayableInventory onClose={onClose} />;
+		return <PlayableInventory onCloseFn={onCloseFn} />;
 	},
 });

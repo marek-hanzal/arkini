@@ -38,7 +38,7 @@ export namespace createGameSessionFx {
 		tickIntervalMs?: number;
 		save?: {
 			debounceMs?: number;
-			write: (state: StateSchema.Type) => Effect.Effect<void, SaveError, never>;
+			writeFx: (state: StateSchema.Type) => Effect.Effect<void, SaveError, never>;
 		};
 	}
 }
@@ -82,16 +82,16 @@ type CommandClaim<Result, Error> =
 	  };
 
 interface GameSessionFatalSignal {
-	readonly getSnapshot: () => GameSessionFatalError | null;
-	readonly report: (
+	readonly getSnapshotFn: () => GameSessionFatalError | null;
+	readonly reportFn: (
 		source: GameSessionFatalSource,
 		cause: unknown,
-		beforePublish: () => void,
+		beforePublishFn: () => void,
 	) => {
 		readonly error: GameSessionFatalError;
 		readonly published: boolean;
 	};
-	readonly subscribe: (listener: () => void) => () => void;
+	readonly subscribeFn: (listenerFn: () => void) => () => void;
 }
 
 /** Small synchronous first-failure signal so bootstrap-time failures cannot be lost. */
@@ -101,8 +101,8 @@ const createGameSessionFatalSignalFx = Effect.fnUntraced(
 		const listeners = new Set<() => void>();
 
 		return {
-			getSnapshot: () => snapshot,
-			report: (source, cause, beforePublish) => {
+			getSnapshotFn: () => snapshot,
+			reportFn: (source, cause, beforePublishFn) => {
 				if (snapshot !== null) {
 					return {
 						error: snapshot,
@@ -117,12 +117,12 @@ const createGameSessionFatalSignalFx = Effect.fnUntraced(
 								source,
 								cause,
 							});
-				beforePublish();
-				for (const listener of [
+				beforePublishFn();
+				for (const listenerFn of [
 					...listeners,
 				]) {
 					try {
-						listener();
+						listenerFn();
 					} catch {
 						// The session is already frozen; one observer cannot hide the fatal
 						// snapshot from later exact-resource observers.
@@ -133,10 +133,10 @@ const createGameSessionFatalSignalFx = Effect.fnUntraced(
 					published: true,
 				};
 			},
-			subscribe: (listener) => {
-				listeners.add(listener);
+			subscribeFn: (listenerFn) => {
+				listeners.add(listenerFn);
 				return () => {
-					listeners.delete(listener);
+					listeners.delete(listenerFn);
 				};
 			},
 		};
@@ -151,23 +151,23 @@ const createGameSessionFatalSignalFx = Effect.fnUntraced(
  */
 export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 	<SaveError>({ config, state, tickIntervalMs, save }: createGameSessionFx.Props<SaveError>) =>
-		Effect.uninterruptibleMask((restore) =>
+		Effect.uninterruptibleMask((restoreFx) =>
 			Effect.gen(function* () {
 				const ownerScope = yield* Scope.make();
 				const lifecycle = MutableRef.make<SessionLifecycle>({
 					type: "running",
 				});
 				const fatalSignal = yield* createGameSessionFatalSignalFx();
-				let quiesceFatalSession = () => undefined;
+				let quiesceFatalSessionFn = () => undefined;
 				let fatalQuiesceStarted = false;
-				const failStop = (source: GameSessionFatalSource, cause: unknown) => {
-					const publication = fatalSignal.report(source, cause, () => {
+				const failStopFn = (source: GameSessionFatalSource, cause: unknown) => {
+					const publication = fatalSignal.reportFn(source, cause, () => {
 						if (MutableRef.get(lifecycle).type === "running") {
 							MutableRef.set(lifecycle, {
 								type: "frozen",
 							});
 						}
-						quiesceFatalSession();
+						quiesceFatalSessionFn();
 					});
 					return publication.error;
 				};
@@ -175,7 +175,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					config,
 					state,
 					intervalMs: tickIntervalMs,
-					onFatalError: (cause) => failStop("tick", cause),
+					onFatalErrorFn: (cause) => failStopFn("tick", cause),
 				});
 				const saveLayer =
 					save === undefined
@@ -185,8 +185,8 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							})
 						: RuntimeSaveLayerFx({
 								debounceMs: save.debounceMs,
-								onFatalError: (cause) => failStop("autosave", cause),
-								save: save.write,
+								onFatalErrorFn: (cause) => failStopFn("autosave", cause),
+								saveFx: save.writeFx,
 							}).pipe(Layer.provide(sessionLayer));
 				const managed = ManagedRuntime.make(Layer.merge(sessionLayer, saveLayer));
 				yield* Scope.addFinalizer(ownerScope, managed.disposeEffect);
@@ -206,7 +206,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					const commandScope = yield* Scope.fork(ownerScope, "sequential");
 					const transitionSubscriptions = yield* runManagedFx(
 						createGameSessionTransitionSubscriptionsFx((cause) =>
-							failStop("subscription", cause),
+							failStopFn("subscription", cause),
 						).pipe(Scope.provide(sessionScope)),
 					);
 					const committedTransitions = yield* runManagedFx(CommittedTransitionsFx);
@@ -215,7 +215,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					);
 					const committedTransitionAtom: Atom.Atom<CommittedTransitionSchema.Type> =
 						Atom.readable((get) => get(committedTransitionSubscriptionAtom));
-					const runCommand = yield* runManagedFx(
+					const runCommandFn = yield* runManagedFx(
 						FiberSet.makeRuntime<GameSessionServices>().pipe(
 							Scope.provide(commandScope),
 						),
@@ -234,7 +234,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					const stopCommandsFx = Scope.close(commandScope, Exit.void);
 					const stopTransitionSubscriptionsFx = Scope.close(sessionScope, Exit.void);
 					const releaseSessionFx = Scope.close(ownerScope, Exit.void);
-					quiesceFatalSession = () => {
+					quiesceFatalSessionFn = () => {
 						if (fatalQuiesceStarted) return;
 						fatalQuiesceStarted = true;
 						managed.runFork(
@@ -244,7 +244,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							),
 						);
 					};
-					if (fatalSignal.getSnapshot() !== null) quiesceFatalSession();
+					if (fatalSignal.getSnapshotFn() !== null) quiesceFatalSessionFn();
 
 					const claimDisposeFx = lifecycleLock.withPermits(1)(
 						Effect.gen(function* () {
@@ -273,12 +273,12 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					);
 
 					const disposeWithSaveModeFx = (saveMode: "flush" | "discard") =>
-						Effect.uninterruptibleMask((restore) =>
+						Effect.uninterruptibleMask((restoreFx) =>
 							Effect.gen(function* () {
 								const claim = yield* claimDisposeFx;
 								if (claim.type === "complete") return;
 								if (claim.type === "await") {
-									return yield* restore(Deferred.await(claim.result));
+									return yield* restoreFx(Deferred.await(claim.result));
 								}
 
 								/**
@@ -310,7 +310,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					const runFx = <Result, CommandError, Requirements extends GameSessionServices>(
 						effect: Effect.Effect<Result, CommandError, Requirements>,
 					): Effect.Effect<Result, CommandError | GameSessionNotRunningError, never> =>
-						Effect.uninterruptibleMask((restore) =>
+						Effect.uninterruptibleMask((restoreFx) =>
 							Effect.sync((): CommandClaim<Result, CommandError> => {
 								const current = MutableRef.get(lifecycle);
 								if (current.type !== "running") {
@@ -328,7 +328,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 
 								return {
 									type: "run",
-									fiber: runCommand(effect),
+									fiber: runCommandFn(effect),
 								};
 							}).pipe(
 								Effect.flatMap(
@@ -342,14 +342,14 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 										if (claim.type === "reject")
 											return Effect.fail(claim.error);
 
-										return restore(Fiber.join(claim.fiber)).pipe(
+										return restoreFx(Fiber.join(claim.fiber)).pipe(
 											Effect.onInterrupt(() => Fiber.interrupt(claim.fiber)),
 										);
 									},
 								),
 							),
 						);
-					const openSubscription = (
+					const openSubscriptionFn = (
 						effect: Effect.Effect<
 							GameSessionTransitionSubscriptionCleanup,
 							never,
@@ -367,7 +367,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							managed.runSync(cleanup.close);
 						};
 					};
-					const read = <Result, ReadError, Requirements extends GameSessionServices>(
+					const readFn = <Result, ReadError, Requirements extends GameSessionServices>(
 						effect: Effect.Effect<Result, ReadError, Requirements>,
 					): Exit.Exit<Result, ReadError | GameSessionNotRunningError> => {
 						const current = MutableRef.get(lifecycle);
@@ -392,26 +392,28 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 						disposeWithoutSaveFx: disposeWithSaveModeFx("discard"),
 						flushSaveFx,
 						committedTransitionAtom,
-						failStop,
-						getFatalError: fatalSignal.getSnapshot,
-						getSnapshot: () => committedTransitions.readUnsafe().runtime,
-						getTransitionSnapshot: committedTransitions.readUnsafe,
-						read,
+						failStopFn,
+						getFatalErrorFn: fatalSignal.getSnapshotFn,
+						getSnapshotFn: () => committedTransitions.readUnsafeFn().runtime,
+						getTransitionSnapshotFn: committedTransitions.readUnsafeFn,
+						readFn,
 						runFx,
-						run: (effect) => Effect.runPromise(runFx(effect)),
-						subscribe: (listener) =>
-							openSubscription(transitionSubscriptions.subscribe(listener)),
-						subscribeTransitions: (listener) =>
-							openSubscription(
-								transitionSubscriptions.subscribeTransitions(listener),
+						runFn: (effect) => Effect.runPromise(runFx(effect)),
+						subscribeFn: (listenerFn) =>
+							openSubscriptionFn(transitionSubscriptions.subscribeFx(listenerFn)),
+						subscribeTransitionsFn: (listenerFn) =>
+							openSubscriptionFn(
+								transitionSubscriptions.subscribeTransitionsFx(listenerFn),
 							),
-						subscribeEvents: (listener) =>
-							openSubscription(transitionSubscriptions.subscribeEvents(listener)),
-						subscribeFatalError: fatalSignal.subscribe,
+						subscribeEventsFn: (listenerFn) =>
+							openSubscriptionFn(
+								transitionSubscriptions.subscribeEventsFx(listenerFn),
+							),
+						subscribeFatalErrorFn: fatalSignal.subscribeFn,
 					} satisfies GameSession;
 				});
 
-				return yield* restore(initializeFx).pipe(
+				return yield* restoreFx(initializeFx).pipe(
 					Effect.onExit((exit) =>
 						Exit.isFailure(exit) ? Scope.close(ownerScope, exit) : Effect.void,
 					),

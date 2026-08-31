@@ -28,8 +28,8 @@ vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 		config: {
 			items: {},
 		},
-		getResourceUrl: (resourceId: string) => resourceId,
-		readOrThrow: <Value>(value: Value) => value,
+		getResourceUrlFn: (resourceId: string) => resourceId,
+		readOrThrowFn: <Value>(value: Value) => value,
 	}),
 }));
 

@@ -101,7 +101,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						className="mt-4"
 						disabled={controller.buildPending}
 						cursorIntent={controller.buildPending ? "progress" : undefined}
-						onClick={controller.build}
+						onClick={controller.buildFn}
 					>
 						<PackageCheck className="mr-2 size-4" />
 						Build
@@ -116,7 +116,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								data-ui="EditorBuildInstall"
 								disabled={controller.installPending || !controller.installAvailable}
 								cursorIntent={controller.installPending ? "progress" : undefined}
-								onClick={controller.installArtifact}
+								onClick={controller.installArtifactFn}
 							>
 								<InstallIcon className="mr-2 size-4" />
 								{controller.installAction === "update" ? "Update" : "Install"}
@@ -126,7 +126,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								data-ui="EditorBuildSave"
 								disabled={controller.savePending}
 								cursorIntent={controller.savePending ? "progress" : undefined}
-								onClick={controller.saveArtifact}
+								onClick={controller.saveArtifactFn}
 							>
 								<Download className="mr-2 size-4" />
 								Save as…
@@ -151,8 +151,8 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						confirmation={controller.installConfirmation}
 						error={controller.installError}
 						pending={controller.installPending}
-						onCancel={controller.cancelInstall}
-						onConfirm={controller.confirmInstall}
+						onCancelFn={controller.cancelInstallFn}
+						onConfirmFn={controller.confirmInstallFn}
 					/>
 				)}
 			</section>

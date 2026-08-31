@@ -52,9 +52,9 @@ export const useCanvasRenderer = ({
 }: useCanvasRenderer.Props): useCanvasRenderer.Output => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
-	const drawItemArtwork = useCanvasArtworkPainter(scheduleDrawRef);
-	const drawItemNode = useCanvasItemNodePainter(drawItemArtwork);
-	const readCanvasPalette = useCanvasPalette(scheduleDrawRef);
+	const drawItemArtworkFn = useCanvasArtworkPainter(scheduleDrawRef);
+	const drawItemNodeFn = useCanvasItemNodePainter(drawItemArtworkFn);
+	const readCanvasPaletteFn = useCanvasPalette(scheduleDrawRef);
 	const routePainter = useCanvasRoutePainter();
 	const viewportRef = useRef<Viewport>(readDefaultOriginFlowViewportFn());
 	const frameRef = useRef<number | undefined>(undefined);
@@ -92,7 +92,7 @@ export const useCanvasRenderer = ({
 		selection,
 	};
 
-	const draw = useCallback(() => {
+	const drawFn = useCallback(() => {
 		frameRef.current = undefined;
 		const canvas = canvasRef.current;
 		if (canvas === null) return;
@@ -142,10 +142,10 @@ export const useCanvasRenderer = ({
 			rect.height,
 			FlowEdgeCullPaddingPx,
 		);
-		const palette = readCanvasPalette(canvas);
+		const palette = readCanvasPaletteFn(canvas);
 		context.setTransform(dpr, 0, 0, dpr, 0, 0);
 		context.clearRect(0, 0, rect.width, rect.height);
-		routePainter.drawGrid(context, rect.width, rect.height, viewport, palette);
+		routePainter.drawGridFn(context, rect.width, rect.height, viewport, palette);
 
 		context.save();
 		context.translate(viewport.x, viewport.y);
@@ -167,7 +167,7 @@ export const useCanvasRenderer = ({
 				const bounds = state.edgeBounds.get(edge.id);
 				if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
 				if (!isOriginFlowEdgeVisibleFn(bounds, visibleEdges)) continue;
-				routePainter.drawEdge(
+				routePainter.drawEdgeFn(
 					context,
 					backbone,
 					highlightColor,
@@ -188,7 +188,7 @@ export const useCanvasRenderer = ({
 				state.highlight,
 				relationFocusNodeIdRef.current,
 			);
-			drawItemNode({
+			drawItemNodeFn({
 				connectedPortIds: state.connectedPorts.get(node.id),
 				context,
 				highlight: nodeHighlight,
@@ -208,21 +208,21 @@ export const useCanvasRenderer = ({
 		}
 		context.restore();
 	}, [
-		drawItemNode,
-		readCanvasPalette,
+		drawItemNodeFn,
+		readCanvasPaletteFn,
 		relationFocusNodeIdRef,
 		routePainter,
 	]);
 
-	const scheduleDraw = useCallback(() => {
+	const scheduleDrawFn = useCallback(() => {
 		if (frameRef.current !== undefined) return;
-		frameRef.current = requestAnimationFrame(draw);
+		frameRef.current = requestAnimationFrame(drawFn);
 	}, [
-		draw,
+		drawFn,
 	]);
-	scheduleDrawRef.current = scheduleDraw;
+	scheduleDrawRef.current = scheduleDrawFn;
 
-	const focusNode = useCallback(
+	const focusNodeFn = useCallback(
 		(nodeId: string) => {
 			const canvas = canvasRef.current;
 			const position = positions.get(nodeId);
@@ -236,26 +236,26 @@ export const useCanvasRenderer = ({
 				FlowSearchZoom,
 			);
 			resetViewportRef.current = false;
-			scheduleDraw();
+			scheduleDrawFn();
 			return true;
 		},
 		[
 			positions,
-			scheduleDraw,
+			scheduleDrawFn,
 		],
 	);
 
 	useLayoutEffect(() => {
 		resetViewportRef.current = true;
-		scheduleDraw();
+		scheduleDrawFn();
 	}, [
 		fitContent,
 		positions,
-		scheduleDraw,
+		scheduleDrawFn,
 	]);
 
 	useEffect(() => {
-		scheduleDraw();
+		scheduleDrawFn();
 	}, [
 		backbones,
 		connectedPorts,
@@ -267,24 +267,24 @@ export const useCanvasRenderer = ({
 		metroBackbones,
 		nodeMetrics,
 		resourceUrls,
-		scheduleDraw,
+		scheduleDrawFn,
 		selection,
 	]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (canvas === null) return;
-		const observer = new ResizeObserver(() => scheduleDraw());
+		const observer = new ResizeObserver(() => scheduleDrawFn());
 		observer.observe(canvas);
 		return () => observer.disconnect();
 	}, [
-		scheduleDraw,
+		scheduleDrawFn,
 	]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (canvas === null) return;
-		const handleWheel = (event: WheelEvent) => {
+		const handleWheelFn = (event: WheelEvent) => {
 			event.preventDefault();
 			const rect = canvas.getBoundingClientRect();
 			const pointerX = event.clientX - rect.left;
@@ -301,14 +301,14 @@ export const useCanvasRenderer = ({
 				y: pointerY - worldY * zoom,
 				zoom,
 			};
-			scheduleDraw();
+			scheduleDrawFn();
 		};
-		canvas.addEventListener("wheel", handleWheel, {
+		canvas.addEventListener("wheel", handleWheelFn, {
 			passive: false,
 		});
-		return () => canvas.removeEventListener("wheel", handleWheel);
+		return () => canvas.removeEventListener("wheel", handleWheelFn);
 	}, [
-		scheduleDraw,
+		scheduleDrawFn,
 	]);
 
 	useEffect(
@@ -320,8 +320,8 @@ export const useCanvasRenderer = ({
 
 	return {
 		canvasRef,
-		focusNode,
-		scheduleDraw,
+		focusNodeFn,
+		scheduleDrawFn,
 		viewportRef,
 	};
 };
@@ -347,8 +347,8 @@ export namespace useCanvasRenderer {
 
 	export interface Output {
 		readonly canvasRef: RefObject<HTMLCanvasElement | null>;
-		readonly focusNode: (nodeId: string) => boolean;
-		readonly scheduleDraw: () => void;
+		readonly focusNodeFn: (nodeId: string) => boolean;
+		readonly scheduleDrawFn: () => void;
 		readonly viewportRef: RefObject<Viewport>;
 	}
 }

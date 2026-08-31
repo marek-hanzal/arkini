@@ -25,7 +25,7 @@ export const ItemEstimateRouteGraph = ({
 	readonly projectId: string;
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
-	const [sort, setSort] = useState<ItemEstimateSort>("time");
+	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
 	const requiredByFactId = new Map<string, Set<string>>();
 	for (const route of routeSteps)
 		for (const requirement of route.requirements) {
@@ -62,7 +62,7 @@ export const ItemEstimateRouteGraph = ({
 						<button
 							className={`cursor-pointer rounded-md border px-2.5 py-1 text-xs font-semibold ${selectableClassName}`}
 							key={value}
-							onClick={() => setSort(value)}
+							onClick={() => setSortFn(value)}
 							type="button"
 							{...readDataUiFn({
 								dataUi: "EditorItemEstimateRouteSort",

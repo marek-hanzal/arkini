@@ -6,7 +6,7 @@ import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 interface GameLoopLayerProps {
 	readonly intervalMs?: number;
-	readonly onFatalError?: (cause: unknown) => void;
+	readonly onFatalErrorFn?: (cause: unknown) => void;
 }
 
 /**
@@ -18,12 +18,12 @@ interface GameLoopLayerProps {
  */
 export const GameLoopLayerFx = ({
 	intervalMs = SimulationStepMs,
-	onFatalError = () => undefined,
+	onFatalErrorFn = () => undefined,
 }: GameLoopLayerProps = {}) => {
 	const advance = TickFx.pipe(
 		Effect.flatMap(({ advanceRuntime }) => advanceRuntime),
 		Effect.onError((cause) =>
-			Cause.hasInterruptsOnly(cause) ? Effect.void : Effect.sync(() => onFatalError(cause)),
+			Cause.hasInterruptsOnly(cause) ? Effect.void : Effect.sync(() => onFatalErrorFn(cause)),
 		),
 	);
 

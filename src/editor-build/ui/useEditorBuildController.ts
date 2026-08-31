@@ -15,22 +15,22 @@ type EditorBuildStatus = "building" | "not-built" | "stale" | "valid";
 export namespace useEditorBuildController {
 	export interface Output {
 		readonly artifact?: EditorProjectBuildSchema.Type;
-		readonly build: () => void;
+		readonly buildFn: () => void;
 		readonly buildFailure?: EditorBuildFailure;
 		readonly buildPending: boolean;
 		readonly buildStatus: EditorBuildStatus;
-		readonly cancelInstall: () => void;
-		readonly confirmInstall: () => void;
+		readonly cancelInstallFn: () => void;
+		readonly confirmInstallFn: () => void;
 		readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
 		readonly installAction: "install" | "update";
-		readonly installArtifact: () => void;
+		readonly installArtifactFn: () => void;
 		readonly installAvailable: boolean;
 		readonly installConfirmation?: EditorBuildMajorUpdateConfirmation;
 		readonly installError?: string;
 		readonly installPending: boolean;
 		readonly installedPackageId?: string;
 		readonly project: Project;
-		readonly saveArtifact: () => void;
+		readonly saveArtifactFn: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;
 	}
@@ -52,22 +52,22 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 
 	return {
 		artifact: artifactController.artifact,
-		build: artifactController.build,
+		buildFn: artifactController.buildFn,
 		buildFailure: artifactController.buildFailure,
 		buildPending: artifactController.buildPending,
 		buildStatus: artifactController.buildStatus,
-		cancelInstall: installController.cancelInstall,
-		confirmInstall: installController.confirmInstall,
+		cancelInstallFn: installController.cancelInstallFn,
+		confirmInstallFn: installController.confirmInstallFn,
 		diagnostics: artifactController.diagnostics,
 		installAction: installController.installAction,
-		installArtifact: installController.installArtifact,
+		installArtifactFn: installController.installArtifactFn,
 		installAvailable: installController.installAvailable,
 		installConfirmation: installController.installConfirmation,
 		installError: installController.installError,
 		installPending: installController.installPending,
 		installedPackageId: installController.installedPackageId,
 		project,
-		saveArtifact: saveController.saveArtifact,
+		saveArtifactFn: saveController.saveArtifactFn,
 		saveError: saveController.saveError,
 		savePending: saveController.savePending,
 	};

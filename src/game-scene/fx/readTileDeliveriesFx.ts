@@ -48,7 +48,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 		inventoryOpener?.location.scope === LocationScopeEnumSchema.enum.Toolbar
 			? inventoryOpener.location
 			: undefined;
-	const readPresentationLocation = (
+	const readPresentationLocationFn = (
 		location: GridLocationSchema.Type,
 	): GridLocationSchema.Type | undefined =>
 		location.scope === LocationScopeEnumSchema.enum.Inventory
@@ -79,8 +79,8 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 			}
 		}
 		if (semanticTo === undefined) continue;
-		const from = readPresentationLocation(semanticFrom);
-		const to = readPresentationLocation(semanticTo);
+		const from = readPresentationLocationFn(semanticFrom);
+		const to = readPresentationLocationFn(semanticTo);
 		if (from === undefined || to === undefined) continue;
 		const visibleOnMain = [
 			from,

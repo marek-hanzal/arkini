@@ -21,9 +21,9 @@ export namespace refreshEditorProjectFx {
 
 const requestRefreshFx = (projectId: string) =>
 	invokeProjectTransportFx({
-		call: () => window.arkini.editor.refreshProject(projectId),
+		callFn: () => window.arkini.editor.refreshProjectFn(projectId),
 		operation: "refresh-project",
-		parse: (candidate: EditorProjectTransport.Project) => {
+		parseFn: (candidate: EditorProjectTransport.Project) => {
 			return ProjectPayloadSchema.parse(candidate);
 		},
 		requestMessage: "The editor project refresh request failed.",
@@ -55,7 +55,7 @@ export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 										: syncEditorBoardGameFx(current).pipe(Effect.ignore),
 								),
 							);
-							yield* Effect.sync(() => unsavedChanges.discardAll());
+							yield* Effect.sync(() => unsavedChanges.discardAllFn());
 							if (fresh.projectId === projectId) {
 								yield* publishEditorProjectFx(projectId, {
 									replacement: fresh,

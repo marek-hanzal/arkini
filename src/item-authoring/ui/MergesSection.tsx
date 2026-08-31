@@ -11,20 +11,20 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 const MergeFields = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (value: MergeSchema.Type[] | undefined) => void;
+	readonly onChangeFn: (value: MergeSchema.Type[] | undefined) => void;
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
-	const readItemLabel = useEditorItemOptionLabel();
+	const readItemLabelFn = useEditorItemOptionLabel();
 	const merges = value ?? [];
-	const update = (index: number, merge: MergeSchema.Type) => {
+	const updateFn = (index: number, merge: MergeSchema.Type) => {
 		const next = [
 			...merges,
 		];
 		next[index] = merge;
-		onChange(next);
+		onChangeFn(next);
 	};
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
@@ -34,8 +34,8 @@ const MergeFields = ({
 						actionLabel="Enable merges"
 						description="Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output."
 						icon={Combine}
-						onEnable={() =>
-							onChange([
+						onEnableFn={() =>
+							onChangeFn([
 								structuredClone(MergeDraftDefault),
 							])
 						}
@@ -51,28 +51,28 @@ const MergeFields = ({
 					<EditorCollectionSelector
 						addLabel="Add merge"
 						count={merges.length}
-						itemLabel={(index) => {
+						itemLabelFn={(index) => {
 							const itemId = merges[index].target.itemId;
-							return readItemLabel(itemId, `Merge ${index + 1}`);
+							return readItemLabelFn(itemId, `Merge ${index + 1}`);
 						}}
 						label="Merges"
 						navigationCard
-						onAdd={() =>
-							onChange([
+						onAddFn={() =>
+							onChangeFn([
 								...merges,
 								structuredClone(MergeDraftDefault),
 							])
 						}
-						onRemove={(index) => {
+						onRemoveFn={(index) => {
 							const next = merges.filter((_merge, candidate) => candidate !== index);
-							onChange(next.length === 0 ? undefined : next);
+							onChangeFn(next.length === 0 ? undefined : next);
 						}}
 						removeLabel="Remove merge"
 					>
 						{(index) => (
 							<MergeField
 								merge={merges[index]}
-								onChange={(merge) => update(index, merge)}
+								onChangeFn={(merge) => updateFn(index, merge)}
 							/>
 						)}
 					</EditorCollectionSelector>
@@ -89,7 +89,7 @@ export const MergesSection = () => {
 			{(merge) => (
 				<MergeFields
 					value={merge}
-					onChange={(next) => form.setFieldValue("merge", next)}
+					onChangeFn={(next) => form.setFieldValue("merge", next)}
 				/>
 			)}
 		</form.Subscribe>

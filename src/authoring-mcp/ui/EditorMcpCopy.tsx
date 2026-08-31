@@ -2,11 +2,11 @@ import { Check, Copy } from "lucide-react";
 
 export const EditorMcpCopyButton = ({
 	copied,
-	onCopy,
+	onCopyFn,
 	title,
 }: {
 	readonly copied: boolean;
-	readonly onCopy: () => void;
+	readonly onCopyFn: () => void;
 	readonly title: string;
 }) => {
 	const Icon = copied ? Check : Copy;
@@ -15,7 +15,7 @@ export const EditorMcpCopyButton = ({
 			type="button"
 			className="grid size-6 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-current opacity-65 transition-opacity hover:opacity-100"
 			title={copied ? "Copied" : title}
-			onClick={onCopy}
+			onClick={onCopyFn}
 		>
 			<Icon className="size-4" />
 		</button>
@@ -25,12 +25,12 @@ export const EditorMcpCopyButton = ({
 export const EditorMcpCopyableUrl = ({
 	copied,
 	label,
-	onCopy,
+	onCopyFn,
 	url,
 }: {
 	readonly copied: boolean;
 	readonly label: string;
-	readonly onCopy: () => void;
+	readonly onCopyFn: () => void;
 	readonly url: string;
 }) => (
 	<div className="flex min-w-0 items-center gap-1 text-sm text-success">
@@ -39,7 +39,7 @@ export const EditorMcpCopyableUrl = ({
 		</span>
 		<EditorMcpCopyButton
 			copied={copied}
-			onCopy={onCopy}
+			onCopyFn={onCopyFn}
 			title="Copy URL"
 		/>
 	</div>

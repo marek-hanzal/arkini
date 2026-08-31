@@ -9,22 +9,22 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 /** Selects a stable projection from the latest committed runtime snapshot. */
 export const useRuntimeSelector = <Selected>(
 	game: PlayableGame,
-	selector: (runtime: RuntimeSchema.Type) => Selected,
-	isEqual: (left: Selected, right: Selected) => boolean = Object.is,
+	selectorFn: (runtime: RuntimeSchema.Type) => Selected,
+	isEqualFn: (left: Selected, right: Selected) => boolean = Object.is,
 ): Selected => {
 	const selectedAtom = useMemo(
 		() =>
 			Atom.readable((get) => {
-				const selected = selector(get(game.committedTransitionAtom).runtime);
+				const selected = selectorFn(get(game.committedTransitionAtom).runtime);
 				return Option.match(get.self<Selected>(), {
 					onNone: () => selected,
-					onSome: (previous) => (isEqual(previous, selected) ? previous : selected),
+					onSome: (previous) => (isEqualFn(previous, selected) ? previous : selected),
 				});
 			}),
 		[
 			game,
-			isEqual,
-			selector,
+			isEqualFn,
+			selectorFn,
 		],
 	);
 

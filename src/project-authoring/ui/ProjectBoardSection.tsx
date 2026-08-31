@@ -14,8 +14,8 @@ export const ProjectBoardSection = () => {
 	const height = useStore(form.store, (state) => state.values.board.height);
 	const currentSpace = useStore(form.store, (state) => state.values.start.currentSpace);
 	const startBoard = useStore(form.store, (state) => state.values.start.board);
-	const [selectedSpace, setSelectedSpace] = useState(currentSpace);
-	const [spaceInput, setSpaceInput] = useState(String(currentSpace));
+	const [selectedSpace, setSelectedSpaceFn] = useState(currentSpace);
+	const [spaceInput, setSpaceInputFn] = useState(String(currentSpace));
 	const requestedSpace = Number(spaceInput);
 	const canSwitchSpace =
 		spaceInput !== "" && Number.isInteger(requestedSpace) && requestedSpace >= 0;
@@ -64,12 +64,12 @@ export const ProjectBoardSection = () => {
 							className={`${editorInputClassName} w-28`}
 							min={0}
 							step={1}
-							onChange={(event) => setSpaceInput(event.currentTarget.value)}
+							onChange={(event) => setSpaceInputFn(event.currentTarget.value)}
 						/>
 					</label>
 					<Button
 						disabled={!canSwitchSpace}
-						onClick={() => setSelectedSpace(requestedSpace)}
+						onClick={() => setSelectedSpaceFn(requestedSpace)}
 					>
 						Switch
 					</Button>
@@ -78,7 +78,7 @@ export const ProjectBoardSection = () => {
 			<ProjectStartGrid
 				cells={cells}
 				height={height}
-				onCellsChange={(nextCells) =>
+				onCellsChangeFn={(nextCells) =>
 					form.setFieldValue("start.board", [
 						...startBoard.filter((entry) => entry.space !== selectedSpace),
 						...nextCells.map((cell) => ({

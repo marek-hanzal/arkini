@@ -86,12 +86,12 @@ describe("useEditorAssetManagerController", () => {
 			},
 		);
 
-		controller?.onArkpackChange(
+		controller?.onArkpackChangeFn(
 			changeEvent([
 				arkpack,
 			]),
 		);
-		controller?.onFilesChange(
+		controller?.onFilesChangeFn(
 			changeEvent([
 				png,
 			]),

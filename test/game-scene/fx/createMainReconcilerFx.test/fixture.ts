@@ -257,7 +257,7 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		dragging: false,
 		dragOffsetX: 0,
 		dragOffsetY: 0,
-		onPointerDown: null,
+		onPointerDownFn: null,
 	} satisfies PixiTileActor;
 };
 
@@ -369,13 +369,13 @@ export const createAnimator = () => {
 					activeChannels.set(animation.actor, channels);
 					animations.push({
 						...animation,
-						onCancel: () => {
+						onCancelFn: () => {
 							clearChannel(animation.actor, animation.channel, token);
-							animation.onCancel?.();
+							animation.onCancelFn?.();
 						},
-						onComplete: () => {
+						onCompleteFn: () => {
 							clearChannel(animation.actor, animation.channel, token);
-							animation.onComplete?.();
+							animation.onCompleteFn?.();
 						},
 					} as ActorAnimation);
 				}),
@@ -499,7 +499,7 @@ export const createReconcilerHarness = ({
 	} as unknown as MainSurface;
 	const dropPresentation = Effect.runSync(createDropPresentationFx());
 	const game = {
-		readOrThrow: (query: unknown) => {
+		readOrThrowFn: (query: unknown) => {
 			const projection = query as {
 				readonly kind: "tile-actors" | "tile-deliveries";
 				readonly surface: "inventory" | "main";
@@ -544,7 +544,7 @@ export const createReconcilerHarness = ({
 				closeFx: Effect.void,
 				star: Texture.EMPTY,
 			},
-			readPalette: () =>
+			readPaletteFn: () =>
 				({
 					success: 0x57d7b2,
 				}) as never,
@@ -573,7 +573,7 @@ export const transition = (sequence: number) =>
 		previousRuntime: {},
 		runtime: {},
 		sequence,
-	}) as unknown as ReturnType<GameEngine["getTransitionSnapshot"]>;
+	}) as unknown as ReturnType<GameEngine["getTransitionSnapshotFn"]>;
 
 beforeEach(() => {
 	projectionState.cues = [];

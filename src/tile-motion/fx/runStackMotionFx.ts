@@ -33,11 +33,11 @@ export namespace runStackMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly magneticField: MagneticField;
-		readonly onComplete: () => void;
-		readonly onPayloadCreated: (actor: PixiTileActor) => void;
+		readonly onCompleteFn: () => void;
+		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
 		readonly origin: ActorPose;
-		readonly readPalette: () => PixiScenePalette;
-		readonly readTargetRoute: (
+		readonly readPaletteFn: () => PixiScenePalette;
+		readonly readTargetRouteFn: (
 			actorId: string,
 			location: TargetRoute["location"],
 		) => TargetRoute;
@@ -56,21 +56,21 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	magneticField,
-	onComplete,
-	onPayloadCreated,
+	onCompleteFn,
+	onPayloadCreatedFn,
 	origin,
-	readPalette,
-	readTargetRoute,
+	readPaletteFn,
+	readTargetRouteFn,
 	surface,
 	target,
 	textures,
 }: runStackMotionFx.Props) {
-	const readLiveContactPose = yield* createLiveContactPoseReaderFx();
+	const readLiveContactPoseFn = yield* createLiveContactPoseReaderFx();
 	const canonical =
 		actorStore.canonicalItems.get(cue.targetActorId) ??
 		actorStore.actors.get(cue.targetActorId)?.item;
 	if (canonical === undefined) {
-		onComplete();
+		onCompleteFn();
 		return;
 	}
 	const candidateSource = actorStore.actors.get(cue.originActorId);
@@ -93,7 +93,7 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 					quantity: cue.quantity,
 				},
 			),
-			palette: readPalette(),
+			palette: readPaletteFn(),
 			textures,
 		}));
 	if (source !== null) {
@@ -103,14 +103,14 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 		});
 	}
 	payload.container.eventMode = "none";
-	if (source === null) onPayloadCreated(payload);
+	if (source === null) onPayloadCreatedFn(payload);
 	surface.transientActorLayer.addChild(payload.container);
 	yield* updateTileActorFx({
 		actor: payload,
 		animator,
 		frames: application.frames,
 		item: payload.item,
-		palette: readPalette(),
+		palette: readPaletteFn(),
 		size: target.size,
 		textures,
 	});
@@ -128,10 +128,10 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 			delayMs,
 		});
 	}
-	const readCurrentRoute = () => readTargetRoute(cue.targetActorId, cue.targetLocation);
-	const readLiveTarget = () => {
-		const route = readCurrentRoute();
-		return readLiveContactPose({
+	const readCurrentRouteFn = () => readTargetRouteFn(cue.targetActorId, cue.targetLocation);
+	const readLiveTargetFn = () => {
+		const route = readCurrentRouteFn();
+		return readLiveContactPoseFn({
 			actorId: route.actorId,
 			actors: actorStore.actors,
 			movingActor: payload,
@@ -145,8 +145,8 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 		]),
 		magneticField,
 		surface,
-		readAttraction: () => {
-			const route = readCurrentRoute();
+		readAttractionFn: () => {
+			const route = readCurrentRouteFn();
 			return {
 				attractedActorId: route.actorId,
 				eligibleAttractionActorIds: new Set([
@@ -160,9 +160,9 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 		animator,
 		delayMs,
 		fallbackTarget: target,
-		onPose: magneticProjector.projectPose,
-		onSettled: () => {
-			const route = readCurrentRoute();
+		onPoseFn: magneticProjector.projectPoseFn,
+		onSettledFn: () => {
+			const route = readCurrentRouteFn();
 			RendererRuntime.runSync(
 				flashMotionTargetFx({
 					actorStore,
@@ -171,25 +171,25 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 				}),
 			);
 			let settled = false;
-			const settle = () => {
+			const settleFn = () => {
 				if (settled) return;
 				settled = true;
-				magneticProjector.release();
+				magneticProjector.releaseFn();
 				RendererRuntime.runSync(animator.cancelActorFx(payload));
 				RendererRuntime.runSync(destroyTileActorFx(payload));
-				onComplete();
+				onCompleteFn();
 			};
 			RendererRuntime.runSync(
 				startActorExitFx({
 					actor: payload,
 					animator,
-					onCancel: settle,
-					onComplete: settle,
+					onCancelFn: settleFn,
+					onCompleteFn: settleFn,
 				}),
 			);
 		},
 		ownerKey: `motion:${cueKey}`,
-		readLiveTarget,
+		readLiveTargetFn,
 		surface,
 		targetLocation: cue.targetLocation,
 	});

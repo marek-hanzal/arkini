@@ -14,14 +14,14 @@ export const ItemLineDetails = ({
 	line,
 	ownerItemId,
 	pendingWithdraw,
-	requestWithdraw,
+	requestWithdrawFn,
 	stale,
 }: {
 	readonly disabled: boolean;
 	readonly line: ItemDetailLinesProjection.Line;
 	readonly ownerItemId: string;
 	readonly pendingWithdraw: boolean;
-	readonly requestWithdraw: () => void;
+	readonly requestWithdrawFn: () => void;
 	readonly stale: boolean;
 }) => {
 	const unavailable = line.availability.kind === "unavailable";
@@ -34,7 +34,7 @@ export const ItemLineDetails = ({
 		)
 			? {
 					disabled: contentReadOnly,
-					onClick: requestWithdraw,
+					onClickFn: requestWithdrawFn,
 					pending: pendingWithdraw,
 				}
 			: undefined;
@@ -81,7 +81,7 @@ export const ItemLineDetails = ({
 					</div>
 					<Outputs
 						output={line.output}
-						renderItem={(item) =>
+						renderItemFn={(item) =>
 							item.sourceUrl === undefined ? (
 								<span className="truncate font-medium text-foreground">
 									{item.title}

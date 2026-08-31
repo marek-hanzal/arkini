@@ -59,11 +59,11 @@ describe("layoutInWorkerFx", () => {
 			};
 
 			const result = yield* layoutInWorkerFx(flow, {
-				runLayout: async (topology) => {
+				runLayoutFn: async (topology) => {
 					received = topology;
 					return layout;
 				},
-				spawn: () => asWorker(worker),
+				spawnFn: () => asWorker(worker),
 			});
 
 			expect(result.positions.get("item:wine")?.x).toBe(12);
@@ -98,8 +98,8 @@ describe("layoutInWorkerFx", () => {
 		Effect.gen(function* () {
 			const worker = new TestWorker();
 			const running = yield* layoutInWorkerFx(flow, {
-				runLayout: () => new Promise(() => undefined),
-				spawn: () => asWorker(worker),
+				runLayoutFn: () => new Promise(() => undefined),
+				spawnFn: () => asWorker(worker),
 			}).pipe(Effect.forkChild);
 
 			yield* Effect.yieldNow;
@@ -116,8 +116,8 @@ describe("layoutInWorkerFx", () => {
 			const worker = new TestWorker();
 			const exit = yield* Effect.exit(
 				layoutInWorkerFx(flow, {
-					runLayout: () => Promise.reject(new Error("layout exploded")),
-					spawn: () => asWorker(worker),
+					runLayoutFn: () => Promise.reject(new Error("layout exploded")),
+					spawnFn: () => asWorker(worker),
 				}),
 			);
 

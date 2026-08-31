@@ -47,9 +47,9 @@ export const useItemDetailNavigationController = ({
 }: useItemDetailNavigationController.Props): useItemDetailNavigationController.Output => {
 	const game = useGameEngine();
 	const { itemId, kind } = target;
-	const sourceSelector = useCallback(
+	const sourceSelectorFn = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailNavigationController.SourcesProjection => {
-			const projection = game.readOrThrow(
+			const projection = game.readOrThrowFn(
 				readItemDetailSourcesFx({
 					target: {
 						kind,
@@ -77,11 +77,11 @@ export const useItemDetailNavigationController = ({
 							ownerItemId: source.ownerItemId,
 							ownerDefinitionItemId: source.ownerDefinitionItemId,
 							title: configured.title,
-							sourceUrl: game.getResourceUrl(owner.item.asset.default[0]),
+							sourceUrl: game.getResourceUrlFn(owner.item.asset.default[0]),
 							...(configured.asset.default[1] === undefined
 								? {}
 								: {
-										compositeUrl: game.getResourceUrl(
+										compositeUrl: game.getResourceUrlFn(
 											configured.asset.default[1],
 										),
 									}),
@@ -100,8 +100,8 @@ export const useItemDetailNavigationController = ({
 			kind,
 		],
 	);
-	const sources = useRuntimeSelector(game, sourceSelector, Equal.equals);
-	const tabsSelector = useCallback(
+	const sources = useRuntimeSelector(game, sourceSelectorFn, Equal.equals);
+	const tabsSelectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) =>
 			readItemDetailTabsFn({
 				target:
@@ -121,7 +121,7 @@ export const useItemDetailNavigationController = ({
 			sources,
 		],
 	);
-	const tabs = useRuntimeSelector(game, tabsSelector, Equal.equals);
+	const tabs = useRuntimeSelector(game, tabsSelectorFn, Equal.equals);
 
 	return {
 		sources,

@@ -1,14 +1,14 @@
-import type { ProjectOwnership } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
+import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
 import { Button, DangerButton } from "~/ui/ui/Button";
 
 interface ProjectDeleteDialogProps {
 	readonly error?: unknown;
-	readonly ownership: ProjectOwnership;
+	readonly ownership: ProjectOwnershipSchema.Type;
 	readonly pending: boolean;
 	readonly project: ProjectDescriptor;
-	readonly onCancel: () => void;
-	readonly onConfirm: () => void;
+	readonly onCancelFn: () => void;
+	readonly onConfirmFn: () => void;
 }
 
 /** Explains managed deletion and external-folder unregistration before repository mutation. */
@@ -17,8 +17,8 @@ export const ProjectDeleteDialog = ({
 	ownership,
 	pending,
 	project,
-	onCancel,
-	onConfirm,
+	onCancelFn,
+	onConfirmFn,
 }: ProjectDeleteDialogProps) => (
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
@@ -42,7 +42,7 @@ export const ProjectDeleteDialog = ({
 			<div className="mt-6 flex justify-end gap-2">
 				<Button
 					disabled={pending}
-					onClick={onCancel}
+					onClick={onCancelFn}
 				>
 					Cancel
 				</Button>
@@ -50,7 +50,7 @@ export const ProjectDeleteDialog = ({
 					disabled={pending}
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorProjectDeleteConfirm"
-					onClick={onConfirm}
+					onClick={onConfirmFn}
 				>
 					Remove project
 				</DangerButton>

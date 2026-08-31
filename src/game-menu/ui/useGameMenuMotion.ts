@@ -35,7 +35,7 @@ export namespace useGameMenuMotion {
 
 	export interface Output {
 		readonly backdropOpacity: number;
-		readonly completeMotionPhase: () => void;
+		readonly completeMotionPhaseFn: () => void;
 		readonly dialog: typeof visibleDialog | typeof exitingDialog;
 	}
 }
@@ -51,17 +51,17 @@ export const useGameMenuMotion = ({ phase }: useGameMenuMotion.Props): useGameMe
 		phase,
 	]);
 
-	const completeMotionPhase = useCallback(() => {
+	const completeMotionPhaseFn = useCallback(() => {
 		if (completedPhaseRef.current === phase) return;
 		match(phase)
 			.with("entering", () => {
 				completedPhaseRef.current = phase;
-				menu.completeEnter();
+				menu.completeEnterFn();
 			})
 			.with("open", () => undefined)
 			.with("exiting", () => {
 				completedPhaseRef.current = phase;
-				menu.completeExit();
+				menu.completeExitFn();
 			})
 			.exhaustive();
 	}, [
@@ -82,7 +82,7 @@ export const useGameMenuMotion = ({ phase }: useGameMenuMotion.Props): useGameMe
 
 	return {
 		backdropOpacity: visual.backdropOpacity,
-		completeMotionPhase,
+		completeMotionPhaseFn,
 		dialog: visual.dialog,
 	};
 };

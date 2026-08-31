@@ -15,7 +15,7 @@ interface OrthogonalRoutePlan {
 	readonly targetTrackX: number;
 }
 
-const readPortPoint = (
+const readPortPointFn = (
 	node: LayoutInput["nodes"][number],
 	position: LayoutNode,
 	portId: string | undefined,
@@ -33,7 +33,7 @@ const readPortPoint = (
 	};
 };
 
-const appendRoutePoint = (points: LayoutPoint[], point: LayoutPoint) => {
+const appendRoutePointFn = (points: LayoutPoint[], point: LayoutPoint) => {
 	const previous = points.at(-1);
 	if (
 		previous === undefined ||
@@ -43,19 +43,19 @@ const appendRoutePoint = (points: LayoutPoint[], point: LayoutPoint) => {
 		points.push(point);
 };
 
-const snapRouteTrack = (value: number) => Math.round(value / RouteBundleGrid) * RouteBundleGrid;
+const snapRouteTrackFn = (value: number) => Math.round(value / RouteBundleGrid) * RouteBundleGrid;
 
-const snapSourceTrack = (x: number) =>
+const snapSourceTrackFn = (x: number) =>
 	Math.ceil((x + RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
 
-const snapTargetTrack = (x: number) =>
+const snapTargetTrackFn = (x: number) =>
 	Math.floor((x - RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
 
-const readForwardTracks = (source: LayoutPoint, target: LayoutPoint) => {
+const readForwardTracksFn = (source: LayoutPoint, target: LayoutPoint) => {
 	const minimumX = source.x + RouteEscape;
 	const maximumX = target.x - RouteEscape;
-	let sourceTrackX = snapSourceTrack(source.x);
-	let targetTrackX = snapTargetTrack(target.x);
+	let sourceTrackX = snapSourceTrackFn(source.x);
+	let targetTrackX = snapTargetTrackFn(target.x);
 	if (sourceTrackX <= targetTrackX)
 		return {
 			sourceTrackX,
@@ -63,7 +63,7 @@ const readForwardTracks = (source: LayoutPoint, target: LayoutPoint) => {
 		};
 
 	const midpointX = (minimumX + maximumX) / 2;
-	const sharedTrackX = Math.max(minimumX, Math.min(maximumX, snapRouteTrack(midpointX)));
+	const sharedTrackX = Math.max(minimumX, Math.min(maximumX, snapRouteTrackFn(midpointX)));
 	sourceTrackX = sharedTrackX;
 	targetTrackX = sharedTrackX;
 	return {
@@ -72,7 +72,7 @@ const readForwardTracks = (source: LayoutPoint, target: LayoutPoint) => {
 	};
 };
 
-const readOrthogonalRoutePlan = (
+const readOrthogonalRoutePlanFn = (
 	source: LayoutPoint,
 	target: LayoutPoint,
 	sourcePosition: LayoutNode,
@@ -81,18 +81,18 @@ const readOrthogonalRoutePlan = (
 ): OrthogonalRoutePlan => {
 	const forward = source.x + RouteEscape <= target.x - RouteEscape;
 	if (forward) {
-		const tracks = readForwardTracks(source, target);
+		const tracks = readForwardTracksFn(source, target);
 		return {
 			edgeId,
-			routeY: snapRouteTrack((source.y + target.y) / 2),
+			routeY: snapRouteTrackFn((source.y + target.y) / 2),
 			source,
 			...tracks,
 			target,
 		};
 	}
 
-	const sourceTrackX = snapSourceTrack(source.x);
-	const targetTrackX = snapTargetTrack(target.x);
+	const sourceTrackX = snapSourceTrackFn(source.x);
+	const targetTrackX = snapTargetTrackFn(target.x);
 	const upperBoundary = Math.min(sourcePosition.y, targetPosition.y) - RouteDetourGap;
 	const lowerBoundary =
 		Math.max(
@@ -113,27 +113,27 @@ const readOrthogonalRoutePlan = (
 	};
 };
 
-const readOrthogonalRoute = (plan: OrthogonalRoutePlan): ReadonlyArray<LayoutPoint> => {
+const readOrthogonalRouteFn = (plan: OrthogonalRoutePlan): ReadonlyArray<LayoutPoint> => {
 	const points: LayoutPoint[] = [
 		plan.source,
 	];
-	appendRoutePoint(points, {
+	appendRoutePointFn(points, {
 		x: plan.sourceTrackX,
 		y: plan.source.y,
 	});
-	appendRoutePoint(points, {
+	appendRoutePointFn(points, {
 		x: plan.sourceTrackX,
 		y: plan.routeY,
 	});
-	appendRoutePoint(points, {
+	appendRoutePointFn(points, {
 		x: plan.targetTrackX,
 		y: plan.routeY,
 	});
-	appendRoutePoint(points, {
+	appendRoutePointFn(points, {
 		x: plan.targetTrackX,
 		y: plan.target.y,
 	});
-	appendRoutePoint(points, plan.target);
+	appendRoutePointFn(points, plan.target);
 	return points;
 };
 
@@ -168,26 +168,26 @@ export const routeFx = Effect.fn("routeFx")(
 						`Cannot route flow edge ${edge.id}: missing endpoint layout data.`,
 					);
 
-				const source = readPortPoint(
+				const source = readPortPointFn(
 					sourceNode,
 					sourcePosition,
 					edge.sourcePortId,
 					"source",
 				);
-				const target = readPortPoint(
+				const target = readPortPointFn(
 					targetNode,
 					targetPosition,
 					edge.targetPortId,
 					"target",
 				);
-				const plan = readOrthogonalRoutePlan(
+				const plan = readOrthogonalRoutePlanFn(
 					source,
 					target,
 					sourcePosition,
 					targetPosition,
 					edge.id,
 				);
-				routes.set(edge.id, readOrthogonalRoute(plan));
+				routes.set(edge.id, readOrthogonalRouteFn(plan));
 			}
 			return routes;
 		}),

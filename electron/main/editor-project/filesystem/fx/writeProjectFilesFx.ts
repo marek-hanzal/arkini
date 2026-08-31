@@ -22,7 +22,7 @@ import { assertProjectFileFx } from "./assertProjectFileFx";
 import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
 
 const encoder = new TextEncoder();
-const encodeJson = (value: unknown) =>
+const encodeJsonFn = (value: unknown) =>
 	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 interface Write {
 	readonly target: string;
@@ -36,7 +36,7 @@ interface FilesystemSnapshot {
 	readonly resources: ReadonlyMap<string, Write>;
 }
 
-const addUniqueTarget = <
+const addUniqueTargetFn = <
 	Write extends {
 		readonly target: string;
 	},
@@ -124,9 +124,9 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 			$schema: GameProjectItemSchemaReference,
 			item,
 		};
-		const collision = addUniqueTarget(itemWrites, {
+		const collision = addUniqueTargetFn(itemWrites, {
 			target,
-			bytes: encodeJson(value),
+			bytes: encodeJsonFn(value),
 		});
 		if (collision !== undefined) return yield* Effect.fail(collision);
 	}
@@ -139,7 +139,7 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 		const target = yield* shellResources.has(resource.id)
 			? paths.resourceFileFx(resource.id)
 			: paths.assetFileFx(resource.id);
-		const collision = addUniqueTarget(resourceWrites, {
+		const collision = addUniqueTargetFn(resourceWrites, {
 			target,
 			bytes: resource.bytes,
 		});
@@ -150,7 +150,7 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 		marker,
 		game: {
 			target: paths.gameFile,
-			bytes: encodeJson(game),
+			bytes: encodeJsonFn(game),
 		},
 		items: new Map(
 			[
@@ -222,7 +222,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 			const writes = [
 				{
 					target: paths.schemaFile,
-					bytes: encodeJson(GameProjectJsonSchema),
+					bytes: encodeJsonFn(GameProjectJsonSchema),
 				},
 				nextSnapshot.game,
 				...[
@@ -267,7 +267,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					scenarioTargets.add(target);
 					writes.push({
 						target,
-						bytes: encodeJson(scenario),
+						bytes: encodeJsonFn(scenario),
 					});
 				}
 				for (const name of props.previousScenarioNames ?? []) {
@@ -278,11 +278,11 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 			if (versionHead !== undefined)
 				writes.push({
 					target: paths.versionHeadFile,
-					bytes: encodeJson(versionHead),
+					bytes: encodeJsonFn(versionHead),
 				});
 			writes.push({
 				target: paths.projectFile,
-				bytes: encodeJson(nextSnapshot.marker),
+				bytes: encodeJsonFn(nextSnapshot.marker),
 			});
 			return {
 				writes,

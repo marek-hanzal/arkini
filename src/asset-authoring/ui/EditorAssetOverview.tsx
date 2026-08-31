@@ -7,7 +7,7 @@ import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: string }) => {
 	const resource = useEditorAssetById(resourceId);
 	const url = useResourceUrl(resourceId);
-	const [dimensions, setDimensions] = useState<{
+	const [dimensions, setDimensionsFn] = useState<{
 		readonly height: number;
 		readonly url: string;
 		readonly width: number;
@@ -26,7 +26,7 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 						className="max-h-[32rem] max-w-full object-contain"
 						draggable={false}
 						onLoad={(event) =>
-							setDimensions({
+							setDimensionsFn({
 								height: event.currentTarget.naturalHeight,
 								url,
 								width: event.currentTarget.naturalWidth,

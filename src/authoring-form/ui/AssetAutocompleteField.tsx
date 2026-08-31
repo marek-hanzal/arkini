@@ -74,10 +74,10 @@ export const AssetAutocompleteField = ({ description, label }: AssetAutocomplete
 			error={error}
 			options={options}
 			value={field.state.value}
-			onBlur={field.handleBlur}
-			onChange={field.handleChange}
-			renderPreview={(option) => <AssetThumbnail resourceId={option.id} />}
-			renderSelectedPreview={(option) => (
+			onBlurFn={field.handleBlur}
+			onChangeFn={field.handleChange}
+			renderPreviewFn={(option) => <AssetThumbnail resourceId={option.id} />}
+			renderSelectedPreviewFn={(option) => (
 				<AssetThumbnail
 					resourceId={option.id}
 					size="sm"

@@ -5,7 +5,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/Diagno
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticRecordEntityEnumSchema";
 import { validateConfigReferencesFn } from "~/game-config-validation/fn/validateConfigReferencesFn";
 
-const replacePath = (
+const replacePathFn = (
 	root: Record<string, unknown>,
 	path: ReadonlyArray<string | number>,
 	value: string,
@@ -67,7 +67,7 @@ export const renameFx = Effect.fn("renameEditorItemFx")(function* ({
 			: [],
 	);
 	const renamed = structuredClone(candidate) as Record<string, unknown>;
-	for (const path of referencePaths) replacePath(renamed, path, newItemId);
+	for (const path of referencePaths) replacePathFn(renamed, path, newItemId);
 
 	return {
 		config: GameConfigSchema.parse(renamed),

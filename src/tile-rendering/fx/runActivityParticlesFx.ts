@@ -20,38 +20,39 @@ const waveTurns = 1.15;
 const shimmerTurns = 2.35;
 const twoPi = Math.PI * 2;
 
-const readActivityAnimationKey = (actor: PixiTileActor) => `activity-particles:${actor.instanceId}`;
+const readActivityAnimationKeyFn = (actor: PixiTileActor) =>
+	`activity-particles:${actor.instanceId}`;
 
-const clampUnit = (value: number) => Math.min(1, Math.max(0, value));
-const easeOutCubic = (value: number) => 1 - (1 - value) ** 3;
-const smoothEnvelope = (value: number) => Math.sin(Math.PI * clampUnit(value)) ** 1.35;
-const smoothStep = (value: number) => {
-	const unit = clampUnit(value);
+const clampUnitFn = (value: number) => Math.min(1, Math.max(0, value));
+const easeOutCubicFn = (value: number) => 1 - (1 - value) ** 3;
+const smoothEnvelopeFn = (value: number) => Math.sin(Math.PI * clampUnitFn(value)) ** 1.35;
+const smoothStepFn = (value: number) => {
+	const unit = clampUnitFn(value);
 	return unit * unit * (3 - 2 * unit);
 };
-const mix = (from: number, to: number, progress: number) => from + (to - from) * progress;
+const mixFn = (from: number, to: number, progress: number) => from + (to - from) * progress;
 
-const mixChannel = (channel: number, target: number, amount: number) =>
+const mixChannelFn = (channel: number, target: number, amount: number) =>
 	Math.round(channel + (target - channel) * amount);
-const mixTint = (from: number, to: number, progress: number) => {
-	const red = Math.round(mix((from >> 16) & 0xff, (to >> 16) & 0xff, progress));
-	const green = Math.round(mix((from >> 8) & 0xff, (to >> 8) & 0xff, progress));
-	const blue = Math.round(mix(from & 0xff, to & 0xff, progress));
+const mixTintFn = (from: number, to: number, progress: number) => {
+	const red = Math.round(mixFn((from >> 16) & 0xff, (to >> 16) & 0xff, progress));
+	const green = Math.round(mixFn((from >> 8) & 0xff, (to >> 8) & 0xff, progress));
+	const blue = Math.round(mixFn(from & 0xff, to & 0xff, progress));
 	return (red << 16) | (green << 8) | blue;
 };
 
 /** Preserves the semantic hue while pushing each shimmer toward the contrast side of its surface. */
-const readShimmerTint = (tint: number, shimmer: number, lightSurface: boolean) => {
-	const unitShimmer = clampUnit(shimmer);
+const readShimmerTintFn = (tint: number, shimmer: number, lightSurface: boolean) => {
+	const unitShimmer = clampUnitFn(shimmer);
 	const amount = lightSurface ? 0.06 + unitShimmer ** 2 * 0.48 : unitShimmer ** 3 * 0.38;
 	const target = lightSurface ? 0 : 255;
-	const red = mixChannel((tint >> 16) & 0xff, target, amount);
-	const green = mixChannel((tint >> 8) & 0xff, target, amount);
-	const blue = mixChannel(tint & 0xff, target, amount);
+	const red = mixChannelFn((tint >> 16) & 0xff, target, amount);
+	const green = mixChannelFn((tint >> 8) & 0xff, target, amount);
+	const blue = mixChannelFn(tint & 0xff, target, amount);
 	return (red << 16) | (green << 8) | blue;
 };
 
-const renderParticles = ({
+const renderParticlesFn = ({
 	actor,
 	handoffProgress = 0,
 	intensity,
@@ -68,7 +69,7 @@ const renderParticles = ({
 }) => {
 	const effect = actor.activityParticles;
 	const burstWindow = 0.64;
-	const resolvedHandoffProgress = kind === "burst" ? clampUnit(handoffProgress) : 0;
+	const resolvedHandoffProgress = kind === "burst" ? clampUnitFn(handoffProgress) : 0;
 	const runningHandoffProgress = (progress * 0.32) % 1;
 	effect.lastProgress = resolvedHandoffProgress > 0 ? runningHandoffProgress : progress;
 	const lightSurface = effect.lightSurface;
@@ -85,9 +86,9 @@ const renderParticles = ({
 			kind === "running"
 				? (progress * speedCycles + phaseOffset) % 1
 				: (progress * burstSpeed - phaseOffset * (1 - burstWindow)) / burstWindow;
-		const localProgress = clampUnit(rawLocalProgress);
+		const localProgress = clampUnitFn(rawLocalProgress);
 		const visible = rawLocalProgress >= 0 && rawLocalProgress <= 1;
-		const riseProgress = easeOutCubic(localProgress);
+		const riseProgress = easeOutCubicFn(localProgress);
 		const spreadProgress = localProgress ** 0.82;
 		const plumeHalfWidth = effect.topHalfWidth * spreadProgress;
 		const wave =
@@ -99,9 +100,9 @@ const renderParticles = ({
 			(Math.sin(waveOffset * 1.73 + localProgress * twoPi * shimmerTurns) + 1) / 2;
 		const x = effect.centerX + spreadOffset * plumeHalfWidth + wave;
 		const y = effect.startY + (effect.topY - effect.startY) * riseProgress;
-		const particleTint = readShimmerTint(tint, shimmer, lightSurface);
+		const particleTint = readShimmerTintFn(tint, shimmer, lightSurface);
 		const alpha =
-			(visible ? smoothEnvelope(localProgress) : 0) *
+			(visible ? smoothEnvelopeFn(localProgress) : 0) *
 			intensity *
 			alphaScale *
 			(kind === "burst" ? 1 : 0.86) *
@@ -115,7 +116,7 @@ const renderParticles = ({
 		}
 
 		const runningLocalProgress = (runningHandoffProgress * speedCycles + phaseOffset) % 1;
-		const runningRiseProgress = easeOutCubic(runningLocalProgress);
+		const runningRiseProgress = easeOutCubicFn(runningLocalProgress);
 		const runningSpreadProgress = runningLocalProgress ** 0.82;
 		const runningPlumeHalfWidth = effect.topHalfWidth * runningSpreadProgress;
 		const runningWave =
@@ -127,13 +128,16 @@ const renderParticles = ({
 			(Math.sin(waveOffset * 1.73 + runningLocalProgress * twoPi * shimmerTurns) + 1) / 2;
 		const runningX = effect.centerX + spreadOffset * runningPlumeHalfWidth + runningWave;
 		const runningY = effect.startY + (effect.topY - effect.startY) * runningRiseProgress;
-		const runningTint = readShimmerTint(effect.workingTint, runningShimmer, lightSurface);
+		const runningTint = readShimmerTintFn(effect.workingTint, runningShimmer, lightSurface);
 		const runningAlpha =
-			smoothEnvelope(runningLocalProgress) * alphaScale * 0.86 * (0.7 + runningShimmer * 0.3);
-		particle.x = mix(x, runningX, resolvedHandoffProgress);
-		particle.y = mix(y, runningY, resolvedHandoffProgress);
-		particle.tint = mixTint(particleTint, runningTint, resolvedHandoffProgress);
-		particle.alpha = mix(alpha, runningAlpha, resolvedHandoffProgress);
+			smoothEnvelopeFn(runningLocalProgress) *
+			alphaScale *
+			0.86 *
+			(0.7 + runningShimmer * 0.3);
+		particle.x = mixFn(x, runningX, resolvedHandoffProgress);
+		particle.y = mixFn(y, runningY, resolvedHandoffProgress);
+		particle.tint = mixTintFn(particleTint, runningTint, resolvedHandoffProgress);
+		particle.alpha = mixFn(alpha, runningAlpha, resolvedHandoffProgress);
 	}
 };
 
@@ -157,7 +161,7 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 ) {
 	const { actor, animator } = action;
 	const effect = actor.activityParticles;
-	const animationKey = readActivityAnimationKey(actor);
+	const animationKey = readActivityAnimationKeyFn(actor);
 
 	switch (action.kind) {
 		case "start": {
@@ -185,7 +189,7 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 				durationMs: runningCycleDurationMs,
 				ownerKey: animationKey,
 				repeat: Number.POSITIVE_INFINITY,
-				render: (progress) => {
+				renderFn: (progress) => {
 					if (
 						!rampComplete &&
 						(progress >= rampProgress || progress < previousTweenProgress)
@@ -193,9 +197,9 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 						rampComplete = true;
 					}
 					const cycleProgress = (fromProgress + progress) % 1;
-					renderParticles({
+					renderParticlesFn({
 						actor,
-						intensity: rampComplete ? 1 : clampUnit(progress / rampProgress),
+						intensity: rampComplete ? 1 : clampUnitFn(progress / rampProgress),
 						kind: "running",
 						progress: cycleProgress,
 						tint: effect.workingTint,
@@ -219,7 +223,7 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 				channel: "activity-particles",
 				durationMs: drainDurationMs,
 				ownerKey: animationKey,
-				onComplete: () => {
+				onCompleteFn: () => {
 					if (actor.container.destroyed) return;
 					if (actor.item.activityEffect) {
 						RendererRuntime.runSync(
@@ -241,8 +245,8 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 						}),
 					);
 				},
-				render: (progress) => {
-					renderParticles({
+				renderFn: (progress) => {
+					renderParticlesFn({
 						actor,
 						intensity: 1 - progress,
 						kind: "running",
@@ -270,7 +274,7 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 				channel: "activity-particles",
 				durationMs: feedbackDurationMs,
 				ownerKey: animationKey,
-				onComplete: () => {
+				onCompleteFn: () => {
 					if (actor.container.destroyed) return;
 					effect.feedbackPhase = null;
 					if (actor.item.activityEffect) {
@@ -292,7 +296,7 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 						}),
 					);
 				},
-				render: (progress) => {
+				renderFn: (progress) => {
 					if (!actor.item.activityEffect) {
 						handoffStartProgress = null;
 						handoffCompleted = false;
@@ -302,11 +306,11 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 					const handoffProgress =
 						handoffStartProgress === null || handoffStartProgress >= 1
 							? 0
-							: smoothStep(
+							: smoothStepFn(
 									(progress - handoffStartProgress) / (1 - handoffStartProgress),
 								);
 					if (handoffProgress >= 0.98) handoffCompleted = true;
-					renderParticles({
+					renderParticlesFn({
 						actor,
 						handoffProgress,
 						intensity: 1,

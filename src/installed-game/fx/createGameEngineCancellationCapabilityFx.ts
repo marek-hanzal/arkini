@@ -103,7 +103,7 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 						if (Exit.isFailure(disposeExit)) {
 							const failure = readExactCauseFailureFn(disposeExit.cause);
 							return yield* Effect.fail(
-								resource.markCriticalFailure(
+								resource.markCriticalFailureFn(
 									"engine-ownership",
 									Option.isSome(failure) ? failure.value : disposeExit.cause,
 								),
@@ -117,7 +117,7 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 
 			const beginCancellationFx = Effect.fn("GameEngineCancellationFx.beginCancellationFx")(
 				(owner: AcquisitionOwner, force: boolean) =>
-					Effect.uninterruptibleMask((restore) =>
+					Effect.uninterruptibleMask((restoreFx) =>
 						withLifecycleLockFx(
 							Effect.gen(function* () {
 								const state = yield* Ref.get(stateRef);
@@ -150,7 +150,7 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 									cancellation,
 								});
 								yield* Effect.forkIn(
-									restore(runCancellationFx(cancellation)),
+									restoreFx(runCancellationFx(cancellation)),
 									operationScope,
 								);
 								return completion;
@@ -164,10 +164,10 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 			);
 
 			const releaseOwnerClaimFx = Effect.fn("GameEngineCancellationFx.releaseOwnerClaimFx")(
-				(owner: AcquisitionOwner, release: () => void) =>
+				(owner: AcquisitionOwner, releaseFn: () => void) =>
 					withLifecycleLockFx(
 						Effect.gen(function* () {
-							release();
+							releaseFn();
 							const state = yield* Ref.get(stateRef);
 							return (
 								(state._tag === "Acquiring" || state._tag === "Provisional") &&

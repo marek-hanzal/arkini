@@ -18,14 +18,14 @@ export const Route = createFileRoute("/editor/$projectId/estimate")({
 	}),
 	component: () => {
 		const search = Route.useSearch();
-		const navigate = useNavigate({
+		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
 		return (
 			<ItemEstimateList
 				incomplete={search.incomplete ?? false}
-				onIncompleteChange={(incomplete) =>
-					void navigate({
+				onIncompleteChangeFn={(incomplete) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,
@@ -33,8 +33,8 @@ export const Route = createFileRoute("/editor/$projectId/estimate")({
 						}),
 					})
 				}
-				onQueryChange={(query) =>
-					void navigate({
+				onQueryChangeFn={(query) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,
@@ -42,8 +42,8 @@ export const Route = createFileRoute("/editor/$projectId/estimate")({
 						}),
 					})
 				}
-				onSortChange={(sort) =>
-					void navigate({
+				onSortChangeFn={(sort) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,

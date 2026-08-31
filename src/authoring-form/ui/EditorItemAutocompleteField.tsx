@@ -25,10 +25,10 @@ export const EditorItemAutocompleteField = ({
 			error={error}
 			options={options}
 			value={field.state.value}
-			onBlur={field.handleBlur}
-			onChange={field.handleChange}
-			renderPreview={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
-			renderSelectedPreview={(option) => (
+			onBlurFn={field.handleBlur}
+			onChangeFn={field.handleChange}
+			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
+			renderSelectedPreviewFn={(option) => (
 				<EditorItemSearchThumbnail
 					item={items?.[option.id]}
 					selected
@@ -40,14 +40,14 @@ export const EditorItemAutocompleteField = ({
 
 interface EditorItemReferenceControlProps {
 	readonly label: string;
-	readonly onChange: (itemId: string) => void;
+	readonly onChangeFn: (itemId: string) => void;
 	readonly value: string;
 }
 
 /** Reuses the canonical item autocomplete outside direct TanStack field bindings. */
 export const EditorItemReferenceControl = ({
 	label,
-	onChange,
+	onChangeFn,
 	value,
 }: EditorItemReferenceControlProps) => {
 	const { items, options } = useEditorItemSearchOptions();
@@ -57,9 +57,9 @@ export const EditorItemReferenceControl = ({
 			emptyLabel="No known item matches this search."
 			options={options}
 			value={value}
-			onChange={onChange}
-			renderPreview={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
-			renderSelectedPreview={(option) => (
+			onChangeFn={onChangeFn}
+			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
+			renderSelectedPreviewFn={(option) => (
 				<EditorItemSearchThumbnail
 					item={items?.[option.id]}
 					selected

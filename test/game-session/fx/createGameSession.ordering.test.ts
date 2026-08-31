@@ -20,20 +20,20 @@ describe("createGameSessionFx / callback ordering", () => {
 		const observedStartedJob = new Promise<boolean>((resolve) => {
 			publishObservedStartedJob = resolve;
 		});
-		const unsubscribe = session.subscribeEvents((batch) => {
+		const unsubscribe = session.subscribeEventsFn((batch) => {
 			const started = batch.events.find(
 				(event) => event.type === GameEventEnumSchema.enum.JobStarted,
 			);
 			if (started !== undefined) {
 				publishObservedStartedJob?.(
-					session.getSnapshot().jobs.some((job) => job.id === started.jobId),
+					session.getSnapshotFn().jobs.some((job) => job.id === started.jobId),
 				);
 			}
 		});
 
 		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
+			const owner = await session.runFn(prepareJobLineFx());
+			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
@@ -58,23 +58,23 @@ describe("createGameSessionFx / callback ordering", () => {
 			markRuntimeDelivered = resolve;
 		});
 		let publishEventSnapshot:
-			| ((snapshot: ReturnType<typeof session.getSnapshot>) => void)
+			| ((snapshot: ReturnType<typeof session.getSnapshotFn>) => void)
 			| undefined;
-		const eventSnapshot = new Promise<ReturnType<typeof session.getSnapshot>>((resolve) => {
+		const eventSnapshot = new Promise<ReturnType<typeof session.getSnapshotFn>>((resolve) => {
 			publishEventSnapshot = resolve;
 		});
-		const unsubscribeRuntime = session.subscribe(() => {
+		const unsubscribeRuntime = session.subscribeFn(() => {
 			runtimeNotifications += 1;
 			markRuntimeDelivered?.();
 		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
+		const unsubscribeEvents = session.subscribeEventsFn(() => {
 			eventNotifications += 1;
-			publishEventSnapshot?.(session.getSnapshot());
+			publishEventSnapshot?.(session.getSnapshotFn());
 		});
 
 		try {
-			const before = session.getSnapshot();
-			await session.run(
+			const before = session.getSnapshotFn();
+			await session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.succeed([
 						undefined,
@@ -92,7 +92,7 @@ describe("createGameSessionFx / callback ordering", () => {
 					] as const),
 				),
 			);
-			const committed = session.getSnapshot();
+			const committed = session.getSnapshotFn();
 			expect(committed).not.toBe(before);
 			const observedSnapshot = await eventSnapshot;
 			await runtimeDelivered;
@@ -120,9 +120,9 @@ describe("createGameSessionFx / callback ordering", () => {
 		const nestedEventsDelivered = new Promise<ReadonlyArray<string>>((resolve) => {
 			publishNestedJobIds = resolve;
 		});
-		const unsubscribeRuntime = session.subscribe(() => {
+		const unsubscribeRuntime = session.subscribeFn(() => {
 			if (nestedUnsubscribe !== undefined) return;
-			nestedUnsubscribe = session.subscribeEvents((batch) => {
+			nestedUnsubscribe = session.subscribeEventsFn((batch) => {
 				nestedJobIds.push(
 					...batch.events.flatMap((event) =>
 						"jobId" in event
@@ -142,7 +142,7 @@ describe("createGameSessionFx / callback ordering", () => {
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.succeed([
 						undefined,
@@ -161,7 +161,7 @@ describe("createGameSessionFx / callback ordering", () => {
 				),
 			);
 			await nestedSubscribed;
-			await session.run(emitCompletedEventFx("job:nested:next"));
+			await session.runFn(emitCompletedEventFx("job:nested:next"));
 			expect(await nestedEventsDelivered).toEqual([
 				"job:nested:next",
 			]);
@@ -181,7 +181,7 @@ describe("createGameSessionFx / callback ordering", () => {
 		const batchesDelivered = new Promise<ReadonlyArray<ReadonlyArray<string>>>((resolve) => {
 			publishBatches = resolve;
 		});
-		const unsubscribe = session.subscribeEvents((batch) => {
+		const unsubscribe = session.subscribeEventsFn((batch) => {
 			const jobEvents = batch.events.flatMap((event) =>
 				event.type === GameEventEnumSchema.enum.JobStarted ||
 				event.type === GameEventEnumSchema.enum.JobCompleted
@@ -202,25 +202,25 @@ describe("createGameSessionFx / callback ordering", () => {
 		});
 
 		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
+			const owner = await session.runFn(prepareJobLineFx());
+			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
 				}),
 			);
-			await session.run(
+			await session.runFn(
 				enqueueLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
 				}),
 			);
-			await session.run(
+			await session.runFn(
 				advanceRuntimeElapsedFx({
 					elapsedMs: 2_000,
 				}),
 			);
-			expect(session.getSnapshot().jobs).toHaveLength(0);
+			expect(session.getSnapshotFn().jobs).toHaveLength(0);
 
 			expect(await batchesDelivered).toEqual([
 				[

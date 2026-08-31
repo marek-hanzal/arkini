@@ -53,21 +53,21 @@ const version: EditorProjectTransport.VersionDescriptor = {
 
 const installEditorApi = () => {
 	const editor: Window["arkini"]["editor"] = {
-		buildProject: vi.fn(async () => {
+		buildProjectFn: vi.fn(async () => {
 			throw new Error("Unexpected build.");
 		}),
-		readProjectBuild: vi.fn(async () => {
+		readProjectBuildFn: vi.fn(async () => {
 			throw new Error("Unexpected build read.");
 		}),
-		saveProjectBuild: vi.fn(async () => {
+		saveProjectBuildFn: vi.fn(async () => {
 			throw new Error("Unexpected build save.");
 		}),
-		status: vi.fn(async () => ({
+		statusFn: vi.fn(async () => ({
 			type: "ready" as const,
 		})),
-		awaitIdle: vi.fn(async () => success(undefined)),
-		createProject: vi.fn(async () => success(project)),
-		createNote: vi.fn(async ({ projectId, content }) =>
+		awaitIdleFn: vi.fn(async () => success(undefined)),
+		createProjectFn: vi.fn(async () => success(project)),
+		createNoteFn: vi.fn(async ({ projectId, content }) =>
 			success({
 				noteId: "note-one",
 				projectId,
@@ -76,13 +76,13 @@ const installEditorApi = () => {
 				updatedAtMs: 12,
 			}),
 		),
-		deleteProject: vi.fn(async () => success(undefined)),
-		deleteNote: vi.fn(async () => success(undefined)),
-		deleteItem: vi.fn(async () => success(commit)),
-		deleteResource: vi.fn(async () => success(project)),
-		exportJsonDirectory: vi.fn(async () => success(null)),
-		importJsonDirectory: vi.fn(async () => success(descriptor)),
-		listProjects: vi.fn(async () =>
+		deleteProjectFn: vi.fn(async () => success(undefined)),
+		deleteNoteFn: vi.fn(async () => success(undefined)),
+		deleteItemFn: vi.fn(async () => success(commit)),
+		deleteResourceFn: vi.fn(async () => success(project)),
+		exportJsonDirectoryFn: vi.fn(async () => success(null)),
+		importJsonDirectoryFn: vi.fn(async () => success(descriptor)),
+		listProjectsFn: vi.fn(async () =>
 			success([
 				{
 					type: "valid" as const,
@@ -91,20 +91,20 @@ const installEditorApi = () => {
 				},
 			]),
 		),
-		listNotes: vi.fn(async () => success([])),
-		openExportDirectory: vi.fn(async () => success(undefined)),
-		openProjectDirectory: vi.fn(async () => success(undefined)),
-		readProject: vi.fn(async () => success(project)),
-		refreshProject: vi.fn(async () => success(project)),
-		onProjectChanged: vi.fn(() => () => undefined),
-		replaceConfig: vi.fn(async () => success(commit)),
-		replaceResource: vi.fn(async () => success(project)),
-		saveResource: vi.fn(async () => success(project)),
-		upsertItem: vi.fn(async () => success(commit)),
-		upsertResources: vi.fn(async () => success(project)),
-		listBoardScenarios: vi.fn(async () => success([])),
-		readBoardScenario: vi.fn(async () => success(null)),
-		writeBoardScenario: vi.fn(async () =>
+		listNotesFn: vi.fn(async () => success([])),
+		openExportDirectoryFn: vi.fn(async () => success(undefined)),
+		openProjectDirectoryFn: vi.fn(async () => success(undefined)),
+		readProjectFn: vi.fn(async () => success(project)),
+		refreshProjectFn: vi.fn(async () => success(project)),
+		onProjectChangedFn: vi.fn(() => () => undefined),
+		replaceConfigFn: vi.fn(async () => success(commit)),
+		replaceResourceFn: vi.fn(async () => success(project)),
+		saveResourceFn: vi.fn(async () => success(project)),
+		upsertItemFn: vi.fn(async () => success(commit)),
+		upsertResourcesFn: vi.fn(async () => success(project)),
+		listBoardScenariosFn: vi.fn(async () => success([])),
+		readBoardScenarioFn: vi.fn(async () => success(null)),
+		writeBoardScenarioFn: vi.fn(async () =>
 			success({
 				projectId: "project-one",
 				name: "Scenario 1",
@@ -117,8 +117,8 @@ const installEditorApi = () => {
 				updatedAtMs: 12,
 			}),
 		),
-		deleteBoardScenario: vi.fn(async () => success(undefined)),
-		readVersionStatus: vi.fn(async () =>
+		deleteBoardScenarioFn: vi.fn(async () => success(undefined)),
+		readVersionStatusFn: vi.fn(async () =>
 			success({
 				canCommit: false,
 				currentBaseVersionId: version.versionId,
@@ -127,12 +127,12 @@ const installEditorApi = () => {
 				versionCount: 1,
 			}),
 		),
-		listVersions: vi.fn(async () =>
+		listVersionsFn: vi.fn(async () =>
 			success([
 				version,
 			]),
 		),
-		diffVersions: vi.fn(async (request) =>
+		diffVersionsFn: vi.fn(async (request) =>
 			success({
 				from: request.from,
 				to: request.to,
@@ -143,10 +143,10 @@ const installEditorApi = () => {
 				scenarios: [],
 			}),
 		),
-		createVersion: vi.fn(async () => success(version)),
-		checkoutVersion: vi.fn(async () => success(undefined)),
-		updateVersionTag: vi.fn(async () => success(version)),
-		updateNote: vi.fn(async ({ projectId, noteId, content }) =>
+		createVersionFn: vi.fn(async () => success(version)),
+		checkoutVersionFn: vi.fn(async () => success(undefined)),
+		updateVersionTagFn: vi.fn(async () => success(version)),
+		updateNoteFn: vi.fn(async ({ projectId, noteId, content }) =>
 			success({
 				noteId,
 				projectId,
@@ -196,7 +196,7 @@ afterEach(() => {
 describe("createElectronProjectRepositoryFx", () => {
 	it("preserves a stable server failure envelope as one typed repository failure", async () => {
 		const editor = installEditorApi();
-		vi.mocked(editor.listProjects).mockResolvedValueOnce({
+		vi.mocked(editor.listProjectsFn).mockResolvedValueOnce({
 			type: "failure",
 			error: {
 				operation: "list-projects",
@@ -217,7 +217,7 @@ describe("createElectronProjectRepositoryFx", () => {
 
 	it("rejects malformed result envelopes as typed boundary failures", async () => {
 		const editor = installEditorApi();
-		vi.mocked(editor.listProjects).mockResolvedValueOnce({
+		vi.mocked(editor.listProjectsFn).mockResolvedValueOnce({
 			type: "invalid-envelope",
 		} as never);
 		const { repository } = createRepository();
@@ -232,7 +232,7 @@ describe("createElectronProjectRepositoryFx", () => {
 
 	it("preserves a main-process invalid request as a typed repository failure", async () => {
 		const editor = installEditorApi();
-		vi.mocked(editor.readProject).mockResolvedValueOnce({
+		vi.mocked(editor.readProjectFn).mockResolvedValueOnce({
 			type: "failure",
 			error: {
 				operation: "read-project",
@@ -245,18 +245,18 @@ describe("createElectronProjectRepositoryFx", () => {
 
 		expect(failure.operation).toBe("read-project");
 		expect(failure.message).toBe("The editor project request is invalid.");
-		expect(editor.readProject).toHaveBeenCalledWith("");
+		expect(editor.readProjectFn).toHaveBeenCalledWith("");
 	});
 
 	it("rejects invalid project and version responses at the renderer boundary", async () => {
 		const editor = installEditorApi();
-		vi.mocked(editor.readProject).mockResolvedValueOnce(
+		vi.mocked(editor.readProjectFn).mockResolvedValueOnce(
 			success({
 				...project,
 				title: "Metadata drift",
 			}),
 		);
-		vi.mocked(editor.listVersions).mockResolvedValueOnce(
+		vi.mocked(editor.listVersionsFn).mockResolvedValueOnce(
 			success([
 				{
 					...version,
@@ -278,7 +278,7 @@ describe("createElectronProjectRepositoryFx", () => {
 
 	it("rejects note responses that escape the requested project or note identity", async () => {
 		const editor = installEditorApi();
-		vi.mocked(editor.listNotes).mockResolvedValueOnce(
+		vi.mocked(editor.listNotesFn).mockResolvedValueOnce(
 			success([
 				{
 					noteId: "foreign-note",
@@ -289,7 +289,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				},
 			]),
 		);
-		vi.mocked(editor.updateNote).mockResolvedValueOnce(
+		vi.mocked(editor.updateNoteFn).mockResolvedValueOnce(
 			success({
 				noteId: "another-note",
 				projectId: "project-one",
@@ -341,7 +341,7 @@ describe("createElectronProjectRepositoryFx", () => {
 			}),
 		);
 
-		const request = vi.mocked(editor.upsertResources).mock.calls[0]?.[0];
+		const request = vi.mocked(editor.upsertResourcesFn).mock.calls[0]?.[0];
 		expect(request?.resources[0]).toMatchObject({
 			id: "fresh-resource",
 			mime: "image/png",
@@ -365,7 +365,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				}),
 			);
 			expect(failure.operation).toBe("save-resource");
-			expect(editor.saveResource).not.toHaveBeenCalled();
+			expect(editor.saveResourceFn).not.toHaveBeenCalled();
 		} finally {
 			Effect.runSync(releaseFx);
 		}

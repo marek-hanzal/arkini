@@ -24,7 +24,7 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 				),
 			);
 		} catch (cause) {
-			throw context.gameEngineResource.markCriticalFailure("game-leave", cause);
+			throw context.gameEngineResource.markCriticalFailureFn("game-leave", cause);
 		}
 		return match(deps)
 			.with(

@@ -40,7 +40,7 @@ export const ProjectToolbarSection = () => {
 					<ProjectStartGrid
 						cells={cells}
 						height={1}
-						onCellsChange={(nextCells) =>
+						onCellsChangeFn={(nextCells) =>
 							form.setFieldValue(
 								"start.toolbar",
 								nextCells.map(({ x, ...cell }) => ({

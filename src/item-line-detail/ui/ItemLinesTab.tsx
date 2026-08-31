@@ -53,7 +53,7 @@ const useItemLinesAutoFocus = ({
 		}
 		let attempts = 0;
 		let frame: number | undefined;
-		const attempt = () => {
+		const attemptFn = () => {
 			if (focusIntentRef.current !== intent || intent.settled) return;
 			const container = scrollContainerRef.current;
 			const row = rowByLineIdRef.current.get(intent.lineId ?? "");
@@ -84,9 +84,9 @@ const useItemLinesAutoFocus = ({
 				intent.settled = true;
 				return;
 			}
-			frame = requestAnimationFrame(attempt);
+			frame = requestAnimationFrame(attemptFn);
 		};
-		frame = requestAnimationFrame(attempt);
+		frame = requestAnimationFrame(attemptFn);
 		return () => {
 			if (frame !== undefined) cancelAnimationFrame(frame);
 		};
@@ -94,7 +94,7 @@ const useItemLinesAutoFocus = ({
 		itemId,
 	]);
 
-	const registerRow = useCallback((lineId: string, row: HTMLElement | null) => {
+	const registerRowFn = useCallback((lineId: string, row: HTMLElement | null) => {
 		if (row === null) {
 			rowByLineIdRef.current.delete(lineId);
 		} else {
@@ -103,7 +103,7 @@ const useItemLinesAutoFocus = ({
 	}, []);
 
 	return {
-		registerRow,
+		registerRowFn,
 		scrollContainerRef,
 	} as const;
 };
@@ -172,10 +172,10 @@ export const ItemLinesTab = ({
 		filteredLines,
 		normalizedQuery,
 		query,
-		setAvailabilityFilter,
-		setQuery,
+		setAvailabilityFilterFn,
+		setQueryFn,
 	} = useItemLineSearch(lines, initialQuery, stale);
-	const { registerRow, scrollContainerRef } = useItemLinesAutoFocus({
+	const { registerRowFn, scrollContainerRef } = useItemLinesAutoFocus({
 		focusLineId: lines.focusLineId,
 		focusLineVisible: filteredLines.some((line) => line.lineId === lines.focusLineId),
 		itemId: lines.itemId,
@@ -198,7 +198,7 @@ export const ItemLinesTab = ({
 						value={query}
 						className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder="Search lines…"
-						onChange={(event) => setQuery(event.currentTarget.value)}
+						onChange={(event) => setQueryFn(event.currentTarget.value)}
 					/>
 				</motion.div>
 				<AnimatePresence initial={false}>
@@ -222,7 +222,7 @@ export const ItemLinesTab = ({
 											key={option.value}
 											className="ak-segmented-option relative cursor-pointer rounded-md px-3 py-1.5 text-center text-xs font-semibold"
 											disabled={optionDisabled}
-											onClick={() => setAvailabilityFilter(option.value)}
+											onClick={() => setAvailabilityFilterFn(option.value)}
 											type="button"
 											{...readDataUiFn({
 												dataUi: "ItemLinesAvailabilityOption",
@@ -296,7 +296,7 @@ export const ItemLinesTab = ({
 							>
 								{filteredLines.map((line) => (
 									<ItemLineRow
-										ref={(row) => registerRow(line.lineId, row)}
+										ref={(row) => registerRowFn(line.lineId, row)}
 										key={line.lineId}
 										definitionItemId={definitionItemId}
 										disabled={disabled}

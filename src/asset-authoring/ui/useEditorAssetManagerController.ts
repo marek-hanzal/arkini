@@ -27,11 +27,11 @@ export namespace useEditorAssetManagerController {
 		readonly importError?: unknown;
 		readonly importPending: boolean;
 		readonly importedCount?: number;
-		readonly onArkpackChange: ChangeEventHandler<HTMLInputElement>;
-		readonly onFilesChange: ChangeEventHandler<HTMLInputElement>;
-		readonly openArkpackImport: () => void;
-		readonly openFilesImport: () => void;
-		readonly resources: ReadonlyArray<Project["resources"][number]>;
+		readonly onArkpackChangeFn: ChangeEventHandler<HTMLInputElement>;
+		readonly onFilesChangeFn: ChangeEventHandler<HTMLInputElement>;
+		readonly openArkpackImportFn: () => void;
+		readonly openFilesImportFn: () => void;
+		readonly resources: ReadonlyArray<Project.Resource>;
 	}
 }
 
@@ -68,7 +68,7 @@ export const useEditorAssetManagerController = ({
 	const arkpackInputRef = useRef<HTMLInputElement>(null);
 	const filesInputRef = useRef<HTMLInputElement>(null);
 	const result = useAtomValue(importEditorAssetsCommandAtom);
-	const importAssets = useAtomSet(importEditorAssetsCommandAtom);
+	const importAssetsFn = useAtomSet(importEditorAssetsCommandAtom);
 	const importPending = result.waiting;
 	const importError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const importedCount =
@@ -82,27 +82,27 @@ export const useEditorAssetManagerController = ({
 			: filter === "unused" && query.trim() === ""
 				? "unused-empty"
 				: "no-matches";
-	const openArkpackImport = () => {
+	const openArkpackImportFn = () => {
 		arkpackInputRef.current?.click();
 	};
-	const openFilesImport = () => {
+	const openFilesImportFn = () => {
 		filesInputRef.current?.click();
 	};
-	const onArkpackChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+	const onArkpackChangeFn: ChangeEventHandler<HTMLInputElement> = (event) => {
 		const file = event.currentTarget.files?.[0];
 		event.currentTarget.value = "";
 		if (file === undefined) return;
-		importAssets({
+		importAssetsFn({
 			file,
 			projectId: library.projectId,
 			source: "arkpack",
 		});
 	};
-	const onFilesChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+	const onFilesChangeFn: ChangeEventHandler<HTMLInputElement> = (event) => {
 		const files = Array.from(event.currentTarget.files ?? []);
 		event.currentTarget.value = "";
 		if (files.length === 0) return;
-		importAssets({
+		importAssetsFn({
 			files,
 			projectId: library.projectId,
 			source: "files",
@@ -116,10 +116,10 @@ export const useEditorAssetManagerController = ({
 		importError,
 		importPending,
 		importedCount,
-		onArkpackChange,
-		onFilesChange,
-		openArkpackImport,
-		openFilesImport,
+		onArkpackChangeFn,
+		onFilesChangeFn,
+		openArkpackImportFn,
+		openFilesImportFn,
 		resources: library.resources,
 	};
 };

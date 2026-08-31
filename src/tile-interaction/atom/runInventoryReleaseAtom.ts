@@ -5,8 +5,6 @@ import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameA
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 
-type Command = releaseInventoryItemFx.Props;
-
 /**
  * Owns mounted Inventory release execution for one exact live Game.
  * Placement and resulting inventory semantics remain entirely engine-owned.
@@ -16,7 +14,7 @@ type Command = releaseInventoryItemFx.Props;
 export const runInventoryReleaseAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
-			(command: Command) =>
+			(command: releaseInventoryItemFx.Props) =>
 				Effect.yieldNow.pipe(Effect.andThen(game.runFx(releaseInventoryItemFx(command)))),
 			{
 				concurrent: true,

@@ -55,7 +55,7 @@ export namespace useEditorBuildArtifactController {
 
 	export interface Output {
 		readonly artifact?: EditorProjectBuildSchema.Type;
-		readonly build: () => void;
+		readonly buildFn: () => void;
 		readonly buildFailure?: EditorBuildFailure;
 		readonly buildPending: boolean;
 		readonly buildStatus: EditorBuildStatus;
@@ -69,7 +69,7 @@ export const useEditorBuildArtifactController = ({
 }: useEditorBuildArtifactController.Props): useEditorBuildArtifactController.Output => {
 	const buildAtom = BuildCommandAtoms.build(project.projectId);
 	const buildResult = useAtomValue(buildAtom);
-	const runBuild = useAtomSet(buildAtom);
+	const runBuildFn = useAtomSet(buildAtom);
 	const builtArtifact =
 		AsyncResult.isSuccess(buildResult) && !buildResult.waiting ? buildResult.value : undefined;
 	const artifact = builtArtifact?.revision === project.revision ? builtArtifact : undefined;
@@ -106,8 +106,8 @@ export const useEditorBuildArtifactController = ({
 		.otherwise(() => "not-built" as const);
 	return {
 		artifact,
-		build: () => {
-			runBuild({
+		buildFn: () => {
+			runBuildFn({
 				expectedRevision: project.revision,
 			});
 		},

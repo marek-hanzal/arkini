@@ -81,8 +81,8 @@ describe("CLI installation IPC", () => {
 			}),
 		};
 		const trustedRenderer: TrustedRenderer = {
-			isTrustedUrl: () => false,
-			isTrustedIpcSender: () => false,
+			isTrustedUrlFn: () => false,
+			isTrustedIpcSenderFn: () => false,
 			assertTrustedIpcSenderFx: () =>
 				Effect.fail(
 					new ElectronMainError({

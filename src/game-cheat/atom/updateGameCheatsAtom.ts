@@ -99,13 +99,13 @@ export const updateGameCheatsAtom = Effect.runSync(
 						return yield* settleRendererCommandFailureFx({
 							cause: exit.cause,
 							game,
-							onFailure: (failure) =>
+							onFailureFx: (failure) =>
 								Atom.set(stateAtom, {
 									kind: "error",
 									action: command.action,
 									error: failure,
 								}),
-							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
+							setFatalCauseFx: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
 					}
 					yield* Atom.set(

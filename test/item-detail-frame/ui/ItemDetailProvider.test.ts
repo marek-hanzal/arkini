@@ -42,7 +42,7 @@ describe("Item Detail frame provider", () => {
 		await act(async () => completeEnter(readControl(), entering.generation));
 		const interrupted = vi.fn();
 		await act(async () => {
-			readControl().runPendingAction({
+			readControl().runPendingActionFn({
 				action: "autofill",
 				failureMessage: "Autofill failed.",
 				key: "line:runtime:first",
@@ -50,7 +50,7 @@ describe("Item Detail frame provider", () => {
 			});
 			await Promise.resolve();
 		});
-		expect(readControl().readPendingAction("line:runtime:first")).toBe("autofill");
+		expect(readControl().readPendingActionFn("line:runtime:first")).toBe("autofill");
 
 		await act(async () => {
 			render({
@@ -59,7 +59,7 @@ describe("Item Detail frame provider", () => {
 		});
 
 		await vi.waitFor(() => expect(interrupted).toHaveBeenCalledOnce());
-		expect(readControl().readPendingAction("line:runtime:first")).toBeNull();
+		expect(readControl().readPendingActionFn("line:runtime:first")).toBeNull();
 	});
 
 	it("keeps outcomes within their exact target visit while close lets admitted work settle", async () => {
@@ -89,7 +89,7 @@ describe("Item Detail frame provider", () => {
 			Effect.runSync(Deferred.fail(firstFailure, new Error("First deferred failure.")));
 		});
 		await vi.waitFor(() =>
-			expect(readControl().readActionError("line:runtime:first")).toBe(
+			expect(readControl().readActionErrorFn("line:runtime:first")).toBe(
 				"First deferred failure.",
 			),
 		);
@@ -100,7 +100,7 @@ describe("Item Detail frame provider", () => {
 				tab: "lines",
 			});
 		});
-		expect(readControl().readActionError("line:runtime:first")).toBeNull();
+		expect(readControl().readActionErrorFn("line:runtime:first")).toBeNull();
 
 		const lateFailure = Effect.runSync(Deferred.make<never, Error>());
 		await act(async () => {
@@ -117,12 +117,12 @@ describe("Item Detail frame provider", () => {
 			completeExit(readControl(), exiting.generation);
 			await closeOutcome;
 		});
-		expect(readControl().readPendingAction("line:runtime:second")).toBe("enqueue");
+		expect(readControl().readPendingActionFn("line:runtime:second")).toBe("enqueue");
 
 		Effect.runSync(Deferred.fail(lateFailure, new Error("Late failure after close.")));
 		await vi.waitFor(() =>
-			expect(readControl().readPendingAction("line:runtime:second")).toBeNull(),
+			expect(readControl().readPendingActionFn("line:runtime:second")).toBeNull(),
 		);
-		expect(readControl().readActionError("line:runtime:second")).toBeNull();
+		expect(readControl().readActionErrorFn("line:runtime:second")).toBeNull();
 	});
 });

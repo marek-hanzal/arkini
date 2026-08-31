@@ -36,7 +36,7 @@ export const gameMenuCommandAtom = Effect.runSync(
 							Exit.isFailure(exit) &&
 							Option.isNone(readExactCauseFailureFn(exit.cause))
 						) {
-							game.failStop("ui", exit.cause);
+							game.failStopFn("ui", exit.cause);
 							return yield* Effect.failCause(exit.cause);
 						}
 						return {

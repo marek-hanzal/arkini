@@ -130,8 +130,8 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		await expect(
 			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one"),
 		).resolves.toBeUndefined();
-		expect(ownership.readProjectContext()).toBe("project-one");
-		const requestCheckout = vi.mocked(ownership.setProjectContext).mock.calls[0]?.[1];
+		expect(ownership.readProjectContextFn()).toBe("project-one");
+		const requestCheckout = vi.mocked(ownership.setProjectContextFn).mock.calls[0]?.[1];
 		if (requestCheckout === undefined) throw new Error("Expected renderer checkout binding.");
 		const checkout = Effect.runPromise(requestCheckout("version-one"));
 		const postMessage = vi.mocked(sender.postMessage);
@@ -158,16 +158,16 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 				"another-project",
 			),
 		).resolves.toBeUndefined();
-		expect(ownership.readProjectContext()).toBe("project-one");
+		expect(ownership.readProjectContextFn()).toBe("project-one");
 		await expect(
 			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextClear, "project-one"),
 		).resolves.toBeUndefined();
-		expect(ownership.readProjectContext()).toBeUndefined();
+		expect(ownership.readProjectContextFn()).toBeUndefined();
 
 		await expect(
 			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, ""),
 		).rejects.toBeDefined();
-		expect(ownership.readProjectContext()).toBeUndefined();
+		expect(ownership.readProjectContextFn()).toBeUndefined();
 
 		await invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one");
 		sender.emit(
@@ -177,14 +177,14 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 			true,
 			true,
 		);
-		expect(ownership.readProjectContext()).toBe("project-one");
+		expect(ownership.readProjectContextFn()).toBe("project-one");
 		sender.emit("did-start-navigation", {}, "arkini://app/frame", false, false);
-		expect(ownership.readProjectContext()).toBe("project-one");
+		expect(ownership.readProjectContextFn()).toBe("project-one");
 		sender.emit("did-start-navigation", {}, "arkini://app/main-menu", false, true);
-		expect(ownership.readProjectContext()).toBeUndefined();
+		expect(ownership.readProjectContextFn()).toBeUndefined();
 		await invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-two");
 		sender.emit("destroyed");
-		expect(ownership.readProjectContext()).toBeUndefined();
+		expect(ownership.readProjectContextFn()).toBeUndefined();
 	});
 
 	it("rejects project context changes from an untrusted renderer", async () => {
@@ -200,6 +200,6 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		await expect(
 			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one"),
 		).rejects.toThrow("authorize MCP context test renderer");
-		expect(ownership.readProjectContext()).toBeUndefined();
+		expect(ownership.readProjectContextFn()).toBeUndefined();
 	});
 });

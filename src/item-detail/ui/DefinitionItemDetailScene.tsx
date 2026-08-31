@@ -20,7 +20,7 @@ export const DefinitionItemDetailScene = ({
 	const controller = useDefinitionItemDetailSceneController({
 		target,
 	});
-	const closeItemDetail = useCloseItemDetail();
+	const closeItemDetailFn = useCloseItemDetail();
 
 	if (controller.definition.kind === "unavailable") {
 		return (
@@ -29,7 +29,7 @@ export const DefinitionItemDetailScene = ({
 				<button
 					type="button"
 					className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-					onClick={() => closeItemDetail()}
+					onClick={() => closeItemDetailFn()}
 				>
 					×
 				</button>

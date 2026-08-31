@@ -21,7 +21,7 @@ const useFallingPortraitMotion = ({
 	readonly portraitUrls: readonly string[];
 }) => {
 	const controls = useAnimationControls();
-	const [appearance, setAppearance] = useState<FallingPortraitAppearance>({
+	const [appearance, setAppearanceFn] = useState<FallingPortraitAppearance>({
 		blurPx: 0,
 		portraitUrl: portraitUrls[0] ?? "",
 		sizePx: 64,
@@ -29,11 +29,11 @@ const useFallingPortraitMotion = ({
 	});
 
 	useEffect(() => {
-		const randomBetween = (minimum: number, maximum: number) =>
+		const randomBetweenFn = (minimum: number, maximum: number) =>
 			minimum + Math.random() * (maximum - minimum);
-		const wait = (milliseconds: number) =>
-			new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
-		const pickPortrait = (urls: readonly string[]) =>
+		const waitFn = (milliseconds: number) =>
+			new Promise<void>((resolveFn) => window.setTimeout(resolveFn, milliseconds));
+		const pickPortraitFn = (urls: readonly string[]) =>
 			urls[Math.floor(Math.random() * urls.length)] ?? urls[0] ?? "";
 		if (!active) {
 			controls.stop();
@@ -45,36 +45,36 @@ const useFallingPortraitMotion = ({
 
 		let disposed = false;
 
-		const run = async () => {
-			await wait(initialDelayMs);
+		const runFn = async () => {
+			await waitFn(initialDelayMs);
 
 			while (!disposed) {
 				const container = containerRef.current;
 				if (container === null) {
-					await wait(100);
+					await waitFn(100);
 					continue;
 				}
 
 				const bounds = container.getBoundingClientRect();
 				const depth = Math.random();
 				const sizePx = Math.round(92 + depth * 164);
-				const opacity = randomBetween(0.36, 0.48) + depth * 0.45;
-				const durationSeconds = randomBetween(8.5, 11.5) - depth * 2.25;
-				const cycleDurationSeconds = randomBetween(11.5, 13.5);
-				const startX = randomBetween(
+				const opacity = randomBetweenFn(0.36, 0.48) + depth * 0.45;
+				const durationSeconds = randomBetweenFn(8.5, 11.5) - depth * 2.25;
+				const cycleDurationSeconds = randomBetweenFn(11.5, 13.5);
+				const startX = randomBetweenFn(
 					-sizePx * 0.15,
 					Math.max(0, bounds.width - sizePx * 0.85),
 				);
 				const endX = Math.min(
-					Math.max(startX + randomBetween(-90, 90), -sizePx * 0.25),
+					Math.max(startX + randomBetweenFn(-90, 90), -sizePx * 0.25),
 					bounds.width - sizePx * 0.75,
 				);
-				const startRotation = randomBetween(-28, 28);
-				const endRotation = startRotation + randomBetween(-190, 190);
+				const startRotation = randomBetweenFn(-28, 28);
+				const endRotation = startRotation + randomBetweenFn(-190, 190);
 
-				setAppearance({
+				setAppearanceFn({
 					blurPx: (1 - depth) * 1.1,
-					portraitUrl: pickPortrait(portraitUrls),
+					portraitUrl: pickPortraitFn(portraitUrls),
 					sizePx,
 					zIndex: 1 + Math.round(depth * 8),
 				});
@@ -111,11 +111,11 @@ const useFallingPortraitMotion = ({
 					},
 				});
 
-				await wait(Math.max(0.9, cycleDurationSeconds - durationSeconds) * 1_000);
+				await waitFn(Math.max(0.9, cycleDurationSeconds - durationSeconds) * 1_000);
 			}
 		};
 
-		void run();
+		void runFn();
 		return () => {
 			disposed = true;
 			controls.stop();

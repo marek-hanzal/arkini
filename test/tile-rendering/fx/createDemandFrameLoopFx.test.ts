@@ -10,10 +10,10 @@ const createFakeFrames = () => {
 	const callbacks = new Map<number, FrameRequestCallback>();
 	return {
 		callbacks,
-		cancelFrame: (handle: number) => {
+		cancelFrameFn: (handle: number) => {
 			callbacks.delete(handle);
 		},
-		requestFrame: (callback: FrameRequestCallback) => {
+		requestFrameFn: (callback: FrameRequestCallback) => {
 			const handle = ++nextId;
 			callbacks.set(handle, callback);
 			return handle;
@@ -38,10 +38,10 @@ describe("DemandFrameLoop", () => {
 		const render = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure: vi.fn(),
-				render,
-				requestFrame: fake.requestFrame,
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: render,
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 
@@ -58,10 +58,10 @@ describe("DemandFrameLoop", () => {
 		const render = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure: vi.fn(),
-				render,
-				requestFrame: fake.requestFrame,
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: render,
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 		Effect.runSync(loop.invalidateFx);
@@ -78,10 +78,10 @@ describe("DemandFrameLoop", () => {
 		const canceledWork = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure: vi.fn(),
-				render: vi.fn(),
-				requestFrame: fake.requestFrame,
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: vi.fn(),
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 
@@ -101,10 +101,10 @@ describe("DemandFrameLoop", () => {
 		const canceled = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure: vi.fn(),
-				render: () => order.push("projected"),
-				requestFrame: fake.requestFrame,
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: () => order.push("projected"),
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 
@@ -125,10 +125,10 @@ describe("DemandFrameLoop", () => {
 		const laterWork = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure: vi.fn(),
-				render: vi.fn(),
-				requestFrame: fake.requestFrame,
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: vi.fn(),
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 
@@ -144,10 +144,10 @@ describe("DemandFrameLoop", () => {
 		const laterWork = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure: vi.fn(),
-				render: vi.fn(),
-				requestFrame: fake.requestFrame,
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: vi.fn(),
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 		let cancelLater = () => {};
@@ -164,12 +164,12 @@ describe("DemandFrameLoop", () => {
 		const reportCriticalFailure = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
-				cancelFrame: fake.cancelFrame,
-				reportCriticalFailure,
-				render: () => {
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: reportCriticalFailure,
+				renderFn: () => {
 					throw new Error("context lost");
 				},
-				requestFrame: fake.requestFrame,
+				requestFrameFn: fake.requestFrameFn,
 			}),
 		);
 		Effect.runSync(loop.invalidateFx);

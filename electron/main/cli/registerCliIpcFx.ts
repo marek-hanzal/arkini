@@ -23,7 +23,7 @@ export const registerCliIpcFx = Effect.fn("registerCliIpcFx")(
 		Effect.sync(() => {
 			if (registered) return;
 			registered = true;
-			const runAuthorized = <Value, Error>(
+			const runAuthorizedFn = <Value, Error>(
 				event: IpcMainInvokeEvent,
 				operation: Effect.Effect<Value, Error, never>,
 			) =>
@@ -33,38 +33,39 @@ export const registerCliIpcFx = Effect.fn("registerCliIpcFx")(
 			const handlers = [
 				[
 					ArkiniElectronApi.channels.cliStatus,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, installation.readStatusFx),
+					(event: IpcMainInvokeEvent) =>
+						runAuthorizedFn(event, installation.readStatusFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliInstall,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, installation.installFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, installation.installFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliReplace,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, installation.replaceFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, installation.replaceFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliUninstall,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, installation.uninstallFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, installation.uninstallFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliCompletionStatus,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, completion.readStatusFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.readStatusFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliCompletionInstall,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, completion.installFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.installFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliCompletionReplace,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, completion.replaceFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.replaceFx),
 				],
 				[
 					ArkiniElectronApi.channels.cliCompletionUninstall,
-					(event: IpcMainInvokeEvent) => runAuthorized(event, completion.uninstallFx),
+					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.uninstallFx),
 				],
 			] as const;
-			for (const [channel, handler] of handlers) ipcMain.handle(channel, handler);
+			for (const [channel, handlerFn] of handlers) ipcMain.handle(channel, handlerFn);
 			app.once("will-quit", () => {
 				for (const [channel] of handlers) ipcMain.removeHandler(channel);
 				registered = false;

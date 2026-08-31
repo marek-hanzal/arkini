@@ -13,7 +13,7 @@ interface GameSessionLayerProps {
 	config: GameConfigSchema.Type;
 	state?: StateSchema.Type;
 	intervalMs?: number;
-	onFatalError?: (cause: unknown) => void;
+	onFatalErrorFn?: (cause: unknown) => void;
 }
 
 /** Combines one game core with its scoped production loop. */
@@ -21,7 +21,7 @@ export const GameSessionLayerFx = ({
 	config,
 	state,
 	intervalMs,
-	onFatalError,
+	onFatalErrorFn,
 }: GameSessionLayerProps) => {
 	const makeSessionLayer = (initialRuntime?: RuntimeSchema.Type) => {
 		const runtime = GameRuntimeLayerFx({
@@ -32,7 +32,7 @@ export const GameSessionLayerFx = ({
 		const core = Layer.merge(runtime, tick);
 		const loop = GameLoopLayerFx({
 			intervalMs,
-			onFatalError,
+			onFatalErrorFn,
 		}).pipe(Layer.provide(core));
 		return Layer.merge(core, loop);
 	};

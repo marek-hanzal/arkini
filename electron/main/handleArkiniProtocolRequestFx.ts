@@ -12,7 +12,7 @@ export namespace handleArkiniProtocolRequestFx {
 	}
 }
 
-const withProductionContentSecurityPolicy = (response: Response) => {
+const withProductionContentSecurityPolicyFn = (response: Response) => {
 	const headers = new Headers(response.headers);
 	headers.set("Content-Security-Policy", RendererContentSecurityPolicy.production);
 	return new Response(response.body, {
@@ -26,7 +26,7 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 	({ request, rendererRoot }: handleArkiniProtocolRequestFx.Props) =>
 		Effect.gen(function* () {
 			if (request.method !== "GET" && request.method !== "HEAD") {
-				return withProductionContentSecurityPolicy(
+				return withProductionContentSecurityPolicyFn(
 					new Response("Method not allowed.", {
 						status: 405,
 					}),
@@ -39,7 +39,7 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 			}).pipe(
 				Effect.catch((error) =>
 					Effect.succeed(
-						withProductionContentSecurityPolicy(
+						withProductionContentSecurityPolicyFn(
 							new Response(error.message, {
 								status: error.status,
 							}),
@@ -62,6 +62,6 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 								message: "Arkini renderer asset could not be served.",
 							}),
 			});
-			return withProductionContentSecurityPolicy(response);
+			return withProductionContentSecurityPolicyFn(response);
 		}),
 );

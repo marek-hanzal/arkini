@@ -7,6 +7,7 @@ import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactC
 import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 import { createGameAudioSynthFx } from "~/game-audio/fx/createGameAudioSynthFx";
 import { useGameEvents } from "~/game-presentation/ui/useGameEvents";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 
@@ -75,7 +76,7 @@ const useGameAudioAtoms = (game: GameEngine) =>
 			},
 		).pipe(Atom.setIdleTTL(0));
 		const playBatchAtom = Atom.fn(
-			(batch: useGameEvents.Batch, get) =>
+			(batch: GameEventBatchSchema.Type, get) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(get.result(synthAtom)),
 					Effect.flatMap((audio) => audio.playFx(readGameAudioCuesFn(batch))),
@@ -109,9 +110,9 @@ export const GameAudio = () => {
 	const audioAtoms = useGameAudioAtoms(game);
 	const activeAudioAtomsRef = useRef<typeof audioAtoms | null>(null);
 	useAtomMount(audioAtoms.synthAtom);
-	const prepare = useAtomSet(audioAtoms.prepareAtom);
-	const unlock = useAtomSet(audioAtoms.unlockAtom);
-	const playBatch = useAtomSet(audioAtoms.playBatchAtom);
+	const prepareFn = useAtomSet(audioAtoms.prepareAtom);
+	const unlockFn = useAtomSet(audioAtoms.unlockAtom);
+	const playBatchFn = useAtomSet(audioAtoms.playBatchAtom);
 
 	useLayoutEffect(() => {
 		activeAudioAtomsRef.current = audioAtoms;
@@ -125,31 +126,31 @@ export const GameAudio = () => {
 	]);
 
 	useEffect(() => {
-		prepare();
+		prepareFn();
 	}, [
-		prepare,
+		prepareFn,
 	]);
 
 	useEffect(() => {
-		const onUnlock = () => {
+		const onUnlockFn = () => {
 			if (activeAudioAtomsRef.current !== audioAtoms) return;
-			unlock();
+			unlockFn();
 		};
-		window.addEventListener("pointerdown", onUnlock, true);
-		window.addEventListener("keydown", onUnlock, true);
+		window.addEventListener("pointerdown", onUnlockFn, true);
+		window.addEventListener("keydown", onUnlockFn, true);
 
 		return () => {
-			window.removeEventListener("pointerdown", onUnlock, true);
-			window.removeEventListener("keydown", onUnlock, true);
+			window.removeEventListener("pointerdown", onUnlockFn, true);
+			window.removeEventListener("keydown", onUnlockFn, true);
 		};
 	}, [
 		audioAtoms,
-		unlock,
+		unlockFn,
 	]);
 
 	useGameEvents((batch) => {
 		if (activeAudioAtomsRef.current !== audioAtoms) return;
-		playBatch(batch);
+		playBatchFn(batch);
 	});
 
 	return null;

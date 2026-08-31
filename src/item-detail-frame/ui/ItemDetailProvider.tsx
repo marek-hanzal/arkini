@@ -44,38 +44,38 @@ export const ItemDetailProvider = ({
 		() =>
 			createItemDetailCommandAtom({
 				game,
-				readOutcomeScope: controller.readOutcomeScope,
+				readOutcomeScopeFn: controller.readOutcomeScopeFn,
 			}),
 		[
 			controller,
 			game,
 		],
 	);
-	const [commandState, writeCommand] = useAtom(commandAtom);
-	const runPendingAction = useCallback(
+	const [commandState, writeCommandFn] = useAtom(commandAtom);
+	const runPendingActionFn = useCallback(
 		<Result, Failure>(command: RunItemDetailPendingActionProps<Result, Failure>) =>
-			writeCommand(command),
+			writeCommandFn(command),
 		[
-			writeCommand,
+			writeCommandFn,
 		],
 	);
-	const [closeResult, close] = useAtom(controller.closeAtom);
+	const [closeResult, closeFn] = useAtom(controller.closeAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(closeResult));
 	const snapshot = useSyncExternalStore(
-		controller.subscribe,
-		controller.getSnapshot,
-		controller.getSnapshot,
+		controller.subscribeFn,
+		controller.getSnapshotFn,
+		controller.getSnapshotFn,
 	);
 
 	useEffect(() => {
-		writeCommand({
+		writeCommandFn({
 			kind: "scope-changed",
-			outcomeScope: controller.readOutcomeScope(),
+			outcomeScope: controller.readOutcomeScopeFn(),
 		});
 	}, [
 		controller,
 		snapshot,
-		writeCommand,
+		writeCommandFn,
 	]);
 
 	const openItemDetailFx = useCallback(
@@ -86,8 +86,8 @@ export const ItemDetailProvider = ({
 			origin = null,
 		}: Parameters<ItemDetailControl["openItemDetailFx"]>[0]) =>
 			Effect.suspend(() => {
-				const runtime = game.getSnapshot();
-				const sources = game.readOrThrow(
+				const runtime = game.getSnapshotFn();
+				const sources = game.readOrThrowFn(
 					readItemDetailSourcesFx({
 						target: {
 							kind: "runtime",
@@ -111,7 +111,7 @@ export const ItemDetailProvider = ({
 						resolved.tab === "lines"
 							? linesSearchQuery?.trim() || undefined
 							: undefined,
-					origin: controller.readOrigin(origin),
+					origin: controller.readOriginFn(origin),
 				});
 			}),
 		[
@@ -127,8 +127,8 @@ export const ItemDetailProvider = ({
 			tab,
 		}: Parameters<ItemDetailControl["openItemDefinitionDetailFx"]>[0]) =>
 			Effect.suspend(() => {
-				const runtime = game.getSnapshot();
-				const sources = game.readOrThrow(
+				const runtime = game.getSnapshotFn();
+				const sources = game.readOrThrowFn(
 					readItemDetailSourcesFx({
 						target: {
 							kind: "definition",
@@ -154,7 +154,7 @@ export const ItemDetailProvider = ({
 					kind: "definition",
 					itemId: sources.targetDefinitionItemId,
 					tab: resolvedTab,
-					origin: controller.readOrigin(origin),
+					origin: controller.readOriginFn(origin),
 				});
 			}),
 		[
@@ -166,7 +166,7 @@ export const ItemDetailProvider = ({
 	const selectRetainedItemDetailTabFx = useCallback(
 		({ itemId, tab }: Parameters<ItemDetailControl["selectRetainedItemDetailTabFx"]>[0]) =>
 			Effect.suspend(() => {
-				const current = controller.getSnapshot();
+				const current = controller.getSnapshotFn();
 				if (
 					current.phase === "closed" ||
 					current.phase === "exiting" ||
@@ -187,20 +187,20 @@ export const ItemDetailProvider = ({
 	);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
-			const current = controller.getSnapshot();
+		const onKeyDownFn = (event: KeyboardEvent) => {
+			const current = controller.getSnapshotFn();
 			if (event.key !== "Escape" || current.phase === "closed") return;
 			event.preventDefault();
 			event.stopPropagation();
 			if (current.phase !== "exiting") {
-				close(undefined);
+				closeFn(undefined);
 			}
 		};
-		window.addEventListener("keydown", onKeyDown, true);
-		return () => window.removeEventListener("keydown", onKeyDown, true);
+		window.addEventListener("keydown", onKeyDownFn, true);
+		return () => window.removeEventListener("keydown", onKeyDownFn, true);
 	}, [
 		controller,
-		close,
+		closeFn,
 	]);
 
 	useEffect(
@@ -215,14 +215,14 @@ export const ItemDetailProvider = ({
 	const control = useMemo<ItemDetailControl>(
 		() => ({
 			state: snapshot,
-			readActionError: (key) => {
+			readActionErrorFn: (key) => {
 				const error = commandState.actionErrors.get(key);
-				return error !== undefined && error.outcomeScope === controller.readOutcomeScope()
+				return error !== undefined && error.outcomeScope === controller.readOutcomeScopeFn()
 					? error.message
 					: null;
 			},
-			readPendingAction: (key) => commandState.pendingActions.get(key)?.action ?? null,
-			runPendingAction,
+			readPendingActionFn: (key) => commandState.pendingActions.get(key)?.action ?? null,
+			runPendingActionFn,
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
 			selectRetainedItemDetailTabFx,
@@ -236,7 +236,7 @@ export const ItemDetailProvider = ({
 			commandState,
 			openItemDefinitionDetailFx,
 			openItemDetailFx,
-			runPendingAction,
+			runPendingActionFn,
 			selectRetainedItemDetailTabFx,
 			snapshot,
 		],

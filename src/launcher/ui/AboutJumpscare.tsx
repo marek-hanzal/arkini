@@ -24,12 +24,12 @@ const useAboutJumpscareMotion = ({
 	readonly portraitUrls: readonly string[];
 }) => {
 	const controls = useAnimationControls();
-	const [portraitUrl, setPortraitUrl] = useState(portraitUrls[0] ?? "");
+	const [portraitUrl, setPortraitUrlFn] = useState(portraitUrls[0] ?? "");
 
 	useEffect(() => {
-		const randomBetween = (minimum: number, maximum: number) =>
+		const randomBetweenFn = (minimum: number, maximum: number) =>
 			minimum + Math.random() * (maximum - minimum);
-		const pickPortrait = (urls: readonly string[]) =>
+		const pickPortraitFn = (urls: readonly string[]) =>
 			urls[Math.floor(Math.random() * urls.length)] ?? urls[0] ?? "";
 		if (!active) {
 			controls.stop();
@@ -42,23 +42,23 @@ const useAboutJumpscareMotion = ({
 		let disposed = false;
 		let timeout: number | undefined;
 
-		const schedule = (delayMs: number) => {
+		const scheduleFn = (delayMs: number) => {
 			timeout = window.setTimeout(async () => {
 				if (disposed) return;
 
 				const container = containerRef.current;
 				if (container === null) {
-					schedule(500);
+					scheduleFn(500);
 					return;
 				}
 
 				const startedAt = window.performance.now();
 				const bounds = container.getBoundingClientRect();
 				const fullscreenScale =
-					(Math.max(bounds.width, bounds.height) / 256) * randomBetween(1.18, 1.42);
-				const startRotation = randomBetween(-8, 8);
+					(Math.max(bounds.width, bounds.height) / 256) * randomBetweenFn(1.18, 1.42);
+				const startRotation = randomBetweenFn(-8, 8);
 
-				setPortraitUrl(pickPortrait(portraitUrls));
+				setPortraitUrlFn(pickPortraitFn(portraitUrls));
 				controls.set({
 					filter: "blur(14px)",
 					opacity: 0,
@@ -79,7 +79,7 @@ const useAboutJumpscareMotion = ({
 						0.72,
 						0,
 					],
-					rotate: startRotation + randomBetween(-5, 5),
+					rotate: startRotation + randomBetweenFn(-5, 5),
 					scale: [
 						0.15,
 						0.68,
@@ -105,16 +105,16 @@ const useAboutJumpscareMotion = ({
 
 				if (disposed) return;
 
-				const targetStartGapMs = randomBetween(
+				const targetStartGapMs = randomBetweenFn(
 					repeatDelayRangeMs.minimum,
 					repeatDelayRangeMs.maximum,
 				);
 				const elapsedMs = window.performance.now() - startedAt;
-				schedule(Math.max(0, targetStartGapMs - elapsedMs));
+				scheduleFn(Math.max(0, targetStartGapMs - elapsedMs));
 			}, delayMs);
 		};
 
-		schedule(randomBetween(firstDelayRangeMs.minimum, firstDelayRangeMs.maximum));
+		scheduleFn(randomBetweenFn(firstDelayRangeMs.minimum, firstDelayRangeMs.maximum));
 
 		return () => {
 			disposed = true;

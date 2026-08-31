@@ -49,12 +49,12 @@ vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 vi.mock("~/game-shell/ui/Inventory", async () => {
 	const { createElement: createReactElement } = await import("react");
 	return {
-		Inventory: ({ onClose }: { readonly onClose: () => void }) =>
+		Inventory: ({ onCloseFn }: { readonly onCloseFn: () => void }) =>
 			createReactElement(
 				"button",
 				{
 					"data-ui": "InventoryRouteClose",
-					onClick: onClose,
+					onClick: onCloseFn,
 					type: "button",
 				},
 				"Close",

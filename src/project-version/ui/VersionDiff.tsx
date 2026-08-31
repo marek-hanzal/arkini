@@ -6,7 +6,7 @@ import type {
 import type { ProjectCompatibilityDiffResult } from "~/project-version/type/ProjectCompatibility";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
-const formatValue = (value: unknown) => {
+const formatValueFn = (value: unknown) => {
 	if (value === undefined) return "—";
 	const json = JSON.stringify(value, null, 2);
 	return json ?? String(value);
@@ -41,7 +41,7 @@ const ValueChange = ({ change }: { readonly change: ProjectVersionValueChange })
 					Before
 				</div>
 				<pre className="max-h-44 overflow-auto whitespace-pre-wrap break-words text-xs text-muted">
-					{formatValue(change.before)}
+					{formatValueFn(change.before)}
 				</pre>
 			</div>
 			<div className="min-w-0">
@@ -49,7 +49,7 @@ const ValueChange = ({ change }: { readonly change: ProjectVersionValueChange })
 					After
 				</div>
 				<pre className="max-h-44 overflow-auto whitespace-pre-wrap break-words text-xs text-foreground">
-					{formatValue(change.after)}
+					{formatValueFn(change.after)}
 				</pre>
 			</div>
 		</div>

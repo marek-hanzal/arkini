@@ -64,7 +64,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 			const sourceExports = yield* Semaphore.make(1);
 			const sourceExportRoots = new WeakMap<WebContents, string>();
 			yield* Effect.sync(() => {
-				const runAuthorized = <Value>(
+				const runAuthorizedFn = <Value>(
 					event: IpcMainInvokeEvent,
 					operation: Effect.Effect<Value, never, never>,
 				) =>
@@ -73,18 +73,18 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							.assertTrustedIpcSenderFx(event)
 							.pipe(Effect.andThen(operation)),
 					);
-				const handle = <Value>(
+				const handleFn = <Value>(
 					channel: string,
-					run: (
+					runFx: (
 						event: IpcMainInvokeEvent,
 						candidate: unknown,
 					) => Effect.Effect<Value, never, never>,
 				) =>
 					ipcMain.handle(channel, (event, candidate) =>
-						runAuthorized(event, run(event, candidate)),
+						runAuthorizedFn(event, runFx(event, candidate)),
 					);
 
-				handle(ArkiniElectronApi.channels.editorStatus, () =>
+				handleFn(ArkiniElectronApi.channels.editorStatus, () =>
 					Effect.succeed(
 						ownership.type === "ready"
 							? ({
@@ -96,7 +96,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 								} as const),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorAwaitIdle, () =>
+				handleFn(ArkiniElectronApi.channels.editorAwaitIdle, () =>
 					(ownership.type === "ready"
 						? ownership.repository.awaitIdleFx
 						: Effect.void
@@ -117,7 +117,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						}),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectBuild, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectBuild, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"build-project",
 						ownership,
@@ -125,7 +125,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.buildProjectFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectBuildRead, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectBuildRead, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"read-project-build",
 						ownership,
@@ -133,7 +133,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.readProjectBuildFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"save-project-build",
 						ownership,
@@ -149,7 +149,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectList, () =>
+				handleFn(ArkiniElectronApi.channels.editorProjectList, () =>
 					executeEditorProjectRepositoryFx(
 						"list-projects",
 						ownership,
@@ -157,7 +157,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository) => repository.listProjectsFx,
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectRead, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectRead, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"read-project",
 						ownership,
@@ -165,7 +165,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.readProjectFx(projectId),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectRefresh, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectRefresh, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"refresh-project",
 						ownership,
@@ -173,7 +173,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.refreshProjectFx(projectId),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectCreate, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectCreate, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"create-project",
 						ownership,
@@ -181,7 +181,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.createProjectFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectDelete, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectDelete, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"delete-project",
 						ownership,
@@ -189,7 +189,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.deleteProjectFx(projectId),
 					),
 				);
-				handle(
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 					(event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -222,7 +222,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 									),
 						),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectImportJsonDirectory, (event) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectImportJsonDirectory, (event) =>
 					executeEditorProjectRepositoryFx(
 						"import-json-directory",
 						ownership,
@@ -234,7 +234,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectOpenExportDirectory, (event) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectOpenExportDirectory, (event) =>
 					executeEditorProjectRepositoryFx(
 						"open-export-directory",
 						ownership,
@@ -254,27 +254,31 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(_repository, root) => openEditorExportDirectoryFx(root),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectOpenDirectory, (_event, candidate) =>
-					executeEditorProjectRepositoryFx(
-						"open-project-directory",
-						ownership,
-						requestParser.parseProjectRootFx(candidate),
-						(repository, root) =>
-							openInvalidEditorProjectDirectoryFx({
-								repository,
-								root,
-							}),
-					),
+				handleFn(
+					ArkiniElectronApi.channels.editorProjectOpenDirectory,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"open-project-directory",
+							ownership,
+							requestParser.parseProjectRootFx(candidate),
+							(repository, root) =>
+								openInvalidEditorProjectDirectoryFx({
+									repository,
+									root,
+								}),
+						),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectReplaceConfig, (_event, candidate) =>
-					executeEditorProjectRepositoryFx(
-						"replace-config",
-						ownership,
-						requestParser.parseReplaceConfigFx(candidate),
-						(repository, request) => repository.replaceConfigFx(request),
-					),
+				handleFn(
+					ArkiniElectronApi.channels.editorProjectReplaceConfig,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"replace-config",
+							ownership,
+							requestParser.parseReplaceConfigFx(candidate),
+							(repository, request) => repository.replaceConfigFx(request),
+						),
 				);
-				handle(
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectReplaceResource,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -284,15 +288,17 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, request) => repository.replaceResourceFx(request),
 						),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectSaveResource, (_event, candidate) =>
-					executeEditorProjectRepositoryFx(
-						"save-resource",
-						ownership,
-						requestParser.parseSaveResourceFx(candidate),
-						(repository, request) => repository.saveResourceFx(request),
-					),
+				handleFn(
+					ArkiniElectronApi.channels.editorProjectSaveResource,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"save-resource",
+							ownership,
+							requestParser.parseSaveResourceFx(candidate),
+							(repository, request) => repository.saveResourceFx(request),
+						),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectUpsertItem, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectUpsertItem, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"upsert-item",
 						ownership,
@@ -300,7 +306,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.upsertItemFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorProjectDeleteItem, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorProjectDeleteItem, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"delete-item",
 						ownership,
@@ -308,7 +314,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.deleteItemFx(request),
 					),
 				);
-				handle(
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectDeleteResource,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -318,7 +324,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, request) => repository.deleteResourceFx(request),
 						),
 				);
-				handle(
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -328,7 +334,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, request) => repository.upsertResourcesFx(request),
 						),
 				);
-				handle(ArkiniElectronApi.channels.editorVersionStatus, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorVersionStatus, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"read-version-status",
 						ownership,
@@ -336,7 +342,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.readVersionStatusFx(projectId),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorVersionList, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorVersionList, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"list-versions",
 						ownership,
@@ -344,7 +350,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.listVersionsFx(projectId),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorVersionDiff, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorVersionDiff, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"diff-versions",
 						ownership,
@@ -352,7 +358,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.diffVersionsFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorVersionCommit, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorVersionCommit, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"create-version",
 						ownership,
@@ -360,7 +366,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.createVersionFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorVersionCheckout, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorVersionCheckout, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"checkout-version",
 						ownership,
@@ -368,7 +374,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.checkoutVersionFx(request),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorVersionTag, (_event, candidate) =>
+				handleFn(ArkiniElectronApi.channels.editorVersionTag, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"update-version-tag",
 						ownership,

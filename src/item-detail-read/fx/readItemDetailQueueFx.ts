@@ -55,7 +55,7 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies readItemDetailQueueFx.Result;
 
-const readPrimaryOutputItemId = (line: LineSchema.Type | undefined) => {
+const readPrimaryOutputItemIdFn = (line: LineSchema.Type | undefined) => {
 	const roll = line?.output?.set[0]?.roll[0];
 	if (roll === undefined) return undefined;
 	return roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
@@ -89,7 +89,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 			}).pipe(
 				Effect.map((status) => {
 					const line = lineById.get(job.lineId);
-					const outputItemId = readPrimaryOutputItemId(line);
+					const outputItemId = readPrimaryOutputItemIdFn(line);
 					return {
 						jobId: job.id,
 						lineId: job.lineId,
@@ -136,7 +136,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 					if (Result.isFailure(hardConditions)) {
 						status = "blocked-condition";
 						const line = lineById.get(request.lineId);
-						const outputItemId = readPrimaryOutputItemId(line);
+						const outputItemId = readPrimaryOutputItemIdFn(line);
 						return {
 							requestId: request.id,
 							lineId: request.lineId,
@@ -182,7 +182,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 				}
 			}
 			const line = lineById.get(request.lineId);
-			const outputItemId = readPrimaryOutputItemId(line);
+			const outputItemId = readPrimaryOutputItemIdFn(line);
 			return {
 				requestId: request.id,
 				lineId: request.lineId,

@@ -17,9 +17,9 @@ import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
 
 export namespace createAnimationDriverFx {
 	export interface Props {
-		readonly cancelFrame?: (frameId: number) => void;
+		readonly cancelFrameFn?: (frameId: number) => void;
 		readonly frames: DemandFrameLoop;
-		readonly requestFrame?: (callback: FrameRequestCallback) => number;
+		readonly requestFrameFn?: (callbackFn: FrameRequestCallback) => number;
 	}
 }
 
@@ -31,15 +31,15 @@ export namespace createAnimationDriverFx {
  */
 export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 	({
-		cancelFrame = cancelAnimationFrame,
+		cancelFrameFn = cancelAnimationFrame,
 		frames,
-		requestFrame = requestAnimationFrame,
+		requestFrameFn = requestAnimationFrame,
 	}: createAnimationDriverFx.Props) =>
 		Effect.sync((): AnimationDriver => {
 			const activeClosers = new Set<() => void>();
 			let closed = false;
 
-			const invalidate = () => RendererRuntime.runSync(frames.invalidateFx);
+			const invalidateFn = () => RendererRuntime.runSync(frames.invalidateFx);
 			const inactiveControl: AnimationControl = {
 				stopFx: Effect.void,
 			};
@@ -47,11 +47,11 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 				closeFx: Effect.void,
 				setTargetFx: () => Effect.void,
 			};
-			const disposeAll = (disposers: ReadonlyArray<() => void>, message: string) => {
+			const disposeAllFn = (disposers: ReadonlyArray<() => void>, message: string) => {
 				const failures: unknown[] = [];
-				for (const dispose of disposers) {
+				for (const disposeFn of disposers) {
 					try {
-						dispose();
+						disposeFn();
 					} catch (cause) {
 						failures.push(cause);
 					}
@@ -61,7 +61,7 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 
 			return {
 				createSpringFx: Effect.fn("AnimationDriver.createSpringFx")(
-					({ initialValue, onUpdate, options }) =>
+					({ initialValue, onUpdateFn, options }) =>
 						Effect.sync((): AnimationSpring => {
 							if (closed) return inactiveSpring;
 							const target = motionValue(initialValue);
@@ -69,7 +69,7 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 							try {
 								value = springValue<number>(target, options);
 							} catch (cause) {
-								disposeAll(
+								disposeAllFn(
 									[
 										() => target.destroy(),
 									],
@@ -78,20 +78,20 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 								throw cause;
 							}
 							let springClosed = false;
-							let removeChangeListener: () => void;
+							let removeChangeListenerFn: () => void;
 							try {
-								removeChangeListener = value.on("change", (latest) => {
+								removeChangeListenerFn = value.on("change", (latest) => {
 									if (closed || springClosed) return;
 									try {
-										onUpdate(latest);
+										onUpdateFn(latest);
 									} catch (cause) {
-										frames.reportCriticalFailure(cause);
+										frames.reportCriticalFailureFn(cause);
 									} finally {
-										invalidate();
+										invalidateFn();
 									}
 								});
 							} catch (cause) {
-								disposeAll(
+								disposeAllFn(
 									[
 										() => value.destroy(),
 										() => target.destroy(),
@@ -100,13 +100,13 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 								);
 								throw cause;
 							}
-							const close = () => {
+							const closeFn = () => {
 								if (springClosed) return;
 								springClosed = true;
-								activeClosers.delete(close);
-								disposeAll(
+								activeClosers.delete(closeFn);
+								disposeAllFn(
 									[
-										removeChangeListener,
+										removeChangeListenerFn,
 										// springValue defers retargeting to Motion's post-render step.
 										// Settling first makes an already queued callback a no-op after teardown.
 										() => value.jump(target.get()),
@@ -116,9 +116,9 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 									"Pixi spring cleanup failed.",
 								);
 							};
-							activeClosers.add(close);
+							activeClosers.add(closeFn);
 							return {
-								closeFx: Effect.sync(close),
+								closeFx: Effect.sync(closeFn),
 								setTargetFx: Effect.fnUntraced(function* (nextValue) {
 									if (closed || springClosed) return;
 									target.set(nextValue);
@@ -134,8 +134,8 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 						delayMs = 0,
 						durationMs,
 						from,
-						onComplete,
-						onUpdate,
+						onCompleteFn,
+						onUpdateFn,
 						repeat,
 						to,
 					}) =>
@@ -148,7 +148,7 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 							} = {
 								state: "active",
 							};
-							const stop = () => {
+							const stopFn = () => {
 								if (
 									playback.state === "completed" ||
 									playback.state === "stopped"
@@ -156,15 +156,15 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 									return;
 								}
 								playback.state = "stopped";
-								activeClosers.delete(stop);
+								activeClosers.delete(stopFn);
 								if (completionFrameId !== null) {
-									cancelFrame(completionFrameId);
+									cancelFrameFn(completionFrameId);
 									completionFrameId = null;
 								} else {
 									controls?.stop();
 								}
 							};
-							activeClosers.add(stop);
+							activeClosers.add(stopFn);
 							try {
 								const timing =
 									curve.kind === "spring"
@@ -188,37 +188,37 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 									onUpdate: (latest) => {
 										if (closed || playback.state !== "active") return;
 										try {
-											onUpdate(latest);
+											onUpdateFn(latest);
 										} catch (cause) {
-											frames.reportCriticalFailure(cause);
+											frames.reportCriticalFailureFn(cause);
 										} finally {
-											invalidate();
+											invalidateFn();
 										}
 									},
 									onComplete: () => {
 										if (closed || playback.state !== "active") return;
 										playback.state = "completing";
-										completionFrameId = requestFrame(() => {
+										completionFrameId = requestFrameFn(() => {
 											completionFrameId = null;
 											if (closed || playback.state !== "completing") return;
 											playback.state = "completed";
-											activeClosers.delete(stop);
+											activeClosers.delete(stopFn);
 											try {
-												onComplete?.();
+												onCompleteFn?.();
 											} catch (cause) {
-												frames.reportCriticalFailure(cause);
+												frames.reportCriticalFailureFn(cause);
 											}
 										});
 									},
 								});
 							} catch (cause) {
 								playback.state = "stopped";
-								activeClosers.delete(stop);
+								activeClosers.delete(stopFn);
 								throw cause;
 							}
 							if (playback.state === "stopped") controls.stop();
 							return {
-								stopFx: Effect.sync(stop),
+								stopFx: Effect.sync(stopFn),
 							};
 						}),
 				),
@@ -226,7 +226,7 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 					if (closed) return;
 					closed = true;
 					try {
-						disposeAll(
+						disposeAllFn(
 							[
 								...activeClosers,
 							],

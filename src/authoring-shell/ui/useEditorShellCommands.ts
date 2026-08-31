@@ -29,14 +29,14 @@ export namespace useEditorShellCommands {
 
 	export interface Output {
 		readonly exit: {
-			readonly close: () => void;
+			readonly closeFn: () => void;
 			readonly disabled: boolean;
 			readonly pending: boolean;
 		};
 		readonly refresh: {
 			readonly disabled: boolean;
 			readonly pending: boolean;
-			readonly refresh: () => void;
+			readonly refreshFn: () => void;
 			readonly tooltip: string;
 		};
 	}
@@ -48,44 +48,44 @@ export const useEditorShellCommands = ({
 }: useEditorShellCommands.Props): useEditorShellCommands.Output => {
 	const owner = useEditorUnsavedChangesOwner();
 	const router = useRouter();
-	const waitForProjectWrites = useAtomSet(waitForEditorProjectWritesCommandAtom, {
+	const waitForProjectWritesFn = useAtomSet(waitForEditorProjectWritesCommandAtom, {
 		mode: "promise",
 	});
-	const [exitPending, setExitPending] = useState(false);
+	const [exitPending, setExitPendingFn] = useState(false);
 	const refresh = useEditorProjectRefreshController({
 		blocked: exitPending,
 		projectId,
 	});
 
-	useEffect(() => window.arkini.lifecycle.onCloseFailed(() => setExitPending(false)), []);
+	useEffect(() => window.arkini.lifecycle.onCloseFailedFn(() => setExitPendingFn(false)), []);
 
-	const close = async () => {
+	const closeFn = async () => {
 		if (exitPending || refresh.pending) return;
-		setExitPending(true);
+		setExitPendingFn(true);
 		try {
-			if (!(await owner.requestLeave("/main-menu"))) {
-				setExitPending(false);
+			if (!(await owner.requestLeaveFn("/main-menu"))) {
+				setExitPendingFn(false);
 				return;
 			}
-			await waitForProjectWrites(undefined);
+			await waitForProjectWritesFn(undefined);
 			await router.navigate({
 				to: "/main-menu",
 			});
 		} catch {
-			setExitPending(false);
+			setExitPendingFn(false);
 		}
 	};
 
 	return {
 		exit: {
-			close: () => void close(),
+			closeFn: () => void closeFn(),
 			disabled: exitPending || refresh.pending,
 			pending: exitPending,
 		},
 		refresh: {
 			disabled: refresh.disabled,
 			pending: refresh.pending,
-			refresh: refresh.refresh,
+			refreshFn: refresh.refreshFn,
 			tooltip: refresh.tooltip,
 		},
 	};

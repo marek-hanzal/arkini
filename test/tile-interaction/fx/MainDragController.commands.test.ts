@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import {
 	createItem,
 	flushMicrotasks,
@@ -45,7 +45,7 @@ const redirectCases = [
 			},
 			source: storedSource,
 			storedQuantity: 1,
-		} satisfies runTileDropAtom.Result,
+		} satisfies DropItemResult,
 		expected: [
 			{
 				sourceActorId: item.id,
@@ -81,7 +81,7 @@ const redirectCases = [
 				previousQuantity: 1,
 				previousRevision: "revision:tree:1",
 			},
-		} satisfies runTileDropAtom.Result,
+		} satisfies DropItemResult,
 		expected: [
 			{
 				sourceActorId: item.id,
@@ -113,7 +113,7 @@ const redirectCases = [
 				previousQuantity: 3,
 			},
 			storedQuantity: 1,
-		} satisfies runTileDropAtom.Result,
+		} satisfies DropItemResult,
 		expected: [],
 	},
 ] as const;

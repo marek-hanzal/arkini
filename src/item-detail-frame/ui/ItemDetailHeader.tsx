@@ -31,7 +31,7 @@ export const ItemDetailHeader = ({
 	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
 	readonly stale: boolean;
 }) => {
-	const closeItemDetail = useCloseItemDetail();
+	const closeItemDetailFn = useCloseItemDetail();
 	const IdentityRenderer = renderIdentity;
 	const identityNode = (
 		<ItemIdentity
@@ -68,7 +68,7 @@ export const ItemDetailHeader = ({
 				className="grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"
 				data-ui="ItemDetailCloseButton"
 				disabled={disabled}
-				onClick={() => closeItemDetail()}
+				onClick={() => closeItemDetailFn()}
 			>
 				<X className="size-10" />
 			</button>

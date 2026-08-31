@@ -20,7 +20,7 @@ interface FeedbackLayer {
 const enterDurationMs = 130;
 const exitDurationMs = 180;
 
-const readTargetKey = (
+const readTargetKeyFn = (
 	color: number,
 	slot: NonNullable<Parameters<DropFeedback["renderFx"]>[0]["slot"]>,
 	surface: SurfaceLayout,
@@ -45,7 +45,7 @@ interface DrawDropFeedbackProps {
 	readonly surface: SurfaceLayout | null;
 }
 
-const drawRoundedOuterSlotPath = (
+const drawRoundedOuterSlotPathFn = (
 	graphics: Graphics,
 	surface: SurfaceLayout,
 	slot: NonNullable<DrawDropFeedbackProps["slot"]>,
@@ -92,7 +92,7 @@ const drawDropFeedbackFx = Effect.fn("drawDropFeedbackFx")(function* ({
 	graphics.clear();
 	if (slot === null || surface === null) return;
 	const radius = readSurfaceRadiusFn(surface);
-	drawRoundedOuterSlotPath(graphics, surface, slot, radius)
+	drawRoundedOuterSlotPathFn(graphics, surface, slot, radius)
 		.fill({
 			alpha: 0.16,
 			color,
@@ -167,14 +167,14 @@ export const createDropFeedbackFx = Effect.fn("createDropFeedbackFx")(
 					const control = yield* animationDriver.startTweenFx({
 						durationMs,
 						from: layer.graphics.alpha,
-						onComplete: () => {
+						onCompleteFn: () => {
 							if (closed || layer.generation !== generation) return;
 							completedSynchronously = true;
 							layer.control = null;
 							layer.graphics.alpha = to;
 							if (clearOnComplete) layer.graphics.clear();
 						},
-						onUpdate: (alpha) => {
+						onUpdateFn: (alpha) => {
 							if (closed || layer.generation !== generation) return;
 							layer.graphics.alpha = alpha;
 						},
@@ -206,7 +206,7 @@ export const createDropFeedbackFx = Effect.fn("createDropFeedbackFx")(
 							return;
 						}
 
-						const nextKey = readTargetKey(color, slot, surface);
+						const nextKey = readTargetKeyFn(color, slot, surface);
 						const current = layers[currentIndex];
 						if (currentKey === nextKey) {
 							yield* drawDropFeedbackFx({

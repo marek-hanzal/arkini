@@ -66,8 +66,8 @@ export const createRegisteredIpcHarness = async () => {
 				),
 	);
 	const trustedRenderer: TrustedRenderer = {
-		isTrustedUrl: () => true,
-		isTrustedIpcSender: () => true,
+		isTrustedUrlFn: () => true,
+		isTrustedIpcSenderFn: () => true,
 		assertTrustedIpcSenderFx,
 		registerWindowFx: () => Effect.void,
 	};

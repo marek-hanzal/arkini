@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 

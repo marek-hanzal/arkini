@@ -1,11 +1,11 @@
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
-import type { InputCapacityExceededIssueSchema } from "~/production-input/schema/check/InputCapacityExceededIssueSchema";
-import type { InputLineMissingIssueSchema } from "~/production-input/schema/check/InputLineMissingIssueSchema";
-import type { InputOwnerMissingIssueSchema } from "~/production-input/schema/check/InputOwnerMissingIssueSchema";
-import type { InputSelectorMismatchIssueSchema } from "~/production-input/schema/check/InputSelectorMismatchIssueSchema";
-import type { InputSlotInvalidIssueSchema } from "~/production-input/schema/check/InputSlotInvalidIssueSchema";
+import type { InputCapacityExceededIssueSchema } from "~/production-input/schema/InputCapacityExceededIssueSchema";
+import type { InputLineMissingIssueSchema } from "~/production-input/schema/InputLineMissingIssueSchema";
+import type { InputOwnerMissingIssueSchema } from "~/production-input/schema/InputOwnerMissingIssueSchema";
+import type { InputSelectorMismatchIssueSchema } from "~/production-input/schema/InputSelectorMismatchIssueSchema";
+import type { InputSlotInvalidIssueSchema } from "~/production-input/schema/InputSlotInvalidIssueSchema";
 import type { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import type { LineInputClosedIssueSchema } from "~/production-line/schema/check/LineInputClosedIssueSchema";

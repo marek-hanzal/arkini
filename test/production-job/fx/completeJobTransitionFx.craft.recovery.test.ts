@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";

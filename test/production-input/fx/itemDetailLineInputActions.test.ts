@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
-import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
-import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
-import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
+import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
+import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";

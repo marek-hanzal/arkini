@@ -28,7 +28,7 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
-import { checkRuntimeInputLocationsFn } from "~/production-input/check/checkRuntimeInputLocationsFn";
+import { checkRuntimeInputLocationsFn } from "~/production-input/fn/checkRuntimeInputLocationsFn";
 import { checkRuntimeJobsFn } from "~/production-job/check/checkRuntimeJobsFn";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import { checkRuntimeDefaultLinesFn } from "~/production-line/fn/checkRuntimeDefaultLinesFn";

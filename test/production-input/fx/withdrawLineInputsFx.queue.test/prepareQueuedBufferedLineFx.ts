@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

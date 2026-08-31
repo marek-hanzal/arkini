@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { MaterialSchema } from "~/production-input/schema/MaterialSchema";
-import { runtimeInputTestItem } from "~test/production-input/fx/support/inputTestItems";
+import { runtimeInputTestItem } from "~test/production-input/support/inputTestItems";
 
 const input = MaterialSchema.parse({
 	type: "materials",

@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
-import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
+import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
+import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -12,7 +12,7 @@ import {
 	ownerItemId,
 	prepareQueuedBufferedLineFx,
 	queuedInputTestConfig,
-} from "~test/production-input/write/withdrawLineInputsFx.queue.test/prepareQueuedBufferedLineFx";
+} from "~test/production-input/fx/withdrawLineInputsFx.queue.test/prepareQueuedBufferedLineFx";
 
 const assertPreservedBlockedQueue = ({
 	after,

@@ -3,7 +3,7 @@ import { Array, Effect } from "effect";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isInputRuntimeItemFn } from "~/production-input/read/fn/isInputRuntimeItemFn";
+import { isInputRuntimeItemFn } from "~/production-input/fn/isInputRuntimeItemFn";
 import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 
 export namespace withdrawLineInputsFx {

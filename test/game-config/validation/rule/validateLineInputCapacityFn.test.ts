@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import {
 	createLine,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createEditorAcquisitionGraphFn } from "~/flow/fn/createEditorAcquisitionGraphFn";
-import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import {
 	createProducerItem,

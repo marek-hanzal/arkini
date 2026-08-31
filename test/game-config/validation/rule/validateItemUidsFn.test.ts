@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import {
 	createRootSource,

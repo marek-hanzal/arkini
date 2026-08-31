@@ -5,11 +5,11 @@ import { FileSystem, Path } from "effect";
 import { Effect, Exit } from "effect";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { compileGameDirectoryFx } from "~/game-config/compiler/fx/compileGameDirectoryFx";
+import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
 import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
-import { assertGameConfigValidFx } from "~/game-config/compiler/fx/assertGameConfigValidFx";
+import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { encodeFx } from "./encodeFx";
 import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";

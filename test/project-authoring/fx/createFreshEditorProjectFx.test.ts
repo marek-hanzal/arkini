@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { validateArkpackPayloadFx } from "~/arkpack/renderer/validateArkpackPayloadFx";
+import { validateArkpackPayloadFx } from "~/arkpack-admission/fx/validateArkpackPayloadFx";
 import { createFreshEditorProjectFx } from "~/project-authoring/fx/createFreshEditorProjectFx";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import {

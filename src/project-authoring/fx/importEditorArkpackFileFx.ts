@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import {
 	type EditorArkpackFileInput,
 	readSelectedArkpackFileFx,
-} from "~/arkpack/renderer/readSelectedArkpackFileFx";
+} from "~/arkpack-admission/fx/readSelectedArkpackFileFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
 

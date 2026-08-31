@@ -1,5 +1,5 @@
 import type { MouseEventHandler, PropsWithChildren, ReactNode } from "react";
-import { CursorClassName, type CursorSemantic } from "~/ui/cursor/CursorSemantic";
+import { CursorClassName, type CursorSemantic } from "~/ui/type/CursorSemantic";
 import { LauncherHero } from "~/launcher/ui/LauncherHero";
 import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 

@@ -1,5 +1,5 @@
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { EditorItemSectionDescriptor } from "~/item-authoring/type/EditorItemSection";
 

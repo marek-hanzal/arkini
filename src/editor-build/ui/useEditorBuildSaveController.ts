@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";
 
 const readErrorMessageFn = (error: unknown) =>

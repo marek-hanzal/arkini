@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 
-import { ItemIdentity } from "~/ui/item/ItemIdentity";
+import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 
 interface ItemDetailHeaderIdentity {

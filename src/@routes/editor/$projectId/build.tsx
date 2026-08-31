@@ -6,7 +6,7 @@ import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArti
 import { EditorBuildDiagnostics } from "~/editor-build/ui/EditorBuildDiagnostics";
 import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajorUpdateDialog";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
-import { Button, PrimaryButton } from "~/ui/button/Button";
+import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorProjectExport } from "~/project-authoring/ui/EditorProjectExport";

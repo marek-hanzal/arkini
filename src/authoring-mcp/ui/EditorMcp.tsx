@@ -6,7 +6,7 @@ import {
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServer } from "./EditorMcpServer";
 import { EditorMcpSettings } from "./EditorMcpSettings";

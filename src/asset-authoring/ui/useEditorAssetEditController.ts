@@ -12,7 +12,7 @@ import { IdSchema } from "~/game-config/schema/IdSchema";
 import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 

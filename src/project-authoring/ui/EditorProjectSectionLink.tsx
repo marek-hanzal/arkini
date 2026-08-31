@@ -1,4 +1,4 @@
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { EditorProjectSectionDescriptor } from "~/project-authoring/type/EditorProjectSections";
 

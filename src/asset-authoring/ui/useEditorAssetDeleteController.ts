@@ -12,7 +12,7 @@ import {
 	readEditorAssetDeleteBlockersFn,
 	type EditorAssetDeleteBlocker,
 } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 interface DeleteEditorAssetCommandProps {
 	readonly expectedRevision: number;

@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 
 /** Opens the production form with one authored line selected. */
 export const EditorProductionLineEditLink = ({

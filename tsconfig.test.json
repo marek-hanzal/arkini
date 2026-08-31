@@ -96,6 +96,7 @@
 		"src/game-shell",
 		"src/chatgpt-asset-authoring",
 		"src/authoring-form",
+		"src/editor-control",
 		"src/ui",
 		"test",
 		"vitest.config.ts"

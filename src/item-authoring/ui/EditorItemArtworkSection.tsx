@@ -2,12 +2,12 @@ import { GalleryHorizontalEnd, Layers2, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { Button } from "~/ui/button/Button";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { Button } from "~/ui/ui/Button";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
 import { EditorItemArtworkTimeline } from "~/item-authoring/ui/EditorItemArtworkTimeline";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";

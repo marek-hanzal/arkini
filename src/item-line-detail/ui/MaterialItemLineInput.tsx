@@ -13,7 +13,7 @@ import {
 	type ItemLineInputState,
 } from "~/item-line-detail/ui/ItemLineInputFrame";
 import { MaterialInputWithdraw } from "~/item-line-detail/ui/ItemLineInputWithdrawal";
-import { LinkButton } from "~/ui/button/LinkButton";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 type MaterialInput = Extract<

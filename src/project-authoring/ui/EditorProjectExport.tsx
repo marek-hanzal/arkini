@@ -8,8 +8,8 @@ import { EditorSourceExportSchema } from "../../../electron/contract/editor/Edit
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { Button, PrimaryButton } from "~/ui/button/Button";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const exportProjectSourceAtom = Atom.family((projectId: string) =>
 	Atom.fn(() =>

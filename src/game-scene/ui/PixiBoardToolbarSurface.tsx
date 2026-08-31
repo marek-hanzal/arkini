@@ -15,7 +15,7 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
-import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
+import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 
 type MainRuntime = Effect.Success<ReturnType<typeof createMainRuntimeFx>>;

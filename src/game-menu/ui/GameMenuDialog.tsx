@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 import type { Game } from "~/installed-game/type/Game";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
-import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
+import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 import { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";
 import { useGameMenuFocus } from "~/game-menu/ui/useGameMenuFocus";
 import { gameMenuTransition, useGameMenuMotion } from "~/game-menu/ui/useGameMenuMotion";

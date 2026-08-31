@@ -5,7 +5,7 @@ import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLi
 import { DetailFact, DetailSection } from "~/item-authoring/ui/EditorItemDetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/EditorItemOutputDetail";
 import { EditorProductionLineDetail } from "~/item-authoring/ui/EditorProductionLineDetail";
-import { Status } from "~/ui/status/Status";
+import { Status } from "~/ui/ui/Status";
 
 /** Dispatches production-capable lines, temporary lifetime, or the disabled contract. */
 export const EditorItemProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {

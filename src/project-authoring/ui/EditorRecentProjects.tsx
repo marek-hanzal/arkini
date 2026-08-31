@@ -5,7 +5,7 @@ import type {
 	EditorProjectOwnership,
 } from "~/project-authoring/schema/EditorProjectCandidateSchema";
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
-import { Button, ButtonLink } from "~/ui/button/Button";
+import { Button, ButtonLink } from "~/ui/ui/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",

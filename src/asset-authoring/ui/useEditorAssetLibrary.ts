@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
-import { useFuseSearch } from "~/ui/search/useFuseSearch";
+import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
 interface UseEditorAssetLibraryProps {
 	readonly filter: "all" | "unused";

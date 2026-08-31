@@ -6,7 +6,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";

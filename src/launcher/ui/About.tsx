@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
-import { BackButton } from "~/ui/button/BackButton";
+import { useExclusiveAction } from "~/ui/ui/useExclusiveAction";
+import { BackButton } from "~/ui/ui/BackButton";
 
 /** Renders project and authorship credits for the normalized About page. */
 export const About = () => {

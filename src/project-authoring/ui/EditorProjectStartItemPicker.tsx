@@ -1,6 +1,6 @@
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProjectStartItemPickerController } from "~/project-authoring/ui/useEditorProjectStartItemPickerController";
-import { ItemSpotlight } from "~/ui/search/ItemSpotlight";
+import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
 
 interface EditorProjectStartItemPickerProps
 	extends useEditorProjectStartItemPickerController.Props {}

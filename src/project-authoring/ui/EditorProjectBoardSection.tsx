@@ -1,10 +1,10 @@
 import { useStore } from "@tanstack/react-form";
 import { useState } from "react";
 
-import { Button } from "~/ui/button/Button";
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
-import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import { Button } from "~/ui/ui/Button";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorProjectStartGrid } from "~/project-authoring/ui/EditorProjectStartGrid";
 import { useEditorProjectFormSession } from "~/project-authoring/ui/EditorProjectFormContext";
 

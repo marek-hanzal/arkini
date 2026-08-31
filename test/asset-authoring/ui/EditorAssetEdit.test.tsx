@@ -42,7 +42,7 @@ vi.mock("~/authoring-shell/ui/EditorSectionPage", () => ({
 	}) => createElement("div", null, tabs, children),
 }));
 
-vi.mock("~/ui/form/EditorFormContent", () => ({
+vi.mock("~/editor-control/ui/EditorFormContent", () => ({
 	EditorFormContent: ({ children }: { readonly children?: ReactNode }) => children,
 }));
 

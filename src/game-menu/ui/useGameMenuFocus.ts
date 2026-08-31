@@ -1,7 +1,7 @@
 import { type RefObject, useEffect, useRef } from "react";
 
 import type { GameMenuPhase } from "~/game-menu/type/GameMenuControl";
-import { overlayFocusableSelector } from "~/ui/focus/overlayFocusableSelector";
+import { overlayFocusableSelector } from "~/ui/constant/overlayFocusableSelector";
 
 export namespace useGameMenuFocus {
 	export interface Props {

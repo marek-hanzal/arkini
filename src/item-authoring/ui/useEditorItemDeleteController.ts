@@ -12,7 +12,7 @@ import { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorIt
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { deleteEditorItemFx } from "~/item-authoring/fx/deleteEditorItemFx";
 import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const deleteEditorItemCommandAtom = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) =>

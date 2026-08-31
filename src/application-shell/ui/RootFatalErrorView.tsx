@@ -7,8 +7,8 @@ import { openDiagnosticDirectoryFx } from "~/application-diagnostics/fx/openDiag
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { Button, DangerButton } from "~/ui/button/Button";
-import { Canvas } from "~/ui/canvas/Canvas";
+import { Button, DangerButton } from "~/ui/ui/Button";
+import { Canvas } from "~/ui/ui/Canvas";
 
 interface RootFatalErrorViewProps {
 	readonly error: unknown;

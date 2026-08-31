@@ -5,7 +5,7 @@ import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSectio
 import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorItemSectionForPathFn";
 import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 type EditorGameDiagnostic = GameDiagnosticSchema.Type;

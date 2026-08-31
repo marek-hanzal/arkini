@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorItemEstimateIndexEntry } from "~/estimate/type/EditorItemEstimateIndex";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 

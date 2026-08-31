@@ -5,11 +5,11 @@ import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormCont
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { EditorLineFields } from "~/production-line-authoring/ui/EditorLineField";
 import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
-import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 
 interface EditorProductionFieldValues {
 	readonly maxQueueSize?: number;

@@ -6,7 +6,7 @@ import {
 	useState,
 } from "react";
 
-import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
+import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import type {
 	EditorProjectStartGridCell,
 	EditorProjectStartGridPosition,

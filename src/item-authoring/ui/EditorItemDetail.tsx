@@ -2,7 +2,7 @@ import { LogIn, LogOut, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";

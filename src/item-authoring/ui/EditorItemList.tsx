@@ -4,10 +4,10 @@ import { useMemo } from "react";
 
 import { searchEditorItemsFn } from "~/item-authoring/fn/searchEditorItemsFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { PrimaryButtonLink } from "~/ui/button/Button";
+import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorItemListRow } from "~/item-authoring/ui/EditorItemListRow";
-import { Status } from "~/ui/status/Status";
+import { Status } from "~/ui/ui/Status";
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const EditorItemList = ({

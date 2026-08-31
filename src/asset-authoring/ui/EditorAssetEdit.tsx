@@ -1,15 +1,15 @@
 import { FileQuestion } from "lucide-react";
 import { type DragEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { PrimaryButton } from "~/ui/button/Button";
+import { PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import { editorInputClassName } from "~/ui/form/EditorInputClassName";
-import { EditorFormContent } from "~/ui/form/EditorFormContent";
+import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
+import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";
-import { Status } from "~/ui/status/Status";
+import { Status } from "~/ui/ui/Status";
 
 interface EditorAssetEditProps extends useEditorAssetEditController.Props {}
 

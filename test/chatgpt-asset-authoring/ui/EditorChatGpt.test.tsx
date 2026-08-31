@@ -62,7 +62,7 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	};
 });
 
-vi.mock("~/ui/reactivity/readSettledAsyncResultErrorFx", async () => {
+vi.mock("~/ui/fx/readSettledAsyncResultErrorFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),

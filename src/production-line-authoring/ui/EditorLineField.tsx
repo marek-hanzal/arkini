@@ -2,10 +2,10 @@ import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "l
 
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
-import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorLineInputsControl } from "~/production-line-authoring/ui/EditorLineInputsControl";
 import { EditorOutputControl } from "~/production-line-authoring/ui/EditorOutputControl";
 import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";

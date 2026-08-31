@@ -1,9 +1,9 @@
 import { PackagePlus } from "lucide-react";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
-import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
 import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";

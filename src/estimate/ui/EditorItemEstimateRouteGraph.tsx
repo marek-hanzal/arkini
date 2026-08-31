@@ -3,7 +3,7 @@ import type { EstimateRouteStep } from "~/estimate-projection/type/EstimateProje
 import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 
 const formatQuantityFn = (quantity: number) =>

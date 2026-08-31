@@ -39,7 +39,7 @@ vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
 		}),
 }));
 
-vi.mock("~/ui/button/Button", () => {
+vi.mock("~/ui/ui/Button", () => {
 	const Button = ({ children, cursorIntent: _cursorIntent, ...props }: Record<string, unknown>) =>
 		createElement("button", props, children as ReactNode);
 	return {

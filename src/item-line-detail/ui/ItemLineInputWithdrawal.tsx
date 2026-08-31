@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { useItemLineInputWithdrawalController } from "~/item-line-detail/ui/useItemLineInputWithdrawalController";
 import { itemDetailBadgeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
-import { LinkButton } from "~/ui/button/LinkButton";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 export interface ItemLineInputsWithdrawAction {
 	readonly disabled: boolean;

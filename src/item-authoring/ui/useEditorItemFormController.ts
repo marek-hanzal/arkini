@@ -20,7 +20,7 @@ import type {
 } from "~/item-authoring/type/EditorItemSection";
 import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorItemSectionForPathFn";
 import { EditorItemMergeDraftDefault } from "~/item-authoring/ui/EditorItemMergeDraftDefault";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 

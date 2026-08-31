@@ -5,11 +5,11 @@ import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/Ed
 import { EditorQuantityFields } from "~/production-line-authoring/ui/EditorQuantityControl";
 import { EditorBoardDistanceControl } from "~/production-line-authoring/ui/EditorBoardDistanceControl";
 import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
-import { Button } from "~/ui/button/Button";
-import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { Button } from "~/ui/ui/Button";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
+import { Tooltip } from "~/ui/ui/Tooltip";
 
 const inputTypeOptions = [
 	{

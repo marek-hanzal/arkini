@@ -14,12 +14,12 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
-import { Status } from "~/ui/status/Status";
+import { Status } from "~/ui/ui/Status";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
 	readonly onFilterChange: (filter: useEditorAssetManagerController.Filter) => void;

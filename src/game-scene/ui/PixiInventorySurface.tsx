@@ -11,7 +11,7 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { createInventoryRuntimeFx } from "~/game-scene/fx/createInventoryRuntimeFx";
-import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
+import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 
 type InventoryRuntime = Effect.Success<ReturnType<typeof createInventoryRuntimeFx>>;

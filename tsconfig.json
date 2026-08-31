@@ -110,6 +110,7 @@
 		"src/game-shell",
 		"src/chatgpt-asset-authoring",
 		"src/authoring-form",
+		"src/editor-control",
 		"src/ui",
 		"src/@routes",
 		"src/main.tsx",

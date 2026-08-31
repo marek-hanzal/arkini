@@ -1,7 +1,7 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorItemFx";
-import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
+import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
 
 const EditorItemDeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (

@@ -1,7 +1,7 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 
 /** Presents one saved item and owns its type-filter affordance. */

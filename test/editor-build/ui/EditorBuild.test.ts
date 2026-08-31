@@ -111,7 +111,7 @@ vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 	EditorHistoryBackButton: () => createElement("span"),
 }));
 
-vi.mock("~/ui/button/Button", () => ({
+vi.mock("~/ui/ui/Button", () => ({
 	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
 	PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>

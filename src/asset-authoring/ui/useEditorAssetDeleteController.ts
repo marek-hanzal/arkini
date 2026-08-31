@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
-import { deleteEditorAssetFx } from "~/asset-authoring/session/deleteEditorAssetFx";
+import { deleteEditorAssetFx } from "~/asset-authoring/fx/deleteEditorAssetFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";

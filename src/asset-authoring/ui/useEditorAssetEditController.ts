@@ -4,8 +4,8 @@ import { Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useRef, useState } from "react";
 
-import { editEditorAssetFx } from "~/asset-authoring/session/editEditorAssetFx";
-import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
+import { editEditorAssetFx } from "~/asset-authoring/fx/editEditorAssetFx";
+import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { IdSchema } from "~/game-config/schema/IdSchema";

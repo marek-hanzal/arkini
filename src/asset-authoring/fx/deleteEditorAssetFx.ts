@@ -9,7 +9,7 @@ interface DeleteEditorAssetProps {
 	readonly resourceId: string;
 }
 
-/** Deletes one unreferenced asset and publishes the canonical project snapshot. */
+/** Deletes one unreferenced Editor asset and publishes the canonical project snapshot. */
 export const deleteEditorAssetFx = Effect.fn("deleteEditorAssetFx")(function* (
 	props: DeleteEditorAssetProps,
 ) {

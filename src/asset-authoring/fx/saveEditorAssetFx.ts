@@ -5,7 +5,7 @@ import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProj
 import {
 	type EditorAssetFileInput,
 	validateEditorAssetFileFx,
-} from "~/asset-authoring/validation/validateEditorAssetFileFx";
+} from "~/asset-authoring/fx/validateEditorAssetFileFx";
 
 interface SaveEditorAssetProps {
 	readonly expectedRevision: number;

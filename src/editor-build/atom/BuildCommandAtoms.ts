@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { installBuiltEditorArkpackFx } from "~/editor-build/fx/installBuiltEditorArkpackFx";
@@ -35,7 +35,7 @@ export const BuildCommandAtoms = RendererRuntime.runSync(
 					request: {
 						readonly artifact: EditorProjectBuildSchema.Type;
 						readonly confirmation?: EditorBuildMajorUpdateConfirmation;
-						readonly targetVersion: ArkpackVersionSchema.Type;
+						readonly targetVersion: GameVersionSchema.Type;
 					},
 					get,
 				) => {

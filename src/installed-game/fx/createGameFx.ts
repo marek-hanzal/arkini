@@ -13,7 +13,7 @@ import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
-import { readArkpackVersionFn } from "~/game-version/fn/readArkpackVersionFn";
+import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
 
 export namespace createGameFx {
 	export interface Props {
@@ -60,8 +60,8 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					}),
 			),
 		);
-		const arkpackVersion = readArkpackVersionFn(loaded.payload.version);
-		const saveVersion = readArkpackVersionFn(saved.version);
+		const arkpackVersion = readGameVersionMajorFn(loaded.payload.version);
+		const saveVersion = readGameVersionMajorFn(saved.version);
 		if (saveVersion.major !== arkpackVersion.major) {
 			return yield* Effect.fail(
 				new GameSaveBootstrapError({

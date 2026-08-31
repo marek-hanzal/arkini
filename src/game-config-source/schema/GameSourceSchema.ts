@@ -4,7 +4,7 @@ import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
-import { RolesSchema } from "~/game-config-resource/schema/RolesSchema";
+import { RolesSchema } from "~/game-config/schema/RolesSchema";
 
 /**
  * Internal assembly value shared by the canonical `game.json` root and

@@ -2,10 +2,10 @@ import { encode } from "@msgpack/msgpack";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import type { ArkiniSaveSchema } from "~/game-persistence/schema/ArkiniSaveSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 interface Props {
-	readonly version: ArkpackVersionSchema.Type;
+	readonly version: GameVersionSchema.Type;
 	readonly state: StateSchema.Type;
 }
 

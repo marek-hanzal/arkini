@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 /** Complete portable project root; item definitions live in separate files. */
 export const GameFileSchema = GameConfigSchema.omit({
@@ -10,7 +10,7 @@ export const GameFileSchema = GameConfigSchema.omit({
 })
 	.extend({
 		$schema: z.literal(GameProjectGameSchemaReference),
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 	})
 	.meta({
 		id: "GameFileSchema",

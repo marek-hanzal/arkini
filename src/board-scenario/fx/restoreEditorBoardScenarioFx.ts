@@ -8,7 +8,7 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
-import { readArkpackVersionFn } from "~/game-version/fn/readArkpackVersionFn";
+import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
 
 export namespace restoreEditorBoardScenarioFx {
 	export type Result =
@@ -56,8 +56,8 @@ export const restoreEditorBoardScenarioFx = Effect.fn("restoreEditorBoardScenari
 					new Error("Scenario metadata does not match its save payload."),
 				);
 			}
-			const projectVersion = readArkpackVersionFn(project.version);
-			const saveVersion = readArkpackVersionFn(saved.version);
+			const projectVersion = readGameVersionMajorFn(project.version);
+			const saveVersion = readGameVersionMajorFn(saved.version);
 			if (saveVersion.major !== projectVersion.major) {
 				return yield* Effect.fail(
 					new Error(

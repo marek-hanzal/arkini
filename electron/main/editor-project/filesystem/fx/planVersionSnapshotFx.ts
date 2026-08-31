@@ -7,7 +7,7 @@ import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVers
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { createVersionFingerprint, hashVersionBytes, hashVersionJson } from "./VersionFingerprint";
 
 const sortedRecord = (
@@ -26,7 +26,7 @@ const sortedRecord = (
 
 export namespace planVersionSnapshotFx {
 	export interface Props {
-		readonly arkpack: ArkpackVersionSchema.Type;
+		readonly arkpack: GameVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;

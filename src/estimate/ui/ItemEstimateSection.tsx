@@ -235,7 +235,7 @@ export const ItemEstimateSection = ({ itemId }: { readonly itemId: string }) => 
 			) : null}
 			{state.status === "ready" ? (
 				<ItemEstimateResult
-					config={project.config}
+					config={state.config}
 					estimate={state.estimate}
 					projectId={project.projectId}
 				/>

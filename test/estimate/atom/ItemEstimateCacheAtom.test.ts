@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ItemEstimateCacheAtom } from "~/estimate/atom/ItemEstimateCacheAtom";
+import type { ItemEstimateSnapshot } from "~/estimate/fn/createItemEstimateSnapshotFn";
 
 const runItemEstimateInWorkerFxMock = vi.hoisted(() => vi.fn());
 
@@ -52,7 +53,7 @@ const config = {
 	},
 } as unknown as GameConfigSchema.Type;
 
-const snapshot = (revision: number): ItemEstimateCacheAtom.Snapshot => ({
+const snapshot = (revision: number): ItemEstimateSnapshot => ({
 	config,
 	projectId: "project",
 	revision,

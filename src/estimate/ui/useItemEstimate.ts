@@ -1,18 +1,19 @@
 import { useAtom } from "@effect/atom-react";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
-import {
-	ItemEstimateCacheAtom,
-	type ItemEstimateCacheAtom as ItemEstimateCache,
-} from "~/estimate/atom/ItemEstimateCacheAtom";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { ItemEstimateCacheAtom } from "~/estimate/atom/ItemEstimateCacheAtom";
+import type { ItemEstimateSnapshot } from "~/estimate/fn/createItemEstimateSnapshotFn";
+import { useItemEstimateEntrySnapshot } from "~/estimate/ui/useItemEstimateEntrySnapshot";
 
 export type ItemEstimateState =
 	| {
 			readonly status: "loading";
 	  }
 	| {
+			readonly config: GameConfigSchema.Type;
 			readonly estimate: ItemEstimate;
 			readonly status: "ready";
 	  }
@@ -21,25 +22,12 @@ export type ItemEstimateState =
 			readonly status: "error";
 	  };
 
-const sameSnapshotFn = (
-	left: ItemEstimateCache.Snapshot | undefined,
-	right: ItemEstimateCache.Snapshot,
-) => left?.projectId === right.projectId && left.revision === right.revision;
+const sameSnapshotFn = (left: ItemEstimateSnapshot | undefined, right: ItemEstimateSnapshot) =>
+	left?.projectId === right.projectId && left.revision === right.revision;
 
 /** Reads a cached estimate or requests one from the renderer-owned estimate authority. */
 export const useItemEstimate = (project: Project, itemId: string): ItemEstimateState => {
-	const snapshot = useMemo<ItemEstimateCache.Snapshot>(
-		() => ({
-			config: project.config,
-			projectId: project.projectId,
-			revision: project.revision,
-		}),
-		[
-			project.config,
-			project.projectId,
-			project.revision,
-		],
-	);
+	const snapshot = useItemEstimateEntrySnapshot(project);
 	const [state, requestEstimateFn] = useAtom(ItemEstimateCacheAtom);
 
 	useEffect(() => {
@@ -61,6 +49,7 @@ export const useItemEstimate = (project: Project, itemId: string): ItemEstimateS
 	const estimate = state.estimates.get(itemId);
 	if (estimate !== undefined)
 		return {
+			config: snapshot.config,
 			estimate,
 			status: "ready",
 		};

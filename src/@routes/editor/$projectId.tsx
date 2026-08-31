@@ -11,6 +11,7 @@ import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorP
 import { EditorShell } from "~/authoring-shell/ui/EditorShell";
 import { ProjectResourceUrlProvider } from "~/authoring-session/ui/ResourceUrlSession";
 import { VersionRestoreAction } from "~/project-version/ui/VersionRestoreAction";
+import { ItemEstimateWarmup } from "~/estimate/ui/ItemEstimateWarmup";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
 	(project: Project | undefined) =>
@@ -66,6 +67,7 @@ export const Route = createFileRoute("/editor/$projectId")({
 		const project = Route.useLoaderData();
 		return (
 			<EditorProjectProvider loaded={project}>
+				<ItemEstimateWarmup project={project} />
 				<VersionRestoreAction projectId={project.projectId} />
 				<EditorProjectReplacementBoundary>
 					<ProjectResourceUrlProvider>

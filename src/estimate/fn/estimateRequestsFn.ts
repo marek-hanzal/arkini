@@ -48,22 +48,17 @@ const makeEstimateFn = ({
 	readonly witnesses: ReadonlyArray<EstimateWitness>;
 }): ItemEstimate => {
 	const uniqueDiagnostics = uniqueDiagnosticsFn(diagnostics);
-	const searchExhausted = uniqueDiagnostics.some(
-		({ kind }) => kind === "witness-search-exhausted",
-	);
-	const best = searchExhausted
-		? undefined
-		: witnesses
-				.map((witness) => ({
-					projection: projectEstimateWitnessFn(witness),
-					witness,
-				}))
-				.filter(({ projection }) => Number.isFinite(projection.durationMs))
-				.sort(
-					(left, right) =>
-						left.projection.durationMs - right.projection.durationMs ||
-						Order.String(left.witness.topRouteId, right.witness.topRouteId),
-				)[0];
+	const best = witnesses
+		.map((witness) => ({
+			projection: projectEstimateWitnessFn(witness),
+			witness,
+		}))
+		.filter(({ projection }) => Number.isFinite(projection.durationMs))
+		.sort(
+			(left, right) =>
+				left.projection.durationMs - right.projection.durationMs ||
+				Order.String(left.witness.topRouteId, right.witness.topRouteId),
+		)[0];
 	if (best !== undefined)
 		return {
 			diagnostics: uniqueDiagnostics.slice(0, maximumDiagnostics),

@@ -387,6 +387,76 @@ describe("estimateRequestsFn", () => {
 		expect(result.route.routeId).toBe("complex-target");
 	});
 
+	it("keeps a complete route when bounded refinement rejects another route", () => {
+		const inputFactIds = Array.from(
+			{
+				length: 5,
+			},
+			(_, index) => `input-${index}`,
+		);
+		const result = estimate(
+			graph({
+				facts: [
+					"raw",
+					...inputFactIds,
+					"target",
+				],
+				roots: [
+					{
+						factId: "raw",
+						quantity: 1,
+					},
+				],
+				routes: [
+					...inputFactIds.flatMap((factId) => [
+						route({
+							allOf: [
+								requirement("raw"),
+							],
+							durationMs: 0,
+							id: `fast-${factId}`,
+							output: factId,
+						}),
+						route({
+							allOf: [
+								requirement("raw"),
+							],
+							durationMs: 10,
+							id: `slow-${factId}`,
+							output: factId,
+						}),
+					]),
+					route({
+						allOf: inputFactIds.map((factId) => requirement(factId)),
+						durationMs: 0,
+						id: "complex-target",
+						output: "target",
+					}),
+					route({
+						durationMs: 100,
+						id: "direct-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			diagnostics: [
+				{
+					kind: "witness-search-exhausted",
+					maximumStates: 8,
+					routeId: "complex-target",
+				},
+			],
+			durationMs: 100,
+			obtainable: true,
+			status: "complete",
+		});
+		if (!result.obtainable) throw new Error("Expected the complete fallback route.");
+		expect(result.route.routeId).toBe("direct-target");
+	});
+
 	it("uses stable route identity to break complete-duration ties", () => {
 		const result = estimate(
 			graph({

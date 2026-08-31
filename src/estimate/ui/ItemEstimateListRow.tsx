@@ -12,14 +12,20 @@ const runtimeLabelFn = (estimate: ItemEstimateIndexEntry) => {
 	return `≈ ${duration}`;
 };
 
-const demandFormatter = new Intl.NumberFormat("en-US", {
-	maximumFractionDigits: 2,
-});
+const demandFormatter = new Intl.NumberFormat("en-US");
 
 const demandRatioLabelFn = (demand: number, maximumDemand: number) => {
 	const percentage = maximumDemand <= 0 ? 0 : (demand / maximumDemand) * 100;
 	if (percentage <= 0.1) return "negligible";
 	return `${Number.isInteger(percentage) ? percentage : percentage.toFixed(1)}%`;
+};
+
+const demandLabelFn = (demand: number, maximumDemand: number) => {
+	const roundedDemand = Math.ceil(demand);
+	return `${demandFormatter.format(roundedDemand)} (${demandRatioLabelFn(
+		roundedDemand,
+		Math.ceil(maximumDemand),
+	)})`;
 };
 
 /** Presents one compact projection of the cached static estimate. */
@@ -62,10 +68,9 @@ export const ItemEstimateListRow = ({
 					<dd className="font-semibold text-foreground">{runtimeLabelFn(estimate)}</dd>
 				</div>
 				<div className="flex items-baseline justify-end gap-1.5">
-					<dt className="text-muted">Approx. demand:</dt>
+					<dt className="text-muted">Demand:</dt>
 					<dd className="font-semibold text-foreground">
-						{demandFormatter.format(estimate.demand)} (
-						{demandRatioLabelFn(estimate.demand, maximumDemand)})
+						{demandLabelFn(estimate.demand, maximumDemand)}
 					</dd>
 				</div>
 			</dl>

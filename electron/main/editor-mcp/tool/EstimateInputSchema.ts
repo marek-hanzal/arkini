@@ -1,13 +1,9 @@
 import { z } from "zod";
 
-import { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
+import { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 
 export const EstimateInputSchema = z
 	.object({
-		incomplete: z
-			.boolean()
-			.default(false)
-			.describe("Return only partial and unreachable item estimates."),
 		page: z.number().int().min(1).default(1).describe("One-based page number."),
 		pageSize: z
 			.number()
@@ -20,15 +16,15 @@ export const EstimateInputSchema = z
 			.string()
 			.optional()
 			.describe("Optional fuzzy search across item title, ID, description, and type."),
-		sort: ItemEstimateSortSchema.default("fastest").describe(
-			"Global Estimate ordering: fastest, slowest, or highest aggregate demand first.",
+		view: ItemEstimateViewSchema.default("fastest").describe(
+			"Global Estimate view: fastest, slowest, highest aggregate demand, or incomplete items only.",
 		),
 	})
 	.strict()
 	.meta({
 		$id: "urn:arkini:schema:mcp:estimate-input",
 		title: "Estimate tool input",
-		description: "Pagination, filtering, search, and ordering for the global Estimate tool.",
+		description: "Pagination, search, and display mode for the global Estimate tool.",
 	});
 
 export type EstimateInput = z.output<typeof EstimateInputSchema>;

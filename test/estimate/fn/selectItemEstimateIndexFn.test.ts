@@ -49,13 +49,12 @@ const items = [
 	item("unused", "Unused"),
 ];
 
-const readItemIds = (sort: "demand" | "fastest" | "slowest", query = "", incomplete = false) =>
+const readItemIds = (view: "demand" | "fastest" | "incomplete" | "slowest", query = "") =>
 	selectItemEstimateIndexFn({
 		entries,
-		incomplete,
 		items,
 		query,
-		sort,
+		view,
 	}).map(({ item }) => item.id);
 
 describe("selectItemEstimateIndexFn", () => {
@@ -87,11 +86,11 @@ describe("selectItemEstimateIndexFn", () => {
 	});
 
 	it("returns only partial and unreachable estimates without changing query semantics", () => {
-		expect(readItemIds("fastest", "", true)).toEqual([
+		expect(readItemIds("incomplete")).toEqual([
 			"unused",
 			"well",
 		]);
-		expect(readItemIds("demand", "unus", true)).toEqual([
+		expect(readItemIds("incomplete", "unus")).toEqual([
 			"unused",
 		]);
 	});
@@ -112,10 +111,9 @@ describe("selectItemEstimateIndexFn", () => {
 		expect(
 			selectItemEstimateIndexFn({
 				entries: tiedEntries,
-				incomplete: false,
 				items: tiedItems,
 				query: "",
-				sort: "fastest",
+				view: "fastest",
 			}).map(({ item }) => item.id),
 		).toEqual([
 			"water",

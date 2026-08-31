@@ -4,7 +4,7 @@ import { ButtonLink } from "~/ui/ui/Button";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 
-const runtimeLabel = (estimate: ItemEstimateIndexEntry) => {
+const runtimeLabelFn = (estimate: ItemEstimateIndexEntry) => {
 	if (estimate.status === "partial") return "Partial";
 	if (estimate.status === "unreachable") return "No path";
 	if (estimate.runtimeMs === undefined) return "—";
@@ -16,7 +16,7 @@ const demandFormatter = new Intl.NumberFormat("en-US", {
 	maximumFractionDigits: 2,
 });
 
-const demandRatioLabel = (demand: number, maximumDemand: number) => {
+const demandRatioLabelFn = (demand: number, maximumDemand: number) => {
 	const percentage = maximumDemand <= 0 ? 0 : (demand / maximumDemand) * 100;
 	if (percentage <= 0.1) return "negligible";
 	return `${Number.isInteger(percentage) ? percentage : percentage.toFixed(1)}%`;
@@ -59,13 +59,13 @@ export const ItemEstimateListRow = ({
 			<dl className="grid shrink-0 gap-1 text-right text-sm tabular-nums">
 				<div className="flex items-baseline justify-end gap-1.5">
 					<dt className="text-muted">Estimate:</dt>
-					<dd className="font-semibold text-foreground">{runtimeLabel(estimate)}</dd>
+					<dd className="font-semibold text-foreground">{runtimeLabelFn(estimate)}</dd>
 				</div>
 				<div className="flex items-baseline justify-end gap-1.5">
 					<dt className="text-muted">Approx. demand:</dt>
 					<dd className="font-semibold text-foreground">
 						{demandFormatter.format(estimate.demand)} (
-						{demandRatioLabel(estimate.demand, maximumDemand)})
+						{demandRatioLabelFn(estimate.demand, maximumDemand)})
 					</dd>
 				</div>
 			</dl>

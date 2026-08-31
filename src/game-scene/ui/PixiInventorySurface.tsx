@@ -22,44 +22,44 @@ import type { InventoryRuntime } from "~/game-scene/service/InventoryRuntime";
  * opens Item Detail and never initiates either command.
  */
 export const PixiInventorySurface = ({
-	onSpaceActivated,
+	onSpaceActivatedFn,
 }: {
-	readonly onSpaceActivated: () => void;
+	readonly onSpaceActivatedFn: () => void;
 }) => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();
 	const { interaction, textures } = usePixiGameRuntime();
-	const releaseInventoryItem = useAtomSet(runInventoryReleaseAtom(game), {
+	const releaseInventoryItemFn = useAtomSet(runInventoryReleaseAtom(game), {
 		mode: "promise",
 	});
-	const runSpaceActivation = useAtomSet(runSpaceActivationAtom(game), {
+	const runSpaceActivationFn = useAtomSet(runSpaceActivationAtom(game), {
 		mode: "promise",
 	});
-	const runDrop = useAtomSet(runTileDropAtom(game), {
+	const runDropFn = useAtomSet(runTileDropAtom(game), {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
 	const runtimeRef = useRef<InventoryRuntime | null>(null);
 	const controlsRef = useRef({
 		itemDetail,
-		onSpaceActivated,
-		releaseInventoryItem,
-		runSpaceActivation,
+		onSpaceActivatedFn,
+		releaseInventoryItemFn,
+		runSpaceActivationFn,
 	});
 	controlsRef.current = {
 		itemDetail,
-		onSpaceActivated,
-		releaseInventoryItem,
-		runSpaceActivation,
+		onSpaceActivatedFn,
+		releaseInventoryItemFn,
+		runSpaceActivationFn,
 	};
 
-	const activate = useCallback(
+	const activateFn = useCallback(
 		(item: TileActorItem, openDetail: boolean, origin: HTMLElement) => {
 			const {
 				itemDetail: currentItemDetail,
-				onSpaceActivated: currentOnSpaceActivated,
-				releaseInventoryItem: currentReleaseInventoryItem,
-				runSpaceActivation: currentRunSpaceActivation,
+				onSpaceActivatedFn: currentOnSpaceActivatedFn,
+				releaseInventoryItemFn: currentReleaseInventoryItemFn,
+				runSpaceActivationFn: currentRunSpaceActivationFn,
 			} = controlsRef.current;
 			if (openDetail) {
 				RendererRuntime.runSync(
@@ -74,7 +74,7 @@ export const PixiInventorySurface = ({
 			if (item.primaryAction.kind === "activate-space") {
 				const runtime = runtimeRef.current;
 				if (runtime === null) return;
-				return currentRunSpaceActivation({
+				return currentRunSpaceActivationFn({
 					currentSpace: item.primaryAction.currentSpace,
 					itemId: item.id,
 					location: item.location,
@@ -86,10 +86,10 @@ export const PixiInventorySurface = ({
 							runtime.projectSpaceActivationFx(result.transition),
 						);
 					}
-					if (runtimeRef.current === runtime) currentOnSpaceActivated();
+					if (runtimeRef.current === runtime) currentOnSpaceActivatedFn();
 				});
 			}
-			return currentReleaseInventoryItem({
+			return currentReleaseInventoryItemFn({
 				itemId: item.id,
 				location: item.location,
 				revision: item.revision,
@@ -103,14 +103,14 @@ export const PixiInventorySurface = ({
 		if (host === null) return;
 		let cancelled = false;
 		let runtime: InventoryRuntime | null = null;
-		let unregisterInteraction: () => void = () => undefined;
+		let unregisterInteractionFn: () => void = () => undefined;
 		void RendererRuntime.runPromise(
 			createInventoryRuntimeFx({
 				dragThreshold: PointerDragThreshold,
 				game,
 				host,
-				onActivate: activate,
-				onDrop: runDrop,
+				onActivateFn: activateFn,
+				onDropFn: runDropFn,
 				textures,
 			}),
 		)
@@ -120,7 +120,7 @@ export const PixiInventorySurface = ({
 				}
 				runtime = created;
 				runtimeRef.current = created;
-				unregisterInteraction = RendererRuntime.runSync(
+				unregisterInteractionFn = RendererRuntime.runSync(
 					interaction.registerFx(() =>
 						RendererRuntime.runSync(created.cancelInteractionFx),
 					),
@@ -128,11 +128,11 @@ export const PixiInventorySurface = ({
 			})
 			.catch((cause) => {
 				if (cancelled) return;
-				game.reportCriticalFailure("game-presentation", cause);
+				game.reportCriticalFailureFn("game-presentation", cause);
 			});
 		return () => {
 			cancelled = true;
-			unregisterInteraction();
+			unregisterInteractionFn();
 			if (runtime !== null) {
 				if (runtimeRef.current === runtime) runtimeRef.current = null;
 				void RendererRuntime.runPromise(runtime.closeFx).catch((cause) => {
@@ -141,10 +141,10 @@ export const PixiInventorySurface = ({
 			}
 		};
 	}, [
-		activate,
+		activateFn,
 		game,
 		interaction,
-		runDrop,
+		runDropFn,
 		textures,
 	]);
 

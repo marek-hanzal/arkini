@@ -23,17 +23,17 @@ export const useEditorUnsavedChangesRegistration = (
 	sessionRef.current = props;
 	useLayoutEffect(
 		() =>
-			owner.register(props.id, {
-				discard: () => sessionRef.current.discard(),
-				isDirty: () => sessionRef.current.isDirty(),
-				isValid: () => sessionRef.current.isValid(),
-				ownsPathname: (pathname) => sessionRef.current.ownsPathname(pathname),
-				save: () => sessionRef.current.save(),
+			owner.registerFn(props.id, {
+				discardFn: () => sessionRef.current.discardFn(),
+				isDirtyFn: () => sessionRef.current.isDirtyFn(),
+				isValidFn: () => sessionRef.current.isValidFn(),
+				ownsPathnameFn: (pathname) => sessionRef.current.ownsPathnameFn(pathname),
+				saveFn: () => sessionRef.current.saveFn(),
 			}),
 		[
 			owner,
 			props.id,
 		],
 	);
-	useLayoutEffect(() => owner.refresh());
+	useLayoutEffect(() => owner.refreshFn());
 };

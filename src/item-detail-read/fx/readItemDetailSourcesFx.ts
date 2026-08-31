@@ -88,10 +88,10 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies readItemDetailSourcesFx.Result;
 
-const quantityBounds = (quantity: QuantitySchema.Type): readItemDetailSourcesFx.QuantityBounds =>
+const quantityBoundsFn = (quantity: QuantitySchema.Type): readItemDetailSourcesFx.QuantityBounds =>
 	quantity;
 
-const targetQuantity = ({
+const targetQuantityFn = ({
 	drop,
 	targetDefinitionItemId,
 }: {
@@ -103,7 +103,7 @@ const targetQuantity = ({
 	let found = false;
 	for (const candidate of drop) {
 		if (candidate.itemId !== targetDefinitionItemId) continue;
-		const bounds = quantityBounds(candidate.quantity);
+		const bounds = quantityBoundsFn(candidate.quantity);
 		min += bounds.min;
 		max += bounds.max;
 		found = true;
@@ -116,7 +116,7 @@ const targetQuantity = ({
 		: undefined;
 };
 
-const readMatchingFacts = ({
+const readMatchingFactsFn = ({
 	output,
 	targetDefinitionItemId,
 }: {
@@ -136,7 +136,7 @@ const readMatchingFacts = ({
 						type: RollTypeSchema.enum.Guaranteed,
 					},
 					({ drop }) => {
-						const quantity = targetQuantity({
+						const quantity = targetQuantityFn({
 							drop,
 							targetDefinitionItemId,
 						});
@@ -154,7 +154,7 @@ const readMatchingFacts = ({
 						type: RollTypeSchema.enum.Chance,
 					},
 					({ chance, drop }) => {
-						const quantity = targetQuantity({
+						const quantity = targetQuantityFn({
 							drop,
 							targetDefinitionItemId,
 						});
@@ -178,7 +178,7 @@ const readMatchingFacts = ({
 							0,
 						);
 						for (const candidate of drop) {
-							const quantity = targetQuantity({
+							const quantity = targetQuantityFn({
 								drop: candidate.drop,
 								targetDefinitionItemId,
 							});
@@ -187,7 +187,7 @@ const readMatchingFacts = ({
 								kind: "weight",
 								optionWeight: candidate.weight,
 								quantity,
-								selections: quantityBounds(selections),
+								selections: quantityBoundsFn(selections),
 								setWeight,
 								totalOptionWeight,
 								totalSetWeight,
@@ -225,7 +225,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 		const lines = readLineOwnerLinesFn(ownerItem);
 		const matchingLines: readItemDetailSourcesFx.Line[] = [];
 		for (const line of lines) {
-			const output = readMatchingFacts({
+			const output = readMatchingFactsFn({
 				output: line.output,
 				targetDefinitionItemId,
 			});
@@ -326,7 +326,7 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 			if (
 				!lines.some(
 					(line) =>
-						readMatchingFacts({
+						readMatchingFactsFn({
 							output: line.output,
 							targetDefinitionItemId: requestedDefinitionItemId,
 						}).length > 0,

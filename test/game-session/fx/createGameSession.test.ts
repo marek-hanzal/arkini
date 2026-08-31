@@ -23,19 +23,19 @@ describe("createGameSessionFx / fail-stop", () => {
 		const fatalDelivered = new Promise<void>((resolve) => {
 			markFatalDelivered = resolve;
 		});
-		const unsubscribeThrowingRuntime = session.subscribe(() => {
+		const unsubscribeThrowingRuntime = session.subscribeFn(() => {
 			throw new Error("runtime listener exploded");
 		});
-		const unsubscribeHealthyRuntime = session.subscribe(() => {
+		const unsubscribeHealthyRuntime = session.subscribeFn(() => {
 			runtimeNotifications += 1;
 			markRuntimeDelivered?.();
 		});
-		const unsubscribeFatal = session.subscribeFatalError(() => {
+		const unsubscribeFatal = session.subscribeFatalErrorFn(() => {
 			markFatalDelivered?.();
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:water:listener",
 					itemId: "water",
@@ -55,9 +55,9 @@ describe("createGameSessionFx / fail-stop", () => {
 			]);
 
 			expect(runtimeNotifications).toBe(1);
-			expect(session.getFatalError()?.source).toBe("subscription");
+			expect(session.getFatalErrorFn()?.source).toBe("subscription");
 			await expect(
-				session.run(emitCompletedEventFx("job:listener:rejected")),
+				session.runFn(emitCompletedEventFx("job:listener:rejected")),
 			).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",
 				state: "frozen",
@@ -78,17 +78,17 @@ describe("createGameSessionFx / fail-stop", () => {
 		const fatalDelivered = new Promise<void>((resolve) => {
 			markFatalDelivered = resolve;
 		});
-		const unsubscribeFatal = session.subscribeFatalError(() => {
+		const unsubscribeFatal = session.subscribeFatalErrorFn(() => {
 			markFatalDelivered?.();
 		});
-		const unsubscribe = session.subscribeEvents(async () => {
+		const unsubscribe = session.subscribeEventsFn(async () => {
 			throw new Error("async event listener exploded");
 		});
 
 		try {
-			await session.run(emitCompletedEventFx("job:listener:rejected"));
+			await session.runFn(emitCompletedEventFx("job:listener:rejected"));
 			await fatalDelivered;
-			expect(session.getFatalError()?.source).toBe("subscription");
+			expect(session.getFatalErrorFn()?.source).toBe("subscription");
 		} finally {
 			unsubscribe();
 			unsubscribeFatal();
@@ -106,13 +106,13 @@ describe("createGameSessionFx / fail-stop", () => {
 		const fatalDelivered = new Promise<void>((resolve) => {
 			markFatalDelivered = resolve;
 		});
-		const unsubscribe = session.subscribeFatalError(() => {
+		const unsubscribe = session.subscribeFatalErrorFn(() => {
 			notifications += 1;
 			markFatalDelivered?.();
 		});
 
 		try {
-			const owner = await session.run(
+			const owner = await session.runFn(
 				spawnItemFx({
 					id: "runtime:tick-reporter-forge",
 					itemId: "forge",
@@ -127,7 +127,7 @@ describe("createGameSessionFx / fail-stop", () => {
 					quantity: 1,
 				}),
 			);
-			await session.run(
+			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
@@ -136,12 +136,12 @@ describe("createGameSessionFx / fail-stop", () => {
 			delete (config.items as Record<string, unknown>).inventoryOutput;
 
 			await fatalDelivered;
-			const fatal = session.getFatalError();
+			const fatal = session.getFatalErrorFn();
 			expect(fatal?.source).toBe("tick");
-			session.failStop("presentation", new Error("later failure"));
-			expect(session.getFatalError()).toBe(fatal);
+			session.failStopFn("presentation", new Error("later failure"));
+			expect(session.getFatalErrorFn()).toBe(fatal);
 			expect(notifications).toBe(1);
-			await expect(session.run(Effect.void)).rejects.toMatchObject({
+			await expect(session.runFn(Effect.void)).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",
 				state: "frozen",
 			});

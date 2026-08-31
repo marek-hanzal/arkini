@@ -35,12 +35,12 @@ describe("tile actor destruction", () => {
 		const cancelCurrent = vi.fn();
 		const cancelPending = vi.fn();
 		current.visual.readyListeners.add({
-			onCancel: cancelCurrent,
-			onReady: vi.fn(),
+			onCancelFn: cancelCurrent,
+			onReadyFn: vi.fn(),
 		});
 		pending.visual.readyListeners.add({
-			onCancel: cancelPending,
-			onReady: vi.fn(),
+			onCancelFn: cancelPending,
+			onReadyFn: vi.fn(),
 		});
 		const destroy = vi.fn();
 		const container = {
@@ -93,7 +93,7 @@ describe("tile actor destruction", () => {
 		const { visual } = createVisual();
 		const ready = vi.fn();
 		visual.readyListeners.add({
-			onReady: ready,
+			onReadyFn: ready,
 		});
 		const actorContainer = {
 			cursor: "grab",
@@ -135,8 +135,8 @@ describe("tile actor destruction", () => {
 		const ready = vi.fn();
 		const canceled = vi.fn();
 		visual.readyListeners.add({
-			onCancel: canceled,
-			onReady: ready,
+			onCancelFn: canceled,
+			onReadyFn: ready,
 		});
 		const actorContainer = {
 			cursor: "grab",
@@ -156,7 +156,7 @@ describe("tile actor destruction", () => {
 				id: "runtime:exiting",
 			} as TileActorItem,
 			lifecycleIntentGeneration: 0,
-			onPointerDown,
+			onPointerDownFn: onPointerDown,
 			pendingVisual: null,
 			visuals: new Set([
 				visual,
@@ -170,7 +170,7 @@ describe("tile actor destruction", () => {
 		expect(Effect.runSync(store.releaseActorFx(actor.item.id))).toBe(actor);
 		expect(store.actors.has(actor.item.id)).toBe(false);
 		expect(actorContainer.off).toHaveBeenCalledExactlyOnceWith("pointerdown", onPointerDown);
-		expect(actor.onPointerDown).toBeNull();
+		expect(actor.onPointerDownFn).toBeNull();
 		expect(actorContainer.eventMode).toBe("none");
 		Effect.runSync(store.closeFx);
 		Effect.runSync(
@@ -209,7 +209,7 @@ describe("tile actor destruction", () => {
 					id: "runtime:replaced",
 				} as TileActorItem,
 				lifecycleIntentGeneration: 0,
-				onPointerDown: null,
+				onPointerDownFn: null,
 				pendingVisual: null,
 				visuals: new Set([
 					visual,

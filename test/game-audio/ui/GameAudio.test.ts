@@ -7,7 +7,7 @@ import { StrictMode, Suspense, act, createElement, startTransition } from "react
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { useGameEvents } from "~/game-presentation/ui/useGameEvents";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { createGameAudioSynthFx } from "~/game-audio/fx/createGameAudioSynthFx";
 
@@ -15,7 +15,7 @@ const eventState = vi.hoisted(() => ({
 	game: {
 		id: "game:first",
 	},
-	listener: null as ((batch: useGameEvents.Batch) => void | PromiseLike<void>) | null,
+	listener: null as ((batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) | null,
 }));
 
 vi.mock("~/game-presentation/ui/useGameEngine", () => ({
@@ -24,7 +24,7 @@ vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 
 vi.mock("~/game-presentation/ui/useGameEvents", async (importOriginal) => ({
 	...(await importOriginal()),
-	useGameEvents: (listener: (batch: useGameEvents.Batch) => void | PromiseLike<void>) => {
+	useGameEvents: (listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) => {
 		eventState.listener = listener;
 	},
 }));
@@ -86,7 +86,7 @@ const jobStartedBatch = {
 			lineId: "line:1",
 		},
 	],
-} satisfies useGameEvents.Batch;
+} satisfies GameEventBatchSchema.Type;
 
 const jobCompletedBatch = {
 	events: [
@@ -97,7 +97,7 @@ const jobCompletedBatch = {
 			lineId: "line:1",
 		},
 	],
-} satisfies useGameEvents.Batch;
+} satisfies GameEventBatchSchema.Type;
 
 const makeRegistry = () => {
 	const registry = AtomRegistry.make({

@@ -4,7 +4,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const laneGap = 22;
 
-const readWorkingCopyState = (status: ProjectVersionStatus) =>
+const readWorkingCopyStateFn = (status: ProjectVersionStatus) =>
 	status.currentBaseVersionId === undefined ? "unversioned" : status.dirty ? "dirty" : "clean";
 
 const WorkingCopyLabel = {
@@ -24,7 +24,7 @@ const VersionRails = ({
 	readonly laneCount: number;
 	readonly parentLane?: number;
 }) => {
-	const x = (index: number) => 11 + index * laneGap;
+	const xFn = (index: number) => 11 + index * laneGap;
 	return (
 		<svg
 			className="h-16 shrink-0 overflow-visible"
@@ -38,8 +38,8 @@ const VersionRails = ({
 				.map((activeLane) => (
 					<line
 						key={activeLane}
-						x1={x(activeLane)}
-						x2={x(activeLane)}
+						x1={xFn(activeLane)}
+						x2={xFn(activeLane)}
 						y1="0"
 						y2="64"
 						className="stroke-line-strong"
@@ -47,8 +47,8 @@ const VersionRails = ({
 					/>
 				))}
 			<line
-				x1={x(lane)}
-				x2={x(lane)}
+				x1={xFn(lane)}
+				x2={xFn(lane)}
 				y1="0"
 				y2="22"
 				className="stroke-accent"
@@ -56,13 +56,13 @@ const VersionRails = ({
 			/>
 			{parentLane === undefined ? null : (
 				<path
-					d={`M ${x(lane)} 22 C ${x(lane)} 40, ${x(parentLane)} 40, ${x(parentLane)} 64`}
+					d={`M ${xFn(lane)} 22 C ${xFn(lane)} 40, ${xFn(parentLane)} 40, ${xFn(parentLane)} 64`}
 					className="fill-none stroke-accent"
 					strokeWidth="2"
 				/>
 			)}
 			<circle
-				cx={x(lane)}
+				cx={xFn(lane)}
 				cy="22"
 				r="5"
 				className="fill-accent stroke-surface"
@@ -74,18 +74,18 @@ const VersionRails = ({
 
 export const VersionGraph = ({
 	layout,
-	onSelect,
-	onSelectWorkingCopy,
+	onSelectFn,
+	onSelectWorkingCopyFn,
 	selectedReference,
 	status,
 }: {
 	readonly layout: VersionGraphLayout;
-	readonly onSelect: (versionId: string) => void;
-	readonly onSelectWorkingCopy: () => void;
+	readonly onSelectFn: (versionId: string) => void;
+	readonly onSelectWorkingCopyFn: () => void;
 	readonly selectedReference: string;
 	readonly status: ProjectVersionStatus;
 }) => {
-	const workingCopyStatus = readWorkingCopyState(status);
+	const workingCopyStatus = readWorkingCopyStateFn(status);
 	return (
 		<div
 			className="grid content-start"
@@ -94,7 +94,7 @@ export const VersionGraph = ({
 			<button
 				type="button"
 				className="group flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left enabled:hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10! data-[ui-status=clean]:bg-success/10 data-[ui-status=dirty]:bg-warning/12 data-[ui-status=unversioned]:bg-surface-raised/65"
-				onClick={onSelectWorkingCopy}
+				onClick={onSelectWorkingCopyFn}
 				{...readDataUiFn({
 					dataUi: "EditorVersionWorkingCopy",
 					state: {
@@ -136,7 +136,7 @@ export const VersionGraph = ({
 					key={row.version.versionId}
 					type="button"
 					className="flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10"
-					onClick={() => onSelect(row.version.versionId)}
+					onClick={() => onSelectFn(row.version.versionId)}
 					{...readDataUiFn({
 						dataUi: "EditorVersionRow",
 						state: {

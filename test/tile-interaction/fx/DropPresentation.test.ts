@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 
 const sourceLocation = {
@@ -41,7 +41,7 @@ const moveResult = {
 	location: targetLocation,
 	previousLocation: sourceLocation,
 	revision: "revision:moved",
-} satisfies runTileDropAtom.Result;
+} satisfies DropItemResult;
 
 const swapResult = {
 	kind: "swap",
@@ -57,7 +57,7 @@ const swapResult = {
 		previousLocation: targetLocation,
 		revision: "revision:target-swapped",
 	},
-} satisfies runTileDropAtom.Result;
+} satisfies DropItemResult;
 
 describe("drop presentation", () => {
 	it("settles one drop without clearing another pending generation", () => {

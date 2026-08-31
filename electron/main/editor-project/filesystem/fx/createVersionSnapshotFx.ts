@@ -10,7 +10,7 @@ import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchem
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { hashVersionBytes } from "./VersionFingerprint";
+import { hashVersionBytesFn } from "./VersionFingerprint";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 
@@ -87,7 +87,7 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 		const target = yield* paths.jsonObjectFileFx(hash);
 		if (yield* fileSystem.exists(target)) {
 			const current = yield* fileSystem.readFile(target);
-			if (hashVersionBytes(current) === hash) continue;
+			if (hashVersionBytesFn(current) === hash) continue;
 		}
 		yield* filesystemWrite.replaceFileFx({
 			lock,
@@ -101,7 +101,7 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 		const target = yield* paths.pngObjectFileFx(hash);
 		if (yield* fileSystem.exists(target)) {
 			const current = yield* fileSystem.readFile(target);
-			if (hashVersionBytes(current) === hash) continue;
+			if (hashVersionBytesFn(current) === hash) continue;
 		}
 		yield* filesystemWrite.replaceFileFx({
 			lock,

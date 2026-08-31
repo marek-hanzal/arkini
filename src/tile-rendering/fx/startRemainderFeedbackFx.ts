@@ -14,16 +14,16 @@ const remainderFadeInDurationMs = 375;
 export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(function* ({
 	actor,
 	animator,
-	onCancel,
+	onCancelFn,
 	onHiddenFx,
-	onRevealed,
+	onRevealedFn,
 	ownerKey,
 }: {
 	readonly actor: PixiTileActor;
 	readonly animator: ActorAnimator;
-	readonly onCancel?: () => void;
+	readonly onCancelFn?: () => void;
 	readonly onHiddenFx: Effect.Effect<void, never, never>;
-	readonly onRevealed: () => void;
+	readonly onRevealedFn: () => void;
 	readonly ownerKey: string;
 }) {
 	yield* animator.animateFx({
@@ -31,8 +31,8 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 		channel: "lifecycle-opacity",
 		durationMs: remainderFadeOutDurationMs,
 		ownerKey,
-		onCancel,
-		onComplete: () => {
+		onCancelFn,
+		onCompleteFn: () => {
 			if (actor.container.destroyed) return;
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
@@ -42,8 +42,8 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 						channel: "lifecycle-opacity",
 						durationMs: remainderFadeInDurationMs,
 						ownerKey,
-						onCancel,
-						onComplete: onRevealed,
+						onCancelFn,
+						onCompleteFn: onRevealedFn,
 						toAlpha: 1,
 					});
 				}),

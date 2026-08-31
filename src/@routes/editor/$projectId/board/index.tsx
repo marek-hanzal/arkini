@@ -6,24 +6,24 @@ import { PlayableBoard } from "~/game-shell/ui/PlayableBoard";
 export const Route = createFileRoute("/editor/$projectId/board/")({
 	component: () => {
 		const { projectId } = Route.useParams();
-		const navigate = useNavigate();
-		const onOpenInventory = useCallback(
+		const navigateFn = useNavigate();
+		const onOpenInventoryFn = useCallback(
 			() =>
-				navigate({
+				navigateFn({
 					to: "/editor/$projectId/board/inventory",
 					params: {
 						projectId,
 					},
 				}).then(() => undefined),
 			[
-				navigate,
+				navigateFn,
 				projectId,
 			],
 		);
 		return (
 			<PlayableBoard
 				cheatAlwaysAvailable
-				onOpenInventory={onOpenInventory}
+				onOpenInventoryFn={onOpenInventoryFn}
 			/>
 		);
 	},

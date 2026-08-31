@@ -40,15 +40,15 @@ describe("useExclusiveAction", () => {
 		if (control === undefined) throw new Error("Expected exclusive action control.");
 
 		await act(async () => {
-			expect(control?.claim("first")).toBe(true);
-			expect(control?.claim("second")).toBe(false);
-			control?.release("second");
-			expect(control?.claim("second")).toBe(false);
+			expect(control?.claimFn("first")).toBe(true);
+			expect(control?.claimFn("second")).toBe(false);
+			control?.releaseFn("second");
+			expect(control?.claimFn("second")).toBe(false);
 		});
 		expect(control.active).toBe("first");
 
 		await act(async () => {
-			control?.release("first");
+			control?.releaseFn("first");
 		});
 		expect(control.active).toBeNull();
 	});

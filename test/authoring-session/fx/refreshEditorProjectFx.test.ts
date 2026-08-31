@@ -63,7 +63,7 @@ const runRefresh = async (
 	vi.stubGlobal("window", {
 		arkini: {
 			editor: {
-				refreshProject: async (): Promise<
+				refreshProjectFn: async (): Promise<
 					EditorProjectTransport.Result<EditorProjectTransport.Project>
 				> => {
 					events.push("refresh");
@@ -101,22 +101,22 @@ const runRefresh = async (
 		upsertResourcesFx: () => Effect.die("Unexpected resources write."),
 	};
 	const unsaved = {
-		decide: async () => undefined,
-		discardAll: () => events.push("discard"),
-		getSnapshot: () => ({
+		decideFn: async () => undefined,
+		discardAllFn: () => events.push("discard"),
+		getSnapshotFn: () => ({
 			canSave: false,
 			error: undefined,
 			hasDirtySession: true,
 			promptOpen: false,
 			saving: false,
 		}),
-		refresh: () => undefined,
-		register: () => () => undefined,
-		requestLeave: async () => {
+		refreshFn: () => undefined,
+		registerFn: () => () => undefined,
+		requestLeaveFn: async () => {
 			events.push("prompt");
 			return false;
 		},
-		subscribe: () => () => undefined,
+		subscribeFn: () => () => undefined,
 	};
 	try {
 		const exit = await Effect.runPromiseExit(

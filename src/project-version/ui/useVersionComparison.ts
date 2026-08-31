@@ -13,7 +13,7 @@ const currentReference: ProjectVersionReference = {
 	type: "current",
 };
 
-const decodeReference = (value: string): ProjectVersionReference =>
+const decodeReferenceFn = (value: string): ProjectVersionReference =>
 	value === "current"
 		? currentReference
 		: {
@@ -24,54 +24,54 @@ const decodeReference = (value: string): ProjectVersionReference =>
 interface VersionComparisonProps {
 	readonly enabled: boolean;
 	readonly projectId: string;
-	readonly reportError: (error: unknown) => void;
+	readonly reportErrorFn: (error: unknown) => void;
 }
 
 interface VersionComparisonOutput {
 	readonly compareFrom: string;
 	readonly compareTo: string;
-	readonly compareVersion: (version: ProjectVersionDescriptor) => void;
+	readonly compareVersionFn: (version: ProjectVersionDescriptor) => void;
 	readonly diff?: ProjectVersionDiff;
 	readonly pending: boolean;
-	readonly resetToBase: (versionId?: string) => void;
-	readonly setCompareFrom: (value: string) => void;
-	readonly setCompareTo: (value: string) => void;
+	readonly resetToBaseFn: (versionId?: string) => void;
+	readonly setCompareFromFn: (value: string) => void;
+	readonly setCompareToFn: (value: string) => void;
 }
 
 /** Owns the arbitrary saved-version versus working-copy comparison. */
 export const useVersionComparison = ({
 	enabled,
 	projectId,
-	reportError,
+	reportErrorFn,
 }: VersionComparisonProps): VersionComparisonOutput => {
-	const [compareFrom, setCompareFrom] = useState("current");
-	const [compareTo, setCompareTo] = useState("current");
-	const [diff, setDiff] = useState<ProjectVersionDiff>();
-	const [pending, setPending] = useState(false);
+	const [compareFrom, setCompareFromFn] = useState("current");
+	const [compareTo, setCompareToFn] = useState("current");
+	const [diff, setDiffFn] = useState<ProjectVersionDiff>();
+	const [pending, setPendingFn] = useState(false);
 
 	useEffect(() => {
 		if (!enabled) return;
 		let mounted = true;
-		setPending(true);
+		setPendingFn(true);
 		void RendererRuntime.runPromise(
 			Effect.flatMap(ProjectRepository, (repository) =>
 				repository.diffVersionsFx({
 					projectId,
-					from: decodeReference(compareFrom),
-					to: decodeReference(compareTo),
+					from: decodeReferenceFn(compareFrom),
+					to: decodeReferenceFn(compareTo),
 				}),
 			),
 		)
 			.then((next) => {
 				if (!mounted) return;
-				setDiff(next);
-				setPending(false);
+				setDiffFn(next);
+				setPendingFn(false);
 			})
 			.catch((cause) => {
 				if (!mounted) return;
-				reportError(cause);
-				setDiff(undefined);
-				setPending(false);
+				reportErrorFn(cause);
+				setDiffFn(undefined);
+				setPendingFn(false);
 			});
 		return () => {
 			mounted = false;
@@ -81,30 +81,30 @@ export const useVersionComparison = ({
 		compareTo,
 		enabled,
 		projectId,
-		reportError,
+		reportErrorFn,
 	]);
 
-	const compareVersion = useCallback((version: ProjectVersionDescriptor) => {
-		setCompareFrom(version.parentVersionId ?? version.versionId);
-		setCompareTo(version.versionId);
+	const compareVersionFn = useCallback((version: ProjectVersionDescriptor) => {
+		setCompareFromFn(version.parentVersionId ?? version.versionId);
+		setCompareToFn(version.versionId);
 	}, []);
-	const resetToBase = useCallback((versionId?: string) => {
-		setCompareFrom(versionId ?? "current");
-		setCompareTo("current");
+	const resetToBaseFn = useCallback((versionId?: string) => {
+		setCompareFromFn(versionId ?? "current");
+		setCompareToFn("current");
 	}, []);
 
 	return {
 		compareFrom,
 		compareTo,
-		compareVersion,
+		compareVersionFn,
 		...(diff === undefined
 			? {}
 			: {
 					diff,
 				}),
 		pending,
-		resetToBase,
-		setCompareFrom,
-		setCompareTo,
+		resetToBaseFn,
+		setCompareFromFn,
+		setCompareToFn,
 	};
 };

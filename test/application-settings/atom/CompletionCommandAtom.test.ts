@@ -28,15 +28,15 @@ describe("Settings CLI completion command", () => {
 			value: {
 				cli: {
 					completion: {
-						status: () =>
+						statusFn: () =>
 							Promise.resolve({
 								type: "not-installed" as const,
 								completionPath: "/tmp/_arkini-cli",
 								shell: "zsh" as const,
 							}),
-						install,
-						replace: vi.fn(),
-						uninstall: vi.fn(),
+						installFn: install,
+						replaceFn: vi.fn(),
+						uninstallFn: vi.fn(),
 					},
 				},
 			},

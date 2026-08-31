@@ -22,8 +22,8 @@ export const createEvent = () => {
 };
 
 export const createTrustedRenderer = (trusted = true): TrustedRenderer => ({
-	isTrustedUrl: () => trusted,
-	isTrustedIpcSender: () => trusted,
+	isTrustedUrlFn: () => trusted,
+	isTrustedIpcSenderFn: () => trusted,
 	assertTrustedIpcSenderFx: () =>
 		trusted
 			? Effect.void
@@ -54,7 +54,7 @@ export const createOwnership = (localReady = false): ServerOwnership => {
 		},
 	};
 	return {
-		readLocalStatus: () => ({
+		readLocalStatusFn: () => ({
 			type: "inactive",
 		}),
 		readOverviewFx: Effect.succeed(overview),
@@ -79,17 +79,17 @@ export const createOwnership = (localReady = false): ServerOwnership => {
 		resetRemoteAuthFx: Effect.succeed({
 			overview,
 		}),
-		readProjectContext: () => projectContext,
-		setProjectContext: vi.fn((projectId) => {
+		readProjectContextFn: () => projectContext,
+		setProjectContextFn: vi.fn((projectId) => {
 			projectContext = projectId;
 		}),
-		clearProjectContext: vi.fn((projectId) => {
+		clearProjectContextFn: vi.fn((projectId) => {
 			if (projectContext === projectId) projectContext = undefined;
 		}),
-		resetProjectContext: vi.fn(() => {
+		resetProjectContextFn: vi.fn(() => {
 			projectContext = undefined;
 		}),
 		closeFx: Effect.void,
-		closeSync: vi.fn(),
+		closeSyncFn: vi.fn(),
 	};
 };

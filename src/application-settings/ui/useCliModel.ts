@@ -21,11 +21,11 @@ const describeInstallationFn = (status: InstallationStatus | undefined) => {
 };
 
 export const useCliModel = () => {
-	const [state, runCommand] = useAtom(CliCommandAtom);
+	const [state, runCommandFn] = useAtom(CliCommandAtom);
 	useEffect(() => {
-		runCommand("read");
+		runCommandFn("read");
 	}, [
-		runCommand,
+		runCommandFn,
 	]);
 
 	const status = "status" in state ? state.status : undefined;
@@ -52,8 +52,8 @@ export const useCliModel = () => {
 					: status?.type === "conflict"
 						? "Replace"
 						: "Install",
-		toggleInstallation: () =>
-			runCommand(
+		toggleInstallationFn: () =>
+			runCommandFn(
 				status?.type === "installed"
 					? "uninstall"
 					: status?.type === "conflict"

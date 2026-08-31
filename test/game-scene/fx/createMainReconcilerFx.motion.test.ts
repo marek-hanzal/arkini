@@ -33,10 +33,10 @@ describe("main reconciliation / layout and landing", () => {
 		const travel = harness.animations.find(
 			(animation) => animation.actor === actor && animation.channel === "pose",
 		);
-		if (travel?.channel !== "pose" || travel.readPose === undefined) {
+		if (travel?.channel !== "pose" || travel.readPoseFn === undefined) {
 			throw new Error("Expected a retargetable layout settle.");
 		}
-		const beforeResize = travel.readPose(0.4);
+		const beforeResize = travel.readPoseFn(0.4);
 		actor.container.position.set(beforeResize.x, beforeResize.y);
 		actor.container.scale.set(beforeResize.scale ?? 1);
 		pose.size = 120;
@@ -50,16 +50,16 @@ describe("main reconciliation / layout and landing", () => {
 		);
 		expect(resizeTravels).toHaveLength(2);
 		const retargeted = resizeTravels.at(-1);
-		if (retargeted?.channel !== "pose" || retargeted.readPose === undefined) {
+		if (retargeted?.channel !== "pose" || retargeted.readPoseFn === undefined) {
 			throw new Error("Expected resize hydration to retarget the active settle.");
 		}
-		const retargetedStart = retargeted.readPose(0);
+		const retargetedStart = retargeted.readPoseFn(0);
 		expect(retargetedStart).toMatchObject({
 			x: beforeResize.x,
 			y: beforeResize.y,
 		});
 		expect((retargetedStart.scale ?? 1) * actor.size).toBe((beforeResize.scale ?? 1) * 80);
-		expect(retargeted.readPose(1)).toEqual({
+		expect(retargeted.readPoseFn(1)).toEqual({
 			scale: 1,
 			x: 700,
 			y: 500,

@@ -11,7 +11,7 @@ export namespace writeElectronPreferenceFx {
 		readonly target: string;
 		readonly value: Value;
 		readonly operation: string;
-		readonly serialize: (value: Value) => string;
+		readonly serializeFn: (value: Value) => string;
 	}
 }
 
@@ -23,11 +23,11 @@ export const writeElectronPreferenceFx = Effect.fn("writeElectronPreferenceFx")(
 		target,
 		value,
 		operation,
-		serialize,
+		serializeFn,
 	}: writeElectronPreferenceFx.Props<Value>) =>
 		Effect.gen(function* () {
 			const serialized = yield* Effect.try({
-				try: () => serialize(value),
+				try: () => serializeFn(value),
 				catch: (cause) =>
 					new ElectronMainError({
 						operation,

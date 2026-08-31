@@ -42,14 +42,14 @@ const initialState: CornerPortraitPeekState = {
 
 /** Randomly selects which already-mounted portrait peeks from this corner. */
 const useCornerPortraitPeek = (active: boolean, portraitUrls: readonly string[]) => {
-	const [peek, setPeek] = useState(initialState);
+	const [peek, setPeekFn] = useState(initialState);
 	const previousPortraitIndexRef = useRef<number | undefined>(undefined);
 
 	useEffect(() => {
-		const randomBetween = (minimum: number, maximum: number) =>
+		const randomBetweenFn = (minimum: number, maximum: number) =>
 			minimum + Math.random() * (maximum - minimum);
 		if (!active) {
-			setPeek((current) => ({
+			setPeekFn((current) => ({
 				...current,
 				activePortraitIndex: undefined,
 			}));
@@ -59,7 +59,7 @@ const useCornerPortraitPeek = (active: boolean, portraitUrls: readonly string[])
 		let disposed = false;
 		let timeout: number | undefined;
 
-		const schedulePeek = () => {
+		const schedulePeekFn = () => {
 			timeout = window.setTimeout(
 				() => {
 					if (disposed) return;
@@ -70,28 +70,31 @@ const useCornerPortraitPeek = (active: boolean, portraitUrls: readonly string[])
 					const nextIndex =
 						candidates[Math.floor(Math.random() * candidates.length)] ?? 0;
 					previousPortraitIndexRef.current = nextIndex;
-					setPeek({
+					setPeekFn({
 						activePortraitIndex: nextIndex,
-						sizePx: Math.round(randomBetween(176, 248)),
+						sizePx: Math.round(randomBetweenFn(176, 248)),
 					});
 
 					timeout = window.setTimeout(
 						() => {
 							if (disposed) return;
-							setPeek((current) => ({
+							setPeekFn((current) => ({
 								...current,
 								activePortraitIndex: undefined,
 							}));
-							timeout = window.setTimeout(schedulePeek, randomBetween(700, 3_200));
+							timeout = window.setTimeout(
+								schedulePeekFn,
+								randomBetweenFn(700, 3_200),
+							);
 						},
-						randomBetween(1_100, 2_300),
+						randomBetweenFn(1_100, 2_300),
 					);
 				},
-				randomBetween(350, 2_800),
+				randomBetweenFn(350, 2_800),
 			);
 		};
 
-		schedulePeek();
+		schedulePeekFn();
 		return () => {
 			disposed = true;
 			if (timeout !== undefined) window.clearTimeout(timeout);

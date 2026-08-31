@@ -35,7 +35,7 @@ describe("Settings feature commands", () => {
 			configurable: true,
 			value: {
 				diagnostics: {
-					openDirectory,
+					openDirectoryFn: openDirectory,
 				},
 			},
 		});
@@ -59,7 +59,7 @@ describe("Settings feature commands", () => {
 			configurable: true,
 			value: {
 				diagnostics: {
-					openDirectory: () => Promise.reject(new Error("logs unavailable")),
+					openDirectoryFn: () => Promise.reject(new Error("logs unavailable")),
 				},
 			},
 		});
@@ -80,7 +80,7 @@ describe("Settings feature commands", () => {
 			configurable: true,
 			value: {
 				userData: {
-					openDirectory: () => Promise.reject(new Error("data unavailable")),
+					openDirectoryFn: () => Promise.reject(new Error("data unavailable")),
 				},
 			},
 		});

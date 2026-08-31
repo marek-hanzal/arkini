@@ -9,14 +9,14 @@ import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 	force,
 	itemId,
-	notifyProjectChanged,
+	notifyProjectChangedFn,
 	project,
 	repository,
 	revision,
 }: {
 	readonly force: boolean;
 	readonly itemId: string;
-	readonly notifyProjectChanged: (projectId: string) => void;
+	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 	readonly revision: number;
@@ -34,7 +34,7 @@ export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 		itemUid: item.uid,
 		projectId: project.projectId,
 	});
-	yield* notifyProjectChangedFx(notifyProjectChanged, project.projectId);
+	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		"Deleted item.",
 		`ID: ${itemId}`,

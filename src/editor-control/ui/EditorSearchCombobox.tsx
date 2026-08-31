@@ -32,11 +32,11 @@ interface EditorSearchComboboxProps {
 	readonly options: readonly EditorSearchOption[];
 	readonly placeholder?: string;
 	readonly value: string;
-	readonly onBlur?: () => void;
-	readonly onChange: (value: string) => void;
-	readonly onInputChange?: (value: string) => void;
-	readonly renderPreview: (option: EditorSearchOption) => ReactNode;
-	readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
+	readonly onBlurFn?: () => void;
+	readonly onChangeFn: (value: string) => void;
+	readonly onInputChangeFn?: (value: string) => void;
+	readonly renderPreviewFn: (option: EditorSearchOption) => ReactNode;
+	readonly renderSelectedPreviewFn?: (option: EditorSearchOption) => ReactNode;
 }
 
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
@@ -47,27 +47,27 @@ export const EditorSearchCombobox = ({
 	error,
 	label,
 	labelVisible = true,
-	onBlur,
-	onChange,
-	onInputChange,
+	onBlurFn,
+	onChangeFn,
+	onInputChangeFn,
 	options,
 	placeholder,
-	renderPreview,
-	renderSelectedPreview,
+	renderPreviewFn,
+	renderSelectedPreviewFn,
 	value,
 }: EditorSearchComboboxProps) => {
 	const selectedOption = options.find((option) => option.id === value);
 	const selectedPreview =
-		selectedOption === undefined ? undefined : renderSelectedPreview?.(selectedOption);
+		selectedOption === undefined ? undefined : renderSelectedPreviewFn?.(selectedOption);
 	const selectedLabel = displaySelectedLabel
 		? (options.find((option) => option.id === value)?.label ?? value)
 		: value;
-	const [query, setQuery] = useState(selectedLabel);
-	const [open, setOpen] = useState(false);
-	const [activeIndex, setActiveIndex] = useState(0);
+	const [query, setQueryFn] = useState(selectedLabel);
+	const [open, setOpenFn] = useState(false);
+	const [activeIndex, setActiveIndexFn] = useState(0);
 	const { floatingStyles, refs } = useFloating({
 		open,
-		onOpenChange: setOpen,
+		onOpenChange: setOpenFn,
 		placement: "bottom-start",
 		middleware: [
 			offset(4),
@@ -118,24 +118,24 @@ export const EditorSearchCombobox = ({
 	});
 
 	useEffect(() => {
-		setQuery(selectedLabel);
+		setQueryFn(selectedLabel);
 	}, [
 		selectedLabel,
 	]);
 	useEffect(() => {
-		setActiveIndex(0);
+		setActiveIndexFn(0);
 	}, [
 		query,
 	]);
 
-	const choose = (option: EditorSearchOption) => {
-		onChange(option.id);
-		setQuery(displaySelectedLabel ? option.label : option.id);
-		setOpen(false);
+	const chooseFn = (option: EditorSearchOption) => {
+		onChangeFn(option.id);
+		setQueryFn(displaySelectedLabel ? option.label : option.id);
+		setOpenFn(false);
 	};
-	const beginSearch = () => {
-		if (!open && query === selectedLabel) setQuery("");
-		setOpen(true);
+	const beginSearchFn = () => {
+		if (!open && query === selectedLabel) setQueryFn("");
+		setOpenFn(true);
 	};
 
 	return (
@@ -167,28 +167,28 @@ export const EditorSearchCombobox = ({
 						className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
-							setOpen(false);
-							setQuery(selectedLabel);
-							onBlur?.();
+							setOpenFn(false);
+							setQueryFn(selectedLabel);
+							onBlurFn?.();
 						}}
 						onChange={(event) => {
 							const value = event.currentTarget.value;
-							setQuery(value);
-							onInputChange?.(value);
-							setOpen(true);
+							setQueryFn(value);
+							onInputChangeFn?.(value);
+							setOpenFn(true);
 						}}
-						onClick={beginSearch}
-						onFocus={beginSearch}
+						onClick={beginSearchFn}
+						onFocus={beginSearchFn}
 						onKeyDown={(event) => {
 							if (event.key === "Escape") {
-								setOpen(false);
-								setQuery(selectedLabel);
+								setOpenFn(false);
+								setQueryFn(selectedLabel);
 								return;
 							}
 							if (event.key === "ArrowDown" || event.key === "ArrowUp") {
 								event.preventDefault();
-								setOpen(true);
-								setActiveIndex((current) => {
+								setOpenFn(true);
+								setActiveIndexFn((current) => {
 									if (matches.length === 0) return 0;
 									const offset = event.key === "ArrowDown" ? 1 : -1;
 									return (current + offset + matches.length) % matches.length;
@@ -201,7 +201,7 @@ export const EditorSearchCombobox = ({
 								matches[activeIndex] !== undefined
 							) {
 								event.preventDefault();
-								choose(matches[activeIndex]);
+								chooseFn(matches[activeIndex]);
 							}
 						}}
 						{...readDataUiFn({
@@ -218,9 +218,9 @@ export const EditorSearchCombobox = ({
 							title="Clear search"
 							onMouseDown={(event) => event.preventDefault()}
 							onClick={() => {
-								setQuery("");
-								onInputChange?.("");
-								setOpen(true);
+								setQueryFn("");
+								onInputChangeFn?.("");
+								setOpenFn(true);
 							}}
 						>
 							<X className="size-5" />
@@ -249,8 +249,8 @@ export const EditorSearchCombobox = ({
 								type="button"
 								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised data-[ui-active=true]:bg-surface-raised"
 								onMouseDown={(event) => event.preventDefault()}
-								onMouseEnter={() => setActiveIndex(index)}
-								onClick={() => choose(option)}
+								onMouseEnter={() => setActiveIndexFn(index)}
+								onClick={() => chooseFn(option)}
 								{...readDataUiFn({
 									dataUi: "EditorSearchComboboxOption",
 									state: {
@@ -259,7 +259,7 @@ export const EditorSearchCombobox = ({
 									},
 								})}
 							>
-								{renderPreview(option)}
+								{renderPreviewFn(option)}
 								<span className="min-w-0 flex-1">
 									<span className="block truncate text-sm font-semibold text-foreground">
 										{option.label}

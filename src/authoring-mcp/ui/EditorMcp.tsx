@@ -19,16 +19,16 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 	const project = useEditorProject();
 	const overviewController = useEditorMcpOverviewController();
 	const settingsController = useEditorMcpSettingsController({
-		onConfigure: overviewController.configure,
+		onConfigureFn: overviewController.configureFn,
 		overview: overviewController.overview,
 	});
 	const clipboardController = useEditorMcpClipboardController();
 	const overview = overviewController.overview;
 	const error =
 		settingsController.error ?? clipboardController.error ?? overviewController.commandError;
-	const execute = (command: () => void) => {
-		settingsController.clearError();
-		command();
+	const executeFn = (commandFn: () => void) => {
+		settingsController.clearErrorFn();
+		commandFn();
 	};
 	const title = section === "server" ? "MCP - Server" : "MCP - Settings";
 	return (
@@ -76,12 +76,12 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 						.with("server", () => (
 							<EditorMcpServer
 								copied={clipboardController.copied}
-								onCopy={clipboardController.copy}
-								onResetAuth={() => execute(overviewController.resetAuth)}
-								onStartLocal={() => execute(overviewController.startLocal)}
-								onStartRemote={() => execute(overviewController.startRemote)}
-								onStopLocal={() => execute(overviewController.stopLocal)}
-								onStopRemote={() => execute(overviewController.stopRemote)}
+								onCopyFn={clipboardController.copyFn}
+								onResetAuthFn={() => executeFn(overviewController.resetAuthFn)}
+								onStartLocalFn={() => executeFn(overviewController.startLocalFn)}
+								onStartRemoteFn={() => executeFn(overviewController.startRemoteFn)}
+								onStopLocalFn={() => executeFn(overviewController.stopLocalFn)}
+								onStopRemoteFn={() => executeFn(overviewController.stopRemoteFn)}
 								overview={overview}
 								pending={overviewController.pending}
 							/>
@@ -91,12 +91,12 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 								authtoken={settingsController.authtoken}
 								copied={clipboardController.copied}
 								ngrokDomain={settingsController.ngrokDomain}
-								onCopy={clipboardController.copy}
-								onSaveNgrok={settingsController.saveNgrok}
-								onSavePort={settingsController.savePort}
-								onSetAuthtoken={settingsController.setAuthtoken}
-								onSetNgrokDomain={settingsController.setNgrokDomain}
-								onSetPort={settingsController.setPort}
+								onCopyFn={clipboardController.copyFn}
+								onSaveNgrokFn={settingsController.saveNgrokFn}
+								onSavePortFn={settingsController.savePortFn}
+								onSetAuthtokenFn={settingsController.setAuthtokenFn}
+								onSetNgrokDomainFn={settingsController.setNgrokDomainFn}
+								onSetPortFn={settingsController.setPortFn}
 								overview={overview}
 								pending={overviewController.pending}
 								port={settingsController.port}

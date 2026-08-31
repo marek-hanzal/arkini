@@ -2,15 +2,15 @@ import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVer
 import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 
 export const VersionCheckoutDialog = ({
-	onCancel,
-	onCommit,
-	onRestore,
+	onCancelFn,
+	onCommitFn,
+	onRestoreFn,
 	pending,
 	version,
 }: {
-	readonly onCancel: () => void;
-	readonly onCommit: () => void;
-	readonly onRestore: () => void;
+	readonly onCancelFn: () => void;
+	readonly onCommitFn: () => void;
+	readonly onRestoreFn: () => void;
 	readonly pending: boolean;
 	readonly version: ProjectVersionDescriptor;
 }) => (
@@ -28,20 +28,20 @@ export const VersionCheckoutDialog = ({
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
 				<Button
 					disabled={pending}
-					onClick={onCancel}
+					onClick={onCancelFn}
 				>
 					Cancel
 				</Button>
 				<PrimaryButton
 					disabled={pending}
-					onClick={onCommit}
+					onClick={onCommitFn}
 				>
 					Go to Commit
 				</PrimaryButton>
 				<DangerButton
 					disabled={pending}
 					cursorIntent={pending ? "progress" : undefined}
-					onClick={onRestore}
+					onClick={onRestoreFn}
 				>
 					Restore and discard
 				</DangerButton>

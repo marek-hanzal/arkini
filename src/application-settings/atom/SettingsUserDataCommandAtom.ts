@@ -6,7 +6,7 @@ import { createSettingsDirectoryCommandAtomFx } from "~/application-settings/fx/
 export const SettingsUserDataCommandAtom = Effect.runSync(
 	createSettingsDirectoryCommandAtomFx(
 		Effect.tryPromise({
-			try: () => window.arkini.userData.openDirectory(),
+			try: () => window.arkini.userData.openDirectoryFn(),
 			catch: (cause) => cause,
 		}),
 	),

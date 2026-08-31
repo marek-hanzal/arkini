@@ -8,7 +8,7 @@ interface EditorCapabilityStatusProps {
 	readonly dataUi?: string;
 	readonly description: string;
 	readonly icon: LucideIcon;
-	readonly onEnable: () => void;
+	readonly onEnableFn: () => void;
 	readonly title: string;
 }
 
@@ -18,11 +18,11 @@ export const EditorCapabilityStatus = ({
 	dataUi,
 	description,
 	icon,
-	onEnable,
+	onEnableFn,
 	title,
 }: EditorCapabilityStatusProps) => (
 	<Status
-		action={<PrimaryButton onClick={onEnable}>{actionLabel}</PrimaryButton>}
+		action={<PrimaryButton onClick={onEnableFn}>{actionLabel}</PrimaryButton>}
 		dataUi={dataUi}
 		description={description}
 		icon={icon}

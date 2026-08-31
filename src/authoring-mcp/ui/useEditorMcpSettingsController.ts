@@ -4,49 +4,49 @@ import type { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMc
 
 export namespace useEditorMcpSettingsController {
 	export interface Props {
-		readonly onConfigure: (configuration: EditorMcpConfigurationSchema.Type) => void;
+		readonly onConfigureFn: (configuration: EditorMcpConfigurationSchema.Type) => void;
 		readonly overview?: EditorMcpOverviewSchema.Type;
 	}
 
 	export interface Output {
 		readonly authtoken: string;
-		readonly clearError: () => void;
+		readonly clearErrorFn: () => void;
 		readonly error?: string;
 		readonly ngrokDomain: string;
 		readonly port: string;
-		readonly saveNgrok: () => void;
-		readonly savePort: () => void;
-		readonly setAuthtoken: (value: string) => void;
-		readonly setNgrokDomain: (value: string) => void;
-		readonly setPort: (value: string) => void;
+		readonly saveNgrokFn: () => void;
+		readonly savePortFn: () => void;
+		readonly setAuthtokenFn: (value: string) => void;
+		readonly setNgrokDomainFn: (value: string) => void;
+		readonly setPortFn: (value: string) => void;
 	}
 }
 
 /** Owns unsaved MCP configuration drafts and their local validation. */
 export const useEditorMcpSettingsController = ({
-	onConfigure,
+	onConfigureFn,
 	overview,
 }: useEditorMcpSettingsController.Props): useEditorMcpSettingsController.Output => {
-	const [portDraft, setPortDraft] = useState<string>();
-	const [authtoken, setAuthtoken] = useState("");
-	const [ngrokDomainDraft, setNgrokDomainDraft] = useState<string>();
-	const [error, setError] = useState<string>();
+	const [portDraft, setPortDraftFn] = useState<string>();
+	const [authtoken, setAuthtokenFn] = useState("");
+	const [ngrokDomainDraft, setNgrokDomainDraftFn] = useState<string>();
+	const [error, setErrorFn] = useState<string>();
 	const port = portDraft ?? (overview === undefined ? "" : String(overview.port));
 	const ngrokDomain = ngrokDomainDraft ?? overview?.ngrokDomain ?? "";
 
 	return {
 		authtoken,
-		clearError: () => setError(undefined),
+		clearErrorFn: () => setErrorFn(undefined),
 		error,
 		ngrokDomain,
 		port,
-		saveNgrok: () => {
+		saveNgrokFn: () => {
 			if (authtoken.trim() === "") {
-				setError("Paste an ngrok authtoken first.");
+				setErrorFn("Paste an ngrok authtoken first.");
 				return;
 			}
 			if (ngrokDomain.trim() === "") {
-				setError("Enter the assigned ngrok domain first.");
+				setErrorFn("Enter the assigned ngrok domain first.");
 				return;
 			}
 			const ngrok = EditorMcpConfigurationSchema.safeParse({
@@ -55,33 +55,33 @@ export const useEditorMcpSettingsController = ({
 				domain: ngrokDomain,
 			});
 			if (!ngrok.success) {
-				setError("Enter the ngrok hostname without https:// or a path.");
+				setErrorFn("Enter the ngrok hostname without https:// or a path.");
 				return;
 			}
-			onConfigure(ngrok.data);
-			setAuthtoken("");
-			setNgrokDomainDraft(undefined);
+			onConfigureFn(ngrok.data);
+			setAuthtokenFn("");
+			setNgrokDomainDraftFn(undefined);
 		},
-		savePort: () => {
+		savePortFn: () => {
 			const candidate = Number(port);
 			if (!Number.isInteger(candidate) || candidate < 1_024 || candidate > 65_535) {
-				setError("Use a port from 1024 to 65535.");
+				setErrorFn("Use a port from 1024 to 65535.");
 				return;
 			}
-			onConfigure({
+			onConfigureFn({
 				type: "port",
 				port: candidate,
 			});
-			setPortDraft(undefined);
+			setPortDraftFn(undefined);
 		},
-		setAuthtoken,
-		setNgrokDomain: (value) => {
-			setError(undefined);
-			setNgrokDomainDraft(value);
+		setAuthtokenFn,
+		setNgrokDomainFn: (value) => {
+			setErrorFn(undefined);
+			setNgrokDomainDraftFn(value);
 		},
-		setPort: (value) => {
-			setError(undefined);
-			setPortDraft(value);
+		setPortFn: (value) => {
+			setErrorFn(undefined);
+			setPortDraftFn(value);
 		},
 	};
 };

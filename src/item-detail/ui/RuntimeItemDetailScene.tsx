@@ -23,7 +23,7 @@ export const RuntimeItemDetailScene = ({
 	const controller = useRuntimeItemDetailSceneController({
 		target,
 	});
-	const closeItemDetail = useCloseItemDetail();
+	const closeItemDetailFn = useCloseItemDetail();
 
 	return (
 		<div
@@ -44,7 +44,7 @@ export const RuntimeItemDetailScene = ({
 					<button
 						type="button"
 						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-						onClick={() => closeItemDetail()}
+						onClick={() => closeItemDetailFn()}
 					>
 						×
 					</button>

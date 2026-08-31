@@ -38,8 +38,8 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 				activeWorkspace={activeWorkspace}
 				exitDisabled={commands.exit.disabled}
 				exitPending={commands.exit.pending}
-				onExit={commands.exit.close}
-				onRefresh={commands.refresh.refresh}
+				onExitFn={commands.exit.closeFn}
+				onRefreshFn={commands.refresh.refreshFn}
 				projectId={project.projectId}
 				refreshDisabled={commands.refresh.disabled}
 				refreshPending={commands.refresh.pending}

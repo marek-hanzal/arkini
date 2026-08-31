@@ -26,16 +26,16 @@ export interface EditorSelectOption<Value extends string> {
 /** Replaces visually inconsistent native selects with the editor's Floating UI menu. */
 export const EditorSelect = <Value extends string>({
 	label,
-	onChange,
+	onChangeFn,
 	options,
 	value,
 }: {
 	readonly label: string;
-	readonly onChange: (value: Value) => void;
+	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<EditorSelectOption<Value>>;
 	readonly value: Value;
 }) => {
-	const [open, setOpen] = useState(false);
+	const [open, setOpenFn] = useState(false);
 	const selected = options.find((option) => option.value === value);
 	const { context, floatingStyles, refs } = useFloating({
 		middleware: [
@@ -51,15 +51,16 @@ export const EditorSelect = <Value extends string>({
 				},
 			}),
 		],
-		onOpenChange: setOpen,
+		onOpenChange: setOpenFn,
 		open,
 		placement: "bottom-end",
 		whileElementsMounted: autoUpdate,
 	});
-	const { getFloatingProps, getReferenceProps } = useInteractions([
-		useClick(context),
-		useDismiss(context),
-	]);
+	const { getFloatingProps: getFloatingPropsFn, getReferenceProps: getReferencePropsFn } =
+		useInteractions([
+			useClick(context),
+			useDismiss(context),
+		]);
 
 	return (
 		<>
@@ -68,7 +69,7 @@ export const EditorSelect = <Value extends string>({
 				className="h-12 min-h-12 min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none"
 				data-ui="EditorSelectTrigger"
 				title={label}
-				{...getReferenceProps()}
+				{...getReferencePropsFn()}
 			>
 				<span>{selected?.label ?? value}</span>
 				<ChevronDown className="size-4 shrink-0 text-muted" />
@@ -80,7 +81,7 @@ export const EditorSelect = <Value extends string>({
 						className="z-50 grid gap-1 rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
 						data-ui="EditorSelectMenu"
 						style={floatingStyles}
-						{...getFloatingProps()}
+						{...getFloatingPropsFn()}
 					>
 						{options.map((option) => (
 							<button
@@ -88,8 +89,8 @@ export const EditorSelect = <Value extends string>({
 								disabled={option.disabled}
 								key={option.value}
 								onClick={() => {
-									onChange(option.value);
-									setOpen(false);
+									onChangeFn(option.value);
+									setOpenFn(false);
 								}}
 								type="button"
 								{...readDataUiFn({

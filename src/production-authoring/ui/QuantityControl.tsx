@@ -7,7 +7,7 @@ interface QuantityControlProps {
 	readonly label?: string;
 	readonly maximumDescription?: string;
 	readonly minimumDescription?: string;
-	readonly onChange: (quantity: QuantitySchema.Type) => void;
+	readonly onChangeFn: (quantity: QuantitySchema.Type) => void;
 	readonly value: QuantitySchema.Type;
 }
 
@@ -15,7 +15,7 @@ interface QuantityControlProps {
 export const QuantityFields = ({
 	maximumDescription,
 	minimumDescription,
-	onChange,
+	onChangeFn,
 	value,
 }: Omit<QuantityControlProps, "description" | "label">) => (
 	<>
@@ -24,8 +24,8 @@ export const QuantityFields = ({
 			label="Minimum"
 			value={value.min}
 			min={1}
-			onChange={(min) =>
-				onChange({
+			onChangeFn={(min) =>
+				onChangeFn({
 					...value,
 					min,
 				})
@@ -36,8 +36,8 @@ export const QuantityFields = ({
 			label="Maximum"
 			value={value.max}
 			min={value.min}
-			onChange={(max) =>
-				onChange({
+			onChangeFn={(max) =>
+				onChangeFn({
 					...value,
 					max,
 				})
@@ -52,7 +52,7 @@ export const QuantityControl = ({
 	label = "Quantity",
 	maximumDescription,
 	minimumDescription,
-	onChange,
+	onChangeFn,
 	value,
 }: QuantityControlProps) => (
 	<div className="grid gap-3">
@@ -67,7 +67,7 @@ export const QuantityControl = ({
 				maximumDescription={maximumDescription}
 				minimumDescription={minimumDescription}
 				value={value}
-				onChange={onChange}
+				onChangeFn={onChangeFn}
 			/>
 		</div>
 	</div>

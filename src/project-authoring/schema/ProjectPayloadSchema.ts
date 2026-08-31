@@ -25,7 +25,7 @@ const commitTransportSchema = projectTransportSchema
 		],
 	});
 
-const materializeProjectRecord = (transport: z.infer<typeof projectTransportSchema>) => {
+const materializeProjectRecordFn = (transport: z.infer<typeof projectTransportSchema>) => {
 	const record = ProjectRecordSchema.parse({
 		projectId: transport.projectId,
 		config: transport.config,
@@ -47,21 +47,21 @@ const materializeProjectRecord = (transport: z.infer<typeof projectTransportSche
 	};
 };
 
-const materializeCommit = (transport: z.infer<typeof commitTransportSchema>): ProjectCommit => {
+const materializeCommitFn = (transport: z.infer<typeof commitTransportSchema>): ProjectCommit => {
 	return {
-		...materializeProjectRecord(transport),
+		...materializeProjectRecordFn(transport),
 		previousRevision: transport.previousRevision,
 	};
 };
 
-export const ProjectCommitPayloadSchema = commitTransportSchema.transform(materializeCommit);
+export const ProjectCommitPayloadSchema = commitTransportSchema.transform(materializeCommitFn);
 
 export const ProjectPayloadSchema = projectTransportSchema
 	.extend({
 		resources: ResourceSchema.array(),
 	})
 	.transform((project) => ({
-		...materializeProjectRecord(project),
+		...materializeProjectRecordFn(project),
 		resources: project.resources
 			.map((resource) => ({
 				...resource,

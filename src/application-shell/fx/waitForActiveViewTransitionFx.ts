@@ -14,8 +14,8 @@ export const waitForActiveViewTransitionFx = Effect.fn("waitForActiveViewTransit
 		}
 
 		for (let frame = 0; frame < maxDiscoveryFrames; frame += 1) {
-			await new Promise<void>((resolve) => {
-				window.requestAnimationFrame(() => resolve());
+			await new Promise<void>((resolveFn) => {
+				window.requestAnimationFrame(() => resolveFn());
 			});
 			const transition = document.activeViewTransition;
 			if (transition === null) continue;

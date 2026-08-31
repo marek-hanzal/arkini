@@ -103,7 +103,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 	runtime,
 	surface,
 }: {
-	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly runtime: RuntimeSchema.Type;
 	readonly surface: "inventory" | "main";
 }) {

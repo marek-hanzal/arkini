@@ -36,19 +36,19 @@ export namespace registerEditorBoardScenarioIpcFx {
 export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardScenarioIpcFx")(
 	({ ownership, trustedRenderer }: registerEditorBoardScenarioIpcFx.Props) =>
 		Effect.sync(() => {
-			const handle = <Value>(
+			const handleFn = <Value>(
 				channel: string,
-				run: (candidate: unknown) => Effect.Effect<Value, never, never>,
+				runFx: (candidate: unknown) => Effect.Effect<Value, never, never>,
 			) =>
 				ipcMain.handle(channel, (event: IpcMainInvokeEvent, candidate) =>
 					ElectronMainRuntime.runPromise(
 						trustedRenderer
 							.assertTrustedIpcSenderFx(event)
-							.pipe(Effect.andThen(run(candidate))),
+							.pipe(Effect.andThen(runFx(candidate))),
 					),
 				);
 
-			handle(ArkiniElectronApi.channels.editorBoardScenarioList, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorBoardScenarioList, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"list-board-scenarios",
 					ownership,
@@ -56,7 +56,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 					(repository, projectId) => repository.listBoardScenariosFx(projectId),
 				),
 			);
-			handle(ArkiniElectronApi.channels.editorBoardScenarioRead, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorBoardScenarioRead, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"read-board-scenario",
 					ownership,
@@ -68,7 +68,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 					(repository, request) => repository.readBoardScenarioFx(request),
 				),
 			);
-			handle(ArkiniElectronApi.channels.editorBoardScenarioWrite, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorBoardScenarioWrite, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"write-board-scenario",
 					ownership,
@@ -80,7 +80,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 					(repository, request) => repository.writeBoardScenarioFx(request),
 				),
 			);
-			handle(ArkiniElectronApi.channels.editorBoardScenarioDelete, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorBoardScenarioDelete, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"delete-board-scenario",
 					ownership,

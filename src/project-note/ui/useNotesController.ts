@@ -10,10 +10,10 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 
 export namespace useNotesController {
 	export interface Output {
-		readonly cancelEdit: () => void;
+		readonly cancelEditFn: () => void;
 		readonly canCreate: boolean;
 		readonly canSaveEdit: boolean;
-		readonly create: () => void;
+		readonly createFn: () => void;
 		readonly editContent: string;
 		readonly editingNoteId?: string;
 		readonly error?: unknown;
@@ -22,37 +22,37 @@ export namespace useNotesController {
 		readonly newContent: string;
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly pending: boolean;
-		readonly remove: (noteId: string) => void;
-		readonly retry: () => void;
-		readonly saveEdit: () => void;
-		readonly setEditContent: (content: string) => void;
-		readonly setNewContent: (content: string) => void;
-		readonly startEdit: (note: NoteSchema.Type) => void;
+		readonly removeFn: (noteId: string) => void;
+		readonly retryFn: () => void;
+		readonly saveEditFn: () => void;
+		readonly setEditContentFn: (content: string) => void;
+		readonly setNewContentFn: (content: string) => void;
+		readonly startEditFn: (note: NoteSchema.Type) => void;
 	}
 }
 
 export const useNotesController = (): useNotesController.Output => {
 	const project = useEditorProject();
-	const commandAtom = NoteCommandAtoms.command(project.projectId);
-	const streamAtom = NoteCommandAtoms.stream(project.projectId);
+	const commandAtom = NoteCommandAtoms.commandFn(project.projectId);
+	const streamAtom = NoteCommandAtoms.streamFn(project.projectId);
 	const commandResult = useAtomValue(commandAtom);
 	const notes = useAtomValue(streamAtom);
-	const run = useAtomSet(commandAtom, {
+	const runFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
-	const [editContent, setEditContent] = useState("");
-	const [editingNoteId, setEditingNoteId] = useState<string>();
-	const [newContent, setNewContent] = useState("");
+	const [editContent, setEditContentFn] = useState("");
+	const [editingNoteId, setEditingNoteIdFn] = useState<string>();
+	const [newContent, setNewContentFn] = useState("");
 
 	useEffect(() => {
 		if (notes !== undefined || !AsyncResult.isInitial(commandResult)) return;
-		void run({
+		void runFn({
 			action: "load",
 		}).catch(() => undefined);
 	}, [
 		commandResult,
 		notes,
-		run,
+		runFn,
 	]);
 
 	const loaded = notes !== undefined;
@@ -65,56 +65,56 @@ export const useNotesController = (): useNotesController.Output => {
 		loaded && !pending && newContentLength > 0 && newContentLength <= NoteContentMaxLength;
 	const canSaveEdit =
 		!pending && editContentLength > 0 && editContentLength <= NoteContentMaxLength;
-	const create = () => {
+	const createFn = () => {
 		if (!canCreate) return;
-		void run({
+		void runFn({
 			action: "create",
 			content: newContent,
 		})
-			.then(() => setNewContent(""))
+			.then(() => setNewContentFn(""))
 			.catch(() => undefined);
 	};
-	const startEdit = (note: NoteSchema.Type) => {
-		setEditingNoteId(note.noteId);
-		setEditContent(note.content);
+	const startEditFn = (note: NoteSchema.Type) => {
+		setEditingNoteIdFn(note.noteId);
+		setEditContentFn(note.content);
 	};
-	const cancelEdit = () => {
+	const cancelEditFn = () => {
 		if (pending) return;
-		setEditingNoteId(undefined);
-		setEditContent("");
+		setEditingNoteIdFn(undefined);
+		setEditContentFn("");
 	};
-	const saveEdit = () => {
+	const saveEditFn = () => {
 		if (!canSaveEdit || editingNoteId === undefined) return;
-		void run({
+		void runFn({
 			action: "update",
 			noteId: editingNoteId,
 			content: editContent,
 		})
 			.then(() => {
-				setEditingNoteId(undefined);
-				setEditContent("");
+				setEditingNoteIdFn(undefined);
+				setEditContentFn("");
 			})
 			.catch(() => undefined);
 	};
-	const remove = (noteId: string) => {
+	const removeFn = (noteId: string) => {
 		if (pending) return;
-		void run({
+		void runFn({
 			action: "delete",
 			noteId,
 		}).catch(() => undefined);
 	};
-	const retry = () => {
+	const retryFn = () => {
 		if (pending) return;
-		void run({
+		void runFn({
 			action: "load",
 		}).catch(() => undefined);
 	};
 
 	return {
-		cancelEdit,
+		cancelEditFn,
 		canCreate,
 		canSaveEdit,
-		create,
+		createFn,
 		editContent,
 		...(editingNoteId === undefined
 			? {}
@@ -131,11 +131,11 @@ export const useNotesController = (): useNotesController.Output => {
 		newContent,
 		notes: notes ?? [],
 		pending,
-		remove,
-		retry,
-		saveEdit,
-		setEditContent,
-		setNewContent,
-		startEdit,
+		removeFn,
+		retryFn,
+		saveEditFn,
+		setEditContentFn,
+		setNewContentFn,
+		startEditFn,
 	};
 };

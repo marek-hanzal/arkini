@@ -85,7 +85,7 @@ describe("temporary material input eligibility", () => {
 		});
 		const batches: unknown[] = [];
 		try {
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:owner",
 					itemId: "owner",
@@ -100,7 +100,7 @@ describe("temporary material input eligibility", () => {
 					quantity: 1,
 				}),
 			);
-			const temporary = await session.run(
+			const temporary = await session.runFn(
 				spawnItemFx({
 					id: "runtime:temporary",
 					itemId: "temporary",
@@ -115,13 +115,13 @@ describe("temporary material input eligibility", () => {
 					quantity: 1,
 				}),
 			);
-			const before = await session.run(readRuntimeFx());
-			const unsubscribe = session.subscribeEvents((batch) => {
+			const before = await session.runFn(readRuntimeFx());
+			const unsubscribe = session.subscribeEventsFn((batch) => {
 				batches.push(batch);
 			});
 			try {
 				await expect(
-					session.run(
+					session.runFn(
 						storeInputMaterialFx({
 							ownerItemId: "runtime:owner",
 							lineId: "line:owner",
@@ -135,7 +135,7 @@ describe("temporary material input eligibility", () => {
 					_tag: "InputMaterialUnavailableError",
 					sourceItemId: temporary.id,
 				});
-				const after = await session.run(readRuntimeFx());
+				const after = await session.runFn(readRuntimeFx());
 				expect(after).toEqual(before);
 				expect(batches).toEqual([]);
 			} finally {

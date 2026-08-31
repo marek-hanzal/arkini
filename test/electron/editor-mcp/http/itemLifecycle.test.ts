@@ -45,7 +45,7 @@ describe("editor MCP item lifecycle", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("item-lifecycle");
+		ownership.setProjectContextFn("item-lifecycle");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 

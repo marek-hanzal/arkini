@@ -31,18 +31,20 @@ export const useEditorWorkspaceTransition = ({
 	projectId,
 }: useEditorWorkspaceTransition.Props): useEditorWorkspaceTransition.Output => {
 	const router = useRouter();
-	const [workspace, setWorkspace] = useState<EditorWorkspaceId>();
+	const [workspace, setWorkspaceFn] = useState<EditorWorkspaceId>();
 
 	useEffect(() => {
-		const unsubscribeBeforeNavigate = router.subscribe("onBeforeNavigate", ({ toLocation }) =>
+		const unsubscribeBeforeNavigateFn = router.subscribe("onBeforeNavigate", ({ toLocation }) =>
 			flushSync(() =>
-				setWorkspace(readWorkspaceFromPathnameFn(toLocation.pathname, projectId)),
+				setWorkspaceFn(readWorkspaceFromPathnameFn(toLocation.pathname, projectId)),
 			),
 		);
-		const unsubscribeResolved = router.subscribe("onResolved", () => setWorkspace(undefined));
+		const unsubscribeResolvedFn = router.subscribe("onResolved", () =>
+			setWorkspaceFn(undefined),
+		);
 		return () => {
-			unsubscribeBeforeNavigate();
-			unsubscribeResolved();
+			unsubscribeBeforeNavigateFn();
+			unsubscribeResolvedFn();
 		};
 	}, [
 		projectId,

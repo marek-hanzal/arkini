@@ -9,12 +9,12 @@ export const readRequiredGameProjectJsonFx = Effect.fn("readRequiredGameProjectJ
 	path,
 	missingIssueCode,
 	missingMessage,
-	validate,
+	validateFn,
 }: {
 	readonly path: string;
 	readonly missingIssueCode: string;
 	readonly missingMessage: string;
-	readonly validate: (json: unknown) => GameDiagnosticsSchema.Type;
+	readonly validateFn: (json: unknown) => GameDiagnosticsSchema.Type;
 }) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const source = yield* Effect.option(fileSystem.readFileString(path));
@@ -31,7 +31,7 @@ export const readRequiredGameProjectJsonFx = Effect.fn("readRequiredGameProjectJ
 		] satisfies GameDiagnosticsSchema.Type;
 	return yield* Effect.sync(() => {
 		try {
-			return validate(JSON.parse(source.value));
+			return validateFn(JSON.parse(source.value));
 		} catch (error) {
 			return [
 				{

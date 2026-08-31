@@ -12,17 +12,17 @@ export const GameProjectJsonSchema = (() => {
 	if (typeof rootId !== "string")
 		throw new Error("The exported JSON Schema requires a root $id.");
 
-	const visit = (value: unknown): void => {
+	const visitFn = (value: unknown): void => {
 		if (Array.isArray(value)) {
-			for (const child of value) visit(child);
+			for (const child of value) visitFn(child);
 			return;
 		}
 		if (typeof value !== "object" || value === null) return;
 		const record = value as Record<string, unknown>;
 		if (typeof record.$ref === "string" && record.$ref.startsWith("#/$defs/"))
 			record.$ref = `${rootId}${record.$ref}`;
-		for (const child of Object.values(record)) visit(child);
+		for (const child of Object.values(record)) visitFn(child);
 	};
-	visit(schema);
+	visitFn(schema);
 	return schema;
 })();

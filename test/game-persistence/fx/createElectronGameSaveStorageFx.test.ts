@@ -8,9 +8,9 @@ describe("createElectronGameSaveStorageFx", () => {
 		const storage = Effect.runSync(
 			createElectronGameSaveStorageFx({
 				api: {
-					clear: vi.fn(),
-					read: vi.fn(),
-					write: vi.fn().mockRejectedValue(cause),
+					clearFn: vi.fn(),
+					readFn: vi.fn(),
+					writeFn: vi.fn().mockRejectedValue(cause),
 				},
 			}),
 		);

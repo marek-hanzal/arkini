@@ -35,7 +35,7 @@ describe("editor MCP project validation", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("invalid-project");
+		ownership.setProjectContextFn("invalid-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 		const result = await client.callTool({

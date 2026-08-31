@@ -24,31 +24,31 @@ export namespace runVisualReadinessFx {
 		  }
 		| {
 				readonly kind: "when-ready";
-				readonly onCancel?: () => void;
-				readonly onReady: () => void;
+				readonly onCancelFn?: () => void;
+				readonly onReadyFn: () => void;
 				readonly visual: ActorVisual;
 		  };
 }
 
-const invokeListener = (visual: ActorVisual, callback: () => void) => {
+const invokeListenerFn = (visual: ActorVisual, callbackFn: () => void) => {
 	try {
-		callback();
+		callbackFn();
 	} catch (cause) {
-		visual.reportCriticalFailure(cause);
+		visual.reportCriticalFailureFn(cause);
 	}
 };
 
-const drainListeners = (
+const drainListenersFn = (
 	visual: ActorVisual,
-	select: (listener: VisualReadyListener) => (() => void) | undefined,
+	selectFn: (listener: VisualReadyListener) => (() => void) | undefined,
 ) => {
 	const listeners = [
 		...visual.readyListeners,
 	];
 	visual.readyListeners.clear();
 	for (const listener of listeners) {
-		const callback = select(listener);
-		if (callback !== undefined) invokeListener(visual, callback);
+		const callbackFn = selectFn(listener);
+		if (callbackFn !== undefined) invokeListenerFn(visual, callbackFn);
 	}
 };
 
@@ -61,7 +61,7 @@ export const runVisualReadinessFx = Effect.fnUntraced(function* (
 		switch (action.kind) {
 			case "begin": {
 				if (visual.textureState === "destroyed") return visual.textureGeneration;
-				drainListeners(visual, ({ onCancel }) => onCancel);
+				drainListenersFn(visual, ({ onCancelFn }) => onCancelFn);
 				visual.textureState = "loading";
 				visual.textureGeneration += 1;
 				return visual.textureGeneration;
@@ -73,7 +73,7 @@ export const runVisualReadinessFx = Effect.fnUntraced(function* (
 				)
 					return;
 				visual.textureState = "ready";
-				drainListeners(visual, ({ onReady }) => onReady);
+				drainListenersFn(visual, ({ onReadyFn }) => onReadyFn);
 				return;
 			}
 			case "fail": {
@@ -83,28 +83,29 @@ export const runVisualReadinessFx = Effect.fnUntraced(function* (
 				)
 					return;
 				visual.textureState = "failed";
-				drainListeners(visual, ({ onCancel }) => onCancel);
+				drainListenersFn(visual, ({ onCancelFn }) => onCancelFn);
 				return;
 			}
 			case "cancel": {
 				if (visual.textureState === "destroyed") return;
 				visual.textureState = "destroyed";
 				visual.textureGeneration += 1;
-				drainListeners(visual, ({ onCancel }) => onCancel);
+				drainListenersFn(visual, ({ onCancelFn }) => onCancelFn);
 				return;
 			}
 			case "when-ready": {
 				if (visual.textureState === "ready") {
-					invokeListener(visual, action.onReady);
+					invokeListenerFn(visual, action.onReadyFn);
 					return;
 				}
 				if (visual.textureState === "destroyed" || visual.textureState === "failed") {
-					if (action.onCancel !== undefined) invokeListener(visual, action.onCancel);
+					if (action.onCancelFn !== undefined)
+						invokeListenerFn(visual, action.onCancelFn);
 					return;
 				}
 				visual.readyListeners.add({
-					onCancel: action.onCancel,
-					onReady: action.onReady,
+					onCancelFn: action.onCancelFn,
+					onReadyFn: action.onReadyFn,
 				});
 			}
 		}

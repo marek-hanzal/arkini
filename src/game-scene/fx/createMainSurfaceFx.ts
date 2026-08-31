@@ -4,8 +4,8 @@ import { Container, Graphics, Rectangle } from "pixi.js";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
 import type { MainInteractionTargetFacts as TargetFacts } from "~/tile-interaction/type/MainInteractionSurface";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
@@ -44,7 +44,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 	}: CreateMainSurfaceProps) =>
 		Effect.sync((): MainSurface => {
 			let palette = initialPalette;
-			let latestTransition = game.getTransitionSnapshot();
+			let latestTransition = game.getTransitionSnapshotFn();
 			let layoutRevision = 0;
 			let layout: MainLayout = readMainLayoutFn({
 				boardHeight: game.config.meta.board.height,
@@ -104,7 +104,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			application.stage.eventMode = "static";
 			let closed = false;
 
-			const readLocationPose = (location: TileActorItem["location"]) => {
+			const readLocationPoseFn = (location: TileActorItem["location"]) => {
 				if (
 					location.scope === LocationScopeEnumSchema.enum.Board &&
 					location.space === latestTransition.runtime.currentSpace
@@ -130,7 +130,9 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				return null;
 			};
 
-			const readTargetLocation = (target: PixiSceneDropTarget): TileActorItem["location"] =>
+			const readTargetLocationFn = (
+				target: PixiSceneDropTarget,
+			): TileActorItem["location"] =>
 				target.layout.kind === "board"
 					? {
 							scope: LocationScopeEnumSchema.enum.Board,
@@ -148,7 +150,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 							},
 						};
 
-			const readTargetFactsFromTarget = (
+			const readTargetFactsFromTargetFx = (
 				target: PixiSceneDropTarget | null,
 			): Effect.Effect<TargetFacts, never, never> =>
 				Effect.gen(function* () {
@@ -165,7 +167,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 							target: null,
 						};
 					}
-					const location = readTargetLocation(target);
+					const location = readTargetLocationFn(target);
 					const occupant = yield* actorStore.readCanonicalOccupantFx(location);
 					return {
 						commandTarget: {
@@ -195,7 +197,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					};
 				});
 
-			const readDropTarget = (x: number, y: number): PixiSceneDropTarget | null => {
+			const readDropTargetFn = (x: number, y: number): PixiSceneDropTarget | null => {
 				const toolbar = layout.toolbar;
 				const toolbarSlot = readSlotFn({
 					surface: toolbar,
@@ -223,7 +225,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						};
 			};
 
-			const appendIntersectingLocations = (
+			const appendIntersectingLocationsFn = (
 				locations: TileActorItem["location"][],
 				surface: MainLayout["board"] | null,
 				bounds: {
@@ -318,19 +320,19 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					}
 				}),
 				readActorPoseFx: Effect.fn("MainSurface.readActorPoseFx")((item) =>
-					Effect.sync(() => readLocationPose(item.location)),
+					Effect.sync(() => readLocationPoseFn(item.location)),
 				),
 				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
-					readTargetFactsFromTarget(readDropTarget(x, y)),
+					readTargetFactsFromTargetFx(readDropTargetFn(x, y)),
 				),
 				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
-					Effect.sync(() => readLocationPose(location)),
+					Effect.sync(() => readLocationPoseFn(location)),
 				),
 				readLocalActorIdsFx: Effect.fn("MainSurface.readLocalActorIdsFx")((bounds) =>
 					Effect.gen(function* () {
 						const locations: TileActorItem["location"][] = [];
-						appendIntersectingLocations(locations, layout.board, bounds);
-						appendIntersectingLocations(locations, layout.toolbar, bounds);
+						appendIntersectingLocationsFn(locations, layout.board, bounds);
+						appendIntersectingLocationsFn(locations, layout.toolbar, bounds);
 						const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
 						return occupants
 							.filter(({ id }) => id !== bounds.excludeActorId)
@@ -385,7 +387,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				renderDropFeedbackFx: Effect.fn("MainSurface.renderDropFeedbackFx")(
 					(
 						target: PixiSceneDropTarget | null,
-						kind: readTileDropPreviewFx.Result["kind"] | null,
+						kind: readDropItemPreviewFx.Result["kind"] | null,
 					) =>
 						Effect.gen(function* () {
 							const accepted =

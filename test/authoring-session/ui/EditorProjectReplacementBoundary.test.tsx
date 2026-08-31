@@ -28,11 +28,11 @@ beforeEach(() => {
 		configurable: true,
 		value: {
 			editor: {
-				onProjectChanged: () => () => undefined,
+				onProjectChangedFn: () => () => undefined,
 			},
 			editorMcp: {
-				clearProjectContext: () => Promise.resolve(),
-				setProjectContext: () => Promise.resolve(),
+				clearProjectContextFn: () => Promise.resolve(),
+				setProjectContextFn: () => Promise.resolve(),
 			},
 		},
 	});

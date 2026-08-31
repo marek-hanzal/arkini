@@ -6,13 +6,13 @@ import type { ProjectState } from "../ProjectState";
 import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { ProjectVersionReference } from "~/project-version/type/ProjectVersion";
 import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
-import { hashVersionBytes } from "./VersionFingerprint";
+import { hashVersionBytesFn } from "./VersionFingerprint";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
 export namespace createVersionReaderFx {
 	export interface Props {
-		readonly readState: (
+		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 	}
@@ -20,7 +20,7 @@ export namespace createVersionReaderFx {
 
 /** Reads published history and creates canonical current/version projections. */
 export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function* ({
-	readState,
+	readStateFx,
 }: createVersionReaderFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const pathService = yield* Path.Path;
@@ -64,7 +64,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 	const readCurrentSnapshotFx = Effect.fn("readCurrentVersionSnapshotFx")(function* (
 		projectId: string,
 	) {
-		const state = yield* readState(projectId);
+		const state = yield* readStateFx(projectId);
 		const scenarios = state.scenarios.map((scenario) =>
 			BoardScenarioFileSchema.parse({
 				name: scenario.name,
@@ -108,7 +108,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 						resource.id,
 						JSON.stringify([
 							resource.mime,
-							hashVersionBytes(resource.bytes),
+							hashVersionBytesFn(resource.bytes),
 						]),
 					]),
 				),
@@ -117,7 +117,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 						scenario.name,
 						JSON.stringify([
 							scenario.version,
-							hashVersionBytes(scenario.bytes),
+							hashVersionBytesFn(scenario.bytes),
 						]),
 					]),
 				),
@@ -148,7 +148,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 					resource.id,
 					JSON.stringify([
 						resource.mime,
-						hashVersionBytes(resource.bytes),
+						hashVersionBytesFn(resource.bytes),
 					]),
 				]),
 			),
@@ -157,7 +157,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 					scenario.name,
 					JSON.stringify([
 						scenario.version,
-						hashVersionBytes(Buffer.from(scenario.save, "base64")),
+						hashVersionBytesFn(Buffer.from(scenario.save, "base64")),
 					]),
 				]),
 			),

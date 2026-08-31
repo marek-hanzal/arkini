@@ -11,7 +11,7 @@ const encodeUnpairedSurrogateFn = (codeUnit: number) =>
 export const encodeGameProjectFileStemFn = (projectId: string) => {
 	let encoded = "";
 	let wellFormed = "";
-	const flushWellFormed = () => {
+	const flushWellFormedFn = () => {
 		encoded += encodeURIComponent(wellFormed);
 		wellFormed = "";
 	};
@@ -25,18 +25,18 @@ export const encodeGameProjectFileStemFn = (projectId: string) => {
 				index += 1;
 				continue;
 			}
-			flushWellFormed();
+			flushWellFormedFn();
 			encoded += encodeUnpairedSurrogateFn(codeUnit);
 			continue;
 		}
 		if (codeUnit >= 0xdc00 && codeUnit <= 0xdfff) {
-			flushWellFormed();
+			flushWellFormedFn();
 			encoded += encodeUnpairedSurrogateFn(codeUnit);
 			continue;
 		}
 		wellFormed += projectId[index];
 	}
-	flushWellFormed();
+	flushWellFormedFn();
 
 	return encoded.replaceAll(".", "%2E");
 };

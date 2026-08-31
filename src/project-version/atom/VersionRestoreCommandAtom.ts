@@ -13,7 +13,7 @@ const completedFrameDurationMs = 240;
 export namespace VersionRestoreCommandAtom {
 	export interface Command {
 		readonly confirmDiscardCurrentChanges: boolean;
-		readonly onFailure: (cause: unknown) => void;
+		readonly onFailureFn: (cause: unknown) => void;
 		readonly subject: string;
 		readonly versionId: string;
 	}
@@ -61,7 +61,7 @@ export const VersionRestoreCommandAtom = RendererRuntime.runSync(
 							});
 							if (Cause.hasInterruptsOnly(exit.cause))
 								return yield* Effect.failCause(exit.cause);
-							yield* Effect.sync(() => command.onFailure(Cause.squash(exit.cause)));
+							yield* Effect.sync(() => command.onFailureFn(Cause.squash(exit.cause)));
 							return;
 						}
 						const completedAtMs = yield* Clock.currentTimeMillis;

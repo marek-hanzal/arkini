@@ -15,14 +15,14 @@ import { useProjectStartGridDrag } from "~/project-authoring/ui/useProjectStartG
 interface ProjectStartGridProps {
 	readonly cells: ReadonlyArray<ProjectStartGridCell>;
 	readonly height: number;
-	readonly onCellsChange: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
+	readonly onCellsChangeFn: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
 	readonly scope: ProjectStartScope;
 	readonly width: number;
 }
 
-const positionKey = ({ x, y }: ProjectStartGridPosition) => `${x}:${y}`;
+const positionKeyFn = ({ x, y }: ProjectStartGridPosition) => `${x}:${y}`;
 
-const moveCell = (
+const moveCellFn = (
 	cells: ReadonlyArray<ProjectStartGridCell>,
 	source: ProjectStartGridCell,
 	target: ProjectStartGridPosition,
@@ -72,20 +72,20 @@ const ProjectStartGridDragPreview = ({
 export const ProjectStartGrid = ({
 	cells,
 	height,
-	onCellsChange,
+	onCellsChangeFn,
 	scope,
 	width,
 }: ProjectStartGridProps) => {
 	const { items } = useEditorItemSearchOptions();
 	const gridRef = useRef<HTMLDivElement>(null);
-	const [pickerCell, setPickerCell] = useState<ProjectStartGridPosition>();
-	const { dragPreviewRef, dragVisual, startDrag, suppressClickRef } = useProjectStartGridDrag({
+	const [pickerCell, setPickerCellFn] = useState<ProjectStartGridPosition>();
+	const { dragPreviewRef, dragVisual, startDragFn, suppressClickRef } = useProjectStartGridDrag({
 		gridRef,
-		onMove: (source, target) => onCellsChange(moveCell(cells, source, target)),
+		onMoveFn: (source, target) => onCellsChangeFn(moveCellFn(cells, source, target)),
 	});
 	const cellsByPosition = new Map(
 		cells.map((cell) => [
-			positionKey(cell),
+			positionKeyFn(cell),
 			cell,
 		]),
 	);
@@ -98,15 +98,15 @@ export const ProjectStartGrid = ({
 			y: Math.floor(index / Math.max(1, width)),
 		}),
 	);
-	const changeCell = (
+	const changeCellFn = (
 		position: ProjectStartGridPosition,
-		change: (cell: ProjectStartGridCell | undefined) => ProjectStartGridCell | undefined,
+		changeFn: (cell: ProjectStartGridCell | undefined) => ProjectStartGridCell | undefined,
 	) => {
 		const index = cells.findIndex(({ x, y }) => x === position.x && y === position.y);
 		const current = cells[index];
-		const next = change(current);
+		const next = changeFn(current);
 		if (next === current) return;
-		onCellsChange(
+		onCellsChangeFn(
 			index === -1
 				? next === undefined
 					? cells
@@ -119,8 +119,8 @@ export const ProjectStartGrid = ({
 					: cells.map((cell, candidateIndex) => (candidateIndex === index ? next : cell)),
 		);
 	};
-	const increment = (position: ProjectStartGridPosition) =>
-		changeCell(position, (cell) => {
+	const incrementFn = (position: ProjectStartGridPosition) =>
+		changeCellFn(position, (cell) => {
 			if (cell === undefined) return cell;
 			const maxStackSize = items[cell.itemId]?.maxStackSize ?? 1;
 			return cell.quantity >= maxStackSize
@@ -130,8 +130,8 @@ export const ProjectStartGrid = ({
 						quantity: cell.quantity + 1,
 					};
 		});
-	const decrement = (position: ProjectStartGridPosition) =>
-		changeCell(position, (cell) =>
+	const decrementFn = (position: ProjectStartGridPosition) =>
+		changeCellFn(position, (cell) =>
 			cell === undefined || cell.quantity <= 1
 				? undefined
 				: {
@@ -151,7 +151,7 @@ export const ProjectStartGrid = ({
 					}}
 				>
 					{positions.map(({ x, y }) => {
-						const key = positionKey({
+						const key = positionKeyFn({
 							x,
 							y,
 						});
@@ -174,14 +174,14 @@ export const ProjectStartGrid = ({
 								isDragTarget={isDragTarget}
 								itemResourceIds={item?.asset.default}
 								key={key}
-								onDecrement={() =>
-									decrement({
+								onDecrementFn={() =>
+									decrementFn({
 										x,
 										y,
 									})
 								}
-								onDelete={() =>
-									changeCell(
+								onDeleteFn={() =>
+									changeCellFn(
 										{
 											x,
 											y,
@@ -189,13 +189,13 @@ export const ProjectStartGrid = ({
 										() => undefined,
 									)
 								}
-								onIncrement={() =>
-									increment({
+								onIncrementFn={() =>
+									incrementFn({
 										x,
 										y,
 									})
 								}
-								onMove={(offset) => {
+								onMoveFn={(offset) => {
 									if (cell === undefined) return;
 									const target = {
 										x: x + offset.x,
@@ -208,10 +208,10 @@ export const ProjectStartGrid = ({
 										target.y >= height
 									)
 										return;
-									onCellsChange(moveCell(cells, cell, target));
+									onCellsChangeFn(moveCellFn(cells, cell, target));
 								}}
-								onOpen={() =>
-									setPickerCell({
+								onOpenFn={() =>
+									setPickerCellFn({
 										x,
 										y,
 									})
@@ -220,7 +220,7 @@ export const ProjectStartGrid = ({
 									x,
 									y,
 								}}
-								startDrag={startDrag}
+								startDragFn={startDragFn}
 								suppressClickRef={suppressClickRef}
 							/>
 						);
@@ -234,9 +234,9 @@ export const ProjectStartGrid = ({
 			</p>
 			{pickerCell === undefined ? null : (
 				<ProjectStartItemPicker
-					onClose={() => setPickerCell(undefined)}
-					onSelect={(itemId) =>
-						changeCell(pickerCell, () => ({
+					onCloseFn={() => setPickerCellFn(undefined)}
+					onSelectFn={(itemId) =>
+						changeCellFn(pickerCell, () => ({
 							itemId,
 							quantity: 1,
 							...pickerCell,

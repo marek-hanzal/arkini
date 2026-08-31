@@ -32,15 +32,15 @@ const createGame = ({
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	read: testGameRead,
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	getResourceUrlFn: () => "blob:test",
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
+	readFn: testGameRead,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 	saveKey: {
 		packageId,
 	},
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn: () => () => undefined,
 });
 
 describe("acquireGameEngineResourceFx", () => {

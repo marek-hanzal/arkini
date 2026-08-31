@@ -120,7 +120,7 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 					tickIntervalMs: 60_000,
 					save: {
 						debounceMs: 60_000,
-						write: (state) =>
+						writeFx: (state) =>
 							Effect.sync(() => {
 								preparedState = state;
 							}),
@@ -152,7 +152,7 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 					tickIntervalMs: 2,
 					save: {
 						debounceMs: 0,
-						write: () =>
+						writeFx: () =>
 							Effect.gen(function* () {
 								writes += 1;
 								if (writes === 2) {

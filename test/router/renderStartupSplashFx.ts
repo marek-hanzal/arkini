@@ -48,9 +48,9 @@ export const renderStartupSplashFx = Effect.fn("renderStartupSplashFx")(
 				RendererLifecycleOwnerAtom,
 				Effect.runSync(
 					createRendererLifecycleFx({
-						forceClose: () => undefined,
-						requestClose: () => Promise.resolve(),
-						waitUntilVisible: () => visible,
+						forceCloseFn: () => undefined,
+						requestCloseFn: () => Promise.resolve(),
+						waitUntilVisibleFn: () => visible,
 					}),
 				),
 			);

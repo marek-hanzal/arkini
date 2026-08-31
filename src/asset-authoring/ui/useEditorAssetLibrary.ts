@@ -13,7 +13,7 @@ interface UseEditorAssetLibraryProps {
 interface UseEditorAssetLibraryOutput {
 	readonly empty: boolean;
 	readonly projectId: string;
-	readonly resources: ReadonlyArray<Project["resources"][number]>;
+	readonly resources: ReadonlyArray<Project.Resource>;
 }
 
 /** Projects the canonical resource catalog through its usage and fuzzy-search filters. */

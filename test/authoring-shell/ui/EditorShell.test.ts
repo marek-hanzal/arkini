@@ -45,7 +45,7 @@ beforeEach(() => {
 		configurable: true,
 		value: {
 			lifecycle: {
-				onCloseFailed: () => () => undefined,
+				onCloseFailedFn: () => () => undefined,
 			},
 		},
 	});
@@ -72,12 +72,12 @@ const gate = () => {
 
 const DirtyDraft = () => {
 	useEditorUnsavedChangesRegistration({
-		discard: () => undefined,
+		discardFn: () => undefined,
 		id: "test-draft",
-		isDirty: () => true,
-		isValid: () => true,
-		ownsPathname: (pathname) => pathname.includes("/editor/items/test/form/"),
-		save: async () => true,
+		isDirtyFn: () => true,
+		isValidFn: () => true,
+		ownsPathnameFn: (pathname) => pathname.includes("/editor/items/test/form/"),
+		saveFn: async () => true,
 	});
 	return createElement("p", {
 		"data-ui": "DirtyDraftProbe",
@@ -243,8 +243,8 @@ describe("EditorShell", () => {
 			readLink(container, "project").click();
 			await Promise.resolve();
 		});
-		await vi.waitFor(() => expect(owner.getSnapshot().promptOpen).toBe(true));
-		await act(async () => owner.decide("cancel"));
+		await vi.waitFor(() => expect(owner.getSnapshotFn().promptOpen).toBe(true));
+		await act(async () => owner.decideFn("cancel"));
 
 		expect(router.state.location.pathname).toBe(
 			"/editor/editor-test/editor/items/test/form/identity",

@@ -20,7 +20,7 @@ const startRemoteHandler = async () => {
 	let handler: RemoteHandler | undefined;
 	const server = createServer((request, response) => {
 		if (handler === undefined) throw new Error("Remote handler is unavailable.");
-		handler.handle(request, response);
+		handler.handleFn(request, response);
 	});
 	await new Promise<void>((resolve, reject) => {
 		server.once("error", reject);
@@ -56,12 +56,12 @@ const startRemoteHandler = async () => {
 	handler = Effect.runSync(
 		createRemoteHandlerFx({
 			storage,
-			mcpHandler: (request, response) => {
+			mcpHandlerFn: (request, response) => {
 				mcpHandler(request, response);
 				response.end();
 			},
 			origin,
-			runPromise: Effect.runPromise,
+			runPromiseFn: Effect.runPromise,
 		}),
 	);
 	return {

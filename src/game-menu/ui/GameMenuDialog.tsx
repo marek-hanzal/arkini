@@ -60,7 +60,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 				}}
 				animate={actorMotion.dialog}
 				transition={gameMenuTransition}
-				onAnimationComplete={actorMotion.completeMotionPhase}
+				onAnimationComplete={actorMotion.completeMotionPhaseFn}
 			>
 				<h2 className="mb-4 text-center text-lg font-semibold">Game menu</h2>
 
@@ -69,7 +69,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						className="w-full"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
-						onClick={() => void actions.close()}
+						onClick={() => void actions.closeFn()}
 					>
 						Return to game
 					</PrimaryButton>
@@ -77,7 +77,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
-						onClick={actions.requestSettings}
+						onClick={actions.requestSettingsFn}
 					>
 						Settings
 					</Button>
@@ -86,7 +86,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 							className="w-full shadow-none"
 							cursorIntent={actionCursorIntent}
 							disabled={actions.actionDisabled}
-							onClick={actions.requestCheats}
+							onClick={actions.requestCheatsFn}
 						>
 							Cheats
 						</Button>
@@ -95,7 +95,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
-						onClick={actions.requestMainMenu}
+						onClick={actions.requestMainMenuFn}
 					>
 						Main Menu
 					</Button>
@@ -106,7 +106,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
-						onClick={actions.requestSave}
+						onClick={actions.requestSaveFn}
 					>
 						Save
 					</Button>
@@ -114,7 +114,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
-						onClick={actions.requestSaveAndExit}
+						onClick={actions.requestSaveAndExitFn}
 					>
 						Save and exit
 					</Button>
@@ -136,7 +136,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 										className="min-h-0 px-3 py-2 shadow-none"
 										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
-										onClick={() => actions.setConfirmingDestroy(false)}
+										onClick={() => actions.setConfirmingDestroyFn(false)}
 									>
 										Cancel
 									</Button>
@@ -144,7 +144,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 										className="min-h-0 px-3 py-2 shadow-none"
 										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
-										onClick={actions.requestHardReset}
+										onClick={actions.requestHardResetFn}
 									>
 										Destroy permanently
 									</DangerButton>
@@ -155,7 +155,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 								className="w-full shadow-none"
 								cursorIntent={actionCursorIntent}
 								disabled={actions.actionDisabled}
-								onClick={() => actions.setConfirmingDestroy(true)}
+								onClick={() => actions.setConfirmingDestroyFn(true)}
 							>
 								Destroy
 							</DangerButton>

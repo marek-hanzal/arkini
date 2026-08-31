@@ -46,7 +46,7 @@ describe("main drag controller: pointer", () => {
 		mounted.flushFrame();
 		expect(mounted.actor.dragging).toBe(true);
 
-		mounted.reportCriticalFailure.mockImplementationOnce(() => {
+		mounted.reportCriticalFailureFn.mockImplementationOnce(() => {
 			expect(mounted.actor.dragging).toBe(false);
 			expect(mounted.finishCursorGrab).toHaveBeenCalledOnce();
 		});
@@ -55,7 +55,7 @@ describe("main drag controller: pointer", () => {
 		mounted.stage.emit("globalpointermove", pointer(40, 20));
 		mounted.flushFrame();
 
-		expect(mounted.reportCriticalFailure).toHaveBeenCalledExactlyOnceWith(
+		expect(mounted.reportCriticalFailureFn).toHaveBeenCalledExactlyOnceWith(
 			"game-presentation",
 			failure,
 		);
@@ -159,7 +159,7 @@ describe("main drag controller: pointer", () => {
 
 		expect(mounted.actor.container.eventMode).toBe("static");
 		expect(mounted.actor.container.cursor).toBe("grab");
-		expect(mounted.actor.onPointerDown).not.toBeNull();
+		expect(mounted.actor.onPointerDownFn).not.toBeNull();
 	});
 
 	it("acknowledges activation synchronously before async command admission", () => {
@@ -189,7 +189,7 @@ describe("main drag controller: pointer", () => {
 			(animation) =>
 				animation.actor === mounted.actor && animation.channel === "activity-particles",
 		);
-		if (burst?.channel === "activity-particles") burst.render(0.5);
+		if (burst?.channel === "activity-particles") burst.renderFn(0.5);
 		const tint = mounted.actor.activityParticles.particles[0]?.particle.tint ?? 0;
 		const red = (tint >> 16) & 0xff;
 		const green = (tint >> 8) & 0xff;

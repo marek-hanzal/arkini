@@ -23,7 +23,7 @@ describe("refreshEditorServiceStatusFx", () => {
 			configurable: true,
 			value: {
 				editor: {
-					status: () => Promise.resolve(status),
+					statusFn: () => Promise.resolve(status),
 				},
 			},
 		});
@@ -48,7 +48,7 @@ describe("refreshEditorServiceStatusFx", () => {
 			configurable: true,
 			value: {
 				editor: {
-					status: () => new Promise(() => undefined),
+					statusFn: () => new Promise(() => undefined),
 				},
 			},
 		});
@@ -75,7 +75,7 @@ describe("refreshEditorServiceStatusFx", () => {
 			configurable: true,
 			value: {
 				editor: {
-					status: () => Promise.reject(new Error("IPC unavailable")),
+					statusFn: () => Promise.reject(new Error("IPC unavailable")),
 				},
 			},
 		});

@@ -85,7 +85,7 @@ describe("motion stack contact", () => {
 			sourceKind: "motion",
 		});
 
-		travel.onComplete?.();
+		travel.onCompleteFn?.();
 		const vanish = advanceStackMergeVanish({
 			actor: travel.actor,
 			animations,
@@ -158,7 +158,7 @@ describe("motion stack contact", () => {
 			x: target.container.x - target.container.pivot.x * target.container.scale.x,
 			y: target.container.y - target.container.pivot.y * target.container.scale.y,
 		});
-		travel.onComplete?.();
+		travel.onCompleteFn?.();
 		advanceStackMergeVanish({
 			actor: source,
 			animations,

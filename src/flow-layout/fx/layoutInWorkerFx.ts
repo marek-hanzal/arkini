@@ -16,23 +16,23 @@ class LayoutWorkerError extends Data.TaggedError("LayoutWorkerError")<{
 
 type RunLayout = (topology: LayoutInput, worker: Worker) => Promise<Layout>;
 
-const runLayout = (topology: LayoutInput, worker: Worker): Promise<Layout> =>
-	new Promise((resolve, reject) => {
-		const cleanUp = () => {
-			worker.removeEventListener("message", handleMessage);
-			worker.removeEventListener("error", handleError);
+const runLayoutFn = (topology: LayoutInput, worker: Worker): Promise<Layout> =>
+	new Promise((resolveFn, rejectFn) => {
+		const cleanUpFn = () => {
+			worker.removeEventListener("message", handleMessageFn);
+			worker.removeEventListener("error", handleErrorFn);
 		};
-		const handleMessage = ({ data }: MessageEvent<LayoutWorkerResponse>) => {
-			cleanUp();
-			if (data.status === "success") resolve(data.layout);
-			else reject(new Error(data.message));
+		const handleMessageFn = ({ data }: MessageEvent<LayoutWorkerResponse>) => {
+			cleanUpFn();
+			if (data.status === "success") resolveFn(data.layout);
+			else rejectFn(new Error(data.message));
 		};
-		const handleError = (event: ErrorEvent) => {
-			cleanUp();
-			reject(event.error ?? new Error(event.message || "Flow layout worker failed."));
+		const handleErrorFn = (event: ErrorEvent) => {
+			cleanUpFn();
+			rejectFn(event.error ?? new Error(event.message || "Flow layout worker failed."));
 		};
-		worker.addEventListener("message", handleMessage);
-		worker.addEventListener("error", handleError);
+		worker.addEventListener("message", handleMessageFn);
+		worker.addEventListener("error", handleErrorFn);
 		worker.postMessage({
 			topology,
 		} satisfies LayoutWorkerRequest);
@@ -43,8 +43,8 @@ export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 	(
 		flow: ItemOriginFlow,
 		options: {
-			readonly runLayout?: RunLayout;
-			readonly spawn?: () => Worker;
+			readonly runLayoutFn?: RunLayout;
+			readonly spawnFn?: () => Worker;
 		} = {},
 	) =>
 		Effect.gen(function* () {
@@ -75,7 +75,7 @@ export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 			} satisfies LayoutInput;
 			return yield* Effect.acquireUseRelease(
 				Effect.try({
-					try: options.spawn ?? (() => new LayoutWorker()),
+					try: options.spawnFn ?? (() => new LayoutWorker()),
 					catch: (cause) =>
 						new LayoutWorkerError({
 							cause,
@@ -84,7 +84,7 @@ export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 				}),
 				(worker) =>
 					Effect.tryPromise({
-						try: () => (options.runLayout ?? runLayout)(topology, worker),
+						try: () => (options.runLayoutFn ?? runLayoutFn)(topology, worker),
 						catch: (cause) =>
 							new LayoutWorkerError({
 								cause,

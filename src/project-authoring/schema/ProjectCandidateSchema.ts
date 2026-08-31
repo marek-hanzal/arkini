@@ -28,4 +28,3 @@ export const ProjectCandidateSchema = z
 	});
 
 export type ProjectCandidate = z.infer<typeof ProjectCandidateSchema>;
-export type ProjectOwnership = ProjectOwnershipSchema.Type;

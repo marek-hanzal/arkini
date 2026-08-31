@@ -5,10 +5,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/installed-game/type/Game";
 import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
-const command: runTileDropAtom.Command = {
+const command: DropItemCommand = {
 	sourceItemId: "runtime:source",
 	sourceRevision: "revision:source",
 	sourceLocation: {
@@ -24,7 +26,7 @@ const command: runTileDropAtom.Command = {
 	},
 };
 
-const outcome: runTileDropAtom.Result = {
+const outcome: DropItemResult = {
 	kind: DropItemResultKind.Reject,
 	reason: DropItemRejectedReason.UnsupportedTarget,
 	itemId: command.sourceItemId,
@@ -45,7 +47,7 @@ const makeRegistry = () => {
 	return registry;
 };
 
-const createGame = (effect: Effect.Effect<runTileDropAtom.Result, unknown>) => {
+const createGame = (effect: Effect.Effect<DropItemResult, unknown>) => {
 	const runFx = vi.fn(() => effect);
 	return {
 		game: {

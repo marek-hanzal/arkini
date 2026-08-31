@@ -57,15 +57,15 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 	disposeFx,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	read: testGameRead,
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	getResourceUrlFn: () => "blob:test",
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
+	readFn: testGameRead,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 	saveKey: {
 		packageId,
 	},
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn: () => () => undefined,
 });
 
 const createHarness = async (game: Game) => {
@@ -200,7 +200,7 @@ describe("game exit action route", () => {
 			),
 		);
 		expect(currentFailure).toBe(loggedCause);
-		expect(() => resource.assertUsable()).toThrow(loggedCause);
+		expect(() => resource.assertUsableFn()).toThrow(loggedCause);
 	});
 
 	it("joins the retained fail-stop finalization for the terminal close attempt", async () => {
@@ -218,7 +218,7 @@ describe("game exit action route", () => {
 		await vi.advanceTimersByTimeAsync(0);
 		await vi.advanceTimersByTimeAsync(2_500);
 		await leaving;
-		expect(() => resource.assertUsable()).toThrow();
+		expect(() => resource.assertUsableFn()).toThrow();
 		expect(disposeAttempts).toBe(1);
 		const firstLifecycleFailure = rendererRuntime.runSync(
 			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)).pipe(

@@ -15,7 +15,7 @@ const requestSchema = z
 
 export namespace installEditorMcpVersionCheckoutFx {
 	export interface Props {
-		readonly editorMcp: Pick<Window["arkini"]["editorMcp"], "onVersionCheckoutRequested">;
+		readonly editorMcp: Pick<Window["arkini"]["editorMcp"], "onVersionCheckoutRequestedFn">;
 		readonly rendererRuntime: typeof RendererRuntime;
 		readonly router: Pick<ArkiniRouter, "navigate" | "state">;
 	}
@@ -26,7 +26,7 @@ export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVers
 	({ editorMcp, rendererRuntime, router }: installEditorMcpVersionCheckoutFx.Props) =>
 		Effect.sync(() => {
 			let running = false;
-			return editorMcp.onVersionCheckoutRequested(async (candidate) => {
+			return editorMcp.onVersionCheckoutRequestedFn(async (candidate) => {
 				if (running) throw new Error("Another editor version checkout is already running.");
 				const request = requestSchema.parse(candidate);
 				const isOpen = router.state.matches.some(

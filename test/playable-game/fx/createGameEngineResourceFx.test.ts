@@ -17,7 +17,7 @@ const createResourceHarness = async () => {
 	const game = {
 		...session,
 		config,
-		getResourceUrl: () => "blob:test",
+		getResourceUrlFn: () => "blob:test",
 	} satisfies PlayableGame;
 
 	return {
@@ -32,12 +32,12 @@ describe("createGameEngineResourceFx", () => {
 		const firstCause = new Error("final save failed");
 
 		try {
-			const first = resource.markCriticalFailure("game-leave", firstCause);
-			const second = resource.markCriticalFailure("game-reset", new Error("later failure"));
+			const first = resource.markCriticalFailureFn("game-leave", firstCause);
+			const second = resource.markCriticalFailureFn("game-reset", new Error("later failure"));
 
 			expect(second).toBe(first);
 			expect(first.cause).toBe(firstCause);
-			expect(() => resource.assertUsable()).toThrow(first);
+			expect(() => resource.assertUsableFn()).toThrow(first);
 		} finally {
 			await Effect.runPromise(session.disposeFx);
 		}
@@ -48,12 +48,12 @@ describe("createGameEngineResourceFx", () => {
 		const failure = new Error("line projection invariant failed");
 
 		try {
-			expect(() => resource.game.readOrThrow(Effect.fail(failure))).toThrow(
+			expect(() => resource.game.readOrThrowFn(Effect.fail(failure))).toThrow(
 				CriticalGameLifecycleError,
 			);
 			let critical: unknown;
 			try {
-				resource.assertUsable();
+				resource.assertUsableFn();
 			} catch (cause) {
 				critical = cause;
 			}
@@ -76,12 +76,12 @@ describe("createGameEngineResourceFx", () => {
 		const readCause = Cause.combine(Cause.fail(readFailure), Cause.die(readDefect));
 
 		try {
-			expect(() => resource.game.readOrThrow(Effect.failCause(readCause))).toThrow(
+			expect(() => resource.game.readOrThrowFn(Effect.failCause(readCause))).toThrow(
 				CriticalGameLifecycleError,
 			);
 			let critical: unknown;
 			try {
-				resource.assertUsable();
+				resource.assertUsableFn();
 			} catch (cause) {
 				critical = cause;
 			}
@@ -107,27 +107,27 @@ describe("createGameEngineResourceFx", () => {
 		let notifications = 0;
 		let readWasFrozenDuringNotification = false;
 		let runWasFrozenDuringNotification = false;
-		resource.subscribeCriticalFailure(() => {
+		resource.subscribeCriticalFailureFn(() => {
 			notifications += 1;
-			readWasFrozenDuringNotification = session.read(Effect.void)._tag === "Failure";
+			readWasFrozenDuringNotification = session.readFn(Effect.void)._tag === "Failure";
 			runWasFrozenDuringNotification =
 				Effect.runSyncExit(session.runFx(Effect.void))._tag === "Failure";
 		});
 		const failure = new Error("presentation exploded");
 
 		try {
-			resource.game.reportCriticalFailure("game-presentation", failure);
-			const first = resource.getCriticalFailure();
-			resource.game.reportCriticalFailure("game-runtime", new Error("later failure"));
+			resource.game.reportCriticalFailureFn("game-presentation", failure);
+			const first = resource.getCriticalFailureFn();
+			resource.game.reportCriticalFailureFn("game-runtime", new Error("later failure"));
 
 			expect(first?.operation).toBe("game-presentation");
-			expect(resource.getCriticalFailure()).toBe(first);
-			expect(session.getFatalError()?.source).toBe("presentation");
-			expect(session.getFatalError()?.cause).toBe(failure);
+			expect(resource.getCriticalFailureFn()).toBe(first);
+			expect(session.getFatalErrorFn()?.source).toBe("presentation");
+			expect(session.getFatalErrorFn()?.cause).toBe(failure);
 			expect(notifications).toBe(1);
 			expect(readWasFrozenDuringNotification).toBe(true);
 			expect(runWasFrozenDuringNotification).toBe(true);
-			await expect(session.run(Effect.void)).rejects.toMatchObject({
+			await expect(session.runFn(Effect.void)).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",
 				state: "frozen",
 			});
@@ -140,8 +140,8 @@ describe("createGameEngineResourceFx", () => {
 		const { resource, session } = await createResourceHarness();
 		let readWasFrozenDuringNotification = false;
 		let runWasFrozenDuringNotification = false;
-		resource.subscribeCriticalFailure(() => {
-			readWasFrozenDuringNotification = session.read(Effect.void)._tag === "Failure";
+		resource.subscribeCriticalFailureFn(() => {
+			readWasFrozenDuringNotification = session.readFn(Effect.void)._tag === "Failure";
 			runWasFrozenDuringNotification =
 				Effect.runSyncExit(session.runFx(Effect.void))._tag === "Failure";
 		});
@@ -150,13 +150,13 @@ describe("createGameEngineResourceFx", () => {
 
 		try {
 			try {
-				resource.game.readOrThrow(Effect.fail(failure));
+				resource.game.readOrThrowFn(Effect.fail(failure));
 			} catch (cause) {
 				thrown = cause;
 			}
 
-			const first = resource.getCriticalFailure();
-			const sessionFatal = session.getFatalError();
+			const first = resource.getCriticalFailureFn();
+			const sessionFatal = session.getFatalErrorFn();
 			expect(thrown).toBe(first);
 			expect(first?.operation).toBe("game-read");
 			expect(first?.cause).toBe(sessionFatal);

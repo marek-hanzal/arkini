@@ -18,12 +18,12 @@ export namespace chaseTargetFx {
 		readonly delayMs?: number;
 		readonly durationMs?: number;
 		readonly fallbackTarget: ActorPose;
-		readonly onPose?: (pose: PresentedPose) => void;
-		readonly onSettled: () => void;
+		readonly onPoseFn?: (pose: PresentedPose) => void;
+		readonly onSettledFn: () => void;
 		readonly ownerKey: string;
-		readonly readLiveTarget?: () => Required<PresentedPose> | null;
+		readonly readLiveTargetFn?: () => Required<PresentedPose> | null;
 		readonly settleWithinTileRatio?: number;
-		readonly shouldSettle?: () => boolean;
+		readonly shouldSettleFn?: () => boolean;
 		readonly surface: MainSurface;
 		readonly targetLocation: TileActorItem["location"];
 	}
@@ -44,25 +44,25 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 	delayMs = 0,
 	durationMs,
 	fallbackTarget,
-	onPose,
-	onSettled,
+	onPoseFn,
+	onSettledFn,
 	ownerKey,
-	readLiveTarget,
+	readLiveTargetFn,
 	settleWithinTileRatio,
-	shouldSettle,
+	shouldSettleFn,
 	surface,
 	targetLocation,
 }: chaseTargetFx.Props) {
 	let settled = false;
 	let cancelingForProximitySettlement = false;
 	let proximitySettlementQueued = false;
-	const settle = () => {
+	const settleFn = () => {
 		if (settled) return;
 		settled = true;
-		onSettled();
+		onSettledFn();
 	};
-	const isInsideSettlementField = (pose: PresentedPose) => {
-		const liveTarget = readLiveTarget?.();
+	const isInsideSettlementFieldFn = (pose: PresentedPose) => {
+		const liveTarget = readLiveTargetFn?.();
 		return (
 			settleWithinTileRatio !== undefined &&
 			liveTarget !== null &&
@@ -72,8 +72,8 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 					settleWithinTileRatio
 		);
 	};
-	if (actor.container.destroyed || shouldSettle?.()) {
-		settle();
+	if (actor.container.destroyed || shouldSettleFn?.()) {
+		settleFn();
 		return;
 	}
 	const semanticTarget = (yield* surface.readLocationPoseFx(targetLocation)) ?? fallbackTarget;
@@ -82,19 +82,19 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 		x: actor.container.x,
 		y: actor.container.y,
 	};
-	const target = readLiveTarget?.() ?? {
+	const target = readLiveTargetFn?.() ?? {
 		scale: semanticTarget.size / Math.max(1, actor.size),
 		x: semanticTarget.x,
 		y: semanticTarget.y,
 	};
 	if (from.x === target.x && from.y === target.y && from.scale === target.scale) {
-		settle();
+		settleFn();
 		return;
 	}
 	const poseSampler = yield* createMotionPoseSamplerFx({
 		actorBaseSize: actor.size,
 		from,
-		readLiveTarget,
+		readLiveTargetFn,
 		surface,
 		target: semanticTarget,
 		targetLocation,
@@ -114,12 +114,12 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 				toY: target.y,
 			}),
 		ownerKey,
-		onCancel: () => {
+		onCancelFn: () => {
 			if (!cancelingForProximitySettlement) settled = true;
 		},
-		onComplete: () => {
-			if (shouldSettle?.() || !poseSampler.needsCompletionSettle()) {
-				settle();
+		onCompleteFn: () => {
+			if (shouldSettleFn?.() || !poseSampler.needsCompletionSettleFn()) {
+				settleFn();
 				return;
 			}
 			settled = true;
@@ -129,29 +129,29 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 					animator,
 					curve,
 					fallbackTarget: semanticTarget,
-					onPose,
-					onSettled,
+					onPoseFn,
+					onSettledFn,
 					ownerKey,
-					readLiveTarget,
+					readLiveTargetFn,
 					settleWithinTileRatio,
-					shouldSettle,
+					shouldSettleFn,
 					surface,
 					targetLocation,
 				}),
 			);
 		},
-		readPose: (progress) => {
-			const pose = poseSampler.readPose(progress);
-			onPose?.(pose);
-			if (progress < 1 && !proximitySettlementQueued && isInsideSettlementField(pose)) {
+		readPoseFn: (progress) => {
+			const pose = poseSampler.readPoseFn(progress);
+			onPoseFn?.(pose);
+			if (progress < 1 && !proximitySettlementQueued && isInsideSettlementFieldFn(pose)) {
 				proximitySettlementQueued = true;
 				// The animator applies this returned pose after `readPose`; settle from the next
 				// microtask so contact observes the published frame and never destroys mid-write.
 				queueMicrotask(() => {
 					proximitySettlementQueued = false;
-					if (settled || actor.container.destroyed || shouldSettle?.()) return;
+					if (settled || actor.container.destroyed || shouldSettleFn?.()) return;
 					if (
-						!isInsideSettlementField({
+						!isInsideSettlementFieldFn({
 							scale: actor.container.scale.x,
 							x: actor.container.x,
 							y: actor.container.y,
@@ -159,7 +159,7 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 					) {
 						return;
 					}
-					const contactPose = readLiveTarget?.();
+					const contactPose = readLiveTargetFn?.();
 					if (contactPose === null || contactPose === undefined) return;
 					cancelingForProximitySettlement = true;
 					try {
@@ -176,7 +176,7 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 					} finally {
 						cancelingForProximitySettlement = false;
 					}
-					settle();
+					settleFn();
 				});
 			}
 			return pose;

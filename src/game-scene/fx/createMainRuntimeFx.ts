@@ -3,7 +3,8 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameTransition } from "~/game-session/type/GameSession";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createMainActorStoreFx } from "~/tile-rendering/fx/createMainActorStoreFx";
 import { createParticleTexturesFx } from "~/tile-rendering/fx/createParticleTexturesFx";
@@ -31,12 +32,12 @@ interface CreateMainRuntimeProps {
 	readonly dragThreshold: number;
 	readonly game: GameEngine;
 	readonly host: HTMLElement;
-	readonly onActivate: (
+	readonly onActivateFn: (
 		item: TileActorItem,
 		intent: MainActivationIntent,
 		origin: HTMLElement,
 	) => void | PromiseLike<void>;
-	readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
+	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly textures: TextureStore;
 }
 
@@ -51,21 +52,21 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 	dragThreshold,
 	game,
 	host,
-	onActivate,
-	onDrop,
+	onActivateFn,
+	onDropFn,
 	textures,
 }: CreateMainRuntimeProps) {
-	const reportCriticalFailure = (cause: unknown) =>
-		game.reportCriticalFailure("game-presentation", cause);
+	const reportCriticalFailureFn = (cause: unknown) =>
+		game.reportCriticalFailureFn("game-presentation", cause);
 	const application = yield* createApplicationOwnerFx({
 		host,
-		reportCriticalFailure,
+		reportCriticalFailureFn,
 	});
 	const rollbackEffects: Effect.Effect<void, unknown, never>[] = [];
-	const registerRollback = (closeFx: Effect.Effect<void, unknown, never>) => {
+	const registerRollbackFn = (closeFx: Effect.Effect<void, unknown, never>) => {
 		rollbackEffects.unshift(closeFx);
 	};
-	registerRollback(application.closeFx);
+	registerRollbackFn(application.closeFx);
 	const rollbackFx = Effect.suspend(() =>
 		Effect.forEach(
 			rollbackEffects,
@@ -80,12 +81,12 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			current: yield* readScenePaletteFx(host),
 		};
 		const particleTextures = yield* createParticleTexturesFx();
-		registerRollback(particleTextures.closeFx);
+		registerRollbackFn(particleTextures.closeFx);
 		const actorStore = yield* createMainActorStoreFx();
 		const animationDriver = yield* createAnimationDriverFx({
 			frames: application.frames,
 		});
-		registerRollback(animationDriver.closeFx);
+		registerRollbackFn(animationDriver.closeFx);
 		const animator = yield* createActorAnimatorFx({
 			animationDriver,
 			frames: application.frames,
@@ -94,7 +95,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			animationDriver,
 			label: "DropFeedbackLayer",
 		});
-		registerRollback(dropFeedback.closeFx);
+		registerRollbackFn(dropFeedback.closeFx);
 		const surface = yield* createMainSurfaceFx({
 			actorStore,
 			application,
@@ -102,34 +103,35 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			game,
 			palette: paletteState.current,
 		});
-		registerRollback(surface.closeFx);
+		registerRollbackFn(surface.closeFx);
 		// Retained actors must die before their parent surface destroys its layers.
-		registerRollback(actorStore.closeFx);
-		registerRollback(animator.closeFx);
+		registerRollbackFn(actorStore.closeFx);
+		registerRollbackFn(animator.closeFx);
 		const magneticField = yield* createMagneticFieldFx({
 			actorStore,
 			animationDriver,
-			scheduleApply: (apply) => RendererRuntime.runSync(application.frames.scheduleFx(apply)),
+			scheduleApplyFn: (applyFn) =>
+				RendererRuntime.runSync(application.frames.scheduleFx(applyFn)),
 		});
-		registerRollback(magneticField.closeFx);
+		registerRollbackFn(magneticField.closeFx);
 		const motion = yield* createMotionRuntimeFx({
 			actorStore,
 			animator,
 			application,
 			magneticField,
-			readPalette: () => paletteState.current,
+			readPaletteFn: () => paletteState.current,
 			surface,
 			textures,
 		});
-		registerRollback(motion.closeFx);
+		registerRollbackFn(motion.closeFx);
 		const cursorGrab = yield* createCursorGrabMotionFx({
 			animationDriver,
 			animator,
 		});
-		registerRollback(cursorGrab.closeFx);
+		registerRollbackFn(cursorGrab.closeFx);
 		const dropPresentation = yield* createDropPresentationFx();
-		registerRollback(dropPresentation.closeFx);
-		let replayCurrentTransition: () => void = () => undefined;
+		registerRollbackFn(dropPresentation.closeFx);
+		let replayCurrentTransitionFn: () => void = () => undefined;
 		const dropSubmission = yield* createDropSubmissionFx({
 			actorStore,
 			animator,
@@ -138,11 +140,11 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			game,
 			magneticField,
 			motion,
-			onAcceptedDrop: () => replayCurrentTransition(),
-			onDrop,
+			onAcceptedDropFn: () => replayCurrentTransitionFn(),
+			onDropFn,
 			surface,
 		});
-		registerRollback(dropSubmission.closeFx);
+		registerRollbackFn(dropSubmission.closeFx);
 		const drag = yield* createMainDragControllerFx({
 			actorStore,
 			animator,
@@ -153,11 +155,11 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			game,
 			magneticField,
 			motion,
-			onActivate,
-			readAckTint: () => paletteState.current.success,
+			onActivateFn,
+			readAckTintFn: () => paletteState.current.success,
 			surface,
 		});
-		registerRollback(drag.closeFx);
+		registerRollbackFn(drag.closeFx);
 		const delivery = yield* createDeliveryRuntimeFx({
 			actorStore,
 			animator,
@@ -165,11 +167,11 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			drag,
 			magneticField,
 			particleTextures,
-			readPalette: () => paletteState.current,
+			readPaletteFn: () => paletteState.current,
 			surface,
 			textures,
 		});
-		registerRollback(delivery.closeFx);
+		registerRollbackFn(delivery.closeFx);
 		const reconciler = yield* createMainReconcilerFx({
 			actorStore,
 			animator,
@@ -181,15 +183,15 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			magneticField,
 			motion,
 			particleTextures,
-			readPalette: () => paletteState.current,
+			readPaletteFn: () => paletteState.current,
 			surface,
 			textures,
 		});
-		registerRollback(reconciler.closeFx);
+		registerRollbackFn(reconciler.closeFx);
 		let closed = false;
-		let latestTransition = game.getTransitionSnapshot();
+		let latestTransition = game.getTransitionSnapshotFn();
 
-		const applyTransition = (transition: GameTransition, delivery: "hydrate" | "present") => {
+		const applyTransitionFn = (transition: GameTransition, delivery: "hydrate" | "present") => {
 			if (closed) return;
 			latestTransition = transition;
 			// Surface hit testing and actor reconciliation must observe one committed snapshot.
@@ -201,29 +203,30 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			);
 		};
 		const transitionPresenter = yield* createSpaceActionPresenterFx({
-			applyTransition,
+			applyTransitionFn,
 			initialSequence: latestTransition.sequence,
-			scheduleAfterRender: (work) =>
-				RendererRuntime.runSync(application.frames.scheduleAfterRenderFx(work)),
-			setInteractionBlocked: (blocked) =>
+			scheduleAfterRenderFn: (workFn) =>
+				RendererRuntime.runSync(application.frames.scheduleAfterRenderFx(workFn)),
+			setInteractionBlockedFn: (blocked) =>
 				RendererRuntime.runSync(drag.setInteractionBlockedFx(blocked)),
 		});
-		registerRollback(transitionPresenter.closeFx);
-		replayCurrentTransition = () => transitionPresenter.refresh(game.getTransitionSnapshot());
+		registerRollbackFn(transitionPresenter.closeFx);
+		replayCurrentTransitionFn = () =>
+			transitionPresenter.refreshFn(game.getTransitionSnapshotFn());
 
-		const redraw = () => {
+		const redrawFn = () => {
 			if (closed) return;
 			RendererRuntime.runSync(surface.redrawFx);
 			RendererRuntime.runSync(reconciler.hydrateFx(latestTransition));
 		};
 
 		RendererRuntime.runSync(surface.redrawFx);
-		applyTransition(latestTransition, "hydrate");
+		applyTransitionFn(latestTransition, "hydrate");
 		const subscriptionReplayGate = yield* createSubscriptionReplayGateFx(
 			latestTransition.sequence,
 		);
-		const removeResizeListener = yield* application.addResizeListenerFx(redraw);
-		registerRollback(Effect.sync(() => removeResizeListener()));
+		const removeResizeListenerFn = yield* application.addResizeListenerFx(redrawFn);
+		registerRollbackFn(Effect.sync(() => removeResizeListenerFn()));
 		const appearanceObserver = new MutationObserver(() => {
 			paletteState.current = RendererRuntime.runSync(readScenePaletteFx(host));
 			RendererRuntime.runSync(surface.setPaletteFx(paletteState.current));
@@ -237,18 +240,18 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			],
 			attributes: true,
 		});
-		registerRollback(Effect.sync(() => appearanceObserver.disconnect()));
-		const unsubscribeTransitions = game.subscribeTransitions((transition) => {
+		registerRollbackFn(Effect.sync(() => appearanceObserver.disconnect()));
+		const unsubscribeTransitionsFn = game.subscribeTransitionsFn((transition) => {
 			try {
 				const delivery = RendererRuntime.runSync(
 					subscriptionReplayGate.classifyFx(transition.sequence),
 				);
-				transitionPresenter.present(transition, delivery);
+				transitionPresenter.presentFn(transition, delivery);
 			} catch (cause) {
-				reportCriticalFailure(cause);
+				reportCriticalFailureFn(cause);
 			}
 		});
-		registerRollback(Effect.sync(() => unsubscribeTransitions()));
+		registerRollbackFn(Effect.sync(() => unsubscribeTransitionsFn()));
 
 		return {
 			canvas: application.app.canvas,

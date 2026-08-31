@@ -13,14 +13,14 @@ interface Props {
 export const installRendererNativeDragGuardFx = Effect.fn("installRendererNativeDragGuardFx")(
 	({ root }: Props) =>
 		Effect.sync(() => {
-			const preventNativeDrag = (event: DragEvent) => {
+			const preventNativeDragFn = (event: DragEvent) => {
 				event.preventDefault();
 			};
-			root.addEventListener("dragstart", preventNativeDrag, {
+			root.addEventListener("dragstart", preventNativeDragFn, {
 				capture: true,
 			});
 			return () => {
-				root.removeEventListener("dragstart", preventNativeDrag, {
+				root.removeEventListener("dragstart", preventNativeDragFn, {
 					capture: true,
 				});
 			};

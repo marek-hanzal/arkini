@@ -9,7 +9,7 @@ import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import { DetailFact, DetailFacts, EmptyDetail } from "~/item-authoring/ui/DetailDefinition";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 
-const formatQuantity = (quantity: QuantitySchema.Type) =>
+const formatQuantityFn = (quantity: QuantitySchema.Type) =>
 	quantity.min === quantity.max ? String(quantity.min) : `${quantity.min}–${quantity.max}`;
 
 const QueryDetail = ({ query }: { readonly query: QuerySchema.Type }) => (
@@ -79,7 +79,7 @@ const DropDetail = ({ drop }: { readonly drop: DropSchema.Type }) => (
 			/>
 			<DetailFact
 				label="Quantity"
-				value={formatQuantity(drop.quantity)}
+				value={formatQuantityFn(drop.quantity)}
 			/>
 			<DetailFact
 				label="Placement"
@@ -100,7 +100,7 @@ const RollDetail = ({ roll }: { readonly roll: RollSchema.Type }) => {
 		return (
 			<li className="grid gap-3 py-3 first:pt-0 last:pb-0">
 				<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-					{roll.type} · {formatQuantity(roll.quantity)} picks
+					{roll.type} · {formatQuantityFn(roll.quantity)} picks
 				</p>
 				<ul className="grid gap-3">
 					{roll.drop.map((candidate, index) => (

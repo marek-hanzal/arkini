@@ -12,33 +12,33 @@ export interface GameSessionTransitionSubscriptionCleanup {
 }
 
 interface GameSessionTransitionSubscriptions {
-	readonly subscribe: (
-		listener: () => void | PromiseLike<void>,
+	readonly subscribeFx: (
+		listenerFn: () => void | PromiseLike<void>,
 	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup, never, never>;
-	readonly subscribeTransitions: (
-		listener: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
+	readonly subscribeTransitionsFx: (
+		listenerFn: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
 	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup, never, never>;
-	readonly subscribeEvents: (
-		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
+	readonly subscribeEventsFx: (
+		listenerFn: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
 	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup, never, never>;
 }
 
 namespace openGameSessionTransitionSubscriptionFx {
 	export interface Props {
 		readonly committedTransitions: CommittedTransitionsFxService;
-		readonly delivery: (
+		readonly deliveryFx: (
 			changes: Stream.Stream<CommittedTransitionSchema.Type>,
 		) => Effect.Effect<void, unknown, never>;
 		readonly sessionScope: Scope.Scope;
-		readonly onFatalError: (cause: unknown) => void;
+		readonly onFatalErrorFn: (cause: unknown) => void;
 	}
 }
 
 const invokeListenerFx = <Value>(
-	listener: (value: Value) => void | PromiseLike<void>,
+	listenerFn: (value: Value) => void | PromiseLike<void>,
 	value: Value,
 ) =>
-	Effect.sync(() => listener(value)).pipe(
+	Effect.sync(() => listenerFn(value)).pipe(
 		Effect.flatMap((result) =>
 			result === undefined
 				? Effect.void
@@ -49,7 +49,7 @@ const invokeListenerFx = <Value>(
 		),
 	);
 
-const isSubscriptionClosure = (cause: Cause.Cause<unknown>) =>
+const isSubscriptionClosureFn = (cause: Cause.Cause<unknown>) =>
 	cause.reasons.length > 0 &&
 	cause.reasons.every(
 		(reason) =>
@@ -62,9 +62,9 @@ const openGameSessionTransitionSubscriptionFx = Effect.fn(
 	"openGameSessionTransitionSubscriptionFx",
 )(function* ({
 	committedTransitions,
-	delivery,
+	deliveryFx,
 	sessionScope,
-	onFatalError,
+	onFatalErrorFn,
 }: openGameSessionTransitionSubscriptionFx.Props) {
 	const listenerScope = yield* Scope.fork(sessionScope, "sequential");
 	const replaySeen = yield* Deferred.make<void>();
@@ -72,9 +72,11 @@ const openGameSessionTransitionSubscriptionFx = Effect.fn(
 		Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
 	);
 	yield* Effect.forkIn(
-		delivery(changes).pipe(
+		deliveryFx(changes).pipe(
 			Effect.onError((cause) =>
-				isSubscriptionClosure(cause) ? Effect.void : Effect.sync(() => onFatalError(cause)),
+				isSubscriptionClosureFn(cause)
+					? Effect.void
+					: Effect.sync(() => onFatalErrorFn(cause)),
 			),
 		),
 		listenerScope,
@@ -96,46 +98,46 @@ const openGameSessionTransitionSubscriptionFx = Effect.fn(
  */
 export const createGameSessionTransitionSubscriptionsFx = Effect.fn(
 	"createGameSessionTransitionSubscriptionsFx",
-)(function* (onFatalError: (cause: unknown) => void = () => undefined) {
+)(function* (onFatalErrorFn: (cause: unknown) => void = () => undefined) {
 	const committedTransitions = yield* CommittedTransitionsFx;
 	const sessionScope = yield* Effect.scope;
 
-	const subscribe = Effect.fn("subscribeGameSessionRuntimeFx")(
-		(listener: () => void | PromiseLike<void>) =>
+	const subscribeFx = Effect.fn("subscribeGameSessionRuntimeFx")(
+		(listenerFn: () => void | PromiseLike<void>) =>
 			openGameSessionTransitionSubscriptionFx({
 				committedTransitions,
 				sessionScope,
-				onFatalError,
-				delivery: (changes) =>
+				onFatalErrorFn,
+				deliveryFx: (changes) =>
 					changes.pipe(
 						Stream.map((transition) => transition.runtime),
 						Stream.changesWith(Object.is),
 						Stream.drop(1),
-						Stream.runForEach(() => invokeListenerFx(listener, undefined)),
+						Stream.runForEach(() => invokeListenerFx(listenerFn, undefined)),
 					),
 			}),
 	);
 
-	const subscribeTransitions = Effect.fn("subscribeGameSessionTransitionsFx")(
-		(listener: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>) =>
+	const subscribeTransitionsFx = Effect.fn("subscribeGameSessionTransitionsFx")(
+		(listenerFn: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>) =>
 			openGameSessionTransitionSubscriptionFx({
 				committedTransitions,
 				sessionScope,
-				onFatalError,
-				delivery: (changes) =>
+				onFatalErrorFn,
+				deliveryFx: (changes) =>
 					changes.pipe(
-						Stream.runForEach((transition) => invokeListenerFx(listener, transition)),
+						Stream.runForEach((transition) => invokeListenerFx(listenerFn, transition)),
 					),
 			}),
 	);
 
-	const subscribeEvents = Effect.fn("subscribeGameSessionEventsFx")(
-		(listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) =>
+	const subscribeEventsFx = Effect.fn("subscribeGameSessionEventsFx")(
+		(listenerFn: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) =>
 			openGameSessionTransitionSubscriptionFx({
 				committedTransitions,
 				sessionScope,
-				onFatalError,
-				delivery: (changes) =>
+				onFatalErrorFn,
+				deliveryFx: (changes) =>
 					changes.pipe(
 						// A replay may contain transient facts committed before this listener
 						// linearized. Only later transitions are live event deliveries.
@@ -146,14 +148,14 @@ export const createGameSessionTransitionSubscriptionsFx = Effect.fn(
 								events: transition.events,
 							}),
 						),
-						Stream.runForEach((batch) => invokeListenerFx(listener, batch)),
+						Stream.runForEach((batch) => invokeListenerFx(listenerFn, batch)),
 					),
 			}),
 	);
 
 	return {
-		subscribe,
-		subscribeTransitions,
-		subscribeEvents,
+		subscribeFx,
+		subscribeTransitionsFx,
+		subscribeEventsFx,
 	} satisfies GameSessionTransitionSubscriptions;
 });

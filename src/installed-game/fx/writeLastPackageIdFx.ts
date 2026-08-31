@@ -6,7 +6,7 @@ import { LastPackageIdError } from "~/installed-game/error/LastPackageIdError";
 export const writeLastPackageIdFx = Effect.fn("writeLastPackageIdFx")(
 	(packageId: LastPackageIdSchema.Type) =>
 		Effect.tryPromise({
-			try: () => window.arkini.launcher.writeLastPackageId(packageId),
+			try: () => window.arkini.launcher.writeLastPackageIdFn(packageId),
 			catch: (cause) =>
 				new LastPackageIdError({
 					operation: "write",

@@ -19,7 +19,7 @@ export const ItemDetailDialog = ({
 	renderLineIdentity,
 	state,
 }: ItemDetailDialogProps) => {
-	const closeItemDetail = useCloseItemDetail();
+	const closeItemDetailFn = useCloseItemDetail();
 	const motionState = useItemDetailMotion({
 		state,
 	});
@@ -45,7 +45,7 @@ export const ItemDetailDialog = ({
 			transition={itemDetailTransition}
 			onPointerDown={(event) => {
 				if (event.target !== event.currentTarget || state.phase === "exiting") return;
-				closeItemDetail();
+				closeItemDetailFn();
 			}}
 		>
 			<motion.div
@@ -62,7 +62,7 @@ export const ItemDetailDialog = ({
 				}}
 				animate={motionState.dialog}
 				transition={itemDetailTransition}
-				onAnimationComplete={motionState.completeMotionPhase}
+				onAnimationComplete={motionState.completeMotionPhaseFn}
 			>
 				{match(state.target)
 					.with(

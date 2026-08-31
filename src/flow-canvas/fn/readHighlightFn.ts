@@ -6,7 +6,7 @@ import type {
 } from "~/flow/type/ItemOriginFlow";
 import type { OriginFlowDirection, Highlight, Selection } from "~/flow-canvas/type/Highlight";
 
-const EdgeOrder = Order.make<ItemOriginEdge>(
+const EdgeOrderFn = Order.make<ItemOriginEdge>(
 	(left, right) =>
 		Order.String(left.operationId, right.operationId) || Order.String(left.id, right.id),
 );
@@ -39,7 +39,7 @@ const traceInputOperationFn = (trace: InputHighlightTrace, operationId: string) 
 	if (ownerNodeId !== undefined) trace.nodeIds.add(ownerNodeId);
 	for (const edge of [
 		...(trace.outputEdgesByOperation.get(operationId) ?? []),
-	].sort(EdgeOrder)) {
+	].sort(EdgeOrderFn)) {
 		addHighlightEdgeFn(trace, edge);
 		const outputNode = trace.nodeById.get(edge.target);
 		if (outputNode !== undefined) traceInputItemFn(trace, outputNode);
@@ -54,7 +54,7 @@ const traceInputItemFn = (trace: InputHighlightTrace, itemNode: ItemOriginItemNo
 	const operationIds = new Set(trace.operationIdsByOwner.get(itemNode.id) ?? []);
 	for (const edge of [
 		...(trace.inputEdgesBySource.get(itemNode.id) ?? []),
-	].sort(EdgeOrder)) {
+	].sort(EdgeOrderFn)) {
 		addHighlightEdgeFn(trace, edge);
 		operationIds.add(edge.operationId);
 	}
@@ -147,7 +147,7 @@ const traceOutputItemFn = (
 
 	const directOutputEdgesForItem = [
 		...(trace.outputEdgesByTarget.get(itemNode.id) ?? []),
-	].sort(EdgeOrder);
+	].sort(EdgeOrderFn);
 	const witness =
 		itemNode.acquisitionSourceId === undefined
 			? directOutputEdgesForItem[0]
@@ -176,7 +176,7 @@ const traceOutputOperationFn = (
 	if (ownerNode !== undefined) traceOutputItemFn(trace, ownerNode, activeItemIds);
 	for (const edge of [
 		...(trace.inputEdgesByOperation.get(operationId) ?? []),
-	].sort(EdgeOrder)) {
+	].sort(EdgeOrderFn)) {
 		addHighlightEdgeFn(trace, edge);
 		const requirementNode = trace.nodeById.get(edge.source);
 		if (requirementNode !== undefined) traceOutputItemFn(trace, requirementNode, activeItemIds);
@@ -228,7 +228,7 @@ const readOutputHighlightFn = (flow: ItemOriginFlow, startNode: ItemOriginItemNo
 	const directEdgesByProducer = new Map<string, ItemOriginEdge[]>();
 	for (const edge of [
 		...(outputEdgesByTarget.get(startNode.id) ?? []),
-	].sort(EdgeOrder)) {
+	].sort(EdgeOrderFn)) {
 		if (edge.source === startNode.id) continue;
 		const edges = directEdgesByProducer.get(edge.source) ?? [];
 		edges.push(edge);

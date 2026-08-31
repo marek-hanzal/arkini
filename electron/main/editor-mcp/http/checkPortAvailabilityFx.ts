@@ -17,16 +17,16 @@ export const checkPortAvailabilityFx = Effect.fn("checkPortAvailabilityFx")((can
 				message: "Use a port from 1024 to 65535.",
 			} satisfies EditorMcpPortAvailability;
 		}
-		return yield* Effect.callback<EditorMcpPortAvailability>((resume) => {
+		return yield* Effect.callback<EditorMcpPortAvailability>((resumeFn) => {
 			const server = createServer();
 			let settled = false;
-			const finish = (result: EditorMcpPortAvailability) => {
+			const finishFn = (result: EditorMcpPortAvailability) => {
 				if (settled) return;
 				settled = true;
-				resume(Effect.succeed(result));
+				resumeFn(Effect.succeed(result));
 			};
 			server.once("error", () =>
-				finish({
+				finishFn({
 					type: "unavailable",
 					message: `Port ${port.value} is already in use or cannot be bound.`,
 				}),
@@ -39,7 +39,7 @@ export const checkPortAvailabilityFx = Effect.fn("checkPortAvailabilityFx")((can
 				},
 				() => {
 					server.close((error) =>
-						finish(
+						finishFn(
 							error === undefined
 								? {
 										type: "available",

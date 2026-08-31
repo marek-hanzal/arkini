@@ -86,7 +86,7 @@ const runtime = Effect.runSync(
 	),
 );
 const game = {
-	getResourceUrl: (resourceId: string) => resourceId,
+	getResourceUrlFn: (resourceId: string) => resourceId,
 };
 const source = runtime.items.find(
 	(item) => item.location.scope === "board" && item.location.position.x === 0,

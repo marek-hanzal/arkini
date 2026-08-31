@@ -13,11 +13,11 @@ import { useProjectFormController } from "~/project-authoring/ui/useProjectFormC
 
 export const Route = createFileRoute("/editor/$projectId/project")({
 	component: () => {
-		const navigate = useNavigate();
+		const navigateFn = useNavigate();
 		const project = useEditorProject();
-		const onInvalidSection = useCallback(
+		const onInvalidSectionFn = useCallback(
 			(sectionId: ProjectSectionId) =>
-				navigate({
+				navigateFn({
 					to: "/editor/$projectId/project/$sectionId",
 					params: {
 						projectId: project.projectId,
@@ -25,12 +25,12 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 					},
 				}),
 			[
-				navigate,
+				navigateFn,
 				project.projectId,
 			],
 		);
 		const controller = useProjectFormController({
-			onInvalidSection,
+			onInvalidSectionFn,
 		});
 		return (
 			<ProjectFormProvider value={controller}>
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 								version={project.version}
 							/>
 						}
-						save={controller.save}
+						saveFn={controller.saveFn}
 						saving={controller.isSaving}
 						tabs={
 							<EditorSectionTabs>

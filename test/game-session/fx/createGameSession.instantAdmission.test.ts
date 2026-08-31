@@ -87,7 +87,7 @@ describe("GameSession Instant gameplay admission", () => {
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				Effect.gen(function* () {
 					yield* setInstantGameplayFx({
 						enabled: true,
@@ -97,13 +97,13 @@ describe("GameSession Instant gameplay admission", () => {
 					});
 				}),
 			);
-			const first = await session.run(
+			const first = await session.runFn(
 				prepareOwnerFx({
 					id: "first",
 					y: 0,
 				}),
 			);
-			const second = await session.run(
+			const second = await session.runFn(
 				prepareOwnerFx({
 					id: "second",
 					y: 1,
@@ -111,13 +111,13 @@ describe("GameSession Instant gameplay admission", () => {
 			);
 
 			await Promise.all([
-				session.run(
+				session.runFn(
 					startLineFx({
 						ownerItemId: first.id,
 						lineId,
 					}),
 				),
-				session.run(
+				session.runFn(
 					startLineFx({
 						ownerItemId: second.id,
 						lineId,
@@ -127,7 +127,7 @@ describe("GameSession Instant gameplay admission", () => {
 
 			expect(
 				session
-					.getSnapshot()
+					.getSnapshotFn()
 					.jobs.map(({ ownerItemId }) => ownerItemId)
 					.sort(),
 			).toEqual(
@@ -137,12 +137,12 @@ describe("GameSession Instant gameplay admission", () => {
 				].sort(),
 			);
 
-			await session.run(
+			await session.runFn(
 				advanceRuntimeElapsedFx({
 					elapsedMs: SimulationStepMs,
 				}),
 			);
-			expect(session.getSnapshot().jobs).toEqual([]);
+			expect(session.getSnapshotFn().jobs).toEqual([]);
 		} finally {
 			await Effect.runPromise(session.disposeWithoutSaveFx);
 		}
@@ -157,7 +157,7 @@ describe("GameSession Instant gameplay admission", () => {
 		let unsubscribe: () => void = () => undefined;
 
 		try {
-			await session.run(
+			await session.runFn(
 				Effect.gen(function* () {
 					yield* setInstantGameplayFx({
 						enabled: true,
@@ -200,7 +200,7 @@ describe("GameSession Instant gameplay admission", () => {
 						length: 5,
 					},
 					() =>
-						session.run(
+						session.runFn(
 							enqueueLineFx({
 								ownerItemId,
 								lineId,
@@ -208,21 +208,23 @@ describe("GameSession Instant gameplay admission", () => {
 						),
 				),
 			);
-			expect(session.getSnapshot().jobs).toEqual([]);
-			expect(session.getSnapshot().jobQueue).toHaveLength(5);
+			expect(session.getSnapshotFn().jobs).toEqual([]);
+			expect(session.getSnapshotFn().jobQueue).toHaveLength(5);
 			let publishWokenRuntime:
-				| ((runtime: ReturnType<typeof session.getSnapshot>) => void)
+				| ((runtime: ReturnType<typeof session.getSnapshotFn>) => void)
 				| undefined;
-			const wokenRuntime = new Promise<ReturnType<typeof session.getSnapshot>>((resolve) => {
-				publishWokenRuntime = resolve;
-			});
-			unsubscribe = session.subscribeTransitions((transition) => {
+			const wokenRuntime = new Promise<ReturnType<typeof session.getSnapshotFn>>(
+				(resolve) => {
+					publishWokenRuntime = resolve;
+				},
+			);
+			unsubscribe = session.subscribeTransitionsFn((transition) => {
 				if (transition.runtime.jobQueue.length === 4) {
 					publishWokenRuntime?.(transition.runtime);
 				}
 			});
 
-			await session.run(
+			await session.runFn(
 				Effect.gen(function* () {
 					yield* spawnItemFx({
 						id: "runtime:water:remainder",
@@ -257,7 +259,7 @@ describe("GameSession Instant gameplay admission", () => {
 			expect(runtime.jobs).toEqual([]);
 			expect(runtime.jobQueue).toHaveLength(4);
 			expect(runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
-			expect(session.getFatalError()).toBeNull();
+			expect(session.getFatalErrorFn()).toBeNull();
 		} finally {
 			unsubscribe();
 			await Effect.runPromise(session.disposeWithoutSaveFx);

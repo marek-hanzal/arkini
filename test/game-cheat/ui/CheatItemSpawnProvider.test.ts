@@ -67,7 +67,7 @@ const makeGame = (
 	saveKey: {
 		packageId: `package:spawn-${suffix}`,
 	},
-	getResourceUrl: () => "blob:test",
+	getResourceUrlFn: () => "blob:test",
 	runFx: ((_effect) => session.runFx(commandFx)) as Game["runFx"],
 });
 
@@ -147,7 +147,7 @@ describe("CheatItemSpawnProvider lifecycle", () => {
 				root,
 			});
 		});
-		control?.request("item:test");
+		control?.requestFn("item:test");
 		await Effect.runPromise(Deferred.await(pending.entered));
 
 		await act(async () => root.unmount());
@@ -180,7 +180,7 @@ describe("CheatItemSpawnProvider lifecycle", () => {
 				root,
 			});
 		});
-		control?.request("item:test");
+		control?.requestFn("item:test");
 		await Effect.runPromise(Deferred.await(pending.entered));
 
 		await act(async () => {
@@ -220,7 +220,7 @@ describe("CheatItemSpawnProvider lifecycle", () => {
 				root,
 			});
 		});
-		control?.request("item:a");
+		control?.requestFn("item:a");
 		await Effect.runPromise(Deferred.await(first.entered));
 
 		await act(async () => {
@@ -234,7 +234,7 @@ describe("CheatItemSpawnProvider lifecycle", () => {
 		await Effect.runPromise(Deferred.await(first.interrupted));
 		if (control === undefined) throw new Error("Expected Game B spawn control.");
 		expect(control.state.kind).toBe("idle");
-		control.request("item:b");
+		control.requestFn("item:b");
 		await vi.waitFor(() => {
 			if (control === undefined) throw new Error("Expected Game B spawn control.");
 			expect(control.state.kind).toBe("success");
@@ -275,8 +275,8 @@ describe("CheatItemSpawnProvider lifecycle", () => {
 		});
 		if (control === undefined) throw new Error("Expected spawn control.");
 		await act(async () => {
-			control?.request("item:first");
-			control?.request("item:second");
+			control?.requestFn("item:first");
+			control?.requestFn("item:second");
 			await Effect.runPromise(Deferred.await(bothEntered));
 		});
 		expect(invocation).toBe(2);

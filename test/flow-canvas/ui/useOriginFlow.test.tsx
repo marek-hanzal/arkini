@@ -105,7 +105,7 @@ describe("useOriginFlow", () => {
 	it("publishes one complete globally laid-out flow", async () => {
 		mocks.read.mockImplementation((request: ItemOriginFlowRequest) =>
 			Effect.sync(() => {
-				request.onProgress?.({
+				request.onProgressFn?.({
 					label: "Indexing sources",
 					percent: 50,
 				});

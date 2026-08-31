@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
@@ -27,7 +28,7 @@ export namespace createMainDragPreviewFx {
 			}
 		>;
 		eligibleAttractionActorIds: ReadonlySet<string>;
-		previewKind: readTileDropPreviewFx.Result["kind"] | null;
+		previewKind: readDropItemPreviewFx.Result["kind"] | null;
 		previewSource: Pick<TileActorItem, "id" | "location" | "revision"> | null;
 		target: NonNullable<TargetFacts["target"]> | null;
 		targetKey: string;
@@ -41,7 +42,7 @@ export namespace createMainDragPreviewFx {
 			readonly targetFacts: TargetFacts;
 		}) => Effect.Effect<TileActorItem | null, never, never>;
 		readonly readAttractionActorIdFn: (props: {
-			readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
+			readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 			readonly targetItem: TileActorItem | null;
 		}) => string | null;
 		readonly readCurrentSourceFx: (
@@ -50,7 +51,7 @@ export namespace createMainDragPreviewFx {
 		readonly readPreviewKindFx: (props: {
 			readonly sourceItem: TileActorItem;
 			readonly targetFacts: TargetFacts;
-		}) => Effect.Effect<readTileDropPreviewFx.Result["kind"], never, never>;
+		}) => Effect.Effect<readDropItemPreviewFx.Result["kind"], never, never>;
 		readonly refreshAttractionEligibilityFx: (props: {
 			readonly candidateActorIds: ReadonlyArray<string>;
 			readonly drag: State;
@@ -70,7 +71,7 @@ const readAttractionActorIdFn = ({
 	previewKind,
 	targetItem,
 }: {
-	readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
+	readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 	readonly targetItem: TileActorItem | null;
 }): string | null => {
 	if (targetItem === null) return null;

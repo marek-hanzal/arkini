@@ -17,10 +17,10 @@ vi.mock("~/asset-authoring/ui/useEditorAssetEditController", () => ({
 		nextId: "hero",
 		projectId: "project",
 		resourceFound: true,
-		save: vi.fn().mockResolvedValue(true),
+		saveFn: vi.fn().mockResolvedValue(true),
 		saving: false,
-		setFile: vi.fn(),
-		setNextId: vi.fn(),
+		setFileFn: vi.fn(),
+		setNextIdFn: vi.fn(),
 	}),
 }));
 

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 
-const readResolvedCssColor = (
+const readResolvedCssColorFn = (
 	probe: HTMLElement,
 	context: CanvasRenderingContext2D,
 	property: string,
@@ -30,20 +30,20 @@ export const readScenePaletteFx = Effect.fn("readScenePaletteFx")((host: HTMLEle
 		if (context === null) throw new Error("Pixi CSS color resolver has no Canvas 2D context.");
 		host.append(probe);
 		try {
-			const read = (property: string) => readResolvedCssColor(probe, context, property);
+			const readFn = (property: string) => readResolvedCssColorFn(probe, context, property);
 			return {
-				accent: read("--ak-accent"),
-				danger: read("--ak-danger"),
-				foreground: read("--ak-foreground"),
-				gridA: read("--ak-tile-grid-slot-surface-a"),
-				gridB: read("--ak-tile-grid-slot-surface-b"),
-				line: read("--ak-line"),
-				overlay: read("--ak-overlay"),
-				overlayForeground: read("--ak-overlay-foreground"),
-				success: read("--ak-success"),
-				surface: read("--ak-surface"),
-				toolbarA: read("--ak-toolbar-grid-slot-surface-a"),
-				toolbarB: read("--ak-toolbar-grid-slot-surface-b"),
+				accent: readFn("--ak-accent"),
+				danger: readFn("--ak-danger"),
+				foreground: readFn("--ak-foreground"),
+				gridA: readFn("--ak-tile-grid-slot-surface-a"),
+				gridB: readFn("--ak-tile-grid-slot-surface-b"),
+				line: readFn("--ak-line"),
+				overlay: readFn("--ak-overlay"),
+				overlayForeground: readFn("--ak-overlay-foreground"),
+				success: readFn("--ak-success"),
+				surface: readFn("--ak-surface"),
+				toolbarA: readFn("--ak-toolbar-grid-slot-surface-a"),
+				toolbarB: readFn("--ak-toolbar-grid-slot-surface-b"),
 			};
 		} finally {
 			probe.remove();

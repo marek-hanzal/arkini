@@ -136,7 +136,7 @@ describe("input remainder travel", () => {
 		expect(transient.container.x).toBe(125);
 		samplePoseAnimation(firstTravel, 1);
 		owner.container.x = 340;
-		firstTravel.onComplete?.();
+		firstTravel.onCompleteFn?.();
 
 		const travelSegments = animations.filter(
 			(animation) =>
@@ -159,7 +159,7 @@ describe("input remainder travel", () => {
 		).toHaveLength(0);
 		samplePoseAnimation(finalTravel, 1);
 		source.dragging = true;
-		finalTravel.onComplete?.();
+		finalTravel.onCompleteFn?.();
 
 		expect(
 			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
@@ -228,7 +228,7 @@ describe("input remainder travel", () => {
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
 		};
 		source.dragging = false;
-		returnTravel.onComplete?.();
+		returnTravel.onCompleteFn?.();
 
 		expect(transient.container.destroyed).toBe(false);
 		expect(source.item.quantity).toBe(2);

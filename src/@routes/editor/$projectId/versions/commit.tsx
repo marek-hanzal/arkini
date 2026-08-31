@@ -49,7 +49,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 									placeholder="Describe this saved state"
 									value={controller.subject}
 									onChange={(event) =>
-										controller.setSubject(event.currentTarget.value)
+										controller.setSubjectFn(event.currentTarget.value)
 									}
 								/>
 								<span className="text-xs text-subtle">
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 									placeholder="Why this state matters, what changed, or what to try next"
 									value={controller.body}
 									onChange={(event) =>
-										controller.setBody(event.currentTarget.value)
+										controller.setBodyFn(event.currentTarget.value)
 									}
 								/>
 							</label>
@@ -76,7 +76,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 									placeholder="safe, balance pass, weird but useful…"
 									value={controller.tag}
 									onChange={(event) =>
-										controller.setTag(event.currentTarget.value)
+										controller.setTagFn(event.currentTarget.value)
 									}
 								/>
 								<span className="text-xs text-subtle">
@@ -97,7 +97,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 								<PrimaryButton
 									disabled={!controller.canCommit || controller.pending}
 									cursorIntent={controller.pending ? "progress" : undefined}
-									onClick={controller.commit}
+									onClick={controller.commitFn}
 								>
 									Commit version
 								</PrimaryButton>

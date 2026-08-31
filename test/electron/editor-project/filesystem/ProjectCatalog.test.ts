@@ -105,7 +105,7 @@ describe("filesystem Editor project catalog", () => {
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
-		expect(catalog.list()).toEqual([
+		expect(catalog.listFn()).toEqual([
 			{
 				root: await realPath(managedRoot),
 				ownership: "managed",
@@ -114,7 +114,7 @@ describe("filesystem Editor project catalog", () => {
 			...expected.projects,
 		]);
 		expect(JSON.parse(await readFile(catalogPath, "utf8"))).toEqual({
-			projects: catalog.list(),
+			projects: catalog.listFn(),
 		});
 	});
 
@@ -155,7 +155,7 @@ describe("filesystem Editor project catalog", () => {
 		);
 
 		const canonicalManagedRoots = await Promise.all(managedRoots.map(realPath));
-		expect(catalog.list()).toEqual(
+		expect(catalog.listFn()).toEqual(
 			canonicalManagedRoots.map((root) => ({
 				root,
 				ownership: "managed",
@@ -163,7 +163,7 @@ describe("filesystem Editor project catalog", () => {
 			})),
 		);
 		expect(JSON.parse(await readFile(catalogPath, "utf8"))).toEqual({
-			projects: catalog.list(),
+			projects: catalog.listFn(),
 		});
 		expect(await readFile(join(managedRoots[1]!, "preserved.txt"), "utf8")).toBe("keep");
 	});

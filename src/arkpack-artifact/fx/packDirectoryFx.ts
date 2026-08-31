@@ -16,7 +16,7 @@ import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 
-const gzipAsync = promisify(gzip);
+const gzipAsyncFn = promisify(gzip);
 
 export namespace packDirectoryFx {
 	export interface Props {
@@ -64,7 +64,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		config,
 		resources: pngAssets,
 	});
-	const compressed = yield* Effect.promise(async () => new Uint8Array(await gzipAsync(bytes)));
+	const compressed = yield* Effect.promise(async () => new Uint8Array(await gzipAsyncFn(bytes)));
 	const arkpack = yield* encodeArkpackEnvelopeFx({
 		payload: compressed,
 	});

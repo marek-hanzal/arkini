@@ -52,18 +52,18 @@ const queryScopeOptions = [
 ] as const;
 
 const QueryScopeControl = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (query: QuerySchema.Type) => void;
+	readonly onChangeFn: (query: QuerySchema.Type) => void;
 	readonly value: QuerySchema.Type;
 }) => (
 	<EditorChoiceControl
 		label="Query scope"
 		value={value.scope}
 		options={queryScopeOptions}
-		onChange={(scope) =>
-			onChange(
+		onChangeFn={(scope) =>
+			onChangeFn(
 				scope === "board"
 					? {
 							scope,
@@ -79,7 +79,7 @@ const QueryScopeControl = ({
 	/>
 );
 
-const readRuleTypeDescription = (type: RuleType, target: RuleTarget) => {
+const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget) => {
 	if (target === "drop")
 		return type === "enable"
 			? "Allows this selected drop only while every condition passes. It does not enable or disable the production line itself."
@@ -102,10 +102,10 @@ const readRuleTypeDescription = (type: RuleType, target: RuleTarget) => {
 };
 
 const WhenControl = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (when: WhenSchema.Type) => void;
+	readonly onChangeFn: (when: WhenSchema.Type) => void;
 	readonly value: WhenSchema.Type;
 }) => (
 	<div className="grid min-w-0 gap-3">
@@ -131,8 +131,8 @@ const WhenControl = ({
 					value: "range",
 				},
 			]}
-			onChange={(type) =>
-				onChange(
+			onChangeFn={(type) =>
+				onChangeFn(
 					type === "exists"
 						? {
 								type,
@@ -157,8 +157,8 @@ const WhenControl = ({
 			<div className="min-w-64 flex-1">
 				<SelectorControl
 					value={value.query.selector}
-					onChange={(selector) =>
-						onChange({
+					onChangeFn={(selector) =>
+						onChangeFn({
 							...value,
 							query: {
 								...value.query,
@@ -185,8 +185,8 @@ const WhenControl = ({
 								label="Exact count"
 								value={when.count}
 								min={0}
-								onChange={(count) =>
-									onChange({
+								onChangeFn={(count) =>
+									onChangeFn({
 										...when,
 										count,
 									})
@@ -205,8 +205,8 @@ const WhenControl = ({
 								label="Minimum count"
 								value={when.min}
 								min={0}
-								onChange={(min) =>
-									onChange({
+								onChangeFn={(min) =>
+									onChangeFn({
 										...when,
 										min,
 									})
@@ -216,8 +216,8 @@ const WhenControl = ({
 								label="Maximum count"
 								value={when.max}
 								min={when.min}
-								onChange={(max) =>
-									onChange({
+								onChangeFn={(max) =>
+									onChangeFn({
 										...when,
 										max,
 									})
@@ -231,8 +231,8 @@ const WhenControl = ({
 		<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
 			<QueryScopeControl
 				value={value.query}
-				onChange={(query) =>
-					onChange({
+				onChangeFn={(query) =>
+					onChangeFn({
 						...value,
 						query,
 					})
@@ -241,8 +241,8 @@ const WhenControl = ({
 			{value.query.scope !== "board" ? null : (
 				<BoardDistanceControl
 					value={value.query}
-					onChange={(query) =>
-						onChange({
+					onChangeFn={(query) =>
+						onChangeFn({
 							...value,
 							query,
 						})
@@ -255,16 +255,16 @@ const WhenControl = ({
 
 const RuleControl = ({
 	allowedTypes,
-	createRule,
-	onChange,
+	createRuleFn,
+	onChangeFn,
 	rule,
 	ruleIndex,
 	ruleTarget,
 	ruleTypeDescription,
 }: {
 	readonly allowedTypes: ReadonlyArray<RuleType>;
-	readonly createRule: (type: RuleType) => LineRuleSchema.Type;
-	readonly onChange: (rule: RuleValue) => void;
+	readonly createRuleFn: (type: RuleType) => LineRuleSchema.Type;
+	readonly onChangeFn: (rule: RuleValue) => void;
 	readonly rule: RuleValue;
 	readonly ruleIndex: number;
 	readonly ruleTarget: RuleTarget;
@@ -275,8 +275,8 @@ const RuleControl = ({
 			label="Hint"
 			placeholder="Optional explanation shown while this rule applies"
 			value={rule.hint ?? ""}
-			onChange={(hint) =>
-				onChange({
+			onChangeFn={(hint) =>
+				onChangeFn({
 					...rule,
 					...(hint.trim() === ""
 						? {
@@ -295,13 +295,13 @@ const RuleControl = ({
 					description={ruleTypeDescription}
 					value={rule.type}
 					options={allowedTypes.map((type) => ({
-						description: readRuleTypeDescription(type, ruleTarget),
+						description: readRuleTypeDescriptionFn(type, ruleTarget),
 						label: type,
 						value: type,
 					}))}
-					onChange={(type) => {
-						const next = createRule(type);
-						onChange({
+					onChangeFn={(type) => {
+						const next = createRuleFn(type);
+						onChangeFn({
 							...next,
 							...(rule.hint === undefined
 								? {}
@@ -320,8 +320,8 @@ const RuleControl = ({
 				value={rule.multiplier}
 				min={0.01}
 				step={0.01}
-				onChange={(multiplier) =>
-					onChange({
+				onChangeFn={(multiplier) =>
+					onChangeFn({
 						...rule,
 						multiplier,
 					})
@@ -332,8 +332,8 @@ const RuleControl = ({
 			<EditorSecondsControl
 				label="Runtime adjustment (seconds)"
 				value={rule.adjustMs / 1_000}
-				onChange={(adjustSeconds) =>
-					onChange({
+				onChangeFn={(adjustSeconds) =>
+					onChangeFn({
 						...rule,
 						adjustMs: Math.round(adjustSeconds * 1_000),
 					})
@@ -343,10 +343,10 @@ const RuleControl = ({
 		<EditorCollectionSelector
 			addLabel="Add condition"
 			count={rule.when.length}
-			itemLabel={(whenIndex) => `Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`}
+			itemLabelFn={(whenIndex) => `Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`}
 			label={`Rule ${ruleIndex + 1} conditions`}
-			onAdd={() =>
-				onChange({
+			onAddFn={() =>
+				onChangeFn({
 					...rule,
 					when: [
 						...rule.when,
@@ -354,11 +354,11 @@ const RuleControl = ({
 					],
 				})
 			}
-			onRemove={
+			onRemoveFn={
 				rule.when.length === 1
 					? undefined
 					: (whenIndex) =>
-							onChange({
+							onChangeFn({
 								...rule,
 								when: rule.when.filter(
 									(_candidate, candidateIndex) => candidateIndex !== whenIndex,
@@ -370,8 +370,8 @@ const RuleControl = ({
 			{(whenIndex) => (
 				<WhenControl
 					value={rule.when[whenIndex]}
-					onChange={(next) =>
-						onChange({
+					onChangeFn={(next) =>
+						onChangeFn({
 							...rule,
 							when: rule.when.map((candidate, candidateIndex) =>
 								candidateIndex === whenIndex ? next : candidate,
@@ -388,17 +388,17 @@ const RuleControl = ({
 export const RulesControl = ({
 	allowedTypes,
 	description,
-	onChange,
+	onChangeFn,
 	rules,
 	target,
 }: {
 	readonly allowedTypes: ReadonlyArray<RuleType>;
 	readonly description: string;
-	readonly onChange: (rules: RuleValue[]) => void;
+	readonly onChangeFn: (rules: RuleValue[]) => void;
 	readonly rules: ReadonlyArray<RuleValue>;
 	readonly target: RuleTarget;
 }) => {
-	const createRule = (type: RuleType): LineRuleSchema.Type =>
+	const createRuleFn = (type: RuleType): LineRuleSchema.Type =>
 		({
 			type,
 			when: [
@@ -424,29 +424,29 @@ export const RulesControl = ({
 			<EditorCollectionSelector
 				addLabel="Add rule"
 				count={rules.length}
-				itemLabel={(ruleIndex) => `Rule ${ruleIndex + 1} — ${rules[ruleIndex].type}`}
+				itemLabelFn={(ruleIndex) => `Rule ${ruleIndex + 1} — ${rules[ruleIndex].type}`}
 				label="Rules"
-				onAdd={() =>
-					onChange([
+				onAddFn={() =>
+					onChangeFn([
 						...rules,
-						createRule(allowedTypes[0]),
+						createRuleFn(allowedTypes[0]),
 					])
 				}
-				onRemove={(ruleIndex) =>
-					onChange(rules.filter((_current, index) => index !== ruleIndex))
+				onRemoveFn={(ruleIndex) =>
+					onChangeFn(rules.filter((_current, index) => index !== ruleIndex))
 				}
 				removeLabel="Remove rule"
 			>
 				{(ruleIndex) => (
 					<RuleControl
 						allowedTypes={allowedTypes}
-						createRule={createRule}
+						createRuleFn={createRuleFn}
 						rule={rules[ruleIndex]}
 						ruleIndex={ruleIndex}
 						ruleTarget={target}
 						ruleTypeDescription={description}
-						onChange={(next) =>
-							onChange(
+						onChangeFn={(next) =>
+							onChangeFn(
 								rules.map((current, index) =>
 									index === ruleIndex ? next : current,
 								),

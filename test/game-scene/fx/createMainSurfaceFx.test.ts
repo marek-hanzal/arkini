@@ -104,7 +104,7 @@ const game = {
 			toolbarSize: 8,
 		},
 	},
-	getTransitionSnapshot: () => ({
+	getTransitionSnapshotFn: () => ({
 		runtime: {
 			currentSpace: 0,
 		},
@@ -351,7 +351,7 @@ describe("main surface", () => {
 				runtime: {
 					currentSpace: 1,
 				},
-			} as ReturnType<GameEngine["getTransitionSnapshot"]>),
+			} as ReturnType<GameEngine["getTransitionSnapshotFn"]>),
 		);
 		Effect.runSync(
 			actorStore.replaceCanonicalItemsFx([

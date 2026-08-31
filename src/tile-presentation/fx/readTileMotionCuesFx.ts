@@ -46,7 +46,7 @@ type UnstaggeredTileMotionCue =
 			"staggerIndex"
 	  >;
 
-const readOriginLocation = ({
+const readOriginLocationFn = ({
 	originItemId,
 	transition,
 }: {
@@ -65,7 +65,7 @@ const readOriginLocation = ({
 	return current?.location ?? null;
 };
 
-const readTarget = ({
+const readTargetFn = ({
 	canonicalItemId,
 	itemId,
 	location,
@@ -103,7 +103,7 @@ type SpawnMotionEvent = Pick<
 	"canonicalItemId" | "itemId" | "location" | "originItemId"
 >;
 
-const readSpawnCue = ({
+const readSpawnCueFn = ({
 	event,
 	eventIndex,
 	transition,
@@ -112,11 +112,11 @@ const readSpawnCue = ({
 	readonly eventIndex: number;
 	readonly transition: CommittedTransitionSchema.Type;
 }) => {
-	const originLocation = readOriginLocation({
+	const originLocation = readOriginLocationFn({
 		originItemId: event.originItemId,
 		transition,
 	});
-	const target = readTarget({
+	const target = readTargetFn({
 		canonicalItemId: event.canonicalItemId,
 		itemId: event.itemId,
 		location: event.location,
@@ -139,7 +139,7 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 	runtime,
 	source,
 }: {
-	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: GridRuntimeItemSchema.Type;
 }) {
@@ -180,22 +180,22 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 }: {
 	readonly event: GameEventSchema.Type;
 	readonly eventIndex: number;
-	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly transition: CommittedTransitionSchema.Type;
 }) {
 	if (event.type === GameEventEnumSchema.enum.ItemSpawned) {
-		return readSpawnCue({
+		return readSpawnCueFn({
 			event,
 			eventIndex,
 			transition,
 		});
 	}
 	if (event.type === GameEventEnumSchema.enum.ItemStacked) {
-		const originLocation = readOriginLocation({
+		const originLocation = readOriginLocationFn({
 			originItemId: event.originItemId,
 			transition,
 		});
-		const target = readTarget({
+		const target = readTargetFn({
 			canonicalItemId: event.canonicalItemId,
 			itemId: event.itemId,
 			location: event.location,
@@ -290,7 +290,7 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 		event.type === GameEventEnumSchema.enum.ItemPlaced &&
 		event.previousLocation.scope === LocationScopeEnumSchema.enum.Inventory
 	) {
-		return readSpawnCue({
+		return readSpawnCueFn({
 			event,
 			eventIndex,
 			transition,
@@ -309,7 +309,7 @@ export const readTileMotionCuesFx = Effect.fn("readTileMotionCuesFx")(function* 
 	game,
 	transition,
 }: {
-	readonly game: Pick<GameEngine, "getResourceUrl">;
+	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly transition: CommittedTransitionSchema.Type;
 }) {
 	const cues = yield* Effect.forEach(transition.events, (event, eventIndex) =>

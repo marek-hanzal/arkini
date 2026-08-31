@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
+import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import {
 	createItem,
 	flushMicrotasks,
@@ -33,9 +33,9 @@ describe("main drag controller: shortcuts", () => {
 			y: 20,
 		});
 		setOrdinaryInventoryTarget(mounted, inventory);
-		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		let resolveDrop!: (result: DropItemResult) => void;
 		mounted.onDrop.mockReturnValueOnce(
-			new Promise<runTileDropAtom.Result>((resolve) => {
+			new Promise<DropItemResult>((resolve) => {
 				resolveDrop = resolve;
 			}) as never,
 		);
@@ -104,7 +104,7 @@ describe("main drag controller: shortcuts", () => {
 			]),
 		);
 
-		travel?.onComplete?.();
+		travel?.onCompleteFn?.();
 		const fade = mounted.animations.find(
 			(animation) =>
 				animation.actor === mounted.actor && animation.channel === "lifecycle-opacity",
@@ -122,14 +122,14 @@ describe("main drag controller: shortcuts", () => {
 					animation.channel === "activity-particles",
 			),
 		).toBe(true);
-		fade?.onComplete?.();
+		fade?.onCompleteFn?.();
 
 		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
 			new Set(),
 		);
 		expect(mounted.actor.dragging).toBe(false);
-		fade?.onCancel?.();
+		fade?.onCancelFn?.();
 		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
 		expect(mounted.targetRedirects).toHaveLength(1);
 	});

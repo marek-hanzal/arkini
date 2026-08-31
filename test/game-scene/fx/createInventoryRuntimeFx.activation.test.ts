@@ -60,7 +60,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 
 		publishItems([]);
 
-		expect(actor.onPointerDown).toBeNull();
+		expect(actor.onPointerDownFn).toBeNull();
 		expect(actorContainer.eventMode).toBe("none");
 		expect(actor.container.destroyed).toBe(false);
 
@@ -132,7 +132,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 		expect(actor.container.destroyed).toBe(false);
 		expect(actor.container.eventMode).toBe("static");
 		expect(actor.container.cursor).toBe("grab");
-		expect(actor.onPointerDown).not.toBeNull();
+		expect(actor.onPointerDownFn).not.toBeNull();
 
 		for (const complete of [
 			...sceneState.pendingTweenCompletions,

@@ -29,7 +29,7 @@ export const ItemReferenceButton = ({
 	sourceUrl,
 }: ItemReferenceButtonProps) => {
 	const itemDetail = useItemDetailControl();
-	const [hovered, setHovered] = useState(false);
+	const [hovered, setHoveredFn] = useState(false);
 	const canOpen = !disabled && (runtimeItemId !== undefined || definitionItemId !== undefined);
 	return (
 		<motion.button
@@ -41,8 +41,8 @@ export const ItemReferenceButton = ({
 			animate={{
 				scale: hovered && canOpen ? 1.035 : 1,
 			}}
-			onHoverStart={() => setHovered(true)}
-			onHoverEnd={() => setHovered(false)}
+			onHoverStart={() => setHoveredFn(true)}
+			onHoverEnd={() => setHoveredFn(false)}
 			transition={{
 				duration: 0.14,
 				ease: [

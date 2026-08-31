@@ -115,8 +115,8 @@ describe("cursor grab motion", () => {
 		expect(springs).toHaveLength(2);
 		expect(springs[0]?.setTarget).toHaveBeenCalledWith(30);
 		expect(springs[1]?.setTarget).toHaveBeenCalledWith(30);
-		springs[0]?.props.onUpdate(12);
-		springs[1]?.props.onUpdate(18);
+		springs[0]?.props.onUpdateFn(12);
+		springs[1]?.props.onUpdateFn(18);
 		Effect.runSync(motion.finishFx(actor));
 
 		expect(actor.container.x).toBe(-2);
@@ -194,8 +194,8 @@ describe("cursor grab motion", () => {
 				y: 30,
 			}),
 		);
-		springs[0]?.props.onUpdate(12);
-		springs[1]?.props.onUpdate(18);
+		springs[0]?.props.onUpdateFn(12);
+		springs[1]?.props.onUpdateFn(18);
 
 		Effect.runSync(motion.finishFx(actor));
 

@@ -8,12 +8,8 @@ import { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMc
 import { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
-type EditorMcpCommand = EditorMcpCommandSchema.Type;
-type EditorMcpConfiguration = EditorMcpConfigurationSchema.Type;
-type EditorMcpOverview = EditorMcpOverviewSchema.Type;
-
 const readEditorMcpOverviewFx = Effect.tryPromise({
-	try: async () => EditorMcpOverviewSchema.parse(await window.arkini.editorMcp.readOverview()),
+	try: async () => EditorMcpOverviewSchema.parse(await window.arkini.editorMcp.readOverviewFn()),
 	catch: (cause) => cause,
 });
 
@@ -26,7 +22,7 @@ const configureEditorMcpFx = Effect.fn("configureEditorMcpFx")((candidate: unkno
 			Effect.tryPromise({
 				try: async () =>
 					EditorMcpOverviewSchema.parse(
-						await window.arkini.editorMcp.configure(configuration),
+						await window.arkini.editorMcp.configureFn(configuration),
 					),
 				catch: (cause) => cause,
 			}),
@@ -43,7 +39,7 @@ const executeEditorMcpCommandFx = Effect.fn("executeEditorMcpCommandFx")((candid
 			Effect.tryPromise({
 				try: async () =>
 					EditorMcpCommandResultSchema.parse(
-						await window.arkini.editorMcp.command(command),
+						await window.arkini.editorMcp.commandFn(command),
 					),
 				catch: (cause) => cause,
 			}),
@@ -52,7 +48,7 @@ const executeEditorMcpCommandFx = Effect.fn("executeEditorMcpCommandFx")((candid
 );
 
 export namespace EditorMcpCommandAtom {
-	export type Action = EditorMcpCommand | "configure" | "read";
+	export type Action = EditorMcpCommandSchema.Type | "configure" | "read";
 
 	export type Command =
 		| {
@@ -60,15 +56,15 @@ export namespace EditorMcpCommandAtom {
 		  }
 		| {
 				readonly type: "synchronize";
-				readonly overview: EditorMcpOverview;
+				readonly overview: EditorMcpOverviewSchema.Type;
 		  }
 		| {
 				readonly type: "configure";
-				readonly configuration: EditorMcpConfiguration;
+				readonly configuration: EditorMcpConfigurationSchema.Type;
 		  }
 		| {
 				readonly type: "execute";
-				readonly command: EditorMcpCommand;
+				readonly command: EditorMcpCommandSchema.Type;
 		  };
 
 	export type State =
@@ -77,17 +73,17 @@ export namespace EditorMcpCommandAtom {
 		  }
 		| {
 				readonly kind: "ready";
-				readonly overview: EditorMcpOverview;
+				readonly overview: EditorMcpOverviewSchema.Type;
 		  }
 		| {
 				readonly kind: "pending";
 				readonly action: Action;
-				readonly overview: EditorMcpOverview;
+				readonly overview: EditorMcpOverviewSchema.Type;
 		  }
 		| {
 				readonly kind: "error";
 				readonly message: string;
-				readonly overview?: EditorMcpOverview;
+				readonly overview?: EditorMcpOverviewSchema.Type;
 		  };
 }
 

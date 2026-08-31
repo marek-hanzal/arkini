@@ -184,7 +184,7 @@ describe("main drag controller: preview", () => {
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
 		mounted.flushFrame();
 		expect(mounted.actor.dragging).toBe(false);
-		expect(mounted.reportCriticalFailure).toHaveBeenCalledOnce();
+		expect(mounted.reportCriticalFailureFn).toHaveBeenCalledOnce();
 
 		previewState.failureActorIds.delete(eligible.id);
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));

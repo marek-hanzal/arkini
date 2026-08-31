@@ -16,18 +16,18 @@ export const createElectronEditorBuildRepositoryFx = Effect.gen(function* () {
 			admission.admitWriteFx(
 				"build-project",
 				invokeProjectTransportFx({
-					call: () => window.arkini.editor.buildProject(request),
+					callFn: () => window.arkini.editor.buildProjectFn(request),
 					operation: "build-project",
-					parse: (value) => EditorProjectBuildSchema.parse(value),
+					parseFn: (value) => EditorProjectBuildSchema.parse(value),
 					requestMessage: "The editor IPC request failed.",
 					responseMessage: "The editor IPC response is invalid.",
 				}),
 			),
 		readProjectBuildFx: (request) =>
 			invokeProjectTransportFx({
-				call: () => window.arkini.editor.readProjectBuild(request),
+				callFn: () => window.arkini.editor.readProjectBuildFn(request),
 				operation: "read-project-build",
-				parse: (value) => EditorProjectBuildContentSchema.parse(value),
+				parseFn: (value) => EditorProjectBuildContentSchema.parse(value),
 				requestMessage: "The editor IPC request failed.",
 				responseMessage: "The editor IPC response is invalid.",
 			}),

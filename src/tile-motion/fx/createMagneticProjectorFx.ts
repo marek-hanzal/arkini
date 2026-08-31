@@ -12,15 +12,15 @@ interface CreateMagneticProjectorProps {
 	readonly eligibleAttractionActorIds: ReadonlySet<string>;
 	readonly magneticField: MagneticField;
 	readonly surface: MainSurface;
-	readonly readAttraction?: () => {
+	readonly readAttractionFn?: () => {
 		readonly attractedActorId: string | null;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
 	};
 }
 
 interface MagneticProjector {
-	readonly projectPose: (pose: PresentedPose) => void;
-	readonly release: () => void;
+	readonly projectPoseFn: (pose: PresentedPose) => void;
+	readonly releaseFn: () => void;
 }
 
 /**
@@ -35,7 +35,7 @@ export const createMagneticProjectorFx = Effect.fn("createMagneticProjectorFx")(
 		attractedActorId,
 		eligibleAttractionActorIds,
 		magneticField,
-		readAttraction,
+		readAttractionFn,
 		surface,
 	}: CreateMagneticProjectorProps) =>
 		Effect.sync((): MagneticProjector => {
@@ -48,7 +48,7 @@ export const createMagneticProjectorFx = Effect.fn("createMagneticProjectorFx")(
 				y: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
 			};
 			return {
-				projectPose: (pose) => {
+				projectPoseFn: (pose) => {
 					if (released) return;
 					const scale = pose.scale ?? previousPose.scale;
 					const sourcePose = {
@@ -64,7 +64,7 @@ export const createMagneticProjectorFx = Effect.fn("createMagneticProjectorFx")(
 					if (!acquired) {
 						acquired = true;
 					}
-					const attraction = readAttraction?.() ?? {
+					const attraction = readAttractionFn?.() ?? {
 						attractedActorId,
 						eligibleAttractionActorIds,
 					};
@@ -99,7 +99,7 @@ export const createMagneticProjectorFx = Effect.fn("createMagneticProjectorFx")(
 					);
 					previousPose = sourcePose;
 				},
-				release: () => {
+				releaseFn: () => {
 					if (released) return;
 					released = true;
 					if (!acquired) return;

@@ -105,8 +105,6 @@ export namespace commitStackDropFx {
 		readonly targetRevision: RevisionSchema.Type;
 		readonly targetLocation: GridLocationSchema.Type;
 	}
-
-	export type Result = DropItemResult;
 }
 
 /** Commits one exact pure-stack transfer and normalizes both actor identities. */
@@ -126,7 +124,7 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 		targetRevision,
 		targetLocation,
 	}).pipe(
-		Effect.map((result): commitStackDropFx.Result => {
+		Effect.map((result): DropItemResult => {
 			const source = projectDropTransferActorFn({
 				after: result.sourceAfter,
 				before: result.sourceBefore,

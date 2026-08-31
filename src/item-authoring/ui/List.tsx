@@ -12,13 +12,13 @@ import { Status } from "~/ui/ui/Status";
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
 	itemType,
-	onItemTypeChange,
-	onQueryChange,
+	onItemTypeChangeFn,
+	onQueryChangeFn,
 	query,
 }: {
 	readonly itemType?: TypeSchema.Type;
-	readonly onItemTypeChange: (itemType: TypeSchema.Type | undefined) => void;
-	readonly onQueryChange: (query: string) => void;
+	readonly onItemTypeChangeFn: (itemType: TypeSchema.Type | undefined) => void;
+	readonly onQueryChangeFn: (query: string) => void;
 	readonly query: string;
 }) => {
 	const project = useEditorProject();
@@ -57,14 +57,14 @@ export const List = ({
 					value={query}
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title, ID or type…"
-					onChange={(event) => onQueryChange(event.currentTarget.value)}
+					onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
 				/>
 				{itemType === undefined ? null : (
 					<button
 						type="button"
 						className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
 						data-ui="EditorItemTypeFilter"
-						onClick={() => onItemTypeChange(undefined)}
+						onClick={() => onItemTypeChangeFn(undefined)}
 					>
 						{itemType}
 						<span>×</span>
@@ -117,7 +117,7 @@ export const List = ({
 						key={item.uid}
 						activeType={itemType}
 						item={item}
-						onSelectType={onItemTypeChange}
+						onSelectTypeFn={onItemTypeChangeFn}
 						projectId={project.projectId}
 					/>
 				))}

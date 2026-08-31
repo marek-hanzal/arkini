@@ -56,7 +56,7 @@ export const verifyArkpackProvenanceWithFx = Effect.fn("verifyArkpackProvenanceW
 					bundleFromJSON(serialized),
 					Buffer.from(decoded.value.payload),
 				);
-				const originalVerify = sigstoreCrypto.verify;
+				const originalVerifyFn = sigstoreCrypto.verify;
 				// Electron 43 requires the ECDSA digest explicitly, while Sigstore's Rekor checks omit it.
 				sigstoreCrypto.verify = (data, key, signature, algorithm) => {
 					const keyType = key instanceof KeyObject ? key.asymmetricKeyType : undefined;
@@ -77,7 +77,7 @@ export const verifyArkpackProvenanceWithFx = Effect.fn("verifyArkpackProvenanceW
 						},
 					});
 				} finally {
-					sigstoreCrypto.verify = originalVerify;
+					sigstoreCrypto.verify = originalVerifyFn;
 				}
 				return {
 					type: "official",

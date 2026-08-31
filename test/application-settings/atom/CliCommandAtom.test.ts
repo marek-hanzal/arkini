@@ -26,14 +26,14 @@ describe("Settings CLI command", () => {
 			configurable: true,
 			value: {
 				cli: {
-					status: () =>
+					statusFn: () =>
 						Promise.resolve({
 							type: "not-installed" as const,
 							commandPath: "/tmp/arkini-cli",
 						}),
-					install,
-					replace: vi.fn(),
-					uninstall: vi.fn(),
+					installFn: install,
+					replaceFn: vi.fn(),
+					uninstallFn: vi.fn(),
 				},
 			},
 		});
@@ -73,16 +73,16 @@ describe("Settings CLI command", () => {
 			configurable: true,
 			value: {
 				cli: {
-					status: () =>
+					statusFn: () =>
 						Promise.resolve({
 							type: "conflict" as const,
 							commandPath: "/tmp/arkini-cli",
 							message: "Another file already exists.",
 							replaceable: true,
 						}),
-					install: vi.fn(),
-					replace,
-					uninstall: vi.fn(),
+					installFn: vi.fn(),
+					replaceFn: replace,
+					uninstallFn: vi.fn(),
 				},
 			},
 		});

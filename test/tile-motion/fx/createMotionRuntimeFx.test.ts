@@ -90,7 +90,7 @@ describe("motion stack payload", () => {
 		const secondDestroy = vi.spyOn(secondTravel.actor.container, "destroy");
 
 		samplePoseAnimation(firstTravel, 1);
-		firstTravel.onComplete?.();
+		firstTravel.onCompleteFn?.();
 		advanceStackMergeVanish({
 			actor: firstTravel.actor,
 			animations,
@@ -138,7 +138,7 @@ describe("motion stack payload", () => {
 					if (channel !== "pose" || poseState.active === null) return;
 					const canceled = poseState.active;
 					poseState.active = null;
-					canceled.onCancel?.();
+					canceled.onCancelFn?.();
 				}),
 		} satisfies ActorAnimator;
 		Effect.runSync(
@@ -151,9 +151,9 @@ describe("motion stack payload", () => {
 					x: 100,
 					y: 0,
 				},
-				onSettled,
+				onSettledFn: onSettled,
 				ownerKey: "test:proximity-cancel",
-				readLiveTarget: () => ({
+				readLiveTargetFn: () => ({
 					scale: 1,
 					x: 100,
 					y: 0,
@@ -172,7 +172,7 @@ describe("motion stack payload", () => {
 		);
 		const travel = poseState.active;
 		if (travel === null) throw new Error("Expected proximity travel.");
-		const pose = travel.readPose?.(0.7);
+		const pose = travel.readPoseFn?.(0.7);
 		if (pose === undefined) throw new Error("Expected proximity pose.");
 		actor.container.position.set(pose.x, pose.y);
 		Effect.runSync(animator.cancelChannelFx(actor, "pose"));

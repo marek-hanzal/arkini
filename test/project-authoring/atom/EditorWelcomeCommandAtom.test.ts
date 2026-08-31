@@ -184,7 +184,7 @@ describe("EditorWelcomeCommandAtom", () => {
 			return createElement(
 				"button",
 				{
-					onClick: actions.createProject,
+					onClick: actions.createProjectFn,
 					type: "button",
 				},
 				actions.active ?? "idle",

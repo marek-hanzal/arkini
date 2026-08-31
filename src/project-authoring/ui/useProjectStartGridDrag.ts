@@ -28,25 +28,25 @@ interface ProjectStartGridDragVisual {
 	readonly targetKey?: string;
 }
 
-const positionKey = ({ x, y }: ProjectStartGridPosition) => `${x}:${y}`;
+const positionKeyFn = ({ x, y }: ProjectStartGridPosition) => `${x}:${y}`;
 
 /** Owns modifier-pointer drag admission, global continuation, preview, and completion. */
 export const useProjectStartGridDrag = ({
 	gridRef,
-	onMove,
+	onMoveFn,
 }: {
 	readonly gridRef: RefObject<HTMLDivElement | null>;
-	readonly onMove: (source: ProjectStartGridCell, target: ProjectStartGridPosition) => void;
+	readonly onMoveFn: (source: ProjectStartGridCell, target: ProjectStartGridPosition) => void;
 }) => {
 	const dragRef = useRef<ProjectStartGridDrag | undefined>(undefined);
 	const dragPreviewRef = useRef<HTMLDivElement>(null);
-	const onMoveRef = useRef(onMove);
-	onMoveRef.current = onMove;
+	const onMoveRef = useRef(onMoveFn);
+	onMoveRef.current = onMoveFn;
 	const suppressClickRef = useRef(false);
-	const [dragVisual, setDragVisual] = useState<ProjectStartGridDragVisual>();
+	const [dragVisual, setDragVisualFn] = useState<ProjectStartGridDragVisual>();
 
 	useEffect(() => {
-		const readTarget = (target: EventTarget | null) => {
+		const readTargetFn = (target: EventTarget | null) => {
 			if (!(target instanceof Element)) return undefined;
 			const cell = target.closest<HTMLElement>("[data-start-grid-cell]");
 			if (cell === null || gridRef.current?.contains(cell) !== true) return undefined;
@@ -59,17 +59,17 @@ export const useProjectStartGridDrag = ({
 					}
 				: undefined;
 		};
-		const reset = () => {
+		const resetFn = () => {
 			dragRef.current = undefined;
-			setDragVisual(undefined);
+			setDragVisualFn(undefined);
 		};
-		const suppressNextClick = () => {
+		const suppressNextClickFn = () => {
 			suppressClickRef.current = true;
 			window.setTimeout(() => {
 				suppressClickRef.current = false;
 			}, 0);
 		};
-		const onPointerMove = (event: PointerEvent) => {
+		const onPointerMoveFn = (event: PointerEvent) => {
 			const drag = dragRef.current;
 			if (drag === undefined || event.pointerId !== drag.pointerId) return;
 			event.preventDefault();
@@ -79,19 +79,19 @@ export const useProjectStartGridDrag = ({
 					PointerDragThreshold
 			)
 				return;
-			const target = readTarget(event.target);
-			const targetKey = target === undefined ? undefined : positionKey(target);
+			const target = readTargetFn(event.target);
+			const targetKey = target === undefined ? undefined : positionKeyFn(target);
 			drag.target = target;
 			if (drag.phase === "pressed") {
 				drag.phase = "dragging";
-				setDragVisual({
+				setDragVisualFn({
 					clientX: event.clientX,
 					clientY: event.clientY,
 					source: drag.source,
 					targetKey,
 				});
 			} else {
-				setDragVisual((current) =>
+				setDragVisualFn((current) =>
 					current === undefined
 						? current
 						: {
@@ -105,12 +105,12 @@ export const useProjectStartGridDrag = ({
 			if (dragPreviewRef.current !== null)
 				dragPreviewRef.current.style.transform = `translate3d(${event.clientX + 12}px, ${event.clientY + 12}px, 0)`;
 		};
-		const finish = (event: PointerEvent, commit: boolean) => {
+		const finishFn = (event: PointerEvent, commit: boolean) => {
 			const drag = dragRef.current;
 			if (drag === undefined || event.pointerId !== drag.pointerId) return;
 			if (drag.phase === "dragging") {
 				event.preventDefault();
-				const target = readTarget(event.target) ?? drag.target;
+				const target = readTargetFn(event.target) ?? drag.target;
 				if (
 					commit &&
 					target !== undefined &&
@@ -118,26 +118,26 @@ export const useProjectStartGridDrag = ({
 				)
 					onMoveRef.current(drag.source, target);
 			}
-			suppressNextClick();
-			reset();
+			suppressNextClickFn();
+			resetFn();
 		};
-		const onPointerUp = (event: PointerEvent) => finish(event, true);
-		const onPointerCancel = (event: PointerEvent) => finish(event, false);
-		window.addEventListener("pointermove", onPointerMove);
-		window.addEventListener("pointerup", onPointerUp);
-		window.addEventListener("pointercancel", onPointerCancel);
-		window.addEventListener("blur", reset);
+		const onPointerUpFn = (event: PointerEvent) => finishFn(event, true);
+		const onPointerCancelFn = (event: PointerEvent) => finishFn(event, false);
+		window.addEventListener("pointermove", onPointerMoveFn);
+		window.addEventListener("pointerup", onPointerUpFn);
+		window.addEventListener("pointercancel", onPointerCancelFn);
+		window.addEventListener("blur", resetFn);
 		return () => {
-			window.removeEventListener("pointermove", onPointerMove);
-			window.removeEventListener("pointerup", onPointerUp);
-			window.removeEventListener("pointercancel", onPointerCancel);
-			window.removeEventListener("blur", reset);
+			window.removeEventListener("pointermove", onPointerMoveFn);
+			window.removeEventListener("pointerup", onPointerUpFn);
+			window.removeEventListener("pointercancel", onPointerCancelFn);
+			window.removeEventListener("blur", resetFn);
 		};
 	}, [
 		gridRef,
 	]);
 
-	const startDrag = (
+	const startDragFn = (
 		event: ReactPointerEvent<HTMLButtonElement>,
 		source: ProjectStartGridCell,
 	) => {
@@ -155,7 +155,7 @@ export const useProjectStartGridDrag = ({
 	return {
 		dragPreviewRef,
 		dragVisual,
-		startDrag,
+		startDragFn,
 		suppressClickRef,
 	};
 };

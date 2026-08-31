@@ -11,78 +11,78 @@ const parseEditorMcpOverviewFn = (candidate: unknown) =>
 export namespace useEditorMcpOverviewController {
 	export interface Output {
 		readonly commandError?: string;
-		readonly configure: (configuration: EditorMcpConfigurationSchema.Type) => void;
+		readonly configureFn: (configuration: EditorMcpConfigurationSchema.Type) => void;
 		readonly overview?: EditorMcpOverviewSchema.Type;
 		readonly pending: boolean;
-		readonly resetAuth: () => void;
-		readonly startLocal: () => void;
-		readonly startRemote: () => void;
-		readonly stopLocal: () => void;
-		readonly stopRemote: () => void;
+		readonly resetAuthFn: () => void;
+		readonly startLocalFn: () => void;
+		readonly startRemoteFn: () => void;
+		readonly stopLocalFn: () => void;
+		readonly stopRemoteFn: () => void;
 	}
 }
 
 /** Owns the single renderer subscription and command admission for the MCP overview. */
 export const useEditorMcpOverviewController = (): useEditorMcpOverviewController.Output => {
-	const [state, dispatch] = useAtom(EditorMcpCommandAtom);
+	const [state, dispatchFn] = useAtom(EditorMcpCommandAtom);
 	const overview = "overview" in state ? state.overview : undefined;
 
 	useEffect(() => {
-		dispatch({
+		dispatchFn({
 			type: "read",
 		});
-		return window.arkini.editorMcp.onOverviewChanged((candidate) => {
+		return window.arkini.editorMcp.onOverviewChangedFn((candidate) => {
 			const parsed = parseEditorMcpOverviewFn(candidate);
 			if (!parsed.success) return;
-			dispatch({
+			dispatchFn({
 				type: "synchronize",
 				overview: parsed.data,
 			});
 		});
 	}, [
-		dispatch,
+		dispatchFn,
 	]);
 
-	const execute = (
+	const executeFn = (
 		command: EditorMcpCommandAtom.Command & {
 			readonly type: "execute";
 		},
 	) => {
-		dispatch(command);
+		dispatchFn(command);
 	};
 
 	return {
 		commandError: state.kind === "error" ? state.message : undefined,
-		configure: (configuration) => {
-			dispatch({
+		configureFn: (configuration) => {
+			dispatchFn({
 				type: "configure",
 				configuration,
 			});
 		},
 		overview,
 		pending: state.kind === "loading" || state.kind === "pending",
-		resetAuth: () =>
-			execute({
+		resetAuthFn: () =>
+			executeFn({
 				type: "execute",
 				command: "reset-remote-auth",
 			}),
-		startLocal: () =>
-			execute({
+		startLocalFn: () =>
+			executeFn({
 				type: "execute",
 				command: "start-local",
 			}),
-		startRemote: () =>
-			execute({
+		startRemoteFn: () =>
+			executeFn({
 				type: "execute",
 				command: "start-remote",
 			}),
-		stopLocal: () =>
-			execute({
+		stopLocalFn: () =>
+			executeFn({
 				type: "execute",
 				command: "stop-local",
 			}),
-		stopRemote: () =>
-			execute({
+		stopRemoteFn: () =>
+			executeFn({
 				type: "execute",
 				command: "stop-remote",
 			}),

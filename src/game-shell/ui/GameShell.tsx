@@ -24,7 +24,7 @@ const editorGameBoardViewTransitionName = "arkini-editor-game-board";
 const ItemDetailOverlayPrecedence = () => {
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const closeItemDetail = useCloseItemDetail();
+	const closeItemDetailFn = useCloseItemDetail();
 
 	useEffect(() => {
 		if (
@@ -34,11 +34,11 @@ const ItemDetailOverlayPrecedence = () => {
 		) {
 			return;
 		}
-		closeItemDetail({
+		closeItemDetailFn({
 			restoreFocus: false,
 		});
 	}, [
-		closeItemDetail,
+		closeItemDetailFn,
 		gameMenu.phase,
 		itemDetail.state.phase,
 	]);

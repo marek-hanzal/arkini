@@ -41,20 +41,20 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: () =>
+				writeFx: () =>
 					Deferred.await(releaseWrite).pipe(Effect.andThen(Effect.failCause(mixedCause))),
 			},
 		});
 		let publishFatal:
-			| ((fatal: NonNullable<ReturnType<typeof session.getFatalError>>) => void)
+			| ((fatal: NonNullable<ReturnType<typeof session.getFatalErrorFn>>) => void)
 			| undefined;
-		const fatalObserved = new Promise<NonNullable<ReturnType<typeof session.getFatalError>>>(
+		const fatalObserved = new Promise<NonNullable<ReturnType<typeof session.getFatalErrorFn>>>(
 			(resolve) => {
 				publishFatal = resolve;
 			},
 		);
-		const unsubscribe = session.subscribeFatalError(() => {
-			const fatal = session.getFatalError();
+		const unsubscribe = session.subscribeFatalErrorFn(() => {
+			const fatal = session.getFatalErrorFn();
 			if (fatal !== null) publishFatal?.(fatal);
 		});
 
@@ -76,22 +76,22 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: () =>
+				writeFx: () =>
 					Deferred.await(releaseWrite).pipe(
 						Effect.andThen(Effect.die(new Error("save defect"))),
 					),
 			},
 		});
 		let publishFatal:
-			| ((fatal: NonNullable<ReturnType<typeof session.getFatalError>>) => void)
+			| ((fatal: NonNullable<ReturnType<typeof session.getFatalErrorFn>>) => void)
 			| undefined;
-		const fatalObserved = new Promise<NonNullable<ReturnType<typeof session.getFatalError>>>(
+		const fatalObserved = new Promise<NonNullable<ReturnType<typeof session.getFatalErrorFn>>>(
 			(resolve) => {
 				publishFatal = resolve;
 			},
 		);
-		const unsubscribe = session.subscribeFatalError(() => {
-			const fatal = session.getFatalError();
+		const unsubscribe = session.subscribeFatalErrorFn(() => {
+			const fatal = session.getFatalErrorFn();
 			if (fatal !== null) publishFatal?.(fatal);
 		});
 
@@ -113,7 +113,7 @@ describe("RuntimeSaveLayerFx", () => {
 		});
 		const save = RuntimeSaveLayerFx({
 			debounceMs: 15,
-			save: (state) =>
+			saveFx: (state) =>
 				Effect.sync(() => {
 					saves.push(state);
 				}),
@@ -171,7 +171,7 @@ describe("RuntimeSaveLayerFx", () => {
 		});
 		const save = RuntimeSaveLayerFx({
 			debounceMs: 40,
-			save: (state) =>
+			saveFx: (state) =>
 				Effect.sync(() => {
 					savedItemCounts.push(state.items.length);
 				}),
@@ -238,7 +238,7 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: (state) =>
+				writeFx: (state) =>
 					Effect.promise(async () => {
 						if (state.items.length === 1) {
 							markFirstSaveStarted?.();
@@ -250,7 +250,7 @@ describe("RuntimeSaveLayerFx", () => {
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:save:race:first",
 					itemId: "water",
@@ -265,7 +265,7 @@ describe("RuntimeSaveLayerFx", () => {
 				}),
 			);
 			await firstSaveStarted;
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:save:race:second",
 					itemId: "water",
@@ -303,7 +303,7 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: () =>
+				writeFx: () =>
 					Effect.sync(() => {
 						writes += 1;
 					}).pipe(
@@ -316,15 +316,15 @@ describe("RuntimeSaveLayerFx", () => {
 		const fatalObserved = new Promise<void>((resolve) => {
 			markFatalObserved = resolve;
 		});
-		const unsubscribe = session.subscribeFatalError(() => {
+		const unsubscribe = session.subscribeFatalErrorFn(() => {
 			markFatalObserved?.();
 		});
 		try {
 			Effect.runSync(Deferred.succeed(releaseWrite, undefined));
 			await fatalObserved;
 			expect(writes).toBe(1);
-			expect(session.getFatalError()?.source).toBe("autosave");
-			await expect(session.run(Effect.void)).rejects.toMatchObject({
+			expect(session.getFatalErrorFn()?.source).toBe("autosave");
+			await expect(session.runFn(Effect.void)).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",
 				state: "frozen",
 			});
@@ -350,7 +350,7 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 60_000,
-				write: () =>
+				writeFx: () =>
 					Effect.promise(async () => {
 						writes += 1;
 						markSaveStarted?.();
@@ -398,7 +398,7 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 60_000,
-				write: (state) =>
+				writeFx: (state) =>
 					Effect.promise(async () => {
 						saves.push(state);
 						markSaveStarted?.();
@@ -407,7 +407,7 @@ describe("RuntimeSaveLayerFx", () => {
 			},
 		});
 		const command = session
-			.run(
+			.runFn(
 				Deferred.succeed(commandStarted, undefined).pipe(
 					Effect.andThen(Deferred.await(releaseCommand)),
 					Effect.andThen(
@@ -453,14 +453,14 @@ describe("RuntimeSaveLayerFx", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 60_000,
-				write: (state) =>
+				writeFx: (state) =>
 					Effect.sync(() => {
 						saves.push(state);
 					}),
 			},
 		});
 
-		await session.run(
+		await session.runFn(
 			spawnItemFx({
 				id: "runtime:save:dispose",
 				itemId: "water",

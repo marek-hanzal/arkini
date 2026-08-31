@@ -14,10 +14,10 @@ import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/c
 import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
-const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffect">) =>
+const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffectFn">) =>
 	createGameFromPackageFx({
 		...props,
-		runRendererEffect: Effect.runSync,
+		runRendererEffectFn: Effect.runSync,
 	});
 
 const createStorages = async (version = "1.0") => {
@@ -110,7 +110,7 @@ describe("createGameFx", () => {
 
 		expect(first.arkpack.packageId).toBe(storages.packageId);
 		expect(first.config).toEqual(testArkpackConfig);
-		expect(first.getSnapshot().items).toEqual([
+		expect(first.getSnapshotFn().items).toEqual([
 			expect.objectContaining({
 				item: testArkpackConfig.items.water,
 				location: {
@@ -123,7 +123,7 @@ describe("createGameFx", () => {
 				},
 			}),
 		]);
-		expect(first.getResourceUrl("asset:water")).toMatch(/^blob:/);
+		expect(first.getResourceUrlFn("asset:water")).toMatch(/^blob:/);
 		await Effect.runPromise(first.disposeFx);
 		expect(storages.readSaved()).not.toBeNull();
 
@@ -135,8 +135,8 @@ describe("createGameFx", () => {
 			}),
 		);
 		try {
-			expect(restored.getSnapshot().items).toHaveLength(1);
-			expect(restored.getSnapshot().items[0]?.item.id).toBe("water");
+			expect(restored.getSnapshotFn().items).toHaveLength(1);
+			expect(restored.getSnapshotFn().items[0]?.item.id).toBe("water");
 		} finally {
 			await Effect.runPromise(restored.disposeFx);
 		}
@@ -184,7 +184,7 @@ describe("createGameFx", () => {
 				saveStorage: storages.saveStorage,
 			}),
 		);
-		await first.run(
+		await first.runFn(
 			spawnItemFx({
 				id: "runtime:old-major",
 				itemId: "water",
@@ -227,7 +227,7 @@ describe("createGameFx", () => {
 		vi.stubGlobal("window", {
 			arkini: {
 				diagnostics: {
-					write: (record: DiagnosticRecord) => {
+					writeFn: (record: DiagnosticRecord) => {
 						diagnosticWrites.push(record);
 						return Promise.resolve();
 					},
@@ -253,8 +253,8 @@ describe("createGameFx", () => {
 				saveStorage,
 			}),
 		);
-		const resourceUrl = game.getResourceUrl("asset:water");
-		await game.run(
+		const resourceUrl = game.getResourceUrlFn("asset:water");
+		await game.runFn(
 			spawnItemFx({
 				id: "runtime:public-disposal-retry",
 				itemId: "water",
@@ -272,10 +272,10 @@ describe("createGameFx", () => {
 		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk full");
 		expect(writes).toBe(1);
 		expect(diagnosticWrites.some(({ event }) => event === "session-ended")).toBe(false);
-		expect(game.getResourceUrl("asset:water")).toBe(resourceUrl);
+		expect(game.getResourceUrlFn("asset:water")).toBe(resourceUrl);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		await expect(
-			game.run(
+			game.runFn(
 				spawnItemFx({
 					id: "runtime:must-remain-frozen",
 					itemId: "water",
@@ -301,7 +301,7 @@ describe("createGameFx", () => {
 			}),
 		]);
 		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
-		expect(() => game.getResourceUrl("asset:water")).toThrow(
+		expect(() => game.getResourceUrlFn("asset:water")).toThrow(
 			"Game resource asset:water is unavailable.",
 		);
 		const saved = storages.readSaved();
@@ -317,7 +317,7 @@ describe("createGameFx", () => {
 		vi.stubGlobal("window", {
 			arkini: {
 				diagnostics: {
-					write: () => {
+					writeFn: () => {
 						throw new Error("logger unavailable");
 					},
 				},
@@ -335,7 +335,7 @@ describe("createGameFx", () => {
 				saveStorage,
 			}),
 		);
-		const resourceUrl = game.getResourceUrl("asset:water");
+		const resourceUrl = game.getResourceUrlFn("asset:water");
 
 		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk still full");
 		expect(revokeObjectUrl).not.toHaveBeenCalled();

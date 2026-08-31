@@ -85,7 +85,7 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 					if (Exit.isSuccess(exit)) return Exit.void;
 					const failure = readExactCauseFailureFn(exit.cause);
 					return Exit.fail(
-						finalization.resource.markCriticalFailure(
+						finalization.resource.markCriticalFailureFn(
 							finalization.operation === "release" ? "game-leave" : "game-reset",
 							Option.isSome(failure) ? failure.value : exit.cause,
 						),
@@ -111,7 +111,7 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 					joinInFlightOperation = false,
 				): Effect.Effect<void, unknown, never> =>
 					Effect.suspend(() =>
-						Effect.uninterruptibleMask((restore) =>
+						Effect.uninterruptibleMask((restoreFx) =>
 							withLifecycleLockFx(
 								Effect.gen(function* () {
 									const state = yield* Ref.get(stateRef);
@@ -177,7 +177,7 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 										finalization,
 									});
 									yield* Effect.forkIn(
-										restore(runFinalizationFx(finalization, actionFx)),
+										restoreFx(runFinalizationFx(finalization, actionFx)),
 										operationScope,
 									);
 									return {

@@ -8,9 +8,13 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { createVersionFingerprint, hashVersionBytes, hashVersionJson } from "./VersionFingerprint";
+import {
+	createVersionFingerprintFn,
+	hashVersionBytesFn,
+	hashVersionJsonFn,
+} from "./VersionFingerprint";
 
-const sortedRecord = (
+const sortedRecordFn = (
 	entries: ReadonlyArray<
 		readonly [
 			string,
@@ -37,12 +41,12 @@ export namespace planVersionSnapshotFx {
 export const planVersionSnapshotFx = Effect.fn("planVersionSnapshotFx")(
 	(props: planVersionSnapshotFx.Props) =>
 		Effect.try({
-			try: () => materializePlan(props),
+			try: () => materializePlanFn(props),
 			catch: (cause) => cause,
 		}),
 );
 
-const materializePlan = ({
+const materializePlanFn = ({
 	arkpack,
 	config,
 	resources,
@@ -50,13 +54,13 @@ const materializePlan = ({
 }: planVersionSnapshotFx.Props) => {
 	const jsonObjects = new Map<string, unknown>();
 	const pngObjects = new Map<string, Uint8Array>();
-	const addJson = (value: unknown) => {
-		const hash = hashVersionJson(value);
+	const addJsonFn = (value: unknown) => {
+		const hash = hashVersionJsonFn(value);
 		if (!jsonObjects.has(hash)) jsonObjects.set(hash, value);
 		return hash;
 	};
-	const addPng = (bytes: Uint8Array) => {
-		const hash = hashVersionBytes(bytes);
+	const addPngFn = (bytes: Uint8Array) => {
+		const hash = hashVersionBytesFn(bytes);
 		if (!pngObjects.has(hash)) pngObjects.set(hash, bytes);
 		return hash;
 	};
@@ -84,7 +88,7 @@ const materializePlan = ({
 		itemUids.add(item.uid);
 		itemHashes.push([
 			item.uid,
-			addJson(item),
+			addJsonFn(item),
 		]);
 	}
 
@@ -112,7 +116,7 @@ const materializePlan = ({
 		resourceIds.add(resource.id);
 		(shellResourceIds.has(resource.id) ? resourceHashes : assetHashes).push([
 			resource.id,
-			addPng(resource.bytes),
+			addPngFn(resource.bytes),
 		]);
 	}
 
@@ -131,20 +135,20 @@ const materializePlan = ({
 		scenarioNames.add(scenario.name);
 		scenarioHashes.push([
 			scenario.name,
-			addJson(scenario),
+			addJsonFn(scenario),
 		]);
 	}
 
 	const manifest = VersionManifestSchema.parse({
-		game: addJson(game),
-		items: sortedRecord(itemHashes),
-		assets: sortedRecord(assetHashes),
-		resources: sortedRecord(resourceHashes),
-		scenarios: sortedRecord(scenarioHashes),
+		game: addJsonFn(game),
+		items: sortedRecordFn(itemHashes),
+		assets: sortedRecordFn(assetHashes),
+		resources: sortedRecordFn(resourceHashes),
+		scenarios: sortedRecordFn(scenarioHashes),
 	});
 	return {
 		manifest,
-		contentFingerprint: createVersionFingerprint(manifest, scenarios),
+		contentFingerprint: createVersionFingerprintFn(manifest, scenarios),
 		jsonObjects,
 		pngObjects,
 	};

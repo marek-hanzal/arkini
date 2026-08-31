@@ -208,7 +208,7 @@ export const createActor = (id: string): PixiTileActor => {
 		titleStyle,
 		item,
 		readyListeners: new Set(),
-		reportCriticalFailure: () => {},
+		reportCriticalFailureFn: () => {},
 		size: 80,
 		textureGeneration: 0,
 		textureState: "ready",
@@ -257,7 +257,7 @@ export const createActor = (id: string): PixiTileActor => {
 		lifecycleNotBeforeMs: 0,
 		lifecycleTargetAlpha: 0,
 		offsetLayer,
-		onPointerDown: null,
+		onPointerDownFn: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),
 		size: 80,
@@ -354,7 +354,7 @@ export const createApplication = (
 	frames: {
 		closeFx: Effect.void,
 		invalidateFx: Effect.void,
-		reportCriticalFailure: () => {},
+		reportCriticalFailureFn: () => {},
 		scheduleAfterRenderFx: () => Effect.succeed(() => {}),
 		scheduleFx: () => Effect.succeed(() => {}),
 	},
@@ -432,7 +432,7 @@ export const createRecordingAnimator = ({
 			]
 				.reverse()
 				.find((animation) => animation.ownerKey === ownerKey)
-				?.onCancel?.();
+				?.onCancelFn?.();
 		}),
 	closeFx: Effect.void,
 	isChannelActiveFx: () => Effect.succeed(false),
@@ -532,7 +532,7 @@ export const samplePoseAnimation = (
 	>,
 	progress: number,
 ) => {
-	const pose = animation.readPose?.(progress);
+	const pose = animation.readPoseFn?.(progress);
 	if (pose === undefined) throw new Error("Expected a semantic pose sampler.");
 	animation.actor.container.position.set(pose.x, pose.y);
 	if (pose.scale !== undefined) animation.actor.container.scale.set(pose.scale);
@@ -561,7 +561,7 @@ export const advanceInputRemainderFlash = ({
 		throw new Error("Expected the input consumption fade-out.");
 	}
 	const quantityBeforeFadeOut = actor.item.quantity;
-	fadeOut.onComplete?.();
+	fadeOut.onCompleteFn?.();
 	const badgeCountAfterFadeOut = actor.item.badgeCount;
 	const quantityAfterFadeOut = actor.item.quantity;
 
@@ -575,7 +575,7 @@ export const advanceInputRemainderFlash = ({
 	if (fadeIn?.channel !== "lifecycle-opacity") {
 		throw new Error("Expected the input remainder fade-in.");
 	}
-	(cancelFadeIn ? fadeIn.onCancel : fadeIn.onComplete)?.();
+	(cancelFadeIn ? fadeIn.onCancelFn : fadeIn.onCompleteFn)?.();
 	return {
 		badgeCountAfterFadeOut,
 		fadeIn,
@@ -610,7 +610,7 @@ export const advanceStackMergeVanish = ({
 	if (vanishOpacity?.channel !== "lifecycle-opacity") {
 		throw new Error("Expected stack merge vanish opacity.");
 	}
-	vanishOpacity.onComplete?.();
+	vanishOpacity.onCompleteFn?.();
 	return {
 		vanishOpacity,
 		vanishScale,
@@ -677,7 +677,7 @@ export const createMotionHarness = ({
 			animator,
 			application,
 			magneticField,
-			readPalette: () => palette,
+			readPaletteFn: () => palette,
 			surface,
 			textures: {} as never,
 		}),

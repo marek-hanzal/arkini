@@ -12,10 +12,10 @@ import { useState } from "react";
 
 /** Owns the shared bottom-aligned Floating UI behavior for compact editor menus. */
 export const useEditorFloatingMenu = () => {
-	const [open, setOpen] = useState(false);
+	const [open, setOpenFn] = useState(false);
 	const { context, floatingStyles, refs } = useFloating({
 		open,
-		onOpenChange: setOpen,
+		onOpenChange: setOpenFn,
 		placement: "bottom-end",
 		middleware: [
 			offset(6),
@@ -30,7 +30,7 @@ export const useEditorFloatingMenu = () => {
 		floatingStyles,
 		open,
 		refs,
-		setOpen,
+		setOpenFn,
 		...useInteractions([
 			useClick(context),
 			useDismiss(context),

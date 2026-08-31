@@ -29,8 +29,8 @@ export namespace runActorLifecycleFx {
 		| (LifecycleProps & {
 				readonly durationMs?: number;
 				readonly kind: "start-exit";
-				readonly onCancel?: () => void;
-				readonly onComplete?: () => void;
+				readonly onCancelFn?: () => void;
+				readonly onCompleteFn?: () => void;
 		  })
 		| (LifecycleProps & {
 				readonly durationMs?: number;
@@ -45,18 +45,18 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 	const { actor, animator } = action;
 	if (actor.container.destroyed) return;
 
-	const animate = ({
+	const animateFx = ({
 		delayMs = 0,
 		durationMs,
-		onCancel,
-		onComplete,
+		onCancelFn,
+		onCompleteFn,
 		toAlpha,
 		toScale,
 	}: {
 		readonly delayMs?: number;
 		readonly durationMs: number;
-		readonly onCancel?: () => void;
-		readonly onComplete?: () => void;
+		readonly onCancelFn?: () => void;
+		readonly onCompleteFn?: () => void;
 		readonly toAlpha: number;
 		readonly toScale: number;
 	}): Effect.Effect<void, never, never> =>
@@ -74,16 +74,16 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 				channel: "lifecycle-opacity",
 				delayMs,
 				durationMs,
-				onCancel,
-				onComplete,
+				onCancelFn,
+				onCompleteFn,
 				toAlpha,
 			});
 		});
 
-	const resumeEnter = () => {
+	const resumeEnterFn = () => {
 		if (actor.lifecycleTargetAlpha !== 1 || actor.lifecycleTransitionStarted) return;
 		const intentGeneration = actor.lifecycleIntentGeneration;
-		const startEnter = () => {
+		const startEnterFn = () => {
 			if (
 				actor.container.destroyed ||
 				actor.lifecycleIntentGeneration !== intentGeneration ||
@@ -94,7 +94,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			}
 			actor.lifecycleTransitionStarted = true;
 			RendererRuntime.runSync(
-				animate({
+				animateFx({
 					delayMs: Math.max(0, actor.lifecycleNotBeforeMs - performance.now()),
 					durationMs: actor.lifecycleDurationMs,
 					toAlpha: 1,
@@ -106,7 +106,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			RendererRuntime.runSync(
 				whenVisualReadyFx({
 					visual,
-					onReady: startEnter,
+					onReadyFn: startEnterFn,
 				}),
 			);
 		}
@@ -127,7 +127,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			return;
 		}
 		case "resume-enter": {
-			resumeEnter();
+			resumeEnterFn();
 			return;
 		}
 		case "start-enter": {
@@ -148,7 +148,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 				alpha: 0,
 				channel: "lifecycle-opacity",
 			});
-			resumeEnter();
+			resumeEnterFn();
 			return;
 		}
 		case "start-exit": {
@@ -158,10 +158,10 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			actor.lifecycleTransitionStarted = true;
 			actor.lifecycleNotBeforeMs = performance.now();
 			actor.lifecycleDurationMs = durationMs;
-			yield* animate({
+			yield* animateFx({
 				durationMs,
-				onCancel: action.onCancel,
-				onComplete: action.onComplete,
+				onCancelFn: action.onCancelFn,
+				onCompleteFn: action.onCompleteFn,
 				toAlpha: 0,
 				toScale: lifecycleReducedScale,
 			});
@@ -174,7 +174,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			actor.lifecycleTransitionStarted = true;
 			actor.lifecycleNotBeforeMs = performance.now();
 			actor.lifecycleDurationMs = durationMs;
-			yield* animate({
+			yield* animateFx({
 				durationMs,
 				toAlpha: 1,
 				toScale: 1,

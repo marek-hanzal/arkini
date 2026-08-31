@@ -16,38 +16,38 @@ export const CheatItemSpawnProvider = ({
 	readonly game: PlayableGame;
 }>) => {
 	const commandAtom = CheatItemSpawnCommandAtom(game);
-	const [state, runCommand] = useAtom(commandAtom);
+	const [state, runCommandFn] = useAtom(commandAtom);
 	const pending = state.kind === "pending";
-	const request = useCallback(
+	const requestFn = useCallback(
 		(itemId: string) => {
-			runCommand({
+			runCommandFn({
 				kind: "spawn",
 				itemId,
 			});
 		},
 		[
-			runCommand,
+			runCommandFn,
 		],
 	);
-	const reset = useCallback(() => {
-		runCommand({
+	const resetFn = useCallback(() => {
+		runCommandFn({
 			kind: "reset",
 		});
 	}, [
-		runCommand,
+		runCommandFn,
 	]);
 
 	const control = useMemo<CheatItemSpawnControl>(
 		() => ({
 			pending,
-			request,
-			reset,
+			requestFn,
+			resetFn,
 			state,
 		}),
 		[
 			pending,
-			request,
-			reset,
+			requestFn,
+			resetFn,
 			state,
 		],
 	);

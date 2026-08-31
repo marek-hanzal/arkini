@@ -8,7 +8,7 @@ import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearc
 interface InputsControlProps {
 	readonly allowMaterials?: boolean;
 	readonly emptyAllowed?: boolean;
-	readonly onChange: (inputs: LineInputSchema.Type[]) => void;
+	readonly onChangeFn: (inputs: LineInputSchema.Type[]) => void;
 	readonly value: ReadonlyArray<LineInputSchema.Type>;
 }
 
@@ -16,15 +16,15 @@ interface InputsControlProps {
 export const InputsControl = ({
 	allowMaterials = true,
 	emptyAllowed = false,
-	onChange,
+	onChangeFn,
 	value,
 }: InputsControlProps) => {
-	const readItemLabel = useEditorItemOptionLabel();
-	const replaceAt = (index: number, input: LineInputSchema.Type) => {
+	const readItemLabelFn = useEditorItemOptionLabel();
+	const replaceAtFn = (index: number, input: LineInputSchema.Type) => {
 		const next = value.map((current, currentIndex) =>
 			currentIndex === index ? input : current,
 		);
-		onChange(next);
+		onChangeFn(next);
 	};
 	return (
 		<section className="grid min-w-0 content-start gap-3">
@@ -40,26 +40,26 @@ export const InputsControl = ({
 			<EditorCollectionSelector
 				addLabel="Add input"
 				count={value.length}
-				itemLabel={(index) => {
+				itemLabelFn={(index) => {
 					const input = value[index];
 					if (input.type === "materials")
-						return `${readItemLabel(input.selector.itemId, `Material input ${index + 1}`)} — Materials`;
+						return `${readItemLabelFn(input.selector.itemId, `Material input ${index + 1}`)} — Materials`;
 					if (input.type === "deposit")
-						return `${readItemLabel(input.query.selector.itemId, `Deposit input ${index + 1}`)} — Deposit`;
+						return `${readItemLabelFn(input.query.selector.itemId, `Deposit input ${index + 1}`)} — Deposit`;
 					return `Simple input ${index + 1}`;
 				}}
 				label={allowMaterials ? "Line inputs" : "Action inputs"}
-				onAdd={() =>
-					onChange([
+				onAddFn={() =>
+					onChangeFn([
 						...value,
 						structuredClone(DraftDefaults.inputs.simple),
 					])
 				}
-				onRemove={
+				onRemoveFn={
 					!emptyAllowed && value.length === 1
 						? undefined
 						: (index) =>
-								onChange(
+								onChangeFn(
 									value.filter(
 										(_current, currentIndex) => currentIndex !== index,
 									),
@@ -71,7 +71,7 @@ export const InputsControl = ({
 					<InputControl
 						allowMaterials={allowMaterials}
 						input={value[index]}
-						onChange={(next) => replaceAt(index, next)}
+						onChangeFn={(next) => replaceAtFn(index, next)}
 					/>
 				)}
 			</EditorCollectionSelector>

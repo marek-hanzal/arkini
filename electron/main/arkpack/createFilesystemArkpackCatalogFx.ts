@@ -80,7 +80,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					readonly user: ReadonlySet<string>;
 			  }
 			| undefined;
-		const publishScan = ({
+		const publishScanFn = ({
 			bundled,
 			user,
 		}: {
@@ -103,7 +103,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 		const listFx = operations.withPermits(1)(
 			scanFx.pipe(
 				Effect.map(({ bundled, user }) => {
-					return publishScan({
+					return publishScanFn({
 						bundled,
 						user,
 					});
@@ -140,7 +140,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 			(packageId) =>
 				operations.withPermits(1)(
 					Effect.gen(function* () {
-						if (eligibility === undefined) publishScan(yield* scanFx);
+						if (eligibility === undefined) publishScanFn(yield* scanFx);
 						const eligible = eligibility;
 						if (eligible === undefined) return [];
 						const [bundled, user] = yield* Effect.all(

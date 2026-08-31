@@ -147,7 +147,7 @@ const renderSurface = async () => {
 	await act(async () => {
 		root.render(
 			createElement(PixiBoardToolbarSurface, {
-				onOpenInventory: boardState.navigate,
+				onOpenInventoryFn: boardState.navigate,
 			}),
 		);
 		await Promise.resolve();
@@ -221,13 +221,13 @@ describe("PixiBoardToolbarSurface", () => {
 		} satisfies TileActorItem;
 		const canvas = document.createElement("canvas");
 
-		await createProps.onActivate(owner, "primary", canvas);
+		await createProps.onActivateFn(owner, "primary", canvas);
 
 		expect(boardState.enqueueLine).not.toHaveBeenCalled();
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 		expect(boardState.navigate).not.toHaveBeenCalled();
 
-		await createProps.onActivate(owner, "detail", canvas);
+		await createProps.onActivateFn(owner, "detail", canvas);
 
 		expect(boardState.openItemDetail).toHaveBeenCalledWith({
 			itemId: owner.id,
@@ -281,7 +281,7 @@ describe("PixiBoardToolbarSurface", () => {
 			title: "Material",
 		} satisfies TileActorItem;
 
-		await createProps.onActivate(stack, "split-stack", document.createElement("canvas"));
+		await createProps.onActivateFn(stack, "split-stack", document.createElement("canvas"));
 
 		expect(boardState.splitStack).toHaveBeenCalledWith({
 			itemId: stack.id,
@@ -325,13 +325,13 @@ describe("PixiBoardToolbarSurface", () => {
 			title: "Producer",
 		} satisfies TileActorItem;
 
-		await createProps.onActivate(producer, "primary", document.createElement("canvas"));
+		await createProps.onActivateFn(producer, "primary", document.createElement("canvas"));
 
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
 			kind: "enqueue",
 			ownerItemId: producer.id,
 		});
-		await createProps.onActivate(
+		await createProps.onActivateFn(
 			producer,
 			"fill-default-line-queue",
 			document.createElement("canvas"),
@@ -341,7 +341,7 @@ describe("PixiBoardToolbarSurface", () => {
 			kind: "fill",
 			ownerItemId: producer.id,
 		});
-		await createProps.onActivate(
+		await createProps.onActivateFn(
 			{
 				...producer,
 				location: {
@@ -387,7 +387,7 @@ describe("PixiBoardToolbarSurface", () => {
 			title: "Inventory",
 		} satisfies TileActorItem;
 
-		await createProps.onActivate(item, "primary", document.createElement("canvas"));
+		await createProps.onActivateFn(item, "primary", document.createElement("canvas"));
 
 		expect(boardState.navigate).toHaveBeenCalledWith();
 		expect(boardState.registerInteraction).toHaveBeenCalledOnce();

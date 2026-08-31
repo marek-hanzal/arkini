@@ -24,7 +24,7 @@ export interface DiagnosticLog {
 const MAX_FILE_BYTES = 5 * 1_024 * 1_024;
 const MAX_FILES = 4;
 
-const writeRecord = (logger: Logger, record: DiagnosticRecord) => {
+const writeRecordFn = (logger: Logger, record: DiagnosticRecord) => {
 	const properties = {
 		event: record.event,
 		...(record.sessionId === undefined
@@ -98,7 +98,7 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 			writeFx: (record) =>
 				Effect.try(() => {
 					if (closed) return;
-					writeRecord(logger, record);
+					writeRecordFn(logger, record);
 				}),
 			openDirectoryFx: Effect.tryPromise({
 				try: async () => {

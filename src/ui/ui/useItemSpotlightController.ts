@@ -20,9 +20,9 @@ export namespace useItemSpotlightController {
 	}
 
 	export interface Props {
-		readonly onClose: () => void;
-		readonly onQueryChange?: (query: string) => void;
-		readonly onSelectItem: (itemId: string) => void;
+		readonly onCloseFn: () => void;
+		readonly onQueryChangeFn?: (query: string) => void;
+		readonly onSelectItemFn: (itemId: string) => void;
 		readonly options: ReadonlyArray<Option>;
 		readonly resultLimit?: number;
 	}
@@ -34,29 +34,29 @@ export namespace useItemSpotlightController {
 
 	export interface Output {
 		readonly inputRef: RefObject<HTMLInputElement | null>;
-		readonly onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
+		readonly onKeyDownFn: (event: KeyboardEvent<HTMLDivElement>) => void;
 		readonly query: string;
-		readonly requestSelected: () => void;
+		readonly requestSelectedFn: () => void;
 		readonly results: ReadonlyArray<Option>;
-		readonly selectItem: (props: SelectItemProps) => void;
+		readonly selectItemFn: (props: SelectItemProps) => void;
 		readonly selectedIndex: number;
-		readonly setSelectedIndex: (index: number) => void;
-		readonly updateQuery: (query: string) => void;
+		readonly setSelectedIndexFn: (index: number) => void;
+		readonly updateQueryFn: (query: string) => void;
 	}
 }
 
 /** Owns query, selection, open autofocus, Escape close, and focus return for one item Spotlight. */
 export const useItemSpotlightController = ({
-	onClose,
-	onQueryChange,
-	onSelectItem,
+	onCloseFn,
+	onQueryChangeFn,
+	onSelectItemFn,
 	options,
 	resultLimit,
 }: useItemSpotlightController.Props): useItemSpotlightController.Output => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
-	const [query, setQuery] = useState("");
-	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [query, setQueryFn] = useState("");
+	const [selectedIndex, setSelectedIndexFn] = useState(0);
 	const candidates = useMemo(
 		() =>
 			options.map(({ itemId, terms }) => ({
@@ -95,32 +95,32 @@ export const useItemSpotlightController = ({
 		optionsById,
 		resultLimit,
 	]);
-	const updateQuery = (value: string) => {
-		setQuery(value);
-		setSelectedIndex(0);
-		onQueryChange?.(value);
+	const updateQueryFn = (value: string) => {
+		setQueryFn(value);
+		setSelectedIndexFn(0);
+		onQueryChangeFn?.(value);
 	};
-	const selectItem = ({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
-		setSelectedIndex(index);
-		onSelectItem(itemId);
+	const selectItemFn = ({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
+		setSelectedIndexFn(index);
+		onSelectItemFn(itemId);
 	};
-	const requestSelected = () => {
+	const requestSelectedFn = () => {
 		const selected = results[selectedIndex];
 		if (selected === undefined) return;
-		selectItem({
+		selectItemFn({
 			index: selectedIndex,
 			itemId: selected.itemId,
 		});
 	};
-	const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+	const onKeyDownFn = (event: KeyboardEvent<HTMLDivElement>) => {
 		if (event.key !== "Escape") return;
 		event.preventDefault();
 		event.stopPropagation();
-		onClose();
+		onCloseFn();
 	};
 
 	useEffect(() => {
-		setSelectedIndex((current) => Math.min(current, Math.max(0, results.length - 1)));
+		setSelectedIndexFn((current) => Math.min(current, Math.max(0, results.length - 1)));
 	}, [
 		results.length,
 	]);
@@ -136,13 +136,13 @@ export const useItemSpotlightController = ({
 
 	return {
 		inputRef,
-		onKeyDown,
+		onKeyDownFn,
 		query,
-		requestSelected,
+		requestSelectedFn,
 		results,
-		selectItem,
+		selectItemFn,
 		selectedIndex,
-		setSelectedIndex,
-		updateQuery,
+		setSelectedIndexFn,
+		updateQueryFn,
 	};
 };

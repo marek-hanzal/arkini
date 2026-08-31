@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import type { useGameEvents } from "~/game-presentation/ui/useGameEvents";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 
 const boardLocation = {
@@ -65,7 +65,7 @@ describe("readGameAudioCuesFn", () => {
 					quantity: 4,
 				},
 			],
-		} satisfies useGameEvents.Batch;
+		} satisfies GameEventBatchSchema.Type;
 
 		expect(readGameAudioCuesFn(batch)).toEqual([
 			{
@@ -147,7 +147,7 @@ describe("readGameAudioCuesFn", () => {
 					resultingQuantity: 0,
 				},
 			],
-		} satisfies useGameEvents.Batch;
+		} satisfies GameEventBatchSchema.Type;
 
 		expect(readGameAudioCuesFn(batch).map(({ kind }) => kind)).toEqual([
 			"job-start",

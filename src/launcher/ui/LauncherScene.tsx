@@ -32,7 +32,7 @@ interface LauncherSceneProps extends PropsWithChildren {
 	readonly dataUi: string;
 	readonly foregroundOverlay?: ReactNode;
 	readonly layout?: LauncherSceneLayout;
-	readonly onClick?: MouseEventHandler<HTMLElement>;
+	readonly onClickFn?: MouseEventHandler<HTMLElement>;
 	readonly overlay?: ReactNode;
 }
 
@@ -44,13 +44,13 @@ export const LauncherScene = ({
 	dataUi,
 	foregroundOverlay,
 	layout = "centered",
-	onClick,
+	onClickFn,
 	overlay,
 }: LauncherSceneProps) => (
 	<main
 		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${cursor === undefined ? "" : ` ${CursorClassName[cursor]}`}`}
 		data-ui={dataUi}
-		onClick={onClick}
+		onClick={onClickFn}
 	>
 		<RouteBackdrop
 			className="launcher-scene__backdrop absolute inset-0"

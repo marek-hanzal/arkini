@@ -18,9 +18,9 @@ import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
 const control = vi.hoisted(() => ({
 	openItemDefinitionDetailFx: vi.fn(),
 	openItemDetailFx: vi.fn(),
-	readActionError: vi.fn((_key: string) => null),
-	readPendingAction: vi.fn((_key: string): ItemDetailPendingAction | null => null),
-	runPendingAction: vi.fn(),
+	readActionErrorFn: vi.fn((_key: string) => null),
+	readPendingActionFn: vi.fn((_key: string): ItemDetailPendingAction | null => null),
+	runPendingActionFn: vi.fn(),
 }));
 
 const commandSpies = vi.hoisted(() => ({
@@ -152,8 +152,8 @@ beforeEach(() => {
 	for (const value of Object.values(control)) value.mockReset();
 	control.openItemDefinitionDetailFx.mockReturnValue(Effect.succeed(true));
 	control.openItemDetailFx.mockReturnValue(Effect.succeed(true));
-	control.readActionError.mockReturnValue(null);
-	control.readPendingAction.mockReturnValue(null);
+	control.readActionErrorFn.mockReturnValue(null);
+	control.readPendingActionFn.mockReturnValue(null);
 	game.runFx.mockClear();
 	for (const command of Object.values(commands)) command.mockReset();
 });

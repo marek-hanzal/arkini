@@ -15,3 +15,7 @@ export interface Project extends ProjectDescriptor {
 	readonly config: GameConfigSchema.Type;
 	readonly resources: ReadonlyArray<ResourceSchema.Type>;
 }
+
+export namespace Project {
+	export type Resource = Project["resources"][number];
+}

@@ -7,7 +7,7 @@ import { LinkButton } from "~/ui/ui/LinkButton";
 
 export interface ItemLineInputsWithdrawAction {
 	readonly disabled: boolean;
-	readonly onClick: () => void;
+	readonly onClickFn: () => void;
 	readonly pending: boolean;
 }
 
@@ -29,7 +29,7 @@ export const ItemLineInputsHeader = ({
 						cursorIntent={withdraw.pending ? "progress" : undefined}
 						data-ui="TileLineWithdrawButton"
 						disabled={withdraw.disabled || withdraw.pending}
-						onClick={withdraw.onClick}
+						onClick={withdraw.onClickFn}
 					>
 						Withdraw
 					</LinkButton>
@@ -71,7 +71,7 @@ export const MaterialInputWithdraw = ({
 				cursorIntent={controller.pending ? "progress" : undefined}
 				data-ui="TileLineInputWithdrawButton"
 				disabled={disabled || controller.pending || !input.canWithdraw}
-				onClick={controller.withdraw}
+				onClick={controller.withdrawFn}
 			>
 				Withdraw
 			</LinkButton>

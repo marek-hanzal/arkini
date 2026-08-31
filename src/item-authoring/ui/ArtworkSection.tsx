@@ -8,7 +8,7 @@ import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSe
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
-import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
+import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { ArtworkTimeline } from "~/item-authoring/ui/ArtworkTimeline";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 
@@ -19,13 +19,13 @@ const defaultArtwork: ItemSchema.Type["asset"] = {
 	sources: [],
 };
 
-const ArtworkFields = withFieldGroup({
+const ArtworkFields = withFieldGroupFn({
 	defaultValues: defaultArtwork,
 	props: {
-		onSelectedProgressIndexChange: undefined as ((index: number) => void) | undefined,
+		onSelectedProgressIndexChangeFn: undefined as ((index: number) => void) | undefined,
 		selectedProgressIndex: undefined as number | undefined,
 	},
-	render: ({ group, onSelectedProgressIndexChange, selectedProgressIndex }) => (
+	render: ({ group, onSelectedProgressIndexChangeFn, selectedProgressIndex }) => (
 		<>
 			<EditorFormSectionDivider
 				description="The default visual composition shown before any runtime progress artwork applies."
@@ -42,7 +42,7 @@ const ArtworkFields = withFieldGroup({
 							actionLabel="Enable composite artwork"
 							description="Composite artwork overlays a second asset on the base image, using the same two-layer presentation wherever this item is rendered."
 							icon={Layers2}
-							onEnable={() =>
+							onEnableFn={() =>
 								group.setFieldValue("default", [
 									assets[0],
 									"",
@@ -88,24 +88,24 @@ const ArtworkFields = withFieldGroup({
 									actionLabel="Enable progress artwork"
 									description="Progress artwork adds ordered visual states after the default composition so the item can change appearance as its runtime state advances."
 									icon={GalleryHorizontalEnd}
-									onEnable={() => sourcesField.pushValue("")}
+									onEnableFn={() => sourcesField.pushValue("")}
 									title="Progress artwork is disabled"
 								/>
 							) : (
 								<EditorCollectionSelector
 									addLabel="Add progress asset"
 									count={sources.length}
-									itemLabel={(index) =>
+									itemLabelFn={(index) =>
 										sources[index] || `Progress asset ${index + 1}`
 									}
 									label="Progress assets"
-									onAdd={() => sourcesField.pushValue("")}
-									onRemove={(index) =>
+									onAddFn={() => sourcesField.pushValue("")}
+									onRemoveFn={(index) =>
 										sources.length === 1
 											? group.setFieldValue("sources", undefined)
 											: sourcesField.removeValue(index)
 									}
-									onSelectedIndexChange={onSelectedProgressIndexChange}
+									onSelectedIndexChangeFn={onSelectedProgressIndexChangeFn}
 									removeLabel="Remove progress asset"
 									selectedIndex={selectedProgressIndex ?? 0}
 								>
@@ -128,11 +128,11 @@ const ArtworkFields = withFieldGroup({
 
 const ArtworkPreview = ({
 	asset,
-	onSelectProgress,
+	onSelectProgressFn,
 	selectedProgressIndex,
 }: {
 	readonly asset: ItemSchema.Type["asset"];
-	readonly onSelectProgress: (index: number) => void;
+	readonly onSelectProgressFn: (index: number) => void;
 	readonly selectedProgressIndex: number;
 }) => (
 	<EditorFormCard>
@@ -142,7 +142,7 @@ const ArtworkPreview = ({
 		</header>
 		<ArtworkTimeline
 			asset={asset}
-			onSelectProgress={onSelectProgress}
+			onSelectProgressFn={onSelectProgressFn}
 			selectedProgressIndex={selectedProgressIndex}
 		/>
 	</EditorFormCard>
@@ -150,14 +150,14 @@ const ArtworkPreview = ({
 
 export const ArtworkSection = () => {
 	const { form } = useFormSession();
-	const [selectedProgressIndex, setSelectedProgressIndex] = useState(0);
+	const [selectedProgressIndex, setSelectedProgressIndexFn] = useState(0);
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormCard>
 				<ArtworkFields
 					form={form}
 					fields="asset"
-					onSelectedProgressIndexChange={setSelectedProgressIndex}
+					onSelectedProgressIndexChangeFn={setSelectedProgressIndexFn}
 					selectedProgressIndex={selectedProgressIndex}
 				/>
 			</EditorFormCard>
@@ -165,7 +165,7 @@ export const ArtworkSection = () => {
 				{(asset) => (
 					<ArtworkPreview
 						asset={asset}
-						onSelectProgress={setSelectedProgressIndex}
+						onSelectProgressFn={setSelectedProgressIndexFn}
 						selectedProgressIndex={selectedProgressIndex}
 					/>
 				)}

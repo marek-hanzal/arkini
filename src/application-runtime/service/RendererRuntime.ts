@@ -81,7 +81,7 @@ export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 					createGameFx: (selectedPackageId) =>
 						createGameFx({
 							packageId: selectedPackageId,
-							runRendererEffect: (effect) => RendererRuntime.runSync(effect),
+							runRendererEffectFn: (effect) => RendererRuntime.runSync(effect),
 						}),
 					packageId,
 				}),

@@ -19,7 +19,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 		const barrierDelivered = new Promise<void>((resolve) => {
 			markBarrierDelivered = resolve;
 		});
-		const unsubscribe = session.subscribeEvents((batch) => {
+		const unsubscribe = session.subscribeEventsFn((batch) => {
 			if (
 				batch.events.some(
 					(event) => "jobId" in event && event.jobId === "job:event:validation-barrier",
@@ -32,7 +32,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 		});
 
 		try {
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:event:duplicate",
 					itemId: "water",
@@ -47,7 +47,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 				}),
 			);
 			await expect(
-				session.run(
+				session.runFn(
 					modifyRuntimeFx((runtime) =>
 						Effect.succeed([
 							runtime,
@@ -70,7 +70,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 					),
 				),
 			).rejects.toBeDefined();
-			await session.run(
+			await session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.succeed([
 						undefined,
@@ -104,7 +104,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 		const eventsDelivered = new Promise<ReadonlyArray<string>>((resolve) => {
 			markEventsDelivered = resolve;
 		});
-		const unsubscribe = session.subscribeEvents((batch) => {
+		const unsubscribe = session.subscribeEventsFn((batch) => {
 			jobIds.push(
 				...batch.events.flatMap((event) =>
 					"jobId" in event
@@ -129,7 +129,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 		});
 
 		try {
-			const first = session.run(
+			const first = session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.promise(async () => {
 						markFirstEntered?.();
@@ -150,7 +150,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 				),
 			);
 			await firstEntered;
-			const second = session.run(
+			const second = session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.succeed([
 						undefined,

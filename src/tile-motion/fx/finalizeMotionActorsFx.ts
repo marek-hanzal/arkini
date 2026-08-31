@@ -16,7 +16,7 @@ export namespace finalizeMotionActorsFx {
 		readonly actorStore: MainActorStore;
 		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly readPalette: () => PixiScenePalette;
+		readonly readPaletteFn: () => PixiScenePalette;
 		readonly stillClaimedActorIds: ReadonlySet<string>;
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
@@ -29,7 +29,7 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 	actorStore,
 	animator,
 	application,
-	readPalette,
+	readPaletteFn,
 	stillClaimedActorIds,
 	surface,
 	textures,
@@ -49,7 +49,7 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 			yield* startActorExitFx({
 				actor,
 				animator,
-				onComplete: () => {
+				onCompleteFn: () => {
 					RendererRuntime.runSync(animator.cancelActorFx(actor));
 					RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
 				},
@@ -63,7 +63,7 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 			animator,
 			frames: application.frames,
 			item: canonical,
-			palette: readPalette(),
+			palette: readPaletteFn(),
 			size: pose.size,
 			textures,
 		});

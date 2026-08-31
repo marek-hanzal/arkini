@@ -128,17 +128,17 @@ const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(funct
 });
 
 /** Registers the project lifecycle and destructive gameplay-design tools as one coherent surface. */
-export const registerGameplayDesignTools = ({
-	notifyProjectChanged,
+export const registerGameplayDesignToolsFn = ({
+	notifyProjectChangedFn,
 	readProjectFx,
 	repository,
-	runTool,
+	runToolFn,
 	server,
 }: {
-	readonly notifyProjectChanged: (projectId: string) => void;
+	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly readProjectFx: () => Effect.Effect<Project, unknown, never>;
 	readonly repository: ProjectRepositoryService;
-	readonly runTool: (effect: Effect.Effect<string, unknown, never>) => Promise<ToolResult>;
+	readonly runToolFn: (effect: Effect.Effect<string, unknown, never>) => Promise<ToolResult>;
 	readonly server: McpServer;
 }) => {
 	server.registerTool(
@@ -148,7 +148,7 @@ export const registerGameplayDesignTools = ({
 				"Read JSON containing the complete editable non-item project config and its revision. The config contains full meta, resources, and start sections but intentionally excludes items. Read item_config for one complete item.",
 			inputSchema: ProjectConfigInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.map(readProjectConfigTextFn))),
+		async () => runToolFn(readProjectFx().pipe(Effect.map(readProjectConfigTextFn))),
 	);
 	server.registerTool(
 		"edit_project",
@@ -158,12 +158,12 @@ export const registerGameplayDesignTools = ({
 			inputSchema: EditProjectInputSchema,
 		},
 		async (input) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						editProjectFx({
 							input,
-							notifyProjectChanged,
+							notifyProjectChangedFn,
 							project,
 							repository,
 						}),
@@ -178,7 +178,7 @@ export const registerGameplayDesignTools = ({
 				"Validate the canonical saved project with the same completed-game semantic and resource-reference rules used by the editor build path. Returns readable diagnostics; it does not re-decode stored PNG bytes.",
 			inputSchema: ValidateProjectInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.flatMap(readProjectValidationTextFx))),
+		async () => runToolFn(readProjectFx().pipe(Effect.flatMap(readProjectValidationTextFx))),
 	);
 	server.registerTool(
 		"rename_item",
@@ -188,13 +188,13 @@ export const registerGameplayDesignTools = ({
 			inputSchema: RenameItemInputSchema,
 		},
 		async ({ itemId, newItemId, revision }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						renameItemFx({
 							itemId,
 							newItemId,
-							notifyProjectChanged,
+							notifyProjectChangedFn,
 							project,
 							repository,
 							revision,
@@ -211,7 +211,7 @@ export const registerGameplayDesignTools = ({
 			inputSchema: ItemDeleteImpactInputSchema,
 		},
 		async ({ itemId }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemDeleteImpactTextFx(project, itemId)),
 				),
@@ -225,13 +225,13 @@ export const registerGameplayDesignTools = ({
 			inputSchema: DeleteItemInputSchema,
 		},
 		async ({ force, itemId, revision }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						deleteItemFx({
 							force,
 							itemId,
-							notifyProjectChanged,
+							notifyProjectChangedFn,
 							project,
 							repository,
 							revision,

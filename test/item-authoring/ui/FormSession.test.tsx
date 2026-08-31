@@ -45,7 +45,7 @@ const state = vi.hoisted(() => ({
 	saveItem: vi.fn(),
 	unsavedSession: undefined as
 		| {
-				readonly save: () => Promise<boolean>;
+				readonly saveFn: () => Promise<boolean>;
 		  }
 		| undefined,
 }));
@@ -214,7 +214,7 @@ describe("item section form session", () => {
 
 		await changeInput(title, "Saved without leaving");
 		await act(async () => {
-			await state.unsavedSession?.save();
+			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem).toHaveBeenCalledOnce();
 		expect(state.navigate).not.toHaveBeenCalled();

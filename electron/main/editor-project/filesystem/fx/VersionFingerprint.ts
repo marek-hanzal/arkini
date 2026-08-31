@@ -5,13 +5,13 @@ import type { VersionManifestSchema } from "~/project-version/schema/VersionMani
 
 const encoder = new TextEncoder();
 
-export const hashVersionBytes = (bytes: Uint8Array) =>
+export const hashVersionBytesFn = (bytes: Uint8Array) =>
 	createHash("sha256").update(bytes).digest("hex");
 
-export const hashVersionJson = (value: unknown) =>
-	hashVersionBytes(encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`));
+export const hashVersionJsonFn = (value: unknown) =>
+	hashVersionBytesFn(encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`));
 
-const sortedRecord = (
+const sortedRecordFn = (
 	entries: ReadonlyArray<
 		readonly [
 			string,
@@ -26,20 +26,20 @@ const sortedRecord = (
 	);
 
 /** Hashes authored content while excluding checkout-specific scenario provenance. */
-export const createVersionFingerprint = (
+export const createVersionFingerprintFn = (
 	manifest: VersionManifestSchema.Type,
 	scenarios: ReadonlyArray<BoardScenarioFileSchema.Type>,
 ) =>
-	hashVersionBytes(
+	hashVersionBytesFn(
 		encoder.encode(
 			JSON.stringify({
 				...manifest,
-				scenarios: sortedRecord(
+				scenarios: sortedRecordFn(
 					scenarios.map(
 						({ revision: _revision, ...scenario }) =>
 							[
 								scenario.name,
-								hashVersionJson(scenario),
+								hashVersionJsonFn(scenario),
 							] as const,
 					),
 				),

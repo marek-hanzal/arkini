@@ -8,12 +8,12 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 export const ListRow = ({
 	activeType,
 	item,
-	onSelectType,
+	onSelectTypeFn,
 	projectId,
 }: {
 	readonly activeType: ItemSchema.Type["type"] | undefined;
 	readonly item: ItemSchema.Type;
-	readonly onSelectType: (type: ItemSchema.Type["type"]) => void;
+	readonly onSelectTypeFn: (type: ItemSchema.Type["type"]) => void;
 	readonly projectId: string;
 }) => (
 	<article
@@ -40,7 +40,7 @@ export const ListRow = ({
 		<button
 			type="button"
 			className={`relative z-10 shrink-0 cursor-pointer rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider ${selectableClassName}`}
-			onClick={() => onSelectType(item.type)}
+			onClick={() => onSelectTypeFn(item.type)}
 			{...readDataUiFn({
 				dataUi: "EditorItemTypeFilter",
 				state: {

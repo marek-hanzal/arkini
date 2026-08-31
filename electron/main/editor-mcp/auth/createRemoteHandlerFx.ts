@@ -13,7 +13,7 @@ import {
 import type { McpStorage } from "../storage/McpStorage";
 
 export interface RemoteHandler {
-	readonly handle: (request: IncomingMessage, response: ServerResponse) => void;
+	readonly handleFn: (request: IncomingMessage, response: ServerResponse) => void;
 }
 
 const oauthFields = [
@@ -27,32 +27,32 @@ const oauthFields = [
 	"resource",
 ] as const;
 
-const escapeHtml = (value: string) =>
+const escapeHtmlFn = (value: string) =>
 	value
 		.replaceAll("&", "&amp;")
 		.replaceAll('"', "&quot;")
 		.replaceAll("<", "&lt;")
 		.replaceAll(">", "&gt;");
 
-const readFormValue = (candidate: unknown, field: string) => {
+const readFormValueFn = (candidate: unknown, field: string) => {
 	if (typeof candidate !== "object" || candidate === null) return undefined;
 	const value = Reflect.get(candidate, field);
 	return typeof value === "string" ? value : undefined;
 };
 
-const trustLoopbackProxy = (address: string) =>
+const trustLoopbackProxyFn = (address: string) =>
 	address === "127.0.0.1" || address === "::1" || address.startsWith("::ffff:127.");
 
-const renderConsent = (candidate: unknown, error?: string) => {
-	const clientName = readFormValue(candidate, "client_name") ?? "Remote MCP client";
-	const redirectUri = readFormValue(candidate, "redirect_uri") ?? "an unknown callback";
+const renderConsentFn = (candidate: unknown, error?: string) => {
+	const clientName = readFormValueFn(candidate, "client_name") ?? "Remote MCP client";
+	const redirectUri = readFormValueFn(candidate, "redirect_uri") ?? "an unknown callback";
 	const hidden = oauthFields
 		.flatMap((field) => {
-			const value = readFormValue(candidate, field);
+			const value = readFormValueFn(candidate, field);
 			return value === undefined
 				? []
 				: [
-						`<input type="hidden" name="${field}" value="${escapeHtml(value)}">`,
+						`<input type="hidden" name="${field}" value="${escapeHtmlFn(value)}">`,
 					];
 		})
 		.join("");
@@ -76,10 +76,10 @@ button { width: 100%; margin-top: 18px; border: 0; border-radius: 10px; padding:
 <body>
 <main>
 <p>ARKINI EDITOR</p>
-<h1>Connect ${escapeHtml(clientName)}</h1>
+<h1>Connect ${escapeHtmlFn(clientName)}</h1>
 <p>This client will receive full access to the project currently open in Arkini.</p>
-<p>After approval, Arkini will return control to ${escapeHtml(redirectUri)}.</p>
-${error === undefined ? "" : `<p class="error">${escapeHtml(error)}</p>`}
+<p>After approval, Arkini will return control to ${escapeHtmlFn(redirectUri)}.</p>
+${error === undefined ? "" : `<p class="error">${escapeHtmlFn(error)}</p>`}
 <form method="post" action="/confirm">
 ${hidden}
 <label>Remote password<input type="password" name="secret" required autocomplete="current-password"></label>
@@ -93,9 +93,9 @@ ${hidden}
 export namespace createRemoteHandlerFx {
 	export interface Props {
 		readonly storage: Pick<McpStorage, "model" | "verifySecretFx">;
-		readonly mcpHandler: (request: IncomingMessage, response: ServerResponse) => void;
+		readonly mcpHandlerFn: (request: IncomingMessage, response: ServerResponse) => void;
 		readonly origin: URL;
-		readonly runPromise: <Value, Error>(
+		readonly runPromiseFn: <Value, Error>(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
 	}
@@ -103,7 +103,7 @@ export namespace createRemoteHandlerFx {
 
 /** Mounts OAuth and protected MCP routes over one existing Node HTTP listener. */
 export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
-	({ storage, mcpHandler, origin, runPromise }: createRemoteHandlerFx.Props) =>
+	({ storage, mcpHandlerFn, origin, runPromiseFn }: createRemoteHandlerFx.Props) =>
 		Effect.sync((): RemoteHandler => {
 			const resourceUrl = new URL("/remote/mcp", origin);
 			const provider = new OAuthServer({
@@ -127,30 +127,30 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 				errorHandler: (step, error) =>
 					console.error(`Remote MCP OAuth ${step} failed.`, error),
 			});
-			const app = express();
-			app.disable("x-powered-by");
-			app.set("trust proxy", trustLoopbackProxy);
-			app.use((request, response, next) => {
+			const appFn = express();
+			appFn.disable("x-powered-by");
+			appFn.set("trust proxy", trustLoopbackProxyFn);
+			appFn.use((request, response, nextFn) => {
 				if (request.headers.host === origin.host) {
-					next();
+					nextFn();
 					return;
 				}
 				response.status(404).type("text/plain").send("Not found");
 			});
-			app.use((_request, response, next) => {
+			appFn.use((_request, response, nextFn) => {
 				// The fixed local form action finishes with the OAuth client's validated external redirect.
 				// A form-action CSP would make Chromium reject that redirect chain before POSTing.
 				response.setHeader(
 					"Content-Security-Policy",
 					"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'",
 				);
-				next();
+				nextFn();
 			});
-			app.get("/consent", (request, response) => {
+			appFn.get("/consent", (request, response) => {
 				response.setHeader("Cache-Control", "no-store");
-				response.status(200).type("html").send(renderConsent(request.query));
+				response.status(200).type("html").send(renderConsentFn(request.query));
 			});
-			app.use(
+			appFn.use(
 				"/confirm",
 				rateLimit({
 					windowMs: 5 * 60 * 1_000,
@@ -161,24 +161,26 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 				express.urlencoded({
 					extended: false,
 				}),
-				async (request, response, next) => {
+				async (request, response, nextFn) => {
 					if (request.method !== "POST") {
-						next();
+						nextFn();
 						return;
 					}
-					const secret = readFormValue(request.body, "secret") ?? "";
+					const secret = readFormValueFn(request.body, "secret") ?? "";
 					try {
-						if (await runPromise(storage.verifySecretFx(secret))) {
+						if (await runPromiseFn(storage.verifySecretFx(secret))) {
 							Reflect.set(request, "arkiniMcpUser", "arkini-owner");
-							next();
+							nextFn();
 							return;
 						}
 						response
 							.status(401)
 							.type("html")
-							.send(renderConsent(request.body, "The Remote password is incorrect."));
+							.send(
+								renderConsentFn(request.body, "The Remote password is incorrect."),
+							);
 					} catch (cause) {
-						next(cause);
+						nextFn(cause);
 					}
 				},
 				authenticateHandler({
@@ -189,7 +191,7 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 					},
 				}),
 			);
-			app.all(
+			appFn.all(
 				"/remote/mcp",
 				requireBearerAuth({
 					verifier: provider,
@@ -199,9 +201,9 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 					resourceMetadataUrl: getOAuthProtectedResourceMetadataUrl(resourceUrl),
 					resource: resourceUrl,
 				}),
-				(request, response) => void mcpHandler(request, response),
+				(request, response) => void mcpHandlerFn(request, response),
 			);
-			app.use(
+			appFn.use(
 				mcpAuthRouter({
 					provider,
 					baseUrl: origin,
@@ -212,11 +214,11 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 					],
 				}),
 			);
-			app.use((_request, response) =>
+			appFn.use((_request, response) =>
 				response.status(404).type("text/plain").send("Not found"),
 			);
 			return {
-				handle: app,
+				handleFn: appFn,
 			};
 		}),
 );

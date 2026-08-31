@@ -17,8 +17,8 @@ import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
-import { registerGameplayDesignTools } from "./registerGameplayDesignTools";
-import { registerVersionTools } from "./registerVersionTools";
+import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
+import { registerVersionToolsFn } from "./registerVersionTools";
 
 const itemTypes = [
 	"simple",
@@ -96,7 +96,7 @@ const ItemEstimateInputSchema = z
 		description: "The target item and quantity for one authored dependency estimate.",
 	});
 
-const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+const errorTextFn = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
 const readProjectTextFn = (project: Project) => {
 	const avatarResourceIds = Object.entries(project.config.resources)
@@ -181,12 +181,12 @@ const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")((project: Project
 
 const readCurrentProjectFx = (
 	repository: ProjectRepositoryService,
-	readProjectContext: () => string | undefined,
+	readProjectContextFn: () => string | undefined,
 ) =>
 	Effect.gen(function* () {
 		const projectId = yield* Effect.try({
 			try: () => {
-				const current = readProjectContext();
+				const current = readProjectContextFn();
 				if (current === undefined)
 					throw new Error(
 						"No editor project is currently open. Open a project in Arkini before using editor tools.",
@@ -203,23 +203,23 @@ const readCurrentProjectFx = (
 		return project;
 	});
 
-const createServer = (
-	notifyProjectChanged: (projectId: string) => void,
+const createServerFn = (
+	notifyProjectChangedFn: (projectId: string) => void,
 	repository: ProjectRepositoryService,
-	readProjectContext: () => string | undefined,
+	readProjectContextFn: () => string | undefined,
 	requestVersionCheckoutFx: (
 		projectId: string,
 		versionId: string,
 	) => Effect.Effect<void, unknown, never>,
-	runPromise: <Value, Error>(effect: Effect.Effect<Value, Error, never>) => Promise<Value>,
+	runPromiseFn: <Value, Error>(effect: Effect.Effect<Value, Error, never>) => Promise<Value>,
 ) => {
-	const runTool = async (effect: Effect.Effect<string, unknown, never>) => {
+	const runToolFn = async (effect: Effect.Effect<string, unknown, never>) => {
 		try {
 			return {
 				content: [
 					{
 						type: "text" as const,
-						text: await runPromise(effect),
+						text: await runPromiseFn(effect),
 					},
 				],
 			};
@@ -229,7 +229,7 @@ const createServer = (
 				content: [
 					{
 						type: "text" as const,
-						text: `Editor operation failed: ${errorText(cause)}`,
+						text: `Editor operation failed: ${errorTextFn(cause)}`,
 					},
 				],
 			};
@@ -245,7 +245,7 @@ const createServer = (
 				"Every tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON config; no tool dumps complete game configs or snapshot binaries. Create, edit, and version tools persist canonical saved editor state; version_checkout performs an explicit destructive hard reset.",
 		},
 	);
-	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContext);
+	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
 	for (const type of itemTypes) {
 		server.registerTool(
 			`create_${type}_item`,
@@ -254,12 +254,12 @@ const createServer = (
 				inputSchema: CreateItemInputSchemas[type],
 			},
 			async (input: CreateItemInput) =>
-				runTool(
+				runToolFn(
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
 							createItemFx({
 								input,
-								notifyProjectChanged,
+								notifyProjectChangedFn,
 								project,
 								repository,
 								type,
@@ -277,12 +277,12 @@ const createServer = (
 				inputSchema: EditItemInputSchemas[type],
 			},
 			async (input: EditItemInput) =>
-				runTool(
+				runToolFn(
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
 							editItemFx({
 								input,
-								notifyProjectChanged,
+								notifyProjectChangedFn,
 								project,
 								repository,
 								type,
@@ -292,11 +292,11 @@ const createServer = (
 				),
 		);
 	}
-	registerGameplayDesignTools({
-		notifyProjectChanged,
+	registerGameplayDesignToolsFn({
+		notifyProjectChangedFn,
 		readProjectFx,
 		repository,
-		runTool,
+		runToolFn,
 		server,
 	});
 	server.registerTool(
@@ -306,7 +306,7 @@ const createServer = (
 				"Summarize the project currently open in Arkini, including its identity, version, layouts, and collection sizes.",
 			inputSchema: ProjectInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.map(readProjectTextFn))),
+		async () => runToolFn(readProjectFx().pipe(Effect.map(readProjectTextFn))),
 	);
 	server.registerTool(
 		"item_meta",
@@ -314,7 +314,7 @@ const createServer = (
 			description: "Count items in the open project by their canonical item type.",
 			inputSchema: ItemMetaInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.map(readItemMetaTextFn))),
+		async () => runToolFn(readProjectFx().pipe(Effect.map(readItemMetaTextFn))),
 	);
 	server.registerTool(
 		"estimate",
@@ -324,7 +324,7 @@ const createServer = (
 			inputSchema: EstimateInputSchema,
 		},
 		async (input) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(Effect.map((project) => readEstimateTextFn(project, input))),
 			),
 	);
@@ -336,7 +336,7 @@ const createServer = (
 			inputSchema: ItemCollectionInputSchema,
 		},
 		async (input) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.map((project) => readItemCollectionTextFn(project, input)),
 				),
@@ -350,7 +350,7 @@ const createServer = (
 			inputSchema: ItemDetailInputSchema,
 		},
 		async ({ id }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemDetailTextFx(project, id)),
 				),
@@ -364,7 +364,7 @@ const createServer = (
 			inputSchema: ItemConfigInputSchema,
 		},
 		async ({ itemId }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemConfigTextFx(project, itemId)),
 				),
@@ -385,7 +385,7 @@ const createServer = (
 				inputSchema: itemRelationInputSchema(role),
 			},
 			async ({ itemId, level }) =>
-				runTool(
+				runToolFn(
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
 							readItemRelationTextFx(project, {
@@ -406,18 +406,18 @@ const createServer = (
 			inputSchema: ItemEstimateInputSchema,
 		},
 		async ({ itemId, quantity }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemEstimateTextFx(project, itemId, quantity)),
 				),
 			),
 	);
-	registerVersionTools({
-		notifyProjectChanged,
+	registerVersionToolsFn({
+		notifyProjectChangedFn,
 		readProjectFx,
 		repository,
 		requestVersionCheckoutFx,
-		runTool,
+		runToolFn,
 		server,
 	});
 	return server;
@@ -426,31 +426,31 @@ const createServer = (
 /** Creates the synchronous server factory required by the MCP HTTP handler. */
 export const createServerFx = Effect.fn("createServerFx")(
 	({
-		notifyProjectChanged,
-		readProjectContext,
+		notifyProjectChangedFn,
+		readProjectContextFn,
 		repository,
 		requestVersionCheckoutFx,
-		runPromise,
+		runPromiseFn,
 	}: {
-		readonly notifyProjectChanged: (projectId: string) => void;
-		readonly readProjectContext: () => string | undefined;
+		readonly notifyProjectChangedFn: (projectId: string) => void;
+		readonly readProjectContextFn: () => string | undefined;
 		readonly repository: ProjectRepositoryService;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,
 		) => Effect.Effect<void, unknown, never>;
-		readonly runPromise: <Value, Error>(
+		readonly runPromiseFn: <Value, Error>(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
 	}) =>
 		Effect.succeed({
 			create: () =>
-				createServer(
-					notifyProjectChanged,
+				createServerFn(
+					notifyProjectChangedFn,
 					repository,
-					readProjectContext,
+					readProjectContextFn,
 					requestVersionCheckoutFx,
-					runPromise,
+					runPromiseFn,
 				),
 		} as const),
 );

@@ -17,7 +17,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 60_000,
-				write: (state) =>
+				writeFx: (state) =>
 					Effect.suspend(() => {
 						writes += 1;
 						savedItemIds.push(state.items.map(({ id }) => id));
@@ -25,7 +25,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 					}),
 			},
 		});
-		await session.run(
+		await session.runFn(
 			spawnItemFx({
 				id: "runtime:retry-final-save",
 				itemId: "water",
@@ -44,7 +44,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 			"save target unavailable",
 		);
 		await expect(
-			session.run(
+			session.runFn(
 				spawnItemFx({
 					id: "runtime:must-not-change-after-shutdown",
 					itemId: "water",
@@ -77,7 +77,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 60_000,
-				write: () => Effect.fail(failure),
+				writeFx: () => Effect.fail(failure),
 			},
 		});
 
@@ -98,17 +98,17 @@ describe("createGameSessionFx / final save lifecycle", () => {
 		});
 
 		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
+			const owner = await session.runFn(prepareJobLineFx());
+			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
 				}),
 			);
-			await waitFor(() => session.getSnapshot().jobs.length === 0);
+			await waitFor(() => session.getSnapshotFn().jobs.length === 0);
 			expect(
 				session
-					.getSnapshot()
+					.getSnapshotFn()
 					.items.some(
 						(item) =>
 							item.location.scope === "job" || item.location.scope === "reserved",

@@ -169,8 +169,6 @@ export namespace commitMoveDropFx {
 		readonly sourceLocation: GridLocationSchema.Type;
 		readonly targetLocation: GridLocationSchema.Type;
 	}
-
-	export type Result = DropItemResult;
 }
 
 /** Commits one exact empty-slot drop and normalizes its public result. */
@@ -187,7 +185,7 @@ export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
 		location: targetLocation,
 	}).pipe(
 		Effect.map(
-			(result): commitMoveDropFx.Result => ({
+			(result): DropItemResult => ({
 				kind: DropItemResultKind.Move,
 				itemId: result.item.id,
 				revision: result.item.revision,

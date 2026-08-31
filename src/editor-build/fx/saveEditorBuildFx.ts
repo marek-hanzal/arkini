@@ -8,14 +8,14 @@ import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTr
 export const saveEditorBuildFx = Effect.fn("saveEditorBuildFx")(
 	(artifact: EditorProjectBuildSchema.Type) =>
 		invokeProjectTransportFx({
-			call: () =>
-				window.arkini.editor.saveProjectBuild({
+			callFn: () =>
+				window.arkini.editor.saveProjectBuildFn({
 					projectId: artifact.projectId,
 					expectedRevision: artifact.revision,
 					contentHash: artifact.contentHash,
 				}),
 			operation: "save-project-build",
-			parse: (value) => z.boolean().parse(value),
+			parseFn: (value) => z.boolean().parse(value),
 			requestMessage: "The Editor build save request failed.",
 			responseMessage: "The Editor build save response is invalid.",
 		}),

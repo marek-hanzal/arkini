@@ -6,7 +6,7 @@ import { TunnelProvenanceHeader } from "./TunnelProvenanceHeader";
 
 const NgrokReconnectGraceMs = 10_000;
 
-const createSafeNgrokError = (message: string, cause: unknown) => {
+const createSafeNgrokErrorFn = (message: string, cause: unknown) => {
 	const errorCode =
 		typeof cause === "object" &&
 		cause !== null &&
@@ -25,7 +25,7 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 			Effect.gen(function* () {
 				const reconnectScope = yield* Scope.make();
 				const closed = yield* Deferred.make<void>();
-				const runReconnectFx = yield* FiberHandle.makeRuntime<never, never>().pipe(
+				const runReconnectFn = yield* FiberHandle.makeRuntime<never, never>().pipe(
 					Effect.provideService(Scope.Scope, reconnectScope),
 				);
 				return yield* Effect.tryPromise({
@@ -36,11 +36,11 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 							domain,
 							onStatusChange: (status) => {
 								if (status === "connected") {
-									runReconnectFx(Effect.void);
+									runReconnectFn(Effect.void);
 									return;
 								}
 								if (status !== "closed") return;
-								runReconnectFx(
+								runReconnectFn(
 									Deferred.succeed(closed, undefined).pipe(
 										Effect.delay(NgrokReconnectGraceMs),
 									),
@@ -76,7 +76,7 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 									Effect.tryPromise({
 										try: async () => listener.close(),
 										catch: (cause) =>
-											createSafeNgrokError(
+											createSafeNgrokErrorFn(
 												"ngrok could not close the Remote MCP tunnel",
 												cause,
 											),
@@ -86,7 +86,7 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 						};
 					},
 					catch: (cause) =>
-						createSafeNgrokError("ngrok could not open the Remote MCP tunnel", cause),
+						createSafeNgrokErrorFn("ngrok could not open the Remote MCP tunnel", cause),
 				}).pipe(Effect.onError(() => Scope.close(reconnectScope, Exit.void)));
 			}),
 	}),

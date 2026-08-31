@@ -114,11 +114,11 @@ export type EditorWorkspaceId = (typeof EditorWorkspaceRoutes)[number]["id"];
 
 /** Projects accepted pending navigation over the currently committed editor workspace. */
 export const useEditorActiveWorkspace = (projectId: string): EditorWorkspaceId | undefined => {
-	const matchRoute = useMatchRoute();
-	const readWorkspace = (pending: boolean) =>
+	const matchRouteFn = useMatchRoute();
+	const readWorkspaceFn = (pending: boolean) =>
 		EditorWorkspaceRoutes.find(
 			({ matchTo }) =>
-				matchRoute({
+				matchRouteFn({
 					fuzzy: true,
 					includeSearch: false,
 					params: {
@@ -129,5 +129,5 @@ export const useEditorActiveWorkspace = (projectId: string): EditorWorkspaceId |
 				}) !== false,
 		)?.id;
 
-	return readWorkspace(true) ?? readWorkspace(false);
+	return readWorkspaceFn(true) ?? readWorkspaceFn(false);
 };

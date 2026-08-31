@@ -83,17 +83,17 @@ const createButton = (displayName: string, variant: ButtonVariant) => {
 
 const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
 	const Component = forwardRef<HTMLAnchorElement, ButtonAnchorProps>(
-		({ className, cursorIntent, linkDisabled = false, onClick, ...props }, ref) => {
+		({ className, cursorIntent, linkDisabled = false, onClick: onClickFn, ...props }, ref) => {
 			const cursor = readControlCursorSemanticFn({
 				disabled: linkDisabled,
 				intent: cursorIntent,
 			});
-			const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
+			const handleClickFn: MouseEventHandler<HTMLAnchorElement> = (event) => {
 				if (linkDisabled) {
 					event.preventDefault();
 					return;
 				}
-				onClick?.(event);
+				onClickFn?.(event);
 			};
 			return (
 				<a
@@ -105,7 +105,7 @@ const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
 						CursorClassName[cursor],
 						className,
 					)}
-					onClick={handleClick}
+					onClick={handleClickFn}
 					{...readDataUiFn({
 						dataUi: props["data-ui"] ?? displayName,
 						state: {

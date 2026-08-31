@@ -10,7 +10,7 @@ export namespace createGameResourceUrlsFx {
 }
 
 export interface GameResourceUrls {
-	readonly get: (resourceId: string) => string;
+	readonly getFn: (resourceId: string) => string;
 	readonly releaseFx: Effect.Effect<void, never, never>;
 }
 
@@ -46,7 +46,7 @@ export const createGameResourceUrlsFx = Effect.fn("createGameResourceUrlsFx")(fu
 			);
 		}
 		return {
-			get: (resourceId: string) => {
+			getFn: (resourceId: string) => {
 				const url = urls.get(resourceId);
 				if (url === undefined)
 					throw new Error(`${owner} resource ${resourceId} is unavailable.`);

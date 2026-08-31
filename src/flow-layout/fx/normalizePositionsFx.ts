@@ -13,7 +13,7 @@ const OverlapGap = 32;
 const OverlapIterations = 1800;
 const OverlapTolerance = 0.2;
 
-const deterministicUnit = (leftId: string, rightId: string) => {
+const deterministicUnitFn = (leftId: string, rightId: string) => {
 	let hash = 2166136261;
 	for (const char of `${leftId}\u0000${rightId}`) {
 		hash ^= char.charCodeAt(0);
@@ -26,7 +26,7 @@ const deterministicUnit = (leftId: string, rightId: string) => {
 	};
 };
 
-const relaxOverlaps = (nodes: MutableNodePosition[]) => {
+const relaxOverlapsFn = (nodes: MutableNodePosition[]) => {
 	for (let iteration = 0; iteration < OverlapIterations; iteration += 1) {
 		let maximumOverlap = 0;
 		for (let leftIndex = 0; leftIndex < nodes.length; leftIndex += 1) {
@@ -55,7 +55,7 @@ const relaxOverlaps = (nodes: MutableNodePosition[]) => {
 						right.x + right.width / 2 - (left.x + left.width / 2),
 					);
 					if (direction === 0)
-						direction = deterministicUnit(left.id, right.id).x >= 0 ? 1 : -1;
+						direction = deterministicUnitFn(left.id, right.id).x >= 0 ? 1 : -1;
 					const movement = overlapX + OverlapGap;
 					left.x -= direction * movement * (leftInverseMass / inverseMass);
 					right.x += direction * movement * (rightInverseMass / inverseMass);
@@ -64,7 +64,7 @@ const relaxOverlaps = (nodes: MutableNodePosition[]) => {
 						right.y + right.height / 2 - (left.y + left.height / 2),
 					);
 					if (direction === 0)
-						direction = deterministicUnit(left.id, right.id).y >= 0 ? 1 : -1;
+						direction = deterministicUnitFn(left.id, right.id).y >= 0 ? 1 : -1;
 					const movement = overlapY + OverlapGap;
 					left.y -= direction * movement * (leftInverseMass / inverseMass);
 					right.y += direction * movement * (rightInverseMass / inverseMass);
@@ -87,7 +87,7 @@ export const normalizePositionsFx = Effect.fn("normalizePositionsFx")(
 				...node,
 			}));
 			if (relaxed.length === 0) return new Map<string, LayoutNode>();
-			relaxOverlaps(relaxed);
+			relaxOverlapsFn(relaxed);
 
 			let minimumX = Number.POSITIVE_INFINITY;
 			let minimumY = Number.POSITIVE_INFINITY;

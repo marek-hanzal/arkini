@@ -34,12 +34,12 @@ const createAnimationDriver = () => {
 					complete: () => {
 						if (!active) return;
 						active = false;
-						props.onComplete?.();
+						props.onCompleteFn?.();
 					},
 					props,
 					stop,
 					update: (progress) => {
-						if (active) props.onUpdate(progress);
+						if (active) props.onUpdateFn(progress);
 					},
 				});
 				return {
@@ -69,7 +69,7 @@ const createFrames = () => {
 					work();
 					return () => {};
 				}),
-			reportCriticalFailure: vi.fn(),
+			reportCriticalFailureFn: vi.fn(),
 		} satisfies DemandFrameLoop,
 		invalidate,
 	};
@@ -188,7 +188,7 @@ describe("actor animator", () => {
 				durationMs: 640,
 				ownerKey: "particles:actor",
 				repeat: Number.POSITIVE_INFINITY,
-				render: (progress) => {
+				renderFn: (progress) => {
 					const particle = actor.activityParticles.particles[0]?.particle;
 					if (particle !== undefined) particle.alpha = progress;
 				},
@@ -252,7 +252,7 @@ describe("actor animator", () => {
 				actor,
 				channel: "lifecycle-opacity",
 				durationMs: 520,
-				onCancel: canceled,
+				onCancelFn: canceled,
 				ownerKey: "spawn-entry",
 				toAlpha: 1,
 			}),
@@ -339,8 +339,8 @@ describe("actor animator", () => {
 				actor,
 				channel: "lifecycle-opacity",
 				durationMs: 220,
-				onCancel: canceled,
-				onComplete: completed,
+				onCancelFn: canceled,
+				onCompleteFn: completed,
 				toAlpha: 0,
 			}),
 		);
@@ -481,7 +481,7 @@ describe("actor animator", () => {
 				actor,
 				channel: "pose",
 				durationMs: 300,
-				onCancel: () => {
+				onCancelFn: () => {
 					actor.container.destroyed = true;
 					Object.defineProperty(actor.container, "x", {
 						get: () => {
@@ -524,7 +524,7 @@ describe("actor animator", () => {
 				actor: firstActor,
 				channel: "pose",
 				durationMs: 300,
-				onComplete: staleComplete,
+				onCompleteFn: staleComplete,
 				ownerKey: "first-owner",
 				toX: 100,
 				toY: 200,
@@ -535,7 +535,7 @@ describe("actor animator", () => {
 				actor: firstActor,
 				channel: "pose",
 				durationMs: 300,
-				onComplete: survivingComplete,
+				onCompleteFn: survivingComplete,
 				ownerKey: "second-owner",
 				toX: 200,
 				toY: 300,
@@ -547,7 +547,7 @@ describe("actor animator", () => {
 				channel: "activity-particles",
 				durationMs: 300,
 				ownerKey: "second-actor-particles",
-				render: () => undefined,
+				renderFn: () => undefined,
 			}),
 		);
 		Effect.runSync(

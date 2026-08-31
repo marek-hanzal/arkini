@@ -76,7 +76,7 @@ export const useCanvasRenderModel = ({
 		outputNavigationNodeIds: projection.outputNavigationNodeIds,
 		resourceUrls,
 		rootNavigationNodeIds: projection.rootNavigationNodeIds,
-		setHighlightDepth: projection.setHighlightDepth,
+		setHighlightDepthFn: projection.setHighlightDepthFn,
 	};
 };
 
@@ -103,6 +103,6 @@ export namespace useCanvasRenderModel {
 		readonly outputNavigationNodeIds: ReadonlyArray<string>;
 		readonly resourceUrls: ReadonlyMap<string, string>;
 		readonly rootNavigationNodeIds: ReadonlyArray<string>;
-		readonly setHighlightDepth: Dispatch<SetStateAction<HighlightDepth | undefined>>;
+		readonly setHighlightDepthFn: Dispatch<SetStateAction<HighlightDepth | undefined>>;
 	}
 }

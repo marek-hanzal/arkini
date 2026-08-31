@@ -3,11 +3,11 @@ import { Context } from "effect";
 type EditorUnsavedChangesDecision = "cancel" | "discard" | "save";
 
 export interface EditorUnsavedChangesSession {
-	readonly discard: () => void;
-	readonly isDirty: () => boolean;
-	readonly isValid: () => boolean | Promise<boolean>;
-	readonly ownsPathname: (pathname: string) => boolean;
-	readonly save: () => Promise<boolean>;
+	readonly discardFn: () => void;
+	readonly isDirtyFn: () => boolean;
+	readonly isValidFn: () => boolean | Promise<boolean>;
+	readonly ownsPathnameFn: (pathname: string) => boolean;
+	readonly saveFn: () => Promise<boolean>;
 }
 
 export interface EditorUnsavedChangesSnapshot {
@@ -19,13 +19,13 @@ export interface EditorUnsavedChangesSnapshot {
 }
 
 export interface EditorUnsavedChangesService {
-	readonly decide: (decision: EditorUnsavedChangesDecision) => Promise<void>;
-	readonly discardAll: () => void;
-	readonly getSnapshot: () => EditorUnsavedChangesSnapshot;
-	readonly refresh: () => void;
-	readonly register: (id: string, session: EditorUnsavedChangesSession) => () => void;
-	readonly requestLeave: (pathname?: string) => Promise<boolean>;
-	readonly subscribe: (listener: () => void) => () => void;
+	readonly decideFn: (decision: EditorUnsavedChangesDecision) => Promise<void>;
+	readonly discardAllFn: () => void;
+	readonly getSnapshotFn: () => EditorUnsavedChangesSnapshot;
+	readonly refreshFn: () => void;
+	readonly registerFn: (id: string, session: EditorUnsavedChangesSession) => () => void;
+	readonly requestLeaveFn: (pathname?: string) => Promise<boolean>;
+	readonly subscribeFn: (listenerFn: () => void) => () => void;
 }
 
 export class EditorUnsavedChanges extends Context.Service<

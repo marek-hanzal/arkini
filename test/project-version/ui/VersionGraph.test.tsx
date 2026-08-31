@@ -37,8 +37,8 @@ describe("VersionGraph", () => {
 						rows: [],
 						workingCopyLane: 0,
 					}}
-					onSelect={vi.fn()}
-					onSelectWorkingCopy={() => {
+					onSelectFn={vi.fn()}
+					onSelectWorkingCopyFn={() => {
 						setSelectedReference("current");
 						onSelectWorkingCopy();
 					}}

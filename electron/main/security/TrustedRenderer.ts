@@ -4,8 +4,8 @@ import type { ElectronMainError } from "../ElectronMainError";
 
 export interface TrustedRenderer {
 	readonly developmentRendererUrl?: string;
-	readonly isTrustedUrl: (candidate: string) => boolean;
-	readonly isTrustedIpcSender: (event: IpcMainEvent | IpcMainInvokeEvent) => boolean;
+	readonly isTrustedUrlFn: (candidate: string) => boolean;
+	readonly isTrustedIpcSenderFn: (event: IpcMainEvent | IpcMainInvokeEvent) => boolean;
 	readonly assertTrustedIpcSenderFx: (
 		event: IpcMainEvent | IpcMainInvokeEvent,
 	) => Effect.Effect<void, ElectronMainError, never>;

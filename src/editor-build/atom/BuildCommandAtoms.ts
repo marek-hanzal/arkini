@@ -13,16 +13,16 @@ import {
 } from "~/editor-build/service/EditorBuildRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
-type EditorBuildRequest = Omit<
+type BuildRequest = Omit<
 	Parameters<EditorBuildRepositoryService["buildProjectFx"]>[0],
 	"projectId"
 >;
 
 /** Keeps build command settlement keyed to the exact project or artifact identity it mutates. */
-export const EditorBuildCommandAtoms = RendererRuntime.runSync(
+export const BuildCommandAtoms = RendererRuntime.runSync(
 	Effect.map(EditorBuildRepository, (repository) => ({
 		build: Atom.family((projectId: string) =>
-			Atom.fn((request: EditorBuildRequest) =>
+			Atom.fn((request: BuildRequest) =>
 				repository.buildProjectFx({
 					...request,
 					projectId,

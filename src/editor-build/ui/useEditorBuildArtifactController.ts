@@ -9,7 +9,7 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
-import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";
+import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
 
 export type EditorBuildFailure =
 	| {
@@ -67,7 +67,7 @@ export namespace useEditorBuildArtifactController {
 export const useEditorBuildArtifactController = ({
 	project,
 }: useEditorBuildArtifactController.Props): useEditorBuildArtifactController.Output => {
-	const buildAtom = EditorBuildCommandAtoms.build(project.projectId);
+	const buildAtom = BuildCommandAtoms.build(project.projectId);
 	const buildResult = useAtomValue(buildAtom);
 	const runBuild = useAtomSet(buildAtom);
 	const builtArtifact =

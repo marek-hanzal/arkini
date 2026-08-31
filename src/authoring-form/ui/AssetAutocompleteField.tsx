@@ -7,9 +7,9 @@ import {
 	EditorSearchCombobox,
 	type EditorSearchOption,
 } from "~/editor-control/ui/EditorSearchCombobox";
-import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
-interface EditorAssetAutocompleteFieldProps {
+interface AssetAutocompleteFieldProps {
 	readonly description?: string;
 	readonly label: string;
 }
@@ -17,14 +17,14 @@ interface EditorAssetAutocompleteFieldProps {
 const readAssetNameFn = (id: string) =>
 	id.replaceAll(/[-_]+/g, " ").replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase());
 
-const EditorAssetThumbnail = ({
+const AssetThumbnail = ({
 	resourceId,
 	size = "md",
 }: {
 	readonly resourceId: string;
 	readonly size?: "sm" | "md" | "lg";
 }) => {
-	const url = useEditorResourceUrl(resourceId);
+	const url = useResourceUrl(resourceId);
 	return (
 		<span
 			className={`grid shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-canvas/70 ${size === "lg" ? "size-16" : size === "sm" ? "size-8" : "size-12"}`}
@@ -44,10 +44,7 @@ const EditorAssetThumbnail = ({
 };
 
 /** Picks one PNG asset known by the active editor project. */
-export const EditorAssetAutocompleteField = ({
-	description,
-	label,
-}: EditorAssetAutocompleteFieldProps) => {
+export const AssetAutocompleteField = ({ description, label }: AssetAutocompleteFieldProps) => {
 	const field = useFieldContext<string>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const project = useEditorProject();
@@ -79,9 +76,9 @@ export const EditorAssetAutocompleteField = ({
 			value={field.state.value}
 			onBlur={field.handleBlur}
 			onChange={field.handleChange}
-			renderPreview={(option) => <EditorAssetThumbnail resourceId={option.id} />}
+			renderPreview={(option) => <AssetThumbnail resourceId={option.id} />}
 			renderSelectedPreview={(option) => (
-				<EditorAssetThumbnail
+				<AssetThumbnail
 					resourceId={option.id}
 					size="sm"
 				/>

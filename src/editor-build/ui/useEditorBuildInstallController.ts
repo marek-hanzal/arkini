@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { useState } from "react";
 
-import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
+import { CatalogAtom } from "~/arkpack-catalog/atom/CatalogAtom";
 import {
 	type EditorBuildMajorUpdateConfirmation,
 	readEditorBuildInstallPlanFn,
@@ -11,7 +11,7 @@ import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProje
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
-import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";
+import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
 
 const readErrorMessageFn = (error: unknown) =>
 	error === undefined ? undefined : error instanceof Error ? error.message : String(error);
@@ -40,7 +40,7 @@ export const useEditorBuildInstallController = ({
 	artifact,
 	targetVersion,
 }: useEditorBuildInstallController.Props): useEditorBuildInstallController.Output => {
-	const catalogState = useAtomValue(ArkpackCatalogAtom);
+	const catalogState = useAtomValue(CatalogAtom);
 	const installPlan =
 		artifact !== undefined && catalogState.type === "ready"
 			? readEditorBuildInstallPlanFn({
@@ -49,7 +49,7 @@ export const useEditorBuildInstallController = ({
 					targetVersion,
 				})
 			: undefined;
-	const installAtom = EditorBuildCommandAtoms.install(artifact?.contentHash ?? "unbuilt");
+	const installAtom = BuildCommandAtoms.install(artifact?.contentHash ?? "unbuilt");
 	const installResult = useAtomValue(installAtom);
 	const runInstall = useAtomSet(installAtom, {
 		mode: "promise",

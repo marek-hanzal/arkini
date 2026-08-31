@@ -5,10 +5,10 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-	EditorProjectResourceUrlProvider,
-	useEditorResourceUrl,
-	useEditorResourceUrls,
-} from "~/asset-authoring/ui/EditorResourceUrlSession";
+	ProjectResourceUrlProvider,
+	useResourceUrl,
+	useResourceUrls,
+} from "~/authoring-session/ui/ResourceUrlSession";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 
 const state = vi.hoisted(() => ({
@@ -39,7 +39,7 @@ afterEach(async () => {
 });
 
 const UrlProbe = ({ resourceId }: { readonly resourceId: string }) =>
-	createElement("output", null, useEditorResourceUrl(resourceId));
+	createElement("output", null, useResourceUrl(resourceId));
 
 const UrlMapProbe = ({ resourceIds }: { readonly resourceIds: ReadonlyArray<string> }) => {
 	const stableIds = useMemo(
@@ -52,14 +52,14 @@ const UrlMapProbe = ({ resourceIds }: { readonly resourceIds: ReadonlyArray<stri
 		"output",
 		null,
 		[
-			...useEditorResourceUrls(stableIds).entries(),
+			...useResourceUrls(stableIds).entries(),
 		]
 			.map(([id, url]) => `${id}:${url}`)
 			.join("|"),
 	);
 };
 
-describe("EditorProjectResourceUrlProvider", () => {
+describe("ProjectResourceUrlProvider", () => {
 	it("allocates URLs only for mounted consumers and shares one active URL per resource", async () => {
 		const createObjectUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:hero");
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
@@ -88,7 +88,7 @@ describe("EditorProjectResourceUrlProvider", () => {
 		await act(async () =>
 			root.render(
 				createElement(
-					EditorProjectResourceUrlProvider,
+					ProjectResourceUrlProvider,
 					null,
 					createElement("span", null, "No preview"),
 				),
@@ -99,7 +99,7 @@ describe("EditorProjectResourceUrlProvider", () => {
 		await act(async () =>
 			root.render(
 				createElement(
-					EditorProjectResourceUrlProvider,
+					ProjectResourceUrlProvider,
 					null,
 					createElement(UrlProbe, {
 						resourceId: "hero",
@@ -117,7 +117,7 @@ describe("EditorProjectResourceUrlProvider", () => {
 		await act(async () =>
 			root.render(
 				createElement(
-					EditorProjectResourceUrlProvider,
+					ProjectResourceUrlProvider,
 					null,
 					createElement("span", null, "No preview"),
 				),
@@ -169,7 +169,7 @@ describe("EditorProjectResourceUrlProvider", () => {
 			state.resources = resources;
 			return root.render(
 				createElement(
-					EditorProjectResourceUrlProvider,
+					ProjectResourceUrlProvider,
 					null,
 					createElement(UrlProbe, {
 						resourceId: "hero",
@@ -239,7 +239,7 @@ describe("EditorProjectResourceUrlProvider", () => {
 		await act(async () =>
 			root.render(
 				createElement(
-					EditorProjectResourceUrlProvider,
+					ProjectResourceUrlProvider,
 					null,
 					createElement(UrlMapProbe, {
 						resourceIds,

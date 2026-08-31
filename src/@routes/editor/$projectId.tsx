@@ -9,7 +9,7 @@ import { readEditorProjectFx } from "~/project-authoring/fx/readEditorProjectFx"
 import { ButtonLink } from "~/ui/ui/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/ui/EditorShell";
-import { EditorProjectResourceUrlProvider } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { ProjectResourceUrlProvider } from "~/authoring-session/ui/ResourceUrlSession";
 import { EditorVersionRestoreAction } from "~/project-version/ui/EditorVersionRestoreAction";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
@@ -68,11 +68,11 @@ export const Route = createFileRoute("/editor/$projectId")({
 			<EditorProjectProvider loaded={project}>
 				<EditorVersionRestoreAction projectId={project.projectId} />
 				<EditorProjectReplacementBoundary>
-					<EditorProjectResourceUrlProvider>
+					<ProjectResourceUrlProvider>
 						<EditorShell>
 							<Outlet />
 						</EditorShell>
-					</EditorProjectResourceUrlProvider>
+					</ProjectResourceUrlProvider>
 				</EditorProjectReplacementBoundary>
 			</EditorProjectProvider>
 		);

@@ -73,16 +73,16 @@ src/game-config-validation  completed-config semantic validation and provenance-
 src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
 src/arkpack-admission  bounded package decoding and canonical semantic admission
 src/arkpack-artifact  package bytes, envelopes, compression, signing and provenance
-src/arkpack-catalog  renderer catalog, storage capability, selection and mutation lifecycle
+src/arkpack-catalog  renderer catalog state, storage capability and mutation lifecycle
 src/arkpack-cli  package build and offline provenance commands
 src/arkpack-selector  package catalog controls and selector presentation
-src/editor-build  Build contract, renderer admission and Build presentation
+src/editor-build  Build contract, command Atoms, renderer admission and presentation
 src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows
 src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls
 src/project-version  immutable version graph, compatibility policies and checkout workspace
 src/project-note  ordered project Notes contracts and workspace
 src/authoring-mcp  renderer-side MCP status, settings and checkout presentation
-src/authoring-session  mounted project publication, refresh, replacement and unsaved-change authority
+src/authoring-session  mounted project publication, refresh, replacement, resource URLs and unsaved-change authority
 src/authoring-shell  cross-product Editor shell and navigation composition
 src/asset-authoring  Asset catalog, validation, import/edit/delete sessions and product presentation
 src/item-authoring  authored Item value policy, repository/session Effects and product UI
@@ -102,7 +102,7 @@ src/application-settings  Appearance, Cheat availability and application Setting
 src/application-shell  renderer root context, fatal surface and shared route transition/navigation behavior
 src/window-mode  native window-mode state, persistence and Electron-confirmed synchronization
 src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
-src/authoring-form  shared Editor form registry and canonical authored Item-reference controls
+src/authoring-form  shared Editor form registry and canonical authored Item- and Asset-reference controls
 src/editor-control  shared Editor field, form-section and value controls
 src/ui        cross-product presentation primitives only
 src/@routes   TanStack Router registration, lifecycle and route-specific composition

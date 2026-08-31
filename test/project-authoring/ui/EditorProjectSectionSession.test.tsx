@@ -87,8 +87,8 @@ vi.mock("~/ui/fx/readSettledAsyncResultErrorFx", () => ({
 	readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),
 }));
 
-vi.mock("~/asset-authoring/ui/EditorAssetAutocompleteField", () => ({
-	EditorAssetAutocompleteField: ({ label }: { readonly label: string }) =>
+vi.mock("~/authoring-form/ui/AssetAutocompleteField", () => ({
+	AssetAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));
 

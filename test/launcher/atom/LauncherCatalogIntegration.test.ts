@@ -7,7 +7,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
+import { CatalogAtom } from "~/arkpack-catalog/atom/CatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
@@ -68,7 +68,7 @@ describe("Launcher catalog integration", () => {
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 		});
-		registry.mount(ArkpackCatalogAtom);
+		registry.mount(CatalogAtom);
 		registry.mount(LauncherStartupAtom);
 
 		await Effect.runPromise(
@@ -81,7 +81,7 @@ describe("Launcher catalog integration", () => {
 		if (!AsyncResult.isSuccess(startup)) throw new Error("Expected successful startup.");
 		expect(startup.value.defaultPackageId).toBe(ArkiniDefaultPackageId);
 		expect(registry.get(ArkpackCatalogOwnerAtom)).toBe(catalog);
-		expect(registry.get(ArkpackCatalogAtom)).toEqual({
+		expect(registry.get(CatalogAtom)).toEqual({
 			type: "ready",
 			arkpacks: [],
 		});

@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
-import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { twMerge } from "tailwind-merge";
 
 const thumbnailSizeClassName = {
@@ -51,8 +51,8 @@ export const EditorItemThumbnail = ({
 	resourceIds,
 	size = "lg",
 }: EditorItemThumbnailProps) => {
-	const backgroundUrl = useEditorResourceUrl(resourceIds[0]);
-	const foregroundUrl = useEditorResourceUrl(resourceIds[1]);
+	const backgroundUrl = useResourceUrl(resourceIds[0]);
+	const foregroundUrl = useResourceUrl(resourceIds[1]);
 	const ready =
 		backgroundUrl !== undefined &&
 		(resourceIds[1] === undefined || foregroundUrl !== undefined);

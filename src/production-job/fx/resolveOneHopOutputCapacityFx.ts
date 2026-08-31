@@ -5,7 +5,7 @@ import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readOutputConditionalMaximumQuantitiesFn } from "~/production-output/fn/readOutputConditionalMaximumQuantitiesFn";
@@ -93,7 +93,7 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 			itemId: intermediateItemId,
 		});
 		if (intermediate.type !== TypeSchema.enum.Blueprint) continue;
-		const owner = Option.getOrUndefined(isLineOwnerItemFn(intermediate));
+		const owner = Option.getOrUndefined(narrowLineOwnerItemFn(intermediate));
 		if (owner === undefined) continue;
 		const applicable = readLineOwnerLinesFn(owner).filter(
 			(candidate) => candidate.show && candidate.enable,

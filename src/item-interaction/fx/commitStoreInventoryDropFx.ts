@@ -5,10 +5,10 @@ import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -102,8 +102,8 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 				entityId: runtimeInventory.id,
 				expectedRevision: props.inventoryRevision,
 			});
-			const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
-			const inventory = Option.getOrUndefined(isGridRuntimeItemFn(runtimeInventory));
+			const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+			const inventory = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeInventory));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

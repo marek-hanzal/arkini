@@ -2,7 +2,7 @@ import { Option } from "effect";
 
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 
 type ItemDetailTabsTarget =
 	| {
@@ -61,7 +61,7 @@ const lineOwnerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 export const readItemDetailTabsFn = ({ sources, target }: readItemDetailTabsFn.Props) => {
 	if (target.kind === "definition") return withSourcesFn(infoTab, sources);
 	if (target.item === undefined) return noTabs;
-	const lineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(target.item.item));
+	const lineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(target.item.item));
 	if (lineOwnerItem === undefined) return withSourcesFn(infoTab, sources);
 	return withSourcesFn(lineOwnerTabs, sources);
 };

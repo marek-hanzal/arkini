@@ -12,7 +12,7 @@ import { resolveStartOutputCapacityFx } from "~/production-job/fx/resolveStartOu
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -281,7 +281,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 }: ItemDetailLines.Props) {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined) return unavailable;
-	const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+	const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 	if (ownerItem === undefined) return unavailable;
 
 	const lines = readLineOwnerLinesFn(ownerItem);

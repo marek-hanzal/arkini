@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -31,7 +31,7 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 					}),
 				);
 			}
-			const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+			const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 			const lines = ownerItem === undefined ? undefined : readLineOwnerLinesFn(ownerItem);
 			if (lines?.some((line) => line.id === lineId) !== true) {
 				return yield* Effect.fail(

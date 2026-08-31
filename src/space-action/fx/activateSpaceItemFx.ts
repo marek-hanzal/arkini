@@ -14,12 +14,12 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { modifyRuntimeWithTransitionFx } from "~/game-runtime/fx/modifyRuntimeWithTransitionFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import { readValidatedRuntimeItemFx } from "~/item-interaction/fx/readValidatedRuntimeItemFx";
+import { readRuntimeCommandTargetFx } from "~/game-runtime/fx/readRuntimeCommandTargetFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { CurrentSpaceConflictError } from "~/space-action/error/CurrentSpaceConflictError";
@@ -58,7 +58,7 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 		itemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
+	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
 	if (owner === undefined || owner.item.type !== TypeSchema.enum.Space) {
 		return yield* Effect.fail(
 			new SpaceActionUnavailableError({
@@ -171,12 +171,12 @@ const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(funct
 			}),
 		);
 	}
-	const runtimeItem = yield* readValidatedRuntimeItemFx({
+	const runtimeItem = yield* readRuntimeCommandTargetFx({
 		itemId,
 		revision,
 		runtime,
 	});
-	const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
+	const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
 	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnGridError({

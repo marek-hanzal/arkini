@@ -6,10 +6,10 @@ import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
@@ -63,7 +63,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				entityId: runtimeItem.id,
 				expectedRevision: revision,
 			});
-			const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
+			const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
 			if (item === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

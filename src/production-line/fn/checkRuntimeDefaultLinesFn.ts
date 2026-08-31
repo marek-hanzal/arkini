@@ -1,6 +1,6 @@
 import { Option } from "effect";
 
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { DefaultLineIssueSchema } from "~/production-line/schema/DefaultLineIssueSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -27,7 +27,7 @@ export const checkRuntimeDefaultLinesFn = ({ runtime }: checkRuntimeDefaultLines
 			});
 			continue;
 		}
-		const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+		const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 		if (ownerItem === undefined) {
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,

@@ -3,7 +3,7 @@ import { Array, Effect } from "effect";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isInputRuntimeItemFn } from "~/production-input/fn/isInputRuntimeItemFn";
+import { narrowInputRuntimeItemFn } from "~/production-input/fn/narrowInputRuntimeItemFn";
 import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 
 export namespace withdrawLineInputsFx {
@@ -31,7 +31,9 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 				runtime,
 			});
 
-			const bufferedItems = Array.getSomes(runtime.items.map(isInputRuntimeItemFn)).filter(
+			const bufferedItems = Array.getSomes(
+				runtime.items.map(narrowInputRuntimeItemFn),
+			).filter(
 				(item) =>
 					item.location.ownerItemId === ownerItemId && item.location.lineId === lineId,
 			);

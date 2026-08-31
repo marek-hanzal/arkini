@@ -8,8 +8,11 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
-/** Reads one exact mutable runtime root and validates its captured revision and scope. */
-export const readValidatedRuntimeItemFx = Effect.fn("readValidatedRuntimeItemFx")(function* ({
+/**
+ * Reads one command target and validates its captured revision and mutable scope.
+ * The existing trace label stays stable because Effect diagnostics are observable.
+ */
+export const readRuntimeCommandTargetFx = Effect.fn("readValidatedRuntimeItemFx")(function* ({
 	itemId,
 	revision,
 	runtime,

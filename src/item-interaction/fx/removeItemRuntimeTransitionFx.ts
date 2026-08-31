@@ -8,7 +8,7 @@ import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
-import { readValidatedRuntimeItemFx } from "~/item-interaction/fx/readValidatedRuntimeItemFx";
+import { readRuntimeCommandTargetFx } from "~/game-runtime/fx/readRuntimeCommandTargetFx";
 
 export namespace removeItemRuntimeTransitionFx {
 	export interface Props {
@@ -30,7 +30,7 @@ export const removeItemRuntimeTransitionFx = Effect.fn("removeItemRuntimeTransit
 	revision,
 	runtime,
 }: removeItemRuntimeTransitionFx.Props) {
-	const item = yield* readValidatedRuntimeItemFx({
+	const item = yield* readRuntimeCommandTargetFx({
 		itemId,
 		revision,
 		runtime,

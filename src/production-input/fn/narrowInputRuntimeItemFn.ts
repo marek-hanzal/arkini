@@ -5,7 +5,7 @@ import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeI
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 /** Narrows one live runtime item to a line-owned input material. */
-export const isInputRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
+export const narrowInputRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
 	Option.liftPredicate(
 		item,
 		(candidate): candidate is InputRuntimeItemSchema.Type =>

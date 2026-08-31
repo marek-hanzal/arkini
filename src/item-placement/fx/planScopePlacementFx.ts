@@ -10,7 +10,7 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
@@ -36,7 +36,7 @@ const readAvailableStackItemsFn = ({
 	readonly runtime: RuntimeSchema.Type;
 }) => {
 	const locationKeys = new Set(locations.map(readGridLocationKeyFn));
-	return Array.getSomes(runtime.items.map(isGridRuntimeItemFn))
+	return Array.getSomes(runtime.items.map(narrowGridRuntimeItemFn))
 		.filter(
 			(item) =>
 				locationKeys.has(readGridLocationKeyFn(item.location)) &&

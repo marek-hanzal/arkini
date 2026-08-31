@@ -14,7 +14,7 @@ import type { LineRun } from "~/production-line/type/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -106,7 +106,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		itemId: ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOwner));
+	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({

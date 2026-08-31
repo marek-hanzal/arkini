@@ -6,7 +6,7 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -216,7 +216,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineId}`));
 	const source: OrderedSource[] = [];
 	for (const owner of runtime.items) {
-		const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+		const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 		if (ownerItem === undefined) continue;
 		const boardLocation =
 			owner.location.scope === LocationScopeEnumSchema.enum.Board
@@ -320,7 +320,7 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 	});
 	if (source.length === 0) {
 		for (const candidate of Object.values(config.items)) {
-			const owner = Option.getOrUndefined(isLineOwnerItemFn(candidate));
+			const owner = Option.getOrUndefined(narrowLineOwnerItemFn(candidate));
 			if (owner === undefined || owner.id === targetDefinitionItemId) continue;
 			const lines = readLineOwnerLinesFn(owner);
 			if (

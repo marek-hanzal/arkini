@@ -3,7 +3,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -68,7 +68,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 }: readItemDetailQueueFx.Props) {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined) return unavailable;
-	const lineOwner = isLineOwnerItemFn(owner.item);
+	const lineOwner = narrowLineOwnerItemFn(owner.item);
 	if (Option.isNone(lineOwner)) return unavailable;
 	const capacity = readItemQueueSizeFn({
 		item: lineOwner.value,

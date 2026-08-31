@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
 
-import type { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import type { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 /** Reads the canonical authored lines owned by one exact line-capable item. */
-export const readLineOwnerLinesFn = (item: isLineOwnerItemFn.Result) =>
+export const readLineOwnerLinesFn = (item: narrowLineOwnerItemFn.Result) =>
 	match(item)
 		.with(
 			{

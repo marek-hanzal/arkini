@@ -1,7 +1,7 @@
 import { Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { isDeliveryRuntimeItemFn } from "~/game-runtime/fn/isDeliveryRuntimeItemFn";
+import { narrowDeliveryRuntimeItemFn } from "~/game-runtime/fn/narrowDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/game-runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -25,7 +25,7 @@ export const readLineInputDeliveryClaimsFn = ({
 }) => {
 	const claims: LineInputDeliveryClaim[] = [];
 	for (const item of runtime.items) {
-		const delivery = isDeliveryRuntimeItemFn(item);
+		const delivery = narrowDeliveryRuntimeItemFn(item);
 		if (
 			Option.isNone(delivery) ||
 			delivery.value.location.phase !== "outbound" ||

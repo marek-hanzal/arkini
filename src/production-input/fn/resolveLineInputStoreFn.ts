@@ -7,10 +7,10 @@ import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMateria
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -49,9 +49,9 @@ export const resolveLineInputStoreFn = ({
 }: resolveLineInputStoreFn.Props) => {
 	const lineOwnerItem = owner.item;
 	if (owner.id === source.id) return undefined;
-	const narrowedLineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(lineOwnerItem));
+	const narrowedLineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(lineOwnerItem));
 	if (narrowedLineOwnerItem === undefined) return undefined;
-	const boardOwner = Option.getOrUndefined(isBoardRuntimeItemFn(owner));
+	const boardOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));
 	if (boardOwner === undefined) return undefined;
 	const effectiveDefaultLine =
 		requestedLineId === undefined

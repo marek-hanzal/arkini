@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { DefaultLineQueueUnavailableError } from "~/production-job/error/DefaultLineQueueUnavailableError";
-import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -23,7 +23,7 @@ export const readDefaultLineQueueTargetFx = Effect.fn("readDefaultLineQueueTarge
 		itemId: ownerItemId,
 		runtime,
 	});
-	const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+	const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 	if (ownerItem === undefined) {
 		return yield* Effect.fail(
 			new DefaultLineQueueUnavailableError({

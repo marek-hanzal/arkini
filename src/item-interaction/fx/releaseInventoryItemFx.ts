@@ -13,9 +13,9 @@ import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readRuntimeInventoryOpenerFx } from "~/item-interaction/fx/readRuntimeInventoryOpenerFx";
 
@@ -44,7 +44,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				entityId: runtimeItem.id,
 				expectedRevision: revision,
 			});
-			const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
+			const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
 			if (item === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

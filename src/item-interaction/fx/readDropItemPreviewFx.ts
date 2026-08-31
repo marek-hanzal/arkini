@@ -11,8 +11,8 @@ import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationCl
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
-import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -91,7 +91,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
 		return rejected(DropItemRejectedReason.StaleSource);
 	}
-	const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
+	const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return rejected(DropItemRejectedReason.InvalidSource);
 	}
@@ -149,7 +149,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
 		return rejected(DropItemRejectedReason.StaleTarget);
 	}
-	const targetItem = Option.getOrUndefined(isGridRuntimeItemFn(runtimeTargetItem));
+	const targetItem = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTargetItem));
 	if (targetItem === undefined) {
 		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
@@ -161,8 +161,8 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejected(DropItemRejectedReason.StaleTarget);
 	}
-	const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
-	const boardTarget = Option.getOrUndefined(isBoardRuntimeItemFn(targetItem));
+	const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));
+	const boardTarget = Option.getOrUndefined(narrowBoardRuntimeItemFn(targetItem));
 	if (
 		boardSource !== undefined &&
 		boardTarget !== undefined &&

@@ -9,7 +9,7 @@ import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -33,7 +33,7 @@ export const isolateGridStatefulOwnerTransitionFx = Effect.fn(
 		itemId: ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(isGridRuntimeItemFn(runtimeOwner));
+	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeOwner));
 	if (owner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnGridError({

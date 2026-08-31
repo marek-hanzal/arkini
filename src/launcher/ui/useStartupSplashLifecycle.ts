@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
-import { RendererLifecycleUnavailableError } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleUnavailableError } from "~/application-runtime/error/RendererLifecycleUnavailableError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { completeLauncherSplashAtom } from "~/launcher/atom/completeLauncherSplashAtom";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";

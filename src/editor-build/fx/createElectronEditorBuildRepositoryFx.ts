@@ -5,14 +5,15 @@ import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { admitProjectWriteFx } from "~/project-authoring/service/ProjectWriteAdmission";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 
 /** Creates the Electron-backed proxy for exact revision-pinned Editor Build operations. */
-export const createElectronEditorBuildRepositoryFx = Effect.sync(
-	(): EditorBuildRepositoryService => ({
+export const createElectronEditorBuildRepositoryFx = Effect.gen(function* () {
+	const admission = yield* ProjectWriteAdmission;
+	return {
 		buildProjectFx: (request) =>
-			admitProjectWriteFx(
+			admission.admitWriteFx(
 				"build-project",
 				invokeProjectTransportFx({
 					call: () => window.arkini.editor.buildProject(request),
@@ -30,5 +31,5 @@ export const createElectronEditorBuildRepositoryFx = Effect.sync(
 				requestMessage: "The editor IPC request failed.",
 				responseMessage: "The editor IPC response is invalid.",
 			}),
-	}),
-);
+	} satisfies EditorBuildRepositoryService;
+});

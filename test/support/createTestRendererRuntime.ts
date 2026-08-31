@@ -22,6 +22,8 @@ import { GameEngineResourceLayer } from "~/installed-game/layer/GameEngineResour
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 
 export interface TestRendererRuntimeProps {
 	readonly clearSaveFx?: Parameters<typeof GameEngineResourceLayer>[0]["clearSaveFx"];
@@ -74,6 +76,7 @@ export const createTestRendererRuntime = ({
 			Layer.succeed(AtomRegistry.AtomRegistry, atomRegistry),
 			Layer.succeed(EditorBuildRepository, editorBuildRepository),
 			Layer.succeed(ProjectRepository, editorProjectRepository),
+			Layer.effect(ProjectWriteAdmission, createProjectWriteAdmissionFx),
 			Layer.effect(
 				EditorUnsavedChanges,
 				createEditorUnsavedChangesOwnerFx().pipe(

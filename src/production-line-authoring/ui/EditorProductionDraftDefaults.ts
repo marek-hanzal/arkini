@@ -2,9 +2,9 @@ import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
-import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
-import type { WeightedDropSchema } from "~/production-output/roll/schema/WeightedDropSchema";
+import type { RollSchema } from "~/production-output/schema/RollSchema";
+import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import type { WeightedDropSchema } from "~/production-output/schema/WeightedDropSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const drop = {
@@ -118,7 +118,7 @@ export const EditorProductionDraftDefaults = {
 				],
 			},
 		] as [
-			SetSchema.Type,
+			RollSetSchema.Type,
 		],
 	} satisfies OutputSchema.Type,
 	when: {

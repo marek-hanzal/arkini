@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
-import type { RuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
 
 export namespace dropRuleFx {
 	export interface Props {
 		origin: GridLocationSchema.Type;
-		rule: RuleSchema.Type;
+		rule: DropRuleSchema.Type;
 	}
 
 	export interface Result {

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseDropRuleSchema } from "./BaseDropRuleSchema";
+import { DropRuleTypeSchema } from "./DropRuleTypeSchema";
 
 /**
  * A rule that disables a selected drop when all of its conditions pass.
@@ -9,13 +9,13 @@ import { TypeSchema } from "./TypeSchema";
  * An applicable disable rule vetoes emission. The selected drop is discarded
  * without rerolling or choosing a replacement candidate.
  */
-export const DisableSchema = z
+export const DisableDropRuleSchema = z
 	.object({
-		...BaseSchema.shape,
+		...BaseDropRuleSchema.shape,
 		/**
 		 * Identifies this rule as a disable veto for the selected drop.
 		 */
-		type: TypeSchema.extract([
+		type: DropRuleTypeSchema.extract([
 			"Disable",
 		]).describe("Identifies this rule as a disable veto for the selected drop."),
 	})
@@ -25,8 +25,8 @@ export const DisableSchema = z
 		description: "A rule that disables a selected drop when its conditions pass.",
 	});
 
-export type DisableSchema = typeof DisableSchema;
+export type DisableDropRuleSchema = typeof DisableDropRuleSchema;
 
-export namespace DisableSchema {
-	export type Type = z.infer<DisableSchema>;
+export namespace DisableDropRuleSchema {
+	export type Type = z.infer<DisableDropRuleSchema>;
 }

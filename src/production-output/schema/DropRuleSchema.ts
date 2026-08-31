@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { DisableSchema } from "./DisableSchema";
-import { EnableSchema } from "./EnableSchema";
+import { DisableDropRuleSchema } from "./DisableDropRuleSchema";
+import { EnableDropRuleSchema } from "./EnableDropRuleSchema";
 
 /**
  * An availability rule evaluated for a drop selected by a successful roll.
@@ -9,18 +9,18 @@ import { EnableSchema } from "./EnableSchema";
  * Each member owns its own behavior and fields. The `type` discriminator keeps
  * the union explicit and directly compatible with `ts-pattern`.
  */
-export const RuleSchema = z
+export const DropRuleSchema = z
 	.discriminatedUnion("type", [
-		EnableSchema,
-		DisableSchema,
+		EnableDropRuleSchema,
+		DisableDropRuleSchema,
 	])
 	.meta({
 		id: "drop.RuleSchema",
 		description: "An availability rule evaluated for a selected drop.",
 	});
 
-export type RuleSchema = typeof RuleSchema;
+export type DropRuleSchema = typeof DropRuleSchema;
 
-export namespace RuleSchema {
-	export type Type = z.infer<RuleSchema>;
+export namespace DropRuleSchema {
+	export type Type = z.infer<DropRuleSchema>;
 }

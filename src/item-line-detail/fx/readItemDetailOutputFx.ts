@@ -7,8 +7,8 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { dropRulesFx } from "~/production-output/fx/dropRulesFx";
-import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
-import { TypeSchema } from "~/production-output/roll/schema/TypeSchema";
+import type { RollSchema } from "~/production-output/schema/RollSchema";
+import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
@@ -77,7 +77,7 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 	return yield* match(roll)
 		.with(
 			{
-				type: TypeSchema.enum.Guaranteed,
+				type: RollTypeSchema.enum.Guaranteed,
 			},
 			({ drop }) =>
 				Effect.gen(function* () {
@@ -92,7 +92,7 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Chance,
+				type: RollTypeSchema.enum.Chance,
 			},
 			({ chance, drop }) =>
 				Effect.gen(function* () {
@@ -108,7 +108,7 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Weight,
+				type: RollTypeSchema.enum.Weight,
 			},
 			({ quantity, drop }) =>
 				Effect.gen(function* () {

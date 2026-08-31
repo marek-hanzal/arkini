@@ -7,7 +7,7 @@ import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/Rule
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 import { EditorBoardDistanceControl } from "~/production-line-authoring/ui/EditorBoardDistanceControl";
 import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
-import type { RuleSchema as DropRuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import {

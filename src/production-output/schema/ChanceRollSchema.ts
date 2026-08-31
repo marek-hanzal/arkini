@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { DropSchema } from "~/production-output/schema/DropSchema";
 
-import { BaseSchema } from "./BaseSchema";
-import { TypeSchema } from "./TypeSchema";
+import { BaseRollSchema } from "./BaseRollSchema";
+import { RollTypeSchema } from "./RollTypeSchema";
 
 const ProbabilitySchema = z.number().min(0).max(1).meta({
 	id: "ChanceSchema",
@@ -13,10 +13,10 @@ const ProbabilitySchema = z.number().min(0).max(1).meta({
 /**
  * An output roll that will provide its output according to a probability.
  */
-export const ChanceSchema = z
+export const ChanceRollSchema = z
 	.object({
-		...BaseSchema.shape,
-		type: TypeSchema.extract([
+		...BaseRollSchema.shape,
+		type: RollTypeSchema.extract([
 			"Chance",
 		]),
 		/**
@@ -43,8 +43,8 @@ export const ChanceSchema = z
 		description: "A roll that provides its output according to a probability.",
 	});
 
-export type ChanceSchema = typeof ChanceSchema;
+export type ChanceRollSchema = typeof ChanceRollSchema;
 
-export namespace ChanceSchema {
-	export type Type = z.infer<ChanceSchema>;
+export namespace ChanceRollSchema {
+	export type Type = z.infer<ChanceRollSchema>;
 }

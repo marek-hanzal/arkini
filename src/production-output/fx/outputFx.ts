@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { rollSetFx } from "~/production-output/roll/fx/rollSetFx";
-import { selectRollSetFx } from "~/production-output/roll/fx/selectRollSetFx";
+import { rollSetFx } from "~/production-output/fx/rollSetFx";
+import { selectRollSetFx } from "~/production-output/fx/selectRollSetFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { dropFx } from "./dropFx";
 

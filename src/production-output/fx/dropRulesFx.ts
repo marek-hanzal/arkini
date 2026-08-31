@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { RuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { dropRuleFx } from "./dropRuleFx";
 
 export namespace dropRulesFx {
 	export interface Props {
 		origin: GridLocationSchema.Type;
-		rules: RuleSchema.Type[];
+		rules: DropRuleSchema.Type[];
 	}
 
 	export type Result = ReadonlyArray<dropRuleFx.Result>;

@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { readRollMaximumQuantitiesFn } from "~/production-output/roll/fn/readRollMaximumQuantitiesFn";
+import { readRollMaximumQuantitiesFn } from "~/production-output/fn/readRollMaximumQuantitiesFn";
 
 export namespace readOutputMaximumQuantitiesFn {
 	export interface Props {

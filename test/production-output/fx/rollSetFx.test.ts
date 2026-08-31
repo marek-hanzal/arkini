@@ -3,7 +3,7 @@ import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { DropSchema } from "~/production-output/schema/DropSchema";
-import { rollSetFx } from "~/production-output/roll/fx/rollSetFx";
+import { rollSetFx } from "~/production-output/fx/rollSetFx";
 
 const createDrop = (itemId: string): DropSchema.Type => {
 	return {

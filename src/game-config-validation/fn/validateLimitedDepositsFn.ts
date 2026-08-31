@@ -6,10 +6,10 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { TypeSchema as ItemTypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
+import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 
 import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
 
@@ -110,7 +110,7 @@ export const validateLimitedDepositsFn = ({
 		});
 		for (const { output } of outputs) {
 			for (const depositId of Object.keys(config.items)) {
-				if (config.items[depositId]?.type !== TypeSchema.enum.Deposit) continue;
+				if (config.items[depositId]?.type !== ItemTypeSchema.enum.Deposit) continue;
 				const outputCertainty = readOutputRecreationCertaintyFn(output, depositId);
 				certainty.set(
 					depositId,
@@ -122,7 +122,7 @@ export const validateLimitedDepositsFn = ({
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type !== TypeSchema.enum.Deposit || item.charges === undefined) continue;
+		if (item.type !== ItemTypeSchema.enum.Deposit || item.charges === undefined) continue;
 		const itemCertainty = certainty.get(itemId) ?? "none";
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {

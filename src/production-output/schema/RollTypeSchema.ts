@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Discriminates the rule used to determine whether an output roll is provided.
  */
-export const TypeSchema = z
+export const RollTypeSchema = z
 	.enum({
 		Guaranteed: "guaranteed",
 		Chance: "chance",
@@ -14,8 +14,8 @@ export const TypeSchema = z
 		description: "The rule used to determine an output roll.",
 	});
 
-export type TypeSchema = typeof TypeSchema;
+export type RollTypeSchema = typeof RollTypeSchema;
 
-export namespace TypeSchema {
-	export type Type = z.infer<TypeSchema>;
+export namespace RollTypeSchema {
+	export type Type = z.infer<RollTypeSchema>;
 }

@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Discriminates the rules evaluated after a roll selects a drop.
  */
-export const TypeSchema = z
+export const DropRuleTypeSchema = z
 	.enum({
 		Enable: "enable",
 		Disable: "disable",
@@ -13,8 +13,8 @@ export const TypeSchema = z
 		description: "The kind of availability rule evaluated for a selected drop.",
 	});
 
-export type TypeSchema = typeof TypeSchema;
+export type DropRuleTypeSchema = typeof DropRuleTypeSchema;
 
-export namespace TypeSchema {
-	export type Type = z.infer<TypeSchema>;
+export namespace DropRuleTypeSchema {
+	export type Type = z.infer<DropRuleTypeSchema>;
 }

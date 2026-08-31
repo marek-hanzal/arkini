@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import type { Highlight, Selection } from "~/flow-canvas/type/Highlight";
 
 interface RouteColors {
@@ -41,7 +41,7 @@ const hashTextFn = (value: string) => {
 
 /** Projects stable colors onto selected flow routes and their connected ports. */
 export const readRouteColorsFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	selection: Selection | undefined,
 	highlight: Highlight | undefined,
 ): RouteColors => {

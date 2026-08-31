@@ -1,39 +1,39 @@
 import { Effect, Order } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { createEditorAcquisitionGraphFn } from "~/flow/fn/createEditorAcquisitionGraphFn";
-import { readEditorItemOriginSourcesFn } from "~/flow/fn/readEditorItemOriginSourcesFn";
+import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
+import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
 import type {
-	EditorItemOriginOutputOccurrence,
-	EditorItemOriginRelation,
-	EditorItemOriginRelationRole,
-	EditorItemOriginSource,
-} from "~/flow/type/EditorItemOriginSource";
-import { readEditorItemOriginRelationsFn } from "~/flow/fn/readEditorItemOriginRelationsFn";
+	ItemOriginOutputOccurrence,
+	ItemOriginRelation,
+	ItemOriginRelationRole,
+	ItemOriginSource,
+} from "~/flow/type/ItemOriginSource";
+import { readItemOriginRelationsFn } from "~/flow/fn/readItemOriginRelationsFn";
 
-interface EditorItemOriginRelationSubgraph {
+interface ItemOriginRelationSubgraph {
 	readonly itemIds: ReadonlySet<string>;
 	readonly relations: ReadonlyArray<
-		EditorItemOriginRelation & {
+		ItemOriginRelation & {
 			readonly level: number;
 		}
 	>;
 }
 
 /** Traverses canonical input edges forward and output edges backward for one MCP relation lookup. */
-const readEditorItemOriginRelationSubgraphFn = ({
+const readItemOriginRelationSubgraphFn = ({
 	level,
 	role,
 	sources,
 	targetItemId,
 }: {
 	readonly level: number;
-	readonly role: EditorItemOriginRelationRole;
-	readonly sources: ReadonlyArray<EditorItemOriginSource>;
+	readonly role: ItemOriginRelationRole;
+	readonly sources: ReadonlyArray<ItemOriginSource>;
 	readonly targetItemId: string;
-}): EditorItemOriginRelationSubgraph => {
-	const relationsBySourceItem = new Map<string, EditorItemOriginRelation[]>();
-	const relationGroups = sources.map(readEditorItemOriginRelationsFn);
+}): ItemOriginRelationSubgraph => {
+	const relationsBySourceItem = new Map<string, ItemOriginRelation[]>();
+	const relationGroups = sources.map(readItemOriginRelationsFn);
 	for (const relation of relationGroups.flat()) {
 		if (relation.role !== role) continue;
 		const traversalSourceItemId = role === "input" ? relation.fromItemId : relation.toItemId;
@@ -54,7 +54,7 @@ const readEditorItemOriginRelationSubgraphFn = ({
 	]);
 	const relationByKey = new Map<
 		string,
-		EditorItemOriginRelation & {
+		ItemOriginRelation & {
 			readonly level: number;
 		}
 	>();
@@ -125,7 +125,7 @@ const itemReference = (project: EditorProject, itemId: string) => {
 const formatQuantity = ({ max, min }: { readonly max: number; readonly min: number }) =>
 	min === max ? String(min) : `${min}–${max}`;
 
-const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
+const outputAnnotation = (output: ItemOriginOutputOccurrence) =>
 	[
 		`quantity ${formatQuantity(output.quantity)}`,
 		output.selectionKind,
@@ -141,10 +141,7 @@ const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
 				]),
 	].join(", ");
 
-const outputRequirementLines = (
-	project: EditorProject,
-	output: EditorItemOriginOutputOccurrence,
-) => [
+const outputRequirementLines = (project: EditorProject, output: ItemOriginOutputOccurrence) => [
 	...output.requirements.allOf.map(
 		(requirement) =>
 			`      requires all: ${itemReference(project, requirement.itemId)} (quantity ${formatQuantity(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
@@ -162,7 +159,7 @@ const outputRequirementLines = (
 	),
 ];
 
-const sourceReferenceLines = (project: EditorProject, source: EditorItemOriginSource) => [
+const sourceReferenceLines = (project: EditorProject, source: ItemOriginSource) => [
 	`  Source item: ${itemReference(project, source.ownerItemId)}`,
 	...(() => {
 		switch (source.reference.type) {
@@ -196,15 +193,15 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 	}: {
 		readonly itemId: string;
 		readonly level: number;
-		readonly role: EditorItemOriginRelationRole;
+		readonly role: ItemOriginRelationRole;
 	},
 ) {
 	const item = project.config.items[itemId];
 	if (item === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
-	const graph = createEditorAcquisitionGraphFn(project.config);
-	const sources = readEditorItemOriginSourcesFn(graph);
-	const subgraph = readEditorItemOriginRelationSubgraphFn({
+	const graph = createAcquisitionGraphFn(project.config);
+	const sources = readItemOriginSourcesFn(graph);
+	const subgraph = readItemOriginRelationSubgraphFn({
 		level,
 		role,
 		sources,

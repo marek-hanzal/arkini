@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorItemEstimateQuantitySchema } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
+import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchemas, type CreateItemInput } from "./CreateItemInputSchemas";
@@ -87,7 +87,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 const ItemEstimateInputSchema = z
 	.object({
 		itemId: IdSchema.describe("The exact target item ID returned by item_collection."),
-		quantity: EditorItemEstimateQuantitySchema.default(1),
+		quantity: ItemEstimateQuantitySchema.default(1),
 	})
 	.strict()
 	.meta({

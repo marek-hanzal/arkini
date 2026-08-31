@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { readItemEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readItemEstimateTextFx";
 import { readItemRelationTextFx } from "../../../../electron/main/editor-mcp/tool/readItemRelationTextFx";
-import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
+import { itemEstimateMaximumQuantity } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createGraphProject, createToolProject } from "./support/createToolProject";
 import { createRelationTraversalProject } from "./readGraphTextFx.test/fixture";
@@ -119,14 +119,14 @@ describe("editor MCP graph tool text", () => {
 		const complete = Effect.runSync(readItemEstimateTextFx(project, "ingot", 1));
 		const unreachable = Effect.runSync(readItemEstimateTextFx(project, "unused", 1));
 		const bounded = Effect.runSync(
-			readItemEstimateTextFx(project, "ingot", editorItemEstimateMaximumQuantity + 1),
+			readItemEstimateTextFx(project, "ingot", itemEstimateMaximumQuantity + 1),
 		);
 
 		expect(complete).toContain("Status: complete");
 		expect(complete).toContain("Approximate action runs: 1");
 		expect(complete).toContain("- ingot [Ingot; simple] x 1 via");
 		expect(unreachable).toContain("Status: unreachable");
-		expect(bounded).toContain(`static estimate limit of ${editorItemEstimateMaximumQuantity}`);
+		expect(bounded).toContain(`static estimate limit of ${itemEstimateMaximumQuantity}`);
 	});
 
 	it("rejects a missing estimate item through the typed failure channel", () => {

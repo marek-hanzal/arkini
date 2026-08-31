@@ -1,30 +1,28 @@
 import { Graph, Order } from "effect";
 
 import type {
-	EditorAcquisitionGraph,
-	EditorAcquisitionRequirement,
-	EditorAcquisitionRoute,
-} from "~/flow/type/EditorAcquisitionGraph";
+	AcquisitionGraph,
+	AcquisitionRequirement,
+	AcquisitionRoute,
+} from "~/flow/type/AcquisitionGraph";
 
 interface EstimateRouteRequirements {
-	readonly allOf: ReadonlyArray<EditorAcquisitionRequirement>;
-	readonly anyOf: ReadonlyArray<ReadonlyArray<EditorAcquisitionRequirement>>;
+	readonly allOf: ReadonlyArray<AcquisitionRequirement>;
+	readonly anyOf: ReadonlyArray<ReadonlyArray<AcquisitionRequirement>>;
 }
 
 export interface EstimateTopology {
 	readonly componentByFact: ReadonlyMap<string, string>;
 	readonly factCount: number;
 	readonly factIds: ReadonlySet<string>;
-	readonly requirementsByRoute: ReadonlyMap<EditorAcquisitionRoute, EstimateRouteRequirements>;
+	readonly requirementsByRoute: ReadonlyMap<AcquisitionRoute, EstimateRouteRequirements>;
 	readonly roots: ReadonlyMap<string, number | "unbounded">;
-	readonly routesByFact: ReadonlyMap<string, ReadonlyArray<EditorAcquisitionRoute>>;
+	readonly routesByFact: ReadonlyMap<string, ReadonlyArray<AcquisitionRoute>>;
 	readonly seededComponentByFact: ReadonlyMap<string, string>;
-	readonly unsupportedRoutes: ReadonlySet<EditorAcquisitionRoute>;
+	readonly unsupportedRoutes: ReadonlySet<AcquisitionRoute>;
 }
 
-const projectRequirementFn = (
-	requirement: EditorAcquisitionRequirement,
-): EditorAcquisitionRequirement =>
+const projectRequirementFn = (requirement: AcquisitionRequirement): AcquisitionRequirement =>
 	requirement.source === "charged-item"
 		? {
 				...requirement,
@@ -33,7 +31,7 @@ const projectRequirementFn = (
 			}
 		: requirement;
 
-const projectRequirementsFn = (route: EditorAcquisitionRoute): EstimateRouteRequirements => ({
+const projectRequirementsFn = (route: AcquisitionRoute): EstimateRouteRequirements => ({
 	// Positive enable facts remain hard acquisition prerequisites. Negative/alternative
 	// condition branches cannot add optimistic authored demand.
 	allOf: route.requirements.allOf.map(projectRequirementFn),
@@ -103,7 +101,7 @@ const readComponentsFn = ({
 };
 
 /** Indexes immutable acquisition topology and authored seed evidence for one Estimate batch. */
-export const createEstimateTopologyFn = (graph: EditorAcquisitionGraph): EstimateTopology => {
+export const createEstimateTopologyFn = (graph: AcquisitionGraph): EstimateTopology => {
 	const factIds = new Set(graph.factIds);
 	const roots = new Map(
 		graph.roots.map(({ factId, quantity }) => [
@@ -125,7 +123,7 @@ export const createEstimateTopologyFn = (graph: EditorAcquisitionGraph): Estimat
 			(route) => route.operation?.outputCompilation === "state-space-unsupported",
 		),
 	);
-	const routesByFact = new Map<string, EditorAcquisitionRoute[]>();
+	const routesByFact = new Map<string, AcquisitionRoute[]>();
 	for (const route of graph.routes) {
 		const routes = routesByFact.get(route.output.factId) ?? [];
 		routes.push(route);

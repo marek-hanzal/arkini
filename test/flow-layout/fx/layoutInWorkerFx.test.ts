@@ -2,14 +2,14 @@ import { Cause, Effect, Exit, Fiber, Option } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
 import {
-	EditorItemOriginItemInputPortId,
-	EditorItemOriginItemOutputPortId,
-	type EditorItemOriginFlow,
-} from "~/flow/type/EditorItemOriginFlow";
+	ItemOriginItemInputPortId,
+	ItemOriginItemOutputPortId,
+	type ItemOriginFlow,
+} from "~/flow/type/ItemOriginFlow";
 import { layoutInWorkerFx } from "~/flow-layout/fx/layoutInWorkerFx";
 import type { Layout, LayoutInput } from "~/flow-layout/type/Layout";
 
-const flow: EditorItemOriginFlow = {
+const flow: ItemOriginFlow = {
 	edges: [],
 	nodes: [
 		{
@@ -75,12 +75,12 @@ describe("layoutInWorkerFx", () => {
 						id: "item:wine",
 						ports: [
 							{
-								id: EditorItemOriginItemInputPortId,
+								id: ItemOriginItemInputPortId,
 								x: -210,
 								y: -21,
 							},
 							{
-								id: EditorItemOriginItemOutputPortId,
+								id: ItemOriginItemOutputPortId,
 								x: 210,
 								y: -21,
 							},

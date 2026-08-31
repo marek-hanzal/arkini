@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import type { EditorItemEstimateSortSchema } from "~/estimate/schema/EditorItemEstimateSortSchema";
-import { EditorItemEstimateList } from "~/estimate/ui/EditorItemEstimateList";
+import type { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
+import { ItemEstimateList } from "~/estimate/ui/ItemEstimateList";
 
 interface EditorEstimateRouteSearch {
 	readonly incomplete?: boolean;
 	readonly query?: string;
-	readonly sort?: EditorItemEstimateSortSchema.Type;
+	readonly sort?: ItemEstimateSortSchema.Type;
 }
 
 export const Route = createFileRoute("/editor/$projectId/estimate")({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/editor/$projectId/estimate")({
 			from: Route.fullPath,
 		});
 		return (
-			<EditorItemEstimateList
+			<ItemEstimateList
 				incomplete={search.incomplete ?? false}
 				onIncompleteChange={(incomplete) =>
 					void navigate({

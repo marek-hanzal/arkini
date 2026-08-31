@@ -1,18 +1,18 @@
 import { Order } from "effect";
 
-import { groupEstimateRequirementsFn } from "~/estimate-demand/fn/groupEstimateRequirementsFn";
+import { groupEstimateRequirementsFn } from "~/estimate/fn/groupEstimateRequirementsFn";
 import type { EstimateTopology } from "~/estimate/fn/createEstimateTopologyFn";
 import { readEstimateMissingQuantityFn } from "~/estimate/fn/readEstimateMissingQuantityFn";
 import {
 	readEstimateScalarExpectedRunsFn,
 	type EstimateExpectedRunsResult,
 } from "~/estimate/fn/readEstimateExpectedRunsFn";
-import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
+import { itemEstimateMaximumQuantity } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import type {
-	EditorAcquisitionQuantityProbability,
-	EditorAcquisitionRequirement,
-	EditorAcquisitionRoute,
-} from "~/flow/type/EditorAcquisitionGraph";
+	AcquisitionQuantityProbability,
+	AcquisitionRequirement,
+	AcquisitionRoute,
+} from "~/flow/type/AcquisitionGraph";
 
 const epsilon = 1e-9;
 
@@ -25,7 +25,7 @@ interface EstimateRoutePolicy {
 interface EstimateRouteCostContext {
 	readonly quantityCostMemo: Map<string, number>;
 	readonly scalarRunsByDistribution: Map<
-		ReadonlyArray<EditorAcquisitionQuantityProbability>,
+		ReadonlyArray<AcquisitionQuantityProbability>,
 		Map<number, EstimateExpectedRunsResult>
 	>;
 }
@@ -39,15 +39,15 @@ interface EstimateRouteChoicePoint {
 const requirementChoiceKeyFn = (routeId: string, clauseIndex: number) =>
 	`requirement\u0000${routeId}\u0000${clauseIndex}`;
 
-const readRequirementQuantityFn = (requirement: EditorAcquisitionRequirement, actionRuns: number) =>
+const readRequirementQuantityFn = (requirement: AcquisitionRequirement, actionRuns: number) =>
 	requirement.quantity * (requirement.usage === "consume" ? actionRuns : 1);
 
 const readScalarExpectedRunsFn = (
 	context: EstimateRouteCostContext,
-	distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
+	distribution: ReadonlyArray<AcquisitionQuantityProbability>,
 	quantity: number,
 ) => {
-	if (quantity > editorItemEstimateMaximumQuantity)
+	if (quantity > itemEstimateMaximumQuantity)
 		return {
 			status: "state-space-unsupported",
 		} satisfies EstimateExpectedRunsResult;
@@ -77,7 +77,7 @@ const compileCompleteFactsFn = (
 		);
 	for (let iteration = 0; iteration < topology.factCount; iteration += 1) {
 		let changed = false;
-		const nextPending: EditorAcquisitionRoute[] = [];
+		const nextPending: AcquisitionRoute[] = [];
 		for (const route of pending) {
 			const requirements = topology.requirementsByRoute.get(route);
 			if (
@@ -113,7 +113,7 @@ const readCompleteFactsFn = (policy: EstimateRoutePolicy, blockedFactIds: Readon
 
 const isCompleteRouteFn = (
 	policy: EstimateRoutePolicy,
-	route: EditorAcquisitionRoute,
+	route: AcquisitionRoute,
 	blockedFactIds: ReadonlySet<string>,
 ) => {
 	if (policy.topology.unsupportedRoutes.has(route)) return false;
@@ -160,7 +160,7 @@ const createRouteCostContextFn = (): EstimateRouteCostContext => ({
 
 const selectRouteRequirementsFn = (
 	policy: EstimateRoutePolicy,
-	route: EditorAcquisitionRoute,
+	route: AcquisitionRoute,
 	actionRuns: number,
 	activeComponentId: string,
 	blockedFactIds: ReadonlySet<string>,
@@ -237,7 +237,7 @@ const selectRouteRequirementsFn = (
 
 export const readEstimateRouteRequirementsFn = (
 	policy: EstimateRoutePolicy,
-	route: EditorAcquisitionRoute,
+	route: AcquisitionRoute,
 	actionRuns: number,
 	overrides: ReadonlyMap<string, string>,
 ) =>
@@ -253,7 +253,7 @@ export const readEstimateRouteRequirementsFn = (
 
 const readRouteCostFn = (
 	policy: EstimateRoutePolicy,
-	route: EditorAcquisitionRoute,
+	route: AcquisitionRoute,
 	quantity: number,
 	activeComponentId = policy.topology.componentByFact.get(route.output.factId) ??
 		route.output.factId,

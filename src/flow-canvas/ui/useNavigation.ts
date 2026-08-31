@@ -1,6 +1,6 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import {
 	readDefaultOriginFlowViewportFn,
 	readOriginFlowInitialFocusFn,
@@ -101,7 +101,7 @@ export const useNavigation = ({
 }: {
 	readonly canvasRef: RefObject<HTMLCanvasElement | null>;
 	readonly direction: OriginFlowDirection;
-	readonly flow: EditorItemOriginFlow;
+	readonly flow: ItemOriginFlow;
 	readonly inputNodeIds: ReadonlyArray<string>;
 	readonly maxHighlightLevel: number;
 	readonly navigationNodeIds: ReadonlyArray<string>;

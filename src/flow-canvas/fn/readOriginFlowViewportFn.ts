@@ -1,4 +1,4 @@
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import type { Bounds, Viewport } from "~/flow-canvas/type/Viewport";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 
@@ -78,7 +78,7 @@ export const readOriginFlowNodeViewportFn = (
 });
 
 export const readOriginFlowInitialFocusFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	positions: ReadonlyMap<string, LayoutNode>,
 ) => {
 	const starters = flow.nodes

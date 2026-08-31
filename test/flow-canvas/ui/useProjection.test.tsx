@@ -4,10 +4,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type {
-	EditorItemOriginFlow,
-	EditorItemOriginItemNode,
-} from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow, ItemOriginItemNode } from "~/flow/type/ItemOriginFlow";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 import { useProjection } from "~/flow-canvas/ui/useProjection";
 
@@ -18,7 +15,7 @@ import { useProjection } from "~/flow-canvas/ui/useProjection";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const itemNode = (itemId: string): EditorItemOriginItemNode => ({
+const itemNode = (itemId: string): ItemOriginItemNode => ({
 	id: `item:${itemId}`,
 	itemId,
 	operations: [],
@@ -40,7 +37,7 @@ const point = (x: number, y: number): LayoutPoint => ({
 	x,
 	y,
 });
-const flow: EditorItemOriginFlow = {
+const flow: ItemOriginFlow = {
 	edges: [
 		{
 			id: "ore-smelter-a",

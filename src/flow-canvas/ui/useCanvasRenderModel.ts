@@ -1,7 +1,7 @@
 import { type Dispatch, type SetStateAction, useMemo } from "react";
 
 import { useEditorResourceUrls } from "~/asset-authoring/ui/EditorResourceUrlSession";
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import { readConnectedPortsFn, type ConnectedPorts } from "~/flow-canvas/fn/readConnectedPortsFn";
 import { readOriginFlowBackboneBoundsFn } from "~/flow-canvas/fn/readOriginFlowViewportFn";
 import type { Bounds } from "~/flow-canvas/type/Viewport";
@@ -84,7 +84,7 @@ export namespace useCanvasRenderModel {
 	export interface Props {
 		readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 		readonly direction?: OriginFlowDirection;
-		readonly flow: EditorItemOriginFlow;
+		readonly flow: ItemOriginFlow;
 		readonly positions: ReadonlyMap<string, LayoutNode>;
 		readonly selection: Selection | undefined;
 	}

@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { createEstimateTopologyFn } from "~/estimate/fn/createEstimateTopologyFn";
 
-import { editorItemEstimateTestFixture } from "~test/estimate/fn/editorItemEstimateTestFixture";
+import { itemEstimateTestFixture } from "~test/estimate/fn/itemEstimateTestFixture";
 
-const { graph, requirement, route } = editorItemEstimateTestFixture;
+const { graph, requirement, route } = itemEstimateTestFixture;
 
 describe("createEstimateTopologyFn", () => {
 	it("keeps component identity and seeded projection independent of insertion order", () => {

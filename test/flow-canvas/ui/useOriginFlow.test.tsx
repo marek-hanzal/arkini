@@ -7,8 +7,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
-import type { EditorItemOriginFlowRequest } from "~/flow/fx/readEditorItemOriginFlowFx";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
+import type { ItemOriginFlowRequest } from "~/flow/fx/readItemOriginFlowFx";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { Layout } from "~/flow-layout/type/Layout";
 
@@ -17,9 +17,9 @@ const mocks = vi.hoisted(() => ({
 	read: vi.fn(),
 }));
 
-vi.mock("~/flow/fx/readEditorItemOriginFlowFx", async (importOriginal) => ({
+vi.mock("~/flow/fx/readItemOriginFlowFx", async (importOriginal) => ({
 	...(await importOriginal()),
-	readEditorItemOriginFlowFx: mocks.read,
+	readItemOriginFlowFx: mocks.read,
 }));
 vi.mock("~/flow-layout/fx/layoutInWorkerFx", () => ({
 	layoutInWorkerFx: mocks.layout,
@@ -47,7 +47,7 @@ afterEach(async () => {
 });
 
 const Config = {} as GameConfigSchema.Type;
-const Flow: EditorItemOriginFlow = {
+const Flow: ItemOriginFlow = {
 	edges: [],
 	nodes: [
 		{
@@ -103,7 +103,7 @@ const renderProbe = async () => {
 
 describe("useOriginFlow", () => {
 	it("publishes one complete globally laid-out flow", async () => {
-		mocks.read.mockImplementation((request: EditorItemOriginFlowRequest) =>
+		mocks.read.mockImplementation((request: ItemOriginFlowRequest) =>
 			Effect.sync(() => {
 				request.onProgress?.({
 					label: "Indexing sources",

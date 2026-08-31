@@ -6,7 +6,7 @@ import {
 	EditorItemMergesDetail,
 } from "~/item-authoring/ui/EditorItemCapabilityDetails";
 import { EditorItemDeleteSection } from "~/item-authoring/ui/EditorItemDeleteSection";
-import { EditorItemEstimateSection } from "~/estimate/ui/EditorItemEstimateSection";
+import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import { EditorItemIdentityDetail } from "~/item-authoring/ui/EditorItemIdentityDetail";
 import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
 import { EditorItemProductionDetail } from "~/item-authoring/ui/EditorItemProductionDetail";
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 			case "production":
 				return <EditorItemProductionDetail item={item} />;
 			case "estimate":
-				return <EditorItemEstimateSection itemId={item.id} />;
+				return <ItemEstimateSection itemId={item.id} />;
 			case "delete":
 				return <EditorItemDeleteSection item={item} />;
 		}

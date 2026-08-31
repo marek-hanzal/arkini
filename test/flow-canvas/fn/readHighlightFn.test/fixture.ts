@@ -1,14 +1,14 @@
 import type {
-	EditorItemOriginFlow,
-	EditorItemOriginItemNode,
-	EditorItemOriginOperation,
-} from "~/flow/type/EditorItemOriginFlow";
+	ItemOriginFlow,
+	ItemOriginItemNode,
+	ItemOriginOperation,
+} from "~/flow/type/ItemOriginFlow";
 
 const operation = (
 	id: string,
 	inputs: ReadonlyArray<string>,
 	outputs: ReadonlyArray<string>,
-): EditorItemOriginOperation => ({
+): ItemOriginOperation => ({
 	id,
 	inputs: inputs.map((itemId) => ({
 		id: `${id}:input:${itemId}`,
@@ -26,8 +26,8 @@ const operation = (
 
 const item = (
 	itemId: string,
-	operations: ReadonlyArray<EditorItemOriginOperation> = [],
-): EditorItemOriginItemNode => ({
+	operations: ReadonlyArray<ItemOriginOperation> = [],
+): ItemOriginItemNode => ({
 	id: `item:${itemId}`,
 	itemId,
 	operations,
@@ -39,7 +39,7 @@ const item = (
 	type: "simple",
 });
 
-export const producerFlow: EditorItemOriginFlow = {
+export const producerFlow: ItemOriginFlow = {
 	edges: [
 		{
 			id: "tool-forge",
@@ -100,7 +100,7 @@ export const producerFlow: EditorItemOriginFlow = {
 	],
 };
 
-export const cyclicFlow: EditorItemOriginFlow = {
+export const cyclicFlow: ItemOriginFlow = {
 	edges: [
 		{
 			id: "target-a",

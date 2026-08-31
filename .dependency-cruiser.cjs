@@ -297,42 +297,6 @@ module.exports = {
 			},
 		},
 		{
-			name: "estimate-demand-does-not-import-consumers",
-			comment:
-				"Estimate demand grouping is the lowest pure policy and never imports witness, projection, or orchestration owners.",
-			severity: "error",
-			from: {
-				path: "^src/estimate-demand(?:/|$)",
-			},
-			to: {
-				path: "^src/(?:estimate(?:/|$)|estimate-(?:projection|witness)(?:/|$))",
-			},
-		},
-		{
-			name: "estimate-witness-does-not-import-consumers",
-			comment:
-				"Estimate witness vocabulary may consume demand semantics but never projection or orchestration owners.",
-			severity: "error",
-			from: {
-				path: "^src/estimate-witness(?:/|$)",
-			},
-			to: {
-				path: "^src/(?:estimate(?:/|$)|estimate-projection(?:/|$))",
-			},
-		},
-		{
-			name: "estimate-projection-does-not-import-orchestration",
-			comment:
-				"Estimate projection consumes stable witnesses and owns its output contract without importing orchestration.",
-			severity: "error",
-			from: {
-				path: "^src/estimate-projection(?:/|$)",
-			},
-			to: {
-				path: "^src/estimate(?:/|$)",
-			},
-		},
-		{
 			name: "fn-does-not-import-runtime-fx",
 			comment:
 				"Fn provides total value operations to Fx. A Fn never imports runtime Fx composition; type-only references do not execute an Fx.",

@@ -6,14 +6,14 @@ import {
 	GameEngineResourceFx,
 	type GameEngineResourceFxService,
 } from "~/installed-game/service/GameEngineResourceFx";
-import { createGameEngineAcquisitionCapabilityFx } from "~/installed-game/fx/lifecycle/createGameEngineAcquisitionCapabilityFx";
-import { createGameEngineCancellationCapabilityFx } from "~/installed-game/fx/lifecycle/createGameEngineCancellationCapabilityFx";
-import { createGameEngineFinalizationCapabilityFx } from "~/installed-game/fx/lifecycle/createGameEngineFinalizationCapabilityFx";
-import { createFailedSaveRecoveryCapabilityFx } from "~/installed-game/fx/lifecycle/createFailedSaveRecoveryCapabilityFx";
+import { createGameEngineAcquisitionCapabilityFx } from "~/installed-game/fx/createGameEngineAcquisitionCapabilityFx";
+import { createGameEngineCancellationCapabilityFx } from "~/installed-game/fx/createGameEngineCancellationCapabilityFx";
+import { createGameEngineFinalizationCapabilityFx } from "~/installed-game/fx/createGameEngineFinalizationCapabilityFx";
+import { createFailedSaveRecoveryCapabilityFx } from "~/installed-game/fx/createFailedSaveRecoveryCapabilityFx";
 import type {
 	AcquisitionOwner,
 	GameEngineResourceServiceState,
-} from "~/installed-game/fx/lifecycle/GameEngineResourceServiceState";
+} from "~/installed-game/type/GameEngineResourceServiceState";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 

@@ -7,7 +7,7 @@ import type {
 	Cancellation,
 	GameEngineResourceServiceState,
 	LeaseRecord,
-} from "~/installed-game/fx/lifecycle/GameEngineResourceServiceState";
+} from "~/installed-game/type/GameEngineResourceServiceState";
 
 export namespace createGameEngineCancellationCapabilityFx {
 	export interface Dependencies {

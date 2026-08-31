@@ -7,8 +7,8 @@ import { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
-import { saveEditorAssetFx } from "~/asset-authoring/session/saveEditorAssetFx";
-import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
+import { saveEditorAssetFx } from "~/asset-authoring/fx/saveEditorAssetFx";
+import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

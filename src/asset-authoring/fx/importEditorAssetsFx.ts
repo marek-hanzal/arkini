@@ -11,7 +11,7 @@ import { EditorProjectRepository } from "~/project-authoring/service/EditorProje
 import {
 	type EditorAssetFileInput,
 	validateEditorAssetFileFx,
-} from "~/asset-authoring/validation/validateEditorAssetFileFx";
+} from "~/asset-authoring/fx/validateEditorAssetFileFx";
 
 type ImportEditorAssetsProps =
 	| {

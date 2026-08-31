@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { importEditorAssetsFx } from "~/asset-authoring/session/importEditorAssetsFx";
+import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {

@@ -14,6 +14,7 @@ export interface EditorAssetFileInput {
 	readonly arrayBuffer: () => Promise<ArrayBuffer>;
 }
 
+/** Admits one browser file as a bounded Editor PNG resource. */
 export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
 	inputFile: EditorAssetFileInput,
 	resourceIdOverride?: string,

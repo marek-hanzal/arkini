@@ -9,7 +9,7 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/project-authoring/service/EditorProjectRepository";
-import { importEditorAssetsFx } from "~/asset-authoring/session/importEditorAssetsFx";
+import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 

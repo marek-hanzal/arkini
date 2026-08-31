@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type ChangeEventHandler, type RefObject, useRef } from "react";
 
-import { importEditorAssetsFx } from "~/asset-authoring/session/importEditorAssetsFx";
+import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

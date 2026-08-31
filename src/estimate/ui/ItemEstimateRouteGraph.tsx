@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
 import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
@@ -20,7 +20,7 @@ export const ItemEstimateRouteGraph = ({
 	projectId,
 	routeSteps,
 }: {
-	readonly config: EditorProject["config"];
+	readonly config: Project["config"];
 	readonly header: ReactNode;
 	readonly projectId: string;
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;

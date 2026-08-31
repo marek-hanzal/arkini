@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 
 interface DeleteEditorAssetProps {
@@ -13,7 +13,7 @@ interface DeleteEditorAssetProps {
 export const deleteEditorAssetFx = Effect.fn("deleteEditorAssetFx")(function* (
 	props: DeleteEditorAssetProps,
 ) {
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {

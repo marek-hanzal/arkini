@@ -2,9 +2,9 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
-import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -18,7 +18,7 @@ const decoder = new TextDecoder("utf-8", {
 
 export namespace readVersionSnapshotFx {
 	export interface Props {
-		readonly manifest: EditorVersionManifestSchema.Type;
+		readonly manifest: VersionManifestSchema.Type;
 		readonly objectCache?: Map<string, Uint8Array>;
 		readonly paths: ProjectPaths;
 	}
@@ -27,7 +27,7 @@ export namespace readVersionSnapshotFx {
 		readonly arkpack: GameVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
-		readonly scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;
+		readonly scenarios: ReadonlyArray<BoardScenarioFileSchema.Type>;
 		readonly contentFingerprint: string;
 	}
 }
@@ -40,7 +40,7 @@ export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function
 }: readVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const manifest = yield* Effect.try({
-		try: () => EditorVersionManifestSchema.parse(candidateManifest),
+		try: () => VersionManifestSchema.parse(candidateManifest),
 		catch: (cause) =>
 			new Error("The Editor version manifest is invalid.", {
 				cause,
@@ -172,14 +172,14 @@ export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function
 	}
 	resources.sort((left, right) => left.id.localeCompare(right.id));
 
-	const scenarios: Array<EditorBoardScenarioFileSchema.Type> = [];
+	const scenarios: Array<BoardScenarioFileSchema.Type> = [];
 	for (const [name, hash] of Object.entries(manifest.scenarios).sort(([left], [right]) =>
 		left.localeCompare(right),
 	)) {
 		const scenario = yield* readJsonObjectFx(hash).pipe(
 			Effect.flatMap((candidate) =>
 				Effect.try({
-					try: () => EditorBoardScenarioFileSchema.parse(candidate),
+					try: () => BoardScenarioFileSchema.parse(candidate),
 					catch: (cause) =>
 						new Error(`Editor version Board scenario ${name} is invalid.`, {
 							cause,

@@ -3,8 +3,8 @@ import { Deferred, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { routeTree } from "~/_route";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
@@ -44,7 +44,7 @@ export const tearDownEditorProjectRouteTest = async () => {
 	Reflect.deleteProperty(window, "arkini");
 };
 
-const createProject = (projectId: string, revision = 1): EditorProject => ({
+const createProject = (projectId: string, revision = 1): Project => ({
 	projectId,
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,
@@ -55,9 +55,7 @@ const createProject = (projectId: string, revision = 1): EditorProject => ({
 	resources: editorTestPayload.resources,
 });
 
-const createRepository = (
-	projects: ReadonlyMap<string, EditorProject>,
-): EditorProjectRepositoryService => ({
+const createRepository = (projects: ReadonlyMap<string, Project>): ProjectRepositoryService => ({
 	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected createProjectFx call."),
@@ -144,7 +142,7 @@ export const createEditorProjectRouteHarness = async () => {
 		events,
 		owner: trackedOwner,
 		projectA,
-		setProject: (project: EditorProject) => projects.set(project.projectId, project),
+		setProject: (project: Project) => projects.set(project.projectId, project),
 		releaseProjectA,
 		rendererRuntime,
 		router,

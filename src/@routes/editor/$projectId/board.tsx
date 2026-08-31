@@ -10,7 +10,7 @@ import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
 import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
 import { EditorBoardItemDetailLink } from "~/board-scenario/ui/EditorBoardItemDetailLink";
 import { EditorBoardProductionLineLink } from "~/board-scenario/ui/EditorBoardProductionLineLink";
-import { EditorBoardScenarioToolbar } from "~/board-scenario/ui/EditorBoardScenarioToolbar";
+import { BoardScenarioToolbar } from "~/board-scenario/ui/BoardScenarioToolbar";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 
 type EditorGameResource = GameEngineResource<EditorBoardGame>;
@@ -72,7 +72,7 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 			state.resource.game.projectRevision === project.revision;
 		return (
 			<section className="grid size-full min-h-0 grid-rows-[auto_minmax(0,1fr)]">
-				<EditorBoardScenarioToolbar
+				<BoardScenarioToolbar
 					game={ready ? state.resource.game : undefined}
 					project={project}
 				/>

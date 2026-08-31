@@ -5,7 +5,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type ChangeEventHandler, type RefObject, useRef } from "react";
 
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
@@ -47,10 +47,10 @@ type ImportEditorAssetsProps =
 	  };
 
 const importEditorAssetsCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.fn((variables: ImportEditorAssetsProps) =>
 			importEditorAssetsFx(variables).pipe(
-				Effect.provideService(EditorProjectRepository, repository),
+				Effect.provideService(ProjectRepository, repository),
 			),
 		).pipe(Atom.withLabel("EditorAssetsImport"), Atom.setIdleTTL(0)),
 	),

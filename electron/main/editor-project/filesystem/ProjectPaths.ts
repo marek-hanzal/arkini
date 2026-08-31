@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { EditorObjectHashSchema } from "~/project-version/schema/EditorObjectHashSchema";
+import type { VersionObjectHashSchema } from "~/project-version/schema/VersionObjectHashSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 /** Complete path grammar below one portable Editor project root. */
@@ -31,6 +31,6 @@ export interface ProjectPaths {
 	readonly versionDirectoryFx: (versionId: string) => Effect.Effect<string>;
 	readonly versionDescriptorFileFx: (versionId: string) => Effect.Effect<string>;
 	readonly versionManifestFileFx: (versionId: string) => Effect.Effect<string>;
-	readonly jsonObjectFileFx: (hash: EditorObjectHashSchema.Type) => Effect.Effect<string>;
-	readonly pngObjectFileFx: (hash: EditorObjectHashSchema.Type) => Effect.Effect<string>;
+	readonly jsonObjectFileFx: (hash: VersionObjectHashSchema.Type) => Effect.Effect<string>;
+	readonly pngObjectFileFx: (hash: VersionObjectHashSchema.Type) => Effect.Effect<string>;
 }

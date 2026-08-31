@@ -38,9 +38,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 
 vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
-	const { EditorProjectRepository } = await import(
-		"~/project-authoring/service/EditorProjectRepository"
-	);
+	const { ProjectRepository } = await import("~/project-authoring/service/ProjectRepository");
 	const repository = {
 		deleteProjectFx: (projectId: string) => Effect.sync(() => deletion.run(projectId)),
 	};
@@ -49,17 +47,17 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 			runSync: (effect: EffectModule.Effect<unknown, unknown, unknown>) =>
 				Effect.runSync(
 					effect.pipe(
-						Effect.provideService(EditorProjectRepository, repository as never),
+						Effect.provideService(ProjectRepository, repository as never),
 					) as EffectModule.Effect<unknown, unknown, never>,
 				),
 		},
 	};
 });
 
-vi.mock("~/project-authoring/fx/createFreshEditorProjectFx", async () => {
+vi.mock("~/project-authoring/fx/createFreshProjectFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		createFreshEditorProjectFx: () => Effect.die("Unexpected create."),
+		createFreshProjectFx: () => Effect.die("Unexpected create."),
 	};
 });
 

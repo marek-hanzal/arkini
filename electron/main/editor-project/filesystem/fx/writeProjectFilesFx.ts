@@ -11,8 +11,8 @@ import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
+import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
@@ -177,8 +177,8 @@ export namespace writeProjectFilesFx {
 		readonly previous?: ProjectFiles;
 		readonly next: ProjectFiles;
 		readonly previousScenarioNames?: ReadonlyArray<string>;
-		readonly scenarios?: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;
-		readonly versionHead?: EditorVersionHeadFileSchema.Type;
+		readonly scenarios?: ReadonlyArray<BoardScenarioFileSchema.Type>;
+		readonly versionHead?: VersionHeadFileSchema.Type;
 	}
 }
 
@@ -203,7 +203,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				props.scenarios === undefined
 					? undefined
 					: yield* Effect.try({
-							try: () => EditorBoardScenarioFileSchema.array().parse(props.scenarios),
+							try: () => BoardScenarioFileSchema.array().parse(props.scenarios),
 							catch: (cause) =>
 								new Error("The Editor Board scenarios are invalid.", {
 									cause,
@@ -213,7 +213,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				props.versionHead === undefined
 					? undefined
 					: yield* Effect.try({
-							try: () => EditorVersionHeadFileSchema.parse(props.versionHead),
+							try: () => VersionHeadFileSchema.parse(props.versionHead),
 							catch: (cause) =>
 								new Error("The Editor version head is invalid.", {
 									cause,

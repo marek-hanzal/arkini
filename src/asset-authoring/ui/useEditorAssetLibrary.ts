@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
@@ -13,7 +13,7 @@ interface UseEditorAssetLibraryProps {
 interface UseEditorAssetLibraryOutput {
 	readonly empty: boolean;
 	readonly projectId: string;
-	readonly resources: ReadonlyArray<EditorProject["resources"][number]>;
+	readonly resources: ReadonlyArray<Project["resources"][number]>;
 }
 
 /** Projects the canonical resource catalog through its usage and fuzzy-search filters. */

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import { checkoutEditorProjectVersionFx } from "~/project-version/fx/checkoutEditorProjectVersionFx";
+import { checkoutProjectVersionFx } from "~/project-version/fx/checkoutProjectVersionFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { IdSchema } from "~/game-config/schema/IdSchema";
@@ -38,7 +38,7 @@ export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVers
 				running = true;
 				try {
 					await rendererRuntime.runPromise(
-						checkoutEditorProjectVersionFx({
+						checkoutProjectVersionFx({
 							confirmDiscardCurrentChanges: true,
 							projectId: request.projectId,
 							versionId: request.versionId,

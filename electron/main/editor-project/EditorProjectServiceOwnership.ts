@@ -1,26 +1,26 @@
 import type { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type {
-	EditorProjectRepository,
-	EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
-import type { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+	ProjectRepository,
+	ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
+import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 
 export interface OwnedEditorProjectRepository
-	extends EditorProjectRepositoryService,
+	extends ProjectRepositoryService,
 		EditorBuildRepositoryService {
 	readonly closeFx: Effect.Effect<void>;
 	readonly openProjectFx: (
-		props: EditorProjectRepository.OpenProjectProps,
-	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+		props: ProjectRepository.OpenProjectProps,
+	) => Effect.Effect<Project, ProjectRepositoryError>;
 	readonly readProjectRootFx: (
 		projectId: string,
-	) => Effect.Effect<string | null, EditorProjectRepositoryError>;
+	) => Effect.Effect<string | null, ProjectRepositoryError>;
 	readonly refreshProjectFx: (
 		projectId: string,
-	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError>;
 }
 
 /** Editor persistence may fail independently; gameplay must still boot. */

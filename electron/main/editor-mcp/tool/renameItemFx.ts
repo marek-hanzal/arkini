@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { renameFx } from "~/item-authoring/fx/renameFx";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 
@@ -17,8 +17,8 @@ export const renameItemFx = Effect.fn("renameItemFx")(function* ({
 	readonly itemId: string;
 	readonly newItemId: string;
 	readonly notifyProjectChanged: (projectId: string) => void;
-	readonly project: EditorProject;
-	readonly repository: EditorProjectRepositoryService;
+	readonly project: Project;
+	readonly repository: ProjectRepositoryService;
 	readonly revision?: number;
 }) {
 	if (revision !== undefined && revision !== project.revision)

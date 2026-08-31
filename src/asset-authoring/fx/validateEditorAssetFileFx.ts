@@ -6,7 +6,7 @@ import {
 } from "~/game-config-resource/fx/validatePngResourceFx";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
+import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 
 export interface EditorAssetFileInput {
 	readonly name: string;
@@ -24,7 +24,7 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 		inputFile.size > PngResourceLimits.maxBytes
 	) {
 		return yield* Effect.fail(
-			new EditorProjectError({
+			new ProjectOperationError({
 				reason: "invalid-asset",
 				message: `Asset ${inputFile.name} must be a PNG no larger than ${PngResourceLimits.maxBytes} bytes.`,
 			}),
@@ -34,7 +34,7 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 	const resourceId = yield* Effect.try({
 		try: () => IdSchema.parse(projectedResourceId),
 		catch: (cause) =>
-			new EditorProjectError({
+			new ProjectOperationError({
 				reason: "invalid-resource-id",
 				message: `Asset ${inputFile.name} does not produce a valid resource ID.`,
 				cause,
@@ -43,7 +43,7 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 	const bytes = yield* Effect.tryPromise({
 		try: async () => new Uint8Array(await inputFile.arrayBuffer()),
 		catch: (cause) =>
-			new EditorProjectError({
+			new ProjectOperationError({
 				reason: "invalid-asset",
 				message: `Asset ${resourceId} could not be read.`,
 				cause,
@@ -52,7 +52,7 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 	yield* validatePngResourceFx(bytes, resourceId).pipe(
 		Effect.mapError(
 			(cause) =>
-				new EditorProjectError({
+				new ProjectOperationError({
 					reason: "invalid-asset",
 					message: cause.message.replace(/^Resource /, "Asset "),
 					cause,

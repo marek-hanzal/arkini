@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const boardSpaceProject = {
@@ -32,4 +32,4 @@ export const boardSpaceProject = {
 		},
 	},
 	resources: editorTestPayload.resources,
-} satisfies EditorProject;
+} satisfies Project;

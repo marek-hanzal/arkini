@@ -1,14 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { EditorProjectAppearanceSection } from "~/project-authoring/ui/EditorProjectAppearanceSection";
-import { EditorProjectBoardSection } from "~/project-authoring/ui/EditorProjectBoardSection";
-import { EditorProjectGeneralSection } from "~/project-authoring/ui/EditorProjectGeneralSection";
-import { EditorProjectInventorySection } from "~/project-authoring/ui/EditorProjectInventorySection";
-import {
-	type EditorProjectSectionId,
-	EditorProjectSectionIds,
-} from "~/project-authoring/type/EditorProjectSections";
-import { EditorProjectToolbarSection } from "~/project-authoring/ui/EditorProjectToolbarSection";
+import { ProjectAppearanceSection } from "~/project-authoring/ui/ProjectAppearanceSection";
+import { ProjectBoardSection } from "~/project-authoring/ui/ProjectBoardSection";
+import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSection";
+import { ProjectInventorySection } from "~/project-authoring/ui/ProjectInventorySection";
+import { type ProjectSectionId, ProjectSectionIds } from "~/project-authoring/type/ProjectSections";
+import { ProjectToolbarSection } from "~/project-authoring/ui/ProjectToolbarSection";
 
 interface EditorProjectSectionSearch {
 	readonly avatar?: number;
@@ -24,7 +21,7 @@ export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 			: {};
 	},
 	beforeLoad: ({ params }) => {
-		if (EditorProjectSectionIds.some((section) => section === params.sectionId)) return;
+		if (ProjectSectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/project/$sectionId",
 			params: {
@@ -37,17 +34,17 @@ export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const { avatar } = Route.useSearch();
-		switch (sectionId as EditorProjectSectionId) {
+		switch (sectionId as ProjectSectionId) {
 			case "general":
-				return <EditorProjectGeneralSection />;
+				return <ProjectGeneralSection />;
 			case "appearance":
-				return <EditorProjectAppearanceSection initialAvatarIndex={avatar ?? 0} />;
+				return <ProjectAppearanceSection initialAvatarIndex={avatar ?? 0} />;
 			case "board":
-				return <EditorProjectBoardSection />;
+				return <ProjectBoardSection />;
 			case "toolbar":
-				return <EditorProjectToolbarSection />;
+				return <ProjectToolbarSection />;
 			case "inventory":
-				return <EditorProjectInventorySection />;
+				return <ProjectInventorySection />;
 		}
 	},
 });

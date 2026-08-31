@@ -9,7 +9,7 @@ import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildContro
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorProjectExport } from "~/project-authoring/ui/EditorProjectExport";
+import { ProjectSourceExport } from "~/project-authoring/ui/ProjectSourceExport";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const buildStatusLabels = {
@@ -145,7 +145,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						)}
 					</article>
 				)}
-				<EditorProjectExport projectId={controller.project.projectId} />
+				<ProjectSourceExport projectId={controller.project.projectId} />
 				{controller.installConfirmation === undefined ? null : (
 					<EditorBuildMajorUpdateDialog
 						confirmation={controller.installConfirmation}

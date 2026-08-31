@@ -2,7 +2,7 @@ import { Deferred, Effect, Fiber, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
@@ -10,7 +10,7 @@ import type { GameEngineResource } from "~/playable-game/type/GameEngineResource
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
-const createProject = (revision: number): EditorProject => ({
+const createProject = (revision: number): Project => ({
 	projectId: "editor-board",
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,
@@ -31,7 +31,7 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 			const releaseGate = yield* Deferred.make<void>();
 			const releaseEntered = yield* Deferred.make<void>();
 			const events: string[] = [];
-			const createResourceFx = (project: EditorProject) =>
+			const createResourceFx = (project: Project) =>
 				Effect.gen(function* () {
 					events.push(`create-${project.revision}`);
 					const game = yield* createEditorBoardGameFx({
@@ -117,7 +117,7 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 				const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 				const created: number[] = [];
 				let failFirstDisposal = true;
-				const createResourceFx = (project: EditorProject) =>
+				const createResourceFx = (project: Project) =>
 					Effect.gen(function* () {
 						created.push(project.revision);
 						const game = yield* createEditorBoardGameFx({
@@ -186,7 +186,7 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 			const creationError = new Error("revision creation failed");
 			const created: number[] = [];
 			let failRevisionTwo = true;
-			const createResourceFx = (project: EditorProject) =>
+			const createResourceFx = (project: Project) =>
 				Effect.gen(function* () {
 					created.push(project.revision);
 					if (project.revision === 2 && failRevisionTwo) {

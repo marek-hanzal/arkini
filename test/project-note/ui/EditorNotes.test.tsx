@@ -11,12 +11,12 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		projectId: "project-one",
 	}),
 }));
-vi.mock("~/project-note/atom/EditorNotesCommandAtoms", async () => {
+vi.mock("~/project-note/atom/NoteCommandAtoms", async () => {
 	const { EditorNotesTestCommandAtoms } = await import(
 		"~test/project-note/support/EditorNotesFixture"
 	);
 	return {
-		EditorNotesCommandAtoms: EditorNotesTestCommandAtoms,
+		NoteCommandAtoms: EditorNotesTestCommandAtoms,
 	};
 });
 vi.mock("~/ui/ui/Tooltip", () => ({

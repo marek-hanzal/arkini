@@ -1,7 +1,7 @@
-import type { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
-import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import type { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDescriptorFileSchema";
+import type { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 
 export interface PublishedVersion {
-	readonly descriptor: EditorVersionDescriptorFileSchema.Type;
-	readonly manifest: EditorVersionManifestSchema.Type;
+	readonly descriptor: VersionDescriptorFileSchema.Type;
+	readonly manifest: VersionManifestSchema.Type;
 }

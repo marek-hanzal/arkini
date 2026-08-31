@@ -3,9 +3,9 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
+import type { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
@@ -22,12 +22,12 @@ export namespace createVersionSnapshotFx {
 		readonly config: GameConfigSchema.Type;
 		readonly filesystemWrite: FilesystemWrite;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
-		readonly scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>;
+		readonly scenarios: ReadonlyArray<BoardScenarioSchema.Type>;
 		readonly paths: ProjectPaths;
 	}
 
 	export interface Success {
-		readonly manifest: EditorVersionManifestSchema.Type;
+		readonly manifest: VersionManifestSchema.Type;
 		readonly contentFingerprint: string;
 	}
 }
@@ -46,8 +46,8 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 	const snapshotScenarios = yield* Effect.try({
 		try: () =>
 			scenarios.map((scenario) => {
-				const parsed = EditorBoardScenarioSchema.parse(scenario);
-				return EditorBoardScenarioFileSchema.parse({
+				const parsed = BoardScenarioSchema.parse(scenario);
+				return BoardScenarioFileSchema.parse({
 					name: parsed.name,
 					revision: parsed.projectRevision,
 					version: parsed.version,

@@ -9,21 +9,21 @@ import {
 } from "react";
 
 import { EditorMcpProjectContextSchema } from "../../../electron/contract/editor/EditorMcpProjectContextSchema";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
-import { readEditorProjectFx } from "~/project-authoring/fx/readEditorProjectFx";
+import { readProjectFx } from "~/project-authoring/fx/readProjectFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 /** Carries the latest canonical repository snapshot through one mounted project route. */
-const EditorProjectContext = createContext<EditorProject | undefined>(undefined);
+const EditorProjectContext = createContext<Project | undefined>(undefined);
 
 /** Publishes one committed repository snapshot to the mounted editor tree. */
 export const EditorProjectProvider = ({
 	children,
 	loaded,
 }: PropsWithChildren<{
-	readonly loaded: EditorProject;
+	readonly loaded: Project;
 }>) => {
 	const [project, publish] = useAtom(EditorProjectAtom(loaded.projectId));
 	useLayoutEffect(() => {
@@ -62,7 +62,7 @@ export const EditorProjectProvider = ({
 		const unsubscribe = window.arkini.editor.onProjectChanged((projectId) => {
 			if (projectId !== loaded.projectId) return;
 			void RendererRuntime.runPromise(
-				readEditorProjectFx({
+				readProjectFx({
 					projectId,
 				}),
 			)

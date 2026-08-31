@@ -4,7 +4,7 @@ import { CircleCheckBig } from "lucide-react";
 import { PrimaryButton } from "~/ui/ui/Button";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { Status } from "~/ui/ui/Status";
-import { useEditorVersionCommitController } from "~/project-version/ui/useEditorVersionCommitController";
+import { useVersionCommitController } from "~/project-version/ui/useVersionCommitController";
 
 interface EditorVersionCommitSearch {
 	readonly returnTo?: string;
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 				: undefined,
 	}),
 	component: () => {
-		const controller = useEditorVersionCommitController();
+		const controller = useVersionCommitController();
 		return (
 			<div
 				className="h-full min-h-0 overflow-y-auto p-4"

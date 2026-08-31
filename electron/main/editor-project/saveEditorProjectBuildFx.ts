@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import type { EditorProjectTransport } from "../../contract/editor/EditorProjectTransport";
 import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 
 /** Saves the exact current local Editor build through one native file choice. */
@@ -54,9 +54,9 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 		}).pipe(
 			Effect.provide(NodeServices.layer),
 			Effect.mapError((cause) =>
-				cause instanceof EditorProjectRepositoryError
+				cause instanceof ProjectRepositoryError
 					? cause
-					: new EditorProjectRepositoryError({
+					: new ProjectRepositoryError({
 							operation: "save-project-build",
 							message:
 								cause instanceof Error

@@ -4,8 +4,8 @@ import {
 	type EditorArkpackFileInput,
 	readSelectedArkpackFileFx,
 } from "~/arkpack-admission/fx/readSelectedArkpackFileFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 
 export namespace importEditorArkpackFileFx {
 	export interface Props {
@@ -18,11 +18,11 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 	file,
 }: importEditorArkpackFileFx.Props) {
 	const loaded = yield* readSelectedArkpackFileFx(file);
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	const project = yield* repository.createProjectFx({
 		version: loaded.payload.version,
 		config: loaded.payload.config,
 		resources: loaded.payload.resources,
 	});
-	return project satisfies EditorProjectDescriptor;
+	return project satisfies ProjectDescriptor;
 });

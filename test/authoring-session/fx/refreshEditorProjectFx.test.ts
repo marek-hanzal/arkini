@@ -4,12 +4,12 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
-import { blockEditorProjectWrites } from "~/project-authoring/service/EditorProjectWriteAdmission";
+import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
@@ -81,7 +81,7 @@ const runRefresh = async (mode: "failure" | "renamed" | "same" = "same") => {
 			},
 		},
 	});
-	const repository: EditorProjectRepositoryService = {
+	const repository: ProjectRepositoryService = {
 		...UnusedEditorProjectRepository,
 		awaitIdleFx: Effect.sync(() => events.push("idle")),
 		createProjectFx: () => Effect.die("Unexpected project create."),
@@ -116,7 +116,7 @@ const runRefresh = async (mode: "failure" | "renamed" | "same" = "same") => {
 			refreshEditorProjectFx({
 				projectId: project.projectId,
 			}).pipe(
-				Effect.provideService(EditorProjectRepository, repository),
+				Effect.provideService(ProjectRepository, repository),
 				Effect.provideService(EditorUnsavedChanges, unsaved),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
 			),
@@ -177,7 +177,7 @@ describe("refreshEditorProjectFx", () => {
 	});
 
 	it("reports replacement ownership collisions without touching mounted state", async () => {
-		const release = blockEditorProjectWrites();
+		const release = blockProjectWrites();
 		try {
 			const result = await runRefresh();
 			expect(Exit.isFailure(result.exit)).toBe(true);

@@ -5,16 +5,16 @@ import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { admitEditorProjectWriteFx } from "~/project-authoring/service/EditorProjectWriteAdmission";
-import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
+import { admitProjectWriteFx } from "~/project-authoring/service/ProjectWriteAdmission";
+import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 
 /** Creates the Electron-backed proxy for exact revision-pinned Editor Build operations. */
 export const createElectronEditorBuildRepositoryFx = Effect.sync(
 	(): EditorBuildRepositoryService => ({
 		buildProjectFx: (request) =>
-			admitEditorProjectWriteFx(
+			admitProjectWriteFx(
 				"build-project",
-				invokeEditorProjectTransportFx({
+				invokeProjectTransportFx({
 					call: () => window.arkini.editor.buildProject(request),
 					operation: "build-project",
 					parse: (value) => EditorProjectBuildSchema.parse(value),
@@ -23,7 +23,7 @@ export const createElectronEditorBuildRepositoryFx = Effect.sync(
 				}),
 			),
 		readProjectBuildFx: (request) =>
-			invokeEditorProjectTransportFx({
+			invokeProjectTransportFx({
 				call: () => window.arkini.editor.readProjectBuild(request),
 				operation: "read-project-build",
 				parse: (value) => EditorProjectBuildContentSchema.parse(value),

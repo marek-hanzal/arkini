@@ -6,7 +6,7 @@ import { act, createElement, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorProjectProvider, useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -47,7 +47,7 @@ afterEach(async () => {
 	Reflect.deleteProperty(window, "arkini");
 });
 
-const createProject = (revision: number): EditorProject => ({
+const createProject = (revision: number): Project => ({
 	projectId: "project",
 	title: `Project ${revision}`,
 	version: "1.0",

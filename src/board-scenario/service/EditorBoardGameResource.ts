@@ -1,6 +1,6 @@
 import type { Effect, SubscriptionRef } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
@@ -32,12 +32,12 @@ export namespace EditorBoardGameResource {
 export interface EditorBoardGameResource {
 	readonly state: SubscriptionRef.SubscriptionRef<EditorBoardGameResource.State>;
 	/** Claims the routed project before synchronizing its latest loaded revision. */
-	readonly syncFx: (project: EditorProject) => Effect.Effect<void>;
+	readonly syncFx: (project: Project) => Effect.Effect<void>;
 	/** Synchronizes a committed revision only while its project still owns the route. */
-	readonly publishFx: (project: EditorProject) => Effect.Effect<void>;
+	readonly publishFx: (project: Project) => Effect.Effect<void>;
 	/** Replaces the current same-revision session after an explicit scenario selection. */
 	readonly replaceFx: (
-		project: EditorProject,
+		project: Project,
 		state?: StateSchema.Type,
 	) => Effect.Effect<void, unknown>;
 	readonly releaseCurrentFx: Effect.Effect<void, unknown>;

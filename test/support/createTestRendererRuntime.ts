@@ -3,17 +3,17 @@ import { Effect, Layer, ManagedRuntime } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
 import {
 	EditorBuildRepository,
 	type EditorBuildRepositoryService,
 } from "~/editor-build/service/EditorBuildRepository";
 import {
-	EditorProjectRepositoryError,
-	type EditorProjectRepositoryOperation,
-} from "~/project-authoring/error/EditorProjectRepositoryError";
+	ProjectRepositoryError,
+	type ProjectRepositoryOperation,
+} from "~/project-authoring/error/ProjectRepositoryError";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";
@@ -29,19 +29,19 @@ export interface TestRendererRuntimeProps {
 		packageId: string,
 	) => Effect.Effect<InstalledGameEngineResource, unknown>;
 	readonly editorBuildRepository?: EditorBuildRepositoryService;
-	readonly editorProjectRepository?: EditorProjectRepositoryService;
+	readonly editorProjectRepository?: ProjectRepositoryService;
 }
 
-const unavailableEditorProjectRepositoryFx = (operation: EditorProjectRepositoryOperation) =>
+const unavailableEditorProjectRepositoryFx = (operation: ProjectRepositoryOperation) =>
 	Effect.fail(
-		new EditorProjectRepositoryError({
+		new ProjectRepositoryError({
 			operation,
 			message: "This test did not provide an editor project repository.",
 		}),
 	);
 
 /** Fail-fast default for tests which do not exercise editor persistence. */
-const UnavailableEditorProjectRepository: EditorProjectRepositoryService = {
+const UnavailableEditorProjectRepository: ProjectRepositoryService = {
 	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => unavailableEditorProjectRepositoryFx("create-project"),
@@ -73,7 +73,7 @@ export const createTestRendererRuntime = ({
 		Layer.mergeAll(
 			Layer.succeed(AtomRegistry.AtomRegistry, atomRegistry),
 			Layer.succeed(EditorBuildRepository, editorBuildRepository),
-			Layer.succeed(EditorProjectRepository, editorProjectRepository),
+			Layer.succeed(ProjectRepository, editorProjectRepository),
 			Layer.effect(
 				EditorUnsavedChanges,
 				createEditorUnsavedChangesOwnerFx().pipe(

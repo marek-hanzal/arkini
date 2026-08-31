@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { createEditorNotesCommandAtomsFx } from "~/project-note/fx/createEditorNotesCommandAtomsFx";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { createNoteCommandAtomsFx } from "~/project-note/fx/createNoteCommandAtomsFx";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 export const editorNotesTestState = {
 	createFailures: 0,
@@ -40,7 +40,7 @@ const repository = {
 				return note;
 			},
 			catch: (cause) =>
-				new EditorProjectRepositoryError({
+				new ProjectRepositoryError({
 					operation: "create-note",
 					message: cause instanceof Error ? cause.message : String(cause),
 					cause,
@@ -50,6 +50,4 @@ const repository = {
 	deleteNoteFx: () => Effect.die("Unexpected note delete."),
 };
 
-export const EditorNotesTestCommandAtoms = Effect.runSync(
-	createEditorNotesCommandAtomsFx(repository),
-);
+export const EditorNotesTestCommandAtoms = Effect.runSync(createNoteCommandAtomsFx(repository));

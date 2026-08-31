@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { saveWithRepositoryFx } from "~/item-authoring/fx/saveWithRepositoryFx";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -18,8 +18,8 @@ export const editItemFx = Effect.fn("editItemFx")(function* ({
 }: {
 	readonly input: EditItemInput;
 	readonly notifyProjectChanged: (projectId: string) => void;
-	readonly project: EditorProject;
-	readonly repository: EditorProjectRepositoryService;
+	readonly project: Project;
+	readonly repository: ProjectRepositoryService;
 	readonly type: TypeSchema.Type;
 }) {
 	const current = project.config.items[input.itemId];

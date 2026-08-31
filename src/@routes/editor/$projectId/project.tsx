@@ -2,24 +2,21 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { EditorCompatibilityNotice } from "~/project-version/ui/EditorCompatibilityNotice";
+import { ProjectCompatibilityNotice } from "~/project-version/ui/ProjectCompatibilityNotice";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
-import { EditorProjectFormProvider } from "~/project-authoring/ui/EditorProjectFormContext";
-import { EditorProjectSectionLink } from "~/project-authoring/ui/EditorProjectSectionLink";
-import {
-	EditorProjectSections,
-	type EditorProjectSectionId,
-} from "~/project-authoring/type/EditorProjectSections";
-import { useEditorProjectFormController } from "~/project-authoring/ui/useEditorProjectFormController";
+import { ProjectFormProvider } from "~/project-authoring/ui/ProjectFormContext";
+import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
+import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
+import { useProjectFormController } from "~/project-authoring/ui/useProjectFormController";
 
 export const Route = createFileRoute("/editor/$projectId/project")({
 	component: () => {
 		const navigate = useNavigate();
 		const project = useEditorProject();
 		const onInvalidSection = useCallback(
-			(sectionId: EditorProjectSectionId) =>
+			(sectionId: ProjectSectionId) =>
 				navigate({
 					to: "/editor/$projectId/project/$sectionId",
 					params: {
@@ -32,11 +29,11 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 				project.projectId,
 			],
 		);
-		const controller = useEditorProjectFormController({
+		const controller = useProjectFormController({
 			onInvalidSection,
 		});
 		return (
-			<EditorProjectFormProvider value={controller}>
+			<ProjectFormProvider value={controller}>
 				<section
 					className="h-full min-h-0"
 					data-ui="EditorProjectForm"
@@ -53,7 +50,7 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 							/>
 						}
 						notice={
-							<EditorCompatibilityNotice
+							<ProjectCompatibilityNotice
 								compatibility={controller.compatibility}
 								version={project.version}
 							/>
@@ -62,8 +59,8 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 						saving={controller.isSaving}
 						tabs={
 							<EditorSectionTabs>
-								{EditorProjectSections.map((candidate) => (
-									<EditorProjectSectionLink
+								{ProjectSections.map((candidate) => (
+									<ProjectSectionLink
 										key={candidate.id}
 										projectId={project.projectId}
 										section={candidate}
@@ -75,7 +72,7 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 						<Outlet />
 					</EditorFormSectionPage>
 				</section>
-			</EditorProjectFormProvider>
+			</ProjectFormProvider>
 		);
 	},
 });

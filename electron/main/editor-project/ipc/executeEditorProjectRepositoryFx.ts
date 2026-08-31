@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "../../../contract/editor/EditorProjectTransport";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 import type {
 	EditorProjectServiceOwnership,
@@ -12,17 +12,17 @@ import type {
 export const executeEditorProjectRepositoryFx = <Request, Value>(
 	operation: EditorProjectTransport.Operation,
 	ownership: EditorProjectServiceOwnership,
-	requestFx: Effect.Effect<Request, EditorProjectRepositoryError>,
+	requestFx: Effect.Effect<Request, ProjectRepositoryError>,
 	run: (
 		repository: OwnedEditorProjectRepository,
 		request: Request,
-	) => Effect.Effect<Value, EditorProjectRepositoryError>,
+	) => Effect.Effect<Value, ProjectRepositoryError>,
 ): Effect.Effect<EditorProjectTransport.Result<Value>> =>
 	requestFx.pipe(
 		Effect.flatMap((request) =>
 			ownership.type === "unavailable"
 				? Effect.fail(
-						new EditorProjectRepositoryError({
+						new ProjectRepositoryError({
 							operation,
 							message: ownership.message,
 						}),

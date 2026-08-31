@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
-const project: EditorProject = {
+const project: Project = {
 	projectId: "editor-board",
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,

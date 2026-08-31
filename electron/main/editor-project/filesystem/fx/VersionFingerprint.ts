@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
-import type { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import type { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
+import type { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 
 const encoder = new TextEncoder();
 
@@ -27,8 +27,8 @@ const sortedRecord = (
 
 /** Hashes authored content while excluding checkout-specific scenario provenance. */
 export const createVersionFingerprint = (
-	manifest: EditorVersionManifestSchema.Type,
-	scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>,
+	manifest: VersionManifestSchema.Type,
+	scenarios: ReadonlyArray<BoardScenarioFileSchema.Type>,
 ) =>
 	hashVersionBytes(
 		encoder.encode(

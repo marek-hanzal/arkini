@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
-import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

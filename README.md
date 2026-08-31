@@ -34,7 +34,7 @@ src/simulation-time  canonical fixed simulation quantum shared by time-aware gam
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
 src/temporary-item  temporary lifetime advancement, expiry admission and atomic expiry output
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
-src/item-query  canonical Runtime Item query execution across authored reach, scope and distance
+src/item-query  authored Item query schemas and canonical Runtime execution across scope, reach and distance
 src/item-resolution  canonical configured Item lookup and exact not-found rejection
 src/item-revision  opaque live Item revisions, fresh creation and stale-write rejection
 src/item-state-isolation  atomic stateful-owner stack isolation and pure-remainder placement
@@ -50,7 +50,7 @@ src/tile-presentation  semantic tile actors, feedback, replacements and committe
 src/tile-rendering  Pixi application/frame/texture lifecycle, native actors, visuals and animation capabilities
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
 src/tile-interaction  pointer gestures, drag/drop execution, gameplay command admission and cancellation
-src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
+src/item-definition  immutable authored Item schemas, selector vocabulary and total selection policy
 src/item-location  grid coordinates, distance, runtime locations, claims and Board/grid location rejections
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
 src/item-merge  directional merge contracts, admission and atomic source/target lifecycle

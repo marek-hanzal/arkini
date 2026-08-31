@@ -5,7 +5,7 @@ import type { Game } from "~/installed-game/type/Game";
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import { writeLastPackageIdFx } from "~/renderer/launcher/writeLastPackageIdFx";
+import { writeLastPackageIdFx } from "~/installed-game/fx/writeLastPackageIdFx";
 
 export namespace acquireGameEngineResourceFx {
 	export interface Props {

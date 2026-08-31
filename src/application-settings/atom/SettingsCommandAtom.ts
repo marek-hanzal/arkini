@@ -7,7 +7,7 @@ import { setAppearanceThemeAtom } from "~/application-settings/atom/setAppearanc
 import { setCheatAvailabilityAtom } from "~/application-settings/atom/setCheatAvailabilityAtom";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
-import { setWindowModeAtom } from "~/renderer/window/setWindowModeAtom";
+import { setWindowModeAtom } from "~/window-mode/atom/setWindowModeAtom";
 
 type SettingsCommandAction = "cheat-tools" | "window-mode" | "theme" | "exit";
 

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
-import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
-import { WindowModeReadyAtom } from "~/renderer/window/WindowModeReadyAtom";
+import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
+import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";
 
 /** Installs the process-lifetime renderer listener for Electron-confirmed mode changes. */
 export const installWindowModeSyncFx = Effect.fn("installWindowModeSyncFx")(() =>

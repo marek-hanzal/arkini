@@ -25,7 +25,7 @@ Read the smallest entry point needed for the task:
 src/game-runtime  canonical live Runtime schemas, Item purity/stateful rejection, cheat state, validation, identity, reads and atomic publication
 src/game-session  package-independent Runtime/Tick/save execution, subscriptions, fail-stop and disposal lifecycle
 src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
-src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization and recovery
+src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization, recovery and last successful package preference
 src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
 src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
 src/application-version  Arkini writer provenance, major-only admission and incompatibility failure
@@ -67,7 +67,7 @@ src/game-config  authored value/config schemas and loaded-config capability
 src/game-config-cli  schema generation and completed-project validation commands
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
 src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation and typed validation failure
-src/game-config-resource  authored resource schemas, references, source discovery, usage and rename semantics
+src/game-config-resource  authored resource schemas, bounded PNG admission, references, source discovery, usage and rename semantics
 src/game-config-source  portable source layout, schemas, discovery, parsing and project admission
 src/game-config-validation  completed-config semantic validation and provenance-aware diagnostics
 src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
@@ -103,9 +103,9 @@ src/application-diagnostics  shared renderer-side failure extraction, diagnostic
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
 src/application-settings  Appearance, Cheat availability and application Settings state, commands and presentation
 src/application-shell  renderer root context, fatal surface and shared route transition/navigation behavior
+src/window-mode  native window-mode state, persistence and Electron-confirmed synchronization
 src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
 src/authoring-form  shared Editor form registry and canonical authored Item-reference controls
-src/renderer  remaining launcher preference, PNG validation and window-mode transport capabilities
 src/ui        cross-product primitives and general controls only
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership

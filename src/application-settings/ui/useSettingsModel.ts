@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react";
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
 import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
-import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
+import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { SettingsCommandAtom } from "~/application-settings/atom/SettingsCommandAtom";
 

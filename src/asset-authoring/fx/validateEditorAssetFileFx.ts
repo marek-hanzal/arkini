@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import {
 	PngResourceLimits,
 	validatePngResourceFx,
-} from "~/renderer/resource/validatePngResourceFx";
+} from "~/game-config-resource/fx/validatePngResourceFx";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";

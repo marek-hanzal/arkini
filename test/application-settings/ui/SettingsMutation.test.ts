@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
-import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
+import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import {
 	buttonByText,
 	linkByText,

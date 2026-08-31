@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { validatePngResourceFx } from "~/renderer/resource/validatePngResourceFx";
+import { validatePngResourceFx } from "~/game-config-resource/fx/validatePngResourceFx";
 import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";

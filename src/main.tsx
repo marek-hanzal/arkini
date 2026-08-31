@@ -17,7 +17,7 @@ import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEdit
 import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/installEditorMcpVersionCheckoutFx";
 import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
-import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";
+import { installWindowModeSyncFx } from "~/window-mode/fx/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
 import {

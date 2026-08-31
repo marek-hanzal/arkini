@@ -17,7 +17,7 @@ export const PngResourceLimits = {
 	maxPixels: 16 * 1024 * 1024,
 } as const;
 
-/** Decodes one bounded PNG and releases the temporary browser bitmap. */
+/** Admits one bounded PNG resource and releases the temporary browser bitmap. */
 export const validatePngResourceFx = Effect.fn("validatePngResourceFx")(
 	(bytes: Uint8Array, resourceId: string) =>
 		Effect.scoped(

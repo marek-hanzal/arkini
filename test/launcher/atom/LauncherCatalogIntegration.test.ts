@@ -24,7 +24,7 @@ vi.mock("~/application-settings/fx/readAppearanceThemeFx", () => ({
 vi.mock("~/application-settings/fx/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
-vi.mock("~/renderer/window/readWindowModeFx", () => ({
+vi.mock("~/window-mode/fx/readWindowModeFx", () => ({
 	readWindowModeFx: () => Effect.succeed("bordered"),
 }));
 vi.mock("~/launcher/atom/LauncherHeroAtom", () => ({

@@ -35,10 +35,10 @@ vi.mock("~/application-settings/fx/readAppearanceThemeFx", () => ({
 vi.mock("~/application-settings/fx/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
-vi.mock("~/renderer/window/readWindowModeFx", () => ({
+vi.mock("~/window-mode/fx/readWindowModeFx", () => ({
 	readWindowModeFx: () => Effect.succeed("bordered"),
 }));
-vi.mock("~/renderer/launcher/readLastPackageIdFx", () => ({
+vi.mock("~/installed-game/fx/readLastPackageIdFx", () => ({
 	readLastPackageIdFx: () => Effect.succeed(harness.lastPackageId),
 }));
 vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({

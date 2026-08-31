@@ -82,7 +82,7 @@
 		"src/arkpack-artifact",
 		"src/arkpack-catalog",
 		"src/arkpack-cli",
-		"src/arkpack",
+		"src/arkpack-selector",
 		"src/asset-authoring",
 		"src/editor-build",
 		"src/project-authoring",

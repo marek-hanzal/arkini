@@ -7,7 +7,7 @@ import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import {
 	cleanupArkpackSelectorTests,
 	renderArkpackSelector,
-} from "~test/arkpack/ui/ArkpackSelector.test/fixture";
+} from "~test/arkpack-selector/ui/ArkpackSelector.test/fixture";
 
 afterEach(async () => {
 	await cleanupArkpackSelectorTests();

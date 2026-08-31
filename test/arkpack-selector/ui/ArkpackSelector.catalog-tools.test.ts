@@ -8,11 +8,11 @@ import {
 	buttonByText,
 	cleanupArkpackSelectorTests,
 	renderArkpackSelector,
-} from "~test/arkpack/ui/ArkpackSelector.test/fixture";
+} from "~test/arkpack-selector/ui/ArkpackSelector.test/fixture";
 
 const openEditorArkpack = vi.hoisted(() => vi.fn());
 
-vi.mock("~/arkpack/ui/editor/openEditorArkpackAtom", async () => {
+vi.mock("~/project-authoring/atom/openEditorArkpackAtom", async () => {
 	const { Effect } = await import("effect");
 	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {

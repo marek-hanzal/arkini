@@ -6,10 +6,10 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
+import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
-import { removeArkpackAtom } from "~/arkpack/ui/removeArkpackAtom";
+import { removeArkpackAtom } from "~/arkpack-selector/atom/removeArkpackAtom";
 
 (
 	globalThis as {

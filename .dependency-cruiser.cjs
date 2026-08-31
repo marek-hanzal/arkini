@@ -11,6 +11,9 @@ const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
 const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
 const itemRevisionPattern = "^src/item-revision(?:/|$)";
+const arkpackArtifactPattern = "^src/arkpack-artifact(?:/|$)";
+const arkpackAdmissionPattern = "^src/arkpack-admission(?:/|$)";
+const arkpackCatalogPattern = "^src/arkpack-catalog(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -73,6 +76,40 @@ module.exports = {
 			},
 			to: {
 				path: "^src/application-version(?:/|$)",
+			},
+		},
+		{
+			name: "arkpack-artifact-stays-upstream",
+			comment:
+				"Artifact bytes, provenance, and publication never import admission, catalog, or selector consumers.",
+			severity: "error",
+			from: {
+				path: arkpackArtifactPattern,
+			},
+			to: {
+				path: "^src/arkpack-(?:admission|catalog|selector)(?:/|$)",
+			},
+		},
+		{
+			name: "arkpack-admission-stays-upstream",
+			comment: "Package admission never imports catalog or selector consumers.",
+			severity: "error",
+			from: {
+				path: arkpackAdmissionPattern,
+			},
+			to: {
+				path: "^src/arkpack-(?:catalog|selector)(?:/|$)",
+			},
+		},
+		{
+			name: "arkpack-catalog-stays-upstream",
+			comment: "The authoritative catalog runtime never imports selector presentation.",
+			severity: "error",
+			from: {
+				path: arkpackCatalogPattern,
+			},
+			to: {
+				path: "^src/arkpack-selector(?:/|$)",
 			},
 		},
 		{

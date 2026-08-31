@@ -6,8 +6,3 @@ export class FilesystemWriteError extends Data.TaggedError("FilesystemWriteError
 	readonly cause?: unknown;
 	readonly recovery?: string;
 }> {}
-
-export const withFilesystemWriteRecovery = (message: string, cause: unknown) =>
-	cause instanceof FilesystemWriteError && cause.recovery !== undefined
-		? `${message} Recovery was preserved at ${cause.recovery}.`
-		: message;

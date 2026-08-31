@@ -13,6 +13,11 @@ import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBo
 import { ProjectVersionCheckoutConfirmationRequired } from "~/project-version/error/ProjectVersionCheckoutConfirmationRequired";
 import { checkoutProjectVersionFx } from "~/project-version/fx/checkoutProjectVersionFx";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import {
+	ProjectWriteAdmission,
+	type ProjectWriteAdmissionService,
+} from "~/project-authoring/service/ProjectWriteAdmission";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
@@ -31,10 +36,12 @@ const runCheckout = async ({
 	confirm = true,
 	dirty = false,
 	fail = false,
+	writeAdmission = Effect.runSync(createProjectWriteAdmissionFx),
 }: {
 	readonly confirm?: boolean;
 	readonly dirty?: boolean;
 	readonly fail?: boolean;
+	readonly writeAdmission?: ProjectWriteAdmissionService;
 } = {}) => {
 	const events: string[] = [];
 	const registry = AtomRegistry.make();
@@ -124,6 +131,7 @@ const runCheckout = async ({
 				versionId: "version-one",
 			}).pipe(
 				Effect.provideService(ProjectRepository, repository),
+				Effect.provideService(ProjectWriteAdmission, writeAdmission),
 				Effect.provideService(EditorUnsavedChanges, unsaved),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
 			),
@@ -188,5 +196,26 @@ describe("checkoutProjectVersionFx", () => {
 			"board-sync-7",
 		]);
 		expect(result.replacementEpoch).toBe(0);
+	});
+
+	it("reports a concurrent project replacement as a typed failure", async () => {
+		const writeAdmission = Effect.runSync(createProjectWriteAdmissionFx);
+		const releaseFx = Effect.runSync(writeAdmission.acquireReplacementFx("refresh-project"));
+		try {
+			const result = await runCheckout({
+				writeAdmission,
+			});
+			expect(Exit.isFailure(result.exit)).toBe(true);
+			if (Exit.isFailure(result.exit)) {
+				expect(Cause.hasDies(result.exit.cause)).toBe(false);
+				const failure = Cause.findErrorOption(result.exit.cause);
+				expect(Option.isSome(failure)).toBe(true);
+				if (Option.isSome(failure))
+					expect(failure.value).toBeInstanceOf(ProjectRepositoryError);
+			}
+			expect(result.events).toEqual([]);
+		} finally {
+			Effect.runSync(releaseFx);
+		}
 	});
 });

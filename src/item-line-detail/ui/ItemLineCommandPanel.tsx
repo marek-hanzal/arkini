@@ -1,8 +1,6 @@
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
-import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 
 /** Renders the commands and runtime status for one live production line. */
 export const ItemLineCommandPanel = ({
@@ -23,16 +21,6 @@ export const ItemLineCommandPanel = ({
 	readonly unsetDefault: () => void;
 }) => {
 	const activeJob = line.activeJob;
-	const runtime =
-		activeJob === undefined
-			? {
-					value: formatDurationFn(line.effectiveRuntimeMs),
-					detail:
-						line.baseRuntimeMs === line.effectiveRuntimeMs
-							? "Per cycle"
-							: `Base ${formatDurationFn(line.baseRuntimeMs)}`,
-				}
-			: readActiveJobRuntimeFn(activeJob);
 	const unavailable = line.availability.kind === "unavailable";
 
 	return (
@@ -65,8 +53,13 @@ export const ItemLineCommandPanel = ({
 			</div>
 			<ProductionJobRuntime
 				dataUi="TileLineRuntime"
-				jobStatus={activeJob?.status ?? "idle"}
-				runtime={runtime}
+				runtime={
+					activeJob ?? {
+						baseDurationMs: line.baseRuntimeMs,
+						durationMs: line.effectiveRuntimeMs,
+						status: "idle",
+					}
+				}
 			/>
 		</div>
 	);

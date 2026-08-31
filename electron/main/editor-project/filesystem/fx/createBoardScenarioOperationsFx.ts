@@ -11,7 +11,7 @@ import {
 	BoardScenarioSchema,
 } from "~/board-scenario/schema/BoardScenarioSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
+import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
@@ -37,7 +37,7 @@ const error = (operation: Operation, message: string, cause?: unknown) =>
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecovery(message, cause),
+				message: withFilesystemWriteRecoveryFn(message, cause),
 				cause,
 			});
 

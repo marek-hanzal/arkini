@@ -18,7 +18,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
+import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { readProjectFilesFx } from "./readProjectFilesFx";
 import { readSidecarsFx } from "./readSidecarsFx";
 import { readVersionHistoryFx } from "./readVersionHistoryFx";
@@ -95,7 +95,7 @@ const error = (
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecovery(message, cause),
+				message: withFilesystemWriteRecoveryFn(message, cause),
 				cause,
 			});
 

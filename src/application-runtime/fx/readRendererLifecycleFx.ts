@@ -1,15 +1,7 @@
-import { Data, Effect } from "effect";
+import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
-
-/** Signals that renderer lifecycle composition did not run before a consumer started. */
-export class RendererLifecycleUnavailableError extends Data.TaggedError(
-	"RendererLifecycleUnavailableError",
-)<{}> {
-	override get message(): string {
-		return "Arkini Electron lifecycle is unavailable.";
-	}
-}
+import { RendererLifecycleUnavailableError } from "~/application-runtime/error/RendererLifecycleUnavailableError";
 
 /** Reads the exact renderer lifecycle capability configured by the composition root. */
 export const readRendererLifecycleFx = Effect.fn("readRendererLifecycleFx")(function* () {

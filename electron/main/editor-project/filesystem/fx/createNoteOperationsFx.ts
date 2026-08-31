@@ -9,7 +9,7 @@ import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
 import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
+import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
@@ -30,7 +30,7 @@ const error = (
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecovery(message, cause),
+				message: withFilesystemWriteRecoveryFn(message, cause),
 				cause,
 			});
 

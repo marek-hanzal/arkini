@@ -8,6 +8,8 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/fx/createElectronEditorBuildRepositoryFx";
 import { createElectronProjectRepositoryFx } from "~/project-authoring/fx/createElectronProjectRepositoryFx";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
@@ -20,6 +22,11 @@ import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 
 const RendererAtomRegistryLayer = Layer.succeed(AtomRegistry.AtomRegistry, RendererAtomRegistry);
+
+const EditorRepositoriesLayer = Layer.mergeAll(
+	Layer.effect(EditorBuildRepository, createElectronEditorBuildRepositoryFx),
+	Layer.effect(ProjectRepository, createElectronProjectRepositoryFx),
+).pipe(Layer.provideMerge(Layer.effect(ProjectWriteAdmission, createProjectWriteAdmissionFx)));
 
 const EditorUnsavedChangesLayer = Layer.effect(
 	EditorUnsavedChanges,
@@ -53,14 +60,14 @@ export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 	| AtomRegistry.AtomRegistry
 	| EditorBuildRepository
 	| ProjectRepository
+	| ProjectWriteAdmission
 	| EditorUnsavedChanges
 	| GameEngineResourceFx,
 	never
 > = ManagedRuntime.make(
 	Layer.mergeAll(
 		RendererAtomRegistryLayer,
-		Layer.effect(EditorBuildRepository, createElectronEditorBuildRepositoryFx),
-		Layer.effect(ProjectRepository, createElectronProjectRepositoryFx),
+		EditorRepositoriesLayer,
 		EditorBoardGameLayer,
 		EditorUnsavedChangesLayer,
 		GameEngineResourceLayer({

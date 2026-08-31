@@ -4,11 +4,10 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { ProjectPayloadSchema } from "~/project-authoring/schema/ProjectPayloadSchema";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
-import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
-import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
@@ -31,21 +30,15 @@ const requestRefreshFx = (projectId: string) =>
 		responseMessage: "The editor project refresh response is invalid.",
 	});
 
+const acquireProjectRefreshFx = Effect.flatMap(ProjectWriteAdmission, (admission) =>
+	admission.acquireReplacementFx("refresh-project"),
+);
+
 /** Hard-replaces the mounted project with its authoritative Editor-folder state. */
 export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 	({ projectId }: refreshEditorProjectFx.Props) =>
 		Effect.acquireUseRelease(
-			Effect.try({
-				try: blockProjectWrites,
-				catch: (cause) =>
-					cause instanceof ProjectRepositoryError
-						? cause
-						: new ProjectRepositoryError({
-								operation: "refresh-project",
-								message: "The editor project refresh could not acquire ownership.",
-								cause,
-							}),
-			}),
+			acquireProjectRefreshFx,
 			() =>
 				Effect.gen(function* () {
 					const repository = yield* ProjectRepository;
@@ -77,6 +70,6 @@ export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 						}),
 					);
 				}),
-			(release) => Effect.sync(release),
+			(releaseFx) => releaseFx,
 		),
 );

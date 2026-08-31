@@ -9,7 +9,11 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
-import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
+import {
+	ProjectWriteAdmission,
+	type ProjectWriteAdmissionService,
+} from "~/project-authoring/service/ProjectWriteAdmission";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
 import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
@@ -27,7 +31,10 @@ const project = {
 	resources: editorTestPayload.resources,
 };
 
-const runRefresh = async (mode: "failure" | "renamed" | "same" = "same") => {
+const runRefresh = async (
+	mode: "failure" | "renamed" | "same" = "same",
+	writeAdmission: ProjectWriteAdmissionService = Effect.runSync(createProjectWriteAdmissionFx),
+) => {
 	const events: string[] = [];
 	const registry = AtomRegistry.make();
 	const state = Effect.runSync(
@@ -117,6 +124,7 @@ const runRefresh = async (mode: "failure" | "renamed" | "same" = "same") => {
 				projectId: project.projectId,
 			}).pipe(
 				Effect.provideService(ProjectRepository, repository),
+				Effect.provideService(ProjectWriteAdmission, writeAdmission),
 				Effect.provideService(EditorUnsavedChanges, unsaved),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
 			),
@@ -177,17 +185,20 @@ describe("refreshEditorProjectFx", () => {
 	});
 
 	it("reports replacement ownership collisions without touching mounted state", async () => {
-		const release = blockProjectWrites();
+		const writeAdmission = Effect.runSync(createProjectWriteAdmissionFx);
+		const releaseFx = Effect.runSync(writeAdmission.acquireReplacementFx("checkout-version"));
 		try {
-			const result = await runRefresh();
+			const result = await runRefresh("same", writeAdmission);
 			expect(Exit.isFailure(result.exit)).toBe(true);
-			if (Exit.isFailure(result.exit))
+			if (Exit.isFailure(result.exit)) {
+				expect(Cause.hasDies(result.exit.cause)).toBe(false);
 				expect(Option.isSome(Cause.findErrorOption(result.exit.cause))).toBe(true);
+			}
 			expect(result.events).toEqual([]);
 			expect(result.published?.revision).toBe(9);
 			expect(result.replacementEpoch).toBe(0);
 		} finally {
-			release();
+			Effect.runSync(releaseFx);
 		}
 	});
 });

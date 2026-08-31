@@ -29,7 +29,7 @@ import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
+import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 
 type Operations = ProjectVersionRepositoryService;
 type Operation = ProjectRepositoryError["operation"];
@@ -41,7 +41,7 @@ const error = (operation: Operation, message: string, cause?: unknown) =>
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecovery(message, cause),
+				message: withFilesystemWriteRecoveryFn(message, cause),
 				cause,
 			});
 

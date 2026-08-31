@@ -8,7 +8,6 @@ import {
 } from "~/item-detail-frame/ui/ItemDetailMotion";
 import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
-import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 
@@ -171,8 +170,7 @@ export const ItemQueueActiveSlot = ({
 							</div>
 							<ProductionJobRuntime
 								dataUi="ItemQueueRuntime"
-								jobStatus={job.status}
-								runtime={readActiveJobRuntimeFn(job)}
+								runtime={job}
 							/>
 						</div>
 					</motion.article>

@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
@@ -15,6 +16,7 @@ const readErrorMessageFn = (error: unknown) =>
 const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 	Effect.gen(function* () {
 		const repository = yield* ProjectRepository;
+		const writeAdmission = yield* ProjectWriteAdmission;
 		const unsavedChanges = yield* EditorUnsavedChanges;
 		return Atom.family((projectId: string) =>
 			Atom.fn(
@@ -23,6 +25,7 @@ const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 						projectId,
 					}).pipe(
 						Effect.provideService(ProjectRepository, repository),
+						Effect.provideService(ProjectWriteAdmission, writeAdmission),
 						Effect.provideService(EditorUnsavedChanges, unsavedChanges),
 					),
 				{

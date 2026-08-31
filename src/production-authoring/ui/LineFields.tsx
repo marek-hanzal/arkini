@@ -1,14 +1,14 @@
 import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { EditorLineInputsControl } from "~/production-line-authoring/ui/EditorLineInputsControl";
-import { EditorOutputControl } from "~/production-line-authoring/ui/EditorOutputControl";
-import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";
+import { InputsControl } from "~/production-authoring/ui/InputsControl";
+import { OutputControl } from "~/production-authoring/ui/OutputControl";
+import { RulesControl } from "~/production-authoring/ui/RulesControl";
 
 const defaultLine: LineSchema.Type = {
 	id: "",
@@ -27,7 +27,7 @@ const defaultLine: LineSchema.Type = {
 };
 
 /** Edits one line through registered leaf fields while preserving authored rules. */
-export const EditorLineFields = withFieldGroup({
+export const LineFields = withFieldGroup({
 	defaultValues: defaultLine,
 	props: {
 		label: undefined as string | null | undefined,
@@ -103,7 +103,7 @@ export const EditorLineFields = withFieldGroup({
 			<EditorFormCard>
 				<group.Subscribe selector={(state) => state.values.rules}>
 					{(rules) => (
-						<EditorRulesControl
+						<RulesControl
 							rules={rules}
 							target="line"
 							description="These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected."
@@ -129,7 +129,7 @@ export const EditorLineFields = withFieldGroup({
 				<div className="min-w-0 pr-[var(--ak-panel-padding)]">
 					<group.Subscribe selector={(state) => state.values.input}>
 						{(input) => (
-							<EditorLineInputsControl
+							<InputsControl
 								value={input}
 								onChange={(next) =>
 									group.setFieldValue("input", next as LineSchema.Type["input"])
@@ -150,9 +150,7 @@ export const EditorLineFields = withFieldGroup({
 										onEnable={() =>
 											group.setFieldValue(
 												"output",
-												structuredClone(
-													EditorProductionDraftDefaults.output,
-												),
+												structuredClone(DraftDefaults.output),
 											)
 										}
 										title="Line output is disabled"
@@ -164,7 +162,7 @@ export const EditorLineFields = withFieldGroup({
 											title="Output"
 											variant="secondary"
 										/>
-										<EditorOutputControl
+										<OutputControl
 											value={output}
 											onChange={(next) => group.setFieldValue("output", next)}
 										/>

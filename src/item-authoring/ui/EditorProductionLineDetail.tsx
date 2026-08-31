@@ -9,7 +9,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { EditorProductionLineEditLink } from "~/production-line-authoring/ui/EditorProductionLineEditLink";
+import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 import { EditorProductionLineInputs } from "~/item-authoring/ui/EditorProductionLineInputs";
 
@@ -118,14 +118,14 @@ export const EditorProductionLineDetail = ({
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-2">
 						<h3 className="text-lg font-semibold leading-tight text-foreground">
-							<EditorProductionLineEditLink
+							<LineEditLink
 								dataUi="EditorProductionLineDetailEditLink"
 								itemUid={itemUid}
 								lineId={line.id}
 							>
 								{line.title}
 								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
-							</EditorProductionLineEditLink>
+							</LineEditLink>
 						</h3>
 						{!line.enable ? (
 							<span className="rounded-full border border-danger/35 bg-danger/10 px-2.5 py-1 text-xs font-semibold text-foreground">

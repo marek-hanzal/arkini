@@ -54,7 +54,7 @@
 		"src/production-input",
 		"src/production-job",
 		"src/production-line",
-		"src/production-line-authoring",
+		"src/production-authoring",
 		"src/production-output",
 		"src/game-config",
 		"src/game-config-compiler",

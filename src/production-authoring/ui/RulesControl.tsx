@@ -4,9 +4,9 @@ import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/RuleSchema";
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
-import { EditorBoardDistanceControl } from "~/production-line-authoring/ui/EditorBoardDistanceControl";
-import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
+import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
+import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -17,9 +17,9 @@ import {
 	EditorTextControl,
 } from "~/editor-control/ui/EditorValueControls";
 
-type EditorRule = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
-type EditorRuleType = LineRuleSchema.Type["type"];
-type EditorRuleTarget = "action" | "drop" | "line";
+type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
+type RuleType = LineRuleSchema.Type["type"];
+type RuleTarget = "action" | "drop" | "line";
 
 const queryScopeOptions = [
 	{
@@ -51,7 +51,7 @@ const queryScopeOptions = [
 	},
 ] as const;
 
-const EditorQueryScopeControl = ({
+const QueryScopeControl = ({
 	onChange,
 	value,
 }: {
@@ -79,7 +79,7 @@ const EditorQueryScopeControl = ({
 	/>
 );
 
-const readRuleTypeDescription = (type: EditorRuleType, target: EditorRuleTarget) => {
+const readRuleTypeDescription = (type: RuleType, target: RuleTarget) => {
 	if (target === "drop")
 		return type === "enable"
 			? "Allows this selected drop only while every condition passes. It does not enable or disable the production line itself."
@@ -101,7 +101,7 @@ const readRuleTypeDescription = (type: EditorRuleType, target: EditorRuleTarget)
 	return "Multiplies this production line's runtime while every condition passes. Active multipliers are applied before runtime adjustments.";
 };
 
-const EditorWhenControl = ({
+const WhenControl = ({
 	onChange,
 	value,
 }: {
@@ -155,7 +155,7 @@ const EditorWhenControl = ({
 		/>
 		<div className="flex min-w-0 flex-wrap items-end gap-3">
 			<div className="min-w-64 flex-1">
-				<EditorSelectorControl
+				<SelectorControl
 					value={value.query.selector}
 					onChange={(selector) =>
 						onChange({
@@ -229,7 +229,7 @@ const EditorWhenControl = ({
 				.exhaustive()}
 		</div>
 		<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-			<EditorQueryScopeControl
+			<QueryScopeControl
 				value={value.query}
 				onChange={(query) =>
 					onChange({
@@ -239,7 +239,7 @@ const EditorWhenControl = ({
 				}
 			/>
 			{value.query.scope !== "board" ? null : (
-				<EditorBoardDistanceControl
+				<BoardDistanceControl
 					value={value.query}
 					onChange={(query) =>
 						onChange({
@@ -253,7 +253,7 @@ const EditorWhenControl = ({
 	</div>
 );
 
-const EditorRuleControl = ({
+const RuleControl = ({
 	allowedTypes,
 	createRule,
 	onChange,
@@ -262,12 +262,12 @@ const EditorRuleControl = ({
 	ruleTarget,
 	ruleTypeDescription,
 }: {
-	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
-	readonly createRule: (type: EditorRuleType) => LineRuleSchema.Type;
-	readonly onChange: (rule: EditorRule) => void;
-	readonly rule: EditorRule;
+	readonly allowedTypes: ReadonlyArray<RuleType>;
+	readonly createRule: (type: RuleType) => LineRuleSchema.Type;
+	readonly onChange: (rule: RuleValue) => void;
+	readonly rule: RuleValue;
 	readonly ruleIndex: number;
-	readonly ruleTarget: EditorRuleTarget;
+	readonly ruleTarget: RuleTarget;
 	readonly ruleTypeDescription: string;
 }) => (
 	<article className="grid gap-3">
@@ -350,7 +350,7 @@ const EditorRuleControl = ({
 					...rule,
 					when: [
 						...rule.when,
-						structuredClone(EditorProductionDraftDefaults.when),
+						structuredClone(DraftDefaults.when),
 					],
 				})
 			}
@@ -368,7 +368,7 @@ const EditorRuleControl = ({
 			removeLabel="Remove condition"
 		>
 			{(whenIndex) => (
-				<EditorWhenControl
+				<WhenControl
 					value={rule.when[whenIndex]}
 					onChange={(next) =>
 						onChange({
@@ -385,24 +385,24 @@ const EditorRuleControl = ({
 );
 
 /** Assembles the shared conditional Rule collection used by lines and selected drops. */
-export const EditorRulesControl = ({
+export const RulesControl = ({
 	allowedTypes,
 	description,
 	onChange,
 	rules,
 	target,
 }: {
-	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
+	readonly allowedTypes: ReadonlyArray<RuleType>;
 	readonly description: string;
-	readonly onChange: (rules: EditorRule[]) => void;
-	readonly rules: ReadonlyArray<EditorRule>;
-	readonly target: EditorRuleTarget;
+	readonly onChange: (rules: RuleValue[]) => void;
+	readonly rules: ReadonlyArray<RuleValue>;
+	readonly target: RuleTarget;
 }) => {
-	const createRule = (type: EditorRuleType): LineRuleSchema.Type =>
+	const createRule = (type: RuleType): LineRuleSchema.Type =>
 		({
 			type,
 			when: [
-				structuredClone(EditorProductionDraftDefaults.when),
+				structuredClone(DraftDefaults.when),
 			],
 			...(type === "runtime:multiplier"
 				? {
@@ -438,7 +438,7 @@ export const EditorRulesControl = ({
 				removeLabel="Remove rule"
 			>
 				{(ruleIndex) => (
-					<EditorRuleControl
+					<RuleControl
 						allowedTypes={allowedTypes}
 						createRule={createRule}
 						rule={rules[ruleIndex]}

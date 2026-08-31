@@ -2,20 +2,20 @@ import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
-import { EditorRollSetControl } from "~/production-line-authoring/ui/EditorRollSetControl";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
+import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
-interface EditorOutputControlProps {
+interface OutputControlProps {
 	readonly onChange: (output: OutputSchema.Type | undefined) => void;
 	readonly value: OutputSchema.Type;
 }
 
 /** Edits weighted output sets through their concrete RollSet domain. */
-export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProps) => {
+export const OutputControl = ({ onChange, value }: OutputControlProps) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
 		<section className="grid gap-3">
@@ -43,7 +43,7 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 							{
 								weight: 1,
 								roll: [
-									structuredClone(EditorProductionDraftDefaults.rolls.guaranteed),
+									structuredClone(DraftDefaults.rolls.guaranteed),
 								],
 							},
 						],
@@ -61,7 +61,7 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 				removeLabel="Remove output set"
 			>
 				{(index) => (
-					<EditorRollSetControl
+					<RollSetControl
 						index={index}
 						value={value.set[index]}
 						onChange={(next) =>

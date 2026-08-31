@@ -2,7 +2,7 @@ import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { ReactNode } from "react";
 import { EditorNumberControl, EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 
-interface EditorQuantityControlProps {
+interface QuantityControlProps {
 	readonly description?: ReactNode;
 	readonly label?: string;
 	readonly maximumDescription?: string;
@@ -12,12 +12,12 @@ interface EditorQuantityControlProps {
 }
 
 /** Renders the reusable minimum and maximum quantity fields without imposing layout. */
-export const EditorQuantityFields = ({
+export const QuantityFields = ({
 	maximumDescription,
 	minimumDescription,
 	onChange,
 	value,
-}: Omit<EditorQuantityControlProps, "description" | "label">) => (
+}: Omit<QuantityControlProps, "description" | "label">) => (
 	<>
 		<EditorNumberControl
 			description={minimumDescription}
@@ -47,14 +47,14 @@ export const EditorQuantityFields = ({
 );
 
 /** Edits the required inclusive positive quantity bounds. */
-export const EditorQuantityControl = ({
+export const QuantityControl = ({
 	description,
 	label = "Quantity",
 	maximumDescription,
 	minimumDescription,
 	onChange,
 	value,
-}: EditorQuantityControlProps) => (
+}: QuantityControlProps) => (
 	<div className="grid gap-3">
 		<div className="text-sm">
 			<EditorValueLabel
@@ -63,7 +63,7 @@ export const EditorQuantityControl = ({
 			/>
 		</div>
 		<div className="grid gap-3 sm:grid-cols-2">
-			<EditorQuantityFields
+			<QuantityFields
 				maximumDescription={maximumDescription}
 				minimumDescription={minimumDescription}
 				value={value}

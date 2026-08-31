@@ -24,7 +24,7 @@ const boardDistanceOptions = [
 	},
 ] as const;
 
-export const EditorBoardDistanceControl = ({
+export const BoardDistanceControl = ({
 	onChange,
 	value,
 }: {

@@ -1,10 +1,10 @@
 import { BatteryMedium, Trash2 } from "lucide-react";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { match } from "ts-pattern";
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
-import { EditorQuantityFields } from "~/production-line-authoring/ui/EditorQuantityControl";
-import { EditorBoardDistanceControl } from "~/production-line-authoring/ui/EditorBoardDistanceControl";
-import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
+import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
+import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
+import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { Button } from "~/ui/ui/Button";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -36,21 +36,21 @@ const inputTypeOptions = [
 	readonly value: LineInputSchema.Type["type"];
 }>;
 
-type EditorDepositInput = Extract<
+type DepositInput = Extract<
 	LineInputSchema.Type,
 	{
 		readonly type: "deposit";
 	}
 >;
 
-type EditorMaterialInput = Extract<
+type MaterialInput = Extract<
 	LineInputSchema.Type,
 	{
 		readonly type: "materials";
 	}
 >;
 
-const EditorInputCharges = ({
+const InputCharges = ({
 	input,
 	onChange,
 }: {
@@ -146,12 +146,12 @@ const EditorInputCharges = ({
 	);
 };
 
-const EditorMaterialModeControl = ({
+const MaterialModeControl = ({
 	input,
 	onChange,
 }: {
-	readonly input: EditorMaterialInput;
-	readonly onChange: (input: EditorMaterialInput) => void;
+	readonly input: MaterialInput;
+	readonly onChange: (input: MaterialInput) => void;
 }) => (
 	<EditorChoiceControl
 		label="Material mode"
@@ -179,15 +179,15 @@ const EditorMaterialModeControl = ({
 	/>
 );
 
-const EditorMaterialLineInput = ({
+const MaterialInputControl = ({
 	input,
 	onChange,
 }: {
-	readonly input: EditorMaterialInput;
-	readonly onChange: (input: EditorMaterialInput) => void;
+	readonly input: MaterialInput;
+	readonly onChange: (input: MaterialInput) => void;
 }) => (
 	<div className="grid gap-4">
-		<EditorSelectorControl
+		<SelectorControl
 			value={input.selector}
 			onChange={(selector) =>
 				onChange({
@@ -197,7 +197,7 @@ const EditorMaterialLineInput = ({
 			}
 		/>
 		<div className="grid gap-3 sm:grid-cols-3">
-			<EditorQuantityFields
+			<QuantityFields
 				minimumDescription="Minimum matching material quantity required before this line can start. If this amount is available, the run becomes ready."
 				maximumDescription="Maximum matching material quantity one run consumes or reserves. A ready run uses what is currently stored, capped at this amount."
 				value={input.quantity}
@@ -224,14 +224,14 @@ const EditorMaterialLineInput = ({
 	</div>
 );
 
-const EditorDepositLineInput = ({
+const DepositInputControl = ({
 	input,
 	onChange,
 }: {
-	readonly input: EditorDepositInput;
-	readonly onChange: (input: EditorDepositInput) => void;
+	readonly input: DepositInput;
+	readonly onChange: (input: DepositInput) => void;
 }) => (
-	<EditorSelectorControl
+	<SelectorControl
 		value={input.query.selector}
 		onChange={(selector) =>
 			onChange({
@@ -245,7 +245,7 @@ const EditorDepositLineInput = ({
 	/>
 );
 
-export const EditorLineInput = ({
+export const InputControl = ({
 	allowMaterials = true,
 	input,
 	onChange,
@@ -267,9 +267,7 @@ export const EditorLineInput = ({
 				options={inputTypeOptions.filter(
 					(option) => allowMaterials || option.value !== "materials",
 				)}
-				onChange={(type) =>
-					onChange(structuredClone(EditorProductionDraftDefaults.inputs[type]))
-				}
+				onChange={(type) => onChange(structuredClone(DraftDefaults.inputs[type]))}
 			/>
 			{match(input)
 				.with(
@@ -277,7 +275,7 @@ export const EditorLineInput = ({
 						type: "materials",
 					},
 					(material) => (
-						<EditorMaterialModeControl
+						<MaterialModeControl
 							input={material}
 							onChange={onChange}
 						/>
@@ -288,7 +286,7 @@ export const EditorLineInput = ({
 						type: "deposit",
 					},
 					(deposit) => (
-						<EditorBoardDistanceControl
+						<BoardDistanceControl
 							value={deposit.query}
 							onChange={(query) => {
 								if (query.scope === "board")
@@ -314,7 +312,7 @@ export const EditorLineInput = ({
 					type: "materials",
 				},
 				(material) => (
-					<EditorMaterialLineInput
+					<MaterialInputControl
 						input={material}
 						onChange={onChange}
 					/>
@@ -325,14 +323,14 @@ export const EditorLineInput = ({
 					type: "deposit",
 				},
 				(deposit) => (
-					<EditorDepositLineInput
+					<DepositInputControl
 						input={deposit}
 						onChange={onChange}
 					/>
 				),
 			)
 			.exhaustive()}
-		<EditorInputCharges
+		<InputCharges
 			input={input}
 			onChange={onChange}
 		/>

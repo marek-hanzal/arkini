@@ -4,8 +4,8 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
-import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
-import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
+import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
+import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 
 /** Edits the target, effects, replacement, and optional output of one merge definition. */
@@ -43,7 +43,7 @@ export const EditorMergeField = ({
 						})
 					}
 				/>
-				<EditorSelectorControl
+				<SelectorControl
 					value={merge.target}
 					onChange={(target) =>
 						onChange({
@@ -111,7 +111,7 @@ export const EditorMergeField = ({
 			title="Merge output"
 		/>
 		<EditorFormCard>
-			<EditorOptionalOutputControl
+			<OptionalOutputControl
 				addLabel="Enable merge output"
 				emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
 				emptyIcon={PackagePlus}

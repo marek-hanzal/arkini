@@ -1,11 +1,11 @@
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { EditorLineInput } from "~/production-line-authoring/ui/EditorLineInput";
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
+import { InputControl } from "~/production-authoring/ui/InputControl";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
-interface EditorLineInputsControlProps {
+interface InputsControlProps {
 	readonly allowMaterials?: boolean;
 	readonly emptyAllowed?: boolean;
 	readonly onChange: (inputs: LineInputSchema.Type[]) => void;
@@ -13,12 +13,12 @@ interface EditorLineInputsControlProps {
 }
 
 /** Assembles immediate input requirements, optionally including Line-owned materials. */
-export const EditorLineInputsControl = ({
+export const InputsControl = ({
 	allowMaterials = true,
 	emptyAllowed = false,
 	onChange,
 	value,
-}: EditorLineInputsControlProps) => {
+}: InputsControlProps) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	const replaceAt = (index: number, input: LineInputSchema.Type) => {
 		const next = value.map((current, currentIndex) =>
@@ -52,7 +52,7 @@ export const EditorLineInputsControl = ({
 				onAdd={() =>
 					onChange([
 						...value,
-						structuredClone(EditorProductionDraftDefaults.inputs.simple),
+						structuredClone(DraftDefaults.inputs.simple),
 					])
 				}
 				onRemove={
@@ -68,7 +68,7 @@ export const EditorLineInputsControl = ({
 				removeLabel="Remove input"
 			>
 				{(index) => (
-					<EditorLineInput
+					<InputControl
 						allowMaterials={allowMaterials}
 						input={value[index]}
 						onChange={(next) => replaceAt(index, next)}

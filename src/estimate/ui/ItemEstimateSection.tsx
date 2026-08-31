@@ -1,9 +1,9 @@
-import { Calculator, Info, TriangleAlert } from "lucide-react";
+import { ArrowRight, Calculator, Info, TriangleAlert } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
-import type { AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
+import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { ItemEstimateRouteGraph } from "~/estimate/ui/ItemEstimateRouteGraph";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
@@ -33,78 +33,94 @@ const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 	}
 };
 
-const limitationTextFn = (limitation: AcquisitionLimitation) => {
-	switch (limitation) {
-		case "conditional-runtime-adjustments-ignored":
-			return "Conditional runtime adjustments are ignored.";
-		case "negative-availability-constraints-ignored":
-			return "Positive enable prerequisites are acquired, but rule truth and disabling conditions are ignored.";
-		case "spatial-requirements-approximated":
-			return "Scope, distance, board capacity, and concrete placement are ignored.";
+const readRouteSourceItemIdFn = (route: EstimateRouteStep) => {
+	switch (route.metadata?.kind) {
+		case "line-output":
+			return route.metadata.ownerItemId;
+		case "line-charge-depletion":
+			return route.metadata.chargedItemId;
+		case "merge-output":
+			return route.metadata.sourceItemId;
+		case "temporary-expiry":
+			return route.metadata.itemId;
+		case undefined:
+			return undefined;
 	}
 };
 
-const ItemEstimateMethodDetails = ({ estimate }: { readonly estimate: ItemEstimate }) => (
-	<div
-		className="min-w-0"
-		data-ui="EditorItemEstimateMethod"
-	>
-		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
-			<Calculator className="mt-0.5 size-5 shrink-0 text-sky-700" />
-			<div>
-				<h3 className="font-semibold text-foreground">Approximate dependency estimator</h3>
-				<p className="mt-1 text-xs text-muted">Optimistic bounded-distribution analysis</p>
+const ItemEstimateMethodDetails = ({
+	config,
+	estimate,
+}: {
+	readonly config: GameConfigSchema.Type;
+	readonly estimate: ItemEstimate;
+}) => {
+	const route = estimate.obtainable ? estimate.route : undefined;
+	const sourceItemId = route === undefined ? undefined : readRouteSourceItemIdFn(route);
+	const sourceTitle =
+		sourceItemId === undefined
+			? undefined
+			: (config.items[sourceItemId]?.title ?? sourceItemId);
+	const targetTitle =
+		route === undefined ? undefined : (config.items[route.factId]?.title ?? route.factId);
+	return (
+		<div
+			className="min-w-0"
+			data-ui="EditorItemEstimateMethod"
+		>
+			<header className="flex items-start gap-3 border-b border-line/70 pb-3">
+				<Calculator className="mt-0.5 size-5 shrink-0 text-sky-700" />
+				<div>
+					<h3 className="font-semibold text-foreground">
+						Approximate dependency estimator
+					</h3>
+					<p className="mt-1 text-xs text-muted">
+						Optimistic bounded-distribution analysis
+					</p>
+				</div>
+			</header>
+			<p className="py-3 text-xs leading-relaxed text-muted">
+				Uses authored dependencies to select an optimistic acquisition path and estimate its
+				critical-path duration.
+			</p>
+			<div className="border-t border-line/70 pt-3">
+				{sourceTitle !== undefined && targetTitle !== undefined ? (
+					<div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground">
+						<span>{sourceTitle}</span>
+						<ArrowRight className="size-4 shrink-0 text-muted" />
+						<span>{targetTitle}</span>
+					</div>
+				) : targetTitle !== undefined ? (
+					<p className="text-sm font-semibold text-foreground">{targetTitle}</p>
+				) : (
+					<p className="text-xs leading-relaxed text-muted">
+						{estimate.status === "partial"
+							? "No duration is claimed for this incomplete path."
+							: "No route satisfied every required dependency."}
+					</p>
+				)}
 			</div>
-		</header>
-		<p className="py-3 text-xs leading-relaxed text-muted">
-			Expands from authored starting facts and ranks complete routes by quantity-aware
-			upstream critical-path cost with stable route identity as the tie-break. Bounded output
-			distributions provide expected first-hitting time, including whole deterministic batches
-			and correlated co-products. Demand uses the larger of additive consumption and each
-			selected route's simultaneous consumed-plus-reusable need. Finite starting pools are
-			shared across the selected-fact witness. Runtime rule truth, concrete item identity
-			packing, placement, renewable capacity, and engine execution are not simulated.
-			Unsupported bounded state space returns a partial estimate.
-		</p>
-		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
-			{estimate.obtainable ? (
-				<>
-					<li>Selected route: {estimate.route.routeId}.</li>
-					<li>
-						Approximate action runs: {formatQuantityFn(estimate.route.actionRuns)};
-						output samples: {formatQuantityFn(estimate.route.outputRuns)}.
-					</li>
-				</>
-			) : (
-				<li>
-					{estimate.status === "partial"
-						? "No duration is claimed for this incomplete path."
-						: "No route satisfied every required dependency."}
-				</li>
-			)}
-			<li>Starting authored items contribute no acquisition time.</li>
-			<li>The normalized selected-fact DAG explains the deterministic approximation.</li>
-			{estimate.obtainable && estimate.diagnostics.length > 0 ? (
-				<li>
-					Rejected alternatives:{" "}
-					{estimate.diagnostics
-						.map((diagnostic) => diagnosticTextFn(diagnostic))
-						.join(" ")}
-				</li>
-			) : null}
-			{estimate.limitations.map((limitation) => (
-				<li key={limitation}>Limitation: {limitationTextFn(limitation)}</li>
-			))}
-		</ul>
-	</div>
-);
+		</div>
+	);
+};
 
-const ItemEstimateHeading = ({ estimate }: { readonly estimate?: ItemEstimate }) => (
+const ItemEstimateHeading = ({
+	config,
+	estimate,
+}: {
+	readonly config?: GameConfigSchema.Type;
+	readonly estimate?: ItemEstimate;
+}) => (
 	<header className="flex items-center gap-1">
 		<h2 className="text-lg font-semibold text-foreground">Approximate acquisition path</h2>
-		{estimate === undefined ? null : (
+		{config === undefined || estimate === undefined ? null : (
 			<Tooltip
-				content={<ItemEstimateMethodDetails estimate={estimate} />}
+				content={
+					<ItemEstimateMethodDetails
+						config={config}
+						estimate={estimate}
+					/>
+				}
 				contentClassName="w-[min(40rem,calc(100vw-2rem))] max-w-none p-4"
 				placement="bottom-start"
 			>
@@ -124,9 +140,18 @@ const ItemEstimateHeading = ({ estimate }: { readonly estimate?: ItemEstimate })
 	</header>
 );
 
-const ItemEstimateSummary = ({ estimate }: { readonly estimate: ItemEstimate }) => (
+const ItemEstimateSummary = ({
+	config,
+	estimate,
+}: {
+	readonly config: GameConfigSchema.Type;
+	readonly estimate: ItemEstimate;
+}) => (
 	<div className="flex min-w-0 flex-1 items-center justify-between gap-4">
-		<ItemEstimateHeading estimate={estimate} />
+		<ItemEstimateHeading
+			config={config}
+			estimate={estimate}
+		/>
 		<p className="shrink-0 font-semibold tabular-nums text-foreground">
 			{estimate.obtainable
 				? `≈ ${formatRuntimeFn(estimate.durationMs)}`
@@ -149,7 +174,12 @@ const ItemEstimateResult = ({
 	estimate.obtainable ? (
 		<ItemEstimateRouteGraph
 			config={config}
-			header={<ItemEstimateSummary estimate={estimate} />}
+			header={
+				<ItemEstimateSummary
+					config={config}
+					estimate={estimate}
+				/>
+			}
 			projectId={projectId}
 			routeSteps={estimate.routeSteps}
 		/>
@@ -158,7 +188,10 @@ const ItemEstimateResult = ({
 			className="rounded-xl border border-line bg-surface-raised p-4"
 			data-ui="EditorItemEstimateHeader"
 		>
-			<ItemEstimateSummary estimate={estimate} />
+			<ItemEstimateSummary
+				config={config}
+				estimate={estimate}
+			/>
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
 					{estimate.status === "partial"

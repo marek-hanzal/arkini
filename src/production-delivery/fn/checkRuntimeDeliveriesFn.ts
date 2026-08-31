@@ -1,7 +1,7 @@
 import { Option } from "effect";
 
-import type { DeliveryTargetIssueSchema } from "~/production-delivery/schema/check/DeliveryTargetIssueSchema";
-import { DeliveryTargetIssueReasonEnumSchema } from "~/production-delivery/schema/check/DeliveryTargetIssueReasonEnumSchema";
+import type { DeliveryTargetIssueSchema } from "~/production-delivery/schema/DeliveryTargetIssueSchema";
+import { DeliveryTargetIssueReasonEnumSchema } from "~/production-delivery/schema/DeliveryTargetIssueReasonEnumSchema";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";

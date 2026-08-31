@@ -18,7 +18,7 @@ import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { makeActionChargeSpendRandomFx } from "../random/makeActionChargeSpendRandomFx";
+import { makeActionChargeSpendRandomFx } from "./makeActionChargeSpendRandomFx";
 
 export namespace spendActionChargesFx {
 	export interface Props {

@@ -1,6 +1,6 @@
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { EditorItemList } from "~/item-authoring/ui/EditorItemList";
+import { List } from "~/item-authoring/ui/List";
 
 interface EditorItemsRouteSearch {
 	readonly itemType?: TypeSchema.Type;
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 			from: Route.fullPath,
 		});
 		return (
-			<EditorItemList
+			<List
 				itemType={search.itemType}
 				query={search.query ?? ""}
 				onItemTypeChange={(itemType) =>

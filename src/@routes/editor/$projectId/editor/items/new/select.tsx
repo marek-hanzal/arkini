@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorItemTypePresentation } from "~/item-authoring/ui/EditorItemTypePresentation";
+import { TypePresentation } from "~/item-authoring/ui/TypePresentation";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/new/select")({
 	component: () => {
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 				</header>
 				<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
 					{TypeSchema.options.map((type) => {
-						const presentation = EditorItemTypePresentation[type];
+						const presentation = TypePresentation[type];
 						const Icon = presentation.icon;
 						return (
 							<ButtonLink

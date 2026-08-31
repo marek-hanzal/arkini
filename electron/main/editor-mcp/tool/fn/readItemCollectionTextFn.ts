@@ -1,7 +1,7 @@
 import { Order } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { searchEditorItemsFn } from "~/item-authoring/fn/searchEditorItemsFn";
+import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 
 const indentText = (value: string) =>
@@ -19,9 +19,7 @@ export const readItemCollectionTextFn = (project: EditorProject, input: ItemColl
 	const typeFilteredItems =
 		allowedTypes === undefined ? items : items.filter((item) => allowedTypes.has(item.type));
 	const matches =
-		input.query === undefined
-			? typeFilteredItems
-			: searchEditorItemsFn(typeFilteredItems, input.query);
+		input.query === undefined ? typeFilteredItems : searchFn(typeFilteredItems, input.query);
 	const totalPages = Math.ceil(matches.length / input.pageSize);
 	const pageItems = matches.slice((input.page - 1) * input.pageSize, input.page * input.pageSize);
 	const hasPreviousPage = input.page > 1;

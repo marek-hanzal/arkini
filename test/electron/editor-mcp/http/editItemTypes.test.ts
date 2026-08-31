@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
+import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
@@ -93,7 +93,7 @@ const groups = [
 const itemId = (type: TypeSchema.Type) =>
 	`${type === "producer" ? "producer" : "item"}:edit-${type}`;
 const resourceId = editorTestPayload.resources[0]?.id ?? "missing-asset";
-const producerDraft = createEditorItemDraftFn({
+const producerDraft = createDraftFn({
 	resourceId,
 	type: "producer",
 	uid: "uid:deposit-line-source",
@@ -115,7 +115,7 @@ const seededConfig = GameConfigSchema.parse({
 				return [
 					id,
 					{
-						...createEditorItemDraftFn({
+						...createDraftFn({
 							resourceId,
 							type,
 							uid: `uid:edit-${type}`,

@@ -8,7 +8,7 @@ import {
 import { admitEditorProjectWriteFx } from "~/project-authoring/service/EditorProjectWriteAdmission";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 
-/** Creates the renderer proxy for exact revision-pinned Editor Build operations. */
+/** Creates the Electron-backed proxy for exact revision-pinned Editor Build operations. */
 export const createElectronEditorBuildRepositoryFx = Effect.sync(
 	(): EditorBuildRepositoryService => ({
 		buildProjectFx: (request) =>

@@ -6,7 +6,7 @@ import { acquireGameEngineResourceFx } from "~/installed-game/fx/acquireGameEngi
 import { createGameFx } from "~/installed-game/fx/createGameFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
-import { createElectronEditorBuildRepositoryFx } from "~/editor-build/renderer/createElectronEditorBuildRepositoryFx";
+import { createElectronEditorBuildRepositoryFx } from "~/editor-build/fx/createElectronEditorBuildRepositoryFx";
 import { createElectronEditorProjectRepositoryFx } from "~/project-authoring/fx/createElectronEditorProjectRepositoryFx";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";

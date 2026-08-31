@@ -4,8 +4,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
-import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";
-import { saveEditorBuildFx } from "~/editor-build/renderer/saveEditorBuildFx";
+import { installBuiltEditorArkpackFx } from "~/editor-build/fx/installBuiltEditorArkpackFx";
+import { saveEditorBuildFx } from "~/editor-build/fx/saveEditorBuildFx";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import {
 	EditorBuildRepository,

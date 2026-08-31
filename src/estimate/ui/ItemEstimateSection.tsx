@@ -1,4 +1,4 @@
-import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
+import { Calculator, Info, TriangleAlert } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -6,6 +6,7 @@ import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemE
 import type { AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { ItemEstimateRouteGraph } from "~/estimate/ui/ItemEstimateRouteGraph";
+import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { Status } from "~/ui/ui/Status";
@@ -190,15 +191,7 @@ export const ItemEstimateSection = ({ itemId }: { readonly itemId: string }) => 
 					<ItemEstimateHeading />
 				</div>
 			)}
-			{state.status === "loading" ? (
-				<Status
-					dataUi="EditorItemEstimateLoading"
-					description="Analyzing authored routes and their requirements."
-					icon={LoaderCircle}
-					iconSpin
-					title="Calculating estimate"
-				/>
-			) : null}
+			{state.status === "loading" ? <ItemEstimateLoading /> : null}
 			{state.status === "error" ? (
 				<Status
 					dataUi="EditorItemEstimateError"

@@ -94,6 +94,12 @@ describe("estimateRequestsFn", () => {
 	});
 
 	it("compares locally cheap co-product routes by their joint critical path", () => {
+		const independentFactIds = Array.from(
+			{
+				length: 9,
+			},
+			(_, index) => `independent-${index}`,
+		);
 		const operation = {
 			id: "alternating-a-or-b",
 			inputs: [],
@@ -149,12 +155,25 @@ describe("estimateRequestsFn", () => {
 				facts: [
 					"a",
 					"b",
+					...independentFactIds,
 					"target",
 				],
 				roots: [],
 				routes: [
 					makeSharedOutput("a"),
 					makeSharedOutput("b"),
+					...independentFactIds.flatMap((factId) => [
+						route({
+							durationMs: 1,
+							id: `a-${factId}`,
+							output: factId,
+						}),
+						route({
+							durationMs: 1,
+							id: `b-${factId}`,
+							output: factId,
+						}),
+					]),
 					route({
 						durationMs: 2.5,
 						id: "standalone-a",
@@ -169,6 +188,7 @@ describe("estimateRequestsFn", () => {
 						allOf: [
 							requirement("a"),
 							requirement("b"),
+							...independentFactIds.map((factId) => requirement(factId)),
 						],
 						durationMs: 0,
 						id: "make-target",

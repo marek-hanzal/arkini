@@ -7,10 +7,9 @@ import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
 import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndexFn";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import {
-	ItemEstimateCacheAtom,
-	type ItemEstimateCacheAtom as ItemEstimateCache,
-} from "~/estimate/atom/ItemEstimateCacheAtom";
+import { ItemEstimateCacheAtom } from "~/estimate/atom/ItemEstimateCacheAtom";
+import type { ItemEstimateSnapshot } from "~/estimate/fn/createItemEstimateSnapshotFn";
+import { useItemEstimateEntrySnapshot } from "~/estimate/ui/useItemEstimateEntrySnapshot";
 
 export type ItemEstimateIndexState =
 	| {
@@ -30,10 +29,8 @@ export type ItemEstimateIndexState =
 			readonly status: "error";
 	  };
 
-const sameSnapshotFn = (
-	left: ItemEstimateCache.Snapshot | undefined,
-	right: ItemEstimateCache.Snapshot,
-) => left?.projectId === right.projectId && left.revision === right.revision;
+const sameSnapshotFn = (left: ItemEstimateSnapshot | undefined, right: ItemEstimateSnapshot) =>
+	left?.projectId === right.projectId && left.revision === right.revision;
 
 /** Reads the shared result of one full-snapshot estimate batch. */
 export const useItemEstimateIndex = (
@@ -48,18 +45,7 @@ export const useItemEstimateIndex = (
 		readonly view: ItemEstimateViewSchema.Type;
 	},
 ): ItemEstimateIndexState => {
-	const snapshot = useMemo<ItemEstimateCache.Snapshot>(
-		() => ({
-			config: project.config,
-			projectId: project.projectId,
-			revision: project.revision,
-		}),
-		[
-			project.config,
-			project.projectId,
-			project.revision,
-		],
-	);
+	const snapshot = useItemEstimateEntrySnapshot(project);
 	const [state, requestIndexFn] = useAtom(ItemEstimateCacheAtom);
 
 	useEffect(() => {
@@ -71,22 +57,22 @@ export const useItemEstimateIndex = (
 	const selection = useMemo(() => {
 		const entries = createItemEstimateIndexFn({
 			estimates: state.estimates,
-			itemIds: Object.keys(project.config.items),
+			itemIds: Object.keys(snapshot.config.items),
 		});
 		return {
 			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),
 			rows: selectItemEstimateIndexFn({
 				entries,
 				itemType,
-				items: Object.values(project.config.items),
+				items: Object.values(snapshot.config.items),
 				query,
 				view,
 			}),
 		};
 	}, [
 		itemType,
-		project.config.items,
 		query,
+		snapshot.config.items,
 		view,
 		state.estimates,
 	]);

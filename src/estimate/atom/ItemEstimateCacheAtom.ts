@@ -1,21 +1,15 @@
 import { Cause, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { Project } from "~/project-authoring/type/Project";
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
+import type { ItemEstimateSnapshot } from "~/estimate/fn/createItemEstimateSnapshotFn";
 import { runItemEstimateInWorkerFx } from "~/estimate/worker/runItemEstimateInWorkerFx";
 
 export namespace ItemEstimateCacheAtom {
-	export interface Snapshot {
-		readonly config: Project["config"];
-		readonly projectId: string;
-		readonly revision: number;
-	}
-
 	export interface State {
 		readonly estimates: ReadonlyMap<string, ItemEstimate>;
 		readonly message?: string;
-		readonly snapshot?: Snapshot;
+		readonly snapshot?: ItemEstimateSnapshot;
 		readonly status: "idle" | "loading" | "ready" | "error";
 	}
 }
@@ -25,10 +19,8 @@ const initialState: ItemEstimateCacheAtom.State = {
 	status: "idle",
 };
 
-const sameSnapshotFn = (
-	left: ItemEstimateCacheAtom.Snapshot | undefined,
-	right: ItemEstimateCacheAtom.Snapshot,
-) => left?.projectId === right.projectId && left.revision === right.revision;
+const sameSnapshotFn = (left: ItemEstimateSnapshot | undefined, right: ItemEstimateSnapshot) =>
+	left?.projectId === right.projectId && left.revision === right.revision;
 
 const readCauseMessageFn = (cause: Cause.Cause<unknown>) => {
 	const error = Cause.findErrorOption(cause);
@@ -38,7 +30,7 @@ const readCauseMessageFn = (cause: Cause.Cause<unknown>) => {
 };
 
 const stateAtom = Atom.make<ItemEstimateCacheAtom.State>(initialState).pipe(Atom.keepAlive);
-const runnerAtom = Atom.fn((snapshot: ItemEstimateCacheAtom.Snapshot) =>
+const runnerAtom = Atom.fn((snapshot: ItemEstimateSnapshot) =>
 	Effect.gen(function* () {
 		const exit = yield* Effect.exit(
 			runItemEstimateInWorkerFx({
@@ -79,7 +71,7 @@ const runnerAtom = Atom.fn((snapshot: ItemEstimateCacheAtom.Snapshot) =>
 /** Process-lifetime estimate authority owned and disposed by RendererAtomRegistry. */
 export const ItemEstimateCacheAtom = Atom.writable(
 	(get) => get(stateAtom),
-	(context, snapshot: ItemEstimateCacheAtom.Snapshot) => {
+	(context, snapshot: ItemEstimateSnapshot) => {
 		const state = context.get(stateAtom);
 		if (
 			sameSnapshotFn(state.snapshot, snapshot) &&

@@ -6,7 +6,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 const config = GameConfigSchema.parse({
 	resources: {

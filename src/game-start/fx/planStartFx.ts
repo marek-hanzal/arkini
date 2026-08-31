@@ -11,7 +11,7 @@ import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planSpawnPlacementFx } from "~/item-placement/fx/planSpawnPlacementFx";
-import { assertRuntimeFx } from "~/game-runtime/check/assertRuntimeFx";
+import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 

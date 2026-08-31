@@ -1,4 +1,4 @@
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { InputCapacityExceededIssueSchema } from "~/production-input/schema/check/InputCapacityExceededIssueSchema";

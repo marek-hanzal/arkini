@@ -153,6 +153,8 @@ Within an exact domain owner, total synchronous explicit-input data-to-data help
 
 Effect-valued capability fields spell the complete `Effect<A, E, R>` contract. A ready capability explicitly uses `never` for a closed error or requirement channel; a higher-order owner parameterizes and propagates the caller's channels instead of erasing them through a narrower property type or by converting expected failure into a defect.
 
+Public and cross-module contracts name the concrete type owned by the producing domain. Consumers import that type directly; they do not reconstruct it from implementation values through `ReturnType`, `Effect.Success`, `Layer.Success`, or nested inference chains.
+
 One cohesive public ownership boundary owns each module. Sole-owner helpers, commands, constants, and supporting types stay private with it even when that makes the owner longer; split by independently meaningful policy, lifecycle, capability, component, or contract rather than by line count. Once a contract is independently useful, direct cross-domain reuse is valid wherever the import direction remains correct. Public schema, typed-failure, Context/Layer/capability, Atom-state, worker, and framework-entrypoint identities remain standalone where their contract is real.
 
 Each physical process has one Effect execution root:

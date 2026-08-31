@@ -1,4 +1,9 @@
-import { createFormHook } from "@tanstack/react-form";
+import {
+	createFormHook,
+	type AppFieldExtendedReactFormApi,
+	type FormAsyncValidateOrFn,
+	type FormValidateOrFn,
+} from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
 
 import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
@@ -192,17 +197,39 @@ const EditorBoolToggle = ({
 	);
 };
 
+const editorFieldComponents = {
+	AssetField: AssetAutocompleteField,
+	BoolToggle: EditorBoolToggle,
+	ChoiceField: EditorChoiceField,
+	ItemField: EditorItemAutocompleteField,
+	NumberField: EditorNumberField,
+	SecondsField: EditorSecondsField,
+	TextAreaField: EditorTextAreaField,
+	TextField: EditorTextField,
+};
+
+export type EditorFormApi<
+	FormData,
+	DynamicValidator extends FormValidateOrFn<FormData>,
+> = AppFieldExtendedReactFormApi<
+	FormData,
+	FormValidateOrFn<FormData> | undefined,
+	FormValidateOrFn<FormData> | undefined,
+	FormAsyncValidateOrFn<FormData> | undefined,
+	FormValidateOrFn<FormData> | undefined,
+	FormAsyncValidateOrFn<FormData> | undefined,
+	FormValidateOrFn<FormData> | undefined,
+	FormAsyncValidateOrFn<FormData> | undefined,
+	DynamicValidator,
+	FormAsyncValidateOrFn<FormData> | undefined,
+	FormAsyncValidateOrFn<FormData> | undefined,
+	unknown,
+	typeof editorFieldComponents,
+	{}
+>;
+
 export const { useAppForm, withFieldGroup } = createFormHook({
-	fieldComponents: {
-		AssetField: AssetAutocompleteField,
-		BoolToggle: EditorBoolToggle,
-		ChoiceField: EditorChoiceField,
-		ItemField: EditorItemAutocompleteField,
-		NumberField: EditorNumberField,
-		SecondsField: EditorSecondsField,
-		TextAreaField: EditorTextAreaField,
-		TextField: EditorTextField,
-	},
+	fieldComponents: editorFieldComponents,
 	formComponents: {},
 	fieldContext,
 	formContext,

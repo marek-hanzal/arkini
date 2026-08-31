@@ -1,5 +1,4 @@
 import type { Effect, Exit } from "effect";
-import type * as LayerModule from "effect/Layer";
 import type * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { GameSessionNotRunningError } from "~/game-session/error/GameSessionNotRunningError";
@@ -8,13 +7,23 @@ import type {
 	GameSessionFatalSource,
 } from "~/game-session/error/GameSessionFatalError";
 import type { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
+import type { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import type { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import type { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
+import type { GameLoopFx } from "~/game-tick/service/GameLoopFx";
+import type { TickFx } from "~/game-tick/service/TickFx";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
-import type { GameSessionLayerFx } from "~/game-session/layer/GameSessionLayerFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export type GameSessionServices =
-	| LayerModule.Success<ReturnType<typeof GameSessionLayerFx>>
+	| GameConfigFx
+	| RuntimeStoreFx
+	| RuntimeFx
+	| CommittedTransitionsFx
+	| TickFx
+	| GameLoopFx
 	| RuntimeSaveFx;
 
 /** Exact committed game fact exposed to renderer presentation. */

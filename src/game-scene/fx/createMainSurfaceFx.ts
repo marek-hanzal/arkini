@@ -6,7 +6,7 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
-import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
+import type { MainInteractionTargetFacts as TargetFacts } from "~/tile-interaction/type/MainInteractionSurface";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { DropFeedback } from "~/game-scene/service/DropFeedback";
@@ -24,8 +24,6 @@ interface PixiSceneDropTarget {
 	readonly x: number;
 	readonly y: number;
 }
-
-type TargetFacts = Effect.Success<ReturnType<MainInteractionSurface["readTargetFactsFx"]>>;
 
 interface CreateMainSurfaceProps {
 	readonly actorStore: MainActorStore;

@@ -29,7 +29,7 @@ type SettingsCommand =
 			readonly runFx: Effect.Effect<void, unknown, never>;
 	  };
 
-type SettingsCommandState =
+export type SettingsCommandState =
 	| {
 			readonly kind: "idle";
 	  }

@@ -10,7 +10,7 @@ import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
-interface TileReplacement {
+export interface TileReplacement {
 	readonly actorId: string;
 	readonly key: string;
 	readonly previous: TileActorVisual;

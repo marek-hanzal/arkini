@@ -3,6 +3,8 @@ import { useMemo } from "react";
 import type { ProjectStartScope } from "~/project-authoring/type/ProjectStartScope";
 import { readProjectStartItemIdsFn } from "~/project-authoring/fn/readProjectStartItemIdsFn";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobox";
 
 export namespace useProjectStartItemPickerController {
 	export interface Props {
@@ -12,8 +14,8 @@ export namespace useProjectStartItemPickerController {
 	}
 
 	export interface Output {
-		readonly items: ReturnType<typeof useEditorItemSearchOptions>["items"];
-		readonly options: ReturnType<typeof useEditorItemSearchOptions>["options"];
+		readonly items: GameConfigSchema.Type["items"];
+		readonly options: ReadonlyArray<EditorSearchOption>;
 		readonly selectItem: (itemId: string) => void;
 	}
 }

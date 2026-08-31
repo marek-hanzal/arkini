@@ -9,6 +9,11 @@ export namespace createGameResourceUrlsFx {
 	}
 }
 
+export interface GameResourceUrls {
+	readonly get: (resourceId: string) => string;
+	readonly releaseFx: Effect.Effect<void, never, never>;
+}
+
 /** Owns immutable object URLs for one exact live game's resource revision. */
 export const createGameResourceUrlsFx = Effect.fn("createGameResourceUrlsFx")(function* ({
 	owner,
@@ -24,7 +29,7 @@ export const createGameResourceUrlsFx = Effect.fn("createGameResourceUrlsFx")(fu
 		}),
 	);
 	const releaseFx = Scope.close(scope, Exit.void);
-	return yield* Effect.sync(() => {
+	return yield* Effect.sync((): GameResourceUrls => {
 		for (const resource of resources) {
 			urls.set(
 				resource.id,

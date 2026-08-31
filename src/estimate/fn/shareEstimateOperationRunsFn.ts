@@ -1,7 +1,8 @@
 import { Order } from "effect";
 
 import {
-	createEstimateRoutePolicyFn,
+	type EstimateRouteChoicePoint,
+	type EstimateRoutePolicy,
 	readEstimateRouteRequirementsFn,
 } from "~/estimate/fn/createEstimateRoutePolicyFn";
 import { readEstimateExpectedRunsFn } from "~/estimate/fn/readEstimateExpectedRunsFn";
@@ -11,7 +12,7 @@ import type { EstimateSelectedRoute } from "~/estimate/type/EstimateWitness";
 interface ShareEstimateOperationRunsProps {
 	readonly choiceOverrides: ReadonlyMap<string, string>;
 	readonly factId: string;
-	readonly policy: ReturnType<typeof createEstimateRoutePolicyFn>;
+	readonly policy: EstimateRoutePolicy;
 	readonly selected: ReadonlyMap<string, EstimateSelectedRoute>;
 	readonly topRouteId: string;
 }
@@ -22,9 +23,7 @@ interface SharedOperationFailure {
 }
 
 interface SharedOperationSuccess {
-	readonly choices: ReadonlyArray<
-		NonNullable<ReturnType<typeof readEstimateRouteRequirementsFn>>["choices"][number]
-	>;
+	readonly choices: ReadonlyArray<EstimateRouteChoicePoint>;
 	readonly selected: Map<string, EstimateSelectedRoute>;
 	readonly sharedOperationIds: ReadonlySet<string>;
 	readonly status: "success";
@@ -38,10 +37,7 @@ export const shareEstimateOperationRunsFn = ({
 	selected,
 	topRouteId,
 }: ShareEstimateOperationRunsProps): SharedOperationFailure | SharedOperationSuccess => {
-	const choices = new Map<
-		string,
-		NonNullable<ReturnType<typeof readEstimateRouteRequirementsFn>>["choices"][number]
-	>();
+	const choices = new Map<string, EstimateRouteChoicePoint>();
 	const result = new Map(selected);
 	const selectedByOperationId = new Map<
 		string,

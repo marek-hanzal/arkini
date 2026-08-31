@@ -10,13 +10,15 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { FormSchema, type FormValues } from "~/item-authoring/schema/FormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveFx } from "~/item-authoring/fx/saveFx";
-import { useAppForm } from "~/authoring-form/ui/EditorForm";
+import { type EditorFormApi, useAppForm } from "~/authoring-form/ui/EditorForm";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
+import type { ProjectCompatibility } from "~/project-version/type/ProjectCompatibility";
+import type { Project } from "~/project-authoring/type/Project";
 
 const saveCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -39,7 +41,18 @@ export namespace useFormController {
 		readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
 	}
 
-	export type Output = ReturnType<typeof useFormController>;
+	export interface Output {
+		readonly canonicalItem: FormValues;
+		readonly compatibility?: ProjectCompatibility;
+		readonly error: unknown;
+		readonly form: EditorFormApi<FormValues, FormSchema>;
+		readonly initialItem: ItemSchema.Type;
+		readonly isDirty: boolean;
+		readonly isSaving: boolean;
+		readonly itemId: string;
+		readonly project: Project;
+		readonly save: () => Promise<boolean>;
+	}
 }
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
@@ -48,7 +61,7 @@ export const useFormController = ({
 	initialItem,
 	onInvalidSection,
 	onSaved,
-}: useFormController.Props) => {
+}: useFormController.Props): useFormController.Output => {
 	const project = useEditorProject();
 	const canonicalItem = useMemo<FormValues>(
 		() => ({

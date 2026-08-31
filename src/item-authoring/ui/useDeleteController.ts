@@ -13,6 +13,7 @@ import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { deleteFx } from "~/item-authoring/fx/deleteFx";
 import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
+import type { Project } from "~/project-authoring/type/Project";
 
 const deleteCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -41,7 +42,7 @@ export namespace useDeleteController {
 		readonly error: unknown;
 		readonly forceImpact: forceDeleteFx.Impact;
 		readonly open: (force: boolean) => void;
-		readonly project: ReturnType<typeof useEditorProject>;
+		readonly project: Project;
 	}
 }
 

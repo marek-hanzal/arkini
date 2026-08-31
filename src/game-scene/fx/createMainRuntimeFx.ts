@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -24,6 +25,7 @@ import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscriptionReplayGateFx";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
+import type { MainRuntime } from "~/game-scene/service/MainRuntime";
 
 interface CreateMainRuntimeProps {
 	readonly dragThreshold: number;
@@ -187,10 +189,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		let closed = false;
 		let latestTransition = game.getTransitionSnapshot();
 
-		const applyTransition = (
-			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
-			delivery: "hydrate" | "present",
-		) => {
+		const applyTransition = (transition: GameTransition, delivery: "hydrate" | "present") => {
 			if (closed) return;
 			latestTransition = transition;
 			// Surface hit testing and actor reconciliation must observe one committed snapshot.
@@ -260,6 +259,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 				closed = true;
 				yield* rollbackFx;
 			}),
-		};
+		} satisfies MainRuntime;
 	}).pipe(Effect.onError(() => rollbackFx));
 });

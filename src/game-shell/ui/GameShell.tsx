@@ -13,6 +13,7 @@ import { ItemDetailModal } from "~/item-detail/ui/ItemDetailModal";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 import { PixiGameProvider } from "~/game-scene/ui/PixiGameRuntime";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 
 type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscreen";
 
@@ -100,7 +101,7 @@ const GameShellLayers = ({
 	menu,
 	routePresentation,
 }: PropsWithChildren<{
-	readonly game: ReturnType<typeof useGameEngine>;
+	readonly game: GameEngine;
 	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
 	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
 	readonly menu?: ReactNode;

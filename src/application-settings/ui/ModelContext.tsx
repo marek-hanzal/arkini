@@ -2,7 +2,7 @@ import { createContext, type PropsWithChildren, useContext } from "react";
 
 import type { useSettingsModel } from "~/application-settings/ui/useSettingsModel";
 
-type SettingsModel = ReturnType<typeof useSettingsModel>;
+type SettingsModel = useSettingsModel.Output;
 
 const ModelContext = createContext<SettingsModel | undefined>(undefined);
 

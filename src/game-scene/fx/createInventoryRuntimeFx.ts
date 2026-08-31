@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSpaceActionPresentationPhasesFn } from "~/game-scene/fn/readSpaceActionPresentationPhasesFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -22,6 +23,7 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { InventorySurface } from "~/game-scene/service/InventorySurface";
 import { createInventorySurfaceFx } from "~/game-scene/fx/createInventorySurfaceFx";
 import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscriptionReplayGateFx";
+import type { InventoryRuntime } from "~/game-scene/service/InventoryRuntime";
 
 interface CreateInventoryRuntimeProps {
 	readonly dragThreshold: number;
@@ -35,8 +37,6 @@ interface CreateInventoryRuntimeProps {
 	readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
 	readonly textures: TextureStore;
 }
-
-type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
 
 /**
  * Composes the routed Inventory canvas without sharing display objects with the main scene.
@@ -257,6 +257,6 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 			cancelInteractionFx: createdDrag.cancelInteractionFx,
 			projectSpaceActivationFx,
 			closeFx,
-		};
+		} satisfies InventoryRuntime;
 	}).pipe(Effect.onError(() => closeFx));
 });

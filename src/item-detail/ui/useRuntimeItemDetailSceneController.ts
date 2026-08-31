@@ -1,4 +1,4 @@
-import { Effect, Equal } from "effect";
+import { Equal } from "effect";
 import { useCallback, useEffect } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -8,7 +8,10 @@ import { readItemDetailIdentityFx } from "~/item-detail-read/fx/readItemDetailId
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";
-import { projectItemDetailQueueFx } from "~/item-detail/fx/projectItemDetailQueueFx";
+import {
+	type ItemDetailQueueProjection,
+	projectItemDetailQueueFx,
+} from "~/item-detail/fx/projectItemDetailQueueFx";
 import { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { useItemDetailLines } from "~/item-line-detail/ui/useItemDetailLines";
@@ -41,7 +44,7 @@ export namespace useRuntimeItemDetailSceneController {
 				readonly kind: "unavailable";
 		  };
 
-	export type QueueProjection = Effect.Success<ReturnType<typeof projectItemDetailQueueFx>>;
+	export type QueueProjection = ItemDetailQueueProjection;
 
 	export interface Props {
 		readonly target: Target;
@@ -57,7 +60,7 @@ export namespace useRuntimeItemDetailSceneController {
 		readonly queueStale: boolean;
 		readonly sources?: useItemDetailNavigationController.SourcesProjection;
 		readonly stale: boolean;
-		readonly tabs: ReturnType<typeof useItemDetailNavigationController>["tabs"];
+		readonly tabs: useItemDetailNavigationController.Output["tabs"];
 	}
 }
 

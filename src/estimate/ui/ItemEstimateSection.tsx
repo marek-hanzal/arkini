@@ -1,6 +1,7 @@
 import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
 import type { AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
@@ -140,7 +141,7 @@ const ItemEstimateResult = ({
 	estimate,
 	projectId,
 }: {
-	readonly config: ReturnType<typeof useEditorProject>["config"];
+	readonly config: GameConfigSchema.Type;
 	readonly estimate: ItemEstimate;
 	readonly projectId: string;
 }) =>

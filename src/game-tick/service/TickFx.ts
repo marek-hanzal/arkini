@@ -1,15 +1,14 @@
 import { Context, type Effect } from "effect";
 
-import type { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
+import type { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import type { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
+import type { AdvanceRuntimeElapsedError } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 
-type RuntimeAdvanceFx =
-	ReturnType<typeof advanceRuntimeElapsedFx> extends Effect.Effect<
-		unknown,
-		infer Error,
-		infer Requirements
-	>
-		? Effect.Effect<void, Error, Requirements>
-		: never;
+type RuntimeAdvanceFx = Effect.Effect<
+	void,
+	AdvanceRuntimeElapsedError,
+	RuntimeStoreFx | GameConfigFx
+>;
 
 interface TickFxService {
 	readonly advanceRuntime: RuntimeAdvanceFx;

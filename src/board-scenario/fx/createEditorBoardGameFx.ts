@@ -2,7 +2,10 @@ import { Effect } from "effect";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
-import { createGameResourceUrlsFx } from "~/playable-game/fx/createGameResourceUrlsFx";
+import {
+	createGameResourceUrlsFx,
+	type GameResourceUrls,
+} from "~/playable-game/fx/createGameResourceUrlsFx";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { startFx } from "~/game-start/fx/startFx";
@@ -29,7 +32,7 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 					state,
 				}),
 	});
-	let resourceUrls: Effect.Success<ReturnType<typeof createGameResourceUrlsFx>> | undefined;
+	let resourceUrls: GameResourceUrls | undefined;
 	const discardFailedBootstrapFx = discardGameBootstrapFx(
 		session,
 		Effect.suspend(() => resourceUrls?.releaseFx ?? Effect.void),

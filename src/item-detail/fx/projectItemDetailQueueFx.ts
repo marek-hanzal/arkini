@@ -30,7 +30,7 @@ interface Props {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-type Result =
+export type ItemDetailQueueProjection =
 	| {
 			readonly kind: "available";
 			readonly itemId: EngineQueue["itemId"];
@@ -87,7 +87,7 @@ export const projectItemDetailQueueFx = Effect.fn("projectItemDetailQueueFx")(fu
 	if (queue.kind === "unavailable") {
 		return {
 			kind: "unavailable",
-		} satisfies Result;
+		} satisfies ItemDetailQueueProjection;
 	}
 	const [active, request] = yield* Effect.all([
 		Effect.all(
@@ -115,5 +115,5 @@ export const projectItemDetailQueueFx = Effect.fn("projectItemDetailQueueFx")(fu
 		capacity: queue.capacity,
 		active,
 		request,
-	} satisfies Result;
+	} satisfies ItemDetailQueueProjection;
 });

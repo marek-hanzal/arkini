@@ -16,7 +16,7 @@ import type {
 
 const epsilon = 1e-9;
 
-interface EstimateRoutePolicy {
+export interface EstimateRoutePolicy {
 	readonly completeFactsByBlockedKey: ReadonlyMap<string, ReadonlySet<string>>;
 	readonly topology: EstimateTopology;
 	readonly unitCost: ReadonlyMap<string, number>;
@@ -30,7 +30,7 @@ interface EstimateRouteCostContext {
 	>;
 }
 
-interface EstimateRouteChoicePoint {
+export interface EstimateRouteChoicePoint {
 	readonly key: string;
 	readonly options: ReadonlyArray<string>;
 	readonly selected: string;

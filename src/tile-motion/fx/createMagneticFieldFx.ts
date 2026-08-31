@@ -323,13 +323,13 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 							source,
 						): source is {
 							readonly sample: ActiveMagneticSample;
-							readonly sourceRect: NonNullable<ReturnType<typeof readSourceRect>>;
+							readonly sourceRect: MagneticRect;
 						} => source.sourceRect !== null,
 					);
 				const activeSourceActorIds = new Set(
 					activeSamples.map(({ sample }) => sample.sourceActorId),
 				);
-				const actorRects = new Map<string, ReturnType<typeof readActorRect>>();
+				const actorRects = new Map<string, MagneticRect>();
 				const displacements = new Map<
 					string,
 					{

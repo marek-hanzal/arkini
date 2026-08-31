@@ -6,14 +6,14 @@ import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPr
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
-interface MainInteractionDropTarget {
+export interface MainInteractionDropTarget {
 	readonly kind: "slot";
 	readonly layout: SurfaceLayout;
 	readonly x: number;
 	readonly y: number;
 }
 
-interface MainInteractionTargetFacts {
+export interface MainInteractionTargetFacts {
 	readonly commandTarget: dropItemFx.Props["target"];
 	readonly occupant: TileActorItem | null;
 	readonly stableKey: string;

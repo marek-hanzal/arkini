@@ -7,14 +7,31 @@ import type { AppearanceThemeSchema } from "~electron/contract/appearance/Appear
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
-import { SettingsCommandAtom } from "~/application-settings/atom/SettingsCommandAtom";
+import {
+	SettingsCommandAtom,
+	type SettingsCommandState,
+} from "~/application-settings/atom/SettingsCommandAtom";
+
+export namespace useSettingsModel {
+	export interface Output {
+		readonly blocked: boolean;
+		readonly cheatToolsAvailable: boolean;
+		readonly status: SettingsCommandState;
+		readonly theme: AppearanceThemeSchema.Type;
+		readonly windowMode: WindowModeSchema.Type;
+		readonly goBack: () => void;
+		readonly selectTheme: (theme: AppearanceThemeSchema.Type) => void;
+		readonly selectWindowMode: (mode: WindowModeSchema.Type) => void;
+		readonly setCheatToolsAvailable: (available: boolean) => void;
+	}
+}
 
 /** Owns application settings commands and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
 	onBackFx,
 }: {
 	readonly onBackFx: Effect.Effect<void, unknown, never>;
-}) => {
+}): useSettingsModel.Output => {
 	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);

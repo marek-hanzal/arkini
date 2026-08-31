@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { readTileMotionCuesFx } from "~/tile-presentation/fx/readTileMotionCuesFx";
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { startFx } from "~/game-start/fx/startFx";
 

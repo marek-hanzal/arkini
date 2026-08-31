@@ -2,12 +2,12 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 

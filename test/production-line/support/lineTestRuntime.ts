@@ -1,4 +1,4 @@
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 export const lineTestConfig = GameConfigSchema.parse({

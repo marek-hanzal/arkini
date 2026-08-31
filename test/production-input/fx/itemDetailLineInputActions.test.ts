@@ -1,16 +1,16 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
-import { getItemFx } from "~test/support/runtime/getItemFx";
+import { getItemFx } from "~test/support/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,

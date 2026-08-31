@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { useGameFx } from "~test/support/game/useGameFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";

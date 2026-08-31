@@ -1,10 +1,10 @@
 import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

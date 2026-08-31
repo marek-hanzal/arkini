@@ -1,13 +1,13 @@
 import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~test/support/game/GameLayerFx";
+import { useGameFx } from "~test/support/useGameFx";
+import type { GameLayerFx } from "~test/support/GameLayerFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";

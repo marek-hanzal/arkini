@@ -7,7 +7,7 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { completeJobRuntimeForTestFx } from "~test/production-job/support/completeJobRuntimeForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";

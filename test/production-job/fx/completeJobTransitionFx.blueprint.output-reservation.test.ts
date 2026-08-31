@@ -7,7 +7,7 @@ import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReser
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { blueprintConfig } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/config";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import {

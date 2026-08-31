@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineStartFx";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";

@@ -5,8 +5,8 @@ import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSch
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { createTestGameSession } from "~test/support/createTestGameSession";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 
 describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 	it("does not publish events for a candidate runtime that fails validation", async () => {

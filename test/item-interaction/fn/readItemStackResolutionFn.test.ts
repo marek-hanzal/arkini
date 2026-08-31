@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";

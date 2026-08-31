@@ -2,11 +2,11 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { outputFx } from "~/production-output/fx/outputFx";
 

@@ -18,9 +18,9 @@ import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineR
 
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 
-import { testGameRead } from "~test/support/game/testGameRead";
+import { testGameRead } from "~test/support/testGameRead";
 
 export const runtimes: Array<ManagedRuntime.ManagedRuntime<GameEngineResourceFx, never>> = [];
 

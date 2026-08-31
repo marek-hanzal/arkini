@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
@@ -13,7 +13,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/DefaultLineIssueReasonEnumSchema";
 

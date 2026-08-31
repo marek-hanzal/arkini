@@ -1,8 +1,8 @@
 import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~test/support/game/GameLayerFx";
+import { useGameFx } from "~test/support/useGameFx";
+import type { GameLayerFx } from "~test/support/GameLayerFx";
 import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
@@ -11,7 +11,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 

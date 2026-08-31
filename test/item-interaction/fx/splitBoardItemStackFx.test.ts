@@ -1,12 +1,12 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { splitBoardItemStackFx } from "~/item-interaction/fx/splitBoardItemStackFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";

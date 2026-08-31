@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 
 import type { GameSession } from "~/game-session/type/GameSession";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";

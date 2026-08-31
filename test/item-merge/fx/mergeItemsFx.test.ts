@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";

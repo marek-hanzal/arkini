@@ -1,8 +1,8 @@
 import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import { GameLayerFx } from "~test/support/game/GameLayerFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { GameLayerFx } from "~test/support/GameLayerFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 

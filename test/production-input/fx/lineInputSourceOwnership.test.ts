@@ -2,8 +2,8 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
-import { useGameFx } from "~test/support/game/useGameFx";
-import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/fx/readItemDetailMaterialAutofillAvailabilityFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";

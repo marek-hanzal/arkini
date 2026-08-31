@@ -1,13 +1,13 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { fillDefaultLineQueueFx } from "~/production-job/fx/fillDefaultLineQueueFx";
 import { unsetDefaultLineFx } from "~/production-line/fx/unsetDefaultLineFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { Effect } from "effect";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 
 import { waitFor } from "./createGameSession.test/fixture";
 

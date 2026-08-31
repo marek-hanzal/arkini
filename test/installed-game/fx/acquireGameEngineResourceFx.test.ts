@@ -6,8 +6,8 @@ import { acquireGameEngineResourceFx } from "~/installed-game/fx/acquireGameEngi
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { Game } from "~/installed-game/type/Game";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
+import { testGameRead } from "~test/support/testGameRead";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const createGame = ({

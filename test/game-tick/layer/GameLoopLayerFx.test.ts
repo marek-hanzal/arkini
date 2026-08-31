@@ -10,7 +10,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { TickFx } from "~/game-tick/service/TickFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createTickFailureTestConfig } from "~test/game-tick/support/createTickFailureTestConfig";

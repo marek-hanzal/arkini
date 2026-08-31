@@ -14,7 +14,7 @@ import {
 	type CheatItemSpawnControl,
 } from "~/game-cheat/context/CheatItemSpawnContext";
 import { CheatItemSpawnProvider } from "~/game-cheat/ui/CheatItemSpawnProvider";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 (

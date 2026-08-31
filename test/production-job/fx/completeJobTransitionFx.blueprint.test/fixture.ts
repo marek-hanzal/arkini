@@ -1,8 +1,8 @@
 import { Effect, type Layer } from "effect";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~test/support/game/GameLayerFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { useGameFx } from "~test/support/useGameFx";
+import type { GameLayerFx } from "~test/support/GameLayerFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { blueprintConfig } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/config";
 
 export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({

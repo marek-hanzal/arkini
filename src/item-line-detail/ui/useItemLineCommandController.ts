@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
-import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";

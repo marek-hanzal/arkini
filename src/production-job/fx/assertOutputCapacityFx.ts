@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
-import { resolveStartOutputCapacityFx } from "~/production-job/fx/read/resolveStartOutputCapacityFx";
+import { resolveStartOutputCapacityFx } from "~/production-job/fx/resolveStartOutputCapacityFx";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

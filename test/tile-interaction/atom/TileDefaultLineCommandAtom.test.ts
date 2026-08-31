@@ -12,10 +12,10 @@ const engineCommands = vi.hoisted(() => ({
 }));
 const failStop = vi.fn<Game["failStop"]>();
 
-vi.mock("~/production-job/write/enqueueDefaultLineFx", () => ({
+vi.mock("~/production-job/fx/enqueueDefaultLineFx", () => ({
 	enqueueDefaultLineFx: (props: unknown) => engineCommands.enqueue(props),
 }));
-vi.mock("~/production-job/write/fillDefaultLineQueueFx", () => ({
+vi.mock("~/production-job/fx/fillDefaultLineQueueFx", () => ({
 	fillDefaultLineQueueFx: (props: unknown) => engineCommands.fill(props),
 }));
 

@@ -6,8 +6,8 @@ import { settleRendererCommandFailureFx } from "~/game-presentation/fx/settleRen
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { enqueueDefaultLineFx } from "~/production-job/write/enqueueDefaultLineFx";
-import { fillDefaultLineQueueFx } from "~/production-job/write/fillDefaultLineQueueFx";
+import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
+import { fillDefaultLineQueueFx } from "~/production-job/fx/fillDefaultLineQueueFx";
 
 type Command =
 	| {

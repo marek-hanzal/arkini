@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
-import { readDefaultLineQueueTargetFx } from "~/production-job/fx/read/readDefaultLineQueueTargetFx";
+import { readDefaultLineQueueTargetFx } from "~/production-job/fx/readDefaultLineQueueTargetFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 
 export namespace enqueueDefaultLineFx {

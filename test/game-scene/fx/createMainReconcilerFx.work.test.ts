@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { Effect } from "effect";
 
 import {

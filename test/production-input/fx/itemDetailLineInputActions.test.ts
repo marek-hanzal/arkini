@@ -7,7 +7,7 @@ import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
-import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

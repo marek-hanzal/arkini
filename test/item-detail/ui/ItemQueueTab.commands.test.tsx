@@ -32,7 +32,7 @@ vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));
 
-vi.mock("~/production-job/write/clearItemJobQueueFx", () => ({
+vi.mock("~/production-job/fx/clearItemJobQueueFx", () => ({
 	clearItemJobQueueFx: clearQueue,
 }));
 

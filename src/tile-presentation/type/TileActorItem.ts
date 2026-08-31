@@ -1,6 +1,6 @@
 import type { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 

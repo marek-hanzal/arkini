@@ -46,7 +46,7 @@ vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));
 
-vi.mock("~/production-job/write/enqueueLineFx", () => ({
+vi.mock("~/production-job/fx/enqueueLineFx", () => ({
 	enqueueLineFx: (command: unknown) => {
 		commands.enqueue(command);
 		return command;

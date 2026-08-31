@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { resolveJobQueueFx } from "~/production-job/fx/read/resolveJobQueueFx";
+import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";

@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
-import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
+import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 
 export namespace useItemQueueClearController {
 	export interface Props {

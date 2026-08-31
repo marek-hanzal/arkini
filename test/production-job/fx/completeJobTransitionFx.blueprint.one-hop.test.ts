@@ -1,8 +1,8 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveOneHopOutputCapacityFx } from "~/production-job/fx/read/resolveOneHopOutputCapacityFx";
-import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
+import { resolveOneHopOutputCapacityFx } from "~/production-job/fx/resolveOneHopOutputCapacityFx";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

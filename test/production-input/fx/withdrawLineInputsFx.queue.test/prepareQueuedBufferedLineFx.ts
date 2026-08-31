@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
-import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

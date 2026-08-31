@@ -2,8 +2,8 @@ import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { JobCompletionOwner } from "~/production-job/completion/JobCompletionContext";
-import { completeLineJobRuntimeFx } from "~/production-job/completion/fx/completeLineJobRuntimeFx";
+import type { JobCompletionOwner } from "~/production-job/type/JobCompletionContext";
+import { completeLineJobRuntimeFx } from "~/production-job/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
@@ -11,7 +11,7 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
-import { makeJobCompletionRandomFx } from "~/production-job/random/makeJobCompletionRandomFx";
+import { makeJobCompletionRandomFx } from "~/production-job/fx/makeJobCompletionRandomFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";

@@ -26,7 +26,7 @@ type SettingsCommand =
 	  }
 	| {
 			readonly action: "exit";
-			readonly runFx: Effect.Effect<void, unknown>;
+			readonly runFx: Effect.Effect<void, unknown, never>;
 	  };
 
 type SettingsCommandState =

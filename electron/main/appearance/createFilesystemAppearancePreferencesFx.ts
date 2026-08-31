@@ -10,14 +10,14 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 
 /** Effect-native main-process capability for application-wide appearance preferences. */
 export interface AppearancePreferences {
-	readonly readThemeFx: Effect.Effect<AppearanceThemeSchema.Type, ElectronMainError>;
+	readonly readThemeFx: Effect.Effect<AppearanceThemeSchema.Type, ElectronMainError, never>;
 	readonly writeThemeFx: (
 		theme: AppearanceThemeSchema.Type,
-	) => Effect.Effect<void, ElectronMainError>;
-	readonly readAccentFx: Effect.Effect<AppearanceAccentSchema.Type, ElectronMainError>;
+	) => Effect.Effect<void, ElectronMainError, never>;
+	readonly readAccentFx: Effect.Effect<AppearanceAccentSchema.Type, ElectronMainError, never>;
 	readonly writeAccentFx: (
 		accent: AppearanceAccentSchema.Type,
-	) => Effect.Effect<void, ElectronMainError>;
+	) => Effect.Effect<void, ElectronMainError, never>;
 }
 
 export namespace createFilesystemAppearancePreferencesFx {

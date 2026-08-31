@@ -85,10 +85,12 @@ const readGameAudioTonePlanFn = (cue: readGameAudioCuesFn.Result): ReadonlyArray
 
 export namespace createGameAudioSynthFx {
 	export interface Result {
-		readonly prepareFx: Effect.Effect<void, unknown>;
-		readonly unlockFx: Effect.Effect<void, unknown>;
-		readonly playFx: (cues: ReadonlyArray<readGameAudioCuesFn.Result>) => Effect.Effect<void>;
-		readonly closeFx: Effect.Effect<void, unknown>;
+		readonly prepareFx: Effect.Effect<void, unknown, never>;
+		readonly unlockFx: Effect.Effect<void, unknown, never>;
+		readonly playFx: (
+			cues: ReadonlyArray<readGameAudioCuesFn.Result>,
+		) => Effect.Effect<void, never, never>;
+		readonly closeFx: Effect.Effect<void, unknown, never>;
 	}
 }
 

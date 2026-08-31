@@ -25,12 +25,12 @@ export interface MotionSnapshot {
 
 export interface MotionRuntime {
 	/** Releases interruptible spawn or swap ownership at its live pose for direct interaction. */
-	readonly beginInteractionHandoffFx: (actorId: string) => Effect.Effect<boolean>;
-	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void>;
+	readonly beginInteractionHandoffFx: (actorId: string) => Effect.Effect<boolean, never, never>;
+	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void, never, never>;
 	/** Transfers trailing presentation payloads when their original receiver is consumed. */
-	readonly redirectTargetFx: (redirect: MotionRedirect) => Effect.Effect<void>;
-	readonly readSnapshotFx: Effect.Effect<MotionSnapshot>;
-	readonly startFx: Effect.Effect<void>;
-	readonly syncPresentationFx: Effect.Effect<void>;
-	readonly closeFx: Effect.Effect<void>;
+	readonly redirectTargetFx: (redirect: MotionRedirect) => Effect.Effect<void, never, never>;
+	readonly readSnapshotFx: Effect.Effect<MotionSnapshot, never, never>;
+	readonly startFx: Effect.Effect<void, never, never>;
+	readonly syncPresentationFx: Effect.Effect<void, never, never>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 }

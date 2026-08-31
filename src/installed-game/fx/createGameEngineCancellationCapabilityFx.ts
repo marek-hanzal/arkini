@@ -20,12 +20,12 @@ export namespace createGameEngineCancellationCapabilityFx {
 		readonly beginCancellationFx: (
 			owner: AcquisitionOwner,
 			force: boolean,
-		) => Effect.Effect<void, CriticalGameLifecycleError>;
+		) => Effect.Effect<void, CriticalGameLifecycleError, never>;
 		readonly releaseCloseClaimFx: (
 			owner: AcquisitionOwner,
 			token: symbol,
-		) => Effect.Effect<void, CriticalGameLifecycleError>;
-		readonly releaseLeaseRecordFx: (record: LeaseRecord) => Effect.Effect<void>;
+		) => Effect.Effect<void, CriticalGameLifecycleError, never>;
+		readonly releaseLeaseRecordFx: (record: LeaseRecord) => Effect.Effect<void, never, never>;
 	}
 }
 

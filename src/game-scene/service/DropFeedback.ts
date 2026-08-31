@@ -5,7 +5,7 @@ import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
 export interface DropFeedback {
 	readonly container: Container;
-	readonly closeFx: Effect.Effect<void>;
+	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly renderFx: (props: {
 		readonly color: number;
 		readonly slot: {
@@ -13,5 +13,5 @@ export interface DropFeedback {
 			readonly y: number;
 		} | null;
 		readonly surface: SurfaceLayout | null;
-	}) => Effect.Effect<void>;
+	}) => Effect.Effect<void, never, never>;
 }

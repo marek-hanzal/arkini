@@ -23,7 +23,7 @@ import { ElectronMainRuntime } from "../ElectronMainRuntime";
 export interface ChatGptViewController {
 	readonly setSurfaceFx: (
 		surface: ChatGptSurfaceSchema.Type | null,
-	) => Effect.Effect<void, unknown>;
+	) => Effect.Effect<void, unknown, never>;
 }
 
 const CHAT_GPT_URL = "https://chatgpt.com/";

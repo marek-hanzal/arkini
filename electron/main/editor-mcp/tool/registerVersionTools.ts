@@ -157,12 +157,12 @@ const formatDiff = (diff: ProjectVersionDiff) => {
 export namespace registerVersionTools {
 	export interface Props {
 		readonly notifyProjectChanged: (projectId: string) => void;
-		readonly readProjectFx: () => Effect.Effect<Project, unknown>;
+		readonly readProjectFx: () => Effect.Effect<Project, unknown, never>;
 		readonly repository: ProjectRepositoryService;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,
-		) => Effect.Effect<void, unknown>;
+		) => Effect.Effect<void, unknown, never>;
 		readonly runTool: RunTool;
 		readonly server: McpServer;
 	}

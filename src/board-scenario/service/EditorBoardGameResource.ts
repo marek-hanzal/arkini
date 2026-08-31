@@ -32,14 +32,14 @@ export namespace EditorBoardGameResource {
 export interface EditorBoardGameResource {
 	readonly state: SubscriptionRef.SubscriptionRef<EditorBoardGameResource.State>;
 	/** Claims the routed project before synchronizing its latest loaded revision. */
-	readonly syncFx: (project: Project) => Effect.Effect<void>;
+	readonly syncFx: (project: Project) => Effect.Effect<void, never, never>;
 	/** Synchronizes a committed revision only while its project still owns the route. */
-	readonly publishFx: (project: Project) => Effect.Effect<void>;
+	readonly publishFx: (project: Project) => Effect.Effect<void, never, never>;
 	/** Replaces the current same-revision session after an explicit scenario selection. */
 	readonly replaceFx: (
 		project: Project,
 		state?: StateSchema.Type,
-	) => Effect.Effect<void, unknown>;
-	readonly releaseCurrentFx: Effect.Effect<void, unknown>;
-	readonly shutdownFx: Effect.Effect<void>;
+	) => Effect.Effect<void, unknown, never>;
+	readonly releaseCurrentFx: Effect.Effect<void, unknown, never>;
+	readonly shutdownFx: Effect.Effect<void, never, never>;
 }

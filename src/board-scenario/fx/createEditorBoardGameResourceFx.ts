@@ -13,7 +13,7 @@ export namespace createEditorBoardGameResourceFx {
 		readonly createResourceFx?: (
 			project: Project,
 			state?: StateSchema.Type,
-		) => Effect.Effect<EditorBoardGameResource.Resource, unknown>;
+		) => Effect.Effect<EditorBoardGameResource.Resource, unknown, never>;
 	}
 }
 

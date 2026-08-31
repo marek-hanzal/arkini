@@ -22,7 +22,7 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 	readonly actor: PixiTileActor;
 	readonly animator: ActorAnimator;
 	readonly onCancel?: () => void;
-	readonly onHiddenFx: Effect.Effect<void>;
+	readonly onHiddenFx: Effect.Effect<void, never, never>;
 	readonly onRevealed: () => void;
 	readonly ownerKey: string;
 }) {

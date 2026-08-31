@@ -16,16 +16,16 @@ import { createHttpListenerOwnershipFx } from "./createHttpListenerOwnershipFx";
 
 export interface ServerOwnership {
 	readonly readLocalStatus: () => EditorMcpStatus;
-	readonly readOverviewFx: Effect.Effect<EditorMcpOverviewSchema.Type, unknown>;
-	readonly publishOverviewFx: Effect.Effect<void, unknown>;
+	readonly readOverviewFx: Effect.Effect<EditorMcpOverviewSchema.Type, unknown, never>;
+	readonly publishOverviewFx: Effect.Effect<void, unknown, never>;
 	readonly configureFx: (
 		configuration: EditorMcpConfigurationSchema.Type,
-	) => Effect.Effect<EditorMcpOverviewSchema.Type, unknown>;
-	readonly startLocalFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown>;
-	readonly stopLocalFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown>;
-	readonly startRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown>;
-	readonly stopRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown>;
-	readonly resetRemoteAuthFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown>;
+	) => Effect.Effect<EditorMcpOverviewSchema.Type, unknown, never>;
+	readonly startLocalFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
+	readonly stopLocalFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
+	readonly startRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
+	readonly stopRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
+	readonly resetRemoteAuthFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
 	readonly readProjectContext: () => string | undefined;
 	readonly setProjectContext: (
 		projectId: string,
@@ -33,14 +33,14 @@ export interface ServerOwnership {
 	) => void;
 	readonly clearProjectContext: (projectId: string) => void;
 	readonly resetProjectContext: () => void;
-	readonly closeFx: Effect.Effect<void, unknown>;
+	readonly closeFx: Effect.Effect<void, unknown, never>;
 	readonly closeSync: () => void;
 }
 
 export namespace createEditorMcpOwnershipFx {
 	export interface Props {
 		readonly checkPortFx?: typeof checkPortAvailabilityFx;
-		readonly checkRemoteFx?: (origin: URL) => Effect.Effect<void, unknown>;
+		readonly checkRemoteFx?: (origin: URL) => Effect.Effect<void, unknown, never>;
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyOverviewChanged: (overview: EditorMcpOverviewSchema.Type) => void;
 		readonly notifyProjectChanged: (projectId: string) => void;

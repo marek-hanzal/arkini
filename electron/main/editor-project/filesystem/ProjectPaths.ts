@@ -23,14 +23,18 @@ export interface ProjectPaths {
 	readonly itemFileFx: (props: {
 		readonly type: TypeSchema.Type;
 		readonly uid: string;
-	}) => Effect.Effect<string>;
-	readonly assetFileFx: (resourceId: string) => Effect.Effect<string, Error>;
-	readonly resourceFileFx: (resourceId: string) => Effect.Effect<string, Error>;
-	readonly noteFileFx: (noteId: string) => Effect.Effect<string>;
-	readonly scenarioFileFx: (name: string) => Effect.Effect<string>;
-	readonly versionDirectoryFx: (versionId: string) => Effect.Effect<string>;
-	readonly versionDescriptorFileFx: (versionId: string) => Effect.Effect<string>;
-	readonly versionManifestFileFx: (versionId: string) => Effect.Effect<string>;
-	readonly jsonObjectFileFx: (hash: VersionObjectHashSchema.Type) => Effect.Effect<string>;
-	readonly pngObjectFileFx: (hash: VersionObjectHashSchema.Type) => Effect.Effect<string>;
+	}) => Effect.Effect<string, never, never>;
+	readonly assetFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
+	readonly resourceFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
+	readonly noteFileFx: (noteId: string) => Effect.Effect<string, never, never>;
+	readonly scenarioFileFx: (name: string) => Effect.Effect<string, never, never>;
+	readonly versionDirectoryFx: (versionId: string) => Effect.Effect<string, never, never>;
+	readonly versionDescriptorFileFx: (versionId: string) => Effect.Effect<string, never, never>;
+	readonly versionManifestFileFx: (versionId: string) => Effect.Effect<string, never, never>;
+	readonly jsonObjectFileFx: (
+		hash: VersionObjectHashSchema.Type,
+	) => Effect.Effect<string, never, never>;
+	readonly pngObjectFileFx: (
+		hash: VersionObjectHashSchema.Type,
+	) => Effect.Effect<string, never, never>;
 }

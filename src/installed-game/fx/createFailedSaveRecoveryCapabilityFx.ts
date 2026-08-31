@@ -11,7 +11,7 @@ import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage
 
 export namespace createFailedSaveRecoveryCapabilityFx {
 	export interface Dependencies {
-		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown>;
+		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown, never>;
 		readonly lifecycle: Semaphore.Semaphore;
 		readonly operationScope: Scope.Scope;
 		readonly stateRef: Ref.Ref<GameEngineResourceServiceState>;

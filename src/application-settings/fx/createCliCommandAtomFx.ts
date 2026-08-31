@@ -41,10 +41,10 @@ const admitsMutationFn = (command: Exclude<CliCommand, "read">, status: CliStatu
 			: status.type === "installed" || status.type === "repairable";
 
 interface CreateCliCommandAtomFxProps<Status extends CliStatus> {
-	readonly readFx: () => Effect.Effect<Status, unknown>;
-	readonly installFx: () => Effect.Effect<Status, unknown>;
-	readonly replaceFx: () => Effect.Effect<Status, unknown>;
-	readonly uninstallFx: () => Effect.Effect<Status, unknown>;
+	readonly readFx: () => Effect.Effect<Status, unknown, never>;
+	readonly installFx: () => Effect.Effect<Status, unknown, never>;
+	readonly replaceFx: () => Effect.Effect<Status, unknown, never>;
+	readonly uninstallFx: () => Effect.Effect<Status, unknown, never>;
 }
 
 /** Builds one Settings-owned command authority for a CLI filesystem capability. */

@@ -19,13 +19,13 @@ import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage
 
 export namespace createGameEngineResourceServiceFx {
 	export interface Dependencies {
-		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown>;
+		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown, never>;
 		/**
 		 * Creates the resource only. This service is the sole lifecycle lock owner.
 		 */
 		readonly createResourceFx: (
 			packageId: string,
-		) => Effect.Effect<InstalledGameEngineResource, unknown>;
+		) => Effect.Effect<InstalledGameEngineResource, unknown, never>;
 	}
 }
 

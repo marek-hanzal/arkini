@@ -210,10 +210,10 @@ const createServer = (
 	requestVersionCheckoutFx: (
 		projectId: string,
 		versionId: string,
-	) => Effect.Effect<void, unknown>,
-	runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>,
+	) => Effect.Effect<void, unknown, never>,
+	runPromise: <Value, Error>(effect: Effect.Effect<Value, Error, never>) => Promise<Value>,
 ) => {
-	const runTool = async (effect: Effect.Effect<string, unknown>) => {
+	const runTool = async (effect: Effect.Effect<string, unknown, never>) => {
 		try {
 			return {
 				content: [
@@ -439,7 +439,9 @@ export const createServerFx = Effect.fn("createServerFx")(
 			projectId: string,
 			versionId: string,
 		) => Effect.Effect<void, unknown, never>;
-		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
+		readonly runPromise: <Value, Error>(
+			effect: Effect.Effect<Value, Error, never>,
+		) => Promise<Value>;
 	}) =>
 		Effect.succeed({
 			create: () =>

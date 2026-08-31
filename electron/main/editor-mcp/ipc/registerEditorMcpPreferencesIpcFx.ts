@@ -30,7 +30,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			registered = true;
 			const runAuthorized = <Value, Error>(
 				event: IpcMainInvokeEvent,
-				operation: Effect.Effect<Value, Error>,
+				operation: Effect.Effect<Value, Error, never>,
 			) =>
 				ElectronMainRuntime.runPromise(
 					trustedRenderer.assertTrustedIpcSenderFx(event).pipe(Effect.andThen(operation)),

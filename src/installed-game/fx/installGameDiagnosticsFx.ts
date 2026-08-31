@@ -15,7 +15,7 @@ export namespace installGameDiagnosticsFx {
 	export interface Props {
 		readonly arkpack: ArkpackDescriptor;
 		readonly restored: boolean;
-		readonly runRendererEffect: <Value>(effect: Effect.Effect<Value>) => Value;
+		readonly runRendererEffect: <Value>(effect: Effect.Effect<Value, never, never>) => Value;
 		readonly session: GameDiagnosticsSession;
 	}
 }

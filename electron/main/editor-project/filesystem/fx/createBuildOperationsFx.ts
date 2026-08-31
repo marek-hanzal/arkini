@@ -116,7 +116,7 @@ export namespace createBuildOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 	}
 }
 

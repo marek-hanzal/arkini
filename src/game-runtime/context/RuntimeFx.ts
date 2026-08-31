@@ -6,7 +6,7 @@ interface RuntimeFxService {
 	/**
 	 * Reads the current runtime snapshot without exposing its mutable store.
 	 */
-	readonly read: Effect.Effect<RuntimeSchema.Type>;
+	readonly read: Effect.Effect<RuntimeSchema.Type, never, never>;
 }
 
 /**

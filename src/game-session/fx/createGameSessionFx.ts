@@ -38,7 +38,7 @@ export namespace createGameSessionFx {
 		tickIntervalMs?: number;
 		save?: {
 			debounceMs?: number;
-			write: (state: StateSchema.Type) => Effect.Effect<void, SaveError>;
+			write: (state: StateSchema.Type) => Effect.Effect<void, SaveError, never>;
 		};
 	}
 }
@@ -194,7 +194,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				const initializeFx = Effect.gen(function* () {
 					const runManagedFx = <Result, Error>(
 						effect: Effect.Effect<Result, Error, GameSessionServices>,
-					): Effect.Effect<Result, unknown> =>
+					): Effect.Effect<Result, unknown, never> =>
 						Effect.tryPromise({
 							try: (signal) =>
 								managed.runPromise(effect, {
@@ -309,7 +309,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 
 					const runFx = <Result, CommandError, Requirements extends GameSessionServices>(
 						effect: Effect.Effect<Result, CommandError, Requirements>,
-					): Effect.Effect<Result, CommandError | GameSessionNotRunningError> =>
+					): Effect.Effect<Result, CommandError | GameSessionNotRunningError, never> =>
 						Effect.uninterruptibleMask((restore) =>
 							Effect.sync((): CommandClaim<Result, CommandError> => {
 								const current = MutableRef.get(lifecycle);
@@ -336,7 +336,8 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 										claim,
 									): Effect.Effect<
 										Result,
-										CommandError | GameSessionNotRunningError
+										CommandError | GameSessionNotRunningError,
+										never
 									> => {
 										if (claim.type === "reject")
 											return Effect.fail(claim.error);
@@ -349,7 +350,11 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							),
 						);
 					const openSubscription = (
-						effect: Effect.Effect<GameSessionTransitionSubscriptionCleanup>,
+						effect: Effect.Effect<
+							GameSessionTransitionSubscriptionCleanup,
+							never,
+							never
+						>,
 					) => {
 						// Admit new observers only while the session can still publish commands.
 						if (MutableRef.get(lifecycle).type !== "running") return () => undefined;

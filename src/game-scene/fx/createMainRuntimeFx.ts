@@ -61,8 +61,8 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		host,
 		reportCriticalFailure,
 	});
-	const rollbackEffects: Effect.Effect<void, unknown>[] = [];
-	const registerRollback = (closeFx: Effect.Effect<void, unknown>) => {
+	const rollbackEffects: Effect.Effect<void, unknown, never>[] = [];
+	const registerRollback = (closeFx: Effect.Effect<void, unknown, never>) => {
 		rollbackEffects.unshift(closeFx);
 	};
 	registerRollback(application.closeFx);

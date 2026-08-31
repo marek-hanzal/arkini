@@ -15,7 +15,7 @@ type SettingsDirectoryCommandState =
 /** Builds one independent Settings-owned directory command with shared lifecycle semantics. */
 export const createSettingsDirectoryCommandAtomFx = Effect.fn(
 	"createSettingsDirectoryCommandAtomFx",
-)((openDirectoryFx: Effect.Effect<void, unknown>) =>
+)((openDirectoryFx: Effect.Effect<void, unknown, never>) =>
 	Effect.sync(() => {
 		const stateAtom = Atom.make<SettingsDirectoryCommandState>({
 			kind: "idle",

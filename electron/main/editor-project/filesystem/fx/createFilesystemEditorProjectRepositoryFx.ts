@@ -90,7 +90,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		...versions,
 		closeFx: operations.withPermits(1)(Effect.void),
 	} satisfies OwnedEditorProjectRepository;
-	const provide = <Value, Failure>(effect: Effect.Effect<Value, Failure>) =>
+	const provide = <Value, Failure>(effect: Effect.Effect<Value, Failure, never>) =>
 		effect.pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),

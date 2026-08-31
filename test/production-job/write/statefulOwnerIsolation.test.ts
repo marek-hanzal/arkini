@@ -5,7 +5,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 
 const config = GameConfigSchema.parse({

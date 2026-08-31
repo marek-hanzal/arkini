@@ -1,6 +1,6 @@
 import { Option } from "effect";
 
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads one grid item from an optional runtime without leaking Option to cue compilers. */

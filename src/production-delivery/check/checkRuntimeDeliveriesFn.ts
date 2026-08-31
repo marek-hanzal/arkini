@@ -8,7 +8,7 @@ import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { isDeliveryRuntimeItemFn } from "~/game-runtime/read/fn/isDeliveryRuntimeItemFn";
+import { isDeliveryRuntimeItemFn } from "~/game-runtime/fn/isDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/game-runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";

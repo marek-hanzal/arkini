@@ -11,7 +11,7 @@ import {
 	lineRunTestConfig,
 } from "~test/production-line/fx/run/support/lineRunTestRuntime";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 
 export {
 	Effect,

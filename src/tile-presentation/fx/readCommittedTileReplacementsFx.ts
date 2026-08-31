@@ -7,7 +7,7 @@ import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisua
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 interface TileReplacement {

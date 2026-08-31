@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemJobScopedError } from "~/game-runtime/error/ItemJobScopedError";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 

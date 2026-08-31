@@ -4,7 +4,7 @@ import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 export namespace resolveJobRunnableFx {

@@ -7,8 +7,8 @@ import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const compareTarget = (

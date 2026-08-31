@@ -3,13 +3,13 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
-import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";

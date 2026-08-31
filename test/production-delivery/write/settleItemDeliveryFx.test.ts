@@ -5,7 +5,7 @@ import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryF
 import { useGameFx } from "~test/support/game/useGameFx";
 import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";

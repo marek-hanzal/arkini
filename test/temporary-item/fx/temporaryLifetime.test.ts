@@ -6,7 +6,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

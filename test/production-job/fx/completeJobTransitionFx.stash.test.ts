@@ -6,7 +6,7 @@ import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

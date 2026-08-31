@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 

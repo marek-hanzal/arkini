@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";

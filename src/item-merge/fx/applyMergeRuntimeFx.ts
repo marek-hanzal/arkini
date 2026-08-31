@@ -5,7 +5,7 @@ import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlace
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
-import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";

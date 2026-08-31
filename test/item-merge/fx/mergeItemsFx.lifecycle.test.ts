@@ -5,9 +5,9 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { applyMergeRuntimeFx } from "~/item-merge/fx/applyMergeRuntimeFx";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
+import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 

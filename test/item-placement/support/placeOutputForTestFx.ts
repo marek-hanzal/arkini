@@ -5,7 +5,7 @@ import { outputFx } from "~/production-output/fx/outputFx";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
-import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
 
 interface PlaceOutputForTestProps {
 	readonly originItemId: IdSchema.Type;

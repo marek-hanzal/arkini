@@ -6,7 +6,7 @@ import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema"
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";

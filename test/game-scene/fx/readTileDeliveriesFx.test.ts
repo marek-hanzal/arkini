@@ -6,7 +6,7 @@ import { readTileDeliveriesFx } from "~/game-scene/fx/readTileDeliveriesFx";
 import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	inputRuntimeTestConfig,

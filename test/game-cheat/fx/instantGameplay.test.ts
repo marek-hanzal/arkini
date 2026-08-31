@@ -5,7 +5,7 @@ import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";

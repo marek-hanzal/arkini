@@ -6,7 +6,7 @@ import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { InventoryOpenerUnavailableError } from "~/item-interaction/error/InventoryOpenerUnavailableError";
-import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

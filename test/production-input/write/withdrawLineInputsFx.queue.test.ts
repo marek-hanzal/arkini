@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
 	lineId,

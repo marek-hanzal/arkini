@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import {

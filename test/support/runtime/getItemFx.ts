@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 
 interface GetItemProps {
 	itemId: IdSchema.Type;

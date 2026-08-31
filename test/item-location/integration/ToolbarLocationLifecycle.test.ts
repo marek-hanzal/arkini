@@ -8,7 +8,7 @@ import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

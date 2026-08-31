@@ -16,7 +16,7 @@ import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationCla
 import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { isDeliveryRuntimeItemFn } from "~/game-runtime/read/fn/isDeliveryRuntimeItemFn";
+import { isDeliveryRuntimeItemFn } from "~/game-runtime/fn/isDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/game-runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

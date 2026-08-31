@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { resolveOneHopOutputCapacityFx } from "~/production-job/fx/read/resolveOneHopOutputCapacityFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import {

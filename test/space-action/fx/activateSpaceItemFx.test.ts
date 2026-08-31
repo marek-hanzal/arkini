@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { board, inventory, run, spawnAndActivate, toolbar } from "../support/spaceActionFixture";

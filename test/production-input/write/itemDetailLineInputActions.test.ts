@@ -9,7 +9,7 @@ import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInput
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {

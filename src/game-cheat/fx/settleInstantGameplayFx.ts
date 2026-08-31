@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { isInstantGameplayEnabledFn } from "~/game-runtime/read/fn/isInstantGameplayEnabledFn";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 

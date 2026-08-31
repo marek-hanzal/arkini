@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
 import { activateSpaceItemWithTransitionFx } from "~/space-action/fx/activateSpaceItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

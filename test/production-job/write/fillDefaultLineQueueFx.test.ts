@@ -6,7 +6,7 @@ import { enqueueDefaultLineFx } from "~/production-job/write/enqueueDefaultLineF
 import { fillDefaultLineQueueFx } from "~/production-job/write/fillDefaultLineQueueFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
-import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";

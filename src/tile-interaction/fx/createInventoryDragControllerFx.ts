@@ -25,7 +25,10 @@ import { setDraggedActorPoseFx } from "~/tile-interaction/fx/setDraggedActorPose
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import type { InventoryInteractionSurface } from "~/tile-interaction/type/InventoryInteractionSurface";
+import type {
+	InventoryInteractionDropTarget,
+	InventoryInteractionSurface,
+} from "~/tile-interaction/type/InventoryInteractionSurface";
 
 export interface InventoryDragController {
 	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
@@ -50,10 +53,6 @@ interface Props {
 	readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
 	readonly surface: InventoryInteractionSurface;
 }
-
-type InventoryInteractionDropTarget = Effect.Success<
-	ReturnType<InventoryInteractionSurface["readDropTargetFx"]>
->;
 
 interface ActiveInventoryDrag {
 	readonly actor: PixiTileActor;

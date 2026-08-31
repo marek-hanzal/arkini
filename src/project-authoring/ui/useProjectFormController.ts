@@ -11,18 +11,20 @@ import type { Project } from "~/project-authoring/type/Project";
 import {
 	type ProjectFormSchema,
 	ProjectAvatarKeys,
+	ProjectFormBaseSchema,
 } from "~/project-authoring/schema/ProjectFormSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
-import { useAppForm } from "~/authoring-form/ui/EditorForm";
+import { type EditorFormApi, useAppForm } from "~/authoring-form/ui/EditorForm";
 import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
+import type { ProjectCompatibility } from "~/project-version/type/ProjectCompatibility";
 
 const createProjectConfigFn = (
 	project: Pick<Project, "config">,
@@ -138,10 +140,21 @@ export namespace useProjectFormController {
 		readonly onInvalidSection: (section: ProjectSectionId) => void | Promise<void>;
 	}
 
-	export type Output = ReturnType<typeof useProjectFormController>;
+	export interface Output {
+		readonly canonicalValues: ProjectFormSchema.Type;
+		readonly compatibility?: ProjectCompatibility;
+		readonly error: unknown;
+		readonly form: EditorFormApi<ProjectFormSchema.Type, typeof ProjectFormBaseSchema>;
+		readonly isDirty: boolean;
+		readonly isSaving: boolean;
+		readonly project: Project;
+		readonly save: () => Promise<boolean>;
+	}
 }
 
-export const useProjectFormController = ({ onInvalidSection }: useProjectFormController.Props) => {
+export const useProjectFormController = ({
+	onInvalidSection,
+}: useProjectFormController.Props): useProjectFormController.Output => {
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
 		() => readProjectFormValuesFn(project),

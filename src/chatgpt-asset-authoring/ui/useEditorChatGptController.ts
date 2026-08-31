@@ -12,7 +12,10 @@ import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAs
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
-import { useEditorChatGptSurface } from "./useEditorChatGptSurface";
+import {
+	type ChatGptViewState,
+	useEditorChatGptSurface,
+} from "~/chatgpt-asset-authoring/ui/useEditorChatGptSurface";
 
 interface AssetCandidate {
 	readonly file: File;
@@ -47,7 +50,7 @@ export namespace useEditorChatGptController {
 		readonly saving: boolean;
 		readonly setResourceId: (resourceId: string) => void;
 		readonly surfaceRef: RefObject<HTMLDivElement | null>;
-		readonly viewState: ReturnType<typeof useEditorChatGptSurface>["viewState"];
+		readonly viewState: ChatGptViewState;
 	}
 }
 

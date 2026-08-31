@@ -1,4 +1,4 @@
-import { createRouter } from "@tanstack/react-router";
+import { createRouter, type Router } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { routeTree } from "~/_route";
 import type { RootContext } from "~/application-shell/context/RootContext";
@@ -90,7 +90,7 @@ export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: 
 	}),
 );
 
-export type ArkiniRouter = Effect.Success<ReturnType<typeof createArkiniRouterFx>>;
+export type ArkiniRouter = Router<typeof routeTree, "never", false>;
 
 declare module "@tanstack/react-router" {
 	interface Register {

@@ -8,8 +8,9 @@ import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 import { createGameAudioSynthFx } from "~/game-audio/fx/createGameAudioSynthFx";
 import { useGameEvents } from "~/game-presentation/ui/useGameEvents";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 
-const useGameAudioAtoms = (game: ReturnType<typeof useGameEngine>) =>
+const useGameAudioAtoms = (game: GameEngine) =>
 	useMemo(() => {
 		const logGameAudioFailureFx = (message: string, cause: Cause.Cause<unknown>) =>
 			Effect.sync(() => {

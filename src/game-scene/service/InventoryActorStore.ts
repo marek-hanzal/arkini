@@ -1,11 +1,9 @@
 import type { Effect } from "effect";
 
-import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { InventoryDropTarget } from "~/game-scene/service/InventorySurface";
-
-type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
 
 interface InventoryReconciliation {
 	readonly created: readonly PixiTileActor[];

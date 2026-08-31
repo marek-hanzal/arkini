@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFn } from "~/tile-presentation/fn/readTileActorFeedbackCuesFn";
@@ -34,6 +35,7 @@ import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
 import { classifyActorUpdateFn } from "~/game-scene/fn/classifyActorUpdateFn";
 import { classifyReconciliationFn } from "~/game-scene/fn/classifyReconciliationFn";
@@ -56,12 +58,8 @@ interface CreateMainReconcilerProps {
 }
 
 interface MainReconciler {
-	readonly hydrateFx: (
-		transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
-	) => Effect.Effect<void, never, never>;
-	readonly reconcileFx: (
-		transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
-	) => Effect.Effect<void, never, never>;
+	readonly hydrateFx: (transition: GameTransition) => Effect.Effect<void, never, never>;
+	readonly reconcileFx: (transition: GameTransition) => Effect.Effect<void, never, never>;
 	readonly refreshVisualsFx: Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }
@@ -127,7 +125,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		actor,
 		cue,
 	}: {
-		readonly actor: NonNullable<ReturnType<typeof actorStore.actors.get>>;
+		readonly actor: PixiTileActor;
 		readonly cue: TileActorFeedbackCue;
 	}) {
 		if (processedFeedbackKeys.has(cue.key) || actor.container.destroyed) return;
@@ -152,7 +150,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		}
 	});
 
-	const refreshActor = (actor: NonNullable<ReturnType<typeof actorStore.actors.get>>) => {
+	const refreshActor = (actor: PixiTileActor) => {
 		const pose = RendererRuntime.runSync(surface.readActorPoseFx(actor.item));
 		if (pose === null) return;
 		RendererRuntime.runSync(
@@ -241,7 +239,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		transition,
 	}: {
 		readonly presentCommittedEffects: boolean;
-		readonly transition: ReturnType<GameEngine["getTransitionSnapshot"]>;
+		readonly transition: GameTransition;
 	}) {
 		if (closed) return;
 		const nextItems = game.readOrThrow(

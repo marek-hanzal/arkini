@@ -45,7 +45,21 @@ const ItemLineUnavailableReason = ({
 		.exhaustive();
 };
 
-const readUnavailableDependencyFn = (reason: ItemDetailLinesProjection.DisabledReason) => {
+interface UnavailableDependency {
+	readonly detail: NonNullable<
+		Extract<
+			ItemDetailLinesProjection.DisabledReason,
+			{
+				readonly kind: "deposit-target-missing";
+			}
+		>["detail"]
+	>;
+	readonly status: string;
+}
+
+const readUnavailableDependencyFn = (
+	reason: ItemDetailLinesProjection.DisabledReason,
+): UnavailableDependency | undefined => {
 	if (reason.kind === "deposit-target-missing") {
 		return reason.detail === undefined
 			? undefined
@@ -61,7 +75,7 @@ const ItemLineUnavailableDependency = ({
 	dependency,
 	disabled,
 }: {
-	readonly dependency: NonNullable<ReturnType<typeof readUnavailableDependencyFn>>;
+	readonly dependency: UnavailableDependency;
 	readonly disabled: boolean;
 }) => (
 	<div

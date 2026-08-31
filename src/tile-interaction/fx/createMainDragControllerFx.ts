@@ -80,7 +80,7 @@ interface MovableGesture extends ActiveDragBase {
 }
 
 type ActiveDrag = ActivationOnlyGesture | MotionHandoffGesture | MovableGesture;
-type MainDragPreview = Effect.Success<ReturnType<typeof createMainDragPreviewFx>>;
+type MainDragPreview = createMainDragPreviewFx.Output;
 type PointerSample = createPointerFrameSamplerFx.Sample;
 
 const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInventoryShortcutFx")(

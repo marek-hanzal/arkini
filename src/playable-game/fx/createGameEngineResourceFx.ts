@@ -8,6 +8,7 @@ import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { GameSessionServices } from "~/game-session/type/GameSession";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
+import type { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 /** Wraps one exact playable session in a presentation fail-stop guard. */
@@ -58,7 +59,7 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				cause,
 			) => {
 				explicitFailurePublication = true;
-				let fatal: ReturnType<PlayableGame["failStop"]>;
+				let fatal: GameSessionFatalError;
 				try {
 					fatal = game.failStop(
 						operation === "game-presentation" ? "presentation" : "runtime",
@@ -77,7 +78,7 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				if (Exit.isFailure(exit)) {
 					const failure = readExactCauseFailureFn(exit.cause);
 					explicitFailurePublication = true;
-					let fatal: ReturnType<PlayableGame["failStop"]>;
+					let fatal: GameSessionFatalError;
 					try {
 						fatal = game.failStop(
 							"runtime",

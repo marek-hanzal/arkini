@@ -13,6 +13,7 @@ import {
 	unlink,
 	writeFile,
 } from "node:fs/promises";
+import type { FileHandle } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { Effect } from "effect";
 
@@ -49,7 +50,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	readExpectedContents,
 	executable = false,
 }: createManagedFileFx.Props) {
-	const assertManagedHandle = async (handle: Awaited<ReturnType<typeof open>>) => {
+	const assertManagedHandle = async (handle: FileHandle) => {
 		const opened = await handle.stat();
 		const contents = await handle.readFile("utf8");
 		if (!opened.isFile() || !contents.startsWith(managedPrefix)) {

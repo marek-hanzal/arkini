@@ -12,7 +12,7 @@ export namespace useCheatsModel {
 		readonly enabled: boolean;
 		readonly instantGameplay: boolean;
 		readonly status: updateGameCheatsAtom.State;
-		readonly requestExit: (runFx: Effect.Effect<void, unknown>) => void;
+		readonly requestExit: (runFx: Effect.Effect<void, unknown, never>) => void;
 		readonly setEnabled: (enabled: boolean) => void;
 		readonly setInstantGameplay: (enabled: boolean) => void;
 	}
@@ -24,7 +24,7 @@ export const useCheatsModel = (game: PlayableGame): useCheatsModel.Model => {
 	const commandAtom = updateGameCheatsAtom(game);
 	const [commandState, runCommand] = useAtom(commandAtom);
 	const requestExit = useCallback(
-		(runFx: Effect.Effect<void, unknown>) => {
+		(runFx: Effect.Effect<void, unknown, never>) => {
 			runCommand({
 				action: "exit",
 				runFx,

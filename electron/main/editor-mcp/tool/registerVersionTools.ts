@@ -24,7 +24,7 @@ type ToolResult = {
 	}>;
 };
 
-type RunTool = (effect: Effect.Effect<string, unknown>) => Promise<ToolResult>;
+type RunTool = (effect: Effect.Effect<string, unknown, never>) => Promise<ToolResult>;
 
 const referenceSchema = z
 	.union([

@@ -59,7 +59,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 		readonly onComplete?: () => void;
 		readonly toAlpha: number;
 		readonly toScale: number;
-	}): Effect.Effect<void> =>
+	}): Effect.Effect<void, never, never> =>
 		Effect.gen(function* () {
 			// Register scale first so the opacity completion observes the same final lifecycle frame.
 			yield* animator.animateFx({

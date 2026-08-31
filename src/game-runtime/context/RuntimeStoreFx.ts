@@ -5,7 +5,7 @@ import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedT
 export interface RuntimeStoreFxService {
 	/** Authoritative transition reference. Gameplay code must mutate through `modifyEffect`. */
 	readonly ref: SubscriptionRef.SubscriptionRef<CommittedTransitionSchema.Type>;
-	readonly read: Effect.Effect<CommittedTransitionSchema.Type>;
+	readonly read: Effect.Effect<CommittedTransitionSchema.Type, never, never>;
 	/** Synchronous snapshot reserved for explicitly synchronous renderer boundaries. */
 	readonly readUnsafe: () => CommittedTransitionSchema.Type;
 	/** Replays the latest transition, then every later commit in order. */

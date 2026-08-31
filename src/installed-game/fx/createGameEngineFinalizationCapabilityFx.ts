@@ -94,7 +94,7 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 			);
 
 			const runFinalizationFx = Effect.fn("GameEngineFinalizationFx.runFinalizationFx")(
-				(finalization: Finalization, actionFx: Effect.Effect<void, unknown>) =>
+				(finalization: Finalization, actionFx: Effect.Effect<void, unknown, never>) =>
 					actionFx.pipe(
 						Effect.exit,
 						Effect.flatMap((exit) => canonicalFinalizationExitFx(finalization, exit)),
@@ -106,10 +106,10 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 				(
 					resource: InstalledGameEngineResource,
 					operation: Finalization["operation"],
-					actionFx: Effect.Effect<void, unknown>,
+					actionFx: Effect.Effect<void, unknown, never>,
 					allowAlreadyFinalized: boolean,
 					joinInFlightOperation = false,
-				): Effect.Effect<void, unknown> =>
+				): Effect.Effect<void, unknown, never> =>
 					Effect.suspend(() =>
 						Effect.uninterruptibleMask((restore) =>
 							withLifecycleLockFx(

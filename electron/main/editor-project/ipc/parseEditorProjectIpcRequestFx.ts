@@ -8,7 +8,7 @@ export const parseEditorProjectIpcRequestFx = <Value>(
 	operation: ProjectRepositoryError["operation"],
 	schema: z.ZodType<Value>,
 	candidate: unknown,
-): Effect.Effect<Value, ProjectRepositoryError> =>
+): Effect.Effect<Value, ProjectRepositoryError, never> =>
 	Effect.try({
 		try: () => {
 			const result = schema.safeParse(candidate);

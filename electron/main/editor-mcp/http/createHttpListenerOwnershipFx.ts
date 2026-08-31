@@ -41,7 +41,9 @@ export namespace createHttpListenerOwnershipFx {
 			projectId: string,
 			versionId: string,
 		) => Effect.Effect<void, unknown, never>;
-		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
+		readonly runPromise: <Value, Error>(
+			effect: Effect.Effect<Value, Error, never>,
+		) => Promise<Value>;
 	}
 }
 

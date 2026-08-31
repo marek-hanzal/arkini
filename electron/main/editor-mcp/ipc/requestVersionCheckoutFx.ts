@@ -33,7 +33,7 @@ export const requestVersionCheckoutFx = Effect.fn("requestVersionCheckoutFx")(
 			const { port1, port2 } = new MessageChannelMain();
 			let settled = false;
 			let onDestroyed: () => void = () => undefined;
-			const finish = (result: Effect.Effect<void, Error>) => {
+			const finish = (result: Effect.Effect<void, Error, never>) => {
 				if (settled) return;
 				settled = true;
 				sender.removeListener("destroyed", onDestroyed);

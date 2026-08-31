@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "../../../../shared/ArkpackLimits";
-import { Magic } from "~/arkpack/artifact/Magic";
+import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
 
 /** Splits one self-contained Arkpack without interpreting its optional proof. */
 export const decodeArkpackEnvelopeFx = Effect.fn("decodeArkpackEnvelopeFx")((bytes: Uint8Array) =>

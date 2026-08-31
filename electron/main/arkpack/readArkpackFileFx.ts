@@ -4,9 +4,9 @@ import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
-import { verifyArkpackProvenanceFx } from "~/arkpack/artifact/fx/verifyArkpackProvenanceFx";
-import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { verifyArkpackProvenanceFx } from "~/arkpack-artifact/fx/verifyArkpackProvenanceFx";
+import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
 
 export namespace readArkpackFileFx {
 	export interface Props {

@@ -2,9 +2,9 @@ import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { ArkpackDecodeError } from "~/arkpack/artifact/error/ArkpackDecodeError";
-import { Magic } from "~/arkpack/artifact/Magic";
-import { decodeFx } from "~/arkpack/artifact/fx/decodeFx";
+import { ArkpackDecodeError } from "~/arkpack-artifact/error/ArkpackDecodeError";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
+import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
 
 const createManifestOnlyPackFn = (manifest: Uint8Array) => {
 	const headerLength = Magic.byteLength + 4;

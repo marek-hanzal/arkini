@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
 import { createTestPngBytes } from "~test/arkpack/support/createTestPngBytes";
 

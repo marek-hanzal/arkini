@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { ArkpackDistributionChannel } from "~/arkpack/artifact/ArkpackDistributionChannel";
-import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
-import { verifyArkpackProvenanceWithFx } from "~/arkpack/artifact/fx/verifyArkpackProvenanceFx";
-import { readArkpackContentHashFx } from "~/arkpack/artifact/fx/readArkpackContentHashFx";
+import { ArkpackDistributionChannel } from "~/arkpack-artifact/constant/ArkpackDistributionChannel";
+import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
+import { verifyArkpackProvenanceWithFx } from "~/arkpack-artifact/fx/verifyArkpackProvenanceFx";
+import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
 import fixture from "./verifyArkpackProvenanceFx.test/official.fixture.json";
 
 // This suite owns the isolated test-only Sigstore root and its one proof over this exact
-// payload/channel. Production trust remains src/arkpack/artifact/trusted-root.json.
+// payload/channel. Production trust remains src/arkpack-artifact/constant/trusted-root.json.
 const payload = Uint8Array.from(Buffer.from(fixture.payloadBase64, "base64"));
 const proof = new TextEncoder().encode(JSON.stringify(fixture.proof));
 const verifyFixtureFx = (bytes: Uint8Array) =>

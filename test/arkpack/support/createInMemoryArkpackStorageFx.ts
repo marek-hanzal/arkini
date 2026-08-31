@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
 
 /** Creates an explicit in-memory Arkpack capability for tests only. */

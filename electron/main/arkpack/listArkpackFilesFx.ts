@@ -6,7 +6,7 @@ import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 
 const suffix = ".arkpack";
 

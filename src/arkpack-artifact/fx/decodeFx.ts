@@ -1,10 +1,10 @@
 import { decode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 
-import { ArkpackDecodeError } from "~/arkpack/artifact/error/ArkpackDecodeError";
-import { Magic } from "~/arkpack/artifact/Magic";
-import { ManifestSchema } from "~/arkpack/artifact/schema/ManifestSchema";
-import { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
+import { ArkpackDecodeError } from "~/arkpack-artifact/error/ArkpackDecodeError";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
+import { ManifestSchema } from "~/arkpack-artifact/schema/ManifestSchema";
+import { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 
 export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {

@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
+import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
 
 export namespace ArkpackStorage {
 	export interface File {

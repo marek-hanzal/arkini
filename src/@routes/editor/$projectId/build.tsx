@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, PackageCheck, PackagePlus } from "lucide-react";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { EditorBuildDiagnostics } from "~/editor-build/ui/EditorBuildDiagnostics";
 import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajorUpdateDialog";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";

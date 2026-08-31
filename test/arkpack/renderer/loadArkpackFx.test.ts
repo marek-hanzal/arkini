@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
 import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
+import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { createTestArkpack } from "~test/arkpack/support/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";

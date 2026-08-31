@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { signArkpackFileFx } from "../../../../src/arkpack/artifact/fx/signArkpackFileFx";
+import { signArkpackFileFx } from "../../../src/arkpack-artifact/fx/signArkpackFileFx";
 
 let root = "";
 

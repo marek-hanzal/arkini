@@ -2,10 +2,10 @@ import { Effect } from "effect";
 
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/arkpack/renderer/validateArkpackPayloadFx";
-import { decodeFx } from "~/arkpack/artifact/fx/decodeFx";
-import { decodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/decodeArkpackEnvelopeFx";
-import { readArkpackContentHashFx } from "~/arkpack/artifact/fx/readArkpackContentHashFx";
-import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
+import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
+import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
+import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
+import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 

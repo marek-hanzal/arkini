@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "../../../../shared/ArkpackLimits";
-import { Magic } from "~/arkpack/artifact/Magic";
+import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
 
 export namespace encodeArkpackEnvelopeFx {
 	export interface Props {

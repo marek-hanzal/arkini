@@ -5,7 +5,7 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { writeArkpackFileFx } from "./writeArkpackFileFx";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 
 export namespace writeUserArkpackFx {
 	export interface Props {

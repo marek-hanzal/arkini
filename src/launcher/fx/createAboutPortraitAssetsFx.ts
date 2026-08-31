@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
+import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
 
 const avatarRoles = [

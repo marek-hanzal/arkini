@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import type { ElectronMainError } from "../ElectronMainError";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";

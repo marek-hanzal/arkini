@@ -6,7 +6,7 @@ import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPh
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
-import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
+import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
@@ -132,7 +132,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		deliveryItemIds.push(delivery.id);
 		scheduledQuantity += input.reduce((total, allocation) => total + allocation.quantity, 0);
 	}
-	const isolation = yield* isolateStatefulOwnerTransitionFx({
+	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
 		ownerItemId,
 		runtime: deliveryRuntime,
 	});

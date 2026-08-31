@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
-export interface CheatItemCatalogEntry {
+interface CheatItemCatalogEntry {
 	readonly itemId: IdSchema.Type;
 	readonly title: string;
 	readonly sourceResourceId: IdSchema.Type;

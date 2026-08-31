@@ -5,9 +5,9 @@ import { match } from "ts-pattern";
 
 import { BackButton } from "~/ui/button/BackButton";
 import { ButtonLink } from "~/ui/button/Button";
-import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
-import { ModelProvider } from "~/ui/settings/ModelContext";
-import { useSettingsModel } from "~/ui/settings/useSettingsModel";
+import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
+import { ModelProvider } from "~/application-settings/ui/ModelContext";
+import { useSettingsModel } from "~/application-settings/ui/useSettingsModel";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -27,10 +27,7 @@ const sections = [
 ] as const;
 
 const tabClassName =
-	"min-h-9 rounded-lg border border-b-2 border-accent/20 border-b-accent/35 bg-accent/5 px-3 py-2 text-sm text-foreground shadow-none hover:bg-accent/10";
-
-const activeTabClassName =
-	"border-accent/40 border-b-accent/75 bg-accent/15 text-accent hover:bg-accent/20";
+	"min-h-9 rounded-lg border border-b-2 border-accent/20 border-b-accent/35 bg-accent/5 px-3 py-2 text-sm text-foreground shadow-none hover:bg-accent/10 data-[ui-selected=true]:border-accent/40 data-[ui-selected=true]:border-b-accent/75 data-[ui-selected=true]:bg-accent/15 data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:bg-accent/20";
 
 export const Route = createFileRoute("/_launcher/settings")({
 	/** Composes standalone Settings with history-aware route navigation. */
@@ -63,33 +60,21 @@ export const Route = createFileRoute("/_launcher/settings")({
 		});
 
 		return (
-			<MainPageLayout
-				labelledBy="settings-title"
-				page="settings"
-			>
+			<LauncherPageLayout page="settings">
 				<ModelProvider model={model}>
 					<section
 						className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] gap-5"
 						data-ui="Settings"
 					>
 						<header className="text-center">
-							<h1
-								id="settings-title"
-								className="text-2xl font-semibold"
-							>
-								Settings
-							</h1>
+							<h1 className="text-2xl font-semibold">Settings</h1>
 						</header>
 
 						<nav
 							className="min-w-0 overflow-x-auto overscroll-x-contain"
-							aria-label="Settings sections"
 							data-ui="SettingsSectionTabs"
 						>
-							<div
-								className="flex min-w-max items-center gap-2 py-1"
-								role="tablist"
-							>
+							<div className="flex min-w-max items-center gap-2 py-1">
 								{sections.map((section) => (
 									<ButtonLink
 										key={section.id}
@@ -99,7 +84,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 											exact: true,
 										}}
 										activeProps={{
-											className: activeTabClassName,
+											"data-ui-selected": true,
 										}}
 										className={tabClassName}
 									>
@@ -121,7 +106,6 @@ export const Route = createFileRoute("/_launcher/settings")({
 
 						<div
 							className="min-h-6 text-center text-sm"
-							aria-live="polite"
 							data-ui="SettingsStatus"
 						>
 							{match(model.status)
@@ -195,7 +179,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 						/>
 					</section>
 				</ModelProvider>
-			</MainPageLayout>
+			</LauncherPageLayout>
 		);
 	},
 });

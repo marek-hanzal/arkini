@@ -3,10 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
 import type { DiagnosticRecord } from "../../../../electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackDescriptor } from "~/engine/pack/Arkpack";
+import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
 import { installGameDiagnosticsFx } from "~/renderer/game/diagnostics/installGameDiagnosticsFx";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
 const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);

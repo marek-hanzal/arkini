@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { refreshEditorServiceStatusFx } from "~/ui/editor/refreshEditorServiceStatusFx";
+import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEditorServiceStatusFx";
 
 /** Joins installed ownership; active Games still leave through their final-save route. */
 export const Route = createFileRoute("/editor")({

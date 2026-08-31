@@ -1,6 +1,6 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 
-import { EditorAssetDeleteSection } from "~/ui/resource/editor/EditorAssetDeleteSection";
+import { EditorAssetDeleteSection } from "~/asset-authoring/ui/EditorAssetDeleteSection";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail/delete")({
 	component: () => {

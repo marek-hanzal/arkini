@@ -16,7 +16,7 @@ import {
 import { basename, dirname, join } from "node:path";
 import { Effect } from "effect";
 
-export type ManagedFileInspection =
+type ManagedFileInspection =
 	| {
 			readonly type: "missing" | "installed" | "repairable";
 	  }

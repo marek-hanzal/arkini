@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { PrimaryButton } from "~/ui/button/Button";
 import { Status } from "~/ui/status/Status";
 
-export interface EditorCapabilityStatusProps {
+interface EditorCapabilityStatusProps {
 	readonly actionLabel: string;
 	readonly dataUi?: string;
 	readonly description: string;

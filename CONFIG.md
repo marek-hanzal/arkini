@@ -1,6 +1,6 @@
 # Arkini game authoring
 
-This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. The generated `schema.json` and the schemas under [`src/engine`](src/engine) own exact fields; [`GAME.MD`](GAME.MD) owns runtime interpretation.
+This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. The generated `schema.json` and the schemas under [`src/game-config`](src/game-config) own exact fields; [`GAME.MD`](GAME.MD) owns runtime interpretation.
 
 ## Canonical project
 
@@ -71,6 +71,8 @@ The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests,
 
 Exact item variants, line/input/rule/output shapes, conditions, rolls, and fields come from `schema.json`. Important cross-field rules are:
 
+The canonical immutable Item vocabulary lives in [`src/item-definition`](src/item-definition): Item schema identities, storage permission, bounded quantities, selectors, authored query shapes, and total selection policy over explicit definitions. Canonical aggregate reads live in `src/game-runtime`, drop/write and ordinary click reads live in `src/item-interaction`, and runtime query execution remains in `src/engine`. `SpaceSchema` remains with the Space action that interprets it, game metadata remains in `src/game-config`, and toolbar size is owned beside location contracts in `src/item-location`.
+
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
@@ -95,6 +97,8 @@ The compiler must reject an invalid project without producing a usable artifact.
 Notes are portable but do not change authoring revision and do not enter Versions, Build, or Arkpack output. Scenarios are explicit portable gameplay-State snapshots included in Versions; the live Editor Board is not persisted. Versions are complete immutable logical snapshots published through `versions/head.json`, not property deltas.
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
+
+`src/asset-authoring` owns the Assets product catalog, renderer PNG/file admission, import/edit/delete sessions, object-URL lifecycle, and presentation. `src/game-config/resource` remains the upstream authored-config contract for resource schemas, references, usage, and rename semantics; Asset Authoring consumes that contract instead of creating a second Resource domain.
 
 ## Content workflow
 

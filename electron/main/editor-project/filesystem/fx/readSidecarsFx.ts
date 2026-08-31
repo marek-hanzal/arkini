@@ -3,11 +3,29 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
-import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
+import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import { EditorProjectNoteFileSchema } from "~/project-note/schema/EditorProjectNoteFileSchema";
+import { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+
+const decodeNoteFileStemFn = (stem: string) => {
+	// URI decoding rejects the lone-surrogate triplets emitted by the total writer.
+	const withLoneSurrogates = stem.replace(
+		/%ED%([AB][0-9A-F])%([89AB][0-9A-F])/gu,
+		(_match, secondByte: string, thirdByte: string) =>
+			String.fromCharCode(
+				0xd000 |
+					((Number.parseInt(secondByte, 16) & 0x3f) << 6) |
+					(Number.parseInt(thirdByte, 16) & 0x3f),
+			),
+	);
+	try {
+		return decodeURIComponent(withLoneSurrogates);
+	} catch {
+		return undefined;
+	}
+};
 
 const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (
 	root: string,
@@ -57,13 +75,11 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 		yield* readJsonFilesFx(paths.root, paths.notes),
 		({ file, value }) =>
 			Effect.gen(function* () {
-				const noteId = yield* Effect.try({
-					try: () => decodeURIComponent(path.basename(file).slice(0, -".json".length)),
-					catch: (cause) =>
-						new Error(`Editor note ${file} has an invalid filename.`, {
-							cause,
-						}),
-				});
+				const noteId = decodeNoteFileStemFn(path.basename(file).slice(0, -".json".length));
+				if (noteId === undefined)
+					return yield* Effect.fail(
+						new Error(`Editor note ${file} has an invalid filename.`),
+					);
 				const note = yield* Effect.try({
 					try: () => EditorProjectNoteFileSchema.parse(value),
 					catch: (cause) =>

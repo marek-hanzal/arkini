@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { Effect } from "effect";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
+import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
@@ -216,7 +216,7 @@ describe("createGameSessionFx / callback ordering", () => {
 				}),
 			);
 			await session.run(
-				runTickRuntimeByFx({
+				advanceRuntimeElapsedFx({
 					elapsedMs: 2_000,
 				}),
 			);

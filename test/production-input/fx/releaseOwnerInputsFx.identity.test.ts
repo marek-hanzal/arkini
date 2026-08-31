@@ -1,0 +1,479 @@
+import { Effect, Result } from "effect";
+import { describe, expect, it } from "vitest";
+
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
+import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
+
+const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
+	uid: id,
+	id,
+	title: id,
+	description: id,
+	asset: {
+		default: [
+			`asset:${id}`,
+		],
+	},
+	scope: "any" as const,
+	maxStackSize,
+});
+
+const materialInput = (itemId: string) => ({
+	type: "materials" as const,
+	selector: {
+		type: "item" as const,
+		itemId,
+	},
+	quantity: {
+		min: 1,
+		max: 1,
+	},
+	capacity: 1,
+	mode: "reserve" as const,
+});
+
+const config = GameConfigSchema.parse({
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:release-owner-inputs",
+		title: "Release owner inputs",
+		board: {
+			width: 2,
+			height: 1,
+		},
+		inventory: {
+			width: 1,
+			height: 1,
+		},
+	},
+	start: {
+		currentSpace: 0,
+	},
+	items: {
+		outer: {
+			...baseItem({
+				id: "outer",
+			}),
+			type: "producer",
+			maxQueueSize: 1,
+			lines: [
+				{
+					id: "line:outer",
+					title: "Outer",
+					description: "Outer",
+					runtimeMs: 1_000,
+					input: [
+						materialInput("worker"),
+						materialInput("worker"),
+						{
+							...materialInput("material"),
+							capacity: 3,
+							quantity: {
+								min: 3,
+								max: 3,
+							},
+						},
+					],
+					rules: [],
+				},
+			],
+		},
+		worker: {
+			...baseItem({
+				id: "worker",
+			}),
+			type: "producer",
+			charges: {
+				amount: 2,
+			},
+			maxQueueSize: 1,
+			lines: [
+				{
+					id: "line:worker",
+					title: "Worker",
+					description: "Worker",
+					runtimeMs: 1_000,
+					input: [
+						materialInput("payload"),
+					],
+					rules: [],
+				},
+			],
+		},
+		payload: {
+			...baseItem({
+				id: "payload",
+			}),
+			type: "simple",
+		},
+		material: {
+			...baseItem({
+				id: "material",
+				maxStackSize: 10,
+			}),
+			type: "simple",
+		},
+		blocker: {
+			...baseItem({
+				id: "blocker",
+			}),
+			type: "simple",
+		},
+	},
+});
+
+const boardOwner = {
+	id: "runtime:outer",
+	itemId: "outer",
+	location: {
+		scope: "board" as const,
+		space: 2,
+		position: {
+			x: 0,
+			y: 0,
+		},
+	},
+	quantity: 1,
+};
+
+const inputItem = ({
+	id,
+	inputIndex,
+	itemId,
+	ownerItemId = boardOwner.id,
+	remainingCharges,
+}: {
+	id: string;
+	inputIndex: number;
+	itemId: string;
+	ownerItemId?: string;
+	remainingCharges?: number;
+}) => ({
+	id,
+	itemId,
+	location: {
+		scope: "input" as const,
+		ownerItemId,
+		lineId: ownerItemId === boardOwner.id ? "line:outer" : "line:worker",
+		inputIndex,
+	},
+	quantity: 1,
+	remainingCharges,
+});
+
+const runRemoveFx = (state: StateSchema.Type) =>
+	Effect.gen(function* () {
+		const before = yield* readRuntimeFx();
+		const owner = before.items.find((item) => item.id === boardOwner.id);
+		if (owner === undefined) {
+			return yield* Effect.die(new Error("Expected outer owner."));
+		}
+		const attempt = yield* Effect.result(
+			removeRuntimeItemForTestFx({
+				itemId: owner.id,
+				revision: owner.revision,
+			}),
+		);
+		const store = yield* RuntimeStoreFx;
+		const transition = yield* store.read;
+		return {
+			after: transition.runtime,
+			attempt,
+			before,
+			events: transition.events,
+		};
+	}).pipe(
+		useGameFx({
+			config,
+			state,
+		}),
+	);
+
+describe("releaseOwnerInputsFx existing identity", () => {
+	it("preserves one impure buffered root and its passive subtree", () => {
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardOwner,
+				inputItem({
+					id: "runtime:worker",
+					inputIndex: 0,
+					itemId: "worker",
+					remainingCharges: 1,
+				}),
+				inputItem({
+					id: "runtime:payload",
+					inputIndex: 0,
+					itemId: "payload",
+					ownerItemId: "runtime:worker",
+				}),
+			],
+			jobQueue: [],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(runRemoveFx(state));
+
+		expect(Result.isSuccess(result.attempt)).toBe(true);
+		const worker = result.after.items.find((item) => item.id === "runtime:worker");
+		expect(worker).toMatchObject({
+			remainingCharges: 1,
+			location: {
+				scope: "board",
+				space: 2,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		});
+		expect(result.after.items.find((item) => item.id === "runtime:payload")).toMatchObject({
+			location: {
+				scope: "input",
+				ownerItemId: "runtime:worker",
+			},
+		});
+		expect(result.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				itemId: boardOwner.id,
+				canonicalItemId: boardOwner.itemId,
+				location: boardOwner.location,
+				quantity: boardOwner.quantity,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				itemId: "runtime:worker",
+				canonicalItemId: "worker",
+				originItemId: boardOwner.id,
+				previousLocation: {
+					scope: "input",
+					ownerItemId: boardOwner.id,
+					lineId: "line:outer",
+					inputIndex: 0,
+				},
+				location: {
+					scope: "board",
+					space: 2,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			},
+		]);
+	});
+
+	it("allows a pure buffered root to normalize into an existing stack", () => {
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardOwner,
+				{
+					...inputItem({
+						id: "runtime:buffered-material",
+						inputIndex: 2,
+						itemId: "material",
+					}),
+					quantity: 3,
+				},
+				{
+					id: "runtime:material-stack",
+					itemId: "material",
+					location: {
+						scope: "board" as const,
+						space: 2,
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 2,
+				},
+			],
+			jobQueue: [],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(runRemoveFx(state));
+
+		expect(Result.isSuccess(result.attempt)).toBe(true);
+		expect(result.after.items.some((item) => item.id === "runtime:buffered-material")).toBe(
+			false,
+		);
+		expect(
+			result.after.items.find((item) => item.id === "runtime:material-stack"),
+		).toMatchObject({
+			quantity: 5,
+		});
+		expect(result.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				itemId: boardOwner.id,
+				canonicalItemId: boardOwner.itemId,
+				location: boardOwner.location,
+				quantity: boardOwner.quantity,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemStacked,
+				itemId: "runtime:material-stack",
+				canonicalItemId: "material",
+				originItemId: boardOwner.id,
+				location: {
+					scope: "board",
+					space: 2,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				previousQuantity: 2,
+				quantity: 5,
+			},
+		]);
+	});
+
+	it("preserves impure identities across board-first inventory fallback", () => {
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardOwner,
+				inputItem({
+					id: "runtime:worker:a",
+					inputIndex: 0,
+					itemId: "worker",
+					remainingCharges: 1,
+				}),
+				inputItem({
+					id: "runtime:worker:b",
+					inputIndex: 1,
+					itemId: "worker",
+					remainingCharges: 1,
+				}),
+				{
+					id: "runtime:blocker",
+					itemId: "blocker",
+					location: {
+						scope: "board" as const,
+						space: 2,
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				},
+			],
+			jobQueue: [],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(runRemoveFx(state));
+
+		expect(Result.isSuccess(result.attempt)).toBe(true);
+		expect(result.after.items.find((item) => item.id === "runtime:worker:a")).toMatchObject({
+			remainingCharges: 1,
+			location: {
+				scope: "board",
+				space: 2,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		});
+		expect(result.after.items.find((item) => item.id === "runtime:worker:b")).toMatchObject({
+			remainingCharges: 1,
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		});
+	});
+
+	it("rolls back the whole removal when one impure root has no exclusive cell", () => {
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardOwner,
+				inputItem({
+					id: "runtime:worker:a",
+					inputIndex: 0,
+					itemId: "worker",
+					remainingCharges: 1,
+				}),
+				inputItem({
+					id: "runtime:worker:b",
+					inputIndex: 1,
+					itemId: "worker",
+					remainingCharges: 1,
+				}),
+				{
+					id: "runtime:board-blocker",
+					itemId: "blocker",
+					location: {
+						scope: "board" as const,
+						space: 2,
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				},
+				{
+					id: "runtime:inventory-blocker",
+					itemId: "blocker",
+					location: {
+						scope: "inventory" as const,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				},
+			],
+			jobQueue: [],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(runRemoveFx(state));
+
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
+				_tag: "PlacementUnavailableError",
+			});
+		}
+		expect(result.after).toEqual(result.before);
+		expect(result.events).toEqual([]);
+	});
+});

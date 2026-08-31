@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { outputFx } from "~/engine/output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { outputFx } from "~/production-output/fx/outputFx";
+import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
 
 export namespace completeTemporaryItemExpiryTransitionFx {

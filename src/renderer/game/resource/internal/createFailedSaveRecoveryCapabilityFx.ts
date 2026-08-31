@@ -2,12 +2,12 @@ import { Deferred, Effect, Exit, Option, Ref, Scope, type Semaphore } from "effe
 
 import type { GameEngineResourceFxService } from "~/renderer/game/resource/GameEngineResourceFx";
 import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type {
 	FailedSaveRecovery,
 	GameEngineResourceServiceState,
 } from "~/renderer/game/resource/internal/GameEngineResourceServiceState";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
+import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
 export namespace createFailedSaveRecoveryCapabilityFx {
 	export interface Dependencies {

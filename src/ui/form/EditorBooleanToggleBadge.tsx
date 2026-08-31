@@ -1,12 +1,10 @@
 import { Info, type LucideIcon } from "lucide-react";
 
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tooltip } from "~/ui/overlay/Tooltip";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 
-export interface EditorBooleanToggleBadgeProps {
+interface EditorBooleanToggleBadgeProps {
 	readonly checked: boolean;
 	readonly checkedIcon: LucideIcon;
 	readonly description: string;
@@ -27,10 +25,13 @@ export const EditorBooleanToggleBadge = ({
 	const Icon = checked ? checkedIcon : uncheckedIcon;
 	return (
 		<div
-			className={`inline-flex min-w-0 items-center rounded-full border ${
-				checked ? selectableActiveClassName : selectableInactiveClassName
-			}`}
-			data-ui="EditorBooleanToggleBadge"
+			className={`inline-flex min-w-0 items-center rounded-full border ${selectableClassName}`}
+			{...readDataUiFn({
+				dataUi: "EditorBooleanToggleBadge",
+				state: {
+					selected: checked,
+				},
+			})}
 		>
 			<button
 				type="button"

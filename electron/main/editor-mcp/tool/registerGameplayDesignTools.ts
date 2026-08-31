@@ -2,14 +2,13 @@ import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
 import { editProjectFx } from "./editProjectFx";
-import { readProjectConfigTextFn } from "./fn/readProjectConfigTextFn";
-import { readItemDeleteImpactTextFx } from "./readItemDeleteImpactTextFx";
+import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 import { readProjectValidationTextFx } from "./readProjectValidationTextFx";
 import { renameItemFx } from "./renameItemFx";
 
@@ -78,6 +77,55 @@ const DeleteItemInputSchema = z
 		title: "Delete item tool input",
 		description: "A revision-guarded safe or forced item deletion request.",
 	});
+
+const readProjectConfigTextFn = (project: EditorProject) =>
+	JSON.stringify(
+		{
+			projectId: project.projectId,
+			revision: project.revision,
+			version: project.version,
+			config: {
+				meta: project.config.meta,
+				resources: project.config.resources,
+				start: project.config.start,
+			},
+		},
+		null,
+		2,
+	);
+
+const formatListFn = (values: ReadonlyArray<string>) =>
+	values.length === 0 ? "none" : values.join(", ");
+
+const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(function* (
+	project: EditorProject,
+	itemId: string,
+) {
+	const { blockers, impact, item } = yield* readItemDeleteImpactFx(project, itemId);
+	const lines = [
+		"Item delete impact",
+		`ID: ${itemId}`,
+		`UID: ${item.uid}`,
+		`Revision: ${project.revision}`,
+		`References: ${blockers.length}`,
+		`Safe delete: ${blockers.length === 0 ? "yes" : "no"}`,
+	];
+	if (blockers.length > 0) {
+		lines.push("Reference paths:");
+		for (const blocker of blockers)
+			lines.push(`- ${blocker.path.join(".")}: ${blocker.message}`);
+	}
+	lines.push(
+		"Force cleanup:",
+		`- Owner items deleted: ${formatListFn(impact.deletedOwnerItemIds)}`,
+		`- Charge outputs removed from: ${formatListFn(impact.removedChargeOutputOwnerIds)}`,
+		`- Expiry outputs removed from: ${formatListFn(impact.removedExpiryOutputOwnerIds)}`,
+		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemId, lineId }) => `${ownerItemId}/${lineId}`))}`,
+		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemId, ruleNumber }) => `${ownerItemId}#${ruleNumber}`))}`,
+		`- Start entries removed: board ${impact.removedStartEntries.board}, inventory ${impact.removedStartEntries.inventory}, toolbar ${impact.removedStartEntries.toolbar}`,
+	);
+	return lines.join("\n");
+});
 
 /** Registers the project lifecycle and destructive gameplay-design tools as one coherent surface. */
 export const registerGameplayDesignTools = ({

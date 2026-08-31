@@ -1,13 +1,12 @@
-import { app, BrowserWindow, nativeTheme, safeStorage } from "electron";
+import { app, BrowserWindow, nativeTheme, protocol, safeStorage } from "electron";
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
+import { handleArkiniProtocolRequestFx } from "./handleArkiniProtocolRequestFx";
 import { registerArkiniElectronIpcFx } from "./registerArkiniElectronIpcFx";
-import { registerArkiniProtocolFx } from "./registerArkiniProtocolFx";
-import { registerWindowLifecycleFx } from "./registerWindowLifecycleFx";
 import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
 import { createFilesystemCheatPreferencesFx } from "./cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesystemLauncherPreferencesFx";
@@ -44,7 +43,11 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			window.focus();
 		});
 	});
-	yield* registerWindowLifecycleFx(app);
+	yield* Effect.sync(() => {
+		app.on("window-all-closed", () => {
+			app.quit();
+		});
+	});
 	yield* Effect.promise(() => app.whenReady());
 
 	const userDataPath = app.getPath("userData");
@@ -234,7 +237,16 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		launcherPath: packagedCliLauncherPath,
 		unavailableMessage: cliUnavailableMessage,
 	});
-	yield* registerArkiniProtocolFx(rendererRoot);
+	yield* Effect.sync(() => {
+		protocol.handle("arkini", (request) =>
+			ElectronMainRuntime.runPromise(
+				handleArkiniProtocolRequestFx({
+					request,
+					rendererRoot,
+				}),
+			),
+		);
+	});
 	yield* registerArkiniElectronIpcFx({
 		bundledArkpacksRoot: app.isPackaged
 			? join(process.resourcesPath, "game")

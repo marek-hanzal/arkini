@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, FolderOutput, PackageCheck, PackagePlus } from "lucide-react";
+import { Download, PackageCheck, PackagePlus } from "lucide-react";
 
-import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
-import { EditorBuildMajorUpdateDialog } from "~/ui/arkpack/editor/EditorBuildMajorUpdateDialog";
-import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
+import { EditorBuildDiagnostics } from "~/editor-build/ui/EditorBuildDiagnostics";
+import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajorUpdateDialog";
+import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorProjectExport } from "~/project-authoring/ui/EditorProjectExport";
 
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {
@@ -116,50 +117,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						)}
 					</article>
 				)}
-				<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
-					<h2 className="text-lg font-semibold">Editor project export</h2>
-					<p className="mt-1 text-sm text-muted">
-						Copies the complete saved Editor folder, including assets, notes, scenarios,
-						and version history. The exported folder can be opened directly by the
-						Editor.
-					</p>
-					<div className="mt-4 flex flex-wrap gap-3">
-						<PrimaryButton
-							data-ui="EditorBuildExportSource"
-							disabled={controller.exportSourcePending}
-							cursorIntent={controller.exportSourcePending ? "progress" : undefined}
-							onClick={controller.exportSource}
-						>
-							<FolderOutput className="mr-2 size-4" />
-							Export
-						</PrimaryButton>
-						{controller.openSourceExportAvailable ? (
-							<Button
-								data-ui="EditorBuildOpenSourceExport"
-								disabled={controller.openSourceExportPending}
-								cursorIntent={
-									controller.openSourceExportPending ? "progress" : undefined
-								}
-								onClick={controller.openSourceExport}
-							>
-								Open folder
-							</Button>
-						) : null}
-					</div>
-					{controller.exportSourceError === undefined ? null : (
-						<p className="mt-3 text-sm text-danger">{controller.exportSourceError}</p>
-					)}
-					{controller.exportSourceSummary === undefined ? null : (
-						<p className="mt-3 break-all text-sm text-success">
-							{controller.exportSourceSummary}
-						</p>
-					)}
-					{controller.openSourceExportError === undefined ? null : (
-						<p className="mt-3 text-sm text-danger">
-							{controller.openSourceExportError}
-						</p>
-					)}
-				</article>
+				<EditorProjectExport projectId={controller.project.projectId} />
 				{controller.installConfirmation === undefined ? null : (
 					<EditorBuildMajorUpdateDialog
 						confirmation={controller.installConfirmation}

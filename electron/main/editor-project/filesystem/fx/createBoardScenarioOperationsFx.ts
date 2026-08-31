@@ -3,13 +3,13 @@ import { Clock } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import {
 	EditorBoardScenarioNameSchema,
 	EditorBoardScenarioSchema,
-} from "~/editor/board/EditorBoardScenarioSchema";
+} from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { withProjectLockFx } from "./withProjectLockFx";

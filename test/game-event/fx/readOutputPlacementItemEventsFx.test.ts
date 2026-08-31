@@ -1,0 +1,102 @@
+import { Effect } from "effect";
+import { describe, expect, it } from "vitest";
+
+import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import type { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+
+const config = createJobTestConfig();
+const board = (x: number) => ({
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x,
+		y: 0,
+	},
+});
+
+const item = ({
+	id,
+	itemId,
+	location,
+	quantity,
+}: {
+	id: string;
+	itemId: "water" | "tool";
+	location: ReturnType<typeof board>;
+	quantity: number;
+}) => ({
+	id,
+	item: config.items[itemId],
+	location,
+	quantity,
+	revision: `revision:${id}`,
+});
+
+describe("readOutputPlacementItemEventsFx", () => {
+	it("reports exact stack growth before exact spawned identities in placement order", () => {
+		const stacked = item({
+			id: "runtime:stacked",
+			itemId: "water",
+			location: board(0),
+			quantity: 3,
+		});
+		const spawned = item({
+			id: "runtime:spawned",
+			itemId: "water",
+			location: board(1),
+			quantity: 2,
+		});
+		const placement = {
+			drop: [
+				{
+					drop: {
+						itemId: "water",
+						quantity: 4,
+						placement: "drop",
+					},
+					placement: {
+						remove: [],
+						stack: [
+							{
+								item: stacked,
+								quantity: 2,
+							},
+						],
+						spawn: [
+							spawned,
+						],
+					},
+				},
+			],
+		} satisfies applyOutputPlacementFx.Result;
+
+		expect(
+			Effect.runSync(
+				readOutputPlacementItemEventsFx({
+					originItemId: "runtime:origin",
+					placement,
+				}),
+			),
+		).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemStacked,
+				itemId: stacked.id,
+				canonicalItemId: "water",
+				originItemId: "runtime:origin",
+				location: stacked.location,
+				previousQuantity: 1,
+				quantity: 3,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: spawned.id,
+				canonicalItemId: "water",
+				originItemId: "runtime:origin",
+				location: spawned.location,
+				quantity: 2,
+			},
+		]);
+	});
+});

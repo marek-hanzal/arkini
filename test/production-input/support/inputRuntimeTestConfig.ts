@@ -1,0 +1,140 @@
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+
+const baseItem = ({
+	id,
+	maxStackSize,
+	scope,
+}: {
+	id: string;
+	maxStackSize: number;
+	scope: "any" | "board" | "inventory";
+}) => {
+	return {
+		uid: id,
+		id,
+		title: id,
+		description: id,
+		asset: {
+			default: [
+				`asset:${id}`,
+			],
+		},
+		scope,
+		maxStackSize,
+	} as const;
+};
+
+export const inputRuntimeTestConfig = GameConfigSchema.parse({
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:input-runtime",
+		title: "Input runtime",
+		board: {
+			width: 5,
+			height: 2,
+		},
+		inventory: {
+			width: 3,
+			height: 1,
+		},
+	},
+	start: {
+		currentSpace: 0,
+	},
+	items: {
+		workshop: {
+			...baseItem({
+				id: "workshop",
+				maxStackSize: 10,
+				scope: "any",
+			}),
+			type: "producer",
+			lines: [
+				{
+					id: "line:workshop:build",
+					title: "Build",
+					description: "Build something.",
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "materials",
+							selector: {
+								type: "item",
+								itemId: "water",
+							},
+							quantity: {
+								min: 3,
+								max: 3,
+							},
+							capacity: 2,
+						},
+						{
+							type: "simple",
+						},
+					],
+					rules: [],
+				},
+			],
+		},
+		water: {
+			...baseItem({
+				id: "water",
+				maxStackSize: 10,
+				scope: "any",
+			}),
+			type: "simple",
+		},
+		stone: {
+			...baseItem({
+				id: "stone",
+				maxStackSize: 10,
+				scope: "any",
+			}),
+			type: "simple",
+			charges: {
+				amount: 2,
+			},
+		},
+	},
+});
+
+export const inputRuntimeToolbarTestConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	meta: {
+		...inputRuntimeTestConfig.meta,
+		toolbarSize: 3,
+	},
+	items: {
+		...inputRuntimeTestConfig.items,
+		inventory: {
+			...baseItem({
+				id: "inventory",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			type: "inventory",
+		},
+	},
+});
+
+export const workshopLocation = {
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x: 0,
+		y: 0,
+	},
+};
+
+export const sourceLocation = (x: number) => {
+	return {
+		scope: "board" as const,
+		space: 0,
+		position: {
+			x,
+			y: 0,
+		},
+	};
+};

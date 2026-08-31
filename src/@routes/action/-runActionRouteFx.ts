@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { defaultLoadingMinimumDurationMs } from "~/ui/loading/defaultLoadingMinimumDurationMs";
-import { waitForActiveViewTransitionFx } from "~/ui/navigation/waitForActiveViewTransitionFx";
+import { ActionLoadingMinimumDurationMs } from "~/launcher/ui/ActionLoadingScreen";
+import { waitForActiveViewTransitionFx } from "~/application-shell/fx/waitForActiveViewTransitionFx";
 
 /** Lets an action route enter cleanly, then remain pending long enough to read deliberately. */
 export const runActionRouteFx = Effect.fn("runActionRouteFx")(
@@ -12,7 +12,7 @@ export const runActionRouteFx = Effect.fn("runActionRouteFx")(
 				Effect.promise(
 					() =>
 						new Promise<void>((resolve) => {
-							window.setTimeout(resolve, defaultLoadingMinimumDurationMs);
+							window.setTimeout(resolve, ActionLoadingMinimumDurationMs);
 						}),
 				),
 			],

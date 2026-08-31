@@ -1,7 +1,7 @@
 import { shell } from "electron";
 import { Effect } from "effect";
 
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 /** Opens one successful Editor source-export root in the operating-system file browser. */
 export const openEditorExportDirectoryFx = Effect.fn("openEditorExportDirectoryFx")(

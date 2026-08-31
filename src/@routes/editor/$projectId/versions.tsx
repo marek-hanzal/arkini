@@ -1,13 +1,12 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import {
-	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 	EditorSectionTabs,
-} from "~/ui/editor/EditorSectionTabs";
+} from "~/authoring-shell/ui/EditorSectionTabs";
 
 export const Route = createFileRoute("/editor/$projectId/versions")({
 	component: () => {
@@ -31,7 +30,7 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 							</div>
 						}
 						tabs={
-							<EditorSectionTabs label="Version sections">
+							<EditorSectionTabs>
 								<ButtonLink
 									to="/editor/$projectId/versions/commit"
 									params={params}
@@ -39,7 +38,7 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 										exact: true,
 									}}
 									activeProps={{
-										className: editorSectionTabActiveClassName,
+										"data-ui-selected": true,
 									}}
 									className={editorSectionTabClassName}
 								>
@@ -52,7 +51,7 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 										exact: true,
 									}}
 									activeProps={{
-										className: editorSectionTabActiveClassName,
+										"data-ui-selected": true,
 									}}
 									className={editorSectionTabClassName}
 								>

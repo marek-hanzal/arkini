@@ -4,15 +4,15 @@ import { Effect } from "effect";
 import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
-} from "~/engine/source/GameProjectReference";
-import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
+} from "~/game-config/source/GameProjectReference";
+import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
@@ -222,7 +222,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 			const writes = [
 				{
 					target: paths.schemaFile,
-					bytes: encodeJson(createGameProjectJsonSchema()),
+					bytes: encodeJson(GameProjectJsonSchema),
 				},
 				nextSnapshot.game,
 				...[

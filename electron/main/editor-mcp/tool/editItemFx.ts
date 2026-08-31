@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import { saveEditorItemWithRepositoryFx } from "~/item-authoring/fx/saveEditorItemWithRepositoryFx";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditItemInput } from "./EditItemInputSchemas";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 

@@ -7,11 +7,11 @@ import type {
 	GameSessionFatalError,
 	GameSessionFatalSource,
 } from "~/renderer/game/session/GameSessionFatalError";
-import type { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
-import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import type { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export type GameSessionServices =
 	| LayerModule.Success<ReturnType<typeof GameSessionLayerFx>>

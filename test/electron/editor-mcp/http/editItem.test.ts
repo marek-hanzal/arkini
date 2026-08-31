@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { createEditorItemDraftFn } from "~/editor/item/fn/createEditorItemDraftFn";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,

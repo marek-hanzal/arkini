@@ -4,7 +4,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx";
 import { GameSessionNotRunningError } from "~/renderer/game/session/GameSessionNotRunningError";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 describe("GameSession.runFx", () => {
 	it.effect("returns success and provides the existing session services", () =>

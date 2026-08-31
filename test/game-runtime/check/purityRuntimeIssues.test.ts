@@ -1,0 +1,297 @@
+import { Effect } from "effect";
+import { describe, expect, it } from "vitest";
+
+import { useGameFx } from "~test/support/game/useGameFx";
+import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
+const board = (x: number) => ({
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x,
+		y: 0,
+	},
+});
+
+describe("runtime purity invariants", () => {
+	it("reports the effective singleton stack limit and buffered closed input", () => {
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:craft",
+					item: purityTestConfig.items.craft,
+					location: board(0),
+					quantity: 2,
+					revision: "revision:craft",
+				},
+				{
+					id: "runtime:material",
+					item: purityTestConfig.items.material,
+					location: {
+						scope: "input" as const,
+						ownerItemId: "runtime:craft",
+						lineId: "line:craft",
+						inputIndex: 0,
+					},
+					quantity: 1,
+					revision: "revision:material",
+				},
+			],
+			jobs: [
+				{
+					id: "job:craft",
+					ownerItemId: "runtime:craft",
+					lineId: "line:craft",
+					durationMs: 1_000,
+					remainingMs: 1_000,
+				},
+			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([
+			{
+				canonicalItemId: "craft",
+				itemId: "runtime:craft",
+				maxStackSize: 1,
+				quantity: 2,
+				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
+			},
+			{
+				ownerItemId: "runtime:craft",
+				lineId: "line:craft",
+				inputIndex: 0,
+				itemIds: [
+					"runtime:material",
+				],
+				type: RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
+			},
+		]);
+	});
+
+	it.each([
+		{
+			name: "buffered input",
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:material",
+					item: purityTestConfig.items.material,
+					location: {
+						scope: "input" as const,
+						ownerItemId: "runtime:producer",
+						lineId: "line:producer:buffer",
+						inputIndex: 0,
+					},
+					quantity: 1,
+					revision: "revision:material",
+				},
+			],
+			jobs: [],
+			jobQueue: [],
+
+			defaultLineByOwnerItemId: {},
+		},
+		{
+			name: "active job",
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [],
+			jobs: [
+				{
+					id: "job:producer",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer:buffer",
+					durationMs: 1_000,
+					remainingMs: 1_000,
+				},
+			],
+			jobQueue: [],
+
+			defaultLineByOwnerItemId: {},
+		},
+		{
+			name: "queued request",
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [],
+			jobs: [],
+			jobQueue: [
+				{
+					id: "request:producer",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer:buffer",
+				},
+			],
+
+			defaultLineByOwnerItemId: {},
+		},
+	])("rejects an impure producer stack with $name", ({ items, jobs, jobQueue }) => {
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:producer",
+					item: purityTestConfig.items.producer,
+					location: board(0),
+					quantity: 2,
+					revision: "revision:producer",
+				},
+				...items,
+			],
+			jobs,
+			jobQueue,
+
+			defaultLineByOwnerItemId: {},
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(result.issues).toContainEqual({
+			canonicalItemId: "producer",
+			itemId: "runtime:producer",
+			maxStackSize: 1,
+			quantity: 2,
+			type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
+		});
+	});
+
+	it("keeps a pure producer stack at its configured limit", () => {
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:producer",
+					item: purityTestConfig.items.producer,
+					location: board(0),
+					quantity: 2,
+					revision: "revision:producer",
+				},
+			],
+			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([]);
+	});
+
+	it("allows buffered input on a running positive-capacity line", () => {
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:producer",
+					item: purityTestConfig.items.producer,
+					location: board(0),
+					quantity: 1,
+					revision: "revision:producer",
+				},
+				{
+					id: "runtime:material",
+					item: purityTestConfig.items.material,
+					location: {
+						scope: "input" as const,
+						ownerItemId: "runtime:producer",
+						lineId: "line:producer:buffer",
+						inputIndex: 0,
+					},
+					quantity: 1,
+					revision: "revision:material",
+				},
+			],
+			jobs: [
+				{
+					id: "job:producer",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer:buffer",
+					durationMs: 1_000,
+					remainingMs: 1_000,
+				},
+			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([]);
+	});
+});

@@ -1,28 +1,26 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Effect, Option } from "effect";
 
-import { parseEditorItemSectionIdFx } from "~/@routes/editor/$projectId/editor/items/$itemUid/-parseEditorItemSectionIdFx";
-import { EditorItemArtworkDetail } from "~/ui/item/editor/EditorItemArtworkDetail";
+import { EditorItemArtworkDetail } from "~/item-authoring/ui/EditorItemArtworkDetail";
 import {
 	EditorItemChargesDetail,
 	EditorItemMergesDetail,
-} from "~/ui/item/editor/EditorItemCapabilityDetails";
-import { EditorItemDeleteSection } from "~/ui/item/editor/EditorItemDeleteSection";
-import { EditorItemEstimateSection } from "~/ui/item/editor/EditorItemEstimateSection";
-import { EditorItemIdentityDetail } from "~/ui/item/editor/EditorItemIdentityDetail";
-import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
-import { EditorItemProductionDetail } from "~/ui/item/editor/EditorItemProductionDetail";
-import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
-import { EditorSpaceActionDetail } from "~/ui/item/editor/EditorSpaceActionDetail";
-import { readEditorItemSectionsFn } from "~/ui/item/editor/fn/readEditorItemSectionsFn";
-import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
+} from "~/item-authoring/ui/EditorItemCapabilityDetails";
+import { EditorItemDeleteSection } from "~/item-authoring/ui/EditorItemDeleteSection";
+import { EditorItemEstimateSection } from "~/estimate/ui/EditorItemEstimateSection";
+import { EditorItemIdentityDetail } from "~/item-authoring/ui/EditorItemIdentityDetail";
+import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
+import { EditorItemProductionDetail } from "~/item-authoring/ui/EditorItemProductionDetail";
+import {
+	type EditorItemSectionId,
+	EditorItemSectionIds,
+} from "~/item-authoring/type/EditorItemSection";
+import { EditorSpaceActionDetail } from "~/item-authoring/ui/EditorSpaceActionDetail";
+import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
+import { useEditorItemByUid } from "~/item-authoring/ui/useEditorItemByUid";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({
-	beforeLoad: ({ context, params }) => {
-		const section = context.rendererRuntime.runSync(
-			parseEditorItemSectionIdFx(params.sectionId).pipe(Effect.option),
-		);
-		if (Option.isSome(section)) return;
+	beforeLoad: ({ params }) => {
+		if (EditorItemSectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 			params: {

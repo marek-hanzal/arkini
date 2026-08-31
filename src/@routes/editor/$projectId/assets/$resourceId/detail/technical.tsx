@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { EditorAssetTechnical } from "~/ui/resource/editor/EditorAssetTechnical";
+import { EditorAssetTechnical } from "~/asset-authoring/ui/EditorAssetTechnical";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail/technical")({
 	component: () => {

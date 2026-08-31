@@ -3,8 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 
-export interface EditorTextareaProps
-	extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "rows"> {
+interface EditorTextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "rows"> {
 	readonly minRows?: number;
 	readonly maxRows?: number;
 }

@@ -1,18 +1,18 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorCompatibilityNotice } from "~/project-version/ui/EditorCompatibilityNotice";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
-import { EditorProjectFormProvider } from "~/ui/project/editor/EditorProjectFormContext";
-import { EditorProjectSectionLink } from "~/ui/project/editor/EditorProjectSectionLink";
+import { EditorProjectFormProvider } from "~/project-authoring/ui/EditorProjectFormContext";
+import { EditorProjectSectionLink } from "~/project-authoring/ui/EditorProjectSectionLink";
 import {
 	EditorProjectSections,
 	type EditorProjectSectionId,
-} from "~/ui/project/editor/EditorProjectSections";
-import { useEditorProjectFormController } from "~/ui/project/editor/useEditorProjectFormController";
+} from "~/project-authoring/type/EditorProjectSections";
+import { useEditorProjectFormController } from "~/project-authoring/ui/useEditorProjectFormController";
 
 export const Route = createFileRoute("/editor/$projectId/project")({
 	component: () => {
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 						save={controller.save}
 						saving={controller.isSaving}
 						tabs={
-							<EditorSectionTabs label="Project sections">
+							<EditorSectionTabs>
 								{EditorProjectSections.map((candidate) => (
 									<EditorProjectSectionLink
 										key={candidate.id}

@@ -1,7 +1,7 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Option, Ref, Scope, type Semaphore } from "effect";
 
 import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type {
 	AcquisitionOwner,
 	Cancellation,

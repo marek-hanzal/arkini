@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export interface EditorAssetsSearch {
+interface EditorAssetsSearch {
 	readonly filter?: "all" | "unused";
 	readonly query?: string;
 }

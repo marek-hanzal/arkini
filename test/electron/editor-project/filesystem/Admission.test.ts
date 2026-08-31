@@ -198,6 +198,45 @@ describe("filesystem Editor project admission", () => {
 		).toBe(project.projectId);
 	});
 
+	it("reports an invalid note payload before its decodable noncanonical filename", async () => {
+		harness = await createProjectTestHarness("arkini-project-note-precedence-");
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "note-precedence-project");
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed root missing.");
+		await harness.closeRepository(repository);
+		const note = join(root, "notes", "%62roken.json");
+		await mkdir(join(root, "notes"), {
+			recursive: true,
+		});
+		await writeFile(note, "{}");
+
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([
+			expect.objectContaining({
+				type: "invalid",
+				root,
+				validationError: `Editor note ${note} is invalid.`,
+			}),
+		]);
+
+		await writeFile(
+			note,
+			JSON.stringify({
+				content: "Valid payload",
+				createdAtMs: 1,
+				updatedAtMs: 1,
+			}),
+		);
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([
+			expect.objectContaining({
+				type: "invalid",
+				root,
+				validationError: "Editor note broken has an invalid filename.",
+			}),
+		]);
+	});
+
 	it("rejects an external project whose sidecars fail complete validation", async () => {
 		harness = await createProjectTestHarness("arkini-project-external-");
 		const root = await harness.createExternalProject("invalid-external");

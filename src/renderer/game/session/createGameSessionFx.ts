@@ -20,14 +20,14 @@ import {
 	type GameSessionTransitionSubscriptionCleanup,
 	createGameSessionTransitionSubscriptionsFx,
 } from "~/renderer/game/session/createGameSessionTransitionSubscriptionsFx";
-import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
-import { RuntimeSaveLayerFx } from "~/engine/save/RuntimeSaveLayerFx";
-import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
+import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
+import { RuntimeSaveLayerFx } from "~/game-persistence/layer/RuntimeSaveLayerFx";
+import { GameLoopFx } from "~/game-tick/service/GameLoopFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace createGameSessionFx {
 	export interface Props<SaveError = unknown> {

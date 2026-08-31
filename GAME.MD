@@ -6,6 +6,8 @@ This document owns implemented gameplay meaning. [`CONFIG.md`](CONFIG.md) owns a
 
 Arkini runs multiple isolated Board spaces plus global Inventory and optional Toolbar storage. A Board cell is `space + x + y`; equal coordinates in different spaces never interact. `currentSpace` selects presentation and passive-storage release destination, but all spaces keep simulating.
 
+A new game applies authored start entries in Board → Inventory → Toolbar order against one evolving candidate Runtime. Board space and coordinates plus Inventory/Toolbar slots are exact; every entry uses canonical placement, and `currentSpace` plus the complete initial state commit atomically or not at all.
+
 Spatial mechanics—distance, placement, merge, charge targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:
 
 - active/ready jobs pause and queued work does not dispatch there;
@@ -95,13 +97,15 @@ validate live + reserved maxCount
 
 `drop` starts from the supplied origin; `random` chooses one Board origin, including occupied cells, then uses the same stack-first, nearest-first policy. An `any` item may fall back Board → Inventory → Toolbar, never another Board. Existing pure items may normalize; impure items keep exact identity and require one empty cell. Partial placement is forbidden and rolls back the owning mutation.
 
-Directional merge is one engine command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed or used, one Board target is kept/removed/replaced, optional output uses ordinary placement, and a used source returns through ordinary placement. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
+Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed or used, one Board target is kept/removed/replaced, optional output uses ordinary placement, and a used source returns through ordinary placement. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
 
 ## Cheats, save, and presentation
 
 Cheat availability is application preference; enabled cheat state, including Instant gameplay, is Runtime state. Instant settles valid time-based jobs and temporary lifetimes through the same authoritative engine without changing Tick units. Hard reset is renderer lifecycle: discard the exact Game without final save, clear only its verified save, then acquire a fresh Game. It is not an authored item command.
 
 Serializable State contains items, deliveries, jobs, queues, current space, and gameplay cheat state—not wall-clock timestamps, Tick observation cursors, transient events, or UI state. Hydration strictly validates the current shape and invariants. Matching-major compatibility is defined only by [`VERSION.md`](VERSION.md).
+
+[`src/game-event`](src/game-event) owns strict transient facts projected from already-applied transition results. Event-only commits do not mutate Runtime. Transition subscribers observe current-plus-tail, while event subscribers discard that current replay. Slow presentation callbacks cannot delay Runtime, Tick, save, or another subscriber. A failing callback cannot roll back or stall its triggering commit or peer delivery; afterward, the existing fatal session fail-stop applies.
 
 Presentation may trail canonical Runtime and may redirect, shorten, collapse, or skip choreography. It never determines readiness, validity, placement, queue/job state, Tick progress, save, or event publication; a new subscriber never receives old events merely because another surface is still animating them.
 

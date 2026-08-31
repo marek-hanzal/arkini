@@ -7,22 +7,25 @@ import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkiniWindowTitle } from "../shared/ArkiniAppMetadata";
-import { createArkpackCatalogFx } from "~/renderer/arkpack/createArkpackCatalogFx";
-import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
-import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
-import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
-import { RendererAtomRegistry } from "~/renderer/RendererAtomRegistry";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { refreshEditorServiceStatusFx } from "~/ui/editor/refreshEditorServiceStatusFx";
-import { installEditorMcpVersionCheckoutFx } from "~/ui/version/editor/installEditorMcpVersionCheckoutFx";
-import { installRendererControlledCloseFx } from "~/ui/root/installRendererControlledCloseFx";
-import { installRendererNativeDragGuardFx } from "~/renderer/installRendererNativeDragGuardFx";
+import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
+import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
+import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEditorServiceStatusFx";
+import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/installEditorMcpVersionCheckoutFx";
+import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
+import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
 import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
-import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
-import { configureLauncherStartupFx } from "~/ui/launcher/configureLauncherStartupFx";
-import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
-import { LauncherStartupHydrator } from "~/ui/launcher/LauncherStartupHydrator";
+import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
+import {
+	LauncherHeroAsset,
+	LauncherStartupConfigAtom,
+} from "~/launcher/atom/LauncherStartupConfigAtom";
+import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
+import "~/launcher/ui/launcher.css";
 import "~/ui/styles.css";
 
 const rootElement = document.getElementById("root");
@@ -48,7 +51,7 @@ const lifecycle = RendererRuntime.runSync(createRendererLifecycleFx(window.arkin
 RendererRuntime.runSync(Atom.set(RendererLifecycleOwnerAtom, lifecycle));
 RendererRuntime.runSync(installWindowModeSyncFx());
 RendererRuntime.runSync(
-	configureLauncherStartupFx({
+	Atom.set(LauncherStartupConfigAtom, {
 		heroUrl: LauncherHeroAsset.url,
 	}),
 );

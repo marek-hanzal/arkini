@@ -3,11 +3,11 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import type { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
-import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { hashVersionBytes } from "./VersionFingerprint";

@@ -6,9 +6,9 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
-} from "~/engine/source/GameProjectReference";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+} from "~/game-config/source/GameProjectReference";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
 
 const openHarnesses: Array<Awaited<ReturnType<typeof createProjectFilesHarness>>> = [];
@@ -110,7 +110,7 @@ describe("filesystem Editor project current tree", () => {
 				items: {
 					water: {
 						...initial.config.items.water,
-						uid: "water.next",
+						uid: "water.\ud800",
 						title: "Fresh water",
 					},
 				},
@@ -140,7 +140,10 @@ describe("filesystem Editor project current tree", () => {
 		).rejects.toBeDefined();
 		expect(
 			JSON.parse(
-				await readFile(join(harness.root, "items", "simple", "water%2Enext.json"), "utf8"),
+				await readFile(
+					join(harness.root, "items", "simple", "water%2E%ED%A0%80.json"),
+					"utf8",
+				),
 			),
 		).toEqual({
 			$schema: GameProjectItemSchemaReference,

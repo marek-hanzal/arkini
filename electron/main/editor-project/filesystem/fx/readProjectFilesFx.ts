@@ -2,16 +2,16 @@ import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { readPngAssetFx } from "~/engine/pack/fx/readPngAssetFx";
-import { readResourceDescriptorsFx } from "~/engine/resource/fx/readResourceDescriptorsFx";
-import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
-import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
-import { ItemFileSchema } from "~/engine/source/schema/ItemFileSchema";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { readPngResourceFx } from "~/game-config/resource/fx/readPngResourceFx";
+import { readResourceDescriptorsFx } from "~/game-config/resource/fx/readResourceDescriptorsFx";
+import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
+import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
+import { ItemFileSchema } from "~/game-config/source/schema/ItemFileSchema";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
-import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
+import type { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectFiles } from "./ProjectFiles";
 
@@ -73,7 +73,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 		(candidate) => candidate,
 		"Editor game schema",
 	);
-	if (!isDeepStrictEqual(gameSchema, createGameProjectJsonSchema()))
+	if (!isDeepStrictEqual(gameSchema, GameProjectJsonSchema))
 		return yield* Effect.fail(
 			new Error("The Editor game schema does not match the current project schema."),
 		);
@@ -198,7 +198,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 				: left.id.localeCompare(right.id),
 		),
 		({ path: resourcePath }) =>
-			readPngAssetFx({
+			readPngResourceFx({
 				path: resourcePath,
 			}).pipe(
 				Effect.map((resource) => ({

@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
-import { EditorItemDetail } from "~/ui/item/editor/EditorItemDetail";
-import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import { EditorItemDetail } from "~/item-authoring/ui/EditorItemDetail";
+import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail")({
 	component: () => {

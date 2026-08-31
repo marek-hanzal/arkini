@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace isInstantGameplayEnabledFx {
 	export interface Props {

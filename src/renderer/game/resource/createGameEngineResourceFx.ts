@@ -8,7 +8,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import type { GameSessionServices } from "~/renderer/game/session/GameSession";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 /** Wraps one exact playable session in a presentation fail-stop guard. */
 export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")(

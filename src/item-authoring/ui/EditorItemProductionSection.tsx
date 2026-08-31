@@ -3,8 +3,8 @@ import { match } from "ts-pattern";
 
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { EditorLineFields } from "~/production-line-authoring/ui/EditorLineField";
-import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
+import { LineFields } from "~/production-authoring/ui/LineFields";
+import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
@@ -132,7 +132,7 @@ const EditorProductionFields = withFieldGroup({
 							removeLabel="Remove line"
 						>
 							{(index) => (
-								<EditorLineFields
+								<LineFields
 									form={group}
 									fields={`lines[${index}]`}
 									label={null}
@@ -210,7 +210,7 @@ export const EditorItemProductionSection = () => {
 							}
 						>
 							{(output) => (
-								<EditorOptionalOutputControl
+								<OptionalOutputControl
 									addLabel="Enable expiry output"
 									emptyDescription="Without an output, the temporary item simply disappears when its duration ends. Enable one to emit configured items at expiry."
 									emptyIcon={PackagePlus}
@@ -235,7 +235,7 @@ export const EditorItemProductionSection = () => {
 				type: "stash",
 			},
 			() => (
-				<EditorLineFields
+				<LineFields
 					form={form}
 					fields="line"
 					label="Product line"

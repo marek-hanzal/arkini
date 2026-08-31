@@ -5,7 +5,7 @@ import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStat
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
+import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 export const EditorItemChargesSection = () => {
@@ -64,7 +64,7 @@ export const EditorItemChargesSection = () => {
 								title="Depletion output"
 							/>
 							<EditorFormCard>
-								<EditorOptionalOutputControl
+								<OptionalOutputControl
 									addLabel="Enable depletion output"
 									emptyDescription="Without an output, the item simply disappears when its last charge is spent. Enable one to emit configured items at depletion."
 									emptyIcon={PackagePlus}

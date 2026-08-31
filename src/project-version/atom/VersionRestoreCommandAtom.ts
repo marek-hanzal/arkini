@@ -2,6 +2,7 @@ import { Cause, Clock, Duration, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { checkoutProjectVersionFx } from "~/project-version/fx/checkoutProjectVersionFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -33,6 +34,7 @@ export namespace VersionRestoreCommandAtom {
 export const VersionRestoreCommandAtom = RendererRuntime.runSync(
 	Effect.gen(function* () {
 		const repository = yield* ProjectRepository;
+		const writeAdmission = yield* ProjectWriteAdmission;
 		const unsavedChanges = yield* EditorUnsavedChanges;
 		return Atom.family((projectId: string) => {
 			const stateAtom = Atom.make<VersionRestoreCommandAtom.State>({
@@ -49,6 +51,7 @@ export const VersionRestoreCommandAtom = RendererRuntime.runSync(
 								versionId: command.versionId,
 							}).pipe(
 								Effect.provideService(ProjectRepository, repository),
+								Effect.provideService(ProjectWriteAdmission, writeAdmission),
 								Effect.provideService(EditorUnsavedChanges, unsavedChanges),
 							),
 						);

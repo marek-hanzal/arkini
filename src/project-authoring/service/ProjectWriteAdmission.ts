@@ -1,39 +1,26 @@
-import { Effect } from "effect";
+import { Context, type Effect } from "effect";
 
-import {
+import type {
 	ProjectRepositoryError,
-	type ProjectRepositoryOperation,
+	ProjectRepositoryOperation,
 } from "~/project-authoring/error/ProjectRepositoryError";
 
-let blocked = false;
+export type ProjectReplacementOperation = "checkout-version" | "refresh-project";
 
-/** Blocks renderer-originated editor writes while one terminal project replacement owns the UI. */
-export const blockProjectWrites = () => {
-	if (blocked)
-		throw new ProjectRepositoryError({
-			operation: "checkout-version",
-			message: "Another editor project replacement is already running.",
-		});
-	blocked = true;
-	let released = false;
-	return () => {
-		if (released) return;
-		released = true;
-		blocked = false;
-	};
-};
+export interface ProjectWriteAdmissionService {
+	readonly acquireReplacementFx: (
+		operation: ProjectReplacementOperation,
+	) => Effect.Effect<Effect.Effect<void, never, never>, ProjectRepositoryError, never>;
+	readonly admitWriteFx: <Value, Error, Requirements>(
+		operation: ProjectRepositoryOperation,
+		effect: Effect.Effect<Value, Error, Requirements>,
+	) => Effect.Effect<Value, Error | ProjectRepositoryError, Requirements>;
+}
 
-export const admitProjectWriteFx = <Value>(
-	operation: ProjectRepositoryOperation,
-	effect: Effect.Effect<Value, ProjectRepositoryError>,
-) =>
-	Effect.suspend(() =>
-		blocked
-			? Effect.fail(
-					new ProjectRepositoryError({
-						operation,
-						message: "The editor project is being replaced by a checked-out version.",
-					}),
-				)
-			: effect,
-	);
+/** Renderer-lifecycle authority that excludes ordinary writes during project replacement. */
+export class ProjectWriteAdmission extends Context.Service<
+	ProjectWriteAdmission,
+	ProjectWriteAdmissionService
+>()("ProjectWriteAdmission") {
+	//
+}

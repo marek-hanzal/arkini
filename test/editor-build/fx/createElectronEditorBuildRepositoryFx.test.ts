@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/fx/createElectronEditorBuildRepositoryFx";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const installBuildApi = () => {
@@ -31,6 +33,15 @@ const readTypedFailure = async <Value>(effect: Effect.Effect<Value, unknown>) =>
 	const failure = Cause.findErrorOption(exit.cause);
 	if (Option.isNone(failure)) throw new Error("Expected a typed Editor Build failure.");
 	return failure.value;
+};
+
+const createRepository = () => {
+	const admission = Effect.runSync(createProjectWriteAdmissionFx);
+	return Effect.runSync(
+		createElectronEditorBuildRepositoryFx.pipe(
+			Effect.provideService(ProjectWriteAdmission, admission),
+		),
+	);
 };
 
 afterEach(() => {
@@ -64,7 +75,7 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 				diagnostics,
 			},
 		});
-		const repository = Effect.runSync(createElectronEditorBuildRepositoryFx);
+		const repository = createRepository();
 
 		const failure = await readTypedFailure(
 			repository.buildProjectFx({
@@ -90,7 +101,7 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 				],
 			},
 		} as EditorProjectTransport.Result<never>);
-		const repository = Effect.runSync(createElectronEditorBuildRepositoryFx);
+		const repository = createRepository();
 
 		const failure = await readTypedFailure(
 			repository.buildProjectFx({

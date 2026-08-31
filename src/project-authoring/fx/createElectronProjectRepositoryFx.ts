@@ -12,7 +12,7 @@ import {
 	BoardScenarioDescriptorSchema,
 	BoardScenarioSchema,
 } from "~/board-scenario/schema/BoardScenarioSchema";
-import { admitProjectWriteFx } from "~/project-authoring/service/ProjectWriteAdmission";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import {
 	ProjectCommitPayloadSchema,
 	ProjectPayloadSchema,
@@ -134,14 +134,14 @@ const callFx = <Value, Parsed>(
 		responseMessage: "The editor IPC response is invalid.",
 	});
 
-const writeFx = <Value>(
-	operation: ProjectRepositoryOperation,
-	effect: Effect.Effect<Value, ProjectRepositoryError>,
-) => admitProjectWriteFx(operation, effect);
-
 /** Creates an infallible renderer proxy; editor availability is queried separately. */
-export const createElectronProjectRepositoryFx = Effect.sync(
-	(): ProjectRepositoryService => ({
+export const createElectronProjectRepositoryFx = Effect.gen(function* () {
+	const admission = yield* ProjectWriteAdmission;
+	const writeFx = <Value>(
+		operation: ProjectRepositoryOperation,
+		effect: Effect.Effect<Value, ProjectRepositoryError, never>,
+	) => admission.admitWriteFx(operation, effect);
+	return {
 		awaitIdleFx: callFx(
 			"await-idle",
 			() => window.arkini.editor.awaitIdle(),
@@ -353,5 +353,5 @@ export const createElectronProjectRepositoryFx = Effect.sync(
 					() => undefined,
 				),
 			),
-	}),
-);
+	} satisfies ProjectRepositoryService;
+});

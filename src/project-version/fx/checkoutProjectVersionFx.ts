@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
-import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
@@ -31,11 +31,15 @@ export namespace checkoutProjectVersionFx {
 	}
 }
 
+const acquireProjectVersionCheckoutFx = Effect.flatMap(ProjectWriteAdmission, (admission) =>
+	admission.acquireReplacementFx("checkout-version"),
+);
+
 /** Performs the terminal renderer handshake before one persisted project replacement. */
 export const checkoutProjectVersionFx = Effect.fn("checkoutEditorProjectVersionFx")(
 	({ confirmDiscardCurrentChanges, projectId, versionId }: checkoutProjectVersionFx.Props) =>
 		Effect.acquireUseRelease(
-			Effect.sync(blockProjectWrites),
+			acquireProjectVersionCheckoutFx,
 			() =>
 				Effect.gen(function* () {
 					const repository = yield* ProjectRepository;
@@ -89,6 +93,6 @@ export const checkoutProjectVersionFx = Effect.fn("checkoutEditorProjectVersionF
 						}),
 					);
 				}),
-			(release) => Effect.sync(release),
+			(releaseFx) => releaseFx,
 		),
 );

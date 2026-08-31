@@ -5,8 +5,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { createElectronProjectRepositoryFx } from "~/project-authoring/fx/createElectronProjectRepositoryFx";
-import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
@@ -176,6 +177,18 @@ const readTypedFailure = async <Value>(effect: Effect.Effect<Value, ProjectRepos
 	return failure.value as ProjectRepositoryError;
 };
 
+const createRepository = () => {
+	const admission = Effect.runSync(createProjectWriteAdmissionFx);
+	return {
+		admission,
+		repository: Effect.runSync(
+			createElectronProjectRepositoryFx.pipe(
+				Effect.provideService(ProjectWriteAdmission, admission),
+			),
+		),
+	};
+};
+
 afterEach(() => {
 	Reflect.deleteProperty(window, "arkini");
 });
@@ -190,7 +203,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				message: "The editor service is unavailable.",
 			},
 		});
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
+		const { repository } = createRepository();
 
 		const failure = await readTypedFailure(repository.listProjectsFx);
 
@@ -207,7 +220,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		vi.mocked(editor.listProjects).mockResolvedValueOnce({
 			type: "invalid-envelope",
 		} as never);
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
+		const { repository } = createRepository();
 
 		const envelopeFailure = await readTypedFailure(repository.listProjectsFx);
 
@@ -226,7 +239,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				message: "The editor project request is invalid.",
 			},
 		});
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
+		const { repository } = createRepository();
 
 		const failure = await readTypedFailure(repository.readProjectFx(""));
 
@@ -251,7 +264,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				},
 			]),
 		);
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
+		const { repository } = createRepository();
 
 		const projectFailure = await readTypedFailure(repository.readProjectFx("project-one"));
 		const versionFailure = await readTypedFailure(repository.listVersionsFx("project-one"));
@@ -285,7 +298,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				updatedAtMs: 2,
 			}),
 		);
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
+		const { repository } = createRepository();
 
 		const listFailure = await readTypedFailure(repository.listNotesFx("project-one"));
 		const updateFailure = await readTypedFailure(
@@ -308,7 +321,7 @@ describe("createElectronProjectRepositoryFx", () => {
 
 	it("keeps resource bytes typed across request and response boundaries", async () => {
 		const editor = installEditorApi();
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
+		const { repository } = createRepository();
 		const requestBytes = new Uint8Array([
 			9,
 			8,
@@ -340,8 +353,8 @@ describe("createElectronProjectRepositoryFx", () => {
 
 	it("blocks save-resource IPC while a hard project replacement owns writes", async () => {
 		const editor = installEditorApi();
-		const repository = Effect.runSync(createElectronProjectRepositoryFx);
-		const release = blockProjectWrites();
+		const { admission, repository } = createRepository();
+		const releaseFx = Effect.runSync(admission.acquireReplacementFx("checkout-version"));
 		try {
 			const failure = await readTypedFailure(
 				repository.saveResourceFx({
@@ -354,7 +367,7 @@ describe("createElectronProjectRepositoryFx", () => {
 			expect(failure.operation).toBe("save-resource");
 			expect(editor.saveResource).not.toHaveBeenCalled();
 		} finally {
-			release();
+			Effect.runSync(releaseFx);
 		}
 	});
 });

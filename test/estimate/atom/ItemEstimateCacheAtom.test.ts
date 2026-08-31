@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ItemEstimateCacheAtom } from "~/estimate/ui/ItemEstimateCacheAtom";
+import { ItemEstimateCacheAtom } from "~/estimate/atom/ItemEstimateCacheAtom";
 
 const runItemEstimateInWorkerFxMock = vi.hoisted(() => vi.fn());
 

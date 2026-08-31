@@ -11,7 +11,7 @@ import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
 import { readCheatAvailabilityFx } from "~/application-settings/fx/readCheatAvailabilityFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
-import { RendererLifecycleUnavailableError } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleUnavailableError } from "~/application-runtime/error/RendererLifecycleUnavailableError";
 import { readWindowModeFx } from "~/window-mode/fx/readWindowModeFx";
 import { RendererAtomRuntime } from "~/application-runtime/atom/RendererAtomRegistry";
 import { LauncherHeroAtom } from "~/launcher/atom/LauncherHeroAtom";

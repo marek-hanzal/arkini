@@ -19,7 +19,7 @@ import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProje
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
+import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
 type Operations = Pick<
@@ -38,7 +38,7 @@ const error = (operation: ProjectRepositoryOperation, message: string, cause?: u
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecovery(message, cause),
+				message: withFilesystemWriteRecoveryFn(message, cause),
 				cause,
 			});
 

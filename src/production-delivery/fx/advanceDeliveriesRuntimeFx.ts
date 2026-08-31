@@ -13,7 +13,7 @@ interface AdvanceDeliveriesRuntimeResult {
 }
 
 /** Advances and settles the step-start delivery identities in stable id order. */
-export const advanceDeliveriesRuntimeFx = Effect.fn("advanceDeliveriesRuntimeFx")(function* (
+export const advanceDeliveriesRuntimeFx = Effect.fn("advanceDeliveriesFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
 	const instantGameplay = isInstantGameplayEnabledFn({

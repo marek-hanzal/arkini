@@ -13,7 +13,7 @@ export namespace deleteFx {
 }
 
 /** Deletes one item under the requested safe or force contract and publishes the commit. */
-export const deleteFx = Effect.fn("deleteFx")(function* (props: deleteFx.Props) {
+export const deleteFx = Effect.fn("deleteEditorItemFx")(function* (props: deleteFx.Props) {
 	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(

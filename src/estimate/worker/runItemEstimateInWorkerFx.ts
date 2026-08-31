@@ -23,7 +23,7 @@ interface RunItemEstimateInWorkerOptions {
 }
 
 /** Runs one cancellable estimate request off the renderer thread. */
-export const runItemEstimateInWorkerFx = Effect.fn("runItemEstimateInWorkerFx")(
+export const runItemEstimateInWorkerFx = Effect.fn("runEditorItemEstimateInWorkerFx")(
 	(request: ItemEstimateWorkerRequest, options: RunItemEstimateInWorkerOptions = {}) =>
 		Effect.acquireUseRelease(
 			Effect.try({

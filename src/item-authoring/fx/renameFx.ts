@@ -23,7 +23,7 @@ const replacePath = (
 };
 
 /** Renames one canonical item and every exact reference while preserving stable identities. */
-export const renameFx = Effect.fn("renameFx")(function* ({
+export const renameFx = Effect.fn("renameEditorItemFx")(function* ({
 	config,
 	itemId,
 	newItemId,

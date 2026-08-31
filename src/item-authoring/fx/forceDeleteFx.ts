@@ -63,7 +63,7 @@ const createItemCleanup = (): ItemCleanup => ({
 });
 
 /** Mechanically removes one item and every authored structure that directly references it. */
-export const forceDeleteFx = Effect.fn("forceDeleteFx")(function* ({
+export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	config,
 	itemId,
 }: forceDeleteFx.Props) {

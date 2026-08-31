@@ -6,7 +6,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemSchema as CanonicalItemSchema } from "~/item-definition/schema/ItemSchema";
 
 /** Validates and persists one item through the canonical editor repository. */
-export const saveWithRepositoryFx = Effect.fn("saveWithRepositoryFx")(function* ({
+export const saveWithRepositoryFx = Effect.fn("saveEditorItemWithRepositoryFx")(function* ({
 	expectedRevision,
 	item: candidate,
 	projectId,

@@ -7,7 +7,7 @@ import { saveEditorBuildFx } from "~/editor-build/fx/saveEditorBuildFx";
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("saveEditorBuildFx", () => {
+describe("Editor Build saveEditorBuildFx", () => {
 	it("asks main to save the exact local Build identity", async () => {
 		const saveProjectBuild = vi.fn(async () => ({
 			type: "success" as const,

@@ -32,7 +32,7 @@ const descriptor = (
 	source,
 });
 
-describe("Editor build install admission", () => {
+describe("Editor Build install admission", () => {
 	it("classifies canonical bundled and user package identities independently of presentation", async () => {
 		const initial = readEditorBuildInstallPlanFn({
 			arkpacks: [

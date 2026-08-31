@@ -4,8 +4,8 @@ import { Effect, Path } from "effect";
 import {
 	GameProjectManifestFileName,
 	GameProjectSchemaFileName,
-} from "~/game-config/source/GameProjectReference";
-import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
+} from "~/game-config-source/constant/GameProjectReference";
+import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import type { ProjectPaths } from "./ProjectPaths";
 
 /** Resolves every fixed and identity-derived path below one Editor project root. */

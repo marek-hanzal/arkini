@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ProjectSchema } from "~/game-config/source/schema/ProjectSchema";
+import { ProjectSchema } from "~/game-config-source/schema/ProjectSchema";
 
 /** The canonical generated schema shared by project root and item authoring files. */
 export const GameProjectJsonSchema = (() => {

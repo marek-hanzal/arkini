@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameProjectItemSchemaReference } from "~/game-config/source/GameProjectReference";
-import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
-import { parseGameSourceFileFx } from "~/game-config/source/fx/parseGameSourceFileFx";
+import { GameProjectItemSchemaReference } from "~/game-config-source/constant/GameProjectReference";
+import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
+import { parseGameSourceFileFx } from "~/game-config-source/fx/parseGameSourceFileFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 describe("encodeGameProjectFileStemFn", () => {

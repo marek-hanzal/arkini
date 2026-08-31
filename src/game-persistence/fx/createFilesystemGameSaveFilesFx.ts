@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
+import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
 class GameSaveFilesError extends Data.TaggedError("GameSaveFilesError")<{

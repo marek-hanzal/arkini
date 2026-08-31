@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
-import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
+import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
+import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";

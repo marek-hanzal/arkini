@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
-import { ItemFileSchema } from "~/game-config/source/schema/ItemFileSchema";
+import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
+import { ItemFileSchema } from "~/game-config-source/schema/ItemFileSchema";
 
 /** One fragment accepted by the portable game-project JSON Schema. */
 export const ProjectSchema = z

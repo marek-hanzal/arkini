@@ -53,6 +53,7 @@
 		"src/game-config",
 		"src/game-config-compiler",
 		"src/game-config-resource",
+		"src/game-config-source",
 		"src/game-project-json-schema",
 		"src/arkpack/type/ArkpackDescriptor.ts",
 		"src/arkpack/artifact",

@@ -4,9 +4,9 @@ import { Effect } from "effect";
 import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
-} from "~/game-config/source/GameProjectReference";
-import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
-import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
+} from "~/game-config-source/constant/GameProjectReference";
+import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
+import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";

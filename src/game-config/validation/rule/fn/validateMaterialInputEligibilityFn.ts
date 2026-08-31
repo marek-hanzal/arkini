@@ -1,7 +1,7 @@
 import { readMaterialInputEligibilityFn } from "~/production-input/read/fn/readMaterialInputEligibilityFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
-import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
+import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";

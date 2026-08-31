@@ -4,7 +4,7 @@ import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledErro
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { removeItemRuntimeTransitionFx } from "~/item-interaction/fx/removeItemRuntimeTransitionFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 
 export namespace removeCheatItemFx {
 	export interface Props {

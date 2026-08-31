@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { autofillLineInputsRuntimeFx } from "~/production-input/write/autofillLineInputsRuntimeFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 
 export namespace autofillLineInputsFx {
 	export interface Props {

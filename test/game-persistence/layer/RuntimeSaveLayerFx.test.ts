@@ -6,7 +6,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/game-persistence/layer/RuntimeSaveLayerFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";

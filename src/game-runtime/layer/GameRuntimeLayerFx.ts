@@ -6,8 +6,8 @@ import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { fromConfigFx } from "~/game-runtime/fx/fromConfigFx";
-import { makeRuntimeStoreFx } from "~/game-runtime/internal/makeRuntimeStoreFx";
-import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
+import { makeRuntimeStoreFx } from "~/game-runtime/fx/makeRuntimeStoreFx";
+import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { settleItemDeliveryRuntimeFx } from "~/production-delivery/write/settleItemDeliveryRuntimeFx";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 
 export namespace settleItemDeliveryFx {
 	export interface Props {

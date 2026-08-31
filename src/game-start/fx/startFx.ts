@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeNotEmptyError } from "~/game-start/error/RuntimeNotEmptyError";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { planStartFx } from "~/game-start/fx/planStartFx";
 
 /**

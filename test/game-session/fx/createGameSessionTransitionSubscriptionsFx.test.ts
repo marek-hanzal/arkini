@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

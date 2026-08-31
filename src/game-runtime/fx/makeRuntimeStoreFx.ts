@@ -1,6 +1,6 @@
 import { Effect, Option, SubscriptionRef } from "effect";
 
-import type { RuntimeStoreFxService } from "~/game-runtime/internal/RuntimeStoreFx";
+import type { RuntimeStoreFxService } from "~/game-runtime/context/RuntimeStoreFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 /** Builds the one authoritative, replaying committed-transition reference. */

@@ -22,8 +22,8 @@ import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { ItemTemporaryDurationIssueSchema } from "./ItemTemporaryDurationIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
-import { DefaultLineIssueSchema } from "~/production-line/schema/check/DefaultLineIssueSchema";
-import { LineInputClosedIssueSchema } from "~/production-line/schema/check/LineInputClosedIssueSchema";
+import { DefaultLineIssueSchema } from "~/production-line/schema/DefaultLineIssueSchema";
+import { LineInputClosedIssueSchema } from "~/production-line/schema/LineInputClosedIssueSchema";
 import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
 
 /**

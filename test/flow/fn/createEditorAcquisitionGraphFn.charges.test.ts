@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createEditorAcquisitionGraphFn } from "~/flow/fn/createEditorAcquisitionGraphFn";
 import { estimateEditorItemsFn } from "~/estimate/fn/estimateEditorItemsFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
+import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 import {
 	createMergeTestConfig,

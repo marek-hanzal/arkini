@@ -11,7 +11,7 @@ import {
 } from "~/flow/type/EditorItemOriginFlow";
 import { readEditorItemOriginFlowFx } from "~/flow/fx/readEditorItemOriginFlowFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/RuleSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
 

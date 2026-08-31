@@ -6,10 +6,10 @@ import { WhenSchema } from "~/production-condition/schema/WhenSchema";
 /**
  * Fields shared by every rule evaluated for a product line.
  *
- * Specialized line-rule schemas spread `BaseSchema.shape` to preserve this
+ * Specialized line-rule schemas spread `BaseRuleSchema.shape` to preserve this
  * common contract while adding their discriminator and rule-specific fields.
  */
-export const BaseSchema = z
+export const BaseRuleSchema = z
 	.object({
 		/**
 		 * Optional player-facing explanation shown while this rule applies.
@@ -36,8 +36,8 @@ export const BaseSchema = z
 		description: "The common fields shared by every product-line rule.",
 	});
 
-export type BaseSchema = typeof BaseSchema;
+export type BaseRuleSchema = typeof BaseRuleSchema;
 
-export namespace BaseSchema {
-	export type Type = z.infer<BaseSchema>;
+export namespace BaseRuleSchema {
+	export type Type = z.infer<BaseRuleSchema>;
 }

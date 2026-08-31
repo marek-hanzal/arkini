@@ -1,4 +1,4 @@
-import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/RuleSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RuleSchema as DropRuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";

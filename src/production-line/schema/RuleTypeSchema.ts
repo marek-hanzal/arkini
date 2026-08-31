@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Discriminates the rules evaluated for a product line.
  */
-export const TypeSchema = z
+export const RuleTypeSchema = z
 	.enum({
 		Show: "show",
 		Hide: "hide",
@@ -17,8 +17,8 @@ export const TypeSchema = z
 		description: "The kind of rule evaluated for a product line.",
 	});
 
-export type TypeSchema = typeof TypeSchema;
+export type RuleTypeSchema = typeof RuleTypeSchema;
 
-export namespace TypeSchema {
-	export type Type = z.infer<TypeSchema>;
+export namespace RuleTypeSchema {
+	export type Type = z.infer<RuleTypeSchema>;
 }

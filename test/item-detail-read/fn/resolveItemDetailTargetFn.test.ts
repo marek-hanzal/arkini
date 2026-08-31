@@ -6,7 +6,7 @@ import { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,
-} from "~test/production-line/fx/run/support/lineRunTestRuntime";
+} from "~test/production-line/support/lineRunTestRuntime";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const sourceProjection = {

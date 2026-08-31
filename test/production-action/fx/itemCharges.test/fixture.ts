@@ -4,7 +4,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
+import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";

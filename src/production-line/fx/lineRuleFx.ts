@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx";
-import { TypeSchema } from "~/production-line/schema/rule/TypeSchema";
-import type { RuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
+import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
 
@@ -57,7 +57,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 	return yield* match(rule)
 		.with(
 			{
-				type: TypeSchema.enum.Show,
+				type: RuleTypeSchema.enum.Show,
 			},
 			(rule) =>
 				Effect.gen(function* () {
@@ -73,7 +73,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Hide,
+				type: RuleTypeSchema.enum.Hide,
 			},
 			(rule) =>
 				Effect.gen(function* () {
@@ -89,7 +89,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Enable,
+				type: RuleTypeSchema.enum.Enable,
 			},
 			(rule) => {
 				return resolveActionRuleFx({
@@ -100,7 +100,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Disable,
+				type: RuleTypeSchema.enum.Disable,
 			},
 			(rule) => {
 				return resolveActionRuleFx({
@@ -111,7 +111,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 		)
 		.with(
 			{
-				type: TypeSchema.enum.RuntimeAdjust,
+				type: RuleTypeSchema.enum.RuntimeAdjust,
 			},
 			(rule) =>
 				Effect.gen(function* () {
@@ -128,7 +128,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 		)
 		.with(
 			{
-				type: TypeSchema.enum.RuntimeMultiplier,
+				type: RuleTypeSchema.enum.RuntimeMultiplier,
 			},
 			(rule) =>
 				Effect.gen(function* () {

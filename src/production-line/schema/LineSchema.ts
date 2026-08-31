@@ -5,7 +5,7 @@ import { DescriptionSchema } from "~/game-config/schema/DescriptionSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { TimeSchema } from "~/game-config/schema/TimeSchema";
 import { TitleSchema } from "~/game-config/schema/TitleSchema";
-import { RuleSchema } from "./rule/RuleSchema";
+import { RuleSchema } from "./RuleSchema";
 
 /**
  * A single product line with its accepted inputs and produced output.

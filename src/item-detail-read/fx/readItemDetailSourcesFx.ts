@@ -8,7 +8,7 @@ import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
-import { TypeSchema as LineRuleTypeSchema } from "~/production-line/schema/rule/TypeSchema";
+import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";

@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
-import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
-import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
+import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
+import { unsetDefaultLineFx } from "~/production-line/fx/unsetDefaultLineFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
@@ -15,7 +15,7 @@ import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
-import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/check/DefaultLineIssueReasonEnumSchema";
+import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/DefaultLineIssueReasonEnumSchema";
 
 const line = (id: string, title: string, isDefault = false) => ({
 	id,

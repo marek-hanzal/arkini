@@ -7,7 +7,7 @@ import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/remov
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";
+import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 
 export const createFixedStepTestConfig = () => {
 	const base = createJobTestConfig();

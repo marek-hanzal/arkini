@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
-import { lineRunRuntime } from "~test/production-line/fx/run/support/lineRunTestRuntime";
+import { lineRunRuntime } from "~test/production-line/support/lineRunTestRuntime";
 
 describe("isInstantGameplayEnabledFn", () => {
 	it("requires both persisted cheat enablement and Instant gameplay", () => {

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { RuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { lineRuleFx } from "./lineRuleFx";
 

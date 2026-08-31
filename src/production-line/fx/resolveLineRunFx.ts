@@ -12,7 +12,7 @@ import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { TypeSchema as LineRuleTypeSchema } from "~/production-line/schema/rule/TypeSchema";
+import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";

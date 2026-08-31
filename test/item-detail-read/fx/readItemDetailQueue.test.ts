@@ -8,7 +8,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,
-} from "~test/production-line/fx/run/support/lineRunTestRuntime";
+} from "~test/production-line/support/lineRunTestRuntime";
 
 const run = <A, E>(effect: Effect.Effect<A, E, never>) => Effect.runSync(effect);
 

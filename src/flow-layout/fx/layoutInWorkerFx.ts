@@ -1,6 +1,6 @@
 import { Data, Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import LayoutWorker from "~/flow-layout/worker/layout.worker.ts?worker";
 import type { Layout, LayoutInput } from "~/flow-layout/type/Layout";
 import type {
@@ -41,7 +41,7 @@ const runLayout = (topology: LayoutInput, worker: Worker): Promise<Layout> =>
 /** Computes one flow layout off the renderer thread and terminates its worker on exit. */
 export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 	(
-		flow: EditorItemOriginFlow,
+		flow: ItemOriginFlow,
 		options: {
 			readonly runLayout?: RunLayout;
 			readonly spawn?: () => Worker;

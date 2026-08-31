@@ -4,51 +4,45 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
-import {
-	type EditorItemOriginFlow,
-	type EditorItemOriginFlowProgress,
-} from "~/flow/type/EditorItemOriginFlow";
-import {
-	readEditorItemOriginFlowFx,
-	type EditorItemOriginFlowRequest,
-} from "~/flow/fx/readEditorItemOriginFlowFx";
+import { type ItemOriginFlow, type ItemOriginFlowProgress } from "~/flow/type/ItemOriginFlow";
+import { readItemOriginFlowFx, type ItemOriginFlowRequest } from "~/flow/fx/readItemOriginFlowFx";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 import { layoutInWorkerFx } from "~/flow-layout/fx/layoutInWorkerFx";
 
 type State =
 	| {
 			readonly flow: undefined;
-			readonly progress: EditorItemOriginFlowProgress;
+			readonly progress: ItemOriginFlowProgress;
 			readonly status: "loading";
 	  }
 	| {
 			readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
-			readonly flow: EditorItemOriginFlow;
+			readonly flow: ItemOriginFlow;
 			readonly positions: ReadonlyMap<string, LayoutNode>;
-			readonly progress: EditorItemOriginFlowProgress;
+			readonly progress: ItemOriginFlowProgress;
 			readonly status: "ready";
 	  }
 	| {
 			readonly flow: undefined;
-			readonly progress: EditorItemOriginFlowProgress;
+			readonly progress: ItemOriginFlowProgress;
 			readonly status: "error";
 	  };
 
 interface CommandRequest {
-	readonly config: EditorItemOriginFlowRequest["config"];
+	readonly config: ItemOriginFlowRequest["config"];
 }
 
 interface ProgressState {
-	readonly progress: EditorItemOriginFlowProgress;
+	readonly progress: ItemOriginFlowProgress;
 	readonly request?: CommandRequest;
 }
 
-const InitialProgress: EditorItemOriginFlowProgress = {
+const InitialProgress: ItemOriginFlowProgress = {
 	label: "Preparing flow",
 	percent: 0,
 };
 
-const FailedProgress: EditorItemOriginFlowProgress = {
+const FailedProgress: ItemOriginFlowProgress = {
 	label: "Flow failed",
 	percent: 0,
 };
@@ -63,7 +57,7 @@ const createAtoms = () => {
 				progress: InitialProgress,
 				request,
 			});
-			const flow = yield* readEditorItemOriginFlowFx({
+			const flow = yield* readItemOriginFlowFx({
 				config: request.config,
 				onProgress: (progress) => {
 					get.set(progressAtom, {
@@ -105,7 +99,7 @@ const createAtoms = () => {
 };
 
 /** Owns one subscription-scoped build of the complete authored game flow. */
-export const useOriginFlow = (config: EditorItemOriginFlowRequest["config"]): State => {
+export const useOriginFlow = (config: ItemOriginFlowRequest["config"]): State => {
 	const { commandAtom, progressAtom } = useMemo(createAtoms, []);
 	const request = useMemo<CommandRequest>(
 		() => ({

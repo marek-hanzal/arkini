@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "react";
 
 import {
-	EditorItemOriginItemInputPortId,
-	EditorItemOriginItemOutputPortId,
-	type EditorItemOriginItemNode,
-	type EditorItemOriginOperationKind,
-} from "~/flow/type/EditorItemOriginFlow";
+	ItemOriginItemInputPortId,
+	ItemOriginItemOutputPortId,
+	type ItemOriginItemNode,
+	type ItemOriginOperationKind,
+} from "~/flow/type/ItemOriginFlow";
 import type { CanvasPalette } from "~/flow-canvas/type/CanvasPalette";
 import { useCanvasTextPainter } from "~/flow-canvas/ui/useCanvasTextPainter";
 import {
@@ -17,7 +17,7 @@ import {
 import type { LayoutNode } from "~/flow-layout/type/Layout";
 import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 
-const readItemTypeColorFn = (palette: CanvasPalette, type: EditorItemOriginItemNode["type"]) => {
+const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["type"]) => {
 	switch (type) {
 		case "blueprint":
 		case "producer":
@@ -37,7 +37,7 @@ const readItemTypeColorFn = (palette: CanvasPalette, type: EditorItemOriginItemN
 	}
 };
 
-const readSourceKindColorFn = (palette: CanvasPalette, kind: EditorItemOriginOperationKind) => {
+const readSourceKindColorFn = (palette: CanvasPalette, kind: ItemOriginOperationKind) => {
 	switch (kind) {
 		case "line":
 			return palette.accent;
@@ -50,7 +50,7 @@ const readSourceKindColorFn = (palette: CanvasPalette, kind: EditorItemOriginOpe
 	}
 };
 
-const SourceKindIconPath: Record<EditorItemOriginOperationKind, string> = {
+const SourceKindIconPath: Record<ItemOriginOperationKind, string> = {
 	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
 	charges:
 		"m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
@@ -60,7 +60,7 @@ const SourceKindIconPath: Record<EditorItemOriginOperationKind, string> = {
 
 type DrawCanvasItemArtwork = (
 	context: CanvasRenderingContext2D,
-	node: EditorItemOriginItemNode,
+	node: ItemOriginItemNode,
 	resourceUrls: ReadonlyMap<string, string>,
 	x: number,
 	y: number,
@@ -74,7 +74,7 @@ interface DrawCanvasItemNodeProps {
 	readonly highlight: "active" | "idle" | "selected";
 	readonly highlightedPortColors: ReadonlyMap<string, string> | undefined;
 	readonly metrics: NodeMetrics;
-	readonly node: EditorItemOriginItemNode;
+	readonly node: ItemOriginItemNode;
 	readonly opacity: number;
 	readonly palette: CanvasPalette;
 	readonly position: LayoutNode;
@@ -84,7 +84,7 @@ interface DrawCanvasItemNodeProps {
 /** Owns the stable item-card drawing callback and icon cache for one Flow Canvas renderer. */
 export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork) => {
 	const textPainter = useCanvasTextPainter();
-	const sourceIconPathCacheRef = useRef<Map<EditorItemOriginOperationKind, Path2D>>(new Map());
+	const sourceIconPathCacheRef = useRef<Map<ItemOriginOperationKind, Path2D>>(new Map());
 
 	return useCallback(
 		({
@@ -110,19 +110,19 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 			context.strokeStyle = highlight === "idle" ? typeColor : palette.accent;
 			context.stroke();
 
-			if (connectedPortIds?.has(EditorItemOriginItemInputPortId) === true) {
+			if (connectedPortIds?.has(ItemOriginItemInputPortId) === true) {
 				context.beginPath();
 				context.arc(position.x, position.y + metrics.itemPortY, 6, 0, Math.PI * 2);
 				context.fillStyle =
-					highlightedPortColors?.get(EditorItemOriginItemInputPortId) ??
+					highlightedPortColors?.get(ItemOriginItemInputPortId) ??
 					palette.itemSurfaces[node.type];
 				context.fill();
 				context.lineWidth = 2.5;
 				context.strokeStyle =
-					highlightedPortColors?.get(EditorItemOriginItemInputPortId) ?? typeColor;
+					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? typeColor;
 				context.stroke();
 			}
-			if (connectedPortIds?.has(EditorItemOriginItemOutputPortId) === true) {
+			if (connectedPortIds?.has(ItemOriginItemOutputPortId) === true) {
 				context.beginPath();
 				context.arc(
 					position.x + position.width,
@@ -132,12 +132,12 @@ export const useCanvasItemNodePainter = (drawItemArtwork: DrawCanvasItemArtwork)
 					Math.PI * 2,
 				);
 				context.fillStyle =
-					highlightedPortColors?.get(EditorItemOriginItemOutputPortId) ??
+					highlightedPortColors?.get(ItemOriginItemOutputPortId) ??
 					palette.itemSurfaces[node.type];
 				context.fill();
 				context.lineWidth = 2.5;
 				context.strokeStyle =
-					highlightedPortColors?.get(EditorItemOriginItemOutputPortId) ?? typeColor;
+					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? typeColor;
 				context.stroke();
 			}
 

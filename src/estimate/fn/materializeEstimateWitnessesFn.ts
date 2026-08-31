@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import { projectEstimateWitnessFn } from "~/estimate-projection/fn/projectEstimateWitnessFn";
+import { projectEstimateWitnessFn } from "~/estimate/fn/projectEstimateWitnessFn";
 import {
 	createEstimateRoutePolicyFn,
 	readEstimateRouteOptionsFn,
@@ -13,16 +13,13 @@ import {
 	type EstimateExpectedRunsResult,
 } from "~/estimate/fn/readEstimateExpectedRunsFn";
 import { shareEstimateOperationRunsFn } from "~/estimate/fn/shareEstimateOperationRunsFn";
-import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
-import type { EditorItemEstimateDiagnostic } from "~/estimate/type/EditorItemEstimate";
+import { itemEstimateMaximumQuantity } from "~/estimate/schema/ItemEstimateQuantitySchema";
+import type { ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
+import type { EstimateSelectedRoute, EstimateWitness } from "~/estimate/type/EstimateWitness";
 import type {
-	EstimateSelectedRoute,
-	EstimateWitness,
-} from "~/estimate-witness/type/EstimateWitness";
-import type {
-	EditorAcquisitionQuantityProbability,
-	EditorAcquisitionRoute,
-} from "~/flow/type/EditorAcquisitionGraph";
+	AcquisitionQuantityProbability,
+	AcquisitionRoute,
+} from "~/flow/type/AcquisitionGraph";
 
 interface EstimateRequest {
 	readonly factId: string;
@@ -36,11 +33,11 @@ interface MaterializeEstimateWitnessesProps {
 
 interface EstimateWitnessBatchEntry extends EstimateRequest {
 	readonly candidates: ReadonlyArray<EstimateWitness>;
-	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
+	readonly diagnostics: ReadonlyArray<ItemEstimateDiagnostic>;
 }
 
 interface CandidateFailure {
-	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
+	readonly diagnostics: ReadonlyArray<ItemEstimateDiagnostic>;
 	readonly status: "failure";
 }
 
@@ -82,7 +79,7 @@ interface CandidateAttempt {
 const epsilon = 1e-9;
 const maximumWitnessSearchStates = 4_096;
 
-const isPartialDiagnosticFn = (diagnostic: EditorItemEstimateDiagnostic) =>
+const isPartialDiagnosticFn = (diagnostic: ItemEstimateDiagnostic) =>
 	diagnostic.kind === "joint-output-accounting-unsupported" ||
 	diagnostic.kind === "quantity-limit-exceeded" ||
 	diagnostic.kind === "witness-search-exhausted";
@@ -121,10 +118,10 @@ const equalQuantitiesFn = (left: ReadonlyMap<string, number>, right: ReadonlyMap
 	].every(([factId, quantity]) => Math.abs(quantity - (right.get(factId) ?? -1)) <= epsilon);
 
 const readScalarExpectedRunsFn = (
-	distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
+	distribution: ReadonlyArray<AcquisitionQuantityProbability>,
 	quantity: number,
 ): EstimateExpectedRunsResult =>
-	quantity > editorItemEstimateMaximumQuantity
+	quantity > itemEstimateMaximumQuantity
 		? {
 				status: "state-space-unsupported",
 			}
@@ -178,7 +175,7 @@ const materializeCandidateSelectionFn = (
 	policy: EstimateRoutePolicy,
 	factId: string,
 	quantity: number,
-	topRoute: EditorAcquisitionRoute,
+	topRoute: AcquisitionRoute,
 	choiceContext: WitnessChoiceContext,
 ): CandidateResult => {
 	let required = new Map([
@@ -195,13 +192,13 @@ const materializeCandidateSelectionFn = (
 		for (const [id, requiredQuantity] of [
 			...required,
 		].sort(([left], [right]) => Order.String(left, right))) {
-			if (requiredQuantity > editorItemEstimateMaximumQuantity)
+			if (requiredQuantity > itemEstimateMaximumQuantity)
 				return {
 					diagnostics: [
 						{
 							factId: id,
 							kind: "quantity-limit-exceeded",
-							maximumQuantity: editorItemEstimateMaximumQuantity,
+							maximumQuantity: itemEstimateMaximumQuantity,
 							quantity: requiredQuantity,
 							source: "authored-demand",
 						},
@@ -482,7 +479,7 @@ const materializeCandidateAttemptFn = (
 	policy: EstimateRoutePolicy,
 	factId: string,
 	quantity: number,
-	topRoute: EditorAcquisitionRoute,
+	topRoute: AcquisitionRoute,
 	overrides: ReadonlyMap<string, string>,
 ): CandidateAttempt => {
 	const choices = new Map<string, WitnessChoicePoint>();
@@ -502,14 +499,14 @@ const materializeCandidateFn = (
 	policy: EstimateRoutePolicy,
 	factId: string,
 	quantity: number,
-	topRoute: EditorAcquisitionRoute,
+	topRoute: AcquisitionRoute,
 ): CandidateResult => {
 	const baseline = materializeCandidateAttemptFn(policy, factId, quantity, topRoute, new Map());
 	const pending: Array<ReadonlyMap<string, string>> = [];
 	const seen = new Set<string>();
 	let attemptedStates = 1;
 	let best = baseline.result.status === "success" ? baseline.result.witness : undefined;
-	const partialDiagnostics: EditorItemEstimateDiagnostic[] =
+	const partialDiagnostics: ItemEstimateDiagnostic[] =
 		baseline.result.status === "failure"
 			? baseline.result.diagnostics.filter(isPartialDiagnosticFn)
 			: [];
@@ -604,7 +601,7 @@ const materializeRequestFn = (
 	policy: EstimateRoutePolicy,
 	request: EstimateRequest,
 ): EstimateWitnessBatchEntry => {
-	if (request.quantity > editorItemEstimateMaximumQuantity)
+	if (request.quantity > itemEstimateMaximumQuantity)
 		return {
 			...request,
 			candidates: [],
@@ -612,7 +609,7 @@ const materializeRequestFn = (
 				{
 					factId: request.factId,
 					kind: "quantity-limit-exceeded",
-					maximumQuantity: editorItemEstimateMaximumQuantity,
+					maximumQuantity: itemEstimateMaximumQuantity,
 					quantity: request.quantity,
 					source: "request",
 				},
@@ -640,7 +637,7 @@ const materializeRequestFn = (
 		};
 
 	const candidates: EstimateWitness[] = [];
-	const diagnostics: EditorItemEstimateDiagnostic[] = [];
+	const diagnostics: ItemEstimateDiagnostic[] = [];
 	for (const topRoute of policy.topology.routesByFact.get(request.factId) ?? []) {
 		const result = materializeCandidateFn(policy, request.factId, request.quantity, topRoute);
 		if (result.status === "success") candidates.push(result.witness);

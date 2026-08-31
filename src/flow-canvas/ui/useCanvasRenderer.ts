@@ -1,6 +1,6 @@
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import {
 	readCanvasEdgeOpacityFn,
 	readCanvasNodeHighlightFn,
@@ -333,7 +333,7 @@ export namespace useCanvasRenderer {
 		readonly edgeBounds: ReadonlyMap<string, Bounds>;
 		readonly fitContent: boolean;
 		readonly focusNodeId: string | undefined;
-		readonly flow: EditorItemOriginFlow;
+		readonly flow: ItemOriginFlow;
 		readonly highlight: Highlight | undefined;
 		readonly highlightedEdgeColors: ReadonlyMap<string, string>;
 		readonly highlightedPortColors: ReadonlyMap<string, ReadonlyMap<string, string>>;

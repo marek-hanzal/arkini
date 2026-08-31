@@ -1,7 +1,7 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { createEditorItemEstimateIndexFn } from "~/estimate/fn/createEditorItemEstimateIndexFn";
-import { estimateEditorItemCatalogFn } from "~/estimate/fn/estimateEditorItemCatalogFn";
-import { selectEditorItemEstimateIndexFn } from "~/estimate/fn/selectEditorItemEstimateIndexFn";
+import { createItemEstimateIndexFn } from "~/estimate/fn/createItemEstimateIndexFn";
+import { estimateItemCatalogFn } from "~/estimate/fn/estimateItemCatalogFn";
+import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndexFn";
 import type { EstimateInput } from "../EstimateInputSchema";
 
 const formatNumberFn = (value: number) =>
@@ -27,8 +27,8 @@ const demandRatioLabelFn = (demand: number, maximumDemand: number) => {
 
 /** Computes, selects, pages, and formats the global Estimate projection for MCP. */
 export const readEstimateTextFn = (project: EditorProject, input: EstimateInput) => {
-	const estimates = estimateEditorItemCatalogFn(project.config);
-	const entries = createEditorItemEstimateIndexFn({
+	const estimates = estimateItemCatalogFn(project.config);
+	const entries = createItemEstimateIndexFn({
 		estimates: new Map(
 			estimates.map((estimate) => [
 				estimate.factId,
@@ -37,7 +37,7 @@ export const readEstimateTextFn = (project: EditorProject, input: EstimateInput)
 		),
 		itemIds: Object.keys(project.config.items),
 	});
-	const rows = selectEditorItemEstimateIndexFn({
+	const rows = selectItemEstimateIndexFn({
 		entries,
 		incomplete: input.incomplete,
 		items: Object.values(project.config.items),

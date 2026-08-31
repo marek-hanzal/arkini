@@ -1,9 +1,9 @@
 import {
-	EditorItemOriginItemInputPortId,
-	EditorItemOriginItemOutputPortId,
-	type EditorItemOriginItemNode,
-	type EditorItemOriginOperation,
-} from "~/flow/type/EditorItemOriginFlow";
+	ItemOriginItemInputPortId,
+	ItemOriginItemOutputPortId,
+	type ItemOriginItemNode,
+	type ItemOriginOperation,
+} from "~/flow/type/ItemOriginFlow";
 
 const NodeWidth = 420;
 const NodeMinHeight = 176;
@@ -50,10 +50,10 @@ export interface NodeMetrics {
 	readonly width: number;
 }
 
-const readOperationBodyHeightFn = (operation: EditorItemOriginOperation) =>
+const readOperationBodyHeightFn = (operation: ItemOriginOperation) =>
 	Math.max(1, operation.inputs.length, operation.outputs.length) * PortLineHeight;
 
-const readOperationHeightFn = (operation: EditorItemOriginOperation) =>
+const readOperationHeightFn = (operation: ItemOriginOperation) =>
 	OperationContentPadding * 2 +
 	OperationHeaderHeight +
 	OperationHeaderGap +
@@ -78,7 +78,7 @@ const readPortYsFn = (
 };
 
 /** Shared flow-canvas geometry for variable-height item cards and their embedded operation ports. */
-export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics => {
+export const readNodeMetricsFn = (node: ItemOriginItemNode): NodeMetrics => {
 	const itemTextBounds = {
 		height: node.operations.length === 0 ? NodeMinHeight : NodeHeaderHeight,
 		width: NodeWidth - 120,
@@ -94,14 +94,14 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 			operations: [],
 			portOffsets: new Map([
 				[
-					EditorItemOriginItemInputPortId,
+					ItemOriginItemInputPortId,
 					{
 						x: -NodeWidth / 2,
 						y: readItemPortYFn(NodeMinHeight) - NodeMinHeight / 2,
 					},
 				],
 				[
-					EditorItemOriginItemOutputPortId,
+					ItemOriginItemOutputPortId,
 					{
 						x: NodeWidth / 2,
 						y: readItemPortYFn(NodeMinHeight) - NodeMinHeight / 2,
@@ -135,11 +135,11 @@ export const readNodeMetricsFn = (node: EditorItemOriginItemNode): NodeMetrics =
 			readonly y: number;
 		}
 	>();
-	portOffsets.set(EditorItemOriginItemInputPortId, {
+	portOffsets.set(ItemOriginItemInputPortId, {
 		x: -NodeWidth / 2,
 		y: readItemPortYFn(NodeHeaderHeight) - height / 2,
 	});
-	portOffsets.set(EditorItemOriginItemOutputPortId, {
+	portOffsets.set(ItemOriginItemOutputPortId, {
 		x: NodeWidth / 2,
 		y: readItemPortYFn(NodeHeaderHeight) - height / 2,
 	});

@@ -1,13 +1,10 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { createEditorAcquisitionGraphFn } from "~/flow/fn/createEditorAcquisitionGraphFn";
-import type { EstimateRouteStep } from "~/estimate-projection/type/EstimateProjection";
-import type {
-	EditorItemEstimate,
-	EditorItemEstimateDiagnostic,
-} from "~/estimate/type/EditorItemEstimate";
-import { estimateEditorItemsFn } from "~/estimate/fn/estimateEditorItemsFn";
+import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
+import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
+import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
+import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 
 const formatNumberFn = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
@@ -17,7 +14,7 @@ const itemReferenceFn = (project: EditorProject, itemId: string) => {
 	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
 };
 
-const diagnosticTextFn = (diagnostic: EditorItemEstimateDiagnostic) => {
+const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
 		case "joint-output-accounting-unsupported":
 			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space`;
@@ -50,7 +47,7 @@ const amountLinesFn = (
 				),
 			];
 
-const limitationTextFn = (limitation: EditorItemEstimate["limitations"][number]) => {
+const limitationTextFn = (limitation: ItemEstimate["limitations"][number]) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
 			return "conditional runtime adjustments are ignored";
@@ -91,7 +88,7 @@ const routeLinesFn = (
 const formatEstimateFn = (
 	project: EditorProject,
 	target: EditorProject["config"]["items"][string],
-	estimate: EditorItemEstimate,
+	estimate: ItemEstimate,
 ) => {
 	const header = [
 		"Item estimate",
@@ -158,8 +155,8 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 	const target = project.config.items[itemId];
 	if (target === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
-	const graph = createEditorAcquisitionGraphFn(project.config);
-	const estimate = estimateEditorItemsFn({
+	const graph = createAcquisitionGraphFn(project.config);
+	const estimate = estimateRequestsFn({
 		graph,
 		requests: [
 			{

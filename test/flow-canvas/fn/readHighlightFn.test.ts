@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import type { OriginFlowDirection, Selection } from "~/flow-canvas/type/Highlight";
 import { readHighlightFn } from "~/flow-canvas/fn/readHighlightFn";
 import { cyclicFlow, producerFlow } from "./readHighlightFn.test/fixture";
 
 const readHighlight = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	selection: Selection,
 	direction: OriginFlowDirection = "output",
 ) => readHighlightFn(flow, selection, direction);

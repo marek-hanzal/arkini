@@ -1,12 +1,12 @@
 import { Order } from "effect";
 import type {
-	EditorItemOriginEdge,
-	EditorItemOriginFlow,
-	EditorItemOriginItemNode,
-} from "~/flow/type/EditorItemOriginFlow";
+	ItemOriginEdge,
+	ItemOriginFlow,
+	ItemOriginItemNode,
+} from "~/flow/type/ItemOriginFlow";
 import type { OriginFlowDirection, Highlight, Selection } from "~/flow-canvas/type/Highlight";
 
-const EdgeOrder = Order.make<EditorItemOriginEdge>(
+const EdgeOrder = Order.make<ItemOriginEdge>(
 	(left, right) =>
 		Order.String(left.operationId, right.operationId) || Order.String(left.id, right.id),
 );
@@ -16,17 +16,17 @@ interface HighlightTrace {
 	readonly nodeIds: Set<string>;
 }
 
-const addHighlightEdgeFn = (trace: HighlightTrace, edge: EditorItemOriginEdge) => {
+const addHighlightEdgeFn = (trace: HighlightTrace, edge: ItemOriginEdge) => {
 	trace.edgeIds.add(edge.id);
 	trace.nodeIds.add(edge.source);
 	trace.nodeIds.add(edge.target);
 };
 
 interface InputHighlightTrace extends HighlightTrace {
-	readonly inputEdgesBySource: ReadonlyMap<string, ReadonlyArray<EditorItemOriginEdge>>;
-	readonly nodeById: ReadonlyMap<string, EditorItemOriginItemNode>;
+	readonly inputEdgesBySource: ReadonlyMap<string, ReadonlyArray<ItemOriginEdge>>;
+	readonly nodeById: ReadonlyMap<string, ItemOriginItemNode>;
 	readonly operationIdsByOwner: ReadonlyMap<string, ReadonlySet<string>>;
-	readonly outputEdgesByOperation: ReadonlyMap<string, ReadonlyArray<EditorItemOriginEdge>>;
+	readonly outputEdgesByOperation: ReadonlyMap<string, ReadonlyArray<ItemOriginEdge>>;
 	readonly ownerNodeIdByOperation: ReadonlyMap<string, string>;
 	readonly tracedItems: Set<string>;
 	readonly tracedOperations: Set<string>;
@@ -46,7 +46,7 @@ const traceInputOperationFn = (trace: InputHighlightTrace, operationId: string) 
 	}
 };
 
-const traceInputItemFn = (trace: InputHighlightTrace, itemNode: EditorItemOriginItemNode) => {
+const traceInputItemFn = (trace: InputHighlightTrace, itemNode: ItemOriginItemNode) => {
 	trace.nodeIds.add(itemNode.id);
 	if (trace.tracedItems.has(itemNode.id)) return;
 	trace.tracedItems.add(itemNode.id);
@@ -65,10 +65,7 @@ const traceInputItemFn = (trace: InputHighlightTrace, itemNode: EditorItemOrigin
 };
 
 /** Reads every operation that depends on the selected item and recursively follows its outputs. */
-const readInputHighlightFn = (
-	flow: EditorItemOriginFlow,
-	startNode: EditorItemOriginItemNode,
-): Highlight => {
+const readInputHighlightFn = (flow: ItemOriginFlow, startNode: ItemOriginItemNode): Highlight => {
 	const nodeById = new Map(
 		flow.nodes.map(
 			(node) =>
@@ -78,8 +75,8 @@ const readInputHighlightFn = (
 				] as const,
 		),
 	);
-	const inputEdgesBySource = new Map<string, EditorItemOriginEdge[]>();
-	const outputEdgesByOperation = new Map<string, EditorItemOriginEdge[]>();
+	const inputEdgesBySource = new Map<string, ItemOriginEdge[]>();
+	const outputEdgesByOperation = new Map<string, ItemOriginEdge[]>();
 	const ownerNodeIdByOperation = new Map<string, string>();
 	const operationIdsByOwner = new Map<string, Set<string>>();
 	for (const edge of flow.edges) {
@@ -126,9 +123,9 @@ const readInputHighlightFn = (
 };
 
 interface OutputHighlightTrace extends HighlightTrace {
-	readonly inputEdgesByOperation: ReadonlyMap<string, ReadonlyArray<EditorItemOriginEdge>>;
-	readonly nodeById: ReadonlyMap<string, EditorItemOriginItemNode>;
-	readonly outputEdgesByTarget: ReadonlyMap<string, ReadonlyArray<EditorItemOriginEdge>>;
+	readonly inputEdgesByOperation: ReadonlyMap<string, ReadonlyArray<ItemOriginEdge>>;
+	readonly nodeById: ReadonlyMap<string, ItemOriginItemNode>;
+	readonly outputEdgesByTarget: ReadonlyMap<string, ReadonlyArray<ItemOriginEdge>>;
 	readonly ownerNodeIdByOperation: ReadonlyMap<string, string>;
 	readonly tracedItems: Set<string>;
 	readonly tracedOperations: Set<string>;
@@ -136,7 +133,7 @@ interface OutputHighlightTrace extends HighlightTrace {
 
 const traceOutputItemFn = (
 	trace: OutputHighlightTrace,
-	itemNode: EditorItemOriginItemNode,
+	itemNode: ItemOriginItemNode,
 	activeItemIds: ReadonlySet<string>,
 ) => {
 	trace.nodeIds.add(itemNode.id);
@@ -187,10 +184,7 @@ const traceOutputOperationFn = (
 };
 
 /** Reads every direct producer branch and one deterministic acquisition proof below each branch. */
-const readOutputHighlightFn = (
-	flow: EditorItemOriginFlow,
-	startNode: EditorItemOriginItemNode,
-): Highlight => {
+const readOutputHighlightFn = (flow: ItemOriginFlow, startNode: ItemOriginItemNode): Highlight => {
 	const nodeById = new Map(
 		flow.nodes.map(
 			(node) =>
@@ -200,8 +194,8 @@ const readOutputHighlightFn = (
 				] as const,
 		),
 	);
-	const outputEdgesByTarget = new Map<string, EditorItemOriginEdge[]>();
-	const inputEdgesByOperation = new Map<string, EditorItemOriginEdge[]>();
+	const outputEdgesByTarget = new Map<string, ItemOriginEdge[]>();
+	const inputEdgesByOperation = new Map<string, ItemOriginEdge[]>();
 	const ownerNodeIdByOperation = new Map<string, string>();
 	for (const edge of flow.edges) {
 		ownerNodeIdByOperation.set(
@@ -231,7 +225,7 @@ const readOutputHighlightFn = (
 			nodeLevels: new Map(),
 		};
 
-	const directEdgesByProducer = new Map<string, EditorItemOriginEdge[]>();
+	const directEdgesByProducer = new Map<string, ItemOriginEdge[]>();
 	for (const edge of [
 		...(outputEdgesByTarget.get(startNode.id) ?? []),
 	].sort(EdgeOrder)) {
@@ -292,7 +286,7 @@ const connectHighlightNodesFn = (adjacency: Map<string, string[]>, left: string,
 
 /** Assigns breadth-first visual depth to every node and edge in one selected flow. */
 const readHighlightLevelsFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	highlight: Highlight,
 	rootNodeId: string,
 ): Highlight => {
@@ -347,7 +341,7 @@ const readEmptyHighlightFn = (): Highlight => ({
 
 /** Reads the complete directional graph selected by an item or connection. */
 export const readHighlightFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	selection: Selection,
 	direction: OriginFlowDirection = "input",
 ) => {

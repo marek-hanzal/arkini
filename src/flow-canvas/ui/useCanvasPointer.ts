@@ -2,10 +2,10 @@ import { Order } from "effect";
 import { useRef, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 
 import {
-	EditorItemOriginItemInputPortId,
-	EditorItemOriginItemOutputPortId,
-	type EditorItemOriginFlow,
-} from "~/flow/type/EditorItemOriginFlow";
+	ItemOriginItemInputPortId,
+	ItemOriginItemOutputPortId,
+	type ItemOriginFlow,
+} from "~/flow/type/ItemOriginFlow";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 import type { ConnectedPorts } from "~/flow-canvas/fn/readConnectedPortsFn";
 import {
@@ -61,7 +61,7 @@ const readHitFn = ({
 }: {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 	readonly connectedPorts: ConnectedPorts;
-	readonly flow: EditorItemOriginFlow;
+	readonly flow: ItemOriginFlow;
 	readonly highlight: Highlight | undefined;
 	readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 	readonly nodeMetrics: ReadonlyMap<string, NodeMetrics>;
@@ -86,20 +86,18 @@ const readHitFn = ({
 		const readItemPortTarget = (portId: string) =>
 			flow.edges
 				.filter((edge) =>
-					portId === EditorItemOriginItemInputPortId
+					portId === ItemOriginItemInputPortId
 						? edge.target === node.id && edge.targetPortId === portId
 						: edge.source === node.id && edge.sourcePortId === portId,
 				)
 				.sort((left, right) => Order.String(left.id, right.id))
-				.map((edge) =>
-					portId === EditorItemOriginItemInputPortId ? edge.source : edge.target,
-				)
+				.map((edge) => (portId === ItemOriginItemInputPortId ? edge.source : edge.target))
 				.find((targetNodeId) => positions.has(targetNodeId));
 		if (
-			connectedPortIds?.has(EditorItemOriginItemInputPortId) === true &&
+			connectedPortIds?.has(ItemOriginItemInputPortId) === true &&
 			Math.hypot(x - position.x, y - (position.y + metrics.itemPortY)) <= portTolerance
 		) {
-			const targetNodeId = readItemPortTarget(EditorItemOriginItemInputPortId);
+			const targetNodeId = readItemPortTarget(ItemOriginItemInputPortId);
 			if (targetNodeId !== undefined)
 				return {
 					kind: "port",
@@ -107,11 +105,11 @@ const readHitFn = ({
 				};
 		}
 		if (
-			connectedPortIds?.has(EditorItemOriginItemOutputPortId) === true &&
+			connectedPortIds?.has(ItemOriginItemOutputPortId) === true &&
 			Math.hypot(x - (position.x + position.width), y - (position.y + metrics.itemPortY)) <=
 				portTolerance
 		) {
-			const targetNodeId = readItemPortTarget(EditorItemOriginItemOutputPortId);
+			const targetNodeId = readItemPortTarget(ItemOriginItemOutputPortId);
 			if (targetNodeId !== undefined)
 				return {
 					kind: "port",
@@ -236,7 +234,7 @@ export const useCanvasPointer = ({
 }: {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 	readonly connectedPorts: ConnectedPorts;
-	readonly flow: EditorItemOriginFlow;
+	readonly flow: ItemOriginFlow;
 	readonly highlight: Highlight | undefined;
 	readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 	readonly nodeMetrics: ReadonlyMap<string, NodeMetrics>;

@@ -1,4 +1,4 @@
-import type { EditorItemOriginEdge } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginEdge } from "~/flow/type/ItemOriginFlow";
 
 export type ConnectedPorts = ReadonlyMap<string, ReadonlySet<string>>;
 
@@ -22,9 +22,7 @@ const connectPortFn = (
 };
 
 /** Reads the exact connected port IDs for every rendered item node. */
-export const readConnectedPortsFn = (
-	edges: ReadonlyArray<EditorItemOriginEdge>,
-): ConnectedPorts => {
+export const readConnectedPortsFn = (edges: ReadonlyArray<ItemOriginEdge>): ConnectedPorts => {
 	const portsByNode = new Map<string, Set<string>>();
 	for (const edge of edges) {
 		connectPortFn(portsByNode, edge.source, edge.sourcePortId);

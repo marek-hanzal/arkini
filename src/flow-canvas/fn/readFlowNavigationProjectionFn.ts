@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import type { EditorItemOriginFlow } from "~/flow/type/EditorItemOriginFlow";
+import type { ItemOriginFlow } from "~/flow/type/ItemOriginFlow";
 import type { Highlight, OriginFlowDirection } from "~/flow-canvas/type/Highlight";
 
 interface FlowNavigationPosition {
@@ -15,19 +15,19 @@ type FlowNavigationProjectionRequest =
 	| {
 			readonly allowedEdgeIds: ReadonlySet<string>;
 			readonly direction: OriginFlowDirection;
-			readonly flow: EditorItemOriginFlow;
+			readonly flow: ItemOriginFlow;
 			readonly kind: "directional";
 			readonly positions: ReadonlyMap<string, FlowNavigationPosition>;
 			readonly selectedNodeId: string;
 	  }
 	| {
-			readonly flow: EditorItemOriginFlow;
+			readonly flow: ItemOriginFlow;
 			readonly kind: "relation";
 			readonly selectedNodeId: string;
 			readonly selectedRole: "input" | "output";
 	  }
 	| {
-			readonly flow: EditorItemOriginFlow;
+			readonly flow: ItemOriginFlow;
 			readonly highlight: Highlight;
 			readonly kind: "root";
 	  };
@@ -65,7 +65,7 @@ const readTurnCostFn = (
 };
 
 const readNavigationFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	positions: ReadonlyMap<string, FlowNavigationPosition>,
 	startNodeId: string,
 	direction: OriginFlowDirection,
@@ -125,7 +125,7 @@ const readNavigationFn = (
 };
 
 const readRelationNavigationFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	selectedNodeId: string,
 	selectedRole: "input" | "output",
 ): ReadonlyArray<string> => {
@@ -167,7 +167,7 @@ const readRelationNavigationFn = (
 };
 
 const readRootNavigationFn = (
-	flow: EditorItemOriginFlow,
+	flow: ItemOriginFlow,
 	highlight: Highlight,
 ): ReadonlyArray<string> => {
 	const nodesById = new Map(

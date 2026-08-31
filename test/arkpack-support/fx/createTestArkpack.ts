@@ -6,7 +6,7 @@ import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnve
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
-import { createTestPngBytes } from "~test/arkpack/support/createTestPngBytes";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 export const testArkpackConfig = GameConfigSchema.parse({

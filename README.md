@@ -73,8 +73,9 @@ src/game-config-validation  completed-config semantic validation and provenance-
 src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
 src/arkpack-admission  bounded package decoding and canonical semantic admission
 src/arkpack-artifact  package bytes, envelopes, compression, signing and provenance
+src/arkpack-catalog  renderer catalog, storage capability, selection and mutation lifecycle
 src/arkpack-cli  package build and offline provenance commands
-src/arkpack   renderer catalog runtime and package UI pending their flat-domain slices
+src/arkpack   package selector UI pending its flat-domain slice
 src/editor-build  Build contract, renderer admission and Build presentation
 src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows
 src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls

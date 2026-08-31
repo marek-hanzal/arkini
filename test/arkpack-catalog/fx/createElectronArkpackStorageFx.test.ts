@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { ArkpackStorageError } from "~/arkpack/renderer/ArkpackStorageError";
-import { createElectronArkpackStorageFx } from "~/arkpack/renderer/createElectronArkpackStorageFx";
+import { ArkpackStorageError } from "~/arkpack-catalog/error/ArkpackStorageError";
+import { createElectronArkpackStorageFx } from "~/arkpack-catalog/fx/createElectronArkpackStorageFx";
 
 describe("createElectronArkpackStorageFx", () => {
 	it("turns Electron filesystem rejection into one typed transport error", async () => {

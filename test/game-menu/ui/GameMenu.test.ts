@@ -21,7 +21,7 @@ import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererL
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { GameMenu } from "~/game-menu/ui/GameMenu";
 import { GameMenuProvider } from "~/game-menu/ui/GameMenuProvider";
-import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/game/testGameRead";

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 

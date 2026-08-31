@@ -1,8 +1,8 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Stream, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
-import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
-import { builtIn, imported } from "~test/arkpack/renderer/createArkpackCatalogFx.test/fixture";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
+import { builtIn, imported } from "~test/arkpack-catalog/fx/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx concurrency", () => {
 	it.effect("settles an admitted operation before honoring caller interruption", () =>

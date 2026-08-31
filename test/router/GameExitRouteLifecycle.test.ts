@@ -12,7 +12,7 @@ import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLi
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
-import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,

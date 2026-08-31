@@ -1,9 +1,9 @@
 import { Deferred, Effect, Fiber, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
-import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
-import { builtIn, imported } from "~test/arkpack/renderer/createArkpackCatalogFx.test/fixture";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
+import { builtIn, imported } from "~test/arkpack-catalog/fx/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx install lifecycle", () => {
 	it.effect("recovers canonical truth after a failed install and permits retry", () =>

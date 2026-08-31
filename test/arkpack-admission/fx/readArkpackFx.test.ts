@@ -7,11 +7,11 @@ import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
-import { createTestArkpack, testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import {
 	createTestPngBytes,
 	installTestPngDecoder,
-} from "~test/arkpack/support/createTestPngBytes";
+} from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 

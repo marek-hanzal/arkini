@@ -14,7 +14,7 @@ import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import {
 	createTestPngBytes,
 	installTestPngDecoder,
-} from "~test/arkpack/support/createTestPngBytes";
+} from "~test/arkpack-support/fn/createTestPngBytes";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";

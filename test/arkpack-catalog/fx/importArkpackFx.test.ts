@@ -1,17 +1,17 @@
 import { Effect } from "effect";
 import { gzipSync } from "node:zlib";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { importArkpackFx } from "~/arkpack/renderer/importArkpackFx";
-import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
+import { importArkpackFx } from "~/arkpack-catalog/fx/importArkpackFx";
+import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import { createTestArkpack, testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import {
 	createTestPngBytes,
 	installTestPngDecoder,
-} from "~test/arkpack/support/createTestPngBytes";
-import { createInMemoryArkpackStorageFx } from "~test/arkpack/support/createInMemoryArkpackStorageFx";
+} from "~test/arkpack-support/fn/createTestPngBytes";
+import { createInMemoryArkpackStorageFx } from "~test/arkpack-support/fx/createInMemoryArkpackStorageFx";
 
 beforeEach(() => {
 	installTestPngDecoder();

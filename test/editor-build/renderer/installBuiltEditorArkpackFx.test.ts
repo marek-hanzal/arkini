@@ -2,8 +2,8 @@ import { Effect, SubscriptionRef } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
-import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
 import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";
 import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";

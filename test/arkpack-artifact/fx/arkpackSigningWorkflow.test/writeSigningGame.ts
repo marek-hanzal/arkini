@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
-import { createTestPngBytes } from "~test/arkpack/support/createTestPngBytes";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 
 export const writeSigningGame = async (root: string) => {
 	const gameDirectory = join(root, "game");

@@ -13,7 +13,7 @@ import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/Edito
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
-import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";

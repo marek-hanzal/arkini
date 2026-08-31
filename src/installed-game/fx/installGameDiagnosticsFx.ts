@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import type { GameSession, GameTransition } from "~/game-session/type/GameSession";

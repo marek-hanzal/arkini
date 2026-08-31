@@ -1,5 +1,5 @@
 import { Effect, Exit } from "effect";
-import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
+import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { readLastPackageIdFx } from "~/renderer/launcher/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/launcher/fx/preloadLauncherHeroFx";

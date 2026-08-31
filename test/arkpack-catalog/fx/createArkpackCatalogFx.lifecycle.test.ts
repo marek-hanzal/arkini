@@ -1,8 +1,8 @@
 import { Cause, Deferred, Effect, Exit, Fiber, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
-import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
-import { builtIn, imported } from "~test/arkpack/renderer/createArkpackCatalogFx.test/fixture";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
+import { builtIn, imported } from "~test/arkpack-catalog/fx/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx lifecycle", () => {
 	it.effect("keeps the ready catalog visible while a manual refresh is pending", () =>

@@ -1,7 +1,7 @@
 import { useAtomValue } from "@effect/atom-react";
 
 import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
-import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
+import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 
 export namespace useArkpacks {
 	export type State = ArkpackCatalog.State;

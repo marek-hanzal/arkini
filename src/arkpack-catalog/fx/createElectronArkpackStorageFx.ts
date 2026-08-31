@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
-import { ArkpackStorageError } from "~/arkpack/renderer/ArkpackStorageError";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
+import { ArkpackStorageError } from "~/arkpack-catalog/error/ArkpackStorageError";
 
 export namespace createElectronArkpackStorageFx {
 	export interface Props {

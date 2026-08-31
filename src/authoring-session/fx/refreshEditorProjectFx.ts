@@ -2,16 +2,16 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
-import { EditorProjectPayloadSchema } from "~/project-authoring/schema/EditorProjectPayloadSchema";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectPayloadSchema } from "~/project-authoring/schema/ProjectPayloadSchema";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
-import { blockEditorProjectWrites } from "~/project-authoring/service/EditorProjectWriteAdmission";
+import { blockProjectWrites } from "~/project-authoring/service/ProjectWriteAdmission";
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
-import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
+import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 
 export namespace refreshEditorProjectFx {
@@ -21,11 +21,11 @@ export namespace refreshEditorProjectFx {
 }
 
 const requestRefreshFx = (projectId: string) =>
-	invokeEditorProjectTransportFx({
+	invokeProjectTransportFx({
 		call: () => window.arkini.editor.refreshProject(projectId),
 		operation: "refresh-project",
 		parse: (candidate: EditorProjectTransport.Project) => {
-			return EditorProjectPayloadSchema.parse(candidate);
+			return ProjectPayloadSchema.parse(candidate);
 		},
 		requestMessage: "The editor project refresh request failed.",
 		responseMessage: "The editor project refresh response is invalid.",
@@ -36,11 +36,11 @@ export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 	({ projectId }: refreshEditorProjectFx.Props) =>
 		Effect.acquireUseRelease(
 			Effect.try({
-				try: blockEditorProjectWrites,
+				try: blockProjectWrites,
 				catch: (cause) =>
-					cause instanceof EditorProjectRepositoryError
+					cause instanceof ProjectRepositoryError
 						? cause
-						: new EditorProjectRepositoryError({
+						: new ProjectRepositoryError({
 								operation: "refresh-project",
 								message: "The editor project refresh could not acquire ownership.",
 								cause,
@@ -48,7 +48,7 @@ export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 			}),
 			() =>
 				Effect.gen(function* () {
-					const repository = yield* EditorProjectRepository;
+					const repository = yield* ProjectRepository;
 					const unsavedChanges = yield* EditorUnsavedChanges;
 					yield* repository.awaitIdleFx;
 					const current = yield* Atom.get(EditorProjectAtom(projectId));

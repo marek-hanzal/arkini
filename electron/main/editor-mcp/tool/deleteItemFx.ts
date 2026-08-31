@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 
@@ -17,8 +17,8 @@ export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 	readonly force: boolean;
 	readonly itemId: string;
 	readonly notifyProjectChanged: (projectId: string) => void;
-	readonly project: EditorProject;
-	readonly repository: EditorProjectRepositoryService;
+	readonly project: Project;
+	readonly repository: ProjectRepositoryService;
 	readonly revision: number;
 }) {
 	if (revision !== project.revision)

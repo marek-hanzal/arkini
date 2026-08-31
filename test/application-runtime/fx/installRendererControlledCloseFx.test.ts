@@ -3,7 +3,7 @@
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
@@ -208,7 +208,7 @@ describe("installRendererControlledClose", () => {
 	it("waits for admitted editor operations before selecting an active Game exit route", async () => {
 		const idle = Effect.runSync(Deferred.make<void>());
 		const resource = createResource("package:editor-idle");
-		const repository: EditorProjectRepositoryService = {
+		const repository: ProjectRepositoryService = {
 			...UnusedEditorProjectRepository,
 			awaitIdleFx: Deferred.await(idle),
 			createProjectFx: () => Effect.die("Unexpected create."),

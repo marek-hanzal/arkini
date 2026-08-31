@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import { EditorNoteContentSchema } from "~/project-note/schema/EditorNoteSchema";
+import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
@@ -14,7 +14,7 @@ import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx
 const createNoteSchema = z
 	.object({
 		projectId: IdSchema,
-		content: EditorNoteContentSchema,
+		content: NoteContentSchema,
 	})
 	.strict();
 const noteKeySchema = z
@@ -25,7 +25,7 @@ const noteKeySchema = z
 	.strict();
 const updateNoteSchema = noteKeySchema
 	.extend({
-		content: EditorNoteContentSchema,
+		content: NoteContentSchema,
 	})
 	.strict();
 

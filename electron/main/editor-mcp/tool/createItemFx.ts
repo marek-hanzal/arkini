@@ -1,8 +1,8 @@
 import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
 import { saveWithRepositoryFx } from "~/item-authoring/fx/saveWithRepositoryFx";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
@@ -19,8 +19,8 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 }: {
 	readonly input: CreateItemInput;
 	readonly notifyProjectChanged: (projectId: string) => void;
-	readonly project: EditorProject;
-	readonly repository: EditorProjectRepositoryService;
+	readonly project: Project;
+	readonly repository: ProjectRepositoryService;
 	readonly type: TypeSchema.Type;
 }) {
 	const draft = createDraftFn({

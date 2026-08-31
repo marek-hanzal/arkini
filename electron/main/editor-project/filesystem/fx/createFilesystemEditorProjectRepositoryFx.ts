@@ -3,7 +3,7 @@ import { Effect, FileSystem, Path, Semaphore } from "effect";
 
 import type { OwnedEditorProjectRepository } from "../../EditorProjectServiceOwnership";
 import type { ProjectState } from "../ProjectState";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createBoardScenarioOperationsFx } from "./createBoardScenarioOperationsFx";
 import { createNoteOperationsFx } from "./createNoteOperationsFx";
@@ -45,7 +45,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		const state = states.get(projectId);
 		return state === undefined
 			? Effect.fail(
-					new EditorProjectRepositoryError({
+					new ProjectRepositoryError({
 						operation: "read-project",
 						message: `Editor project ${projectId} does not exist.`,
 					}),

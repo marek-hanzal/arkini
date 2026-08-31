@@ -3,10 +3,10 @@ import { Clock, FileSystem } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { EditorProjectNoteFileSchema } from "~/project-note/schema/EditorProjectNoteFileSchema";
-import { EditorNoteContentSchema, EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
+import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
@@ -17,7 +17,7 @@ const encodeJson = (value: unknown) =>
 	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 
 type Operations = Pick<
-	EditorProjectRepositoryService,
+	ProjectRepositoryService,
 	"listNotesFx" | "createNoteFx" | "updateNoteFx" | "deleteNoteFx"
 >;
 
@@ -26,9 +26,9 @@ const error = (
 	message: string,
 	cause?: unknown,
 ) =>
-	cause instanceof EditorProjectRepositoryError && cause.operation === operation
+	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
-		: new EditorProjectRepositoryError({
+		: new ProjectRepositoryError({
 				operation,
 				message: withFilesystemWriteRecovery(message, cause),
 				cause,
@@ -40,7 +40,7 @@ export namespace createNoteOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
 		readonly states: Map<string, ProjectState>;
 	}
 }
@@ -60,7 +60,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 				...state.notes,
 			]),
 		);
-	const publishNotes = (state: ProjectState, notes: ReadonlyArray<EditorNoteSchema.Type>) =>
+	const publishNotes = (state: ProjectState, notes: ReadonlyArray<NoteSchema.Type>) =>
 		states.set(state.project.projectId, {
 			...state,
 			notes: [
@@ -94,7 +94,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 	const createNoteFx: Operations["createNoteFx"] = ({ projectId, content: candidate }) =>
 		Effect.gen(function* () {
 			const content = yield* Effect.try({
-				try: () => EditorNoteContentSchema.parse(candidate),
+				try: () => NoteContentSchema.parse(candidate),
 				catch: (cause) =>
 					error("create-note", "The Editor project note is invalid.", cause),
 			});
@@ -106,7 +106,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 					const latest = notes[0]?.updatedAtMs;
 					const createdAtMs =
 						latest === undefined ? clockMs : Math.max(clockMs, latest + 1);
-					const note = EditorNoteSchema.parse({
+					const note = NoteSchema.parse({
 						noteId: randomUUID(),
 						projectId,
 						content,
@@ -121,7 +121,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 							lock: state.paths.lockFile,
 							target,
 							bytes: encodeJson(
-								EditorProjectNoteFileSchema.parse({
+								NoteFileSchema.parse({
 									content: note.content,
 									createdAtMs: note.createdAtMs,
 									updatedAtMs: note.updatedAtMs,
@@ -151,7 +151,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 			const { noteId, content } = yield* Effect.try({
 				try: () => ({
 					noteId: IdSchema.parse(candidateId),
-					content: EditorNoteContentSchema.parse(candidate),
+					content: NoteContentSchema.parse(candidate),
 				}),
 				catch: (cause) =>
 					error("update-note", "The Editor project note is invalid.", cause),
@@ -170,7 +170,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 							),
 						);
 					const latest = notes[0]?.updatedAtMs ?? previous.updatedAtMs;
-					const note = EditorNoteSchema.parse({
+					const note = NoteSchema.parse({
 						...previous,
 						content,
 						updatedAtMs: Math.max(clockMs, latest + 1),

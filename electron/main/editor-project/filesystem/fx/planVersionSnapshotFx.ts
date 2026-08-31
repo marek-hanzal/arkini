@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import type { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
-import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -29,7 +29,7 @@ export namespace planVersionSnapshotFx {
 		readonly arkpack: GameVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
-		readonly scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;
+		readonly scenarios: ReadonlyArray<BoardScenarioFileSchema.Type>;
 	}
 }
 
@@ -135,7 +135,7 @@ const materializePlan = ({
 		]);
 	}
 
-	const manifest = EditorVersionManifestSchema.parse({
+	const manifest = VersionManifestSchema.parse({
 		game: addJson(game),
 		items: sortedRecord(itemHashes),
 		assets: sortedRecord(assetHashes),

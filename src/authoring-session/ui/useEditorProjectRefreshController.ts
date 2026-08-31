@@ -3,7 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
@@ -14,7 +14,7 @@ const readErrorMessageFn = (error: unknown) =>
 
 const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 	Effect.gen(function* () {
-		const repository = yield* EditorProjectRepository;
+		const repository = yield* ProjectRepository;
 		const unsavedChanges = yield* EditorUnsavedChanges;
 		return Atom.family((projectId: string) =>
 			Atom.fn(
@@ -22,7 +22,7 @@ const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 					refreshEditorProjectFx({
 						projectId,
 					}).pipe(
-						Effect.provideService(EditorProjectRepository, repository),
+						Effect.provideService(ProjectRepository, repository),
 						Effect.provideService(EditorUnsavedChanges, unsavedChanges),
 					),
 				{

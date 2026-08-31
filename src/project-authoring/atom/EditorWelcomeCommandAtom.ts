@@ -1,13 +1,13 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { createFreshEditorProjectFx } from "~/project-authoring/fx/createFreshEditorProjectFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { createFreshProjectFx } from "~/project-authoring/fx/createFreshProjectFx";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import {
-	type EditorProjectDescriptor,
-	EditorProjectDescriptorSchema,
-} from "~/project-authoring/schema/EditorProjectDescriptorSchema";
-import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
+	type ProjectDescriptor,
+	ProjectDescriptorSchema,
+} from "~/project-authoring/schema/ProjectDescriptorSchema";
+import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { importEditorArkpackFileFx } from "~/project-authoring/fx/importEditorArkpackFileFx";
@@ -62,7 +62,7 @@ export namespace EditorWelcomeCommandAtom {
 		| {
 				readonly kind: "ready";
 				readonly action: "create" | "import-arkpack" | "import-json";
-				readonly project: EditorProjectDescriptor;
+				readonly project: ProjectDescriptor;
 		  }
 		| {
 				readonly kind: "ready";
@@ -97,7 +97,7 @@ const EditorWelcomeCommandStateAtom = Atom.make<EditorWelcomeCommandAtom.State>(
 	kind: "idle",
 }).pipe(Atom.keepAlive);
 
-const editorProjectRepository = RendererRuntime.runSync(EditorProjectRepository);
+const editorProjectRepository = RendererRuntime.runSync(ProjectRepository);
 
 const publishCommandFailureFx = (cause: Cause.Cause<unknown>) =>
 	Cause.hasInterruptsOnly(cause)
@@ -131,7 +131,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			}
 			if (command.action === "open-project-folder") {
 				const result = yield* Effect.exit(
-					invokeEditorProjectTransportFx({
+					invokeProjectTransportFx({
 						call: () => window.arkini.editor.openProjectDirectory(command.root),
 						operation: "open-project-directory",
 						parse: () => undefined,
@@ -147,25 +147,20 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			}
 			const operation =
 				command.action === "create"
-					? createFreshEditorProjectFx().pipe(
-							Effect.provideService(EditorProjectRepository, editorProjectRepository),
+					? createFreshProjectFx().pipe(
+							Effect.provideService(ProjectRepository, editorProjectRepository),
 						)
 					: command.action === "import-arkpack"
 						? importEditorArkpackFileFx({
 								file: command.file,
 							}).pipe(
-								Effect.provideService(
-									EditorProjectRepository,
-									editorProjectRepository,
-								),
+								Effect.provideService(ProjectRepository, editorProjectRepository),
 							)
-						: invokeEditorProjectTransportFx({
+						: invokeProjectTransportFx({
 								call: () => window.arkini.editor.importJsonDirectory(),
 								operation: "import-json-directory",
 								parse: (value) =>
-									value === null
-										? null
-										: EditorProjectDescriptorSchema.parse(value),
+									value === null ? null : ProjectDescriptorSchema.parse(value),
 								requestMessage: "The editor JSON import request failed.",
 								responseMessage: "The editor JSON import response is invalid.",
 							});

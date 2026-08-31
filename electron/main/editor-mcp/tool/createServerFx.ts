@@ -3,8 +3,8 @@ import { Effect, Order } from "effect";
 import { z } from "zod";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
@@ -98,7 +98,7 @@ const ItemEstimateInputSchema = z
 
 const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
-const readProjectTextFn = (project: EditorProject) => {
+const readProjectTextFn = (project: Project) => {
 	const avatarResourceIds = Object.entries(project.config.resources)
 		.filter(([role]) => role.startsWith("avatar-"))
 		.map(([, resourceId]) => resourceId);
@@ -122,7 +122,7 @@ const readProjectTextFn = (project: EditorProject) => {
 	].join("\n");
 };
 
-const readItemMetaTextFn = (project: EditorProject) => {
+const readItemMetaTextFn = (project: Project) => {
 	const counts = new Map<string, number>();
 	for (const item of Object.values(project.config.items))
 		counts.set(item.type, (counts.get(item.type) ?? 0) + 1);
@@ -136,53 +136,51 @@ const readItemMetaTextFn = (project: EditorProject) => {
 	].join("\n");
 };
 
-const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
-	(project: EditorProject, itemId: string) =>
-		Effect.gen(function* () {
-			const item = project.config.items[itemId];
-			if (item === undefined)
-				return yield* Effect.fail(
-					new Error(`Item ${itemId} does not exist in the open project.`),
-				);
-			return [
-				`Item: ${item.title}`,
-				`ID: ${item.id}`,
-				`UID: ${item.uid}`,
-				`Type: ${item.type}`,
-				"Description:",
-				...item.description.split("\n").map((line) => `  ${line}`),
-				`Storage: ${item.scope}`,
-				`Stack capacity: ${item.maxStackSize}`,
-				...(item.maxCount === undefined
-					? []
-					: [
-							`Game limit: ${item.maxCount}`,
-						]),
-			].join("\n");
-		}),
+const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project, itemId: string) =>
+	Effect.gen(function* () {
+		const item = project.config.items[itemId];
+		if (item === undefined)
+			return yield* Effect.fail(
+				new Error(`Item ${itemId} does not exist in the open project.`),
+			);
+		return [
+			`Item: ${item.title}`,
+			`ID: ${item.id}`,
+			`UID: ${item.uid}`,
+			`Type: ${item.type}`,
+			"Description:",
+			...item.description.split("\n").map((line) => `  ${line}`),
+			`Storage: ${item.scope}`,
+			`Stack capacity: ${item.maxStackSize}`,
+			...(item.maxCount === undefined
+				? []
+				: [
+						`Game limit: ${item.maxCount}`,
+					]),
+		].join("\n");
+	}),
 );
 
-const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
-	(project: EditorProject, itemId: string) =>
-		Effect.gen(function* () {
-			const item = project.config.items[itemId];
-			if (item === undefined)
-				return yield* Effect.fail(
-					new Error(`Item ${itemId} does not exist in the open project.`),
-				);
-			return JSON.stringify(
-				{
-					revision: project.revision,
-					item,
-				},
-				null,
-				2,
+const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")((project: Project, itemId: string) =>
+	Effect.gen(function* () {
+		const item = project.config.items[itemId];
+		if (item === undefined)
+			return yield* Effect.fail(
+				new Error(`Item ${itemId} does not exist in the open project.`),
 			);
-		}),
+		return JSON.stringify(
+			{
+				revision: project.revision,
+				item,
+			},
+			null,
+			2,
+		);
+	}),
 );
 
 const readCurrentProjectFx = (
-	repository: EditorProjectRepositoryService,
+	repository: ProjectRepositoryService,
 	readProjectContext: () => string | undefined,
 ) =>
 	Effect.gen(function* () {
@@ -207,7 +205,7 @@ const readCurrentProjectFx = (
 
 const createServer = (
 	notifyProjectChanged: (projectId: string) => void,
-	repository: EditorProjectRepositoryService,
+	repository: ProjectRepositoryService,
 	readProjectContext: () => string | undefined,
 	requestVersionCheckoutFx: (
 		projectId: string,
@@ -436,7 +434,7 @@ export const createServerFx = Effect.fn("createServerFx")(
 	}: {
 		readonly notifyProjectChanged: (projectId: string) => void;
 		readonly readProjectContext: () => string | undefined;
-		readonly repository: EditorProjectRepositoryService;
+		readonly repository: ProjectRepositoryService;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,

@@ -1,24 +1,24 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type {
-	EditorProjectVersionCheckoutInput,
-	EditorProjectVersionCommitInput,
-	EditorProjectVersionDiffInput,
-	EditorProjectVersionTagInput,
-} from "~/project-version/type/EditorProjectVersion";
+	ProjectVersionCheckoutInput,
+	ProjectVersionCommitInput,
+	ProjectVersionDiffInput,
+	ProjectVersionTagInput,
+} from "~/project-version/type/ProjectVersion";
 import {
-	EditorProjectVersionBodySchema,
-	EditorProjectVersionSubjectSchema,
-	EditorProjectVersionTagSchema,
-} from "~/project-version/schema/EditorProjectVersionMetadataSchema";
+	ProjectVersionBodySchema,
+	ProjectVersionSubjectSchema,
+	ProjectVersionTagSchema,
+} from "~/project-version/schema/ProjectVersionMetadataSchema";
 
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 
@@ -110,11 +110,11 @@ const versionReferenceSchema = z.discriminatedUnion("type", [
 ]);
 const versionCommitSchema = z
 	.object({
-		body: EditorProjectVersionBodySchema.optional(),
+		body: ProjectVersionBodySchema.optional(),
 		expectedFingerprint: fingerprintSchema.optional(),
 		projectId: IdSchema,
-		subject: EditorProjectVersionSubjectSchema,
-		tag: EditorProjectVersionTagSchema.optional(),
+		subject: ProjectVersionSubjectSchema,
+		tag: ProjectVersionTagSchema.optional(),
 	})
 	.strict();
 const versionCheckoutSchema = z
@@ -127,7 +127,7 @@ const versionCheckoutSchema = z
 const versionTagSchema = z
 	.object({
 		projectId: IdSchema,
-		tag: EditorProjectVersionTagSchema.optional(),
+		tag: ProjectVersionTagSchema.optional(),
 		versionId: IdSchema,
 	})
 	.strict();
@@ -153,10 +153,8 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseCreateProjectFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.CreateProjectProps,
-				EditorProjectRepositoryError
-			> => parseEditorProjectIpcRequestFx("create-project", createProjectSchema, candidate),
+			): Effect.Effect<ProjectRepository.CreateProjectProps, ProjectRepositoryError> =>
+				parseEditorProjectIpcRequestFx("create-project", createProjectSchema, candidate),
 			parseProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
 			parseDeleteProjectIdFx: (candidate: unknown) =>
@@ -169,28 +167,19 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseDeleteItemFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.DeleteItemProps,
-				EditorProjectRepositoryError
-			> => parseEditorProjectIpcRequestFx("delete-item", deleteItemSchema, candidate),
+			): Effect.Effect<ProjectRepository.DeleteItemProps, ProjectRepositoryError> =>
+				parseEditorProjectIpcRequestFx("delete-item", deleteItemSchema, candidate),
 			parseDeleteResourceFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.DeleteResourceProps,
-				EditorProjectRepositoryError
-			> => parseEditorProjectIpcRequestFx("delete-resource", deleteResourceSchema, candidate),
+			): Effect.Effect<ProjectRepository.DeleteResourceProps, ProjectRepositoryError> =>
+				parseEditorProjectIpcRequestFx("delete-resource", deleteResourceSchema, candidate),
 			parseReplaceConfigFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.ReplaceConfigProps,
-				EditorProjectRepositoryError
-			> => parseEditorProjectIpcRequestFx("replace-config", replaceConfigSchema, candidate),
+			): Effect.Effect<ProjectRepository.ReplaceConfigProps, ProjectRepositoryError> =>
+				parseEditorProjectIpcRequestFx("replace-config", replaceConfigSchema, candidate),
 			parseReplaceResourceFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.ReplaceResourceProps,
-				EditorProjectRepositoryError
-			> =>
+			): Effect.Effect<ProjectRepository.ReplaceResourceProps, ProjectRepositoryError> =>
 				parseEditorProjectIpcRequestFx(
 					"replace-resource",
 					replaceResourceSchema,
@@ -198,22 +187,15 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseSaveResourceFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.SaveResourceProps,
-				EditorProjectRepositoryError
-			> => parseEditorProjectIpcRequestFx("save-resource", saveResourceSchema, candidate),
+			): Effect.Effect<ProjectRepository.SaveResourceProps, ProjectRepositoryError> =>
+				parseEditorProjectIpcRequestFx("save-resource", saveResourceSchema, candidate),
 			parseUpsertItemFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.UpsertItemProps,
-				EditorProjectRepositoryError
-			> => parseEditorProjectIpcRequestFx("upsert-item", upsertItemSchema, candidate),
+			): Effect.Effect<ProjectRepository.UpsertItemProps, ProjectRepositoryError> =>
+				parseEditorProjectIpcRequestFx("upsert-item", upsertItemSchema, candidate),
 			parseUpsertResourcesFx: (
 				candidate: unknown,
-			): Effect.Effect<
-				EditorProjectRepository.UpsertResourcesProps,
-				EditorProjectRepositoryError
-			> =>
+			): Effect.Effect<ProjectRepository.UpsertResourcesProps, ProjectRepositoryError> =>
 				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
 			parseVersionStatusProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-version-status", IdSchema, candidate),
@@ -221,11 +203,11 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("list-versions", IdSchema, candidate),
 			parseVersionCommitFx: (
 				candidate: unknown,
-			): Effect.Effect<EditorProjectVersionCommitInput, EditorProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionCommitInput, ProjectRepositoryError> =>
 				parseEditorProjectIpcRequestFx("create-version", versionCommitSchema, candidate),
 			parseVersionCheckoutFx: (
 				candidate: unknown,
-			): Effect.Effect<EditorProjectVersionCheckoutInput, EditorProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionCheckoutInput, ProjectRepositoryError> =>
 				parseEditorProjectIpcRequestFx(
 					"checkout-version",
 					versionCheckoutSchema,
@@ -233,11 +215,11 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				),
 			parseVersionTagFx: (
 				candidate: unknown,
-			): Effect.Effect<EditorProjectVersionTagInput, EditorProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionTagInput, ProjectRepositoryError> =>
 				parseEditorProjectIpcRequestFx("update-version-tag", versionTagSchema, candidate),
 			parseVersionDiffFx: (
 				candidate: unknown,
-			): Effect.Effect<EditorProjectVersionDiffInput, EditorProjectRepositoryError> =>
+			): Effect.Effect<ProjectVersionDiffInput, ProjectRepositoryError> =>
 				parseEditorProjectIpcRequestFx("diff-versions", versionDiffSchema, candidate),
 		} as const),
 );

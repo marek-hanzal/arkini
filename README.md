@@ -74,10 +74,10 @@ src/arkpack-artifact  package bytes, envelopes, compression, signing and provena
 src/arkpack-catalog  renderer catalog state, storage capability and mutation lifecycle
 src/arkpack-selector  package catalog controls and selector presentation
 src/editor-build  Build contract, command Atoms, renderer admission and presentation
-src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows
-src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls
-src/project-version  immutable version graph, compatibility policies and checkout workspace
-src/project-note  ordered project Notes contracts and workspace
+src/project-authoring  portable Project model, ProjectOperationError, ProjectRepository, configuration and catalog workflows
+src/board-scenario  portable BoardScenario contracts and revision-pinned EditorBoardGame session lifecycle and controls
+src/project-version  immutable ProjectVersion graph, ProjectCompatibility policies and checkout workspace
+src/project-note  ordered Note and portable NoteFile contracts and workspace
 src/authoring-mcp  renderer-side MCP status, settings and checkout presentation
 src/authoring-session  mounted project publication, refresh, replacement, resource URLs and unsaved-change authority
 src/authoring-shell  cross-product Editor shell and navigation composition

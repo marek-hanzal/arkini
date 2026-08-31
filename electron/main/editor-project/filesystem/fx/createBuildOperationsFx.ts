@@ -10,7 +10,7 @@ import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
 import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
@@ -78,9 +78,9 @@ const createBuildErrorFn = (
 	message: string,
 	cause?: unknown,
 ) =>
-	cause instanceof EditorProjectRepositoryError && cause.operation === operation
+	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
-		: new EditorProjectRepositoryError({
+		: new ProjectRepositoryError({
 				operation,
 				message:
 					cause instanceof EditorProjectBuildOperationError
@@ -116,7 +116,7 @@ export namespace createBuildOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
 	}
 }
 

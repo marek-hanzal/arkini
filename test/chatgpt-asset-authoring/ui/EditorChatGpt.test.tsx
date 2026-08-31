@@ -44,10 +44,10 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/project-authoring/service/EditorProjectRepository", async () => {
+vi.mock("~/project-authoring/service/ProjectRepository", async () => {
 	const { Effect } = await import("effect");
 	return {
-		EditorProjectRepository: Effect.succeed({}),
+		ProjectRepository: Effect.succeed({}),
 	};
 });
 

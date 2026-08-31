@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { FormSchema, type FormValues } from "~/item-authoring/schema/FormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -16,16 +16,16 @@ import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
+import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
 
 const saveCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
 			Atom.fn((item: saveFx.Props["item"]) =>
 				saveFx({
 					item,
 					projectId,
-				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+				}).pipe(Effect.provideService(ProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),
 		),
 	),
@@ -132,7 +132,7 @@ export const useFormController = ({
 		};
 		if (initialItem.id !== parsed.data.id) delete items[initialItem.id];
 		items[parsed.data.id] = parsed.data;
-		return analyzeEditorProjectCompatibilityFn(project.config, {
+		return analyzeProjectCompatibilityFn(project.config, {
 			...project.config,
 			items,
 		});

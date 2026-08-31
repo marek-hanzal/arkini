@@ -4,8 +4,8 @@ import { match, P } from "ts-pattern";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import type { Project } from "~/project-authoring/type/Project";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
@@ -32,7 +32,7 @@ const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefine
 			type: "validation",
 			diagnostics: error.diagnostics,
 		};
-	if (error instanceof EditorProjectRepositoryError) {
+	if (error instanceof ProjectRepositoryError) {
 		if (error.diagnostics !== undefined)
 			return {
 				type: "validation",
@@ -50,7 +50,7 @@ const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefine
 
 export namespace useEditorBuildArtifactController {
 	export interface Props {
-		readonly project: EditorProject;
+		readonly project: Project;
 	}
 
 	export interface Output {

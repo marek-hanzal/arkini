@@ -5,23 +5,23 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import type { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import type { Project } from "~/project-authoring/type/Project";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import type { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
-import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
-import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
+import { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDescriptorFileSchema";
+import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
 import type {
-	EditorProjectVersionDescriptor,
-	EditorProjectVersionRepositoryService,
-} from "~/project-version/type/EditorProjectVersion";
-import { createEditorProjectVersionDiffFn } from "~/project-version/fn/createEditorProjectVersionDiffFn";
+	ProjectVersionDescriptor,
+	ProjectVersionRepositoryService,
+} from "~/project-version/type/ProjectVersion";
+import { createProjectVersionDiffFn } from "~/project-version/fn/createProjectVersionDiffFn";
 import {
-	EditorProjectVersionBodySchema,
-	EditorProjectVersionSubjectSchema,
-	EditorProjectVersionTagSchema,
-} from "~/project-version/schema/EditorProjectVersionMetadataSchema";
+	ProjectVersionBodySchema,
+	ProjectVersionSubjectSchema,
+	ProjectVersionTagSchema,
+} from "~/project-version/schema/ProjectVersionMetadataSchema";
 import { createVersionReaderFx } from "./createVersionReaderFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
@@ -31,21 +31,21 @@ import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 
-type Operations = EditorProjectVersionRepositoryService;
-type Operation = EditorProjectRepositoryError["operation"];
-type DescriptorFile = EditorVersionDescriptorFileSchema.Type;
+type Operations = ProjectVersionRepositoryService;
+type Operation = ProjectRepositoryError["operation"];
+type DescriptorFile = VersionDescriptorFileSchema.Type;
 const encoder = new TextEncoder();
 
 const error = (operation: Operation, message: string, cause?: unknown) =>
-	cause instanceof EditorProjectRepositoryError && cause.operation === operation
+	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
-		: new EditorProjectRepositoryError({
+		: new ProjectRepositoryError({
 				operation,
 				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
-const cloneProject = (project: EditorProject): EditorProject => ({
+const cloneProject = (project: Project): Project => ({
 	...project,
 	resources: project.resources.map((resource) => ({
 		...resource,
@@ -57,7 +57,7 @@ const materializeDescriptor = (
 	projectId: string,
 	versionId: string,
 	file: DescriptorFile,
-): EditorProjectVersionDescriptor => ({
+): ProjectVersionDescriptor => ({
 	arkini: file.arkini,
 	arkpackVersion: file.version,
 	...(file.body === undefined
@@ -98,8 +98,8 @@ const sameCommit = (
 
 const toScenario = (
 	projectId: string,
-	file: EditorBoardScenarioFileSchema.Type,
-): EditorBoardScenarioSchema.Type => ({
+	file: BoardScenarioFileSchema.Type,
+): BoardScenarioSchema.Type => ({
 	projectId,
 	name: file.name,
 	projectRevision: file.revision,
@@ -115,7 +115,7 @@ export namespace createVersionOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
 		readonly states: Map<string, ProjectState>;
 	}
 }
@@ -240,16 +240,16 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 		Effect.gen(function* () {
 			const metadata = yield* Effect.try({
 				try: () => ({
-					subject: EditorProjectVersionSubjectSchema.parse(subjectCandidate),
+					subject: ProjectVersionSubjectSchema.parse(subjectCandidate),
 					...(bodyCandidate === undefined
 						? {}
 						: {
-								body: EditorProjectVersionBodySchema.parse(bodyCandidate),
+								body: ProjectVersionBodySchema.parse(bodyCandidate),
 							}),
 					...(tagCandidate === undefined
 						? {}
 						: {
-								tag: EditorProjectVersionTagSchema.parse(tagCandidate),
+								tag: ProjectVersionTagSchema.parse(tagCandidate),
 							}),
 				}),
 				catch: (cause) =>
@@ -308,7 +308,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 											),
 										)),
 									);
-						const descriptor = EditorVersionDescriptorFileSchema.parse({
+						const descriptor = VersionDescriptorFileSchema.parse({
 							...(head === undefined
 								? {}
 								: {
@@ -324,7 +324,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 									? clockMs
 									: Math.max(clockMs, latestCreatedAt + 1),
 						});
-						const nextHead = EditorVersionHeadFileSchema.parse({
+						const nextHead = VersionHeadFileSchema.parse({
 							current: versionId,
 							versions: [
 								...(head?.versions ?? []),
@@ -458,7 +458,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							);
 						const updatedAtMs = Math.max(nowMs, current.state.project.updatedAtMs + 1);
 						const restoredScenarioFiles = snapshot.scenarios.map((scenario) =>
-							EditorBoardScenarioFileSchema.parse({
+							BoardScenarioFileSchema.parse({
 								...scenario,
 								revision: updatedAtMs,
 							}),
@@ -487,7 +487,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 									"The Editor project has no published versions.",
 								),
 							);
-						const nextHead = EditorVersionHeadFileSchema.parse({
+						const nextHead = VersionHeadFileSchema.parse({
 							...head,
 							current: versionId,
 						});
@@ -550,7 +550,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 				tagCandidate === undefined
 					? undefined
 					: yield* Effect.try({
-							try: () => EditorProjectVersionTagSchema.parse(tagCandidate),
+							try: () => ProjectVersionTagSchema.parse(tagCandidate),
 							catch: (cause) =>
 								error(
 									"update-version-tag",
@@ -563,7 +563,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 					Effect.gen(function* () {
 						const state = yield* readState(projectId);
 						const version = yield* readPublishedVersionFx(state, versionId);
-						const descriptor = EditorVersionDescriptorFileSchema.parse({
+						const descriptor = VersionDescriptorFileSchema.parse({
 							...version.descriptor,
 							arkini: ArkiniAppVersion,
 							...(tag === undefined
@@ -616,7 +616,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
-				return createEditorProjectVersionDiffFn(
+				return createProjectVersionDiffFn(
 					from,
 					to,
 					yield* readDiffSnapshotFx(state, from),

@@ -6,14 +6,14 @@ import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectCatalog } from "./createProjectCatalogFx";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectCandidate } from "~/project-authoring/schema/EditorProjectCandidateSchema";
-import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
-import type { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
+import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
+import type { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
-import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
+import { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
@@ -27,30 +27,25 @@ import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
 interface LifecycleOperations {
 	readonly createProjectFx: (
-		props: EditorProjectRepository.CreateProjectProps,
-	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
-	readonly deleteProjectFx: (
-		projectId: string,
-	) => Effect.Effect<void, EditorProjectRepositoryError>;
-	readonly listProjectsFx: Effect.Effect<
-		ReadonlyArray<EditorProjectCandidate>,
-		EditorProjectRepositoryError
-	>;
+		props: ProjectRepository.CreateProjectProps,
+	) => Effect.Effect<Project, ProjectRepositoryError>;
+	readonly deleteProjectFx: (projectId: string) => Effect.Effect<void, ProjectRepositoryError>;
+	readonly listProjectsFx: Effect.Effect<ReadonlyArray<ProjectCandidate>, ProjectRepositoryError>;
 	readonly openProjectFx: (
-		props: EditorProjectRepository.OpenProjectProps,
-	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+		props: ProjectRepository.OpenProjectProps,
+	) => Effect.Effect<Project, ProjectRepositoryError>;
 	readonly readProjectFx: (
 		projectId: string,
-	) => Effect.Effect<EditorProject | null, EditorProjectRepositoryError>;
+	) => Effect.Effect<Project | null, ProjectRepositoryError>;
 	readonly readProjectRootFx: (
 		projectId: string,
-	) => Effect.Effect<string | null, EditorProjectRepositoryError>;
+	) => Effect.Effect<string | null, ProjectRepositoryError>;
 	readonly refreshProjectFx: (
 		projectId: string,
-	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+	) => Effect.Effect<Project, ProjectRepositoryError>;
 }
 
-const cloneProject = (project: EditorProject): EditorProject => ({
+const cloneProject = (project: Project): Project => ({
 	...project,
 	config: GameConfigSchema.parse(project.config),
 	resources: project.resources.map((resource) => ({
@@ -65,7 +60,7 @@ const materializeDescriptor = ({
 	version,
 	createdAtMs,
 	updatedAtMs,
-}: EditorProject): EditorProjectDescriptor => ({
+}: Project): ProjectDescriptor => ({
 	projectId,
 	title,
 	version,
@@ -90,16 +85,16 @@ const error = (
 	message: string,
 	cause?: unknown,
 ) =>
-	cause instanceof EditorProjectRepositoryError && cause.operation === operation
+	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
-		: new EditorProjectRepositoryError({
+		: new ProjectRepositoryError({
 				operation,
 				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
 const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
-	catalog: EditorProjectCatalogEntrySchema.Type,
+	catalog: ProjectCatalogEntrySchema.Type,
 	filesystemWrite: FilesystemWrite,
 ) {
 	return yield* withProjectLockFx(
@@ -159,7 +154,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 	});
 	const managedProjectsRoot = yield* fileSystem.realPath(projectsRoot);
 	const lifecycleLock = path.join(managedProjectsRoot, ".projects.lock");
-	const assertSafeCatalogEntryFx = (entry: EditorProjectCatalogEntrySchema.Type) =>
+	const assertSafeCatalogEntryFx = (entry: ProjectCatalogEntrySchema.Type) =>
 		Effect.gen(function* () {
 			const root = yield* fileSystem.realPath(path.resolve(entry.root));
 			if (entry.ownership === "managed") {
@@ -171,7 +166,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 						),
 					);
 			}
-			return EditorProjectCatalogEntrySchema.parse({
+			return ProjectCatalogEntrySchema.parse({
 				...entry,
 				root,
 			});
@@ -183,7 +178,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
-	const materializeFx = (entry: EditorProjectCatalogEntrySchema.Type) =>
+	const materializeFx = (entry: ProjectCatalogEntrySchema.Type) =>
 		assertSafeCatalogEntryFx(entry).pipe(
 			Effect.flatMap((safeEntry) =>
 				providePlatform(materializeProjectFx(safeEntry, filesystemWrite)),
@@ -192,7 +187,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 	const writeProjectFx = (props: Parameters<typeof writeProjectFilesFx>[0]) =>
 		providePlatform(writeProjectFilesFx(props));
 	const readCandidatesFx = Effect.gen(function* () {
-		const candidates: Array<EditorProjectCandidate> = [];
+		const candidates: Array<ProjectCandidate> = [];
 		const listedRoots = new Set<string>();
 		for (const entry of catalog.list()) {
 			const mounted = [
@@ -353,7 +348,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 										resources,
 									},
 								});
-								const entry = EditorProjectCatalogEntrySchema.parse({
+								const entry = ProjectCatalogEntrySchema.parse({
 									root: yield* fileSystem.realPath(root),
 									ownership: "managed",
 									createdAtMs: nowMs,
@@ -390,7 +385,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 					...states.values(),
 				].find((state) => state.catalog.root === root);
 				if (existing !== undefined) return cloneProject(existing.project);
-				const provisionalEntry = EditorProjectCatalogEntrySchema.parse({
+				const provisionalEntry = ProjectCatalogEntrySchema.parse({
 					root,
 					ownership: "external",
 					createdAtMs: 0,
@@ -404,7 +399,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 							`Editor project ID ${projectId} is already open from another folder.`,
 						),
 					);
-				const entry = EditorProjectCatalogEntrySchema.parse({
+				const entry = ProjectCatalogEntrySchema.parse({
 					...provisionalEntry,
 					createdAtMs: provisionalState.project.updatedAtMs,
 				});

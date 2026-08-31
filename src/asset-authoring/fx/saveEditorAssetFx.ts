@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import {
 	type EditorAssetFileInput,
@@ -24,7 +24,7 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 	resourceId,
 }: SaveEditorAssetProps) {
 	const resource = yield* validateEditorAssetFileFx(file, resourceId.trim());
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {

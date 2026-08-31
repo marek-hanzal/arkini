@@ -1,16 +1,16 @@
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import type { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
-import type { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
+import type { Project } from "~/project-authoring/type/Project";
+import type { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
+import type { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCatalogEntrySchema";
+import type { NoteSchema } from "~/project-note/schema/NoteSchema";
 import type { ProjectPaths } from "./ProjectPaths";
 import type { VersionHistory } from "./VersionHistory";
 
 /** One loaded canonical workspace; disk is consulted again only by explicit Refresh. */
 export interface ProjectState {
-	readonly catalog: EditorProjectCatalogEntrySchema.Type;
-	readonly notes: ReadonlyArray<EditorNoteSchema.Type>;
+	readonly catalog: ProjectCatalogEntrySchema.Type;
+	readonly notes: ReadonlyArray<NoteSchema.Type>;
 	readonly paths: ProjectPaths;
-	readonly project: EditorProject;
-	readonly scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>;
+	readonly project: Project;
+	readonly scenarios: ReadonlyArray<BoardScenarioSchema.Type>;
 	readonly versionHistory: VersionHistory;
 }

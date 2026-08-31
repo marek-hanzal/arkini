@@ -12,11 +12,11 @@ import { createVersionOperationsFx } from "../../../../electron/main/editor-proj
 import { readProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
 import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
 import { writeProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
-import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
+import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
+import { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCatalogEntrySchema";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
-import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
+import { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
@@ -43,7 +43,7 @@ describe("filesystem Editor project versions", () => {
 			...editorTestPayload.config,
 			$schema: GameProjectGameSchemaReference,
 		});
-		const initialScenario = EditorBoardScenarioSchema.parse({
+		const initialScenario = BoardScenarioSchema.parse({
 			projectId,
 			name: "Opening",
 			projectRevision: 1,
@@ -91,7 +91,7 @@ describe("filesystem Editor project versions", () => {
 				});
 
 				const state: ProjectState = {
-					catalog: EditorProjectCatalogEntrySchema.parse({
+					catalog: ProjectCatalogEntrySchema.parse({
 						root,
 						ownership: "external",
 						createdAtMs: 1,
@@ -198,7 +198,7 @@ describe("filesystem Editor project versions", () => {
 							}
 						: resource,
 				);
-				const changedScenario = EditorBoardScenarioSchema.parse({
+				const changedScenario = BoardScenarioSchema.parse({
 					...initialScenario,
 					projectRevision: 2,
 					version: "1.1",
@@ -269,7 +269,7 @@ describe("filesystem Editor project versions", () => {
 							second.versionId,
 							{
 								...secondVersion,
-								descriptor: EditorVersionDescriptorFileSchema.parse({
+								descriptor: VersionDescriptorFileSchema.parse({
 									...secondVersion.descriptor,
 									version: "9.9",
 								}),

@@ -4,9 +4,9 @@ import { Effect } from "effect";
 import type { ProjectPaths } from "../ProjectPaths";
 import type { PublishedVersion } from "../PublishedVersion";
 import type { VersionHistory } from "../VersionHistory";
-import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
-import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
-import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
+import { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDescriptorFileSchema";
+import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
+import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
@@ -44,7 +44,7 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 	yield* assertCanonicalPathFx(paths.versionHeadFile);
 	const head = yield* readJsonFx(
 		paths.versionHeadFile,
-		(candidate) => EditorVersionHeadFileSchema.parse(candidate),
+		(candidate) => VersionHeadFileSchema.parse(candidate),
 		`Editor version head ${paths.versionHeadFile} is invalid.`,
 	);
 	const versions = new Map<string, PublishedVersion>();
@@ -55,12 +55,12 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 		yield* assertCanonicalPathFx(manifestFile);
 		const descriptor = yield* readJsonFx(
 			descriptorFile,
-			(candidate) => EditorVersionDescriptorFileSchema.parse(candidate),
+			(candidate) => VersionDescriptorFileSchema.parse(candidate),
 			`Editor version descriptor ${descriptorFile} is invalid.`,
 		);
 		const manifest = yield* readJsonFx(
 			manifestFile,
-			(candidate) => EditorVersionManifestSchema.parse(candidate),
+			(candidate) => VersionManifestSchema.parse(candidate),
 			`Editor version manifest ${manifestFile} is invalid.`,
 		);
 		versions.set(versionId, {

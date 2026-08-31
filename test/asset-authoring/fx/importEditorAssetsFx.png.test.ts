@@ -3,12 +3,12 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
@@ -20,7 +20,7 @@ const createPng = () =>
 			"base64",
 		),
 	);
-const createProject = (revision = 0): EditorProject => ({
+const createProject = (revision = 0): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,
@@ -38,7 +38,7 @@ const createFixture = () => {
 		scheduleTask,
 	});
 	registries.push(registry);
-	const upsertResourcesFx = vi.fn<EditorProjectRepositoryService["upsertResourcesFx"]>(
+	const upsertResourcesFx = vi.fn<ProjectRepositoryService["upsertResourcesFx"]>(
 		({ resources }) =>
 			Effect.succeed({
 				...createProject(1),
@@ -48,7 +48,7 @@ const createFixture = () => {
 				],
 			}),
 	);
-	const repository: EditorProjectRepositoryService = {
+	const repository: ProjectRepositoryService = {
 		...UnusedEditorProjectRepository,
 		awaitIdleFx: Effect.void,
 		createProjectFx: () => Effect.die("Unexpected create."),
@@ -105,7 +105,7 @@ describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
 					},
 				],
 			}).pipe(
-				Effect.provideService(EditorProjectRepository, fixture.repository),
+				Effect.provideService(ProjectRepository, fixture.repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 			),
 		);
@@ -172,7 +172,7 @@ describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
 				source: "files",
 				files,
 			}).pipe(
-				Effect.provideService(EditorProjectRepository, fixture.repository),
+				Effect.provideService(ProjectRepository, fixture.repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 			),
 		);
@@ -222,7 +222,7 @@ describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
 						},
 					],
 				}).pipe(
-					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(ProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 				),
 			),
@@ -252,7 +252,7 @@ describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
 						},
 					],
 				}).pipe(
-					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(ProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 				),
 			),
@@ -283,7 +283,7 @@ describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
 						},
 					],
 				}).pipe(
-					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(ProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 				),
 			),

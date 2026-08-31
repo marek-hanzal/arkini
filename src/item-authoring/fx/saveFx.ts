@@ -1,7 +1,7 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { saveWithRepositoryFx } from "~/item-authoring/fx/saveWithRepositoryFx";
 
@@ -14,7 +14,7 @@ export namespace saveFx {
 
 /** Atomically validates and saves one UID-owned item into the canonical project. */
 export const saveFx = Effect.fn("saveFx")(function* ({ item: candidate, projectId }: saveFx.Props) {
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {

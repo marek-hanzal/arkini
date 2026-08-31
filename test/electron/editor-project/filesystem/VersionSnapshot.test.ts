@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
 import { createVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
 import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
-import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
+import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
@@ -38,7 +38,7 @@ afterEach(async () => {
 
 describe("filesystem Editor version objects", () => {
 	it("round-trips one full snapshot, deduplicates valid objects, and rejects corruption", async () => {
-		const scenario = EditorBoardScenarioSchema.parse({
+		const scenario = BoardScenarioSchema.parse({
 			projectId: "editor-test",
 			name: "Opening",
 			projectRevision: 3,

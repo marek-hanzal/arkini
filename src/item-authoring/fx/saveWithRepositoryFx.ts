@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
+import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemSchema as CanonicalItemSchema } from "~/item-definition/schema/ItemSchema";
 
@@ -15,12 +15,12 @@ export const saveWithRepositoryFx = Effect.fn("saveWithRepositoryFx")(function* 
 	readonly expectedRevision?: number;
 	readonly item: Pick<ItemSchema.Type, "id" | "type"> & Record<string, unknown>;
 	readonly projectId: string;
-	readonly repository: EditorProjectRepositoryService;
+	readonly repository: ProjectRepositoryService;
 }) {
 	const item = yield* Effect.try({
 		try: () => CanonicalItemSchema.parse(candidate),
 		catch: (cause) =>
-			new EditorProjectError({
+			new ProjectOperationError({
 				reason: "invalid-item",
 				message: `Item ${candidate.id} does not satisfy its ${candidate.type} schema.`,
 				cause,

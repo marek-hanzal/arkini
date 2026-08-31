@@ -1,7 +1,7 @@
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { EditorProjectAvatarKeys } from "~/project-authoring/schema/EditorProjectFormSchema";
+import type { Project } from "~/project-authoring/type/Project";
+import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import type { EditorAssetDeleteBlocker } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -28,7 +28,7 @@ const EditorAssetDeleteDialog = ({
 	readonly error: unknown;
 	readonly filter: "all" | "unused";
 	readonly pending: boolean;
-	readonly project: EditorProject;
+	readonly project: Project;
 	readonly query: string;
 	readonly resourceId: string;
 	readonly onCancel: () => void;
@@ -92,7 +92,7 @@ const EditorAssetDeleteBlockerLink = ({
 	project,
 }: {
 	readonly blocker: EditorAssetDeleteBlocker;
-	readonly project: EditorProject;
+	readonly project: Project;
 }) => {
 	if (blocker.owner === "item") {
 		const owner = project.config.items[blocker.ownerId];
@@ -125,11 +125,11 @@ const EditorAssetDeleteBlockerLink = ({
 	}
 
 	const role = blocker.path[1];
-	const roleIndex = EditorProjectAvatarKeys.findIndex((key) => key === role);
+	const roleIndex = ProjectAvatarKeys.findIndex((key) => key === role);
 	const avatarIndex =
 		roleIndex < 0
 			? undefined
-			: EditorProjectAvatarKeys.slice(0, roleIndex + 1).filter(
+			: ProjectAvatarKeys.slice(0, roleIndex + 1).filter(
 					(key) => project.config.resources[key] !== undefined,
 				).length - 1;
 	return (

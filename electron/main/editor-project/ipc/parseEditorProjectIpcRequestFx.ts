@@ -1,23 +1,23 @@
 import { Effect } from "effect";
 import type { z } from "zod";
 
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 /** Parses one untrusted editor IPC request into the canonical repository error contract. */
 export const parseEditorProjectIpcRequestFx = <Value>(
-	operation: EditorProjectRepositoryError["operation"],
+	operation: ProjectRepositoryError["operation"],
 	schema: z.ZodType<Value>,
 	candidate: unknown,
-): Effect.Effect<Value, EditorProjectRepositoryError> =>
+): Effect.Effect<Value, ProjectRepositoryError> =>
 	Effect.try({
 		try: () => {
 			const result = schema.safeParse(candidate);
 			if (result.success) return result.data;
-			throw new EditorProjectRepositoryError({
+			throw new ProjectRepositoryError({
 				operation,
 				message: "The editor project request is invalid.",
 				cause: result.error,
 			});
 		},
-		catch: (error) => error as EditorProjectRepositoryError,
+		catch: (error) => error as ProjectRepositoryError,
 	});

@@ -13,7 +13,7 @@ import { memo } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
@@ -164,7 +164,7 @@ const EditorAssetCard = ({
 }: {
 	readonly filter: "all" | "unused";
 	readonly query: string;
-	readonly resource: EditorProject["resources"][number];
+	readonly resource: Project["resources"][number];
 }) => {
 	const project = useEditorProject();
 	const url = useResourceUrl(resource.id);
@@ -205,7 +205,7 @@ const EditorAssetCard = ({
 interface EditorAssetGridProps {
 	readonly filter: "all" | "unused";
 	readonly query: string;
-	readonly resources: EditorProject["resources"];
+	readonly resources: Project["resources"];
 }
 
 const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps) => (

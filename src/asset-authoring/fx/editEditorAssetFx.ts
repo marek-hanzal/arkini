@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
+import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
 
 interface EditEditorAssetProps {
@@ -24,13 +24,13 @@ export const editEditorAssetFx = Effect.fn("editEditorAssetFx")(function* ({
 	const resourceId = yield* Effect.try({
 		try: () => IdSchema.parse(candidateId.trim()),
 		catch: (cause) =>
-			new EditorProjectError({
+			new ProjectOperationError({
 				reason: "invalid-resource-id",
 				message: "Asset ID must not be empty.",
 				cause,
 			}),
 	});
-	const repository = yield* EditorProjectRepository;
+	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {
@@ -38,7 +38,7 @@ export const editEditorAssetFx = Effect.fn("editEditorAssetFx")(function* ({
 			const existing = project?.resources.find(({ id }) => id === currentId);
 			if (project === null || existing === undefined) {
 				return yield* Effect.fail(
-					new EditorProjectError({
+					new ProjectOperationError({
 						reason: "invalid-asset",
 						message: `Asset ${currentId} no longer exists.`,
 					}),

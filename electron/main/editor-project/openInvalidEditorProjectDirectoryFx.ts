@@ -2,7 +2,7 @@ import { shell } from "electron";
 import { Effect } from "effect";
 
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 /** Opens only an exact project root currently blocked by complete repository validation. */
 export const openInvalidEditorProjectDirectoryFx = Effect.fn("openInvalidEditorProjectDirectoryFx")(
@@ -18,7 +18,7 @@ export const openInvalidEditorProjectDirectoryFx = Effect.fn("openInvalidEditorP
 		);
 		if (candidate === undefined || candidate.type !== "invalid")
 			return yield* Effect.fail(
-				new EditorProjectRepositoryError({
+				new ProjectRepositoryError({
 					operation: "open-project-directory",
 					message: "The Editor project folder is not a currently blocked project.",
 				}),
@@ -29,7 +29,7 @@ export const openInvalidEditorProjectDirectoryFx = Effect.fn("openInvalidEditorP
 				if (error !== "") throw new Error(error);
 			},
 			catch: (cause) =>
-				new EditorProjectRepositoryError({
+				new ProjectRepositoryError({
 					operation: "open-project-directory",
 					message: "The invalid Editor project folder could not be opened.",
 					cause,

@@ -4,10 +4,10 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
 import { acquireGameEngineResourceFx } from "~/installed-game/fx/acquireGameEngineResourceFx";
 import { createGameFx } from "~/installed-game/fx/createGameFx";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/fx/createElectronEditorBuildRepositoryFx";
-import { createElectronEditorProjectRepositoryFx } from "~/project-authoring/fx/createElectronEditorProjectRepositoryFx";
+import { createElectronProjectRepositoryFx } from "~/project-authoring/fx/createElectronProjectRepositoryFx";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
@@ -52,7 +52,7 @@ const EditorBoardGameLayer = Layer.effectDiscard(
 export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 	| AtomRegistry.AtomRegistry
 	| EditorBuildRepository
-	| EditorProjectRepository
+	| ProjectRepository
 	| EditorUnsavedChanges
 	| GameEngineResourceFx,
 	never
@@ -60,7 +60,7 @@ export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 	Layer.mergeAll(
 		RendererAtomRegistryLayer,
 		Layer.effect(EditorBuildRepository, createElectronEditorBuildRepositoryFx),
-		Layer.effect(EditorProjectRepository, createElectronEditorProjectRepositoryFx),
+		Layer.effect(ProjectRepository, createElectronProjectRepositoryFx),
 		EditorBoardGameLayer,
 		EditorUnsavedChangesLayer,
 		GameEngineResourceLayer({

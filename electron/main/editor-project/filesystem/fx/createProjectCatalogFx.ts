@@ -1,31 +1,31 @@
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
-import { EditorProjectCatalogSchema } from "~/project-authoring/schema/EditorProjectCatalogSchema";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCatalogEntrySchema";
+import { ProjectCatalogSchema } from "~/project-authoring/schema/ProjectCatalogSchema";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 const encoder = new TextEncoder();
 
-type Entry = EditorProjectCatalogEntrySchema.Type;
+type Entry = ProjectCatalogEntrySchema.Type;
 
 export interface ProjectCatalog {
-	readonly addFx: (entry: Entry) => Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly addFx: (entry: Entry) => Effect.Effect<void, ProjectRepositoryError>;
 	readonly list: () => ReadonlyArray<Entry>;
-	readonly removeFx: (root: string) => Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly removeFx: (root: string) => Effect.Effect<void, ProjectRepositoryError>;
 }
 
 const createError = (message: string, cause?: unknown) =>
-	new EditorProjectRepositoryError({
+	new ProjectRepositoryError({
 		operation: "list-projects",
 		message: withFilesystemWriteRecovery(message, cause),
 		cause,
 	});
 
-const parseCatalog = (candidate: unknown) => EditorProjectCatalogSchema.parse(candidate);
+const parseCatalog = (candidate: unknown) => ProjectCatalogSchema.parse(candidate);
 const parseStoredCatalog = (source: string) => {
 	try {
 		return parseCatalog(JSON.parse(source));
@@ -83,7 +83,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 			if ((yield* fileSystem.stat(root)).type !== "Directory") continue;
 			if (!(yield* isFilesystemPathSafeFx(fileSystem, managedProjectsRoot, root))) continue;
 			managed.push(
-				EditorProjectCatalogEntrySchema.parse({
+				ProjectCatalogEntrySchema.parse({
 					root,
 					ownership: "managed",
 					createdAtMs: previousManaged.get(root) ?? 0,
@@ -91,7 +91,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 			);
 		}
 		const managedRoots = new Set(managed.map((entry) => entry.root));
-		return EditorProjectCatalogSchema.parse({
+		return ProjectCatalogSchema.parse({
 			projects: [
 				...managed,
 				...(stored?.projects ?? []).filter(
@@ -111,7 +111,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 				lock,
 				Effect.gen(function* () {
 					const current = yield* readReconciledFx;
-					const next = EditorProjectCatalogSchema.parse({
+					const next = ProjectCatalogSchema.parse({
 						projects: update(current.projects),
 					});
 					yield* writeJsonFx(next);

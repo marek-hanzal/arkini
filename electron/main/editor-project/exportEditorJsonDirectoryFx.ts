@@ -2,7 +2,7 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { dialog, type BrowserWindow } from "electron";
 import { Effect } from "effect";
 
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
@@ -51,7 +51,7 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 			]);
 			if (project === null || source === null)
 				return yield* Effect.fail(
-					new EditorProjectRepositoryError({
+					new ProjectRepositoryError({
 						operation: "export-json-directory",
 						message: `Editor project ${projectId} does not exist.`,
 					}),
@@ -69,9 +69,9 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 		}).pipe(
 			Effect.provide(NodeServices.layer),
 			Effect.mapError((cause) =>
-				cause instanceof EditorProjectRepositoryError
+				cause instanceof ProjectRepositoryError
 					? cause
-					: new EditorProjectRepositoryError({
+					: new ProjectRepositoryError({
 							operation: "export-json-directory",
 							message:
 								cause instanceof Error

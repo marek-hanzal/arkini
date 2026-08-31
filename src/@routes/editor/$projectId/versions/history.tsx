@@ -2,16 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
-import type { EditorProjectVersionDescriptor } from "~/project-version/type/EditorProjectVersion";
+import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVersion";
 import { Button, DangerButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { Tooltip } from "~/ui/ui/Tooltip";
-import { EditorVersionCheckoutDialog } from "~/project-version/ui/EditorVersionCheckoutDialog";
-import { EditorVersionDiff } from "~/project-version/ui/EditorVersionDiff";
-import { EditorVersionGraph } from "~/project-version/ui/EditorVersionGraph";
-import { useEditorVersionHistoryController } from "~/project-version/ui/useEditorVersionHistoryController";
+import { VersionCheckoutDialog } from "~/project-version/ui/VersionCheckoutDialog";
+import { VersionDiff } from "~/project-version/ui/VersionDiff";
+import { VersionGraph } from "~/project-version/ui/VersionGraph";
+import { useVersionHistoryController } from "~/project-version/ui/useVersionHistoryController";
 
 const EditorVersionReferenceSelect = ({
 	label,
@@ -22,7 +22,7 @@ const EditorVersionReferenceSelect = ({
 	readonly label: string;
 	readonly onChange: (value: string) => void;
 	readonly value: string;
-	readonly versions: ReadonlyArray<EditorProjectVersionDescriptor>;
+	readonly versions: ReadonlyArray<ProjectVersionDescriptor>;
 }) => {
 	const options: ReadonlyArray<EditorSelectOption<string>> = [
 		{
@@ -54,7 +54,7 @@ const VersionCreatedAt = ({ createdAtMs }: { readonly createdAtMs: number }) => 
 
 export const Route = createFileRoute("/editor/$projectId/versions/history")({
 	component: () => {
-		const controller = useEditorVersionHistoryController();
+		const controller = useVersionHistoryController();
 		const versions = controller.history?.versions ?? [];
 		const selectedParent = versions.find(
 			(version) => version.versionId === controller.selected?.parentVersionId,
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 					{controller.history === undefined || controller.graph === undefined ? (
 						<p className="p-4 text-sm text-muted">Reading version history…</p>
 					) : (
-						<EditorVersionGraph
+						<VersionGraph
 							layout={controller.graph}
 							onSelect={controller.selectVersion}
 							onSelectWorkingCopy={controller.selectWorkingCopy}
@@ -215,13 +215,13 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 							{controller.diffPending ? (
 								<p className="text-sm text-muted">Comparing…</p>
 							) : controller.diff === undefined ? null : (
-								<EditorVersionDiff diff={controller.diff} />
+								<VersionDiff diff={controller.diff} />
 							)}
 						</article>
 					</div>
 				</section>
 				{controller.confirmVersion === undefined ? null : (
-					<EditorVersionCheckoutDialog
+					<VersionCheckoutDialog
 						onCancel={controller.cancelCheckout}
 						onCommit={controller.goToCommit}
 						onRestore={controller.confirmCheckout}

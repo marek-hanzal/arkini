@@ -1,8 +1,8 @@
 import { dialog, type BrowserWindow } from "electron";
 import { Effect } from "effect";
 
-import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 
 export namespace importEditorJsonDirectoryFx {
@@ -39,12 +39,12 @@ export const importEditorJsonDirectoryFx = Effect.fn("importEditorJsonDirectoryF
 				version: project.version,
 				createdAtMs: project.createdAtMs,
 				updatedAtMs: project.updatedAtMs,
-			} satisfies EditorProjectDescriptor;
+			} satisfies ProjectDescriptor;
 		}).pipe(
 			Effect.mapError((cause) =>
-				cause instanceof EditorProjectRepositoryError
+				cause instanceof ProjectRepositoryError
 					? cause
-					: new EditorProjectRepositoryError({
+					: new ProjectRepositoryError({
 							operation: "import-json-directory",
 							message:
 								cause instanceof Error

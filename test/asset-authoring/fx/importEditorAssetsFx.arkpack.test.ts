@@ -4,12 +4,12 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
 import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -17,7 +17,7 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 
 const registries: Array<AtomRegistry.AtomRegistry> = [];
 
-const createProject = (resources: EditorProject["resources"], revision = 1): EditorProject => ({
+const createProject = (resources: Project["resources"], revision = 1): Project => ({
 	projectId: "target-project",
 	title: editorTestPayload.config.meta.title,
 	version: "1.1",
@@ -44,10 +44,10 @@ describe("Asset Authoring importEditorAssetsFx from Arkpack", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		const upsertResourcesFx = vi.fn<EditorProjectRepositoryService["upsertResourcesFx"]>(
+		const upsertResourcesFx = vi.fn<ProjectRepositoryService["upsertResourcesFx"]>(
 			({ resources }) => Effect.succeed(createProject(resources)),
 		);
-		const repository: EditorProjectRepositoryService = {
+		const repository: ProjectRepositoryService = {
 			...UnusedEditorProjectRepository,
 			awaitIdleFx: Effect.void,
 			createProjectFx: () => Effect.die("Unexpected project create."),
@@ -70,7 +70,7 @@ describe("Asset Authoring importEditorAssetsFx from Arkpack", () => {
 				projectId: "target-project",
 				source: "arkpack",
 			}).pipe(
-				Effect.provideService(EditorProjectRepository, repository),
+				Effect.provideService(ProjectRepository, repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
 			),
 		);

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 
 /** Explicitly unavailable repository domains for focused tests outside their ownership. */
 export const UnusedEditorProjectRepository = {
@@ -22,7 +22,7 @@ export const UnusedEditorProjectRepository = {
 	writeBoardScenarioFx: () => Effect.die("Unexpected Board scenario write."),
 	deleteBoardScenarioFx: () => Effect.die("Unexpected Board scenario delete."),
 } satisfies Pick<
-	EditorProjectRepositoryService,
+	ProjectRepositoryService,
 	| "deleteProjectFx"
 	| "deleteResourceFx"
 	| "checkoutVersionFx"

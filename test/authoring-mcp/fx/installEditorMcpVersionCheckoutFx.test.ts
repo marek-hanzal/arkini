@@ -3,8 +3,8 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/installEditorMcpVersionCheckoutFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -19,7 +19,7 @@ afterEach(async () => {
 
 describe("installEditorMcpVersionCheckoutFx", () => {
 	it("uses the renderer checkout coordinator and returns to the refreshed history", async () => {
-		const project: EditorProject = {
+		const project: Project = {
 			projectId: "project-one",
 			title: editorTestPayload.config.meta.title,
 			version: editorTestPayload.version,
@@ -30,7 +30,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			resources: editorTestPayload.resources,
 		};
 		const checkoutVersionFx = vi.fn(() => Effect.void);
-		const repository: EditorProjectRepositoryService = {
+		const repository: ProjectRepositoryService = {
 			...UnusedEditorProjectRepository,
 			awaitIdleFx: Effect.void,
 			checkoutVersionFx,

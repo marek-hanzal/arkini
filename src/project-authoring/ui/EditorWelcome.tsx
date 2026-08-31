@@ -1,26 +1,26 @@
 import { FileJson2, FilePlus2, RefreshCw } from "lucide-react";
 
 import type {
-	EditorProjectCandidate,
-	EditorProjectOwnership,
-} from "~/project-authoring/schema/EditorProjectCandidateSchema";
-import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
+	ProjectCandidate,
+	ProjectOwnership,
+} from "~/project-authoring/schema/ProjectCandidateSchema";
+import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/project-authoring/ui/EditorArkpackImportButton";
 import { BackButton } from "~/ui/ui/BackButton";
 import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { EditorRecentProjects } from "~/project-authoring/ui/EditorRecentProjects";
-import { EditorProjectDeleteDialog } from "~/project-authoring/ui/EditorProjectDeleteDialog";
+import { ProjectDeleteDialog } from "~/project-authoring/ui/ProjectDeleteDialog";
 import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";
 
 interface EditorWelcomeProps {
-	readonly recentProjects: ReadonlyArray<EditorProjectCandidate>;
+	readonly recentProjects: ReadonlyArray<ProjectCandidate>;
 }
 
 interface ProjectToDelete {
-	readonly ownership: EditorProjectOwnership;
-	readonly project: EditorProjectDescriptor;
+	readonly ownership: ProjectOwnership;
+	readonly project: ProjectDescriptor;
 }
 
 /** Starts or reopens one local editor project. */
@@ -147,7 +147,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 				</footer>
 			</div>
 			{projectToDelete === null ? null : (
-				<EditorProjectDeleteDialog
+				<ProjectDeleteDialog
 					error={deleteRequested ? actions.error : undefined}
 					ownership={projectToDelete.ownership}
 					pending={actions.active === "delete-project"}

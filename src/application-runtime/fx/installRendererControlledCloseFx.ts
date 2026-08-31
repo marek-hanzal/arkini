@@ -2,7 +2,7 @@ import { Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
@@ -62,7 +62,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 			let exitPresentationRequired = false;
 			const awaitEditorOperations = async () => {
 				await rendererRuntime.runPromise(
-					Effect.flatMap(EditorProjectRepository, (repository) => repository.awaitIdleFx),
+					Effect.flatMap(ProjectRepository, (repository) => repository.awaitIdleFx),
 				);
 				const catalog = await rendererRuntime.runPromise(Atom.get(ArkpackCatalogOwnerAtom));
 				if (catalog !== undefined) await rendererRuntime.runPromise(catalog.awaitIdleFx);

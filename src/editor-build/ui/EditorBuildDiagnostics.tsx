@@ -1,10 +1,10 @@
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { readGameDiagnosticPresentationFn } from "~/game-config-diagnostic/fn/readGameDiagnosticPresentationFn";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
-import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";
-import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
+import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections";
+import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
 import { ButtonLink } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -24,7 +24,7 @@ type EditorDiagnosticTarget =
 	  }
 	| {
 			readonly kind: "project";
-			readonly sectionId: EditorProjectSectionId;
+			readonly sectionId: ProjectSectionId;
 			readonly label: string;
 	  };
 
@@ -97,7 +97,7 @@ const readOwnedItemSectionFn = (diagnostic: EditorGameDiagnostic): SectionId | u
 
 const readEditorGameDiagnosticTargetsFn = (
 	diagnostic: EditorGameDiagnostic,
-	project: Pick<EditorProject, "config" | "resources">,
+	project: Pick<Project, "config" | "resources">,
 ): ReadonlyArray<EditorDiagnosticTarget> => {
 	const itemSection =
 		readOwnedItemSectionFn(diagnostic) ?? readSectionForPathFn(diagnostic.path.slice(2));
@@ -132,7 +132,7 @@ const readEditorGameDiagnosticTargetsFn = (
 	return [
 		{
 			kind: "project",
-			sectionId: readEditorProjectSectionForPathFn(diagnostic.path),
+			sectionId: readProjectSectionForPathFn(diagnostic.path),
 			label: "project settings",
 		} satisfies EditorDiagnosticTarget,
 	];
@@ -140,7 +140,7 @@ const readEditorGameDiagnosticTargetsFn = (
 
 const printEditorGameDiagnosticFn = (
 	diagnostic: EditorGameDiagnostic,
-	project: Pick<EditorProject, "config" | "resources">,
+	project: Pick<Project, "config" | "resources">,
 ): EditorGameDiagnosticPresentation => {
 	const presentation = readGameDiagnosticPresentationFn(diagnostic);
 	const targets = readEditorGameDiagnosticTargetsFn(diagnostic, project);
@@ -217,7 +217,7 @@ export const EditorBuildDiagnostics = ({
 	project,
 }: {
 	readonly diagnostics: ReadonlyArray<EditorGameDiagnostic>;
-	readonly project: Pick<EditorProject, "projectId" | "config" | "resources">;
+	readonly project: Pick<Project, "projectId" | "config" | "resources">;
 }) => (
 	<ul className="mt-4 grid gap-3">
 		{diagnostics.map((diagnostic, index) => {

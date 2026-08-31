@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
 import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
@@ -9,7 +9,7 @@ import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 const formatNumberFn = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
-const itemReferenceFn = (project: EditorProject, itemId: string) => {
+const itemReferenceFn = (project: Project, itemId: string) => {
 	const item = project.config.items[itemId];
 	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
 };
@@ -30,7 +30,7 @@ const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 };
 
 const amountLinesFn = (
-	project: EditorProject,
+	project: Project,
 	title: string,
 	amounts: ReadonlyArray<{
 		readonly factId: string;
@@ -59,7 +59,7 @@ const limitationTextFn = (limitation: ItemEstimate["limitations"][number]) => {
 };
 
 const routeLinesFn = (
-	project: EditorProject,
+	project: Project,
 	routeSteps: ReadonlyArray<EstimateRouteStep>,
 ): ReadonlyArray<string> => {
 	const routeByFactId = new Map(
@@ -86,8 +86,8 @@ const routeLinesFn = (
 };
 
 const formatEstimateFn = (
-	project: EditorProject,
-	target: EditorProject["config"]["items"][string],
+	project: Project,
+	target: Project["config"]["items"][string],
 	estimate: ItemEstimate,
 ) => {
 	const header = [
@@ -148,7 +148,7 @@ const formatEstimateFn = (
 
 /** Computes and formats one approximate static item estimate for MCP. */
 export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(function* (
-	project: EditorProject,
+	project: Project,
 	itemId: string,
 	quantity: number,
 ) {

@@ -1,7 +1,7 @@
 import { shell } from "electron";
 import { Effect } from "effect";
 
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 /** Opens one successful Editor source-export root in the operating-system file browser. */
 export const openEditorExportDirectoryFx = Effect.fn("openEditorExportDirectoryFx")(
@@ -12,7 +12,7 @@ export const openEditorExportDirectoryFx = Effect.fn("openEditorExportDirectoryF
 				if (error !== "") throw new Error(error);
 			},
 			catch: (cause) =>
-				new EditorProjectRepositoryError({
+				new ProjectRepositoryError({
 					operation: "open-export-directory",
 					message: "The Editor project export folder could not be opened.",
 					cause,

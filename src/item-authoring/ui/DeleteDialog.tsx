@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
+import type { Project } from "~/project-authoring/type/Project";
 import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
 
 const DeleteError = ({ error }: { readonly error: unknown }) =>
@@ -10,7 +10,7 @@ const DeleteError = ({ error }: { readonly error: unknown }) =>
 		</p>
 	);
 
-const readItemTitle = (project: EditorProject, itemId: string) =>
+const readItemTitle = (project: Project, itemId: string) =>
 	project.config.items[itemId]?.title || itemId;
 
 const startSurfaceTitles = {
@@ -24,7 +24,7 @@ const ForceDeleteImpactList = ({
 	project,
 }: {
 	readonly impact: forceDeleteFx.Impact;
-	readonly project: EditorProject;
+	readonly project: Project;
 }) => {
 	const entries: string[] = [];
 	for (const [surface, count] of Object.entries(impact.removedStartEntries)) {
@@ -84,7 +84,7 @@ export const DeleteDialog = ({
 	readonly impact: forceDeleteFx.Impact;
 	readonly item: ItemSchema.Type;
 	readonly pending: boolean;
-	readonly project: EditorProject;
+	readonly project: Project;
 	readonly onCancel: () => void;
 	readonly onConfirm: () => void;
 }) => (

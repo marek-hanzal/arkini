@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import { EditorBoardScenarioNameSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
+import { BoardScenarioNameSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
@@ -15,7 +15,7 @@ import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx
 const boardScenarioKeySchema = z
 	.object({
 		projectId: IdSchema,
-		name: EditorBoardScenarioNameSchema,
+		name: BoardScenarioNameSchema,
 	})
 	.strict();
 const writeBoardScenarioSchema = boardScenarioKeySchema

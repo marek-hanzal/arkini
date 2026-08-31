@@ -3,19 +3,19 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
 import { saveFx } from "~/item-authoring/fx/saveFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
-const createProject = (revision = 0): EditorProject => ({
+const createProject = (revision = 0): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
 	version: editorTestPayload.version,
@@ -31,7 +31,7 @@ const createFixture = () => {
 		scheduleTask,
 	});
 	registries.push(registry);
-	const upsertItemFx = vi.fn<EditorProjectRepositoryService["upsertItemFx"]>(({ item }) => {
+	const upsertItemFx = vi.fn<ProjectRepositoryService["upsertItemFx"]>(({ item }) => {
 		const { resources: _resources, ...commit } = createProject(1);
 		return Effect.succeed({
 			...commit,
@@ -45,7 +45,7 @@ const createFixture = () => {
 			},
 		});
 	});
-	const repository: EditorProjectRepositoryService = {
+	const repository: ProjectRepositoryService = {
 		...UnusedEditorProjectRepository,
 		awaitIdleFx: Effect.void,
 		createProjectFx: () => Effect.die("Unexpected create."),
@@ -89,7 +89,7 @@ describe("saveFx", () => {
 				projectId: "project",
 				item,
 			}).pipe(
-				Effect.provideService(EditorProjectRepository, fixture.repository),
+				Effect.provideService(ProjectRepository, fixture.repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 			),
 		);
@@ -114,7 +114,7 @@ describe("saveFx", () => {
 						id: "",
 					},
 				}).pipe(
-					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(ProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 				),
 			),

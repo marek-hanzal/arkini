@@ -3,10 +3,10 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
-import { EditorProjectNoteFileSchema } from "~/project-note/schema/EditorProjectNoteFileSchema";
-import { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
+import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
+import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
+import { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 const decodeNoteFileStemFn = (stem: string) => {
@@ -81,7 +81,7 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 						new Error(`Editor note ${file} has an invalid filename.`),
 					);
 				const note = yield* Effect.try({
-					try: () => EditorProjectNoteFileSchema.parse(value),
+					try: () => NoteFileSchema.parse(value),
 					catch: (cause) =>
 						new Error(`Editor note ${file} is invalid.`, {
 							cause,
@@ -94,7 +94,7 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 					);
 				return yield* Effect.try({
 					try: () =>
-						EditorNoteSchema.parse({
+						NoteSchema.parse({
 							...note,
 							noteId,
 							projectId,
@@ -111,7 +111,7 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 		({ file, value }) =>
 			Effect.gen(function* () {
 				const scenario = yield* Effect.try({
-					try: () => EditorBoardScenarioFileSchema.parse(value),
+					try: () => BoardScenarioFileSchema.parse(value),
 					catch: (cause) =>
 						new Error(`Editor Board scenario ${file} is invalid.`, {
 							cause,
@@ -126,7 +126,7 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 					);
 				return yield* Effect.try({
 					try: () =>
-						EditorBoardScenarioSchema.parse({
+						BoardScenarioSchema.parse({
 							projectId,
 							name: scenario.name,
 							projectRevision: scenario.revision,

@@ -4,7 +4,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
 	editorTestConfig,
@@ -12,7 +12,7 @@ import {
 } from "~test/project-authoring/support/editorTestPayload";
 
 const state = vi.hoisted(() => ({
-	project: undefined as unknown as EditorProject,
+	project: undefined as unknown as Project,
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -37,7 +37,7 @@ import { Form } from "~/item-authoring/ui/Form";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const project: EditorProject = {
+const project: Project = {
 	projectId: "editor-test",
 	title: "Editor test",
 	version: "1.0",

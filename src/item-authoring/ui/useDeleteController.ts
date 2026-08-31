@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
-import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
@@ -15,13 +15,13 @@ import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack"
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const deleteCommandAtom = RendererRuntime.runSync(
-	Effect.map(EditorProjectRepository, (repository) =>
+	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
 			Atom.fn((props: Omit<deleteFx.Props, "projectId">) =>
 				deleteFx({
 					...props,
 					projectId,
-				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+				}).pipe(Effect.provideService(ProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),
 		),
 	),

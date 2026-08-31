@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen, Pencil, Save, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { EditorNoteContentMaxLength } from "~/project-note/schema/EditorNoteSchema";
+import { NoteContentMaxLength } from "~/project-note/schema/NoteSchema";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { EditorTextarea } from "~/editor-control/ui/EditorTextarea";
 import { Tooltip } from "~/ui/ui/Tooltip";
-import { useEditorNotesController } from "~/project-note/ui/useEditorNotesController";
+import { useNotesController } from "~/project-note/ui/useNotesController";
 import { Status } from "~/ui/ui/Status";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -45,7 +45,7 @@ const noteMotion = {
 
 export const Route = createFileRoute("/editor/$projectId/notes")({
 	component: () => {
-		const controller = useEditorNotesController();
+		const controller = useNotesController();
 		return (
 			<div
 				className="h-full min-h-0 overflow-y-auto p-4"
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 					</header>
 					<section className="grid gap-3 rounded-2xl border border-line bg-surface-raised/60 p-5">
 						<EditorTextarea
-							maxLength={EditorNoteContentMaxLength}
+							maxLength={NoteContentMaxLength}
 							maxRows={12}
 							minRows={6}
 							placeholder="Write a note…"
@@ -222,7 +222,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 												</header>
 												{editing ? (
 													<EditorTextarea
-														maxLength={EditorNoteContentMaxLength}
+														maxLength={NoteContentMaxLength}
 														maxRows={12}
 														minRows={6}
 														disabled={controller.pending}

@@ -3,13 +3,13 @@ import { Clock } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import {
-	EditorBoardScenarioNameSchema,
-	EditorBoardScenarioSchema,
-} from "~/board-scenario/schema/EditorBoardScenarioSchema";
+	BoardScenarioNameSchema,
+	BoardScenarioSchema,
+} from "~/board-scenario/schema/BoardScenarioSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { withProjectLockFx } from "./withProjectLockFx";
@@ -19,7 +19,7 @@ const encodeJson = (value: unknown) =>
 	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 
 type Operations = Pick<
-	EditorProjectRepositoryService,
+	ProjectRepositoryService,
 	| "listBoardScenariosFx"
 	| "readBoardScenarioFx"
 	| "writeBoardScenarioFx"
@@ -33,9 +33,9 @@ type Operation =
 	| "delete-board-scenario";
 
 const error = (operation: Operation, message: string, cause?: unknown) =>
-	cause instanceof EditorProjectRepositoryError && cause.operation === operation
+	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
-		: new EditorProjectRepositoryError({
+		: new ProjectRepositoryError({
 				operation,
 				message: withFilesystemWriteRecovery(message, cause),
 				cause,
@@ -47,7 +47,7 @@ export namespace createBoardScenarioOperationsFx {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, ProjectRepositoryError>;
 		readonly states: Map<string, ProjectState>;
 	}
 }
@@ -71,7 +71,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 			);
 		const publishScenarios = (
 			state: ProjectState,
-			scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>,
+			scenarios: ReadonlyArray<BoardScenarioSchema.Type>,
 		) =>
 			states.set(state.project.projectId, {
 				...state,
@@ -136,7 +136,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 			Effect.gen(function* () {
 				const { name, bytes } = yield* Effect.try({
 					try: () => ({
-						name: EditorBoardScenarioNameSchema.parse(candidateName),
+						name: BoardScenarioNameSchema.parse(candidateName),
 						bytes: new Uint8Array(candidateBytes),
 					}),
 					catch: (cause) =>
@@ -163,7 +163,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 							);
 						const scenarios = yield* readScenariosFx(projectId);
 						const previous = scenarios.find((scenario) => scenario.name === name);
-						const written = EditorBoardScenarioSchema.parse({
+						const written = BoardScenarioSchema.parse({
 							projectId,
 							name,
 							projectRevision: state.project.revision,
@@ -183,7 +183,7 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 								lock: state.paths.lockFile,
 								target,
 								bytes: encodeJson(
-									EditorBoardScenarioFileSchema.parse({
+									BoardScenarioFileSchema.parse({
 										name: written.name,
 										revision: written.projectRevision,
 										version: written.version,

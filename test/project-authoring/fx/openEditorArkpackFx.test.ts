@@ -3,11 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { openEditorArkpackFx } from "~/project-authoring/fx/openEditorArkpackFx";
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import {
-	EditorProjectRepository,
-	type EditorProjectRepositoryService,
-} from "~/project-authoring/service/EditorProjectRepository";
+	ProjectRepository,
+	type ProjectRepositoryService,
+} from "~/project-authoring/service/ProjectRepository";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
@@ -16,7 +16,7 @@ vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 	loadArkpackFx: vi.fn(),
 }));
 
-const project: EditorProject = {
+const project: Project = {
 	projectId: editorTestPayload.config.meta.id,
 	title: editorTestPayload.config.meta.title,
 	version: "4.2",
@@ -28,9 +28,9 @@ const project: EditorProject = {
 };
 
 const createRepository = (
-	readProjectFx: EditorProjectRepositoryService["readProjectFx"],
-	createProjectFx: EditorProjectRepositoryService["createProjectFx"],
-): EditorProjectRepositoryService => ({
+	readProjectFx: ProjectRepositoryService["readProjectFx"],
+	createProjectFx: ProjectRepositoryService["createProjectFx"],
+): ProjectRepositoryService => ({
 	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	readProjectFx,
@@ -43,10 +43,10 @@ const createRepository = (
 	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 });
 
-const runOpen = (repository: EditorProjectRepositoryService) =>
+const runOpen = (repository: ProjectRepositoryService) =>
 	Effect.runPromise(
 		openEditorArkpackFx(project.projectId).pipe(
-			Effect.provideService(EditorProjectRepository, repository),
+			Effect.provideService(ProjectRepository, repository),
 		),
 	);
 

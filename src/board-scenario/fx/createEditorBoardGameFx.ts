@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { createGameResourceUrlsFx } from "~/playable-game/fx/createGameResourceUrlsFx";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
@@ -11,7 +11,7 @@ import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace createEditorBoardGameFx {
 	export interface Props {
-		readonly project: EditorProject;
+		readonly project: Project;
 		readonly state?: StateSchema.Type;
 	}
 }

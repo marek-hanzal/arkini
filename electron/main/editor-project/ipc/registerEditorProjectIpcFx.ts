@@ -4,7 +4,7 @@ import { Effect, Semaphore } from "effect";
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
-import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";
 import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";
@@ -24,7 +24,7 @@ const readEditorWindowFx = (
 		Effect.flatMap((window) =>
 			window === null
 				? Effect.fail(
-						new EditorProjectRepositoryError({
+						new ProjectRepositoryError({
 							operation,
 							message: "The editor window is unavailable.",
 						}),
@@ -239,7 +239,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							Effect.flatMap((root) =>
 								root === undefined
 									? Effect.fail(
-											new EditorProjectRepositoryError({
+											new ProjectRepositoryError({
 												operation: "open-export-directory",
 												message:
 													"No completed Editor project export is available.",

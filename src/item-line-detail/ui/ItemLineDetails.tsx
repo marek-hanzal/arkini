@@ -2,10 +2,11 @@ import { ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
+import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineInputs } from "~/item-line-detail/ui/ItemLineInputs";
 import { ItemLineUnavailableWithdrawals } from "~/item-line-detail/ui/ItemLineInputWithdrawal";
-import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
+import { Outputs } from "~/production-output/ui/Outputs";
 
 /** Renders the input-to-output body and buffered-input recovery for one line. */
 export const ItemLineDetails = ({
@@ -78,9 +79,24 @@ export const ItemLineDetails = ({
 					>
 						<ChevronRight className="size-5" />
 					</div>
-					<ItemLineOutputs
-						disabled={contentReadOnly}
+					<Outputs
 						output={line.output}
+						renderItem={(item) =>
+							item.sourceUrl === undefined ? (
+								<span className="truncate font-medium text-foreground">
+									{item.title}
+								</span>
+							) : (
+								<ItemReferenceButton
+									compositeUrl={item.compositeUrl}
+									dataUi="TileLineOutputDetailLink"
+									definitionItemId={item.definitionItemId}
+									disabled={contentReadOnly}
+									label={item.title}
+									sourceUrl={item.sourceUrl}
+								/>
+							)
+						}
 					/>
 				</motion.div>
 			)}

@@ -10,6 +10,7 @@ import { dropRulesFx } from "~/production-output/fx/dropRulesFx";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 interface ItemDetailOutputRuleContext {
@@ -87,7 +88,7 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 							drops: drop,
 							ruleContext,
 						}),
-					} satisfies ItemDetailLines.LineOutputRoll;
+					} satisfies OutputProjection.Roll<ItemDetailLines.OutputItem>;
 				}),
 		)
 		.with(
@@ -103,7 +104,7 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 							drops: drop,
 							ruleContext,
 						}),
-					} satisfies ItemDetailLines.LineOutputRoll;
+					} satisfies OutputProjection.Roll<ItemDetailLines.OutputItem>;
 				}),
 		)
 		.with(
@@ -129,7 +130,7 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 						kind: "weight",
 						selections: quantity,
 						option,
-					} satisfies ItemDetailLines.LineOutputRoll;
+					} satisfies OutputProjection.Roll<ItemDetailLines.OutputItem>;
 				}),
 		)
 		.exhaustive();
@@ -143,9 +144,9 @@ export const readItemDetailOutputFx = Effect.fn("readItemDetailOutputFx")(functi
 	readonly line: LineSchema.Type;
 	readonly ruleContext?: ItemDetailOutputRuleContext;
 }) {
-	const output: ItemDetailLines.LineOutputSet[] = [];
+	const output: OutputProjection.Set<ItemDetailLines.OutputItem>[] = [];
 	for (const set of line.output?.set ?? []) {
-		const roll: ItemDetailLines.LineOutputRoll[] = [];
+		const roll: OutputProjection.Roll<ItemDetailLines.OutputItem>[] = [];
 		for (const configuredRoll of set.roll) {
 			roll.push(
 				yield* readItemDetailOutputRollFx({

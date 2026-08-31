@@ -2,11 +2,11 @@ import { ArrowUpRight, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
+import { Outputs } from "~/production-output/ui/Outputs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
@@ -15,10 +15,7 @@ import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 
 type ItemRegistry = Record<string, ItemSchema.Type>;
 
-const projectDrop = (
-	drop: DropSchema.Type,
-	items: ItemRegistry,
-): ItemDetailLinesProjection.OutputItem => ({
+const projectDrop = (drop: DropSchema.Type, items: ItemRegistry): OutputProjection.Item => ({
 	itemId: drop.itemId,
 	quantity: drop.quantity,
 	title: items[drop.itemId]?.title ?? drop.itemId,
@@ -28,9 +25,9 @@ const projectDrop = (
 const projectOutput = (
 	output: OutputSchema.Type | undefined,
 	items: ItemRegistry,
-): readonly ItemDetailLinesProjection.OutputSet[] =>
+): readonly OutputProjection.Set<OutputProjection.Item>[] =>
 	output?.set.map((set) => ({
-		roll: set.roll.map((roll): ItemDetailLinesProjection.OutputRoll => {
+		roll: set.roll.map((roll): OutputProjection.Roll<OutputProjection.Item> => {
 			if (roll.type === "weight")
 				return {
 					kind: "weight",
@@ -55,7 +52,7 @@ const projectOutput = (
 	})) ?? [];
 
 const renderOutputItem = (
-	item: ItemDetailLinesProjection.OutputItem,
+	item: OutputProjection.Item,
 	items: ItemRegistry,
 	projectId: string,
 ): ReactNode => {
@@ -79,8 +76,7 @@ const ProductionLineOutputs = ({
 	readonly output: OutputSchema.Type | undefined;
 	readonly projectId: string;
 }) => (
-	<ItemLineOutputs
-		disabled={false}
+	<Outputs
 		output={projectOutput(output, items)}
 		renderItem={(item) => renderOutputItem(item, items, projectId)}
 	/>

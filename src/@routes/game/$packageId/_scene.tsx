@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
+import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
 import { GameShell } from "~/game-shell/ui/GameShell";
 
 /**
@@ -11,10 +11,10 @@ import { GameShell } from "~/game-shell/ui/GameShell";
  */
 export const Route = createFileRoute("/game/$packageId/_scene")({
 	component: () => (
-		<PlayableGameRoute>
+		<PlayableGameResources>
 			<GameShell>
 				<Outlet />
 			</GameShell>
-		</PlayableGameRoute>
+		</PlayableGameResources>
 	),
 });

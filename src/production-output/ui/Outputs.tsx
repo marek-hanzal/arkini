@@ -2,37 +2,21 @@ import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
-import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
+import type { OutputProjection } from "~/production-output/type/OutputProjection";
 
-const ItemLineOutputItem = ({
-	disabled,
+const OutputItem = <Item extends OutputProjection.Item>({
 	item,
 	renderItem,
 }: {
-	readonly disabled: boolean;
-	readonly item: ItemDetailLinesProjection.OutputItem;
-	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
+	readonly item: Item;
+	readonly renderItem: (item: Item) => ReactNode;
 }) => (
 	<div
 		className="grid gap-1.5"
 		data-ui="TileLineOutputItem"
 	>
 		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
-			{renderItem !== undefined ? (
-				renderItem(item)
-			) : item.sourceUrl === undefined ? (
-				<span className="truncate font-medium text-foreground">{item.title}</span>
-			) : (
-				<ItemReferenceButton
-					compositeUrl={item.compositeUrl}
-					dataUi="TileLineOutputDetailLink"
-					definitionItemId={item.definitionItemId}
-					disabled={disabled}
-					label={item.title}
-					sourceUrl={item.sourceUrl}
-				/>
-			)}
+			{renderItem(item)}
 			<span className="shrink-0 text-muted">
 				×
 				{item.quantity.min === item.quantity.max
@@ -53,20 +37,17 @@ const ItemLineOutputItem = ({
 	</div>
 );
 
-const ItemLineOutputItems = ({
-	disabled,
+const OutputItems = <Item extends OutputProjection.Item>({
 	items,
 	renderItem,
 }: {
-	readonly disabled: boolean;
-	readonly items: readonly ItemDetailLinesProjection.OutputItem[];
-	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
+	readonly items: readonly Item[];
+	readonly renderItem: (item: Item) => ReactNode;
 }) => (
 	<div className="space-y-1.5">
 		{items.map((item) => (
-			<ItemLineOutputItem
+			<OutputItem
 				key={item.itemId}
-				disabled={disabled}
 				item={item}
 				renderItem={renderItem}
 			/>
@@ -74,14 +55,12 @@ const ItemLineOutputItems = ({
 	</div>
 );
 
-const ItemLineOutputRoll = ({
-	disabled,
+const OutputRoll = <Item extends OutputProjection.Item>({
 	roll,
 	renderItem,
 }: {
-	readonly disabled: boolean;
-	readonly roll: ItemDetailLinesProjection.OutputRoll;
-	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
+	readonly roll: OutputProjection.Roll<Item>;
+	readonly renderItem: (item: Item) => ReactNode;
 }) =>
 	match(roll)
 		.with(
@@ -97,8 +76,7 @@ const ItemLineOutputRoll = ({
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 						Guaranteed
 					</p>
-					<ItemLineOutputItems
-						disabled={disabled}
+					<OutputItems
 						items={guaranteed.item}
 						renderItem={renderItem}
 					/>
@@ -118,8 +96,7 @@ const ItemLineOutputRoll = ({
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 						{Math.round(chance.chance * 100)}% chance
 					</p>
-					<ItemLineOutputItems
-						disabled={disabled}
+					<OutputItems
 						items={chance.item}
 						renderItem={renderItem}
 					/>
@@ -148,8 +125,7 @@ const ItemLineOutputRoll = ({
 							className="border-l border-line pl-3"
 						>
 							<p className="mb-1.5 text-xs text-muted">Weight {option.weight}</p>
-							<ItemLineOutputItems
-								disabled={disabled}
+							<OutputItems
 								items={option.item}
 								renderItem={renderItem}
 							/>
@@ -161,14 +137,12 @@ const ItemLineOutputRoll = ({
 		.exhaustive();
 
 /** Renders every authored output alternative and roll for one visible product line. */
-export const ItemLineOutputs = ({
-	disabled,
+export const Outputs = <Item extends OutputProjection.Item>({
 	output,
 	renderItem,
 }: {
-	readonly disabled: boolean;
-	readonly output: readonly ItemDetailLinesProjection.OutputSet[];
-	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
+	readonly output: readonly OutputProjection.Set<Item>[];
+	readonly renderItem: (item: Item) => ReactNode;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -190,9 +164,8 @@ export const ItemLineOutputs = ({
 						) : null}
 						<div className="divide-y divide-line/60">
 							{set.roll.map((roll, rollIndex) => (
-								<ItemLineOutputRoll
+								<OutputRoll
 									key={`${roll.kind}:${rollIndex}`}
-									disabled={disabled}
 									roll={roll}
 									renderItem={renderItem}
 								/>

@@ -42,7 +42,7 @@ src/arkini-cli  product CLI commands, diagnostic presentation, process compositi
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections
-src/item-line-detail  line-detail reads, board/stored projections, inputs/outputs/autofill and Item Lines presentation
+src/item-line-detail  line-detail reads, board/stored projections, input/output facts, autofill and Item Lines presentation
 src/item-detail  Item Detail dialog composition, remaining projections and Queue/Sources/Info presentation
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
 src/game-scene  concrete Board, Toolbar and Inventory Pixi scene composition, reconciliation and delivery presentation
@@ -60,7 +60,7 @@ src/production-condition  authored runtime condition evaluation
 src/production-input  line-input schemas, material planning and storage lifecycle
 src/production-line  production-line definitions, rules, reads and run planning
 src/production-authoring  controlled authored Line, Input, Rule and Output UI
-src/production-output  output, drop and roll schemas plus resolution policy
+src/production-output  output, drop and roll schemas, resolution policy and generic output presentation
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, travel advancement, validation and settlement
 src/game-config  authored value/config schemas, explicit non-item resource roles and loaded-config capability
@@ -89,9 +89,9 @@ src/flow-canvas  global Flow projection, painter policy and product UI
 src/estimate  demand grouping, witness and projection vocabulary, bounded Estimate analysis, cache and worker
 src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and About motion
 src/game-presentation  mounted-Game React context, selectors, events, command settlement and failures
-src/game-shell  Board, Inventory, gameplay resources and overlay composition
+src/game-shell  Board, Inventory, playable Game resources and overlay composition
 src/game-menu  Game Menu lifecycle, save/close commands and navigation intent
-src/game-audio  committed-event cue projection and route-scoped Web Audio lifecycle
+src/game-audio  committed-event cue projection and playable-surface-scoped Web Audio lifecycle
 src/game-cheat  save-scoped Cheat commands, catalog, controls and item-spawn spotlight
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle

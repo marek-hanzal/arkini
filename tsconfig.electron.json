@@ -51,6 +51,7 @@
 		"src/production-line",
 		"src/production-output",
 		"src/game-config",
+		"src/game-config-compiler",
 		"src/game-config-resource",
 		"src/arkpack/type/ArkpackDescriptor.ts",
 		"src/arkpack/artifact",

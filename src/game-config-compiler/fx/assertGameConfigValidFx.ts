@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameCompilationResultSchema } from "~/game-config/compiler/schema/GameCompilationResultSchema";
+import type { GameCompilationResultSchema } from "~/game-config-compiler/schema/GameCompilationResultSchema";
 import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 

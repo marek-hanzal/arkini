@@ -333,7 +333,7 @@ platform-check() {
 		test/electron \
 		test/arkpack/artifact \
 		test/game-config/source \
-		test/game-config/compiler/fx/readGameSourceFilesFx.test.ts
+		test/game-config-compiler/fx/readGameSourceFilesFx.test.ts
 }
 
 # @cmd Run the complete repository gate

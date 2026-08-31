@@ -3,10 +3,10 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import { readGameSourceFilesFx } from "~/game-config/compiler/fx/readGameSourceFilesFx";
+import { readGameSourceFilesFx } from "~/game-config-compiler/fx/readGameSourceFilesFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { GameProjectJsonSchema } from "~/game-config/source/json-schema/GameProjectJsonSchema";
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 describe("readGameSourceFilesFx", () => {
 	it.effect("collects JSON syntax and fragment-schema diagnostics across files", () =>

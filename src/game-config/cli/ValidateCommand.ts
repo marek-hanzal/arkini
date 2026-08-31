@@ -1,8 +1,8 @@
 import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
-import { compileGameDirectoryFx } from "~/game-config/compiler/fx/compileGameDirectoryFx";
-import { assertGameConfigValidFx } from "~/game-config/compiler/fx/assertGameConfigValidFx";
+import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
+import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
 import { printGameDiagnosticsForCliFx } from "~/game-config/diagnostic/printer/printGameDiagnosticsForCliFx";
 
 export namespace ValidateCommand {

@@ -2,7 +2,7 @@ import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 import { readResourceDescriptorsFx } from "~/game-config-resource/fx/readResourceDescriptorsFx";

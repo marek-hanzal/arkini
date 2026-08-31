@@ -2,14 +2,14 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 /** Canonical project row persisted without duplicated display metadata. */
 export const EditorProjectRecordSchema = z
 	.object({
 		projectId: IdSchema,
 		config: GameConfigSchema,
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		revision: z.number().int().nonnegative(),
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),

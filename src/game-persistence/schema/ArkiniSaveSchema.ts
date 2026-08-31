@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 export const ArkiniSaveSchema = z
 	.object({
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		arkini: ArkiniVersionSchema,
 		state: StateSchema,
 	})

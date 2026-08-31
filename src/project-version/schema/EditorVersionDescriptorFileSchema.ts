@@ -6,7 +6,7 @@ import {
 	EditorProjectVersionTagSchema,
 } from "~/project-version/schema/EditorProjectVersionMetadataSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { EditorObjectHashSchema } from "./EditorObjectHashSchema";
 
@@ -18,7 +18,7 @@ export const EditorVersionDescriptorFileSchema = z
 		body: EditorProjectVersionBodySchema.optional(),
 		tag: EditorProjectVersionTagSchema.optional(),
 		arkini: ArkiniVersionSchema,
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		sourceRevision: z.number().int().nonnegative(),
 		contentFingerprint: EditorObjectHashSchema,
 		createdAtMs: z.number().int().nonnegative(),

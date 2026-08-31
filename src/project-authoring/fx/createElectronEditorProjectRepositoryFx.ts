@@ -18,7 +18,7 @@ import {
 	EditorProjectPayloadSchema,
 } from "~/project-authoring/schema/EditorProjectPayloadSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 
@@ -38,7 +38,7 @@ const versionReferenceSchema = z.discriminatedUnion("type", [
 const versionDescriptorSchema = z
 	.object({
 		arkini: ArkiniVersionSchema,
-		arkpackVersion: ArkpackVersionSchema,
+		arkpackVersion: GameVersionSchema,
 		body: z.string().optional(),
 		createdAtMs: z.number().int().nonnegative(),
 		parentVersionId: z.string().min(1).optional(),

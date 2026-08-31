@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { printGameDiagnosticsForCliFx } from "~/game-config-diagnostic/fx/printGameDiagnosticsForCliFx";
+import { printGameDiagnosticsForCliFx } from "~/arkini-cli/fx/printGameDiagnosticsForCliFx";
 
 describe("printGameDiagnosticsForCliFx", () => {
 	it("prints severity, stable code, context, location, and detailed cause", async () => {

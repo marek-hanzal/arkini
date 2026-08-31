@@ -8,7 +8,7 @@ import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVers
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { createVersionFingerprint, hashVersionBytes } from "./VersionFingerprint";
 
@@ -24,7 +24,7 @@ export namespace readVersionSnapshotFx {
 	}
 
 	export interface Success {
-		readonly arkpack: ArkpackVersionSchema.Type;
+		readonly arkpack: GameVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;

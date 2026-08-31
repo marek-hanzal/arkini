@@ -3,7 +3,7 @@ import { Console, Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
 import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
-import { printGameDiagnosticsForCliFx } from "~/game-config-diagnostic/fx/printGameDiagnosticsForCliFx";
+import { printGameDiagnosticsForCliFx } from "~/arkini-cli/fx/printGameDiagnosticsForCliFx";
 
 export namespace ValidateCommand {
 	export interface Props {

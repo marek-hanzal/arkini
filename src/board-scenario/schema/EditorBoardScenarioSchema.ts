@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { TitleSchema } from "~/game-config/schema/TitleSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 export const EditorBoardScenarioNameSchema = TitleSchema.max(80);
 
@@ -11,7 +11,7 @@ export const EditorBoardScenarioDescriptorSchema = z
 		projectId: IdSchema,
 		name: EditorBoardScenarioNameSchema,
 		projectRevision: z.number().int().nonnegative(),
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),
 	})

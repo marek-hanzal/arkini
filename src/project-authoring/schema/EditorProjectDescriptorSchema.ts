@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 /** Stable repository-backed identity used by editor discovery and navigation. */
 export const EditorProjectDescriptorSchema = z
 	.object({
 		projectId: IdSchema,
 		title: z.string(),
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),
 	})

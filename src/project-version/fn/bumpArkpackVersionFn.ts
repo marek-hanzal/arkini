@@ -1,5 +1,5 @@
 import type { EditorProjectCompatibilityResult } from "~/project-version/type/EditorProjectCompatibility";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 const incrementDecimalDigitsFn = (digits: string) => {
 	const result = Array.from(digits);
@@ -14,7 +14,7 @@ const incrementDecimalDigitsFn = (digits: string) => {
 
 /** Applies one classified editor commit to its persisted gameplay compatibility version. */
 export const bumpArkpackVersionFn = (
-	version: ArkpackVersionSchema.Type,
+	version: GameVersionSchema.Type,
 	result: EditorProjectCompatibilityResult,
 ) => {
 	const separator = version.indexOf(".");

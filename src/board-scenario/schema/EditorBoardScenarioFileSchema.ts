@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 import { EditorBoardScenarioNameSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 /** Portable authored Board scenario with its opaque save bytes encoded as JSON. */
 export const EditorBoardScenarioFileSchema = z
 	.object({
 		name: EditorBoardScenarioNameSchema,
 		revision: z.number().int().nonnegative(),
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		save: z.base64().min(1),
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),

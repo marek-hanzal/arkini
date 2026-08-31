@@ -13,7 +13,10 @@ export namespace saveFx {
 }
 
 /** Atomically validates and saves one UID-owned item into the canonical project. */
-export const saveFx = Effect.fn("saveFx")(function* ({ item: candidate, projectId }: saveFx.Props) {
+export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
+	item: candidate,
+	projectId,
+}: saveFx.Props) {
 	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(

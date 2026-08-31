@@ -1,6 +1,6 @@
 import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 type ArkpackSource = "bundled" | "user";
 
@@ -9,7 +9,7 @@ export interface ArkpackDescriptor {
 	readonly packageId: string;
 	readonly contentHash: string;
 	readonly title: string;
-	readonly version: ArkpackVersionSchema.Type;
+	readonly version: GameVersionSchema.Type;
 	readonly arkini: ArkiniVersionSchema.Type;
 	readonly provenance: ArkpackProvenanceSchema.Type;
 	readonly source: ArkpackSource;

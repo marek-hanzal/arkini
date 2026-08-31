@@ -6,7 +6,7 @@ import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourc
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 import { readResourceDescriptorsFx } from "~/game-config-resource/fx/readResourceDescriptorsFx";
-import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
+import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { ItemFileSchema } from "~/game-config-source/schema/ItemFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { ManifestResourceSchema } from "./ManifestResourceSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 export const ManifestSchema = z
 	.object({
-		version: ArkpackVersionSchema.describe("The gameplay compatibility version."),
+		version: GameVersionSchema.describe("The gameplay compatibility version."),
 		arkini: ArkiniVersionSchema.describe("The Arkini version that built this package."),
 		length: NonNegativeIntegerSchema.describe("The encoded configuration size in bytes."),
 		resources: z

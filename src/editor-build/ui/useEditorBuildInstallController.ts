@@ -8,7 +8,7 @@ import {
 	readEditorBuildInstallPlanFn,
 } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
@@ -19,7 +19,7 @@ const readErrorMessageFn = (error: unknown) =>
 export namespace useEditorBuildInstallController {
 	export interface Props {
 		readonly artifact?: EditorProjectBuildSchema.Type;
-		readonly targetVersion: ArkpackVersionSchema.Type;
+		readonly targetVersion: GameVersionSchema.Type;
 	}
 
 	export interface Output {

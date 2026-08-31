@@ -1,13 +1,13 @@
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import { readArkpackVersionFn } from "~/game-version/fn/readArkpackVersionFn";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 export interface EditorBuildMajorUpdateConfirmation {
 	readonly installedContentHash: string;
-	readonly installedVersion: ArkpackVersionSchema.Type;
+	readonly installedVersion: GameVersionSchema.Type;
 	readonly targetContentHash: string;
-	readonly targetVersion: ArkpackVersionSchema.Type;
+	readonly targetVersion: GameVersionSchema.Type;
 }
 
 interface EditorBuildInstallPlan {
@@ -27,7 +27,7 @@ export const readEditorBuildInstallPlanFn = ({
 }: {
 	readonly arkpacks: ReadonlyArray<ArkpackDescriptor>;
 	readonly artifact: EditorProjectBuildSchema.Type;
-	readonly targetVersion: ArkpackVersionSchema.Type;
+	readonly targetVersion: GameVersionSchema.Type;
 }): EditorBuildInstallPlan => {
 	const installed = arkpacks.find(({ packageId }) => packageId === artifact.projectId);
 	if (installed === undefined) {
@@ -37,8 +37,8 @@ export const readEditorBuildInstallPlanFn = ({
 			expectedCurrent: null,
 		} satisfies EditorBuildInstallPlan;
 	}
-	const installedVersion = readArkpackVersionFn(installed.version);
-	const nextVersion = readArkpackVersionFn(targetVersion);
+	const installedVersion = readGameVersionMajorFn(installed.version);
+	const nextVersion = readGameVersionMajorFn(targetVersion);
 	return {
 		action: "update",
 		expectedCurrent: {

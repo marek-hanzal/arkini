@@ -16,7 +16,7 @@ import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProje
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { readProjectFilesFx } from "./readProjectFilesFx";
@@ -315,7 +315,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 					const config = GameConfigSchema.parse(candidateConfig);
 					return {
 						projectId: config.meta.id,
-						version: ArkpackVersionSchema.parse(candidateVersion),
+						version: GameVersionSchema.parse(candidateVersion),
 						config,
 						resources: ResourceSchema.array().parse(candidateResources),
 					};

@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
@@ -57,7 +57,7 @@ export const testArkpackConfig = GameConfigSchema.parse({
 export const createTestArkpack = (
 	config = testArkpackConfig,
 	packageId = config.meta.id,
-	version: ArkpackVersionSchema.Type = "1.0",
+	version: GameVersionSchema.Type = "1.0",
 	arkini: ArkiniVersionSchema.Type = ArkiniAppVersion,
 ) => {
 	const identifiedConfig = {

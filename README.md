@@ -38,7 +38,7 @@ src/item-query  authored Item query schemas and canonical Runtime execution acro
 src/item-resolution  canonical configured Item lookup and exact not-found rejection
 src/item-revision  opaque live Item revisions, fresh creation and stale-write rejection
 src/item-state-isolation  atomic stateful-owner stack isolation and pure-remainder placement
-src/arkini-cli  product CLI process composition and its one Node runtime root
+src/arkini-cli  product CLI commands, diagnostic presentation, process composition and its one Node runtime root
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections
@@ -63,18 +63,15 @@ src/production-line-authoring  controlled Line, Input, Rule and Output editor UI
 src/production-output  output, drop and roll schemas plus resolution policy
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, validation and settlement
-src/game-config  authored value/config schemas and loaded-config capability
-src/game-config-cli  schema generation and completed-project validation commands
+src/game-config  authored value/config schemas, explicit non-item resource roles and loaded-config capability
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
-src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation and typed validation failure
-src/game-config-resource  authored resource schemas, bounded PNG admission, references, source discovery, usage and rename semantics
-src/game-config-source  portable source layout, schemas, discovery, parsing and project admission
+src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation projection and typed validation failure
+src/game-config-resource  embedded resource schemas, bounded PNG admission, references, source discovery, usage and rename semantics
+src/game-config-source  portable source layout, schemas, generated JSON Schema, discovery, parsing and project admission
 src/game-config-validation  completed-config semantic validation and provenance-aware diagnostics
-src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
 src/arkpack-admission  bounded package decoding and canonical semantic admission
 src/arkpack-artifact  package bytes, envelopes, compression, signing and provenance
 src/arkpack-catalog  renderer catalog state, storage capability and mutation lifecycle
-src/arkpack-cli  package build and offline provenance commands
 src/arkpack-selector  package catalog controls and selector presentation
 src/editor-build  Build contract, command Atoms, renderer admission and presentation
 src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows

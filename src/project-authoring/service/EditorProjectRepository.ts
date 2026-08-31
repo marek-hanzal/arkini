@@ -11,12 +11,12 @@ import type {
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { EditorProjectVersionRepositoryService } from "~/project-version/type/EditorProjectVersion";
 
 export namespace EditorProjectRepository {
 	export interface CreateProjectProps {
-		readonly version: ArkpackVersionSchema.Type;
+		readonly version: GameVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}

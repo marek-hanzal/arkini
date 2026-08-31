@@ -7,7 +7,7 @@ import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type {
 	EditorProjectVersionCheckoutInput,
 	EditorProjectVersionCommitInput,
@@ -24,7 +24,7 @@ import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx
 
 const createProjectSchema = z
 	.object({
-		version: ArkpackVersionSchema,
+		version: GameVersionSchema,
 		config: GameConfigSchema,
 		resources: ResourceSchema.array(),
 	})

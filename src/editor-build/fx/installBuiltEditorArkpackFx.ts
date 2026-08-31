@@ -6,7 +6,7 @@ import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildI
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 const matchesConfirmationFn = (
 	actual: EditorBuildMajorUpdateConfirmation,
@@ -30,7 +30,7 @@ export const installBuiltEditorArkpackFx = Effect.fn("installBuiltEditorArkpackF
 	readonly catalog: ArkpackCatalog;
 	readonly confirmation?: EditorBuildMajorUpdateConfirmation;
 	readonly repository: Pick<EditorBuildRepositoryService, "readProjectBuildFx">;
-	readonly targetVersion: ArkpackVersionSchema.Type;
+	readonly targetVersion: GameVersionSchema.Type;
 }) {
 	const catalogState = yield* SubscriptionRef.get(catalog.state);
 	if (catalogState.type !== "ready") {

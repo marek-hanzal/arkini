@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import { Effect } from "effect";
 
-import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
+import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";

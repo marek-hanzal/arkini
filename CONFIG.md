@@ -1,6 +1,6 @@
 # Arkini game authoring
 
-This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-config-source`](src/game-config-source) owns exact source files and schemas; [`src/game-config`](src/game-config) owns completed config values; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-project-json-schema`](src/game-project-json-schema) owns the generated `schema.json`; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
+This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-config-source`](src/game-config-source) owns exact source files, source schemas, and the generated `schema.json`; [`src/game-config`](src/game-config) owns completed config values; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
 
 ## Canonical project
 
@@ -98,7 +98,7 @@ Notes are portable but do not change authoring revision and do not enter Version
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
 
-`src/asset-authoring` owns the Assets product catalog, browser-file admission, import/edit/delete sessions, and presentation. `src/authoring-session` owns the mounted-project object-URL lifecycle shared by authoring products, while `src/authoring-form` owns the canonical Asset-reference form control. `src/game-config-resource` is the flat upstream authored-config contract for resource schemas, bounded PNG byte/decode admission, references, source discovery, usage, and rename semantics; Asset Authoring consumes that contract instead of creating a second Resource domain.
+`src/asset-authoring` owns the Assets product catalog, browser-file admission, import/edit/delete sessions, and presentation. `src/authoring-session` owns the mounted-project object-URL lifecycle shared by authoring products, while `src/authoring-form` owns the canonical Asset-reference form control. `src/game-config-resource` is the flat upstream authored-config contract for embedded PNG and source-descriptor schemas, bounded PNG byte/decode admission, references, source discovery, usage, and rename semantics; Asset Authoring consumes that contract instead of creating a second Resource domain. Explicit non-item resource roles belong to the completed `src/game-config` value they populate.
 
 ## Content workflow
 

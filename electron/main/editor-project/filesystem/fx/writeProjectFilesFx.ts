@@ -9,8 +9,8 @@ import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
-import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
+import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
+import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
@@ -74,7 +74,7 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 			}),
 	});
 	const arkpack = yield* Effect.try({
-		try: () => ArkpackVersionSchema.parse(files.arkpack),
+		try: () => GameVersionSchema.parse(files.arkpack),
 		catch: (cause) =>
 			new Error("The Editor Arkpack version is invalid.", {
 				cause,

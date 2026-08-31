@@ -64,6 +64,7 @@ src/production-output  output, drop and roll schemas plus resolution policy
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, validation and settlement
 src/game-config  authored value/config schemas, source admission, diagnostics and validation
+src/game-config-cli  schema generation and completed-project validation commands
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
 src/game-config-resource  authored resource schemas, references, source discovery, usage and rename semantics
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI

@@ -10,8 +10,8 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/project-authoring/service/EditorProjectRepository";
-import { createTestArkpack } from "~test/arkpack/support/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 

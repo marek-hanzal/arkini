@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createInMemoryArkpackStorageFx } from "~test/arkpack/support/createInMemoryArkpackStorageFx";
+import { createInMemoryArkpackStorageFx } from "~test/arkpack-support/fx/createInMemoryArkpackStorageFx";
 
 const packageId = "package:\ud800";
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
+import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { openEditorArkpackFx } from "~/arkpack/ui/editor/openEditorArkpackFx";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import {
@@ -12,7 +12,7 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
-vi.mock("~/arkpack/renderer/loadArkpackFx", () => ({
+vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 	loadArkpackFx: vi.fn(),
 }));
 

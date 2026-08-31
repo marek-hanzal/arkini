@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 
 /** Creates an explicit in-memory Arkpack capability for tests only. */
 export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackStorageFx")(() =>

@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
+import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import { LauncherSplashCompletedAtom } from "~/launcher/atom/LauncherSplashCompletedAtom";
 import { renderStartupSplashFx } from "~test/router/renderStartupSplashFx";
 

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
-import { importArkpackFileFx } from "~/arkpack/renderer/importArkpackFileFx";
+import { importArkpackFileFx } from "~/arkpack-catalog/fx/importArkpackFileFx";
 
 describe("importArkpackFileFx", () => {
 	it("rejects oversized files before arrayBuffer allocates their contents", async () => {

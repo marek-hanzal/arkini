@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { createElectronArkpackStorageFx } from "~/arkpack/renderer/createElectronArkpackStorageFx";
+import { createElectronArkpackStorageFx } from "~/arkpack-catalog/fx/createElectronArkpackStorageFx";
 
 /** Opens the user-owned Arkpack directory through the renderer storage capability. */
 export const openUserArkpackDirectoryAtom = Atom.fn(

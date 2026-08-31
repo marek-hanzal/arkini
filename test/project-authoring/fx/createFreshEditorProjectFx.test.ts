@@ -8,7 +8,7 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/project-authoring/service/EditorProjectRepository";
-import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
+import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const createRepository = (

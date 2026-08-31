@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
-import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
+import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { Game } from "~/installed-game/type/Game";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";

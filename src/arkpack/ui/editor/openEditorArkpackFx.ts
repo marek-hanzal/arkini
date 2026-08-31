@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
+import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
 

@@ -5,8 +5,8 @@ import { Effect, SubscriptionRef } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
+import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
@@ -15,7 +15,7 @@ import { LauncherHeroUrlAtom } from "~/launcher/atom/LauncherHeroUrlAtom";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { retryLauncherStartupAtom } from "~/launcher/atom/retryLauncherStartupAtom";
-import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 
 const harness = vi.hoisted(() => ({
 	lastPackageId: "package:last" as string | null,
@@ -41,7 +41,7 @@ vi.mock("~/renderer/window/readWindowModeFx", () => ({
 vi.mock("~/renderer/launcher/readLastPackageIdFx", () => ({
 	readLastPackageIdFx: () => Effect.succeed(harness.lastPackageId),
 }));
-vi.mock("~/arkpack/renderer/loadArkpackFx", () => ({
+vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 	loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>
 		Effect.suspend(() => {
 			harness.loadedPackageIds.push(packageId);

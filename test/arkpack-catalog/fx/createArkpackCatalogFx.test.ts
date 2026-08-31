@@ -1,7 +1,7 @@
 import { Effect, Stream, SubscriptionRef } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
-import { builtIn, imported } from "~test/arkpack/renderer/createArkpackCatalogFx.test/fixture";
+import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
+import { builtIn, imported } from "~test/arkpack-catalog/fx/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx state", () => {
 	it("rejects a stale package snapshot before mutation without replacing ready truth", async () => {

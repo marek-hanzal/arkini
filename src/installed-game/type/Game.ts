@@ -1,4 +1,4 @@
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";

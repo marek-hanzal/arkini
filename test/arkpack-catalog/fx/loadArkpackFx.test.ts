@@ -2,11 +2,11 @@ import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
-import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
+import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
-import { createTestArkpack } from "~test/arkpack/support/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 

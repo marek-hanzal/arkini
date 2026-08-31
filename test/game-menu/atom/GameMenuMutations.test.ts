@@ -9,7 +9,7 @@ import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererL
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { gameMenuCommandAtom } from "~/game-menu/atom/gameMenuCommandAtom";
-import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
 

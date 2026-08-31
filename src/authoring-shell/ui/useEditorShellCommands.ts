@@ -5,7 +5,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useEffect, useState } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { useEditorProjectRefreshController } from "~/authoring-session/ui/useEditorProjectRefreshController";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";

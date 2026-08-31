@@ -1,6 +1,6 @@
 import { Effect, SubscriptionRef } from "effect";
 
-import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
+import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";

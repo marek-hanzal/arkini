@@ -65,7 +65,7 @@ const payload = {
 	],
 };
 
-vi.mock("~/arkpack/renderer/loadArkpackFx", async () => {
+vi.mock("~/arkpack-catalog/fx/loadArkpackFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>

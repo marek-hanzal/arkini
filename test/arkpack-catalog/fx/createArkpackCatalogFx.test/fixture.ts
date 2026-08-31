@@ -1,4 +1,4 @@
-import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 
 export const builtIn: ArkpackDescriptor = {
 	packageId: "arkini",

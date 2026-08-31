@@ -7,8 +7,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
-import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
 import { removeArkpackAtom } from "~/arkpack/ui/removeArkpackAtom";
 
 (

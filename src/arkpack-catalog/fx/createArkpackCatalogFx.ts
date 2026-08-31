@@ -1,9 +1,9 @@
 import { Cause, Effect, Exit, Option, Semaphore, SubscriptionRef } from "effect";
-import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
-import { importArkpackFileFx } from "~/arkpack/renderer/importArkpackFileFx";
-import { importArkpackFx } from "~/arkpack/renderer/importArkpackFx";
-import { listArkpacksFx } from "~/arkpack/renderer/listArkpacksFx";
-import { createElectronArkpackStorageFx } from "~/arkpack/renderer/createElectronArkpackStorageFx";
+import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
+import { importArkpackFileFx } from "~/arkpack-catalog/fx/importArkpackFileFx";
+import { importArkpackFx } from "~/arkpack-catalog/fx/importArkpackFx";
+import { listArkpacksFx } from "~/arkpack-catalog/fx/listArkpacksFx";
+import { createElectronArkpackStorageFx } from "~/arkpack-catalog/fx/createElectronArkpackStorageFx";
 
 /** Creates one shared catalog owner over authoritative Arkpack storage operations. */
 export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(

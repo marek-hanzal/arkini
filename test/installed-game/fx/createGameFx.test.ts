@@ -3,15 +3,15 @@ import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { createGameFx as createGameFromPackageFx } from "~/installed-game/fx/createGameFx";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { createTestArkpack, testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
+import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffect">) =>

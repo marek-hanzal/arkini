@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
-import { listArkpacksFx } from "~/arkpack/renderer/listArkpacksFx";
-import { createTestArkpack } from "~test/arkpack/support/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
+import { listArkpacksFx } from "~/arkpack-catalog/fx/listArkpacksFx";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 
 beforeEach(installTestPngDecoder);
 

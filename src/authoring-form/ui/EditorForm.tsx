@@ -12,7 +12,7 @@ import {
 } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { EditorItemAutocompleteField } from "~/authoring-form/ui/EditorItemAutocompleteField";
-import { EditorAssetAutocompleteField } from "~/asset-authoring/ui/EditorAssetAutocompleteField";
+import { AssetAutocompleteField } from "~/authoring-form/ui/AssetAutocompleteField";
 
 interface EditorTextFieldProps {
 	readonly autoComplete?: string;
@@ -194,7 +194,7 @@ const EditorBoolToggle = ({
 
 export const { useAppForm, withFieldGroup } = createFormHook({
 	fieldComponents: {
-		AssetField: EditorAssetAutocompleteField,
+		AssetField: AssetAutocompleteField,
 		BoolToggle: EditorBoolToggle,
 		ChoiceField: EditorChoiceField,
 		ItemField: EditorItemAutocompleteField,

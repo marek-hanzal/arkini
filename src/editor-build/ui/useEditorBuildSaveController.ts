@@ -3,7 +3,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
-import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";
+import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
 
 const readErrorMessageFn = (error: unknown) =>
 	error === undefined ? undefined : error instanceof Error ? error.message : String(error);
@@ -24,7 +24,7 @@ export namespace useEditorBuildSaveController {
 export const useEditorBuildSaveController = ({
 	artifact,
 }: useEditorBuildSaveController.Props): useEditorBuildSaveController.Output => {
-	const saveAtom = EditorBuildCommandAtoms.save(artifact?.contentHash ?? "unbuilt");
+	const saveAtom = BuildCommandAtoms.save(artifact?.contentHash ?? "unbuilt");
 	const saveResult = useAtomValue(saveAtom);
 	const runSave = useAtomSet(saveAtom);
 	const saveError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult));

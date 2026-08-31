@@ -6,7 +6,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkpackCatalogAtom } from "~/arkpack-selector/atom/ArkpackCatalogAtom";
+
 import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
 import { removeArkpackAtom } from "~/arkpack-selector/atom/removeArkpackAtom";
@@ -28,28 +28,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("ArkpackCatalogAtom", () => {
-	it("projects authoritative catalog refreshes through the real registry", async () => {
-		const catalog = Effect.runSync(
-			createArkpackCatalogFx({
-				listFx: Effect.succeed([]),
-			}),
-		);
-		const registry = AtomRegistry.make({
-			defaultIdleTTL: 400,
-			scheduleTask,
-		});
-		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
-		registry.mount(ArkpackCatalogAtom);
-		await Effect.runPromise(catalog.refreshFx);
-
-		expect(registry.get(ArkpackCatalogAtom)).toEqual({
-			type: "ready",
-			arkpacks: [],
-		});
-	});
-
+describe("removeArkpackAtom", () => {
 	it("settles the official React promise mode for success and domain failure", async () => {
 		const failure = new Error("remove failed");
 		let fail = false;

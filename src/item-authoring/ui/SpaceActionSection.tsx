@@ -53,7 +53,7 @@ export const SpaceActionSection = () => {
 							description="These rules gate only this Space action. Every Enable rule must pass, and any matching Disable rule vetoes activation."
 							rules={rules}
 							target="action"
-							onChange={(next) =>
+							onChangeFn={(next) =>
 								form.setFieldValue("rules", next as ActionRuleSchema.Type[])
 							}
 						/>
@@ -67,7 +67,7 @@ export const SpaceActionSection = () => {
 							allowMaterials={false}
 							emptyAllowed
 							value={input}
-							onChange={(next) =>
+							onChangeFn={(next) =>
 								form.setFieldValue(
 									"input",
 									next.filter(

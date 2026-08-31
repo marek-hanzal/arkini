@@ -10,15 +10,13 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { FormSchema, type FormValues } from "~/item-authoring/schema/FormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveFx } from "~/item-authoring/fx/saveFx";
-import { type EditorFormApi, useAppForm } from "~/authoring-form/ui/EditorForm";
+import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
-import type { ProjectCompatibility } from "~/project-version/type/ProjectCompatibility";
-import type { Project } from "~/project-authoring/type/Project";
 
 const saveCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -37,31 +35,21 @@ export namespace useFormController {
 	export interface Props {
 		readonly enableCapability?: OptionalCapability;
 		readonly initialItem: ItemSchema.Type;
-		readonly onInvalidSection: (section: SectionId) => void | Promise<void>;
-		readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
+		readonly onInvalidSectionFn: (section: SectionId) => void | Promise<void>;
+		readonly onSavedFn?: (item: ItemSchema.Type) => void | Promise<void>;
 	}
 
-	export interface Output {
-		readonly canonicalItem: FormValues;
-		readonly compatibility?: ProjectCompatibility;
-		readonly error: unknown;
-		readonly form: EditorFormApi<FormValues, FormSchema>;
-		readonly initialItem: ItemSchema.Type;
-		readonly isDirty: boolean;
-		readonly isSaving: boolean;
-		readonly itemId: string;
-		readonly project: Project;
-		readonly save: () => Promise<boolean>;
-	}
+	/** Inferred to preserve TanStack Form's configured hook API without mirroring generics. */
+	export type Output = ReturnType<typeof useFormController>;
 }
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
 export const useFormController = ({
 	enableCapability,
 	initialItem,
-	onInvalidSection,
-	onSaved,
-}: useFormController.Props): useFormController.Output => {
+	onInvalidSectionFn,
+	onSavedFn,
+}: useFormController.Props) => {
 	const project = useEditorProject();
 	const canonicalItem = useMemo<FormValues>(
 		() => ({
@@ -79,7 +67,7 @@ export const useFormController = ({
 	);
 	const saveItemAtom = saveCommandAtom(project.projectId);
 	const saveItemResult = useAtomValue(saveItemAtom);
-	const saveItem = useAtomSet(saveItemAtom, {
+	const saveItemFn = useAtomSet(saveItemAtom, {
 		mode: "promise",
 	});
 	const submitSucceeded = useRef(false);
@@ -95,7 +83,7 @@ export const useFormController = ({
 		},
 		onSubmit: async ({ formApi, value }) => {
 			const item = FormSchema.parse(value);
-			const saved = await saveItem(item);
+			const saved = await saveItemFn(item);
 			submitSucceeded.current = true;
 			formApi.reset({
 				...saved,
@@ -106,7 +94,7 @@ export const useFormController = ({
 								...saved.merge,
 							],
 			});
-			if (notifyOnSaved.current) await onSaved?.(saved);
+			if (notifyOnSaved.current) await onSavedFn?.(saved);
 		},
 	});
 	const initializedCapability = useRef(false);
@@ -161,7 +149,7 @@ export const useFormController = ({
 			? "Fix the highlighted item fields before saving."
 			: undefined,
 	);
-	const runSave = useCallback(
+	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (!dirty || submitting) return false;
 			submitSucceeded.current = false;
@@ -175,13 +163,13 @@ export const useFormController = ({
 				const result = FormSchema.safeParse(form.state.values);
 				const issue = result.success ? undefined : result.error.issues[0];
 				if (issue !== undefined) {
-					await onInvalidSection(readSectionForPathFn(issue.path));
-					const focusInvalidField = () =>
+					await onInvalidSectionFn(readSectionForPathFn(issue.path));
+					const focusInvalidFieldFn = () =>
 						document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
 					if (typeof requestAnimationFrame === "function") {
-						requestAnimationFrame(focusInvalidField);
+						requestAnimationFrame(focusInvalidFieldFn);
 					} else {
-						setTimeout(focusInvalidField, 0);
+						setTimeout(focusInvalidFieldFn, 0);
 					}
 				}
 			}
@@ -190,32 +178,32 @@ export const useFormController = ({
 		[
 			dirty,
 			form,
-			onInvalidSection,
+			onInvalidSectionFn,
 			submitting,
 		],
 	);
-	const save = useCallback(
-		() => runSave(true),
+	const saveFn = useCallback(
+		() => runSaveFn(true),
 		[
-			runSave,
+			runSaveFn,
 		],
 	);
-	const saveDraft = useCallback(
-		() => runSave(false),
+	const saveDraftFn = useCallback(
+		() => runSaveFn(false),
 		[
-			runSave,
+			runSaveFn,
 		],
 	);
 	useEditorUnsavedChangesRegistration({
-		discard: () => form.reset(canonicalItem),
+		discardFn: () => form.reset(canonicalItem),
 		id: `item:${project.projectId}:${initialItem.uid}`,
-		isDirty: () => form.state.isDirty,
-		isValid: () => FormSchema.safeParse(form.state.values).success,
-		ownsPathname: (pathname) =>
+		isDirtyFn: () => form.state.isDirty,
+		isValidFn: () => FormSchema.safeParse(form.state.values).success,
+		ownsPathnameFn: (pathname) =>
 			pathname.startsWith(
 				`/editor/${project.projectId}/editor/items/${initialItem.uid}/form`,
 			),
-		save: saveDraft,
+		saveFn: saveDraftFn,
 	});
 	const error =
 		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ?? validationError;
@@ -230,7 +218,7 @@ export const useFormController = ({
 			initialItem,
 			itemId,
 			project,
-			save,
+			saveFn,
 		}),
 		[
 			canonicalItem,
@@ -241,7 +229,7 @@ export const useFormController = ({
 			initialItem,
 			itemId,
 			project,
-			save,
+			saveFn,
 			submitting,
 		],
 	);

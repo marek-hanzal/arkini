@@ -37,7 +37,7 @@ export namespace useItemDetailMotion {
 
 	export interface Output {
 		readonly backdropOpacity: number;
-		readonly completeMotionPhase: () => void;
+		readonly completeMotionPhaseFn: () => void;
 		readonly dialog: typeof visibleDialog | typeof exitingDialog;
 	}
 }
@@ -56,7 +56,7 @@ export const useItemDetailMotion = ({
 		state.generation,
 	]);
 
-	const completeMotionPhase = useCallback(() => {
+	const completeMotionPhaseFn = useCallback(() => {
 		if (completedPhaseRef.current === state.phase) return;
 		match(state)
 			.with(
@@ -115,7 +115,7 @@ export const useItemDetailMotion = ({
 
 	return {
 		backdropOpacity: visual.backdropOpacity,
-		completeMotionPhase,
+		completeMotionPhaseFn,
 		dialog: visual.dialog,
 	};
 };

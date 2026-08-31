@@ -19,11 +19,11 @@ interface EditorItemFlowSearchProps {
 	readonly items: Readonly<Record<string, ItemSchema.Type>>;
 	readonly options: readonly EditorSearchOption[];
 	readonly value: string;
-	readonly onChange: (value: string) => void;
+	readonly onChangeFn: (value: string) => void;
 }
 
 /** Searches the item facts available in one rendered Flow graph. */
-const EditorItemFlowSearch = ({ items, onChange, options, value }: EditorItemFlowSearchProps) => (
+const EditorItemFlowSearch = ({ items, onChangeFn, options, value }: EditorItemFlowSearchProps) => (
 	<div className="flex min-w-0 items-end gap-2">
 		<div className="min-w-0 flex-1">
 			<EditorSearchCombobox
@@ -34,9 +34,9 @@ const EditorItemFlowSearch = ({ items, onChange, options, value }: EditorItemFlo
 				options={options}
 				placeholder="Search"
 				value={value}
-				onChange={onChange}
-				renderPreview={(option) => <EditorItemSearchThumbnail item={items[option.id]} />}
-				renderSelectedPreview={(option) => (
+				onChangeFn={onChangeFn}
+				renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items[option.id]} />}
+				renderSelectedPreviewFn={(option) => (
 					<EditorItemSearchThumbnail
 						item={items[option.id]}
 						selected
@@ -49,7 +49,7 @@ const EditorItemFlowSearch = ({ items, onChange, options, value }: EditorItemFlo
 				<button
 					type="button"
 					className="grid min-h-[var(--ak-control-min-height)] min-w-[var(--ak-control-min-height)] cursor-pointer place-items-center rounded-lg border border-line-strong bg-surface-raised text-muted hover:text-foreground"
-					onClick={() => onChange("")}
+					onClick={() => onChangeFn("")}
 				>
 					<X className="size-5" />
 				</button>
@@ -58,7 +58,7 @@ const EditorItemFlowSearch = ({ items, onChange, options, value }: EditorItemFlo
 	</div>
 );
 
-const readGraphFilterDescription = (direction: OriginFlowDirection) =>
+const readGraphFilterDescriptionFn = (direction: OriginFlowDirection) =>
 	direction === "input"
 		? "Search selects an item; Input highlights downstream operations that use it."
 		: "Search selects an item; Output highlights upstream operations that produce it.";
@@ -68,19 +68,19 @@ export const EditorGameFlow = ({
 	direction,
 	itemId = "",
 	projectId,
-	onDirectionChange,
-	onItemIdChange,
+	onDirectionChangeFn,
+	onItemIdChangeFn,
 }: {
 	readonly direction: OriginFlowDirection;
 	readonly itemId?: string;
 	readonly projectId: string;
-	readonly onDirectionChange: (direction: OriginFlowDirection) => void;
-	readonly onItemIdChange: (itemId: string) => Promise<void>;
+	readonly onDirectionChangeFn: (direction: OriginFlowDirection) => void;
+	readonly onItemIdChangeFn: (itemId: string) => Promise<void>;
 }) => {
-	const [focusRequestKey, setFocusRequestKey] = useState(0);
+	const [focusRequestKey, setFocusRequestKeyFn] = useState(0);
 	const { items, options } = useEditorItemSearchOptions();
 	useEffect(() => {
-		setFocusRequestKey((current) => current + 1);
+		setFocusRequestKeyFn((current) => current + 1);
 	}, [
 		itemId,
 	]);
@@ -100,7 +100,7 @@ export const EditorGameFlow = ({
 						/>
 						<span className="flex min-w-0 items-center gap-1 text-sm">
 							<span className="font-semibold text-foreground">Flow</span>
-							<EditorInfoTooltip content={readGraphFilterDescription(direction)} />
+							<EditorInfoTooltip content={readGraphFilterDescriptionFn(direction)} />
 						</span>
 					</div>
 					<span className="shrink-0 rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
@@ -111,7 +111,7 @@ export const EditorGameFlow = ({
 					<div className="min-w-0 flex-1">
 						<EditorItemFlowSearch
 							items={items}
-							onChange={(value) => void onItemIdChange(value)}
+							onChangeFn={(value) => void onItemIdChangeFn(value)}
 							options={options}
 							value={itemId}
 						/>
@@ -126,7 +126,7 @@ export const EditorGameFlow = ({
 							<button
 								className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${selectableClassName}`}
 								key={value}
-								onClick={() => onDirectionChange(value)}
+								onClick={() => onDirectionChangeFn(value)}
 								type="button"
 								{...readDataUiFn({
 									dataUi: "EditorGameFlowDirection",
@@ -145,7 +145,7 @@ export const EditorGameFlow = ({
 				direction={direction}
 				focusItemId={itemId || undefined}
 				focusRequestKey={focusRequestKey}
-				onFocusItemChange={onItemIdChange}
+				onFocusItemChangeFn={onItemIdChangeFn}
 			/>
 		</section>
 	);

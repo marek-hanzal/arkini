@@ -7,17 +7,17 @@ import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 
 interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
-	readonly children: (activeIndex: number, selectIndex: (index: number) => void) => ReactNode;
+	readonly children: (activeIndex: number, selectIndexFn: (index: number) => void) => ReactNode;
 	readonly count: number;
 	readonly dataUi?: string;
-	readonly itemLabel: (index: number) => string;
+	readonly itemLabelFn: (index: number) => string;
 	readonly initialSelectedIndex?: number;
 	readonly label: string;
 	readonly navigationCard?: boolean;
 	readonly navigationHeader?: ReactNode;
-	readonly onAdd?: () => void;
-	readonly onRemove?: (activeIndex: number) => void;
-	readonly onSelectedIndexChange?: (index: number) => void;
+	readonly onAddFn?: () => void;
+	readonly onRemoveFn?: (activeIndex: number) => void;
+	readonly onSelectedIndexChangeFn?: (index: number) => void;
 	readonly removeLabel?: string;
 	readonly selectedIndex?: number;
 }
@@ -28,22 +28,22 @@ export const EditorCollectionSelector = ({
 	children,
 	count,
 	dataUi = "EditorCollectionSelector",
-	itemLabel,
+	itemLabelFn,
 	initialSelectedIndex = 0,
 	label,
 	navigationCard = false,
 	navigationHeader,
-	onAdd,
-	onRemove,
-	onSelectedIndexChange,
+	onAddFn,
+	onRemoveFn,
+	onSelectedIndexChangeFn,
 	removeLabel = "Remove item",
 	selectedIndex,
 }: EditorCollectionSelectorProps) => {
-	const [internalSelectedIndex, setInternalSelectedIndex] = useState(initialSelectedIndex);
+	const [internalSelectedIndex, setInternalSelectedIndexFn] = useState(initialSelectedIndex);
 	const requestedIndex = selectedIndex ?? internalSelectedIndex;
-	const selectIndex = (index: number) => {
-		setInternalSelectedIndex(index);
-		onSelectedIndexChange?.(index);
+	const selectIndexFn = (index: number) => {
+		setInternalSelectedIndexFn(index);
+		onSelectedIndexChangeFn?.(index);
 	};
 	const activeIndex = count === 0 ? undefined : Math.min(requestedIndex, count - 1);
 	const navigation = (
@@ -61,7 +61,7 @@ export const EditorCollectionSelector = ({
 								length: count,
 							},
 							(_, index) => {
-								const optionLabel = itemLabel(index);
+								const optionLabel = itemLabelFn(index);
 								return {
 									id: String(index),
 									label: optionLabel,
@@ -71,31 +71,31 @@ export const EditorCollectionSelector = ({
 								};
 							},
 						)}
-						renderPreview={() => null}
+						renderPreviewFn={() => null}
 						value={activeIndex === undefined ? "" : String(activeIndex)}
-						onChange={(index) => selectIndex(Number(index))}
+						onChangeFn={(index) => selectIndexFn(Number(index))}
 					/>
 				</div>
 				<div className="flex shrink-0 items-center gap-2">
-					{onAdd === undefined ? null : (
+					{onAddFn === undefined ? null : (
 						<Button
 							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 							title={addLabel}
 							onClick={() => {
-								onAdd();
-								selectIndex(count);
+								onAddFn();
+								selectIndexFn(count);
 							}}
 						>
 							<Plus className="size-5" />
 						</Button>
 					)}
-					{onRemove === undefined || activeIndex === undefined ? null : (
+					{onRemoveFn === undefined || activeIndex === undefined ? null : (
 						<Button
 							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 							title={removeLabel}
 							onClick={() => {
-								onRemove(activeIndex);
-								selectIndex(Math.max(0, activeIndex - 1));
+								onRemoveFn(activeIndex);
+								selectIndexFn(Math.max(0, activeIndex - 1));
 							}}
 						>
 							<Trash2 className="size-4" />
@@ -112,7 +112,7 @@ export const EditorCollectionSelector = ({
 		>
 			{navigationCard ? <EditorFormCard>{navigation}</EditorFormCard> : navigation}
 			{activeIndex === undefined ? null : (
-				<div key={activeIndex}>{children(activeIndex, selectIndex)}</div>
+				<div key={activeIndex}>{children(activeIndex, selectIndexFn)}</div>
 			)}
 		</section>
 	);

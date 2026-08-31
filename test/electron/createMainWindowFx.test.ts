@@ -140,7 +140,7 @@ describe("createMainWindowFx", () => {
 		const trustedWindowRemoved = vi.fn();
 		const trustedRenderer = {
 			developmentRendererUrl: undefined,
-			isTrustedIpcSender: () => false,
+			isTrustedIpcSenderFn: () => false,
 			registerWindowFx: (window: BrowserWindow) =>
 				Effect.sync(() => {
 					window.once("closed", trustedWindowRemoved);
@@ -201,7 +201,7 @@ describe("createMainWindowFx", () => {
 	it("restores exclusive fullscreen without maximizing the bordered shell", async () => {
 		const trustedRenderer = {
 			developmentRendererUrl: undefined,
-			isTrustedIpcSender: () => false,
+			isTrustedIpcSenderFn: () => false,
 			registerWindowFx: () => Effect.void,
 		} as unknown as TrustedRenderer;
 		const windowPreferences: WindowPreferences = {
@@ -231,7 +231,7 @@ describe("createMainWindowFx", () => {
 		electronState.loadSucceeds = true;
 		const trustedRenderer = {
 			developmentRendererUrl: undefined,
-			isTrustedIpcSender: () => false,
+			isTrustedIpcSenderFn: () => false,
 			registerWindowFx: () => Effect.void,
 		} as unknown as TrustedRenderer;
 		const windowPreferences: WindowPreferences = {

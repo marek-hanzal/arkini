@@ -27,11 +27,11 @@ if (GameBoardRoute === undefined)
 vi.mock("~/game-shell/ui/PlayableBoard", async () => {
 	const { createElement: createReactElement } = await import("react");
 	return {
-		PlayableBoard: ({ onOpenInventory }: { readonly onOpenInventory: () => void }) =>
+		PlayableBoard: ({ onOpenInventoryFn }: { readonly onOpenInventoryFn: () => void }) =>
 			createReactElement(
 				"button",
 				{
-					onClick: onOpenInventory,
+					onClick: onOpenInventoryFn,
 					type: "button",
 				},
 				"Inventory",

@@ -12,13 +12,13 @@ import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 /** Creates one type-owned item from the same draft and persistence path as the Editor UI. */
 export const createItemFx = Effect.fn("createItemFx")(function* ({
 	input,
-	notifyProjectChanged,
+	notifyProjectChangedFn,
 	project,
 	repository,
 	type,
 }: {
 	readonly input: CreateItemInput;
-	readonly notifyProjectChanged: (projectId: string) => void;
+	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 	readonly type: TypeSchema.Type;
@@ -37,7 +37,7 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 		projectId: project.projectId,
 		repository,
 	});
-	yield* notifyProjectChangedFx(notifyProjectChanged, project.projectId);
+	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		`Created ${item.type} item.`,
 		`ID: ${item.id}`,

@@ -18,10 +18,10 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 			let criticalFailure: CriticalGameLifecycleError | null = null;
 			let explicitFailurePublication = false;
 			const criticalFailureListeners = new Set<() => void>();
-			const assertUsable = () => {
+			const assertUsableFn = () => {
 				if (criticalFailure !== null) throw criticalFailure;
 			};
-			const markCriticalFailure = (
+			const markCriticalFailureFn = (
 				operation: CriticalGameLifecycleOperation,
 				cause: unknown,
 			) => {
@@ -33,17 +33,17 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 								operation,
 								cause,
 							});
-				for (const listener of [
+				for (const listenerFn of [
 					...criticalFailureListeners,
 				])
-					listener();
+					listenerFn();
 				return criticalFailure;
 			};
-			const publishSessionFatal = () => {
+			const publishSessionFatalFn = () => {
 				if (explicitFailurePublication) return;
-				const fatal = game.getFatalError();
+				const fatal = game.getFatalErrorFn();
 				if (fatal === null) return;
-				markCriticalFailure(
+				markCriticalFailureFn(
 					fatal.source === "autosave"
 						? "game-save"
 						: fatal.source === "presentation"
@@ -52,59 +52,59 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 					fatal,
 				);
 			};
-			publishSessionFatal();
-			game.subscribeFatalError(publishSessionFatal);
-			const reportCriticalFailure: GameEngine["reportCriticalFailure"] = (
+			publishSessionFatalFn();
+			game.subscribeFatalErrorFn(publishSessionFatalFn);
+			const reportCriticalFailureFn: GameEngine["reportCriticalFailureFn"] = (
 				operation,
 				cause,
 			) => {
 				explicitFailurePublication = true;
 				let fatal: GameSessionFatalError;
 				try {
-					fatal = game.failStop(
+					fatal = game.failStopFn(
 						operation === "game-presentation" ? "presentation" : "runtime",
 						cause,
 					);
 				} finally {
 					explicitFailurePublication = false;
 				}
-				markCriticalFailure(operation, fatal);
+				markCriticalFailureFn(operation, fatal);
 			};
-			const readOrThrow = <Result, Error, Requirements extends GameSessionServices>(
+			const readOrThrowFn = <Result, Error, Requirements extends GameSessionServices>(
 				effect: Effect.Effect<Result, Error, Requirements>,
 			): Result => {
-				assertUsable();
-				const exit = game.read(effect);
+				assertUsableFn();
+				const exit = game.readFn(effect);
 				if (Exit.isFailure(exit)) {
 					const failure = readExactCauseFailureFn(exit.cause);
 					explicitFailurePublication = true;
 					let fatal: GameSessionFatalError;
 					try {
-						fatal = game.failStop(
+						fatal = game.failStopFn(
 							"runtime",
 							Option.isSome(failure) ? failure.value : exit.cause,
 						);
 					} finally {
 						explicitFailurePublication = false;
 					}
-					throw markCriticalFailure("game-read", fatal);
+					throw markCriticalFailureFn("game-read", fatal);
 				}
 				return exit.value;
 			};
 			const engine: GameEngine<GameType> = {
 				...game,
-				readOrThrow,
-				reportCriticalFailure,
+				readOrThrowFn,
+				reportCriticalFailureFn,
 			};
 			return {
 				game: engine,
-				getCriticalFailure: () => criticalFailure,
-				assertUsable,
-				markCriticalFailure,
-				subscribeCriticalFailure: (listener) => {
-					criticalFailureListeners.add(listener);
+				getCriticalFailureFn: () => criticalFailure,
+				assertUsableFn,
+				markCriticalFailureFn,
+				subscribeCriticalFailureFn: (listenerFn) => {
+					criticalFailureListeners.add(listenerFn);
 					return () => {
-						criticalFailureListeners.delete(listener);
+						criticalFailureListeners.delete(listenerFn);
 					};
 				},
 			} satisfies GameEngineResource<GameType>;

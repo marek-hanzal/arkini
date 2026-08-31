@@ -45,24 +45,24 @@ export const GameMenuProvider = ({
 	readonly keyboardEnabled?: boolean;
 }>) => {
 	const stateRef = useRef<GameMenuState>(initialState);
-	const [state, setState] = useState<GameMenuState>(initialState);
-	const publish = useCallback((next: GameMenuState) => {
+	const [state, setStateFn] = useState<GameMenuState>(initialState);
+	const publishFn = useCallback((next: GameMenuState) => {
 		const current = stateRef.current;
 		if (current.phase === next.phase && current.activeAction === next.activeAction) return;
 		stateRef.current = next;
-		setState(next);
+		setStateFn(next);
 	}, []);
-	const open = useCallback(() => {
+	const openFn = useCallback(() => {
 		const current = stateRef.current;
 		if (current.activeAction !== null || current.phase !== "closed") return;
-		publish({
+		publishFn({
 			...current,
 			phase: "entering",
 		});
 	}, [
-		publish,
+		publishFn,
 	]);
-	const close = useCallback(() => {
+	const closeFn = useCallback(() => {
 		const current = stateRef.current;
 		if (
 			current.activeAction !== null ||
@@ -71,70 +71,70 @@ export const GameMenuProvider = ({
 		) {
 			return;
 		}
-		publish({
+		publishFn({
 			...current,
 			phase: "exiting",
 		});
 	}, [
-		publish,
+		publishFn,
 	]);
-	const toggle = useCallback(() => {
+	const toggleFn = useCallback(() => {
 		const current = stateRef.current;
 		if (current.activeAction !== null || current.phase === "exiting") return;
-		publish({
+		publishFn({
 			...current,
 			phase: current.phase === "closed" ? "entering" : "exiting",
 		});
 	}, [
-		publish,
+		publishFn,
 	]);
-	const beginAction = useCallback(
+	const beginActionFn = useCallback(
 		(action: GameMenuAction) => {
 			const current = stateRef.current;
 			if (current.activeAction !== null || current.phase !== "open") return false;
-			publish({
+			publishFn({
 				...current,
 				activeAction: action,
 			});
 			return true;
 		},
 		[
-			publish,
+			publishFn,
 		],
 	);
-	const completeAction = useCallback(
+	const completeActionFn = useCallback(
 		(action: GameMenuAction) => {
 			const current = stateRef.current;
 			if (current.activeAction !== action) return;
-			publish({
+			publishFn({
 				...current,
 				activeAction: null,
 			});
 		},
 		[
-			publish,
+			publishFn,
 		],
 	);
-	const completeEnter = useCallback(() => {
+	const completeEnterFn = useCallback(() => {
 		const current = stateRef.current;
 		if (current.phase !== "entering") return;
-		publish({
+		publishFn({
 			...current,
 			phase: "open",
 		});
 	}, [
-		publish,
+		publishFn,
 	]);
-	const completeExit = useCallback(() => {
+	const completeExitFn = useCallback(() => {
 		if (stateRef.current.phase !== "exiting") return;
-		publish(initialState);
+		publishFn(initialState);
 	}, [
-		publish,
+		publishFn,
 	]);
 
 	useEffect(() => {
 		if (!keyboardEnabled) return;
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || event.defaultPrevented) return;
 			const current = stateRef.current;
 			if (current.activeAction !== null || current.phase === "exiting") {
@@ -142,36 +142,36 @@ export const GameMenuProvider = ({
 				return;
 			}
 			event.preventDefault();
-			toggle();
+			toggleFn();
 		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
 	}, [
 		keyboardEnabled,
-		toggle,
+		toggleFn,
 	]);
 
 	const control = useMemo<GameMenuControl>(
 		() => ({
 			phase: state.phase,
 			activeAction: state.activeAction,
-			open,
-			close,
-			toggle,
-			beginAction,
-			completeAction,
-			completeEnter,
-			completeExit,
+			openFn,
+			closeFn,
+			toggleFn,
+			beginActionFn,
+			completeActionFn,
+			completeEnterFn,
+			completeExitFn,
 		}),
 		[
-			beginAction,
-			close,
-			completeAction,
-			completeEnter,
-			completeExit,
-			open,
+			beginActionFn,
+			closeFn,
+			completeActionFn,
+			completeEnterFn,
+			completeExitFn,
+			openFn,
 			state,
-			toggle,
+			toggleFn,
 		],
 	);
 

@@ -133,7 +133,7 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 							<DangerButton
 								className="mt-3"
 								data-ui="EditorItemForceDeleteOpen"
-								onClick={() => controller.open(true)}
+								onClick={() => controller.openFn(true)}
 							>
 								Force delete item…
 							</DangerButton>
@@ -143,7 +143,7 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 					<div>
 						<DangerButton
 							data-ui="EditorItemDeleteOpen"
-							onClick={() => controller.open(false)}
+							onClick={() => controller.openFn(false)}
 						>
 							Delete item
 						</DangerButton>
@@ -158,8 +158,8 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 					item={item}
 					pending={controller.deleting}
 					project={controller.project}
-					onCancel={controller.cancel}
-					onConfirm={() => void controller.confirm()}
+					onCancelFn={controller.cancelFn}
+					onConfirmFn={() => void controller.confirmFn()}
 				/>
 			)}
 		</>

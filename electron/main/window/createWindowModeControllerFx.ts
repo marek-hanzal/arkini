@@ -66,8 +66,8 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 						display.workArea,
 					);
 					window.unmaximize();
-					yield* Effect.callback<void>((resume) => {
-						const immediate = setImmediate(() => resume(Effect.void));
+					yield* Effect.callback<void>((resumeFn) => {
+						const immediate = setImmediate(() => resumeFn(Effect.void));
 						return Effect.sync(() => clearImmediate(immediate));
 					});
 					window.setBounds({
@@ -84,7 +84,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 					),
 				);
 
-			const publishMode = (mode: WindowModeSchema.Type) => {
+			const publishModeFn = (mode: WindowModeSchema.Type) => {
 				nativeFullscreenTarget = mode === "fullscreen";
 				if (mode === "fullscreen") {
 					if (currentMode !== "fullscreen") previousWindowedMode = currentMode;
@@ -107,7 +107,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				);
 
 			const settlePassiveModeFx = (mode: WindowModeSchema.Type) =>
-				Effect.sync(() => publishMode(mode)).pipe(
+				Effect.sync(() => publishModeFn(mode)).pipe(
 					Effect.andThen(persistPassiveModeFx(mode)),
 				);
 
@@ -181,7 +181,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 						}),
 					);
 
-					yield* Effect.sync(() => publishMode(request.mode));
+					yield* Effect.sync(() => publishModeFn(request.mode));
 					yield* windowPreferences.writeModeFx(request.mode);
 				}).pipe(Effect.ensuring(clearPendingRequestFx(request)));
 

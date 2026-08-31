@@ -2,7 +2,10 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChatGptAssetCandidateSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
+import {
+	ChatGptAssetCandidateSchema,
+	type ChatGptViewStateSchema,
+} from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -12,10 +15,7 @@ import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAs
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
-import {
-	type ChatGptViewState,
-	useEditorChatGptSurface,
-} from "~/chatgpt-asset-authoring/ui/useEditorChatGptSurface";
+import { useEditorChatGptSurface } from "~/chatgpt-asset-authoring/ui/useEditorChatGptSurface";
 
 interface AssetCandidate {
 	readonly file: File;
@@ -40,17 +40,17 @@ export namespace useEditorChatGptController {
 		readonly candidateError?: unknown;
 		readonly candidateValidating: boolean;
 		readonly collision: boolean;
-		readonly discard: () => void;
+		readonly discardFn: () => void;
 		readonly error?: unknown;
 		readonly previewUrl?: string;
 		readonly replacementApproved: boolean;
 		readonly resourceId: string;
-		readonly retry: () => void;
-		readonly save: () => Promise<boolean>;
+		readonly retryFn: () => void;
+		readonly saveFn: () => Promise<boolean>;
 		readonly saving: boolean;
-		readonly setResourceId: (resourceId: string) => void;
+		readonly setResourceIdFn: (resourceId: string) => void;
 		readonly surfaceRef: RefObject<HTMLDivElement | null>;
-		readonly viewState: ChatGptViewState;
+		readonly viewState: ChatGptViewStateSchema.Type;
 	}
 }
 
@@ -66,10 +66,10 @@ const toFileFn = (filename: string, bytes: Uint8Array) =>
 	);
 
 const subscribeChatGptAssetCandidateFx = Effect.fn("subscribeChatGptAssetCandidateFx")(
-	(listener: (candidate: ChatGptAssetCandidateSchema.Type) => void) =>
+	(listenerFn: (candidate: ChatGptAssetCandidateSchema.Type) => void) =>
 		Effect.sync(() =>
-			window.arkini.chatGpt.onAssetCandidate((candidate) =>
-				listener(ChatGptAssetCandidateSchema.parse(candidate)),
+			window.arkini.chatGpt.onAssetCandidateFn((candidate) =>
+				listenerFn(ChatGptAssetCandidateSchema.parse(candidate)),
 			),
 		),
 );
@@ -90,20 +90,20 @@ const saveEditorAssetCommandAtom = RendererRuntime.runSync(
 /** Owns the declarative native surface and one explicit downloaded-asset decision. */
 export const useEditorChatGptController = (): useEditorChatGptController.Output => {
 	const project = useEditorProject();
-	const [candidate, setCandidate] = useState<AssetCandidate>();
+	const [candidate, setCandidateFn] = useState<AssetCandidate>();
 	const candidateRef = useRef(candidate);
 	candidateRef.current = candidate;
-	const [candidateError, setCandidateError] = useState<unknown>();
+	const [candidateError, setCandidateErrorFn] = useState<unknown>();
 	const candidateErrorRef = useRef(candidateError);
 	candidateErrorRef.current = candidateError;
-	const [candidateValidating, setCandidateValidatingState] = useState(false);
+	const [candidateValidating, setCandidateValidatingStateFn] = useState(false);
 	const candidateValidatingRef = useRef(candidateValidating);
 	candidateValidatingRef.current = candidateValidating;
-	const [resourceId, setResourceIdState] = useState("");
-	const [replacementApproval, setReplacementApproval] = useState<ReplacementApproval>();
+	const [resourceId, setResourceIdStateFn] = useState("");
+	const [replacementApproval, setReplacementApprovalFn] = useState<ReplacementApproval>();
 	const commandAtom = saveEditorAssetCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
-	const mutate = useAtomSet(commandAtom, {
+	const mutateFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
 	const collision = project.resources.some(({ id }) => id === resourceId.trim());
@@ -113,14 +113,14 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 		replacementApproval.revision === project.revision;
 	const dirtyRef = useRef(candidate !== undefined);
 	dirtyRef.current = candidate !== undefined;
-	const setCandidateValidating = (validating: boolean) => {
+	const setCandidateValidatingFn = (validating: boolean) => {
 		candidateValidatingRef.current = validating;
-		setCandidateValidatingState(validating);
+		setCandidateValidatingStateFn(validating);
 	};
 
 	useEffect(() => {
 		let active = true;
-		const unsubscribe = RendererRuntime.runSync(
+		const unsubscribeFn = RendererRuntime.runSync(
 			subscribeChatGptAssetCandidateFx((next) => {
 				if (
 					!active ||
@@ -135,31 +135,31 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 				};
 				candidateRef.current = claimed;
 				dirtyRef.current = true;
-				setCandidate(claimed);
-				setCandidateError(undefined);
+				setCandidateFn(claimed);
+				setCandidateErrorFn(undefined);
 				candidateErrorRef.current = undefined;
-				setCandidateValidating(true);
-				setResourceIdState(readEditorAssetResourceIdFn(next.filename));
-				setReplacementApproval(undefined);
+				setCandidateValidatingFn(true);
+				setResourceIdStateFn(readEditorAssetResourceIdFn(next.filename));
+				setReplacementApprovalFn(undefined);
 				void RendererRuntime.runPromise(
 					validateEditorAssetFileFx(file, "chatgpt-preview"),
 				).then(
 					() => {
 						if (!active || candidateRef.current !== claimed) return;
-						setCandidateValidating(false);
+						setCandidateValidatingFn(false);
 					},
 					(error) => {
 						if (!active || candidateRef.current !== claimed) return;
 						candidateErrorRef.current = error;
-						setCandidateError(error);
-						setCandidateValidating(false);
+						setCandidateErrorFn(error);
+						setCandidateValidatingFn(false);
 					},
 				);
 			}),
 		);
 		return () => {
 			active = false;
-			unsubscribe();
+			unsubscribeFn();
 		};
 	}, [
 		project.projectId,
@@ -186,17 +186,17 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 		],
 	);
 
-	const discard = useCallback(() => {
+	const discardFn = useCallback(() => {
 		dirtyRef.current = false;
 		candidateRef.current = undefined;
-		setCandidate(undefined);
-		setCandidateError(undefined);
+		setCandidateFn(undefined);
+		setCandidateErrorFn(undefined);
 		candidateErrorRef.current = undefined;
-		setCandidateValidating(false);
-		setResourceIdState("");
-		setReplacementApproval(undefined);
+		setCandidateValidatingFn(false);
+		setResourceIdStateFn("");
+		setReplacementApprovalFn(undefined);
 	}, []);
-	const persist = useCallback(async () => {
+	const persistFn = useCallback(async () => {
 		const current = candidateRef.current;
 		if (
 			current === undefined ||
@@ -212,24 +212,24 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 			replacementApproval?.resourceId === id &&
 			replacementApproval.revision === project.revision;
 		if (currentCollision && !overwrite) return false;
-		await mutate({
+		await mutateFn({
 			expectedRevision: project.revision,
 			file: current.file,
 			overwrite,
 			resourceId: id,
 		});
-		discard();
+		discardFn();
 		return true;
 	}, [
-		discard,
-		mutate,
+		discardFn,
+		mutateFn,
 		project.resources,
 		project.revision,
 		replacementApproval,
 		resourceId,
 		result.waiting,
 	]);
-	const save = async () => {
+	const saveFn = async () => {
 		if (
 			candidateRef.current === undefined ||
 			candidateValidatingRef.current ||
@@ -238,23 +238,23 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 		)
 			return false;
 		if (collision && !replacementApproved) {
-			setReplacementApproval({
+			setReplacementApprovalFn({
 				resourceId: resourceId.trim(),
 				revision: project.revision,
 			});
 			return false;
 		}
-		return persist();
+		return persistFn();
 	};
-	const setResourceId = (next: string) => {
-		setResourceIdState(next);
-		setReplacementApproval(undefined);
+	const setResourceIdFn = (next: string) => {
+		setResourceIdStateFn(next);
+		setReplacementApprovalFn(undefined);
 	};
 	useEditorUnsavedChangesRegistration({
-		discard,
+		discardFn,
 		id: `chatgpt-download:${project.projectId}`,
-		isDirty: () => dirtyRef.current,
-		isValid: async () => {
+		isDirtyFn: () => dirtyRef.current,
+		isValidFn: async () => {
 			const current = candidateRef.current;
 			if (
 				current === undefined ||
@@ -269,8 +269,8 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 				),
 			);
 		},
-		ownsPathname: (pathname) => pathname === `/editor/${project.projectId}/chatgpt`,
-		save: persist,
+		ownsPathnameFn: (pathname) => pathname === `/editor/${project.projectId}/chatgpt`,
+		saveFn: persistFn,
 	});
 
 	return {
@@ -278,15 +278,15 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 		candidateError,
 		candidateValidating,
 		collision,
-		discard,
+		discardFn,
 		error: RendererRuntime.runSync(readSettledAsyncResultErrorFx(result)),
 		previewUrl,
 		replacementApproved,
 		resourceId,
-		retry: surface.retry,
-		save,
+		retryFn: surface.retryFn,
+		saveFn,
 		saving: result.waiting,
-		setResourceId,
+		setResourceIdFn,
 		surfaceRef: surface.surfaceRef,
 		viewState: surface.viewState,
 	};

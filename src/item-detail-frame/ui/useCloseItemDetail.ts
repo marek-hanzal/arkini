@@ -9,12 +9,12 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 /** Runs the controller-owned close command and surfaces lifecycle causes to the boundary. */
 export const useCloseItemDetail = () => {
 	const itemDetail = useItemDetailControl();
-	const [result, close] = useAtom(itemDetail.closeAtom);
+	const [result, closeFn] = useAtom(itemDetail.closeAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	return useCallback(
-		(props?: CloseItemDetailProps) => close(props),
+		(props?: CloseItemDetailProps) => closeFn(props),
 		[
-			close,
+			closeFn,
 		],
 	);
 };

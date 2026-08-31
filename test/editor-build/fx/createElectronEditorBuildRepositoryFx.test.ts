@@ -10,14 +10,14 @@ import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteA
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const installBuildApi = () => {
-	const buildProject = vi.fn<Window["arkini"]["editor"]["buildProject"]>();
-	const readProjectBuild = vi.fn<Window["arkini"]["editor"]["readProjectBuild"]>();
+	const buildProject = vi.fn<Window["arkini"]["editor"]["buildProjectFn"]>();
+	const readProjectBuild = vi.fn<Window["arkini"]["editor"]["readProjectBuildFn"]>();
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
 			editor: {
-				buildProject,
-				readProjectBuild,
+				buildProjectFn: buildProject,
+				readProjectBuildFn: readProjectBuild,
 			},
 		},
 	});

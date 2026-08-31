@@ -40,19 +40,19 @@ export namespace registerEditorNoteIpcFx {
 export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 	({ ownership, trustedRenderer }: registerEditorNoteIpcFx.Props) =>
 		Effect.sync(() => {
-			const handle = <Value>(
+			const handleFn = <Value>(
 				channel: string,
-				run: (candidate: unknown) => Effect.Effect<Value, never, never>,
+				runFx: (candidate: unknown) => Effect.Effect<Value, never, never>,
 			) =>
 				ipcMain.handle(channel, (event: IpcMainInvokeEvent, candidate) =>
 					ElectronMainRuntime.runPromise(
 						trustedRenderer
 							.assertTrustedIpcSenderFx(event)
-							.pipe(Effect.andThen(run(candidate))),
+							.pipe(Effect.andThen(runFx(candidate))),
 					),
 				);
 
-			handle(ArkiniElectronApi.channels.editorNoteList, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorNoteList, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"list-notes",
 					ownership,
@@ -60,7 +60,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					(repository, projectId) => repository.listNotesFx(projectId),
 				),
 			);
-			handle(ArkiniElectronApi.channels.editorNoteCreate, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorNoteCreate, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"create-note",
 					ownership,
@@ -68,7 +68,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					(repository, request) => repository.createNoteFx(request),
 				),
 			);
-			handle(ArkiniElectronApi.channels.editorNoteUpdate, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorNoteUpdate, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"update-note",
 					ownership,
@@ -76,7 +76,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					(repository, request) => repository.updateNoteFx(request),
 				),
 			);
-			handle(ArkiniElectronApi.channels.editorNoteDelete, (candidate) =>
+			handleFn(ArkiniElectronApi.channels.editorNoteDelete, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"delete-note",
 					ownership,

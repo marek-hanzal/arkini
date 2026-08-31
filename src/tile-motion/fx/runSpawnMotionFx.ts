@@ -21,7 +21,7 @@ export namespace runSpawnMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly magneticField: MagneticField;
-		readonly onComplete: () => void;
+		readonly onCompleteFn: () => void;
 		readonly origin: ActorPose;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -36,14 +36,14 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	magneticField,
-	onComplete,
+	onCompleteFn,
 	origin,
 	surface,
 	target,
 }: runSpawnMotionFx.Props) {
 	const actor = actorStore.actors.get(cue.actorId);
 	if (actor === undefined) {
-		onComplete();
+		onCompleteFn();
 		return;
 	}
 	surface.transientActorLayer.addChild(actor.container);
@@ -90,20 +90,20 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 		delayMs,
 		durationMs,
 		ownerKey: `motion:${cueKey}`,
-		onCancel: magneticProjector.release,
-		onComplete: () => {
-			const settle = () => {
-				magneticProjector.release();
+		onCancelFn: magneticProjector.releaseFn,
+		onCompleteFn: () => {
+			const settleFn = () => {
+				magneticProjector.releaseFn();
 				const currentTarget =
 					RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ??
 					target;
 				if (!actor.container.destroyed) {
 					currentTarget.layer.addChild(actor.container);
 				}
-				onComplete();
+				onCompleteFn();
 			};
-			if (!poseSampler.needsCompletionSettle()) {
-				settle();
+			if (!poseSampler.needsCompletionSettleFn()) {
+				settleFn();
 				return;
 			}
 			RendererRuntime.runSync(
@@ -111,17 +111,17 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 					actor,
 					animator,
 					fallbackTarget: target,
-					onPose: magneticProjector.projectPose,
-					onSettled: settle,
+					onPoseFn: magneticProjector.projectPoseFn,
+					onSettledFn: settleFn,
 					ownerKey: `motion:${cueKey}`,
 					surface,
 					targetLocation: cue.targetLocation,
 				}),
 			);
 		},
-		readPose: (progress) => {
-			const pose = poseSampler.readPose(progress);
-			magneticProjector.projectPose(pose);
+		readPoseFn: (progress) => {
+			const pose = poseSampler.readPoseFn(progress);
+			magneticProjector.projectPoseFn(pose);
 			return pose;
 		},
 	});

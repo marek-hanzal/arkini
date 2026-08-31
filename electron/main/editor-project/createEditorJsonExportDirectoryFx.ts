@@ -5,7 +5,7 @@ import { match, P } from "ts-pattern";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
-const isPortableEditorProjectFile = (path: Path.Path, relative: string) =>
+const isPortableEditorProjectFileFn = (path: Path.Path, relative: string) =>
 	match(relative.split(path.sep))
 		.with(
 			[
@@ -73,7 +73,7 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 	const files = (yield* fileSystem.readDirectory(canonicalSource, {
 		recursive: true,
 	}))
-		.filter((relative) => isPortableEditorProjectFile(path, relative))
+		.filter((relative) => isPortableEditorProjectFileFn(path, relative))
 		.sort();
 	for (const relative of files) {
 		const sourceFile = path.join(canonicalSource, relative);

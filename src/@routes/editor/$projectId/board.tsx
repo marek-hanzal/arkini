@@ -35,9 +35,9 @@ const EditorBoardStatus = ({
 
 const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource }) => {
 	const failure = useSyncExternalStore(
-		resource.subscribeCriticalFailure,
-		resource.getCriticalFailure,
-		resource.getCriticalFailure,
+		resource.subscribeCriticalFailureFn,
+		resource.getCriticalFailureFn,
+		resource.getCriticalFailureFn,
 	);
 	if (failure !== null) {
 		return (

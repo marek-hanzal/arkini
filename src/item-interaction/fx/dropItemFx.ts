@@ -12,12 +12,6 @@ import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
-export namespace dropItemFx {
-	export type Props = DropItemCommand;
-
-	export type Result = DropItemResult;
-}
-
 /**
  * Resolves one requested item drop through the authoritative runtime command path.
  *
@@ -31,7 +25,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	sourceRevision,
 	sourceLocation,
 	target,
-}: dropItemFx.Props) {
+}: DropItemCommand) {
 	const preflight = yield* readDropItemPreviewFx({
 		sourceItemId,
 		sourceRevision,
@@ -48,7 +42,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						targetItemId: target.occupant.itemId,
 					}
 				: {}),
-		} satisfies dropItemFx.Result;
+		} satisfies DropItemResult;
 	}
 	if (preflight.kind === DropItemResultKind.Ignored) {
 		return {
@@ -56,7 +50,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			reason: preflight.reason,
 			itemId: sourceItemId,
 			location: sourceLocation,
-		} satisfies dropItemFx.Result;
+		} satisfies DropItemResult;
 	}
 	if (target.kind === "unsupported") {
 		return yield* Effect.die(

@@ -148,7 +148,7 @@ describe("Cheat availability Atom", () => {
 			configurable: true,
 			value: {
 				cheats: {
-					writeAvailable,
+					writeAvailableFn: writeAvailable,
 				},
 			},
 		});
@@ -180,7 +180,7 @@ describe("Cheat availability Atom", () => {
 			configurable: true,
 			value: {
 				cheats: {
-					writeAvailable: () => Promise.reject(failure),
+					writeAvailableFn: () => Promise.reject(failure),
 				},
 			},
 		});
@@ -218,7 +218,7 @@ describe("Cheat availability Atom", () => {
 			configurable: true,
 			value: {
 				cheats: {
-					writeAvailable,
+					writeAvailableFn: writeAvailable,
 				},
 			},
 		});

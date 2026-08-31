@@ -9,13 +9,13 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 type TransitionFields = Pick<
 	GameSession,
 	| "committedTransitionAtom"
-	| "failStop"
-	| "getFatalError"
-	| "getSnapshot"
-	| "getTransitionSnapshot"
+	| "failStopFn"
+	| "getFatalErrorFn"
+	| "getSnapshotFn"
+	| "getTransitionSnapshotFn"
 	| "runFx"
-	| "subscribeFatalError"
-	| "subscribeTransitions"
+	| "subscribeFatalErrorFn"
+	| "subscribeTransitionsFn"
 >;
 
 export interface TestGameTransitionFields extends TransitionFields {
@@ -46,18 +46,18 @@ export const makeTestGameTransitionFieldsFx = Effect.fn("makeTestGameTransitionF
 			return {
 				committedTransitionAtom,
 				committedTransitionRef: ref,
-				failStop: (source, cause) =>
+				failStopFn: (source, cause) =>
 					new GameSessionFatalError({
 						source,
 						cause,
 					}),
-				getFatalError: () => null,
-				getSnapshot: () => getTransitionSnapshot().runtime,
-				getTransitionSnapshot,
+				getFatalErrorFn: () => null,
+				getSnapshotFn: () => getTransitionSnapshot().runtime,
+				getTransitionSnapshotFn: getTransitionSnapshot,
 				runFx: ((effect: Effect.Effect<unknown, unknown>) =>
 					effect) as GameSession["runFx"],
-				subscribeFatalError: () => () => undefined,
-				subscribeTransitions: (listener) => {
+				subscribeFatalErrorFn: () => () => undefined,
+				subscribeTransitionsFn: (listener) => {
 					void listener(getTransitionSnapshot());
 					return () => undefined;
 				},

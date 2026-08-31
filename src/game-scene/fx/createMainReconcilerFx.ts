@@ -52,7 +52,7 @@ interface CreateMainReconcilerProps {
 	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
 	readonly particleTextures: ParticleTextures;
-	readonly readPalette: () => PixiScenePalette;
+	readonly readPaletteFn: () => PixiScenePalette;
 	readonly surface: MainSurface;
 	readonly textures: TextureStore;
 }
@@ -105,7 +105,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	magneticField,
 	motion,
 	particleTextures,
-	readPalette,
+	readPaletteFn,
 	surface,
 	textures,
 }: CreateMainReconcilerProps) {
@@ -113,7 +113,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	const processedFeedbackKeys = new Set<string>();
 	let closed = false;
 
-	const retainNewestFeedbackKeys = () => {
+	const retainNewestFeedbackKeysFn = () => {
 		while (processedFeedbackKeys.size > 256) {
 			const oldest = processedFeedbackKeys.values().next().value;
 			if (oldest === undefined) return;
@@ -130,7 +130,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	}) {
 		if (processedFeedbackKeys.has(cue.key) || actor.container.destroyed) return;
 		processedFeedbackKeys.add(cue.key);
-		retainNewestFeedbackKeys();
+		retainNewestFeedbackKeysFn();
 		yield* (cue.kind === "consume-source" ? flashConsumedSourceFx : burstFeedbackParticlesFx)({
 			actor,
 			animator,
@@ -150,7 +150,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		}
 	});
 
-	const refreshActor = (actor: PixiTileActor) => {
+	const refreshActorFn = (actor: PixiTileActor) => {
 		const pose = RendererRuntime.runSync(surface.readActorPoseFx(actor.item));
 		if (pose === null) return;
 		RendererRuntime.runSync(
@@ -159,7 +159,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				animator,
 				frames: application.frames,
 				item: actor.item,
-				palette: readPalette(),
+				palette: readPaletteFn(),
 				size: pose.size,
 				textures,
 			}),
@@ -227,7 +227,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			actor,
 			animator,
 			durationMs: exitDurationMs,
-			onComplete: () => {
+			onCompleteFn: () => {
 				RendererRuntime.runSync(animator.cancelActorFx(actor));
 				RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
 			},
@@ -242,7 +242,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		readonly transition: GameTransition;
 	}) {
 		if (closed) return;
-		const nextItems = game.readOrThrow(
+		const nextItems = game.readOrThrowFn(
 			readTileActorsFx({
 				game,
 				runtime: transition.runtime,
@@ -251,7 +251,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		const inventoryActorIds = new Set(
 			game
-				.readOrThrow(
+				.readOrThrowFn(
 					readTileActorsFx({
 						game,
 						runtime: transition.runtime,
@@ -263,7 +263,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
 		yield* delivery.syncFx(
-			game.readOrThrow(
+			game.readOrThrowFn(
 				readTileDeliveriesFx({
 					game,
 					runtime: transition.runtime,
@@ -299,7 +299,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				cue.targetActorId,
 			]),
 		);
-		const belongsToInputMotion = (cue: TileActorFeedbackCue) => {
+		const belongsToInputMotionFn = (cue: TileActorFeedbackCue) => {
 			for (const prefix of inputMotionFeedbackPrefixes) {
 				if (cue.key.startsWith(prefix)) return true;
 			}
@@ -308,7 +308,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const feedbackCues = presentCommittedEffects
 			? [
 					...readTileActorFeedbackCuesFn(transition).filter(
-						(cue) => !belongsToInputMotion(cue),
+						(cue) => !belongsToInputMotionFn(cue),
 					),
 					...dropSnapshot.feedback.flatMap(({ cues }) =>
 						cues.filter((cue) => !inputMotionActorIds.has(cue.actorId)),
@@ -398,7 +398,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					createTileActorFx({
 						frames: application.frames,
 						item: displayItem,
-						palette: readPalette(),
+						palette: readPaletteFn(),
 						particleTextures,
 						textures,
 					}),
@@ -432,7 +432,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					animator,
 					frames: application.frames,
 					item: displayItem,
-					palette: readPalette(),
+					palette: readPaletteFn(),
 					size: pose.size,
 					textures,
 				});
@@ -470,7 +470,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					animator,
 					frames: application.frames,
 					item: displayItem,
-					palette: readPalette(),
+					palette: readPaletteFn(),
 					preserveVisual: updatePlan.item.preserveVisual,
 					size: updatePlan.item.size,
 					textures,
@@ -480,7 +480,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					actor,
 					frames: application.frames,
 					item: displayItem,
-					palette: readPalette(),
+					palette: readPaletteFn(),
 					size: actor.size,
 				});
 			} else {
@@ -517,7 +517,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			}
 			if (updatePlan.pose.kind === "travel") {
 				surface.transientActorLayer.addChild(actor.container);
-				const finishTravel = () => {
+				const finishTravelFn = () => {
 					if (actor.container.destroyed) return;
 					const latest =
 						RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
@@ -541,11 +541,12 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 								toY: pose.y,
 							})
 						: undefined,
-					onComplete: finishTravel,
-					readSize: () =>
+					onCompleteFn: finishTravelFn,
+					readSizeFn: () =>
 						RendererRuntime.runSync(surface.readActorPoseFx(actor.item))?.size ??
 						pose.size,
-					readTarget: () => RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
+					readTargetFn: () =>
+						RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
 					target: pose,
 				});
 			} else {
@@ -558,7 +559,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			animator,
 			application,
 			processedKeys: processedReplacementKeys,
-			readPalette,
+			readPaletteFn,
 			replacements,
 			surface,
 			textures,
@@ -589,7 +590,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				transition,
 			}),
 		refreshVisualsFx: Effect.sync(() => {
-			for (const actor of actorStore.actors.values()) refreshActor(actor);
+			for (const actor of actorStore.actors.values()) refreshActorFn(actor);
 		}),
 		closeFx: Effect.sync(() => {
 			closed = true;

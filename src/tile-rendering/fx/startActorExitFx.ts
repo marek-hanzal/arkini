@@ -7,8 +7,8 @@ export namespace startActorExitFx {
 		readonly actor: PixiTileActor;
 		readonly animator: ActorAnimator;
 		readonly durationMs?: number;
-		readonly onCancel?: () => void;
-		readonly onComplete?: () => void;
+		readonly onCancelFn?: () => void;
+		readonly onCompleteFn?: () => void;
 	}
 }
 export const startActorExitFx = Effect.fnUntraced(function* (props: startActorExitFx.Props) {

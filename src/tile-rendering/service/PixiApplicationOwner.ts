@@ -7,6 +7,8 @@ export interface PixiApplicationOwner {
 	readonly app: Application;
 	readonly stage: Container;
 	readonly frames: DemandFrameLoop;
-	readonly addResizeListenerFx: (listener: () => void) => Effect.Effect<() => void, never, never>;
+	readonly addResizeListenerFx: (
+		listenerFn: () => void,
+	) => Effect.Effect<() => void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }

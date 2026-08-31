@@ -51,11 +51,11 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 	}: acquireGameEngineResourceFx.Props) =>
 		beforeCreateFx.pipe(
 			Effect.andThen(
-				Effect.uninterruptibleMask((restore) =>
+				Effect.uninterruptibleMask((restoreFx) =>
 					Effect.gen(function* () {
-						const game = yield* restore(createGameFx(packageId));
+						const game = yield* restoreFx(createGameFx(packageId));
 						const adoptionExit = yield* Effect.exit(
-							restore(
+							restoreFx(
 								Effect.gen(function* () {
 									if (game.arkpack.packageId !== packageId) {
 										return yield* Effect.fail(

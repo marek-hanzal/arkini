@@ -208,7 +208,7 @@ describe("readItemOriginFlow", () => {
 		const flow = await Effect.runPromise(
 			readItemOriginFlowFx({
 				config: createReachabilityConfig(true),
-				onProgress: (update) => progress.push(update),
+				onProgressFn: (update) => progress.push(update),
 			}),
 		);
 

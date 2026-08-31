@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 	component: () => {
 		const { state: catalogState } = useArkpacks();
 		const startup = useAtomValue(LauncherStartupAtom);
-		const [exitState, requestExit] = useAtom(MainMenuExitCommandAtom);
+		const [exitState, requestExitFn] = useAtom(MainMenuExitCommandAtom);
 		const editorStatus = useAtomValue(EditorServiceStatusAtom);
 		const exitPending = exitState.kind === "pending";
 		const defaultPackageAvailable =
@@ -98,7 +98,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						className="rounded-xl"
 						cursorIntent={exitPending ? "progress" : undefined}
 						disabled={exitPending}
-						onClick={() => requestExit(undefined)}
+						onClick={() => requestExitFn(undefined)}
 					>
 						Exit
 					</Button>

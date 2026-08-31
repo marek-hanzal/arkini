@@ -15,14 +15,14 @@ import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 
 type ItemRegistry = Record<string, ItemSchema.Type>;
 
-const projectDrop = (drop: DropSchema.Type, items: ItemRegistry): OutputProjection.Item => ({
+const projectDropFn = (drop: DropSchema.Type, items: ItemRegistry): OutputProjection.Item => ({
 	itemId: drop.itemId,
 	quantity: drop.quantity,
 	title: items[drop.itemId]?.title ?? drop.itemId,
 	activeRuleHints: [],
 });
 
-const projectOutput = (
+const projectOutputFn = (
 	output: OutputSchema.Type | undefined,
 	items: ItemRegistry,
 ): readonly OutputProjection.Set<OutputProjection.Item>[] =>
@@ -32,26 +32,26 @@ const projectOutput = (
 				return {
 					kind: "weight",
 					option: roll.drop.map((option) => ({
-						item: option.drop.map((drop) => projectDrop(drop, items)),
+						item: option.drop.map((drop) => projectDropFn(drop, items)),
 						weight: option.weight,
 					})),
 					selections: roll.quantity,
 				};
 			return roll.type === "guaranteed"
 				? {
-						item: roll.drop.map((drop) => projectDrop(drop, items)),
+						item: roll.drop.map((drop) => projectDropFn(drop, items)),
 						kind: "guaranteed",
 					}
 				: {
 						chance: roll.chance,
-						item: roll.drop.map((drop) => projectDrop(drop, items)),
+						item: roll.drop.map((drop) => projectDropFn(drop, items)),
 						kind: "chance",
 					};
 		}),
 		weight: set.weight,
 	})) ?? [];
 
-const renderOutputItem = (
+const renderOutputItemFn = (
 	item: OutputProjection.Item,
 	items: ItemRegistry,
 	projectId: string,
@@ -77,8 +77,8 @@ const ProductionLineOutputs = ({
 	readonly projectId: string;
 }) => (
 	<Outputs
-		output={projectOutput(output, items)}
-		renderItem={(item) => renderOutputItem(item, items, projectId)}
+		output={projectOutputFn(output, items)}
+		renderItemFn={(item) => renderOutputItemFn(item, items, projectId)}
 	/>
 );
 

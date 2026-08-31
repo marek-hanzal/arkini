@@ -11,12 +11,12 @@ interface EditorMcpSettingsProps {
 	readonly authtoken: string;
 	readonly copied?: string;
 	readonly ngrokDomain: string;
-	readonly onCopy: (key: string, value: string) => Promise<void>;
-	readonly onSaveNgrok: () => void;
-	readonly onSavePort: () => void;
-	readonly onSetAuthtoken: (value: string) => void;
-	readonly onSetNgrokDomain: (value: string) => void;
-	readonly onSetPort: (value: string) => void;
+	readonly onCopyFn: (key: string, value: string) => Promise<void>;
+	readonly onSaveNgrokFn: () => void;
+	readonly onSavePortFn: () => void;
+	readonly onSetAuthtokenFn: (value: string) => void;
+	readonly onSetNgrokDomainFn: (value: string) => void;
+	readonly onSetPortFn: (value: string) => void;
 	readonly overview: EditorMcpOverviewSchema.Type;
 	readonly pending: boolean;
 	readonly port: string;
@@ -26,12 +26,12 @@ export const EditorMcpSettings = ({
 	authtoken,
 	copied,
 	ngrokDomain,
-	onCopy,
-	onSaveNgrok,
-	onSavePort,
-	onSetAuthtoken,
-	onSetNgrokDomain,
-	onSetPort,
+	onCopyFn,
+	onSaveNgrokFn,
+	onSavePortFn,
+	onSetAuthtokenFn,
+	onSetNgrokDomainFn,
+	onSetPortFn,
 	overview,
 	pending,
 	port,
@@ -61,20 +61,20 @@ export const EditorMcpSettings = ({
 						value={port}
 						className={editorMcpInputClassName}
 						disabled={portDisabled}
-						onChange={(event) => onSetPort(event.currentTarget.value)}
+						onChange={(event) => onSetPortFn(event.currentTarget.value)}
 					/>
 				</label>
 				<Button
 					className="justify-self-start"
 					disabled={pending}
-					onClick={onSavePort}
+					onClick={onSavePortFn}
 				>
 					Save port
 				</Button>
 				<EditorMcpCopyableUrl
 					copied={copied === "local-url"}
 					label="Local endpoint"
-					onCopy={() => void onCopy("local-url", localUrl)}
+					onCopyFn={() => void onCopyFn("local-url", localUrl)}
 					url={localUrl}
 				/>
 			</div>
@@ -93,7 +93,7 @@ export const EditorMcpSettings = ({
 						className={editorMcpInputClassName}
 						disabled={ngrokDisabled}
 						placeholder="your-assigned-name.ngrok-free.app"
-						onChange={(event) => onSetNgrokDomain(event.currentTarget.value)}
+						onChange={(event) => onSetNgrokDomainFn(event.currentTarget.value)}
 					/>
 				</label>
 				<label className="grid gap-2">
@@ -108,13 +108,13 @@ export const EditorMcpSettings = ({
 								? "Paste ngrok authtoken"
 								: "Configured — paste to replace"
 						}
-						onChange={(event) => onSetAuthtoken(event.currentTarget.value)}
+						onChange={(event) => onSetAuthtokenFn(event.currentTarget.value)}
 					/>
 				</label>
 				<PrimaryButton
 					className="justify-self-start"
 					disabled={ngrokDisabled}
-					onClick={onSaveNgrok}
+					onClick={onSaveNgrokFn}
 				>
 					Save ngrok configuration
 				</PrimaryButton>

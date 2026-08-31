@@ -100,10 +100,10 @@ const createRemoteOwnership = async (
 				type: "ready",
 				repository,
 			},
-			notifyOverviewChanged: () => undefined,
-			notifyProjectChanged: () => undefined,
+			notifyOverviewChangedFn: () => undefined,
+			notifyProjectChangedFn: () => undefined,
 			storage,
-			runPromise: Effect.runPromise,
+			runPromiseFn: Effect.runPromise,
 			tunnel,
 		}),
 	);

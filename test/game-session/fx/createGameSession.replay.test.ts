@@ -40,7 +40,7 @@ describe("createGameSessionFx / transition replay", () => {
 		const allDelivered = new Promise<ReadonlyArray<ObservedTransition>>((resolve) => {
 			publishAll = resolve;
 		});
-		const unsubscribe = session.subscribeTransitions((transition) => {
+		const unsubscribe = session.subscribeTransitionsFn((transition) => {
 			transitions.push({
 				sequence: transition.sequence,
 				previousItems: transition.previousRuntime?.items.length ?? null,
@@ -73,7 +73,7 @@ describe("createGameSessionFx / transition replay", () => {
 				},
 			]);
 
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:transition:ordered",
 					itemId: "water",
@@ -87,7 +87,7 @@ describe("createGameSessionFx / transition replay", () => {
 					quantity: 1,
 				}),
 			);
-			await session.run(emitCompletedEventFx("job:transition:ordered"));
+			await session.runFn(emitCompletedEventFx("job:transition:ordered"));
 
 			expect(await allDelivered).toEqual([
 				{
@@ -111,8 +111,8 @@ describe("createGameSessionFx / transition replay", () => {
 					],
 				},
 			]);
-			expect(session.getTransitionSnapshot().sequence).toBe(2);
-			expect(session.getTransitionSnapshot().runtime).toBe(session.getSnapshot());
+			expect(session.getTransitionSnapshotFn().sequence).toBe(2);
+			expect(session.getTransitionSnapshotFn().runtime).toBe(session.getSnapshotFn());
 		} finally {
 			unsubscribe();
 			await Effect.runPromise(session.disposeFx);
@@ -123,21 +123,21 @@ describe("createGameSessionFx / transition replay", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		const initial = session.getSnapshot();
+		const initial = session.getSnapshotFn();
 		let notifications = 0;
 		let markRuntimeDelivered: (() => void) | undefined;
 		const runtimeDelivered = new Promise<void>((resolve) => {
 			markRuntimeDelivered = resolve;
 		});
-		const unsubscribe = session.subscribe(() => {
+		const unsubscribe = session.subscribeFn(() => {
 			notifications += 1;
 			markRuntimeDelivered?.();
 		});
 
 		try {
-			expect(session.getSnapshot()).toBe(initial);
+			expect(session.getSnapshotFn()).toBe(initial);
 			expect(notifications).toBe(0);
-			await session.run(
+			await session.runFn(
 				spawnItemFx({
 					id: "runtime:react-subscriber:marker",
 					itemId: "water",

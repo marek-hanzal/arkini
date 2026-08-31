@@ -10,7 +10,7 @@ const engineCommands = vi.hoisted(() => ({
 	enqueue: vi.fn(),
 	fill: vi.fn(),
 }));
-const failStop = vi.fn<Game["failStop"]>();
+const failStop = vi.fn<Game["failStopFn"]>();
 
 vi.mock("~/production-job/fx/enqueueDefaultLineFx", () => ({
 	enqueueDefaultLineFx: (props: unknown) => engineCommands.enqueue(props),
@@ -35,7 +35,7 @@ const createRegistry = () => {
 };
 
 const game = {
-	failStop,
+	failStopFn: failStop,
 	runFx: ((effect: Effect.Effect<unknown, unknown>) => effect) as Game["runFx"],
 } as unknown as Game;
 

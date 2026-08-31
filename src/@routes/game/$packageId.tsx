@@ -28,7 +28,7 @@ export const Route = createFileRoute("/game/$packageId")({
 				replace: true,
 			});
 		}
-		if (!controlledClose) resource.assertUsable();
+		if (!controlledClose) resource.assertUsableFn();
 		return {
 			gameEngine: resource.game,
 			gameEngineResource: resource,

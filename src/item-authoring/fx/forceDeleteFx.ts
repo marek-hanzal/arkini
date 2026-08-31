@@ -52,7 +52,7 @@ export namespace forceDeleteFx {
 	}
 }
 
-const createItemCleanup = (): ItemCleanup => ({
+const createItemCleanupFn = (): ItemCleanup => ({
 	actionInputIndexes: new Set(),
 	actionRuleIndexes: new Set(),
 	mergeIndexes: new Set(),
@@ -89,7 +89,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		}
 		if (root !== "items" || typeof second !== "string" || typeof third !== "string")
 			throw new Error(`Unsupported item delete reference path ${blocker.path.join(".")}.`);
-		const cleanup = itemCleanups.get(second) ?? createItemCleanup();
+		const cleanup = itemCleanups.get(second) ?? createItemCleanupFn();
 		itemCleanups.set(second, cleanup);
 		switch (third) {
 			case "input":

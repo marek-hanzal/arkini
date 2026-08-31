@@ -6,14 +6,14 @@ import { Button } from "~/ui/ui/Button";
 interface EditorArkpackImportButtonProps {
 	readonly blocked: boolean;
 	readonly pending: boolean;
-	readonly onFile: (file: File | undefined) => void;
+	readonly onFileFn: (file: File | undefined) => void;
 }
 
 /** Opens the browser-native file picker for importing one arkpack. */
 export const EditorArkpackImportButton = ({
 	blocked,
 	pending,
-	onFile,
+	onFileFn,
 }: EditorArkpackImportButtonProps) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +26,7 @@ export const EditorArkpackImportButton = ({
 				className="hidden"
 				disabled={blocked}
 				onChange={(event) => {
-					onFile(event.currentTarget.files?.[0]);
+					onFileFn(event.currentTarget.files?.[0]);
 					event.currentTarget.value = "";
 				}}
 			/>

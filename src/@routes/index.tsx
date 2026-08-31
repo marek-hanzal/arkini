@@ -23,13 +23,13 @@ export const Route = createFileRoute("/")({
 	},
 	component: () => {
 		const lifecycle = useStartupSplashLifecycle();
-		const failure = (message: string) => (
+		const failureFn = (message: string) => (
 			<div className="grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface p-4 text-center text-foreground shadow-xl">
 				<p className="font-semibold text-danger">Startup failed</p>
 				<p>{message}</p>
 				<PrimaryButton
 					className="mx-auto"
-					onClick={lifecycle.retry}
+					onClick={lifecycle.retryFn}
 				>
 					Retry
 				</PrimaryButton>
@@ -57,7 +57,7 @@ export const Route = createFileRoute("/")({
 						className="grid size-full cursor-default place-items-center bg-black p-6 text-white"
 						data-ui="StartupFailure"
 					>
-						{failure(message)}
+						{failureFn(message)}
 					</main>
 				),
 			)
@@ -69,7 +69,7 @@ export const Route = createFileRoute("/")({
 					<LauncherScene
 						cursor={content.kind === "loading" ? "wait" : "default"}
 						dataUi="StartupSplash"
-						onClick={lifecycle.skip}
+						onClickFn={lifecycle.skipFn}
 					>
 						<div
 							className="min-h-14 text-center text-sm text-muted"
@@ -89,7 +89,7 @@ export const Route = createFileRoute("/")({
 									{
 										kind: "failure",
 									},
-									({ message }) => failure(message),
+									({ message }) => failureFn(message),
 								)
 								.with(
 									{

@@ -7,7 +7,7 @@ import { LineFields } from "~/production-authoring/ui/LineFields";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
-import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
+import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 
@@ -21,7 +21,7 @@ const defaultProductionFieldValues: ProductionFieldValues = {
 	lines: undefined,
 };
 
-const ProductionFields = withFieldGroup({
+const ProductionFields = withFieldGroupFn({
 	defaultValues: defaultProductionFieldValues,
 	props: {
 		kind: "producer" as "deposit" | "producer",
@@ -55,7 +55,7 @@ const ProductionFields = withFieldGroup({
 			>
 				{(linesField) => {
 					const lines = linesField.state.value ?? [];
-					const addLine = () => {
+					const addLineFn = () => {
 						const lineOwnerId =
 							ownerId.replace(/^(?:item|producer):/, "") || "new-item";
 						const lineIdPrefix = `line:${lineOwnerId}`;
@@ -96,7 +96,7 @@ const ProductionFields = withFieldGroup({
 									actionLabel="Enable production lines"
 									description="This deposit currently only supplies matching deposit inputs. Production lines add self-consuming jobs that can transform the deposit and emit outputs."
 									icon={Factory}
-									onEnable={addLine}
+									onEnableFn={addLineFn}
 									title="Production lines are disabled"
 								/>
 							</div>
@@ -105,7 +105,7 @@ const ProductionFields = withFieldGroup({
 						<EditorCollectionSelector
 							addLabel="Add line"
 							count={lines.length}
-							itemLabel={(index) => {
+							itemLabelFn={(index) => {
 								const line = lines[index];
 								return line.title.length === 0
 									? line.id
@@ -117,8 +117,8 @@ const ProductionFields = withFieldGroup({
 							)}
 							label={`${kind === "deposit" ? "Production" : "Product"} lines`}
 							navigationCard
-							onAdd={addLine}
-							onRemove={
+							onAddFn={addLineFn}
+							onRemoveFn={
 								kind === "producer" && lines.length === 1
 									? undefined
 									: (index) => {
@@ -216,7 +216,7 @@ export const ProductionSection = () => {
 									emptyIcon={PackagePlus}
 									emptyTitle="No expiry output"
 									value={output}
-									onChange={(next) => form.setFieldValue("output", next)}
+									onChangeFn={(next) => form.setFieldValue("output", next)}
 								/>
 							)}
 						</form.Subscribe>

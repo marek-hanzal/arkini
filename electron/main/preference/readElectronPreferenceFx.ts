@@ -7,7 +7,7 @@ export namespace readElectronPreferenceFx {
 		readonly path: string;
 		readonly fallback: Value;
 		readonly operation: string;
-		readonly parse: (stored: string) => Value | undefined;
+		readonly parseFn: (stored: string) => Value | undefined;
 	}
 }
 
@@ -18,10 +18,10 @@ export const readElectronPreferenceFx = Effect.fn("readElectronPreferenceFx")(
 		path,
 		fallback,
 		operation,
-		parse,
+		parseFn,
 	}: readElectronPreferenceFx.Props<Value>) =>
 		fileSystem.readFileString(path).pipe(
-			Effect.map((stored) => parse(stored) ?? fallback),
+			Effect.map((stored) => parseFn(stored) ?? fallback),
 			Effect.catchIf(
 				(cause) => cause.reason._tag === "NotFound",
 				() => Effect.succeed(fallback),

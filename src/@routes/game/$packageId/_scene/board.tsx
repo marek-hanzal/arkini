@@ -7,21 +7,21 @@ export const Route = createFileRoute("/game/$packageId/_scene/board")({
 	/** Composes the installed Board with its package-scoped route navigation. */
 	component: () => {
 		const { packageId } = Route.useParams();
-		const navigate = useNavigate();
-		const onOpenInventory = useCallback(
+		const navigateFn = useNavigate();
+		const onOpenInventoryFn = useCallback(
 			() =>
-				navigate({
+				navigateFn({
 					to: "/game/$packageId/inventory",
 					params: {
 						packageId,
 					},
 				}).then(() => undefined),
 			[
-				navigate,
+				navigateFn,
 				packageId,
 			],
 		);
 
-		return <PlayableBoard onOpenInventory={onOpenInventory} />;
+		return <PlayableBoard onOpenInventoryFn={onOpenInventoryFn} />;
 	},
 });

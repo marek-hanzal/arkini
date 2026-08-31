@@ -44,7 +44,7 @@ export const useProjection = ({
 	positions,
 	selection,
 }: useProjection.Props): useProjection.Output => {
-	const [highlightDepth, setHighlightDepth] = useState<HighlightDepth>();
+	const [highlightDepth, setHighlightDepthFn] = useState<HighlightDepth>();
 	const completeHighlight = useMemo(
 		() => (selection === undefined ? undefined : readHighlightFn(flow, selection, direction)),
 		[
@@ -172,7 +172,7 @@ export const useProjection = ({
 	);
 
 	useEffect(
-		() => setHighlightDepth(undefined),
+		() => setHighlightDepthFn(undefined),
 		[
 			direction,
 			selection,
@@ -189,7 +189,7 @@ export const useProjection = ({
 		navigationNodeIds,
 		outputNavigationNodeIds,
 		rootNavigationNodeIds,
-		setHighlightDepth,
+		setHighlightDepthFn,
 	};
 };
 
@@ -212,6 +212,6 @@ export namespace useProjection {
 		readonly navigationNodeIds: ReadonlyArray<string>;
 		readonly outputNavigationNodeIds: ReadonlyArray<string>;
 		readonly rootNavigationNodeIds: ReadonlyArray<string>;
-		readonly setHighlightDepth: Dispatch<SetStateAction<HighlightDepth | undefined>>;
+		readonly setHighlightDepthFn: Dispatch<SetStateAction<HighlightDepth | undefined>>;
 	}
 }

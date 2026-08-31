@@ -10,25 +10,25 @@ import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSa
 
 const encoder = new TextEncoder();
 
-type Entry = ProjectCatalogEntrySchema.Type;
-
 export interface ProjectCatalog {
-	readonly addFx: (entry: Entry) => Effect.Effect<void, ProjectRepositoryError, never>;
-	readonly list: () => ReadonlyArray<Entry>;
+	readonly addFx: (
+		entry: ProjectCatalogEntrySchema.Type,
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
+	readonly listFn: () => ReadonlyArray<ProjectCatalogEntrySchema.Type>;
 	readonly removeFx: (root: string) => Effect.Effect<void, ProjectRepositoryError, never>;
 }
 
-const createError = (message: string, cause?: unknown) =>
+const createErrorFn = (message: string, cause?: unknown) =>
 	new ProjectRepositoryError({
 		operation: "list-projects",
 		message: withFilesystemWriteRecoveryFn(message, cause),
 		cause,
 	});
 
-const parseCatalog = (candidate: unknown) => ProjectCatalogSchema.parse(candidate);
-const parseStoredCatalog = (source: string) => {
+const parseCatalogFn = (candidate: unknown) => ProjectCatalogSchema.parse(candidate);
+const parseStoredCatalogFn = (source: string) => {
 	try {
-		return parseCatalog(JSON.parse(source));
+		return parseCatalogFn(JSON.parse(source));
 	} catch {
 		return null;
 	}
@@ -63,7 +63,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 		const stored = yield* Effect.gen(function* () {
 			if (!(yield* fileSystem.exists(catalogPath))) return null;
 			const source = yield* fileSystem.readFileString(catalogPath);
-			return parseStoredCatalog(source);
+			return parseStoredCatalogFn(source);
 		});
 		const previousManaged = new Map(
 			(stored?.projects ?? [])
@@ -76,7 +76,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 						] as const,
 				),
 		);
-		const managed: Array<Entry> = [];
+		const managed: Array<ProjectCatalogEntrySchema.Type> = [];
 		for (const name of (yield* fileSystem.readDirectory(managedProjectsRoot)).sort()) {
 			if (name === ".projects.lock") continue;
 			const root = path.join(managedProjectsRoot, name);
@@ -105,14 +105,18 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 		readReconciledFx.pipe(Effect.tap(writeJsonFx)),
 	);
 
-	const updateFx = (update: (current: ReadonlyArray<Entry>) => ReadonlyArray<Entry>) =>
+	const updateFx = (
+		updateFn: (
+			current: ReadonlyArray<ProjectCatalogEntrySchema.Type>,
+		) => ReadonlyArray<ProjectCatalogEntrySchema.Type>,
+	) =>
 		filesystemWrite
 			.withLockFx(
 				lock,
 				Effect.gen(function* () {
 					const current = yield* readReconciledFx;
 					const next = ProjectCatalogSchema.parse({
-						projects: update(current.projects),
+						projects: updateFn(current.projects),
 					});
 					yield* writeJsonFx(next);
 					catalog = next;
@@ -120,7 +124,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 			)
 			.pipe(
 				Effect.mapError((cause) =>
-					createError("The Editor project catalog could not be saved.", cause),
+					createErrorFn("The Editor project catalog could not be saved.", cause),
 				),
 			);
 
@@ -130,7 +134,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 				...projects.filter((candidate) => candidate.root !== entry.root),
 				entry,
 			]),
-		list: () => catalog.projects,
+		listFn: () => catalog.projects,
 		removeFx: (root) => updateFx((projects) => projects.filter((entry) => entry.root !== root)),
 	} satisfies ProjectCatalog;
 });

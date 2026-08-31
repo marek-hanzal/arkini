@@ -121,8 +121,8 @@ const applyProjectFileSetFx = Effect.fn("applyProjectFileSetFx")(function* ({
 		});
 	});
 
-	return yield* Effect.uninterruptibleMask((restore) =>
-		restore(prepareTransactionFx).pipe(
+	return yield* Effect.uninterruptibleMask((restoreFx) =>
+		restoreFx(prepareTransactionFx).pipe(
 			Effect.andThen(Effect.uninterruptible(publishTransactionFx)),
 			Effect.onExit((exit) =>
 				Exit.isSuccess(exit)

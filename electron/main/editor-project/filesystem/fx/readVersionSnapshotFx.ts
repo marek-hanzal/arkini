@@ -10,7 +10,7 @@ import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
-import { createVersionFingerprint, hashVersionBytes } from "./VersionFingerprint";
+import { createVersionFingerprintFn, hashVersionBytesFn } from "./VersionFingerprint";
 
 const decoder = new TextDecoder("utf-8", {
 	fatal: true,
@@ -63,7 +63,7 @@ export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function
 				new Error(`Editor version object ${hash} must not be a symbolic link.`),
 			);
 		const bytes = yield* fileSystem.readFile(target);
-		const actual = hashVersionBytes(bytes);
+		const actual = hashVersionBytesFn(bytes);
 		if (actual !== hash)
 			return yield* Effect.fail(
 				new Error(`Editor version object ${hash} failed its content hash check.`),
@@ -199,6 +199,6 @@ export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function
 		config,
 		resources,
 		scenarios,
-		contentFingerprint: createVersionFingerprint(manifest, scenarios),
+		contentFingerprint: createVersionFingerprintFn(manifest, scenarios),
 	} satisfies readVersionSnapshotFx.Success;
 });

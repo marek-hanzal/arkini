@@ -47,7 +47,7 @@ const FailedProgress: ItemOriginFlowProgress = {
 	percent: 0,
 };
 
-const createAtoms = () => {
+const createAtomsFn = () => {
 	const progressAtom = Atom.make<ProgressState>({
 		progress: InitialProgress,
 	}).pipe(Atom.setIdleTTL(0));
@@ -59,7 +59,7 @@ const createAtoms = () => {
 			});
 			const flow = yield* readItemOriginFlowFx({
 				config: request.config,
-				onProgress: (progress) => {
+				onProgressFn: (progress) => {
 					get.set(progressAtom, {
 						progress: {
 							...progress,
@@ -100,7 +100,7 @@ const createAtoms = () => {
 
 /** Owns one subscription-scoped build of the complete authored game flow. */
 export const useOriginFlow = (config: ItemOriginFlowRequest["config"]): State => {
-	const { commandAtom, progressAtom } = useMemo(createAtoms, []);
+	const { commandAtom, progressAtom } = useMemo(createAtomsFn, []);
 	const request = useMemo<CommandRequest>(
 		() => ({
 			config,
@@ -109,14 +109,14 @@ export const useOriginFlow = (config: ItemOriginFlowRequest["config"]): State =>
 			config,
 		],
 	);
-	const [result, runFlow] = useAtom(commandAtom);
+	const [result, runFlowFn] = useAtom(commandAtom);
 	const progressState = useAtomValue(progressAtom);
 
 	useEffect(() => {
-		runFlow(request);
+		runFlowFn(request);
 	}, [
 		request,
-		runFlow,
+		runFlowFn,
 	]);
 
 	const progress = progressState.request === request ? progressState.progress : InitialProgress;

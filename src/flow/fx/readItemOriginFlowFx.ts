@@ -28,12 +28,12 @@ const ProgressLabels: Record<ItemOriginFlowPhase, string> = {
 /** Reports one normalized phase boundary for origin-flow construction. */
 const reportItemOriginFlowProgressFx = Effect.fn("reportEditorItemOriginFlowProgressFx")(
 	(
-		onProgress: ((progress: ItemOriginFlowProgress) => void) | undefined,
+		onProgressFn: ((progress: ItemOriginFlowProgress) => void) | undefined,
 		phase: ItemOriginFlowPhase,
 		percent: number,
 	) =>
 		Effect.sync(() =>
-			onProgress?.({
+			onProgressFn?.({
 				label: ProgressLabels[phase],
 				percent: Math.max(0, Math.min(100, Math.round(percent))),
 			}),
@@ -43,18 +43,19 @@ const reportItemOriginFlowProgressFx = Effect.fn("reportEditorItemOriginFlowProg
 /** Cooperatively returns flow construction to the renderer and remains interruptible. */
 const yieldItemOriginFlowFx = Effect.fn("yieldEditorItemOriginFlowFx")(() =>
 	Effect.promise(async (signal) => {
-		const abortCause = () => signal.reason ?? new Error("Acquisition graph build interrupted.");
-		if (signal.aborted) throw abortCause();
-		let interrupt: (() => void) | undefined;
-		const interruption = new Promise<never>((_, reject) => {
-			interrupt = () => reject(abortCause());
-			signal.addEventListener("abort", interrupt, {
+		const abortCauseFn = () =>
+			signal.reason ?? new Error("Acquisition graph build interrupted.");
+		if (signal.aborted) throw abortCauseFn();
+		let interruptFn: (() => void) | undefined;
+		const interruption = new Promise<never>((_Fn, rejectFn) => {
+			interruptFn = () => rejectFn(abortCauseFn());
+			signal.addEventListener("abort", interruptFn, {
 				once: true,
 			});
 		});
 		const continuation =
 			typeof globalThis.scheduler === "undefined"
-				? new Promise<void>((resolve) => setTimeout(resolve, 0))
+				? new Promise<void>((resolveFn) => setTimeout(resolveFn, 0))
 				: globalThis.scheduler.postTask(() => undefined, {
 						priority: "background",
 					});
@@ -63,14 +64,14 @@ const yieldItemOriginFlowFx = Effect.fn("yieldEditorItemOriginFlowFx")(() =>
 				continuation,
 				interruption,
 			]);
-			if (signal.aborted) throw abortCause();
+			if (signal.aborted) throw abortCauseFn();
 		} finally {
-			if (interrupt !== undefined) signal.removeEventListener("abort", interrupt);
+			if (interruptFn !== undefined) signal.removeEventListener("abort", interruptFn);
 		}
 	}),
 );
 
-const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
+const uniqueFn = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
 ];
 
@@ -89,12 +90,12 @@ interface ItemOriginSourceIndex {
 /** Indexes authored items, starting scopes, and every concrete acquisition source. */
 const indexItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSourcesFx")(function* ({
 	config,
-	onProgress,
+	onProgressFn,
 }: {
 	readonly config: GameConfigSchema.Type;
-	readonly onProgress?: (progress: ItemOriginFlowProgress) => void;
+	readonly onProgressFn?: (progress: ItemOriginFlowProgress) => void;
 }) {
-	yield* reportItemOriginFlowProgressFx(onProgress, "indexing", 0);
+	yield* reportItemOriginFlowProgressFx(onProgressFn, "indexing", 0);
 	yield* yieldItemOriginFlowFx();
 	const items = new Map(
 		Object.values(config.items).map((item) => [
@@ -103,18 +104,18 @@ const indexItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSourcesFx")(fun
 		]),
 	);
 	const starters = new Map<string, Set<ItemOriginItemNode["starterScopes"][number]>>();
-	const addStarter = (itemId: string, scope: ItemOriginItemNode["starterScopes"][number]) => {
+	const addStarterFn = (itemId: string, scope: ItemOriginItemNode["starterScopes"][number]) => {
 		const scopes = starters.get(itemId) ?? new Set();
 		scopes.add(scope);
 		starters.set(itemId, scopes);
 	};
-	for (const entry of config.start.board) addStarter(entry.itemId, "Board");
-	for (const entry of config.start.inventory) addStarter(entry.itemId, "Inventory");
-	for (const entry of config.start.toolbar) addStarter(entry.itemId, "Toolbar");
+	for (const entry of config.start.board) addStarterFn(entry.itemId, "Board");
+	for (const entry of config.start.inventory) addStarterFn(entry.itemId, "Inventory");
+	for (const entry of config.start.toolbar) addStarterFn(entry.itemId, "Toolbar");
 
 	const graph = createAcquisitionGraphFn(config);
 	const sources = readItemOriginSourcesFn(graph);
-	yield* reportItemOriginFlowProgressFx(onProgress, "indexing", 28);
+	yield* reportItemOriginFlowProgressFx(onProgressFn, "indexing", 28);
 	yield* yieldItemOriginFlowFx();
 	const sourcesByOutput = new Map<string, ItemOriginSource[]>();
 	const sourcesByOwner = new Map<string, ItemOriginSource[]>();
@@ -136,14 +137,14 @@ const indexItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSourcesFx")(fun
 		const ownerSources = sourcesByOwner.get(source.ownerItemId) ?? [];
 		ownerSources.push(source);
 		sourcesByOwner.set(source.ownerItemId, ownerSources);
-		for (const outputItemId of unique(source.outputs.map(({ itemId }) => itemId))) {
+		for (const outputItemId of uniqueFn(source.outputs.map(({ itemId }) => itemId))) {
 			const matches = sourcesByOutput.get(outputItemId) ?? [];
 			matches.push(source);
 			sourcesByOutput.set(outputItemId, matches);
 		}
 		if ((index + 1) % 64 === 0) {
 			yield* reportItemOriginFlowProgressFx(
-				onProgress,
+				onProgressFn,
 				"indexing",
 				28 + ((index + 1) / Math.max(1, sources.length)) * 12,
 			);
@@ -160,10 +161,10 @@ const indexItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSourcesFx")(fun
 	} satisfies ItemOriginSourceIndex;
 });
 
-const readOperationPortLabel = (itemId: string, items: ItemOriginSourceIndex["items"]) =>
+const readOperationPortLabelFn = (itemId: string, items: ItemOriginSourceIndex["items"]) =>
 	items.get(itemId)?.title || itemId;
 
-const readRequirementContexts = (
+const readRequirementContextsFn = (
 	source: ItemOriginSource,
 	itemId: string,
 ): ReadonlyArray<ItemOriginOperationRequirementContext> =>
@@ -194,30 +195,30 @@ const readRequirementContexts = (
 			})),
 	]);
 
-const readOperation = (
+const readOperationFn = (
 	source: ItemOriginSource,
 	items: ItemOriginSourceIndex["items"],
 ): ItemOriginOperation => ({
 	id: source.id,
-	inputs: unique(source.requirementItemIds)
+	inputs: uniqueFn(source.requirementItemIds)
 		.filter((itemId) => itemId !== source.ownerItemId)
 		.sort((left, right) => Order.String(left, right))
 		.map((itemId) => ({
 			id: `${source.id}:input:${itemId}`,
 			itemId,
-			label: readOperationPortLabel(itemId, items),
-			requirementContexts: readRequirementContexts(source, itemId),
+			label: readOperationPortLabelFn(itemId, items),
+			requirementContexts: readRequirementContextsFn(source, itemId),
 		})),
 	kind: source.kind,
 	label: source.label,
 	outputs: source.outputs.map((output, index) => ({
 		id: `${source.id}:output:${index}:${output.itemId}`,
 		itemId: output.itemId,
-		label: readOperationPortLabel(output.itemId, items),
+		label: readOperationPortLabelFn(output.itemId, items),
 	})),
 });
 
-const readItemNode = (
+const readItemNodeFn = (
 	itemId: string,
 	index: ItemOriginSourceIndex,
 	acquisitionSourceByItem: ReadonlyMap<string, string>,
@@ -227,7 +228,7 @@ const readItemNode = (
 		...(index.sourcesByOwner.get(itemId) ?? []),
 	]
 		.sort((left, right) => Order.String(left.id, right.id))
-		.map((source) => readOperation(source, index.items));
+		.map((source) => readOperationFn(source, index.items));
 	return {
 		acquisitionSourceId: acquisitionSourceByItem.get(itemId),
 		id: `item:${itemId}`,
@@ -254,7 +255,7 @@ const readEdgesFn = (sources: ReadonlyArray<ItemOriginSource>): ItemOriginEdge[]
 					id: targetPortId,
 					operationId: source.id,
 					role: "input",
-					requirementContexts: readRequirementContexts(source, relation.fromItemId),
+					requirementContexts: readRequirementContextsFn(source, relation.fromItemId),
 					source: `item:${relation.fromItemId}`,
 					sourcePortId: ItemOriginItemOutputPortId,
 					target: `item:${relation.toItemId}`,
@@ -290,15 +291,15 @@ const materializeItemOriginFlowFn = ({
 	edges: readEdgesFn(index.sources),
 	nodes: [
 		...index.items.keys(),
-	].map((itemId) => readItemNode(itemId, index, acquisitionSourceByItem)),
+	].map((itemId) => readItemNodeFn(itemId, index, acquisitionSourceByItem)),
 });
 
 export interface ItemOriginFlowRequest {
 	readonly config: GameConfigSchema.Type;
-	readonly onProgress?: (progress: ItemOriginFlowProgress) => void;
+	readonly onProgressFn?: (progress: ItemOriginFlowProgress) => void;
 }
 
-const readAcquisitionSourceByItem = (index: ItemOriginSourceIndex) =>
+const readAcquisitionSourceByItemFn = (index: ItemOriginSourceIndex) =>
 	new Map(
 		[
 			...index.sourcesByOutput,
@@ -320,22 +321,22 @@ const readAcquisitionSourceByItem = (index: ItemOriginSourceIndex) =>
 /** Builds the item-origin graph cooperatively. Operations stay embedded in their owning item node. */
 export const readItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx")(function* ({
 	config,
-	onProgress,
+	onProgressFn,
 }: ItemOriginFlowRequest) {
 	const index = yield* indexItemOriginSourcesFx({
 		config,
-		onProgress,
+		onProgressFn,
 	});
-	yield* reportItemOriginFlowProgressFx(onProgress, "resolving", 44);
-	const acquisitionSourceByItem = readAcquisitionSourceByItem(index);
-	yield* reportItemOriginFlowProgressFx(onProgress, "resolving", 74);
+	yield* reportItemOriginFlowProgressFx(onProgressFn, "resolving", 44);
+	const acquisitionSourceByItem = readAcquisitionSourceByItemFn(index);
+	yield* reportItemOriginFlowProgressFx(onProgressFn, "resolving", 74);
 	yield* yieldItemOriginFlowFx();
-	yield* reportItemOriginFlowProgressFx(onProgress, "finalizing", 92);
+	yield* reportItemOriginFlowProgressFx(onProgressFn, "finalizing", 92);
 	yield* yieldItemOriginFlowFx();
 	const flow = materializeItemOriginFlowFn({
 		acquisitionSourceByItem,
 		index,
 	});
-	yield* reportItemOriginFlowProgressFx(onProgress, "finalizing", 100);
+	yield* reportItemOriginFlowProgressFx(onProgressFn, "finalizing", 100);
 	return flow;
 });

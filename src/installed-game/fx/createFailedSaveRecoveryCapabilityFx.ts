@@ -113,7 +113,7 @@ export const createFailedSaveRecoveryCapabilityFx = Effect.fn(
 
 			const recoverFailedSaveFx: GameEngineResourceFxService["recoverFailedSaveFx"] =
 				Effect.fn("GameEngineResourceFx.recoverFailedSaveFx")(({ packageId }) =>
-					Effect.uninterruptibleMask((restore) =>
+					Effect.uninterruptibleMask((restoreFx) =>
 						withLifecycleLockFx(
 							Effect.gen(function* () {
 								const state = yield* Ref.get(stateRef);
@@ -181,7 +181,7 @@ export const createFailedSaveRecoveryCapabilityFx = Effect.fn(
 									recovery,
 								});
 								yield* Effect.forkIn(
-									restore(runFailedSaveRecoveryFx(recovery)),
+									restoreFx(runFailedSaveRecoveryFx(recovery)),
 									operationScope,
 								);
 								return {

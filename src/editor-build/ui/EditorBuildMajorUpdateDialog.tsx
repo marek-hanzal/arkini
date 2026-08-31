@@ -6,14 +6,14 @@ export const EditorBuildMajorUpdateDialog = ({
 	confirmation,
 	error,
 	pending,
-	onCancel,
-	onConfirm,
+	onCancelFn,
+	onConfirmFn,
 }: {
 	readonly confirmation: EditorBuildMajorUpdateConfirmation;
 	readonly error?: string;
 	readonly pending: boolean;
-	readonly onCancel: () => void;
-	readonly onConfirm: () => void;
+	readonly onCancelFn: () => void;
+	readonly onConfirmFn: () => void;
 }) => (
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
@@ -41,7 +41,7 @@ export const EditorBuildMajorUpdateDialog = ({
 			<div className="mt-6 flex justify-end gap-2">
 				<Button
 					disabled={pending}
-					onClick={onCancel}
+					onClick={onCancelFn}
 				>
 					Cancel
 				</Button>
@@ -49,7 +49,7 @@ export const EditorBuildMajorUpdateDialog = ({
 					data-ui="EditorBuildMajorUpdateConfirm"
 					disabled={pending}
 					cursorIntent={pending ? "progress" : undefined}
-					onClick={onConfirm}
+					onClick={onConfirmFn}
 				>
 					Update package
 				</DangerButton>

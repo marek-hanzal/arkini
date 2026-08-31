@@ -12,41 +12,41 @@ export namespace createPointerFrameSamplerFx {
 
 interface Props {
 	readonly frames: DemandFrameLoop;
-	readonly onApply: (sample: createPointerFrameSamplerFx.Sample) => void;
+	readonly onApplyFn: (sample: createPointerFrameSamplerFx.Sample) => void;
 }
 
 /** Coalesces pointer samples through one demand-frame slot with explicit flush and cancellation. */
 export const createPointerFrameSamplerFx = Effect.fn("createPointerFrameSamplerFx")(function* ({
 	frames,
-	onApply,
+	onApplyFn,
 }: Props) {
-	let cancelScheduled: (() => void) | null = null;
+	let cancelScheduledFn: (() => void) | null = null;
 	let pendingSample: createPointerFrameSamplerFx.Sample | null = null;
 
-	const cancel = () => {
+	const cancelFn = () => {
 		pendingSample = null;
-		cancelScheduled?.();
-		cancelScheduled = null;
+		cancelScheduledFn?.();
+		cancelScheduledFn = null;
 	};
 
 	const requestFrameFx = Effect.gen(function* () {
-		if (cancelScheduled !== null) return;
-		cancelScheduled = yield* frames.scheduleFx(() => {
-			cancelScheduled = null;
+		if (cancelScheduledFn !== null) return;
+		cancelScheduledFn = yield* frames.scheduleFx(() => {
+			cancelScheduledFn = null;
 			const latest = pendingSample;
 			pendingSample = null;
-			if (latest !== null) onApply(latest);
+			if (latest !== null) onApplyFn(latest);
 		});
 	});
 
 	return {
-		cancelFx: Effect.sync(cancel),
+		cancelFx: Effect.sync(cancelFn),
 		flushFx: Effect.fn("PointerFrameSampler.flushFx")(
 			(sample?: createPointerFrameSamplerFx.Sample) =>
 				Effect.sync(() => {
 					const latest = sample ?? pendingSample;
-					cancel();
-					if (latest !== null) onApply(latest);
+					cancelFn();
+					if (latest !== null) onApplyFn(latest);
 				}),
 		),
 		scheduleFallbackFx: Effect.fn("PointerFrameSampler.scheduleFallbackFx")(

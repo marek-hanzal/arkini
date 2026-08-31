@@ -30,11 +30,11 @@ export const useCliCompletionModel = ({
 }: {
 	readonly commandInstalled: boolean;
 }) => {
-	const [state, runCommand] = useAtom(CompletionCommandAtom);
+	const [state, runCommandFn] = useAtom(CompletionCommandAtom);
 	useEffect(() => {
-		runCommand("read");
+		runCommandFn("read");
 	}, [
-		runCommand,
+		runCommandFn,
 	]);
 
 	const status = "status" in state ? state.status : undefined;
@@ -61,8 +61,8 @@ export const useCliCompletionModel = ({
 					: status?.type === "conflict"
 						? "Replace"
 						: "Install",
-		toggleCompletion: () =>
-			runCommand(
+		toggleCompletionFn: () =>
+			runCommandFn(
 				cleanupWithoutCommand || status?.type === "installed"
 					? "uninstall"
 					: status?.type === "conflict"

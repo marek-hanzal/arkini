@@ -28,12 +28,12 @@ export const createRendererLifecycleFx = Effect.fn("createRendererLifecycleFx")(
 	(
 		api: Pick<
 			ArkiniElectronApi.Api["lifecycle"],
-			"forceClose" | "requestClose" | "waitUntilVisible"
+			"forceCloseFn" | "requestCloseFn" | "waitUntilVisibleFn"
 		>,
 	) =>
 		Effect.succeed<RendererLifecycle>({
 			forceCloseFx: Effect.try({
-				try: () => api.forceClose(),
+				try: () => api.forceCloseFn(),
 				catch: (cause) =>
 					new RendererLifecycleError({
 						operation: "force-close",
@@ -41,7 +41,7 @@ export const createRendererLifecycleFx = Effect.fn("createRendererLifecycleFx")(
 					}),
 			}),
 			requestCloseFx: Effect.tryPromise({
-				try: () => api.requestClose(),
+				try: () => api.requestCloseFn(),
 				catch: (cause) =>
 					new RendererLifecycleError({
 						operation: "request-close",
@@ -49,7 +49,7 @@ export const createRendererLifecycleFx = Effect.fn("createRendererLifecycleFx")(
 					}),
 			}),
 			waitUntilVisibleFx: Effect.tryPromise({
-				try: () => api.waitUntilVisible(),
+				try: () => api.waitUntilVisibleFn(),
 				catch: (cause) =>
 					new RendererLifecycleError({
 						operation: "wait-until-visible",

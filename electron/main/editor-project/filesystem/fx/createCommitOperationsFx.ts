@@ -33,7 +33,7 @@ type Operations = Pick<
 	| "upsertResourcesFx"
 >;
 
-const error = (operation: ProjectRepositoryOperation, message: string, cause?: unknown) =>
+const errorFn = (operation: ProjectRepositoryOperation, message: string, cause?: unknown) =>
 	cause instanceof ProjectRepositoryError && cause.operation === operation
 		? cause
 		: new ProjectRepositoryError({
@@ -42,7 +42,7 @@ const error = (operation: ProjectRepositoryOperation, message: string, cause?: u
 				cause,
 			});
 
-const cloneProject = (project: Project): Project => ({
+const cloneProjectFn = (project: Project): Project => ({
 	...project,
 	resources: project.resources.map((resource) => ({
 		...resource,
@@ -50,7 +50,7 @@ const cloneProject = (project: Project): Project => ({
 	})),
 });
 
-const asCommit = (
+const asCommitFn = (
 	{ resources: _resources, ...project }: Project,
 	previousRevision: number,
 ): ProjectCommit => ({
@@ -58,7 +58,7 @@ const asCommit = (
 	previousRevision,
 });
 
-const assertExpectedRevision = (
+const assertExpectedRevisionFx = (
 	state: ProjectState,
 	expectedRevision: number,
 	operation: ProjectRepositoryOperation,
@@ -66,7 +66,7 @@ const assertExpectedRevision = (
 	return state.project.revision === expectedRevision
 		? Effect.void
 		: Effect.fail(
-				error(
+				errorFn(
 					operation,
 					`Editor project ${state.project.projectId} changed from revision ${expectedRevision} to ${state.project.revision} before this write could commit.`,
 				),
@@ -76,7 +76,7 @@ const assertExpectedRevision = (
 export namespace createCommitOperationsFx {
 	export interface Props {
 		readonly operations: Semaphore.Semaphore;
-		readonly readState: (
+		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 		readonly states: Map<string, ProjectState>;
@@ -86,7 +86,7 @@ export namespace createCommitOperationsFx {
 /** Applies validated config/item/resource changes as ordered filesystem writes. */
 export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(function* ({
 	operations,
-	readState,
+	readStateFx,
 	states,
 }: createCommitOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
@@ -165,7 +165,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			...state,
 			project: nextProject,
 		});
-		return cloneProject(nextProject);
+		return cloneProjectFn(nextProject);
 	});
 
 	const upsertItemFx: Operations["upsertItemFx"] = ({
@@ -176,18 +176,18 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		Effect.gen(function* () {
 			const item = yield* Effect.try({
 				try: () => ItemSchema.parse(candidateItem),
-				catch: (cause) => error("upsert-item", "The Editor item is invalid.", cause),
+				catch: (cause) => errorFn("upsert-item", "The Editor item is invalid.", cause),
 			});
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
+					const state = yield* readStateFx(projectId);
 					if (expectedRevision !== undefined)
-						yield* assertExpectedRevision(state, expectedRevision, "upsert-item");
+						yield* assertExpectedRevisionFx(state, expectedRevision, "upsert-item");
 					const collision = state.project.config.items[item.id];
 					if (collision !== undefined && collision.uid !== item.uid)
 						return yield* Effect.fail(
-							error(
+							errorFn(
 								"upsert-item",
 								`Item ID ${item.id} is already used by another item.`,
 							),
@@ -197,7 +197,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					);
 					if (previous !== undefined && previous[0] !== item.id)
 						return yield* Effect.fail(
-							error(
+							errorFn(
 								"upsert-item",
 								`Saved item ${previous[0]} cannot be renamed without an explicit rename workflow.`,
 							),
@@ -209,7 +209,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							[item.id]: item,
 						},
 					});
-					return asCommit(
+					return asCommitFn(
 						yield* commitFx({
 							state,
 							config,
@@ -222,7 +222,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"upsert-item",
 					`Item ${candidateItem.id} could not be saved in project ${projectId}.`,
 					cause,
@@ -240,14 +240,14 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
-					yield* assertExpectedRevision(state, expectedRevision, "delete-item");
+					const state = yield* readStateFx(projectId);
+					yield* assertExpectedRevisionFx(state, expectedRevision, "delete-item");
 					const entry = Object.entries(state.project.config.items).find(
 						([, item]) => item.uid === itemUid,
 					);
 					if (entry === undefined)
 						return yield* Effect.fail(
-							error("delete-item", `Item UID ${itemUid} does not exist.`),
+							errorFn("delete-item", `Item UID ${itemUid} does not exist.`),
 						);
 					const [itemId] = entry;
 					const blockers = readDeleteBlockersFn({
@@ -256,7 +256,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					});
 					if (blockers.length > 0 && !force)
 						return yield* Effect.fail(
-							error(
+							errorFn(
 								"delete-item",
 								`Item ${itemId} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
 							),
@@ -274,7 +274,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 									),
 								),
 							});
-					return asCommit(
+					return asCommitFn(
 						yield* commitFx({
 							state,
 							config,
@@ -287,7 +287,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"delete-item",
 					`Item UID ${itemUid} could not be deleted from project ${projectId}.`,
 					cause,
@@ -304,14 +304,14 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			const config = yield* Effect.try({
 				try: () => GameConfigSchema.parse(candidate),
 				catch: (cause) =>
-					error("replace-config", "The Editor project config is invalid.", cause),
+					errorFn("replace-config", "The Editor project config is invalid.", cause),
 			});
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
-					yield* assertExpectedRevision(state, expectedRevision, "replace-config");
-					return asCommit(
+					const state = yield* readStateFx(projectId);
+					yield* assertExpectedRevisionFx(state, expectedRevision, "replace-config");
+					return asCommitFn(
 						yield* commitFx({
 							state,
 							config,
@@ -324,7 +324,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"replace-config",
 					`Project ${projectId} configuration could not be saved.`,
 					cause,
@@ -336,7 +336,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		operation: ProjectRepositoryOperation,
 		projectId: string,
 		expectedRevision: number | undefined,
-		change: (state: ProjectState) => Effect.Effect<
+		changeFx: (state: ProjectState) => Effect.Effect<
 			{
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ResourceSchema.Type>;
@@ -349,10 +349,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
-					const state = yield* readState(projectId);
+					const state = yield* readStateFx(projectId);
 					if (expectedRevision !== undefined)
-						yield* assertExpectedRevision(state, expectedRevision, operation);
-					const next = yield* change(state);
+						yield* assertExpectedRevisionFx(state, expectedRevision, operation);
+					const next = yield* changeFx(state);
 					return yield* commitFx({
 						state,
 						config: next.config,
@@ -373,7 +373,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		Effect.gen(function* () {
 			const resource = yield* Effect.try({
 				try: () => ResourceSchema.parse(candidate),
-				catch: (cause) => error("save-resource", "The Editor resource is invalid.", cause),
+				catch: (cause) =>
+					errorFn("save-resource", "The Editor resource is invalid.", cause),
 			});
 			return yield* commitResourcesFx(
 				"save-resource",
@@ -383,7 +384,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					const exists = state.project.resources.some(({ id }) => id === resource.id);
 					if (exists && !overwrite)
 						return Effect.fail(
-							error("save-resource", `Resource ID ${resource.id} already exists.`),
+							errorFn("save-resource", `Resource ID ${resource.id} already exists.`),
 						);
 					return Effect.succeed({
 						config: state.project.config,
@@ -396,7 +397,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"save-resource",
 					`Resource ${candidate.id} could not be saved in project ${projectId}.`,
 					cause,
@@ -412,11 +413,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			const resources = yield* Effect.try({
 				try: () => ResourceSchema.array().min(1).parse(candidates),
 				catch: (cause) =>
-					error("upsert-resource", "The Editor resources are invalid.", cause),
+					errorFn("upsert-resource", "The Editor resources are invalid.", cause),
 			});
 			if (new Set(resources.map(({ id }) => id)).size !== resources.length)
 				return yield* Effect.fail(
-					error(
+					errorFn(
 						"upsert-resource",
 						"A resource occurs more than once in the same Editor write.",
 					),
@@ -433,7 +434,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			});
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"upsert-resource",
 					`Resources could not be saved in project ${projectId}.`,
 					cause,
@@ -450,7 +451,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			Effect.gen(function* () {
 				if (!state.project.resources.some(({ id }) => id === resourceId))
 					return yield* Effect.fail(
-						error("delete-resource", `Resource ${resourceId} does not exist.`),
+						errorFn("delete-resource", `Resource ${resourceId} does not exist.`),
 					);
 				const blockers = readEditorAssetDeleteBlockersFn({
 					config: state.project.config,
@@ -458,7 +459,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				});
 				if (blockers.length > 0)
 					return yield* Effect.fail(
-						error(
+						errorFn(
 							"delete-resource",
 							`Resource ${resourceId} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
 						),
@@ -470,7 +471,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			}),
 		).pipe(
 			Effect.mapError((cause) =>
-				error(
+				errorFn(
 					"delete-resource",
 					`Resource ${resourceId} could not be deleted from project ${projectId}.`,
 					cause,
@@ -489,12 +490,12 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			const config = yield* Effect.try({
 				try: () => GameConfigSchema.parse(candidateConfig),
 				catch: (cause) =>
-					error("replace-resource", "The resource references are invalid.", cause),
+					errorFn("replace-resource", "The resource references are invalid.", cause),
 			});
 			const resource = yield* Effect.try({
 				try: () => ResourceSchema.parse(candidateResource),
 				catch: (cause) =>
-					error("replace-resource", "The replacement resource is invalid.", cause),
+					errorFn("replace-resource", "The replacement resource is invalid.", cause),
 			});
 			return yield* commitResourcesFx(
 				"replace-resource",
@@ -503,14 +504,17 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				(state) => {
 					if (!state.project.resources.some(({ id }) => id === currentId))
 						return Effect.fail(
-							error("replace-resource", `Resource ${currentId} does not exist.`),
+							errorFn("replace-resource", `Resource ${currentId} does not exist.`),
 						);
 					if (
 						resource.id !== currentId &&
 						state.project.resources.some(({ id }) => id === resource.id)
 					)
 						return Effect.fail(
-							error("replace-resource", `Resource ID ${resource.id} already exists.`),
+							errorFn(
+								"replace-resource",
+								`Resource ID ${resource.id} already exists.`,
+							),
 						);
 					return Effect.succeed({
 						config,
@@ -523,7 +527,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error("replace-resource", `Resource ${currentId} could not be updated.`, cause),
+				errorFn("replace-resource", `Resource ${currentId} could not be updated.`, cause),
 			),
 		);
 

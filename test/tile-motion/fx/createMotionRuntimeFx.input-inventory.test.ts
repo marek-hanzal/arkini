@@ -95,14 +95,14 @@ describe("Inventory input travel", () => {
 				cueKey: "44:0",
 				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
-				onComplete: completed,
-				onRemainderRevealed: () => {},
-				onPayloadCreated: (actor) => {
+				onCompleteFn: completed,
+				onRemainderRevealedFn: () => {},
+				onPayloadCreatedFn: (actor) => {
 					transients.push(actor);
 				},
 				origin: openerPose,
-				readPalette: () => palette,
-				readSourceSurvives: () => true,
+				readPaletteFn: () => palette,
+				readSourceSurvivesFn: () => true,
 				surface: createSurface({
 					readLocationPose: (location) =>
 						location.scope === "toolbar" ? openerPose : targetPose,
@@ -144,7 +144,7 @@ describe("Inventory input travel", () => {
 			(deliveryTarget.y - openerPose.y) * 0.05,
 		);
 		samplePoseAnimation(delivery, 1);
-		delivery.onComplete?.();
+		delivery.onCompleteFn?.();
 
 		expect(transient.item.quantity).toBe(2);
 		advanceInputRemainderFlash({
@@ -175,7 +175,7 @@ describe("Inventory input travel", () => {
 		});
 		opener.container.x = 560;
 		const animationCountBeforeContinuation = animations.length;
-		returned.onComplete?.();
+		returned.onCompleteFn?.();
 
 		const continuation = animations
 			.slice(animationCountBeforeContinuation)
@@ -204,7 +204,7 @@ describe("Inventory input travel", () => {
 			y: openerPose.y,
 		});
 		const animationCountBeforeVanish = animations.length;
-		continuation.onComplete?.();
+		continuation.onCompleteFn?.();
 
 		expect(transient.container.destroyed).toBe(false);
 		const vanishAnimations = animations.slice(animationCountBeforeVanish);
@@ -226,11 +226,11 @@ describe("Inventory input travel", () => {
 			throw new Error("Expected Inventory remainder fade-out.");
 		}
 		expect(vanishOpacity.durationMs).toBe(lifecycleDurationMs);
-		vanishOpacity.onCancel?.();
+		vanishOpacity.onCancelFn?.();
 
 		expect(transient.container.destroyed).toBe(true);
 		expect(completed).toHaveBeenCalledOnce();
-		vanishOpacity.onComplete?.();
+		vanishOpacity.onCompleteFn?.();
 		expect(completed).toHaveBeenCalledOnce();
 	});
 });

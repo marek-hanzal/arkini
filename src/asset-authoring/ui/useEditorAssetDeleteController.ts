@@ -8,10 +8,8 @@ import { deleteEditorAssetFx } from "~/asset-authoring/fx/deleteEditorAssetFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import {
-	readEditorAssetDeleteBlockersFn,
-	type EditorAssetDeleteBlocker,
-} from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
+import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
+import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import type { Project } from "~/project-authoring/type/Project";
 
@@ -41,13 +39,13 @@ export namespace useEditorAssetDeleteController {
 	}
 
 	export interface Output {
-		readonly blockers: ReadonlyArray<EditorAssetDeleteBlocker>;
-		readonly cancel: () => void;
-		readonly confirm: () => Promise<void>;
+		readonly blockers: ReadonlyArray<readGameResourceUsagesFn.Usage>;
+		readonly cancelFn: () => void;
+		readonly confirmFn: () => Promise<void>;
 		readonly confirming: boolean;
 		readonly deleting: boolean;
 		readonly error: unknown;
-		readonly open: () => void;
+		readonly openFn: () => void;
 		readonly project: Project;
 	}
 }
@@ -59,13 +57,13 @@ export const useEditorAssetDeleteController = ({
 	resourceId,
 }: useEditorAssetDeleteController.Props): useEditorAssetDeleteController.Output => {
 	const project = useEditorProject();
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const commandAtom = deleteEditorAssetCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
-	const remove = useAtomSet(commandAtom, {
+	const removeFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
-	const [confirming, setConfirming] = useState(false);
+	const [confirming, setConfirmingFn] = useState(false);
 	const blockers = useMemo(
 		() =>
 			readEditorAssetDeleteBlockersFn({
@@ -77,25 +75,25 @@ export const useEditorAssetDeleteController = ({
 			resourceId,
 		],
 	);
-	const cancel = useCallback(() => {
-		if (!result.waiting) setConfirming(false);
+	const cancelFn = useCallback(() => {
+		if (!result.waiting) setConfirmingFn(false);
 	}, [
 		result.waiting,
 	]);
-	const open = useCallback(() => {
-		if (blockers.length === 0 && !result.waiting) setConfirming(true);
+	const openFn = useCallback(() => {
+		if (blockers.length === 0 && !result.waiting) setConfirmingFn(true);
 	}, [
 		blockers.length,
 		result.waiting,
 	]);
-	const confirm = useCallback(async () => {
+	const confirmFn = useCallback(async () => {
 		if (!confirming || blockers.length > 0 || result.waiting) return;
 		try {
-			await remove({
+			await removeFn({
 				expectedRevision: project.revision,
 				resourceId,
 			});
-			await navigate({
+			await navigateFn({
 				to: "/editor/$projectId/assets",
 				params: {
 					projectId: project.projectId,
@@ -113,23 +111,23 @@ export const useEditorAssetDeleteController = ({
 		blockers.length,
 		confirming,
 		filter,
-		navigate,
+		navigateFn,
 		project.projectId,
 		project.revision,
 		query,
-		remove,
+		removeFn,
 		resourceId,
 		result.waiting,
 	]);
 
 	return {
 		blockers,
-		cancel,
-		confirm,
+		cancelFn,
+		confirmFn,
 		confirming,
 		deleting: result.waiting,
 		error: RendererRuntime.runSync(readSettledAsyncResultErrorFx(result)),
-		open,
+		openFn,
 		project,
 	};
 };

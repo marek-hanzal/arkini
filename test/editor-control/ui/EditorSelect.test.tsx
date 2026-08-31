@@ -32,7 +32,7 @@ describe("EditorSelect", () => {
 			root.render(
 				<EditorSelect
 					label="Version"
-					onChange={onChange}
+					onChangeFn={onChange}
 					options={[
 						{
 							label: "Working copy",

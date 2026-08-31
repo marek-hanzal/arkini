@@ -39,7 +39,7 @@ const popVisitFn = (history: ReadonlyArray<string>) => {
 	};
 };
 
-const readShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
+const readShortcutFn = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
 	if (
 		event.repeat ||
@@ -89,14 +89,14 @@ export const useNavigation = ({
 	inputNodeIds,
 	maxHighlightLevel,
 	navigationNodeIds,
-	onSelectionChange,
+	onSelectionChangeFn,
 	outputNodeIds,
 	positions,
 	relationFocusNodeIdRef,
 	rootNodeIds,
-	scheduleDraw,
+	scheduleDrawFn,
 	selection,
-	setHighlightDepth,
+	setHighlightDepthFn,
 	viewportRef,
 }: {
 	readonly canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -105,14 +105,14 @@ export const useNavigation = ({
 	readonly inputNodeIds: ReadonlyArray<string>;
 	readonly maxHighlightLevel: number;
 	readonly navigationNodeIds: ReadonlyArray<string>;
-	readonly onSelectionChange: (selection: Selection | undefined) => void;
+	readonly onSelectionChangeFn: (selection: Selection | undefined) => void;
 	readonly outputNodeIds: ReadonlyArray<string>;
 	readonly positions: ReadonlyMap<string, LayoutNode>;
 	readonly relationFocusNodeIdRef: RefObject<string | undefined>;
 	readonly rootNodeIds: ReadonlyArray<string>;
-	readonly scheduleDraw: () => void;
+	readonly scheduleDrawFn: () => void;
 	readonly selection: Selection | undefined;
-	readonly setHighlightDepth: (
+	readonly setHighlightDepthFn: (
 		value:
 			| HighlightDepth
 			| undefined
@@ -125,16 +125,16 @@ export const useNavigation = ({
 	const outputIndexRef = useRef(-1);
 	const rootIndexRef = useRef(-1);
 	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
-	const [helpOpen, setHelpOpen] = useState(false);
-	const resetNavigation = useCallback(() => {
+	const [helpOpen, setHelpOpenFn] = useState(false);
+	const resetNavigationFn = useCallback(() => {
 		navigationIndexRef.current = 0;
 	}, []);
 
-	const focusPosition = (position: LayoutNode, zoom: number) => {
+	const focusPositionFn = (position: LayoutNode, zoom: number) => {
 		const rect = canvasRef.current?.getBoundingClientRect();
 		if (rect === undefined) return false;
 		viewportRef.current = readOriginFlowNodeViewportFn(position, rect.width, rect.height, zoom);
-		scheduleDraw();
+		scheduleDrawFn();
 		return true;
 	};
 
@@ -171,18 +171,18 @@ export const useNavigation = ({
 	]);
 
 	useEffect(() => {
-		const handleKeyDown = (event: KeyboardEvent) => {
+		const handleKeyDownFn = (event: KeyboardEvent) => {
 			if (helpOpen) {
 				if (event.key === "Escape" || event.key === "?") {
 					event.preventDefault();
-					setHelpOpen(false);
+					setHelpOpenFn(false);
 				}
 				return;
 			}
-			const shortcut = readShortcut(event);
+			const shortcut = readShortcutFn(event);
 			if (shortcut === undefined) return;
 			event.preventDefault();
-			const focusNode = (
+			const focusNodeFn = (
 				nodeId: string | undefined,
 				indexRef?: {
 					current: number;
@@ -193,7 +193,7 @@ export const useNavigation = ({
 				const position = positions.get(nodeId);
 				if (position === undefined) return false;
 				relationFocusNodeIdRef.current = nodeId;
-				const focused = focusPosition(
+				const focused = focusPositionFn(
 					position,
 					Math.max(viewportRef.current.zoom, DefaultOriginFlowViewportZoom),
 				);
@@ -202,18 +202,18 @@ export const useNavigation = ({
 				return focused;
 			};
 			if (shortcut === "help") {
-				setHelpOpen(true);
+				setHelpOpenFn(true);
 				return;
 			}
 			if (shortcut.startsWith("depth-")) {
 				if (selection?.kind !== "node") return;
 				relationFocusNodeIdRef.current = undefined;
 				if (shortcut === "depth-reset") {
-					setHighlightDepth(undefined);
-					focusNode(selection.id, navigationIndexRef, 0);
+					setHighlightDepthFn(undefined);
+					focusNodeFn(selection.id, navigationIndexRef, 0);
 					return;
 				}
-				setHighlightDepth((current) => {
+				setHighlightDepthFn((current) => {
 					const limit =
 						current?.nodeId === selection.id && current.direction === direction
 							? current.limit
@@ -231,9 +231,9 @@ export const useNavigation = ({
 			}
 			if (shortcut === "back") {
 				const back = popVisitFn(visitHistoryRef.current);
-				if (back.nodeId === undefined || !focusNode(back.nodeId)) return;
+				if (back.nodeId === undefined || !focusNodeFn(back.nodeId)) return;
 				visitHistoryRef.current = back.history;
-				onSelectionChange({
+				onSelectionChangeFn({
 					id: back.nodeId,
 					kind: "node",
 				});
@@ -246,7 +246,7 @@ export const useNavigation = ({
 					readOriginFlowInitialFocusFn(flow, positions);
 				if (
 					position !== undefined &&
-					focusPosition(
+					focusPositionFn(
 						position,
 						Math.max(viewportRef.current.zoom, DefaultOriginFlowViewportZoom),
 					)
@@ -259,18 +259,18 @@ export const useNavigation = ({
 				const indexRef = shortcut === "inputs" ? inputIndexRef : outputIndexRef;
 				if (ids.length === 0) return;
 				const index = (indexRef.current + 1) % ids.length;
-				focusNode(ids[index], indexRef, index);
+				focusNodeFn(ids[index], indexRef, index);
 				return;
 			}
 			if (shortcut === "roots") {
 				if (selection?.kind !== "node" || rootNodeIds.length === 0) return;
-				setHighlightDepth({
+				setHighlightDepthFn({
 					direction,
 					limit: maxHighlightLevel,
 					nodeId: selection.id,
 				});
 				const index = (rootIndexRef.current + 1) % rootNodeIds.length;
-				focusNode(rootNodeIds[index], rootIndexRef, index);
+				focusNodeFn(rootNodeIds[index], rootIndexRef, index);
 				return;
 			}
 			relationFocusNodeIdRef.current = undefined;
@@ -279,10 +279,10 @@ export const useNavigation = ({
 			const index =
 				(navigationIndexRef.current + offset + navigationNodeIds.length) %
 				navigationNodeIds.length;
-			focusNode(navigationNodeIds[index], navigationIndexRef, index);
+			focusNodeFn(navigationNodeIds[index], navigationIndexRef, index);
 		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
+		window.addEventListener("keydown", handleKeyDownFn);
+		return () => window.removeEventListener("keydown", handleKeyDownFn);
 	}, [
 		direction,
 		flow,
@@ -290,19 +290,19 @@ export const useNavigation = ({
 		inputNodeIds,
 		maxHighlightLevel,
 		navigationNodeIds,
-		onSelectionChange,
+		onSelectionChangeFn,
 		outputNodeIds,
 		positions,
 		rootNodeIds,
-		scheduleDraw,
+		scheduleDrawFn,
 		selection,
-		setHighlightDepth,
+		setHighlightDepthFn,
 	]);
 
 	return {
 		helpOpen,
-		resetNavigation,
-		setHelpOpen,
+		resetNavigationFn,
+		setHelpOpenFn,
 		visitHistoryRef,
 	};
 };

@@ -10,7 +10,7 @@ interface FuseDocument<Identity extends string> extends FuseSearchCandidate<Iden
 	readonly order: number;
 }
 
-const normalizeExactTerm = (value: string) => value.trim().toLocaleLowerCase();
+const normalizeExactTermFn = (value: string) => value.trim().toLocaleLowerCase();
 
 /** Searches explicit authorized presentation terms while retaining a stable Fuse corpus by identity. */
 export const useFuseSearch = <Identity extends string>(
@@ -50,9 +50,9 @@ export const useFuseSearch = <Identity extends string>(
 	const normalizedQuery = query.trim();
 	return useMemo(() => {
 		if (normalizedQuery === "") return documents.map(({ identity }) => identity);
-		const exactQuery = normalizeExactTerm(normalizedQuery);
+		const exactQuery = normalizeExactTermFn(normalizedQuery);
 		const exact = documents.filter(({ terms }) =>
-			terms.some((term) => normalizeExactTerm(term) === exactQuery),
+			terms.some((term) => normalizeExactTermFn(term) === exactQuery),
 		);
 		if (exact.length > 0) return exact.map(({ identity }) => identity);
 		return fuse

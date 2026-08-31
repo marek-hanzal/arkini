@@ -11,20 +11,18 @@ import type { Project } from "~/project-authoring/type/Project";
 import {
 	type ProjectFormSchema,
 	ProjectAvatarKeys,
-	ProjectFormBaseSchema,
 } from "~/project-authoring/schema/ProjectFormSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
-import { type EditorFormApi, useAppForm } from "~/authoring-form/ui/EditorForm";
+import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
-import type { ProjectCompatibility } from "~/project-version/type/ProjectCompatibility";
 
 const createProjectConfigFn = (
 	project: Pick<Project, "config">,
@@ -137,24 +135,16 @@ const analyzeProjectStructuralCompatibilityFn = (
 
 export namespace useProjectFormController {
 	export interface Props {
-		readonly onInvalidSection: (section: ProjectSectionId) => void | Promise<void>;
+		readonly onInvalidSectionFn: (section: ProjectSectionId) => void | Promise<void>;
 	}
 
-	export interface Output {
-		readonly canonicalValues: ProjectFormSchema.Type;
-		readonly compatibility?: ProjectCompatibility;
-		readonly error: unknown;
-		readonly form: EditorFormApi<ProjectFormSchema.Type, typeof ProjectFormBaseSchema>;
-		readonly isDirty: boolean;
-		readonly isSaving: boolean;
-		readonly project: Project;
-		readonly save: () => Promise<boolean>;
-	}
+	/** Inferred to preserve TanStack Form's configured hook API without mirroring generics. */
+	export type Output = ReturnType<typeof useProjectFormController>;
 }
 
 export const useProjectFormController = ({
-	onInvalidSection,
-}: useProjectFormController.Props): useProjectFormController.Output => {
+	onInvalidSectionFn,
+}: useProjectFormController.Props) => {
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
 		() => readProjectFormValuesFn(project),
@@ -170,7 +160,7 @@ export const useProjectFormController = ({
 	);
 	const saveConfigAtom = saveProjectConfigCommandAtom(project.projectId);
 	const saveResult = useAtomValue(saveConfigAtom);
-	const saveConfig = useAtomSet(saveConfigAtom, {
+	const saveConfigFn = useAtomSet(saveConfigAtom, {
 		mode: "promise",
 	});
 	const submitSucceeded = useRef(false);
@@ -186,7 +176,7 @@ export const useProjectFormController = ({
 		onSubmit: async ({ formApi, value }) => {
 			const parsed = schema.parse(value);
 			const config = createProjectConfigFn(project, parsed);
-			await saveConfig({
+			await saveConfigFn({
 				config,
 				expectedRevision: project.revision,
 			});
@@ -214,7 +204,7 @@ export const useProjectFormController = ({
 			? "Fix the highlighted project fields before saving."
 			: undefined,
 	);
-	const save = useCallback(async () => {
+	const saveFn = useCallback(async () => {
 		if (!dirty || submitting) return false;
 		submitSucceeded.current = false;
 		await form.handleSubmit();
@@ -222,13 +212,13 @@ export const useProjectFormController = ({
 			const result = schema.safeParse(form.state.values);
 			const issue = result.success ? undefined : result.error.issues[0];
 			if (issue !== undefined) {
-				await onInvalidSection(readProjectSectionForPathFn(issue.path));
-				const focusInvalidField = () =>
+				await onInvalidSectionFn(readProjectSectionForPathFn(issue.path));
+				const focusInvalidFieldFn = () =>
 					document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
 				if (typeof requestAnimationFrame === "function") {
-					requestAnimationFrame(focusInvalidField);
+					requestAnimationFrame(focusInvalidFieldFn);
 				} else {
-					setTimeout(focusInvalidField, 0);
+					setTimeout(focusInvalidFieldFn, 0);
 				}
 			}
 		}
@@ -236,17 +226,17 @@ export const useProjectFormController = ({
 	}, [
 		dirty,
 		form,
-		onInvalidSection,
+		onInvalidSectionFn,
 		schema,
 		submitting,
 	]);
 	useEditorUnsavedChangesRegistration({
-		discard: () => form.reset(canonicalValues),
+		discardFn: () => form.reset(canonicalValues),
 		id: `project:${project.projectId}`,
-		isDirty: () => form.state.isDirty,
-		isValid: () => schema.safeParse(form.state.values).success,
-		ownsPathname: (pathname) => pathname.startsWith(`/editor/${project.projectId}/project`),
-		save,
+		isDirtyFn: () => form.state.isDirty,
+		isValidFn: () => schema.safeParse(form.state.values).success,
+		ownsPathnameFn: (pathname) => pathname.startsWith(`/editor/${project.projectId}/project`),
+		saveFn,
 	});
 	const error =
 		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError;
@@ -259,7 +249,7 @@ export const useProjectFormController = ({
 			isDirty: dirty,
 			isSaving: submitting,
 			project,
-			save,
+			saveFn,
 		}),
 		[
 			canonicalValues,
@@ -268,7 +258,7 @@ export const useProjectFormController = ({
 			error,
 			form,
 			project,
-			save,
+			saveFn,
 			submitting,
 		],
 	);

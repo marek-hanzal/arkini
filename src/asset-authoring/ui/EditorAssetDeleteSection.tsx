@@ -2,7 +2,7 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
-import type { EditorAssetDeleteBlocker } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
+import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -22,8 +22,8 @@ const EditorAssetDeleteDialog = ({
 	project,
 	query,
 	resourceId,
-	onCancel,
-	onConfirm,
+	onCancelFn,
+	onConfirmFn,
 }: {
 	readonly error: unknown;
 	readonly filter: "all" | "unused";
@@ -31,8 +31,8 @@ const EditorAssetDeleteDialog = ({
 	readonly project: Project;
 	readonly query: string;
 	readonly resourceId: string;
-	readonly onCancel: () => void;
-	readonly onConfirm: () => void;
+	readonly onCancelFn: () => void;
+	readonly onConfirmFn: () => void;
 }) => (
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
@@ -70,7 +70,7 @@ const EditorAssetDeleteDialog = ({
 				</ButtonLink>
 				<Button
 					disabled={pending}
-					onClick={onCancel}
+					onClick={onCancelFn}
 				>
 					Cancel
 				</Button>
@@ -78,7 +78,7 @@ const EditorAssetDeleteDialog = ({
 					disabled={pending}
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetDeleteConfirm"
-					onClick={onConfirm}
+					onClick={onConfirmFn}
 				>
 					Delete asset
 				</DangerButton>
@@ -91,7 +91,7 @@ const EditorAssetDeleteBlockerLink = ({
 	blocker,
 	project,
 }: {
-	readonly blocker: EditorAssetDeleteBlocker;
+	readonly blocker: readGameResourceUsagesFn.Usage;
 	readonly project: Project;
 }) => {
 	if (blocker.owner === "item") {
@@ -218,7 +218,7 @@ export const EditorAssetDeleteSection = ({
 					<div>
 						<DangerButton
 							data-ui="EditorAssetDeleteOpen"
-							onClick={controller.open}
+							onClick={controller.openFn}
 						>
 							Delete asset
 						</DangerButton>
@@ -233,8 +233,8 @@ export const EditorAssetDeleteSection = ({
 					project={controller.project}
 					query={query}
 					resourceId={resourceId}
-					onCancel={controller.cancel}
-					onConfirm={() => void controller.confirm()}
+					onCancelFn={controller.cancelFn}
+					onConfirmFn={() => void controller.confirmFn()}
 				/>
 			) : null}
 		</>

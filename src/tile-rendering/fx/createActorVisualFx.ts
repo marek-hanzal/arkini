@@ -76,7 +76,7 @@ const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
 							visual,
 						}),
 					);
-					frames.reportCriticalFailure(cause);
+					frames.reportCriticalFailureFn(cause);
 				});
 		}),
 );
@@ -127,7 +127,7 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		quantityBackground,
 		titleStyle,
 		readyListeners: new Set(),
-		reportCriticalFailure: frames.reportCriticalFailure,
+		reportCriticalFailureFn: frames.reportCriticalFailureFn,
 		item,
 		size,
 		textureGeneration: 0,

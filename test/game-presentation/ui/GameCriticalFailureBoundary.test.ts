@@ -90,14 +90,14 @@ describe("GameCriticalFailureBoundary", () => {
 		const listeners = new Set<() => void>();
 		routeMocks.resource = {
 			game: {} as InstalledGameEngineResource["game"],
-			assertUsable: () => undefined,
-			getCriticalFailure: () => failure,
-			markCriticalFailure: (_operation, cause) => {
+			assertUsableFn: () => undefined,
+			getCriticalFailureFn: () => failure,
+			markCriticalFailureFn: (_operation, cause) => {
 				failure = cause as CriticalGameLifecycleError;
 				for (const listener of listeners) listener();
 				return failure;
 			},
-			subscribeCriticalFailure: (listener) => {
+			subscribeCriticalFailureFn: (listener) => {
 				listeners.add(listener);
 				return () => {
 					listeners.delete(listener);
@@ -127,7 +127,7 @@ describe("GameCriticalFailureBoundary", () => {
 		expect(container.querySelector('[data-ui="RunningGame"]')).not.toBeNull();
 
 		await act(async () => {
-			routeMocks.resource?.markCriticalFailure(
+			routeMocks.resource?.markCriticalFailureFn(
 				"game-runtime",
 				new Error("background runtime exploded"),
 			);
@@ -145,12 +145,12 @@ describe("GameCriticalFailureBoundary", () => {
 		});
 		routeMocks.resource = {
 			game: {} as InstalledGameEngineResource["game"],
-			assertUsable: () => {
+			assertUsableFn: () => {
 				throw failure;
 			},
-			getCriticalFailure: () => failure,
-			markCriticalFailure: () => failure,
-			subscribeCriticalFailure: () => () => undefined,
+			getCriticalFailureFn: () => failure,
+			markCriticalFailureFn: () => failure,
+			subscribeCriticalFailureFn: () => () => undefined,
 		};
 
 		const container = document.createElement("div");

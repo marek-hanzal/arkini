@@ -189,7 +189,7 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				dragging: false,
 				dragOffsetX: 0,
 				dragOffsetY: 0,
-				onPointerDown: null,
+				onPointerDownFn: null,
 			} satisfies PixiTileActor;
 		}),
 );

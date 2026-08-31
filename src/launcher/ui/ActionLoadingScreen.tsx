@@ -41,16 +41,16 @@ interface ActionLoadingScreenProps {
 }
 
 const useProgress = (completed: boolean, durationMs: number) => {
-	const [progress, setProgress] = useState(completed ? 100 : initialProgress);
+	const [progress, setProgressFn] = useState(completed ? 100 : initialProgress);
 
 	useEffect(() => {
 		if (completed) {
-			setProgress(100);
+			setProgressFn(100);
 			return;
 		}
-		setProgress(initialProgress);
+		setProgressFn(initialProgress);
 		const timers = pendingStages.map((stage) =>
-			window.setTimeout(() => setProgress(stage.progress), durationMs * stage.at),
+			window.setTimeout(() => setProgressFn(stage.progress), durationMs * stage.at),
 		);
 		return () => {
 			for (const timer of timers) window.clearTimeout(timer);

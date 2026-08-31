@@ -13,7 +13,7 @@ export const executeEditorProjectRepositoryFx = <Request, Value>(
 	operation: EditorProjectTransport.Operation,
 	ownership: EditorProjectServiceOwnership,
 	requestFx: Effect.Effect<Request, ProjectRepositoryError, never>,
-	run: (
+	runFx: (
 		repository: OwnedEditorProjectRepository,
 		request: Request,
 	) => Effect.Effect<Value, ProjectRepositoryError, never>,
@@ -27,7 +27,7 @@ export const executeEditorProjectRepositoryFx = <Request, Value>(
 							message: ownership.message,
 						}),
 					)
-				: run(ownership.repository, request),
+				: runFx(ownership.repository, request),
 		),
 		Effect.match({
 			onFailure: (error) => ({

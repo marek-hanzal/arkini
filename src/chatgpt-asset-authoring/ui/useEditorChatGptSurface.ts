@@ -1,28 +1,23 @@
 import { Effect } from "effect";
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import {
-	ChatGptViewStateSchema,
-	type ChatGptViewStateSchema as ChatGptViewStateSchemaType,
-} from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
+import { ChatGptViewStateSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 import type { ChatGptSurfaceSchema } from "~electron/contract/chatgpt/ChatGptSurfaceSchema";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
-export type ChatGptViewState = ChatGptViewStateSchemaType.Type;
-
 const setChatGptSurfaceFx = Effect.fn("setChatGptSurfaceFx")(
 	(surface: ChatGptSurfaceSchema.Type | null) =>
 		Effect.tryPromise({
-			try: () => window.arkini.chatGpt.setSurface(surface),
+			try: () => window.arkini.chatGpt.setSurfaceFn(surface),
 			catch: (cause) => cause,
 		}),
 );
 
 const subscribeChatGptViewStateFx = Effect.fn("subscribeChatGptViewStateFx")(
-	(listener: (state: ChatGptViewState) => void) =>
+	(listenerFn: (state: ChatGptViewStateSchema.Type) => void) =>
 		Effect.sync(() =>
-			window.arkini.chatGpt.onStateChanged((candidate) =>
-				listener(ChatGptViewStateSchema.parse(candidate)),
+			window.arkini.chatGpt.onStateChangedFn((candidate) =>
+				listenerFn(ChatGptViewStateSchema.parse(candidate)),
 			),
 		),
 );
@@ -33,9 +28,9 @@ interface UseEditorChatGptSurfaceProps {
 }
 
 interface UseEditorChatGptSurfaceOutput {
-	readonly retry: () => void;
+	readonly retryFn: () => void;
 	readonly surfaceRef: RefObject<HTMLDivElement | null>;
-	readonly viewState: ChatGptViewState;
+	readonly viewState: ChatGptViewStateSchema.Type;
 }
 
 /** Owns placement, state subscription, detach, and retry for the native browser surface. */
@@ -44,16 +39,16 @@ export const useEditorChatGptSurface = ({
 	visible,
 }: UseEditorChatGptSurfaceProps): UseEditorChatGptSurfaceOutput => {
 	const surfaceRef = useRef<HTMLDivElement>(null);
-	const [viewState, setViewState] = useState<ChatGptViewState>({
+	const [viewState, setViewStateFn] = useState<ChatGptViewStateSchema.Type>({
 		type: "loading",
 	});
-	const [retryKey, setRetryKey] = useState(0);
+	const [retryKey, setRetryKeyFn] = useState(0);
 
 	useEffect(
 		() =>
 			RendererRuntime.runSync(
 				subscribeChatGptViewStateFx((state) => {
-					setViewState(state);
+					setViewStateFn(state);
 				}),
 			),
 		[],
@@ -66,7 +61,7 @@ export const useEditorChatGptSurface = ({
 			return;
 		}
 		let previousBounds = "";
-		const publish = () => {
+		const publishFn = () => {
 			const rect = element.getBoundingClientRect();
 			const bounds = {
 				x: Math.max(0, Math.round(rect.x)),
@@ -83,19 +78,19 @@ export const useEditorChatGptSurface = ({
 					bounds,
 				}),
 			).catch((error) => {
-				setViewState({
+				setViewStateFn({
 					type: "unavailable",
 					message: error instanceof Error ? error.message : String(error),
 				});
 			});
 		};
-		const observer = new ResizeObserver(publish);
+		const observer = new ResizeObserver(publishFn);
 		observer.observe(element);
-		window.addEventListener("resize", publish);
-		publish();
+		window.addEventListener("resize", publishFn);
+		publishFn();
 		return () => {
 			observer.disconnect();
-			window.removeEventListener("resize", publish);
+			window.removeEventListener("resize", publishFn);
 			void RendererRuntime.runPromise(setChatGptSurfaceFx(null));
 		};
 	}, [
@@ -104,15 +99,15 @@ export const useEditorChatGptSurface = ({
 		visible,
 	]);
 
-	const retry = useCallback(() => {
-		setViewState({
+	const retryFn = useCallback(() => {
+		setViewStateFn({
 			type: "loading",
 		});
-		setRetryKey((current) => current + 1);
+		setRetryKeyFn((current) => current + 1);
 	}, []);
 
 	return {
-		retry,
+		retryFn,
 		surfaceRef,
 		viewState,
 	};

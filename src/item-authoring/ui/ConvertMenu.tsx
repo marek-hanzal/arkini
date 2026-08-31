@@ -16,14 +16,19 @@ export const ConvertMenu = ({
 	readonly itemUid: string;
 	readonly projectId: string;
 }) => {
-	const { floatingStyles, getFloatingProps, getReferenceProps, open, refs } =
-		useEditorFloatingMenu();
+	const {
+		floatingStyles,
+		getFloatingProps: getFloatingPropsFn,
+		getReferenceProps: getReferencePropsFn,
+		open,
+		refs,
+	} = useEditorFloatingMenu();
 	return (
 		<>
 			<Button
 				ref={refs.setReference}
 				className={`${editorSectionTabClassName} h-10 min-h-10 gap-2`}
-				{...getReferenceProps()}
+				{...getReferencePropsFn()}
 			>
 				<Replace className="size-4" />
 				Convert
@@ -35,7 +40,7 @@ export const ConvertMenu = ({
 						style={floatingStyles}
 						className="z-50 grid w-96 max-w-[calc(100vw-1rem)] gap-1 rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
 						data-ui="EditorItemConvertMenu"
-						{...getFloatingProps()}
+						{...getFloatingPropsFn()}
 					>
 						<p className="px-2.5 py-1.5 text-xs text-muted">
 							Compatible data is kept; unsupported fields are removed on Save.

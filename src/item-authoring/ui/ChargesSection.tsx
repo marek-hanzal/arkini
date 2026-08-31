@@ -21,7 +21,7 @@ export const ChargesSection = () => {
 								dataUi="EditorChargesDisabled"
 								description="Charges give this item a finite number of uses. Configured interactions spend them; reaching zero depletes the item and may emit an output."
 								icon={BatteryCharging}
-								onEnable={() =>
+								onEnableFn={() =>
 									form.setFieldValue("charges", {
 										amount: 1,
 									})
@@ -70,7 +70,7 @@ export const ChargesSection = () => {
 									emptyIcon={PackagePlus}
 									emptyTitle="No depletion output"
 									value={charges.output}
-									onChange={(output) =>
+									onChangeFn={(output) =>
 										form.setFieldValue("charges.output", output)
 									}
 								/>

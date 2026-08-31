@@ -13,7 +13,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 	({ api = window.arkini.arkpack }: createElectronArkpackStorageFx.Props = {}) =>
 		Effect.succeed({
 			listFx: Effect.tryPromise({
-				try: () => api.list(),
+				try: () => api.listFn(),
 				catch: (cause) =>
 					new ArkpackStorageError({
 						operation: "list",
@@ -29,7 +29,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 			),
 			readFx: Effect.fn("ArkpackStorage.readFx")((packageId: string) =>
 				Effect.tryPromise({
-					try: () => api.read(packageId),
+					try: () => api.readFn(packageId),
 					catch: (cause) =>
 						new ArkpackStorageError({
 							operation: "read",
@@ -46,7 +46,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 			),
 			removeFx: Effect.fn("ArkpackStorage.removeFx")((packageId: string) =>
 				Effect.tryPromise({
-					try: () => api.remove(packageId),
+					try: () => api.removeFn(packageId),
 					catch: (cause) =>
 						new ArkpackStorageError({
 							operation: "remove",
@@ -57,7 +57,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 			writeFx: Effect.fn("ArkpackStorage.writeFx")((packageId: string, bytes: ArrayBuffer) =>
 				Effect.tryPromise({
 					try: () =>
-						api.install({
+						api.installFn({
 							packageId,
 							bytes: new Uint8Array(bytes.slice(0)),
 						}),
@@ -69,7 +69,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 				}),
 			),
 			openUserDirectoryFx: Effect.tryPromise({
-				try: () => api.openUserDirectory(),
+				try: () => api.openUserDirectoryFn(),
 				catch: (cause) =>
 					new ArkpackStorageError({
 						operation: "open-user-directory",

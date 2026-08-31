@@ -33,14 +33,14 @@ export namespace createNoteCommandAtomsFx {
 export const createNoteCommandAtomsFx = Effect.fn("createEditorNotesCommandAtomsFx")(
 	(repository: NoteRepository) =>
 		Effect.sync(() => {
-			const stream = Atom.family((projectId: string) =>
+			const streamFn = Atom.family((projectId: string) =>
 				Atom.make<ReadonlyArray<NoteSchema.Type> | undefined>(undefined).pipe(
 					Atom.withLabel(`EditorNotesStream:${projectId}`),
 					Atom.setIdleTTL(0),
 				),
 			);
-			const command = Atom.family((projectId: string) => {
-				const projectStream = stream(projectId);
+			const commandFn = Atom.family((projectId: string) => {
+				const projectStream = streamFn(projectId);
 				return Atom.fn((input: createNoteCommandAtomsFx.Command) => {
 					switch (input.action) {
 						case "load":
@@ -97,8 +97,8 @@ export const createNoteCommandAtomsFx = Effect.fn("createEditorNotesCommandAtoms
 				}).pipe(Atom.withLabel(`EditorNotesCommand:${projectId}`), Atom.setIdleTTL(0));
 			});
 			return {
-				command,
-				stream,
+				commandFn,
+				streamFn,
 			};
 		}),
 );

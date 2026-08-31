@@ -23,7 +23,7 @@ describe("magnetic field", () => {
 						Effect.die("An empty actor store must not acquire springs."),
 					startTweenFx: () => Effect.die("Magnet does not own tweens."),
 				},
-				scheduleApply: (apply) => {
+				scheduleApplyFn: (apply) => {
 					scheduled.push(apply);
 					return () => {
 						const index = scheduled.indexOf(apply);
@@ -87,13 +87,13 @@ describe("magnetic field", () => {
 			}),
 		);
 
-		projector.projectPose({
+		projector.projectPoseFn({
 			scale: 1,
 			x: 20,
 			y: 0,
 		});
-		projector.release();
-		projector.projectPose({
+		projector.releaseFn();
+		projector.projectPoseFn({
 			scale: 1,
 			x: 40,
 			y: 0,
@@ -128,7 +128,7 @@ describe("magnetic field", () => {
 					actors,
 				} as unknown as MainActorStore,
 				animationDriver,
-				scheduleApply: (apply) => {
+				scheduleApplyFn: (apply) => {
 					apply();
 					return () => {};
 				},
@@ -188,7 +188,7 @@ describe("magnetic field", () => {
 					]),
 				} as unknown as MainActorStore,
 				animationDriver,
-				scheduleApply: (apply) => {
+				scheduleApplyFn: (apply) => {
 					apply();
 					return () => {};
 				},

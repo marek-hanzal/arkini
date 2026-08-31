@@ -39,8 +39,8 @@ const event = {
 	},
 } as IpcMainInvokeEvent;
 const trustedRenderer: TrustedRenderer = {
-	isTrustedUrl: () => true,
-	isTrustedIpcSender: () => true,
+	isTrustedUrlFn: () => true,
+	isTrustedIpcSenderFn: () => true,
 	assertTrustedIpcSenderFx: () => Effect.void,
 	registerWindowFx: () => Effect.void,
 };

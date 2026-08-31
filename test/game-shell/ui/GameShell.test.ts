@@ -58,9 +58,9 @@ const game = {
 	config: {
 		items: {},
 	},
-	getSnapshot: () => ({}),
+	getSnapshotFn: () => ({}),
 	id: "game:shell-overlay-precedence",
-	readOrThrow: (request: unknown) => request,
+	readOrThrowFn: (request: unknown) => request,
 } as unknown as GameEngine;
 
 afterEach(async () => {
@@ -169,13 +169,13 @@ describe("Playable Game shell overlay precedence", () => {
 			completeRun = resolve;
 		});
 		await act(async () => {
-			readItemDetail().runPendingAction({
+			readItemDetail().runPendingActionFn({
 				action: "enqueue",
 				failureMessage: "Start failed.",
 				key: "line:runtime:first",
 				run: Effect.promise(() => run),
 			});
-			readGameMenu().open();
+			readGameMenu().openFn();
 			await Promise.resolve();
 		});
 
@@ -184,11 +184,11 @@ describe("Playable Game shell overlay precedence", () => {
 			phase: "exiting",
 			restoreFocus: false,
 		});
-		expect(readItemDetail().readPendingAction("line:runtime:first")).toBe("enqueue");
+		expect(readItemDetail().readPendingActionFn("line:runtime:first")).toBe("enqueue");
 
 		await act(async () => completeRun?.());
 		await vi.waitFor(() =>
-			expect(readItemDetail().readPendingAction("line:runtime:first")).toBeNull(),
+			expect(readItemDetail().readPendingActionFn("line:runtime:first")).toBeNull(),
 		);
 		expect(readItemDetail().state.phase).toBe("exiting");
 	});

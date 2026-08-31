@@ -15,12 +15,12 @@ import type { GameSourceFileSchema } from "~/game-config-source/schema/GameSourc
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectFiles } from "./ProjectFiles";
 
-const parseJsonFx = <Value>(file: string, parse: (candidate: unknown) => Value, label: string) =>
+const parseJsonFx = <Value>(file: string, parseFn: (candidate: unknown) => Value, label: string) =>
 	Effect.gen(function* () {
 		const fileSystem = yield* FileSystem.FileSystem;
 		const source = yield* fileSystem.readFileString(file);
 		return yield* Effect.try({
-			try: () => parse(JSON.parse(source)),
+			try: () => parseFn(JSON.parse(source)),
 			catch: (cause) =>
 				new Error(`${label} ${file} is invalid.`, {
 					cause,

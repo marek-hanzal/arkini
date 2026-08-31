@@ -129,7 +129,7 @@ describe("motion delivery batch", () => {
 			x: 160,
 			y: 90,
 		});
-		spawnTravel.onComplete?.();
+		spawnTravel.onCompleteFn?.();
 		expect(spawned.container).toMatchObject({
 			x: destination.x,
 			y: destination.y,
@@ -164,7 +164,7 @@ describe("motion delivery batch", () => {
 			y: 400,
 		});
 		stacked.container.position.set(1_240, 640);
-		stackTravel.onComplete?.();
+		stackTravel.onCompleteFn?.();
 		expect(stacked.item.quantity).toBe(1);
 
 		const finalContact = animations
@@ -202,7 +202,7 @@ describe("motion delivery batch", () => {
 		expect(
 			magneticReleases.filter((release) => release.sourceActorId === stackTransient.item.id),
 		).toHaveLength(0);
-		finalContact.onComplete?.();
+		finalContact.onCompleteFn?.();
 		expect(animations.length).toBeGreaterThanOrEqual(animationCountBeforeContact + 3);
 		advanceStackMergeVanish({
 			actor: stackTransient,

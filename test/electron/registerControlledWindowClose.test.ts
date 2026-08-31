@@ -55,7 +55,7 @@ const createHarness = () => {
 	} as unknown as Pick<IpcMain, "on" | "removeListener">;
 
 	const trustedRenderer = {
-		isTrustedIpcSender: (event: IpcMainEvent) =>
+		isTrustedIpcSenderFn: (event: IpcMainEvent) =>
 			event.sender.id === 17 &&
 			event.senderFrame === mainFrame &&
 			mainFrame.url.startsWith("arkini://app/"),

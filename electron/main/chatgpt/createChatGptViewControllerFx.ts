@@ -30,7 +30,7 @@ const CHAT_GPT_URL = "https://chatgpt.com/";
 const CHAT_GPT_ORIGIN = new URL(CHAT_GPT_URL).origin;
 const CHAT_GPT_PARTITION = "persist:arkini-chatgpt";
 
-const isWebNavigation = (candidate: string) => {
+const isWebNavigationFn = (candidate: string) => {
 	try {
 		const url = new URL(candidate);
 		return url.protocol === "https:" && url.username === "" && url.password === "";
@@ -39,7 +39,7 @@ const isWebNavigation = (candidate: string) => {
 	}
 };
 
-const isChatGptNavigation = (candidate: string) => {
+const isChatGptNavigationFn = (candidate: string) => {
 	try {
 		return new URL(candidate).origin === CHAT_GPT_ORIGIN;
 	} catch {
@@ -47,7 +47,7 @@ const isChatGptNavigation = (candidate: string) => {
 	}
 };
 
-const isAbortedNavigation = (cause: unknown) =>
+const isAbortedNavigationFn = (cause: unknown) =>
 	typeof cause === "object" &&
 	cause !== null &&
 	(("code" in cause && cause.code === "ERR_ABORTED") || ("errno" in cause && cause.errno === -3));
@@ -72,31 +72,31 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 						readonly path: string;
 				  }
 				| undefined;
-			const sendState = () => {
+			const sendStateFn = () => {
 				if (window.webContents.isDestroyed()) return;
 				window.webContents.send(ArkiniElectronApi.channels.chatGptStateChanged, state);
 			};
-			const setState = (next: ChatGptViewStateSchema.Type) => {
+			const setStateFn = (next: ChatGptViewStateSchema.Type) => {
 				state = next;
-				sendState();
+				sendStateFn();
 			};
-			const detach = () => {
+			const detachFn = () => {
 				if (!attached || view === undefined) return;
 				window.contentView.removeChildView(view);
 				attached = false;
 			};
-			const invalidateAttachment = () => {
+			const invalidateAttachmentFn = () => {
 				surfaceGeneration += 1;
 				activeDownload?.item.cancel();
-				detach();
+				detachFn();
 			};
-			const clearSurface = () => {
+			const clearSurfaceFn = () => {
 				allowDetachedMainFrameNavigation = false;
 				surface = null;
 				candidatePending = false;
-				invalidateAttachment();
+				invalidateAttachmentFn();
 			};
-			const readBounds = (candidate: ChatGptSurfaceSchema.Type["bounds"]) => {
+			const readBoundsFn = (candidate: ChatGptSurfaceSchema.Type["bounds"]) => {
 				const [contentWidth, contentHeight] = window.getContentSize();
 				const x = Math.min(candidate.x, contentWidth);
 				const y = Math.min(candidate.y, contentHeight);
@@ -107,11 +107,11 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 					height: Math.min(candidate.height, contentHeight - y),
 				};
 			};
-			const attach = (candidate: ChatGptSurfaceSchema.Type) => {
+			const attachFn = (candidate: ChatGptSurfaceSchema.Type) => {
 				if (view === undefined || candidatePending) return;
-				const bounds = readBounds(candidate.bounds);
+				const bounds = readBoundsFn(candidate.bounds);
 				if (bounds.width === 0 || bounds.height === 0) {
-					invalidateAttachment();
+					invalidateAttachmentFn();
 					return;
 				}
 				if (!attached) {
@@ -120,39 +120,39 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 				}
 				view.setBounds(bounds);
 			};
-			const restoreCurrentPage = (contents: WebContentsView["webContents"]) => {
+			const restoreCurrentPageFn = (contents: WebContentsView["webContents"]) => {
 				allowDetachedMainFrameNavigation = false;
-				if (surface === null || !isWebNavigation(contents.getURL())) return;
-				attach(surface);
-				setState({
+				if (surface === null || !isWebNavigationFn(contents.getURL())) return;
+				attachFn(surface);
+				setStateFn({
 					type: "ready",
 				});
 			};
-			const recoverCurrentPage = (contents: WebContentsView["webContents"]) => {
+			const recoverCurrentPageFn = (contents: WebContentsView["webContents"]) => {
 				if (contents.isLoadingMainFrame()) return;
-				restoreCurrentPage(contents);
+				restoreCurrentPageFn(contents);
 			};
-			const load = (contents: WebContentsView["webContents"], url = CHAT_GPT_URL) => {
+			const loadFn = (contents: WebContentsView["webContents"], url = CHAT_GPT_URL) => {
 				allowDetachedMainFrameNavigation = true;
-				invalidateAttachment();
-				setState({
+				invalidateAttachmentFn();
+				setStateFn({
 					type: "loading",
 				});
 				void contents.loadURL(url).catch((cause) => {
 					if (contents.isDestroyed()) return;
-					if (isAbortedNavigation(cause)) {
-						recoverCurrentPage(contents);
+					if (isAbortedNavigationFn(cause)) {
+						recoverCurrentPageFn(contents);
 						return;
 					}
 					allowDetachedMainFrameNavigation = false;
-					setState({
+					setStateFn({
 						type: "unavailable",
 						message: cause instanceof Error ? cause.message : String(cause),
 					});
-					invalidateAttachment();
+					invalidateAttachmentFn();
 				});
 			};
-			const onDownload = (
+			const onDownloadFn = (
 				event: Event,
 				item: DownloadItem,
 				contents: WebContentsView["webContents"],
@@ -212,7 +212,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 							)
 								return;
 							candidatePending = true;
-							detach();
+							detachFn();
 							window.webContents.send(
 								ArkiniElectronApi.channels.chatGptAssetCandidate,
 								{
@@ -241,7 +241,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 					});
 				});
 			};
-			const ensureView = () => {
+			const ensureViewFn = () => {
 				if (view !== undefined) return view;
 				const created = new WebContentsView({
 					webPreferences: {
@@ -257,24 +257,24 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 				view = created;
 				viewSession = session;
 				webContents.setWindowOpenHandler(({ url }) => {
-					if (attached && isWebNavigation(url))
+					if (attached && isWebNavigationFn(url))
 						setImmediate(() => {
 							if (webContents.isDestroyed() || !attached || surface === null) return;
-							load(webContents, url);
+							loadFn(webContents, url);
 						});
 					return {
 						action: "deny",
 					};
 				});
-				const preventNonWebNavigation = (
+				const preventNonWebNavigationFn = (
 					event: Event & {
 						readonly isMainFrame: boolean;
 						readonly url: string;
 					},
 				) => {
-					if (!isWebNavigation(event.url)) {
+					if (!isWebNavigationFn(event.url)) {
 						event.preventDefault();
-						if (event.isMainFrame) restoreCurrentPage(webContents);
+						if (event.isMainFrame) restoreCurrentPageFn(webContents);
 						return;
 					}
 					if (event.isMainFrame && attached) {
@@ -284,28 +284,28 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 					if (
 						event.isMainFrame &&
 						!allowDetachedMainFrameNavigation &&
-						!isChatGptNavigation(event.url)
+						!isChatGptNavigationFn(event.url)
 					)
 						event.preventDefault();
 				};
-				webContents.on("will-navigate", preventNonWebNavigation);
-				webContents.on("will-redirect", preventNonWebNavigation);
-				webContents.on("will-frame-navigate", preventNonWebNavigation);
+				webContents.on("will-navigate", preventNonWebNavigationFn);
+				webContents.on("will-redirect", preventNonWebNavigationFn);
+				webContents.on("will-frame-navigate", preventNonWebNavigationFn);
 				webContents.on("did-start-navigation", (_event, _url, isInPlace, isMainFrame) => {
 					if (!isMainFrame || isInPlace) return;
 					if (attached) {
 						allowDetachedMainFrameNavigation = true;
-						invalidateAttachment();
+						invalidateAttachmentFn();
 					}
-					setState({
+					setStateFn({
 						type: "loading",
 					});
 				});
 				webContents.on("dom-ready", () => {
 					allowDetachedMainFrameNavigation = false;
-					if (!isWebNavigation(webContents.getURL())) return;
-					if (surface !== null && !attached) attach(surface);
-					setState({
+					if (!isWebNavigationFn(webContents.getURL())) return;
+					if (surface !== null && !attached) attachFn(surface);
+					setStateFn({
 						type: "ready",
 					});
 				});
@@ -314,37 +314,37 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 					(_event, errorCode, errorDescription, _validatedUrl, isMainFrame) => {
 						if (!isMainFrame) return;
 						if (errorCode === -3) {
-							recoverCurrentPage(webContents);
+							recoverCurrentPageFn(webContents);
 							return;
 						}
 						allowDetachedMainFrameNavigation = false;
-						setState({
+						setStateFn({
 							type: "unavailable",
 							message: errorDescription,
 						});
-						invalidateAttachment();
+						invalidateAttachmentFn();
 					},
 				);
 				session.setPermissionCheckHandler(() => false);
-				session.setPermissionRequestHandler((_contents, _permission, callback) =>
-					callback(false),
+				session.setPermissionRequestHandler((_contents, _permission, callbackFn) =>
+					callbackFn(false),
 				);
-				session.on("will-download", onDownload);
-				load(webContents);
+				session.on("will-download", onDownloadFn);
+				loadFn(webContents);
 				return created;
 			};
 
-			const onArkiniNavigation = (
+			const onArkiniNavigationFn = (
 				_event: Event,
 				_url: string,
 				_isInPlace: boolean,
 				isMainFrame: boolean,
 			) => {
-				if (isMainFrame) clearSurface();
+				if (isMainFrame) clearSurfaceFn();
 			};
-			const onArkiniRendererGone = () => clearSurface();
-			window.webContents.on("did-start-navigation", onArkiniNavigation);
-			window.webContents.on("render-process-gone", onArkiniRendererGone);
+			const onArkiniRendererGoneFn = () => clearSurfaceFn();
+			window.webContents.on("did-start-navigation", onArkiniNavigationFn);
+			window.webContents.on("render-process-gone", onArkiniRendererGoneFn);
 			window.once("closed", () => {
 				const temporaryPath = activeDownload?.path;
 				activeDownload?.item.cancel();
@@ -352,7 +352,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 				attached = false;
 				surface = null;
 				if (viewSession !== undefined) {
-					viewSession.removeListener("will-download", onDownload);
+					viewSession.removeListener("will-download", onDownloadFn);
 					viewSession.setPermissionCheckHandler(null);
 					viewSession.setPermissionRequestHandler(null);
 				}
@@ -377,7 +377,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 				setSurfaceFx: (candidate) => {
 					const updateFx = Effect.sync(() => {
 						if (candidate === null) {
-							clearSurface();
+							clearSurfaceFn();
 							return;
 						}
 						const reenteringSurface = surface === null;
@@ -385,24 +385,24 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 							surfaceGeneration += 1;
 						surface = candidate;
 						const existing = view !== undefined;
-						const currentView = ensureView();
+						const currentView = ensureViewFn();
 						const mustResetBeforeAttach =
 							existing &&
 							reenteringSurface &&
 							(state.type === "loading" ||
 								state.type === "unavailable" ||
-								!isChatGptNavigation(currentView.webContents.getURL()));
+								!isChatGptNavigationFn(currentView.webContents.getURL()));
 						if (mustResetBeforeAttach) {
-							load(currentView.webContents);
-							sendState();
+							loadFn(currentView.webContents);
+							sendStateFn();
 							return;
 						}
 						if (state.type === "loading") {
-							sendState();
+							sendStateFn();
 							return;
 						}
-						attach(candidate);
-						sendState();
+						attachFn(candidate);
+						sendStateFn();
 					});
 					return updateFx;
 				},

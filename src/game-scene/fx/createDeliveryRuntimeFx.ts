@@ -30,7 +30,7 @@ interface CreateDeliveryRuntimeProps {
 	readonly drag: MainDragController;
 	readonly magneticField: MagneticField;
 	readonly particleTextures: ParticleTextures;
-	readonly readPalette: () => PixiScenePalette;
+	readonly readPaletteFn: () => PixiScenePalette;
 	readonly surface: MainSurface;
 	readonly textures: TextureStore;
 }
@@ -39,7 +39,7 @@ interface ActiveDelivery {
 	readonly actor: PixiTileActor;
 	delivery: TileDelivery;
 	readonly generation: number;
-	releaseMagnet: () => void;
+	releaseMagnetFn: () => void;
 	stage:
 		| "awaiting-return-geometry"
 		| "awaiting-travel-geometry"
@@ -75,11 +75,11 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 	drag,
 	magneticField,
 	particleTextures,
-	readPalette,
+	readPaletteFn,
 	surface,
 	textures,
 }: CreateDeliveryRuntimeProps) {
-	const readLiveContactPose = yield* createLiveContactPoseReaderFx();
+	const readLiveContactPoseFn = yield* createLiveContactPoseReaderFx();
 	const activeByItemId = new Map<string, ActiveDelivery>();
 	let closed = false;
 
@@ -88,7 +88,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		active: ActiveDelivery,
 	) {
 		if (activeByItemId.get(itemId) !== active) return;
-		active.releaseMagnet();
+		active.releaseMagnetFn();
 		activeByItemId.delete(itemId);
 		if (actorStore.actors.get(itemId) === active.actor) {
 			yield* actorStore.releaseActorFx(itemId);
@@ -99,7 +99,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		}
 	});
 
-	const markContact = (itemId: string, generation: number) => {
+	const markContactFn = (itemId: string, generation: number) => {
 		const active = activeByItemId.get(itemId);
 		if (
 			closed ||
@@ -122,7 +122,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		readonly to: ActorPose;
 	}) {
 		active.stage = "traveling";
-		active.releaseMagnet();
+		active.releaseMagnetFn();
 		const magneticProjector =
 			delivery.phase === "outbound" && delivery.targetActorId !== undefined
 				? yield* createMagneticProjectorFx({
@@ -135,11 +135,11 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 						surface,
 					})
 				: null;
-		active.releaseMagnet = () => magneticProjector?.release();
-		const readLiveTarget = () =>
+		active.releaseMagnetFn = () => magneticProjector?.releaseFn();
+		const readLiveTargetFn = () =>
 			delivery.targetActorId === undefined
 				? null
-				: readLiveContactPose({
+				: readLiveContactPoseFn({
 						actorId: delivery.targetActorId,
 						actors: actorStore.actors,
 						movingActor: active.actor,
@@ -150,9 +150,9 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 			durationMs: Math.max(0, delivery.remainingDurationMs - 100),
 			curve: delivery.phase === "returning" ? deliveryReturnCurve : deliveryOutboundCurve,
 			fallbackTarget: to,
-			onPose: magneticProjector?.projectPose,
-			onSettled: () => {
-				active.releaseMagnet();
+			onPoseFn: magneticProjector?.projectPoseFn,
+			onSettledFn: () => {
+				active.releaseMagnetFn();
 				if (delivery.phase === "outbound" && delivery.targetActorId !== undefined) {
 					RendererRuntime.runSync(
 						flashMotionTargetFx({
@@ -162,11 +162,11 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 						}),
 					);
 				}
-				markContact(delivery.item.id, delivery.generation);
+				markContactFn(delivery.item.id, delivery.generation);
 			},
 			ownerKey: `delivery:${delivery.item.id}:${delivery.generation}`,
-			readLiveTarget,
-			shouldSettle: () => {
+			readLiveTargetFn,
+			shouldSettleFn: () => {
 				const current = activeByItemId.get(delivery.item.id);
 				return (
 					closed || current === undefined || current.generation !== delivery.generation
@@ -205,13 +205,13 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					animator,
 					frames: application.frames,
 					item: active.delivery.item,
-					palette: readPalette(),
+					palette: readPaletteFn(),
 					size: latestTarget.size,
 					textures,
 				});
 				active.stage = "contact-fade-in";
 			}),
-			onRevealed: () => {
+			onRevealedFn: () => {
 				if (closed || activeByItemId.get(delivery.item.id) !== active) return;
 				const returnTarget = active.target;
 				if (returnTarget === null) {
@@ -235,7 +235,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 			if (closed) return;
 			closed = true;
 			for (const active of activeByItemId.values()) {
-				active.releaseMagnet();
+				active.releaseMagnetFn();
 				yield* animator.cancelActorFx(active.actor);
 			}
 			activeByItemId.clear();
@@ -255,7 +255,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 			);
 			for (const [itemId, active] of activeByItemId) {
 				if (deliveryByItemId.has(itemId)) continue;
-				active.releaseMagnet();
+				active.releaseMagnetFn();
 				yield* animator.cancelChannelFx(active.actor, "pose");
 				const canonical = actorStore.canonicalItems.get(itemId);
 				if (canonical !== undefined) {
@@ -267,7 +267,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 				if (active.stage === "contacted") {
 					active.stage = "exiting";
 					let settled = false;
-					const settle = () => {
+					const settleFn = () => {
 						if (settled) return;
 						settled = true;
 						RendererRuntime.runSync(destroyCompletedDeliveryActorFx(itemId, active));
@@ -275,8 +275,8 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					yield* startActorExitFx({
 						actor: active.actor,
 						animator,
-						onCancel: settle,
-						onComplete: settle,
+						onCancelFn: settleFn,
+						onCompleteFn: settleFn,
 					});
 					continue;
 				}
@@ -291,7 +291,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					active === undefined || active.generation !== delivery.generation;
 				if (from === null || to === null) {
 					if (active !== undefined) {
-						active.releaseMagnet();
+						active.releaseMagnetFn();
 						const contactReturn =
 							generationChanged &&
 							active.delivery.phase === "outbound" &&
@@ -313,7 +313,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 								actor: previous.actor,
 								delivery,
 								generation: delivery.generation,
-								releaseMagnet: () => undefined,
+								releaseMagnetFn: () => undefined,
 								stage: contactReturn
 									? "contact-fade-out"
 									: "awaiting-travel-geometry",
@@ -377,7 +377,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 							animator,
 							frames: application.frames,
 							item: delivery.item,
-							palette: readPalette(),
+							palette: readPaletteFn(),
 							size: to.size,
 							textures,
 						});
@@ -401,13 +401,13 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 						channel: "lifecycle-opacity",
 					});
 				}
-				active?.releaseMagnet();
+				active?.releaseMagnetFn();
 
 				if (actor === undefined) {
 					actor = yield* createTileActorFx({
 						frames: application.frames,
 						item: delivery.item,
-						palette: readPalette(),
+						palette: readPaletteFn(),
 						particleTextures,
 						textures,
 					});
@@ -440,7 +440,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 						animator,
 						frames: application.frames,
 						item: delivery.item,
-						palette: readPalette(),
+						palette: readPaletteFn(),
 						size: to.size,
 						textures,
 					});
@@ -449,7 +449,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					actor,
 					delivery,
 					generation: delivery.generation,
-					releaseMagnet: () => undefined,
+					releaseMagnetFn: () => undefined,
 					stage: "traveling",
 					target: to,
 				};

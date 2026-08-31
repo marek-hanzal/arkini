@@ -32,7 +32,7 @@ export namespace updateTileActorFx {
 
 const tileToSlotRatio = 0.8;
 
-const sameVisualRevision = (left: TileActorItem, right: TileActorItem) =>
+const sameVisualRevisionFn = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
 	left.title === right.title &&
 	left.badgeCount === right.badgeCount &&
@@ -58,7 +58,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	textures,
 }: updateTileActorFx.Props) {
 	const pendingMatches =
-		actor.pendingVisual !== null && sameVisualRevision(actor.pendingVisual.item, item);
+		actor.pendingVisual !== null && sameVisualRevisionFn(actor.pendingVisual.item, item);
 	const texturesChanged =
 		!pendingMatches &&
 		(actor.pendingVisual !== null ||
@@ -66,7 +66,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 			actor.currentVisual.item.compositeUrl !== item.compositeUrl);
 	const visualChanged =
 		!pendingMatches &&
-		(actor.pendingVisual !== null || !sameVisualRevision(actor.currentVisual.item, item));
+		(actor.pendingVisual !== null || !sameVisualRevisionFn(actor.currentVisual.item, item));
 
 	actor.item = item;
 	if (!actor.dragging) {

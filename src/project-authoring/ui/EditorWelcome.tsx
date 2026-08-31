@@ -1,10 +1,8 @@
 import { FileJson2, FilePlus2, RefreshCw } from "lucide-react";
 
-import type {
-	ProjectCandidate,
-	ProjectOwnership,
-} from "~/project-authoring/schema/ProjectCandidateSchema";
+import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
+import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/project-authoring/ui/EditorArkpackImportButton";
 import { BackButton } from "~/ui/ui/BackButton";
@@ -19,14 +17,14 @@ interface EditorWelcomeProps {
 }
 
 interface ProjectToDelete {
-	readonly ownership: ProjectOwnership;
+	readonly ownership: ProjectOwnershipSchema.Type;
 	readonly project: ProjectDescriptor;
 }
 
 /** Starts or reopens one local editor project. */
 export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
-	const [projectToDelete, setProjectToDelete] = useState<ProjectToDelete | null>(null);
-	const [deleteRequested, setDeleteRequested] = useState(false);
+	const [projectToDelete, setProjectToDeleteFn] = useState<ProjectToDelete | null>(null);
+	const [deleteRequested, setDeleteRequestedFn] = useState(false);
 	const actions = useEditorWelcomeActions({
 		exitBlocked: projectToDelete !== null,
 	});
@@ -37,8 +35,8 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 			!actions.deletedProjectIds.has(projectToDelete.project.projectId)
 		)
 			return;
-		setProjectToDelete(null);
-		setDeleteRequested(false);
+		setProjectToDeleteFn(null);
+		setDeleteRequestedFn(false);
 	}, [
 		actions.deletedProjectIds,
 		projectToDelete,
@@ -56,7 +54,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 						disabled={actions.blocked}
 						cursorIntent={actions.refreshingProjects ? "progress" : undefined}
 						className="inline-flex items-center gap-1.5"
-						onClick={() => void actions.refreshProjects()}
+						onClick={() => void actions.refreshProjectsFn()}
 					>
 						<RefreshCw className="size-4" />
 						Refresh
@@ -67,13 +65,13 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 					<EditorArkpackImportButton
 						blocked={actions.blocked}
 						pending={actions.active === "import-arkpack"}
-						onFile={actions.importArkpackFile}
+						onFileFn={actions.importArkpackFileFn}
 					/>
 					<Button
 						disabled={actions.blocked}
 						cursorIntent={actions.active === "import-json" ? "progress" : undefined}
 						className="min-h-44 flex-col gap-3 rounded-2xl"
-						onClick={actions.importJsonDirectory}
+						onClick={actions.importJsonDirectoryFn}
 					>
 						<FileJson2 className="size-9 text-accent" />
 						<span className="text-lg">Open folder</span>
@@ -85,7 +83,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 						disabled={actions.blocked}
 						cursorIntent={actions.active === "create" ? "progress" : undefined}
 						className="min-h-44 flex-col gap-3 rounded-2xl"
-						onClick={actions.createProject}
+						onClick={actions.createProjectFn}
 					>
 						<FilePlus2 className="size-9" />
 						<span className="text-lg">New project</span>
@@ -114,7 +112,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 							disabled={actions.refreshingProjects}
 							cursorIntent={actions.refreshingProjects ? "progress" : undefined}
 							className="mt-3"
-							onClick={() => void actions.refreshProjects()}
+							onClick={() => void actions.refreshProjectsFn()}
 						>
 							Refresh projects
 						</Button>
@@ -123,14 +121,14 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 
 				<EditorRecentProjects
 					blocked={actions.blocked}
-					onDeleteProject={(project, ownership) => {
-						setDeleteRequested(false);
-						setProjectToDelete({
+					onDeleteProjectFn={(project, ownership) => {
+						setDeleteRequestedFn(false);
+						setProjectToDeleteFn({
 							ownership,
 							project,
 						});
 					}}
-					onOpenProjectFolder={actions.openProjectFolder}
+					onOpenProjectFolderFn={actions.openProjectFolderFn}
 					projects={recentProjects.filter(
 						(candidate) =>
 							candidate.type === "invalid" ||
@@ -142,7 +140,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 					<BackButton
 						disabled={actions.blocked}
 						cursorIntent={actions.active === "exit" ? "progress" : undefined}
-						onClick={actions.exit}
+						onClick={actions.exitFn}
 					/>
 				</footer>
 			</div>
@@ -152,13 +150,13 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 					ownership={projectToDelete.ownership}
 					pending={actions.active === "delete-project"}
 					project={projectToDelete.project}
-					onCancel={() => {
-						setDeleteRequested(false);
-						setProjectToDelete(null);
+					onCancelFn={() => {
+						setDeleteRequestedFn(false);
+						setProjectToDeleteFn(null);
 					}}
-					onConfirm={() => {
-						setDeleteRequested(true);
-						actions.deleteProject(projectToDelete.project.projectId);
+					onConfirmFn={() => {
+						setDeleteRequestedFn(true);
+						actions.deleteProjectFn(projectToDelete.project.projectId);
 					}}
 				/>
 			)}

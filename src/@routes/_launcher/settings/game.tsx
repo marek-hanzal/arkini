@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_launcher/settings/game")({
 						className="size-5 shrink-0 accent-accent"
 						disabled={model.blocked}
 						onChange={(event) =>
-							model.setCheatToolsAvailable(event.currentTarget.checked)
+							model.setCheatToolsAvailableFn(event.currentTarget.checked)
 						}
 					/>
 				</label>

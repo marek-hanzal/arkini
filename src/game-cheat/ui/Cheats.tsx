@@ -6,7 +6,7 @@ import type { updateGameCheatsAtom } from "~/game-cheat/atom/updateGameCheatsAto
 import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
-const actionLabel = (action: updateGameCheatsAtom.Command["action"]) => {
+const actionLabelFn = (action: updateGameCheatsAtom.Command["action"]) => {
 	if (action === "instant-gameplay") return "Instant gameplay";
 	if (action === "cheat-mode") return "Cheat mode";
 	return "Navigation";
@@ -15,12 +15,12 @@ const actionLabel = (action: updateGameCheatsAtom.Command["action"]) => {
 /** Renders the small save-scoped cheat option surface from one authoritative model. */
 export const Cheats = ({
 	model,
-	onBack,
+	onBackFn,
 }: {
 	readonly model: useCheatsModel.Model;
-	readonly onBack: () => void;
+	readonly onBackFn: () => void;
 }) => {
-	const errorMessage = (error: unknown) =>
+	const errorMessageFn = (error: unknown) =>
 		error instanceof Error ? error.message : String(error);
 	return (
 		<main
@@ -65,7 +65,7 @@ export const Cheats = ({
 							checked={model.enabled}
 							className="size-5 shrink-0 accent-accent"
 							disabled={model.blocked}
-							onChange={(event) => model.setEnabled(event.currentTarget.checked)}
+							onChange={(event) => model.setEnabledFn(event.currentTarget.checked)}
 						/>
 					</label>
 
@@ -92,7 +92,7 @@ export const Cheats = ({
 							className="size-5 shrink-0 accent-accent"
 							disabled={model.blocked || !model.enabled}
 							onChange={(event) =>
-								model.setInstantGameplay(event.currentTarget.checked)
+								model.setInstantGameplayFn(event.currentTarget.checked)
 							}
 						/>
 					</label>
@@ -115,7 +115,7 @@ export const Cheats = ({
 								kind: "pending",
 							},
 							({ action }) => (
-								<p className="text-accent">Saving {actionLabel(action)}…</p>
+								<p className="text-accent">Saving {actionLabelFn(action)}…</p>
 							),
 						)
 						.with(
@@ -125,7 +125,7 @@ export const Cheats = ({
 							},
 							({ error }) => (
 								<p className="text-danger">
-									Navigation failed: {errorMessage(error)}
+									Navigation failed: {errorMessageFn(error)}
 								</p>
 							),
 						)
@@ -135,7 +135,7 @@ export const Cheats = ({
 							},
 							({ action, error }) => (
 								<p className="text-danger">
-									{actionLabel(action)} update failed: {errorMessage(error)}
+									{actionLabelFn(action)} update failed: {errorMessageFn(error)}
 								</p>
 							),
 						)
@@ -144,7 +144,7 @@ export const Cheats = ({
 								kind: "saved",
 							},
 							({ action }) => (
-								<p className="text-muted">{actionLabel(action)} saved.</p>
+								<p className="text-muted">{actionLabelFn(action)} saved.</p>
 							),
 						)
 						.with(
@@ -159,7 +159,7 @@ export const Cheats = ({
 				<Button
 					className="w-full shadow-none"
 					disabled={model.blocked}
-					onClick={onBack}
+					onClick={onBackFn}
 				>
 					Back to game
 				</Button>

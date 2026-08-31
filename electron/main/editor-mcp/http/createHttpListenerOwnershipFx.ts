@@ -17,9 +17,9 @@ type NodeMcpHandler = (request: IncomingMessage, response: ServerResponse) => vo
 
 interface HttpListenerOwnership {
 	readonly ensureStartedFx: Effect.Effect<void, unknown, never>;
-	readonly readMcpHandler: () => NodeMcpHandler | undefined;
-	readonly setLocalEnabled: (enabled: boolean) => void;
-	readonly setRemoteHandler: (
+	readonly readMcpHandlerFn: () => NodeMcpHandler | undefined;
+	readonly setLocalEnabledFn: (enabled: boolean) => void;
+	readonly setRemoteHandlerFn: (
 		remote:
 			| {
 					readonly handler: RemoteHandler;
@@ -28,33 +28,33 @@ interface HttpListenerOwnership {
 			| undefined,
 	) => void;
 	readonly closeFx: Effect.Effect<void, unknown, never>;
-	readonly closeSync: () => void;
+	readonly closeSyncFn: () => void;
 }
 
 export namespace createHttpListenerOwnershipFx {
 	export interface Props {
 		readonly editor: EditorProjectServiceOwnership;
-		readonly notifyProjectChanged: (projectId: string) => void;
+		readonly notifyProjectChangedFn: (projectId: string) => void;
 		readonly storage: Pick<McpStorage, "readPortFx">;
-		readonly readProjectContext: () => string | undefined;
+		readonly readProjectContextFn: () => string | undefined;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,
 		) => Effect.Effect<void, unknown, never>;
-		readonly runPromise: <Value, Error>(
+		readonly runPromiseFn: <Value, Error>(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
 	}
 }
 
-const writeNotFound = (response: ServerResponse) => {
+const writeNotFoundFn = (response: ServerResponse) => {
 	response.writeHead(404, {
 		"content-type": "text/plain; charset=utf-8",
 	});
 	response.end("Not found");
 };
 
-const writeBadRequest = (response: ServerResponse) => {
+const writeBadRequestFn = (response: ServerResponse) => {
 	response.writeHead(400, {
 		"content-type": "text/plain; charset=utf-8",
 	});
@@ -64,39 +64,39 @@ const writeBadRequest = (response: ServerResponse) => {
 /** Owns the one physical loopback listener shared by local and Remote MCP routing. */
 export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwnershipFx")(function* ({
 	editor,
-	notifyProjectChanged,
+	notifyProjectChangedFn,
 	storage,
-	readProjectContext,
+	readProjectContextFn,
 	requestVersionCheckoutFx,
-	runPromise,
+	runPromiseFn,
 }: createHttpListenerOwnershipFx.Props) {
 	let localEnabled = false;
 	let server: Server | undefined;
 	let mcpHandler: McpHttpHandler | undefined;
-	let nodeHandler: NodeMcpHandler | undefined;
+	let nodeHandlerFn: NodeMcpHandler | undefined;
 	let remote:
 		| {
 				readonly handler: RemoteHandler;
 				readonly provenance: string;
 		  }
 		| undefined;
-	const validateLocalHost = localhostHostValidation();
-	const validateLocalOrigin = localhostOriginValidation();
+	const validateLocalHostFn = localhostHostValidation();
+	const validateLocalOriginFn = localhostOriginValidation();
 	const closeFx = Effect.tryPromise({
 		try: async () => {
 			const currentServer = server;
 			const currentHandler = mcpHandler;
 			server = undefined;
 			mcpHandler = undefined;
-			nodeHandler = undefined;
+			nodeHandlerFn = undefined;
 			remote = undefined;
 			localEnabled = false;
 			await Promise.all([
 				currentServer === undefined
 					? Promise.resolve()
-					: new Promise<void>((resolve, reject) => {
+					: new Promise<void>((resolveFn, rejectFn) => {
 							currentServer.close((error) =>
-								error === undefined ? resolve() : reject(error),
+								error === undefined ? resolveFn() : rejectFn(error),
 							);
 							currentServer.closeAllConnections();
 						}),
@@ -106,17 +106,17 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 		catch: (cause) => cause,
 	});
 	const ensureStartedFx = Effect.gen(function* () {
-		if (server !== undefined && nodeHandler !== undefined) return;
+		if (server !== undefined && nodeHandlerFn !== undefined) return;
 		if (editor.type === "unavailable") return yield* Effect.fail(new Error(editor.message));
 		const factory = yield* createServerFx({
-			notifyProjectChanged,
-			readProjectContext,
+			notifyProjectChangedFn,
+			readProjectContextFn,
 			repository: editor.repository,
 			requestVersionCheckoutFx,
-			runPromise,
+			runPromiseFn,
 		});
 		const handler = createMcpHandler(factory.create);
-		const boundNodeHandler = toNodeHandler(handler, {
+		const boundNodeHandlerFn = toNodeHandler(handler, {
 			onerror: (error) => console.error("Arkini editor MCP request failed.", error),
 		});
 		const listener = createServer((request, response) => {
@@ -124,35 +124,35 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 			try {
 				pathname = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
 			} catch {
-				writeBadRequest(response);
+				writeBadRequestFn(response);
 				return;
 			}
 			const tunnelProvenance = request.headers[TunnelProvenanceHeader];
 			if (tunnelProvenance !== undefined) {
 				if (remote !== undefined && tunnelProvenance === remote.provenance)
-					remote.handler.handle(request, response);
-				else writeNotFound(response);
+					remote.handler.handleFn(request, response);
+				else writeNotFoundFn(response);
 				return;
 			}
 			if (pathname === "/editor/mcp") {
-				if (!localEnabled) return writeNotFound(response);
+				if (!localEnabled) return writeNotFoundFn(response);
 				if (
-					!validateLocalHost(request, response) ||
-					!validateLocalOrigin(request, response)
+					!validateLocalHostFn(request, response) ||
+					!validateLocalOriginFn(request, response)
 				)
 					return;
-				void boundNodeHandler(request, response);
+				void boundNodeHandlerFn(request, response);
 				return;
 			}
-			writeNotFound(response);
+			writeNotFoundFn(response);
 		});
 		const port = yield* storage.readPortFx;
-		yield* Effect.callback<void, Error>((resume) => {
-			const onError = (cause: Error) => resume(Effect.fail(cause));
-			listener.once("error", onError);
+		yield* Effect.callback<void, Error>((resumeFn) => {
+			const onErrorFn = (cause: Error) => resumeFn(Effect.fail(cause));
+			listener.once("error", onErrorFn);
 			listener.listen(port, "127.0.0.1", () => {
-				listener.removeListener("error", onError);
-				resume(Effect.void);
+				listener.removeListener("error", onErrorFn);
+				resumeFn(Effect.void);
 			});
 			return Effect.sync(() => {
 				try {
@@ -174,19 +174,19 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 		);
 		server = listener;
 		mcpHandler = handler;
-		nodeHandler = boundNodeHandler;
+		nodeHandlerFn = boundNodeHandlerFn;
 	});
 	return {
 		ensureStartedFx,
-		readMcpHandler: () => nodeHandler,
-		setLocalEnabled: (enabled) => {
+		readMcpHandlerFn: () => nodeHandlerFn,
+		setLocalEnabledFn: (enabled) => {
 			localEnabled = enabled;
 		},
-		setRemoteHandler: (candidate) => {
+		setRemoteHandlerFn: (candidate) => {
 			remote = candidate;
 		},
 		closeFx,
-		closeSync: () => {
+		closeSyncFn: () => {
 			remote = undefined;
 			localEnabled = false;
 			try {
@@ -202,7 +202,7 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 					console.error("Arkini editor MCP handler could not close.", error),
 				);
 			mcpHandler = undefined;
-			nodeHandler = undefined;
+			nodeHandlerFn = undefined;
 		},
 	} satisfies HttpListenerOwnership;
 });

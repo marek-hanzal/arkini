@@ -43,20 +43,20 @@ export interface GameSession {
 	readonly flushSaveFx: Effect.Effect<void, unknown, never>;
 	/** Read-only renderer projection of the authoritative committed transition source. */
 	readonly committedTransitionAtom: Atom.Atom<GameTransition>;
-	readonly getSnapshot: () => RuntimeSchema.Type;
+	readonly getSnapshotFn: () => RuntimeSchema.Type;
 	/** Latest exact runtime plus the ordered facts and bounded outgoing snapshot for that commit. */
-	readonly getTransitionSnapshot: () => GameTransition;
+	readonly getTransitionSnapshotFn: () => GameTransition;
 	/** The exact first background failure that permanently froze this session. */
-	readonly getFatalError: () => GameSessionFatalError | null;
+	readonly getFatalErrorFn: () => GameSessionFatalError | null;
 	/** Synchronously freezes this exact session on its first unrecoverable failure. */
-	readonly failStop: (source: GameSessionFatalSource, cause: unknown) => GameSessionFatalError;
+	readonly failStopFn: (source: GameSessionFatalSource, cause: unknown) => GameSessionFatalError;
 	/** Notifies once when this exact session first becomes fatally unusable. */
-	readonly subscribeFatalError: (listener: () => void) => () => void;
+	readonly subscribeFatalErrorFn: (listenerFn: () => void) => () => void;
 	/**
 	 * Executes one synchronous query inside this Game's existing session runtime.
 	 * Read and run are lifecycle modes, not type-level authority barriers.
 	 */
-	readonly read: <Result, Error, Requirements extends GameSessionServices>(
+	readonly readFn: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
 	) => Exit.Exit<Result, Error | GameSessionNotRunningError>;
 	/** Runs one typed, interruptible command owned by this session's command scope. */
@@ -64,15 +64,15 @@ export interface GameSession {
 		effect: Effect.Effect<Result, Error, Requirements>,
 	) => Effect.Effect<Result, Error | GameSessionNotRunningError, never>;
 	/** Promise edge retained for non-Effect callers; implemented by `runFx`. */
-	readonly run: <Result, Error, Requirements extends GameSessionServices>(
+	readonly runFn: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
 	) => Promise<Result>;
-	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
+	readonly subscribeFn: (listenerFn: () => void | PromiseLike<void>) => () => void;
 	/** Replays the atomically captured current transition, then every later commit in order. */
-	readonly subscribeTransitions: (
-		listener: (transition: GameTransition) => void | PromiseLike<void>,
+	readonly subscribeTransitionsFn: (
+		listenerFn: (transition: GameTransition) => void | PromiseLike<void>,
 	) => () => void;
-	readonly subscribeEvents: (
-		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
+	readonly subscribeEventsFn: (
+		listenerFn: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
 	) => () => void;
 }

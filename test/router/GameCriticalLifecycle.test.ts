@@ -52,15 +52,15 @@ const createGame = ({
 	disposeFx,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	read: testGameRead,
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	getResourceUrlFn: () => "blob:test",
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
+	readFn: testGameRead,
+	runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 	saveKey: {
 		packageId,
 	},
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
+	subscribeFn: () => () => undefined,
+	subscribeEventsFn: () => () => undefined,
 });
 
 const installElectronApi = (clear: () => Promise<void> = () => Promise.resolve()) => {
@@ -69,12 +69,12 @@ const installElectronApi = (clear: () => Promise<void> = () => Promise.resolve()
 		configurable: true,
 		value: {
 			save: {
-				clear,
-				read: () => Promise.resolve(null),
-				write: () => Promise.resolve(),
+				clearFn: clear,
+				readFn: () => Promise.resolve(null),
+				writeFn: () => Promise.resolve(),
 			},
 			lifecycle: {
-				forceClose,
+				forceCloseFn: forceClose,
 			},
 		} as unknown as ArkiniElectronApi.Api,
 	});
@@ -91,7 +91,7 @@ const createHarness = async ({
 	const { rendererRuntime } = createTestRendererRuntime({
 		clearSaveFx: (key) =>
 			Effect.tryPromise({
-				try: () => window.arkini.save.clear(key),
+				try: () => window.arkini.save.clearFn(key),
 				catch: (cause) => cause,
 			}),
 		createResourceFx: () =>
@@ -177,7 +177,7 @@ describe("critical Game route lifecycle", () => {
 
 		await loadWithMinimum(router);
 		expect(resource).not.toBeNull();
-		expect(() => resource?.assertUsable()).toThrow(CriticalGameLifecycleError);
+		expect(() => resource?.assertUsableFn()).toThrow(CriticalGameLifecycleError);
 		const container = await renderRouter(router);
 		expect(container.querySelector('[data-ui="RootFatalErrorPage"]')).not.toBeNull();
 		expect(container.textContent).not.toContain("Retry");
@@ -206,7 +206,7 @@ describe("critical Game route lifecycle", () => {
 		});
 
 		await loadWithMinimum(router);
-		expect(() => resource?.assertUsable()).toThrow(CriticalGameLifecycleError);
+		expect(() => resource?.assertUsableFn()).toThrow(CriticalGameLifecycleError);
 		expect(
 			(await renderRouter(router)).querySelector('[data-ui="RootFatalErrorPage"]'),
 		).not.toBeNull();
@@ -224,7 +224,7 @@ describe("critical Game route lifecycle", () => {
 
 		await loadWithMinimum(router);
 		expect(discard).toHaveBeenCalledOnce();
-		expect(() => resource?.assertUsable()).toThrow(CriticalGameLifecycleError);
+		expect(() => resource?.assertUsableFn()).toThrow(CriticalGameLifecycleError);
 		expect(
 			(await renderRouter(router)).querySelector('[data-ui="RootFatalErrorPage"]'),
 		).not.toBeNull();

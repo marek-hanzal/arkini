@@ -89,8 +89,8 @@ describe("swap geometry retargeting", () => {
 			x: 640,
 			y: 120,
 		});
-		targetTravel.onComplete?.();
-		sourceTravel.onComplete?.();
+		targetTravel.onCompleteFn?.();
+		sourceTravel.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
 
 		const targetSettle = animations
@@ -123,8 +123,8 @@ describe("swap geometry retargeting", () => {
 			x: 1_000,
 			y: 200,
 		});
-		targetSettle.onComplete?.();
-		sourceSettle.onComplete?.();
+		targetSettle.onCompleteFn?.();
+		sourceSettle.onCompleteFn?.();
 		const finalTargetSettle = animations
 			.filter((animation) => animation.actor === target && animation.channel === "pose")
 			.at(-1);
@@ -148,9 +148,9 @@ describe("swap geometry retargeting", () => {
 			x: 1_400,
 			y: 240,
 		});
-		finalTargetSettle.onComplete?.();
+		finalTargetSettle.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
-		finalSourceSettle.onComplete?.();
+		finalSourceSettle.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
 		expect(target.container).toMatchObject({
 			x: latestTargetDestination.x,

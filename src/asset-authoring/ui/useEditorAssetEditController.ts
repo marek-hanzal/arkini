@@ -69,10 +69,10 @@ export namespace useEditorAssetEditController {
 		readonly nextId: string;
 		readonly projectId: string;
 		readonly resourceFound: boolean;
-		readonly save: () => Promise<boolean>;
+		readonly saveFn: () => Promise<boolean>;
 		readonly saving: boolean;
-		readonly setFile: (file: File | undefined) => void;
-		readonly setNextId: (resourceId: string) => void;
+		readonly setFileFn: (file: File | undefined) => void;
+		readonly setNextIdFn: (resourceId: string) => void;
 	}
 }
 
@@ -84,41 +84,41 @@ export const useEditorAssetEditController = ({
 	const project = useEditorProject();
 	const resource = useEditorAssetById(resourceId);
 	const currentUrl = useResourceUrl(resourceId);
-	const navigate = useNavigate();
+	const navigateFn = useNavigate();
 	const commandAtom = editEditorAssetCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
-	const mutate = useAtomSet(commandAtom, {
+	const mutateFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
-	const [nextId, setNextId] = useState(resourceId);
-	const [file, setFile] = useState<File>();
+	const [nextId, setNextIdFn] = useState(resourceId);
+	const [file, setFileFn] = useState<File>();
 	const dirty = nextId.trim() !== resourceId || file !== undefined;
 	const dirtyRef = useRef(dirty);
 	dirtyRef.current = dirty;
-	const persist = useCallback(async () => {
+	const persistFn = useCallback(async () => {
 		if (!dirty || result.waiting) return false;
 		const id = nextId.trim();
-		await mutate({
+		await mutateFn({
 			currentId: resourceId,
 			file,
 			resourceId: id,
 		});
 		dirtyRef.current = false;
-		setNextId(id);
-		setFile(undefined);
+		setNextIdFn(id);
+		setFileFn(undefined);
 		return true;
 	}, [
 		dirty,
 		file,
-		mutate,
+		mutateFn,
 		nextId,
 		resourceId,
 		result.waiting,
 	]);
-	const save = useCallback(async () => {
-		if (!(await persist())) return false;
+	const saveFn = useCallback(async () => {
+		if (!(await persistFn())) return false;
 		const id = nextId.trim();
-		await navigate({
+		await navigateFn({
 			to: "/editor/$projectId/assets/$resourceId/detail/overview",
 			params: {
 				projectId: project.projectId,
@@ -133,21 +133,21 @@ export const useEditorAssetEditController = ({
 		return true;
 	}, [
 		filter,
-		navigate,
+		navigateFn,
 		nextId,
-		persist,
+		persistFn,
 		project.projectId,
 		query,
 	]);
 	useEditorUnsavedChangesRegistration({
-		discard: () => {
+		discardFn: () => {
 			dirtyRef.current = false;
-			setNextId(resourceId);
-			setFile(undefined);
+			setNextIdFn(resourceId);
+			setFileFn(undefined);
 		},
 		id: `asset:${project.projectId}:${resourceId}`,
-		isDirty: () => dirtyRef.current,
-		isValid: async () =>
+		isDirtyFn: () => dirtyRef.current,
+		isValidFn: async () =>
 			Exit.isSuccess(
 				await RendererRuntime.runPromiseExit(
 					validateEditorAssetDraftFx({
@@ -156,9 +156,9 @@ export const useEditorAssetEditController = ({
 					}),
 				),
 			),
-		ownsPathname: (pathname) =>
+		ownsPathnameFn: (pathname) =>
 			pathname.startsWith(`/editor/${project.projectId}/assets/${resourceId}/edit`),
-		save: persist,
+		saveFn: persistFn,
 	});
 	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const resourceFound = resource !== undefined;
@@ -171,9 +171,9 @@ export const useEditorAssetEditController = ({
 		nextId,
 		projectId: project.projectId,
 		resourceFound,
-		save,
+		saveFn,
 		saving: result.waiting,
-		setFile,
-		setNextId,
+		setFileFn,
+		setNextIdFn,
 	};
 };

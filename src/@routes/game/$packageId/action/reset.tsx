@@ -20,7 +20,7 @@ export const Route = createFileRoute("/game/$packageId/action/reset")({
 				),
 			);
 		} catch (cause) {
-			throw context.gameEngineResource.markCriticalFailure("game-reset", cause);
+			throw context.gameEngineResource.markCriticalFailureFn("game-reset", cause);
 		}
 		throw redirect({
 			to: "/action/load-game/$packageId",

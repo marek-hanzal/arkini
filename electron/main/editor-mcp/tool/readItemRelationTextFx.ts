@@ -117,17 +117,17 @@ const readItemOriginRelationSubgraphFn = ({
 	};
 };
 
-const itemReference = (project: Project, itemId: string) => {
+const itemReferenceFn = (project: Project, itemId: string) => {
 	const item = project.config.items[itemId];
 	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
 };
 
-const formatQuantity = ({ max, min }: { readonly max: number; readonly min: number }) =>
+const formatQuantityFn = ({ max, min }: { readonly max: number; readonly min: number }) =>
 	min === max ? String(min) : `${min}–${max}`;
 
-const outputAnnotation = (output: ItemOriginOutputOccurrence) =>
+const outputAnnotationFn = (output: ItemOriginOutputOccurrence) =>
 	[
-		`quantity ${formatQuantity(output.quantity)}`,
+		`quantity ${formatQuantityFn(output.quantity)}`,
 		output.selectionKind,
 		...(output.weightedSet
 			? [
@@ -141,26 +141,26 @@ const outputAnnotation = (output: ItemOriginOutputOccurrence) =>
 				]),
 	].join(", ");
 
-const outputRequirementLines = (project: Project, output: ItemOriginOutputOccurrence) => [
+const outputRequirementLinesFn = (project: Project, output: ItemOriginOutputOccurrence) => [
 	...output.requirements.allOf.map(
 		(requirement) =>
-			`      requires all: ${itemReference(project, requirement.itemId)} (quantity ${formatQuantity(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
+			`      requires all: ${itemReferenceFn(project, requirement.itemId)} (quantity ${formatQuantityFn(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
 	),
 	...output.requirements.anyOf.flatMap((clause, clauseIndex) => [
 		`      requires one of #${clauseIndex + 1}:`,
 		...clause.map(
 			(requirement) =>
-				`        - ${itemReference(project, requirement.itemId)} (quantity ${formatQuantity(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
+				`        - ${itemReferenceFn(project, requirement.itemId)} (quantity ${formatQuantityFn(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
 		),
 	]),
 	...(output.requirements.unsupported ?? []).map(
 		(requirement) =>
-			`      unsupported requirement: ${itemReference(project, requirement.itemId)} (${requirement.reason}, ${requirement.source})`,
+			`      unsupported requirement: ${itemReferenceFn(project, requirement.itemId)} (${requirement.reason}, ${requirement.source})`,
 	),
 ];
 
-const sourceReferenceLines = (project: Project, source: ItemOriginSource) => [
-	`  Source item: ${itemReference(project, source.ownerItemId)}`,
+const sourceReferenceLinesFn = (project: Project, source: ItemOriginSource) => [
+	`  Source item: ${itemReferenceFn(project, source.ownerItemId)}`,
 	...(() => {
 		switch (source.reference.type) {
 			case "line":
@@ -253,7 +253,7 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 					].sort((left, right) => left.itemId.localeCompare(right.itemId));
 					return [
 						`- Level ${group.level}: ${source.kind} "${source.label}"`,
-						...sourceReferenceLines(project, source),
+						...sourceReferenceLinesFn(project, source),
 						...(source.runtimeMs === undefined
 							? []
 							: [
@@ -262,7 +262,7 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 						"  Traversed:",
 						...group.relations.map(
 							(relation) =>
-								`    - ${itemReference(project, relation.fromItemId)} -> ${itemReference(project, relation.toItemId)}`,
+								`    - ${itemReferenceFn(project, relation.fromItemId)} -> ${itemReferenceFn(project, relation.toItemId)}`,
 						),
 						...(inputs.length === 0
 							? [
@@ -272,13 +272,13 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 									"  Inputs:",
 									...inputs.map(
 										(input) =>
-											`    - ${itemReference(project, input.itemId)} (quantity ${formatQuantity(input.quantity)})`,
+											`    - ${itemReferenceFn(project, input.itemId)} (quantity ${formatQuantityFn(input.quantity)})`,
 									),
 								]),
 						"  Outputs:",
 						...source.outputs.flatMap((output) => [
-							`    - ${itemReference(project, output.itemId)} (${outputAnnotation(output)})`,
-							...outputRequirementLines(project, output),
+							`    - ${itemReferenceFn(project, output.itemId)} (${outputAnnotationFn(output)})`,
+							...outputRequirementLinesFn(project, output),
 						]),
 					];
 				})),

@@ -22,13 +22,13 @@ import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorA
 import { Status } from "~/ui/ui/Status";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
-	readonly onFilterChange: (filter: useEditorAssetManagerController.Filter) => void;
-	readonly onQueryChange: (query: string) => void;
+	readonly onFilterChangeFn: (filter: useEditorAssetManagerController.Filter) => void;
+	readonly onQueryChangeFn: (query: string) => void;
 }
 
 interface EditorAssetImportMenuProps {
-	readonly onImportArkpack: () => void;
-	readonly onImportFiles: () => void;
+	readonly onImportArkpackFn: () => void;
+	readonly onImportFilesFn: () => void;
 	readonly pending: boolean;
 }
 
@@ -76,15 +76,21 @@ const assetCatalogStatuses = {
 >;
 
 const EditorAssetImportMenu = ({
-	onImportArkpack,
-	onImportFiles,
+	onImportArkpackFn,
+	onImportFilesFn,
 	pending,
 }: EditorAssetImportMenuProps) => {
-	const { floatingStyles, getFloatingProps, getReferenceProps, open, refs, setOpen } =
-		useEditorFloatingMenu();
-	const runImport = (importAssets: () => void) => {
-		setOpen(false);
-		importAssets();
+	const {
+		floatingStyles,
+		getFloatingProps: getFloatingPropsFn,
+		getReferenceProps: getReferencePropsFn,
+		open,
+		refs,
+		setOpenFn,
+	} = useEditorFloatingMenu();
+	const runImportFn = (importAssetsFn: () => void) => {
+		setOpenFn(false);
+		importAssetsFn();
 	};
 
 	return (
@@ -98,7 +104,7 @@ const EditorAssetImportMenu = ({
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetImport"
 					disabled={pending}
-					onClick={onImportArkpack}
+					onClick={onImportArkpackFn}
 				>
 					<PackageOpen className="size-4" />
 					Import assets
@@ -109,7 +115,7 @@ const EditorAssetImportMenu = ({
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetImportMenuTrigger"
 					disabled={pending}
-					{...getReferenceProps()}
+					{...getReferencePropsFn()}
 				>
 					<ChevronDown className="size-4" />
 				</PrimaryButton>
@@ -121,12 +127,12 @@ const EditorAssetImportMenu = ({
 						style={floatingStyles}
 						className="z-50 grid w-80 max-w-[calc(100vw-1rem)] gap-1 rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
 						data-ui="EditorAssetImportMenu"
-						{...getFloatingProps()}
+						{...getFloatingPropsFn()}
 					>
 						<Button
 							className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
 							data-ui="EditorAssetImportArkpackOption"
-							onClick={() => runImport(onImportArkpack)}
+							onClick={() => runImportFn(onImportArkpackFn)}
 						>
 							<PackageOpen className="size-5 shrink-0 text-accent" />
 							<span>
@@ -139,7 +145,7 @@ const EditorAssetImportMenu = ({
 						<Button
 							className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
 							data-ui="EditorAssetImportFilesOption"
-							onClick={() => runImport(onImportFiles)}
+							onClick={() => runImportFn(onImportFilesFn)}
 						>
 							<Images className="size-5 shrink-0 text-accent" />
 							<span>
@@ -164,7 +170,7 @@ const EditorAssetCard = ({
 }: {
 	readonly filter: "all" | "unused";
 	readonly query: string;
-	readonly resource: Project["resources"][number];
+	readonly resource: Project.Resource;
 }) => {
 	const project = useEditorProject();
 	const url = useResourceUrl(resource.id);
@@ -243,8 +249,8 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 			: `Imported ${controller.importedCount} asset${controller.importedCount === 1 ? "" : "s"}.`;
 	const importButton = (
 		<EditorAssetImportMenu
-			onImportArkpack={controller.openArkpackImport}
-			onImportFiles={controller.openFilesImport}
+			onImportArkpackFn={controller.openArkpackImportFn}
+			onImportFilesFn={controller.openFilesImportFn}
 			pending={controller.importPending}
 		/>
 	);
@@ -269,7 +275,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					className="hidden"
 					data-ui="EditorAssetArkpackInput"
 					disabled={controller.importPending}
-					onChange={controller.onArkpackChange}
+					onChange={controller.onArkpackChangeFn}
 				/>
 				<input
 					ref={controller.filesInputRef}
@@ -279,7 +285,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					className="hidden"
 					data-ui="EditorAssetImportInput"
 					disabled={controller.importPending}
-					onChange={controller.onFilesChange}
+					onChange={controller.onFilesChangeFn}
 				/>
 				<input
 					type="search"
@@ -287,7 +293,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					className="h-12 min-h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					data-ui="EditorAssetSearch"
 					placeholder="Search assets…"
-					onChange={(event) => props.onQueryChange(event.currentTarget.value)}
+					onChange={(event) => props.onQueryChangeFn(event.currentTarget.value)}
 				/>
 				<div
 					className="inline-flex h-12 min-h-12 rounded-lg border border-line bg-surface p-1"
@@ -299,7 +305,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 							type="button"
 							className={`h-full min-h-0 cursor-pointer rounded-md border px-3 py-0 text-sm font-semibold ${selectableClassName}`}
 							data-filter={option.value}
-							onClick={() => props.onFilterChange(option.value)}
+							onClick={() => props.onFilterChangeFn(option.value)}
 							{...readDataUiFn({
 								dataUi: "EditorAssetFilter",
 								state: {

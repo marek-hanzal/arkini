@@ -25,23 +25,23 @@ type WeightedRoll = Extract<
 	}
 >;
 
-const readChancePercent = (chance: number) => Number((chance * 100).toFixed(6));
-const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
+const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
+const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
 const DropControl = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (drop: DropSchema.Type) => void;
+	readonly onChangeFn: (drop: DropSchema.Type) => void;
 	readonly value: DropSchema.Type;
 }) => (
 	<div className="grid gap-3">
 		<EditorItemReferenceControl
 			label="Dropped item"
 			value={value.itemId}
-			onChange={(itemId) =>
-				onChange({
+			onChangeFn={(itemId) =>
+				onChangeFn({
 					...value,
 					itemId,
 				})
@@ -51,8 +51,8 @@ const DropControl = ({
 			<div className="min-w-0 basis-full sm:basis-1/2">
 				<QuantityControl
 					value={value.quantity}
-					onChange={(quantity) =>
-						onChange({
+					onChangeFn={(quantity) =>
+						onChangeFn({
 							...value,
 							quantity,
 						})
@@ -76,8 +76,8 @@ const DropControl = ({
 						value: "random",
 					},
 				]}
-				onChange={(placement) =>
-					onChange({
+				onChangeFn={(placement) =>
+					onChangeFn({
 						...value,
 						placement,
 					})
@@ -92,8 +92,8 @@ const DropControl = ({
 				"enable",
 				"disable",
 			]}
-			onChange={(rules) =>
-				onChange({
+			onChangeFn={(rules) =>
+				onChangeFn({
 					...value,
 					rules: rules as DropSchema.Type["rules"],
 				})
@@ -103,13 +103,13 @@ const DropControl = ({
 );
 
 const DropList = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (drops: DropListValue | undefined) => void;
+	readonly onChangeFn: (drops: DropListValue | undefined) => void;
 	readonly value: DropListValue;
 }) => {
-	const readItemLabel = useEditorItemOptionLabel();
+	const readItemLabelFn = useEditorItemOptionLabel();
 	return (
 		<section className="grid gap-3">
 			<EditorFormSectionDivider
@@ -120,18 +120,18 @@ const DropList = ({
 			<EditorCollectionSelector
 				addLabel="Add drop"
 				count={value.length}
-				itemLabel={(index) => readItemLabel(value[index].itemId, `Drop ${index + 1}`)}
+				itemLabelFn={(index) => readItemLabelFn(value[index].itemId, `Drop ${index + 1}`)}
 				label="Drops"
-				onAdd={() =>
-					onChange([
+				onAddFn={() =>
+					onChangeFn([
 						...value,
 						structuredClone(DraftDefaults.drop),
 					])
 				}
-				onRemove={(index) =>
+				onRemoveFn={(index) =>
 					value.length === 1
-						? onChange(undefined)
-						: onChange(
+						? onChangeFn(undefined)
+						: onChangeFn(
 								value.filter(
 									(_current, currentIndex) => currentIndex !== index,
 								) as DropListValue,
@@ -142,8 +142,8 @@ const DropList = ({
 				{(index) => (
 					<DropControl
 						value={value[index]}
-						onChange={(next) =>
-							onChange(
+						onChangeFn={(next) =>
+							onChangeFn(
 								value.map((current, currentIndex) =>
 									currentIndex === index ? next : current,
 								) as DropListValue,
@@ -192,13 +192,13 @@ const WeightedSelectionsHelp = () => (
 );
 
 const WeightedRollControl = ({
-	onChange,
+	onChangeFn,
 	roll,
 }: {
-	readonly onChange: (roll: RollSchema.Type | undefined) => void;
+	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
 	readonly roll: WeightedRoll;
 }) => {
-	const readItemLabel = useEditorItemOptionLabel();
+	const readItemLabelFn = useEditorItemOptionLabel();
 	return (
 		<div className="grid gap-4">
 			<div className="grid gap-3">
@@ -228,8 +228,8 @@ const WeightedRollControl = ({
 						minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
 						maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
 						value={roll.quantity}
-						onChange={(quantity) =>
-							onChange({
+						onChangeFn={(quantity) =>
+							onChangeFn({
 								...roll,
 								quantity,
 							})
@@ -245,13 +245,13 @@ const WeightedRollControl = ({
 			<EditorCollectionSelector
 				addLabel="Add weighted candidate"
 				count={roll.drop.length}
-				itemLabel={(candidateIndex) => {
+				itemLabelFn={(candidateIndex) => {
 					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
-					return readItemLabel(itemId ?? "", `Candidate ${candidateIndex + 1}`);
+					return readItemLabelFn(itemId ?? "", `Candidate ${candidateIndex + 1}`);
 				}}
 				label="Weighted candidates"
-				onAdd={() =>
-					onChange({
+				onAddFn={() =>
+					onChangeFn({
 						...roll,
 						drop: [
 							...roll.drop,
@@ -264,10 +264,10 @@ const WeightedRollControl = ({
 						],
 					})
 				}
-				onRemove={(candidateIndex) =>
+				onRemoveFn={(candidateIndex) =>
 					roll.drop.length <= 2
-						? onChange(undefined)
-						: onChange({
+						? onChangeFn(undefined)
+						: onChangeFn({
 								...roll,
 								drop: roll.drop.filter(
 									(_current, currentIndex) => currentIndex !== candidateIndex,
@@ -278,10 +278,10 @@ const WeightedRollControl = ({
 			>
 				{(candidateIndex) => {
 					const candidate = roll.drop[candidateIndex];
-					const removeCandidate = () =>
+					const removeCandidateFn = () =>
 						roll.drop.length <= 2
-							? onChange(undefined)
-							: onChange({
+							? onChangeFn(undefined)
+							: onChangeFn({
 									...roll,
 									drop: roll.drop.filter(
 										(_current, currentIndex) => currentIndex !== candidateIndex,
@@ -293,8 +293,8 @@ const WeightedRollControl = ({
 								label={`Candidate ${candidateIndex + 1} weight`}
 								value={candidate.weight}
 								min={1}
-								onChange={(weight) =>
-									onChange({
+								onChangeFn={(weight) =>
+									onChangeFn({
 										...roll,
 										drop: roll.drop.map((current, currentIndex) =>
 											currentIndex === candidateIndex
@@ -309,10 +309,10 @@ const WeightedRollControl = ({
 							/>
 							<DropList
 								value={candidate.drop}
-								onChange={(drop) =>
+								onChangeFn={(drop) =>
 									drop === undefined
-										? removeCandidate()
-										: onChange({
+										? removeCandidateFn()
+										: onChangeFn({
 												...roll,
 												drop: roll.drop.map((current, currentIndex) =>
 													currentIndex === candidateIndex
@@ -334,10 +334,10 @@ const WeightedRollControl = ({
 };
 
 const RollControl = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (roll: RollSchema.Type | undefined) => void;
+	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
 	readonly value: RollSchema.Type;
 }) => (
 	<div className="grid gap-4">
@@ -364,7 +364,7 @@ const RollControl = ({
 					value: "weight",
 				},
 			]}
-			onChange={(type) => onChange(structuredClone(DraftDefaults.rolls[type]))}
+			onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
 		/>
 		{match(value)
 			.with(
@@ -374,10 +374,10 @@ const RollControl = ({
 				(roll) => (
 					<DropList
 						value={roll.drop}
-						onChange={(drop) =>
+						onChangeFn={(drop) =>
 							drop === undefined
-								? onChange(undefined)
-								: onChange({
+								? onChangeFn(undefined)
+								: onChangeFn({
 										...roll,
 										drop,
 									})
@@ -394,12 +394,12 @@ const RollControl = ({
 						<EditorNumberControl
 							description="Probability that this roll emits its configured drops. The editor converts the percentage to the engine's internal 0–1 value."
 							label="Chance (%)"
-							value={readChancePercent(roll.chance)}
+							value={readChancePercentFn(roll.chance)}
 							min={0}
 							max={100}
 							step={0.01}
-							onChange={(chancePercent) =>
-								onChange({
+							onChangeFn={(chancePercent) =>
+								onChangeFn({
 									...roll,
 									chance: chancePercent / 100,
 								})
@@ -407,10 +407,10 @@ const RollControl = ({
 						/>
 						<DropList
 							value={roll.drop}
-							onChange={(drop) =>
+							onChangeFn={(drop) =>
 								drop === undefined
-									? onChange(undefined)
-									: onChange({
+									? onChangeFn(undefined)
+									: onChangeFn({
 											...roll,
 											drop,
 										})
@@ -426,7 +426,7 @@ const RollControl = ({
 				(roll) => (
 					<WeightedRollControl
 						roll={roll}
-						onChange={onChange}
+						onChangeFn={onChangeFn}
 					/>
 				),
 			)
@@ -436,22 +436,22 @@ const RollControl = ({
 
 export const RollSetControl = ({
 	index,
-	onChange,
+	onChangeFn,
 	value,
 }: {
 	readonly index: number;
-	readonly onChange: (set: RollSetSchema.Type | undefined) => void;
+	readonly onChangeFn: (set: RollSetSchema.Type | undefined) => void;
 	readonly value: RollSetSchema.Type;
 }) => {
-	const readItemLabel = useEditorItemOptionLabel();
+	const readItemLabelFn = useEditorItemOptionLabel();
 	return (
 		<section className="grid gap-3">
 			<EditorNumberControl
 				label="Relative set weight"
 				value={value.weight}
 				min={1}
-				onChange={(weight) =>
-					onChange({
+				onChangeFn={(weight) =>
+					onChangeFn({
 						...value,
 						weight,
 					})
@@ -465,17 +465,17 @@ export const RollSetControl = ({
 			<EditorCollectionSelector
 				addLabel="Add roll"
 				count={value.roll.length}
-				itemLabel={(rollIndex) => {
+				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
-					const itemId = readFirstRollItemId(roll);
-					return `${roll.type} roll ${rollIndex + 1} — ${readItemLabel(
+					const itemId = readFirstRollItemIdFn(roll);
+					return `${roll.type} roll ${rollIndex + 1} — ${readItemLabelFn(
 						itemId ?? "",
 						"No item selected",
 					)}`;
 				}}
 				label={`Output set ${index + 1} rolls`}
-				onAdd={() =>
-					onChange({
+				onAddFn={() =>
+					onChangeFn({
 						...value,
 						roll: [
 							...value.roll,
@@ -483,10 +483,10 @@ export const RollSetControl = ({
 						],
 					})
 				}
-				onRemove={(rollIndex) =>
+				onRemoveFn={(rollIndex) =>
 					value.roll.length === 1
-						? onChange(undefined)
-						: onChange({
+						? onChangeFn(undefined)
+						: onChangeFn({
 								...value,
 								roll: value.roll.filter(
 									(_current, currentIndex) => currentIndex !== rollIndex,
@@ -498,18 +498,18 @@ export const RollSetControl = ({
 				{(rollIndex) => (
 					<RollControl
 						value={value.roll[rollIndex]}
-						onChange={(next) =>
+						onChangeFn={(next) =>
 							next === undefined
 								? value.roll.length === 1
-									? onChange(undefined)
-									: onChange({
+									? onChangeFn(undefined)
+									: onChangeFn({
 											...value,
 											roll: value.roll.filter(
 												(_current, currentIndex) =>
 													currentIndex !== rollIndex,
 											) as typeof value.roll,
 										})
-								: onChange({
+								: onChangeFn({
 										...value,
 										roll: value.roll.map((current, currentIndex) =>
 											currentIndex === rollIndex ? next : current,

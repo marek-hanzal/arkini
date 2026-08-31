@@ -96,11 +96,11 @@ export const readAcquisitionAvailabilityRequirementsFn = ({
 		}
 		if (!factFree && alternatives.length > 0) anyOf.push(alternatives);
 	}
-	const compare = (left: AcquisitionRequirement, right: AcquisitionRequirement) =>
+	const compareFn = (left: AcquisitionRequirement, right: AcquisitionRequirement) =>
 		Order.String(left.factId, right.factId) || left.quantity - right.quantity;
 	return {
-		allOf: allOf.sort(compare),
-		anyOf: anyOf.map((clause) => clause.sort(compare)),
+		allOf: allOf.sort(compareFn),
+		anyOf: anyOf.map((clause) => clause.sort(compareFn)),
 		...(unsupported.length === 0
 			? {}
 			: {

@@ -6,17 +6,17 @@ import type { OutputProjection } from "~/production-output/type/OutputProjection
 
 const OutputItem = <Item extends OutputProjection.Item>({
 	item,
-	renderItem,
+	renderItemFn,
 }: {
 	readonly item: Item;
-	readonly renderItem: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item) => ReactNode;
 }) => (
 	<div
 		className="grid gap-1.5"
 		data-ui="TileLineOutputItem"
 	>
 		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
-			{renderItem(item)}
+			{renderItemFn(item)}
 			<span className="shrink-0 text-muted">
 				×
 				{item.quantity.min === item.quantity.max
@@ -39,17 +39,17 @@ const OutputItem = <Item extends OutputProjection.Item>({
 
 const OutputItems = <Item extends OutputProjection.Item>({
 	items,
-	renderItem,
+	renderItemFn,
 }: {
 	readonly items: readonly Item[];
-	readonly renderItem: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item) => ReactNode;
 }) => (
 	<div className="space-y-1.5">
 		{items.map((item) => (
 			<OutputItem
 				key={item.itemId}
 				item={item}
-				renderItem={renderItem}
+				renderItemFn={renderItemFn}
 			/>
 		))}
 	</div>
@@ -57,10 +57,10 @@ const OutputItems = <Item extends OutputProjection.Item>({
 
 const OutputRoll = <Item extends OutputProjection.Item>({
 	roll,
-	renderItem,
+	renderItemFn,
 }: {
 	readonly roll: OutputProjection.Roll<Item>;
-	readonly renderItem: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item) => ReactNode;
 }) =>
 	match(roll)
 		.with(
@@ -78,7 +78,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					</p>
 					<OutputItems
 						items={guaranteed.item}
-						renderItem={renderItem}
+						renderItemFn={renderItemFn}
 					/>
 				</div>
 			),
@@ -98,7 +98,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					</p>
 					<OutputItems
 						items={chance.item}
-						renderItem={renderItem}
+						renderItemFn={renderItemFn}
 					/>
 				</div>
 			),
@@ -127,7 +127,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 							<p className="mb-1.5 text-xs text-muted">Weight {option.weight}</p>
 							<OutputItems
 								items={option.item}
-								renderItem={renderItem}
+								renderItemFn={renderItemFn}
 							/>
 						</div>
 					))}
@@ -139,10 +139,10 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 /** Renders every authored output alternative and roll for one visible product line. */
 export const Outputs = <Item extends OutputProjection.Item>({
 	output,
-	renderItem,
+	renderItemFn,
 }: {
 	readonly output: readonly OutputProjection.Set<Item>[];
-	readonly renderItem: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item) => ReactNode;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -167,7 +167,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 								<OutputRoll
 									key={`${roll.kind}:${rollIndex}`}
 									roll={roll}
-									renderItem={renderItem}
+									renderItemFn={renderItemFn}
 								/>
 							))}
 						</div>

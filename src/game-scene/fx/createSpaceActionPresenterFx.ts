@@ -6,35 +6,37 @@ import { readSpaceActionPresentationPhasesFn } from "~/game-scene/fn/readSpaceAc
 type TransitionDelivery = "hydrate" | "present";
 
 interface CreateSpaceActionPresenterProps {
-	readonly applyTransition: (transition: GameTransition, delivery: TransitionDelivery) => void;
+	readonly applyTransitionFn: (transition: GameTransition, delivery: TransitionDelivery) => void;
 	readonly initialSequence: number;
-	readonly scheduleAfterRender: (work: () => void) => () => void;
-	readonly setInteractionBlocked: (blocked: boolean) => void;
+	readonly scheduleAfterRenderFn: (workFn: () => void) => () => void;
+	readonly setInteractionBlockedFn: (blocked: boolean) => void;
 }
 
 /** Sequences source-space accounting, one rendered frame, and the following Space switch. */
 export const createSpaceActionPresenterFx = Effect.fn("createSpaceActionPresenterFx")(
 	({
-		applyTransition,
+		applyTransitionFn,
 		initialSequence,
-		scheduleAfterRender,
-		setInteractionBlocked,
+		scheduleAfterRenderFn,
+		setInteractionBlockedFn,
 	}: CreateSpaceActionPresenterProps) =>
 		Effect.sync(() => {
 			let closed = false;
 			let externalInteractionBlocked = false;
 			let spaceSwitchInteractionBlocked = false;
 			let awaitingSpaceSwitchProjection = false;
-			let cancelSpaceSwitchProjection: () => void = () => undefined;
+			let cancelSpaceSwitchProjectionFn: () => void = () => undefined;
 			let highestAdmittedSequence = initialSequence;
 			const queuedTransitions: Array<{
 				readonly delivery: TransitionDelivery;
 				readonly transition: GameTransition;
 			}> = [];
-			const syncInteractionBlock = () =>
-				setInteractionBlocked(externalInteractionBlocked || spaceSwitchInteractionBlocked);
+			const syncInteractionBlockFn = () =>
+				setInteractionBlockedFn(
+					externalInteractionBlocked || spaceSwitchInteractionBlocked,
+				);
 
-			const applyAdmitted = (transition: GameTransition, delivery: TransitionDelivery) => {
+			const applyAdmittedFn = (transition: GameTransition, delivery: TransitionDelivery) => {
 				if (closed) return;
 				if (awaitingSpaceSwitchProjection) {
 					queuedTransitions.push({
@@ -44,7 +46,7 @@ export const createSpaceActionPresenterFx = Effect.fn("createSpaceActionPresente
 					return;
 				}
 				if (delivery === "hydrate") {
-					applyTransition(transition, delivery);
+					applyTransitionFn(transition, delivery);
 					return;
 				}
 
@@ -52,33 +54,33 @@ export const createSpaceActionPresenterFx = Effect.fn("createSpaceActionPresente
 				const accounting = phases[0];
 				const spaceSwitch = phases[1];
 				if (accounting?.kind !== "accounting" || spaceSwitch?.kind !== "space-switch") {
-					applyTransition(transition, delivery);
+					applyTransitionFn(transition, delivery);
 					return;
 				}
 
-				applyTransition(accounting.transition, delivery);
+				applyTransitionFn(accounting.transition, delivery);
 				spaceSwitchInteractionBlocked = true;
-				syncInteractionBlock();
+				syncInteractionBlockFn();
 				awaitingSpaceSwitchProjection = true;
-				cancelSpaceSwitchProjection = scheduleAfterRender(() => {
+				cancelSpaceSwitchProjectionFn = scheduleAfterRenderFn(() => {
 					if (closed) return;
 					awaitingSpaceSwitchProjection = false;
-					cancelSpaceSwitchProjection = () => undefined;
+					cancelSpaceSwitchProjectionFn = () => undefined;
 					spaceSwitchInteractionBlocked = false;
-					syncInteractionBlock();
-					applyTransition(spaceSwitch.transition, delivery);
+					syncInteractionBlockFn();
+					applyTransitionFn(spaceSwitch.transition, delivery);
 					const queued = queuedTransitions.splice(0);
 					for (const queuedTransition of queued) {
-						applyAdmitted(queuedTransition.transition, queuedTransition.delivery);
+						applyAdmittedFn(queuedTransition.transition, queuedTransition.delivery);
 					}
 				});
 			};
-			const present = (transition: GameTransition, delivery: TransitionDelivery) => {
+			const presentFn = (transition: GameTransition, delivery: TransitionDelivery) => {
 				if (closed || transition.sequence <= highestAdmittedSequence) return;
 				highestAdmittedSequence = transition.sequence;
-				applyAdmitted(transition, delivery);
+				applyAdmittedFn(transition, delivery);
 			};
-			const refresh = (transition: GameTransition) => {
+			const refreshFn = (transition: GameTransition) => {
 				if (closed || transition.sequence < highestAdmittedSequence) return;
 				if (transition.sequence > highestAdmittedSequence + 1) return;
 				if (transition.sequence === highestAdmittedSequence) {
@@ -86,27 +88,27 @@ export const createSpaceActionPresenterFx = Effect.fn("createSpaceActionPresente
 						(event) => event.type === "current-space:changed",
 					);
 					if (!awaitingSpaceSwitchProjection && !isSpaceSwitch) {
-						applyTransition(transition, "present");
+						applyTransitionFn(transition, "present");
 					}
 					return;
 				}
 				highestAdmittedSequence = transition.sequence;
-				applyAdmitted(transition, "present");
+				applyAdmittedFn(transition, "present");
 			};
 
 			return {
-				present,
-				refresh,
+				presentFn,
+				refreshFn,
 				setInteractionBlockedFx: (blocked: boolean) =>
 					Effect.sync(() => {
 						if (closed) return;
 						externalInteractionBlocked = blocked;
-						syncInteractionBlock();
+						syncInteractionBlockFn();
 					}),
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
-					cancelSpaceSwitchProjection();
+					cancelSpaceSwitchProjectionFn();
 					queuedTransitions.length = 0;
 				}),
 			};

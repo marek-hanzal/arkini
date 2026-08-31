@@ -102,12 +102,12 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 				{stale ? null : (
 					<ItemLineCommandPanel
 						disabled={disabled}
-						enqueue={commands.enqueue}
+						enqueueFn={commands.enqueueFn}
 						line={line}
 						pendingDefault={commands.pending.default}
 						pendingEnqueue={commands.pending.enqueue}
-						setDefault={commands.setDefault}
-						unsetDefault={commands.unsetDefault}
+						setDefaultFn={commands.setDefaultFn}
+						unsetDefaultFn={commands.unsetDefaultFn}
 					/>
 				)}
 			</div>
@@ -127,7 +127,7 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 				line={line}
 				ownerItemId={ownerItemId}
 				pendingWithdraw={commands.pending.withdraw}
-				requestWithdraw={commands.withdraw}
+				requestWithdrawFn={commands.withdrawFn}
 				stale={stale}
 			/>
 		</motion.article>

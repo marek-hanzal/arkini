@@ -2,13 +2,10 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
+import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 
-interface Props extends readDropItemPreviewFx.Props {
+interface Props extends DropItemCommand {
 	readonly game: GameEngine;
-}
-
-export namespace readTileDropPreviewFx {
-	export type Result = readDropItemPreviewFx.Result;
 }
 
 /**
@@ -18,6 +15,6 @@ export namespace readTileDropPreviewFx {
 export const readTileDropPreviewFx = Effect.fn("readTileDropPreviewFx")(
 	({ game, ...props }: Props) =>
 		Effect.sync(
-			(): readTileDropPreviewFx.Result => game.readOrThrow(readDropItemPreviewFx(props)),
+			(): readDropItemPreviewFx.Result => game.readOrThrowFn(readDropItemPreviewFx(props)),
 		),
 );

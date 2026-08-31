@@ -13,7 +13,7 @@ const readEditorServiceDidNotRespondFn = (): EditorProjectTransport.ServiceStatu
 
 /** Reads and publishes editor readiness without ever failing the renderer root. */
 export const refreshEditorServiceStatusFx = Effect.tryPromise({
-	try: () => window.arkini.editor.status(),
+	try: () => window.arkini.editor.statusFn(),
 	catch: (cause) => cause,
 }).pipe(
 	Effect.timeoutOrElse({

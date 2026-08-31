@@ -13,11 +13,11 @@ interface WeightedGraph {
 	readonly outgoing: ReadonlyMap<string, ReadonlyMap<string, number>>;
 }
 
-const addWeight = (map: Map<string, number>, id: string) => {
+const addWeightFn = (map: Map<string, number>, id: string) => {
 	map.set(id, (map.get(id) ?? 0) + 1);
 };
 
-const readWeightedGraph = (flow: LayoutInput): WeightedGraph => {
+const readWeightedGraphFn = (flow: LayoutInput): WeightedGraph => {
 	const incoming = new Map<string, Map<string, number>>();
 	const outgoing = new Map<string, Map<string, number>>();
 	for (const { id } of flow.nodes) {
@@ -25,8 +25,8 @@ const readWeightedGraph = (flow: LayoutInput): WeightedGraph => {
 		outgoing.set(id, new Map());
 	}
 	for (const { source, target } of flow.edges) {
-		addWeight(outgoing.get(source)!, target);
-		addWeight(incoming.get(target)!, source);
+		addWeightFn(outgoing.get(source)!, target);
+		addWeightFn(incoming.get(target)!, source);
 	}
 	return {
 		incoming,
@@ -34,7 +34,7 @@ const readWeightedGraph = (flow: LayoutInput): WeightedGraph => {
 	};
 };
 
-const sumWeights = (entries: ReadonlyMap<string, number>) => {
+const sumWeightsFn = (entries: ReadonlyMap<string, number>) => {
 	let total = 0;
 	for (const weight of entries.values()) total += weight;
 	return total;
@@ -42,25 +42,25 @@ const sumWeights = (entries: ReadonlyMap<string, number>) => {
 
 /** Keeps feedback edges explicit while giving highlight traversal one stable forward order. */
 const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
-	const graph = readWeightedGraph(flow);
+	const graph = readWeightedGraphFn(flow);
 	const nodeIds = flow.nodes.map(({ id }) => id).sort((left, right) => Order.String(left, right));
 	const active = new Set(nodeIds);
 	const inDegree = new Map(
 		nodeIds.map((id) => [
 			id,
-			sumWeights(graph.incoming.get(id) ?? new Map()),
+			sumWeightsFn(graph.incoming.get(id) ?? new Map()),
 		]),
 	);
 	const outDegree = new Map(
 		nodeIds.map((id) => [
 			id,
-			sumWeights(graph.outgoing.get(id) ?? new Map()),
+			sumWeightsFn(graph.outgoing.get(id) ?? new Map()),
 		]),
 	);
 	const left: string[] = [];
 	const right: string[] = [];
 
-	const remove = (id: string, side: "left" | "right") => {
+	const removeFn = (id: string, side: "left" | "right") => {
 		active.delete(id);
 		(side === "left" ? left : right).push(id);
 		for (const [target, weight] of graph.outgoing.get(id) ?? []) {
@@ -82,7 +82,7 @@ const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 				.sort((leftId, rightId) => Order.String(leftId, rightId));
 			for (const id of sinks) {
 				if (!active.has(id)) continue;
-				remove(id, "right");
+				removeFn(id, "right");
 				removedTerminal = true;
 			}
 			const sources = [
@@ -92,7 +92,7 @@ const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 				.sort((leftId, rightId) => Order.String(leftId, rightId));
 			for (const id of sources) {
 				if (!active.has(id)) continue;
-				remove(id, "left");
+				removeFn(id, "left");
 				removedTerminal = true;
 			}
 		}
@@ -109,7 +109,7 @@ const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 				bestScore = score;
 			}
 		}
-		remove(bestId, "left");
+		removeFn(bestId, "left");
 	}
 
 	const ordered = [

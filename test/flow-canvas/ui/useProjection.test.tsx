@@ -162,7 +162,7 @@ describe("useProjection", () => {
 		const navigationNodeIds = state.current?.navigationNodeIds;
 
 		await act(async () =>
-			state.current?.setHighlightDepth({
+			state.current?.setHighlightDepthFn({
 				direction: "input",
 				limit: 0,
 				nodeId: selection.id,

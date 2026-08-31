@@ -17,7 +17,7 @@ describe("Editor Build saveEditorBuildFx", () => {
 			configurable: true,
 			value: {
 				editor: {
-					saveProjectBuild,
+					saveProjectBuildFn: saveProjectBuild,
 				},
 			},
 		});

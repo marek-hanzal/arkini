@@ -21,7 +21,7 @@ export const saveBoardScenarioFx = Effect.fn("saveEditorBoardScenarioFx")(functi
 	project,
 }: saveBoardScenarioFx.Props) {
 	const state = fromRuntimeFn({
-		runtime: game.getSnapshot(),
+		runtime: game.getSnapshotFn(),
 	});
 	const bytes = encodeArkiniSaveFn({
 		version: project.version,

@@ -5,13 +5,11 @@ import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameA
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { splitBoardItemStackFx } from "~/item-interaction/fx/splitBoardItemStackFx";
 
-type Command = splitBoardItemStackFx.Props;
-
 /** Runs one exact Board-stack split while keeping expected command failures recoverable. */
 export const runTileSplitAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
-			(command: Command) =>
+			(command: splitBoardItemStackFx.Props) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(
 						game.runFx(splitBoardItemStackFx(command)).pipe(

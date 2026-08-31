@@ -15,13 +15,13 @@ describe("createGameSessionFx / planner disposal", () => {
 		const planningGate = await Effect.runPromise(Deferred.make<void>());
 		let runtimeNotifications = 0;
 		let eventNotifications = 0;
-		const unsubscribeRuntime = session.subscribe(() => {
+		const unsubscribeRuntime = session.subscribeFn(() => {
 			runtimeNotifications += 1;
 		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
+		const unsubscribeEvents = session.subscribeEventsFn(() => {
 			eventNotifications += 1;
 		});
-		const pending = session.run(
+		const pending = session.runFn(
 			modifyRuntimeFx((runtime) =>
 				Deferred.succeed(planningEntered, undefined).pipe(
 					Effect.andThen(Deferred.await(planningGate)),

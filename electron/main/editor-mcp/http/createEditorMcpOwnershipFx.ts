@@ -15,7 +15,7 @@ import { checkRemoteEndpointFx } from "./checkRemoteEndpointFx";
 import { createHttpListenerOwnershipFx } from "./createHttpListenerOwnershipFx";
 
 export interface ServerOwnership {
-	readonly readLocalStatus: () => EditorMcpStatus;
+	readonly readLocalStatusFn: () => EditorMcpStatus;
 	readonly readOverviewFx: Effect.Effect<EditorMcpOverviewSchema.Type, unknown, never>;
 	readonly publishOverviewFx: Effect.Effect<void, unknown, never>;
 	readonly configureFx: (
@@ -26,15 +26,15 @@ export interface ServerOwnership {
 	readonly startRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
 	readonly stopRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
 	readonly resetRemoteAuthFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
-	readonly readProjectContext: () => string | undefined;
-	readonly setProjectContext: (
+	readonly readProjectContextFn: () => string | undefined;
+	readonly setProjectContextFn: (
 		projectId: string,
 		requestVersionCheckoutFx?: (versionId: string) => Effect.Effect<void, unknown, never>,
 	) => void;
-	readonly clearProjectContext: (projectId: string) => void;
-	readonly resetProjectContext: () => void;
+	readonly clearProjectContextFn: (projectId: string) => void;
+	readonly resetProjectContextFn: () => void;
 	readonly closeFx: Effect.Effect<void, unknown, never>;
-	readonly closeSync: () => void;
+	readonly closeSyncFn: () => void;
 }
 
 export namespace createEditorMcpOwnershipFx {
@@ -42,10 +42,10 @@ export namespace createEditorMcpOwnershipFx {
 		readonly checkPortFx?: typeof checkPortAvailabilityFx;
 		readonly checkRemoteFx?: (origin: URL) => Effect.Effect<void, unknown, never>;
 		readonly editor: EditorProjectServiceOwnership;
-		readonly notifyOverviewChanged: (overview: EditorMcpOverviewSchema.Type) => void;
-		readonly notifyProjectChanged: (projectId: string) => void;
+		readonly notifyOverviewChangedFn: (overview: EditorMcpOverviewSchema.Type) => void;
+		readonly notifyProjectChangedFn: (projectId: string) => void;
 		readonly storage: McpStorage;
-		readonly runPromise: <Value, Error>(
+		readonly runPromiseFn: <Value, Error>(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
 		readonly tunnel: McpTunnel;
@@ -57,10 +57,10 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	checkPortFx = checkPortAvailabilityFx,
 	checkRemoteFx = checkRemoteEndpointFx,
 	editor,
-	notifyOverviewChanged,
-	notifyProjectChanged,
+	notifyOverviewChangedFn,
+	notifyProjectChangedFn,
 	storage,
-	runPromise,
+	runPromiseFn,
 	tunnel,
 }: createEditorMcpOwnershipFx.Props) {
 	let localEnabled = false;
@@ -84,9 +84,9 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const commandLock = yield* Semaphore.make(1);
 	const httpListener = yield* createHttpListenerOwnershipFx({
 		editor,
-		notifyProjectChanged,
+		notifyProjectChangedFn,
 		storage,
-		readProjectContext: () => projectContext,
+		readProjectContextFn: () => projectContext,
 		requestVersionCheckoutFx: (projectId, versionId) => {
 			if (projectContext !== projectId || versionCheckoutRequestFx === undefined)
 				return Effect.fail(
@@ -94,7 +94,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				);
 			return versionCheckoutRequestFx(versionId);
 		},
-		runPromise,
+		runPromiseFn,
 	});
 
 	const readOverviewFx = Effect.gen(function* () {
@@ -112,7 +112,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 		} satisfies EditorMcpOverviewSchema.Type;
 	});
 	const publishOverviewFx = readOverviewFx.pipe(
-		Effect.tap((overview) => Effect.sync(() => notifyOverviewChanged(overview))),
+		Effect.tap((overview) => Effect.sync(() => notifyOverviewChangedFn(overview))),
 		Effect.asVoid,
 	);
 	const configureFx = (configuration: EditorMcpConfigurationSchema.Type) =>
@@ -142,7 +142,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					});
 				}
 				const overview = yield* readOverviewFx;
-				yield* Effect.sync(() => notifyOverviewChanged(overview));
+				yield* Effect.sync(() => notifyOverviewChangedFn(overview));
 				return overview;
 			}),
 		);
@@ -153,7 +153,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			Effect.gen(function* () {
 				if (tunnelSession !== session) return;
 				tunnelSession = undefined;
-				httpListener.setRemoteHandler(undefined);
+				httpListener.setRemoteHandlerFn(undefined);
 				yield* session.closeFx.pipe(Effect.ignore);
 				remoteStatus = {
 					type: "unavailable",
@@ -180,14 +180,14 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				};
 			} else {
 				localEnabled = true;
-				httpListener.setLocalEnabled(true);
+				httpListener.setLocalEnabledFn(true);
 				localStatus = {
 					type: "ready",
 					port: yield* storage.readPortFx,
 				};
 			}
 			const overview = yield* readOverviewFx;
-			yield* Effect.sync(() => notifyOverviewChanged(overview));
+			yield* Effect.sync(() => notifyOverviewChangedFn(overview));
 			return {
 				overview,
 			};
@@ -196,7 +196,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const stopLocalFx = commandLock.withPermits(1)(
 		Effect.gen(function* () {
 			localEnabled = false;
-			httpListener.setLocalEnabled(false);
+			httpListener.setLocalEnabledFn(false);
 			localStatus =
 				editor.type === "ready"
 					? {
@@ -209,14 +209,14 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			if (remoteStatus.type !== "ready" && remoteStatus.type !== "starting")
 				yield* closeServerFx.pipe(Effect.ignore);
 			const overview = yield* readOverviewFx;
-			yield* Effect.sync(() => notifyOverviewChanged(overview));
+			yield* Effect.sync(() => notifyOverviewChangedFn(overview));
 			return {
 				overview,
 			};
 		}),
 	);
 	const stopRemoteUnlockedFx = Effect.gen(function* () {
-		httpListener.setRemoteHandler(undefined);
+		httpListener.setRemoteHandlerFn(undefined);
 		const session = tunnelSession;
 		tunnelSession = undefined;
 		if (session !== undefined) yield* session.closeFx.pipe(Effect.ignore);
@@ -256,16 +256,16 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 						provenance,
 					});
 					const origin = openedSession.url;
-					const mcpNodeHandler = httpListener.readMcpHandler();
-					if (mcpNodeHandler === undefined)
+					const mcpNodeHandlerFn = httpListener.readMcpHandlerFn();
+					if (mcpNodeHandlerFn === undefined)
 						return yield* Effect.fail(new Error("The MCP handler is unavailable."));
 					const handler = yield* createRemoteHandlerFx({
 						storage,
-						mcpHandler: mcpNodeHandler,
+						mcpHandlerFn: mcpNodeHandlerFn,
 						origin,
-						runPromise,
+						runPromiseFn,
 					});
-					httpListener.setRemoteHandler({
+					httpListener.setRemoteHandlerFn({
 						handler,
 						provenance,
 					});
@@ -277,7 +277,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				}),
 			);
 			if (Exit.isFailure(started)) {
-				httpListener.setRemoteHandler(undefined);
+				httpListener.setRemoteHandlerFn(undefined);
 				if (openedSession !== undefined) yield* openedSession.closeFx.pipe(Effect.ignore);
 				if (!localEnabled) yield* closeServerFx.pipe(Effect.ignore);
 				remoteStatus = {
@@ -290,15 +290,15 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					type: "ready",
 					url: new URL("/remote/mcp", started.value.origin).href,
 				};
-				void runPromise(started.value.session.closedFx)
+				void runPromiseFn(started.value.session.closedFx)
 					.then(
-						() => runPromise(finishTunnelFx(started.value.session)),
-						(cause) => runPromise(finishTunnelFx(started.value.session, cause)),
+						() => runPromiseFn(finishTunnelFx(started.value.session)),
+						(cause) => runPromiseFn(finishTunnelFx(started.value.session, cause)),
 					)
 					.catch((cause) => console.error("Remote MCP tunnel settlement failed.", cause));
 			}
 			const overview = yield* readOverviewFx;
-			yield* Effect.sync(() => notifyOverviewChanged(overview));
+			yield* Effect.sync(() => notifyOverviewChangedFn(overview));
 			return {
 				overview,
 			};
@@ -307,7 +307,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const stopRemoteFx = commandLock.withPermits(1)(
 		stopRemoteUnlockedFx.pipe(
 			Effect.andThen(readOverviewFx),
-			Effect.tap((overview) => Effect.sync(() => notifyOverviewChanged(overview))),
+			Effect.tap((overview) => Effect.sync(() => notifyOverviewChangedFn(overview))),
 			Effect.map((overview) => ({
 				overview,
 			})),
@@ -318,7 +318,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			yield* stopRemoteUnlockedFx;
 			yield* storage.resetFx;
 			const overview = yield* readOverviewFx;
-			yield* Effect.sync(() => notifyOverviewChanged(overview));
+			yield* Effect.sync(() => notifyOverviewChangedFn(overview));
 			return {
 				overview,
 			};
@@ -326,7 +326,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	);
 	const closeFx = commandLock.withPermits(1)(
 		Effect.gen(function* () {
-			httpListener.setRemoteHandler(undefined);
+			httpListener.setRemoteHandlerFn(undefined);
 			const session = tunnelSession;
 			tunnelSession = undefined;
 			if (session !== undefined) yield* session.closeFx.pipe(Effect.ignore);
@@ -334,7 +334,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 		}),
 	);
 	return {
-		readLocalStatus: () => localStatus,
+		readLocalStatusFn: () => localStatus,
 		readOverviewFx,
 		publishOverviewFx,
 		configureFx,
@@ -343,30 +343,30 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 		startRemoteFx,
 		stopRemoteFx,
 		resetRemoteAuthFx,
-		readProjectContext: () => projectContext,
-		setProjectContext: (projectId, requestVersionCheckout) => {
+		readProjectContextFn: () => projectContext,
+		setProjectContextFn: (projectId, requestVersionCheckoutFx) => {
 			projectContext = projectId;
-			versionCheckoutRequestFx = requestVersionCheckout;
+			versionCheckoutRequestFx = requestVersionCheckoutFx;
 		},
-		clearProjectContext: (projectId) => {
+		clearProjectContextFn: (projectId) => {
 			if (projectContext !== projectId) return;
 			projectContext = undefined;
 			versionCheckoutRequestFx = undefined;
 		},
-		resetProjectContext: () => {
+		resetProjectContextFn: () => {
 			projectContext = undefined;
 			versionCheckoutRequestFx = undefined;
 		},
 		closeFx,
-		closeSync: () => {
-			httpListener.setRemoteHandler(undefined);
+		closeSyncFn: () => {
+			httpListener.setRemoteHandlerFn(undefined);
 			const session = tunnelSession;
 			tunnelSession = undefined;
 			if (session !== undefined)
-				void runPromise(session.closeFx).catch((cause) =>
+				void runPromiseFn(session.closeFx).catch((cause) =>
 					console.error("Remote MCP tunnel could not close.", cause),
 				);
-			httpListener.closeSync();
+			httpListener.closeSyncFn();
 		},
 	} satisfies ServerOwnership;
 });

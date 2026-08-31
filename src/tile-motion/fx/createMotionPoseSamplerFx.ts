@@ -9,18 +9,18 @@ import type { ActorPose } from "~/game-scene/type/ActorPose";
 interface CreateMotionPoseSamplerProps {
 	readonly actorBaseSize: number;
 	readonly from: Required<PresentedPose>;
-	readonly readLiveTarget?: () => Required<PresentedPose> | null;
+	readonly readLiveTargetFn?: () => Required<PresentedPose> | null;
 	readonly surface: MainSurface;
 	readonly target: ActorPose;
 	readonly targetLocation: Parameters<MainSurface["readLocationPoseFx"]>[0];
 }
 
 interface MotionPoseSampler {
-	readonly needsCompletionSettle: () => boolean;
-	readonly readPose: (progress: number) => PresentedPose;
+	readonly needsCompletionSettleFn: () => boolean;
+	readonly readPoseFn: (progress: number) => PresentedPose;
 }
 
-const samePose = (left: Required<PresentedPose>, right: Required<PresentedPose>) =>
+const samePoseFn = (left: Required<PresentedPose>, right: Required<PresentedPose>) =>
 	left.x === right.x && left.y === right.y && left.scale === right.scale;
 
 /**
@@ -40,8 +40,8 @@ export const createMotionPoseSamplerFx = Effect.fn("createMotionPoseSamplerFx")(
 				x: props.target.x,
 				y: props.target.y,
 			};
-			const readCurrentTarget = () => {
-				const liveTarget = props.readLiveTarget?.();
+			const readCurrentTargetFn = () => {
+				const liveTarget = props.readLiveTargetFn?.();
 				if (liveTarget !== null && liveTarget !== undefined) return liveTarget;
 				const currentTarget =
 					RendererRuntime.runSync(
@@ -53,11 +53,11 @@ export const createMotionPoseSamplerFx = Effect.fn("createMotionPoseSamplerFx")(
 					y: currentTarget.y,
 				};
 			};
-			const readPose = yield* createRetargetablePoseSamplerFx({
+			const readPoseFn = yield* createRetargetablePoseSamplerFx({
 				from: props.from,
-				readTarget: () => {
-					const nextTarget = readCurrentTarget();
-					if (sampleProgress >= 1 && !samePose(previousTarget, nextTarget)) {
+				readTargetFn: () => {
+					const nextTarget = readCurrentTargetFn();
+					if (sampleProgress >= 1 && !samePoseFn(previousTarget, nextTarget)) {
 						completionRetargeted = true;
 					}
 					previousTarget = nextTarget;
@@ -65,11 +65,11 @@ export const createMotionPoseSamplerFx = Effect.fn("createMotionPoseSamplerFx")(
 				},
 			});
 			return {
-				needsCompletionSettle: () =>
-					completionRetargeted || !samePose(previousTarget, readCurrentTarget()),
-				readPose: (progress) => {
+				needsCompletionSettleFn: () =>
+					completionRetargeted || !samePoseFn(previousTarget, readCurrentTargetFn()),
+				readPoseFn: (progress) => {
 					sampleProgress = progress;
-					return readPose(progress);
+					return readPoseFn(progress);
 				},
 			};
 		}),

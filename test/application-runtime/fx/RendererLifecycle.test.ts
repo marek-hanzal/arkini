@@ -30,9 +30,9 @@ describe("Renderer lifecycle", () => {
 		const waitUntilVisible = vi.fn(() => Promise.resolve(42));
 		const lifecycle = Effect.runSync(
 			createRendererLifecycleFx({
-				forceClose,
-				requestClose,
-				waitUntilVisible,
+				forceCloseFn: forceClose,
+				requestCloseFn: requestClose,
+				waitUntilVisibleFn: waitUntilVisible,
 			}),
 		);
 		const provideRegistry = Effect.provideService(AtomRegistry.AtomRegistry, registry);
@@ -63,11 +63,11 @@ describe("Renderer lifecycle", () => {
 		};
 		const lifecycle = Effect.runSync(
 			createRendererLifecycleFx({
-				forceClose: () => {
+				forceCloseFn: () => {
 					throw causes.forceClose;
 				},
-				requestClose: () => Promise.reject(causes.requestClose),
-				waitUntilVisible: () => Promise.reject(causes.waitUntilVisible),
+				requestCloseFn: () => Promise.reject(causes.requestClose),
+				waitUntilVisibleFn: () => Promise.reject(causes.waitUntilVisible),
 			}),
 		);
 

@@ -1,9 +1,4 @@
-import {
-	createFormHook,
-	type AppFieldExtendedReactFormApi,
-	type FormAsyncValidateOrFn,
-	type FormValidateOrFn,
-} from "@tanstack/react-form";
+import { createFormHook } from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
 
 import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
@@ -43,8 +38,8 @@ const EditorTextField = ({
 			error={error}
 			label={label}
 			name={field.name}
-			onBlur={field.handleBlur}
-			onChange={field.handleChange}
+			onBlurFn={field.handleBlur}
+			onChangeFn={field.handleChange}
 			placeholder={placeholder}
 			readOnly={readOnly}
 			value={field.state.value}
@@ -76,8 +71,8 @@ const EditorTextAreaField = ({
 			fill={fill}
 			label={label}
 			name={field.name}
-			onBlur={field.handleBlur}
-			onChange={field.handleChange}
+			onBlurFn={field.handleBlur}
+			onChangeFn={field.handleChange}
 			placeholder={placeholder}
 			rows={rows}
 			value={field.state.value}
@@ -113,8 +108,8 @@ const EditorNumberField = ({
 			max={max}
 			min={min}
 			name={field.name}
-			onBlur={field.handleBlur}
-			onChange={(nextValue) =>
+			onBlurFn={field.handleBlur}
+			onChangeFn={(nextValue) =>
 				field.handleChange(optional && Number.isNaN(nextValue) ? undefined : nextValue)
 			}
 			step={step}
@@ -139,8 +134,8 @@ const EditorSecondsField = ({ description, label }: EditorSecondsFieldProps) => 
 			label={label}
 			min={0}
 			name={field.name}
-			onBlur={field.handleBlur}
-			onChange={(nextSeconds) => field.handleChange(Math.round(nextSeconds * 1_000))}
+			onBlurFn={field.handleBlur}
+			onChangeFn={(nextSeconds) => field.handleChange(Math.round(nextSeconds * 1_000))}
 			value={seconds}
 		/>
 	);
@@ -164,7 +159,7 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 			description={description}
 			error={error}
 			label={label}
-			onChange={field.handleChange}
+			onChangeFn={field.handleChange}
 			options={options}
 			value={field.state.value}
 		/>
@@ -191,45 +186,25 @@ const EditorBoolToggle = ({
 			checkedIcon={checkedIcon}
 			description={description}
 			label={label}
-			onChange={field.handleChange}
+			onChangeFn={field.handleChange}
 			uncheckedIcon={uncheckedIcon}
 		/>
 	);
 };
 
-const editorFieldComponents = {
-	AssetField: AssetAutocompleteField,
-	BoolToggle: EditorBoolToggle,
-	ChoiceField: EditorChoiceField,
-	ItemField: EditorItemAutocompleteField,
-	NumberField: EditorNumberField,
-	SecondsField: EditorSecondsField,
-	TextAreaField: EditorTextAreaField,
-	TextField: EditorTextField,
-};
-
-export type EditorFormApi<
-	FormData,
-	DynamicValidator extends FormValidateOrFn<FormData>,
-> = AppFieldExtendedReactFormApi<
-	FormData,
-	FormValidateOrFn<FormData> | undefined,
-	FormValidateOrFn<FormData> | undefined,
-	FormAsyncValidateOrFn<FormData> | undefined,
-	FormValidateOrFn<FormData> | undefined,
-	FormAsyncValidateOrFn<FormData> | undefined,
-	FormValidateOrFn<FormData> | undefined,
-	FormAsyncValidateOrFn<FormData> | undefined,
-	DynamicValidator,
-	FormAsyncValidateOrFn<FormData> | undefined,
-	FormAsyncValidateOrFn<FormData> | undefined,
-	unknown,
-	typeof editorFieldComponents,
-	{}
->;
-
-export const { useAppForm, withFieldGroup } = createFormHook({
-	fieldComponents: editorFieldComponents,
+// Keep the configured form API inferred by TanStack Form. If consumers are extracted
+// later, use the library's withForm helper instead of mirroring its generic API by hand.
+export const { useAppForm, withFieldGroup: withFieldGroupFn } = createFormHook({
+	fieldComponents: {
+		AssetField: AssetAutocompleteField,
+		BoolToggle: EditorBoolToggle,
+		ChoiceField: EditorChoiceField,
+		ItemField: EditorItemAutocompleteField,
+		NumberField: EditorNumberField,
+		SecondsField: EditorSecondsField,
+		TextAreaField: EditorTextAreaField,
+		TextField: EditorTextField,
+	},
 	formComponents: {},
 	fieldContext,
 	formContext,

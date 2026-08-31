@@ -35,7 +35,7 @@ export interface MagneticField {
 	) => Effect.Effect<void, never, never>;
 	readonly resetFx: Effect.Effect<void, never, never>;
 	readonly subscribeSourceMembershipFx: (
-		listen: (sourceKind: MagneticSourceKind) => void,
+		listenFn: (sourceKind: MagneticSourceKind) => void,
 	) => Effect.Effect<() => void, never, never>;
 	readonly updateFx: (sample: MagneticSample) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;

@@ -24,12 +24,12 @@ vi.mock("~/project-version/ui/useVersionCommitController", () => ({
 	useVersionCommitController: () => ({
 		body: "",
 		canCommit: state.canCommit,
-		commit: vi.fn(),
+		commitFn: vi.fn(),
 		pending: false,
 		projectId: "editor-test",
-		setBody: vi.fn(),
-		setSubject: vi.fn(),
-		setTag: vi.fn(),
+		setBodyFn: vi.fn(),
+		setSubjectFn: vi.fn(),
+		setTagFn: vi.fn(),
 		status: {
 			canCommit: state.canCommit,
 			currentBaseVersionId: "version-one",

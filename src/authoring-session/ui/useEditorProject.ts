@@ -25,12 +25,12 @@ export const EditorProjectProvider = ({
 }: PropsWithChildren<{
 	readonly loaded: Project;
 }>) => {
-	const [project, publish] = useAtom(EditorProjectAtom(loaded.projectId));
+	const [project, publishFn] = useAtom(EditorProjectAtom(loaded.projectId));
 	useLayoutEffect(() => {
 		const projectId = EditorMcpProjectContextSchema.parse(loaded.projectId);
 		void RendererRuntime.runPromise(
 			Effect.tryPromise({
-				try: () => window.arkini.editorMcp.setProjectContext(projectId),
+				try: () => window.arkini.editorMcp.setProjectContextFn(projectId),
 				catch: (cause) => cause,
 			}),
 		).catch((cause) =>
@@ -39,7 +39,7 @@ export const EditorProjectProvider = ({
 		return () => {
 			void RendererRuntime.runPromise(
 				Effect.tryPromise({
-					try: () => window.arkini.editorMcp.clearProjectContext(projectId),
+					try: () => window.arkini.editorMcp.clearProjectContextFn(projectId),
 					catch: (cause) => cause,
 				}),
 			).catch((cause) =>
@@ -50,16 +50,16 @@ export const EditorProjectProvider = ({
 		loaded.projectId,
 	]);
 	useLayoutEffect(() => {
-		publish({
+		publishFn({
 			project: loaded,
 		});
 	}, [
 		loaded,
-		publish,
+		publishFn,
 	]);
 	useLayoutEffect(() => {
 		let mounted = true;
-		const unsubscribe = window.arkini.editor.onProjectChanged((projectId) => {
+		const unsubscribeFn = window.arkini.editor.onProjectChangedFn((projectId) => {
 			if (projectId !== loaded.projectId) return;
 			void RendererRuntime.runPromise(
 				readProjectFx({
@@ -83,11 +83,11 @@ export const EditorProjectProvider = ({
 		});
 		return () => {
 			mounted = false;
-			unsubscribe();
+			unsubscribeFn();
 		};
 	}, [
 		loaded.projectId,
-		publish,
+		publishFn,
 	]);
 	return createElement(EditorProjectContext, {
 		children,

@@ -19,7 +19,7 @@ describe("PixiInventorySurface", () => {
 		const { root, scene } = await renderPixiInventorySurface();
 		const canvas = document.createElement("canvas");
 
-		await scene.onActivate(item, false, canvas);
+		await scene.onActivateFn(item, false, canvas);
 
 		expect(surfaceState.release).toHaveBeenCalledWith({
 			itemId: item.id,
@@ -43,7 +43,7 @@ describe("PixiInventorySurface", () => {
 		const { scene } = await renderPixiInventorySurface();
 		const canvas = document.createElement("canvas");
 
-		await scene.onActivate(item, true, canvas);
+		await scene.onActivateFn(item, true, canvas);
 
 		expect(surfaceState.detail).toHaveBeenCalledWith({
 			itemId: item.id,

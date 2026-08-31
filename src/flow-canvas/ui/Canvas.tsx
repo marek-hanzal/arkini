@@ -11,8 +11,8 @@ interface CanvasProps extends useCanvasRenderModel.Props {
 	readonly fitContent: boolean;
 	readonly focusNodeId?: string;
 	readonly focusRequestKey?: number;
-	readonly onSelectionChange: (selection: Selection | undefined) => void;
-	readonly onItemOpen: (itemId: string) => void;
+	readonly onSelectionChangeFn: (selection: Selection | undefined) => void;
+	readonly onItemOpenFn: (itemId: string) => void;
 }
 
 /** Composes flow projection, imperative rendering, keyboard navigation, and pointer interaction. */
@@ -23,8 +23,8 @@ export const Canvas = ({
 	flow,
 	focusNodeId,
 	focusRequestKey,
-	onSelectionChange,
-	onItemOpen,
+	onSelectionChangeFn,
+	onItemOpenFn,
 	positions,
 	selection,
 }: CanvasProps) => {
@@ -60,25 +60,25 @@ export const Canvas = ({
 		inputNodeIds: model.inputNavigationNodeIds,
 		maxHighlightLevel: model.maxHighlightLevel,
 		navigationNodeIds: model.navigationNodeIds,
-		onSelectionChange,
+		onSelectionChangeFn,
 		outputNodeIds: model.outputNavigationNodeIds,
 		positions,
 		relationFocusNodeIdRef,
 		rootNodeIds: model.rootNavigationNodeIds,
-		scheduleDraw: renderer.scheduleDraw,
+		scheduleDrawFn: renderer.scheduleDrawFn,
 		selection,
-		setHighlightDepth: model.setHighlightDepth,
+		setHighlightDepthFn: model.setHighlightDepthFn,
 		viewportRef: renderer.viewportRef,
 	});
 
 	useEffect(() => {
-		if (focusNodeId === undefined || !renderer.focusNode(focusNodeId)) return;
-		navigation.resetNavigation();
+		if (focusNodeId === undefined || !renderer.focusNodeFn(focusNodeId)) return;
+		navigation.resetNavigationFn();
 	}, [
 		focusNodeId,
 		focusRequestKey,
-		navigation.resetNavigation,
-		renderer.focusNode,
+		navigation.resetNavigationFn,
+		renderer.focusNodeFn,
 	]);
 
 	const pointer = useCanvasPointer({
@@ -88,11 +88,11 @@ export const Canvas = ({
 		highlight: model.highlight,
 		metroBackbones: model.metroBackbones,
 		nodeMetrics: model.nodeMetrics,
-		onItemOpen,
-		onSelectionChange,
+		onItemOpenFn,
+		onSelectionChangeFn,
 		positions,
-		resetNavigation: navigation.resetNavigation,
-		scheduleDraw: renderer.scheduleDraw,
+		resetNavigationFn: navigation.resetNavigationFn,
+		scheduleDrawFn: renderer.scheduleDrawFn,
 		selection,
 		viewportRef: renderer.viewportRef,
 		visitHistoryRef: navigation.visitHistoryRef,
@@ -103,16 +103,16 @@ export const Canvas = ({
 			<canvas
 				className="block size-full touch-none cursor-grab text-foreground"
 				data-ui="EditorOriginFlowCanvas"
-				onPointerCancel={pointer.handlePointerCancel}
-				onPointerDown={pointer.handlePointerDown}
-				onPointerMove={pointer.handlePointerMove}
-				onPointerUp={pointer.handlePointerUp}
+				onPointerCancel={pointer.handlePointerCancelFn}
+				onPointerDown={pointer.handlePointerDownFn}
+				onPointerMove={pointer.handlePointerMoveFn}
+				onPointerUp={pointer.handlePointerUpFn}
 				ref={renderer.canvasRef}
 			/>
 			{navigation.helpOpen ? (
 				<CanvasShortcutHelp
 					direction={direction}
-					onClose={() => navigation.setHelpOpen(false)}
+					onCloseFn={() => navigation.setHelpOpenFn(false)}
 				/>
 			) : null}
 		</>

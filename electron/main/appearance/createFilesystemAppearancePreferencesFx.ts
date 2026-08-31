@@ -48,7 +48,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 				target: themePath,
 				value: theme,
 				operation: "persist the appearance preference",
-				serialize: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
+				serializeFn: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
 			}),
 	);
 	const writeAccentFx = Effect.fn("FilesystemAppearancePreferences.writeAccentFx")(
@@ -59,7 +59,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 				target: accentPath,
 				value: accent,
 				operation: "persist the appearance accent preference",
-				serialize: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
+				serializeFn: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
 			}),
 	);
 	return {
@@ -68,7 +68,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 			path: themePath,
 			fallback: "dark" as const,
 			operation: "read the appearance preference",
-			parse: (stored) => {
+			parseFn: (stored) => {
 				try {
 					return AppearanceThemeSchema.safeParse(JSON.parse(stored)).data;
 				} catch {
@@ -82,7 +82,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 			path: accentPath,
 			fallback: "rose" as const,
 			operation: "read the appearance accent preference",
-			parse: (stored) => {
+			parseFn: (stored) => {
 				try {
 					return AppearanceAccentSchema.safeParse(JSON.parse(stored)).data;
 				} catch {

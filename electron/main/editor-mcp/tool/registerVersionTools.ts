@@ -107,7 +107,7 @@ const VersionTagInputSchema = z
 		description: "The saved version and optional replacement tag.",
 	});
 
-const decodeReference = (value: string): ProjectVersionReference =>
+const decodeReferenceFn = (value: string): ProjectVersionReference =>
 	value === "current"
 		? {
 				type: "current",
@@ -117,7 +117,7 @@ const decodeReference = (value: string): ProjectVersionReference =>
 				versionId: value,
 			};
 
-const describeVersion = (version: ProjectVersionDescriptor) =>
+const describeVersionFn = (version: ProjectVersionDescriptor) =>
 	[
 		`${version.versionId} · ${version.subject}`,
 		`  ${new Date(version.createdAtMs).toISOString()} · Arkini ${version.arkini}`,
@@ -133,50 +133,50 @@ const describeVersion = (version: ProjectVersionDescriptor) =>
 				]),
 	].join("\n");
 
-const formatDiff = (diff: ProjectVersionDiff) => {
-	const formatBump = (bump: "major" | "minor" | undefined) =>
+const formatDiffFn = (diff: ProjectVersionDiff) => {
+	const formatBumpFn = (bump: "major" | "minor" | undefined) =>
 		bump === undefined ? "" : ` · ${bump} bump`;
 	const lines = [
 		"Version diff",
 		`Changed: ${diff.hasChanges ? "yes" : "no"}`,
 		`Project fields: ${diff.project.length}`,
-		...diff.project.map(({ bump, path }) => `  ${path}${formatBump(bump)}`),
+		...diff.project.map(({ bump, path }) => `  ${path}${formatBumpFn(bump)}`),
 		`Items: ${diff.items.length}`,
 		...diff.items.flatMap(({ change, uid, values }) => [
 			`  ${change} ${uid} · ${values.length} field changes`,
-			...values.map(({ bump, path }) => `    ${path || "Entire item"}${formatBump(bump)}`),
+			...values.map(({ bump, path }) => `    ${path || "Entire item"}${formatBumpFn(bump)}`),
 		]),
 		`Resources: ${diff.resources.length}`,
-		...diff.resources.map(({ bump, change, id }) => `  ${change} ${id}${formatBump(bump)}`),
+		...diff.resources.map(({ bump, change, id }) => `  ${change} ${id}${formatBumpFn(bump)}`),
 		`Board scenarios: ${diff.scenarios.length}`,
 		...diff.scenarios.map(({ change, id }) => `  ${change} ${id}`),
 	];
 	return lines.join("\n");
 };
 
-export namespace registerVersionTools {
+export namespace registerVersionToolsFn {
 	export interface Props {
-		readonly notifyProjectChanged: (projectId: string) => void;
+		readonly notifyProjectChangedFn: (projectId: string) => void;
 		readonly readProjectFx: () => Effect.Effect<Project, unknown, never>;
 		readonly repository: ProjectRepositoryService;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
 			versionId: string,
 		) => Effect.Effect<void, unknown, never>;
-		readonly runTool: RunTool;
+		readonly runToolFn: RunTool;
 		readonly server: McpServer;
 	}
 }
 
 /** Registers explicit, saved-state version tools without exposing raw snapshot payloads. */
-export const registerVersionTools = ({
-	notifyProjectChanged,
+export const registerVersionToolsFn = ({
+	notifyProjectChangedFn,
 	readProjectFx,
 	repository,
 	requestVersionCheckoutFx,
-	runTool,
+	runToolFn,
 	server,
-}: registerVersionTools.Props) => {
+}: registerVersionToolsFn.Props) => {
 	server.registerTool(
 		"version_status",
 		{
@@ -185,7 +185,7 @@ export const registerVersionTools = ({
 			inputSchema: VersionStatusInputSchema,
 		},
 		async () =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => repository.readVersionStatusFx(project.projectId)),
 					Effect.map((status) =>
@@ -208,7 +208,7 @@ export const registerVersionTools = ({
 			inputSchema: VersionListInputSchema,
 		},
 		async ({ limit, offset }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => repository.listVersionsFx(project.projectId)),
 					Effect.map((versions) => {
@@ -217,7 +217,7 @@ export const registerVersionTools = ({
 							"Versions",
 							`Total: ${versions.length}`,
 							`Showing: ${page.length} from offset ${offset}`,
-							...page.map(describeVersion),
+							...page.map(describeVersionFn),
 						].join("\n");
 					}),
 				),
@@ -231,16 +231,16 @@ export const registerVersionTools = ({
 			inputSchema: VersionDiffInputSchema,
 		},
 		async ({ from, to }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						repository.diffVersionsFx({
 							projectId: project.projectId,
-							from: decodeReference(from),
-							to: decodeReference(to),
+							from: decodeReferenceFn(from),
+							to: decodeReferenceFn(to),
 						}),
 					),
-					Effect.map(formatDiff),
+					Effect.map(formatDiffFn),
 				),
 			),
 	);
@@ -252,7 +252,7 @@ export const registerVersionTools = ({
 			inputSchema: VersionCommitInputSchema,
 		},
 		async ({ body, message, tag }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						repository.readVersionStatusFx(project.projectId).pipe(
@@ -274,11 +274,11 @@ export const registerVersionTools = ({
 								}),
 							),
 							Effect.tap(() =>
-								Effect.sync(() => notifyProjectChanged(project.projectId)),
+								Effect.sync(() => notifyProjectChangedFn(project.projectId)),
 							),
 						),
 					),
-					Effect.map((version) => `Version created\n${describeVersion(version)}`),
+					Effect.map((version) => `Version created\n${describeVersionFn(version)}`),
 				),
 			),
 	);
@@ -290,7 +290,7 @@ export const registerVersionTools = ({
 			inputSchema: VersionCheckoutInputSchema,
 		},
 		async ({ versionId }) =>
-			runTool(
+			runToolFn(
 				Effect.gen(function* () {
 					const project = yield* readProjectFx();
 					const versions = yield* repository.listVersionsFx(project.projectId);
@@ -300,7 +300,7 @@ export const registerVersionTools = ({
 							new Error(`Version ${versionId} does not exist.`),
 						);
 					yield* requestVersionCheckoutFx(project.projectId, versionId);
-					return `Version checked out\n${describeVersion(version)}\nThe mounted editor was refreshed in place.`;
+					return `Version checked out\n${describeVersionFn(version)}\nThe mounted editor was refreshed in place.`;
 				}),
 			),
 	);
@@ -312,7 +312,7 @@ export const registerVersionTools = ({
 			inputSchema: VersionTagInputSchema,
 		},
 		async ({ tag, versionId }) =>
-			runTool(
+			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						repository
@@ -327,11 +327,11 @@ export const registerVersionTools = ({
 							})
 							.pipe(
 								Effect.tap(() =>
-									Effect.sync(() => notifyProjectChanged(project.projectId)),
+									Effect.sync(() => notifyProjectChangedFn(project.projectId)),
 								),
 							),
 					),
-					Effect.map((version) => `Version tag updated\n${describeVersion(version)}`),
+					Effect.map((version) => `Version tag updated\n${describeVersionFn(version)}`),
 				),
 			),
 	);

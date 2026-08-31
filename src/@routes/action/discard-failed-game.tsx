@@ -43,7 +43,7 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 			<ActionErrorPage
 				{...props}
 				description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
-				reset={() => {
+				resetFn={() => {
 					void router.invalidate().catch(() => undefined);
 				}}
 				resetLabel="Retry exit"

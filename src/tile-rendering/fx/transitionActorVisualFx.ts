@@ -21,7 +21,7 @@ export namespace transitionActorVisualFx {
 		readonly durationMs: number;
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
-		readonly onDiscard?: () => void;
+		readonly onDiscardFn?: () => void;
 		readonly ownerKey: string;
 		readonly palette: PixiScenePalette;
 		readonly size: number;
@@ -31,7 +31,7 @@ export namespace transitionActorVisualFx {
 
 export const visualCrossfadeDurationMs = 950;
 
-const readEffectiveAlpha = (visual: ActorVisual, visualLayer: Container) => {
+const readEffectiveAlphaFn = (visual: ActorVisual, visualLayer: Container) => {
 	let alpha = visual.container.alpha;
 	let parent = visual.container.parent;
 	while (parent !== null && parent !== visualLayer) {
@@ -53,7 +53,7 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 	durationMs,
 	frames,
 	item,
-	onDiscard,
+	onDiscardFn,
 	ownerKey,
 	palette,
 	size,
@@ -73,7 +73,7 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 		label: `TileActorOutgoingVisuals:${actor.instanceId}:${generation}`,
 	});
 	for (const visual of oldVisuals) {
-		const alpha = readEffectiveAlpha(visual, actor.visualLayer);
+		const alpha = readEffectiveAlphaFn(visual, actor.visualLayer);
 		outgoing.addChild(visual.container);
 		visual.container.alpha = alpha;
 	}
@@ -100,13 +100,13 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 		kind: "resume-enter",
 	});
 
-	const ownsIncoming = () =>
+	const ownsIncomingFn = () =>
 		!actor.container.destroyed &&
 		actor.visualTransitionGeneration === generation &&
 		actor.pendingVisual === incoming;
 
-	const discardIncoming = () => {
-		if (!ownsIncoming()) return;
+	const discardIncomingFn = () => {
+		if (!ownsIncomingFn()) return;
 		actor.pendingVisual = null;
 		actor.visuals.delete(incoming);
 		RendererRuntime.runSync(destroyActorVisualFx(incoming));
@@ -121,15 +121,15 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 			RendererRuntime.runSync(destroyActorVisualFx(visual));
 		}
 		if (!outgoing.destroyed) outgoing.destroy();
-		onDiscard?.();
+		onDiscardFn?.();
 		RendererRuntime.runSync(frames.invalidateFx);
 	};
 
 	yield* whenVisualReadyFx({
 		visual: incoming,
-		onCancel: discardIncoming,
-		onReady: () => {
-			if (!ownsIncoming()) return;
+		onCancelFn: discardIncomingFn,
+		onReadyFn: () => {
+			if (!ownsIncomingFn()) return;
 			RendererRuntime.runSync(
 				animator.animateFx({
 					actor,
@@ -138,8 +138,8 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 					incoming: incoming.container,
 					outgoing,
 					ownerKey,
-					onComplete: () => {
-						if (!ownsIncoming()) return;
+					onCompleteFn: () => {
+						if (!ownsIncomingFn()) return;
 						for (const visual of oldVisuals) {
 							actor.visuals.delete(visual);
 							RendererRuntime.runSync(destroyActorVisualFx(visual));

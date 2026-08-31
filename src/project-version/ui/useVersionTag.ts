@@ -6,39 +6,39 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVersion";
 
 interface VersionTagProps {
-	readonly reload: () => void;
+	readonly reloadFn: () => void;
 	readonly projectId: string;
-	readonly reportError: (error?: unknown) => void;
+	readonly reportErrorFn: (error?: unknown) => void;
 	readonly selected?: ProjectVersionDescriptor;
 }
 
 interface VersionTagOutput {
 	readonly draft: string;
 	readonly pending: boolean;
-	readonly save: () => void;
-	readonly setDraft: (value: string) => void;
+	readonly saveFn: () => void;
+	readonly setDraftFn: (value: string) => void;
 }
 
 /** Owns the editable user-only label for one selected immutable version. */
 export const useVersionTag = ({
-	reload,
+	reloadFn,
 	projectId,
-	reportError,
+	reportErrorFn,
 	selected,
 }: VersionTagProps): VersionTagOutput => {
-	const [draft, setDraft] = useState("");
-	const [pending, setPending] = useState(false);
+	const [draft, setDraftFn] = useState("");
+	const [pending, setPendingFn] = useState(false);
 
 	useEffect(
-		() => setDraft(selected?.tag ?? ""),
+		() => setDraftFn(selected?.tag ?? ""),
 		[
 			selected,
 		],
 	);
-	const save = useCallback(() => {
+	const saveFn = useCallback(() => {
 		if (selected === undefined || pending) return;
-		setPending(true);
-		reportError();
+		setPendingFn(true);
+		reportErrorFn();
 		void RendererRuntime.runPromise(
 			Effect.flatMap(ProjectRepository, (repository) =>
 				repository.updateVersionTagFx({
@@ -53,26 +53,26 @@ export const useVersionTag = ({
 			),
 		)
 			.then(() => {
-				setPending(false);
-				reload();
+				setPendingFn(false);
+				reloadFn();
 			})
 			.catch((cause) => {
-				reportError(cause);
-				setPending(false);
+				reportErrorFn(cause);
+				setPendingFn(false);
 			});
 	}, [
 		draft,
 		pending,
 		projectId,
-		reload,
-		reportError,
+		reloadFn,
+		reportErrorFn,
 		selected,
 	]);
 
 	return {
 		draft,
 		pending,
-		save,
-		setDraft,
+		saveFn,
+		setDraftFn,
 	};
 };

@@ -18,15 +18,15 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 	}),
 	component: () => {
 		const search = Route.useSearch();
-		const navigate = useNavigate({
+		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
 		return (
 			<List
 				itemType={search.itemType}
 				query={search.query ?? ""}
-				onItemTypeChange={(itemType) =>
-					void navigate({
+				onItemTypeChangeFn={(itemType) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,
@@ -34,8 +34,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 						}),
 					})
 				}
-				onQueryChange={(query) =>
-					void navigate({
+				onQueryChangeFn={(query) =>
+					void navigateFn({
 						replace: true,
 						search: (current) => ({
 							...current,

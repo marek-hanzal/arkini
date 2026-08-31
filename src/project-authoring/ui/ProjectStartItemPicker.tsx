@@ -16,8 +16,8 @@ export const ProjectStartItemPicker = (props: ProjectStartItemPickerProps) => {
 					↑↓ select · Enter choose · Esc close
 				</p>
 			}
-			onClose={props.onClose}
-			onSelectItem={controller.selectItem}
+			onCloseFn={props.onCloseFn}
+			onSelectItemFn={controller.selectItemFn}
 			options={controller.options.map((option) => ({
 				artwork: <EditorItemSearchThumbnail item={controller.items[option.id]} />,
 				itemId: option.id,

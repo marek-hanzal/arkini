@@ -12,11 +12,11 @@ export type GameMenuAction =
 export interface GameMenuControl {
 	readonly phase: GameMenuPhase;
 	readonly activeAction: GameMenuAction | null;
-	readonly open: () => void;
-	readonly close: () => void;
-	readonly toggle: () => void;
-	readonly beginAction: (action: GameMenuAction) => boolean;
-	readonly completeAction: (action: GameMenuAction) => void;
-	readonly completeEnter: () => void;
-	readonly completeExit: () => void;
+	readonly openFn: () => void;
+	readonly closeFn: () => void;
+	readonly toggleFn: () => void;
+	readonly beginActionFn: (action: GameMenuAction) => boolean;
+	readonly completeActionFn: (action: GameMenuAction) => void;
+	readonly completeEnterFn: () => void;
+	readonly completeExitFn: () => void;
 }

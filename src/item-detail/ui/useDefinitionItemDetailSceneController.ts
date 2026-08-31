@@ -46,7 +46,7 @@ const useItemDefinitionDetail = (
 	itemId: IdSchema.Type,
 ): useDefinitionItemDetailSceneController.DefinitionProjection => {
 	const game = useGameEngine();
-	const selector = useCallback(
+	const selectorFn = useCallback(
 		(
 			runtime: RuntimeSchema.Type,
 		): useDefinitionItemDetailSceneController.DefinitionProjection => {
@@ -56,11 +56,11 @@ const useItemDefinitionDetail = (
 				kind: "available",
 				itemId: item.id,
 				title: item.title,
-				sourceUrl: game.getResourceUrl(item.asset.default[0]),
+				sourceUrl: game.getResourceUrlFn(item.asset.default[0]),
 				...(item.asset.default[1] === undefined
 					? {}
 					: {
-							compositeUrl: game.getResourceUrl(item.asset.default[1]),
+							compositeUrl: game.getResourceUrlFn(item.asset.default[1]),
 						}),
 				description: item.description,
 				itemType: item.type,
@@ -88,7 +88,7 @@ const useItemDefinitionDetail = (
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, Equal.equals);
+	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };
 
 /** Projects one definition scene and repairs a tab that its current source graph no longer admits. */

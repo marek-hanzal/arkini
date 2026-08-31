@@ -32,12 +32,12 @@ export namespace runInputMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly magneticField: MagneticField;
-		readonly onComplete: () => void;
-		readonly onRemainderRevealed: () => void;
-		readonly readSourceSurvives: () => boolean;
-		readonly onPayloadCreated: (actor: PixiTileActor) => void;
+		readonly onCompleteFn: () => void;
+		readonly onRemainderRevealedFn: () => void;
+		readonly readSourceSurvivesFn: () => boolean;
+		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
 		readonly origin: ActorPose;
-		readonly readPalette: () => PixiScenePalette;
+		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
 		readonly textures: TextureStore;
@@ -66,15 +66,15 @@ const destroyInputTransientFx = Effect.fn("destroyInputTransientFx")(function* (
 
 const exitAndDestroyInputTransientFx = Effect.fn("exitAndDestroyInputTransientFx")(function* ({
 	animator,
-	onComplete,
+	onCompleteFn,
 	transient,
 }: {
 	readonly animator: ActorAnimator;
-	readonly onComplete: () => void;
+	readonly onCompleteFn: () => void;
 	readonly transient: PixiTileActor;
 }) {
 	let settled = false;
-	const settle = () => {
+	const settleFn = () => {
 		if (settled) return;
 		settled = true;
 		RendererRuntime.runSync(
@@ -83,28 +83,28 @@ const exitAndDestroyInputTransientFx = Effect.fn("exitAndDestroyInputTransientFx
 					animator,
 					transient,
 				});
-				onComplete();
+				onCompleteFn();
 			}),
 		);
 	};
 	yield* startActorExitFx({
 		actor: transient,
 		animator,
-		onCancel: settle,
-		onComplete: settle,
+		onCancelFn: settleFn,
+		onCompleteFn: settleFn,
 	});
 });
 
 const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	actorStore,
 	animator,
-	onComplete,
+	onCompleteFn,
 	source,
 	transient,
 }: {
 	readonly actorStore: MainActorStore;
 	readonly animator: ActorAnimator;
-	readonly onComplete: () => void;
+	readonly onCompleteFn: () => void;
 	readonly source: PixiTileActor | null;
 	readonly transient: PixiTileActor;
 }) {
@@ -130,29 +130,29 @@ const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 			yield* actorStore.destroyExitingActorFx(source);
 		}
 	}
-	onComplete();
+	onCompleteFn();
 });
 
 const flashInputRemainderFx = Effect.fn("flashInputRemainderFx")(function* ({
 	animator,
 	cueKey,
-	onComplete,
-	onRemainderRevealed,
+	onCompleteFn,
+	onRemainderRevealedFn,
 	transient,
 }: {
 	readonly animator: ActorAnimator;
 	readonly cueKey: string;
-	readonly onComplete: () => void;
-	readonly onRemainderRevealed: () => void;
+	readonly onCompleteFn: () => void;
+	readonly onRemainderRevealedFn: () => void;
 	readonly transient: PixiTileActor;
 }) {
 	const ownerKey = `motion:${cueKey}:consume`;
 	yield* startRemainderFeedbackFx({
 		actor: transient,
 		animator,
-		onCancel: onComplete,
-		onHiddenFx: Effect.sync(onRemainderRevealed),
-		onRevealed: onComplete,
+		onCancelFn: onCompleteFn,
+		onHiddenFx: Effect.sync(onRemainderRevealedFn),
+		onRevealedFn: onCompleteFn,
 		ownerKey,
 	});
 });
@@ -163,7 +163,7 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	cue,
 	cueKey,
 	magneticField,
-	onComplete,
+	onCompleteFn,
 	source,
 	sourceHome,
 	surface,
@@ -174,13 +174,13 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	readonly cue: TileInputMotionCue;
 	readonly cueKey: string;
 	readonly magneticField: MagneticField;
-	readonly onComplete: () => void;
+	readonly onCompleteFn: () => void;
 	readonly source: PixiTileActor | null;
 	readonly sourceHome: ActorPose;
 	readonly surface: MainSurface;
 	readonly transient: PixiTileActor;
 }) {
-	const readLiveContactPose = yield* createLiveContactPoseReaderFx();
+	const readLiveContactPoseFn = yield* createLiveContactPoseReaderFx();
 	const magneticProjector = yield* createMagneticProjectorFx({
 		actor: transient,
 		attractedActorId: null,
@@ -190,9 +190,9 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 		magneticField,
 		surface,
 	});
-	const readLiveOrigin = () => {
+	const readLiveOriginFn = () => {
 		if (source !== null) return null;
-		return readLiveContactPose({
+		return readLiveContactPoseFn({
 			actorId: cue.originActorId,
 			actors: actorStore.actors,
 			movingActor: transient,
@@ -203,9 +203,9 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 		animator,
 		curve: inputReturnCurve,
 		fallbackTarget: sourceHome,
-		onPose: magneticProjector.projectPose,
-		onSettled: () => {
-			magneticProjector.release();
+		onPoseFn: magneticProjector.projectPoseFn,
+		onSettledFn: () => {
+			magneticProjector.releaseFn();
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					const latestHome =
@@ -213,7 +213,7 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 					if (source === null) {
 						yield* exitAndDestroyInputTransientFx({
 							animator,
-							onComplete,
+							onCompleteFn,
 							transient,
 						});
 						return;
@@ -232,12 +232,12 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 						});
 						source.container.eventMode = "static";
 					}
-					onComplete();
+					onCompleteFn();
 				}),
 			);
 		},
 		ownerKey: `motion:${cueKey}`,
-		readLiveTarget: readLiveOrigin,
+		readLiveTargetFn: readLiveOriginFn,
 		surface,
 		targetLocation: cue.originLocation,
 	});
@@ -260,17 +260,17 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	magneticField,
-	onComplete,
-	onRemainderRevealed,
-	onPayloadCreated,
+	onCompleteFn,
+	onRemainderRevealedFn,
+	onPayloadCreatedFn,
 	origin,
-	readPalette,
-	readSourceSurvives,
+	readPaletteFn,
+	readSourceSurvivesFn,
 	surface,
 	target,
 	textures,
 }: runInputMotionFx.Props) {
-	const readLiveContactPose = yield* createLiveContactPoseReaderFx();
+	const readLiveContactPoseFn = yield* createLiveContactPoseReaderFx();
 	const candidateSource = actorStore.actors.get(cue.sourceActorId);
 	const source =
 		candidateSource === undefined || candidateSource.container.destroyed
@@ -285,7 +285,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 				animator,
 			});
 		}
-		onComplete();
+		onCompleteFn();
 		return;
 	}
 
@@ -299,25 +299,25 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 			quantity: cue.previousQuantity,
 		},
 	);
-	const sourceSurvives = () => cue.resultingQuantity > 0 && readSourceSurvives();
+	const sourceSurvivesFn = () => cue.resultingQuantity > 0 && readSourceSurvivesFn();
 	const transient =
 		source === null
 			? yield* createTileActorFx({
 					frames: application.frames,
 					item: deliveryItem,
-					palette: readPalette(),
+					palette: readPaletteFn(),
 					textures,
 				})
 			: source;
 	transient.container.eventMode = "none";
-	if (source === null) onPayloadCreated(transient);
+	if (source === null) onPayloadCreatedFn(transient);
 	surface.transientActorLayer.addChild(transient.container);
 	yield* updateTileActorFx({
 		actor: transient,
 		animator,
 		frames: application.frames,
 		item: source === null ? deliveryItem : source.item,
-		palette: readPalette(),
+		palette: readPaletteFn(),
 		size: target.size,
 		textures,
 	});
@@ -338,8 +338,8 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 
 	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
 
-	const readLiveTarget = () => {
-		return readLiveContactPose({
+	const readLiveTargetFn = () => {
+		return readLiveContactPoseFn({
 			actorId: cue.targetActorId,
 			actors: actorStore.actors,
 			movingActor: transient,
@@ -360,9 +360,9 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		curve: inputArrivalCurve,
 		delayMs,
 		fallbackTarget: target,
-		onPose: magneticProjector.projectPose,
-		onSettled: () => {
-			magneticProjector.release();
+		onPoseFn: magneticProjector.projectPoseFn,
+		onSettledFn: () => {
+			magneticProjector.releaseFn();
 			RendererRuntime.runSync(
 				flashMotionTargetFx({
 					actorStore,
@@ -370,13 +370,13 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 					targetActorId: cue.targetActorId,
 				}),
 			);
-			if (sourceSurvives()) {
+			if (sourceSurvivesFn()) {
 				if (sourceHome !== null) {
 					RendererRuntime.runSync(
 						flashInputRemainderFx({
 							animator,
 							cueKey,
-							onComplete: () => {
+							onCompleteFn: () => {
 								RendererRuntime.runSync(
 									returnInputRemainderFx({
 										actorStore,
@@ -384,7 +384,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 										cue,
 										cueKey,
 										magneticField,
-										onComplete,
+										onCompleteFn,
 										source,
 										sourceHome,
 										surface,
@@ -392,7 +392,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 									}),
 								);
 							},
-							onRemainderRevealed: () => {
+							onRemainderRevealedFn: () => {
 								if (source === null) {
 									RendererRuntime.runSync(
 										updateTileActorFx({
@@ -403,13 +403,13 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 												kind: "exact",
 												quantity: cue.resultingQuantity,
 											}),
-											palette: readPalette(),
+											palette: readPaletteFn(),
 											size: transient.size,
 											textures,
 										}),
 									);
 								}
-								onRemainderRevealed();
+								onRemainderRevealedFn();
 							},
 							transient,
 						}),
@@ -418,13 +418,13 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 				}
 				if (source !== null) {
 					source.container.eventMode = "static";
-					onComplete();
+					onCompleteFn();
 					return;
 				}
 				RendererRuntime.runSync(
 					exitAndDestroyInputTransientFx({
 						animator,
-						onComplete,
+						onCompleteFn,
 						transient,
 					}),
 				);
@@ -433,14 +433,14 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					let settled = false;
-					const settle = () => {
+					const settleFn = () => {
 						if (settled) return;
 						settled = true;
 						RendererRuntime.runSync(
 							finishConsumedStackFx({
 								actorStore,
 								animator,
-								onComplete,
+								onCompleteFn,
 								source,
 								transient,
 							}),
@@ -449,14 +449,14 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 					yield* startActorExitFx({
 						actor: transient,
 						animator,
-						onCancel: settle,
-						onComplete: settle,
+						onCancelFn: settleFn,
+						onCompleteFn: settleFn,
 					});
 				}),
 			);
 		},
 		ownerKey: `motion:${cueKey}`,
-		readLiveTarget,
+		readLiveTargetFn,
 		surface,
 		targetLocation: cue.targetLocation,
 	});

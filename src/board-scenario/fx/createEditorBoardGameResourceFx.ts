@@ -17,11 +17,11 @@ export namespace createEditorBoardGameResourceFx {
 	}
 }
 
-const ownsRevision = (resource: GameEngineResource<EditorBoardGame>, project: Project) =>
+const ownsRevisionFn = (resource: GameEngineResource<EditorBoardGame>, project: Project) =>
 	resource.game.projectId === project.projectId &&
 	resource.game.projectRevision === project.revision;
 
-const ownsNewerRevision = (state: EditorBoardGameResource.State, project: Project) => {
+const ownsNewerRevisionFn = (state: EditorBoardGameResource.State, project: Project) => {
 	if (state.type === "idle") return false;
 	if (state.type === "ready") {
 		return (
@@ -32,9 +32,9 @@ const ownsNewerRevision = (state: EditorBoardGameResource.State, project: Projec
 	return state.projectId === project.projectId && state.projectRevision > project.revision;
 };
 
-const ownsExactRevision = (state: EditorBoardGameResource.State, project: Project) => {
+const ownsExactRevisionFn = (state: EditorBoardGameResource.State, project: Project) => {
 	if (state.type === "idle") return false;
-	if (state.type === "ready") return ownsRevision(state.resource, project);
+	if (state.type === "ready") return ownsRevisionFn(state.resource, project);
 	return state.projectId === project.projectId && state.projectRevision === project.revision;
 };
 
@@ -70,10 +70,10 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 			const syncOwnedProjectFx = (project: Project) =>
 				Effect.gen(function* () {
 					const snapshot = yield* SubscriptionRef.get(state);
-					if (ownsNewerRevision(snapshot, project)) return;
+					if (ownsNewerRevisionFn(snapshot, project)) return;
 					if (
 						current !== undefined &&
-						ownsRevision(current, project) &&
+						ownsRevisionFn(current, project) &&
 						snapshot.type === "ready"
 					)
 						return;
@@ -129,8 +129,8 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 						const snapshot = yield* SubscriptionRef.get(state);
 						if (
 							routedProjectId !== project.projectId ||
-							!ownsExactRevision(snapshot, project) ||
-							(current !== undefined && !ownsRevision(current, project))
+							!ownsExactRevisionFn(snapshot, project) ||
+							(current !== undefined && !ownsRevisionFn(current, project))
 						) {
 							return yield* Effect.fail(
 								new Error(

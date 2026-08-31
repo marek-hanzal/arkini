@@ -4,20 +4,20 @@ import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
 
 export namespace createDemandFrameLoopFx {
 	export interface Props {
-		readonly reportCriticalFailure: (cause: unknown) => void;
-		readonly render: () => void;
-		readonly requestFrame?: (callback: FrameRequestCallback) => number;
-		readonly cancelFrame?: (handle: number) => void;
+		readonly reportCriticalFailureFn: (cause: unknown) => void;
+		readonly renderFn: () => void;
+		readonly requestFrameFn?: (callbackFn: FrameRequestCallback) => number;
+		readonly cancelFrameFn?: (handle: number) => void;
 	}
 }
 
 /** Creates one coalescing render owner that fully stops while the scene is idle. */
 export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 	({
-		reportCriticalFailure,
-		render,
-		requestFrame = window.requestAnimationFrame.bind(window),
-		cancelFrame = window.cancelAnimationFrame.bind(window),
+		reportCriticalFailureFn,
+		renderFn,
+		requestFrameFn = window.requestAnimationFrame.bind(window),
+		cancelFrameFn = window.cancelAnimationFrame.bind(window),
 	}: createDemandFrameLoopFx.Props) =>
 		Effect.sync((): DemandFrameLoop => {
 			let closed = false;
@@ -28,29 +28,29 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 			const afterRenderWork = new Map<number, () => void>();
 			const scheduledWork = new Map<number, () => void>();
 
-			const schedule = () => {
+			const scheduleFn = () => {
 				if (closed || poisoned || document.hidden || queuedFrame !== null) return;
-				queuedFrame = requestFrame(runFrame);
+				queuedFrame = requestFrameFn(runFrameFn);
 			};
 
-			const runFrame = () => {
+			const runFrameFn = () => {
 				if (closed || poisoned) return;
 
 				const workIds = Array.from(scheduledWork.keys());
 				for (const workId of workIds) {
 					if (closed || poisoned) return;
-					const run = scheduledWork.get(workId);
-					if (run === undefined) continue;
+					const runFn = scheduledWork.get(workId);
+					if (runFn === undefined) continue;
 					scheduledWork.delete(workId);
 					try {
-						run();
+						runFn();
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
 						afterRenderWork.clear();
 						scheduledWork.clear();
 						queuedFrame = null;
-						reportCriticalFailure(cause);
+						reportCriticalFailureFn(cause);
 						return;
 					}
 				}
@@ -60,73 +60,73 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 				dirty = false;
 				if (renderRequested) {
 					try {
-						render();
+						renderFn();
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
 						afterRenderWork.clear();
 						scheduledWork.clear();
-						reportCriticalFailure(cause);
+						reportCriticalFailureFn(cause);
 						return;
 					}
 				}
 				const afterRenderWorkIds = Array.from(afterRenderWork.keys());
 				for (const workId of afterRenderWorkIds) {
 					if (closed || poisoned) return;
-					const run = afterRenderWork.get(workId);
-					if (run === undefined) continue;
+					const runFn = afterRenderWork.get(workId);
+					if (runFn === undefined) continue;
 					afterRenderWork.delete(workId);
 					try {
-						run();
+						runFn();
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
 						afterRenderWork.clear();
 						scheduledWork.clear();
-						reportCriticalFailure(cause);
+						reportCriticalFailureFn(cause);
 						return;
 					}
 				}
-				if (dirty || scheduledWork.size > 0 || afterRenderWork.size > 0) schedule();
+				if (dirty || scheduledWork.size > 0 || afterRenderWork.size > 0) scheduleFn();
 			};
 
-			const onVisibilityChange = () => {
+			const onVisibilityChangeFn = () => {
 				if (document.hidden) {
 					if (queuedFrame !== null) {
-						cancelFrame(queuedFrame);
+						cancelFrameFn(queuedFrame);
 						queuedFrame = null;
 					}
 					return;
 				}
 				dirty = true;
-				schedule();
+				scheduleFn();
 			};
-			document.addEventListener("visibilitychange", onVisibilityChange);
+			document.addEventListener("visibilitychange", onVisibilityChangeFn);
 
 			return {
-				reportCriticalFailure,
+				reportCriticalFailureFn,
 				invalidateFx: Effect.sync(() => {
 					if (closed) return;
 					dirty = true;
-					schedule();
+					scheduleFn();
 				}),
-				scheduleFx: (work) =>
+				scheduleFx: (workFn) =>
 					Effect.sync(() => {
 						if (closed || poisoned) return () => {};
 						const workId = ++nextWorkId;
-						scheduledWork.set(workId, work);
-						schedule();
+						scheduledWork.set(workId, workFn);
+						scheduleFn();
 						return () => {
 							scheduledWork.delete(workId);
 						};
 					}),
-				scheduleAfterRenderFx: (work) =>
+				scheduleAfterRenderFx: (workFn) =>
 					Effect.sync(() => {
 						if (closed || poisoned) return () => {};
 						const workId = ++nextWorkId;
-						afterRenderWork.set(workId, work);
+						afterRenderWork.set(workId, workFn);
 						dirty = true;
-						schedule();
+						scheduleFn();
 						return () => {
 							afterRenderWork.delete(workId);
 						};
@@ -137,9 +137,9 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 					dirty = false;
 					afterRenderWork.clear();
 					scheduledWork.clear();
-					document.removeEventListener("visibilitychange", onVisibilityChange);
+					document.removeEventListener("visibilitychange", onVisibilityChangeFn);
 					if (queuedFrame !== null) {
-						cancelFrame(queuedFrame);
+						cancelFrameFn(queuedFrame);
 						queuedFrame = null;
 					}
 				}),

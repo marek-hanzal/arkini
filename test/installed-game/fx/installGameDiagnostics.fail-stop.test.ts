@@ -9,7 +9,7 @@ import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
-const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
+const runRendererEffectFn = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
 const testArkpack = {
 	packageId: "package:test",
 	contentHash: "content:test",
@@ -37,8 +37,8 @@ describe("Game diagnostics fail-stop", () => {
 			value: {
 				arkini: {
 					diagnostics: {
-						write,
-						openDirectory: () => Promise.resolve(),
+						writeFn: write,
+						openDirectoryFn: () => Promise.resolve(),
 					},
 				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
 			},
@@ -51,15 +51,15 @@ describe("Game diagnostics fail-stop", () => {
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
 				restored: false,
-				runRendererEffect,
+				runRendererEffectFn,
 				session,
 			}),
 		);
 
 		try {
 			const failure = new Error("tick exploded");
-			session.failStop("tick", failure);
-			expect(session.read(Effect.void)).toMatchObject({
+			session.failStopFn("tick", failure);
+			expect(session.readFn(Effect.void)).toMatchObject({
 				_tag: "Failure",
 			});
 			expect(write.mock.calls.at(-1)?.[0]).toMatchObject({

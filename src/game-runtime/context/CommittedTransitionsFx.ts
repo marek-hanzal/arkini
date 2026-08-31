@@ -6,7 +6,7 @@ export interface CommittedTransitionsFxService {
 	/** Latest exact canonical committed transition. */
 	readonly read: Effect.Effect<CommittedTransitionSchema.Type, never, never>;
 	/** Synchronous snapshot reserved for explicitly synchronous renderer boundaries. */
-	readonly readUnsafe: () => CommittedTransitionSchema.Type;
+	readonly readUnsafeFn: () => CommittedTransitionSchema.Type;
 	/** Replays the latest transition, then every later commit exactly once and in order. */
 	readonly changes: Stream.Stream<CommittedTransitionSchema.Type>;
 	/** Narrow read/reactivity access; mutation remains internal to RuntimeStoreFx. */

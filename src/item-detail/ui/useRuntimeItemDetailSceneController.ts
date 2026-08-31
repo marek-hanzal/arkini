@@ -44,8 +44,6 @@ export namespace useRuntimeItemDetailSceneController {
 				readonly kind: "unavailable";
 		  };
 
-	export type QueueProjection = ItemDetailQueueProjection;
-
 	export interface Props {
 		readonly target: Target;
 	}
@@ -55,7 +53,7 @@ export namespace useRuntimeItemDetailSceneController {
 		readonly info?: readItemDetailInfoFn.Result;
 		readonly lineCount?: number;
 		readonly lines?: ItemDetailLinesProjection.Projection;
-		readonly queue?: QueueProjection;
+		readonly queue?: ItemDetailQueueProjection;
 		readonly queueCount?: number;
 		readonly queueStale: boolean;
 		readonly sources?: useItemDetailNavigationController.SourcesProjection;
@@ -68,9 +66,9 @@ const useItemDetailIdentity = (
 	itemId: IdSchema.Type,
 ): useRuntimeItemDetailSceneController.IdentityProjection => {
 	const game = useGameEngine();
-	const selector = useCallback(
+	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type): useRuntimeItemDetailSceneController.IdentityProjection => {
-			const identity = game.readOrThrow(
+			const identity = game.readOrThrowFn(
 				readItemDetailIdentityFx({
 					itemId,
 					runtime,
@@ -82,11 +80,11 @@ const useItemDetailIdentity = (
 				definitionId: identity.definitionId,
 				itemId: identity.itemId,
 				title: identity.title,
-				sourceUrl: game.getResourceUrl(identity.sourceResourceIds[0]),
+				sourceUrl: game.getResourceUrlFn(identity.sourceResourceIds[0]),
 				...(identity.sourceResourceIds[1] === undefined
 					? {}
 					: {
-							compositeUrl: game.getResourceUrl(identity.sourceResourceIds[1]),
+							compositeUrl: game.getResourceUrlFn(identity.sourceResourceIds[1]),
 						}),
 			};
 		},
@@ -95,12 +93,12 @@ const useItemDetailIdentity = (
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, Equal.equals);
+	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };
 
 const useItemDetailInfo = (itemId: IdSchema.Type): readItemDetailInfoFn.Result => {
 	const game = useGameEngine();
-	const selector = useCallback(
+	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type): readItemDetailInfoFn.Result =>
 			readItemDetailInfoFn({
 				itemId,
@@ -110,7 +108,7 @@ const useItemDetailInfo = (itemId: IdSchema.Type): readItemDetailInfoFn.Result =
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, (left, right) => {
+	return useRuntimeSelector(game, selectorFn, (left, right) => {
 		if (left.kind !== right.kind) return false;
 		if (left.kind === "unavailable" || right.kind === "unavailable") return true;
 		return (
@@ -132,13 +130,11 @@ const useItemDetailInfo = (itemId: IdSchema.Type): readItemDetailInfoFn.Result =
 	});
 };
 
-const useItemDetailQueue = (
-	itemId: IdSchema.Type,
-): useRuntimeItemDetailSceneController.QueueProjection => {
+const useItemDetailQueue = (itemId: IdSchema.Type): ItemDetailQueueProjection => {
 	const game = useGameEngine();
-	const selector = useCallback(
-		(runtime: RuntimeSchema.Type): useRuntimeItemDetailSceneController.QueueProjection =>
-			game.readOrThrow(
+	const selectorFn = useCallback(
+		(runtime: RuntimeSchema.Type): ItemDetailQueueProjection =>
+			game.readOrThrowFn(
 				projectItemDetailQueueFx({
 					game,
 					itemId,
@@ -150,7 +146,7 @@ const useItemDetailQueue = (
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, Equal.equals);
+	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };
 
 /** Composes the live and retained projections for one runtime Item Detail scene. */

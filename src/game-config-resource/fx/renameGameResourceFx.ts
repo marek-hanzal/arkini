@@ -12,11 +12,11 @@ export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* 
 	readonly from: string;
 	readonly to: string;
 }) {
-	const rename = (id: string) => (id === from ? to : id);
+	const renameFn = (id: string) => (id === from ? to : id);
 	const resources = Object.fromEntries(
 		Object.entries(config.resources).map(([role, id]) => [
 			role,
-			rename(id),
+			renameFn(id),
 		]),
 	);
 	const items = Object.fromEntries(
@@ -26,8 +26,8 @@ export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* 
 				...item,
 				asset: {
 					...item.asset,
-					default: item.asset.default.map(rename),
-					sources: item.asset.sources?.map(rename),
+					default: item.asset.default.map(renameFn),
+					sources: item.asset.sources?.map(renameFn),
 				},
 			},
 		]),

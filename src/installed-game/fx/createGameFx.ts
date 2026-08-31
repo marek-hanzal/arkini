@@ -22,7 +22,7 @@ export namespace createGameFx {
 	export interface Props {
 		packageId: string;
 		arkpackStorage?: ArkpackStorage;
-		runRendererEffect: installGameDiagnosticsFx.Props["runRendererEffect"];
+		runRendererEffectFn: installGameDiagnosticsFx.Props["runRendererEffectFn"];
 		saveStorage?: GameSaveStorage;
 	}
 }
@@ -36,7 +36,7 @@ export namespace createGameFx {
 export const createGameFx = Effect.fn("createGameFx")(function* ({
 	packageId,
 	arkpackStorage,
-	runRendererEffect,
+	runRendererEffectFn,
 	saveStorage: providedSaveStorage,
 }: createGameFx.Props) {
 	const loaded = yield* loadArkpackFx({
@@ -85,7 +85,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					state,
 				}),
 		save: {
-			write: (nextState) =>
+			writeFx: (nextState) =>
 				saveStorage.writeFx(
 					saveKey,
 					encodeArkiniSaveFn({
@@ -124,7 +124,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		const diagnostics = yield* installGameDiagnosticsFx({
 			arkpack: loaded.descriptor,
 			restored: state !== undefined,
-			runRendererEffect,
+			runRendererEffectFn,
 			session,
 		});
 		const closeDiagnosticsFx = (reason: "discarded" | "saved") =>
@@ -143,7 +143,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				Effect.andThen(liveResourceUrls.releaseFx),
 			),
 			saveKey,
-			getResourceUrl: liveResourceUrls.get,
+			getResourceUrlFn: liveResourceUrls.getFn,
 		} satisfies Game;
 	}).pipe(Effect.onError(() => discardFailedBootstrapFx));
 });

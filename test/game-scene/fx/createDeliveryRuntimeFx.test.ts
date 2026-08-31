@@ -168,7 +168,7 @@ describe("delivery runtime", () => {
 					updateFx: () => Effect.void,
 				},
 				particleTextures: {} as never,
-				readPalette: () => ({}) as never,
+				readPaletteFn: () => ({}) as never,
 				surface: {
 					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
@@ -206,7 +206,7 @@ describe("delivery runtime", () => {
 		const travels = animations.filter((animation) => animation.channel === "pose");
 		expect(travels).toHaveLength(2);
 		for (const travel of travels) {
-			travel.onComplete?.();
+			travel.onCompleteFn?.();
 		}
 
 		Effect.runSync(runtime.syncFx([]));
@@ -218,7 +218,7 @@ describe("delivery runtime", () => {
 		expect(actors.size).toBe(2);
 
 		for (const fade of fades) {
-			fade.onComplete?.();
+			fade.onCompleteFn?.();
 		}
 		expect(destroyed).toEqual([
 			firstItem.id,
@@ -319,7 +319,7 @@ describe("delivery runtime", () => {
 					updateFx: updateMagnetFx,
 				},
 				particleTextures: {} as never,
-				readPalette: () => ({}) as never,
+				readPaletteFn: () => ({}) as never,
 				surface: {
 					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
@@ -361,7 +361,7 @@ describe("delivery runtime", () => {
 		});
 		if (animations[0]?.channel !== "pose") throw new Error("Expected outbound chase.");
 		targetContainer.x = 340;
-		animations[0].readPose?.(0.5);
+		animations[0].readPoseFn?.(0.5);
 		expect(updateMagnetFx).toHaveBeenCalledWith(
 			expect.objectContaining({
 				attractedActorId: targetActor.item.id,
@@ -369,7 +369,7 @@ describe("delivery runtime", () => {
 				sourceKind: "motion",
 			}),
 		);
-		expect(animations[0].readPose?.(1)).toMatchObject({
+		expect(animations[0].readPoseFn?.(1)).toMatchObject({
 			x: 340,
 			y: 0,
 		});
@@ -409,7 +409,7 @@ describe("delivery runtime", () => {
 		expect(container.visible).toBe(true);
 		expect(container.x).toBe(120);
 		expect(animations).toHaveLength(2);
-		animations[1]?.onComplete?.();
+		animations[1]?.onCompleteFn?.();
 		expect(releaseMagnetFx).toHaveBeenCalledWith({
 			sourceActorId: item.id,
 			sourceKind: "motion",
@@ -461,7 +461,7 @@ describe("delivery runtime", () => {
 			]),
 		);
 		expect(container.visible).toBe(false);
-		animations[2]?.onComplete?.();
+		animations[2]?.onCompleteFn?.();
 		expect(actor.item.quantity).toBe(4);
 		expect(animations[3]).toMatchObject({
 			channel: "lifecycle-opacity",
@@ -469,7 +469,7 @@ describe("delivery runtime", () => {
 			ownerKey: "delivery:runtime:water:1:consume",
 			toAlpha: 1,
 		});
-		animations[3]?.onComplete?.();
+		animations[3]?.onCompleteFn?.();
 		expect(animations).toHaveLength(4);
 		geometryAvailable = true;
 		geometryOffset = 20;
@@ -502,12 +502,12 @@ describe("delivery runtime", () => {
 			ownerKey: "delivery:runtime:water:1",
 		});
 		if (animations[4]?.channel !== "pose") throw new Error("Expected pose animation.");
-		expect(animations[4].readPose?.(1)).toMatchObject({
+		expect(animations[4].readPoseFn?.(1)).toMatchObject({
 			x: 220,
 			y: 0,
 		});
-		animations[4].onComplete?.();
-		animations[4].onComplete?.();
+		animations[4].onCompleteFn?.();
+		animations[4].onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(
 			new Set([
 				"runtime:water",

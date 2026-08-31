@@ -100,10 +100,10 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 	ProjectStartGrid: ({
 		cells,
-		onCellsChange,
+		onCellsChangeFn,
 	}: {
 		readonly cells: ReadonlyArray<TestStartGridCell>;
-		readonly onCellsChange: (cells: ReadonlyArray<TestStartGridCell>) => void;
+		readonly onCellsChangeFn: (cells: ReadonlyArray<TestStartGridCell>) => void;
 	}) =>
 		createElement(
 			"button",
@@ -113,7 +113,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 					.join("|"),
 				"data-ui": "EditorProjectStartGrid",
 				onClick: () =>
-					onCellsChange(
+					onCellsChangeFn(
 						cells.map((cell) => ({
 							...cell,
 							quantity: cell.quantity + 1,

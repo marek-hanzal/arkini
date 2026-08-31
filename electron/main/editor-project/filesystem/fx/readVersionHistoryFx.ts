@@ -11,12 +11,16 @@ import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersio
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
-const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value, message: string) =>
+const readJsonFx = <Value>(
+	target: string,
+	parseFn: (candidate: unknown) => Value,
+	message: string,
+) =>
 	Effect.gen(function* () {
 		const fileSystem = yield* FileSystem.FileSystem;
 		const source = yield* fileSystem.readFileString(target);
 		return yield* Effect.try({
-			try: () => parse(JSON.parse(source)),
+			try: () => parseFn(JSON.parse(source)),
 			catch: (cause) =>
 				new Error(message, {
 					cause,
@@ -71,7 +75,7 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 	yield* Effect.try({
 		try: () => {
 			const states = new Map<string, "visiting" | "visited">();
-			const visit = (versionId: string): void => {
+			const visitFn = (versionId: string): void => {
 				const state = states.get(versionId);
 				if (state === "visited") return;
 				if (state === "visiting")
@@ -85,11 +89,11 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 						throw new Error(
 							`Editor version ${versionId} references missing parent ${parent}.`,
 						);
-					visit(parent);
+					visitFn(parent);
 				}
 				states.set(versionId, "visited");
 			};
-			for (const versionId of versions.keys()) visit(versionId);
+			for (const versionId of versions.keys()) visitFn(versionId);
 		},
 		catch: (cause) => cause,
 	});

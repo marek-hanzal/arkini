@@ -25,10 +25,10 @@ const boardDistanceOptions = [
 ] as const;
 
 export const BoardDistanceControl = ({
-	onChange,
+	onChangeFn,
 	value,
 }: {
-	readonly onChange: (query: QuerySchema.Type) => void;
+	readonly onChangeFn: (query: QuerySchema.Type) => void;
 	readonly value: Extract<
 		QuerySchema.Type,
 		{
@@ -40,8 +40,8 @@ export const BoardDistanceControl = ({
 		label="Board distance"
 		value={value.distance}
 		options={boardDistanceOptions}
-		onChange={(distance) =>
-			onChange({
+		onChangeFn={(distance) =>
+			onChangeFn({
 				...value,
 				distance,
 			})

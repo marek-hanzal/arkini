@@ -77,24 +77,24 @@ const readRemoteStatusFn = (
 
 interface EditorMcpServerProps {
 	readonly copied?: string;
-	readonly onCopy: (key: string, value: string) => Promise<void>;
-	readonly onResetAuth: () => void;
-	readonly onStartLocal: () => void;
-	readonly onStartRemote: () => void;
-	readonly onStopLocal: () => void;
-	readonly onStopRemote: () => void;
+	readonly onCopyFn: (key: string, value: string) => Promise<void>;
+	readonly onResetAuthFn: () => void;
+	readonly onStartLocalFn: () => void;
+	readonly onStartRemoteFn: () => void;
+	readonly onStopLocalFn: () => void;
+	readonly onStopRemoteFn: () => void;
 	readonly overview: EditorMcpOverviewSchema.Type;
 	readonly pending: boolean;
 }
 
 export const EditorMcpServer = ({
 	copied,
-	onCopy,
-	onResetAuth,
-	onStartLocal,
-	onStartRemote,
-	onStopLocal,
-	onStopRemote,
+	onCopyFn,
+	onResetAuthFn,
+	onStartLocalFn,
+	onStartRemoteFn,
+	onStopLocalFn,
+	onStopRemoteFn,
 	overview,
 	pending,
 }: EditorMcpServerProps) => {
@@ -129,8 +129,8 @@ export const EditorMcpServer = ({
 							<div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted">
 								<EditorMcpCopyButton
 									copied={copied === remotePasswordCopyKey}
-									onCopy={() =>
-										void onCopy(
+									onCopyFn={() =>
+										void onCopyFn(
 											remotePasswordCopyKey,
 											overview.remotePassword ?? "",
 										)
@@ -142,7 +142,7 @@ export const EditorMcpServer = ({
 						<DangerButton
 							className="shrink-0 gap-2"
 							disabled={pending}
-							onClick={onResetAuth}
+							onClick={onResetAuthFn}
 						>
 							<RefreshCw className="size-4" />
 							Refresh
@@ -161,14 +161,14 @@ export const EditorMcpServer = ({
 					{overview.local.type === "ready" ? (
 						<Button
 							disabled={pending}
-							onClick={onStopLocal}
+							onClick={onStopLocalFn}
 						>
 							Stop Local MCP
 						</Button>
 					) : (
 						<PrimaryButton
 							disabled={pending}
-							onClick={onStartLocal}
+							onClick={onStartLocalFn}
 						>
 							Start Local MCP
 						</PrimaryButton>
@@ -182,7 +182,7 @@ export const EditorMcpServer = ({
 						<EditorMcpCopyableUrl
 							copied={copied === "local-url"}
 							label="Running at"
-							onCopy={() => void onCopy("local-url", localUrl)}
+							onCopyFn={() => void onCopyFn("local-url", localUrl)}
 							url={localUrl}
 						/>
 					)}
@@ -197,14 +197,14 @@ export const EditorMcpServer = ({
 					{overview.remote.type === "ready" ? (
 						<Button
 							disabled={pending}
-							onClick={onStopRemote}
+							onClick={onStopRemoteFn}
 						>
 							Stop Remote MCP
 						</Button>
 					) : (
 						<PrimaryButton
 							disabled={pending || overview.ngrokDomain === undefined}
-							onClick={onStartRemote}
+							onClick={onStartRemoteFn}
 						>
 							Start Remote MCP
 						</PrimaryButton>
@@ -218,7 +218,7 @@ export const EditorMcpServer = ({
 						<EditorMcpCopyableUrl
 							copied={copied === "remote-url"}
 							label="Running at"
-							onCopy={() => void onCopy("remote-url", remoteUrl)}
+							onCopyFn={() => void onCopyFn("remote-url", remoteUrl)}
 							url={remoteUrl}
 						/>
 					)}

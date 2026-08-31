@@ -11,7 +11,7 @@ import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeIt
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-const compareTarget = (
+const compareTargetFn = (
 	origin: {
 		readonly x: number;
 		readonly y: number;
@@ -85,7 +85,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 		}),
 	);
 	const boardCandidates = Array.getSomes(candidates.map(narrowBoardRuntimeItemFn)).sort(
-		(left, right) => compareTarget(owner.location.position, left, right),
+		(left, right) => compareTargetFn(owner.location.position, left, right),
 	);
 
 	for (const target of boardCandidates) {

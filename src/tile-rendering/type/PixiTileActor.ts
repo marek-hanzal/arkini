@@ -27,5 +27,5 @@ export interface PixiTileActor {
 	dragging: boolean;
 	dragOffsetX: number;
 	dragOffsetY: number;
-	onPointerDown: ((event: FederatedPointerEvent) => void) | null;
+	onPointerDownFn: ((event: FederatedPointerEvent) => void) | null;
 }

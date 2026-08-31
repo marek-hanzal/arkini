@@ -25,7 +25,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 		let notifications = 0;
 
 		try {
-			const pending = session.run(
+			const pending = session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.promise(async () => {
 						markPlanningEntered?.();
@@ -42,7 +42,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 			);
 			await planningEntered;
 
-			const unsubscribe = session.subscribe(() => {
+			const unsubscribe = session.subscribeFn(() => {
 				notifications += 1;
 			});
 
@@ -74,7 +74,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 		const jobIds: string[] = [];
 
 		try {
-			const pending = session.run(
+			const pending = session.runFn(
 				modifyRuntimeFx((runtime) =>
 					Effect.promise(async () => {
 						markPlanningEntered?.();
@@ -97,7 +97,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 			);
 			await planningEntered;
 
-			const unsubscribe = session.subscribeEvents((batch) => {
+			const unsubscribe = session.subscribeEventsFn((batch) => {
 				jobIds.push(
 					...batch.events.flatMap((event) =>
 						"jobId" in event
@@ -129,14 +129,14 @@ describe("createGameSessionFx / synchronous admission", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		const initial = session.getSnapshot();
+		const initial = session.getSnapshotFn();
 		let notifications = 0;
-		const unsubscribe = session.subscribe(() => {
+		const unsubscribe = session.subscribeFn(() => {
 			notifications += 1;
 		});
 
 		try {
-			const item = await session.run(
+			const item = await session.runFn(
 				spawnItemFx({
 					id: "runtime:water:ui",
 					itemId: "water",
@@ -151,7 +151,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 				}),
 			);
 
-			const committed = session.getSnapshot();
+			const committed = session.getSnapshotFn();
 			expect(committed).not.toBe(initial);
 			expect(committed.items.some((candidate) => candidate.id === item.id)).toBe(true);
 			expect(committed.items).toHaveLength(1);

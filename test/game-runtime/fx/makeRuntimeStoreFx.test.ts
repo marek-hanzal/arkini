@@ -39,7 +39,7 @@ describe("makeRuntimeStoreFx", () => {
 
 			const planningEntered = yield* Deferred.make<void>();
 			const mutationFiber = yield* store
-				.modifyEffect(() =>
+				.modifyEffectFx(() =>
 					Deferred.succeed(planningEntered, undefined).pipe(Effect.andThen(Effect.never)),
 				)
 				.pipe(Effect.forkChild);
@@ -49,7 +49,7 @@ describe("makeRuntimeStoreFx", () => {
 			const mutationExit = yield* Fiber.await(mutationFiber);
 			const afterInterruption = yield* store.read;
 			const marker = yield* advanceTransitionFx(afterInterruption);
-			yield* store.modifyEffect(() =>
+			yield* store.modifyEffectFx(() =>
 				Effect.succeed([
 					undefined,
 					marker,
@@ -80,7 +80,7 @@ describe("makeRuntimeStoreFx", () => {
 			);
 			yield* Deferred.await(replaySeen);
 
-			const commandResult = yield* store.modifyEffect(() =>
+			const commandResult = yield* store.modifyEffectFx(() =>
 				Effect.succeed([
 					"committed",
 					next,
@@ -113,7 +113,7 @@ describe("makeRuntimeStoreFx", () => {
 				);
 				yield* Deferred.await(replaySeen);
 
-				const commandResult = yield* store.modifyEffect((transition) =>
+				const commandResult = yield* store.modifyEffectFx((transition) =>
 					Effect.succeed([
 						"unchanged",
 						transition,
@@ -121,7 +121,7 @@ describe("makeRuntimeStoreFx", () => {
 				);
 				const afterNoOp = yield* store.read;
 				const marker = yield* advanceTransitionFx(afterNoOp);
-				yield* store.modifyEffect(() =>
+				yield* store.modifyEffectFx(() =>
 					Effect.succeed([
 						undefined,
 						marker,
@@ -149,15 +149,15 @@ describe("makeRuntimeStoreFx", () => {
 			yield* Deferred.await(replaySeen);
 
 			const failedPlanning = yield* store
-				.modifyEffect(() => Effect.fail("planner-failed"))
+				.modifyEffectFx(() => Effect.fail("planner-failed"))
 				.pipe(Effect.exit);
 			const afterFailureRead = yield* store.read;
 			const defectivePlanning = yield* store
-				.modifyEffect(() => Effect.die("planner-defect"))
+				.modifyEffectFx(() => Effect.die("planner-defect"))
 				.pipe(Effect.exit);
 			const afterDefectRead = yield* store.read;
 			const marker = yield* advanceTransitionFx(afterDefectRead);
-			const afterFailure = yield* store.modifyEffect(() =>
+			const afterFailure = yield* store.modifyEffectFx(() =>
 				Effect.succeed([
 					"after-failure",
 					marker,
@@ -187,7 +187,7 @@ describe("makeRuntimeStoreFx", () => {
 				const secondEntered = yield* Deferred.make<void>();
 
 				const firstFiber = yield* store
-					.modifyEffect((transition) =>
+					.modifyEffectFx((transition) =>
 						Deferred.succeed(firstEntered, undefined).pipe(
 							Effect.andThen(Deferred.await(releaseFirst)),
 							Effect.andThen(
@@ -207,7 +207,7 @@ describe("makeRuntimeStoreFx", () => {
 				yield* Deferred.await(firstEntered);
 
 				const secondFiber = yield* store
-					.modifyEffect((transition) =>
+					.modifyEffectFx((transition) =>
 						Deferred.succeed(secondEntered, undefined).pipe(
 							Effect.andThen(
 								advanceTransitionFx(transition).pipe(
@@ -246,7 +246,7 @@ describe("makeRuntimeStoreFx", () => {
 			const secondEntered = yield* Deferred.make<void>();
 
 			const firstFiber = yield* store
-				.modifyEffect((transition) =>
+				.modifyEffectFx((transition) =>
 					Deferred.succeed(firstEntered, undefined).pipe(
 						Effect.andThen(Deferred.await(releaseFirst)),
 						Effect.andThen(
@@ -266,7 +266,7 @@ describe("makeRuntimeStoreFx", () => {
 			yield* Deferred.await(firstEntered);
 
 			const waitingFiber = yield* store
-				.modifyEffect((transition) =>
+				.modifyEffectFx((transition) =>
 					Deferred.succeed(secondEntered, undefined).pipe(
 						Effect.andThen(
 							advanceTransitionFx(transition).pipe(
@@ -311,7 +311,7 @@ describe("makeRuntimeStoreFx", () => {
 			);
 			const commit = yield* Deferred.await(start).pipe(
 				Effect.andThen(
-					store.modifyEffect((transition) =>
+					store.modifyEffectFx((transition) =>
 						advanceTransitionFx(transition).pipe(
 							Effect.map(
 								(nextTransition) =>
@@ -329,7 +329,7 @@ describe("makeRuntimeStoreFx", () => {
 			yield* Deferred.succeed(start, undefined);
 			yield* Fiber.join(commit);
 			yield* Deferred.await(firstSeen);
-			yield* store.modifyEffect((transition) =>
+			yield* store.modifyEffectFx((transition) =>
 				advanceTransitionFx(transition).pipe(
 					Effect.map(
 						(nextTransition) =>
@@ -378,7 +378,7 @@ describe("makeRuntimeStoreFx", () => {
 			yield* Deferred.await(firstReady);
 			yield* Deferred.await(secondReady);
 
-			yield* store.modifyEffect((transition) =>
+			yield* store.modifyEffectFx((transition) =>
 				advanceTransitionFx(transition).pipe(
 					Effect.map(
 						(nextTransition) =>
@@ -389,7 +389,7 @@ describe("makeRuntimeStoreFx", () => {
 					),
 				),
 			);
-			yield* store.modifyEffect((transition) =>
+			yield* store.modifyEffectFx((transition) =>
 				advanceTransitionFx(transition).pipe(
 					Effect.map(
 						(nextTransition) =>
@@ -436,7 +436,7 @@ describe("makeRuntimeStoreFx", () => {
 			yield* Deferred.await(replaySeen);
 
 			yield* Scope.close(listenerScope, Exit.void);
-			yield* store.modifyEffect((transition) =>
+			yield* store.modifyEffectFx((transition) =>
 				advanceTransitionFx(transition).pipe(
 					Effect.map(
 						(nextTransition) =>

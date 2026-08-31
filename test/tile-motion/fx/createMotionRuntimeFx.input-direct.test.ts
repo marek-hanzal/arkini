@@ -110,8 +110,8 @@ describe("direct input remainder", () => {
 				cue,
 				cueKey: "42:0",
 				magneticField: createRecordingMagneticField(),
-				onComplete: completed,
-				onInputRemainderRevealed: () => {
+				onCompleteFn: completed,
+				onInputRemainderRevealedFn: () => {
 					source.item = {
 						...source.item,
 						badgeCount: 7,
@@ -119,14 +119,14 @@ describe("direct input remainder", () => {
 					};
 					source.currentVisual.item = source.item;
 				},
-				onPayloadCreated: (actor) => {
+				onPayloadCreatedFn: (actor) => {
 					transients.push(actor);
 				},
-				onSwapLegSettled: vi.fn(),
-				onSwapLegStarted: vi.fn(),
-				readPalette: () => palette,
-				readSourceSurvives: () => true,
-				readTargetRoute: (actorId, location) => ({
+				onSwapLegSettledFn: vi.fn(),
+				onSwapLegStartedFn: vi.fn(),
+				readPaletteFn: () => palette,
+				readSourceSurvivesFn: () => true,
+				readTargetRouteFn: (actorId, location) => ({
 					actorId,
 					location,
 					redirected: false,
@@ -152,7 +152,7 @@ describe("direct input remainder", () => {
 		});
 		const delivery = readPoseAnimation(animations, source);
 		samplePoseAnimation(delivery, 1);
-		delivery.onComplete?.();
+		delivery.onCompleteFn?.();
 		advanceInputRemainderFlash({
 			actor: source,
 			animations,
@@ -181,7 +181,7 @@ describe("direct input remainder", () => {
 			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
 		};
-		returned.onComplete?.();
+		returned.onCompleteFn?.();
 
 		expect(source.container.destroyed).toBe(false);
 		expect(source.container).toMatchObject({

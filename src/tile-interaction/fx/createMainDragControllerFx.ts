@@ -44,12 +44,12 @@ interface Props {
 	readonly game: GameEngine;
 	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
-	readonly onActivate: (
+	readonly onActivateFn: (
 		item: TileActorItem,
 		intent: MainActivationIntent,
 		origin: HTMLElement,
 	) => void | PromiseLike<void>;
-	readonly readAckTint: () => number;
+	readonly readAckTintFn: () => number;
 	readonly surface: MainInteractionSurface;
 }
 
@@ -80,9 +80,6 @@ interface MovableGesture extends ActiveDragBase {
 }
 
 type ActiveDrag = ActivationOnlyGesture | MotionHandoffGesture | MovableGesture;
-type MainDragPreview = createMainDragPreviewFx.Output;
-type PointerSample = createPointerFrameSamplerFx.Sample;
-
 const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInventoryShortcutFx")(
 	function* ({
 		actorStore,
@@ -92,7 +89,7 @@ const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInvent
 	}: {
 		readonly actorStore: MainActorStore;
 		readonly drag: ActiveDrag;
-		readonly preview: MainDragPreview;
+		readonly preview: createMainDragPreviewFx.Output;
 		readonly surface: MainInteractionSurface;
 	}) {
 		const inventoryActor = Array.from(actorStore.actors.values()).find(
@@ -204,8 +201,8 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	game,
 	magneticField,
 	motion,
-	onActivate,
-	readAckTint,
+	onActivateFn,
+	readAckTintFn,
 	surface,
 }: Props) {
 	let activeDrag: ActiveDrag | null = null;
@@ -220,10 +217,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	});
 	const pointerSampler = yield* createPointerFrameSamplerFx({
 		frames: application.frames,
-		onApply: (sample) => applyPointerMoveSafely(sample),
+		onApplyFn: (sample) => applyPointerMoveSafelyFn(sample),
 	});
 
-	const settleActor = (actor: PixiTileActor) => {
+	const settleActorFn = (actor: PixiTileActor) => {
 		RendererRuntime.runSync(
 			settleDraggedActorFx({
 				actor,
@@ -233,7 +230,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		);
 	};
 
-	const releaseDragPointer = (pointerId: number) => {
+	const releaseDragPointerFn = (pointerId: number) => {
 		try {
 			application.app.canvas.releasePointerCapture(pointerId);
 		} catch {
@@ -241,32 +238,32 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		}
 	};
 
-	const cancelDrag = (drag: ActiveDrag) => {
+	const cancelDragFn = (drag: ActiveDrag) => {
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
-		releaseDragPointer(drag.pointerId);
+		releaseDragPointerFn(drag.pointerId);
 		if (drag.mode !== "drag") return;
 		RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 		RendererRuntime.runSync(magneticField.resetFx);
 		RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
-		settleActor(drag.actor);
+		settleActorFn(drag.actor);
 	};
 
-	const cancelInteraction = () => {
+	const cancelInteractionFn = () => {
 		if (activeDrag === null) return;
-		cancelDrag(activeDrag);
+		cancelDragFn(activeDrag);
 	};
 
-	const detachActor = (actor: PixiTileActor) => {
-		if (actor.onPointerDown !== null) {
-			actor.container.off("pointerdown", actor.onPointerDown);
-			actor.onPointerDown = null;
+	const detachActorFn = (actor: PixiTileActor) => {
+		if (actor.onPointerDownFn !== null) {
+			actor.container.off("pointerdown", actor.onPointerDownFn);
+			actor.onPointerDownFn = null;
 		}
 		if (activeDrag?.actor !== actor) return;
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		const drag = activeDrag;
 		activeDrag = null;
-		releaseDragPointer(drag.pointerId);
+		releaseDragPointerFn(drag.pointerId);
 		if (drag.mode !== "drag") {
 			actor.container.cursor = "default";
 			return;
@@ -278,7 +275,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		actor.container.cursor = "default";
 	};
 
-	const applyPointerMove = (sample: PointerSample) => {
+	const applyPointerMoveFn = (sample: createPointerFrameSamplerFx.Sample) => {
 		const event = {
 			global: {
 				x: sample.x,
@@ -297,7 +294,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (drag.phase === "pressed" && !thresholdCrossed) return;
 		if (drag.phase === "pressed" && drag.mode === "activation-only") {
 			activeDrag = null;
-			releaseDragPointer(drag.pointerId);
+			releaseDragPointerFn(drag.pointerId);
 			return;
 		}
 		if (drag.phase === "pressed" && drag.mode === "motion-handoff") {
@@ -307,7 +304,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				!drag.actor.container.destroyed;
 			if (!actorStillCanonicalBeforeHandoff) {
 				activeDrag = null;
-				releaseDragPointer(drag.pointerId);
+				releaseDragPointerFn(drag.pointerId);
 				return;
 			}
 			const handedOff = RendererRuntime.runSync(
@@ -326,7 +323,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				remainingClaim === "activation-only"
 			) {
 				activeDrag = null;
-				releaseDragPointer(drag.pointerId);
+				releaseDragPointerFn(drag.pointerId);
 				return;
 			}
 			drag = {
@@ -348,7 +345,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			drag.phase = "dragging";
 			const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
 			if (sourceItem === null) {
-				cancelDrag(drag);
+				cancelDragFn(drag);
 				return;
 			}
 			drag.actor.dragging = true;
@@ -374,7 +371,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			}),
 		);
 		if (sourceItem === null) {
-			cancelDrag(drag);
+			cancelDragFn(drag);
 			return;
 		}
 		const pointerTravel = {
@@ -442,7 +439,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		drag.lastPointerY = sample.y;
 	};
 
-	const recordThresholdCrossing = (sample: PointerSample) => {
+	const recordThresholdCrossingFn = (sample: createPointerFrameSamplerFx.Sample) => {
 		const drag = activeDrag;
 		if (
 			thresholdCrossed ||
@@ -456,11 +453,11 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= dragThreshold;
 	};
 
-	const recoverPointerFailure = (cause: unknown, fallbackDrag?: ActiveDrag) => {
+	const recoverPointerFailureFn = (cause: unknown, fallbackDrag?: ActiveDrag) => {
 		const drag = activeDrag ?? fallbackDrag ?? null;
 		if (drag !== null) {
 			try {
-				cancelDrag(drag);
+				cancelDragFn(drag);
 			} catch {
 				RendererRuntime.runSync(pointerSampler.cancelFx);
 				activeDrag = null;
@@ -470,18 +467,18 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		} else {
 			RendererRuntime.runSync(pointerSampler.cancelFx);
 		}
-		game.reportCriticalFailure("game-presentation", cause);
+		game.reportCriticalFailureFn("game-presentation", cause);
 	};
 
-	const applyPointerMoveSafely = (sample: PointerSample) => {
+	const applyPointerMoveSafelyFn = (sample: createPointerFrameSamplerFx.Sample) => {
 		try {
-			applyPointerMove(sample);
+			applyPointerMoveFn(sample);
 		} catch (cause) {
-			recoverPointerFailure(cause);
+			recoverPointerFailureFn(cause);
 		}
 	};
 
-	const onPointerMove = (event: FederatedPointerEvent) => {
+	const onPointerMoveFn = (event: FederatedPointerEvent) => {
 		const drag = activeDrag;
 		if (drag === null || event.pointerId !== drag.pointerId) return;
 		const sample = {
@@ -489,11 +486,11 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			x: event.global.x,
 			y: event.global.y,
 		};
-		recordThresholdCrossing(sample);
+		recordThresholdCrossingFn(sample);
 		RendererRuntime.runSync(pointerSampler.scheduleFx(sample));
 	};
 
-	const finishPointer = (event: FederatedPointerEvent) => {
+	const finishPointerFn = (event: FederatedPointerEvent) => {
 		const pendingDrag = activeDrag;
 		if (pendingDrag === null || event.pointerId !== pendingDrag.pointerId) {
 			return;
@@ -503,11 +500,11 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			x: event.global.x,
 			y: event.global.y,
 		};
-		recordThresholdCrossing(releaseSample);
+		recordThresholdCrossingFn(releaseSample);
 		RendererRuntime.runSync(pointerSampler.flushFx(releaseSample));
 		const drag = activeDrag;
 		if (drag === null || event.pointerId !== drag.pointerId) return;
-		releaseDragPointer(event.pointerId);
+		releaseDragPointerFn(event.pointerId);
 		if (drag.phase === "pressed") {
 			activeDrag = null;
 			const currentActor = actorStore.actors.get(drag.sourceItem.id);
@@ -517,22 +514,22 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					burstFeedbackParticlesFx({
 						actor: currentActor,
 						animator,
-						tint: readAckTint(),
+						tint: readAckTintFn(),
 					}),
 				);
 			} catch (cause) {
-				game.reportCriticalFailure("game-presentation", cause);
+				game.reportCriticalFailureFn("game-presentation", cause);
 			}
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
 					const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
 					if (currentItem === undefined) return;
-					return onActivate(currentItem, drag.activationIntent, application.app.canvas);
+					return onActivateFn(currentItem, drag.activationIntent, application.app.canvas);
 				})
 				.catch((cause) => {
 					if (closed) return;
-					game.reportCriticalFailure("game-presentation", cause);
+					game.reportCriticalFailureFn("game-presentation", cause);
 				});
 			return;
 		}
@@ -550,7 +547,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				}),
 			);
 			if (sourceItem === null) {
-				cancelDrag(drag);
+				cancelDragFn(drag);
 				return;
 			}
 			activeDrag = null;
@@ -564,19 +561,19 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				}),
 			);
 		} catch (cause) {
-			recoverPointerFailure(cause, drag);
+			recoverPointerFailureFn(cause, drag);
 		}
 	};
 
-	const cancelPointer = (event: FederatedPointerEvent) => {
+	const cancelPointerFn = (event: FederatedPointerEvent) => {
 		const drag = activeDrag;
 		if (drag === null || event.pointerId !== drag.pointerId) {
 			return;
 		}
-		cancelDrag(drag);
+		cancelDragFn(drag);
 	};
 
-	const storeDraggedItemInInventory = (event: KeyboardEvent) => {
+	const storeDraggedItemInInventoryFn = (event: KeyboardEvent) => {
 		if (
 			closed ||
 			event.repeat ||
@@ -605,17 +602,17 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				}),
 			);
 		} catch (cause) {
-			recoverPointerFailure(cause);
+			recoverPointerFailureFn(cause);
 			return;
 		}
 		if (submission === null) return;
-		releaseDragPointer(drag.pointerId);
+		releaseDragPointerFn(drag.pointerId);
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
 		RendererRuntime.runSync(dropSubmission.submitFx(submission));
 	};
 
-	const removeDraggedItem = (event: KeyboardEvent) => {
+	const removeDraggedItemFn = (event: KeyboardEvent) => {
 		if (
 			closed ||
 			event.repeat ||
@@ -623,7 +620,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			event.altKey ||
 			event.ctrlKey ||
 			event.metaKey ||
-			!game.getSnapshot().cheats.enabled
+			!game.getSnapshotFn().cheats.enabled
 		) {
 			return;
 		}
@@ -636,7 +633,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (sourceItem === null) return;
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		cancelDrag(drag);
+		cancelDragFn(drag);
 		void RendererRuntime.runPromise(
 			removeCheatItemFx({
 				game,
@@ -644,11 +641,11 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			}),
 		).catch((cause) => {
 			if (closed) return;
-			game.reportCriticalFailure("game-presentation", cause);
+			game.reportCriticalFailureFn("game-presentation", cause);
 		});
 	};
 
-	const unsubscribeSourceMembership = yield* magneticField.subscribeSourceMembershipFx(
+	const unsubscribeSourceMembershipFn = yield* magneticField.subscribeSourceMembershipFx(
 		(sourceKind) => {
 			const drag = activeDrag;
 			if (
@@ -669,23 +666,23 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		},
 	);
 
-	application.stage.on("globalpointermove", onPointerMove);
-	application.stage.on("pointerup", finishPointer);
-	application.stage.on("pointerupoutside", finishPointer);
-	application.stage.on("pointercancel", cancelPointer);
+	application.stage.on("globalpointermove", onPointerMoveFn);
+	application.stage.on("pointerup", finishPointerFn);
+	application.stage.on("pointerupoutside", finishPointerFn);
+	application.stage.on("pointercancel", cancelPointerFn);
 	const keyboardTarget = typeof window === "undefined" ? null : window;
-	keyboardTarget?.addEventListener("keydown", storeDraggedItemInInventory, {
+	keyboardTarget?.addEventListener("keydown", storeDraggedItemInInventoryFn, {
 		capture: true,
 	});
-	keyboardTarget?.addEventListener("keydown", removeDraggedItem, {
+	keyboardTarget?.addEventListener("keydown", removeDraggedItemFn, {
 		capture: true,
 	});
 
 	return {
 		attachActorFx: Effect.fn("MainDragController.attachActorFx")((actor) =>
 			Effect.gen(function* () {
-				if (actor.onPointerDown !== null) {
-					actor.container.off("pointerdown", actor.onPointerDown);
+				if (actor.onPointerDownFn !== null) {
+					actor.container.off("pointerdown", actor.onPointerDownFn);
 				}
 				actor.container.eventMode = "static";
 				actor.container.cursor = readActorCursorFn({
@@ -693,7 +690,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					previewKind: null,
 					running: actor.item.running,
 				});
-				const onPointerDown = (event: FederatedPointerEvent) => {
+				const onPointerDownFn = (event: FederatedPointerEvent) => {
 					const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
 					const motionClaim = motionSnapshot.interactionClaimByActorId.get(actor.item.id);
 					const needsMotionHandoff = motionClaim === "handoff";
@@ -752,13 +749,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					};
 					thresholdCrossed = false;
 				};
-				actor.onPointerDown = onPointerDown;
-				actor.container.on("pointerdown", onPointerDown);
+				actor.onPointerDownFn = onPointerDownFn;
+				actor.container.on("pointerdown", onPointerDownFn);
 			}),
 		),
-		cancelInteractionFx: Effect.sync(() => cancelInteraction()),
+		cancelInteractionFx: Effect.sync(() => cancelInteractionFn()),
 		detachActorFx: Effect.fn("MainDragController.detachActorFx")((actor) =>
-			Effect.sync(() => detachActor(actor)),
+			Effect.sync(() => detachActorFn(actor)),
 		),
 		requestRefreshFx: Effect.gen(function* () {
 			const drag = activeDrag;
@@ -773,27 +770,27 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			(blocked) =>
 				Effect.sync(() => {
 					interactionBlocked = blocked;
-					if (blocked) cancelInteraction();
+					if (blocked) cancelInteractionFn();
 				}),
 		),
 		closeFx: Effect.gen(function* () {
 			if (closed) return;
 			closed = true;
-			unsubscribeSourceMembership();
-			cancelInteraction();
+			unsubscribeSourceMembershipFn();
+			cancelInteractionFn();
 			yield* pointerSampler.cancelFx;
-			application.stage.off("globalpointermove", onPointerMove);
-			application.stage.off("pointerup", finishPointer);
-			application.stage.off("pointerupoutside", finishPointer);
-			application.stage.off("pointercancel", cancelPointer);
-			keyboardTarget?.removeEventListener("keydown", storeDraggedItemInInventory, {
+			application.stage.off("globalpointermove", onPointerMoveFn);
+			application.stage.off("pointerup", finishPointerFn);
+			application.stage.off("pointerupoutside", finishPointerFn);
+			application.stage.off("pointercancel", cancelPointerFn);
+			keyboardTarget?.removeEventListener("keydown", storeDraggedItemInInventoryFn, {
 				capture: true,
 			});
-			keyboardTarget?.removeEventListener("keydown", removeDraggedItem, {
+			keyboardTarget?.removeEventListener("keydown", removeDraggedItemFn, {
 				capture: true,
 			});
 			for (const actor of actorStore.actors.values()) {
-				detachActor(actor);
+				detachActorFn(actor);
 			}
 		}),
 	} satisfies MainDragController;

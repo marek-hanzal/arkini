@@ -427,7 +427,7 @@ describe("EditorBuild", () => {
 
 	it("builds the current local revision without signing input", async () => {
 		await renderController();
-		controller?.build();
+		controller?.buildFn();
 		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
 			expectedRevision: 0,
 		});
@@ -455,18 +455,18 @@ describe("EditorBuild", () => {
 		await renderController();
 		const install = state.commandSetters.get(`install:${artifact.contentHash}`);
 
-		await act(async () => controller?.installArtifact());
+		await act(async () => controller?.installArtifactFn());
 		expect(controller?.installAction).toBe("update");
 		expect(controller?.installConfirmation).toBeDefined();
 		expect(install).not.toHaveBeenCalled();
 
-		await act(async () => controller?.cancelInstall());
+		await act(async () => controller?.cancelInstallFn());
 		expect(controller?.installConfirmation).toBeUndefined();
 		expect(install).not.toHaveBeenCalled();
 
-		await act(async () => controller?.installArtifact());
+		await act(async () => controller?.installArtifactFn());
 		const confirmation = controller?.installConfirmation;
-		await act(async () => controller?.confirmInstall());
+		await act(async () => controller?.confirmInstallFn());
 		expect(install).toHaveBeenCalledWith({
 			artifact,
 			confirmation,
@@ -495,7 +495,7 @@ describe("EditorBuild", () => {
 		};
 		await renderController();
 
-		await act(async () => controller?.installArtifact());
+		await act(async () => controller?.installArtifactFn());
 
 		expect(controller?.installConfirmation).toBeUndefined();
 		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith({

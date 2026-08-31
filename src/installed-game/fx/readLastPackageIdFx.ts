@@ -6,7 +6,7 @@ import { LastPackageIdError } from "~/installed-game/error/LastPackageIdError";
 export const readLastPackageIdFx = Effect.fn("readLastPackageIdFx")(() =>
 	Effect.tryPromise({
 		try: async () => {
-			const packageId = await window.arkini.launcher.readLastPackageId();
+			const packageId = await window.arkini.launcher.readLastPackageIdFn();
 			return packageId === null ? null : LastPackageIdSchema.parse(packageId);
 		},
 		catch: (cause) =>

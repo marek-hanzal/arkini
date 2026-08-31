@@ -88,7 +88,7 @@ describe("swap travel", () => {
 		expect(Array.from(magneticUpdates[1]?.eligibleAttractionActorIds ?? [])).toEqual([
 			target.item.id,
 		]);
-		targetTravel.onComplete?.();
+		targetTravel.onCompleteFn?.();
 		expect(magneticReleases).toEqual([
 			{
 				sourceActorId: target.item.id,
@@ -96,7 +96,7 @@ describe("swap travel", () => {
 			},
 		]);
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
-		sourceTravel.onComplete?.();
+		sourceTravel.onCompleteFn?.();
 
 		expect(magneticReleases).toEqual([
 			{
@@ -129,7 +129,7 @@ describe("swap travel", () => {
 		expect(animations[0]?.actor).toBe(target);
 		samplePoseAnimation(readPoseAnimation(animations, target), 0.5);
 		target.container.destroyed = true;
-		animations[0]?.onComplete?.();
+		animations[0]?.onCompleteFn?.();
 		expect(magneticReleases).toEqual([
 			{
 				sourceActorId: target.item.id,

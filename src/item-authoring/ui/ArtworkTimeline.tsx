@@ -3,13 +3,13 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
-const formatProgress = (progress: number) =>
+const formatProgressFn = (progress: number) =>
 	`${Number.isInteger(progress) ? progress : progress.toFixed(1)}%`;
 
 interface ArtworkTimelineProps {
 	readonly asset: ItemSchema.Type["asset"];
 	readonly linkAssets?: boolean;
-	readonly onSelectProgress?: (index: number) => void;
+	readonly onSelectProgressFn?: (index: number) => void;
 	readonly selectedProgressIndex?: number;
 }
 
@@ -40,7 +40,7 @@ const ResourceLabel = ({
 export const ArtworkTimeline = ({
 	asset,
 	linkAssets = false,
-	onSelectProgress,
+	onSelectProgressFn,
 	selectedProgressIndex,
 }: ArtworkTimelineProps) => {
 	const sources = asset.sources ?? [];
@@ -107,15 +107,15 @@ export const ArtworkTimeline = ({
 									className="relative grid justify-items-center gap-2 px-3 text-center before:absolute before:top-[1.7rem] before:right-1/2 before:h-px before:w-full before:bg-line-strong"
 								>
 									<span className="text-xs font-semibold tabular-nums text-muted">
-										{formatProgress(threshold)}
+										{formatProgressFn(threshold)}
 									</span>
 									<span className="relative z-10 size-3 rounded-full bg-secondary-selected" />
-									{onSelectProgress !== undefined ? (
+									{onSelectProgressFn !== undefined ? (
 										<button
 											type="button"
 											title={`Select progress asset ${index + 1}`}
 											className="cursor-pointer rounded-lg border p-1 data-[ui-selected=false]:border-line data-[ui-selected=false]:bg-canvas data-[ui-selected=true]:border-accent data-[ui-selected=true]:bg-accent/10"
-											onClick={() => onSelectProgress(index)}
+											onClick={() => onSelectProgressFn(index)}
 											{...readDataUiFn({
 												dataUi: "EditorItemArtworkProgressOption",
 												state: {

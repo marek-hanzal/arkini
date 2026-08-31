@@ -7,7 +7,7 @@ import {
 } from "~/project-authoring/error/ProjectRepositoryError";
 import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 
-const parseEnvelope = <Value>(candidate: unknown): EditorProjectTransport.Result<Value> => {
+const parseEnvelopeFn = <Value>(candidate: unknown): EditorProjectTransport.Result<Value> => {
 	if (typeof candidate !== "object" || candidate === null || !("type" in candidate)) {
 		throw new Error("Editor IPC returned no result envelope.");
 	}
@@ -30,20 +30,20 @@ const parseEnvelope = <Value>(candidate: unknown): EditorProjectTransport.Result
 };
 
 export const invokeProjectTransportFx = <Value, Output>({
-	call,
+	callFn,
 	operation,
-	parse,
+	parseFn,
 	requestMessage,
 	responseMessage,
 }: {
-	readonly call: () => Promise<EditorProjectTransport.Result<Value>>;
+	readonly callFn: () => Promise<EditorProjectTransport.Result<Value>>;
 	readonly operation: ProjectRepositoryOperation;
-	readonly parse: (value: Value) => Output;
+	readonly parseFn: (value: Value) => Output;
 	readonly requestMessage: string;
 	readonly responseMessage: string;
 }) =>
 	Effect.tryPromise({
-		try: call,
+		try: callFn,
 		catch: (cause) =>
 			new ProjectRepositoryError({
 				operation,
@@ -53,7 +53,7 @@ export const invokeProjectTransportFx = <Value, Output>({
 	}).pipe(
 		Effect.flatMap((candidate) =>
 			Effect.try({
-				try: () => parseEnvelope<Value>(candidate),
+				try: () => parseEnvelopeFn<Value>(candidate),
 				catch: (cause) =>
 					new ProjectRepositoryError({
 						operation,
@@ -65,7 +65,7 @@ export const invokeProjectTransportFx = <Value, Output>({
 		Effect.flatMap((result) => {
 			if (result.type === "success") {
 				return Effect.try({
-					try: () => parse(result.value),
+					try: () => parseFn(result.value),
 					catch: (cause) =>
 						new ProjectRepositoryError({
 							operation,

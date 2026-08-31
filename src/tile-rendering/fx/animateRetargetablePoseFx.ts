@@ -17,22 +17,22 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 	animator,
 	curve,
 	durationMs: requestedDurationMs,
-	onCancel,
-	onComplete,
+	onCancelFn,
+	onCompleteFn,
 	ownerKey,
-	readSize,
-	readTarget,
+	readSizeFn,
+	readTargetFn,
 	target,
 }: {
 	readonly actor: PixiTileActor;
 	readonly animator: ActorAnimator;
 	readonly curve?: AnimationCurve;
 	readonly durationMs?: number;
-	readonly onCancel?: () => void;
-	readonly onComplete?: () => void;
+	readonly onCancelFn?: () => void;
+	readonly onCompleteFn?: () => void;
 	readonly ownerKey?: string;
-	readonly readSize: () => number;
-	readonly readTarget: () => TargetPose | null;
+	readonly readSizeFn: () => number;
+	readonly readTargetFn: () => TargetPose | null;
 	readonly target: TargetPose;
 }) {
 	const durationMs =
@@ -44,16 +44,16 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 			toX: target.x,
 			toY: target.y,
 		});
-	const readPose = yield* createRetargetablePoseSamplerFx({
+	const readPoseFn = yield* createRetargetablePoseSamplerFx({
 		from: {
 			scale: actor.container.scale.x,
 			x: actor.container.x,
 			y: actor.container.y,
 		},
-		readTarget: () => {
-			const latest = readTarget() ?? target;
+		readTargetFn: () => {
+			const latest = readTargetFn() ?? target;
 			return {
-				scale: readSize() / Math.max(1, actor.size),
+				scale: readSizeFn() / Math.max(1, actor.size),
 				x: latest.x,
 				y: latest.y,
 			};
@@ -64,9 +64,9 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 		channel: "pose",
 		curve,
 		durationMs,
-		onCancel,
-		onComplete,
+		onCancelFn,
+		onCompleteFn,
 		ownerKey,
-		readPose,
+		readPoseFn,
 	});
 });

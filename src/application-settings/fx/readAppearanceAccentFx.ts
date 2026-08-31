@@ -5,7 +5,8 @@ import { AppearanceAccentError } from "~/application-settings/error/AppearanceAc
 /** Reads the Electron-owned accent preference and validates the preload boundary. */
 export const readAppearanceAccentFx = Effect.fn("readAppearanceAccentFx")(() =>
 	Effect.tryPromise({
-		try: async () => AppearanceAccentSchema.parse(await window.arkini.appearance.readAccent()),
+		try: async () =>
+			AppearanceAccentSchema.parse(await window.arkini.appearance.readAccentFn()),
 		catch: (cause) =>
 			new AppearanceAccentError({
 				operation: "read",

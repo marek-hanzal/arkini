@@ -8,19 +8,19 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type GameDiagnosticsSession = Pick<
 	GameSession,
-	"getFatalError" | "subscribeFatalError" | "subscribeTransitions"
+	"getFatalErrorFn" | "subscribeFatalErrorFn" | "subscribeTransitionsFn"
 >;
 
 export namespace installGameDiagnosticsFx {
 	export interface Props {
 		readonly arkpack: ArkpackDescriptor;
 		readonly restored: boolean;
-		readonly runRendererEffect: <Value>(effect: Effect.Effect<Value, never, never>) => Value;
+		readonly runRendererEffectFn: <Value>(effect: Effect.Effect<Value, never, never>) => Value;
 		readonly session: GameDiagnosticsSession;
 	}
 }
 
-const readDeliverySummary = (runtime: RuntimeSchema.Type) =>
+const readDeliverySummaryFn = (runtime: RuntimeSchema.Type) =>
 	runtime.items.flatMap((item) => {
 		const location = item.location;
 		if (location.scope !== "delivery") return [];
@@ -43,9 +43,9 @@ const readDeliverySummary = (runtime: RuntimeSchema.Type) =>
 		];
 	});
 
-const readTransitionSignature = (transition: GameTransition) =>
+const readTransitionSignatureFn = (transition: GameTransition) =>
 	JSON.stringify({
-		deliveries: readDeliverySummary(transition.runtime),
+		deliveries: readDeliverySummaryFn(transition.runtime),
 		jobs: transition.runtime.jobs.map(({ id, lineId, ownerItemId }) => ({
 			id,
 			lineId,
@@ -56,7 +56,7 @@ const readTransitionSignature = (transition: GameTransition) =>
 export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(function* ({
 	arkpack,
 	restored,
-	runRendererEffect,
+	runRendererEffectFn,
 	session,
 }: installGameDiagnosticsFx.Props) {
 	const sessionId = crypto.randomUUID();
@@ -80,14 +80,14 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 		},
 	});
 
-	const unsubscribeTransitions = session.subscribeTransitions((transition) => {
+	const unsubscribeTransitionsFn = session.subscribeTransitionsFn((transition) => {
 		try {
 			latestSequence = transition.sequence;
-			const signature = readTransitionSignature(transition);
+			const signature = readTransitionSignatureFn(transition);
 			if (signature === previousSignature && transition.events.length === 0) return;
 			previousSignature = signature;
 			const runtime = transition.runtime;
-			runRendererEffect(
+			runRendererEffectFn(
 				writeDiagnosticRecordFx({
 					category: [
 						"game",
@@ -102,12 +102,12 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 						itemCount: runtime.items.length,
 						jobCount: runtime.jobs.length,
 						jobQueueCount: runtime.jobQueue.length ?? 0,
-						deliveries: readDeliverySummary(runtime),
+						deliveries: readDeliverySummaryFn(runtime),
 					},
 				}),
 			);
 		} catch (cause) {
-			runRendererEffect(
+			runRendererEffectFn(
 				writeDiagnosticRecordFx({
 					category: [
 						"renderer",
@@ -123,10 +123,10 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			);
 		}
 	});
-	const unsubscribeFatal = session.subscribeFatalError(() => {
+	const unsubscribeFatalFn = session.subscribeFatalErrorFn(() => {
 		try {
-			const fatal = session.getFatalError();
-			runRendererEffect(
+			const fatal = session.getFatalErrorFn();
+			runRendererEffectFn(
 				writeDiagnosticRecordFx({
 					category: [
 						"game",
@@ -143,7 +143,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 				}),
 			);
 		} catch (cause) {
-			runRendererEffect(
+			runRendererEffectFn(
 				writeDiagnosticRecordFx({
 					category: [
 						"renderer",
@@ -165,9 +165,9 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 		close: (reason: "discarded" | "saved") => {
 			if (closed) return;
 			closed = true;
-			unsubscribeFatal();
-			unsubscribeTransitions();
-			runRendererEffect(
+			unsubscribeFatalFn();
+			unsubscribeTransitionsFn();
+			runRendererEffectFn(
 				writeDiagnosticRecordFx({
 					category: [
 						"game",

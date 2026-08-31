@@ -23,8 +23,6 @@ import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
-type Operations = EditorBuildRepositoryService;
-
 class EditorProjectBuildOperationError extends Data.TaggedError(
 	"EditorProjectBuildOperationError",
 )<{
@@ -114,7 +112,7 @@ export namespace createBuildOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
-		readonly readState: (
+		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
 	}
@@ -124,7 +122,7 @@ export namespace createBuildOperationsFx {
 export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(function* ({
 	filesystemWrite,
 	operations,
-	readState,
+	readStateFx,
 }: createBuildOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
@@ -136,10 +134,13 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.provideService(Path.Path, path),
 		);
 
-	const buildProjectFx: Operations["buildProjectFx"] = ({ expectedRevision, projectId }) =>
+	const buildProjectFx: EditorBuildRepositoryService["buildProjectFx"] = ({
+		expectedRevision,
+		projectId,
+	}) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
-				const state = yield* readState(projectId);
+				const state = yield* readStateFx(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
 				const build = yield* providePlatformFx(
 					withProjectLockFx(
@@ -210,14 +211,14 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			),
 		);
 
-	const readProjectBuildFx: Operations["readProjectBuildFx"] = ({
+	const readProjectBuildFx: EditorBuildRepositoryService["readProjectBuildFx"] = ({
 		contentHash,
 		expectedRevision,
 		projectId,
 	}) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
-				const state = yield* readState(projectId);
+				const state = yield* readStateFx(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "read-project-build");
 				return yield* withProjectLockFx(
 					filesystemWrite,

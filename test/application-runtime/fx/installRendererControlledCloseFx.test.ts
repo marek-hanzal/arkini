@@ -25,16 +25,16 @@ const createResource = (packageId: string): InstalledGameEngineResource => ({
 		disposeFx: Effect.void,
 		disposeWithoutSaveFx: Effect.void,
 	} as unknown as InstalledGameEngineResource["game"],
-	assertUsable: () => undefined,
-	getCriticalFailure: () => null,
-	markCriticalFailure: (operation, cause) =>
+	assertUsableFn: () => undefined,
+	getCriticalFailureFn: () => null,
+	markCriticalFailureFn: (operation, cause) =>
 		cause instanceof CriticalGameLifecycleError
 			? cause
 			: new CriticalGameLifecycleError({
 					operation,
 					cause,
 				}),
-	subscribeCriticalFailure: () => () => undefined,
+	subscribeCriticalFailureFn: () => () => undefined,
 });
 
 const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
@@ -46,11 +46,11 @@ const createLifecycle = () => {
 	const removeBeforeCloseReady = vi.fn();
 	return {
 		lifecycle: {
-			onBeforeClose: (listener: CloseListener) => {
+			onBeforeCloseFn: (listener: CloseListener) => {
 				beforeClose = listener;
 				return removeBeforeClose;
 			},
-			onBeforeCloseReady: (listener: CloseListener) => {
+			onBeforeCloseReadyFn: (listener: CloseListener) => {
 				beforeCloseReady = listener;
 				return removeBeforeCloseReady;
 			},

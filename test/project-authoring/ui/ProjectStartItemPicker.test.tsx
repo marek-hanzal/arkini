@@ -62,8 +62,8 @@ const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => vo
 			</button>
 			{open ? (
 				<ProjectStartItemPicker
-					onClose={() => setOpen(false)}
-					onSelect={onSelect}
+					onCloseFn={() => setOpen(false)}
+					onSelectFn={onSelect}
 					scope="inventory"
 				/>
 			) : null}

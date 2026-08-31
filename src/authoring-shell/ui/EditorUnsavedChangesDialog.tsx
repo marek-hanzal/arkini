@@ -5,12 +5,14 @@ import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 import type { EditorUnsavedChangesSnapshot } from "~/authoring-session/service/EditorUnsavedChanges";
 
-type UnsavedChangesState = EditorUnsavedChangesSnapshot;
-
-const EditorUnsavedChangesPrompt = ({ state }: { readonly state: UnsavedChangesState }) => {
+const EditorUnsavedChangesPrompt = ({
+	state,
+}: {
+	readonly state: EditorUnsavedChangesSnapshot;
+}) => {
 	const owner = useEditorUnsavedChangesOwner();
 	const focus = useOverlayFocus({
-		onClose: () => void owner.decide("cancel"),
+		onCloseFn: () => void owner.decideFn("cancel"),
 	});
 
 	return (
@@ -19,7 +21,7 @@ const EditorUnsavedChangesPrompt = ({ state }: { readonly state: UnsavedChangesS
 				ref={focus.overlayRef}
 				className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 				data-ui="EditorUnsavedChangesDialog"
-				onKeyDown={focus.onKeyDown}
+				onKeyDown={focus.onKeyDownFn}
 			>
 				<h2 className="text-lg font-semibold">Unsaved changes</h2>
 				<p className="mt-2 text-sm leading-6 text-muted">
@@ -35,13 +37,13 @@ const EditorUnsavedChangesPrompt = ({ state }: { readonly state: UnsavedChangesS
 				<div className="mt-6 flex justify-end gap-2">
 					<Button
 						disabled={state.saving}
-						onClick={() => void owner.decide("cancel")}
+						onClick={() => void owner.decideFn("cancel")}
 					>
 						Cancel
 					</Button>
 					<DangerButton
 						disabled={state.saving}
-						onClick={() => void owner.decide("discard")}
+						onClick={() => void owner.decideFn("discard")}
 					>
 						Discard
 					</DangerButton>
@@ -49,7 +51,7 @@ const EditorUnsavedChangesPrompt = ({ state }: { readonly state: UnsavedChangesS
 						<PrimaryButton
 							disabled={state.saving}
 							cursorIntent={state.saving ? "progress" : undefined}
-							onClick={() => void owner.decide("save")}
+							onClick={() => void owner.decideFn("save")}
 						>
 							Save
 						</PrimaryButton>
@@ -63,6 +65,6 @@ const EditorUnsavedChangesPrompt = ({ state }: { readonly state: UnsavedChangesS
 /** Renders and owns interaction focus for the process-wide unsaved-changes prompt. */
 export const EditorUnsavedChangesDialog = () => {
 	const owner = useEditorUnsavedChangesOwner();
-	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
+	const state = useSyncExternalStore(owner.subscribeFn, owner.getSnapshotFn, owner.getSnapshotFn);
 	return state.promptOpen ? <EditorUnsavedChangesPrompt state={state} /> : null;
 };

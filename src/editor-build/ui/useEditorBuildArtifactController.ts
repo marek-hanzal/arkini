@@ -7,8 +7,8 @@ import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProje
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
-import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";
-import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
+import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
+import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";
 
 export type EditorBuildFailure =

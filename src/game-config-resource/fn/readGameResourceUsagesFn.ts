@@ -1,7 +1,7 @@
 import { Order } from "effect";
 
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
+import type { DiagnosticPathSchema } from "~/game-config-diagnostic/schema/DiagnosticPathSchema";
 
 export namespace readGameResourceUsagesFn {
 	export type Usage =

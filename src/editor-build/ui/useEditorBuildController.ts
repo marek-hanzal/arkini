@@ -2,7 +2,7 @@ import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readE
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
+import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import {
 	type EditorBuildFailure,
 	useEditorBuildArtifactController,

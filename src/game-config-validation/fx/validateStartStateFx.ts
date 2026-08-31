@@ -4,10 +4,10 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import { planStartFx } from "~/game-start/fx/planStartFx";
-import type { StartInvalidDiagnosticSchema } from "~/game-config/diagnostic/schema/diagnostic/StartInvalidDiagnosticSchema";
+import type { StartInvalidDiagnosticSchema } from "~/game-config-diagnostic/schema/StartInvalidDiagnosticSchema";
 
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
-import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 export namespace validateStartStateFx {
 	export interface Props {
 		config: GameConfigSchema.Type;

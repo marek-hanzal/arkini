@@ -1,6 +1,6 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { readGameDiagnosticPresentationFn } from "~/game-config/diagnostic/printer/fn/readGameDiagnosticPresentationFn";
-import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
+import { readGameDiagnosticPresentationFn } from "~/game-config-diagnostic/fn/readGameDiagnosticPresentationFn";
+import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorItemSectionForPathFn";
 import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";

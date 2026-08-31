@@ -9,7 +9,7 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const bufferedInput = (capacity: number): ReadonlyArray<InputSchema.Type> => [
 	{

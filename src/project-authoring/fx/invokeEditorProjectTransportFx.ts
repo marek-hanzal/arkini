@@ -5,7 +5,7 @@ import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
+import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 
 const parseEnvelope = <Value>(candidate: unknown): EditorProjectTransport.Result<Value> => {
 	if (typeof candidate !== "object" || candidate === null || !("type" in candidate)) {

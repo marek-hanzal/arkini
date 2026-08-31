@@ -66,6 +66,7 @@ src/production-delivery  outbound input delivery allocation, validation and sett
 src/game-config  authored value/config schemas and loaded-config capability
 src/game-config-cli  schema generation and completed-project validation commands
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
+src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation and typed validation failure
 src/game-config-resource  authored resource schemas, references, source discovery, usage and rename semantics
 src/game-config-source  portable source layout, schemas, discovery, parsing and project admission
 src/game-config-validation  completed-config semantic validation and provenance-aware diagnostics

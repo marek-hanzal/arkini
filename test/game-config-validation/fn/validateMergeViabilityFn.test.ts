@@ -6,8 +6,8 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
-import { InvalidMergeReasonEnumSchema } from "~/game-config/diagnostic/schema/InvalidMergeReasonEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
+import { InvalidMergeReasonEnumSchema } from "~/game-config-diagnostic/schema/InvalidMergeReasonEnumSchema";
 
 const compileDiagnostics = async (items: Record<string, unknown>) =>
 	(

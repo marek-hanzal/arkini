@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
+import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 
 export const EditorProjectBuildSchema = z
 	.object({

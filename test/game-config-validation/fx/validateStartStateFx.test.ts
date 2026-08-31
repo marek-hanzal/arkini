@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { validateStartStateFx } from "~/game-config-validation/fx/validateStartStateFx";
 import { startTestConfig } from "~test/game-start/support/startTestConfig";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const provenance = {
 	start: "start.json",

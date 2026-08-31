@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/renderer/createElectronEditorBuildRepositoryFx";
-import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const installBuildApi = () => {
 	const buildProject = vi.fn<Window["arkini"]["editor"]["buildProject"]>();

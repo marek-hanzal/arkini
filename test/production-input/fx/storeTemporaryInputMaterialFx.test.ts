@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({

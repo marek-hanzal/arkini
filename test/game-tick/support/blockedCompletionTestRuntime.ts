@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 

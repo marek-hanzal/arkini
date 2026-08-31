@@ -5,7 +5,7 @@ import { resolveOneHopOutputCapacityFx } from "~/production-job/fx/resolveOneHop
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import {
 	runBlueprint,

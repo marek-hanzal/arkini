@@ -15,8 +15,8 @@ import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineR
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
+import { testGameRead } from "~test/support/testGameRead";
 
 export const packageId = "package-route-load";
 

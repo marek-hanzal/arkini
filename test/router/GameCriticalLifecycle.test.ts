@@ -13,12 +13,12 @@ import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLi
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { testGameRead } from "~test/support/testGameRead";
 
 (
 	globalThis as {

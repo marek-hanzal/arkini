@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";

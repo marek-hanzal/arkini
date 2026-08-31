@@ -9,7 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/installed-game/type/Game";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
@@ -17,8 +17,8 @@ import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import {
 	type TestGameTransitionFields,
 	makeTestGameTransitionFieldsFx,
-} from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
+} from "~test/support/makeTestGameTransitionFieldsFx";
+import { testGameRead } from "~test/support/testGameRead";
 
 (
 	globalThis as {

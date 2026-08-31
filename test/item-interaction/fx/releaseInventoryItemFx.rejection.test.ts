@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Effect, Result } from "effect";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 

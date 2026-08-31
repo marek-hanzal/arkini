@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { board, inventory, run, spawnAndActivate } from "../support/spaceActionFixture";
 
 describe("Space item activation admission", () => {

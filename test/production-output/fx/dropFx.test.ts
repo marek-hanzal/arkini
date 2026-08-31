@@ -2,8 +2,8 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { dropFx } from "~/production-output/fx/dropFx";
 

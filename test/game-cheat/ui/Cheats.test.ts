@@ -10,7 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Game } from "~/installed-game/type/Game";
 import { Cheats } from "~/game-cheat/ui/Cheats";
 import { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 (

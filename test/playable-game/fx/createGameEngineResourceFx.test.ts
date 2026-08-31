@@ -2,7 +2,7 @@ import { Cause, Effect, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";

@@ -5,7 +5,7 @@ import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectro
 import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;

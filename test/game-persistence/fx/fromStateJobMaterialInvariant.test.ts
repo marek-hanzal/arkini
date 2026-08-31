@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";

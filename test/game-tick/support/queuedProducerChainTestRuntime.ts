@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 

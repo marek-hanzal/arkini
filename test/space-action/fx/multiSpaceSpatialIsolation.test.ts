@@ -2,7 +2,7 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
@@ -10,7 +10,7 @@ import { queryFx } from "~/item-query/fx/queryFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";

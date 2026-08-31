@@ -22,9 +22,9 @@ import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomReg
 import { GameMenu } from "~/game-menu/ui/GameMenu";
 import { GameMenuProvider } from "~/game-menu/ui/GameMenuProvider";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { testGameRead } from "~test/support/testGameRead";
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 

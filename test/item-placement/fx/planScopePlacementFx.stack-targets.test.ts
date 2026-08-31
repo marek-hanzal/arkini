@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planScopePlacementFx } from "~/item-placement/fx/planScopePlacementFx";

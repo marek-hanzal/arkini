@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";

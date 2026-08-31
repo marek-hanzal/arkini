@@ -2,10 +2,10 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
 	boardLocation,
 	configuredDrop,

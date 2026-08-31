@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { placeDropForTestFx } from "~test/item-placement/support/placeDropForTestFx";
 import {

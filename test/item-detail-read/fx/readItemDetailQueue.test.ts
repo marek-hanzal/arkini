@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {

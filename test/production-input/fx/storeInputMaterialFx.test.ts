@@ -1,16 +1,16 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
-import { getItemFx } from "~test/support/runtime/getItemFx";
+import { getItemFx } from "~test/support/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

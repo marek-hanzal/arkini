@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 describe("stacked line owner input isolation", () => {

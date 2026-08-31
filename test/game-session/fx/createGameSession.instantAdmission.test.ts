@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 

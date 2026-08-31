@@ -1,7 +1,7 @@
 import { Effect, Option, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~test/support/game/useGameFx";
+import { useGameFx } from "~test/support/useGameFx";
 import { applyMergeRuntimeFx } from "~/item-merge/fx/applyMergeRuntimeFx";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createTestGameSession } from "~test/support/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";

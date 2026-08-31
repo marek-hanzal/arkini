@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";

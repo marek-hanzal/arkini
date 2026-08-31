@@ -10,8 +10,8 @@ import { createRendererLifecycleFx } from "~/application-runtime/fx/createRender
 import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { gameMenuCommandAtom } from "~/game-menu/atom/gameMenuCommandAtom";
 import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
+import { testGameRead } from "~test/support/testGameRead";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const failStop = vi.fn<Game["failStop"]>();

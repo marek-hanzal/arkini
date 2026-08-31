@@ -1,11 +1,11 @@
 import { Effect, type Layer } from "effect";
 
-import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~test/support/game/GameLayerFx";
+import { useGameFx } from "~test/support/useGameFx";
+import type { GameLayerFx } from "~test/support/GameLayerFx";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 
 export const configInput = {
 	resources: {

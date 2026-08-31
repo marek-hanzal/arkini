@@ -1,15 +1,15 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryFx";
-import { useGameFx } from "~test/support/game/useGameFx";
-import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
-import { getItemFx } from "~test/support/runtime/getItemFx";
+import { settleItemDeliveryFx } from "~test/support/settleItemDeliveryFx";
+import { useGameFx } from "~test/support/useGameFx";
+import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
+import { getItemFx } from "~test/support/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

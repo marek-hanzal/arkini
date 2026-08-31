@@ -1,7 +1,7 @@
 import type { Effect, SubscriptionRef } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 

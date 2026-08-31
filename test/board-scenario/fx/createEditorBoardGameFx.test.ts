@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
+import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
@@ -21,7 +21,7 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-describe("createEditorBoardGameFx", () => {
+describe("Board Scenario createEditorBoardGameFx", () => {
 	it("owns one fresh revision-pinned game and discards it without package persistence", async () => {
 		const createObjectUrl = vi
 			.spyOn(URL, "createObjectURL")

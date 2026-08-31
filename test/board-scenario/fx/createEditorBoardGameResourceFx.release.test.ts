@@ -2,8 +2,8 @@ import { Effect, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
-import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
-import { failedCreationProject } from "~test/board-scenario/createEditorBoardGameResourceFx.release.test/failedCreationProject";
+import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
+import { failedCreationProject } from "~test/board-scenario/fx/createEditorBoardGameResourceFx.release.test/failedCreationProject";
 
 describe("createEditorBoardGameResourceFx release", () => {
 	it.effect("clears a failed creation when routed ownership is released", () =>

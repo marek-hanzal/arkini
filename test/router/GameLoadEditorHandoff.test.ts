@@ -7,9 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
-import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
+import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";

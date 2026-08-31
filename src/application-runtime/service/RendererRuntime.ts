@@ -8,8 +8,8 @@ import { EditorProjectRepository } from "~/project-authoring/service/EditorProje
 import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
 import { createElectronEditorBuildRepositoryFx } from "~/editor-build/fx/createElectronEditorBuildRepositoryFx";
 import { createElectronEditorProjectRepositoryFx } from "~/project-authoring/fx/createElectronEditorProjectRepositoryFx";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
+import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";

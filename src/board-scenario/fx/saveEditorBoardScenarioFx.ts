@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
+import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 

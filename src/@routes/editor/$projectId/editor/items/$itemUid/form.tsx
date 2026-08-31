@@ -1,12 +1,12 @@
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
-import { EditorItemForm } from "~/item-authoring/ui/EditorItemForm";
-import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
+import { Form } from "~/item-authoring/ui/Form";
+import type { SectionId } from "~/item-authoring/type/Section";
 
-type EditorItemOptionalCapability = "charges" | "merges";
+type OptionalCapability = "charges" | "merges";
 
 interface EditorItemFormSearch {
-	readonly enable?: EditorItemOptionalCapability;
+	readonly enable?: OptionalCapability;
 	readonly itemType?: TypeSchema.Type;
 	readonly lineId?: string;
 }
@@ -37,9 +37,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		});
 		const sectionId = (
 			typeof params.sectionId === "string" ? params.sectionId : "identity"
-		) as EditorItemSectionId;
+		) as SectionId;
 		return (
-			<EditorItemForm
+			<Form
 				enableCapability={enable}
 				itemType={itemType}
 				productionLineId={lineId}
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				uid={itemUid}
 			>
 				<Outlet />
-			</EditorItemForm>
+			</Form>
 		);
 	},
 });

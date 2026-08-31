@@ -1,21 +1,18 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { EditorItemArtworkSection } from "~/item-authoring/ui/EditorItemArtworkSection";
-import { EditorItemChargesSection } from "~/item-authoring/ui/EditorItemChargesSection";
-import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { EditorItemIdentitySection } from "~/item-authoring/ui/EditorItemIdentitySection";
-import { EditorItemMergesSection } from "~/item-authoring/ui/EditorItemMergesSection";
-import { EditorItemProductionSection } from "~/item-authoring/ui/EditorItemProductionSection";
-import {
-	type EditorItemSectionId,
-	EditorItemSectionIds,
-} from "~/item-authoring/type/EditorItemSection";
-import { EditorSpaceActionSection } from "~/item-authoring/ui/EditorSpaceActionSection";
-import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
+import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
+import { ChargesSection } from "~/item-authoring/ui/ChargesSection";
+import { useFormSession } from "~/item-authoring/ui/FormContext";
+import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
+import { MergesSection } from "~/item-authoring/ui/MergesSection";
+import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
+import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
+import { SpaceActionSection } from "~/item-authoring/ui/SpaceActionSection";
+import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
 	beforeLoad: ({ params }) => {
-		if (EditorItemSectionIds.some((section) => section === params.sectionId)) return;
+		if (SectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
 			params: {
@@ -28,9 +25,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	},
 	component: () => {
 		const { sectionId } = Route.useParams();
-		const section = sectionId as EditorItemSectionId;
-		const session = useEditorItemFormSession();
-		const available = readEditorItemSectionsFn(session.initialItem, "form").some(
+		const section = sectionId as SectionId;
+		const session = useFormSession();
+		const available = readSectionsFn(session.initialItem, "form").some(
 			(candidate) => candidate.id === section,
 		);
 		if (!available)
@@ -47,17 +44,17 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			);
 		switch (section) {
 			case "identity":
-				return <EditorItemIdentitySection />;
+				return <IdentitySection />;
 			case "artwork":
-				return <EditorItemArtworkSection />;
+				return <ArtworkSection />;
 			case "charges":
-				return <EditorItemChargesSection />;
+				return <ChargesSection />;
 			case "merges":
-				return <EditorItemMergesSection />;
+				return <MergesSection />;
 			case "action":
-				return <EditorSpaceActionSection />;
+				return <SpaceActionSection />;
 			case "production":
-				return <EditorItemProductionSection />;
+				return <ProductionSection />;
 		}
 	},
 });

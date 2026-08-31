@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
-import { EditorItemDetail } from "~/item-authoring/ui/EditorItemDetail";
-import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
+import { Detail } from "~/item-authoring/ui/Detail";
+import type { SectionId } from "~/item-authoring/type/Section";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail")({
 	component: () => {
@@ -11,14 +11,14 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		});
 		const sectionId = (
 			typeof params.sectionId === "string" ? params.sectionId : "identity"
-		) as EditorItemSectionId;
+		) as SectionId;
 		return (
-			<EditorItemDetail
+			<Detail
 				sectionId={sectionId}
 				uid={itemUid}
 			>
 				<Outlet />
-			</EditorItemDetail>
+			</Detail>
 		);
 	},
 });

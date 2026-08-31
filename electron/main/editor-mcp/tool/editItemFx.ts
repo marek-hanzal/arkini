@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { saveEditorItemWithRepositoryFx } from "~/item-authoring/fx/saveEditorItemWithRepositoryFx";
+import { saveWithRepositoryFx } from "~/item-authoring/fx/saveWithRepositoryFx";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditItemInput } from "./EditItemInputSchemas";
@@ -42,7 +42,7 @@ export const editItemFx = Effect.fn("editItemFx")(function* ({
 		if (value === null) delete candidate[field];
 		else candidate[field] = value;
 	}
-	const { commit, item } = yield* saveEditorItemWithRepositoryFx({
+	const { commit, item } = yield* saveWithRepositoryFx({
 		expectedRevision: input.revision ?? project.revision,
 		item: candidate,
 		projectId: project.projectId,

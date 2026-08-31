@@ -4,7 +4,7 @@ import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
-import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
+import { DetailReference } from "~/item-authoring/ui/DetailReference";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
@@ -102,7 +102,7 @@ export const ItemEstimateRouteGraph = ({
 										{route.factId} [missing]
 									</span>
 								) : (
-									<EditorItemDetailReference
+									<DetailReference
 										item={item}
 										projectId={projectId}
 										sectionId="estimate"

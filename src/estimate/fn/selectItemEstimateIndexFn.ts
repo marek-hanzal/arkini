@@ -5,7 +5,7 @@ import type {
 	ItemEstimateIndexRow,
 } from "~/estimate/type/ItemEstimateIndex";
 import type { ItemEstimateSortSchema } from "~/estimate/schema/ItemEstimateSortSchema";
-import { searchEditorItemsFn } from "~/item-authoring/fn/searchEditorItemsFn";
+import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const compareRuntimeFn = (
@@ -38,7 +38,7 @@ export const selectItemEstimateIndexFn = ({
 			entry,
 		]),
 	);
-	return searchEditorItemsFn(items, query)
+	return searchFn(items, query)
 		.flatMap((item): ReadonlyArray<ItemEstimateIndexRow> => {
 			const estimate = estimates.get(item.id);
 			return estimate === undefined || (incomplete && estimate.status === "complete")

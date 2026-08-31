@@ -9,9 +9,9 @@ import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorItemFx";
+import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
-import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
+import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
@@ -253,7 +253,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							error("delete-item", `Item UID ${itemUid} does not exist.`),
 						);
 					const [itemId] = entry;
-					const blockers = readEditorItemDeleteBlockersFn({
+					const blockers = readDeleteBlockersFn({
 						config: state.project.config,
 						itemId,
 					});
@@ -265,7 +265,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							),
 						);
 					const config = force
-						? (yield* forceDeleteEditorItemFx({
+						? (yield* forceDeleteFx({
 								config: state.project.config,
 								itemId,
 							})).config

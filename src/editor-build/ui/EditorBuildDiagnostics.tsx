@@ -1,8 +1,8 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { readGameDiagnosticPresentationFn } from "~/game-config-diagnostic/fn/readGameDiagnosticPresentationFn";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
-import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
-import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorItemSectionForPathFn";
+import type { SectionId } from "~/item-authoring/type/Section";
+import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
 import { ButtonLink } from "~/ui/ui/Button";
@@ -14,7 +14,7 @@ type EditorDiagnosticTarget =
 	| {
 			readonly kind: "item";
 			readonly itemUid: string;
-			readonly sectionId: EditorItemSectionId;
+			readonly sectionId: SectionId;
 			readonly label: string;
 	  }
 	| {
@@ -75,9 +75,7 @@ const readDiagnosticItemIdsFn = (diagnostic: EditorGameDiagnostic): ReadonlyArra
 	}
 };
 
-const readOwnedItemSectionFn = (
-	diagnostic: EditorGameDiagnostic,
-): EditorItemSectionId | undefined => {
+const readOwnedItemSectionFn = (diagnostic: EditorGameDiagnostic): SectionId | undefined => {
 	switch (diagnostic.code) {
 		case "merge:invalid":
 			return "merges";
@@ -102,8 +100,7 @@ const readEditorGameDiagnosticTargetsFn = (
 	project: Pick<EditorProject, "config" | "resources">,
 ): ReadonlyArray<EditorDiagnosticTarget> => {
 	const itemSection =
-		readOwnedItemSectionFn(diagnostic) ??
-		readEditorItemSectionForPathFn(diagnostic.path.slice(2));
+		readOwnedItemSectionFn(diagnostic) ?? readSectionForPathFn(diagnostic.path.slice(2));
 	const itemTargets = [
 		...new Set(readDiagnosticItemIdsFn(diagnostic)),
 	].flatMap((itemId) => {

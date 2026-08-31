@@ -3,8 +3,8 @@ import { gzipSync } from "node:zlib";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { importArkpackFx } from "~/arkpack/renderer/importArkpackFx";
 import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
-import { encodeFx } from "~/arkpack/artifact/fx/encodeFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
+import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { createTestArkpack, testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 import {

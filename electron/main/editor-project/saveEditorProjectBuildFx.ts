@@ -7,7 +7,7 @@ import type { EditorProjectTransport } from "../../contract/editor/EditorProject
 import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 
 /** Saves the exact current local Editor build through one native file choice. */
 export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(

@@ -1,7 +1,7 @@
 import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect, FileSystem } from "effect";
 
-import { verifyArkpackProvenanceFx } from "~/arkpack/artifact/fx/verifyArkpackProvenanceFx";
+import { verifyArkpackProvenanceFx } from "~/arkpack-artifact/fx/verifyArkpackProvenanceFx";
 
 const runArkpackVerifyFx = Effect.fn("runArkpackVerifyFx")(function* (arkpackPath: string) {
 	const fileSystem = yield* FileSystem.FileSystem;

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { GameProjectJsonSchema } from "~/game-project-json-schema/schema/GameProjectJsonSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 /** Smallest signature-bearing PNG fixture needed by artifact packing. */
 export const png = new Uint8Array([

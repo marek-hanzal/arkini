@@ -3,8 +3,8 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
 import { Command } from "effect/unstable/cli";
 
-import { ArkpackCommand } from "~/arkpack/artifact/cli/ArkpackCommand";
-import { PackCommand } from "~/arkpack/artifact/cli/PackCommand";
+import { ArkpackCommand } from "~/arkpack-cli/command/ArkpackCommand";
+import { PackCommand } from "~/arkpack-cli/command/PackCommand";
 import { SchemaCommand } from "~/game-config-cli/command/SchemaCommand";
 import { ValidateCommand } from "~/game-config-cli/command/ValidateCommand";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";

@@ -71,7 +71,9 @@ src/game-config-resource  authored resource schemas, references, source discover
 src/game-config-source  portable source layout, schemas, discovery, parsing and project admission
 src/game-config-validation  completed-config semantic validation and provenance-aware diagnostics
 src/game-project-json-schema  canonical portable project JSON Schema generation and filesystem writer
-src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
+src/arkpack-artifact  package bytes, envelopes, compression, signing and provenance
+src/arkpack-cli  package build and offline provenance commands
+src/arkpack   renderer catalog/runtime and package UI pending their flat-domain slices
 src/editor-build  Build contract, renderer admission and Build presentation
 src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows
 src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls

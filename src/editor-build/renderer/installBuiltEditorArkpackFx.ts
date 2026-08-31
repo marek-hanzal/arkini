@@ -3,7 +3,7 @@ import { Effect, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";

@@ -1,4 +1,4 @@
-import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
+import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 

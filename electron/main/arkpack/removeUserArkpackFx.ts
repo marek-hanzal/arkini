@@ -2,7 +2,7 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { ElectronMainError } from "../ElectronMainError";
-import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 
 export namespace removeUserArkpackFx {

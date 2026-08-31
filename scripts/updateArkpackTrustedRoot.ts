@@ -2,7 +2,7 @@ import { TrustedRoot } from "@sigstore/protobuf-specs";
 import { getTrustedRoot } from "@sigstore/tuf";
 import { writeFile } from "node:fs/promises";
 
-const output = new URL("../src/arkpack/artifact/trusted-root.json", import.meta.url);
+const output = new URL("../src/arkpack-artifact/constant/trusted-root.json", import.meta.url);
 const trustedRoot = await getTrustedRoot({
 	force: true,
 });

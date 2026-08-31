@@ -5,9 +5,9 @@ import { Deferred, Effect, Fiber, FileSystem, Path, Ref } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 
-import { decodeFx } from "~/arkpack/artifact/fx/decodeFx";
-import { decodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/decodeArkpackEnvelopeFx";
-import { packDirectoryFx } from "~/arkpack/artifact/fx/packDirectoryFx";
+import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
+import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
+import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
 import { png, writeGameProjectFixtureFx } from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx game-project contract", () => {

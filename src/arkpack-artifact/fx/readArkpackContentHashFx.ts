@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackCryptoError } from "~/arkpack/artifact/error/ArkpackCryptoError";
+import { ArkpackCryptoError } from "~/arkpack-artifact/error/ArkpackCryptoError";
 import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
 
 /** Hashes only immutable gameplay bytes so proof nondeterminism cannot change save identity. */

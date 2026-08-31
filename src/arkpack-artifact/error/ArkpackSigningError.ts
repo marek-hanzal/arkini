@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
+import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
 
 /** The official signing workflow could not establish its requested provenance. */
 export class ArkpackSigningError extends Data.TaggedError("ArkpackSigningError")<{

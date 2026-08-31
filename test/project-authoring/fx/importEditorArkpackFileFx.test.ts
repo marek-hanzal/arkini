@@ -8,9 +8,9 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/project-authoring/service/EditorProjectRepository";
-import { encodeFx } from "~/arkpack/artifact/fx/encodeFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
-import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
+import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
+import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import {
 	createTestPngBytes,
 	installTestPngDecoder,

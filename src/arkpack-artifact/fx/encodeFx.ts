@@ -1,8 +1,8 @@
 import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 
-import { Magic } from "~/arkpack/artifact/Magic";
-import { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
+import { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 
 export const encodeFx = Effect.fn("encodeFx")(function* (payload: PayloadSchema.Type) {
 	return yield* Effect.sync(() => {

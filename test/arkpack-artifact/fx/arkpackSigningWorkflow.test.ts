@@ -5,9 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { packDirectoryFx } from "~/arkpack/artifact/fx/packDirectoryFx";
-import { decodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/decodeArkpackEnvelopeFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
+import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
+import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
+import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
 import { writeSigningGame } from "./arkpackSigningWorkflow.test/writeSigningGame";
 

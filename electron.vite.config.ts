@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "electron-vite";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFn } from "./electron/security/fn/createRendererDevelopmentContentSecurityPolicyFn";
-import { ArkpackDistributionChannelDefaults } from "./src/arkpack/artifact/ArkpackDistributionChannel";
+import { ArkpackDistributionChannelDefaults } from "./src/arkpack-artifact/constant/ArkpackDistributionChannel";
 
 const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),

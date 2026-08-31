@@ -5,9 +5,9 @@ import { toSignedEntity, toTrustMaterial, Verifier } from "@sigstore/verify";
 import { KeyObject, verify as verifyNodeSignature } from "node:crypto";
 import { Effect, Semaphore } from "effect";
 
-import { ArkpackDistributionChannel } from "~/arkpack/artifact/ArkpackDistributionChannel";
-import type { ArkpackProvenanceSchema } from "~/arkpack/artifact/schema/ArkpackProvenanceSchema";
-import trustedRootJson from "~/arkpack/artifact/trusted-root.json";
+import { ArkpackDistributionChannel } from "~/arkpack-artifact/constant/ArkpackDistributionChannel";
+import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
+import trustedRootJson from "~/arkpack-artifact/constant/trusted-root.json";
 import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
 
 export namespace verifyArkpackProvenanceFx {

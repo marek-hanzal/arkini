@@ -2,10 +2,10 @@ import type { LucideIcon } from "lucide-react";
 
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
-import { EditorOutputControl } from "~/production-line-authoring/ui/EditorOutputControl";
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
+import { OutputControl } from "~/production-authoring/ui/OutputControl";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 
-interface EditorOptionalOutputControlProps {
+interface OptionalOutputControlProps {
 	readonly addLabel: string;
 	readonly emptyDescription: string;
 	readonly emptyIcon: LucideIcon;
@@ -15,25 +15,25 @@ interface EditorOptionalOutputControlProps {
 }
 
 /** Adds, edits or removes one optional canonical output through the shared output editor. */
-export const EditorOptionalOutputControl = ({
+export const OptionalOutputControl = ({
 	addLabel,
 	emptyDescription,
 	emptyIcon,
 	emptyTitle,
 	onChange,
 	value,
-}: EditorOptionalOutputControlProps) =>
+}: OptionalOutputControlProps) =>
 	value === undefined ? (
 		<EditorCapabilityStatus
 			actionLabel={addLabel}
 			description={emptyDescription}
 			icon={emptyIcon}
-			onEnable={() => onChange(structuredClone(EditorProductionDraftDefaults.output))}
+			onEnable={() => onChange(structuredClone(DraftDefaults.output))}
 			title={emptyTitle}
 		/>
 	) : (
 		<div className="grid gap-3">
-			<EditorOutputControl
+			<OutputControl
 				value={value}
 				onChange={onChange}
 			/>

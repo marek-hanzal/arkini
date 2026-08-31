@@ -75,7 +75,7 @@ const query = {
 } satisfies QuerySchema.Type;
 
 /** Defaults cloned by production-line controls when adding nested contracts. */
-export const EditorProductionDraftDefaults = {
+export const DraftDefaults = {
 	inputs: {
 		simple: {
 			type: "simple",

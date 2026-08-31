@@ -1,12 +1,9 @@
 import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 
-import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
-import {
-	EditorQuantityControl,
-	EditorQuantityFields,
-} from "~/production-line-authoring/ui/EditorQuantityControl";
-import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";
+import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
+import { QuantityControl, QuantityFields } from "~/production-authoring/ui/QuantityControl";
+import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
@@ -17,11 +14,11 @@ import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutoco
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
-type EditorDropListValue = [
+type DropListValue = [
 	DropSchema.Type,
 	...DropSchema.Type[],
 ];
-type EditorWeightedRoll = Extract<
+type WeightedRoll = Extract<
 	RollSchema.Type,
 	{
 		readonly type: "weight";
@@ -32,7 +29,7 @@ const readChancePercent = (chance: number) => Number((chance * 100).toFixed(6));
 const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
-const EditorDropControl = ({
+const DropControl = ({
 	onChange,
 	value,
 }: {
@@ -52,7 +49,7 @@ const EditorDropControl = ({
 		/>
 		<div className="flex flex-wrap items-end justify-between gap-3">
 			<div className="min-w-0 basis-full sm:basis-1/2">
-				<EditorQuantityControl
+				<QuantityControl
 					value={value.quantity}
 					onChange={(quantity) =>
 						onChange({
@@ -87,7 +84,7 @@ const EditorDropControl = ({
 				}
 			/>
 		</div>
-		<EditorRulesControl
+		<RulesControl
 			rules={value.rules}
 			target="drop"
 			description="These rules belong only to this item drop. Every condition inside a rule must pass. Enable rules gate this drop and any matching disable rule vetoes it when the roll resolves."
@@ -105,12 +102,12 @@ const EditorDropControl = ({
 	</div>
 );
 
-const EditorDropList = ({
+const DropList = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (drops: EditorDropListValue | undefined) => void;
-	readonly value: EditorDropListValue;
+	readonly onChange: (drops: DropListValue | undefined) => void;
+	readonly value: DropListValue;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
@@ -128,7 +125,7 @@ const EditorDropList = ({
 				onAdd={() =>
 					onChange([
 						...value,
-						structuredClone(EditorProductionDraftDefaults.drop),
+						structuredClone(DraftDefaults.drop),
 					])
 				}
 				onRemove={(index) =>
@@ -137,19 +134,19 @@ const EditorDropList = ({
 						: onChange(
 								value.filter(
 									(_current, currentIndex) => currentIndex !== index,
-								) as EditorDropListValue,
+								) as DropListValue,
 							)
 				}
 				removeLabel="Remove drop"
 			>
 				{(index) => (
-					<EditorDropControl
+					<DropControl
 						value={value[index]}
 						onChange={(next) =>
 							onChange(
 								value.map((current, currentIndex) =>
 									currentIndex === index ? next : current,
-								) as EditorDropListValue,
+								) as DropListValue,
 							)
 						}
 					/>
@@ -194,12 +191,12 @@ const WeightedSelectionsHelp = () => (
 	</div>
 );
 
-const EditorWeightedRollControl = ({
+const WeightedRollControl = ({
 	onChange,
 	roll,
 }: {
 	readonly onChange: (roll: RollSchema.Type | undefined) => void;
-	readonly roll: EditorWeightedRoll;
+	readonly roll: WeightedRoll;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
@@ -227,7 +224,7 @@ const EditorWeightedRollControl = ({
 					</span>
 				</div>
 				<div className="grid gap-3 sm:grid-cols-2">
-					<EditorQuantityFields
+					<QuantityFields
 						minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
 						maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
 						value={roll.quantity}
@@ -261,7 +258,7 @@ const EditorWeightedRollControl = ({
 							{
 								weight: 1,
 								drop: [
-									structuredClone(EditorProductionDraftDefaults.drop),
+									structuredClone(DraftDefaults.drop),
 								],
 							},
 						],
@@ -310,7 +307,7 @@ const EditorWeightedRollControl = ({
 									})
 								}
 							/>
-							<EditorDropList
+							<DropList
 								value={candidate.drop}
 								onChange={(drop) =>
 									drop === undefined
@@ -336,7 +333,7 @@ const EditorWeightedRollControl = ({
 	);
 };
 
-const EditorRollControl = ({
+const RollControl = ({
 	onChange,
 	value,
 }: {
@@ -367,9 +364,7 @@ const EditorRollControl = ({
 					value: "weight",
 				},
 			]}
-			onChange={(type) =>
-				onChange(structuredClone(EditorProductionDraftDefaults.rolls[type]))
-			}
+			onChange={(type) => onChange(structuredClone(DraftDefaults.rolls[type]))}
 		/>
 		{match(value)
 			.with(
@@ -377,7 +372,7 @@ const EditorRollControl = ({
 					type: "guaranteed",
 				},
 				(roll) => (
-					<EditorDropList
+					<DropList
 						value={roll.drop}
 						onChange={(drop) =>
 							drop === undefined
@@ -410,7 +405,7 @@ const EditorRollControl = ({
 								})
 							}
 						/>
-						<EditorDropList
+						<DropList
 							value={roll.drop}
 							onChange={(drop) =>
 								drop === undefined
@@ -429,7 +424,7 @@ const EditorRollControl = ({
 					type: "weight",
 				},
 				(roll) => (
-					<EditorWeightedRollControl
+					<WeightedRollControl
 						roll={roll}
 						onChange={onChange}
 					/>
@@ -439,7 +434,7 @@ const EditorRollControl = ({
 	</div>
 );
 
-export const EditorRollSetControl = ({
+export const RollSetControl = ({
 	index,
 	onChange,
 	value,
@@ -484,7 +479,7 @@ export const EditorRollSetControl = ({
 						...value,
 						roll: [
 							...value.roll,
-							structuredClone(EditorProductionDraftDefaults.rolls.guaranteed),
+							structuredClone(DraftDefaults.rolls.guaranteed),
 						],
 					})
 				}
@@ -501,7 +496,7 @@ export const EditorRollSetControl = ({
 				removeLabel="Remove roll"
 			>
 				{(rollIndex) => (
-					<EditorRollControl
+					<RollControl
 						value={value.roll[rollIndex]}
 						onChange={(next) =>
 							next === undefined

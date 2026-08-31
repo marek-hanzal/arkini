@@ -5,8 +5,8 @@ import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { EditorLineInputsControl } from "~/production-line-authoring/ui/EditorLineInputsControl";
-import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";
+import { InputsControl } from "~/production-authoring/ui/InputsControl";
+import { RulesControl } from "~/production-authoring/ui/RulesControl";
 
 /** Authors one immediate Space action through the shared input and availability controls. */
 export const EditorSpaceActionSection = () => {
@@ -45,7 +45,7 @@ export const EditorSpaceActionSection = () => {
 			<EditorFormCard>
 				<form.Subscribe selector={(state) => state.values.rules ?? []}>
 					{(rules) => (
-						<EditorRulesControl
+						<RulesControl
 							allowedTypes={[
 								"enable",
 								"disable",
@@ -63,7 +63,7 @@ export const EditorSpaceActionSection = () => {
 			<EditorFormCard>
 				<form.Subscribe selector={(state) => state.values.input ?? []}>
 					{(input) => (
-						<EditorLineInputsControl
+						<InputsControl
 							allowMaterials={false}
 							emptyAllowed
 							value={input}

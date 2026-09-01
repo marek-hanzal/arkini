@@ -28,6 +28,36 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	}),
 }));
 
+vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", () => ({
+	useEditorItemSearchOptions: () => ({
+		items: {
+			"item:beta": {
+				id: "item:beta",
+				uid: "item-beta-uid",
+			},
+		},
+		options: [
+			{
+				id: "item:beta",
+				label: "Beta item",
+				meta: "Resource · item:beta",
+				terms: [
+					"item:beta",
+					"Beta item",
+					"Resource",
+				],
+			},
+		],
+	}),
+}));
+
+vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
+	EditorItemSearchThumbnail: () =>
+		createElement("span", {
+			"data-ui": "ItemThumbnailProbe",
+		}),
+}));
+
 (
 	globalThis as {
 		IS_REACT_ACT_ENVIRONMENT?: boolean;
@@ -134,6 +164,11 @@ const createTestRouter = ({
 		path: "editor/items/test/form/identity",
 		component: dirty ? DirtyDraft : () => createElement("p", null, "Item form"),
 	});
+	const itemDetailRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "editor/items/$itemUid/detail/$sectionId",
+		component: () => createElement("p", null, "Item detail"),
+	});
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			editorRoute.addChildren([
@@ -141,6 +176,7 @@ const createTestRouter = ({
 				route("build"),
 				route("project", projectLoader),
 				itemRoute,
+				itemDetailRoute,
 			]),
 		]),
 		history: createMemoryHistory({
@@ -195,6 +231,48 @@ const readActiveWorkspace = (container: HTMLElement) =>
 	container.querySelector('[data-ui="ActiveWorkspaceProbe"]')?.textContent;
 
 describe("EditorShell", () => {
+	it("opens the item Spotlight through Mod+Shift+K and navigates to the selected detail", async () => {
+		const router = createTestRouter({});
+		const { container } = await renderRouter(router);
+
+		await act(async () => {
+			document.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "k",
+					code: "KeyK",
+					ctrlKey: true,
+					shiftKey: true,
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		const search = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (search === null) throw new Error("Expected Editor item Spotlight search.");
+		expect(container.querySelector('[data-ui="EditorItemSpotlight"]')).not.toBeNull();
+		expect(document.activeElement).toBe(search);
+
+		await act(async () => {
+			search.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe(
+				"/editor/editor-test/editor/items/item-beta-uid/detail/identity",
+			),
+		);
+		expect(container.querySelector('[data-ui="EditorItemSpotlight"]')).toBeNull();
+	});
+
 	it("projects only the latest accepted destination during rapid navigation", async () => {
 		const project = gate();
 		const assets = gate();

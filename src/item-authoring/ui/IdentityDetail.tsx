@@ -4,41 +4,42 @@ import { Fact, FactList } from "~/ui/ui/FactList";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
-	<div>
-		<section className="pb-5">
-			<p className="max-w-4xl text-pretty text-base leading-relaxed text-muted">
-				{item.description || "No player-facing description."}
-			</p>
-		</section>
-		<section className="border-t border-line pt-2">
-			<FactList>
+	<div className="grid gap-x-8 gap-y-3 min-[64rem]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+		<FactList>
+			<Fact
+				label="Type"
+				value={ItemTypeLabel[item.type]}
+			/>
+			<Fact
+				label="Storage"
+				value={ItemStorageScopeLabel[item.scope]}
+			/>
+			<Fact
+				label="Stack capacity"
+				value={item.maxStackSize === 1 ? "Single item" : `${item.maxStackSize} items`}
+			/>
+			<Fact
+				label="Game limit"
+				value={item.maxCount === undefined ? "No configured limit" : item.maxCount}
+			/>
+			<Fact
+				label="Item ID"
+				mono
+				value={item.id}
+			/>
+			<Fact
+				label="UID"
+				mono
+				value={item.uid}
+			/>
+		</FactList>
+		<div className="self-start">
+			<FactList columns={1}>
 				<Fact
-					label="Type"
-					value={ItemTypeLabel[item.type]}
-				/>
-				<Fact
-					label="Storage"
-					value={ItemStorageScopeLabel[item.scope]}
-				/>
-				<Fact
-					label="Stack capacity"
-					value={item.maxStackSize === 1 ? "Single item" : `${item.maxStackSize} items`}
-				/>
-				<Fact
-					label="Game limit"
-					value={item.maxCount === undefined ? "No configured limit" : item.maxCount}
-				/>
-				<Fact
-					label="Item ID"
-					mono
-					value={item.id}
-				/>
-				<Fact
-					label="UID"
-					mono
-					value={item.uid}
+					label="Description"
+					value={item.description || "No player-facing description."}
 				/>
 			</FactList>
-		</section>
+		</div>
 	</div>
 );

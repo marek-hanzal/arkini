@@ -1,10 +1,12 @@
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorItemSpotlight } from "~/authoring-shell/ui/EditorItemSpotlight";
 import { EditorUnsavedChangesDialog } from "~/authoring-shell/ui/EditorUnsavedChangesDialog";
 import { EditorWorkspaceNavigation } from "~/authoring-shell/ui/EditorWorkspaceNavigation";
 import { useEditorActiveWorkspace } from "~/authoring-shell/ui/useEditorActiveWorkspace";
 import { useEditorNavigationBlocker } from "~/authoring-shell/ui/useEditorNavigationBlocker";
+import { useEditorItemSpotlightController } from "~/authoring-shell/ui/useEditorItemSpotlightController";
 import { useEditorShellCommands } from "~/authoring-shell/ui/useEditorShellCommands";
 import { useEditorWorkspaceShortcuts } from "~/authoring-shell/ui/useEditorWorkspaceShortcuts";
 import { useEditorWorkspaceTransition } from "~/authoring-shell/ui/useEditorWorkspaceTransition";
@@ -20,9 +22,14 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 	const transition = useEditorWorkspaceTransition({
 		projectId: project.projectId,
 	});
+	const shortcutsEnabled =
+		!commands.exit.pending && !commands.refresh.pending && !navigationBlocker.promptOpen;
+	const itemSpotlight = useEditorItemSpotlightController({
+		enabled: shortcutsEnabled,
+		projectId: project.projectId,
+	});
 	useEditorWorkspaceShortcuts({
-		enabled:
-			!commands.exit.pending && !commands.refresh.pending && !navigationBlocker.promptOpen,
+		enabled: shortcutsEnabled && !itemSpotlight.open,
 		projectId: project.projectId,
 	});
 
@@ -55,6 +62,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 			>
 				{children}
 			</main>
+			{itemSpotlight.open ? <EditorItemSpotlight {...itemSpotlight} /> : null}
 			<EditorUnsavedChangesDialog />
 		</div>
 	);

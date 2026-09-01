@@ -22,7 +22,7 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 		<div className="grid gap-6">
 			<EditorRootCard dataUi="EditorProjectBoardSizeDetailCard">
 				<DetailSection title="Board size">
-					<DetailFacts>
+					<DetailFacts columns={3}>
 						<DetailFact
 							label="Width"
 							value={board.width}
@@ -30,6 +30,10 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 						<DetailFact
 							label="Height"
 							value={board.height}
+						/>
+						<DetailFact
+							label="Capacity"
+							value={board.width * board.height}
 						/>
 					</DetailFacts>
 				</DetailSection>

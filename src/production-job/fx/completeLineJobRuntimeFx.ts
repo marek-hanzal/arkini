@@ -40,9 +40,13 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	const events: GameEventSchema.Type[] = [];
 
 	if (depleted) {
+		const withoutDepletedOwnerQueue = {
+			...draft,
+			jobQueue: draft.jobQueue.filter((request) => request.ownerItemId !== context.owner.id),
+		};
 		draft = yield* removeRuntimeItemIdentityFx({
 			item: context.owner,
-			runtime: draft,
+			runtime: withoutDepletedOwnerQueue,
 		});
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDepleted,

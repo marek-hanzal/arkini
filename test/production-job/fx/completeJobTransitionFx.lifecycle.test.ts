@@ -5,6 +5,7 @@ import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -155,6 +156,32 @@ const lifecycleConfig = GameConfigSchema.parse({
 				},
 			],
 		},
+		"producer:finite-queue": {
+			...base("producer:finite-queue"),
+			type: "producer",
+			charges: {
+				amount: 2,
+			},
+			maxQueueSize: 3,
+			lines: [
+				{
+					id: "line:finite-queue:work",
+					title: "Finite queue work",
+					description: "Runs only while the owner has charges.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+							charges: {
+								from: "self",
+								cost: 1,
+							},
+						},
+					],
+					rules: [],
+				},
+			],
+		},
 		"blueprint:empty": {
 			...base("blueprint:empty"),
 			type: "blueprint",
@@ -220,6 +247,65 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 	);
 
 describe("job completion charge lifecycle", () => {
+	it("removes a depleted producer and its remaining queue", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:finite-queue",
+					itemId: "producer:finite-queue",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const blockedOwner = yield* spawnItemFx({
+					id: "runtime:blocked-trader",
+					itemId: "producer:trader",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 2,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				for (let index = 0; index < 3; index += 1) {
+					yield* enqueueLineFx({
+						ownerItemId: owner.id,
+						lineId: "line:finite-queue:work",
+					});
+				}
+				const blockedRequest = yield* enqueueLineFx({
+					ownerItemId: blockedOwner.id,
+					lineId: "line:trader:trade",
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 400,
+				});
+				return {
+					blockedOwner,
+					blockedRequest,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+		);
+
+		expect(result.runtime.items.map((item) => item.id)).toEqual([
+			result.blockedOwner.id,
+		]);
+		expect(result.runtime.jobs).toEqual([]);
+		expect(result.runtime.jobQueue).toEqual([
+			result.blockedRequest,
+		]);
+	});
+
 	it("removes a depleted producer and releases buffered input after placing output", () => {
 		const runtime = run(
 			Effect.gen(function* () {

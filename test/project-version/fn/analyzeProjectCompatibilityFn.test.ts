@@ -119,6 +119,43 @@ describe("analyzeProjectCompatibilityFn", () => {
 		});
 	});
 
+	it("classifies default item artwork changes as minor", () => {
+		const water = editorTestConfig.items.water;
+		if (water === undefined) throw new Error("Missing water fixture.");
+		const next = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				...editorTestConfig.items,
+				water: {
+					...water,
+					asset: {
+						...water.asset,
+						default: [
+							"item-water-new",
+						],
+					},
+				},
+			},
+		});
+
+		expect(analyze(editorTestConfig, next)).toMatchObject({
+			result: "minor",
+			context: [
+				{
+					path: [
+						"items",
+						"water",
+						"asset",
+						"default",
+						0,
+					],
+					result: "minor",
+					rule: "item-default-artwork",
+				},
+			],
+		});
+	});
+
 	it("keeps Temporary lifetime changes minor in either direction", () => {
 		const temporary = TemporarySchema.parse({
 			...createSimpleItem("temporary"),

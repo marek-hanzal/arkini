@@ -9,7 +9,7 @@ export const ProjectInventoryDetail = ({ project }: { readonly project: Project 
 		<div className="grid gap-6">
 			<EditorRootCard dataUi="EditorProjectInventorySizeDetailCard">
 				<DetailSection title="Inventory size">
-					<DetailFacts>
+					<DetailFacts columns={3}>
 						<DetailFact
 							label="Width"
 							value={inventory.width}
@@ -17,6 +17,10 @@ export const ProjectInventoryDetail = ({ project }: { readonly project: Project 
 						<DetailFact
 							label="Height"
 							value={inventory.height}
+						/>
+						<DetailFact
+							label="Capacity"
+							value={inventory.width * inventory.height}
 						/>
 					</DetailFacts>
 				</DetailSection>

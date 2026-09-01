@@ -4,6 +4,7 @@ export type ProjectCompatibilityPath = ReadonlyArray<string | number>;
 export type ProjectCompatibilityRule =
 	| "about-avatar"
 	| "game-title"
+	| "item-default-artwork"
 	| "item-title"
 	| "item-description"
 	| "line-title"

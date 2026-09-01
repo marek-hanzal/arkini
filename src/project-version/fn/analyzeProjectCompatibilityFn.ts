@@ -313,7 +313,12 @@ interface CompatibilityDecision {
 }
 
 const AnyStringPathSegment: unique symbol = Symbol("AnyStringPathSegment");
-type PathPatternSegment = string | number | typeof AnyStringPathSegment;
+const AnyNumberPathSegment: unique symbol = Symbol("AnyNumberPathSegment");
+type PathPatternSegment =
+	| string
+	| number
+	| typeof AnyNumberPathSegment
+	| typeof AnyStringPathSegment;
 
 interface MinorPathRule {
 	readonly message: string;
@@ -369,6 +374,17 @@ const minorPathRules: ReadonlyArray<MinorPathRule> = [
 		rule: "item-description",
 	},
 	{
+		message: "Default item artwork changes are explicitly minor-compatible.",
+		path: [
+			"items",
+			AnyStringPathSegment,
+			"asset",
+			"default",
+			AnyNumberPathSegment,
+		],
+		rule: "item-default-artwork",
+	},
+	{
 		message: "Line title changes are explicitly minor-compatible.",
 		path: [
 			"items",
@@ -410,9 +426,9 @@ const matchesPathFn = (
 	path.length === pattern.length &&
 	path.every((segment, index) => {
 		const expected = pattern[index];
-		return expected === AnyStringPathSegment
-			? typeof segment === "string"
-			: segment === expected;
+		if (expected === AnyStringPathSegment) return typeof segment === "string";
+		if (expected === AnyNumberPathSegment) return typeof segment === "number";
+		return segment === expected;
 	});
 
 const readChangedValuesFn = (

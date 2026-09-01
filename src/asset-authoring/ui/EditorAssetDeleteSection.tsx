@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
+import { ChevronRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
@@ -7,6 +7,7 @@ import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 
 const EditorAssetDeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (
@@ -105,7 +106,7 @@ const EditorAssetDeleteBlockerLink = ({
 						projectId: project.projectId,
 						sectionId: "artwork",
 					}}
-					className="grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border border-line bg-surface/70 p-4 text-left shadow-none"
+					className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
 				>
 					<EditorItemThumbnail
 						resourceIds={owner.asset.default}
@@ -119,7 +120,7 @@ const EditorAssetDeleteBlockerLink = ({
 							{blocker.roleLabel}
 						</span>
 					</span>
-					<ArrowRight className="size-4 text-muted" />
+					<ChevronRight className="size-5 text-subtle" />
 				</ButtonLink>
 			);
 	}
@@ -146,7 +147,7 @@ const EditorAssetDeleteBlockerLink = ({
 							avatar: avatarIndex,
 						}
 			}
-			className="grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border border-line bg-surface/70 p-4 text-left shadow-none"
+			className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
 		>
 			<span className="min-w-0">
 				<span className="block truncate text-sm font-semibold">Project · General</span>
@@ -154,7 +155,7 @@ const EditorAssetDeleteBlockerLink = ({
 					{blocker.roleLabel}
 				</span>
 			</span>
-			<ArrowRight className="size-4 text-muted" />
+			<ChevronRight className="size-5 text-subtle" />
 		</ButtonLink>
 	);
 };
@@ -177,35 +178,47 @@ export const EditorAssetDeleteSection = ({
 	return (
 		<>
 			<section
-				className="grid gap-5"
+				className="grid gap-3"
 				data-ui="EditorAssetDeleteSection"
 			>
-				<div className="flex items-start gap-3">
-					<StateIcon
-						className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
-						{...readDataUiFn({
-							dataUi: "EditorAssetDeleteStateIcon",
-							state: {
-								blocked,
-							},
-						})}
-					/>
-					<div>
-						<h2 className="text-lg font-semibold">
-							{blocked
-								? "This asset cannot be deleted yet"
-								: "This asset can be deleted"}
-						</h2>
-						<p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
-							{blocked
-								? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
-								: "No saved project or item currently references this asset."}
-						</p>
+				<EditorRootCard dataUi="EditorAssetDeleteStateCard">
+					<div className="flex items-start gap-3">
+						<StateIcon
+							className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
+							{...readDataUiFn({
+								dataUi: "EditorAssetDeleteStateIcon",
+								state: {
+									blocked,
+								},
+							})}
+						/>
+						<div>
+							<h2 className="text-lg font-semibold">
+								{blocked
+									? "This asset cannot be deleted yet"
+									: "This asset can be deleted"}
+							</h2>
+							<p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
+								{blocked
+									? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
+									: "No saved project or item currently references this asset."}
+							</p>
+						</div>
 					</div>
-				</div>
+					{blocked ? null : (
+						<div>
+							<DangerButton
+								data-ui="EditorAssetDeleteOpen"
+								onClick={controller.openFn}
+							>
+								Delete asset
+							</DangerButton>
+						</div>
+					)}
+				</EditorRootCard>
 
 				{blocked ? (
-					<div className="grid gap-2">
+					<div className="ak-list grid gap-2">
 						{controller.blockers.map((blocker) => (
 							<EditorAssetDeleteBlockerLink
 								blocker={blocker}
@@ -214,16 +227,7 @@ export const EditorAssetDeleteSection = ({
 							/>
 						))}
 					</div>
-				) : (
-					<div>
-						<DangerButton
-							data-ui="EditorAssetDeleteOpen"
-							onClick={controller.openFn}
-						>
-							Delete asset
-						</DangerButton>
-					</div>
-				)}
+				) : null}
 			</section>
 			{controller.confirming ? (
 				<EditorAssetDeleteDialog

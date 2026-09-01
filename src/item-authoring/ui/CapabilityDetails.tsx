@@ -3,6 +3,7 @@ import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
@@ -54,29 +55,32 @@ const DisabledCapabilityDetail = ({
 /** Presents the optional charge capability or its explicit disabled state. */
 export const ChargesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 	item.charges === undefined ? (
-		<DisabledCapabilityDetail
-			actionLabel="Enable charges"
-			capability="charges"
-			description="Charges give this item a finite number of uses. Spending the last charge depletes it and may emit a configured output."
-			icon={BatteryCharging}
-			itemUid={item.uid}
-			title="Charges are disabled"
-		/>
+		<EditorRootCard dataUi="EditorItemChargesDisabledCard">
+			<DisabledCapabilityDetail
+				actionLabel="Enable charges"
+				capability="charges"
+				description="Charges give this item a finite number of uses. Spending the last charge depletes it and may emit a configured output."
+				icon={BatteryCharging}
+				itemUid={item.uid}
+				title="Charges are disabled"
+			/>
+		</EditorRootCard>
 	) : (
-		<DetailSection title="Charges">
-			<div className="grid gap-5">
-				<DetailFact
-					label="Initial charges"
-					value={item.charges.amount}
-				/>
-				<div>
-					<h3 className="text-sm font-semibold">Depletion output</h3>
-					<div className="mt-2 border-t border-line pt-3">
-						<OutputDetail output={item.charges.output} />
-					</div>
-				</div>
-			</div>
-		</DetailSection>
+		<div className="grid gap-3">
+			<EditorRootCard dataUi="EditorItemChargesCard">
+				<DetailSection title="Charges">
+					<DetailFact
+						label="Initial charges"
+						value={item.charges.amount}
+					/>
+				</DetailSection>
+			</EditorRootCard>
+			<EditorRootCard dataUi="EditorItemDepletionOutputCard">
+				<DetailSection title="Depletion output">
+					<OutputDetail output={item.charges.output} />
+				</DetailSection>
+			</EditorRootCard>
+		</div>
 	);
 
 const MergeDetail = ({

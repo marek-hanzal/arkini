@@ -127,7 +127,7 @@ export const Detail = ({
 				/>
 			}
 		>
-			{sectionId === "estimate" || sectionId === "production" ? (
+			{sectionId === "charges" || sectionId === "estimate" || sectionId === "production" ? (
 				children
 			) : (
 				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>

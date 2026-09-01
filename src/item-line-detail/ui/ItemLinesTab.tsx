@@ -10,8 +10,8 @@ import {
 import { ItemLineRow } from "~/item-line-detail/ui/ItemLineRow";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Scrollable } from "~/ui/ui/Scrollable";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 const autoFocusPadding = 12;
 const autoFocusLayoutAttempts = 24;
@@ -209,35 +209,18 @@ export const ItemLinesTab = ({
 							className="shrink-0"
 							{...itemDetailFadeMotion}
 						>
-							<div
-								className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-surface-raised/65 p-1"
-								data-ui="ItemLinesAvailabilityFilter"
-							>
-								{availabilityOptions.map((option) => {
-									const selected = availabilityFilter === option.value;
-									const optionDisabled =
-										option.value === "available" && availableLineCount === 0;
-									return (
-										<button
-											key={option.value}
-											className="ak-segmented-option relative cursor-pointer rounded-md px-3 py-1.5 text-center text-xs font-semibold"
-											disabled={optionDisabled}
-											onClick={() => setAvailabilityFilterFn(option.value)}
-											type="button"
-											{...readDataUiFn({
-												dataUi: "ItemLinesAvailabilityOption",
-												state: {
-													disabled: optionDisabled,
-													selected,
-													value: option.value,
-												},
-											})}
-										>
-											{option.label}
-										</button>
-									);
-								})}
-							</div>
+							<SegmentedControl
+								dataUi="ItemLinesAvailabilityFilter"
+								onChangeFn={setAvailabilityFilterFn}
+								optionDataUi="ItemLinesAvailabilityOption"
+								options={availabilityOptions.map((option) => ({
+									...option,
+									disabled:
+										option.value === "available" && availableLineCount === 0,
+								}))}
+								size="compact"
+								value={availabilityFilter}
+							/>
 						</motion.div>
 					)}
 				</AnimatePresence>

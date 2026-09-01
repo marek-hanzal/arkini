@@ -1,12 +1,10 @@
-import { Info } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorDurationHint } from "~/editor-control/ui/EditorDurationHint";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
-import { Tooltip } from "~/ui/ui/Tooltip";
-import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 interface EditorValueControlProps {
 	readonly description?: ReactNode;
@@ -251,39 +249,14 @@ export const EditorChoiceControl = <Value extends string>({
 				label={label}
 			/>
 		</legend>
-		<div className="flex min-w-0 flex-wrap gap-2">
-			{options.map((option) => {
-				const button = (
-					<button
-						key={option.value}
-						type="button"
-						className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${compact ? "min-h-9" : "min-h-[var(--ak-control-min-height)]"} ${selectableClassName}`}
-						onClick={() => onChangeFn(option.value)}
-						{...readDataUiFn({
-							dataUi: "EditorChoiceControlOption",
-							state: {
-								selected: option.value === value,
-							},
-						})}
-					>
-						{option.label}
-						{option.description === undefined ? null : (
-							<Info className="size-3.5 opacity-70" />
-						)}
-					</button>
-				);
-				return option.description === undefined ? (
-					button
-				) : (
-					<Tooltip
-						content={option.description}
-						key={option.value}
-					>
-						{button}
-					</Tooltip>
-				);
-			})}
-		</div>
+		<SegmentedControl
+			dataUi="EditorChoiceControlOptions"
+			onChangeFn={onChangeFn}
+			optionDataUi="EditorChoiceControlOption"
+			options={options}
+			size={compact ? "compact" : "default"}
+			value={value}
+		/>
 		{error === undefined ? null : (
 			<span className="text-xs leading-5 text-danger">{error}</span>
 		)}

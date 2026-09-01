@@ -15,10 +15,9 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import type { Project } from "~/project-authoring/type/Project";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { Status } from "~/ui/ui/Status";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
@@ -96,11 +95,11 @@ const EditorAssetImportMenu = ({
 	return (
 		<>
 			<div
-				className="inline-flex h-12 min-h-12 shrink-0 overflow-hidden rounded-lg shadow-lg"
+				className="inline-flex h-12 min-h-0 shrink-0 overflow-hidden rounded-lg shadow-lg"
 				data-ui="EditorAssetImportControl"
 			>
 				<PrimaryButton
-					className="h-full min-h-0 gap-2 rounded-r-none px-4 shadow-none"
+					className="h-12 min-h-0 gap-2 rounded-r-none px-4 py-0 shadow-none"
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetImport"
 					disabled={pending}
@@ -111,7 +110,7 @@ const EditorAssetImportMenu = ({
 				</PrimaryButton>
 				<PrimaryButton
 					ref={refs.setReference}
-					className="h-full min-h-0 rounded-l-none border-l border-accent-contrast/25 px-3 shadow-none"
+					className="size-12 min-h-0 min-w-0 rounded-l-none border-l border-accent-contrast/25 p-0 shadow-none"
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetImportMenuTrigger"
 					disabled={pending}
@@ -295,28 +294,14 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					placeholder="Search assets…"
 					onChange={(event) => props.onQueryChangeFn(event.currentTarget.value)}
 				/>
-				<div
-					className="inline-flex h-12 min-h-12 rounded-lg border border-line bg-surface p-1"
-					data-ui="EditorAssetFilters"
-				>
-					{assetFilters.map((option) => (
-						<button
-							key={option.value}
-							type="button"
-							className={`h-full min-h-0 cursor-pointer rounded-md border px-3 py-0 text-sm font-semibold ${selectableClassName}`}
-							data-filter={option.value}
-							onClick={() => props.onFilterChangeFn(option.value)}
-							{...readDataUiFn({
-								dataUi: "EditorAssetFilter",
-								state: {
-									selected: option.value === props.filter,
-								},
-							})}
-						>
-							{option.label}
-						</button>
-					))}
-				</div>
+				<SegmentedControl
+					dataUi="EditorAssetFilters"
+					onChangeFn={props.onFilterChangeFn}
+					optionDataUi="EditorAssetFilter"
+					options={assetFilters}
+					size="large"
+					value={props.filter}
+				/>
 				{controller.catalogState === "empty" ? null : importButton}
 			</header>
 			<div className="px-3 pt-3 pb-3">

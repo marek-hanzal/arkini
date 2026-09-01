@@ -2,12 +2,17 @@ import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/Rule
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { DetailFact, DetailFacts, EmptyDetail } from "~/item-authoring/ui/DetailDefinition";
+import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
+
+type ItemRegistry = Record<string, ItemSchema.Type>;
 
 const formatQuantityFn = (quantity: QuantitySchema.Type) =>
 	quantity.min === quantity.max ? String(quantity.min) : `${quantity.min}–${quantity.max}`;
@@ -69,33 +74,61 @@ const RulesDetail = ({
 		</ul>
 	);
 
-const DropDetail = ({ drop }: { readonly drop: DropSchema.Type }) => (
-	<li className="py-3 first:pt-0 last:pb-0">
-		<DetailFacts>
-			<DetailFact
-				label="Item"
-				mono
-				value={drop.itemId}
-			/>
-			<DetailFact
-				label="Quantity"
-				value={formatQuantityFn(drop.quantity)}
-			/>
-			<DetailFact
-				label="Placement"
-				value={drop.placement}
-			/>
-		</DetailFacts>
-		{drop.rules.length === 0 ? null : (
-			<div className="mt-3">
-				<p className="text-xs uppercase tracking-wider text-subtle">Rules</p>
-				<RulesDetail rules={drop.rules} />
-			</div>
-		)}
-	</li>
-);
+const DropDetail = ({
+	drop,
+	items,
+	projectId,
+}: {
+	readonly drop: DropSchema.Type;
+	readonly items: ItemRegistry;
+	readonly projectId: string;
+}) => {
+	const item = items[drop.itemId];
+	return (
+		<li className="py-3 first:pt-0 last:pb-0">
+			<DetailFacts>
+				<DetailFact
+					label="Item"
+					mono={item === undefined}
+					value={
+						item === undefined ? (
+							drop.itemId
+						) : (
+							<DetailReference
+								item={item}
+								projectId={projectId}
+							/>
+						)
+					}
+				/>
+				<DetailFact
+					label="Quantity"
+					value={formatQuantityFn(drop.quantity)}
+				/>
+				<DetailFact
+					label="Placement"
+					value={drop.placement}
+				/>
+			</DetailFacts>
+			{drop.rules.length === 0 ? null : (
+				<div className="mt-3">
+					<p className="text-xs uppercase tracking-wider text-subtle">Rules</p>
+					<RulesDetail rules={drop.rules} />
+				</div>
+			)}
+		</li>
+	);
+};
 
-const RollDetail = ({ roll }: { readonly roll: RollSchema.Type }) => {
+const RollDetail = ({
+	items,
+	projectId,
+	roll,
+}: {
+	readonly items: ItemRegistry;
+	readonly projectId: string;
+	readonly roll: RollSchema.Type;
+}) => {
 	if (roll.type === "weight")
 		return (
 			<li className="grid gap-3 py-3 first:pt-0 last:pb-0">
@@ -113,7 +146,9 @@ const RollDetail = ({ roll }: { readonly roll: RollSchema.Type }) => {
 								{candidate.drop.map((drop, dropIndex) => (
 									<DropDetail
 										drop={drop}
+										items={items}
 										key={`${drop.itemId}-${dropIndex}`}
+										projectId={projectId}
 									/>
 								))}
 							</ul>
@@ -132,7 +167,9 @@ const RollDetail = ({ roll }: { readonly roll: RollSchema.Type }) => {
 				{roll.drop.map((drop, index) => (
 					<DropDetail
 						drop={drop}
+						items={items}
 						key={`${drop.itemId}-${index}`}
+						projectId={projectId}
 					/>
 				))}
 			</ul>
@@ -141,8 +178,9 @@ const RollDetail = ({ roll }: { readonly roll: RollSchema.Type }) => {
 };
 
 /** Presents authored output sets, rolls, drops, and conditional rules. */
-export const OutputDetail = ({ output }: { readonly output?: OutputSchema.Type }) =>
-	output === undefined ? (
+export const OutputDetail = ({ output }: { readonly output?: OutputSchema.Type }) => {
+	const project = useEditorProject();
+	return output === undefined ? (
 		<EmptyDetail>No output.</EmptyDetail>
 	) : (
 		<div className="divide-y divide-line/60">
@@ -157,7 +195,9 @@ export const OutputDetail = ({ output }: { readonly output?: OutputSchema.Type }
 					<ul className="mt-2 divide-y divide-line/60">
 						{set.roll.map((roll, rollIndex) => (
 							<RollDetail
+								items={project.config.items}
 								key={`${roll.type}-${rollIndex}`}
+								projectId={project.projectId}
 								roll={roll}
 							/>
 						))}
@@ -166,3 +206,4 @@ export const OutputDetail = ({ output }: { readonly output?: OutputSchema.Type }
 			))}
 		</div>
 	);
+};

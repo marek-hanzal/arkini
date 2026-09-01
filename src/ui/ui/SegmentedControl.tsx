@@ -26,7 +26,13 @@ interface SegmentedControlProps<Value extends string> {
 const SegmentedControlSizeClassName = {
 	compact: "min-h-9 px-3 py-1.5 text-xs",
 	default: "min-h-[var(--ak-control-min-height)] px-3 py-2 text-sm",
-	large: "h-12 min-h-12 px-4 py-0 text-sm",
+	large: "h-full min-h-0 px-4 py-0 text-sm",
+} as const;
+
+const SegmentedControlFrameSizeClassName = {
+	compact: "",
+	default: "",
+	large: "h-12 min-h-12",
 } as const;
 
 /** Renders one canonical mutually exclusive control with input-aligned framing. */
@@ -42,7 +48,7 @@ export const SegmentedControl = <Value extends string>({
 	value,
 }: SegmentedControlProps<Value>) => (
 	<div
-		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex max-w-full"} min-w-0 overflow-x-auto rounded-lg border border-line-strong bg-canvas/70 p-1`}
+		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex w-fit max-w-full self-start"} ${SegmentedControlFrameSizeClassName[size]} min-w-0 overflow-x-auto rounded-lg border border-line-strong bg-canvas/70 p-1`}
 		{...readDataUiFn({
 			dataUi,
 			state: {

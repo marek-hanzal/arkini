@@ -180,6 +180,7 @@
 	.ak-segmented-option:not([data-ui-pending="true"]):not([data-ui-disabled="true"]):not(
 		[data-ui-selected="true"]
 	):hover {
+		z-index: 2;
 		color: var(--ak-secondary-foreground);
 		background-color: var(--ak-secondary-hover);
 		border-color: var(--ak-secondary-border);
@@ -188,6 +189,7 @@
 	.ak-segmented-option[data-ui-selected="true"]:not([data-ui-pending="true"]):not(
 		[data-ui-disabled="true"]
 	):hover {
+		z-index: 2;
 		background-color: var(--ak-secondary-selected);
 	}
 }

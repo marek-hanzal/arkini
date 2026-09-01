@@ -27,11 +27,13 @@ export const ArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
 				</ol>
 			</div>
 		</DetailSection>
-		<DetailSection title="Progress artwork">
-			<ArtworkTimeline
-				asset={item.asset}
-				linkAssets
-			/>
-		</DetailSection>
+		{(item.asset.sources?.length ?? 0) > 0 ? (
+			<DetailSection title="Progress artwork">
+				<ArtworkTimeline
+					asset={item.asset}
+					linkAssets
+				/>
+			</DetailSection>
+		) : null}
 	</div>
 );

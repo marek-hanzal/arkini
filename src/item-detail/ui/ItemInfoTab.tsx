@@ -84,49 +84,52 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 	const translator = useTranslator();
 	const fact = [
 		{
-			label: "Type",
+			label: translator.textFn("Type"),
 			value: translator.textFn(`Item type - ${detail.itemType}`),
 		},
 		...(detail.location === undefined
 			? []
 			: [
 					{
-						label: "Location",
+						label: translator.textFn("Location"),
 						value: readLocationLabelFn(detail.location),
 					},
 				]),
 		{
-			label: "Storage",
+			label: translator.textFn("Storage"),
 			value: translator.textFn(`Item storage scope - ${detail.storageScope}`),
 		},
 		...(detail.currentStack === undefined
 			? []
 			: [
 					{
-						label: "Current stack",
+						label: translator.textFn("Current stack"),
 						value: `${detail.currentStack} ${detail.currentStack === 1 ? "item" : "items"}`,
 					},
 				]),
 		{
-			label: "Stack capacity",
+			label: translator.textFn("Stack capacity"),
 			value: readStackCapacityLabelFn(detail.maxStackSize),
 		},
 		...(detail.ownedQuantity === undefined
 			? []
 			: [
 					{
-						label: "Owned",
+						label: translator.textFn("Owned"),
 						value: readOwnedLabelFn(detail.ownedQuantity, detail.maxCount),
 					},
 				]),
 		{
-			label: "Game limit",
+			label: translator.textFn("Game limit"),
 			value: readGameLimitLabelFn(detail.maxCount),
 		},
 		...(detail.charges === undefined
 			? []
 			: [
-					detail.charges,
+					{
+						...detail.charges,
+						label: translator.textFn(detail.charges.label),
+					},
 				]),
 	];
 	return (

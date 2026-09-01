@@ -1,6 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import ViteYaml from "@modyfi/vite-plugin-yaml";
 import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -96,6 +97,7 @@ export default defineConfig(({ command }) => {
 				alias: sourceAlias,
 			},
 			plugins: [
+				ViteYaml(),
 				tanstackRouter({
 					target: "react",
 					routesDirectory: "./src/@routes",

@@ -1,4 +1,4 @@
-import type { TranslationSchema } from "~/translation/schema/TranslationSchema";
+import type { TranslationListSchema } from "~/translation/schema/TranslationListSchema";
 
 export namespace createTranslatorFn {
 	export interface Value {
@@ -7,13 +7,12 @@ export namespace createTranslatorFn {
 	}
 
 	export interface Translator {
-		listFn(): readonly TranslationSchema.Type[];
 		textFn(key: string, fallback?: string): string;
 		valueFn(key: string, fallback?: string): Value;
 	}
 
 	export interface Props {
-		readonly translations: readonly TranslationSchema.Type[];
+		readonly translations: TranslationListSchema.Type;
 	}
 }
 
@@ -21,24 +20,17 @@ export namespace createTranslatorFn {
 export const createTranslatorFn = ({
 	translations,
 }: createTranslatorFn.Props): createTranslatorFn.Translator => {
-	const entries = Object.freeze(
-		translations.map((translation) =>
-			Object.freeze({
-				...translation,
-			}),
-		),
-	);
 	const index = new Map(
-		entries.map((translation) => [
-			translation.key,
-			translation,
+		Object.entries(translations).map(([key, translation]) => [
+			key,
+			translation.value,
 		]),
 	);
 	const valueFn = (key: string, fallback?: string): createTranslatorFn.Value => {
 		const translation = index.get(key);
 		if (translation !== undefined) {
 			return {
-				text: translation.value,
+				text: translation,
 				type: "translation",
 			};
 		}
@@ -54,7 +46,6 @@ export const createTranslatorFn = ({
 		};
 	};
 	return Object.freeze({
-		listFn: () => entries,
 		valueFn,
 		textFn(key: string, fallback?: string) {
 			return valueFn(key, fallback).text;

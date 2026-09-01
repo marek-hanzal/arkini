@@ -53,6 +53,10 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniElectronApi.channels.localizationPreferredLanguagesRead,
+		[],
+	],
+	[
 		ArkiniElectronApi.channels.windowModeRead,
 		[],
 	],

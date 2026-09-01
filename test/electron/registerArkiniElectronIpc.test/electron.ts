@@ -8,6 +8,12 @@ const electronHarness = vi.hoisted(() => {
 	const requestWindowMode = vi.fn();
 	const openPath = vi.fn(() => Promise.resolve(""));
 	const writeClipboardText = vi.fn();
+	const preferredSystemLanguages = {
+		value: [
+			"cs-CZ",
+			"en-GB",
+		] as ReadonlyArray<string>,
+	};
 	const browserWindow = {
 		once: vi.fn(),
 	};
@@ -31,12 +37,14 @@ const electronHarness = vi.hoisted(() => {
 		nativeTheme,
 		nativeThemeListeners,
 		openPath,
+		preferredSystemLanguages,
 		requestWindowMode,
 		setBackgroundColor,
 		userDataPath,
 		writeClipboardText,
 		module: {
 			app: {
+				getPreferredSystemLanguages: () => preferredSystemLanguages.value,
 				getPath: () => userDataPath.value,
 				once: (event: string, listener: () => void) => {
 					appListeners.set(event, listener);

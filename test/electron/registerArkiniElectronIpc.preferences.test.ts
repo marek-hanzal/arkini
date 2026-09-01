@@ -66,5 +66,16 @@ describe("registerArkiniElectronIpcFx preferences", () => {
 		await expect(
 			harness.invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead, event),
 		).resolves.toBe("package:last");
+
+		harness.preferredSystemLanguages.value = [
+			"sk-SK",
+			"en-US",
+		];
+		await expect(
+			harness.invoke(ArkiniElectronApi.channels.localizationPreferredLanguagesRead, event),
+		).resolves.toEqual([
+			"sk-SK",
+			"en-US",
+		]);
 	});
 });

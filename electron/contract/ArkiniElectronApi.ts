@@ -48,6 +48,7 @@ export namespace ArkiniElectronApi {
 		cliCompletionUninstall: "arkini:cli:completion:uninstall",
 		launcherLastPackageIdRead: "arkini:launcher:last-package:read",
 		launcherLastPackageIdWrite: "arkini:launcher:last-package:write",
+		localizationPreferredLanguagesRead: "arkini:localization:preferred-languages:read",
 		editorStatus: "arkini:editor:status",
 		editorAwaitIdle: "arkini:editor:await-idle",
 		editorProjectBuild: "arkini:editor:project:build",
@@ -188,6 +189,9 @@ export namespace ArkiniElectronApi {
 		readonly launcher: {
 			readonly readLastPackageIdFn: () => Promise<LastPackageIdSchema.Type | null>;
 			readonly writeLastPackageIdFn: (packageId: LastPackageIdSchema.Type) => Promise<void>;
+		};
+		readonly localization: {
+			readonly readPreferredLanguagesFn: () => Promise<ReadonlyArray<string>>;
 		};
 		readonly editor: {
 			readonly statusFn: () => Promise<EditorProjectTransport.ServiceStatus>;

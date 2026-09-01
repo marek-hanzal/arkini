@@ -135,6 +135,14 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(ArkiniElectronApi.channels.launcherLastPackageIdRead, (event) =>
 					runAuthorizedFn(event, launcherPreferences.readLastPackageIdFx),
 				);
+				ipcMain.handle(
+					ArkiniElectronApi.channels.localizationPreferredLanguagesRead,
+					(event) =>
+						runAuthorizedFn(
+							event,
+							Effect.sync(() => app.getPreferredSystemLanguages()),
+						),
+				);
 				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsWrite, (event, record) =>
 					runAuthorizedFn(
 						event,
@@ -246,6 +254,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.clipboardWriteText,
 						ArkiniElectronApi.channels.launcherLastPackageIdRead,
 						ArkiniElectronApi.channels.launcherLastPackageIdWrite,
+						ArkiniElectronApi.channels.localizationPreferredLanguagesRead,
 						ArkiniElectronApi.channels.arkpackList,
 						ArkiniElectronApi.channels.arkpackRead,
 						ArkiniElectronApi.channels.arkpackInstall,

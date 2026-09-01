@@ -8,9 +8,6 @@ import { tx } from "./translation/tx";
 import { TranslationSources } from "~/translation/constant/TranslationSources";
 
 const TranslationConfig = {
-	locales: [
-		"en",
-	],
 	packages: [
 		resolve("."),
 	],

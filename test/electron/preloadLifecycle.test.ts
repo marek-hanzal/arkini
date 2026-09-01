@@ -113,6 +113,22 @@ describe("Electron preload lifecycle", () => {
 		expect(await api.lifecycle.waitUntilVisibleFn()).toBe(visibleAtMs);
 	});
 
+	it("exposes preferred system languages through the localization capability", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue([
+			"cs-CZ",
+			"en-GB",
+		]);
+		const api = await loadPreload();
+
+		await expect(api.localization.readPreferredLanguagesFn()).resolves.toEqual([
+			"cs-CZ",
+			"en-GB",
+		]);
+		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
+			ArkiniElectronContract.channels.localizationPreferredLanguagesRead,
+		);
+	});
+
 	it("routes the mounted editor project context through dedicated MCP IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();

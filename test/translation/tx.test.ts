@@ -64,9 +64,6 @@ Live label:
 `,
 		);
 		const props: tx.Props = {
-			locales: [
-				"en",
-			],
 			mode: "sync",
 			packages: [
 				root,

@@ -146,6 +146,7 @@ export const createRegisteredIpcHarness = async () => {
 		nativeThemeListeners: electronHarness.nativeThemeListeners,
 		openDiagnosticDirectory,
 		openPath: electronHarness.openPath,
+		preferredSystemLanguages: electronHarness.preferredSystemLanguages,
 		requestWindowMode: electronHarness.requestWindowMode,
 		saveKey,
 		setBackgroundColor: electronHarness.setBackgroundColor,

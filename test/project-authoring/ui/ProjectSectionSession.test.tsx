@@ -32,7 +32,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 		Outlet: () => state.section,
 		useNavigate: () => state.navigate,
 		useParams: () => ({
-			sectionId: "general",
+			sectionId: state.sectionId,
 		}),
 	};
 });
@@ -75,6 +75,7 @@ const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 	saveConfig: vi.fn().mockResolvedValue(undefined),
 	section: undefined as ReactNode,
+	sectionId: "general",
 	unsavedSession: undefined as
 		| {
 				readonly saveFn: () => Promise<boolean>;
@@ -161,6 +162,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 	state.navigate.mockClear();
 	state.saveConfig.mockReset().mockResolvedValue(undefined);
+	state.sectionId = "general";
 	state.unsavedSession = undefined;
 });
 
@@ -178,6 +180,22 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("project section form session", () => {
+	it("exposes routed page help only for a section that owns guidance", async () => {
+		state.project = boardSpaceProject;
+		state.section = <div />;
+		state.sectionId = "toolbar";
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(EditorProjectForm)));
+
+		const open = container.querySelector<HTMLButtonElement>('[data-ui="EditorPageHelpOpen"]');
+		expect(open).not.toBeNull();
+		await act(async () => open?.click());
+		expect(document.querySelector('[data-ui="EditorPageHelpDialog"]')).not.toBeNull();
+	});
+
 	it("does not republish the form Context when parent inputs are unchanged", async () => {
 		state.project = {
 			projectId: "project",
@@ -390,7 +408,7 @@ describe("project section form session", () => {
 		});
 	});
 
-	it("edits initial Board cells in an explicitly selected zero-based space", async () => {
+	it("edits initial Board cells in the zero-based space selected live", async () => {
 		state.project = boardSpaceProject;
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -405,22 +423,23 @@ describe("project section form session", () => {
 		const spaceInput = container.querySelector<HTMLInputElement>(
 			'input[type="number"][min="0"]',
 		);
-		const switchButton = Array.from(container.querySelectorAll("button")).find(
-			(button) => button.textContent === "Switch",
-		);
 		const readGridCells = () =>
 			container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]')?.dataset
 				.cells;
-		if (spaceInput === null || switchButton === undefined)
-			throw new Error("Missing initial Board space selector.");
+		if (spaceInput === null) throw new Error("Missing initial Board space selector.");
 
 		expect(spaceInput.value).toBe("0");
 		expect(readGridCells()).toBe("water:1:0:0");
 		await changeInput(spaceInput, "-1");
-		expect(switchButton.disabled).toBe(true);
-		await changeInput(spaceInput, "1");
 		expect(readGridCells()).toBe("water:1:0:0");
-		await act(async () => switchButton.click());
+		await changeInput(spaceInput, "1");
+		expect(readGridCells()).toBe("water:2:1:1");
+		expect(spaceInput.max).toBe("31");
+		await changeInput(spaceInput, "32");
+		expect(readGridCells()).toBe("water:2:1:1");
+		await changeInput(spaceInput, "31");
+		expect(readGridCells()).toBe("");
+		await changeInput(spaceInput, "1");
 		expect(readGridCells()).toBe("water:2:1:1");
 
 		const gridButton = container.querySelector<HTMLButtonElement>(
@@ -430,10 +449,8 @@ describe("project section form session", () => {
 		await act(async () => gridButton.click());
 		expect(readGridCells()).toBe("water:3:1:1");
 		await changeInput(spaceInput, "0");
-		await act(async () => switchButton.click());
 		expect(readGridCells()).toBe("water:1:0:0");
 		await changeInput(spaceInput, "1");
-		await act(async () => switchButton.click());
 		expect(readGridCells()).toBe("water:3:1:1");
 
 		state.section = <ProjectGeneralSection />;

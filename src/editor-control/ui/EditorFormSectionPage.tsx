@@ -1,8 +1,12 @@
 import { Save, Trash2 } from "lucide-react";
 import type { PropsWithChildren, ReactNode } from "react";
 
-import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import {
+	EditorSectionNavigation,
+	EditorSectionNavigationSeparator,
+} from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
+import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
@@ -47,6 +51,7 @@ export const EditorFormSectionPage = ({
 	discardFn,
 	dirty,
 	error,
+	help,
 	leading,
 	notice,
 	rootCard,
@@ -58,6 +63,7 @@ export const EditorFormSectionPage = ({
 	readonly discardFn: () => Promise<void>;
 	readonly dirty: boolean;
 	readonly error: unknown;
+	readonly help?: EditorPageHelpContent;
 	readonly leading?: ReactNode;
 	readonly notice?: ReactNode;
 	readonly rootCard?: boolean;
@@ -73,12 +79,23 @@ export const EditorFormSectionPage = ({
 				title={title}
 				tabs={tabs}
 				action={
-					<EditorFormActions
-						discardFn={discardFn}
-						dirty={dirty}
-						saving={saving}
-						saveFn={saveFn}
-					/>
+					<div className="flex items-center gap-3">
+						{help === undefined ? null : (
+							<>
+								<EditorPageHelp
+									key={help.title}
+									{...help}
+								/>
+								<EditorSectionNavigationSeparator />
+							</>
+						)}
+						<EditorFormActions
+							discardFn={discardFn}
+							dirty={dirty}
+							saving={saving}
+							saveFn={saveFn}
+						/>
+					</div>
 				}
 			/>
 		}

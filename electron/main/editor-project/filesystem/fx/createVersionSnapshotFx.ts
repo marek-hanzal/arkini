@@ -15,6 +15,7 @@ import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 
 const encoder = new TextEncoder();
+const VersionObjectWriteConcurrency = 4;
 
 export namespace createVersionSnapshotFx {
 	export interface Props {
@@ -81,6 +82,10 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 		root: paths.root,
 		directory: paths.objects,
 	});
+	const objectWrites: Array<{
+		readonly target: string;
+		readonly bytes: Uint8Array;
+	}> = [];
 	for (const [hash, value] of [
 		...plan.jsonObjects,
 	].sort(([left], [right]) => left.localeCompare(right))) {
@@ -89,8 +94,7 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 			const current = yield* fileSystem.readFile(target);
 			if (hashVersionBytesFn(current) === hash) continue;
 		}
-		yield* filesystemWrite.replaceFileFx({
-			lock,
+		objectWrites.push({
 			target,
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
 		});
@@ -103,12 +107,17 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 			const current = yield* fileSystem.readFile(target);
 			if (hashVersionBytesFn(current) === hash) continue;
 		}
-		yield* filesystemWrite.replaceFileFx({
-			lock,
+		objectWrites.push({
 			target,
 			bytes,
 		});
 	}
+	if (objectWrites.length > 0)
+		yield* filesystemWrite.replaceIndependentFilesFx({
+			lock,
+			files: objectWrites,
+			concurrency: VersionObjectWriteConcurrency,
+		});
 	return {
 		manifest: plan.manifest,
 		contentFingerprint: plan.contentFingerprint,

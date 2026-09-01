@@ -16,6 +16,15 @@ export interface FilesystemWrite {
 		readonly target: string;
 		readonly bytes: Uint8Array;
 	}) => Effect.Effect<void, FilesystemWriteError, never>;
+	/** Replaces independently publishable files under one lock without aggregate rollback. */
+	readonly replaceIndependentFilesFx: (props: {
+		readonly lock: string;
+		readonly files: ReadonlyArray<{
+			readonly target: string;
+			readonly bytes: Uint8Array;
+		}>;
+		readonly concurrency: number;
+	}) => Effect.Effect<void, FilesystemWriteError, never>;
 	readonly removeFileFx: (props: {
 		readonly lock: string;
 		readonly target: string;

@@ -67,7 +67,9 @@ export const ArtworkTimeline = ({
 							</span>
 						))}
 					</div>
-					<p className="text-xs text-muted">Shown from 0% progress.</p>
+					{sources.length === 0 ? null : (
+						<p className="text-xs text-muted">Shown from 0% progress.</p>
+					)}
 				</div>
 			</div>
 			{sources.length === 0 ? (

@@ -17,10 +17,7 @@ export const ProjectToolbarSection = () => {
 	}));
 	return (
 		<div className="grid gap-6">
-			<EditorFormSection
-				description="The one-row passive toolbar. Set its size to zero to disable it."
-				title="Toolbar size"
-			>
+			<EditorFormSection title="Toolbar size">
 				<EditorFormCard>
 					<form.AppField name="toolbarSize">
 						{(field) => (
@@ -33,10 +30,7 @@ export const ProjectToolbarSection = () => {
 					</form.AppField>
 				</EditorFormCard>
 			</EditorFormSection>
-			<EditorFormSection
-				description="Starting stacks placed in exact toolbar slots."
-				title="Initial toolbar"
-			>
+			<EditorFormSection title="Initial toolbar">
 				{size === 0 ? (
 					<p className="text-sm text-muted">Toolbar is disabled.</p>
 				) : (

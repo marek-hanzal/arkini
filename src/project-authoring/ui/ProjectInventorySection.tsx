@@ -19,10 +19,7 @@ export const ProjectInventorySection = () => {
 	}));
 	return (
 		<div className="grid gap-6">
-			<EditorFormSection
-				description="The dimensions of the shared passive inventory grid."
-				title="Inventory size"
-			>
+			<EditorFormSection title="Inventory size">
 				<EditorFormCard>
 					<div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem]">
 						<form.AppField name="inventory.width">
@@ -48,10 +45,7 @@ export const ProjectInventorySection = () => {
 					</div>
 				</EditorFormCard>
 			</EditorFormSection>
-			<EditorFormSection
-				description="Starting stacks placed in exact inventory slots."
-				title="Initial inventory"
-			>
+			<EditorFormSection title="Initial inventory">
 				<ProjectStartGrid
 					cells={cells}
 					height={height}

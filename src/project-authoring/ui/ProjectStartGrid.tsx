@@ -404,11 +404,6 @@ const ProjectStartGridEdit = ({
 				items={items}
 				width={width}
 			/>
-			<p className="text-xs text-muted">
-				Left click an empty slot to choose an item, left click a stack to add one, right
-				click to remove one. Hold Alt or Cmd and drag, or use Alt/Cmd + Arrow, to move a
-				stack; the destination is replaced. Press Minus to decrement or Delete to remove.
-			</p>
 			{pickerCell === undefined ? null : (
 				<ProjectStartItemPicker
 					onCloseFn={() => setPickerCellFn(undefined)}

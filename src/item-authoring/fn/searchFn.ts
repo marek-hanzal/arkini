@@ -33,6 +33,8 @@ export const searchFn = (
 		threshold: 0.28,
 		ignoreLocation: true,
 		includeScore: true,
+		useTokenSearch: true,
+		tokenMatch: "all",
 	})
 		.search(normalizedQuery)
 		.sort(

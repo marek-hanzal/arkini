@@ -71,6 +71,35 @@ export const FormSession = ({
 				replace: true,
 			}),
 	});
+	const discardFn = useCallback(async () => {
+		controller.discardFn();
+		if (isNew) {
+			await navigateFn({
+				to: "/editor/$projectId/editor/items/list",
+				params: {
+					projectId: project.projectId,
+				},
+				replace: true,
+			});
+			return;
+		}
+		await navigateFn({
+			to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
+			params: {
+				projectId: project.projectId,
+				itemUid: initialItem.uid,
+				sectionId,
+			},
+			replace: true,
+		});
+	}, [
+		controller.discardFn,
+		initialItem.uid,
+		isNew,
+		navigateFn,
+		project.projectId,
+		sectionId,
+	]);
 	const context = useMemo(
 		() => ({
 			...controller,
@@ -98,6 +127,7 @@ export const FormSession = ({
 				data-ui="EditorItemForm"
 			>
 				<EditorFormSectionPage
+					discardFn={discardFn}
 					dirty={controller.isDirty}
 					error={controller.error}
 					notice={

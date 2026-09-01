@@ -136,6 +136,7 @@ const analyzeProjectStructuralCompatibilityFn = (
 export namespace useProjectFormController {
 	export interface Props {
 		readonly onInvalidSectionFn: (section: ProjectSectionId) => void | Promise<void>;
+		readonly onSavedFn?: () => void | Promise<void>;
 	}
 
 	/** Inferred to preserve TanStack Form's configured hook API without mirroring generics. */
@@ -144,6 +145,7 @@ export namespace useProjectFormController {
 
 export const useProjectFormController = ({
 	onInvalidSectionFn,
+	onSavedFn,
 }: useProjectFormController.Props) => {
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
@@ -164,6 +166,7 @@ export const useProjectFormController = ({
 		mode: "promise",
 	});
 	const submitSucceeded = useRef(false);
+	const notifyOnSaved = useRef(true);
 	const form = useAppForm({
 		defaultValues: canonicalValues,
 		validationLogic: revalidateLogic({
@@ -182,6 +185,7 @@ export const useProjectFormController = ({
 			});
 			submitSucceeded.current = true;
 			formApi.reset(parsed);
+			if (notifyOnSaved.current) await onSavedFn?.();
 		},
 	});
 	const dirty = useStore(form.store, (state) => state.isDirty);
@@ -204,39 +208,67 @@ export const useProjectFormController = ({
 			? "Fix the highlighted project fields before saving."
 			: undefined,
 	);
-	const saveFn = useCallback(async () => {
-		if (!dirty || submitting) return false;
-		submitSucceeded.current = false;
-		await form.handleSubmit();
-		if (!submitSucceeded.current) {
-			const result = schema.safeParse(form.state.values);
-			const issue = result.success ? undefined : result.error.issues[0];
-			if (issue !== undefined) {
-				await onInvalidSectionFn(readProjectSectionForPathFn(issue.path));
-				const focusInvalidFieldFn = () =>
-					document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
-				if (typeof requestAnimationFrame === "function") {
-					requestAnimationFrame(focusInvalidFieldFn);
-				} else {
-					setTimeout(focusInvalidFieldFn, 0);
+	const runSaveFn = useCallback(
+		async (notify: boolean) => {
+			if (!dirty || submitting) return false;
+			submitSucceeded.current = false;
+			notifyOnSaved.current = notify;
+			try {
+				await form.handleSubmit();
+			} finally {
+				notifyOnSaved.current = true;
+			}
+			if (!submitSucceeded.current) {
+				const result = schema.safeParse(form.state.values);
+				const issue = result.success ? undefined : result.error.issues[0];
+				if (issue !== undefined) {
+					await onInvalidSectionFn(readProjectSectionForPathFn(issue.path));
+					const focusInvalidFieldFn = () =>
+						document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
+					if (typeof requestAnimationFrame === "function") {
+						requestAnimationFrame(focusInvalidFieldFn);
+					} else {
+						setTimeout(focusInvalidFieldFn, 0);
+					}
 				}
 			}
-		}
-		return submitSucceeded.current;
-	}, [
-		dirty,
-		form,
-		onInvalidSectionFn,
-		schema,
-		submitting,
-	]);
+			return submitSucceeded.current;
+		},
+		[
+			dirty,
+			form,
+			onInvalidSectionFn,
+			schema,
+			submitting,
+		],
+	);
+	const saveFn = useCallback(
+		() => runSaveFn(true),
+		[
+			runSaveFn,
+		],
+	);
+	const saveDraftFn = useCallback(
+		() => runSaveFn(false),
+		[
+			runSaveFn,
+		],
+	);
+	const discardFn = useCallback(
+		() => form.reset(canonicalValues),
+		[
+			canonicalValues,
+			form,
+		],
+	);
 	useEditorUnsavedChangesRegistration({
-		discardFn: () => form.reset(canonicalValues),
+		discardFn,
 		id: `project:${project.projectId}`,
 		isDirtyFn: () => form.state.isDirty,
 		isValidFn: () => schema.safeParse(form.state.values).success,
-		ownsPathnameFn: (pathname) => pathname.startsWith(`/editor/${project.projectId}/project`),
-		saveFn,
+		ownsPathnameFn: (pathname) =>
+			pathname.startsWith(`/editor/${project.projectId}/project/form`),
+		saveFn: saveDraftFn,
 	});
 	const error =
 		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError;
@@ -244,6 +276,7 @@ export const useProjectFormController = ({
 		() => ({
 			canonicalValues,
 			compatibility,
+			discardFn,
 			error,
 			form,
 			isDirty: dirty,
@@ -254,6 +287,7 @@ export const useProjectFormController = ({
 		[
 			canonicalValues,
 			compatibility,
+			discardFn,
 			dirty,
 			error,
 			form,

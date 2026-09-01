@@ -16,7 +16,9 @@ vi.mock("@effect/atom-react", () => ({
 }));
 
 vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
-	useEditorUnsavedChangesRegistration: () => undefined,
+	useEditorUnsavedChangesRegistration: (session: typeof state.unsavedSession) => {
+		state.unsavedSession = session;
+	},
 }));
 
 vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
@@ -29,6 +31,9 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 		...original,
 		Outlet: () => state.section,
 		useNavigate: () => state.navigate,
+		useParams: () => ({
+			sectionId: "general",
+		}),
 	};
 });
 
@@ -70,6 +75,11 @@ const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 	saveConfig: vi.fn().mockResolvedValue(undefined),
 	section: undefined as ReactNode,
+	unsavedSession: undefined as
+		| {
+				readonly saveFn: () => Promise<boolean>;
+		  }
+		| undefined,
 }));
 
 interface TestStartGridCell {
@@ -126,7 +136,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 }));
 
 import type { Project } from "~/project-authoring/type/Project";
-import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project";
+import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project/form";
 import { ProjectBoardSection } from "~/project-authoring/ui/ProjectBoardSection";
 import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSection";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -149,7 +159,9 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	document.body.replaceChildren();
+	state.navigate.mockClear();
 	state.saveConfig.mockReset().mockResolvedValue(undefined);
+	state.unsavedSession = undefined;
 });
 
 const changeInput = async (input: HTMLInputElement, value: string) => {
@@ -230,7 +242,7 @@ describe("project section form session", () => {
 			compatibility,
 		);
 		expect(compatibility?.dataset.uiResult).toBe("minor");
-		await renderSection(<div data-ui="AppearanceSection">Appearance</div>);
+		await renderSection(<div data-ui="BoardSection">Board</div>);
 		await renderSection(<ProjectGeneralSection />);
 
 		expect(container.querySelector('[data-ui="EditorSectionNavigation"]')).toBe(navigation);
@@ -314,6 +326,68 @@ describe("project section form session", () => {
 			"avatar-01": "item-water",
 		});
 		expect(config.start).toEqual(project.config.start);
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/project/detail/$sectionId",
+			params: {
+				projectId: project.projectId,
+				sectionId: "general",
+			},
+			replace: true,
+		});
+	});
+
+	it("keeps unsaved-leave Save persistence-only", async () => {
+		state.project = boardSpaceProject;
+		state.section = <ProjectGeneralSection />;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(EditorProjectForm)));
+
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null || state.unsavedSession === undefined)
+			throw new Error("Missing project form session.");
+		await changeInput(title, "Saved without navigation");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+
+		expect(state.saveConfig).toHaveBeenCalledOnce();
+		expect(state.navigate).not.toHaveBeenCalled();
+	});
+
+	it("discards the local project draft and returns to detail without saving", async () => {
+		state.project = boardSpaceProject;
+		state.section = <ProjectGeneralSection />;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(EditorProjectForm)));
+
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing project title input.");
+		await changeInput(title, "Discarded project title");
+		const discardButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Discard");
+		if (discardButton === undefined) throw new Error("Missing project Discard action.");
+		await act(async () => {
+			discardButton.click();
+			await Promise.resolve();
+		});
+
+		expect(title.value).toBe(boardSpaceProject.config.meta.title);
+		expect(state.saveConfig).not.toHaveBeenCalled();
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/project/detail/$sectionId",
+			params: {
+				projectId: boardSpaceProject.projectId,
+				sectionId: "general",
+			},
+			replace: true,
+		});
 	});
 
 	it("edits initial Board cells in an explicitly selected zero-based space", async () => {

@@ -322,6 +322,26 @@ interface MinorPathRule {
 }
 
 const minorPathRules: ReadonlyArray<MinorPathRule> = [
+	...(
+		[
+			"avatar-01",
+			"avatar-02",
+			"avatar-03",
+			"avatar-04",
+			"avatar-05",
+			"avatar-06",
+			"avatar-07",
+		] as const
+	).map(
+		(avatarRole): MinorPathRule => ({
+			message: "About avatar asset changes are explicitly minor-compatible.",
+			path: [
+				"resources",
+				avatarRole,
+			],
+			rule: "about-avatar",
+		}),
+	),
 	{
 		message: "Game title changes are explicitly minor-compatible.",
 		path: [

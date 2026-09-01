@@ -11,7 +11,7 @@ export const DetailSection = ({
 	readonly description?: string;
 	readonly title: string;
 }) => (
-	<section className="grid gap-4 border-t border-line pt-5 first:border-t-0 first:pt-0">
+	<section className="grid gap-0 border-t border-line pt-5 first:border-t-0 first:pt-0">
 		<header>
 			<h2 className="text-lg font-semibold">{title}</h2>
 			{description === undefined ? null : (

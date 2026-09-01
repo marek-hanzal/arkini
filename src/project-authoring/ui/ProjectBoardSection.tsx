@@ -1,12 +1,15 @@
 import { useStore } from "@tanstack/react-form";
+import { ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
+import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValue";
 
 export const ProjectBoardSection = () => {
 	const { form } = useProjectFormSession();
@@ -33,47 +36,55 @@ export const ProjectBoardSection = () => {
 				description="The dimensions of every playable board space."
 				title="Board size"
 			>
-				<div className="flex flex-wrap items-end gap-4">
-					<div className="grid min-w-72 flex-1 gap-4 md:grid-cols-2">
-						<form.AppField name="board.width">
-							{(field) => (
-								<field.NumberField
-									label="Width"
-									min={1}
-								/>
-							)}
-						</form.AppField>
-						<form.AppField name="board.height">
-							{(field) => (
-								<field.NumberField
-									label="Height"
-									min={1}
-								/>
-							)}
-						</form.AppField>
+				<EditorFormCard>
+					<div className="flex flex-wrap items-end gap-4">
+						<div className="grid min-w-72 flex-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem]">
+							<form.AppField name="board.width">
+								{(field) => (
+									<field.NumberField
+										label="Width"
+										min={1}
+									/>
+								)}
+							</form.AppField>
+							<form.AppField name="board.height">
+								{(field) => (
+									<field.NumberField
+										label="Height"
+										min={1}
+									/>
+								)}
+							</form.AppField>
+							<ProjectGridSizeValue
+								height={height}
+								width={width}
+							/>
+						</div>
+						<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
+						<label className="grid gap-1.5 text-sm">
+							<span className="flex items-center gap-1 font-semibold text-foreground">
+								Space
+								<EditorInfoTooltip content="Enter a Space number, then choose Switch to edit that Space’s starting board below. Other Spaces stay unchanged." />
+							</span>
+							<input
+								type="number"
+								value={spaceInput}
+								className={`${editorInputClassName} w-28`}
+								min={0}
+								step={1}
+								onChange={(event) => setSpaceInputFn(event.currentTarget.value)}
+							/>
+						</label>
+						<LinkButton
+							className="inline-flex min-h-[var(--ak-control-min-height)] items-center gap-1.5"
+							disabled={!canSwitchSpace}
+							onClick={() => setSelectedSpaceFn(requestedSpace)}
+						>
+							<ArrowRightLeft className="size-4" />
+							Switch
+						</LinkButton>
 					</div>
-					<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
-					<label className="grid gap-1.5 text-sm">
-						<span className="flex items-center gap-1 font-semibold text-foreground">
-							Space
-							<EditorInfoTooltip content="Enter a Space number, then choose Switch to edit that Space’s starting board below. Other Spaces stay unchanged." />
-						</span>
-						<input
-							type="number"
-							value={spaceInput}
-							className={`${editorInputClassName} w-28`}
-							min={0}
-							step={1}
-							onChange={(event) => setSpaceInputFn(event.currentTarget.value)}
-						/>
-					</label>
-					<Button
-						disabled={!canSwitchSpace}
-						onClick={() => setSelectedSpaceFn(requestedSpace)}
-					>
-						Switch
-					</Button>
-				</div>
+				</EditorFormCard>
 			</EditorFormSection>
 			<ProjectStartGrid
 				cells={cells}

@@ -211,7 +211,7 @@ describe("EditorWelcomeCommandAtom", () => {
 
 		await vi.waitFor(() => expect(navigation.navigate).toHaveBeenCalledTimes(1));
 		expect(navigation.navigate).toHaveBeenCalledWith({
-			to: "/editor/$projectId/project/$sectionId",
+			to: "/editor/$projectId/project/form/$sectionId",
 			params: {
 				projectId: "project-created",
 				sectionId: "general",

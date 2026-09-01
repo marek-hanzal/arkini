@@ -194,8 +194,15 @@ export const useFormController = ({
 			runSaveFn,
 		],
 	);
+	const discardFn = useCallback(
+		() => form.reset(canonicalItem),
+		[
+			canonicalItem,
+			form,
+		],
+	);
 	useEditorUnsavedChangesRegistration({
-		discardFn: () => form.reset(canonicalItem),
+		discardFn,
 		id: `item:${project.projectId}:${initialItem.uid}`,
 		isDirtyFn: () => form.state.isDirty,
 		isValidFn: () => FormSchema.safeParse(form.state.values).success,
@@ -211,6 +218,7 @@ export const useFormController = ({
 		() => ({
 			canonicalItem,
 			compatibility,
+			discardFn,
 			error,
 			isDirty: dirty,
 			isSaving: submitting,
@@ -223,6 +231,7 @@ export const useFormController = ({
 		[
 			canonicalItem,
 			compatibility,
+			discardFn,
 			dirty,
 			error,
 			form,

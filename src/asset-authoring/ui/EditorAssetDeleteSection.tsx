@@ -134,10 +134,10 @@ const EditorAssetDeleteBlockerLink = ({
 				).length - 1;
 	return (
 		<ButtonLink
-			to="/editor/$projectId/project/$sectionId"
+			to="/editor/$projectId/project/form/$sectionId"
 			params={{
 				projectId: project.projectId,
-				sectionId: "appearance",
+				sectionId: "general",
 			}}
 			search={
 				avatarIndex === undefined
@@ -149,7 +149,7 @@ const EditorAssetDeleteBlockerLink = ({
 			className="grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border border-line bg-surface/70 p-4 text-left shadow-none"
 		>
 			<span className="min-w-0">
-				<span className="block truncate text-sm font-semibold">Project · Appearance</span>
+				<span className="block truncate text-sm font-semibold">Project · General</span>
 				<span className="mt-1 block text-xs font-normal leading-5 text-muted">
 					{blocker.roleLabel}
 				</span>

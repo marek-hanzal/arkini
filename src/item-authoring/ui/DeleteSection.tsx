@@ -54,7 +54,7 @@ const DeleteBlockerLink = ({
 	const section = ProjectSections.find((candidate) => candidate.id === sectionId);
 	return (
 		<ButtonLink
-			to="/editor/$projectId/project/$sectionId"
+			to="/editor/$projectId/project/form/$sectionId"
 			params={{
 				projectId: project.projectId,
 				sectionId,

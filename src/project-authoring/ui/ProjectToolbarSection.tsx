@@ -1,5 +1,6 @@
 import { useStore } from "@tanstack/react-form";
 
+import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -20,15 +21,17 @@ export const ProjectToolbarSection = () => {
 				description="The one-row passive toolbar. Set its size to zero to disable it."
 				title="Toolbar size"
 			>
-				<form.AppField name="toolbarSize">
-					{(field) => (
-						<field.NumberField
-							label="Slots"
-							min={0}
-							max={64}
-						/>
-					)}
-				</form.AppField>
+				<EditorFormCard>
+					<form.AppField name="toolbarSize">
+						{(field) => (
+							<field.NumberField
+								label="Slots"
+								min={0}
+								max={64}
+							/>
+						)}
+					</form.AppField>
+				</EditorFormCard>
 			</EditorFormSection>
 			<EditorFormSection
 				description="Starting stacks placed in exact toolbar slots."

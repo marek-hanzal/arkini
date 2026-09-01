@@ -17,12 +17,10 @@ type ItemEstimateSort = "quantity" | "time";
 export const ItemEstimateRouteGraph = ({
 	config,
 	header,
-	projectId,
 	routeSteps,
 }: {
 	readonly config: Project["config"];
 	readonly header: ReactNode;
-	readonly projectId: string;
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
 	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
@@ -97,8 +95,7 @@ export const ItemEstimateRouteGraph = ({
 									</span>
 								) : (
 									<DetailReference
-										item={item}
-										projectId={projectId}
+										itemId={route.factId}
 										sectionId="estimate"
 										stretched
 									/>

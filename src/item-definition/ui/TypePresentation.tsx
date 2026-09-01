@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 
-/** Canonical editor copy and iconography for every authored item type. */
-export const TypePresentation = {
+const presentations = {
 	blueprint: {
 		description: "A build plan with one construction line.",
 		icon: ScrollText,
@@ -58,3 +58,28 @@ export const TypePresentation = {
 		readonly icon: LucideIcon;
 	}
 >;
+
+/** Presents one item type through the shared label, icon, and description source. */
+export const TypePresentation = ({
+	describe = false,
+	type,
+}: {
+	readonly describe?: boolean;
+	readonly type: TypeSchema.Type;
+}) => {
+	const presentation = presentations[type];
+	const Icon = presentation.icon;
+	return (
+		<span className="flex min-w-0 items-center gap-3">
+			<Icon className="size-6 shrink-0 text-accent" />
+			<span className="min-w-0">
+				<span className="block font-semibold text-foreground">{ItemTypeLabel[type]}</span>
+				{describe ? (
+					<span className="mt-1 block text-xs font-normal leading-5 text-muted">
+						{presentation.description}
+					</span>
+				) : null}
+			</span>
+		</span>
+	);
+};

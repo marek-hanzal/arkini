@@ -90,6 +90,7 @@
 		"electron.vite.config.ts"
 	],
 	"exclude": [
+		"src/item-definition/ui",
 		"src/production-job/ui",
 		"src/production-output/ui"
 	]

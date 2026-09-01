@@ -1,7 +1,7 @@
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectStartGridDetail } from "~/project-authoring/ui/ProjectStartGridDetail";
+import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 
 export const ProjectToolbarDetail = ({ project }: { readonly project: Project }) => {
 	const size = project.config.meta.toolbarSize ?? 0;
@@ -24,7 +24,7 @@ export const ProjectToolbarDetail = ({ project }: { readonly project: Project })
 			{size === 0 ? null : (
 				<EditorRootCard dataUi="EditorProjectToolbarPreviewDetailCard">
 					<DetailSection title="Initial toolbar">
-						<ProjectStartGridDetail
+						<ProjectStartGrid
 							cells={project.config.start.toolbar.map((entry) => ({
 								itemId: entry.itemId,
 								quantity: entry.quantity ?? 1,
@@ -33,6 +33,7 @@ export const ProjectToolbarDetail = ({ project }: { readonly project: Project })
 							}))}
 							height={1}
 							items={project.config.items}
+							mode="detail"
 							width={size}
 						/>
 					</DetailSection>

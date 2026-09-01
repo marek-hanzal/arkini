@@ -1,7 +1,7 @@
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectStartGridDetail } from "~/project-authoring/ui/ProjectStartGridDetail";
+import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 
 export const ProjectInventoryDetail = ({ project }: { readonly project: Project }) => {
 	const { inventory } = project.config.meta;
@@ -27,7 +27,7 @@ export const ProjectInventoryDetail = ({ project }: { readonly project: Project 
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectInventoryPreviewDetailCard">
 				<DetailSection title="Initial inventory">
-					<ProjectStartGridDetail
+					<ProjectStartGrid
 						cells={project.config.start.inventory.map((entry) => ({
 							itemId: entry.itemId,
 							quantity: entry.quantity ?? 1,
@@ -36,6 +36,7 @@ export const ProjectInventoryDetail = ({ project }: { readonly project: Project 
 						}))}
 						height={inventory.height}
 						items={project.config.items}
+						mode="detail"
 						width={inventory.width}
 					/>
 				</DetailSection>

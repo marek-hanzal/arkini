@@ -1,5 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+import { ItemStorageScopeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { Fact, FactList } from "~/ui/ui/FactList";
 
 /** Presents the authored identity and storage contract of one item. */
@@ -8,7 +9,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 		<FactList>
 			<Fact
 				label="Type"
-				value={ItemTypeLabel[item.type]}
+				value={<TypePresentation type={item.type} />}
 			/>
 			<Fact
 				label="Storage"

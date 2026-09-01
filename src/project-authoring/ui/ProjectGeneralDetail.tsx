@@ -1,21 +1,8 @@
-import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
-import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
+import { EditorAssetReference } from "~/asset-authoring/ui/EditorAssetReference";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import type { Project } from "~/project-authoring/type/Project";
-
-const ProjectAssetDetail = ({ resourceId }: { readonly resourceId: string }) => (
-	<div className="flex items-center gap-3">
-		<EditorAssetThumbnail resourceId={resourceId} />
-		<EditorAssetDetailLink
-			className="font-mono text-sm"
-			resourceId={resourceId}
-		>
-			{resourceId}
-		</EditorAssetDetailLink>
-	</div>
-);
 
 export const ProjectGeneralDetail = ({ project }: { readonly project: Project }) => {
 	const avatars = ProjectAvatarKeys.flatMap((slot) => {
@@ -48,7 +35,7 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectHeroDetailCard">
 				<DetailSection title="Hero image">
-					<ProjectAssetDetail resourceId={project.config.resources.hero} />
+					<EditorAssetReference resourceId={project.config.resources.hero} />
 				</DetailSection>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectAvatarsDetailCard">
@@ -58,19 +45,11 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 					) : (
 						<ul className="grid gap-3">
 							{avatars.map(({ resourceId, slot }) => (
-								<li
-									className="flex items-center gap-3"
-									key={slot}
-								>
-									<EditorAssetThumbnail resourceId={resourceId} />
-									<span className="font-mono text-sm font-semibold">{slot}</span>
-									<span className="text-muted">·</span>
-									<EditorAssetDetailLink
-										className="font-mono text-sm"
+								<li key={slot}>
+									<EditorAssetReference
+										context={slot}
 										resourceId={resourceId}
-									>
-										{resourceId}
-									</EditorAssetDetailLink>
+									/>
 								</li>
 							))}
 						</ul>

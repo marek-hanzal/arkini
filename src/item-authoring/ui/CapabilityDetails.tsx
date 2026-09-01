@@ -8,6 +8,7 @@ import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
+import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import type { OptionalCapability } from "~/item-authoring/type/Section";
 import { Status } from "~/ui/ui/Status";
 
@@ -110,8 +111,7 @@ const MergeDetail = ({
 			{"result" in merge ? (
 				<DetailFact
 					label="Replacement item"
-					mono
-					value={merge.result}
+					value={<DetailReference itemId={merge.result} />}
 				/>
 			) : null}
 		</DetailFacts>

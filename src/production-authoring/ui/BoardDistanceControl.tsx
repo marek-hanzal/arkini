@@ -1,25 +1,22 @@
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
+import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 
 const boardDistanceOptions = [
 	{
-		description: "Matches only the origin itself at board distance 0.",
-		label: "Self",
+		...BoardDistancePresentation.self,
 		value: "self",
 	},
 	{
-		description: "Matches items exactly 1 cell away, including diagonals.",
-		label: "Close",
+		...BoardDistancePresentation.close,
 		value: "close",
 	},
 	{
-		description: "Matches items exactly 2 cells away, including diagonals.",
-		label: "Near",
+		...BoardDistancePresentation.near,
 		value: "near",
 	},
 	{
-		description: "Matches any positive board distance and excludes only Self.",
-		label: "Far",
+		...BoardDistancePresentation.far,
 		value: "far",
 	},
 ] as const;

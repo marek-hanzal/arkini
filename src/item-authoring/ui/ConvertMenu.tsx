@@ -4,7 +4,7 @@ import { Replace } from "lucide-react";
 import { Button, ButtonLink } from "~/ui/ui/Button";
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
-import { TypePresentation } from "~/item-authoring/ui/TypePresentation";
+import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 
 /** Selects a target discriminator before opening the standard explicit-save item form. */
 export const ConvertMenu = ({
@@ -47,35 +47,26 @@ export const ConvertMenu = ({
 						</p>
 						{TypeSchema.options
 							.filter((type) => type !== itemType)
-							.map((type) => {
-								const presentation = TypePresentation[type];
-								const Icon = presentation.icon;
-								return (
-									<ButtonLink
-										key={type}
-										to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-										params={{
-											projectId,
-											itemUid,
-											sectionId: "identity",
-										}}
-										search={{
-											itemType: type,
-										}}
-										className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
-									>
-										<Icon className="size-6 shrink-0 text-accent" />
-										<span className="min-w-0">
-											<span className="block font-semibold capitalize">
-												{type}
-											</span>
-											<span className="mt-0.5 block text-xs font-normal leading-4 text-muted">
-												{presentation.description}
-											</span>
-										</span>
-									</ButtonLink>
-								);
-							})}
+							.map((type) => (
+								<ButtonLink
+									key={type}
+									to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+									params={{
+										projectId,
+										itemUid,
+										sectionId: "identity",
+									}}
+									search={{
+										itemType: type,
+									}}
+									className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
+								>
+									<TypePresentation
+										describe
+										type={type}
+									/>
+								</ButtonLink>
+							))}
 					</div>
 				</FloatingPortal>
 			) : null}

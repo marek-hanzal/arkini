@@ -9,7 +9,7 @@ import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
-import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ConvertMenu } from "~/item-authoring/ui/ConvertMenu";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
@@ -55,10 +55,10 @@ export const Detail = ({
 								{item.title || item.id}
 							</h1>
 							<span
-								className="truncate text-xs font-medium uppercase tracking-[0.08em] text-muted"
+								className="text-xs"
 								data-ui="EditorItemType"
 							>
-								{ItemTypeLabel[item.type]}
+								<TypePresentation type={item.type} />
 							</span>
 						</div>
 					}
@@ -127,7 +127,10 @@ export const Detail = ({
 				/>
 			}
 		>
-			{sectionId === "charges" || sectionId === "estimate" || sectionId === "production" ? (
+			{sectionId === "charges" ||
+			sectionId === "delete" ||
+			sectionId === "estimate" ||
+			sectionId === "production" ? (
 				children
 			) : (
 				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>

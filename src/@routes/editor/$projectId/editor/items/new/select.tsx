@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { TypePresentation } from "~/item-authoring/ui/TypePresentation";
+import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/new/select")({
 	component: () => {
@@ -37,36 +37,27 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 					<h1 className="text-xl font-semibold">New item</h1>
 				</header>
 				<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
-					{TypeSchema.options.map((type) => {
-						const presentation = TypePresentation[type];
-						const Icon = presentation.icon;
-						return (
-							<ButtonLink
-								key={type}
-								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-								params={{
-									projectId: project.projectId,
-									itemUid: itemUids[type],
-									sectionId: "identity",
-								}}
-								search={{
-									itemType: type,
-								}}
-								className="ak-list-row min-h-32 justify-start gap-4 rounded-xl p-4 text-left"
-								data-item-type={type}
-							>
-								<Icon className="size-8 shrink-0 text-accent" />
-								<span className="min-w-0">
-									<span className="block text-base font-semibold capitalize">
-										{type}
-									</span>
-									<span className="mt-1 block text-xs leading-5 text-muted">
-										{presentation.description}
-									</span>
-								</span>
-							</ButtonLink>
-						);
-					})}
+					{TypeSchema.options.map((type) => (
+						<ButtonLink
+							key={type}
+							to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+							params={{
+								projectId: project.projectId,
+								itemUid: itemUids[type],
+								sectionId: "identity",
+							}}
+							search={{
+								itemType: type,
+							}}
+							className="ak-list-row min-h-32 justify-start gap-4 rounded-xl p-4 text-left"
+							data-item-type={type}
+						>
+							<TypePresentation
+								describe
+								type={type}
+							/>
+						</ButtonLink>
+					))}
 				</div>
 			</section>
 		);

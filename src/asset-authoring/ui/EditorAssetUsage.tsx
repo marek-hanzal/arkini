@@ -1,9 +1,9 @@
-import { ChevronRight, Unlink } from "lucide-react";
+import { Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
-import { ButtonLink } from "~/ui/ui/Button";
 import { Status } from "~/ui/ui/Status";
+import { EditorAssetUsageRow } from "~/asset-authoring/ui/EditorAssetUsageRow";
 
 export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }) => {
 	const project = useEditorProject();
@@ -24,43 +24,19 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 			className="ak-list grid gap-2"
 			data-ui="EditorAssetUsage"
 		>
-			{usages.map((usage) => {
-				const content = (
-					<>
-						<span className="min-w-0 flex-1">
-							<span className="block truncate font-semibold">{usage.ownerLabel}</span>
-							<span className="mt-1 block text-xs text-muted">{usage.roleLabel}</span>
-						</span>
+			{usages.map((usage) => (
+				<EditorAssetUsageRow
+					dataUi="EditorAssetUsageRow"
+					key={`${usage.owner}:${usage.path.join(".")}`}
+					project={project}
+					trailing={
 						<span className="text-xs uppercase tracking-wide text-subtle">
 							{usage.owner}
 						</span>
-						{usage.owner === "item" ? (
-							<ChevronRight className="size-5 shrink-0 text-subtle" />
-						) : null}
-					</>
-				);
-				return usage.owner === "item" ? (
-					<ButtonLink
-						key={`${usage.ownerId}:${usage.roleLabel}`}
-						to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-						params={{
-							projectId: project.projectId,
-							itemUid: usage.ownerUid,
-							sectionId: "artwork",
-						}}
-						className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-3 rounded-xl border-0 p-4 text-left shadow-none"
-					>
-						{content}
-					</ButtonLink>
-				) : (
-					<div
-						key={`project:${usage.roleLabel}`}
-						className="ak-list-row flex min-w-0 items-center gap-3 rounded-xl p-4"
-					>
-						{content}
-					</div>
-				);
-			})}
+					}
+					usage={usage}
+				/>
+			))}
 		</section>
 	);
 };

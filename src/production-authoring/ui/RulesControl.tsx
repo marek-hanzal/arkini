@@ -10,6 +10,7 @@ import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { QueryScopePresentation } from "~/item-query/ui/QueryPresentation";
 import {
 	EditorChoiceControl,
 	EditorNumberControl,
@@ -23,30 +24,23 @@ type RuleTarget = "action" | "drop" | "line";
 
 const queryScopeOptions = [
 	{
-		description:
-			"Searches matching items on the current board at the selected distance from the action owner.",
-		label: "Board",
+		...QueryScopePresentation.board,
 		value: "board",
 	},
 	{
-		description: "Searches matching items stored anywhere in the inventory.",
-		label: "Inventory",
+		...QueryScopePresentation.inventory,
 		value: "inventory",
 	},
 	{
-		description: "Searches matching items stored anywhere in the toolbar.",
-		label: "Toolbar",
+		...QueryScopePresentation.toolbar,
 		value: "toolbar",
 	},
 	{
-		description:
-			"Searches the inventory, toolbar, and the current board space without a board-distance limit.",
-		label: "Any local",
+		...QueryScopePresentation.any,
 		value: "any",
 	},
 	{
-		description: "Searches the inventory, toolbar, and every board space in the current game.",
-		label: "Universe",
+		...QueryScopePresentation.universe,
 		value: "universe",
 	},
 ] as const;

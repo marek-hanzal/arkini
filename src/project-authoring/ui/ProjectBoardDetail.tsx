@@ -4,7 +4,7 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectStartGridDetail } from "~/project-authoring/ui/ProjectStartGridDetail";
+import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 
 export const ProjectBoardDetail = ({ project }: { readonly project: Project }) => {
 	const { board } = project.config.meta;
@@ -58,7 +58,7 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 				/>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectSpacePreviewCard">
-				<ProjectStartGridDetail
+				<ProjectStartGrid
 					cells={project.config.start.board
 						.filter((entry) => entry.space === selectedSpace)
 						.map((entry) => ({
@@ -69,6 +69,7 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 						}))}
 					height={board.height}
 					items={project.config.items}
+					mode="detail"
 					width={board.width}
 				/>
 			</EditorRootCard>

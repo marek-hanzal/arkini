@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
+import { QuantityValue } from "~/item-definition/ui/QuantityValue";
 
 const OutputItem = <Item extends OutputProjection.Item>({
 	item,
@@ -20,10 +21,7 @@ const OutputItem = <Item extends OutputProjection.Item>({
 		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
 			{renderItemFn(item)}
 			<span className="shrink-0 text-muted">
-				×
-				{item.quantity.min === item.quantity.max
-					? item.quantity.min
-					: `${item.quantity.min}–${item.quantity.max}`}
+				×<QuantityValue quantity={item.quantity} />
 			</span>
 		</div>
 		{item.activeRuleHints.map((hint, index) => (
@@ -124,10 +122,8 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					data-roll-kind="weight"
 				>
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						{weight.selections.min === weight.selections.max
-							? weight.selections.min
-							: `${weight.selections.min}–${weight.selections.max}`}{" "}
-						weighted selection{weight.selections.max === 1 ? "" : "s"}
+						<QuantityValue quantity={weight.selections} /> weighted selection
+						{weight.selections.max === 1 ? "" : "s"}
 					</p>
 					{weight.option.map((option, index) => (
 						<div

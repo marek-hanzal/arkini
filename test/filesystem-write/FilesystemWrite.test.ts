@@ -177,6 +177,70 @@ describe("FilesystemWrite", () => {
 		});
 	});
 
+	it("bounds independent replacements under one held lock", async () => {
+		const nodeFileSystem = await readNodeFileSystem();
+		const fourEntered = Effect.runSync(Deferred.make<void>());
+		const releaseWrites = Effect.runSync(Deferred.make<void>());
+		let active = 0;
+		let entered = 0;
+		let maximumActive = 0;
+		const fileSystem: FileSystem.FileSystem = {
+			...nodeFileSystem,
+			rename: (from, to) =>
+				String(to).endsWith(".json")
+					? Effect.gen(function* () {
+							active += 1;
+							entered += 1;
+							maximumActive = Math.max(maximumActive, active);
+							if (entered === 4) yield* Deferred.succeed(fourEntered, undefined);
+							yield* Deferred.await(releaseWrites);
+							yield* nodeFileSystem.rename(from, to);
+						}).pipe(
+							Effect.ensuring(
+								Effect.sync(() => {
+									active -= 1;
+								}),
+							),
+						)
+					: nodeFileSystem.rename(from, to),
+		};
+		const filesystemWrite = await createWrite(fileSystem);
+		const files = Array.from(
+			{
+				length: 5,
+			},
+			(_unused, index) => ({
+				target: join(root, `${index}.json`),
+				bytes: encoder.encode(String(index)),
+			}),
+		);
+		const write = Effect.runPromise(
+			filesystemWrite.replaceIndependentFilesFx({
+				lock: join(root, ".batch.lock"),
+				files,
+				concurrency: 4,
+			}),
+		);
+
+		await Effect.runPromise(Deferred.await(fourEntered));
+		expect(entered).toBe(4);
+		expect(maximumActive).toBe(4);
+		Effect.runSync(Deferred.succeed(releaseWrites, undefined));
+		await write;
+
+		expect(entered).toBe(5);
+		expect(maximumActive).toBe(4);
+		await expect(
+			Promise.all(files.map(({ target }) => readFile(target, "utf8"))),
+		).resolves.toEqual([
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+		]);
+	});
+
 	it("waits for a live CLI process using the same lock", async () => {
 		const child = spawn(process.execPath, [
 			tsx,

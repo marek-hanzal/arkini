@@ -24,6 +24,15 @@ import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
 const encoder = new TextEncoder();
 const encodeJsonFn = (value: unknown) =>
 	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
+
+const equalBytesFn = (left: Uint8Array, right: Uint8Array) => {
+	if (left.byteLength !== right.byteLength) return false;
+	for (let index = 0; index < left.byteLength; index += 1) {
+		if (left[index] !== right[index]) return false;
+	}
+	return true;
+};
+
 interface Write {
 	readonly target: string;
 	readonly bytes: Uint8Array;
@@ -182,7 +191,7 @@ export namespace writeProjectFilesFx {
 	}
 }
 
-/** Writes the complete owned current tree while preserving unrelated project files. */
+/** Publishes the complete owned current tree through only its divergent filesystem paths. */
 export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 	props: writeProjectFilesFx.Props,
 ) {
@@ -219,7 +228,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 									cause,
 								}),
 						});
-			const writes = [
+			const candidateWrites = [
 				{
 					target: paths.schemaFile,
 					bytes: encodeJsonFn(GameProjectJsonSchema),
@@ -242,7 +251,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				: "";
 			const nextGitignore = addGitignoreRulesFn(gitignore);
 			if (nextGitignore !== gitignore)
-				writes.push({
+				candidateWrites.push({
 					target: paths.gitignoreFile,
 					bytes: encoder.encode(nextGitignore),
 				});
@@ -265,7 +274,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 							new Error(`Editor Board scenario ${scenario.name} is duplicated.`),
 						);
 					scenarioTargets.add(target);
-					writes.push({
+					candidateWrites.push({
 						target,
 						bytes: encodeJsonFn(scenario),
 					});
@@ -276,14 +285,36 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				}
 			}
 			if (versionHead !== undefined)
-				writes.push({
+				candidateWrites.push({
 					target: paths.versionHeadFile,
 					bytes: encodeJsonFn(versionHead),
 				});
-			writes.push({
+			candidateWrites.push({
 				target: paths.projectFile,
 				bytes: encodeJsonFn(nextSnapshot.marker),
 			});
+			const writes =
+				previousSnapshot === undefined
+					? candidateWrites
+					: (yield* Effect.forEach(
+							candidateWrites,
+							(write) =>
+								Effect.gen(function* () {
+									if (
+										!(yield* assertProjectFileFx(
+											fileSystem,
+											paths.root,
+											write.target,
+										))
+									)
+										return write;
+									const current = yield* fileSystem.readFile(write.target);
+									return equalBytesFn(current, write.bytes) ? undefined : write;
+								}),
+							{
+								concurrency: 16,
+							},
+						)).filter((write): write is Write => write !== undefined);
 			return {
 				writes,
 				deletes,

@@ -274,6 +274,32 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 				),
 			),
 		);
+	const replaceIndependentLockedFilesFx: FilesystemWrite["replaceIndependentFilesFx"] = (props) =>
+		provideFx(
+			readFilesystemWritePathsFx(props.lock).pipe(
+				mapInternalFx("replace-file"),
+				Effect.flatMap((paths) =>
+					underLockFx(
+						paths,
+						Effect.forEach(
+							props.files,
+							(file) =>
+								replaceFileFx({
+									paths,
+									props: {
+										lock: props.lock,
+										...file,
+									},
+								}),
+							{
+								concurrency: props.concurrency,
+								discard: true,
+							},
+						).pipe(mapInternalFx("replace-file")),
+					),
+				),
+			),
+		);
 	const removeLockedFileFx: FilesystemWrite["removeFileFx"] = (props) =>
 		provideFx(
 			readFilesystemWritePathsFx(props.lock).pipe(
@@ -293,5 +319,6 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 		withLockFx,
 		removeFileFx: removeLockedFileFx,
 		replaceFileFx: replaceLockedFileFx,
+		replaceIndependentFilesFx: replaceIndependentLockedFilesFx,
 	} satisfies FilesystemWrite;
 });

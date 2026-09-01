@@ -17,6 +17,8 @@ describe("fromRuntimeFn", () => {
 			const state = fromRuntimeFn({
 				runtime: first.getSnapshotFn(),
 			});
+			expect(state.items[0]).not.toHaveProperty("remainingCharges");
+			expect(state.items[0]).not.toHaveProperty("remainingDurationMs");
 			await first.runFn(
 				spawnItemFx({
 					id: "runtime:later",

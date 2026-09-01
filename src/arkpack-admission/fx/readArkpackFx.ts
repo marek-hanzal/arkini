@@ -28,8 +28,9 @@ const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array)
 					`Arkpack payload exceeds the ${ArkpackLimits.maxPayloadBytes} byte compressed limit.`,
 				);
 			}
+			const compressed = new Uint8Array(bytes);
 			const reader = new Blob([
-				bytes.slice().buffer,
+				compressed.buffer,
 			])
 				.stream()
 				.pipeThrough(new DecompressionStream("gzip"))
@@ -92,6 +93,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 		);
 	}
 	return {
+		bytes,
 		descriptor: {
 			packageId: payloadPackageId,
 			contentHash,

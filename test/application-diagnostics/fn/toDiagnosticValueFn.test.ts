@@ -4,6 +4,25 @@ import { DiagnosticRecordSchema } from "~electron/contract/diagnostics/Diagnosti
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 
 describe("toDiagnosticValueFn", () => {
+	it("honors a smaller record-owned serialization budget", () => {
+		const value = toDiagnosticValueFn(
+			{
+				items: Array.from(
+					{
+						length: 100,
+					},
+					(_, index) => ({
+						id: `runtime:item:${index}`,
+						label: "x".repeat(100),
+					}),
+				),
+			},
+			256,
+		);
+
+		expect(JSON.stringify(value).length).toBeLessThanOrEqual(256);
+	});
+
 	it("bounds a circular object with one traversal-owned seen set", () => {
 		const circular: Record<string, unknown> = {};
 		circular.self = circular;
@@ -13,6 +32,35 @@ describe("toDiagnosticValueFn", () => {
 		};
 		expect(toDiagnosticValueFn(circular)).toEqual(expected);
 		expect(toDiagnosticValueFn(circular)).toEqual(expected);
+	});
+
+	it("preserves repeated immutable aliases outside the current ancestor path", () => {
+		const location = {
+			scope: "board",
+			space: 0,
+			position: {
+				x: 2,
+				y: 3,
+			},
+		};
+
+		expect(
+			toDiagnosticValueFn({
+				event: {
+					location,
+				},
+				state: {
+					location,
+				},
+			}),
+		).toEqual({
+			event: {
+				location,
+			},
+			state: {
+				location,
+			},
+		});
 	});
 
 	it("contains reflection failures from an unknown diagnostic value", () => {

@@ -123,6 +123,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		const liveResourceUrls = resourceUrls;
 		const diagnostics = yield* installGameDiagnosticsFx({
 			arkpack: loaded.descriptor,
+			arkpackBytes: loaded.bytes,
 			restored: state !== undefined,
 			runRendererEffectFn,
 			session,

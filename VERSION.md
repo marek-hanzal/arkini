@@ -66,6 +66,7 @@ The Editor installation catalog stores discovery roots, managed/external ownersh
 | `.arkpack` | Self-contained magic/length envelope around one gzip-compressed MessagePack gameplay payload and optional Sigstore proof through EOF. The proof signs only the exact compressed payload. Manifest owns gameplay `version`, Arkini writer, config byte length, and resource IDs/lengths needed to slice the stream. Package ID comes only from `config.meta.id`. |
 | Editor build descriptor | `{ projectId, revision, contentHash, size, diagnostics }`; disposable proof of one Community build, invalidated by later project mutation. `contentHash` covers only the inner gameplay payload. |
 | `.arksave` | MessagePack `{ version, arkini, state }` below the collision-safe encoded package directory. Path owns package identity; payload owns gameplay compatibility, writer provenance, and complete State. |
+| Latest incident environment | Disposable fixed directory `game/incidents/latest/` containing `game.arkpack`, `save.arksave`, and diagnostic-record JSONL from the failed session. A later fatal failure hard-overwrites these files; modification time identifies freshness. Each Arkpack/save retains its own normal compatibility contract. |
 
 Preferences are individual strictly validated scalar JSON files and need no envelope. Diagnostics are library-owned JSONL. OAuth records use the protocol's fields; Arkini validates complete identities but adds no format marker. Public MCP and generated JSON schemas use stable explicit IDs so references are never anonymous or `any`.
 

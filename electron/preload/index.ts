@@ -275,6 +275,10 @@ const api: ArkiniElectronApi.Api = {
 		openDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
 	},
+	incident: {
+		writeFn: (incident) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.incidentWrite, incident),
+	},
 	userData: {
 		openDirectoryFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.userDataOpenDirectory),
 	},

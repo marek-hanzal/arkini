@@ -70,6 +70,7 @@ describe("openEditorArkpackFx", () => {
 	it("creates a missing Editor project from the validated installed payload", async () => {
 		vi.mocked(loadArkpackFx).mockReturnValue(
 			Effect.succeed({
+				bytes: new Uint8Array(),
 				descriptor: {
 					packageId: project.projectId,
 					contentHash: "a".repeat(64),

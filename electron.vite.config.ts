@@ -39,6 +39,7 @@ export default defineConfig(({ command }) => {
 				externalizeDeps: false,
 				minify: true,
 				outDir: resolve(".out/desktop/build/main"),
+				sourcemap: true,
 				rollupOptions: {
 					external: [
 						/^@ngrok\/ngrok(?:$|-)/,
@@ -58,6 +59,7 @@ export default defineConfig(({ command }) => {
 				externalizeDeps: false,
 				minify: true,
 				outDir: resolve(".out/desktop/build/preload"),
+				sourcemap: true,
 				rollupOptions: {
 					input: resolve("electron/preload/index.ts"),
 					output: {
@@ -111,6 +113,7 @@ export default defineConfig(({ command }) => {
 			],
 			build: {
 				outDir: resolve(".out/desktop/build/renderer"),
+				sourcemap: true,
 				target: "esnext",
 				rollupOptions: {
 					input: resolve("index.html"),

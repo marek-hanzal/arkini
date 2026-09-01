@@ -18,6 +18,7 @@ describe("Arkini user data", () => {
 			game: {
 				root: join(userDataPath, "arkini", "game"),
 				arkpacks: join(userDataPath, "arkini", "game", "arkpacks"),
+				incidents: join(userDataPath, "arkini", "game", "incidents"),
 				logs: join(userDataPath, "arkini", "game", "logs"),
 				preferences: join(userDataPath, "arkini", "game", "preferences"),
 				saves: join(userDataPath, "arkini", "game", "saves"),

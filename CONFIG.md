@@ -53,7 +53,12 @@ Product commands are:
 arkini-cli game schema [--output path]
 arkini-cli game validate [project]
 arkini-cli game pack [project]
+arkini-cli game replay --incident <latest-directory> --until-fatal [--timeout-ms 10000]
+arkini-cli game replay --arkpack <file> --save <file> --until-fatal [--timeout-ms 10000]
+arkini-cli diagnostics slice <jsonl-file-or-directory> [--session-id <id>]
 ```
+
+Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files; diagnostic slicing defaults to the latest failed session and accepts both rotating application logs and incident JSONL.
 
 The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary local and Editor builds are Community.
 

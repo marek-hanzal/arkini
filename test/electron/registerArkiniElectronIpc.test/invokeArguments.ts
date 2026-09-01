@@ -131,6 +131,31 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		[],
 	],
 	[
+		ArkiniElectronApi.channels.incidentWrite,
+		[
+			{
+				arkpackBytes: new Uint8Array(),
+				saveBytes: new Uint8Array(),
+				diagnostics: [
+					{
+						level: "info",
+						category: [
+							"game",
+						],
+						event: "session-started",
+					},
+					{
+						level: "fatal",
+						category: [
+							"game",
+						],
+						event: "session-failed",
+					},
+				],
+			},
+		],
+	],
+	[
 		ArkiniElectronApi.channels.userDataOpenDirectory,
 		[],
 	],

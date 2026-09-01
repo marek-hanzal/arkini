@@ -19,7 +19,9 @@ import { createFilesystemGameSaveFilesFx } from "~/game-persistence/fx/createFil
 import type { ArkiniUserDataPaths } from "./user-data/ArkiniUserDataPaths";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
+import { GameIncidentWriteSchema } from "../contract/incident/GameIncidentWrite";
 import type { DiagnosticLog } from "./diagnostics/createDiagnosticLogFx";
+import { writeLatestGameIncidentFx } from "./incident/writeLatestGameIncidentFx";
 import { WindowModeSchema } from "../contract/window/WindowModeSchema";
 import type { WindowPreferences } from "./window/createFilesystemWindowPreferencesFx";
 import type { WindowModeControllerOwnership } from "./window/createWindowModeControllerOwnershipFx";
@@ -154,6 +156,19 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsOpenDirectory, (event) =>
 					runAuthorizedFn(event, diagnostics.openDirectoryFx),
 				);
+				ipcMain.handle(ArkiniElectronApi.channels.incidentWrite, (event, candidate) =>
+					runAuthorizedFn(
+						event,
+						Effect.sync(() => GameIncidentWriteSchema.parse(candidate)).pipe(
+							Effect.flatMap((incident) =>
+								writeLatestGameIncidentFx({
+									incidentsRoot: userDataPaths.game.incidents,
+									incident,
+								}),
+							),
+						),
+					),
+				);
 				ipcMain.handle(ArkiniElectronApi.channels.userDataOpenDirectory, (event) =>
 					runAuthorizedFn(
 						event,
@@ -265,6 +280,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.saveClear,
 						ArkiniElectronApi.channels.diagnosticsWrite,
 						ArkiniElectronApi.channels.diagnosticsOpenDirectory,
+						ArkiniElectronApi.channels.incidentWrite,
 						ArkiniElectronApi.channels.userDataOpenDirectory,
 						ArkiniElectronApi.channels.windowModeRead,
 						ArkiniElectronApi.channels.windowModeWrite,

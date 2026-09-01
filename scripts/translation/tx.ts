@@ -1,4 +1,4 @@
-import { dirname, extname, join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import { Console, Effect, FileSystem } from "effect";
 import * as ts from "typescript";
 import { parse, stringify } from "yaml";
@@ -10,7 +10,6 @@ import type { TranslationSource } from "~/translation/type/TranslationSource";
 
 export namespace tx {
 	export interface Props {
-		readonly locales: readonly string[];
 		readonly mode: "check" | "sync";
 		readonly packages: readonly string[];
 		readonly sourceDirectory: string;
@@ -186,6 +185,39 @@ const readOptionalFileFx = Effect.fn("readOptionalFileFx")(function* (path: stri
 	);
 });
 
+const readCatalogLocalesFx = Effect.fn("readCatalogLocalesFx")(function* (sourceDirectory: string) {
+	const fileSystem = yield* FileSystem.FileSystem;
+	const entries = yield* fileSystem.readDirectory(sourceDirectory).pipe(
+		Effect.mapError(
+			(cause) =>
+				new TranslationSyncError({
+					cause,
+					message: `Translation catalogs could not be discovered below ${sourceDirectory}.`,
+					operation: "discover",
+					path: sourceDirectory,
+				}),
+		),
+	);
+	return yield* Effect.try({
+		try: () =>
+			entries
+				.filter((entry) => extname(entry) === ".yaml")
+				.map((entry) => basename(entry, ".yaml"))
+				.map((locale) => {
+					Intl.getCanonicalLocales(locale);
+					return locale;
+				})
+				.sort(),
+		catch: (cause) =>
+			new TranslationSyncError({
+				cause,
+				message: `Translation catalog filename is not a valid locale below ${sourceDirectory}.`,
+				operation: "discover",
+				path: sourceDirectory,
+			}),
+	});
+});
+
 const writeFileFx = Effect.fn("writeFileFx")(function* (path: string, content: string) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	yield* Effect.gen(function* () {
@@ -208,12 +240,12 @@ const writeFileFx = Effect.fn("writeFileFx")(function* (path: string, content: s
 
 /** Extracts literal keys and reconciles locale catalogs without owning runtime loading. */
 export const tx = Effect.fn("tx")(function* ({
-	locales,
 	mode,
 	packages,
 	sourceDirectory,
 	sources,
 }: tx.Props) {
+	const locales = yield* readCatalogLocalesFx(sourceDirectory);
 	const packageFileNames = yield* Effect.forEach(packages, readSourceFileNamesFx);
 	const fileNames = Array.from(new Set(packageFileNames.flat())).sort();
 	const sourceFiles = yield* Effect.forEach(fileNames, readSourceFileFx, {

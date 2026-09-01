@@ -1,6 +1,8 @@
 import { createContext } from "react";
 
-import { translator } from "~/translation/constant/translator";
+import type { createTranslatorFn } from "~/translation/fn/createTranslatorFn";
 
-/** React projection of the same default translator available to plain modules. */
-export const TranslationContext = createContext(translator);
+/** React projection of the translator selected during renderer bootstrap. */
+export const TranslationContext = createContext<createTranslatorFn.Translator | undefined>(
+	undefined,
+);

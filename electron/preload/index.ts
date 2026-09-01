@@ -153,6 +153,10 @@ const api: ArkiniElectronApi.Api = {
 		writeLastPackageIdFn: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
+	localization: {
+		readPreferredLanguagesFn: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.localizationPreferredLanguagesRead),
+	},
 	editor: {
 		buildProjectFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuild, request),

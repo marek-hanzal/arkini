@@ -5,6 +5,7 @@ import { match } from "ts-pattern";
 import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
 import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
+import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 import {
 	ItemLineSummary,
 	type ItemLineSummaryIdentityRenderer,
@@ -37,10 +38,18 @@ const ItemLineUnavailableReason = ({
 			{
 				kind: "owner-stored",
 			},
+			({ message }) => <p>{message}</p>,
+		)
+		.with(
 			{
 				kind: "deposit-target-missing",
 			},
-			({ message }) => <p>{message}</p>,
+			(reason) => (
+				<p>
+					Requires {reason.selector.label} · None available (Board ·{" "}
+					{BoardDistancePresentation[reason.distance].label}).
+				</p>
+			),
 		)
 		.exhaustive();
 };
@@ -65,7 +74,7 @@ const readUnavailableDependencyFn = (
 			? undefined
 			: {
 					detail: reason.detail,
-					status: `Required · None available (Board · ${reason.distance})`,
+					status: `Required · None available (Board · ${BoardDistancePresentation[reason.distance].label})`,
 				};
 	}
 	return undefined;

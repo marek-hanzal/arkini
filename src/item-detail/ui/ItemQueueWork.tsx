@@ -7,6 +7,7 @@ import {
 	itemDetailMotionTransition,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
 import type { ItemDetailQueueProjection } from "~/item-detail/fx/projectItemDetailQueueFx";
+import { ProductionJobProgress } from "~/production-job/ui/ProductionJobProgress";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
@@ -55,13 +56,6 @@ export const ItemQueueActiveSlot = ({
 	readonly job: QueueProjection["active"][number] | undefined;
 	readonly queuedRequestCount: number;
 }) => {
-	const progress =
-		job === undefined
-			? 0
-			: job.durationMs === 0
-				? 1
-				: Math.max(0, Math.min(1, (job.durationMs - job.remainingMs) / job.durationMs));
-
 	return (
 		<div
 			className="relative min-h-28"
@@ -133,17 +127,8 @@ export const ItemQueueActiveSlot = ({
 						}}
 						transition={itemDetailMotionTransition}
 					>
-						<div
-							className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
-							data-ui="ItemQueueProgress"
-						>
-							<div
-								className="h-full bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
-								data-ui="ItemQueueProgressFill"
-								style={{
-									width: `${progress * 100}%`,
-								}}
-							/>
+						<div className="pointer-events-none absolute inset-y-0 right-0 left-0.5">
+							<ProductionJobProgress runtime={job} />
 						</div>
 						<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 							<div className="min-w-0 flex-1">

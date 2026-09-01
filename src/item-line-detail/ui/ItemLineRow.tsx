@@ -8,6 +8,7 @@ import { ItemLineDetails } from "~/item-line-detail/ui/ItemLineDetails";
 import { ItemLineStatus } from "~/item-line-detail/ui/ItemLineStatus";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineCommandController } from "~/item-line-detail/ui/useItemLineCommandController";
+import { ProductionJobProgress } from "~/production-job/ui/ProductionJobProgress";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemLineRowProps extends useItemLineCommandController.Props {
@@ -28,19 +29,6 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 		ownerItemId,
 	});
 	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;
-	const progress =
-		line.activeJob === undefined
-			? null
-			: line.activeJob.durationMs === 0
-				? 1
-				: Math.max(
-						0,
-						Math.min(
-							1,
-							(line.activeJob.durationMs - line.activeJob.remainingMs) /
-								line.activeJob.durationMs,
-						),
-					);
 	const lineState = stale
 		? "stale"
 		: line.activeJob !== undefined
@@ -64,13 +52,13 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 			{...itemDetailFadeMotion}
 		>
 			<AnimatePresence initial={false}>
-				{stale || progress === null ? null : (
+				{stale || line.activeJob === undefined ? null : (
 					<motion.div
 						key="progress"
 						animate={{
 							opacity: 1,
 						}}
-						className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
+						className="pointer-events-none absolute inset-y-0 right-0 left-0.5"
 						exit={{
 							opacity: 0,
 						}}
@@ -78,15 +66,8 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 							opacity: 0,
 						}}
 						transition={itemDetailFadeMotion.transition}
-						data-ui="TileLineProgress"
 					>
-						<div
-							className="h-full bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
-							data-ui="TileLineProgressFill"
-							style={{
-								width: `${progress * 100}%`,
-							}}
-						/>
+						<ProductionJobProgress runtime={line.activeJob} />
 					</motion.div>
 				)}
 			</AnimatePresence>

@@ -1,5 +1,6 @@
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineInputFrame } from "~/item-line-detail/ui/ItemLineInputFrame";
+import { ChargeCostValue } from "~/production-input/ui/ChargeCostValue";
 
 type SimpleInput = Extract<
 	ItemDetailLinesProjection.Input,
@@ -23,8 +24,7 @@ export const SimpleItemLineInput = ({
 	>
 		<p className="font-medium text-foreground">Owner charge</p>
 		<p className="text-right text-sm text-muted">
-			{input.charges.cost} charge{input.charges.cost === 1 ? "" : "s"} from{" "}
-			{input.charges.from === "self" ? "owner" : "target"}
+			<ChargeCostValue charge={input.charges} />
 		</p>
 	</ItemLineInputFrame>
 );

@@ -2,18 +2,7 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 import { QuantityValue } from "~/item-definition/ui/QuantityValue";
 import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
-
-const formatChargeCostFn = (input: LineInputSchema.Type) => {
-	if (input.charges === undefined) return "";
-	return (
-		" · " +
-		input.charges.cost +
-		" charge" +
-		(input.charges.cost === 1 ? "" : "s") +
-		" from " +
-		(input.charges.from === "self" ? "owner" : "target")
-	);
-};
+import { ChargeCostValue } from "~/production-input/ui/ChargeCostValue";
 
 const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 	const rowClassName =
@@ -23,8 +12,7 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 			<div className={rowClassName}>
 				<p className="font-medium text-foreground">Owner charge</p>
 				<p className="text-right text-sm text-muted">
-					{input.charges.cost} charge{input.charges.cost === 1 ? "" : "s"} from{" "}
-					{input.charges.from === "self" ? "owner" : "target"}
+					<ChargeCostValue charge={input.charges} />
 				</p>
 			</div>
 		);
@@ -42,7 +30,12 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 							? "Consumed"
 							: "Reserved"
 						: "Required deposit"}
-					{formatChargeCostFn(input)}
+					{input.charges === undefined ? null : (
+						<>
+							{" · "}
+							<ChargeCostValue charge={input.charges} />
+						</>
+					)}
 				</p>
 			</div>
 			<p className="text-right font-medium text-foreground">

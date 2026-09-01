@@ -13,6 +13,8 @@ import {
 	type ItemLineInputState,
 } from "~/item-line-detail/ui/ItemLineInputFrame";
 import { MaterialInputWithdraw } from "~/item-line-detail/ui/ItemLineInputWithdrawal";
+import { QuantityValue } from "~/item-definition/ui/QuantityValue";
+import { ChargeCostValue } from "~/production-input/ui/ChargeCostValue";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -124,9 +126,12 @@ export const MaterialItemLineInput = ({
 				/>
 				<p className="mt-0.5 text-xs text-muted">
 					{input.mode === "consume" ? "Consumed" : "Reserved"}
-					{input.charges === undefined
-						? ""
-						: ` · ${input.charges.cost} charge${input.charges.cost === 1 ? "" : "s"} from ${input.charges.from === "self" ? "owner" : "target"}`}
+					{input.charges === undefined ? null : (
+						<>
+							{" · "}
+							<ChargeCostValue charge={input.charges} />
+						</>
+					)}
 				</p>
 			</div>
 			{stale ? null : (
@@ -169,9 +174,7 @@ export const MaterialItemLineInput = ({
 								{...itemDetailFadeMotion}
 							>
 								{delivery ? input.deliveryQuantity : input.storedQuantity} /{" "}
-								{input.required.min === input.required.max
-									? input.required.min
-									: `${input.required.min}–${input.required.max}`}{" "}
+								<QuantityValue quantity={input.required} />{" "}
 								{delivery ? "on the way" : "stored"}
 							</motion.p>
 						</AnimatePresence>

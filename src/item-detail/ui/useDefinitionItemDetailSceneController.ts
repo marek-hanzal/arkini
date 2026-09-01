@@ -1,12 +1,13 @@
 import { Equal } from "effect";
-import { type ComponentProps, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { ItemDefinitionInfoTab } from "~/item-detail/ui/ItemDefinitionInfoTab";
 import { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
+import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -24,9 +25,20 @@ export namespace useDefinitionItemDetailSceneController {
 	>;
 
 	export type DefinitionProjection =
-		| (ComponentProps<typeof ItemDefinitionInfoTab>["definition"] & {
+		| {
 				readonly kind: "available";
-		  })
+				readonly itemId: IdSchema.Type;
+				readonly title: string;
+				readonly sourceUrl: string;
+				readonly compositeUrl?: string;
+				readonly description: string;
+				readonly itemType: TypeSchema.Type;
+				readonly storageScope: StorageSchema.Type;
+				readonly maxStackSize: number;
+				readonly ownedQuantity: number;
+				readonly maxCount?: number;
+				readonly totalCharges?: number;
+		  }
 		| {
 				readonly kind: "unavailable";
 		  };

@@ -12,12 +12,6 @@ export const translator: createTranslatorFn.Translator = Object.freeze({
 		}
 		return activeTranslator.textFn(key, fallback);
 	},
-	valueFn: (key: string, fallback?: string) => {
-		if (activeTranslator === undefined) {
-			throw new Error("Translations are not initialized yet.");
-		}
-		return activeTranslator.valueFn(key, fallback);
-	},
 });
 
 /** Replaces the active catalog before translated application work begins. */

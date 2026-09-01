@@ -1,6 +1,5 @@
 import type { ComponentProps } from "react";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 export namespace Markdown {
 	export interface Props extends Omit<ComponentProps<typeof ReactMarkdown>, "children"> {
@@ -17,9 +16,6 @@ export const Markdown = ({ children, components, ...props }: Markdown.Props) => 
 		<ReactMarkdown
 			{...props}
 			skipHtml
-			remarkPlugins={[
-				remarkGfm,
-			]}
 			components={{
 				h1: ({ children: heading }) => (
 					<h1 className="text-xl font-semibold text-foreground">{heading}</h1>

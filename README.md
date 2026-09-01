@@ -87,16 +87,17 @@ src/flow      canonical authored acquisition graph and origin projection
 src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
 src/flow-canvas  global Flow projection, painter policy and product UI
 src/estimate  demand grouping, witness and projection vocabulary, bounded Estimate analysis, cache and worker
-src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and About motion
+src/launcher  renderer-session hydration, Hero lifecycle, shell/action surfaces and About motion
 src/game-presentation  mounted-Game React context, selectors, events, command settlement and failures
 src/game-shell  Board, Inventory, playable Game resources and overlay composition
 src/game-menu  Game Menu lifecycle, save/close commands and navigation intent
 src/game-audio  committed-event cue projection and playable-surface-scoped Web Audio lifecycle
 src/game-cheat  save-scoped Cheat commands, catalog, controls and item-spawn spotlight
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
-src/application-runtime  renderer process composition, Atom bridge and native lifecycle
+src/application-runtime  renderer process capability root, Atom bridge and native lifecycle
 src/application-settings  Appearance, Cheat availability and application Settings state, commands and presentation
 src/application-shell  renderer root context, fatal surface and shared route transition/navigation behavior
+src/renderer-bootstrap  terminal ordered renderer startup and React root composition
 src/window-mode  native window-mode state, persistence and Electron-confirmed synchronization
 src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
 src/authoring-form  shared Editor form registry and canonical authored Item- and Asset-reference controls

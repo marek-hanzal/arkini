@@ -9,11 +9,10 @@ import { Tooltip } from "~/ui/ui/Tooltip";
 import { useEffect, useState } from "react";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { OriginFlow } from "~/flow-canvas/ui/OriginFlow";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 interface EditorItemFlowSearchProps {
 	readonly items: Readonly<Record<string, ItemSchema.Type>>;
@@ -116,29 +115,22 @@ export const EditorGameFlow = ({
 							value={itemId}
 						/>
 					</div>
-					<div className="inline-flex shrink-0 gap-1">
-						{(
-							[
-								"input",
-								"output",
-							] as const
-						).map((value) => (
-							<button
-								className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${selectableClassName}`}
-								key={value}
-								onClick={() => onDirectionChangeFn(value)}
-								type="button"
-								{...readDataUiFn({
-									dataUi: "EditorGameFlowDirection",
-									state: {
-										selected: direction === value,
-									},
-								})}
-							>
-								{value === "input" ? "Input" : "Output"}
-							</button>
-						))}
-					</div>
+					<SegmentedControl
+						dataUi="EditorGameFlowDirectionOptions"
+						onChangeFn={onDirectionChangeFn}
+						optionDataUi="EditorGameFlowDirection"
+						options={[
+							{
+								label: "Input",
+								value: "input",
+							},
+							{
+								label: "Output",
+								value: "output",
+							},
+						]}
+						value={direction}
+					/>
 				</div>
 			</div>
 			<OriginFlow

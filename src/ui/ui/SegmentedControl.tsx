@@ -1,0 +1,90 @@
+import { Info } from "lucide-react";
+import type { ReactNode } from "react";
+
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Tooltip } from "~/ui/ui/Tooltip";
+
+interface SegmentedControlOption<Value extends string> {
+	readonly description?: ReactNode;
+	readonly disabled?: boolean;
+	readonly label: ReactNode;
+	readonly value: Value;
+}
+
+interface SegmentedControlProps<Value extends string> {
+	readonly dataUi: string;
+	readonly disabled?: boolean;
+	readonly fill?: boolean;
+	readonly onChangeFn: (value: Value) => void;
+	readonly optionDataUi: string;
+	readonly options: ReadonlyArray<SegmentedControlOption<Value>>;
+	readonly pending?: boolean;
+	readonly size?: "compact" | "default" | "large";
+	readonly value: Value;
+}
+
+const SegmentedControlSizeClassName = {
+	compact: "min-h-9 px-3 py-1.5 text-xs",
+	default: "min-h-[var(--ak-control-min-height)] px-3 py-2 text-sm",
+	large: "h-12 min-h-12 px-4 py-0 text-sm",
+} as const;
+
+/** Renders one canonical mutually exclusive control with input-aligned framing. */
+export const SegmentedControl = <Value extends string>({
+	dataUi,
+	disabled = false,
+	fill = false,
+	onChangeFn,
+	optionDataUi,
+	options,
+	pending = false,
+	size = "default",
+	value,
+}: SegmentedControlProps<Value>) => (
+	<div
+		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex max-w-full"} min-w-0 overflow-x-auto rounded-lg border border-line-strong bg-canvas/70 p-1`}
+		{...readDataUiFn({
+			dataUi,
+			state: {
+				fill,
+			},
+		})}
+	>
+		{options.map((option) => {
+			const optionDisabled = disabled || pending || option.disabled === true;
+			const button = (
+				<button
+					key={option.value}
+					type="button"
+					className={`ak-segmented-option relative -ml-px inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border font-semibold first:ml-0 first:rounded-l-md last:rounded-r-md ${fill ? "flex-1" : ""} ${SegmentedControlSizeClassName[size]}`}
+					disabled={optionDisabled}
+					onClick={() => onChangeFn(option.value)}
+					{...readDataUiFn({
+						dataUi: optionDataUi,
+						state: {
+							disabled: optionDisabled,
+							pending,
+							selected: option.value === value,
+							value: option.value,
+						},
+					})}
+				>
+					{option.label}
+					{option.description === undefined ? null : (
+						<Info className="size-3.5 opacity-70" />
+					)}
+				</button>
+			);
+			return option.description === undefined ? (
+				button
+			) : (
+				<Tooltip
+					content={option.description}
+					key={option.value}
+				>
+					{button}
+				</Tooltip>
+			);
+		})}
+	</div>
+);

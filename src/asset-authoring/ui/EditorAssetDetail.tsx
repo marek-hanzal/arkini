@@ -63,10 +63,12 @@ const EditorAssetDetailTab = ({
 
 export const EditorAssetDetail = ({
 	children,
+	contentVariant = "card",
 	filter,
 	query,
 	resourceId,
 }: PropsWithChildren<{
+	readonly contentVariant?: "card" | "flat";
 	readonly filter: "all" | "unused";
 	readonly query: string;
 	readonly resourceId: string;
@@ -170,7 +172,11 @@ export const EditorAssetDetail = ({
 				/>
 			}
 		>
-			<EditorRootCard dataUi="EditorAssetDetailCard">{children}</EditorRootCard>
+			{contentVariant === "flat" ? (
+				children
+			) : (
+				<EditorRootCard dataUi="EditorAssetDetailCard">{children}</EditorRootCard>
+			)}
 		</EditorSectionPage>
 	);
 };

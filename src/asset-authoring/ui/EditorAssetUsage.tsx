@@ -1,4 +1,4 @@
-import { Unlink } from "lucide-react";
+import { ChevronRight, Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
@@ -20,7 +20,10 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 		);
 	}
 	return (
-		<section className="ak-list grid gap-2">
+		<section
+			className="ak-list grid gap-2"
+			data-ui="EditorAssetUsage"
+		>
 			{usages.map((usage) => {
 				const content = (
 					<>
@@ -31,6 +34,9 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 						<span className="text-xs uppercase tracking-wide text-subtle">
 							{usage.owner}
 						</span>
+						{usage.owner === "item" ? (
+							<ChevronRight className="size-5 shrink-0 text-subtle" />
+						) : null}
 					</>
 				);
 				return usage.owner === "item" ? (
@@ -42,14 +48,14 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 							itemUid: usage.ownerUid,
 							sectionId: "artwork",
 						}}
-						className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-3 border-0 p-4 text-left shadow-none"
+						className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-3 rounded-xl border-0 p-4 text-left shadow-none"
 					>
 						{content}
 					</ButtonLink>
 				) : (
 					<div
 						key={`project:${usage.roleLabel}`}
-						className="ak-list-row flex min-w-0 items-center gap-3 rounded-lg p-4"
+						className="ak-list-row flex min-w-0 items-center gap-3 rounded-xl p-4"
 					>
 						{content}
 					</div>

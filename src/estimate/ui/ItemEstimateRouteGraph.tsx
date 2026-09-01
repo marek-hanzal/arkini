@@ -3,8 +3,8 @@ import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
 import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
@@ -52,29 +52,23 @@ export const ItemEstimateRouteGraph = ({
 				data-ui="EditorItemEstimateHeader"
 			>
 				{header}
-				<div className="inline-flex shrink-0 rounded-lg border border-line bg-surface p-1">
-					{(
-						[
-							"time",
-							"quantity",
-						] as const
-					).map((value) => (
-						<button
-							className={`cursor-pointer rounded-md border px-2.5 py-1 text-xs font-semibold ${selectableClassName}`}
-							key={value}
-							onClick={() => setSortFn(value)}
-							type="button"
-							{...readDataUiFn({
-								dataUi: "EditorItemEstimateRouteSort",
-								state: {
-									selected: sort === value,
-								},
-							})}
-						>
-							{value === "time" ? "Time" : "Quantity"}
-						</button>
-					))}
-				</div>
+				<SegmentedControl
+					dataUi="EditorItemEstimateRouteSortOptions"
+					onChangeFn={setSortFn}
+					optionDataUi="EditorItemEstimateRouteSort"
+					options={[
+						{
+							label: "Time",
+							value: "time",
+						},
+						{
+							label: "Quantity",
+							value: "quantity",
+						},
+					]}
+					size="compact"
+					value={sort}
+				/>
 			</article>
 			<div
 				className="ak-list grid min-h-0 gap-2 overflow-y-auto pr-1"

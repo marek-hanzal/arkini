@@ -150,15 +150,20 @@
 
 .ak-segmented-option {
 	color: var(--ak-muted);
+	background-color: var(--ak-secondary-subtle);
+	border-color: var(--ak-line);
 	transition:
 		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
 }
 
 .ak-segmented-option[data-ui-selected="true"] {
-	color: var(--ak-accent-contrast);
-	background-color: var(--ak-accent);
+	z-index: 1;
+	color: var(--ak-secondary-foreground);
+	background-color: var(--ak-secondary-selected);
+	border-color: var(--ak-secondary-border);
 }
 
 .ak-segmented-option[data-ui-pending="true"] {
@@ -175,12 +180,14 @@
 	.ak-segmented-option:not([data-ui-pending="true"]):not([data-ui-disabled="true"]):not(
 		[data-ui-selected="true"]
 	):hover {
-		background-color: var(--ak-surface);
+		color: var(--ak-secondary-foreground);
+		background-color: var(--ak-secondary-hover);
+		border-color: var(--ak-secondary-border);
 	}
 
 	.ak-segmented-option[data-ui-selected="true"]:not([data-ui-pending="true"]):not(
 		[data-ui-disabled="true"]
 	):hover {
-		background-color: var(--ak-accent-hover);
+		background-color: var(--ak-secondary-selected);
 	}
 }

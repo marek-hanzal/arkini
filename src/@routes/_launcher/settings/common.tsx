@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { useModelContext } from "~/application-settings/ui/ModelContext";
-import { SettingsSegmentedChoice } from "~/application-settings/ui/SettingsSegmentedChoice";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 const ThemeOptions: ReadonlyArray<{
 	readonly value: AppearanceThemeSchema.Type;
@@ -54,11 +54,13 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 					disabled={model.blocked}
 				>
 					<legend className="text-sm font-semibold text-foreground">Window</legend>
-					<SettingsSegmentedChoice
+					<SegmentedControl
 						options={WindowModeOptions}
-						selected={model.windowMode}
+						value={model.windowMode}
 						pending={model.blocked}
+						fill
 						dataUi="SettingsWindowModeOptions"
+						optionDataUi="SettingsSegmentedChoiceOption"
 						onChangeFn={model.selectWindowModeFn}
 					/>
 					<p className="text-sm leading-6 text-muted">
@@ -72,11 +74,13 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 					disabled={model.blocked}
 				>
 					<legend className="text-sm font-semibold text-foreground">Theme</legend>
-					<SettingsSegmentedChoice
+					<SegmentedControl
 						options={ThemeOptions}
-						selected={model.theme}
+						value={model.theme}
 						pending={model.blocked}
+						fill
 						dataUi="SettingsThemeOptions"
+						optionDataUi="SettingsSegmentedChoiceOption"
 						onChangeFn={model.selectThemeFn}
 					/>
 					<p className="text-sm leading-6 text-muted">

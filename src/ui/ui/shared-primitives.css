@@ -31,6 +31,11 @@
 	}
 }
 
+/* The interactive row owns its pressed surface; a stretched route link only owns navigation. */
+.ak-list-row-interactive a:active {
+	background-color: transparent;
+}
+
 .ak-list-row-active,
 .ak-list-row[data-ui-state="active"] {
 	background-color: var(--ak-list-row-active-surface);

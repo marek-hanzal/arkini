@@ -7,6 +7,7 @@ import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import { IdentityDetail } from "~/item-authoring/ui/IdentityDetail";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
+import { RequiredBySection } from "~/item-authoring/ui/RequiredBySection";
 import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
 import { SpaceActionDetail } from "~/item-authoring/ui/SpaceActionDetail";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
@@ -57,6 +58,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <ProductionDetail item={item} />;
 			case "estimate":
 				return <ItemEstimateSection itemId={item.id} />;
+			case "required-by":
+				return <RequiredBySection itemId={item.id} />;
 			case "delete":
 				return <DeleteSection item={item} />;
 		}

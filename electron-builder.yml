@@ -30,7 +30,6 @@ files:
     to: app
     filter:
       - '**/*'
-      - '!**/*.map'
 extraResources:
   - from: game/arkini/build
     to: game

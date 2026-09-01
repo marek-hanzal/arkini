@@ -40,9 +40,16 @@ const createTransition = (sequence: number): GameTransition =>
 		previousRuntime: null,
 		events: [],
 		runtime: {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
 			items: [],
 			jobs: [],
 			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		},
 	}) as unknown as GameTransition;
 
@@ -59,6 +66,9 @@ describe("Game diagnostics", () => {
 					diagnostics: {
 						writeFn: write,
 						openDirectoryFn: () => Promise.resolve(),
+					},
+					incident: {
+						writeFn: () => Promise.resolve(),
 					},
 				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
 			},
@@ -85,13 +95,18 @@ describe("Game diagnostics", () => {
 				};
 			},
 			getFatalErrorFn: () => fatal,
+			getTransitionSnapshotFn: () => createTransition(5),
 		} satisfies Pick<
 			GameSession,
-			"getFatalErrorFn" | "subscribeFatalErrorFn" | "subscribeTransitionsFn"
+			| "getFatalErrorFn"
+			| "getTransitionSnapshotFn"
+			| "subscribeFatalErrorFn"
+			| "subscribeTransitionsFn"
 		>;
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
+				arkpackBytes: new Uint8Array(),
 				restored: true,
 				runRendererEffectFn,
 				session,
@@ -105,8 +120,66 @@ describe("Game diagnostics", () => {
 		transitionListener?.(createTransition(1));
 		expect(write).toHaveBeenCalledTimes(2);
 
-		transitionListener?.({
+		const queuedTransition = {
 			...createTransition(2),
+			runtime: {
+				...createTransition(2).runtime,
+				jobQueue: [
+					{
+						id: "request:water:1",
+						ownerItemId: "runtime:item:well",
+						lineId: "line:water",
+					},
+				],
+			},
+		} as unknown as GameTransition;
+		transitionListener?.(queuedTransition);
+		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+			event: "runtime-committed",
+			data: {
+				sequence: 2,
+				jobQueue: [
+					{
+						id: "request:water:1",
+						ownerItemId: "runtime:item:well",
+						lineId: "line:water",
+					},
+				],
+			},
+		});
+
+		const defaultLineTransition = {
+			...queuedTransition,
+			sequence: 3,
+			runtime: {
+				...queuedTransition.runtime,
+				defaultLineByOwnerItemId: {
+					"runtime:item:well": "line:water",
+				},
+			},
+		} as unknown as GameTransition;
+		transitionListener?.(defaultLineTransition);
+		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+			event: "runtime-committed",
+			data: {
+				sequence: 3,
+				defaultLines: [
+					{
+						ownerItemId: "runtime:item:well",
+						lineId: "line:water",
+					},
+				],
+			},
+		});
+		transitionListener?.({
+			...defaultLineTransition,
+			sequence: 4,
+		});
+		expect(write).toHaveBeenCalledTimes(4);
+
+		transitionListener?.({
+			...defaultLineTransition,
+			sequence: 5,
 			events: [
 				{
 					type: "test-semantic-event",
@@ -119,7 +192,7 @@ describe("Game diagnostics", () => {
 				eventTypes: [
 					"test-semantic-event",
 				],
-				sequence: 2,
+				sequence: 5,
 			},
 		});
 
@@ -190,7 +263,7 @@ describe("Game diagnostics", () => {
 					},
 				},
 				source: "tick",
-				sequence: 2,
+				sequence: 5,
 			},
 		});
 
@@ -199,7 +272,7 @@ describe("Game diagnostics", () => {
 			event: "session-ended",
 			data: {
 				reason: "saved",
-				sequence: 2,
+				sequence: 5,
 			},
 		});
 	});

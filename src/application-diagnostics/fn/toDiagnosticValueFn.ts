@@ -139,6 +139,7 @@ const toDiagnosticValueAtDepthFn = (
 					break;
 				}
 			}
+			seen.delete(value);
 			return error;
 		}
 		if (Array.isArray(value)) {
@@ -150,6 +151,7 @@ const toDiagnosticValueAtDepthFn = (
 				budget.remaining -= entryOverhead;
 				result.push(toDiagnosticValueAtDepthFn(entry, depth + 1, seen, budget));
 			}
+			seen.delete(value);
 			return result;
 		}
 
@@ -174,15 +176,23 @@ const toDiagnosticValueAtDepthFn = (
 			result[boundedKey] = toDiagnosticValueAtDepthFn(propertyValue, depth + 1, seen, budget);
 			entryCount += 1;
 		}
+		seen.delete(value);
 		return result;
 	} catch (cause) {
+		if (value !== null && typeof value === "object") seen.delete(value);
 		budget.remaining = startingBudget;
 		return toUnreadableDiagnosticValueFn(cause, budget);
 	}
 };
 
 /** Converts unknown failures and Effect/Pixi objects into a bounded JSON-safe diagnostic value. */
-export const toDiagnosticValueFn = (value: unknown): DiagnosticValue =>
+export const toDiagnosticValueFn = (
+	value: unknown,
+	serializedLengthLimit = maxDiagnosticSerializedLength,
+): DiagnosticValue =>
 	toDiagnosticValueAtDepthFn(value, 0, new WeakSet<object>(), {
-		remaining: maxDiagnosticSerializedLength,
+		remaining:
+			Number.isFinite(serializedLengthLimit) && serializedLengthLimit >= 2
+				? Math.min(maxDiagnosticSerializedLength, Math.floor(serializedLengthLimit))
+				: maxDiagnosticSerializedLength,
 	});

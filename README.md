@@ -25,7 +25,7 @@ Read the smallest entry point needed for the task:
 src/game-runtime  canonical live Runtime schemas, Item purity/stateful rejection, cheat state, validation, identity, reads and atomic publication
 src/game-session  package-independent Runtime/Tick/save execution, subscriptions, fail-stop and disposal lifecycle
 src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
-src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization, recovery and last successful package preference
+src/installed-game  Arkpack/save bootstrap, diagnostics and latest incident capture, package leases, finalization, recovery and last successful package preference
 src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
 src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
 src/application-version  Arkini writer provenance, major-only admission and incompatibility failure
@@ -38,7 +38,7 @@ src/item-query  authored Item query schemas and canonical Runtime execution acro
 src/item-resolution  canonical configured Item lookup and exact not-found rejection
 src/item-revision  opaque live Item revisions, fresh creation and stale-write rejection
 src/item-state-isolation  atomic stateful-owner stack isolation and pure-remainder placement
-src/arkini-cli  product CLI commands, diagnostic presentation, process composition and its one Node runtime root
+src/arkini-cli  product CLI commands, failed-session replay and diagnostic slicing, process composition and its one Node runtime root
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections

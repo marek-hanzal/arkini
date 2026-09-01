@@ -12,6 +12,7 @@ export const createArkiniUserDataPathsFn = (userDataPath: string): ArkiniUserDat
 		game: {
 			root: gameRoot,
 			arkpacks: join(gameRoot, "arkpacks"),
+			incidents: join(gameRoot, "incidents"),
 			logs: join(gameRoot, "logs"),
 			preferences: join(gameRoot, "preferences"),
 			saves: join(gameRoot, "saves"),

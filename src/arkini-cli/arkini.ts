@@ -4,7 +4,9 @@ import { Effect } from "effect";
 import { Command } from "effect/unstable/cli";
 
 import { ArkpackCommand } from "~/arkini-cli/command/ArkpackCommand";
+import { DiagnosticsCommand } from "~/arkini-cli/command/DiagnosticsCommand";
 import { PackCommand } from "~/arkini-cli/command/PackCommand";
+import { ReplayCommand } from "~/arkini-cli/command/ReplayCommand";
 import { SchemaCommand } from "~/arkini-cli/command/SchemaCommand";
 import { ValidateCommand } from "~/arkini-cli/command/ValidateCommand";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
@@ -12,6 +14,7 @@ import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 const GameCommand = Command.make("game")
 	.pipe(
 		Command.withSubcommands([
+			ReplayCommand,
 			PackCommand({
 				input: "game/arkini",
 			}),
@@ -29,6 +32,7 @@ const ArkiniCommand = Command.make("arkini-cli")
 	.pipe(
 		Command.withSubcommands([
 			ArkpackCommand,
+			DiagnosticsCommand,
 			GameCommand,
 		]),
 	)

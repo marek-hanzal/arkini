@@ -62,9 +62,10 @@ copy_paste_check() {
 }
 
 package_macos_artifacts() {
-	local packaged_cli version
+	local packaged_asar packaged_cli version
 	version=$(desktop_version)
 	packaged_cli=.out/desktop/release/mac-arm64/Arkini.app/Contents/MacOS/arkini-cli
+	packaged_asar=.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/app.asar
 	electron-builder \
 		--config electron-builder.yml \
 		--mac \
@@ -76,6 +77,12 @@ package_macos_artifacts() {
 		.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/game/arkini.arkpack
 	"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
 		grep -Fx "{\"type\":\"${ARKINI_EXPECTED_PROVENANCE:-community}\"}"
+	"$packaged_cli" game replay --help | grep -F -- "--until-fatal"
+	"$packaged_cli" diagnostics slice --help | grep -F -- "--session-id"
+	grep -aFq '"arkini.js.map"' "$packaged_asar"
+	grep -aFq '"index.cjs.map"' "$packaged_asar"
+	grep -aEq '"index-[^"]+\.js\.map"' "$packaged_asar"
+	grep -aEq '"[^"]+\.worker-[^"]+\.js\.map"' "$packaged_asar"
 }
 
 package_windows_artifacts() {

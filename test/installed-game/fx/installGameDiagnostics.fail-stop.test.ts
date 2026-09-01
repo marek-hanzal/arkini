@@ -40,6 +40,9 @@ describe("Game diagnostics fail-stop", () => {
 						writeFn: write,
 						openDirectoryFn: () => Promise.resolve(),
 					},
+					incident: {
+						writeFn: () => Promise.resolve(),
+					},
 				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
 			},
 		});
@@ -50,6 +53,7 @@ describe("Game diagnostics fail-stop", () => {
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
+				arkpackBytes: new Uint8Array(),
 				restored: false,
 				runRendererEffectFn,
 				session,

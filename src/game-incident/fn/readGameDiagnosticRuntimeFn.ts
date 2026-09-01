@@ -24,7 +24,6 @@ export const readGameDiagnosticRuntimeFn = ({
 		cheats: runtime.cheats,
 		items: runtime.items.map((item) => ({
 			item: readOwnerFn(item.id),
-			revision: item.revision,
 			quantity: item.quantity,
 			...(item.remainingCharges === undefined
 				? {}

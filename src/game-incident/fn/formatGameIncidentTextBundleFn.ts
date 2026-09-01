@@ -39,7 +39,6 @@ const formatRuntimeFn = (report: GameIncidentReport) => {
 			"",
 			`### ${formatGameDiagnosticItemReferenceTextFn(item.item)}`,
 			"",
-			`- Revision: ${item.revision}`,
 			`- Quantity: ${item.quantity}`,
 			...(item.remainingCharges === undefined
 				? []

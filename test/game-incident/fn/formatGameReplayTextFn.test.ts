@@ -4,32 +4,35 @@ import { formatGameReplayTextFn } from "~/game-incident/fn/formatGameReplayTextF
 import type { GameDiagnosticRuntime } from "~/game-incident/type/GameDiagnosticRuntime";
 import type { GameReplayReport } from "~/game-incident/type/GameReplayReport";
 
+const itemReference = {
+	runtimeItemId: "runtime:item:forge",
+	definition: {
+		itemId: "forge",
+		itemUid: "uid:forge",
+		title: "Forge",
+	},
+} satisfies GameDiagnosticRuntime["items"][number]["item"];
+
 const runtime = ({
-	currentSpace,
-	quantity = 1,
-	revision = "revision:initial",
-}: {
-	readonly currentSpace: number;
-	readonly quantity?: number;
-	readonly revision?: string;
-}): GameDiagnosticRuntime => ({
-	currentSpace,
-	cheats: {
+	cheats = {
 		enabled: false,
 		everEnabled: false,
 		instantGameplay: false,
 	},
+	currentSpace,
+	defaultLineId,
+	quantity = 1,
+}: {
+	readonly cheats?: GameDiagnosticRuntime["cheats"];
+	readonly currentSpace: number;
+	readonly defaultLineId?: string;
+	readonly quantity?: number;
+}): GameDiagnosticRuntime => ({
+	currentSpace,
+	cheats,
 	items: [
 		{
-			item: {
-				runtimeItemId: "runtime:item:forge",
-				definition: {
-					itemId: "forge",
-					itemUid: "uid:forge",
-					title: "Forge",
-				},
-			},
-			revision,
+			item: itemReference,
 			quantity,
 			location: {
 				scope: "board",
@@ -39,7 +42,15 @@ const runtime = ({
 	],
 	jobs: [],
 	queue: [],
-	defaultLines: [],
+	defaultLines:
+		defaultLineId === undefined
+			? []
+			: [
+					{
+						owner: itemReference,
+						lineId: defaultLineId,
+					},
+				],
 });
 
 const report = ({
@@ -87,7 +98,7 @@ describe("formatGameReplayTextFn", () => {
 		expect(text).not.toContain("# Failure");
 	});
 
-	it("reports meaningful item changes without opaque revision churn", () => {
+	it("reports meaningful item changes", () => {
 		const text = formatGameReplayTextFn(
 			report({
 				initialRuntime: runtime({
@@ -96,12 +107,52 @@ describe("formatGameReplayTextFn", () => {
 				finalRuntime: runtime({
 					currentSpace: 0,
 					quantity: 2,
-					revision: "revision:changed",
 				}),
 			}),
 		);
 
 		expect(text).toContain("quantity 1 → 2");
-		expect(text).not.toContain("revision:");
+	});
+
+	it("reports cheat changes instead of claiming that the runtime stayed unchanged", () => {
+		const text = formatGameReplayTextFn(
+			report({
+				initialRuntime: runtime({
+					currentSpace: 0,
+				}),
+				finalRuntime: runtime({
+					cheats: {
+						enabled: true,
+						everEnabled: true,
+						instantGameplay: true,
+					},
+					currentSpace: 0,
+				}),
+			}),
+		);
+
+		expect(text).toContain("### Cheats");
+		expect(text).toContain("- Enabled: no → yes");
+		expect(text).toContain("- Ever enabled: no → yes");
+		expect(text).toContain("- Instant gameplay: no → yes");
+		expect(text).not.toContain("No runtime change was observed");
+	});
+
+	it("reports default-line changes instead of claiming that the runtime stayed unchanged", () => {
+		const text = formatGameReplayTextFn(
+			report({
+				initialRuntime: runtime({
+					currentSpace: 0,
+				}),
+				finalRuntime: runtime({
+					currentSpace: 0,
+					defaultLineId: "line:forge",
+				}),
+			}),
+		);
+
+		expect(text).toContain("### Default lines");
+		expect(text).toContain("- Added: runtime:item:forge · line:forge");
+		expect(text).not.toContain("No runtime change was observed");
 	});
 });

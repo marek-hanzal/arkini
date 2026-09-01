@@ -33,14 +33,15 @@ const formatStackFn = (stack: string): readonly string[] => {
 };
 
 const appendValueFn = (lines: string[], value: DiagnosticValue, indent: string, label?: string) => {
-	const prefix = label === undefined ? indent : `${indent}${label}:`;
+	const renderedLabel = label === undefined ? undefined : redactDiagnosticPathsFn(label);
+	const prefix = renderedLabel === undefined ? indent : `${indent}${renderedLabel}:`;
 	if (value === null || typeof value === "boolean" || typeof value === "number") {
-		lines.push(`${prefix}${label === undefined ? "" : " "}${String(value)}`);
+		lines.push(`${prefix}${renderedLabel === undefined ? "" : " "}${String(value)}`);
 		return;
 	}
 	if (typeof value === "string") {
 		const redacted = redactDiagnosticPathsFn(value);
-		if (label === "stack") {
+		if (renderedLabel === "stack") {
 			lines.push(prefix);
 			for (const stackLine of formatStackFn(redacted)) lines.push(`${indent}  ${stackLine}`);
 			return;
@@ -50,7 +51,7 @@ const appendValueFn = (lines: string[], value: DiagnosticValue, indent: string, 
 			for (const line of redacted.split(/\r?\n/)) lines.push(`${indent}  ${line}`);
 			return;
 		}
-		lines.push(`${prefix}${label === undefined ? "" : " "}${redacted}`);
+		lines.push(`${prefix}${renderedLabel === undefined ? "" : " "}${redacted}`);
 		return;
 	}
 	if (Array.isArray(value)) {
@@ -77,8 +78,8 @@ const appendValueFn = (lines: string[], value: DiagnosticValue, indent: string, 
 		}
 		return;
 	}
-	if (label !== undefined) lines.push(prefix);
-	const childIndent = label === undefined ? indent : `${indent}  `;
+	if (renderedLabel !== undefined) lines.push(prefix);
+	const childIndent = renderedLabel === undefined ? indent : `${indent}  `;
 	const entries = Object.entries(value);
 	if (entries.length === 0) {
 		lines.push(`${childIndent}(none)`);

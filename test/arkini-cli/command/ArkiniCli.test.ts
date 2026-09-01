@@ -159,6 +159,58 @@ describe("game incident CLI", () => {
 		expect(result.stdout.trimStart()).not.toMatch(/^\{/);
 	}, 15_000);
 
+	it("reports invalid replay requests without framework stacks or physical paths", async () => {
+		const missingIncident = join(root, "missing-incident");
+		const runRejectedReplayFn = async (args: readonly string[]) =>
+			execFileAsync(
+				process.execPath,
+				[
+					"node_modules/tsx/dist/cli.mjs",
+					"src/arkini-cli/arkini.ts",
+					"game",
+					"replay",
+					...args,
+				],
+				{
+					env: process.env,
+				},
+			).catch(
+				(cause: unknown) =>
+					cause as {
+						readonly stderr: string;
+						readonly stdout: string;
+					},
+			);
+		const invalidTimeout = await runRejectedReplayFn([
+			"--incident",
+			missingIncident,
+			"--until-fatal",
+			"--timeout-ms",
+			"0",
+		]);
+		const missingInput = await runRejectedReplayFn([
+			"--incident",
+			missingIncident,
+			"--until-fatal",
+			"--timeout-ms",
+			"10",
+		]);
+		const invalidTimeoutOutput = `${invalidTimeout.stdout}${invalidTimeout.stderr}`;
+		const missingInputOutput = `${missingInput.stdout}${missingInput.stderr}`;
+
+		expect(invalidTimeoutOutput).toContain("--timeout-ms must be between 1 and 300000");
+		expect(missingInputOutput).toContain("Could not read the replay Arkpack");
+		for (const output of [
+			invalidTimeoutOutput,
+			missingInputOutput,
+		]) {
+			expect(output).not.toContain(root);
+			expect(output).not.toContain("app.asar");
+			expect(output).not.toContain("file:///");
+			expect(output).not.toMatch(/\n\s+at\s/u);
+		}
+	}, 15_000);
+
 	it("selects one thematic section from a fixed text incident", async () => {
 		const incident = join(root, GameIncidentFiles.directory);
 		await mkdir(incident);
@@ -226,6 +278,8 @@ describe("game incident CLI", () => {
 		const rejectionOutput = `${rejectedSession.stdout}${rejectedSession.stderr}`;
 		expect(rejectionOutput).toContain("--session-id applies only to diagnostic JSONL");
 		expect(rejectionOutput).not.toContain(root);
+		expect(rejectionOutput).not.toContain("DiagnosticsSliceCommand.ts");
+		expect(rejectionOutput).not.toMatch(/\n\s+at\s/u);
 	}, 15_000);
 
 	it("renders the latest failed session from the current rotating JSONL contract", async () => {

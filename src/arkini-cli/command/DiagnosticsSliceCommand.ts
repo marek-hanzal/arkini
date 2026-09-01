@@ -1,4 +1,4 @@
-import { Argument, Command, Flag } from "effect/unstable/cli";
+import { Argument, CliError, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect, FileSystem, Option } from "effect";
 import { join } from "node:path";
 
@@ -7,6 +7,12 @@ import { formatGameDiagnosticSessionTextFn } from "~/game-incident/fn/formatGame
 import { readGameDiagnosticTextSectionFn } from "~/game-incident/fn/readGameDiagnosticTextSectionFn";
 import { readGameDiagnosticLogSessionFx } from "~/game-incident/fx/readGameDiagnosticLogSessionFx";
 import { readGameIncidentTextFx } from "~/game-incident/fx/readGameIncidentTextFx";
+
+const toDiagnosticsUserErrorFn = (cause: unknown) =>
+	new CliError.UserError({
+		cause,
+		userMessage: cause instanceof Error ? cause.message : "The diagnostic command failed.",
+	});
 
 const runDiagnosticsSliceFx = Effect.fn("runDiagnosticsSliceFx")(function* ({
 	input,
@@ -81,7 +87,7 @@ export const DiagnosticsSliceCommand = Command.make(
 			input,
 			section,
 			sessionId,
-		}),
+		}).pipe(Effect.mapError(toDiagnosticsUserErrorFn)),
 ).pipe(
 	Command.withDescription(
 		"Render one failed game session from a fixed incident or rotating diagnostic logs.",

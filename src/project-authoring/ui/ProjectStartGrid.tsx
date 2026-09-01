@@ -144,7 +144,7 @@ export const ProjectStartGrid = ({
 		<>
 			<div className="max-w-full overflow-auto rounded-xl border border-line bg-canvas/50 p-3">
 				<div
-					className="grid w-max gap-1.5"
+					className="mx-auto grid w-max gap-1.5"
 					ref={gridRef}
 					style={{
 						gridTemplateColumns: `repeat(${Math.max(1, width)}, 4.5rem)`,

@@ -2,6 +2,7 @@ export type ProjectCompatibilityResult = "noop" | "minor" | "major";
 export type ProjectCompatibilityDiffResult = Exclude<ProjectCompatibilityResult, "noop">;
 export type ProjectCompatibilityPath = ReadonlyArray<string | number>;
 export type ProjectCompatibilityRule =
+	| "about-avatar"
 	| "game-title"
 	| "item-title"
 	| "item-description"

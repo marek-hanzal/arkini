@@ -236,6 +236,34 @@ describe("item section form session", () => {
 		expect(state.navigate).toHaveBeenCalledOnce();
 	});
 
+	it("discards the local draft and returns an existing item to detail without saving", async () => {
+		const { container } = await render(<IdentitySection />);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing item title input.");
+
+		await changeInput(title, "Discarded title");
+		const discardButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Discard");
+		if (discardButton === undefined) throw new Error("Missing item Discard action.");
+		await act(async () => {
+			discardButton.click();
+			await Promise.resolve();
+		});
+
+		expect(title.value).toBe("Water");
+		expect(state.saveItem).not.toHaveBeenCalled();
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
+			params: {
+				projectId: "editor-test",
+				itemUid: item.uid,
+				sectionId: "identity",
+			},
+			replace: true,
+		});
+	});
+
 	it("retains the local draft across routed section replacement", async () => {
 		const { container, renderSection } = await render(<IdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');

@@ -1,7 +1,9 @@
+import { Save, Trash2, X } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
+import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 import type { EditorUnsavedChangesSnapshot } from "~/authoring-session/service/EditorUnsavedChanges";
 
@@ -34,28 +36,36 @@ const EditorUnsavedChangesPrompt = ({
 						{state.error instanceof Error ? state.error.message : String(state.error)}
 					</p>
 				)}
-				<div className="mt-6 flex justify-end gap-2">
-					<Button
-						disabled={state.saving}
-						onClick={() => void owner.decideFn("cancel")}
-					>
-						Cancel
-					</Button>
-					<DangerButton
+				<div className="mt-6 flex items-center justify-between gap-4">
+					<LinkButton
+						className="inline-flex items-center gap-1.5"
 						disabled={state.saving}
 						onClick={() => void owner.decideFn("discard")}
 					>
+						<Trash2 className="size-4" />
 						Discard
-					</DangerButton>
-					{state.canSave ? (
-						<PrimaryButton
+					</LinkButton>
+					<div className="flex items-center gap-2">
+						<Button
+							className="gap-1.5"
 							disabled={state.saving}
-							cursorIntent={state.saving ? "progress" : undefined}
-							onClick={() => void owner.decideFn("save")}
+							onClick={() => void owner.decideFn("cancel")}
 						>
-							Save
-						</PrimaryButton>
-					) : null}
+							<X className="size-4" />
+							Cancel
+						</Button>
+						{state.canSave ? (
+							<PrimaryButton
+								className="gap-1.5"
+								disabled={state.saving}
+								cursorIntent={state.saving ? "progress" : undefined}
+								onClick={() => void owner.decideFn("save")}
+							>
+								<Save className="size-4" />
+								Save
+							</PrimaryButton>
+						) : null}
+					</div>
 				</div>
 			</div>
 		</div>

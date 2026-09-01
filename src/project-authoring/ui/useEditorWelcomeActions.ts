@@ -56,7 +56,7 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 					})
 				: state.action === "create"
 					? navigateFn({
-							to: "/editor/$projectId/project/$sectionId",
+							to: "/editor/$projectId/project/form/$sectionId",
 							params: {
 								projectId: state.project.projectId,
 								sectionId: "general",

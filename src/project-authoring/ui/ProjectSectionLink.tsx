@@ -3,14 +3,20 @@ import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTab
 import type { ProjectSectionDescriptor } from "~/project-authoring/type/ProjectSections";
 
 export const ProjectSectionLink = ({
+	destination,
 	projectId,
 	section,
 }: {
+	readonly destination: "detail" | "form";
 	readonly projectId: string;
 	readonly section: ProjectSectionDescriptor;
 }) => (
 	<ButtonLink
-		to="/editor/$projectId/project/$sectionId"
+		to={
+			destination === "detail"
+				? "/editor/$projectId/project/detail/$sectionId"
+				: "/editor/$projectId/project/form/$sectionId"
+		}
 		params={{
 			projectId,
 			sectionId: section.id,

@@ -88,6 +88,37 @@ describe("analyzeProjectCompatibilityFn", () => {
 		]);
 	});
 
+	it("classifies an About avatar asset change as minor", () => {
+		const previous = GameConfigSchema.parse({
+			...editorTestConfig,
+			resources: {
+				...editorTestConfig.resources,
+				"avatar-01": "avatar-old",
+			},
+		});
+		const next = GameConfigSchema.parse({
+			...previous,
+			resources: {
+				...previous.resources,
+				"avatar-01": "avatar-new",
+			},
+		});
+
+		expect(analyze(previous, next)).toMatchObject({
+			result: "minor",
+			context: [
+				{
+					path: [
+						"resources",
+						"avatar-01",
+					],
+					result: "minor",
+					rule: "about-avatar",
+				},
+			],
+		});
+	});
+
 	it("keeps Temporary lifetime changes minor in either direction", () => {
 		const temporary = TemporarySchema.parse({
 			...createSimpleItem("temporary"),

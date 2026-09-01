@@ -197,7 +197,7 @@ const EditorDiagnosticLink = ({
 			return (
 				<ButtonLink
 					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/project/$sectionId"
+					to="/editor/$projectId/project/form/$sectionId"
 					params={{
 						projectId,
 						sectionId: target.sectionId,

@@ -7,10 +7,11 @@ import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 
 interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
-	readonly children: (activeIndex: number, selectIndexFn: (index: number) => void) => ReactNode;
+	readonly children: (activeIndex: number) => ReactNode;
 	readonly count: number;
 	readonly dataUi?: string;
 	readonly itemLabelFn: (index: number) => string;
+	readonly itemMetaFn?: (index: number) => string | undefined;
 	readonly initialSelectedIndex?: number;
 	readonly label: string;
 	readonly navigationCard?: boolean;
@@ -19,6 +20,7 @@ interface EditorCollectionSelectorProps {
 	readonly onRemoveFn?: (activeIndex: number) => void;
 	readonly onSelectedIndexChangeFn?: (index: number) => void;
 	readonly removeLabel?: string;
+	readonly renderItemPreviewFn?: (index: number) => ReactNode;
 	readonly selectedIndex?: number;
 }
 
@@ -29,6 +31,7 @@ export const EditorCollectionSelector = ({
 	count,
 	dataUi = "EditorCollectionSelector",
 	itemLabelFn,
+	itemMetaFn,
 	initialSelectedIndex = 0,
 	label,
 	navigationCard = false,
@@ -37,6 +40,7 @@ export const EditorCollectionSelector = ({
 	onRemoveFn,
 	onSelectedIndexChangeFn,
 	removeLabel = "Remove item",
+	renderItemPreviewFn,
 	selectedIndex,
 }: EditorCollectionSelectorProps) => {
 	const [internalSelectedIndex, setInternalSelectedIndexFn] = useState(initialSelectedIndex);
@@ -56,22 +60,36 @@ export const EditorCollectionSelector = ({
 						emptyLabel={`No ${label.toLocaleLowerCase()} match this search.`}
 						label={label}
 						labelVisible={false}
+						optionContentLayout={itemMetaFn === undefined ? "stacked" : "inline"}
 						options={Array.from(
 							{
 								length: count,
 							},
 							(_, index) => {
 								const optionLabel = itemLabelFn(index);
+								const optionMeta = itemMetaFn?.(index);
 								return {
 									id: String(index),
 									label: optionLabel,
+									...(optionMeta === undefined
+										? {}
+										: {
+												meta: optionMeta,
+											}),
 									terms: [
 										optionLabel,
+										...(optionMeta === undefined
+											? []
+											: [
+													optionMeta,
+												]),
 									],
 								};
 							},
 						)}
-						renderPreviewFn={() => null}
+						renderPreviewFn={(option) =>
+							renderItemPreviewFn?.(Number(option.id)) ?? null
+						}
 						value={activeIndex === undefined ? "" : String(activeIndex)}
 						onChangeFn={(index) => selectIndexFn(Number(index))}
 					/>
@@ -112,7 +130,7 @@ export const EditorCollectionSelector = ({
 		>
 			{navigationCard ? <EditorFormCard>{navigation}</EditorFormCard> : navigation}
 			{activeIndex === undefined ? null : (
-				<div key={activeIndex}>{children(activeIndex, selectIndexFn)}</div>
+				<div key={activeIndex}>{children(activeIndex)}</div>
 			)}
 		</section>
 	);

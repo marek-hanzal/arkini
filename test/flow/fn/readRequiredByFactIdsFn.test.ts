@@ -4,21 +4,35 @@ import { readRequiredByFactIdsFn } from "~/flow/fn/readRequiredByFactIdsFn";
 import type { AcquisitionGraph, AcquisitionRoute } from "~/flow/type/AcquisitionGraph";
 
 const routeFn = ({
-	allOf = [],
-	anyOf = [],
 	id,
+	inputFactIds = [],
+	lineConditionFactIds = [],
+	ownerItemId,
 	outputFactId,
 }: {
-	readonly allOf?: ReadonlyArray<string>;
-	readonly anyOf?: ReadonlyArray<ReadonlyArray<string>>;
 	readonly id: string;
+	readonly inputFactIds?: ReadonlyArray<string>;
+	readonly lineConditionFactIds?: ReadonlyArray<string>;
+	readonly ownerItemId: string;
 	readonly outputFactId: string;
 }): AcquisitionRoute => ({
 	durationMs: 0,
 	id,
 	metadata: {
-		itemId: outputFactId,
-		kind: "temporary-expiry",
+		kind: "line-output",
+		lineId: `line:${id}`,
+		lineTitle: id,
+		ownerItemId,
+	},
+	operation: {
+		id: `operation:${id}`,
+		inputs: inputFactIds.map((factId) => ({
+			factId,
+			quantity: {
+				max: 1,
+				min: 1,
+			},
+		})),
 	},
 	output: {
 		annotation: {
@@ -39,65 +53,113 @@ const routeFn = ({
 		],
 	},
 	requirements: {
-		allOf: allOf.map((factId) => ({
-			factId,
-			quantity: 1,
-			source: "temporary-item",
-			usage: "consume",
-		})),
-		anyOf: anyOf.map((clause) =>
-			clause.map((factId) => ({
+		allOf: [
+			{
+				factId: ownerItemId,
+				quantity: 1,
+				source: "owner",
+				usage: "one-time",
+			},
+			...inputFactIds.map((factId) => ({
 				factId,
 				quantity: 1,
-				source: "output-condition",
-				usage: "ongoing",
+				source: "material-input" as const,
+				usage: "consume" as const,
 			})),
-		),
+			...lineConditionFactIds.map((factId) => ({
+				factId,
+				quantity: 1,
+				source: "line-condition" as const,
+				usage: "ongoing" as const,
+			})),
+		],
+		anyOf: [],
 	},
 	runMultiplier: 1,
 });
 
 describe("required-by acquisition facts", () => {
-	it("returns every distinct direct consumer from mandatory and alternative requirements", () => {
+	it("returns operation outputs that directly input or positively require the fact", () => {
 		const graph: AcquisitionGraph = {
 			factIds: [
-				"consumer-a",
-				"consumer-z",
+				"academy",
+				"blueprint-a",
+				"blueprint-z",
+				"condition-output",
 				"material",
+				"output-a",
+				"output-z",
 			],
 			limitations: [],
 			roots: [],
 			routes: [
 				routeFn({
-					allOf: [
-						"material",
-					],
 					id: "route-z",
-					outputFactId: "consumer-z",
-				}),
-				routeFn({
-					anyOf: [
-						[
-							"other",
-							"material",
-						],
-					],
-					id: "route-a",
-					outputFactId: "consumer-a",
-				}),
-				routeFn({
-					allOf: [
+					inputFactIds: [
 						"material",
 					],
+					ownerItemId: "blueprint-z",
+					outputFactId: "output-z",
+				}),
+				routeFn({
+					id: "route-a",
+					inputFactIds: [
+						"material",
+					],
+					ownerItemId: "blueprint-a",
+					outputFactId: "output-a",
+				}),
+				routeFn({
 					id: "route-a-duplicate",
-					outputFactId: "consumer-a",
+					inputFactIds: [
+						"material",
+					],
+					ownerItemId: "blueprint-a",
+					outputFactId: "output-a",
+				}),
+				routeFn({
+					id: "condition",
+					lineConditionFactIds: [
+						"material",
+					],
+					ownerItemId: "condition-owner",
+					outputFactId: "condition-output",
+				}),
+				routeFn({
+					id: "owner-only",
+					ownerItemId: "material",
+					outputFactId: "blueprint-a",
 				}),
 			],
 		};
 
 		expect(readRequiredByFactIdsFn(graph, "material")).toEqual([
-			"consumer-a",
-			"consumer-z",
+			"condition-output",
+			"output-a",
+			"output-z",
 		]);
+	});
+
+	it("does not report an operation output as requiring itself", () => {
+		const graph: AcquisitionGraph = {
+			factIds: [
+				"guild",
+				"topaz",
+			],
+			limitations: [],
+			roots: [],
+			routes: [
+				routeFn({
+					id: "expedition",
+					inputFactIds: [
+						"topaz",
+					],
+					ownerItemId: "guild",
+					outputFactId: "topaz",
+				}),
+			],
+		};
+
+		expect(readRequiredByFactIdsFn(graph, "topaz")).toEqual([]);
 	});
 });

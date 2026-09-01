@@ -2,7 +2,7 @@
 
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 
@@ -45,6 +45,23 @@ describe("EditorPageHelp", () => {
 		await act(async () =>
 			document.querySelector<HTMLButtonElement>('[data-ui="EditorPageHelpClose"]')?.click(),
 		);
-		expect(document.querySelector('[data-ui="EditorPageHelpDialog"]')).toBeNull();
+		await vi.waitFor(() =>
+			expect(document.querySelector('[data-ui="EditorPageHelpDialog"]')).toBeNull(),
+		);
+
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('[data-ui="EditorPageHelpOpen"]')?.click(),
+		);
+		const backdrop = document.querySelector('[data-ui="EditorPageHelpBackdrop"]');
+		await act(async () =>
+			backdrop?.dispatchEvent(
+				new MouseEvent("pointerdown", {
+					bubbles: true,
+				}),
+			),
+		);
+		await vi.waitFor(() =>
+			expect(document.querySelector('[data-ui="EditorPageHelpDialog"]')).toBeNull(),
+		);
 	});
 });

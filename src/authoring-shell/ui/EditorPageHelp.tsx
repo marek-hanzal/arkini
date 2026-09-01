@@ -1,4 +1,5 @@
 import { CircleHelp, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -10,6 +11,16 @@ export interface EditorPageHelpContent {
 	readonly title: string;
 }
 
+const EditorPageHelpTransition = {
+	duration: 0.18,
+	ease: [
+		0.22,
+		1,
+		0.36,
+		1,
+	] as const,
+};
+
 const EditorPageHelpDialog = ({
 	content,
 	title,
@@ -20,13 +31,39 @@ const EditorPageHelpDialog = ({
 	const focus = useOverlayFocus({
 		onCloseFn,
 	});
-	return createPortal(
-		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
-			<div
+	return (
+		<motion.div
+			animate={{
+				opacity: 1,
+			}}
+			className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]"
+			data-ui="EditorPageHelpBackdrop"
+			exit={{
+				opacity: 0,
+			}}
+			initial={{
+				opacity: 0,
+			}}
+			onPointerDown={(event) => {
+				if (event.currentTarget === event.target) onCloseFn();
+			}}
+			transition={EditorPageHelpTransition}
+		>
+			<motion.div
 				ref={focus.overlayRef}
+				animate={{
+					opacity: 1,
+				}}
 				className="w-full max-w-lg rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 				data-ui="EditorPageHelpDialog"
+				exit={{
+					opacity: 0,
+				}}
+				initial={{
+					opacity: 0,
+				}}
 				onKeyDown={focus.onKeyDownFn}
+				transition={EditorPageHelpTransition}
 			>
 				<div className="flex items-center gap-3">
 					<CircleHelp className="size-6 shrink-0 text-accent" />
@@ -41,9 +78,8 @@ const EditorPageHelpDialog = ({
 					</LinkButton>
 				</div>
 				<div className="mt-4 grid gap-3 text-sm leading-6 text-muted">{content}</div>
-			</div>
-		</div>,
-		document.body,
+			</motion.div>
+		</motion.div>
 	);
 };
 
@@ -60,13 +96,19 @@ export const EditorPageHelp = ({ content, title }: EditorPageHelpContent) => {
 			>
 				<CircleHelp className="size-5" />
 			</LinkButton>
-			{open ? (
-				<EditorPageHelpDialog
-					content={content}
-					title={title}
-					onCloseFn={() => setOpenFn(false)}
-				/>
-			) : null}
+			{createPortal(
+				<AnimatePresence>
+					{open ? (
+						<EditorPageHelpDialog
+							content={content}
+							key="page-help"
+							title={title}
+							onCloseFn={() => setOpenFn(false)}
+						/>
+					) : null}
+				</AnimatePresence>,
+				document.body,
+			)}
 		</>
 	);
 };

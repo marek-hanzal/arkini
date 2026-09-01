@@ -1,11 +1,12 @@
+import { createId } from "@paralleldrive/cuid2";
 import { PackageOpen, Plus } from "lucide-react";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useMemo } from "react";
 
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { ListRow } from "~/item-authoring/ui/ListRow";
 import { Status } from "~/ui/ui/Status";
 
@@ -32,6 +33,16 @@ export const List = ({
 		],
 	);
 	const empty = items.length === 0;
+	const newItemUidByType = useMemo(
+		() =>
+			Object.fromEntries(
+				TypeSchema.options.map((type) => [
+					type,
+					createId(),
+				]),
+			) as Record<TypeSchema.Type, string>,
+		[],
+	);
 	const filteredItems = useMemo(
 		() =>
 			searchFn(
@@ -43,6 +54,19 @@ export const List = ({
 			items,
 			query,
 		],
+	);
+	const newItemMenu = (
+		<ItemTypeMenu
+			dataUi="EditorNewItemMenu"
+			description="Choose the item type to start authoring."
+			icon={Plus}
+			label="New item"
+			projectId={project.projectId}
+			readItemUidFn={(type) => newItemUidByType[type]}
+			triggerClassName={empty ? "gap-2" : "h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"}
+			types={TypeSchema.options}
+			variant="primary"
+		/>
 	);
 	return (
 		<section
@@ -70,18 +94,7 @@ export const List = ({
 						<span>×</span>
 					</button>
 				)}
-				{empty ? null : (
-					<PrimaryButtonLink
-						to="/editor/$projectId/editor/items/new/select"
-						params={{
-							projectId: project.projectId,
-						}}
-						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
-					>
-						<Plus className="size-4" />
-						New item
-					</PrimaryButtonLink>
-				)}
+				{empty ? null : newItemMenu}
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">
 				{empty ? (
@@ -90,18 +103,7 @@ export const List = ({
 						description="Create the first item to start authoring this game."
 						icon={PackageOpen}
 						title="No items yet"
-						action={
-							<PrimaryButtonLink
-								to="/editor/$projectId/editor/items/new/select"
-								params={{
-									projectId: project.projectId,
-								}}
-								className="gap-2"
-							>
-								<Plus className="size-4" />
-								New item
-							</PrimaryButtonLink>
-						}
+						action={newItemMenu}
 					/>
 				) : null}
 				{!empty && filteredItems.length === 0 ? (

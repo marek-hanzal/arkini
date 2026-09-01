@@ -1,4 +1,4 @@
-import { Command, Flag } from "effect/unstable/cli";
+import { CliError, Command, Flag } from "effect/unstable/cli";
 import { Clock, Console, Effect, FileSystem, Option } from "effect";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -32,6 +32,12 @@ interface ReplayPaths {
 }
 
 const gunzipAsyncFn = promisify(gunzip);
+
+const toReplayUserErrorFn = (cause: unknown) =>
+	new CliError.UserError({
+		cause,
+		userMessage: cause instanceof Error ? cause.message : "The replay command failed.",
+	});
 
 const resolveReplayPathsFn = ({
 	arkpack,
@@ -108,7 +114,11 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 	if (paths instanceof Error) return yield* Effect.fail(paths);
 	const fileSystem = yield* FileSystem.FileSystem;
 	const clock = yield* Clock.Clock;
-	const arkpackBytes = new Uint8Array(yield* fileSystem.readFile(paths.arkpack));
+	const arkpackBytes = new Uint8Array(
+		yield* fileSystem
+			.readFile(paths.arkpack)
+			.pipe(Effect.mapError(() => new Error("Could not read the replay Arkpack."))),
+	);
 	const envelope = yield* decodeArkpackEnvelopeFx(arkpackBytes);
 	const payload = yield* decodeFx(
 		yield* Effect.tryPromise({
@@ -117,7 +127,10 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 		}),
 	);
 	const contentHash = yield* readArkpackContentHashFx(arkpackBytes);
-	const saved = yield* decodeArkiniSaveFx(yield* fileSystem.readFile(paths.save));
+	const saveBytes = yield* fileSystem
+		.readFile(paths.save)
+		.pipe(Effect.mapError(() => new Error("Could not read the replay save.")));
+	const saved = yield* decodeArkiniSaveFx(saveBytes);
 	const arkpackVersion = readGameVersionMajorFn(payload.version);
 	const saveVersion = readGameVersionMajorFn(saved.version);
 	if (saveVersion.major !== arkpackVersion.major) {
@@ -249,7 +262,7 @@ export const ReplayCommand = Command.make(
 			save,
 			timeoutMs,
 			untilFatal,
-		}),
+		}).pipe(Effect.mapError(toReplayUserErrorFn)),
 ).pipe(
 	Command.withDescription(
 		"Replay a failed environment through the production game loop without reading or writing installed saves.",

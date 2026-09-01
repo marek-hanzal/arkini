@@ -236,6 +236,7 @@ describe("Game fatal-state diagnostics", () => {
 		);
 		const incident = writeIncident.mock.calls[0]?.[0];
 		if (incident === undefined) throw new Error("Expected a failed-session incident.");
+		expect(incident.text.runtimeState).not.toContain("Revision:");
 		const saved = Effect.runSync(decodeArkiniSaveFx(incident.saveBytes));
 		expect(saved).toMatchObject({
 			version: "1.0",

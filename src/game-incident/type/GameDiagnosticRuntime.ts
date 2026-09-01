@@ -7,7 +7,6 @@ import type {
 
 export interface GameDiagnosticRuntimeItem {
 	readonly item: GameDiagnosticItemReferenceSchema.Type;
-	readonly revision: string;
 	readonly quantity: number;
 	readonly remainingCharges?: number;
 	readonly remainingDurationMs?: number;

@@ -39,9 +39,11 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 					value={`${item.durationMs} ms`}
 				/>
 			</DetailSection>
-			<DetailSection title="Expiry output">
-				<OutputDetail output={item.output} />
-			</DetailSection>
+			<OutputDetail
+				emptyLabel="No expiry output configured."
+				output={item.output}
+				title="Expiry output"
+			/>
 		</div>
 	);
 };

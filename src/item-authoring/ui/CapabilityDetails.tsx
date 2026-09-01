@@ -76,9 +76,11 @@ export const ChargesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 				</DetailSection>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorItemDepletionOutputCard">
-				<DetailSection title="Depletion output">
-					<OutputDetail output={item.charges.output} />
-				</DetailSection>
+				<OutputDetail
+					emptyLabel="No depletion output configured."
+					output={item.charges.output}
+					title="Depletion output"
+				/>
 			</EditorRootCard>
 		</div>
 	);
@@ -113,12 +115,11 @@ const MergeDetail = ({
 				/>
 			) : null}
 		</DetailFacts>
-		<div>
-			<h4 className="text-sm font-semibold">Extra output</h4>
-			<div className="mt-2 border-t border-line pt-3">
-				<OutputDetail output={merge.output} />
-			</div>
-		</div>
+		<OutputDetail
+			emptyLabel="No extra output configured."
+			output={merge.output}
+			title="Extra output"
+		/>
 	</article>
 );
 

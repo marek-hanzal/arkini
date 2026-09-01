@@ -79,10 +79,11 @@ package_macos_artifacts() {
 		grep -Fx "{\"type\":\"${ARKINI_EXPECTED_PROVENANCE:-community}\"}"
 	"$packaged_cli" game replay --help | grep -F -- "--until-fatal"
 	"$packaged_cli" diagnostics slice --help | grep -F -- "--session-id"
-	grep -aFq '"arkini.js.map"' "$packaged_asar"
-	grep -aFq '"index.cjs.map"' "$packaged_asar"
-	grep -aEq '"index-[^"]+\.js\.map"' "$packaged_asar"
-	grep -aEq '"[^"]+\.worker-[^"]+\.js\.map"' "$packaged_asar"
+	"$packaged_cli" diagnostics slice --help | grep -F -- "--section"
+	if grep -aEq '"[^"]+\.js\.map"' "$packaged_asar"; then
+		echo "Packaged application contains JavaScript source maps." >&2
+		exit 1
+	fi
 }
 
 package_windows_artifacts() {

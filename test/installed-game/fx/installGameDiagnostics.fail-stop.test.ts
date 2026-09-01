@@ -46,14 +46,16 @@ describe("Game diagnostics fail-stop", () => {
 				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
 			},
 		});
+		const config = createJobTestConfig();
 		const session = await createTestGameSession({
-			config: createJobTestConfig(),
+			config,
 			tickIntervalMs: 60_000,
 		});
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
 				arkpackBytes: new Uint8Array(),
+				config,
 				restored: false,
 				runRendererEffectFn,
 				session,

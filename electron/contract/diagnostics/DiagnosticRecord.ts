@@ -10,7 +10,7 @@ export type DiagnosticValue =
 			readonly [key: string]: DiagnosticValue;
 	  };
 
-const DiagnosticValueSchema: z.ZodType<DiagnosticValue> = z.lazy(() =>
+export const DiagnosticValueSchema: z.ZodType<DiagnosticValue> = z.lazy(() =>
 	z.union([
 		z.null(),
 		z.boolean(),

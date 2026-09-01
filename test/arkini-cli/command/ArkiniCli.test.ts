@@ -13,6 +13,54 @@ import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 const execFileAsync = promisify(execFile);
 let root = "";
 
+const diagnosticHistoryEntry = {
+	sequence: 7,
+	observedAt: "2026-09-01T11:00:01.000Z",
+	elapsedSincePreviousMs: 1_000,
+	initial: false,
+	events: [
+		{
+			type: "job:started",
+			details: {
+				jobId: "job:test",
+			},
+			relatedItems: [],
+		},
+	],
+	itemCount: 1,
+	jobCount: 1,
+	queueCount: 0,
+	jobsAdded: [],
+	jobsRemoved: [],
+	queueAdded: [],
+	queueRemoved: [],
+	defaultLinesChanged: [],
+	deliveries: [],
+	truncated: false,
+};
+
+const diagnosticLogLine = ({
+	event,
+	level,
+	properties,
+	timestamp,
+}: {
+	readonly event: string;
+	readonly level: "INFO" | "FATAL";
+	readonly properties: Readonly<Record<string, unknown>>;
+	readonly timestamp: string;
+}) =>
+	JSON.stringify({
+		"@timestamp": timestamp,
+		level,
+		message: event,
+		logger: "arkini.game",
+		properties: {
+			event,
+			...properties,
+		},
+	});
+
 beforeEach(async () => {
 	root = await mkdtemp(join(tmpdir(), "arkini-signing-cli-"));
 });
@@ -104,51 +152,151 @@ describe("game incident CLI", () => {
 			},
 		);
 
-		expect(JSON.parse(result.stdout.trim())).toMatchObject({
-			status: "timeout",
-			packageId: "game:test",
-		});
+		expect(result.stdout).toContain("# Arkini game replay");
+		expect(result.stdout).toContain("No fatal failure was observed");
+		expect(result.stdout).toContain("- Package: game:test");
+		expect(result.stdout).toContain("# Semantic history");
+		expect(result.stdout.trimStart()).not.toMatch(/^\{/);
 	}, 15_000);
 
-	it("slices the latest failed session across rotated and incident JSONL shapes", async () => {
+	it("selects one thematic section from a fixed text incident", async () => {
+		const incident = join(root, GameIncidentFiles.directory);
+		await mkdir(incident);
+		await writeFile(join(incident, GameIncidentFiles.incident), "# Incident summary");
+		await writeFile(join(incident, GameIncidentFiles.failure), "# Exact failure");
+		await writeFile(join(incident, GameIncidentFiles.history), "# Exact history");
+		await writeFile(join(incident, GameIncidentFiles.runtimeState), "# Exact runtime");
+
+		const result = await execFileAsync(
+			process.execPath,
+			[
+				"node_modules/tsx/dist/cli.mjs",
+				"src/arkini-cli/arkini.ts",
+				"diagnostics",
+				"slice",
+				incident,
+				"--section",
+				"failure",
+			],
+			{
+				env: process.env,
+			},
+		);
+
+		expect(result.stdout.trim()).toBe("# Exact failure");
+
+		const runtime = await execFileAsync(
+			process.execPath,
+			[
+				"node_modules/tsx/dist/cli.mjs",
+				"src/arkini-cli/arkini.ts",
+				"diagnostics",
+				"slice",
+				incident,
+				"--section",
+				"runtime",
+			],
+			{
+				env: process.env,
+			},
+		);
+		expect(runtime.stdout.trim()).toBe("# Exact runtime");
+
+		const rejectedSession = await execFileAsync(
+			process.execPath,
+			[
+				"node_modules/tsx/dist/cli.mjs",
+				"src/arkini-cli/arkini.ts",
+				"diagnostics",
+				"slice",
+				incident,
+				"--session-id",
+				"session:wrong",
+			],
+			{
+				env: process.env,
+			},
+		).catch(
+			(cause: unknown) =>
+				cause as {
+					readonly stderr: string;
+					readonly stdout: string;
+				},
+		);
+		const rejectionOutput = `${rejectedSession.stdout}${rejectedSession.stderr}`;
+		expect(rejectionOutput).toContain("--session-id applies only to diagnostic JSONL");
+		expect(rejectionOutput).not.toContain(root);
+	}, 15_000);
+
+	it("renders the latest failed session from the current rotating JSONL contract", async () => {
 		const logs = join(root, "logs");
 		await mkdir(logs);
 		const rotated = join(logs, "diagnostics.jsonl.1");
 		const current = join(logs, "diagnostics.jsonl");
 		await writeFile(
 			rotated,
-			`${JSON.stringify({
+			`${diagnosticLogLine({
+				event: "session-started",
 				level: "INFO",
-				message: "session-started",
 				properties: {
-					event: "session-started",
 					sessionId: "session:old",
 				},
-			})}\n${JSON.stringify({
+				timestamp: "2026-09-01T10:00:00.000Z",
+			})}\n${diagnosticLogLine({
+				event: "session-failed",
 				level: "FATAL",
-				message: "session-failed",
 				properties: {
-					event: "session-failed",
 					sessionId: "session:old",
 				},
+				timestamp: "2026-09-01T10:00:01.000Z",
 			})}\n`,
 		);
 		await writeFile(
 			current,
-			`${JSON.stringify({
-				level: "info",
-				category: [
-					"game",
-				],
+			`not-json\n${diagnosticLogLine({
 				event: "session-started",
-				sessionId: "session:new",
-			})}\n${JSON.stringify({
-				level: "fatal",
-				category: [
-					"game",
-				],
+				level: "INFO",
+				properties: {
+					sessionId: "session:new",
+					applicationVersion: "0.5.0",
+					packageId: "game:test",
+					contentHash: "hash:test",
+					gameVersion: "1.0",
+					arkini: "0.5.0",
+					restored: true,
+					startedAt: "2026-09-01T11:00:00.000Z",
+				},
+				timestamp: "2026-09-01T11:00:00.000Z",
+			})}\n${diagnosticLogLine({
+				event: "runtime-committed",
+				level: "INFO",
+				properties: {
+					sessionId: "session:new",
+					sequence: 7,
+					eventTypes: [
+						"job:started",
+					],
+					history: diagnosticHistoryEntry,
+					historyTruncated: true,
+				},
+				timestamp: "2026-09-01T11:00:01.000Z",
+			})}\n${diagnosticLogLine({
 				event: "session-failed",
-				sessionId: "session:new",
+				level: "FATAL",
+				properties: {
+					sessionId: "session:new",
+					source: "tick",
+					sequence: 42,
+					error: {
+						name: "JobOwnerBusyError",
+					},
+					errorTruncated: false,
+					lastCommitted: null,
+					lastCommittedTruncated: false,
+					relatedItems: [],
+					relatedItemsTruncated: false,
+				},
+				timestamp: "2026-09-01T11:00:02.000Z",
 			})}\n`,
 		);
 		await utimes(rotated, new Date(1_000), new Date(1_000));
@@ -168,15 +316,16 @@ describe("game incident CLI", () => {
 			},
 		);
 
-		const records = result.stdout
-			.trim()
-			.split("\n")
-			.map((line) => JSON.parse(line) as Record<string, unknown>);
-		expect(records).toHaveLength(2);
-		expect(records.map(({ sessionId }) => sessionId)).toEqual([
-			"session:new",
-			"session:new",
-		]);
+		expect(result.stdout).toContain("# Game diagnostic session");
+		expect(result.stdout).toContain("- Session: session:new");
+		expect(result.stdout).toContain("- Package: game:test");
+		expect(result.stdout).toContain("- Failure: tick at sequence 42");
+		expect(result.stdout).toContain("- Input warnings: 1");
+		expect(result.stdout).toContain("invalid JSON");
+		expect(result.stdout).toContain("1 retained record contains truncated");
+		expect(result.stdout).toContain("name: JobOwnerBusyError");
+		expect(result.stdout).not.toContain(root);
+		expect(result.stdout.trimStart()).not.toMatch(/^\{/);
 	}, 15_000);
 });
 

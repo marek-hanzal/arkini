@@ -16,6 +16,7 @@ import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalErro
 import type { GameTransition } from "~/game-session/type/GameSession";
 import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
 const ownerItemId = "runtime:item:depleted-owner";
@@ -56,6 +57,20 @@ describe("Game fatal-state diagnostics", () => {
 			},
 		});
 		let fatalListener: (() => void) | undefined;
+		const baseConfig = createJobTestConfig();
+		const ownerDefinition = {
+			...baseConfig.items.forge,
+			id: "producer:finite",
+			uid: "uid:producer:finite",
+			title: "Finite producer",
+		};
+		const config = {
+			...baseConfig,
+			items: {
+				...baseConfig.items,
+				[ownerDefinition.id]: ownerDefinition,
+			},
+		};
 		const transition = {
 			sequence: 357,
 			previousRuntime: null,
@@ -77,9 +92,7 @@ describe("Game fatal-state diagnostics", () => {
 				items: [
 					{
 						id: ownerItemId,
-						item: {
-							id: "producer:finite",
-						},
+						item: ownerDefinition,
 						location: {
 							scope: "board",
 							space: 0,
@@ -89,6 +102,7 @@ describe("Game fatal-state diagnostics", () => {
 							},
 						},
 						quantity: 1,
+						revision: "revision:depleted-owner",
 						remainingCharges: 0,
 					},
 				],
@@ -135,6 +149,7 @@ describe("Game fatal-state diagnostics", () => {
 					},
 				} satisfies ArkpackDescriptor,
 				arkpackBytes: Uint8Array.of(1, 2, 3),
+				config,
 				restored: true,
 				runRendererEffectFn: Effect.runSync,
 				session: {
@@ -171,36 +186,52 @@ describe("Game fatal-state diagnostics", () => {
 							ownerItemId,
 						},
 					],
-					state: {
+					runtime: {
 						items: [
 							{
-								id: ownerItemId,
-								itemId: "producer:finite",
+								item: {
+									runtimeItemId: ownerItemId,
+									definition: {
+										itemId: "producer:finite",
+										itemUid: "uid:producer:finite",
+									},
+								},
 								remainingCharges: 0,
 							},
 						],
 						jobs: [
 							{
-								id: "job:last",
+								jobId: "job:last",
 								remainingMs: 100,
 							},
 						],
-						jobQueue: requestIds.map((id) => ({
-							id,
-							ownerItemId,
+						queue: requestIds.map((requestId) => ({
+							requestId,
+							owner: {
+								runtimeItemId: ownerItemId,
+							},
 						})),
 					},
 				},
+				relatedItems: [
+					{
+						runtimeItemId: ownerItemId,
+						definition: {
+							itemId: "producer:finite",
+							itemUid: "uid:producer:finite",
+						},
+					},
+				],
 			},
 		});
 		expect(writeIncident).toHaveBeenCalledWith(
 			expect.objectContaining({
 				arkpackBytes: Uint8Array.of(1, 2, 3),
-				diagnostics: expect.arrayContaining([
-					expect.objectContaining({
-						event: "session-failed",
-					}),
-				]),
+				text: expect.objectContaining({
+					incident: expect.stringContaining("# Arkini game incident"),
+					failure: expect.stringContaining("config-uid uid:producer:finite"),
+					runtimeState: expect.stringContaining("config-uid uid:producer:finite"),
+				}),
 			}),
 		);
 		const incident = writeIncident.mock.calls[0]?.[0];
@@ -217,12 +248,9 @@ describe("Game fatal-state diagnostics", () => {
 				],
 			},
 		});
-		const history = incident.diagnostics.filter(
-			(record) => record.event === "runtime-committed",
-		);
-		expect(history).toHaveLength(32);
-		expect(history[0]?.data?.sequence).toBe(326);
-		expect(history.at(-1)?.data?.sequence).toBe(357);
+		expect(incident.text.history.match(/^## Sequence /gm)).toHaveLength(32);
+		expect(incident.text.history).toContain("## Sequence 326");
+		expect(incident.text.history).toContain("## Sequence 357");
 
 		diagnostics.close("discarded");
 	});

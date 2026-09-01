@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import type { GameIncidentWrite } from "~electron/contract/incident/GameIncidentWrite";
@@ -21,11 +21,29 @@ export const writeLatestGameIncidentFx = Effect.fn("writeLatestGameIncidentFx")(
 				await mkdir(directory, {
 					recursive: true,
 				});
+				await rm(join(directory, "diagnostics.jsonl"), {
+					force: true,
+				});
 				await writeFile(join(directory, GameIncidentFiles.arkpack), incident.arkpackBytes);
 				await writeFile(join(directory, GameIncidentFiles.save), incident.saveBytes);
 				await writeFile(
-					join(directory, GameIncidentFiles.diagnostics),
-					`${incident.diagnostics.map((record) => JSON.stringify(record)).join("\n")}\n`,
+					join(directory, GameIncidentFiles.incident),
+					incident.text.incident,
+					"utf8",
+				);
+				await writeFile(
+					join(directory, GameIncidentFiles.failure),
+					incident.text.failure,
+					"utf8",
+				);
+				await writeFile(
+					join(directory, GameIncidentFiles.history),
+					incident.text.history,
+					"utf8",
+				);
+				await writeFile(
+					join(directory, GameIncidentFiles.runtimeState),
+					incident.text.runtimeState,
 					"utf8",
 				);
 			},

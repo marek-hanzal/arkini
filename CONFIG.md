@@ -55,10 +55,10 @@ arkini-cli game validate [project]
 arkini-cli game pack [project]
 arkini-cli game replay --incident <latest-directory> --until-fatal [--timeout-ms 10000]
 arkini-cli game replay --arkpack <file> --save <file> --until-fatal [--timeout-ms 10000]
-arkini-cli diagnostics slice <jsonl-file-or-directory> [--session-id <id>]
+arkini-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-session-id>] [--section all|summary|failure|history|runtime]
 ```
 
-Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files; diagnostic slicing defaults to the latest failed session and accepts both rotating application logs and incident JSONL.
+Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files. Its bounded text report distinguishes a reproduced fatal failure from a timeout, includes semantic history, and compares the initial and final runtime without dumping duplicate complete states. Diagnostic slicing defaults to the latest failed session, accepts the fixed text incident or current internal rotating application JSONL, reports malformed input without physical paths, and renders only stable human/LLM-readable text. `--session-id` selects only JSONL sessions; `--section runtime` reads only the fixed incident's complete runtime projection. The fixed incident directory links `incident.md`, `failure.md`, `history.md`, and `runtime-state.md`; Item references include runtime ID, authored ID, and immutable configured UID whenever resolution is possible.
 
 The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary local and Editor builds are Community.
 

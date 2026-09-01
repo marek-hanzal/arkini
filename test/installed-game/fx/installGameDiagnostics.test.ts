@@ -11,6 +11,7 @@ import type { GameSession, GameTransition } from "~/game-session/type/GameSessio
 import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import { RuntimeInvalidError } from "~/game-runtime/error/RuntimeInvalidError";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
 const runRendererEffectFn = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
@@ -107,6 +108,7 @@ describe("Game diagnostics", () => {
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
 				arkpackBytes: new Uint8Array(),
+				config: createJobTestConfig(),
 				restored: true,
 				runRendererEffectFn,
 				session,
@@ -122,6 +124,7 @@ describe("Game diagnostics", () => {
 
 		const queuedTransition = {
 			...createTransition(2),
+			previousRuntime: createTransition(1).runtime,
 			runtime: {
 				...createTransition(2).runtime,
 				jobQueue: [
@@ -138,19 +141,24 @@ describe("Game diagnostics", () => {
 			event: "runtime-committed",
 			data: {
 				sequence: 2,
-				jobQueue: [
-					{
-						id: "request:water:1",
-						ownerItemId: "runtime:item:well",
-						lineId: "line:water",
-					},
-				],
+				history: {
+					queueAdded: [
+						{
+							requestId: "request:water:1",
+							lineId: "line:water",
+							owner: {
+								runtimeItemId: "runtime:item:well",
+							},
+						},
+					],
+				},
 			},
 		});
 
 		const defaultLineTransition = {
 			...queuedTransition,
 			sequence: 3,
+			previousRuntime: queuedTransition.runtime,
 			runtime: {
 				...queuedTransition.runtime,
 				defaultLineByOwnerItemId: {
@@ -163,12 +171,16 @@ describe("Game diagnostics", () => {
 			event: "runtime-committed",
 			data: {
 				sequence: 3,
-				defaultLines: [
-					{
-						ownerItemId: "runtime:item:well",
-						lineId: "line:water",
-					},
-				],
+				history: {
+					defaultLinesChanged: [
+						{
+							owner: {
+								runtimeItemId: "runtime:item:well",
+							},
+							lineId: "line:water",
+						},
+					],
+				},
 			},
 		});
 		transitionListener?.({

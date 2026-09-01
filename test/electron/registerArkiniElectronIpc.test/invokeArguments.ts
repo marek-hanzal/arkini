@@ -136,22 +136,12 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 			{
 				arkpackBytes: new Uint8Array(),
 				saveBytes: new Uint8Array(),
-				diagnostics: [
-					{
-						level: "info",
-						category: [
-							"game",
-						],
-						event: "session-started",
-					},
-					{
-						level: "fatal",
-						category: [
-							"game",
-						],
-						event: "session-failed",
-					},
-				],
+				text: {
+					incident: "# Incident",
+					failure: "# Failure",
+					history: "# History",
+					runtimeState: "# Runtime state",
+				},
 			},
 		],
 	],

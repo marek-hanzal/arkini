@@ -4,7 +4,6 @@ import { match } from "ts-pattern";
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import type { ItemDetailQueueProjection } from "~/item-detail/fx/projectItemDetailQueueFx";
-import { ItemDefinitionInfoTab } from "~/item-detail/ui/ItemDefinitionInfoTab";
 import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";
 import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
 import { ItemSourcesTab } from "~/item-detail/ui/ItemSourcesTab";
@@ -87,8 +86,32 @@ const ItemInfoContent = ({
 			})}
 		>
 			<ItemInfoTab
-				info={info}
-				stale={stale}
+				detail={{
+					description: info.description,
+					itemType: info.itemType,
+					storageScope: info.storageScope,
+					maxStackSize: info.maxStackSize,
+					...(info.maxCount === undefined
+						? {}
+						: {
+								maxCount: info.maxCount,
+							}),
+					...(stale
+						? {}
+						: {
+								location: info.location,
+								currentStack: info.quantity,
+								ownedQuantity: info.ownedQuantity,
+								...(info.charges === undefined
+									? {}
+									: {
+											charges: {
+												label: "Charges" as const,
+												value: `${info.charges.remaining} / ${info.charges.total}`,
+											},
+										}),
+							}),
+				}}
 			/>
 		</div>
 	);
@@ -272,7 +295,28 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 				tab={props.target.tab}
 			/>
 		) : props.target.tab === "info" ? (
-			<ItemDefinitionInfoTab definition={props.definition} />
+			<ItemInfoTab
+				detail={{
+					description: props.definition.description,
+					itemType: props.definition.itemType,
+					storageScope: props.definition.storageScope,
+					maxStackSize: props.definition.maxStackSize,
+					ownedQuantity: props.definition.ownedQuantity,
+					...(props.definition.maxCount === undefined
+						? {}
+						: {
+								maxCount: props.definition.maxCount,
+							}),
+					...(props.definition.totalCharges === undefined
+						? {}
+						: {
+								charges: {
+									label: "Charges per item",
+									value: `${props.definition.totalCharges}`,
+								},
+							}),
+				}}
+			/>
 		) : (
 			<ItemSourcesContent
 				disabled={props.disabled}

@@ -91,6 +91,7 @@
 	],
 	"exclude": [
 		"src/item-definition/ui",
+		"src/production-input/ui",
 		"src/production-job/ui",
 		"src/production-output/ui"
 	]

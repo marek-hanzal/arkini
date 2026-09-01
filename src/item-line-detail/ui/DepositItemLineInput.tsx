@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineInputFrame, ItemLineInputTitle } from "~/item-line-detail/ui/ItemLineInputFrame";
+import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
+import { ChargeCostValue } from "~/production-input/ui/ChargeCostValue";
 
 type DepositInput = Extract<
 	ItemDetailLinesProjection.Input,
@@ -35,10 +37,13 @@ export const DepositItemLineInput = ({
 				label={input.selector.label}
 			/>
 			<p className="mt-0.5 text-xs text-muted">
-				Board · {input.distance}
-				{input.charges === undefined
-					? ""
-					: ` · ${input.charges.cost} charge${input.charges.cost === 1 ? "" : "s"} from ${input.charges.from === "self" ? "owner" : "target"}`}
+				Board · {BoardDistancePresentation[input.distance].label}
+				{input.charges === undefined ? null : (
+					<>
+						{" · "}
+						<ChargeCostValue charge={input.charges} />
+					</>
+				)}
 			</p>
 		</div>
 		{stale ? null : (

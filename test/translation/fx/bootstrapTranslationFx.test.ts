@@ -16,9 +16,7 @@ describe("bootstrapTranslationFx", () => {
 
 		const result = await Effect.runPromise(
 			bootstrapTranslationFx({
-				localization: {
-					readPreferredLanguagesFn,
-				},
+				readPreferredLanguagesFn,
 			}),
 		);
 
@@ -33,9 +31,7 @@ describe("bootstrapTranslationFx", () => {
 		const cause = new Error("Localization IPC is unavailable.");
 		const failure = await Effect.runPromise(
 			bootstrapTranslationFx({
-				localization: {
-					readPreferredLanguagesFn: () => Promise.reject(cause),
-				},
+				readPreferredLanguagesFn: () => Promise.reject(cause),
 			}).pipe(Effect.flip),
 		);
 

@@ -44,7 +44,7 @@ const waitForActionLoadingCompletionFrameFx = () =>
 	});
 
 /**
- * Installs the renderer-owned half of the native close handshake.
+ * Bootstraps the renderer-owned half of the native close handshake.
  *
  * The first callback claims an active or provisional Game before route
  * interruption can orphan it, then delegates final save/disposal to the terminal
@@ -52,7 +52,7 @@ const waitForActionLoadingCompletionFrameFx = () =>
  * frame. This owner coordinates the handshake; it never saves or disposes a Game
  * itself.
  */
-export const installRendererControlledCloseFx = Effect.fn("installRendererControlledCloseFx")(
+export const bootstrapRendererControlledCloseFx = Effect.fn("bootstrapRendererControlledCloseFx")(
 	({
 		lifecycle,
 		requestEditorLeaveFx = Effect.flatMap(EditorUnsavedChanges, (owner) =>

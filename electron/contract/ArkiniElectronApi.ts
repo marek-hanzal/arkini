@@ -9,6 +9,7 @@ import type {
 	ChatGptViewStateSchema,
 } from "./chatgpt/ChatGptSurfaceSchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
+import type { readPreferredLanguagesFn } from "./localization/readPreferredLanguagesFn";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
 import type { EditorSourceExportSchema } from "./editor/EditorSourceExportSchema";
@@ -191,7 +192,7 @@ export namespace ArkiniElectronApi {
 			readonly writeLastPackageIdFn: (packageId: LastPackageIdSchema.Type) => Promise<void>;
 		};
 		readonly localization: {
-			readonly readPreferredLanguagesFn: () => Promise<ReadonlyArray<string>>;
+			readonly readPreferredLanguagesFn: readPreferredLanguagesFn;
 		};
 		readonly editor: {
 			readonly statusFn: () => Promise<EditorProjectTransport.ServiceStatus>;

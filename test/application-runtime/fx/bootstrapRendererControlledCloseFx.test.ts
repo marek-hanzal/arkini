@@ -7,7 +7,7 @@ import type { ProjectRepositoryService } from "~/project-authoring/service/Proje
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
-import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
+import { bootstrapRendererControlledCloseFx } from "~/application-runtime/fx/bootstrapRendererControlledCloseFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import {
 	adoptTestGameEngineResourceFx,
@@ -104,7 +104,7 @@ afterEach(async () => {
 	vi.restoreAllMocks();
 });
 
-describe("installRendererControlledClose", () => {
+describe("bootstrapRendererControlledCloseFx", () => {
 	it("replace-navigates an active Game and waits for its painted completion hold", async () => {
 		const resource = createResource("package:close");
 		const { rendererRuntime } = createTestRendererRuntime({
@@ -118,7 +118,7 @@ describe("installRendererControlledClose", () => {
 		const router = createRouter();
 		const frames = frameHarness();
 		const remove = rendererRuntime.runSync(
-			installRendererControlledCloseFx({
+			bootstrapRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
 				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
@@ -168,7 +168,7 @@ describe("installRendererControlledClose", () => {
 		const router = createRouter();
 		const frames = frameHarness();
 		const remove = rendererRuntime.runSync(
-			installRendererControlledCloseFx({
+			bootstrapRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
 				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
@@ -192,7 +192,7 @@ describe("installRendererControlledClose", () => {
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const remove = rendererRuntime.runSync(
-			installRendererControlledCloseFx({
+			bootstrapRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
 				requestEditorLeaveFx: Effect.succeed(false),
 				rendererRuntime,
@@ -231,7 +231,7 @@ describe("installRendererControlledClose", () => {
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const remove = rendererRuntime.runSync(
-			installRendererControlledCloseFx({
+			bootstrapRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
 				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
@@ -283,7 +283,7 @@ describe("installRendererControlledClose", () => {
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const remove = rendererRuntime.runSync(
-			installRendererControlledCloseFx({
+			bootstrapRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
 				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,

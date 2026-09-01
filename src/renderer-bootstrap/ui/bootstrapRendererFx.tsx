@@ -6,9 +6,9 @@ import { createRoot } from "react-dom/client";
 
 import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
 import { bootstrapArkpackCatalogFx } from "~/arkpack-catalog/fx/bootstrapArkpackCatalogFx";
-import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/installEditorMcpVersionCheckoutFx";
+import { bootstrapEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/bootstrapEditorMcpVersionCheckoutFx";
 import { bootstrapRendererLifecycleFx } from "~/application-runtime/fx/bootstrapRendererLifecycleFx";
-import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
+import { bootstrapRendererControlledCloseFx } from "~/application-runtime/fx/bootstrapRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -20,7 +20,7 @@ import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
 import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEditorServiceStatusFx";
 import { bootstrapTranslationFx } from "~/translation/fx/bootstrapTranslationFx";
 import { TranslationContext } from "~/translation/ui/TranslationContext";
-import { installWindowModeSyncFx } from "~/window-mode/fx/installWindowModeSyncFx";
+import { bootstrapWindowModeSyncFx } from "~/window-mode/fx/bootstrapWindowModeSyncFx";
 
 const readRendererRootFx = Effect.sync(() => {
 	const rootElement = document.getElementById("root");
@@ -38,7 +38,7 @@ export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(function* ()
 		root,
 		viewFx: Effect.gen(function* () {
 			const translation = yield* bootstrapTranslationFx({
-				localization: window.arkini.localization,
+				readPreferredLanguagesFn: window.arkini.localization.readPreferredLanguagesFn,
 			});
 			document.title = ArkiniWindowTitle;
 			document.documentElement.lang = translation.locale;
@@ -49,18 +49,18 @@ export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(function* ()
 				root: rootElement,
 			});
 			yield* bootstrapRendererLifecycleFx(window.arkini.lifecycle);
-			yield* installWindowModeSyncFx();
+			yield* bootstrapWindowModeSyncFx();
 			yield* bootstrapLauncherFx();
 
 			const router = yield* createArkiniRouterFx({
 				rendererRuntime: RendererRuntime,
 			});
-			yield* installEditorMcpVersionCheckoutFx({
+			yield* bootstrapEditorMcpVersionCheckoutFx({
 				editorMcp: window.arkini.editorMcp,
 				rendererRuntime: RendererRuntime,
 				router,
 			});
-			yield* installRendererControlledCloseFx({
+			yield* bootstrapRendererControlledCloseFx({
 				lifecycle: window.arkini.lifecycle,
 				rendererRuntime: RendererRuntime,
 				router,

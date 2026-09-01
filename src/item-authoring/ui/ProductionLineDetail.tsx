@@ -1,86 +1,11 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
-import type { ReactNode } from "react";
 
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { OutputProjection } from "~/production-output/type/OutputProjection";
-import { Outputs } from "~/production-output/ui/Outputs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
-import { DetailReference } from "~/item-authoring/ui/DetailReference";
+import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
-
-type ItemRegistry = Record<string, ItemSchema.Type>;
-
-const projectDropFn = (drop: DropSchema.Type, items: ItemRegistry): OutputProjection.Item => ({
-	itemId: drop.itemId,
-	quantity: drop.quantity,
-	title: items[drop.itemId]?.title ?? drop.itemId,
-	activeRuleHints: [],
-});
-
-const projectOutputFn = (
-	output: OutputSchema.Type | undefined,
-	items: ItemRegistry,
-): readonly OutputProjection.Set<OutputProjection.Item>[] =>
-	output?.set.map((set) => ({
-		roll: set.roll.map((roll): OutputProjection.Roll<OutputProjection.Item> => {
-			if (roll.type === "weight")
-				return {
-					kind: "weight",
-					option: roll.drop.map((option) => ({
-						item: option.drop.map((drop) => projectDropFn(drop, items)),
-						weight: option.weight,
-					})),
-					selections: roll.quantity,
-				};
-			return roll.type === "guaranteed"
-				? {
-						item: roll.drop.map((drop) => projectDropFn(drop, items)),
-						kind: "guaranteed",
-					}
-				: {
-						chance: roll.chance,
-						item: roll.drop.map((drop) => projectDropFn(drop, items)),
-						kind: "chance",
-					};
-		}),
-		weight: set.weight,
-	})) ?? [];
-
-const renderOutputItemFn = (
-	item: OutputProjection.Item,
-	items: ItemRegistry,
-	projectId: string,
-): ReactNode => {
-	const definition = items[item.itemId];
-	return definition === undefined ? (
-		<span className="truncate font-medium text-foreground">{item.title}</span>
-	) : (
-		<DetailReference
-			item={definition}
-			projectId={projectId}
-		/>
-	);
-};
-
-const ProductionLineOutputs = ({
-	items,
-	output,
-	projectId,
-}: {
-	readonly items: ItemRegistry;
-	readonly output: OutputSchema.Type | undefined;
-	readonly projectId: string;
-}) => (
-	<Outputs
-		output={projectOutputFn(output, items)}
-		renderItemFn={(item) => renderOutputItemFn(item, items, projectId)}
-	/>
-);
 
 const LineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 	<div className="grid min-w-32 grid-rows-[1rem_1.5rem_1rem] text-right">
@@ -152,10 +77,9 @@ export const ProductionLineDetail = ({
 				>
 					<ChevronRight className="size-5" />
 				</div>
-				<ProductionLineOutputs
-					items={items}
+				<OutputDetail
+					emptyLabel="Consumes inputs without producing an item."
 					output={line.output}
-					projectId={project.projectId}
 				/>
 			</div>
 		</article>

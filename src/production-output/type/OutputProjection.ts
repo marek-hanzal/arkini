@@ -1,5 +1,7 @@
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
+import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 
 /** Shared projection vocabulary for authored output alternatives and rolls. */
 export namespace OutputProjection {
@@ -8,6 +10,11 @@ export namespace OutputProjection {
 		readonly title: string;
 		readonly quantity: Readonly<QuantitySchema.Type>;
 		readonly activeRuleHints: readonly string[];
+	}
+
+	export interface AuthoredItem extends Item {
+		readonly placement: PlacementSchema.Type;
+		readonly rules: readonly DropRuleSchema.Type[];
 	}
 
 	export type Roll<Item> =

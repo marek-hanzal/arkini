@@ -183,6 +183,16 @@ game:schema() {
 	tsx src/arkini-cli/arkini.ts game schema --output game/arkini/schema.json
 }
 
+# @cmd Synchronize application translations and remove dead static keys
+translations:sync() {
+	tsx scripts/translations.ts sync
+}
+
+# @cmd Check application translations without changing files
+translations:check() {
+	tsx scripts/translations.ts check
+}
+
 # @cmd Set the repository package version without creating a Git tag
 # @arg version! Version to write
 version() {
@@ -340,6 +350,7 @@ platform-check() {
 # @cmd Run the complete repository gate
 check() {
 	format_check
+	translations:check
 	typecheck
 	build
 	dependency_check

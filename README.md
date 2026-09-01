@@ -101,6 +101,7 @@ src/window-mode  native window-mode state, persistence and Electron-confirmed sy
 src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
 src/authoring-form  shared Editor form registry and canonical authored Item- and Asset-reference controls
 src/editor-control  shared Editor field, form-section and value controls
+src/translation  exact-key text catalog, plain and React translation APIs, and Markdown text presentation
 src/ui        cross-product presentation primitives only
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
@@ -131,11 +132,13 @@ argc test [path ...]
 argc build
 argc platform-check
 argc game:schema
+argc translations:sync
+argc translations:check
 argc dev-control
 argc mcp-inspect
 ```
 
-`argc dc` is the read-only dependency-topology gate over every active module root and standalone TypeScript config. `argc check` runs formatting, all TypeScript configurations, a production Electron build plus Community Arkpack packing and verification, that dependency gate, copy/paste detection, and the permanent Vitest suite. `argc platform-check` is the narrower hosted macOS/Windows portability gate: it runs that production build and the real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; `platform-check` does not replace the complete closing gate.
+`argc translations:sync` extracts configured literal keys, adds missing entries, removes dead static entries, preserves explicitly dynamic entries, sorts `src/translation/en.yaml`, and regenerates the bundled runtime catalog. `argc translations:check` performs the same reconciliation without writing and fails when either artifact has drifted. `argc dc` is the read-only dependency-topology gate over every active module root and standalone TypeScript config. `argc check` runs formatting and translation drift checks, all TypeScript configurations, a production Electron build plus Community Arkpack packing and verification, that dependency gate, copy/paste detection, and the permanent Vitest suite. `argc platform-check` is the narrower hosted macOS/Windows portability gate: it runs that production build and the real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; `platform-check` does not replace the complete closing gate.
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 

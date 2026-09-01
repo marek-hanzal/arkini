@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { Scrollable } from "~/ui/ui/Scrollable";
 
@@ -81,10 +81,11 @@ const readLocationLabelFn = (location: readItemDetailInfoFn.Location) =>
 
 /** Renders the canonical description-and-facts presentation for configured and live items. */
 export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail }) => {
+	const translator = useTranslator();
 	const fact = [
 		{
 			label: "Type",
-			value: ItemTypeLabel[detail.itemType],
+			value: translator.textFn(`Item type - ${detail.itemType}`),
 		},
 		...(detail.location === undefined
 			? []
@@ -96,7 +97,7 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 				]),
 		{
 			label: "Storage",
-			value: ItemStorageScopeLabel[detail.storageScope],
+			value: translator.textFn(`Item storage scope - ${detail.storageScope}`),
 		},
 		...(detail.currentStack === undefined
 			? []

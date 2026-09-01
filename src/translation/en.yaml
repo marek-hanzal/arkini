@@ -1,0 +1,125 @@
+Board editing:
+  value: Board editing
+Board editing help:
+  value: |
+    Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
+
+    Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
+Close:
+  value: Close
+Estimate:
+  value: Estimate
+Inventory editing:
+  value: Inventory editing
+Inventory editing help:
+  value: |
+    Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
+Item estimate help:
+  value: |
+    Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.
+
+    This is a planning preview, not a simulation or a promise.
+
+    ### Reading the result
+
+    - Each row is an item needed somewhere along the selected route.
+    - **Quantity** is the approximate amount the route consumes or requires.
+    - **Time** is how much that part contributes to the optimistic total.
+    - The Time and Quantity buttons only reorder the same result.
+
+    Arkini uses authored runtimes, output quantities and chances. Random outputs are converted into an expected number of attempts. Independent work can happen in parallel, so its time is not blindly added together.
+
+    Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
+Item required by help:
+  value: |
+    Required by answers: **which items genuinely need this item in order to work?**
+
+    The list includes direct production inputs and production conditions that require the item to exist. It deliberately excludes items that merely produce it, own its production line or return it as an output.
+
+    Open any row to continue exploring the same question for that item. An empty list means nothing currently consumes or requires this item, so it may be unnecessary authored data.
+Item storage scope - any:
+  value: Board, Inventory & Toolbar
+  dynamic: true
+Item storage scope - board:
+  value: Board only
+  dynamic: true
+Item storage scope - inventory:
+  value: Inventory only
+  dynamic: true
+Item storage scope - toolbar:
+  value: Toolbar only
+  dynamic: true
+Item type - blueprint:
+  value: Blueprint
+  dynamic: true
+Item type - craft:
+  value: Craft owner
+  dynamic: true
+Item type - deposit:
+  value: Resource deposit
+  dynamic: true
+Item type - inventory:
+  value: Inventory control
+  dynamic: true
+Item type - missing:
+  value: Missing item
+  dynamic: true
+Item type - producer:
+  value: Producer
+  dynamic: true
+Item type - simple:
+  value: Simple item
+  dynamic: true
+Item type - space:
+  value: Space item
+  dynamic: true
+Item type - stash:
+  value: Stash
+  dynamic: true
+Item type - temporary:
+  value: Temporary item
+  dynamic: true
+Item type description - blueprint:
+  value: A build plan with one construction line.
+  dynamic: true
+Item type description - craft:
+  value: A consumable or quest-like item with one product line.
+  dynamic: true
+Item type description - deposit:
+  value: A board resource source with optional finite production lines.
+  dynamic: true
+Item type description - inventory:
+  value: The singleton item that opens the shared inventory.
+  dynamic: true
+Item type description - producer:
+  value: A building or actor with one or more selectable product lines.
+  dynamic: true
+Item type description - simple:
+  value: A regular stackable item without specialized behavior.
+  dynamic: true
+Item type description - space:
+  value: An immediately activated item that moves play to an authored space.
+  dynamic: true
+Item type description - stash:
+  value: A chest or reward container with one opening line.
+  dynamic: true
+Item type description - temporary:
+  value: A board-only effect that expires after an authored duration.
+  dynamic: true
+Page help:
+  value: Page help
+Required by:
+  value: Required by
+Starting layout controls help:
+  value: |
+    ### Starting layout controls
+
+    - **Click** an empty slot to choose an item, or click a stack to add one.
+    - **Right-click** a stack to remove it.
+    - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack. Anything at the destination is replaced.
+    - Press **Minus** to remove one item or **Delete** to remove the whole stack.
+Toolbar editing:
+  value: Toolbar editing
+Toolbar editing help:
+  value: |
+    Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.

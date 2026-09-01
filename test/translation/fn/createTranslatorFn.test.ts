@@ -15,18 +15,9 @@ describe("createTranslatorFn", () => {
 			},
 		});
 
-		expect(translator.valueFn("Producer")).toEqual({
-			text: "Výrobce",
-			type: "translation",
-		});
+		expect(translator.textFn("Producer")).toBe("Výrobce");
 		expect(translator.textFn("Intentionally empty", "fallback")).toBe("");
-		expect(translator.valueFn("Missing", "Readable fallback")).toEqual({
-			text: "Readable fallback",
-			type: "fallback",
-		});
-		expect(translator.valueFn("Plain missing key")).toEqual({
-			text: "Plain missing key",
-			type: "key",
-		});
+		expect(translator.textFn("Missing", "Readable fallback")).toBe("Readable fallback");
+		expect(translator.textFn("Plain missing key")).toBe("Plain missing key");
 	});
 });

@@ -23,52 +23,17 @@ import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 
 const ItemDetailHelpBySection: Partial<Record<SectionId, EditorPageHelpContent>> = {
 	estimate: {
-		content: (
-			<div className="grid gap-3">
-				<p>
-					Estimate is a planning preview, not a live game simulation. It finds one
-					complete route for obtaining this item from the project's starting items and
-					authored production rules.
-				</p>
-				<p>
-					Each row is an item needed somewhere along that route. Quantity shows roughly
-					how much is needed, while Time shows how long that part contributes. The Time
-					and Quantity buttons only change the order of the same rows.
-				</p>
-				<p>
-					Arkini uses configured runtimes and output amounts. For random outputs, it uses
-					their chances to estimate how many attempts are usually needed. Work that can
-					happen at the same time is counted in parallel instead of simply adding every
-					row together.
-				</p>
-				<p>
-					The chosen route is optimistic. Real play can take longer or use another route
-					because player choices, placement, timing, and random results are not simulated.
-					A partial or unreachable result means Arkini could not find a complete
-					calculable path in the authored data.
-				</p>
-			</div>
-		),
-		title: "Estimate",
+		content: <Mx label="Item estimate help" />,
+		title: <Tx label="Estimate" />,
 	},
 	"required-by": {
-		content: (
-			<div className="grid gap-3">
-				<p>
-					Required by shows which items genuinely need this item to work. They either
-					consume it as an input or require it in a production condition.
-				</p>
-				<p>
-					It does not include items that only produce this item, own its production line,
-					or output the item itself. Open a row to continue exploring who requires that
-					item.
-				</p>
-			</div>
-		),
-		title: "Required by",
+		content: <Mx label="Item required by help" />,
+		title: <Tx label="Required by" />,
 	},
 };
 

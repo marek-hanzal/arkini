@@ -5,10 +5,11 @@ import { createPortal } from "react-dom";
 
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 export interface EditorPageHelpContent {
 	readonly content: ReactNode;
-	readonly title: string;
+	readonly title: ReactNode;
 }
 
 const EditorPageHelpTransition = {
@@ -31,6 +32,7 @@ const EditorPageHelpDialog = ({
 	const focus = useOverlayFocus({
 		onCloseFn,
 	});
+	const translator = useTranslator();
 	return (
 		<motion.div
 			animate={{
@@ -72,7 +74,7 @@ const EditorPageHelpDialog = ({
 						className="ml-auto inline-flex size-8 shrink-0 items-center justify-center no-underline"
 						data-ui="EditorPageHelpClose"
 						onClick={onCloseFn}
-						title="Close"
+						title={translator.textFn("Close")}
 					>
 						<X className="size-5" />
 					</LinkButton>
@@ -86,12 +88,13 @@ const EditorPageHelpDialog = ({
 /** Presents optional page-owned guidance from the shared editor header. */
 export const EditorPageHelp = ({ content, title }: EditorPageHelpContent) => {
 	const [open, setOpenFn] = useState(false);
+	const translator = useTranslator();
 	return (
 		<>
 			<LinkButton
 				className="inline-flex size-9 items-center justify-center text-foreground no-underline hover:text-accent"
 				data-ui="EditorPageHelpOpen"
-				title="Page help"
+				title={translator.textFn("Page help")}
 				onClick={() => setOpenFn(true)}
 			>
 				<CircleHelp className="size-5" />

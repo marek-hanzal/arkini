@@ -10,75 +10,44 @@ import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { useProjectFormController } from "~/project-authoring/ui/useProjectFormController";
 import { ProjectCompatibilityNotice } from "~/project-version/ui/ProjectCompatibilityNotice";
-
-const ProjectStartGridHelp = () => (
-	<>
-		<h3 className="font-semibold text-foreground">Starting layout controls</h3>
-		<ul className="grid gap-2">
-			<li>
-				<strong className="text-foreground">Click:</strong> Choose an item in an empty slot
-				or add one to an existing stack.
-			</li>
-			<li>
-				<strong className="text-foreground">Right click:</strong> Remove the stack.
-			</li>
-			<li>
-				<strong className="text-foreground">Alt/Cmd + drag or Arrow:</strong> Move a stack
-				and replace anything at the destination.
-			</li>
-			<li>
-				<strong className="text-foreground">Minus or Delete:</strong> Decrement or remove
-				the selected stack.
-			</li>
-		</ul>
-	</>
-);
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 
 const ProjectFormHelpBySection: Partial<
 	Record<
 		ProjectSectionId,
 		{
 			readonly content: ReactNode;
-			readonly title: string;
+			readonly title: ReactNode;
 		}
 	>
 > = {
 	board: {
 		content: (
 			<>
-				<p>
-					Width and height apply to every playable Board Space. The Space selector
-					switches live between the 32 zero-based Spaces from 0 to 31; edits stay scoped
-					to the selected Space.
-				</p>
-				<ProjectStartGridHelp />
+				<Mx label="Board editing help" />
+				<Mx label="Starting layout controls help" />
 			</>
 		),
-		title: "Board editing",
+		title: <Tx label="Board editing" />,
 	},
 	toolbar: {
 		content: (
 			<>
-				<p>
-					The Toolbar is a passive one-row starting storage. Set its size to zero to
-					disable it.
-				</p>
-				<ProjectStartGridHelp />
+				<Mx label="Toolbar editing help" />
+				<Mx label="Starting layout controls help" />
 			</>
 		),
-		title: "Toolbar editing",
+		title: <Tx label="Toolbar editing" />,
 	},
 	inventory: {
 		content: (
 			<>
-				<p>
-					Width and height define the shared passive Inventory grid used by every playable
-					Space.
-				</p>
-				<ProjectStartGridHelp />
+				<Mx label="Inventory editing help" />
+				<Mx label="Starting layout controls help" />
 			</>
 		),
-		title: "Inventory editing",
+		title: <Tx label="Inventory editing" />,
 	},
 };
 

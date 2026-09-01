@@ -5,16 +5,14 @@ import { createTranslatorFn } from "~/translation/fn/createTranslatorFn";
 describe("createTranslatorFn", () => {
 	it("resolves exact plain keys and preserves explicit empty translations", () => {
 		const translator = createTranslatorFn({
-			translations: [
-				{
-					key: "Producer",
+			translations: {
+				Producer: {
 					value: "Výrobce",
 				},
-				{
-					key: "Intentionally empty",
+				"Intentionally empty": {
 					value: "",
 				},
-			],
+			},
 		});
 
 		expect(translator.valueFn("Producer")).toEqual({

@@ -7,30 +7,30 @@ import { Command } from "effect/unstable/cli";
 import { tx } from "./translation/tx";
 import { TranslationSources } from "~/translation/constant/TranslationSources";
 
-const runTranslationsFx = (mode: tx.Props["mode"]) =>
+const TranslationConfig = {
+	locales: [
+		"en",
+	],
+	packages: [
+		resolve("."),
+	],
+	sourceDirectory: resolve("src/translation"),
+	sources: TranslationSources,
+} as const;
+
+const TranslationCheckCommand = Command.make("check", {}, () =>
 	tx({
-		locales: [
-			"en",
-		],
-		mode,
-		packages: [
-			resolve("."),
-		],
-		runtimeOutput: {
-			locale: "en",
-			path: resolve("src/translation/constant/EnglishTranslations.ts"),
-		},
-		sourceDirectory: resolve("src/translation"),
-		sources: TranslationSources,
-	});
+		...TranslationConfig,
+		mode: "check",
+	}),
+).pipe(Command.withDescription("Check translation catalogs without changing files."));
 
-const TranslationCheckCommand = Command.make("check", {}, () => runTranslationsFx("check")).pipe(
-	Command.withDescription("Check the runtime translation catalog and remove no files."),
-);
-
-const TranslationSyncCommand = Command.make("sync", {}, () => runTranslationsFx("sync")).pipe(
-	Command.withDescription("Synchronize translation sources and remove dead static keys."),
-);
+const TranslationSyncCommand = Command.make("sync", {}, () =>
+	tx({
+		...TranslationConfig,
+		mode: "sync",
+	}),
+).pipe(Command.withDescription("Synchronize translation catalogs and remove dead static keys."));
 
 const TranslationsCommand = Command.make("translations")
 	.pipe(
@@ -43,4 +43,17 @@ const TranslationsCommand = Command.make("translations")
 
 Command.run(TranslationsCommand, {
 	version: "1.0.0",
-}).pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain);
+}).pipe(
+	Effect.catchTags({
+		TranslationOutOfSyncError: ({ paths }) =>
+			Effect.fail(new Error(`Translation catalogs are out of sync: ${paths.join(", ")}`)),
+		TranslationSyncError: ({ cause, message }) =>
+			Effect.fail(
+				new Error(message, {
+					cause,
+				}),
+			),
+	}),
+	Effect.provide(NodeServices.layer),
+	NodeRuntime.runMain,
+);

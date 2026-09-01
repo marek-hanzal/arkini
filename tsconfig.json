@@ -26,6 +26,7 @@
 		},
 		"resolveJsonModule": true,
 		"types": [
+			"@modyfi/vite-plugin-yaml/modules",
 			"vite/client",
 			"node"
 		]

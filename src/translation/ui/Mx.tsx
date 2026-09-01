@@ -1,10 +1,10 @@
 import type { FC } from "react";
 
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Markdown, type MarkdownProps } from "~/ui/ui/Markdown";
+import { Markdown } from "~/ui/ui/Markdown";
 
 export namespace Mx {
-	export interface Props extends Omit<MarkdownProps, "children"> {
+	export interface Props extends Omit<Markdown.Props, "children"> {
 		readonly fallback?: string;
 		readonly label: string | undefined;
 	}

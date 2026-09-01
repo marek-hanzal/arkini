@@ -2,12 +2,14 @@ import type { ComponentProps } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export interface MarkdownProps extends Omit<ComponentProps<typeof ReactMarkdown>, "children"> {
-	readonly children: string;
+export namespace Markdown {
+	export interface Props extends Omit<ComponentProps<typeof ReactMarkdown>, "children"> {
+		readonly children: string;
+	}
 }
 
 /** Renders trusted application-authored Markdown without admitting embedded HTML. */
-export const Markdown = ({ children, components, ...props }: MarkdownProps) => (
+export const Markdown = ({ children, components, ...props }: Markdown.Props) => (
 	<div
 		className="grid gap-3 text-sm leading-6 text-muted"
 		data-ui="Markdown"

@@ -18,19 +18,14 @@ export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/deta
 			projectId,
 			resourceId,
 		};
-		const flatContentActive = FlatAssetDetailRoutes.some((to) =>
-			[
-				true,
-				false,
-			].some(
-				(pending) =>
-					matchRouteFn({
-						includeSearch: false,
-						params: detailParams,
-						pending,
-						to,
-					}) !== false,
-			),
+		const flatContentActive = FlatAssetDetailRoutes.some(
+			(to) =>
+				matchRouteFn({
+					includeSearch: false,
+					params: detailParams,
+					pending: false,
+					to,
+				}) !== false,
 		);
 		return (
 			<EditorAssetDetail

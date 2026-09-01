@@ -11,6 +11,7 @@ const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
 const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
 const itemRevisionPattern = "^src/item-revision(?:/|$)";
+const rendererBootstrapPattern = "^src/renderer-bootstrap(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -282,6 +283,22 @@ module.exports = {
 			},
 			to: {
 				path: "^src/production-(?:action|delivery|input|job|line)(?:/|$)",
+			},
+		},
+		{
+			name: "renderer-bootstrap-is-terminal",
+			comment:
+				"Only the physical renderer entrypoint starts the explicit downstream bootstrap owner.",
+			severity: "error",
+			from: {
+				path: activeCodePattern,
+				pathNot: [
+					rendererBootstrapPattern,
+					"^src/main[.]tsx$",
+				],
+			},
+			to: {
+				path: rendererBootstrapPattern,
 			},
 		},
 		{

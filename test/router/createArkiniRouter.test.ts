@@ -343,6 +343,36 @@ describe("createArkiniRouterFx", () => {
 		);
 	});
 
+	it("skips native transitions between sections of the same asset detail", () => {
+		const sections = [
+			"overview",
+			"usage",
+			"technical",
+			"delete",
+		] as const;
+		for (const from of sections) {
+			for (const to of sections) {
+				if (from === to) continue;
+				expect(
+					resolveTypes(
+						`/editor/arkini/assets/producer-townhall-t3/detail/${from}`,
+						`/editor/arkini/assets/producer-townhall-t3/detail/${to}`,
+					),
+				).toBe(false);
+			}
+		}
+		expect(
+			resolveTypes(
+				"/editor/arkini/assets/producer-townhall-t3/detail/overview",
+				"/editor/arkini/assets/producer-academy/detail/overview",
+			),
+		).toEqual([
+			"arkini-route",
+			"board-to-board",
+			"editor-to-editor",
+		]);
+	});
+
 	it("uses the typed TanStack policy only when the renderer supports transition types", () => {
 		Object.defineProperty(window, "CSS", {
 			configurable: true,

@@ -32,6 +32,10 @@ const Sections = [
 		label: "Estimate",
 	},
 	{
+		id: "required-by",
+		label: "Required by",
+	},
+	{
 		id: "delete",
 		label: "Delete",
 	},
@@ -52,7 +56,11 @@ export const readSectionsFn = (
 	mode: "detail" | "form" = "detail",
 ): ReadonlyArray<SectionDescriptor> =>
 	Sections.filter((section) => {
-		if (mode === "form" && (section.id === "estimate" || section.id === "delete")) return false;
+		if (
+			mode === "form" &&
+			(section.id === "estimate" || section.id === "required-by" || section.id === "delete")
+		)
+			return false;
 		switch (section.id) {
 			case "production":
 				return ProductionItemTypes.has(item.type);

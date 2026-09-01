@@ -35,7 +35,9 @@ export const Detail = ({
 		itemUid: item.uid,
 	};
 	const editableSectionId =
-		sectionId === "estimate" || sectionId === "delete" ? "identity" : sectionId;
+		sectionId === "estimate" || sectionId === "required-by" || sectionId === "delete"
+			? "identity"
+			: sectionId;
 	const sections = readSectionsFn(item);
 	return (
 		<EditorSectionPage
@@ -130,6 +132,7 @@ export const Detail = ({
 			{sectionId === "charges" ||
 			sectionId === "delete" ||
 			sectionId === "estimate" ||
+			sectionId === "required-by" ||
 			sectionId === "production" ? (
 				children
 			) : (

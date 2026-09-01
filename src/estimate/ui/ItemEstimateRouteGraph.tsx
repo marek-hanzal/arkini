@@ -24,15 +24,6 @@ export const ItemEstimateRouteGraph = ({
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
 	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
-	const requiredByFactId = new Map<string, Set<string>>();
-	for (const route of routeSteps)
-		for (const requirement of route.requirements) {
-			if (requirement.acquisitionFactId === undefined) continue;
-			const requiredBy =
-				requiredByFactId.get(requirement.acquisitionFactId) ?? new Set<string>();
-			requiredBy.add(route.factId);
-			requiredByFactId.set(requirement.acquisitionFactId, requiredBy);
-		}
 	const sortedRouteSteps = [
 		...routeSteps,
 	].sort((left, right) => {
@@ -103,17 +94,6 @@ export const ItemEstimateRouteGraph = ({
 								{route.rootQuantity > 0 ? (
 									<p className="mt-1 truncate text-xs text-muted">
 										{formatQuantityFn(route.rootQuantity)} from authored start
-									</p>
-								) : null}
-								{requiredByFactId.get(route.factId)?.size ? (
-									<p className="mt-1 truncate text-xs text-muted">
-										Required by:{" "}
-										{[
-											...requiredByFactId.get(route.factId)!,
-										]
-											.map((factId) => config.items[factId]?.title ?? factId)
-											.sort()
-											.join(", ")}
 									</p>
 								) : null}
 							</div>

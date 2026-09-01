@@ -23,11 +23,10 @@ afterEach(async () => {
 });
 
 describe("tx", () => {
-	it("adds live literals, removes dead static keys and preserves dynamic keys", async () => {
+	it("reconciles exact live keys and reports catalog drift as typed failure", async () => {
 		const root = await mkdtemp(join(tmpdir(), "arkini-translations-"));
 		temporaryRoots.push(root);
 		const sourceDirectory = join(root, "translations");
-		const runtimePath = join(root, "generated", "EnglishTranslations.ts");
 		await mkdir(join(root, "src"), {
 			recursive: true,
 		});
@@ -52,8 +51,9 @@ translator.textFn(\`Item type - \${type}\`);
 const help = <Mx label="Markdown help" />;
 `,
 		);
+		const sourcePath = join(sourceDirectory, "en.yaml");
 		await writeFile(
-			join(sourceDirectory, "en.yaml"),
+			sourcePath,
 			`Dead label:
   value: Remove me
 Dynamic label:
@@ -71,10 +71,6 @@ Live label:
 			packages: [
 				root,
 			],
-			runtimeOutput: {
-				locale: "en",
-				path: runtimePath,
-			},
 			sourceDirectory,
 			sources: {
 				functions: [],
@@ -95,9 +91,7 @@ Live label:
 
 		await Effect.runPromise(tx(props).pipe(Effect.provide(NodeServices.layer)));
 
-		const translations = TranslationListSchema.parse(
-			parse(await readFile(join(sourceDirectory, "en.yaml"), "utf8")),
-		);
+		const translations = TranslationListSchema.parse(parse(await readFile(sourcePath, "utf8")));
 		expect(translations).toEqual({
 			"Dynamic label": {
 				dynamic: true,
@@ -110,7 +104,6 @@ Live label:
 				value: "Markdown help",
 			},
 		});
-		expect(await readFile(runtimePath, "utf8")).toContain('key: "Markdown help"');
 		await expect(
 			Effect.runPromise(
 				tx({
@@ -122,124 +115,23 @@ Live label:
 			changed: [],
 		});
 
-		await writeFile(runtimePath, "stale runtime catalog\n");
-		await expect(
-			Effect.runPromise(
-				tx({
-					...props,
-					mode: "check",
-				}).pipe(Effect.provide(NodeServices.layer)),
-			),
-		).rejects.toThrow("Translation sources are out of sync");
-	});
-
-	it("leaves the catalog untouched when a source file cannot be parsed", async () => {
-		const root = await mkdtemp(join(tmpdir(), "arkini-translations-invalid-"));
-		temporaryRoots.push(root);
-		const sourceDirectory = join(root, "translations");
-		await mkdir(join(root, "src"), {
-			recursive: true,
-		});
-		await mkdir(sourceDirectory, {
-			recursive: true,
-		});
 		await writeFile(
-			join(root, "tsconfig.json"),
-			JSON.stringify({
-				include: [
-					"src",
-				],
-			}),
+			sourcePath,
+			`Live label:
+  value: Stale translation
+`,
 		);
-		await writeFile(join(root, "src", "Broken.ts"), 'translator.textFn("Unclosed";\n');
-		const original = `Existing label:\n  value: Keep me\n`;
-		const sourcePath = join(sourceDirectory, "en.yaml");
-		await writeFile(sourcePath, original);
-
-		await expect(
-			Effect.runPromise(
-				tx({
-					locales: [
-						"en",
-					],
-					mode: "sync",
-					packages: [
-						root,
-					],
-					runtimeOutput: {
-						locale: "en",
-						path: join(root, "generated", "EnglishTranslations.ts"),
-					},
-					sourceDirectory,
-					sources: {
-						functions: [],
-						jsx: [],
-						objects: [
-							{
-								name: "textFn",
-								object: "translator",
-							},
-						],
-					},
-				}).pipe(Effect.provide(NodeServices.layer)),
-			),
-		).rejects.toThrow("cannot be parsed");
-		expect(await readFile(sourcePath, "utf8")).toBe(original);
-	});
-
-	it("leaves every catalog artifact untouched when discovery finds no source files", async () => {
-		const root = await mkdtemp(join(tmpdir(), "arkini-translations-empty-"));
-		temporaryRoots.push(root);
-		const sourceDirectory = join(root, "translations");
-		const runtimePath = join(root, "generated", "EnglishTranslations.ts");
-		await mkdir(join(root, "src"), {
-			recursive: true,
-		});
-		await mkdir(sourceDirectory, {
-			recursive: true,
-		});
-		await mkdir(join(root, "generated"), {
-			recursive: true,
-		});
-		await writeFile(
-			join(root, "tsconfig.json"),
-			JSON.stringify({
-				include: [
-					"src",
-				],
-			}),
+		const failure = await Effect.runPromise(
+			tx({
+				...props,
+				mode: "check",
+			}).pipe(Effect.provide(NodeServices.layer), Effect.flip),
 		);
-		await writeFile(join(root, "src", "Only.d.ts"), "declare const example: string;\n");
-		const originalSource = `Existing label:\n  value: Keep me\n`;
-		const originalRuntime = "existing generated catalog\n";
-		const sourcePath = join(sourceDirectory, "en.yaml");
-		await writeFile(sourcePath, originalSource);
-		await writeFile(runtimePath, originalRuntime);
-
-		await expect(
-			Effect.runPromise(
-				tx({
-					locales: [
-						"en",
-					],
-					mode: "sync",
-					packages: [
-						root,
-					],
-					runtimeOutput: {
-						locale: "en",
-						path: runtimePath,
-					},
-					sourceDirectory,
-					sources: {
-						functions: [],
-						jsx: [],
-						objects: [],
-					},
-				}).pipe(Effect.provide(NodeServices.layer)),
-			),
-		).rejects.toThrow("No translation source files were discovered");
-		expect(await readFile(sourcePath, "utf8")).toBe(originalSource);
-		expect(await readFile(runtimePath, "utf8")).toBe(originalRuntime);
+		expect(failure).toMatchObject({
+			_tag: "TranslationOutOfSyncError",
+			paths: [
+				sourcePath,
+			],
+		});
 	});
 });

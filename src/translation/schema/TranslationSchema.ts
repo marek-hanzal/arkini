@@ -2,14 +2,13 @@ import { z } from "zod";
 
 export const TranslationSchema = z
 	.object({
-		key: z.string().min(1),
 		value: z.string(),
 		dynamic: z.boolean().optional(),
 	})
 	.strict()
 	.meta({
 		id: "Translation",
-		description: "One runtime translation entry.",
+		description: "One authored translation entry.",
 	});
 
 export type TranslationSchema = typeof TranslationSchema;

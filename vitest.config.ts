@@ -1,7 +1,11 @@
+import ViteYaml from "@modyfi/vite-plugin-yaml";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+	plugins: [
+		ViteYaml(),
+	],
 	resolve: {
 		alias: {
 			"~scripts": fileURLToPath(new URL("./scripts", import.meta.url)),

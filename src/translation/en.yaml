@@ -5,15 +5,29 @@ Board editing help:
     Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
 
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
+Charges:
+  value: Charges
+  dynamic: true
+Charges per item:
+  value: Charges per item
+  dynamic: true
 Close:
   value: Close
+Current stack:
+  value: Current stack
+Description:
+  value: Description
 Estimate:
   value: Estimate
+Game limit:
+  value: Game limit
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
   value: |
     Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
+Item ID:
+  value: Item ID
 Item estimate help:
   value: |
     Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.
@@ -106,10 +120,16 @@ Item type description - stash:
 Item type description - temporary:
   value: A board-only effect that expires after an authored duration.
   dynamic: true
+Location:
+  value: Location
+Owned:
+  value: Owned
 Page help:
   value: Page help
 Required by:
   value: Required by
+Stack capacity:
+  value: Stack capacity
 Starting layout controls help:
   value: |
     ### Starting layout controls
@@ -118,8 +138,14 @@ Starting layout controls help:
     - **Right-click** a stack to remove it.
     - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack. Anything at the destination is replaced.
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
+Storage:
+  value: Storage
 Toolbar editing:
   value: Toolbar editing
 Toolbar editing help:
   value: |
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
+Type:
+  value: Type
+UID:
+  value: UID

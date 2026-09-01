@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { readPreferredLanguagesFn } from "~electron/contract/localization/readPreferredLanguagesFn";
 import { TranslationPreferencesReadError } from "~/translation/error/TranslationPreferencesReadError";
 import type { createTranslatorFn } from "~/translation/fn/createTranslatorFn";
 import { loadTranslatorFx } from "~/translation/fx/loadTranslatorFx";
@@ -8,10 +8,7 @@ import { setTranslatorFx, translator } from "~/translation/service/translator";
 
 export namespace bootstrapTranslationFx {
 	export interface Props {
-		readonly localization: Pick<
-			ArkiniElectronApi.Api["localization"],
-			"readPreferredLanguagesFn"
-		>;
+		readonly readPreferredLanguagesFn: readPreferredLanguagesFn;
 	}
 
 	export interface Result {
@@ -22,10 +19,10 @@ export namespace bootstrapTranslationFx {
 
 /** Selects and publishes the one renderer translation catalog before consumers start. */
 export const bootstrapTranslationFx = Effect.fn("bootstrapTranslationFx")(function* ({
-	localization,
+	readPreferredLanguagesFn,
 }: bootstrapTranslationFx.Props) {
 	const preferredLocales = yield* Effect.tryPromise({
-		try: () => localization.readPreferredLanguagesFn(),
+		try: () => readPreferredLanguagesFn(),
 		catch: (cause) =>
 			new TranslationPreferencesReadError({
 				cause,

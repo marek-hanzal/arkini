@@ -26,6 +26,7 @@ src/game-runtime  canonical live Runtime schemas, Item purity/stateful rejection
 src/game-session  package-independent Runtime/Tick/save execution, subscriptions, fail-stop and disposal lifecycle
 src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
 src/installed-game  Arkpack/save bootstrap, diagnostics and latest incident capture, package leases, finalization, recovery and last successful package preference
+src/game-incident  fixed composed diagnostic models, semantic transition projection and human/LLM text rendering
 src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
 src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
 src/application-version  Arkini writer provenance, major-only admission and incompatibility failure

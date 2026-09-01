@@ -3,5 +3,8 @@ export const GameIncidentFiles = {
 	directory: "latest",
 	arkpack: "game.arkpack",
 	save: "save.arksave",
-	diagnostics: "diagnostics.jsonl",
+	incident: "incident.md",
+	failure: "failure.md",
+	history: "history.md",
+	runtimeState: "runtime-state.md",
 } as const;

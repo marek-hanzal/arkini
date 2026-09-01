@@ -2,136 +2,64 @@ import { Argument, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect, FileSystem, Option } from "effect";
 import { join } from "node:path";
 
-interface DiagnosticLine {
-	readonly line: string;
-	readonly sessionId?: string;
-	readonly fatal: boolean;
-}
-
-const readDiagnosticLineFn = (line: string): DiagnosticLine | undefined => {
-	let value: unknown;
-	try {
-		value = JSON.parse(line);
-	} catch {
-		return undefined;
-	}
-	if (value === null || typeof value !== "object" || Array.isArray(value)) return undefined;
-	const record = value as Record<string, unknown>;
-	const properties =
-		record.properties !== null &&
-		typeof record.properties === "object" &&
-		!Array.isArray(record.properties)
-			? (record.properties as Record<string, unknown>)
-			: undefined;
-	const directSessionId = record.sessionId;
-	const propertySessionId = properties?.sessionId;
-	const sessionId =
-		typeof directSessionId === "string"
-			? directSessionId
-			: typeof propertySessionId === "string"
-				? propertySessionId
-				: undefined;
-	const directEvent = record.event;
-	const propertyEvent = properties?.event;
-	const message = record.message;
-	const event =
-		typeof directEvent === "string"
-			? directEvent
-			: typeof propertyEvent === "string"
-				? propertyEvent
-				: typeof message === "string"
-					? message
-					: undefined;
-	return {
-		line,
-		...(sessionId === undefined
-			? {}
-			: {
-					sessionId,
-				}),
-		fatal: event === "session-failed",
-	};
-};
-
-const readDiagnosticPathsFx = Effect.fn("readDiagnosticPathsFx")(function* (input: string) {
-	const fileSystem = yield* FileSystem.FileSystem;
-	const info = yield* fileSystem.stat(input);
-	if (info.type === "File")
-		return [
-			input,
-		];
-	if (info.type !== "Directory") {
-		return yield* Effect.fail(
-			new Error(`Diagnostics input is not a file or directory: ${input}`),
-		);
-	}
-	const candidates = (yield* fileSystem.readDirectory(input)).filter((filename) =>
-		/^diagnostics\.jsonl(?:\.\d+)?$/.test(filename),
-	);
-	const dated = yield* Effect.forEach(candidates, (filename) =>
-		Effect.map(fileSystem.stat(join(input, filename)), (candidateInfo) => ({
-			filename,
-			mtime: Option.match(candidateInfo.mtime, {
-				onNone: () => 0,
-				onSome: (mtime) => mtime.getTime(),
-			}),
-		})),
-	);
-	return dated
-		.sort(
-			(left, right) =>
-				left.mtime - right.mtime || left.filename.localeCompare(right.filename),
-		)
-		.map(({ filename }) => join(input, filename));
-});
+import { GameIncidentFiles } from "~shared/GameIncidentMetadata";
+import { formatGameDiagnosticSessionTextFn } from "~/game-incident/fn/formatGameDiagnosticSessionTextFn";
+import { readGameDiagnosticTextSectionFn } from "~/game-incident/fn/readGameDiagnosticTextSectionFn";
+import { readGameDiagnosticLogSessionFx } from "~/game-incident/fx/readGameDiagnosticLogSessionFx";
+import { readGameIncidentTextFx } from "~/game-incident/fx/readGameIncidentTextFx";
 
 const runDiagnosticsSliceFx = Effect.fn("runDiagnosticsSliceFx")(function* ({
 	input,
-	sessionId: requestedSessionId,
+	section: requestedSection,
+	sessionId,
 }: {
 	readonly input: string;
+	readonly section: string;
 	readonly sessionId: Option.Option<string>;
 }) {
+	const section = readGameDiagnosticTextSectionFn(requestedSection);
+	if (section instanceof Error) return yield* Effect.fail(section);
 	const fileSystem = yield* FileSystem.FileSystem;
-	const paths = yield* readDiagnosticPathsFx(input);
-	const lines = (yield* Effect.forEach(paths, (path) =>
-		Effect.map(fileSystem.readFileString(path), (content) =>
-			content
-				.split(/\r?\n/)
-				.filter((line) => line.length > 0)
-				.flatMap((line) => {
-					const parsed = readDiagnosticLineFn(line);
-					return parsed === undefined
-						? []
-						: [
-								parsed,
-							];
-				}),
-		),
-	)).flat();
-	let sessionId = Option.getOrUndefined(requestedSessionId);
-	if (sessionId === undefined) {
-		for (let index = lines.length - 1; index >= 0; index -= 1) {
-			const line = lines[index];
-			if (line?.fatal && line.sessionId !== undefined) {
-				sessionId = line.sessionId;
-				break;
-			}
+	const inputInfo = yield* fileSystem
+		.stat(input)
+		.pipe(Effect.mapError(() => new Error("Could not inspect the diagnostic input.")));
+	const fixedIncident =
+		inputInfo.type === "Directory" &&
+		(yield* fileSystem.exists(join(input, GameIncidentFiles.incident)));
+	if (fixedIncident) {
+		if (Option.isSome(sessionId)) {
+			return yield* Effect.fail(
+				new Error(
+					"--session-id applies only to diagnostic JSONL; a fixed incident already owns one exact session.",
+				),
+			);
 		}
+		yield* Console.log(
+			yield* readGameIncidentTextFx({
+				input,
+				section,
+			}),
+		);
+		return;
 	}
-	if (sessionId === undefined) {
-		return yield* Effect.fail(new Error(`No failed game session was found in ${input}.`));
-	}
-	const sessionLines = lines.filter((line) => line.sessionId === sessionId);
-	if (sessionLines.length === 0) {
+	if (section === "runtime") {
 		return yield* Effect.fail(
-			new Error(`Diagnostic session ${sessionId} was not found in ${input}.`),
+			new Error("--section runtime is available only for fixed incidents."),
 		);
 	}
-	for (const line of sessionLines) yield* Console.log(line.line);
+	const session = yield* readGameDiagnosticLogSessionFx({
+		input,
+		requestedSessionId: Option.getOrUndefined(sessionId),
+	});
+	yield* Console.log(
+		formatGameDiagnosticSessionTextFn({
+			section,
+			session,
+		}),
+	);
 });
 
-/** Extracts one exact game session from a diagnostic JSONL file or rotated-log directory. */
+/** Renders one failed game session or fixed incident bundle as diagnostic text. */
 export const DiagnosticsSliceCommand = Command.make(
 	"slice",
 	{
@@ -139,18 +67,23 @@ export const DiagnosticsSliceCommand = Command.make(
 		sessionId: Flag.optional(
 			Flag.string("session-id").pipe(
 				Flag.withDescription(
-					"Exact diagnostic session ID; defaults to the latest failed session.",
+					"Exact JSONL session ID; defaults to the latest failed session.",
 				),
 			),
 		),
+		section: Flag.string("section").pipe(
+			Flag.withDefault("all"),
+			Flag.withDescription("Text section: all, summary, failure, history, or runtime."),
+		),
 	},
-	({ input, sessionId }) =>
+	({ input, section, sessionId }) =>
 		runDiagnosticsSliceFx({
 			input,
+			section,
 			sessionId,
 		}),
 ).pipe(
 	Command.withDescription(
-		"Print one game session from an incident or rotating application diagnostic JSONL set.",
+		"Render one failed game session from a fixed incident or rotating diagnostic logs.",
 	),
 );

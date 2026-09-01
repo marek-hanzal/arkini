@@ -1,16 +1,27 @@
 import { Command, Flag } from "effect/unstable/cli";
-import { Console, Effect, FileSystem, Option } from "effect";
+import { Clock, Console, Effect, FileSystem, Option } from "effect";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { gunzip } from "node:zlib";
 
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { GameIncidentFiles } from "~shared/GameIncidentMetadata";
 import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
 import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
 import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
-import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
+import { toDiagnosticValueResultFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
-import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
+import { GAME_DIAGNOSTIC_HISTORY_LIMIT } from "~/game-incident/constant/GameDiagnosticHistoryLimit";
+import { formatGameReplayTextFn } from "~/game-incident/fn/formatGameReplayTextFn";
+import {
+	readGameDiagnosticHistoryEntryFn,
+	readGameDiagnosticRelatedItemsResultFn,
+	readGameDiagnosticTransitionSignatureFn,
+} from "~/game-incident/fn/readGameDiagnosticHistoryEntryFn";
+import { readGameDiagnosticRuntimeFn } from "~/game-incident/fn/readGameDiagnosticRuntimeFn";
+import type { GameDiagnosticHistoryEntrySchema } from "~/game-incident/schema/GameDiagnosticHistorySchema";
+import type { GameDiagnosticFailure } from "~/game-incident/type/GameDiagnosticFailure";
+import type { GameReplayReport } from "~/game-incident/type/GameReplayReport";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import type { GameSession } from "~/game-session/type/GameSession";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
@@ -96,6 +107,7 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 	});
 	if (paths instanceof Error) return yield* Effect.fail(paths);
 	const fileSystem = yield* FileSystem.FileSystem;
+	const clock = yield* Clock.Clock;
 	const arkpackBytes = new Uint8Array(yield* fileSystem.readFile(paths.arkpack));
 	const envelope = yield* decodeArkpackEnvelopeFx(arkpackBytes);
 	const payload = yield* decodeFx(
@@ -120,44 +132,88 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 		state: saved.state,
 	});
 	return yield* Effect.gen(function* () {
-		let transitions = 0;
-		let lastSequence = session.getTransitionSnapshotFn().sequence;
-		const unsubscribeTransitionsFn = session.subscribeTransitionsFn((transition) => {
-			transitions += 1;
-			lastSequence = transition.sequence;
+		const initialTransition = session.getTransitionSnapshotFn();
+		const initialRuntime = readGameDiagnosticRuntimeFn({
+			config: payload.config,
+			runtime: initialTransition.runtime,
 		});
-		const startedAt = Date.now();
-		const status = yield* waitForFatalFx(session, timeoutMs).pipe(
+		const startedAtMs = clock.currentTimeMillisUnsafe();
+		let previousObservedAtMs: number | undefined;
+		let previousSignature: string | undefined;
+		let observedSnapshots = 0;
+		let totalHistoryEntries = 0;
+		const history: GameDiagnosticHistoryEntrySchema.Type[] = [];
+		const unsubscribeTransitionsFn = session.subscribeTransitionsFn((transition) => {
+			observedSnapshots += 1;
+			const signature = readGameDiagnosticTransitionSignatureFn(transition);
+			if (signature === previousSignature && transition.events.length === 0) return;
+			previousSignature = signature;
+			const observedAtMs = clock.currentTimeMillisUnsafe();
+			history.push(
+				readGameDiagnosticHistoryEntryFn({
+					config: payload.config,
+					elapsedSincePreviousMs:
+						previousObservedAtMs === undefined
+							? null
+							: Math.max(0, observedAtMs - previousObservedAtMs),
+					observedAt: new Date(observedAtMs).toISOString(),
+					transition,
+				}),
+			);
+			previousObservedAtMs = observedAtMs;
+			totalHistoryEntries += 1;
+			if (history.length > GAME_DIAGNOSTIC_HISTORY_LIMIT) {
+				history.splice(0, history.length - GAME_DIAGNOSTIC_HISTORY_LIMIT);
+			}
+		});
+		const result = yield* waitForFatalFx(session, timeoutMs).pipe(
 			Effect.ensuring(Effect.sync(unsubscribeTransitionsFn)),
 		);
-		const transition = session.getTransitionSnapshotFn();
+		const finalTransition = session.getTransitionSnapshotFn();
 		const fatal = session.getFatalErrorFn();
-		yield* Console.log(
-			JSON.stringify({
-				status,
-				packageId: payload.config.meta.id,
-				contentHash,
-				elapsedMs: Date.now() - startedAt,
-				transitions,
-				sequence: lastSequence,
-				...(fatal === null
-					? {}
-					: {
-							source: fatal.source,
-							error: toDiagnosticValueFn(fatal),
-						}),
-				lastCommitted: toDiagnosticValueFn(
-					{
-						sequence: transition.sequence,
-						events: transition.events,
-						state: fromRuntimeFn({
-							runtime: transition.runtime,
-						}),
-					},
-					14 * 1_024,
-				),
+		const capturedAtMs = clock.currentTimeMillisUnsafe();
+		const error = toDiagnosticValueResultFn(fatal);
+		const failure = (() => {
+			if (fatal === null) return null;
+			const relatedItems = readGameDiagnosticRelatedItemsResultFn({
+				config: payload.config,
+				transition: finalTransition,
+				value: fatal,
+			});
+			return {
+				source: fatal.source,
+				sequence: finalTransition.sequence,
+				observedAt: new Date(capturedAtMs).toISOString(),
+				error: error.value,
+				errorTruncated: error.truncated,
+				relatedItems: relatedItems.items,
+				relatedItemsTruncated: relatedItems.truncated,
+			} satisfies GameDiagnosticFailure;
+		})();
+		const report = {
+			applicationVersion: ArkiniAppVersion,
+			packageId: payload.config.meta.id,
+			contentHash,
+			gameVersion: payload.version,
+			elapsedMs: Math.max(0, capturedAtMs - startedAtMs),
+			result,
+			initialSequence: initialTransition.sequence,
+			finalSequence: finalTransition.sequence,
+			observedSnapshots,
+			semanticTransitions: Math.max(0, totalHistoryEntries - 1),
+			history: {
+				retainedLimit: GAME_DIAGNOSTIC_HISTORY_LIMIT,
+				totalEntries: totalHistoryEntries,
+				entries: history,
+			},
+			failure,
+			initialRuntime,
+			finalRuntime: readGameDiagnosticRuntimeFn({
+				config: payload.config,
+				runtime: finalTransition.runtime,
 			}),
-		);
+		} satisfies GameReplayReport;
+		yield* Console.log(formatGameReplayTextFn(report));
 	}).pipe(
 		Effect.ensuring(session.disposeWithoutSaveFx.pipe(Effect.catchCause(() => Effect.void))),
 	);

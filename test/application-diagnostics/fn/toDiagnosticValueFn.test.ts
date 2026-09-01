@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { DiagnosticRecordSchema } from "~electron/contract/diagnostics/DiagnosticRecord";
-import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
+import {
+	toDiagnosticValueFn,
+	toDiagnosticValueResultFn,
+} from "~/application-diagnostics/fn/toDiagnosticValueFn";
 
 describe("toDiagnosticValueFn", () => {
 	it("honors a smaller record-owned serialization budget", () => {
-		const value = toDiagnosticValueFn(
+		const result = toDiagnosticValueResultFn(
 			{
 				items: Array.from(
 					{
@@ -20,7 +23,21 @@ describe("toDiagnosticValueFn", () => {
 			256,
 		);
 
-		expect(JSON.stringify(value).length).toBeLessThanOrEqual(256);
+		expect(JSON.stringify(result.value).length).toBeLessThanOrEqual(256);
+		expect(result.truncated).toBe(true);
+	});
+
+	it("reports complete diagnostic values without a false truncation warning", () => {
+		expect(
+			toDiagnosticValueResultFn({
+				source: "tick",
+			}),
+		).toEqual({
+			value: {
+				source: "tick",
+			},
+			truncated: false,
+		});
 	});
 
 	it("bounds a circular object with one traversal-owned seen set", () => {

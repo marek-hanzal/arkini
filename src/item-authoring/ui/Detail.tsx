@@ -1,21 +1,27 @@
-import { LogIn, LogOut, Pencil } from "lucide-react";
+import { LogIn, LogOut, Pencil, Replace } from "lucide-react";
 import type { PropsWithChildren } from "react";
+import { Link } from "@tanstack/react-router";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
+import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import {
+	EditorSectionNavigation,
+	EditorSectionNavigationSeparator,
+} from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { NotFound } from "~/item-authoring/ui/NotFound";
-import { ConvertMenu } from "~/item-authoring/ui/ConvertMenu";
+import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
 export const Detail = ({
@@ -52,17 +58,23 @@ export const Detail = ({
 						/>
 					}
 					title={
-						<div className="grid min-w-0 gap-0.5">
-							<h1 className="truncate text-xl font-semibold">
-								{item.title || item.id}
-							</h1>
-							<span
-								className="text-xs"
+						<h1 className="flex min-w-0 items-center gap-2 text-xl font-semibold">
+							<span className="truncate">{item.title || item.id}</span>
+							<span className="shrink-0 text-muted">·</span>
+							<Link
+								className="shrink-0 text-base"
 								data-ui="EditorItemType"
+								params={{
+									projectId: project.projectId,
+								}}
+								search={{
+									itemType: item.type,
+								}}
+								to="/editor/$projectId/editor/items/list"
 							>
 								<TypePresentation type={item.type} />
-							</span>
-						</div>
+							</Link>
+						</h1>
 					}
 					tabs={
 						<EditorSectionTabs>
@@ -79,8 +91,8 @@ export const Detail = ({
 					}
 					action={
 						<div className="flex items-center gap-2">
-							<ButtonLink
-								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+							<LinkButtonLink
+								className="inline-flex items-center gap-2 px-1 text-sm"
 								params={{
 									projectId: project.projectId,
 								}}
@@ -92,9 +104,9 @@ export const Detail = ({
 							>
 								<LogIn className="size-4" />
 								Inputs
-							</ButtonLink>
-							<ButtonLink
-								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+							</LinkButtonLink>
+							<LinkButtonLink
+								className="inline-flex items-center gap-2 px-1 text-sm"
 								params={{
 									projectId: project.projectId,
 								}}
@@ -106,12 +118,19 @@ export const Detail = ({
 							>
 								<LogOut className="size-4" />
 								Outputs
-							</ButtonLink>
-							<ConvertMenu
-								itemType={item.type}
-								itemUid={item.uid}
+							</LinkButtonLink>
+							<EditorSectionNavigationSeparator />
+							<ItemTypeMenu
+								dataUi="EditorItemConvertMenu"
+								description="Compatible data is kept; unsupported fields are removed on Save."
+								icon={Replace}
+								label="Convert"
 								projectId={project.projectId}
+								readItemUidFn={() => item.uid}
+								triggerClassName="h-10 min-h-10 gap-2"
+								types={TypeSchema.options.filter((type) => type !== item.type)}
 							/>
+							<EditorSectionNavigationSeparator />
 							<PrimaryButtonLink
 								ref={editActionRef}
 								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"

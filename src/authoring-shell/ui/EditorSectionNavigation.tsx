@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
 
+/** Separates neighboring editor-navigation groups without adding another control surface. */
+export const EditorSectionNavigationSeparator = () => (
+	<span
+		className="h-6 w-px shrink-0 bg-line"
+		data-ui="EditorSectionNavigationSeparator"
+	/>
+);
+
 /** Keeps editor identity, routed tabs, and the primary action in one compact row. */
 export const EditorSectionNavigation = ({
 	action,
@@ -25,12 +33,7 @@ export const EditorSectionNavigation = ({
 				{tabs}
 			</div>
 		)}
-		{tabs === undefined || title === undefined ? null : (
-			<span
-				className="h-6 w-px shrink-0 bg-line"
-				data-ui="EditorSectionNavigationSeparator"
-			/>
-		)}
+		{tabs === undefined || title === undefined ? null : <EditorSectionNavigationSeparator />}
 		{title === undefined ? null : (
 			<div
 				className="min-w-0"

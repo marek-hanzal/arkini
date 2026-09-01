@@ -25,6 +25,8 @@ import {
 	LauncherStartupConfigAtom,
 } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
+import { translator } from "~/translation/constant/translator";
+import { TranslationContext } from "~/translation/ui/TranslationContext";
 import "~/launcher/ui/launcher.css";
 import "~/main.css";
 
@@ -78,10 +80,12 @@ RendererRuntime.runSync(
 
 createRoot(rootElement).render(
 	<StrictMode>
-		<RegistryContext.Provider value={RendererAtomRegistry}>
-			<AppearanceDataset />
-			<LauncherStartupHydrator />
-			<RouterProvider router={router} />
-		</RegistryContext.Provider>
+		<TranslationContext.Provider value={translator}>
+			<RegistryContext.Provider value={RendererAtomRegistry}>
+				<AppearanceDataset />
+				<LauncherStartupHydrator />
+				<RouterProvider router={router} />
+			</RegistryContext.Provider>
+		</TranslationContext.Provider>
 	</StrictMode>,
 );

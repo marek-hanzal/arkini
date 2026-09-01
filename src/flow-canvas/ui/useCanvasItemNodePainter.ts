@@ -15,7 +15,7 @@ import {
 	type NodeMetrics,
 } from "~/flow-layout/fn/readNodeMetricsFn";
 import type { LayoutNode } from "~/flow-layout/type/Layout";
-import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["type"]) => {
 	switch (type) {
@@ -84,6 +84,7 @@ interface DrawCanvasItemNodeProps {
 /** Owns the stable item-card drawing callback and icon cache for one Flow Canvas renderer. */
 export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwork) => {
 	const textPainter = useCanvasTextPainter();
+	const translator = useTranslator();
 	const sourceIconPathCacheRef = useRef<Map<ItemOriginOperationKind, Path2D>>(new Map());
 
 	return useCallback(
@@ -189,8 +190,8 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 				node.starterScopes.length > 0
 					? `Starter: ${node.starterScopes.join(", ")}`
 					: node.type === "missing"
-						? "Missing item"
-						: ItemTypeLabel[node.type];
+						? translator.textFn("Item type - missing")
+						: translator.textFn(`Item type - ${node.type}`);
 			context.fillText(
 				textPainter.fitTextFn(context, label.toUpperCase(), maxTextWidth),
 				textX,
@@ -326,6 +327,7 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 		[
 			drawItemArtworkFn,
 			textPainter,
+			translator,
 		],
 	);
 };

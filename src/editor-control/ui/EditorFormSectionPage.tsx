@@ -82,10 +82,7 @@ export const EditorFormSectionPage = ({
 					<div className="flex items-center gap-3">
 						{help === undefined ? null : (
 							<>
-								<EditorPageHelp
-									key={help.title}
-									{...help}
-								/>
+								<EditorPageHelp {...help} />
 								<EditorSectionNavigationSeparator />
 							</>
 						)}

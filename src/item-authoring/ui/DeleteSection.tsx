@@ -9,6 +9,7 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useDeleteController } from "~/item-authoring/ui/useDeleteController";
 import { ProjectSections } from "~/project-authoring/type/ProjectSections";
 import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 
 const DeleteBlockerLink = ({
 	blocker,
@@ -86,36 +87,41 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 	return (
 		<>
 			<section
-				className="grid gap-5"
+				className="grid gap-3"
 				data-ui="EditorItemDeleteSection"
 			>
-				<div className="flex items-start gap-3">
-					<StateIcon
-						className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
-						{...readDataUiFn({
-							dataUi: "EditorItemDeleteStateIcon",
-							state: {
-								blocked,
-							},
-						})}
-					/>
-					<div>
-						<h2 className="text-lg font-semibold">
-							{blocked
-								? "This item cannot be deleted yet"
-								: "This item can be deleted"}
-						</h2>
-						<p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
-							{blocked
-								? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
-								: "No other game configuration references this item. Its asset files will remain available in the project."}
-						</p>
+				<EditorRootCard dataUi="EditorItemDeleteStateCard">
+					<div className="flex items-start gap-3">
+						<StateIcon
+							className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
+							{...readDataUiFn({
+								dataUi: "EditorItemDeleteStateIcon",
+								state: {
+									blocked,
+								},
+							})}
+						/>
+						<div>
+							<h2 className="text-lg font-semibold">
+								{blocked
+									? "This item cannot be deleted yet"
+									: "This item can be deleted"}
+							</h2>
+							<p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
+								{blocked
+									? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
+									: "No other game configuration references this item. Its asset files will remain available in the project."}
+							</p>
+						</div>
 					</div>
-				</div>
+				</EditorRootCard>
 
 				{blocked ? (
-					<div className="grid gap-4">
-						<div className="grid gap-2">
+					<>
+						<EditorRootCard
+							className="ak-list gap-2"
+							dataUi="EditorItemDeleteBlockersCard"
+						>
 							{controller.blockers.map((blocker, index) => (
 								<DeleteBlockerLink
 									blocker={blocker}
@@ -123,8 +129,11 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 									project={controller.project}
 								/>
 							))}
-						</div>
-						<div className="rounded-xl border border-danger/35 bg-danger/10 p-4">
+						</EditorRootCard>
+						<EditorRootCard
+							className="border-danger/35 bg-danger/10"
+							dataUi="EditorItemForceDeleteCard"
+						>
 							<p className="text-sm leading-6 text-muted">
 								Need this item gone anyway? Force Delete removes every starting
 								entry, merge rule, production line, and owned output that directly
@@ -137,17 +146,20 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 							>
 								Force delete item…
 							</DangerButton>
-						</div>
-					</div>
+						</EditorRootCard>
+					</>
 				) : (
-					<div>
+					<EditorRootCard
+						className="border-danger/35 bg-danger/10"
+						dataUi="EditorItemDeleteActionCard"
+					>
 						<DangerButton
 							data-ui="EditorItemDeleteOpen"
 							onClick={() => controller.openFn(false)}
 						>
 							Delete item
 						</DangerButton>
-					</div>
+					</EditorRootCard>
 				)}
 			</section>
 			{controller.confirming === null ? null : (

@@ -1,13 +1,7 @@
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
-import { DetailReference } from "~/item-authoring/ui/DetailReference";
-
-type ItemRegistry = Record<string, ItemSchema.Type>;
-
-const formatQuantityFn = (quantity: QuantitySchema.Type) =>
-	quantity.min === quantity.max ? String(quantity.min) : quantity.min + "–" + quantity.max;
+import { QuantityValue } from "~/item-definition/ui/QuantityValue";
+import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
+import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 
 const formatChargeCostFn = (input: LineInputSchema.Type) => {
 	if (input.charges === undefined) return "";
@@ -21,35 +15,7 @@ const formatChargeCostFn = (input: LineInputSchema.Type) => {
 	);
 };
 
-const LineInputReference = ({
-	items,
-	projectId,
-	selector,
-}: {
-	readonly items: ItemRegistry;
-	readonly projectId: string;
-	readonly selector: SelectorSchema.Type;
-}) => {
-	const item = items[selector.itemId];
-	return item === undefined ? (
-		<p className="truncate font-medium text-foreground">{selector.itemId}</p>
-	) : (
-		<DetailReference
-			item={item}
-			projectId={projectId}
-		/>
-	);
-};
-
-const LineInput = ({
-	input,
-	items,
-	projectId,
-}: {
-	readonly input: LineInputSchema.Type;
-	readonly items: ItemRegistry;
-	readonly projectId: string;
-}) => {
+const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 	const rowClassName =
 		"ak-line-input grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 rounded-xl bg-transparent px-3 py-2 text-sm";
 	if (input.type === "simple")
@@ -62,28 +28,31 @@ const LineInput = ({
 				</p>
 			</div>
 		);
-	const selector = input.type === "materials" ? input.selector : input.query.selector;
 	return (
 		<div className={rowClassName}>
 			<div className="min-w-0">
-				<LineInputReference
-					items={items}
-					projectId={projectId}
-					selector={selector}
-				/>
+				{input.type === "materials" ? (
+					<SelectorDetail selector={input.selector} />
+				) : (
+					<QueryDetail query={input.query} />
+				)}
 				<p className="mt-0.5 text-xs text-muted">
 					{input.type === "materials"
 						? input.mode === "consume"
 							? "Consumed"
 							: "Reserved"
-						: "Board · " + input.query.distance}
+						: "Required deposit"}
 					{formatChargeCostFn(input)}
 				</p>
 			</div>
 			<p className="text-right font-medium text-foreground">
-				{input.type === "materials"
-					? "×" + formatQuantityFn(input.quantity) + " required"
-					: "Required"}
+				{input.type === "materials" ? (
+					<>
+						×<QuantityValue quantity={input.quantity} /> required
+					</>
+				) : (
+					"Required"
+				)}
 			</p>
 		</div>
 	);
@@ -93,14 +62,10 @@ const LineInput = ({
 export const ProductionLineInputs = ({
 	emptyLabel = "No material input required.",
 	input,
-	items,
-	projectId,
 	title = "Inputs",
 }: {
 	readonly emptyLabel?: string;
 	readonly input: readonly LineInputSchema.Type[];
-	readonly items: ItemRegistry;
-	readonly projectId: string;
 	readonly title?: string;
 }) => {
 	const visibleInput = input.filter(
@@ -118,9 +83,7 @@ export const ProductionLineInputs = ({
 					{visibleInput.map((entry, index) => (
 						<LineInput
 							input={entry}
-							items={items}
 							key={entry.type + ":" + index}
-							projectId={projectId}
 						/>
 					))}
 				</div>

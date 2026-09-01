@@ -1,26 +1,22 @@
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
-import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { projectAuthoredOutputFn } from "~/production-output/fn/projectAuthoredOutputFn";
 import { Outputs } from "~/production-output/ui/Outputs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
-import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
-
-const QueryDetail = ({ query }: { readonly query: QuerySchema.Type }) => (
-	<span>
-		<SelectorDetail selector={query.selector} /> in {query.scope}
-		{"distance" in query ? ` · ${query.distance} distance` : ""}
-	</span>
-);
+import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
 
 const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
-	<li>
-		<span className="font-medium capitalize">{when.type}</span>
-		{when.type === "count" ? ` ${when.count}` : ""}
-		{when.type === "range" ? ` ${when.min}–${when.max}` : ""}:{" "}
+	<li className="grid gap-1">
+		<p className="font-medium">
+			{when.type === "exists"
+				? "Exists"
+				: when.type === "count"
+					? `Exact count · ${when.count}`
+					: `Count range · ${when.min}–${when.max}`}
+		</p>
 		<QueryDetail query={when.query} />
 	</li>
 );
@@ -87,19 +83,7 @@ export const OutputDetail = ({
 			emptyLabel={emptyLabel}
 			output={projectAuthoredOutputFn(output, items)}
 			renderItemDetailFn={(item) => <AuthoredOutputItemDetail item={item} />}
-			renderItemFn={(item) => {
-				const definition = items[item.itemId];
-				return definition === undefined ? (
-					<span className="truncate font-mono font-medium text-foreground">
-						{item.title}
-					</span>
-				) : (
-					<DetailReference
-						item={definition}
-						projectId={project.projectId}
-					/>
-				);
-			}}
+			renderItemFn={(item) => <DetailReference itemId={item.itemId} />}
 			title={title}
 		/>
 	);

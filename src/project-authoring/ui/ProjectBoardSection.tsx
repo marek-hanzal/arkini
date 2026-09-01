@@ -89,6 +89,7 @@ export const ProjectBoardSection = () => {
 			<ProjectStartGrid
 				cells={cells}
 				height={height}
+				mode="edit"
 				onCellsChangeFn={(nextCells) =>
 					form.setFieldValue("start.board", [
 						...startBoard.filter((entry) => entry.space !== selectedSpace),

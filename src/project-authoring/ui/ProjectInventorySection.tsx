@@ -55,6 +55,7 @@ export const ProjectInventorySection = () => {
 				<ProjectStartGrid
 					cells={cells}
 					height={height}
+					mode="edit"
 					onCellsChangeFn={(nextCells) =>
 						form.setFieldValue(
 							"start.inventory",

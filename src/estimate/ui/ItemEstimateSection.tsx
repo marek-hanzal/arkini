@@ -165,11 +165,9 @@ const ItemEstimateSummary = ({
 const ItemEstimateResult = ({
 	config,
 	estimate,
-	projectId,
 }: {
 	readonly config: GameConfigSchema.Type;
 	readonly estimate: ItemEstimate;
-	readonly projectId: string;
 }) =>
 	estimate.obtainable ? (
 		<ItemEstimateRouteGraph
@@ -180,7 +178,6 @@ const ItemEstimateResult = ({
 					estimate={estimate}
 				/>
 			}
-			projectId={projectId}
 			routeSteps={estimate.routeSteps}
 		/>
 	) : (
@@ -237,7 +234,6 @@ export const ItemEstimateSection = ({ itemId }: { readonly itemId: string }) => 
 				<ItemEstimateResult
 					config={state.config}
 					estimate={state.estimate}
-					projectId={project.projectId}
 				/>
 			) : null}
 		</section>

@@ -1,13 +1,13 @@
-import { ChevronRight, ShieldAlert, ShieldCheck } from "lucide-react";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { EditorAssetUsageRow } from "~/asset-authoring/ui/EditorAssetUsageRow";
 
 const EditorAssetDeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (
@@ -99,64 +99,27 @@ const EditorAssetDeleteBlockerLink = ({
 		const owner = project.config.items[blocker.ownerId];
 		if (owner !== undefined)
 			return (
-				<ButtonLink
-					to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-					params={{
-						itemUid: blocker.ownerUid,
-						projectId: project.projectId,
-						sectionId: "artwork",
-					}}
-					className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
-				>
-					<EditorItemThumbnail
-						resourceIds={owner.asset.default}
-						size="sm"
-					/>
-					<span className="min-w-0">
-						<span className="block truncate text-sm font-semibold">
-							{blocker.ownerLabel || blocker.ownerId} · Artwork
-						</span>
-						<span className="mt-1 block text-xs font-normal leading-5 text-muted">
-							{blocker.roleLabel}
-						</span>
-					</span>
-					<ChevronRight className="size-5 text-subtle" />
-				</ButtonLink>
+				<EditorAssetUsageRow
+					dataUi="EditorAssetDeleteBlocker"
+					leading={
+						<EditorItemThumbnail
+							resourceIds={owner.asset.default}
+							size="sm"
+						/>
+					}
+					project={project}
+					title={`${blocker.ownerLabel || blocker.ownerId} · Artwork`}
+					usage={blocker}
+				/>
 			);
 	}
-
-	const role = blocker.path[1];
-	const roleIndex = ProjectAvatarKeys.findIndex((key) => key === role);
-	const avatarIndex =
-		roleIndex < 0
-			? undefined
-			: ProjectAvatarKeys.slice(0, roleIndex + 1).filter(
-					(key) => project.config.resources[key] !== undefined,
-				).length - 1;
 	return (
-		<ButtonLink
-			to="/editor/$projectId/project/form/$sectionId"
-			params={{
-				projectId: project.projectId,
-				sectionId: "general",
-			}}
-			search={
-				avatarIndex === undefined
-					? {}
-					: {
-							avatar: avatarIndex,
-						}
-			}
-			className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
-		>
-			<span className="min-w-0">
-				<span className="block truncate text-sm font-semibold">Project · General</span>
-				<span className="mt-1 block text-xs font-normal leading-5 text-muted">
-					{blocker.roleLabel}
-				</span>
-			</span>
-			<ChevronRight className="size-5 text-subtle" />
-		</ButtonLink>
+		<EditorAssetUsageRow
+			dataUi="EditorAssetDeleteBlocker"
+			project={project}
+			title="Project · General"
+			usage={blocker}
+		/>
 	);
 };
 
@@ -205,20 +168,13 @@ export const EditorAssetDeleteSection = ({
 							</p>
 						</div>
 					</div>
-					{blocked ? null : (
-						<div>
-							<DangerButton
-								data-ui="EditorAssetDeleteOpen"
-								onClick={controller.openFn}
-							>
-								Delete asset
-							</DangerButton>
-						</div>
-					)}
 				</EditorRootCard>
 
 				{blocked ? (
-					<div className="ak-list grid gap-2">
+					<EditorRootCard
+						className="ak-list gap-2"
+						dataUi="EditorAssetDeleteBlockersCard"
+					>
 						{controller.blockers.map((blocker) => (
 							<EditorAssetDeleteBlockerLink
 								blocker={blocker}
@@ -226,8 +182,20 @@ export const EditorAssetDeleteSection = ({
 								project={controller.project}
 							/>
 						))}
-					</div>
-				) : null}
+					</EditorRootCard>
+				) : (
+					<EditorRootCard
+						className="border-danger/35 bg-danger/10"
+						dataUi="EditorAssetDeleteActionCard"
+					>
+						<DangerButton
+							data-ui="EditorAssetDeleteOpen"
+							onClick={controller.openFn}
+						>
+							Delete asset
+						</DangerButton>
+					</EditorRootCard>
+				)}
 			</section>
 			{controller.confirming ? (
 				<EditorAssetDeleteDialog

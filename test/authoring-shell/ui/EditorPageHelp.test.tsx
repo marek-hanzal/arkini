@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -29,10 +30,12 @@ describe("EditorPageHelp", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				<EditorPageHelp
-					content={<p>Guidance</p>}
-					title="Page guidance"
-				/>,
+				<TranslationTestProvider>
+					<EditorPageHelp
+						content={<p>Guidance</p>}
+						title="Page guidance"
+					/>
+				</TranslationTestProvider>,
 			);
 		});
 

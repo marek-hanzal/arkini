@@ -143,6 +143,7 @@ import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSect
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -188,7 +189,13 @@ describe("project section form session", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
 
 		const open = container.querySelector<HTMLButtonElement>('[data-ui="EditorPageHelpOpen"]');
 		expect(open).not.toBeNull();

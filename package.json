@@ -17,6 +17,7 @@
 		"@effect/atom-react": "4.0.0-rc.111",
 		"@effect/platform-node": "4.0.0-rc.111",
 		"@floating-ui/react": "^0.27.20",
+		"@formatjs/intl-localematcher": "0.8.13",
 		"@logtape/file": "2.3.2",
 		"@logtape/logtape": "2.3.2",
 		"@modelcontextprotocol/node": "^2.0.0",

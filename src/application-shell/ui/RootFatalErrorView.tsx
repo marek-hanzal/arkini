@@ -1,8 +1,5 @@
-import { useRouter } from "@tanstack/react-router";
-import { Effect } from "effect";
 import { useEffect } from "react";
 
-import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { openDiagnosticDirectoryFx } from "~/application-diagnostics/fx/openDiagnosticDirectoryFx";
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
@@ -12,12 +9,11 @@ import { Canvas } from "~/ui/ui/Canvas";
 
 interface RootFatalErrorViewProps {
 	readonly error: unknown;
+	readonly onCloseFn: () => void;
 }
 
 /** Renders and closes the application from the unrecoverable renderer boundary. */
-export const RootFatalErrorView = ({ error }: RootFatalErrorViewProps) => {
-	const router = useRouter();
-
+export const RootFatalErrorView = ({ error, onCloseFn }: RootFatalErrorViewProps) => {
 	useEffect(() => {
 		console.error("Arkini renderer entered the fatal lifecycle boundary.", error);
 		RendererRuntime.runSync(
@@ -64,18 +60,7 @@ export const RootFatalErrorView = ({ error }: RootFatalErrorViewProps) => {
 						>
 							Open diagnostics
 						</Button>
-						<DangerButton
-							onClick={() =>
-								router.options.context.rendererRuntime.runSync(
-									readRendererLifecycleFx().pipe(
-										Effect.flatMap((lifecycle) => lifecycle.forceCloseFx),
-										Effect.orDie,
-									),
-								)
-							}
-						>
-							Close Arkini
-						</DangerButton>
+						<DangerButton onClick={onCloseFn}>Close Arkini</DangerButton>
 					</div>
 				</section>
 			</main>

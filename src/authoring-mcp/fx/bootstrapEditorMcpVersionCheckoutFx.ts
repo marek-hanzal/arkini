@@ -13,7 +13,7 @@ const requestSchema = z
 	})
 	.strict();
 
-export namespace installEditorMcpVersionCheckoutFx {
+export namespace bootstrapEditorMcpVersionCheckoutFx {
 	export interface Props {
 		readonly editorMcp: Pick<Window["arkini"]["editorMcp"], "onVersionCheckoutRequestedFn">;
 		readonly rendererRuntime: typeof RendererRuntime;
@@ -21,9 +21,9 @@ export namespace installEditorMcpVersionCheckoutFx {
 	}
 }
 
-/** Installs the only MCP checkout path, reusing the renderer's in-place restore coordinator. */
-export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVersionCheckoutFx")(
-	({ editorMcp, rendererRuntime, router }: installEditorMcpVersionCheckoutFx.Props) =>
+/** Bootstraps the only MCP checkout path, reusing the renderer's restore coordinator. */
+export const bootstrapEditorMcpVersionCheckoutFx = Effect.fn("bootstrapEditorMcpVersionCheckoutFx")(
+	({ editorMcp, rendererRuntime, router }: bootstrapEditorMcpVersionCheckoutFx.Props) =>
 		Effect.sync(() => {
 			let running = false;
 			return editorMcp.onVersionCheckoutRequestedFn(async (candidate) => {

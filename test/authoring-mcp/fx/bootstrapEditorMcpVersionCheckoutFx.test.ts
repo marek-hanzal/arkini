@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
-import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/installEditorMcpVersionCheckoutFx";
+import { bootstrapEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/bootstrapEditorMcpVersionCheckoutFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
@@ -17,7 +17,7 @@ afterEach(async () => {
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
 });
 
-describe("installEditorMcpVersionCheckoutFx", () => {
+describe("bootstrapEditorMcpVersionCheckoutFx", () => {
 	it("uses the renderer checkout coordinator and returns to the refreshed history", async () => {
 		const project: Project = {
 			projectId: "project-one",
@@ -73,7 +73,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			},
 		} as unknown as Pick<ArkiniRouter, "navigate" | "state">;
 		const uninstall = rendererRuntime.runSync(
-			installEditorMcpVersionCheckoutFx({
+			bootstrapEditorMcpVersionCheckoutFx({
 				editorMcp: {
 					onVersionCheckoutRequestedFn: (next) => {
 						listener = next;

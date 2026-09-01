@@ -29,4 +29,23 @@ describe("searchFn", () => {
 			dottedUppercaseI,
 		]);
 	});
+
+	it("requires every fuzzy query token while ignoring its word order", () => {
+		const bioWasteProcessor = item("item:bio-waste-processor", "Bio-Waste Processor");
+		const waste = item("item:waste", "Waste");
+		const processor = item("item:processor", "Processor");
+		const items = [
+			waste,
+			processor,
+			bioWasteProcessor,
+		];
+
+		expect(searchFn(items, "was pro")).toEqual([
+			bioWasteProcessor,
+		]);
+		expect(searchFn(items, "pro was")).toEqual([
+			bioWasteProcessor,
+		]);
+		expect(searchFn(items, "was missing")).toEqual([]);
+	});
 });

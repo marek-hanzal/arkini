@@ -42,6 +42,8 @@ export const useFuseSearch = <Identity extends string>(
 				threshold: 0.28,
 				ignoreLocation: true,
 				includeScore: true,
+				useTokenSearch: true,
+				tokenMatch: "all",
 			}),
 		[
 			documents,

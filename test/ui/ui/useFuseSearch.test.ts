@@ -4,6 +4,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { IFuseOptions } from "fuse.js";
+
 import type { FuseSearchCandidate } from "~/ui/ui/useFuseSearch";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
@@ -17,35 +19,17 @@ const fuseState = vi.hoisted(() => ({
 	constructionCount: 0,
 }));
 
-vi.mock("fuse.js", () => ({
-	default: class MockFuse<Identity extends string> {
-		readonly documents: readonly {
-			readonly identity: Identity;
-			readonly order: number;
-			readonly terms: readonly string[];
-		}[];
-
-		constructor(documents: MockFuse<Identity>["documents"]) {
-			this.documents = documents;
-			fuseState.constructionCount += 1;
-		}
-
-		search(query: string) {
-			const normalized = query.toLowerCase();
-			return this.documents.flatMap((item, refIndex) =>
-				item.terms.some((term) => term.toLowerCase().includes(normalized))
-					? [
-							{
-								item,
-								refIndex,
-								score: 0,
-							},
-						]
-					: [],
-			);
-		}
-	},
-}));
+vi.mock("fuse.js", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("fuse.js")>();
+	return {
+		default: class ObservedFuse<T> extends actual.default<T> {
+			constructor(documents: ReadonlyArray<T>, options?: IFuseOptions<T>) {
+				super(documents, options);
+				fuseState.constructionCount += 1;
+			}
+		},
+	};
+});
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
@@ -187,5 +171,54 @@ describe("useFuseSearch", () => {
 		});
 
 		expect(container.textContent).toBe("exact:first,exact:second");
+	});
+
+	it("requires every fuzzy query token while ignoring its word order", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		const candidates = [
+			{
+				identity: "bio-waste-processor",
+				terms: [
+					"item:bio-waste-processor",
+					"Bio-Waste Processor",
+				],
+			},
+			{
+				identity: "waste",
+				terms: [
+					"Waste",
+				],
+			},
+			{
+				identity: "processor",
+				terms: [
+					"Processor",
+				],
+			},
+		];
+
+		await act(async () => {
+			root.render(
+				createElement(Harness, {
+					candidates,
+					query: "was pro",
+				}),
+			);
+		});
+		expect(container.textContent).toBe("bio-waste-processor");
+
+		await act(async () => {
+			root.render(
+				createElement(Harness, {
+					candidates,
+					query: "pro was",
+				}),
+			);
+		});
+		expect(container.textContent).toBe("bio-waste-processor");
 	});
 });

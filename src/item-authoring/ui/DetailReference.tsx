@@ -29,7 +29,7 @@ export const DetailReference = ({
 				projectId: project.projectId,
 				sectionId,
 			}}
-			className={`group min-h-0 min-w-0 justify-start gap-3 border-0 bg-transparent p-0 text-left shadow-none hover:bg-transparent active:bg-transparent${stretched ? " flex-1 before:absolute before:inset-0 before:content-['']" : ""}`}
+			className={`group min-h-0 min-w-0 justify-start gap-3 border-0 bg-transparent p-0 text-left shadow-none hover:bg-transparent${stretched ? " flex-1 before:absolute before:inset-0 before:content-['']" : ""}`}
 		>
 			<EditorItemThumbnail
 				className="rounded-lg border-0 bg-surface/45 ring-1 ring-line/50"

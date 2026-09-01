@@ -171,9 +171,9 @@ export const EditorAssetDeleteSection = ({
 				</EditorRootCard>
 
 				{blocked ? (
-					<EditorRootCard
-						className="ak-list gap-2"
-						dataUi="EditorAssetDeleteBlockersCard"
+					<div
+						className="ak-list grid gap-2"
+						data-ui="EditorAssetDeleteBlockers"
 					>
 						{controller.blockers.map((blocker) => (
 							<EditorAssetDeleteBlockerLink
@@ -182,7 +182,7 @@ export const EditorAssetDeleteSection = ({
 								project={controller.project}
 							/>
 						))}
-					</EditorRootCard>
+					</div>
 				) : (
 					<EditorRootCard
 						className="border-danger/35 bg-danger/10"

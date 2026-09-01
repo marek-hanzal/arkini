@@ -32,7 +32,7 @@ const DeleteBlockerLink = ({
 					projectId: project.projectId,
 					sectionId: "delete",
 				}}
-				className="grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border border-line bg-surface/70 p-4 text-left shadow-none"
+				className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
 			>
 				<EditorItemThumbnail
 					resourceIds={owner.asset.default}
@@ -60,7 +60,7 @@ const DeleteBlockerLink = ({
 				projectId: project.projectId,
 				sectionId,
 			}}
-			className="grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border border-line bg-surface/70 p-4 text-left shadow-none"
+			className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
 		>
 			<span className="min-w-0">
 				<span className="block truncate text-sm font-semibold">
@@ -118,9 +118,9 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 
 				{blocked ? (
 					<>
-						<EditorRootCard
-							className="ak-list gap-2"
-							dataUi="EditorItemDeleteBlockersCard"
+						<div
+							className="ak-list grid gap-2"
+							data-ui="EditorItemDeleteBlockers"
 						>
 							{controller.blockers.map((blocker, index) => (
 								<DeleteBlockerLink
@@ -129,7 +129,7 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 									project={controller.project}
 								/>
 							))}
-						</EditorRootCard>
+						</div>
 						<EditorRootCard
 							className="border-danger/35 bg-danger/10"
 							dataUi="EditorItemForceDeleteCard"

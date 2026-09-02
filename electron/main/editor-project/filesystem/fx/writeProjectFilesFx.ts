@@ -17,6 +17,7 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
 import { addGitignoreRulesFn } from "../fn/addGitignoreRulesFn";
+import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import type { ProjectFiles } from "./ProjectFiles";
 import { assertProjectFileFx } from "./assertProjectFileFx";
 import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
@@ -228,6 +229,13 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 									cause,
 								}),
 						});
+			yield* assertProjectDirectoryFx({
+				root: paths.root,
+				directory: paths.items,
+			});
+			yield* fileSystem.makeDirectory(paths.items, {
+				recursive: true,
+			});
 			const candidateWrites = [
 				{
 					target: paths.schemaFile,

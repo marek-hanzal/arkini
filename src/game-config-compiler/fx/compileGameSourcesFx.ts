@@ -47,7 +47,9 @@ const resolveSourceReferenceFn = (sourcePath: string, reference: string) => {
 
 /** Keeps the first source provider and records every conflicting provider with provenance. */
 const assembleGameSourcesFn = (sources: ReadonlyArray<GameSourceFileSchema.Type>) => {
-	const value: GameSourceSchema.Type = {};
+	const value: GameSourceSchema.Type = {
+		items: {},
+	};
 	const provenance: GameSourceProvenanceSchema.Type = {
 		items: {},
 	};

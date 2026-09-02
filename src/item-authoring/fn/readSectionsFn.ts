@@ -32,8 +32,8 @@ const Sections = [
 		label: "Estimate",
 	},
 	{
-		id: "required-by",
-		label: "Required by",
+		id: "connections",
+		label: "Connections",
 	},
 	{
 		id: "delete",
@@ -58,7 +58,7 @@ export const readSectionsFn = (
 	Sections.filter((section) => {
 		if (
 			mode === "form" &&
-			(section.id === "estimate" || section.id === "required-by" || section.id === "delete")
+			(section.id === "estimate" || section.id === "connections" || section.id === "delete")
 		)
 			return false;
 		switch (section.id) {

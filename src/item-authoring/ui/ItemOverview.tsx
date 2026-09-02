@@ -20,7 +20,7 @@ import { formatItemEstimateResultFn } from "~/estimate/ui/formatItemEstimateResu
 import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
-import { readRequiredByItemsFn } from "~/item-authoring/fn/readRequiredByItemsFn";
+import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import type { SectionDescriptor, SectionId } from "~/item-authoring/type/Section";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
@@ -34,7 +34,7 @@ const OverviewIconBySection = {
 	estimate: Clock3,
 	merges: Combine,
 	production: Factory,
-	"required-by": Network,
+	connections: Network,
 } as const satisfies Record<Exclude<SectionId, "identity">, LucideIcon>;
 
 const ItemOverviewCard = ({
@@ -65,6 +65,13 @@ const ItemOverviewCard = ({
 						projectId,
 						sectionId: section.id,
 					}}
+					search={
+						section.id === "connections"
+							? {
+									filter: "required-by",
+								}
+							: {}
+					}
 					to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 				>
 					{section.label}
@@ -82,7 +89,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const project = useEditorProject();
 	const estimate = useItemEstimate(project, item.id);
 	const requiredByItems = useMemo(
-		() => readRequiredByItemsFn(project.config, item.id),
+		() => readItemConnectionsFn(project.config, item.id, "required-by"),
 		[
 			item.id,
 			project.config,
@@ -139,10 +146,10 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 		estimate: estimateSummary,
 		merges: item.merge === undefined || item.merge.length === 0 ? "Disabled" : "Enabled",
 		production: `${enabledProductionLineCount} enabled ${enabledProductionLineCount === 1 ? "line" : "lines"}`,
-		"required-by":
+		connections:
 			requiredByItems.length === 0
 				? "Not required by any item"
-				: `${requiredByItems.length} ${requiredByItems.length === 1 ? "item" : "items"}`,
+				: `${requiredByItems.length} ${requiredByItems.length === 1 ? "item requires" : "items require"} this item`,
 	} as const satisfies Record<Exclude<SectionId, "identity">, ReactNode>;
 
 	return (

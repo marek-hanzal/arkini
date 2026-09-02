@@ -2,14 +2,19 @@ import { ButtonLink } from "~/ui/ui/Button";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 
-/** Links one known item reference to its canonical identity detail. */
+/** Links one known item reference to the requested detail section. */
 export const DetailReference = ({
 	itemId,
+	search = {},
 	sectionId = "identity",
 	stretched = false,
 }: {
 	readonly itemId: string;
+	readonly search?: {
+		readonly filter?: ItemConnectionFilter;
+	};
 	readonly sectionId?: SectionId;
 	readonly stretched?: boolean;
 }) => {
@@ -29,6 +34,7 @@ export const DetailReference = ({
 				projectId: project.projectId,
 				sectionId,
 			}}
+			search={search}
 			className={`group min-h-0 min-w-0 justify-start gap-3 border-0 bg-transparent p-0 text-left shadow-none hover:bg-transparent${stretched ? " flex-1 before:absolute before:inset-0 before:content-['']" : ""}`}
 		>
 			<EditorItemThumbnail

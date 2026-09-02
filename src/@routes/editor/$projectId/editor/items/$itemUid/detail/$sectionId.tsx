@@ -1,19 +1,28 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { ChargesDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
 import { DeleteSection } from "~/item-authoring/ui/DeleteSection";
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import { IdentityDetail } from "~/item-authoring/ui/IdentityDetail";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
-import { RequiredBySection } from "~/item-authoring/ui/RequiredBySection";
+import { type ItemConnectionFilter, ItemConnectionFilters } from "~/flow/type/ItemConnectionFilter";
 import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
 import { SpaceActionDetail } from "~/item-authoring/ui/SpaceActionDetail";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
+interface EditorItemDetailRouteSearch {
+	readonly filter?: ItemConnectionFilter;
+}
+
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({
+	validateSearch: (search): EditorItemDetailRouteSearch => ({
+		filter: ItemConnectionFilters.find((filter) => filter === search.filter),
+	}),
 	beforeLoad: ({ params }) => {
 		if (SectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
@@ -26,7 +35,12 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		});
 	},
 	component: () => {
-		const { itemUid, sectionId } = Route.useParams();
+		const { itemUid, projectId, sectionId } = Route.useParams();
+		const search = Route.useSearch();
+		const navigateFn = useNavigate({
+			from: Route.fullPath,
+		});
+		const project = useEditorProject();
 		const item = useItemByUid(itemUid);
 		if (item === undefined) return <NotFound uid={itemUid} />;
 		const section = sectionId as SectionId;
@@ -58,8 +72,38 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <ProductionDetail item={item} />;
 			case "estimate":
 				return <ItemEstimateSection itemId={item.id} />;
-			case "required-by":
-				return <RequiredBySection itemId={item.id} />;
+			case "connections": {
+				const filter = search.filter ?? "required-by";
+				return (
+					<ConnectionsSection
+						filter={filter}
+						itemId={item.id}
+						onFilterChangeFn={(nextFilter) =>
+							void navigateFn({
+								replace: true,
+								search: (current) => ({
+									...current,
+									filter: nextFilter,
+								}),
+							})
+						}
+						onItemIdChangeFn={(nextItemId) => {
+							const nextItem = project.config.items[nextItemId];
+							if (nextItem === undefined) return;
+							void navigateFn({
+								params: {
+									itemUid: nextItem.uid,
+									projectId,
+									sectionId: "connections",
+								},
+								search: {
+									filter,
+								},
+							});
+						}}
+					/>
+				);
+			}
 			case "delete":
 				return <DeleteSection item={item} />;
 		}

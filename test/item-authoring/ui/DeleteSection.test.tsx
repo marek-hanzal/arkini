@@ -40,20 +40,22 @@ vi.mock("~/authoring-shell/ui/useEditorHistoryBack", () => ({
 vi.mock("~/ui/ui/Button", () => {
 	const Button = ({ children, cursorIntent: _cursorIntent, ...props }: Record<string, unknown>) =>
 		createElement("button", props, children as ReactNode);
+	const ButtonLink = ({ children, params, search, to, ...props }: Record<string, unknown>) =>
+		createElement(
+			"a",
+			{
+				...props,
+				"data-params": JSON.stringify(params),
+				"data-search": JSON.stringify(search),
+				"data-to": to,
+			},
+			children as ReactNode,
+		);
 	return {
 		Button,
 		DangerButton: Button,
-		ButtonLink: ({ children, params, search, to, ...props }: Record<string, unknown>) =>
-			createElement(
-				"a",
-				{
-					...props,
-					"data-params": JSON.stringify(params),
-					"data-search": JSON.stringify(search),
-					"data-to": to,
-				},
-				children as ReactNode,
-			),
+		ButtonLink,
+		PrimaryButtonLink: ButtonLink,
 	};
 });
 
@@ -126,6 +128,13 @@ describe("DeleteSection", () => {
 				.querySelector<HTMLButtonElement>('[data-ui="EditorItemForceDeleteOpen"]')
 				?.click(),
 		);
+		const commitLink = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorItemDeleteCreateVersion"]',
+		);
+		expect(commitLink?.dataset.to).toBe("/editor/$projectId/versions/commit");
+		expect(JSON.parse(commitLink?.dataset.params ?? "null")).toEqual({
+			projectId: "project-one",
+		});
 
 		await act(async () =>
 			container

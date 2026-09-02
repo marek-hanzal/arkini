@@ -1,7 +1,10 @@
+import { GitCommitHorizontal, Trash2, X } from "lucide-react";
+
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import type { Project } from "~/project-authoring/type/Project";
-import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
+import { Button, PrimaryButtonLink } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 const DeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (
@@ -92,7 +95,7 @@ export const DeleteDialog = ({
 }) => (
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
-			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+			className="w-full max-w-2xl rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 			data-ui="EditorItemDeleteDialog"
 		>
 			<h2 className="text-lg font-semibold">
@@ -129,34 +132,42 @@ export const DeleteDialog = ({
 			</div>
 			<p className="mt-2 text-xs text-subtle">Item ID: {item.id}</p>
 			<DeleteError error={error} />
-			<div className="mt-6 flex flex-wrap justify-end gap-2">
-				<ButtonLink
-					disabled={pending}
-					data-ui="EditorItemDeleteCreateVersion"
-					to="/editor/$projectId/versions/commit"
-					params={{
-						projectId: project.projectId,
-					}}
-					search={{
-						returnTo: `/editor/${encodeURIComponent(project.projectId)}/editor/items/${encodeURIComponent(item.uid)}/detail/delete`,
-					}}
-				>
-					Create version first…
-				</ButtonLink>
-				<Button
+			<div className="mt-6 flex items-center justify-between gap-4">
+				<LinkButton
+					className="inline-flex items-center gap-1.5"
 					disabled={pending}
 					onClick={onCancelFn}
 				>
+					<X className="size-4" />
 					Cancel
-				</Button>
-				<DangerButton
-					disabled={pending}
-					cursorIntent={pending ? "progress" : undefined}
-					data-ui="EditorItemDeleteConfirm"
-					onClick={onConfirmFn}
-				>
-					{force ? "Force delete item" : "Delete item"}
-				</DangerButton>
+				</LinkButton>
+				<div className="flex shrink-0 items-center gap-2">
+					<Button
+						className="gap-1.5"
+						disabled={pending}
+						cursorIntent={pending ? "progress" : undefined}
+						data-ui="EditorItemDeleteConfirm"
+						onClick={onConfirmFn}
+					>
+						<Trash2 className="size-4" />
+						{force ? "Force delete" : "Delete"}
+					</Button>
+					<PrimaryButtonLink
+						className="gap-1.5"
+						disabled={pending}
+						data-ui="EditorItemDeleteCreateVersion"
+						to="/editor/$projectId/versions/commit"
+						params={{
+							projectId: project.projectId,
+						}}
+						search={{
+							returnTo: `/editor/${encodeURIComponent(project.projectId)}/editor/items/${encodeURIComponent(item.uid)}/detail/delete`,
+						}}
+					>
+						<GitCommitHorizontal className="size-4" />
+						Commit
+					</PrimaryButtonLink>
+				</div>
 			</div>
 		</div>
 	</div>

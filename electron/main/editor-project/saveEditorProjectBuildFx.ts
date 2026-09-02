@@ -5,7 +5,7 @@ import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
-import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
+import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 

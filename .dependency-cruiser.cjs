@@ -9,6 +9,8 @@ const routeModulePattern = "^src/@routes(?:/|$)";
 const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
+const authoringMcpTransportSchemaPattern =
+	"^src/authoring-mcp/schema/EditorMcp(?:CommandResult|Command|Configuration|Overview)Schema[.]ts$";
 const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
 const gameValuePattern = "^src/game-value(?:/|$)";
 const itemRevisionPattern = "^src/item-revision(?:/|$)";
@@ -393,9 +395,21 @@ module.exports = {
 			},
 		},
 		{
+			name: "authoring-mcp-backend-does-not-import-electron-contract",
+			comment:
+				"The Node-compatible MCP backend owns its semantic contracts without depending on the Electron transport seam.",
+			severity: "error",
+			from: {
+				path: "^src/authoring-mcp/(?:auth|fx|http|schema|storage|tool|tunnel|type)(?:/|$)",
+			},
+			to: {
+				path: electronContractPattern,
+			},
+		},
+		{
 			name: "electron-contract-is-pure",
 			comment:
-				"The shared Electron contract owns schemas, transport types, and channel names without importing application or Electron runtime implementation.",
+				"The shared Electron contract owns transport types and channel names without importing application behavior or Electron runtime implementation.",
 			severity: "error",
 			from: {
 				path: electronContractPattern,
@@ -404,6 +418,22 @@ module.exports = {
 				path: "^(?:src|electron)(?:/|$)|^node_modules/electron(?:/|$)",
 				pathNot: [
 					electronContractPattern,
+					authoringMcpTransportSchemaPattern,
+				],
+			},
+		},
+		{
+			name: "electron-contract-uses-authoring-mcp-schemas-as-types-only",
+			comment:
+				"Electron transport refers to MCP-owned payloads without executing or re-owning their schemas.",
+			severity: "error",
+			from: {
+				path: electronContractPattern,
+			},
+			to: {
+				path: authoringMcpTransportSchemaPattern,
+				dependencyTypesNot: [
+					"type-only",
 				],
 			},
 		},

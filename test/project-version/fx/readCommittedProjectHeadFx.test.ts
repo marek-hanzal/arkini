@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
-} from "~test/electron/editor-project/filesystem/support/createProjectTestHarness";
+} from "~test/project-authoring/filesystem/support/createProjectTestHarness";
 import { readCommittedProjectHeadFx } from "~/project-version/fx/readCommittedProjectHeadFx";
 
 let harness: ProjectTestHarness;

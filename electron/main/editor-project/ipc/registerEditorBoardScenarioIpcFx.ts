@@ -9,7 +9,7 @@ import { BoardScenarioNameSchema } from "~/board-scenario/schema/BoardScenarioSc
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
-import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
+import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 

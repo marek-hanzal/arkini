@@ -97,7 +97,7 @@ External changes are ignored while mounted. Refresh is explicit; there is no wat
 
 ## Version commit and Build admission
 
-Ordinary Project, Item and Resource commits update the canonical current tree but leave gameplay version and Version HEAD unchanged. Version preview compares that saved tree with the current HEAD and derives exactly one strongest major/minor/noop result.
+Ordinary non-identity Project, Item and Resource commits update the canonical current tree but leave gameplay version and Version HEAD unchanged. Renaming project identity rekeys the live repository state, preserves gameplay version and current scenarios, and removes the published Version HEAD so the next explicit commit starts the renamed game's new root. Version preview otherwise compares the saved tree with the current HEAD and derives exactly one strongest major/minor/noop result.
 
 Electron main publishes missing immutable objects and the Version descriptor/manifest before atomically applying any derived gameplay-version/scenario change together with `versions/head.json`. A major commit removes current scenarios; scenario-only commits keep the gameplay version. The first explicit commit preserves the starting version, while Arkpack import may create the root commit during project creation.
 

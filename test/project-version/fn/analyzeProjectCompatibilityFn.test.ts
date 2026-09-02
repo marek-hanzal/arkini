@@ -156,6 +156,89 @@ describe("analyzeProjectCompatibilityFn", () => {
 		});
 	});
 
+	it("classifies composite and progress item artwork changes as minor", () => {
+		const water = editorTestConfig.items.water;
+		if (water === undefined) throw new Error("Missing water fixture.");
+		const next = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				...editorTestConfig.items,
+				water: {
+					...water,
+					asset: {
+						default: [
+							...water.asset.default,
+							"item-water-overlay",
+						],
+						sources: [
+							"item-water-progress",
+						],
+					},
+				},
+			},
+		});
+
+		expect(analyze(editorTestConfig, next)).toMatchObject({
+			result: "minor",
+			context: [
+				{
+					path: [
+						"items",
+						"water",
+						"asset",
+						"default",
+						1,
+					],
+					result: "minor",
+					rule: "item-default-artwork",
+				},
+				{
+					path: [
+						"items",
+						"water",
+						"asset",
+						"sources",
+					],
+					result: "minor",
+					rule: "item-progress-artwork",
+				},
+			],
+		});
+
+		const replacedProgress = GameConfigSchema.parse({
+			...next,
+			items: {
+				...next.items,
+				water: {
+					...next.items.water,
+					asset: {
+						...next.items.water?.asset,
+						sources: [
+							"item-water-progress-new",
+						],
+					},
+				},
+			},
+		});
+
+		expect(analyze(next, replacedProgress)).toMatchObject({
+			result: "minor",
+			context: [
+				{
+					path: [
+						"items",
+						"water",
+						"asset",
+						"sources",
+						0,
+					],
+					result: "minor",
+					rule: "item-progress-artwork",
+				},
+			],
+		});
+	});
+
 	it("keeps Temporary lifetime changes minor in either direction", () => {
 		const temporary = TemporarySchema.parse({
 			...createSimpleItem("temporary"),

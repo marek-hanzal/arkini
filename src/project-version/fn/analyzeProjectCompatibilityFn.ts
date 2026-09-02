@@ -385,6 +385,27 @@ const minorPathRules: ReadonlyArray<MinorPathRule> = [
 		rule: "item-default-artwork",
 	},
 	{
+		message: "Progress item artwork changes are explicitly minor-compatible.",
+		path: [
+			"items",
+			AnyStringPathSegment,
+			"asset",
+			"sources",
+		],
+		rule: "item-progress-artwork",
+	},
+	{
+		message: "Progress item artwork changes are explicitly minor-compatible.",
+		path: [
+			"items",
+			AnyStringPathSegment,
+			"asset",
+			"sources",
+			AnyNumberPathSegment,
+		],
+		rule: "item-progress-artwork",
+	},
+	{
 		message: "Line title changes are explicitly minor-compatible.",
 		path: [
 			"items",

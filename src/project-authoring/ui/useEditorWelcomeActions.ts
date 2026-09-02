@@ -86,10 +86,11 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		state,
 	]);
 
-	const createProjectFn = useCallback(() => {
+	const createProjectFn = useCallback((projectId: string) => {
 		if (blocked) return;
 		runCommandFn({
 			action: "create",
+			projectId,
 		});
 	}, [
 		blocked,

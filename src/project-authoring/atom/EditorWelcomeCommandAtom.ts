@@ -24,6 +24,7 @@ export namespace EditorWelcomeCommandAtom {
 	export type Command =
 		| {
 				readonly action: "create";
+				readonly projectId: string;
 		  }
 		| {
 				readonly action: "delete-project";
@@ -147,7 +148,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			}
 			const operation =
 				command.action === "create"
-					? createFreshProjectFx().pipe(
+					? createFreshProjectFx(command.projectId).pipe(
 							Effect.provideService(ProjectRepository, editorProjectRepository),
 						)
 					: command.action === "import-arkpack"

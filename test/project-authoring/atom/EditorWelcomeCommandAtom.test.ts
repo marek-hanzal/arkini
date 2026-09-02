@@ -49,9 +49,9 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 vi.mock("~/project-authoring/fx/createFreshProjectFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		createFreshProjectFx: () =>
+		createFreshProjectFx: (projectId: string) =>
 			Effect.succeed({
-				projectId: "project-created",
+				projectId,
 				title: "Created",
 				version: "1.0",
 				game: "created",
@@ -136,6 +136,7 @@ describe("EditorWelcomeCommandAtom", () => {
 
 		registry.set(EditorWelcomeCommandAtom, {
 			action: "create",
+			projectId: "ignored-while-busy",
 		});
 		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
 			kind: "navigating",
@@ -184,7 +185,7 @@ describe("EditorWelcomeCommandAtom", () => {
 			return createElement(
 				"button",
 				{
-					onClick: actions.createProjectFn,
+					onClick: () => actions.createProjectFn("project-created"),
 					type: "button",
 				},
 				actions.active ?? "idle",

@@ -57,6 +57,7 @@ afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
+	actions.createProjectFn.mockReset();
 	actions.deleteProjectFn.mockReset();
 	actions.openProjectFolderFn.mockReset();
 	actions.refreshProjectsFn.mockReset();
@@ -72,6 +73,38 @@ const findButton = (container: ParentNode, label: string) => {
 };
 
 describe("EditorWelcome project rows", () => {
+	it("collects the chosen package identity before creating a project", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(EditorWelcome, { recentProjects: [] }));
+		});
+
+		const open = container.querySelector('[data-ui="EditorProjectCreateOpen"]');
+		if (!(open instanceof HTMLButtonElement)) throw new Error("New project action missing.");
+		await act(async () => open.click());
+		const input = container.querySelector<HTMLInputElement>('input[name="projectId"]');
+		if (input === null) throw new Error("Project ID input missing.");
+		const valueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		if (valueSetter === undefined) throw new Error("Native input setter missing.");
+		await act(async () => {
+			valueSetter.call(input, "game:chosen");
+			input.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		await act(async () => findButton(container, "Create project").click());
+
+		expect(actions.createProjectFn).toHaveBeenCalledWith("game:chosen");
+	});
+
 	it("confirms the exact selected project deletion command", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

@@ -10,6 +10,7 @@ import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { EditorRecentProjects } from "~/project-authoring/ui/EditorRecentProjects";
 import { ProjectDeleteDialog } from "~/project-authoring/ui/ProjectDeleteDialog";
+import { ProjectCreateDialog } from "~/project-authoring/ui/ProjectCreateDialog";
 import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";
 
 interface EditorWelcomeProps {
@@ -23,10 +24,11 @@ interface ProjectToDelete {
 
 /** Starts or reopens one local editor project. */
 export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
+	const [createOpen, setCreateOpenFn] = useState(false);
 	const [projectToDelete, setProjectToDeleteFn] = useState<ProjectToDelete | null>(null);
 	const [deleteRequested, setDeleteRequestedFn] = useState(false);
 	const actions = useEditorWelcomeActions({
-		exitBlocked: projectToDelete !== null,
+		exitBlocked: createOpen || projectToDelete !== null,
 	});
 
 	useEffect(() => {
@@ -83,7 +85,8 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 						disabled={actions.blocked}
 						cursorIntent={actions.active === "create" ? "progress" : undefined}
 						className="min-h-44 flex-col gap-3 rounded-2xl"
-						onClick={actions.createProjectFn}
+						data-ui="EditorProjectCreateOpen"
+						onClick={() => setCreateOpenFn(true)}
 					>
 						<FilePlus2 className="size-9" />
 						<span className="text-lg">New project</span>
@@ -160,6 +163,14 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 					}}
 				/>
 			)}
+			{createOpen ? (
+				<ProjectCreateDialog
+					error={actions.error}
+					pending={actions.active === "create"}
+					onCancelFn={() => setCreateOpenFn(false)}
+					onCreateFn={actions.createProjectFn}
+				/>
+			) : null}
 		</>
 	);
 };

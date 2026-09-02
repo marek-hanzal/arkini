@@ -51,12 +51,12 @@ describe("createFreshProjectFx", () => {
 		);
 
 		const project = await Effect.runPromise(
-			createFreshProjectFx().pipe(
+			createFreshProjectFx("game:chosen").pipe(
 				Effect.provideService(ProjectRepository, createRepository(createProjectFx)),
 			),
 		);
 
-		expect(project.projectId).toMatch(/^project-[A-Za-z0-9]+$/);
+		expect(project.projectId).toBe("game:chosen");
 		expect(project).toMatchObject({
 			title: "Untitled project",
 			version: "1.0",

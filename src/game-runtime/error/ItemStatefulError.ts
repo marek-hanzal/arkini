@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** A generic identity-changing operation targeted an item that owns runtime state. */
 export class ItemStatefulError extends Data.TaggedError("ItemStatefulError")<{

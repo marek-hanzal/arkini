@@ -10,7 +10,6 @@ import { FormProvider } from "~/item-authoring/ui/FormContext";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
-import { ProjectCompatibilityNotice } from "~/project-version/ui/ProjectCompatibilityNotice";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { useFormController } from "~/item-authoring/ui/useFormController";
 
@@ -140,12 +139,6 @@ export const FormSession = ({
 					discardFn={discardFn}
 					dirty={controller.isDirty}
 					error={controller.error}
-					notice={
-						<ProjectCompatibilityNotice
-							compatibility={controller.compatibility}
-							version={project.version}
-						/>
-					}
 					rootCard={
 						sectionId !== "action" &&
 						sectionId !== "artwork" &&

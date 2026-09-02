@@ -13,8 +13,6 @@ import {
 	ProjectAvatarKeys,
 } from "~/project-authoring/schema/ProjectFormSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { SizeSchema } from "~/item-location/schema/SizeSchema";
-import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
@@ -24,7 +22,6 @@ import {
 } from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
 
 const createProjectConfigFn = (
 	project: Pick<Project, "config">,
@@ -114,27 +111,6 @@ const saveProjectConfigCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-/** Preserves breaking size warnings when another draft invariant prevents full config parsing. */
-const analyzeProjectStructuralCompatibilityFn = (
-	project: Pick<Project, "config">,
-	value: ProjectFormSchema.Type,
-) => {
-	const board = SizeSchema.safeParse(value.board);
-	const inventory = SizeSchema.safeParse(value.inventory);
-	const toolbarSize = ToolbarSizeSchema.safeParse(value.toolbarSize);
-	if (!board.success || !inventory.success || !toolbarSize.success) return undefined;
-	const compatibility = analyzeProjectCompatibilityFn(project.config, {
-		...project.config,
-		meta: {
-			...project.config.meta,
-			board: board.data,
-			inventory: inventory.data,
-			toolbarSize: toolbarSize.data,
-		},
-	});
-	return compatibility.result === "major" ? compatibility : undefined;
-};
-
 export namespace useProjectFormController {
 	export interface Props {
 		readonly onInvalidDestinationFn: (
@@ -193,19 +169,6 @@ export const useProjectFormController = ({
 		},
 	});
 	const dirty = useStore(form.store, (state) => state.isDirty);
-	const values = useStore(form.store, (state) => state.values);
-	const compatibility = useMemo(() => {
-		if (!dirty) return undefined;
-		const parsed = schema.safeParse(values);
-		if (!parsed.success) return analyzeProjectStructuralCompatibilityFn(project, values);
-		const config = createProjectConfigFn(project, parsed.data);
-		return analyzeProjectCompatibilityFn(project.config, config);
-	}, [
-		dirty,
-		project,
-		schema,
-		values,
-	]);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const validationError = useStore(form.store, (state) =>
 		state.submissionAttempts > 0 && !state.isValid
@@ -279,7 +242,6 @@ export const useProjectFormController = ({
 	return useMemo(
 		() => ({
 			canonicalValues,
-			compatibility,
 			discardFn,
 			error,
 			form,
@@ -290,7 +252,6 @@ export const useProjectFormController = ({
 		}),
 		[
 			canonicalValues,
-			compatibility,
 			discardFn,
 			dirty,
 			error,

@@ -61,7 +61,7 @@ describe("filesystem Editor project sidecars", () => {
 		]);
 	});
 
-	it("caches portable notes and scenarios until Refresh, then preserves scenarios on a major commit", async () => {
+	it("caches sidecars until Refresh and deletes current scenarios on a major Version commit", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -132,6 +132,16 @@ describe("filesystem Editor project sidecars", () => {
 				)
 			)?.bytes,
 		).toEqual(Uint8Array.of(9));
+		const initialStatus = await Effect.runPromise(
+			repository.readVersionStatusFx(project.projectId),
+		);
+		await Effect.runPromise(
+			repository.createVersionFx({
+				expectedFingerprint: initialStatus.currentFingerprint,
+				projectId: project.projectId,
+				subject: "Initial",
+			}),
+		);
 
 		const breaking = await Effect.runPromise(
 			repository.replaceConfigFx({
@@ -143,7 +153,7 @@ describe("filesystem Editor project sidecars", () => {
 				},
 			}),
 		);
-		expect(breaking.version).toBe("2.0");
+		expect(breaking.version).toBe("1.0");
 		expect(
 			await Effect.runPromise(repository.listBoardScenariosFx(project.projectId)),
 		).toHaveLength(1);
@@ -157,12 +167,30 @@ describe("filesystem Editor project sidecars", () => {
 				)
 			)?.bytes,
 		).toEqual(Uint8Array.of(9));
-		const persistedScenario = JSON.parse(await readFile(scenarioPath, "utf8")) as {
-			save: string;
-		};
-		expect(Buffer.from(persistedScenario.save, "base64")).toEqual(
-			Buffer.from(Uint8Array.of(9)),
+		const preview = await Effect.runPromise(
+			repository.previewVersionCommitFx(project.projectId),
 		);
+		expect(preview).toMatchObject({
+			bump: "major",
+			nextArkpackVersion: "2.0",
+			scenariosToDelete: [
+				"Opening",
+			],
+		});
+		const committed = await Effect.runPromise(
+			repository.createVersionFx({
+				expectedFingerprint: preview.currentFingerprint,
+				projectId: project.projectId,
+				subject: "Remove the item",
+			}),
+		);
+		expect(committed.arkpackVersion).toBe("2.0");
+		expect(
+			await Effect.runPromise(repository.listBoardScenariosFx(project.projectId)),
+		).toHaveLength(0);
+		await expect(readFile(scenarioPath, "utf8")).rejects.toMatchObject({
+			code: "ENOENT",
+		});
 		expect(await Effect.runPromise(repository.listNotesFx(project.projectId))).toHaveLength(1);
 	});
 });

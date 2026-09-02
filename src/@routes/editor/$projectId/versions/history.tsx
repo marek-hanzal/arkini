@@ -2,51 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle, Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
-import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVersion";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
-import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { VersionCheckoutDialog } from "~/project-version/ui/VersionCheckoutDialog";
 import { VersionDiff } from "~/project-version/ui/VersionDiff";
 import { VersionGraph } from "~/project-version/ui/VersionGraph";
+import { EditorVersionReferenceSelect } from "~/project-version/ui/EditorVersionReferenceSelect";
 import { useVersionHistoryController } from "~/project-version/ui/useVersionHistoryController";
-
-const EditorVersionReferenceSelect = ({
-	label,
-	onChangeFn,
-	value,
-	versions,
-}: {
-	readonly label: string;
-	readonly onChangeFn: (value: string) => void;
-	readonly value: string;
-	readonly versions: ReadonlyArray<ProjectVersionDescriptor>;
-}) => {
-	const options: ReadonlyArray<EditorSelectOption<string>> = [
-		{
-			label: "Working copy",
-			value: "current",
-		},
-		...versions.map((version) => ({
-			label: version.subject,
-			value: version.versionId,
-		})),
-	];
-	return (
-		<div className="grid gap-1 text-xs font-semibold">
-			{label}
-			<EditorSelect
-				label={label}
-				onChangeFn={onChangeFn}
-				options={options}
-				value={value}
-			/>
-		</div>
-	);
-};
 
 const VersionCreatedAt = ({ createdAtMs }: { readonly createdAtMs: number }) => {
 	const createdAt = new Date(createdAtMs);

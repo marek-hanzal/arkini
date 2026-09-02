@@ -14,7 +14,7 @@ import {
 	ProjectVersionSubjectSchema,
 	ProjectVersionTagSchema,
 } from "~/project-version/schema/ProjectVersionMetadataSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 type ToolResult = {
 	readonly isError?: boolean;
@@ -40,6 +40,12 @@ const VersionStatusInputSchema = z.object({}).strict().meta({
 	$id: "urn:arkini:schema:mcp:version-status-input",
 	title: "Version status tool input",
 	description: "The version status tool accepts no arguments.",
+});
+
+const VersionCommitPreviewInputSchema = z.object({}).strict().meta({
+	$id: "urn:arkini:schema:mcp:version-commit-preview-input",
+	title: "Version commit preview tool input",
+	description: "The version commit preview tool accepts no arguments.",
 });
 
 const VersionListInputSchema = z
@@ -70,6 +76,10 @@ const VersionCommitInputSchema = z
 	.object({
 		message: ProjectVersionSubjectSchema,
 		body: ProjectVersionBodySchema.optional(),
+		previewFingerprint: z
+			.string()
+			.regex(/^[a-f0-9]{64}$/)
+			.describe("Exact fingerprint returned by version_commit_preview."),
 		tag: ProjectVersionTagSchema.optional(),
 	})
 	.strict()
@@ -120,7 +130,7 @@ const decodeReferenceFn = (value: string): ProjectVersionReference =>
 const describeVersionFn = (version: ProjectVersionDescriptor) =>
 	[
 		`${version.versionId} · ${version.subject}`,
-		`  ${new Date(version.createdAtMs).toISOString()} · Arkini ${version.arkini}`,
+		`  ${new Date(version.createdAtMs).toISOString()} · Arkpack v${version.arkpackVersion} · Arkini ${version.arkini}`,
 		...(version.parentVersionId === undefined
 			? []
 			: [
@@ -201,6 +211,38 @@ export const registerVersionToolsFn = ({
 			),
 	);
 	server.registerTool(
+		"version_commit_preview",
+		{
+			description:
+				"Preview the exact Arkpack version, compatibility bump, diff, and Board scenario deletions that version_commit would apply to the open project's saved working copy.",
+			inputSchema: VersionCommitPreviewInputSchema,
+		},
+		async () =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) =>
+						repository.previewVersionCommitFx(project.projectId),
+					),
+					Effect.map((preview) =>
+						[
+							"Version commit preview",
+							`Resulting Arkpack: v${preview.nextArkpackVersion}`,
+							`Compatibility bump: ${preview.bump}`,
+							`Board scenarios deleted by commit: ${preview.scenariosToDelete.length}`,
+							...preview.scenariosToDelete.map((name) => `  ${name}`),
+							`Commit fingerprint: ${preview.currentFingerprint}`,
+							`Can commit: ${preview.canCommit ? "yes" : "no"}`,
+							...(preview.diff === undefined
+								? []
+								: [
+										formatDiffFn(preview.diff),
+									]),
+						].join("\n"),
+					),
+				),
+			),
+	);
+	server.registerTool(
 		"version_list",
 		{
 			description:
@@ -248,37 +290,61 @@ export const registerVersionToolsFn = ({
 		"version_commit",
 		{
 			description:
-				"Create an explicit full snapshot of the open project's saved state, including assets and Board scenarios. Unsaved editor drafts are excluded.",
+				"Commit the open project's saved state after version_commit_preview. The commit applies one compatibility bump; a major commit permanently deletes every current Board scenario. Unsaved editor drafts are excluded.",
 			inputSchema: VersionCommitInputSchema,
 		},
-		async ({ body, message, tag }) =>
+		async ({ body, message, previewFingerprint, tag }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
-						repository.readVersionStatusFx(project.projectId).pipe(
-							Effect.flatMap((status) =>
-								repository.createVersionFx({
-									projectId: project.projectId,
-									expectedFingerprint: status.currentFingerprint,
-									subject: message,
-									...(body === undefined
-										? {}
-										: {
-												body,
-											}),
-									...(tag === undefined
-										? {}
-										: {
-												tag,
-											}),
-								}),
+						repository.previewVersionCommitFx(project.projectId).pipe(
+							Effect.flatMap((preview) =>
+								preview.currentFingerprint !== previewFingerprint
+									? Effect.fail(
+											new Error(
+												"The saved project changed after version_commit_preview. Preview the commit again.",
+											),
+										)
+									: repository
+											.createVersionFx({
+												projectId: project.projectId,
+												expectedFingerprint: previewFingerprint,
+												subject: message,
+												...(body === undefined
+													? {}
+													: {
+															body,
+														}),
+												...(tag === undefined
+													? {}
+													: {
+															tag,
+														}),
+											})
+											.pipe(
+												Effect.map((version) => ({
+													preview,
+													version,
+												})),
+											),
 							),
 							Effect.tap(() =>
 								Effect.sync(() => notifyProjectChangedFn(project.projectId)),
 							),
 						),
 					),
-					Effect.map((version) => `Version created\n${describeVersionFn(version)}`),
+					Effect.map(({ preview, version }) =>
+						[
+							"Version created",
+							describeVersionFn(version),
+							`Compatibility bump: ${preview.bump}`,
+							...(preview.scenariosToDelete.length === 0
+								? []
+								: [
+										`Deleted Board scenarios: ${preview.scenariosToDelete.join(", ")}`,
+									]),
+						].join("\n"),
+					),
 				),
 			),
 	);

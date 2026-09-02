@@ -1,7 +1,7 @@
 import { Array, Effect, Option } from "effect";
 
 import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";

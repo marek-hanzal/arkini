@@ -18,6 +18,7 @@ export namespace ProjectRepository {
 	export interface CreateProjectProps {
 		readonly version: GameVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
+		readonly initialVersionSubject?: string;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}
 

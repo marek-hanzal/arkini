@@ -161,7 +161,12 @@ export const VersionGraph = ({
 							parentLane={row.parentLane}
 						/>
 						<div className="min-w-0 flex-1 py-2">
-							<div className="truncate font-semibold">{row.version.subject}</div>
+							<div className="flex min-w-0 items-center gap-2">
+								<div className="truncate font-semibold">{row.version.subject}</div>
+								<span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-xs font-semibold text-accent">
+									v{row.version.arkpackVersion}
+								</span>
+							</div>
 							<div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
 								<span>{new Date(row.version.createdAtMs).toLocaleString()}</span>
 								{row.version.tag === undefined ? null : (

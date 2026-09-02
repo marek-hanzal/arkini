@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { InputSchema } from "~/production-input/schema/InputSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { DescriptionSchema } from "~/game-config/schema/DescriptionSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { TimeSchema } from "~/game-config/schema/TimeSchema";
-import { TitleSchema } from "~/game-config/schema/TitleSchema";
+import { DescriptionSchema } from "~/game-value/schema/DescriptionSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { TimeSchema } from "~/game-value/schema/TimeSchema";
+import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { RuleSchema } from "./RuleSchema";
 
 /**

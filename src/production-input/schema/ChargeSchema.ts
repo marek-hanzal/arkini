@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { ChargeSourceSchema } from "./ChargeSourceSchema";
 
 /** Charge cost paid when one requirement participates in a committed action. */

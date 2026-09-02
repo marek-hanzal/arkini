@@ -4,7 +4,7 @@ import { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { InputSchema } from "~/production-action/schema/InputSchema";
 import { RuleSchema } from "~/production-action/schema/RuleSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 /** An immediately activated item that transitions gameplay to one authored space. */
 export const SpaceSchema = z

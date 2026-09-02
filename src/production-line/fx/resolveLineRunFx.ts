@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { TimeSchema } from "~/game-config/schema/TimeSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { resolveInputRunFx } from "~/production-input/fx/resolveInputRunFx";
 import type { InputRun } from "~/production-input/type/InputRun";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";

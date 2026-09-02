@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { makeDropRejectedResultFn } from "~/item-interaction/fn/makeDropRejectedResultFn";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 

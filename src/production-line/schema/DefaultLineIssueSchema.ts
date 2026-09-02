@@ -3,7 +3,7 @@ import { z } from "zod";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "./DefaultLineIssueReasonEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** One persisted default-line override no longer belongs to its exact live owner. */
 export const DefaultLineIssueSchema = z

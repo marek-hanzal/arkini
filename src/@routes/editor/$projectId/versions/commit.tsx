@@ -8,6 +8,7 @@ import { EditorTextarea } from "~/editor-control/ui/EditorTextarea";
 import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import { Status } from "~/ui/ui/Status";
 import { useVersionCommitController } from "~/project-version/ui/useVersionCommitController";
+import { VersionDiff } from "~/project-version/ui/VersionDiff";
 
 interface EditorVersionCommitSearch {
 	readonly returnTo?: string;
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 	}),
 	component: () => {
 		const controller = useVersionCommitController();
+		const { preview } = controller;
 		return (
 			<div
 				className="h-full min-h-0 overflow-y-auto p-4"
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 			>
 				<div className="mx-auto grid w-full max-w-3xl gap-4">
 					<h2 className="text-lg font-semibold">Commit project</h2>
-					{controller.status?.canCommit === false ? (
+					{preview?.canCommit === false ? (
 						<Status
 							dataUi="EditorVersionCommitClean"
 							description="Working copy matches its current base. Change the saved project before creating another version."
@@ -38,6 +40,46 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 						/>
 					) : (
 						<>
+							{preview === undefined ? null : (
+								<EditorFormCard>
+									<div className="flex flex-wrap items-start justify-between gap-3">
+										<div>
+											<h3 className="font-semibold">
+												{preview.initial
+													? `Initial snapshot · v${preview.nextArkpackVersion}`
+													: `Resulting Arkpack · v${preview.nextArkpackVersion}`}
+											</h3>
+											<p className="mt-1 text-sm text-muted">
+												{preview.initial
+													? "The first commit records the complete project without bumping its starting version."
+													: preview.bump === "noop"
+														? "Only Editor-only content changed, so the Arkpack version stays unchanged."
+														: `This commit applies one ${preview.bump} compatibility bump.`}
+											</p>
+										</div>
+										<span
+											className="rounded-full border border-line px-2.5 py-1 text-xs font-semibold uppercase tracking-wider"
+											data-ui="EditorVersionCommitBump"
+										>
+											{preview.bump}
+										</span>
+									</div>
+									{preview.scenariosToDelete.length === 0 ? null : (
+										<div
+											className="mt-3 rounded-lg bg-warning/12 p-3 text-sm text-warning"
+											data-ui="EditorVersionCommitScenarioDeletion"
+										>
+											This major commit will delete{" "}
+											{preview.scenariosToDelete.length} Board scenario
+											{preview.scenariosToDelete.length === 1 ? "" : "s"}:{" "}
+											{preview.scenariosToDelete.join(", ")}.
+										</div>
+									)}
+								</EditorFormCard>
+							)}
+							{preview?.diff === undefined ? null : (
+								<VersionDiff diff={preview.diff} />
+							)}
 							<EditorFormCard>
 								<label className="grid gap-1.5 text-sm">
 									<EditorValueLabel

@@ -117,10 +117,10 @@ export const DeleteDialog = ({
 			</p>
 			<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 				<p>
-					Deleting an item is a breaking gameplay change. Current Board scenarios and
-					existing published game saves remain stored, but they cannot load the new major
-					version. Create a Version first to preserve the matching project for
-					restoration.
+					Deleting an item only changes the saved working copy. Its next Version commit
+					will apply a major bump and delete every current Board scenario after showing
+					that consequence in the commit preview. Existing published game saves remain
+					stored, but cannot load the resulting major Arkpack.
 				</p>
 				{force ? (
 					<p>

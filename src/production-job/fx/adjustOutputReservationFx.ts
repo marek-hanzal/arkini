@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** Applies one exact quantity delta while keeping zero entries out of the reservation map. */
 export const adjustOutputReservationFx = Effect.fnUntraced(function* (

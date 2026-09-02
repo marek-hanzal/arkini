@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

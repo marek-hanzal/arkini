@@ -78,6 +78,7 @@ export namespace ArkiniElectronApi {
 		editorNoteUpdate: "arkini:editor:note:update",
 		editorNoteDelete: "arkini:editor:note:delete",
 		editorVersionStatus: "arkini:editor:version:status",
+		editorVersionCommitPreview: "arkini:editor:version:commit-preview",
 		editorVersionList: "arkini:editor:version:list",
 		editorVersionDiff: "arkini:editor:version:diff",
 		editorVersionCommit: "arkini:editor:version:commit",
@@ -290,6 +291,11 @@ export namespace ArkiniElectronApi {
 			readonly readVersionStatusFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionStatus>>;
+			readonly previewVersionCommitFn: (
+				projectId: string,
+			) => Promise<
+				EditorProjectTransport.Result<EditorProjectTransport.VersionCommitPreview>
+			>;
 			readonly listVersionsFn: (
 				projectId: string,
 			) => Promise<

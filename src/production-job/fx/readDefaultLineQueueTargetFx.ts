@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { DefaultLineQueueUnavailableError } from "~/production-job/error/DefaultLineQueueUnavailableError";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";

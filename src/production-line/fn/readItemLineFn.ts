@@ -1,6 +1,6 @@
 import { match, P } from "ts-pattern";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";

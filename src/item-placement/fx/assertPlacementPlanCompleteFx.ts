@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementPlanInvalidError } from "~/item-placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";

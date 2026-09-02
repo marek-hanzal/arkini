@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { LineInputDeliveryAllocationSchema } from "./LineInputDeliveryAllocationSchema";
 
 /** One exact line whose material slots may accept an outbound delivery. */

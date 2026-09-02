@@ -3,8 +3,8 @@ import { z } from "zod";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { ItemTemporaryDurationIssueReasonEnumSchema } from "./ItemTemporaryDurationIssueReasonEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { TimeSchema } from "~/game-config/schema/TimeSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /** One live item violates the canonical temporary-lifetime contract. */

@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { TimeSchema } from "~/game-config/schema/TimeSchema";
+import { TimeSchema } from "~/game-value/schema/TimeSchema";
 
 /**
  * A hydrated live item or item stack that owns its current location.

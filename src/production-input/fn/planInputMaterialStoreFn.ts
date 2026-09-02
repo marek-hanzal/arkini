@@ -1,5 +1,5 @@
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { readMaterialInputEligibilityFn } from "~/production-input/fn/readMaterialInputEligibilityFn";

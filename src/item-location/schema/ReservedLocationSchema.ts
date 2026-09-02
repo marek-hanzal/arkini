@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One live runtime item temporarily reserved by an active job. */

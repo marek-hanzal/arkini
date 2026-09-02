@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { LineInputEmptyError } from "~/production-input/error/LineInputEmptyError";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/fx/readItemMaterialInputFx";

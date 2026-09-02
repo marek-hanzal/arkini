@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import type { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -26,6 +26,7 @@ const createProjectSchema = z
 	.object({
 		version: GameVersionSchema,
 		config: GameConfigSchema,
+		initialVersionSubject: ProjectVersionSubjectSchema.optional(),
 		resources: ResourceSchema.array(),
 	})
 	.strict();
@@ -210,6 +211,8 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
 			parseVersionStatusProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-version-status", IdSchema, candidate),
+			parseVersionCommitPreviewProjectIdFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx("preview-version-commit", IdSchema, candidate),
 			parseVersionListProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("list-versions", IdSchema, candidate),
 			parseVersionCommitFx: (

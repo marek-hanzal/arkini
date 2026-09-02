@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
 

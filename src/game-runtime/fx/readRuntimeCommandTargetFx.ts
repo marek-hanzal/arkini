@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemJobScopedError } from "~/game-runtime/error/ItemJobScopedError";

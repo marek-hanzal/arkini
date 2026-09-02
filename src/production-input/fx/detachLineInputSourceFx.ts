@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";

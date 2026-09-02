@@ -25,7 +25,7 @@ const sortedRecordFn = (
 		].sort(([left], [right]) => left.localeCompare(right)),
 	);
 
-/** Hashes authored content while excluding checkout-specific scenario provenance. */
+/** Hashes authored version content while excluding checkout-specific scenario provenance. */
 export const createVersionFingerprintFn = (
 	manifest: VersionManifestSchema.Type,
 	scenarios: ReadonlyArray<BoardScenarioFileSchema.Type>,

@@ -16,7 +16,6 @@ import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
 
 const saveCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -126,26 +125,6 @@ export const useFormController = ({
 	]);
 	const itemId = useStore(form.store, (state) => state.values.id);
 	const dirty = useStore(form.store, (state) => state.isDirty);
-	const values = useStore(form.store, (state) => state.values);
-	const compatibility = useMemo(() => {
-		if (!dirty) return undefined;
-		const parsed = FormSchema.safeParse(values);
-		if (!parsed.success) return undefined;
-		const items = {
-			...project.config.items,
-		};
-		if (initialItem.id !== parsed.data.id) delete items[initialItem.id];
-		items[parsed.data.id] = parsed.data;
-		return analyzeProjectCompatibilityFn(project.config, {
-			...project.config,
-			items,
-		});
-	}, [
-		dirty,
-		initialItem.id,
-		project,
-		values,
-	]);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const validationError = useStore(form.store, (state) =>
 		state.submissionAttempts > 0 && !state.isValid
@@ -220,7 +199,6 @@ export const useFormController = ({
 	return useMemo(
 		() => ({
 			canonicalItem,
-			compatibility,
 			discardFn,
 			error,
 			isDirty: dirty,
@@ -233,7 +211,6 @@ export const useFormController = ({
 		}),
 		[
 			canonicalItem,
-			compatibility,
 			discardFn,
 			dirty,
 			error,

@@ -83,7 +83,6 @@ describe("importEditorArkpackFileFx", () => {
 					resources,
 				}),
 		);
-
 		const descriptor = await runImport(
 			{
 				file: {
@@ -105,6 +104,7 @@ describe("importEditorArkpackFileFx", () => {
 		expect(createProjectFx).toHaveBeenCalledWith({
 			version: "4.2",
 			config: editorTestPayload.config,
+			initialVersionSubject: "Imported Arkpack v4.2",
 			resources: validPayload.resources,
 		});
 	});

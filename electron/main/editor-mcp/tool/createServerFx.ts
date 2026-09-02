@@ -6,7 +6,7 @@ import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchemas, type CreateItemInput } from "./CreateItemInputSchemas";
 import { EditItemInputSchemas, type EditItemInput } from "./EditItemInputSchemas";

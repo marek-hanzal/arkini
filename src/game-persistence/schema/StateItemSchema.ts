@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import { TimeSchema } from "~/game-config/schema/TimeSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /**

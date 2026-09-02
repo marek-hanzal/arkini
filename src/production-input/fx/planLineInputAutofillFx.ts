@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import { isLineInputAutofillSourceLocationFn } from "~/production-input/fn/isLineInputAutofillSourceLocationFn";

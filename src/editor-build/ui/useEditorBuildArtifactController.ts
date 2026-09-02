@@ -50,6 +50,7 @@ const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefine
 
 export namespace useEditorBuildArtifactController {
 	export interface Props {
+		readonly canBuild: boolean;
 		readonly project: Project;
 	}
 
@@ -65,6 +66,7 @@ export namespace useEditorBuildArtifactController {
 
 /** Owns one project's build command and admission of its exact current-revision artifact. */
 export const useEditorBuildArtifactController = ({
+	canBuild,
 	project,
 }: useEditorBuildArtifactController.Props): useEditorBuildArtifactController.Output => {
 	const buildAtom = BuildCommandAtoms.build(project.projectId);
@@ -107,6 +109,7 @@ export const useEditorBuildArtifactController = ({
 	return {
 		artifact,
 		buildFn: () => {
+			if (!canBuild) return;
 			runBuildFn({
 				expectedRevision: project.revision,
 			});

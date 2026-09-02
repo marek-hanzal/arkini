@@ -1,7 +1,20 @@
 import type { Effect } from "effect";
 
 import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
-import type { ProjectCompatibilityDiffResult } from "~/project-version/type/ProjectCompatibility";
+import type {
+	ProjectCompatibilityDiffResult,
+	ProjectCompatibilityResult,
+} from "~/project-version/type/ProjectCompatibility";
+
+export interface ProjectVersionCommitPreview {
+	readonly bump: ProjectCompatibilityResult;
+	readonly canCommit: boolean;
+	readonly currentFingerprint: string;
+	readonly diff?: ProjectVersionDiff;
+	readonly initial: boolean;
+	readonly nextArkpackVersion: string;
+	readonly scenariosToDelete: ReadonlyArray<string>;
+}
 
 /** Lightweight immutable node in one project's version tree. */
 export interface ProjectVersionDescriptor {
@@ -103,6 +116,9 @@ export interface ProjectVersionRepositoryService {
 	readonly listVersionsFx: (
 		projectId: string,
 	) => Effect.Effect<ReadonlyArray<ProjectVersionDescriptor>, ProjectRepositoryError, never>;
+	readonly previewVersionCommitFx: (
+		projectId: string,
+	) => Effect.Effect<ProjectVersionCommitPreview, ProjectRepositoryError, never>;
 	readonly readVersionStatusFx: (
 		projectId: string,
 	) => Effect.Effect<ProjectVersionStatus, ProjectRepositoryError, never>;

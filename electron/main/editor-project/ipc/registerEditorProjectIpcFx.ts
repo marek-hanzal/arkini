@@ -330,6 +330,17 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.readVersionStatusFx(projectId),
 					),
 				);
+				handleFn(
+					ArkiniElectronApi.channels.editorVersionCommitPreview,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"preview-version-commit",
+							ownership,
+							diagnostics,
+							requestParser.parseVersionCommitPreviewProjectIdFx(candidate),
+							(repository, projectId) => repository.previewVersionCommitFx(projectId),
+						),
+				);
 				handleFn(ArkiniElectronApi.channels.editorVersionList, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"list-versions",
@@ -397,6 +408,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectUpsertItem,
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					ArkiniElectronApi.channels.editorVersionStatus,
+					ArkiniElectronApi.channels.editorVersionCommitPreview,
 					ArkiniElectronApi.channels.editorVersionList,
 					ArkiniElectronApi.channels.editorVersionDiff,
 					ArkiniElectronApi.channels.editorVersionCommit,

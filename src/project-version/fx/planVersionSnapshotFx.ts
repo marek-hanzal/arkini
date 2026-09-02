@@ -12,7 +12,7 @@ import {
 	createVersionFingerprintFn,
 	hashVersionBytesFn,
 	hashVersionJsonFn,
-} from "./VersionFingerprint";
+} from "~/project-version/fn/createVersionFingerprintFn";
 
 const sortedRecordFn = (
 	entries: ReadonlyArray<

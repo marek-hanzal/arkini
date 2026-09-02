@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

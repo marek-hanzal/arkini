@@ -1,7 +1,7 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 /**
  * One delivered runtime item cannot be accepted by a material input slot.

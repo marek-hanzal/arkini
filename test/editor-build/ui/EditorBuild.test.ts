@@ -21,6 +21,7 @@ const state = vi.hoisted(() => ({
 	exportResults: new Map<string, unknown>(),
 	installResults: new Map<string, unknown>(),
 	project: undefined as unknown,
+	versionDirty: false,
 }));
 
 type MockButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -62,6 +63,19 @@ vi.mock("~/editor-build/service/EditorBuildRepository", async () => {
 		EditorBuildRepository: Effect.succeed({}),
 	};
 });
+
+vi.mock("~/project-version/ui/useProjectVersionStatus", () => ({
+	useProjectVersionStatus: () => ({
+		status: "ready",
+		versionStatus: {
+			canCommit: state.versionDirty,
+			currentBaseVersionId: "version-one",
+			currentFingerprint: "a".repeat(64),
+			dirty: state.versionDirty,
+			versionCount: 1,
+		},
+	}),
+}));
 
 vi.mock("@effect/atom-react", () => ({
 	useAtomSet: (atom: {
@@ -109,6 +123,13 @@ vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 
 vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 	EditorHistoryBackButton: () => createElement("span"),
+}));
+
+vi.mock("~/ui/ui/LinkButton", () => ({
+	LinkButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+		createElement("button", props, children),
+	LinkButtonLink: ({ children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) =>
+		createElement("a", props, children),
 }));
 
 vi.mock("~/ui/ui/Button", () => ({
@@ -168,6 +189,7 @@ beforeEach(() => {
 		revision: 0,
 		version: "1.0",
 	};
+	state.versionDirty = false;
 	state.buildResult = AsyncResult.initial();
 	state.catalogState = {
 		type: "ready",
@@ -219,6 +241,21 @@ const renderController = async () => {
 };
 
 describe("EditorBuild", () => {
+	it("routes a dirty working copy to Version commit instead of admitting Build", async () => {
+		state.versionDirty = true;
+		const { container } = await renderBuild();
+
+		expect(container.textContent).toContain(
+			"Commit the saved working copy before building its Arkpack.",
+		);
+		expect(container.textContent).toContain("Commit changes");
+		expect(
+			Array.from(container.querySelectorAll("button")).some(
+				(button) => button.textContent?.trim() === "Build",
+			),
+		).toBe(false);
+	});
+
 	it("keeps structured validation diagnostics distinct from operational failures", async () => {
 		const diagnostics = [
 			{

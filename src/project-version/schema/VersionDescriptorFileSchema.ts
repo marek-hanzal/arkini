@@ -5,7 +5,7 @@ import {
 	ProjectVersionSubjectSchema,
 	ProjectVersionTagSchema,
 } from "~/project-version/schema/ProjectVersionMetadataSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { VersionObjectHashSchema } from "./VersionObjectHashSchema";

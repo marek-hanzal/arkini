@@ -1,4 +1,4 @@
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 

@@ -1,7 +1,7 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /** Starting one job would overbook a canonical item's worst-case future maxCount capacity. */
 export class OutputCapacityError extends Data.TaggedError("OutputCapacityError")<{

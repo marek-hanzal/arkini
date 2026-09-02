@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createProjectPathsFx } from "~electron/main/editor-project/filesystem/createProjectPathsFx";
 import { createVersionSnapshotFx } from "~electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
-import { readVersionSnapshotFx } from "~electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -84,7 +84,7 @@ describe("filesystem Editor version objects", () => {
 			Effect.runPromise(
 				readVersionSnapshotFx({
 					manifest: snapshot.manifest,
-					paths,
+					root: paths.root,
 				}).pipe(Effect.provide(NodeServices.layer)),
 			);
 		const restored = await readSnapshot();

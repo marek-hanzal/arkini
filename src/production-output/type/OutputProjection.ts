@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";

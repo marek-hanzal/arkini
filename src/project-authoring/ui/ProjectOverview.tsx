@@ -1,4 +1,5 @@
 import { ArrowRight, Boxes, GitBranch, Images, LoaderCircle, TriangleAlert } from "lucide-react";
+import { Fragment } from "react";
 
 import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
@@ -174,31 +175,34 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						<span>
 							{itemCount} {itemCount === 1 ? "item" : "items"}
 						</span>
-						{unreachableSummary === null && itemTypeCounts.length === 0 ? null : (
-							<span className="h-5 w-px bg-line" />
-						)}
+						{unreachableSummary === null ? null : <span className="h-5 w-px bg-line" />}
 						{unreachableSummary}
-						{unreachableSummary === null || itemTypeCounts.length === 0 ? null : (
-							<span className="h-5 w-px bg-line" />
-						)}
-						{itemTypeCounts.map(({ count, type }) => (
-							<LinkButtonLink
-								className="capitalize"
-								data-overview-id={`items-type-${type}`}
-								data-ui="EditorProjectOverviewLink"
-								key={type}
-								params={{
-									projectId: project.projectId,
-								}}
-								search={{
-									itemType: type,
-								}}
-								to="/editor/$projectId/editor/items/list"
-							>
-								{type} ({count})
-							</LinkButtonLink>
-						))}
 					</div>
+				}
+				footerLeft={
+					itemTypeCounts.length === 0 ? undefined : (
+						<div className="flex flex-wrap items-center gap-2">
+							{itemTypeCounts.map(({ count, type }, index) => (
+								<Fragment key={type}>
+									{index === 0 ? null : <span className="text-subtle">·</span>}
+									<LinkButtonLink
+										className="capitalize"
+										data-overview-id={`items-type-${type}`}
+										data-ui="EditorProjectOverviewLink"
+										params={{
+											projectId: project.projectId,
+										}}
+										search={{
+											itemType: type,
+										}}
+										to="/editor/$projectId/editor/items/list"
+									>
+										{type} ({count})
+									</LinkButtonLink>
+								</Fragment>
+							))}
+						</div>
+					)
 				}
 				footerRight={
 					<LinkButtonLink

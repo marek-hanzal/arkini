@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /**

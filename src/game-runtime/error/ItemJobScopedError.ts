@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** A generic item command targeted a resource exclusively owned by an active job. */
 export class ItemJobScopedError extends Data.TaggedError("ItemJobScopedError")<{

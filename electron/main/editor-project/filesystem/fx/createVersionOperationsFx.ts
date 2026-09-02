@@ -20,6 +20,7 @@ import type {
 	ProjectVersionRepositoryService,
 } from "~/project-version/type/ProjectVersion";
 import { createProjectVersionDiffFn } from "~/project-version/fn/createProjectVersionDiffFn";
+import { createProjectVersionCommitPreviewFn } from "~/project-version/fn/createProjectVersionCommitPreviewFn";
 import {
 	ProjectVersionBodySchema,
 	ProjectVersionSubjectSchema,
@@ -27,8 +28,9 @@ import {
 } from "~/project-version/schema/ProjectVersionMetadataSchema";
 import { createVersionReaderFx } from "./createVersionReaderFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
+import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
-import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
@@ -163,6 +165,40 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 	} = yield* createVersionReaderFx({
 		readStateFx,
 	});
+	const readCommitPreviewFx = Effect.fn("readProjectVersionCommitPreviewFx")(function* (
+		current: {
+			readonly contentFingerprint: string;
+			readonly state: ProjectState;
+		},
+		head: VersionHeadFileSchema.Type | undefined,
+	) {
+		const { state } = current;
+		if (head === undefined)
+			return createProjectVersionCommitPreviewFn({
+				baseArkpackVersion: state.project.version,
+				currentFingerprint: current.contentFingerprint,
+				currentScenarioNames: state.scenarios.map(({ name }) => name),
+			});
+		const base = yield* readDescriptorFx(state, head.current);
+		const from = {
+			type: "version" as const,
+			versionId: head.current,
+		};
+		const to = {
+			type: "current" as const,
+		};
+		return createProjectVersionCommitPreviewFn({
+			baseArkpackVersion: base.version,
+			currentFingerprint: current.contentFingerprint,
+			currentScenarioNames: state.scenarios.map(({ name }) => name),
+			diff: createProjectVersionDiffFn(
+				from,
+				to,
+				yield* readDiffSnapshotFx(state, from),
+				yield* readDiffSnapshotFx(state, to),
+			),
+		});
+	});
 
 	const listVersionsFx: ProjectVersionRepositoryService["listVersionsFx"] = (projectId) =>
 		operations.withPermits(1)(
@@ -232,6 +268,24 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			),
 		);
 
+	const previewVersionCommitFx: ProjectVersionRepositoryService["previewVersionCommitFx"] = (
+		projectId,
+	) =>
+		operations.withPermits(1)(
+			Effect.gen(function* () {
+				const current = yield* readCurrentSnapshotFx(projectId);
+				return yield* readCommitPreviewFx(current, yield* readHeadFx(current.state));
+			}).pipe(
+				Effect.mapError((cause) =>
+					errorFn(
+						"preview-version-commit",
+						`Version commit for project ${projectId} could not be previewed.`,
+						cause,
+					),
+				),
+			),
+		);
+
 	const createVersionFx: ProjectVersionRepositoryService["createVersionFx"] = ({
 		body: bodyCandidate,
 		expectedFingerprint,
@@ -291,17 +345,69 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 								),
 							);
 
+						const preview = yield* readCommitPreviewFx(current, head);
+						const nextScenarios =
+							preview.bump === "major" ? [] : current.state.scenarios;
+						const scenarioFiles = nextScenarios.map((scenario) =>
+							BoardScenarioFileSchema.parse({
+								name: scenario.name,
+								revision: scenario.projectRevision,
+								version: scenario.version,
+								save: Buffer.from(scenario.bytes).toString("base64"),
+								createdAtMs: scenario.createdAtMs,
+								updatedAtMs: scenario.updatedAtMs,
+							}),
+						);
+						const changesCurrentProject =
+							!preview.initial &&
+							(preview.bump !== "noop" || preview.scenariosToDelete.length > 0);
+						const updatedAtMs = changesCurrentProject
+							? Math.max(clockMs, current.state.project.updatedAtMs + 1)
+							: current.state.project.updatedAtMs;
+						const nextProject = cloneProjectFn({
+							...current.state.project,
+							version: preview.nextArkpackVersion,
+							updatedAtMs,
+							revision: changesCurrentProject
+								? updatedAtMs
+								: current.state.project.revision,
+						});
+						const finalPlan = yield* planVersionSnapshotFx({
+							arkpack: nextProject.version,
+							config: nextProject.config,
+							resources: nextProject.resources,
+							scenarios: scenarioFiles,
+						});
 						const versionId = `v-${createHash("sha256")
 							.update(
 								JSON.stringify({
 									parentVersionId: head?.current,
-									contentFingerprint: current.contentFingerprint,
+									contentFingerprint: finalPlan.contentFingerprint,
 									...metadata,
 								}),
 							)
 							.digest("hex")}`;
+						const existingVersion =
+							head !== undefined && head.versions.includes(versionId)
+								? yield* readPublishedVersionFx(current.state, versionId)
+								: undefined;
+						if (
+							existingVersion !== undefined &&
+							(!sameCommitFn(
+								existingVersion.descriptor,
+								metadata,
+								finalPlan.contentFingerprint,
+							) ||
+								existingVersion.descriptor.parentVersionId !== head?.current ||
+								existingVersion.descriptor.version !== nextProject.version)
+						)
+							return yield* Effect.fail(
+								new Error(
+									`Version ${versionId} conflicts with its immutable identity.`,
+								),
+							);
 						const latestCreatedAt =
-							head === undefined
+							head === undefined || existingVersion !== undefined
 								? undefined
 								: Math.max(
 										...(yield* Effect.forEach(head.versions, (id) =>
@@ -310,22 +416,24 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 											),
 										)),
 									);
-						const descriptor = VersionDescriptorFileSchema.parse({
-							...(head === undefined
-								? {}
-								: {
-										parentVersionId: head.current,
-									}),
-							...metadata,
-							arkini: ArkiniAppVersion,
-							version: current.state.project.version,
-							sourceRevision: current.state.project.revision,
-							contentFingerprint: current.contentFingerprint,
-							createdAtMs:
-								latestCreatedAt === undefined
-									? clockMs
-									: Math.max(clockMs, latestCreatedAt + 1),
-						});
+						const descriptor =
+							existingVersion?.descriptor ??
+							VersionDescriptorFileSchema.parse({
+								...(head === undefined
+									? {}
+									: {
+											parentVersionId: head.current,
+										}),
+								...metadata,
+								arkini: ArkiniAppVersion,
+								version: nextProject.version,
+								sourceRevision: nextProject.revision,
+								contentFingerprint: finalPlan.contentFingerprint,
+								createdAtMs:
+									latestCreatedAt === undefined
+										? clockMs
+										: Math.max(clockMs, latestCreatedAt + 1),
+							});
 						const nextHead = VersionHeadFileSchema.parse({
 							current: versionId,
 							versions: [
@@ -343,41 +451,86 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							current.state.paths.root,
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(current.state);
-								const snapshot = yield* providePlatformFx(
-									createVersionSnapshotFx({
-										arkpack: current.state.project.version,
-										config: current.state.project.config,
-										filesystemWrite,
-										resources: current.state.project.resources,
-										scenarios: current.state.scenarios,
-										paths: current.state.paths,
-									}),
-								);
-								if (snapshot.contentFingerprint !== current.contentFingerprint)
+								const snapshot =
+									existingVersion === undefined
+										? yield* providePlatformFx(
+												createVersionSnapshotFx({
+													arkpack: nextProject.version,
+													config: nextProject.config,
+													filesystemWrite,
+													resources: nextProject.resources,
+													scenarios: nextScenarios,
+													paths: current.state.paths,
+												}),
+											)
+										: yield* providePlatformFx(
+												readVersionSnapshotFx({
+													manifest: existingVersion.manifest,
+													root: current.state.paths.root,
+												}).pipe(
+													Effect.map((snapshot) => ({
+														...snapshot,
+														manifest: existingVersion.manifest,
+													})),
+												),
+											);
+								if (snapshot.contentFingerprint !== finalPlan.contentFingerprint)
 									return yield* Effect.fail(
 										new Error(
 											"The Editor version snapshot changed while it was prepared.",
 										),
 									);
-								const directory =
-									yield* current.state.paths.versionDirectoryFx(versionId);
-								yield* fileSystem.makeDirectory(directory, {
-									recursive: true,
-								});
-								yield* writeJsonFx(
-									current.state,
-									yield* current.state.paths.versionManifestFileFx(versionId),
-									snapshot.manifest,
-								);
-								yield* writeJsonFx(
-									current.state,
-									yield* current.state.paths.versionDescriptorFileFx(versionId),
-									descriptor,
-								);
-								yield* writeJsonFx(
-									current.state,
-									current.state.paths.versionHeadFile,
-									nextHead,
+								if (existingVersion === undefined) {
+									const directory =
+										yield* current.state.paths.versionDirectoryFx(versionId);
+									yield* fileSystem.makeDirectory(directory, {
+										recursive: true,
+									});
+									yield* writeJsonFx(
+										current.state,
+										yield* current.state.paths.versionManifestFileFx(versionId),
+										snapshot.manifest,
+									);
+									yield* writeJsonFx(
+										current.state,
+										yield* current.state.paths.versionDescriptorFileFx(
+											versionId,
+										),
+										descriptor,
+									);
+								}
+								yield* providePlatformFx(
+									writeProjectFilesFx({
+										root: current.state.paths.root,
+										previous: {
+											arkpack: current.state.project.version,
+											marker: GameProjectManifestSchema.parse({
+												arkini: ArkiniAppVersion,
+												revision: current.state.project.revision,
+											}),
+											config: current.state.project.config,
+											resources: current.state.project.resources,
+										},
+										next: {
+											arkpack: nextProject.version,
+											marker: GameProjectManifestSchema.parse({
+												arkini: ArkiniAppVersion,
+												revision: nextProject.revision,
+											}),
+											config: nextProject.config,
+											resources: nextProject.resources,
+										},
+										...(preview.bump === "major"
+											? {
+													previousScenarioNames:
+														current.state.scenarios.map(
+															({ name }) => name,
+														),
+													scenarios: scenarioFiles,
+												}
+											: {}),
+										versionHead: nextHead,
+									}),
 								);
 								return snapshot;
 							}),
@@ -389,6 +542,8 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						});
 						states.set(projectId, {
 							...current.state,
+							project: nextProject,
+							scenarios: nextScenarios,
 							versionHistory: {
 								head: nextHead,
 								versions,
@@ -434,7 +589,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						const snapshot = yield* providePlatformFx(
 							readVersionSnapshotFx({
 								manifest: version.manifest,
-								paths: current.state.paths,
+								root: current.state.paths.root,
 							}),
 						);
 						if (snapshot.contentFingerprint !== version.descriptor.contentFingerprint)
@@ -644,6 +799,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 		createVersionFx,
 		diffVersionsFx,
 		listVersionsFx,
+		previewVersionCommitFx,
 		readVersionStatusFx,
 		updateVersionTagFx,
 	} satisfies ProjectVersionRepositoryService;

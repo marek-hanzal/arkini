@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 export const JobQueueExceededIssueSchema = z
 	.object({
 		ownerItemId: IdSchema,

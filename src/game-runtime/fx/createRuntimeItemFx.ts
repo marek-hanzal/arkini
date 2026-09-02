@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";

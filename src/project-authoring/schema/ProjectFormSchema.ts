@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
-import { TitleSchema } from "~/game-config/schema/TitleSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { PositionSchema } from "~/item-location/schema/PositionSchema";
 import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";

@@ -126,6 +126,8 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		createVersionFx: (props) => provideFx(repository.createVersionFx(props)),
 		diffVersionsFx: (props) => provideFx(repository.diffVersionsFx(props)),
 		listVersionsFx: (projectId) => provideFx(repository.listVersionsFx(projectId)),
+		previewVersionCommitFx: (projectId) =>
+			provideFx(repository.previewVersionCommitFx(projectId)),
 		readVersionStatusFx: (projectId) => provideFx(repository.readVersionStatusFx(projectId)),
 		updateVersionTagFx: (props) => provideFx(repository.updateVersionTagFx(props)),
 		closeFx: provideFx(repository.closeFx),

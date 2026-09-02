@@ -22,6 +22,8 @@ import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
+import { createVersionReaderFx } from "./createVersionReaderFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 
 class EditorProjectBuildOperationError extends Data.TaggedError(
 	"EditorProjectBuildOperationError",
@@ -133,6 +135,30 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
+	const { readCurrentSnapshotFx, readHeadFx, readPublishedVersionFx } =
+		yield* createVersionReaderFx({
+			readStateFx,
+		});
+	const assertCommittedHeadFx = Effect.fn("assertProjectCommittedHeadFx")(function* (
+		state: ProjectState,
+	) {
+		const head = yield* readHeadFx(state);
+		if (head === undefined)
+			return yield* Effect.fail(
+				new EditorProjectBuildOperationError({
+					message: "Commit the initial project version before building.",
+				}),
+			);
+		const current = yield* readCurrentSnapshotFx(state.project.projectId);
+		const published = yield* readPublishedVersionFx(state, head.current);
+		if (published.descriptor.contentFingerprint !== current.contentFingerprint)
+			return yield* Effect.fail(
+				new EditorProjectBuildOperationError({
+					message: "Commit the saved project changes before building.",
+				}),
+			);
+		return published;
+	});
 
 	const buildProjectFx: EditorBuildRepositoryService["buildProjectFx"] = ({
 		expectedRevision,
@@ -142,11 +168,36 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.gen(function* () {
 				const state = yield* readStateFx(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
+				const publishedHead = yield* assertCommittedHeadFx(state);
 				const build = yield* providePlatformFx(
 					withProjectLockFx(
 						filesystemWrite,
 						state.paths.root,
 						Effect.gen(function* () {
+							const headSnapshot = yield* readVersionSnapshotFx({
+								manifest: publishedHead.manifest,
+								root: state.paths.root,
+							}).pipe(
+								Effect.filterOrFail(
+									(snapshot) =>
+										snapshot.contentFingerprint ===
+											publishedHead.descriptor.contentFingerprint &&
+										snapshot.arkpack === publishedHead.descriptor.version,
+									() => new Error("The published Version HEAD is inconsistent."),
+								),
+								Effect.mapError(
+									() =>
+										new EditorProjectBuildOperationError({
+											message: "The published Version HEAD is invalid.",
+										}),
+								),
+							);
+							if (headSnapshot.config.meta.id !== projectId)
+								return yield* Effect.fail(
+									new EditorProjectBuildOperationError({
+										message: "The published Version HEAD is invalid.",
+									}),
+								);
 							yield* ensureProjectGitignoreFx(state.paths);
 							const assertCurrentFx = readProjectFilesFx(state.paths.root).pipe(
 								Effect.mapError(projectChangedBeforeBuildFn),

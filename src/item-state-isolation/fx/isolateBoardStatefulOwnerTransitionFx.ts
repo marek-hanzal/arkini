@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { isolateGridStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx";

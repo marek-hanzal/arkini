@@ -1,7 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 /**
  * Creates one stable identity for a newly spawned runtime item.

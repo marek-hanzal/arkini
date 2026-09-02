@@ -62,6 +62,7 @@
 		"src/game-config-resource",
 		"src/game-config-source",
 		"src/game-config-validation",
+		"src/game-value",
 		"src/arkpack-catalog/type/ArkpackDescriptor.ts",
 		"src/arkpack-artifact",
 		"src/asset-authoring/fn",

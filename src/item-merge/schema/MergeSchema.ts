@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { SourceActionSchema } from "./SourceActionSchema";

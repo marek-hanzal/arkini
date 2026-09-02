@@ -8,7 +8,7 @@ import type {
 } from "~/flow/type/AcquisitionGraph";
 import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisitionAvailabilityRequirementsFn";
 import { readAcquisitionOutputOccurrencesFn } from "~/flow/fn/readAcquisitionOutputOccurrencesFn";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";

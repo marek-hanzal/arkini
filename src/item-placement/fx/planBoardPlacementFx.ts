@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 import { match } from "ts-pattern";
 
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { SizeSchema } from "~/item-location/schema/SizeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";

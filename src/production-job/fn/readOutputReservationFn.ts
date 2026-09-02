@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";

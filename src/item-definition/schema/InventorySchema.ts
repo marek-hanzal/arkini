@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 import { BaseSchema } from "./BaseSchema";

@@ -1,6 +1,6 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";

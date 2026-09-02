@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { outputFx } from "~/production-output/fx/outputFx";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";

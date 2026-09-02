@@ -142,6 +142,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectUpsertItem,
 	ArkiniElectronApi.channels.editorProjectUpsertResources,
 	ArkiniElectronApi.channels.editorVersionStatus,
+	ArkiniElectronApi.channels.editorVersionCommitPreview,
 	ArkiniElectronApi.channels.editorVersionList,
 	ArkiniElectronApi.channels.editorVersionDiff,
 	ArkiniElectronApi.channels.editorVersionCommit,
@@ -363,6 +364,14 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		});
 		await expect(
+			invoke(ArkiniElectronApi.channels.editorVersionCommitPreview, "project-one"),
+		).resolves.toMatchObject({
+			type: "success",
+			value: {
+				bump: "noop",
+			},
+		});
+		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionList, "project-one"),
 		).resolves.toEqual({
 			type: "success",
@@ -408,6 +417,7 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.deleteResourceFx).toHaveBeenCalledWith(deleteResourceRequest);
 		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
 		expect(repository.readVersionStatusFx).toHaveBeenCalledWith("project-one");
+		expect(repository.previewVersionCommitFx).toHaveBeenCalledWith("project-one");
 		expect(repository.listVersionsFx).toHaveBeenCalledWith("project-one");
 		expect(repository.diffVersionsFx).toHaveBeenCalledWith(versionDiffRequest);
 		expect(repository.createVersionFx).toHaveBeenCalledWith(versionCommitRequest);

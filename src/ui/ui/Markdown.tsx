@@ -42,7 +42,7 @@ export const Markdown = ({ children, components, ...props }: Markdown.Props) => 
 				hr: () => <hr className="border-line" />,
 				a: ({ children: link, href }) => (
 					<a
-						className="text-accent underline underline-offset-2"
+						className="text-accent no-underline underline-offset-2 hover:underline"
 						href={href}
 						rel="noopener noreferrer"
 						target="_blank"

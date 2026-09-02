@@ -1,6 +1,6 @@
 import { Effect, Random } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 
 /** Bump only when intentionally changing charge-depletion random compatibility. */

@@ -4,7 +4,7 @@ import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageL
 import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import { advanceDeliveriesRuntimeFx } from "~/production-delivery/fx/advanceDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
 import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineStartFx";

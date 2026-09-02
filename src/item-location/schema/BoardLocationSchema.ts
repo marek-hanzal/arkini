@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { PositionSchema } from "~/item-location/schema/PositionSchema";
 
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";

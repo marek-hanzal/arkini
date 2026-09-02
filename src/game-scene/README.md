@@ -1,6 +1,8 @@
 # Game Scene map
 
-Game Scene is Arkini's concrete retained Pixi executor. `src/tile-presentation` owns semantic actor projections, `src/tile-rendering` owns native actors and animation capabilities, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution against exact capabilities. The engine remains gameplay truth; React owns routes, pages, and menus, while `src/item-detail` owns Item Detail dialog composition. Start at `fx/createMainRuntimeFx.ts` for Board + Toolbar and `fx/createInventoryRuntimeFx.ts` for Inventory.
+Game Scene is Arkini's concrete retained Pixi executor. `src/tile-presentation` owns semantic actor projections, `src/tile-rendering` owns native actors and animation capabilities, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution.
+
+The engine remains gameplay truth. React owns routes, pages and menus; `src/item-detail` owns Item Detail dialog composition. Start at `fx/createMainRuntimeFx.ts` for Board + Toolbar and `fx/createInventoryRuntimeFx.ts` for Inventory.
 
 The root has only direct grammar layers: `ui/` for React canvas composition, `fx/` for lifecycle and retained mutation, `fn/` for shared explicit-input calculations, `service/` for readonly scene capabilities, and `type/` for cross-owner geometry values. No layer contains semantic filing subdirectories.
 
@@ -23,6 +25,15 @@ The root has only direct grammar layers: `ui/` for React canvas composition, `fx
 | Typed actor-channel writes | `src/tile-rendering/fx/createActorAnimatorFx.ts` |
 
 Main and Inventory actors are separate because display objects cannot cross canvases. Cross-canvas handoff carries consume-once origin geometry keyed by the releasing actor; the receiving scene still derives identity/outcome from committed engine facts.
+
+## Dependency shape
+
+- Game Scene executes Tile Presentation, Rendering, Motion, and Interaction behavior to compose concrete retained scenes.
+- Tile Motion imports only Game Scene capability and geometry types (`MainSurface`, `ActorPose`); it does not execute scene behavior.
+- Tile Interaction imports only Game Scene surface/actor-store types; Game Scene executes its drag and command controllers.
+- `game-shell → game-scene` composes the public Board/Inventory surfaces. The reverse `game-scene → game-shell` edge is real UI behavior for the shared Inventory shortcut policy, not a type-only edge. Keep it visible when changing that policy instead of claiming a clean top-level DAG.
+
+The concrete module graph remains acyclic. These edge labels describe why the top-level domains are mutually reachable without pretending every reverse type contract is runtime behavior.
 
 ## Flows
 
@@ -64,4 +75,25 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Magnetic response | `src/tile-motion` |
 | Frame/interpolation | `src/tile-rendering` |
 
-Focused semantic projection tests live under `test/tile-presentation`; native actor and animation capability tests live under `test/tile-rendering`; playback policy and lifecycle tests live under `test/tile-motion`; gesture and drop-execution tests live under `test/tile-interaction`; concrete scene regression proofs mirror this owner under `test/game-scene/{fn,fx,ui}`.
+Focused proofs follow the exact owner:
+
+- Semantic projection: `test/tile-presentation`.
+- Native actors and animation capabilities: `test/tile-rendering`.
+- Playback policy and lifecycle: `test/tile-motion`.
+- Gestures and drop execution: `test/tile-interaction`.
+- Concrete scene behavior: `test/game-scene/{fn,fx,ui}`.
+
+## Changing this island?
+
+Likely affected:
+
+- Game Shell composition and route-owned teardown.
+- Tile actor projection, native rendering, motion, or interaction at the exact changed capability.
+- Item Interaction and production commands only when command admission or committed projection changes.
+- Focused tests under the changed `test/game-scene`, `test/tile-*`, or Game Shell owner.
+
+Usually not affected:
+
+- Runtime, Tick, persistence, or production decisions for presentation-only work.
+- Config authoring, Editor project persistence, Versions, Flow, or Estimate.
+- Electron security and IPC unless native window or route lifecycle changes.

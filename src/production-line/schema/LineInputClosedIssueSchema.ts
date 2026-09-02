@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 /** One zero-capacity input retains buffered items while its line has an active job. */
 export const LineInputClosedIssueSchema = z

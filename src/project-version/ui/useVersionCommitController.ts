@@ -3,10 +3,10 @@ import { Effect } from "effect";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
-import { readProjectVersionHistoryFx } from "~/project-version/fx/readProjectVersionHistoryFx";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { ProjectVersionStatus } from "~/project-version/type/ProjectVersion";
+import type { ProjectVersionCommitPreview } from "~/project-version/type/ProjectVersion";
+import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 
 const messageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -17,11 +17,11 @@ export namespace useVersionCommitController {
 		readonly commitFn: () => void;
 		readonly error?: string;
 		readonly pending: boolean;
+		readonly preview?: ProjectVersionCommitPreview;
 		readonly projectId: string;
 		readonly setBodyFn: (value: string) => void;
 		readonly setSubjectFn: (value: string) => void;
 		readonly setTagFn: (value: string) => void;
-		readonly status?: ProjectVersionStatus;
 		readonly subject: string;
 		readonly tag: string;
 	}
@@ -36,15 +36,21 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 	const [body, setBodyFn] = useState("");
 	const [error, setErrorFn] = useState<string>();
 	const [pending, setPendingFn] = useState(false);
-	const [status, setStatusFn] = useState<ProjectVersionStatus>();
+	const [preview, setPreviewFn] = useState<ProjectVersionCommitPreview>();
 	const [subject, setSubjectFn] = useState("");
 	const [tag, setTagFn] = useState("");
 
-	const loadStatusFn = useCallback(() => {
+	const loadPreviewFn = useCallback(() => {
 		let mounted = true;
-		void RendererRuntime.runPromise(readProjectVersionHistoryFx(project.projectId))
-			.then((history) => {
-				if (mounted) setStatusFn(history.status);
+		void RendererRuntime.runPromise(
+			Effect.gen(function* () {
+				const repository = yield* ProjectRepository;
+				yield* repository.awaitIdleFx;
+				return yield* repository.previewVersionCommitFx(project.projectId);
+			}),
+		)
+			.then((nextPreview) => {
+				if (mounted) setPreviewFn(nextPreview);
 			})
 			.catch((cause) => {
 				if (mounted) setErrorFn(messageFn(cause));
@@ -56,36 +62,37 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 		project.projectId,
 	]);
 	useEffect(() => {
-		let disposeLoadFn = loadStatusFn();
+		let disposeLoadFn = loadPreviewFn();
 		const unsubscribeFn = window.arkini.editor.onProjectChangedFn((projectId) => {
 			if (projectId !== project.projectId) return;
 			disposeLoadFn();
-			disposeLoadFn = loadStatusFn();
+			disposeLoadFn = loadPreviewFn();
 		});
 		return () => {
 			disposeLoadFn();
 			unsubscribeFn();
 		};
 	}, [
-		loadStatusFn,
+		loadPreviewFn,
 		project.projectId,
 	]);
 
 	const canCommit =
-		status?.canCommit === true && subject.trim().length > 0 && subject.trim().length <= 120;
+		preview?.canCommit === true && subject.trim().length > 0 && subject.trim().length <= 120;
 	const commitFn = () => {
-		if (!canCommit || status === undefined || pending) return;
+		if (!canCommit || preview === undefined || pending) return;
 		setPendingFn(true);
 		setErrorFn(undefined);
 		void RendererRuntime.runPromise(
-			Effect.flatMap(ProjectRepository, (repository) =>
-				repository.createVersionFx({
+			Effect.gen(function* () {
+				const repository = yield* ProjectRepository;
+				yield* repository.createVersionFx({
 					...(body.trim() === ""
 						? {}
 						: {
 								body,
 							}),
-					expectedFingerprint: status.currentFingerprint,
+					expectedFingerprint: preview.currentFingerprint,
 					projectId: project.projectId,
 					subject,
 					...(tag.trim() === ""
@@ -93,8 +100,13 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 						: {
 								tag,
 							}),
-				}),
-			),
+				});
+				const fresh = yield* repository.readProjectFx(project.projectId);
+				if (fresh === null) return yield* Effect.die("Committed project disappeared.");
+				yield* publishEditorProjectFx(project.projectId, {
+					project: fresh,
+				});
+			}),
 		)
 			.then(async () => {
 				if (
@@ -127,15 +139,15 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 					error,
 				}),
 		pending,
+		...(preview === undefined
+			? {}
+			: {
+					preview,
+				}),
 		projectId: project.projectId,
 		setBodyFn,
 		setSubjectFn,
 		setTagFn,
-		...(status === undefined
-			? {}
-			: {
-					status,
-				}),
 		subject,
 		tag,
 	};

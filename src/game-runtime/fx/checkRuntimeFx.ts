@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { isItemPureWithIndexFn } from "~/game-runtime/fn/isItemPureWithIndexFn";

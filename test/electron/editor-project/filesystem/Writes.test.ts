@@ -60,14 +60,13 @@ describe("filesystem Editor project writes", () => {
 			].sort(),
 		).toEqual(
 			[
-				join(root, "game.json"),
 				join(root, "items", "simple", `${water.uid}.json`),
 				join(root, "project.json"),
 			].sort(),
 		);
 	});
 
-	it("pins config, item, and resource writes to the canonical revision and bumps compatibility", async () => {
+	it("pins config, item, and resource writes while preserving the committed version", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository);
 		const compatible = await Effect.runPromise(
@@ -84,7 +83,7 @@ describe("filesystem Editor project writes", () => {
 				},
 			}),
 		);
-		expect(compatible.version).toBe("1.1");
+		expect(compatible.version).toBe("1.0");
 		expect(compatible.config.$schema).toBe(GameProjectGameSchemaReference);
 
 		const water = editorTestPayload.config.items.water;
@@ -98,7 +97,7 @@ describe("filesystem Editor project writes", () => {
 				},
 			}),
 		);
-		expect(itemCommit.version).toBe("1.2");
+		expect(itemCommit.version).toBe("1.0");
 		await expect(
 			Effect.runPromise(
 				repository.upsertItemFx({
@@ -126,7 +125,7 @@ describe("filesystem Editor project writes", () => {
 			}),
 		);
 		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual(resource);
-		expect(resourceCommit.version).toBe("1.3");
+		expect(resourceCommit.version).toBe("1.0");
 		await expect(
 			Effect.runPromise(
 				repository.saveResourceFx({

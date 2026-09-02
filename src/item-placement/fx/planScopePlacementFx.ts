@@ -1,6 +1,6 @@
 import { Array, Effect, Order } from "effect";
 
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";

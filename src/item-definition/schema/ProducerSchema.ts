@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { LineSchema } from "~/production-line/schema/LineSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";

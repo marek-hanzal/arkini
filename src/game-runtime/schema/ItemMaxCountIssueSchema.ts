@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /**
  * Live quantity plus active worst-case job output exceeds one canonical maxCount.

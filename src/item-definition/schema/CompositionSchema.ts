@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** One or two visual asset layers in authoritative back-to-front order. */
 export const CompositionSchema = z

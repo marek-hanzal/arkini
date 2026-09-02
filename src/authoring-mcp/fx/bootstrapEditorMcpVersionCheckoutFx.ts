@@ -4,7 +4,7 @@ import { z } from "zod";
 import { checkoutProjectVersionFx } from "~/project-version/fx/checkoutProjectVersionFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 const requestSchema = z
 	.object({

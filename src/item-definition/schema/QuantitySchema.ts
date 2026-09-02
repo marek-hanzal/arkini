@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /**
  * Inclusive positive bounds resolved by one input, output, or weighted roll.

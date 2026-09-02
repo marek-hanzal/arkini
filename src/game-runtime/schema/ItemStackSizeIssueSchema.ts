@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /** One live stack exceeds the limit allowed by its current runtime state. */
 export const ItemStackSizeIssueSchema = z

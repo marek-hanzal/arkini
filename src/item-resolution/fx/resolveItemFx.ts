@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 

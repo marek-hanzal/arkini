@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BoardScenarioNameSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { VersionObjectHashSchema } from "./VersionObjectHashSchema";
 

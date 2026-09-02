@@ -13,107 +13,27 @@ Read the smallest entry point needed for the task:
 | Task | Start at |
 | --- | --- |
 | Agent behavior, tests, review | [`AGENTS.md`](AGENTS.md) |
-| Runtime, process, UI, Editor, persistence ownership | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
+| Cross-cutting process, Runtime, UI, persistence and security invariants | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
+| Find a domain, public entrypoint or dense local map | [`DOMAIN_ATLAS.md`](DOMAIN_ATLAS.md) |
 | Implemented gameplay semantics | [`GAME.MD`](GAME.MD) |
 | Project layout, authoring, compiler, validation | [`CONFIG.md`](CONFIG.md) |
 | Compatibility, external formats, Arkpack provenance | [`VERSION.md`](VERSION.md) |
-| Retained gameplay scene navigation | [`src/game-scene/README.md`](src/game-scene/README.md) |
 
 ## Repository map
 
-```text
-src/game-runtime  canonical live Runtime schemas, Item purity/stateful rejection, cheat state, validation, identity, reads and atomic publication
-src/game-session  package-independent Runtime/Tick/save execution, subscriptions, fail-stop and disposal lifecycle
-src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
-src/installed-game  Arkpack/save bootstrap, diagnostics and latest incident capture, package leases, finalization, recovery and last successful package preference
-src/game-incident  fixed composed diagnostic models, semantic transition projection and human/LLM text rendering
-src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
-src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
-src/application-version  Arkini writer provenance, major-only admission and incompatibility failure
-src/game-version  project-owned gameplay compatibility schema and major projection
-src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
-src/game-tick  fixed-step budgeting, replay, delivery/job/temporary orchestration and scoped loop
-src/temporary-item  temporary lifetime advancement, expiry admission and atomic expiry output
-src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
-src/item-query  authored Item query schemas and canonical Runtime execution across scope, reach and distance
-src/item-resolution  canonical configured Item lookup and exact not-found rejection
-src/item-revision  opaque live Item revisions, fresh creation and stale-write rejection
-src/item-state-isolation  atomic stateful-owner stack isolation and pure-remainder placement
-src/arkini-cli  product CLI commands, failed-session replay and diagnostic slicing, process composition and its one Node runtime root
-src/game-start  initial-state schemas, exact placement planning and atomic runtime start
-src/game-event  committed gameplay event schemas and exact downstream event projection
-src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections
-src/item-line-detail  line-detail reads, board/stored projections, input/output facts, autofill and Item Lines presentation
-src/item-detail  Item Detail dialog composition, remaining projections and Queue/Sources/Info presentation
-src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
-src/game-scene  concrete Board, Toolbar and Inventory Pixi scene composition, reconciliation and delivery presentation
-src/tile-presentation  semantic tile actors, feedback, replacements and committed motion projection
-src/tile-rendering  Pixi application/frame/texture lifecycle, native actors, visuals and animation capabilities
-src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
-src/tile-interaction  pointer gestures, drag/drop execution, gameplay command admission and cancellation
-src/item-definition  immutable authored Item schemas, selector vocabulary and total selection policy
-src/item-location  grid coordinates, distance, runtime locations, claims and Board/grid location rejections
-src/item-placement  scope-aware stack, spawn, output and existing-item placement
-src/item-merge  directional merge contracts, admission and atomic source/target lifecycle
-src/space-action  authored Space items and atomic activation/navigation
-src/production-action  immediate action admission, rules, remaining-charge reads and settlement
-src/production-condition  authored runtime condition evaluation
-src/production-input  line-input schemas, material planning and storage lifecycle
-src/production-line  production-line definitions, rules, reads and run planning
-src/production-authoring  controlled authored Line, Input, Rule and Output UI
-src/production-output  output, drop and roll schemas, resolution policy and generic output presentation
-src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
-src/production-delivery  outbound input delivery allocation, travel advancement, validation and settlement
-src/game-value  foundational immutable identity, text, quantity and time schemas
-src/game-config  completed Game Config aggregate, explicit non-item resource roles and loaded-config capability
-src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
-src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation projection and typed validation failure
-src/game-config-resource  embedded resource schemas, bounded PNG admission, references, source discovery, usage and rename semantics
-src/game-config-source  portable source layout, schemas, generated JSON Schema, discovery, parsing and project admission
-src/game-config-validation  completed-config semantic validation and provenance-aware diagnostics
-src/arkpack-admission  bounded package decoding and canonical semantic admission
-src/arkpack-artifact  package bytes, envelopes, compression, signing and provenance
-src/arkpack-catalog  renderer catalog state, storage capability and mutation lifecycle
-src/arkpack-selector  package catalog controls and selector presentation
-src/editor-build  Build contract, command Atoms, renderer admission and presentation
-src/project-authoring  portable Project model, ProjectOperationError, ProjectRepository, configuration and catalog workflows
-src/board-scenario  portable BoardScenario contracts and revision-pinned EditorBoardGame session lifecycle and controls
-src/project-version  immutable ProjectVersion graph, ProjectCompatibility policies and checkout workspace
-src/project-note  ordered Note and portable NoteFile contracts and workspace
-src/authoring-mcp  renderer-side MCP status, settings and checkout presentation
-src/authoring-session  mounted project publication, refresh, replacement, resource URLs and unsaved-change authority
-src/authoring-shell  cross-product Editor shell and navigation composition
-src/asset-authoring  Asset catalog, validation, import/edit/delete sessions and product presentation
-src/item-authoring  authored Item value policy, repository/session Effects and product UI
-src/flow      canonical authored acquisition graph and origin projection
-src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
-src/flow-canvas  global Flow projection, painter policy and product UI
-src/estimate  demand grouping, witness and projection vocabulary, bounded Estimate analysis, cache and worker
-src/launcher  renderer-session hydration, Hero lifecycle, shell/action surfaces and About motion
-src/game-presentation  mounted-Game React context, selectors, events, command settlement and failures
-src/game-shell  Board, Inventory, playable Game resources and overlay composition
-src/game-menu  Game Menu lifecycle, save/close commands and navigation intent
-src/game-audio  committed-event cue projection and playable-surface-scoped Web Audio lifecycle
-src/game-cheat  save-scoped Cheat commands, catalog, controls and item-spawn spotlight
-src/application-diagnostics  shared application failure extraction, visibly bounded human formatting and renderer transport policy
-src/application-runtime  renderer process capability root, Atom bridge and native lifecycle
-src/application-settings  Appearance, Cheat availability and application Settings state, commands and presentation
-src/application-shell  renderer root context, fatal surface and shared route transition/navigation behavior
-src/renderer-bootstrap  terminal ordered renderer startup and React root composition
-src/window-mode  native window-mode state, persistence and Electron-confirmed synchronization
-src/chatgpt-asset-authoring  ChatGPT surface lifecycle and confirmed Editor Asset insertion
-src/authoring-form  shared Editor form registry and canonical authored Item- and Asset-reference controls
-src/editor-control  shared Editor field, form-section and value controls
-src/translation  exact-key text catalog, plain and React translation APIs, and Markdown text presentation
-src/ui        cross-product presentation primitives only
-src/@routes   TanStack Router registration, lifecycle and route-specific composition
-electron      pure transport contract plus main/preload/platform ownership
-shared        immutable cross-process application metadata and hard limits only
-game/arkini   official portable game project
-test          focused behavioral feedback
-```
+| Zone | Owns | Navigate from |
+| --- | --- | --- |
+| Gameplay state and execution | Runtime, Item/space commands, Tick, save and live Game lifecycle | [`src/game-runtime/README.md`](src/game-runtime/README.md) |
+| Production | Conditions, actions, inputs, lines, jobs, delivery and output | [`src/production-line/README.md`](src/production-line/README.md) |
+| Retained gameplay presentation | Tile projection/rendering/motion/interaction and concrete scenes | [`src/game-scene/README.md`](src/game-scene/README.md) |
+| Authored source | Foundational values, completed Config, source files, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
+| Artifacts and compatibility | Arkpack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |
+| Editor persistence | Portable repository, renderer project session, IPC, Scenarios, Notes and Build | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
+| Versions | Immutable project snapshots, compatibility diff and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
+| Flow and Estimate | Authored acquisition graph, layout, Canvas and static optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
+| Application and platform | Launcher, renderer runtime/shell/settings, routes and Electron | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 
-The semantic dependency map and process/runtime ownership live in [`ARCHITECTURE.md`](ARCHITECTURE.md). [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) enforces only stable graph-wide directions stated directly by its named rules; it never catalogs exact current consumers. Directory grammar identifies the code layer, while the architecture contract identifies the semantic owner.
+For an exact domain role and first public entrypoint, search [`DOMAIN_ATLAS.md`](DOMAIN_ATLAS.md). Directory grammar identifies the code layer; source imports and Dependency Cruiser identify the concrete graph; the owning contract identifies meaning.
 
 ## Setup and commands
 
@@ -141,10 +61,18 @@ argc dev-control
 argc mcp-inspect
 ```
 
-`argc translations:sync` discovers every `src/translation/*.yaml` locale catalog, extracts configured literal keys, adds missing entries, removes dead static entries, preserves explicitly dynamic entries, and sorts each catalog. `argc translations:check` performs the same reconciliation without writing and fails when any authored catalog has drifted. The renderer bundles those YAML catalogs directly, negotiates one against Electron's preferred system languages, and falls back to the `en` source catalog; there is no generated translation copy or runtime download. `argc dc` is the read-only dependency-topology gate over every active module root and standalone TypeScript config. `argc check` runs formatting and translation drift checks, all TypeScript configurations, a production Electron build plus Community Arkpack packing and verification, that dependency gate, copy/paste detection, and the permanent Vitest suite. `argc platform-check` is the narrower hosted macOS/Windows portability gate: it runs that production build and the real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; `platform-check` does not replace the complete closing gate.
+`argc translations:sync` reconciles every `src/translation/*.yaml` catalog. It extracts configured literal keys, adds missing entries, removes dead static entries, preserves explicit dynamic entries, and sorts the result. `argc translations:check` performs the same work without writing and fails on drift. The renderer bundles those catalogs, negotiates against Electron's preferred languages, and falls back to `en`; there is no generated copy or runtime download.
+
+`argc dc` checks dependency topology across every active module root and standalone TypeScript config. `argc check` runs formatting and translation drift, all TypeScript configurations, a production Electron build, Community Arkpack packing and verification, dependency checks, copy/paste detection, and the permanent Vitest suite.
+
+`argc platform-check` is the narrower hosted macOS/Windows portability gate. It runs the production build plus real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; this does not replace the complete closing gate.
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 
 ## Distribution
 
-`argc preview-macos` launches an unpacked local arm64 app. The native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset. Working branches run the complete repository gate on hosted Linux and the focused platform boundary gate on macOS and Windows; every platform builds and explicitly verifies a Community Arkpack. `main` deliberately runs nothing. Prerelease tags repeat the same gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release. Every tag build creates the official game Arkpack once, embeds a keyless Sigstore proof for the configured distribution channel, and reuses those exact self-contained `.arkpack` bytes in every native package and standalone release artifact. Local and Editor packs are Community. Official and Community are both playable; [`VERSION.md`](VERSION.md) owns the exact soft-provenance contract.
+`argc preview-macos` launches an unpacked local arm64 app. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.
+
+Working branches run the complete repository gate on hosted Linux and the focused platform gate on macOS and Windows; every platform builds and verifies a Community Arkpack. `main` deliberately runs nothing. Prerelease tags repeat those gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release.
+
+Every tag build creates the official Arkpack once, embeds a keyless Sigstore proof for the configured distribution channel, and reuses the exact self-contained bytes in every native package and standalone release artifact. Local and Editor packs are Community. Both states are playable; [`VERSION.md`](VERSION.md) owns soft provenance.

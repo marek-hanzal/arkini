@@ -2,7 +2,7 @@ import { Play, Sparkles, Trash2 } from "lucide-react";
 import { match } from "ts-pattern";
 
 import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
-import { DangerButton, PrimaryButtonLink } from "~/ui/ui/Button";
+import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 interface ArkpackCatalogListProps {
@@ -80,17 +80,17 @@ export const ArkpackCatalogList = ({
 									{arkpack.filename ?? `${arkpack.packageId} · ${arkpack.arkini}`}
 								</p>
 							</div>
-							<div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
+							<div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-3 sm:shrink-0">
 								{arkpack.source === "user" ? (
-									<DangerButton
-										className="min-h-0 px-3 py-2 text-xs shadow-none"
+									<LinkButton
+										className="inline-flex items-center gap-1.5 text-xs"
 										cursorIntent={blocked ? "progress" : undefined}
 										disabled={blocked}
 										onClick={() => onRemoveFn(arkpack.packageId)}
 									>
-										<Trash2 className="mr-1.5 size-4" />
-										{arkpack.overridesBundled ? "Remove override" : "Remove"}
-									</DangerButton>
+										<Trash2 className="size-4" />
+										Remove
+									</LinkButton>
 								) : null}
 								<LinkButton
 									className="inline-flex items-center gap-1.5 text-xs"

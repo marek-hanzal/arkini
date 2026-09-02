@@ -16,17 +16,16 @@ const requiresFactAsConditionFn = (requirements: ItemOriginOutputRequirements, f
 			),
 	);
 
-/** Reads distinct outputs whose authored operation directly inputs or positively requires one fact. */
+/** Reads distinct authored operation owners that directly input or positively require one fact. */
 export const readRequiredByFactIdsFn = (graph: AcquisitionGraph, factId: string) => {
 	const requiredBy = new Set<string>();
 	for (const source of readItemOriginSourcesFn(graph)) {
 		const directInput = source.inputs.some((input) => input.itemId === factId);
-		for (const output of source.outputs)
-			if (
-				output.itemId !== factId &&
-				(directInput || requiresFactAsConditionFn(output.requirements, factId))
-			)
-				requiredBy.add(output.itemId);
+		const requiredAsCondition = source.outputs.some((output) =>
+			requiresFactAsConditionFn(output.requirements, factId),
+		);
+		if (source.ownerItemId !== factId && (directInput || requiredAsCondition))
+			requiredBy.add(source.ownerItemId);
 	}
 	return [
 		...requiredBy,

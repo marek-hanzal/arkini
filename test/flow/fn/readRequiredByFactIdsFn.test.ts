@@ -79,14 +79,17 @@ const routeFn = ({
 });
 
 describe("required-by acquisition facts", () => {
-	it("returns operation outputs that directly input or positively require the fact", () => {
+	it("returns authored owners rather than outputs for direct inputs and conditions", () => {
 		const graph: AcquisitionGraph = {
 			factIds: [
 				"academy",
+				"bakery",
 				"blueprint-a",
 				"blueprint-z",
+				"bread",
+				"condition-owner",
 				"condition-output",
-				"material",
+				"morale",
 				"output-a",
 				"output-z",
 			],
@@ -96,7 +99,7 @@ describe("required-by acquisition facts", () => {
 				routeFn({
 					id: "route-z",
 					inputFactIds: [
-						"material",
+						"morale",
 					],
 					ownerItemId: "blueprint-z",
 					outputFactId: "output-z",
@@ -104,7 +107,7 @@ describe("required-by acquisition facts", () => {
 				routeFn({
 					id: "route-a",
 					inputFactIds: [
-						"material",
+						"morale",
 					],
 					ownerItemId: "blueprint-a",
 					outputFactId: "output-a",
@@ -112,38 +115,46 @@ describe("required-by acquisition facts", () => {
 				routeFn({
 					id: "route-a-duplicate",
 					inputFactIds: [
-						"material",
+						"morale",
 					],
 					ownerItemId: "blueprint-a",
 					outputFactId: "output-a",
 				}),
 				routeFn({
+					id: "bakery-bread",
+					inputFactIds: [
+						"morale",
+					],
+					ownerItemId: "bakery",
+					outputFactId: "bread",
+				}),
+				routeFn({
 					id: "condition",
 					lineConditionFactIds: [
-						"material",
+						"morale",
 					],
 					ownerItemId: "condition-owner",
 					outputFactId: "condition-output",
 				}),
 				routeFn({
 					id: "owner-only",
-					ownerItemId: "material",
+					ownerItemId: "morale",
 					outputFactId: "blueprint-a",
 				}),
 			],
 		};
 
-		expect(readRequiredByFactIdsFn(graph, "material")).toEqual([
-			"condition-output",
-			"output-a",
-			"output-z",
+		expect(readRequiredByFactIdsFn(graph, "morale")).toEqual([
+			"bakery",
+			"blueprint-a",
+			"blueprint-z",
+			"condition-owner",
 		]);
 	});
 
-	it("does not report an operation output as requiring itself", () => {
+	it("does not report the authored owner as requiring itself", () => {
 		const graph: AcquisitionGraph = {
 			factIds: [
-				"guild",
 				"topaz",
 			],
 			limitations: [],
@@ -154,7 +165,7 @@ describe("required-by acquisition facts", () => {
 					inputFactIds: [
 						"topaz",
 					],
-					ownerItemId: "guild",
+					ownerItemId: "topaz",
 					outputFactId: "topaz",
 				}),
 			],

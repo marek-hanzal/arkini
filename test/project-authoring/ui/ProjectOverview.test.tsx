@@ -4,10 +4,12 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
+
 const state = vi.hoisted(() => ({
 	estimate: {
 		maximumDemand: 0,
-		rows: [],
+		rows: [] as ItemEstimateIndexRow[],
 		status: "loading" as "loading" | "ready",
 	},
 	versionStatus: {
@@ -101,32 +103,65 @@ describe("ProjectOverview", () => {
 			container.querySelectorAll<HTMLAnchorElement>('[data-ui="EditorProjectOverviewLink"]'),
 		);
 		expect(links.map((link) => link.dataset.overviewId)).toEqual([
+			"arkpack-version",
 			"versions-commit",
 			"versions-history",
 			"versions",
-			"arkpack-version",
+			"items-type-simple",
 			"items",
-			"unreachable-items",
 			"assets",
 		]);
 		expect(links.map((link) => link.dataset.to)).toEqual([
+			"/editor/$projectId/build",
 			"/editor/$projectId/versions/commit",
 			"/editor/$projectId/versions/history",
 			"/editor/$projectId/versions/commit",
-			"/editor/$projectId/build",
 			"/editor/$projectId/editor/items/list",
-			"/editor/$projectId/estimate",
+			"/editor/$projectId/editor/items/list",
 			"/editor/$projectId/assets",
 		]);
 		for (const link of links)
 			expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
 				projectId: project.projectId,
 			});
-		expect(JSON.parse(links[5]?.dataset.search ?? "null")).toEqual({
-			view: "incomplete",
+		expect(JSON.parse(links[4]?.dataset.search ?? "null")).toEqual({
+			itemType: "simple",
 		});
 		expect(container.textContent).toContain("Calculating…");
 		expect(container.querySelector(".animate-spin")).not.toBeNull();
+		expect(container.querySelector('[data-overview-id="unreachable-items"]')).toBeNull();
+	});
+
+	it("links an actual unreachable count to the incomplete Estimate view", async () => {
+		state.estimate = {
+			maximumDemand: 0,
+			rows: [
+				{
+					estimate: {
+						demand: 0,
+						itemId: editorTestPayload.config.items.water.id,
+						method: "static",
+						status: "unreachable",
+					},
+					item: editorTestPayload.config.items.water,
+				},
+			],
+			status: "ready",
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => root.render(<ProjectOverview project={project} />));
+
+		const link = container.querySelector<HTMLAnchorElement>(
+			'[data-overview-id="unreachable-items"]',
+		);
+		expect(link?.dataset.to).toBe("/editor/$projectId/estimate");
+		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
+			view: "incomplete",
+		});
 	});
 
 	it("keeps Commit unavailable when the working copy has no changes", async () => {

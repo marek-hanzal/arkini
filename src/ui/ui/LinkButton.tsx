@@ -25,7 +25,7 @@ interface LinkButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const LinkButtonClassName =
-	"inline border-0 bg-transparent p-0 font-medium text-accent underline decoration-accent/55 underline-offset-2 transition-colors hover:text-accent-hover disabled:text-muted disabled:no-underline";
+	"inline border-0 bg-transparent p-0 font-medium text-accent no-underline decoration-accent/55 underline-offset-2 transition-colors hover:text-accent-hover hover:underline disabled:text-muted disabled:hover:no-underline";
 
 /** Renders a native button with the canonical inline-link affordance. */
 export const LinkButton = forwardRef<HTMLButtonElement, LinkButtonProps>(

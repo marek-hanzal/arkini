@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 import { DropRuleSchema } from "./DropRuleSchema";

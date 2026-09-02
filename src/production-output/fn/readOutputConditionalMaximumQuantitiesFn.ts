@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { OutputSchema } from "../schema/OutputSchema";

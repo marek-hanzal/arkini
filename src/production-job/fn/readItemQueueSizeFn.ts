@@ -1,6 +1,6 @@
 import { match, P } from "ts-pattern";
 
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 

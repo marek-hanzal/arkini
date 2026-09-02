@@ -1,5 +1,5 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { TimeSchema } from "~/game-config/schema/TimeSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { TimeSchema } from "~/game-value/schema/TimeSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { lineRuleFx } from "~/production-line/fx/lineRuleFx";
 

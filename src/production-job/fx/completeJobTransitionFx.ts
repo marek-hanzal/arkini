@@ -1,6 +1,6 @@
 import { Array, Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobCompletionOwner } from "~/production-job/type/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/production-job/fx/completeLineJobRuntimeFx";

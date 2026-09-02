@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";

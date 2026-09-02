@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** The single publication pointer to the currently checked-out version. */
 export const VersionHeadFileSchema = z

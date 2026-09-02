@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
-import { DescriptionSchema } from "~/game-config/schema/DescriptionSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
-import { TitleSchema } from "~/game-config/schema/TitleSchema";
+import { DescriptionSchema } from "~/game-value/schema/DescriptionSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { AssetSchema } from "./AssetSchema";
 import { ChargeSchema } from "./ChargeSchema";

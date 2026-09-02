@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** One runtime item cannot be removed while it still owns active or queued work. */
 export class JobOwnerBusyError extends Data.TaggedError("JobOwnerBusyError")<{

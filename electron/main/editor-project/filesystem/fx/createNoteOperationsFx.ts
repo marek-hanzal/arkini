@@ -7,7 +7,7 @@ import type { ProjectRepositoryService } from "~/project-authoring/service/Proje
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
 import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { withProjectLockFx } from "./withProjectLockFx";

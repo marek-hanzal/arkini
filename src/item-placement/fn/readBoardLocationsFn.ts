@@ -1,6 +1,6 @@
 import type { SizeSchema } from "~/item-location/schema/SizeSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 interface ReadBoardLocationsProps {

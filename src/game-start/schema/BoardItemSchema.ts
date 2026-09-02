@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositionSchema } from "~/item-location/schema/PositionSchema";
 
 /** Defines one item instance at an explicit cell in the initial board layout. */

@@ -1,7 +1,7 @@
 import { Equal } from "effect";
 import { type ComponentProps, useCallback } from "react";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readItemDetailTabsFn } from "~/item-detail-read/fn/readItemDetailTabsFn";
 import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";

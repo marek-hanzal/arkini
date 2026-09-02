@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { CheatItemNotSpawnableError } from "~/game-cheat/error/CheatItemNotSpawnableError";
 import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledError";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";

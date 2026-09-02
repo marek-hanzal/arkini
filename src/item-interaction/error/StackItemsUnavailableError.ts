@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 /** A requested stack could not be resolved against the current runtime snapshot. */
 export class StackItemsUnavailableError extends Data.TaggedError("StackItemsUnavailableError")<{

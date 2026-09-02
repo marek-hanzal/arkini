@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/production-input/fx/readInputRunItemFx";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";

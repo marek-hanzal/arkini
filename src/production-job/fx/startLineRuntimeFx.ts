@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
-import type { TimeSchema } from "~/game-config/schema/TimeSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import type { TimeSchema } from "~/game-value/schema/TimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";

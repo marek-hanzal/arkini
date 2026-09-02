@@ -10,6 +10,7 @@ const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
 const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
+const gameValuePattern = "^src/game-value(?:/|$)";
 const itemRevisionPattern = "^src/item-revision(?:/|$)";
 const rendererBootstrapPattern = "^src/renderer-bootstrap(?:/|$)";
 
@@ -160,6 +161,21 @@ module.exports = {
 			},
 		},
 		{
+			name: "game-value-stays-foundational",
+			comment:
+				"Game Value owns immutable scalar schemas without importing aggregate, runtime, authoring, or platform owners.",
+			severity: "error",
+			from: {
+				path: gameValuePattern,
+			},
+			to: {
+				path: activeCodePattern,
+				pathNot: [
+					gameValuePattern,
+				],
+			},
+		},
+		{
 			name: "item-revision-stays-upstream",
 			comment:
 				"Item Revision owns opaque optimistic-concurrency tokens and stale-write rejection without importing its Runtime or command consumers.",
@@ -171,20 +187,20 @@ module.exports = {
 				path: activeCodePattern,
 				pathNot: [
 					itemRevisionPattern,
-					"^src/game-config/schema/IdSchema[.]ts$",
+					"^src/game-value/schema/IdSchema[.]ts$",
 				],
 			},
 		},
 		{
 			name: "item-revision-uses-id-schema-as-type-only",
 			comment:
-				"Revision conflict payloads share exact entity identity as a type contract without coupling Item Revision to Game Config runtime values.",
+				"Revision conflict payloads share exact entity identity as a type contract without a runtime dependency on Game Value.",
 			severity: "error",
 			from: {
 				path: itemRevisionPattern,
 			},
 			to: {
-				path: "^src/game-config/schema/IdSchema[.]ts$",
+				path: "^src/game-value/schema/IdSchema[.]ts$",
 				dependencyTypesNot: [
 					"type-only",
 				],

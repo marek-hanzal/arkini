@@ -50,7 +50,9 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 			}),
 		)
 			.then((nextPreview) => {
-				if (mounted) setPreviewFn(nextPreview);
+				if (!mounted) return;
+				setPreviewFn(nextPreview);
+				setErrorFn(undefined);
 			})
 			.catch((cause) => {
 				if (mounted) setErrorFn(messageFn(cause));

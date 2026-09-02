@@ -1,6 +1,6 @@
 # Project Versions map
 
-Project Versions are immutable logical snapshots of one portable Editor project. `src/project-version` owns the model, compatibility policy and renderer checkout orchestration; Electron main owns physical object and publication I/O.
+Project Versions are immutable logical snapshots of one portable Editor project. `src/project-version` owns the model, compatibility policy, portable object admission and renderer checkout orchestration; Electron main owns physical object writes and publication I/O.
 
 [`VERSION.md`](../../VERSION.md) owns external payload and compatibility guarantees. [`electron/main/editor-project/README.md`](../../electron/main/editor-project/README.md) maps the repository transaction boundary.
 
@@ -15,7 +15,7 @@ Project Versions are immutable logical snapshots of one portable Editor project.
 | Searchable current/Version comparison controls | `src/project-version` | [`ui/EditorVersionReferenceSelect.tsx`](ui/EditorVersionReferenceSelect.tsx), [`ui/useVersionComparison.ts`](ui/useVersionComparison.ts) |
 | Renderer history/status read | `src/project-version` | [`fx/readProjectVersionHistoryFx.ts`](fx/readProjectVersionHistoryFx.ts) |
 | Renderer checkout handshake | `src/project-version` | [`fx/checkoutProjectVersionFx.ts`](fx/checkoutProjectVersionFx.ts) |
-| Immutable snapshot plan and saved-HEAD proof | `src/project-version` | [`fx/planVersionSnapshotFx.ts`](fx/planVersionSnapshotFx.ts), [`fx/readCommittedProjectHeadFx.ts`](fx/readCommittedProjectHeadFx.ts) |
+| Immutable snapshot plan, object-store admission and saved-HEAD proof | `src/project-version` | [`fx/planVersionSnapshotFx.ts`](fx/planVersionSnapshotFx.ts), [`fx/readVersionSnapshotFx.ts`](fx/readVersionSnapshotFx.ts), [`fx/readCommittedProjectHeadFx.ts`](fx/readCommittedProjectHeadFx.ts) |
 | Object writes and Version create/list/diff/tag/checkout I/O | `electron/main/editor-project` | [`../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx.ts`](../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx.ts), [`../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx.ts`](../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx.ts) |
 
 ## Dependency shape

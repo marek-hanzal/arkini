@@ -23,7 +23,7 @@ import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { createVersionReaderFx } from "./createVersionReaderFx";
-import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 
 class EditorProjectBuildOperationError extends Data.TaggedError(
 	"EditorProjectBuildOperationError",
@@ -176,7 +176,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 						Effect.gen(function* () {
 							const headSnapshot = yield* readVersionSnapshotFx({
 								manifest: publishedHead.manifest,
-								paths: state.paths,
+								root: state.paths.root,
 							}).pipe(
 								Effect.filterOrFail(
 									(snapshot) =>

@@ -8,7 +8,7 @@ import type { ProjectVersionReference } from "~/project-version/type/ProjectVers
 import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { hashVersionBytesFn } from "~/project-version/fn/createVersionFingerprintFn";
 import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
-import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 
 export namespace createVersionReaderFx {
 	export interface Props {
@@ -125,7 +125,7 @@ export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function
 		const version = yield* readPublishedVersionFx(state, reference.versionId);
 		const snapshot = yield* readVersionSnapshotFx({
 			manifest: version.manifest,
-			paths: state.paths,
+			root: state.paths.root,
 		}).pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, pathService),

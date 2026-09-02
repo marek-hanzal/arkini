@@ -89,6 +89,6 @@ describe("readCommittedProjectHeadFx", () => {
 			Effect.runPromise(
 				readCommittedProjectHeadFx(root).pipe(Effect.provide(NodeServices.layer)),
 			),
-		).rejects.toThrow("does not match its content hash");
+		).rejects.toThrow("failed its content hash check");
 	});
 });

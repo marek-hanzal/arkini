@@ -1,7 +1,6 @@
-import { FileSystem } from "effect";
+import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import type { ProjectPaths } from "../ProjectPaths";
 import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
@@ -23,7 +22,7 @@ export namespace readVersionSnapshotFx {
 	export interface Props {
 		readonly manifest: VersionManifestSchema.Type;
 		readonly objectCache?: Map<string, Uint8Array>;
-		readonly paths: ProjectPaths;
+		readonly root: string;
 	}
 
 	export interface Success {
@@ -39,9 +38,11 @@ export namespace readVersionSnapshotFx {
 export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function* ({
 	manifest: candidateManifest,
 	objectCache,
-	paths,
+	root: candidateRoot,
 }: readVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
+	const path = yield* Path.Path;
+	const root = path.resolve(candidateRoot);
 	const manifest = yield* Effect.try({
 		try: () => VersionManifestSchema.parse(candidateManifest),
 		catch: (cause) =>
@@ -57,11 +58,8 @@ export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function
 		const cacheKey = `${type}:${hash}`;
 		const cached = objectCache?.get(cacheKey);
 		if (cached !== undefined) return cached;
-		const target =
-			type === "json"
-				? yield* paths.jsonObjectFileFx(hash)
-				: yield* paths.pngObjectFileFx(hash);
-		if (!(yield* isFilesystemPathSafeFx(fileSystem, paths.root, target)))
+		const target = path.join(root, "objects", `${hash}.${type}`);
+		if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
 			return yield* Effect.fail(
 				new Error(`Editor version object ${hash} must not be a symbolic link.`),
 			);

@@ -9,7 +9,7 @@ import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileS
 import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
-import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 
 const readJsonFx = <Value>(
 	target: string,
@@ -102,7 +102,7 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 		const snapshot = yield* readVersionSnapshotFx({
 			manifest: version.manifest,
 			objectCache,
-			paths,
+			root: paths.root,
 		});
 		if (snapshot.arkpack !== version.descriptor.version)
 			return yield* Effect.fail(

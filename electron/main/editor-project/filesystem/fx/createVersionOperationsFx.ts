@@ -30,7 +30,7 @@ import { createVersionReaderFx } from "./createVersionReaderFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
 import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
-import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
@@ -466,7 +466,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 										: yield* providePlatformFx(
 												readVersionSnapshotFx({
 													manifest: existingVersion.manifest,
-													paths: current.state.paths,
+													root: current.state.paths.root,
 												}).pipe(
 													Effect.map((snapshot) => ({
 														...snapshot,
@@ -589,7 +589,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 						const snapshot = yield* providePlatformFx(
 							readVersionSnapshotFx({
 								manifest: version.manifest,
-								paths: current.state.paths,
+								root: current.state.paths.root,
 							}),
 						);
 						if (snapshot.contentFingerprint !== version.descriptor.contentFingerprint)

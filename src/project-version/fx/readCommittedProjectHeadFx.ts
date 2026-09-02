@@ -7,12 +7,8 @@ import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDir
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
-import {
-	createVersionFingerprintFn,
-	hashVersionBytesFn,
-} from "~/project-version/fn/createVersionFingerprintFn";
 import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
+import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 import { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDescriptorFileSchema";
 import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
 import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
@@ -48,7 +44,7 @@ const readScenarioFilesFx = Effect.fn("readCommittedProjectHeadFx.readScenarioFi
 	);
 });
 
-export interface CommittedProjectHead {
+interface CommittedProjectHead {
 	readonly version: GameVersionSchema.Type;
 	readonly versionId: string;
 }
@@ -78,70 +74,14 @@ export const readCommittedProjectHeadFx = Effect.fn("readCommittedProjectHeadFx"
 	const manifest = yield* readJsonFx(path.join(versionDirectory, "manifest.json"), (candidate) =>
 		VersionManifestSchema.parse(candidate),
 	);
-	const objectCache = new Map<string, Uint8Array>();
-	const readVersionObjectFx = Effect.fn("readCommittedProjectHeadFx.readVersionObjectFx")(
-		function* (hash: string, type: "json" | "png") {
-			const key = `${type}:${hash}`;
-			const cached = objectCache.get(key);
-			if (cached !== undefined) return cached;
-			const target = path.join(root, "objects", `${hash}.${type}`);
-			if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
-				return yield* Effect.fail(
-					new Error(`Version object ${hash}.${type} must not be a symbolic link.`),
-				);
-			const bytes = yield* fileSystem.readFile(target);
-			if (hashVersionBytesFn(bytes) !== hash)
-				return yield* Effect.fail(
-					new Error(`Version object ${hash}.${type} does not match its content hash.`),
-				);
-			objectCache.set(key, bytes);
-			return bytes;
-		},
-	);
-	yield* Effect.forEach(
-		[
-			...[
-				manifest.game,
-				...Object.values(manifest.items),
-				...Object.values(manifest.scenarios),
-			].map(
-				(hash) =>
-					[
-						hash,
-						"json",
-					] as const,
-			),
-			...[
-				...Object.values(manifest.assets),
-				...Object.values(manifest.resources),
-			].map(
-				(hash) =>
-					[
-						hash,
-						"png",
-					] as const,
-			),
-		],
-		([hash, type]) => readVersionObjectFx(hash, type),
-		{
-			concurrency: 16,
-			discard: true,
-		},
-	);
-	const publishedScenarios = yield* Effect.forEach(Object.values(manifest.scenarios), (hash) =>
-		Effect.gen(function* () {
-			const bytes = yield* readVersionObjectFx(hash, "json");
-			return yield* Effect.try({
-				try: () =>
-					BoardScenarioFileSchema.parse(JSON.parse(new TextDecoder().decode(bytes))),
-				catch: (cause) =>
-					new Error(`Version object ${hash}.json is invalid.`, {
-						cause,
-					}),
-			});
-		}),
-	);
-	if (createVersionFingerprintFn(manifest, publishedScenarios) !== descriptor.contentFingerprint)
+	const published = yield* readVersionSnapshotFx({
+		manifest,
+		root,
+	});
+	if (
+		published.arkpack !== descriptor.version ||
+		published.contentFingerprint !== descriptor.contentFingerprint
+	)
 		return yield* Effect.fail(
 			new Error(`Version ${head.current} does not match its published snapshot.`),
 		);
@@ -164,6 +104,7 @@ export const readCommittedProjectHeadFx = Effect.fn("readCommittedProjectHeadFx"
 		scenarios,
 	});
 	if (
+		published.config.meta.id !== identity.packageId ||
 		descriptor.version !== identity.version ||
 		descriptor.contentFingerprint !== current.contentFingerprint
 	)

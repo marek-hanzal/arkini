@@ -48,26 +48,38 @@ afterEach(async () => {
 });
 
 describe("StartupSplash", () => {
-	it("anchors the black hold to actual window visibility", async () => {
+	it("keeps the visible startup surface black until the splash is ready", async () => {
+		let resolveBootstrapFn!: (result: typeof readyResult) => void;
+		const bootstrap = new Promise<typeof readyResult>((resolve) => {
+			resolveBootstrapFn = resolve;
+		});
 		const harness = await Effect.runPromise(
 			renderStartupSplashFx({
-				bootstrapFx: Effect.succeed(readyResult),
+				bootstrapFx: Effect.promise(() => bootstrap),
 				catalog,
 			}),
 		);
 		roots.push(harness.root);
 		registries.push(harness.registry);
-		expect(harness.container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
+		expect(harness.container.querySelector('[data-ui="StartupBlackWait"]')).not.toBeNull();
+		await act(async () => harness.resolveVisible(performance.now()));
 
 		await act(async () => vi.advanceTimersByTime(10_000));
-		expect(harness.container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
+		expect(harness.container.querySelector('[data-ui="StartupBlackWait"]')).not.toBeNull();
+		expect(harness.router.state.location.pathname).toBe("/");
 
-		await act(async () => harness.resolveVisible(performance.now()));
-		await act(async () => vi.advanceTimersByTime(499));
-		expect(harness.container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
-		await act(async () => vi.advanceTimersByTime(1));
-		expect(harness.container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull();
+		await act(async () => resolveBootstrapFn(readyResult));
+		await vi.waitFor(() =>
+			expect(harness.container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull(),
+		);
+		expect(harness.container.querySelector('[data-ui="StartupSplashBackdrop"]')).not.toBeNull();
+		expect(harness.container.querySelector('[data-ui="StartupSplashReveal"]')).not.toBeNull();
 		expect(harness.container.textContent).toContain("Press Esc to continue");
+		await act(async () => vi.advanceTimersByTime(4_000));
+		expect(harness.router.state.location.pathname).toBe("/");
+
+		await act(async () => vi.advanceTimersByTime(1_000));
+		await vi.waitFor(() => expect(harness.router.state.location.pathname).toBe("/main-menu"));
 	});
 
 	it("uses Escape to complete the splash before navigating", async () => {
@@ -80,7 +92,7 @@ describe("StartupSplash", () => {
 		roots.push(harness.root);
 		registries.push(harness.registry);
 		await act(async () => harness.resolveVisible(performance.now()));
-		await act(async () => vi.advanceTimersByTime(500));
+		expect(harness.container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull();
 
 		expect(harness.container.querySelector('[data-ui="StartupHeroHandoff"]')).toBeNull();
 		expect(harness.container.textContent).not.toContain("Main menu route");
@@ -109,7 +121,7 @@ describe("StartupSplash", () => {
 		roots.push(harness.root);
 		registries.push(harness.registry);
 		await act(async () => harness.resolveVisible(performance.now()));
-		await act(async () => vi.advanceTimersByTime(500));
+		expect(harness.container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull();
 
 		const splash = harness.container.querySelector('[data-ui="StartupSplash"]');
 		if (!(splash instanceof HTMLElement)) throw new Error("Startup splash missing.");
@@ -132,6 +144,7 @@ describe("StartupSplash", () => {
 		roots.push(harness.root);
 		registries.push(harness.registry);
 		await act(async () => harness.resolveVisible(performance.now()));
+		expect(harness.container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull();
 		await act(async () => vi.advanceTimersByTime(5_000));
 
 		await vi.waitFor(() =>
@@ -152,6 +165,7 @@ describe("StartupSplash", () => {
 		const navigationFailure = new Error("main menu route failed");
 		vi.spyOn(harness.router, "navigate").mockRejectedValueOnce(navigationFailure);
 		await act(async () => harness.resolveVisible(performance.now()));
+		expect(harness.container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull();
 		await act(async () => vi.advanceTimersByTime(5_000));
 
 		await vi.waitFor(() =>
@@ -184,10 +198,8 @@ describe("StartupSplash", () => {
 		);
 		roots.push(harness.root);
 		registries.push(harness.registry);
-		await act(async () => harness.resolveVisible(performance.now()));
-		await act(async () => vi.advanceTimersByTime(500));
-
 		await vi.waitFor(() => expect(harness.container.textContent).toContain("catalog failed"));
+		await act(async () => harness.resolveVisible(performance.now()));
 		const retry = Array.from(harness.container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Retry",
 		);

@@ -1,6 +1,6 @@
 import { RegistryContext } from "@effect/atom-react";
 import { RouterProvider } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Cause, Effect, Exit } from "effect";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -28,55 +28,74 @@ const readRendererRootFx = Effect.sync(() => {
 	return rootElement;
 });
 
-/** Owns the ordered renderer-process bootstrap from platform adapters to React. */
-export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(function* () {
-	const rootElement = yield* readRendererRootFx;
-	const root = yield* Effect.sync(() => createRoot(rootElement));
-
-	yield* renderRendererFx({
-		onCloseFn: () => window.arkini.lifecycle.forceCloseFn(),
-		root,
-		viewFx: Effect.gen(function* () {
-			const translation = yield* bootstrapTranslationFx({
-				readPreferredLanguagesFn: window.arkini.localization.readPreferredLanguagesFn,
-			});
-			document.title = ArkiniWindowTitle;
-			document.documentElement.lang = translation.locale;
-
-			yield* bootstrapArkpackCatalogFx();
-			yield* refreshEditorServiceStatusFx.pipe(Effect.forkDetach);
-			yield* installRendererNativeDragGuardFx({
-				root: rootElement,
-			});
-			yield* bootstrapRendererLifecycleFx(window.arkini.lifecycle);
-			yield* bootstrapWindowModeSyncFx();
-			yield* bootstrapLauncherFx();
-
-			const router = yield* createArkiniRouterFx({
-				rendererRuntime: RendererRuntime,
-			});
-			yield* bootstrapEditorMcpVersionCheckoutFx({
-				editorMcp: window.arkini.editorMcp,
-				rendererRuntime: RendererRuntime,
-				router,
-			});
-			yield* bootstrapRendererControlledCloseFx({
-				lifecycle: window.arkini.lifecycle,
-				rendererRuntime: RendererRuntime,
-				router,
-			});
-
-			return (
-				<StrictMode>
-					<TranslationContext.Provider value={translation.translator}>
-						<RegistryContext.Provider value={RendererAtomRegistry}>
-							<AppearanceDataset />
-							<LauncherStartupHydrator />
-							<RouterProvider router={router} />
-						</RegistryContext.Provider>
-					</TranslationContext.Provider>
-				</StrictMode>
+const forceCloseUnrenderableRendererFx = Effect.sync(() =>
+	window.arkini.lifecycle.forceCloseFn(),
+).pipe(
+	Effect.catchCause((cause) =>
+		Effect.sync(() => {
+			console.error(
+				"Arkini could not close after its fatal renderer surface failed.",
+				Cause.squash(cause),
 			);
 		}),
-	});
-});
+	),
+);
+
+/** Owns the ordered renderer-process bootstrap from platform adapters to React. */
+export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(() =>
+	Effect.gen(function* () {
+		const rootElement = yield* readRendererRootFx;
+		const root = yield* Effect.sync(() => createRoot(rootElement));
+
+		yield* renderRendererFx({
+			onCloseFn: () => window.arkini.lifecycle.forceCloseFn(),
+			root,
+			viewFx: Effect.gen(function* () {
+				const translation = yield* bootstrapTranslationFx({
+					readPreferredLanguagesFn: window.arkini.localization.readPreferredLanguagesFn,
+				});
+				document.title = ArkiniWindowTitle;
+				document.documentElement.lang = translation.locale;
+
+				yield* bootstrapArkpackCatalogFx();
+				yield* refreshEditorServiceStatusFx.pipe(Effect.forkDetach);
+				yield* installRendererNativeDragGuardFx({
+					root: rootElement,
+				});
+				yield* bootstrapRendererLifecycleFx(window.arkini.lifecycle);
+				yield* bootstrapWindowModeSyncFx();
+				yield* bootstrapLauncherFx();
+
+				const router = yield* createArkiniRouterFx({
+					rendererRuntime: RendererRuntime,
+				});
+				yield* bootstrapEditorMcpVersionCheckoutFx({
+					editorMcp: window.arkini.editorMcp,
+					rendererRuntime: RendererRuntime,
+					router,
+				});
+				yield* bootstrapRendererControlledCloseFx({
+					lifecycle: window.arkini.lifecycle,
+					rendererRuntime: RendererRuntime,
+					router,
+				});
+
+				return (
+					<StrictMode>
+						<TranslationContext.Provider value={translation.translator}>
+							<RegistryContext.Provider value={RendererAtomRegistry}>
+								<AppearanceDataset />
+								<LauncherStartupHydrator />
+								<RouterProvider router={router} />
+							</RegistryContext.Provider>
+						</TranslationContext.Provider>
+					</StrictMode>
+				);
+			}),
+		});
+	}).pipe(
+		Effect.onExit((exit) =>
+			Exit.isFailure(exit) ? forceCloseUnrenderableRendererFx : Effect.void,
+		),
+	),
+);

@@ -168,6 +168,7 @@ describe("createMainWindowFx", () => {
 		const window = electronState.windows[0] as BrowserWindow & {
 			readonly destroy: ReturnType<typeof vi.fn>;
 			readonly options: {
+				readonly backgroundColor?: string;
 				readonly fullscreen?: boolean;
 				readonly fullscreenable?: boolean;
 				readonly title?: string;
@@ -177,6 +178,7 @@ describe("createMainWindowFx", () => {
 			readonly webContents: WebContents;
 		};
 		expect(window.options.title).toBe(ArkiniWindowTitle);
+		expect(window.options.backgroundColor).toBe("#000000");
 		expect(window.options.fullscreen).toBe(false);
 		expect(window.options.fullscreenable).toBe(true);
 		expect(Menu.setApplicationMenu).toHaveBeenLastCalledWith(null);

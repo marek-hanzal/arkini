@@ -11,8 +11,6 @@ import { useStartupSplashLifecycle } from "~/launcher/ui/useStartupSplashLifecyc
 const readLauncherSplashCompletedFx = Effect.fn("readLauncherSplashCompletedFx")(() =>
 	Atom.get(LauncherSplashCompletedAtom),
 );
-const startupContentViewTransitionName = "arkini-startup-content";
-
 export const Route = createFileRoute("/")({
 	beforeLoad: ({ context }) => {
 		if (context.rendererRuntime.runSync(readLauncherSplashCompletedFx())) {
@@ -44,7 +42,7 @@ export const Route = createFileRoute("/")({
 				() => (
 					<main
 						className="size-full cursor-wait bg-black"
-						data-ui="StartupBlackHold"
+						data-ui="StartupBlackWait"
 					/>
 				),
 			)
@@ -54,7 +52,7 @@ export const Route = createFileRoute("/")({
 				},
 				({ message }) => (
 					<main
-						className="grid size-full cursor-default place-items-center bg-black p-6 text-white"
+						className="grid size-full cursor-default place-items-center bg-canvas p-6 text-foreground"
 						data-ui="StartupFailure"
 					>
 						{failureFn(message)}
@@ -66,50 +64,57 @@ export const Route = createFileRoute("/")({
 					kind: "scene",
 				},
 				({ content }) => (
-					<LauncherScene
-						cursor={content.kind === "loading" ? "wait" : "default"}
-						dataUi="StartupSplash"
-						onClickFn={lifecycle.skipFn}
+					<div
+						className="size-full bg-black"
+						data-ui="StartupSplashBackdrop"
 					>
 						<div
-							className="min-h-14 text-center text-sm text-muted"
-							data-ui="StartupSplashContent"
-							style={{
-								viewTransitionName: startupContentViewTransitionName,
-							}}
+							className="size-full"
+							data-ui="StartupSplashReveal"
 						>
-							{match(content)
-								.with(
-									{
-										kind: "loading",
-									},
-									() => <p>Preparing Arkini…</p>,
-								)
-								.with(
-									{
-										kind: "failure",
-									},
-									({ message }) => failureFn(message),
-								)
-								.with(
-									{
-										kind: "prompt",
-									},
-									() => (
-										<p className="text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
-											Press Esc to continue
-										</p>
-									),
-								)
-								.with(
-									{
-										kind: "empty",
-									},
-									() => null,
-								)
-								.exhaustive()}
+							<LauncherScene
+								cursor={content.kind === "loading" ? "wait" : "default"}
+								dataUi="StartupSplash"
+								onClickFn={lifecycle.skipFn}
+							>
+								<div
+									className="min-h-14 text-center text-sm text-muted"
+									data-ui="StartupSplashContent"
+								>
+									{match(content)
+										.with(
+											{
+												kind: "loading",
+											},
+											() => <p>Preparing Arkini…</p>,
+										)
+										.with(
+											{
+												kind: "failure",
+											},
+											({ message }) => failureFn(message),
+										)
+										.with(
+											{
+												kind: "prompt",
+											},
+											() => (
+												<p className="text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
+													Press Esc to continue
+												</p>
+											),
+										)
+										.with(
+											{
+												kind: "empty",
+											},
+											() => null,
+										)
+										.exhaustive()}
+								</div>
+							</LauncherScene>
 						</div>
-					</LauncherScene>
+					</div>
 				),
 			)
 			.exhaustive();

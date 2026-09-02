@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act, createElement } from "react";
+import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -9,6 +9,19 @@ vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
 		createElement("span", {
 			"data-ui": "EditorItemThumbnail",
 		}),
+}));
+
+vi.mock("~/ui/ui/Button", () => ({
+	ButtonLink: ({ children, params, to, ...props }: Record<string, unknown>) =>
+		createElement(
+			"a",
+			{
+				...props,
+				"data-params": JSON.stringify(params),
+				"data-to": to,
+			},
+			children as ReactNode,
+		),
 }));
 
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
@@ -51,6 +64,7 @@ describe("ProjectStartGrid", () => {
 					height={2}
 					items={boardSpaceProject.config.items}
 					mode="detail"
+					projectId={boardSpaceProject.projectId}
 					width={2}
 				/>,
 			);
@@ -65,6 +79,20 @@ describe("ProjectStartGrid", () => {
 			4,
 		);
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
+		const itemLink = container.querySelector<HTMLAnchorElement>(
+			'a[data-ui="EditorProjectStartGridSlot"]',
+		);
+		expect(itemLink?.dataset.to).toBe(
+			"/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
+		);
+		expect(JSON.parse(itemLink?.dataset.params ?? "null")).toEqual({
+			itemUid: boardSpaceProject.config.items.water?.uid,
+			projectId: boardSpaceProject.projectId,
+			sectionId: "identity",
+		});
+		expect(
+			container.querySelectorAll('div[data-ui="EditorProjectStartGridSlot"]'),
+		).toHaveLength(3);
 		expect(
 			addWindowListenerFn.mock.calls.filter(([type]) =>
 				[

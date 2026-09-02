@@ -34,6 +34,7 @@ export const ProjectToolbarDetail = ({ project }: { readonly project: Project })
 							height={1}
 							items={project.config.items}
 							mode="detail"
+							projectId={project.projectId}
 							width={size}
 						/>
 					</DetailSection>

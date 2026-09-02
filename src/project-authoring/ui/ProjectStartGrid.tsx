@@ -18,6 +18,7 @@ import type {
 } from "~/project-authoring/type/ProjectStartGridCell";
 import { useProjectStartGridDrag } from "~/project-authoring/ui/useProjectStartGridDrag";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { ButtonLink } from "~/ui/ui/Button";
 
 interface ProjectStartGridCommonProps {
 	readonly cells: ReadonlyArray<ProjectStartGridCell>;
@@ -28,6 +29,7 @@ interface ProjectStartGridCommonProps {
 interface ProjectStartGridDetailProps extends ProjectStartGridCommonProps {
 	readonly items: Readonly<Record<string, ItemSchema.Type>>;
 	readonly mode: "detail";
+	readonly projectId: string;
 }
 
 interface ProjectStartGridEditProps extends ProjectStartGridCommonProps {
@@ -192,6 +194,7 @@ const ProjectStartGridSurface = ({
 	edit,
 	height,
 	items,
+	projectId,
 	width,
 }: ProjectStartGridCommonProps & {
 	readonly edit?: {
@@ -212,6 +215,7 @@ const ProjectStartGridSurface = ({
 		readonly suppressClickRef: RefObject<boolean>;
 	};
 	readonly items: Readonly<Record<string, ItemSchema.Type>>;
+	readonly projectId?: string;
 }) => {
 	const cellsByPosition = new Map(
 		cells.map((cell) => [
@@ -245,20 +249,44 @@ const ProjectStartGridSurface = ({
 					const key = positionKeyFn(position);
 					const cell = cellsByPosition.get(key);
 					const item = cell === undefined ? undefined : items[cell.itemId];
-					if (edit === undefined)
-						return (
+					if (edit === undefined) {
+						const className =
+							"relative grid size-[4.5rem] min-h-0 place-items-center rounded-lg border border-line bg-surface/70 p-0 text-subtle shadow-none";
+						const content = (
+							<ProjectStartGridCellContent
+								quantity={cell?.quantity}
+								resourceIds={item?.asset.default}
+							/>
+						);
+						return cell !== undefined &&
+							item !== undefined &&
+							projectId !== undefined ? (
+							<ButtonLink
+								className={`${className} hover:border-accent`}
+								data-item-id={item.id}
+								data-ui="EditorProjectStartGridSlot"
+								key={key}
+								params={{
+									itemUid: item.uid,
+									projectId,
+									sectionId: "identity",
+								}}
+								title={item.title || item.id}
+								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+							>
+								{content}
+							</ButtonLink>
+						) : (
 							<div
-								className="relative grid size-[4.5rem] place-items-center rounded-lg border border-line bg-surface/70 text-subtle"
+								className={className}
 								data-ui="EditorProjectStartGridSlot"
 								key={key}
 								title={item?.title || item?.id}
 							>
-								<ProjectStartGridCellContent
-									quantity={cell?.quantity}
-									resourceIds={item?.asset.default}
-								/>
+								{content}
 							</div>
 						);
+					}
 					const isDragSource =
 						edit.dragVisual !== undefined &&
 						edit.dragVisual.source.x === position.x &&

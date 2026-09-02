@@ -1,6 +1,9 @@
+import { RotateCcw } from "lucide-react";
+
 import type { ProjectVersionStatus } from "~/project-version/type/ProjectVersion";
 import type { VersionGraphLayout } from "~/project-version/fn/layoutVersionGraphFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 const laneGap = 22;
 
@@ -74,14 +77,18 @@ const VersionRails = ({
 
 export const VersionGraph = ({
 	layout,
+	onRestoreFn,
 	onSelectFn,
 	onSelectWorkingCopyFn,
+	restorePending,
 	selectedReference,
 	status,
 }: {
 	readonly layout: VersionGraphLayout;
+	readonly onRestoreFn: (versionId: string) => void;
 	readonly onSelectFn: (versionId: string) => void;
 	readonly onSelectWorkingCopyFn: () => void;
+	readonly restorePending: boolean;
 	readonly selectedReference: string;
 	readonly status: ProjectVersionStatus;
 }) => {
@@ -132,11 +139,9 @@ export const VersionGraph = ({
 				</div>
 			</button>
 			{layout.rows.map((row) => (
-				<button
+				<div
 					key={row.version.versionId}
-					type="button"
-					className="flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10"
-					onClick={() => onSelectFn(row.version.versionId)}
+					className="group flex min-h-16 w-full items-center border-b border-line/60 hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10"
 					{...readDataUiFn({
 						dataUi: "EditorVersionRow",
 						state: {
@@ -144,27 +149,43 @@ export const VersionGraph = ({
 						},
 					})}
 				>
-					<VersionRails
-						activeLanes={row.activeLanes}
-						lane={row.lane}
-						laneCount={layout.laneCount}
-						parentLane={row.parentLane}
-					/>
-					<div className="min-w-0 flex-1 py-2">
-						<div className="truncate font-semibold">{row.version.subject}</div>
-						<div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
-							<span>{new Date(row.version.createdAtMs).toLocaleString()}</span>
-							{row.version.tag === undefined ? null : (
-								<span className="rounded-full bg-accent/15 px-2 py-0.5 text-accent">
-									{row.version.tag}
-								</span>
-							)}
-							{status.currentBaseVersionId === row.version.versionId ? (
-								<span className="text-success">Current base</span>
-							) : null}
+					<button
+						type="button"
+						className="flex min-h-16 min-w-0 flex-1 cursor-pointer items-center px-2 text-left"
+						onClick={() => onSelectFn(row.version.versionId)}
+					>
+						<VersionRails
+							activeLanes={row.activeLanes}
+							lane={row.lane}
+							laneCount={layout.laneCount}
+							parentLane={row.parentLane}
+						/>
+						<div className="min-w-0 flex-1 py-2">
+							<div className="truncate font-semibold">{row.version.subject}</div>
+							<div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
+								<span>{new Date(row.version.createdAtMs).toLocaleString()}</span>
+								{row.version.tag === undefined ? null : (
+									<span className="rounded-full bg-accent/15 px-2 py-0.5 text-accent">
+										{row.version.tag}
+									</span>
+								)}
+								{status.currentBaseVersionId === row.version.versionId ? (
+									<span className="text-success">Current base</span>
+								) : null}
+							</div>
 						</div>
-					</div>
-				</button>
+					</button>
+					<LinkButton
+						className="invisible mr-3 inline-flex shrink-0 items-center gap-1.5 group-hover:visible"
+						cursorIntent={restorePending ? "progress" : undefined}
+						data-ui="EditorVersionRestore"
+						disabled={restorePending}
+						onClick={() => onRestoreFn(row.version.versionId)}
+					>
+						<RotateCcw className="size-4" />
+						Restore
+					</LinkButton>
+				</div>
 			))}
 		</div>
 	);

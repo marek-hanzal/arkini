@@ -37,11 +37,13 @@ describe("VersionGraph", () => {
 						rows: [],
 						workingCopyLane: 0,
 					}}
+					onRestoreFn={vi.fn()}
 					onSelectFn={vi.fn()}
 					onSelectWorkingCopyFn={() => {
 						setSelectedReference("current");
 						onSelectWorkingCopy();
 					}}
+					restorePending={false}
 					selectedReference={selectedReference}
 					status={{
 						canCommit: true,
@@ -65,5 +67,62 @@ describe("VersionGraph", () => {
 
 		expect(onSelectWorkingCopy).toHaveBeenCalledOnce();
 		expect(workingCopy?.dataset.uiSelected).toBe("true");
+	});
+
+	it("restores the exact version from its graph row action", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const onRestoreFn = vi.fn();
+		const onSelectFn = vi.fn();
+
+		await act(async () =>
+			root.render(
+				<VersionGraph
+					layout={{
+						laneCount: 1,
+						rows: [
+							{
+								activeLanes: [
+									0,
+								],
+								lane: 0,
+								version: {
+									arkini: "0.5.0",
+									arkpackVersion: "1.0",
+									createdAtMs: 1,
+									projectId: "project-one",
+									sourceRevision: 1,
+									subject: "First version",
+									versionId: "version-one",
+								},
+							},
+						],
+						workingCopyLane: 0,
+					}}
+					onRestoreFn={onRestoreFn}
+					onSelectFn={onSelectFn}
+					onSelectWorkingCopyFn={vi.fn()}
+					restorePending={false}
+					selectedReference="version-one"
+					status={{
+						canCommit: true,
+						currentBaseVersionId: "version-one",
+						currentFingerprint: "a".repeat(64),
+						dirty: true,
+						versionCount: 1,
+					}}
+				/>,
+			),
+		);
+		const restore = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorVersionRestore"]',
+		);
+
+		await act(async () => restore?.click());
+
+		expect(onRestoreFn).toHaveBeenCalledExactlyOnceWith("version-one");
+		expect(onSelectFn).not.toHaveBeenCalled();
 	});
 });

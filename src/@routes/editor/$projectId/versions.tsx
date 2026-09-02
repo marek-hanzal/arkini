@@ -34,7 +34,12 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 				className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
 				data-ui="EditorVersions"
 			>
-				<div className="border-b border-line px-4 py-3">
+				<div
+					className="border-b border-line px-4 py-3"
+					style={{
+						viewTransitionName: "arkini-editor-section-navigation",
+					}}
+				>
 					<EditorSectionNavigation
 						leading={
 							<EditorHistoryBackButton
@@ -43,12 +48,9 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 							/>
 						}
 						title={
-							<div>
-								<h1 className="text-xl font-semibold">Versions</h1>
-								<p className="text-xs text-muted">
-									Explicit snapshots of the entire saved project.
-								</p>
-							</div>
+							<h1 className="text-xl font-semibold">
+								{historyActive ? "History" : "Commit"}
+							</h1>
 						}
 						tabs={
 							<EditorSectionTabs>

@@ -38,7 +38,7 @@ export namespace useVersionHistoryController {
 		readonly graph?: VersionGraphLayout;
 		readonly history?: HistoryState;
 		readonly projectId: string;
-		readonly restoreSelectedFn: () => void;
+		readonly restoreVersionFn: (versionId: string) => void;
 		readonly saveTagFn: () => void;
 		readonly selectVersionFn: (versionId: string) => void;
 		readonly selectWorkingCopyFn: () => void;
@@ -104,11 +104,6 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 		project,
 		projectDirty: history?.status.dirty === true,
 		reportErrorFn,
-		...(selected === undefined
-			? {}
-			: {
-					selected,
-				}),
 	});
 	const tag = useVersionTag({
 		reloadFn: loadHistoryFn,
@@ -127,6 +122,10 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 	};
 	const selectWorkingCopyFn = () => {
 		comparison.resetToBaseFn(history?.status.currentBaseVersionId);
+	};
+	const restoreVersionFn = (versionId: string) => {
+		const version = history?.versions.find((candidate) => candidate.versionId === versionId);
+		if (version !== undefined) checkout.restoreVersionFn(version);
 	};
 
 	return {
@@ -163,7 +162,7 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 					history,
 				}),
 		projectId: project.projectId,
-		restoreSelectedFn: checkout.restoreSelectedFn,
+		restoreVersionFn,
 		saveTagFn: tag.saveFn,
 		selectVersionFn,
 		selectWorkingCopyFn,

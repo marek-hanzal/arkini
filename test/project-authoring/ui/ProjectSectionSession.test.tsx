@@ -361,6 +361,51 @@ describe("project section form session", () => {
 		});
 	});
 
+	it("opens the exact invalid avatar in Artwork after cross-section validation", async () => {
+		const project = {
+			...boardSpaceProject,
+			config: {
+				...boardSpaceProject.config,
+				resources: {
+					hero: "hero",
+					"avatar-01": "item-water",
+					"avatar-02": "item-water",
+				},
+			},
+		} satisfies Project;
+		state.project = project;
+		state.section = <ProjectGeneralSection />;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(EditorProjectForm)));
+
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing project title input.");
+		await changeInput(title, "Project with duplicate avatar");
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent?.trim() === "Save");
+		if (saveButton === undefined) throw new Error("Missing project Save action.");
+		await act(async () => {
+			saveButton.click();
+			await Promise.resolve();
+		});
+
+		expect(state.saveConfig).not.toHaveBeenCalled();
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/project/form/$sectionId",
+			params: {
+				projectId: project.projectId,
+				sectionId: "artwork",
+			},
+			search: {
+				avatar: 1,
+			},
+		});
+	});
+
 	it("keeps unsaved-leave Save persistence-only", async () => {
 		state.project = boardSpaceProject;
 		state.section = <ProjectGeneralSection />;

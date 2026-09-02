@@ -70,7 +70,7 @@ export const EditorAssetUsageRow = ({
 			to="/editor/$projectId/project/form/$sectionId"
 			params={{
 				projectId: project.projectId,
-				sectionId: "general",
+				sectionId: "artwork",
 			}}
 			search={
 				avatarIndex === undefined

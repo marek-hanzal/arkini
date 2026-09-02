@@ -347,9 +347,12 @@ test() {
 platform-check() {
 	build
 	run_tests \
+		test/application-data \
+		test/authoring-mcp \
 		test/filesystem-write \
 		test/game-persistence/fx/createFilesystemGameSaveFilesFx.test.ts \
 		test/electron \
+		test/project-authoring/filesystem \
 		test/arkpack-artifact \
 		test/arkini-cli/command/ArkiniCli.test.ts \
 		test/game-config-source \

@@ -1,10 +1,10 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import { createProjectPathsFx } from "./filesystem/createProjectPathsFx";
-import { readProjectFilesFx } from "./filesystem/fx/readProjectFilesFx";
-import { readSidecarsFx } from "./filesystem/fx/readSidecarsFx";
-import { readVersionHistoryFx } from "./filesystem/fx/readVersionHistoryFx";
+import { createProjectPathsFx } from "~/project-authoring/filesystem/createProjectPathsFx";
+import { readProjectFilesFx } from "~/project-authoring/filesystem/fx/readProjectFilesFx";
+import { readSidecarsFx } from "~/project-authoring/filesystem/fx/readSidecarsFx";
+import { readVersionHistoryFx } from "~/project-authoring/filesystem/fx/readVersionHistoryFx";
 
 /** Opens one complete portable Editor project with the production filesystem readers. */
 export const readEditorJsonExportFx = Effect.fn("readEditorJsonExportFx")(function* (root: string) {

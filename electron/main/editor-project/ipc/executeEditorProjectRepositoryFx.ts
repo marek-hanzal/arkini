@@ -8,7 +8,7 @@ import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
 import type {
 	EditorProjectServiceOwnership,
 	OwnedEditorProjectRepository,
-} from "../EditorProjectServiceOwnership";
+} from "~/project-authoring/service/EditorProjectServiceOwnership";
 
 type EditorProjectOperationPhase =
 	| "request validation"

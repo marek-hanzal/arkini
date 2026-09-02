@@ -16,12 +16,12 @@ import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
-import { createArkiniUserDataPathsFn } from "./user-data/fn/createArkiniUserDataPathsFn";
-import type { EditorProjectServiceOwnership } from "./editor-project/EditorProjectServiceOwnership";
+import { resolveArkiniUserDataPathsFx } from "~/application-data/fx/resolveArkiniUserDataPathsFx";
+import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
-import { createFilesystemEditorMcpOwnershipFx } from "./editor-mcp/createFilesystemEditorMcpOwnershipFx";
+import { createFilesystemEditorMcpOwnershipFx } from "~/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx";
 import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
-import { createFilesystemEditorProjectRepositoryFx } from "./editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
+import { createFilesystemEditorProjectRepositoryFx } from "~/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { createInstallationFx } from "./cli/createInstallationFx";
 import { createCompletionFx } from "./cli/createCompletionFx";
 import { registerCliIpcFx } from "./cli/registerCliIpcFx";
@@ -50,8 +50,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* Effect.promise(() => app.whenReady());
 
-	const userDataPath = app.getPath("userData");
-	const userDataPaths = createArkiniUserDataPathsFn(userDataPath);
+	const userDataPaths = yield* resolveArkiniUserDataPathsFx;
 	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.diagnostics).pipe(
 		Effect.catch((cause) =>
 			Effect.sync(() => {
@@ -186,7 +185,6 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			}
 		},
 		root: userDataPaths.editor.root,
-		runPromiseFn: ElectronMainRuntime.runPromise,
 	});
 	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSyncFn));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();

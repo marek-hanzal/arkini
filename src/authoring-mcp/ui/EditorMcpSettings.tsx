@@ -1,4 +1,4 @@
-import type { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
+import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { EditorMcpCopyableUrl } from "./EditorMcpCopy";

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
-import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
+import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 
 export namespace importEditorJsonDirectoryFx {
 	export interface Props {

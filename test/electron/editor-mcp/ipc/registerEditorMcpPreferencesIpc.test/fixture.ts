@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { vi } from "vitest";
 
 import { ElectronMainError } from "~electron/main/ElectronMainError";
-import type { ServerOwnership } from "~electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
+import type { ServerOwnership } from "~/authoring-mcp/http/createEditorMcpOwnershipFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 
 export const createEvent = () => {

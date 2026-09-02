@@ -16,7 +16,7 @@ import { createFilesystemAppearancePreferencesFx } from "~electron/main/appearan
 import { createFilesystemCheatPreferencesFx } from "~electron/main/cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "~electron/main/launcher/createFilesystemLauncherPreferencesFx";
 import { registerArkiniElectronIpcFx } from "~electron/main/registerArkiniElectronIpcFx";
-import { createArkiniUserDataPathsFn } from "~electron/main/user-data/fn/createArkiniUserDataPathsFn";
+import { createArkiniUserDataPathsFn } from "~/application-data/fn/createArkiniUserDataPathsFn";
 import { createFilesystemWindowPreferencesFx } from "~electron/main/window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "~electron/main/window/createWindowModeControllerOwnershipFx";
 

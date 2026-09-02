@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { vi } from "vitest";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import type { OwnedEditorProjectRepository } from "~electron/main/editor-project/EditorProjectServiceOwnership";
+import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const editorProjectIpcDescriptor = {

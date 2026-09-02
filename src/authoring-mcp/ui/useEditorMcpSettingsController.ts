@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
-import type { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
+import { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
+import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
 export namespace useEditorMcpSettingsController {
 	export interface Props {

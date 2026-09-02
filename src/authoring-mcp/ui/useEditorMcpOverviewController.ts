@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
-import type { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
-import { EditorMcpOverviewSchema } from "~electron/contract/editor/EditorMcpOverviewSchema";
+import type { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
+import { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
 import { EditorMcpCommandAtom } from "~/authoring-mcp/atom/EditorMcpCommandAtom";
 

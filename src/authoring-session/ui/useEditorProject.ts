@@ -8,7 +8,7 @@ import {
 	type PropsWithChildren,
 } from "react";
 
-import { EditorMcpProjectContextSchema } from "~electron/contract/editor/EditorMcpProjectContextSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
@@ -27,7 +27,7 @@ export const EditorProjectProvider = ({
 }>) => {
 	const [project, publishFn] = useAtom(EditorProjectAtom(loaded.projectId));
 	useLayoutEffect(() => {
-		const projectId = EditorMcpProjectContextSchema.parse(loaded.projectId);
+		const projectId = IdSchema.parse(loaded.projectId);
 		void RendererRuntime.runPromise(
 			Effect.tryPromise({
 				try: () => window.arkini.editorMcp.setProjectContextFn(projectId),

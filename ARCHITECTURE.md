@@ -25,7 +25,7 @@ The important dense clusters are:
 | Runtime and Production | Real behavior in both directions for aggregate validation/cleanup and canonical Runtime mutation | [`src/game-runtime/README.md`](src/game-runtime/README.md), [`src/production-line/README.md`](src/production-line/README.md) |
 | Authored schemas | Game Value is foundational; Config, Item, Location and Production compose its scalar contracts | [`src/game-config/README.md`](src/game-config/README.md) |
 | Retained scene | Game Scene executes Tile Motion/Interaction; their reverse edges are type-only. Game Shell and Game Scene also share one explicit UI behavior seam. | [`src/game-scene/README.md`](src/game-scene/README.md) |
-| Editor persistence | Renderer products and Electron repository cross through exact capability, transport and replacement lifecycles | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
+| Editor persistence | Renderer products, filesystem Project Repository, MCP and Electron IPC cross through exact capability, transport and replacement lifecycles | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 | Flow and Estimate | Analysis core flows one way from Estimate to Flow; presentation reuse adds wider top-level edges | [`src/estimate/README.md`](src/estimate/README.md) |
 
 ## Stable boundaries
@@ -59,7 +59,7 @@ renderer      → RendererRuntime
 product CLI   → NodeRuntime.runMain
 ```
 
-`arkini-cli editor mcp` is the one deliberate handoff between those roots. The Node CLI launches the installed Arkini executable as a renderer-free Electron-main process so MCP can reuse the installation's filesystem repository and ngrok configuration without creating a window.
+`arkini-cli editor mcp` owns its filesystem repository, MCP server and optional ngrok tunnel directly inside the existing Node CLI root. It does not start or import an Electron runtime. The GUI Electron main composes the same Node-compatible capabilities independently.
 
 Application Runtime also owns the renderer's one process-lifetime Atom registry/runtime bridge. It installs exact lower capabilities and never becomes a second source of their state. Ordinary components, callbacks and IPC handlers do not create private runtimes or Promise schedulers.
 
@@ -129,7 +129,7 @@ The router uses history routing in development and packaged Electron. `/` owns r
 
 ## Electron and security
 
-Electron main is the only filesystem, native-window, protocol, MCP transport and privileged IPC owner. Renderer domains receive typed capabilities through `electron/contract`; physical paths and native objects never cross it. The CLI is a separate Node process owner; its Editor MCP command only starts and waits for the renderer-free Electron owner described above.
+Electron main owns native windows, protocols, privileged IPC and GUI-side filesystem composition. Node-compatible Project and MCP transport capabilities live under their semantic `src` owners, so the GUI and CLI may compose them without importing each other's process root. Renderer domains receive typed capabilities through `electron/contract`; physical paths and native objects never cross it.
 
 Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
@@ -137,16 +137,19 @@ The Editor ChatGPT page is the one foreign surface. Electron owns its separate s
 
 ## Persistence and Editor
 
-Electron user data is split by owner:
+Arkini-owned data is resolved independently from Electron below the effective system user's home:
 
 ```text
-<userData>/arkini/game/    Arkpacks, saves, preferences, logs, latest incident
-<userData>/arkini/editor/  project catalog, managed projects, MCP state
+~/.arkini/diagnostics/  application logs
+~/.arkini/game/         Arkpacks, saves, preferences, latest incident
+~/.arkini/editor/       project catalog, managed projects, MCP state
 ```
+
+`src/application-data` is the only owner of that root and complete path tree. Electron's `userData` remains private Chromium storage and is never an Arkini persistence root.
 
 Game Persistence observes changed Runtime root identity, debounces and always flushes the latest canonical snapshot. Event-only transitions do not wake it. Persistence is an observer, not gameplay truth.
 
-The Editor's portable current tree is canonical. Electron main implements the Project Repository; renderer project state, forms, object URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and use one recoverable current-tree transaction while preserving `.git` and unrelated files.
+The Editor's portable current tree is canonical. The GUI Electron main and Node CLI alternatively compose the same filesystem Project Repository; renderer project state, forms, object URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and use one recoverable current-tree transaction while preserving `.git` and unrelated files.
 
 External changes are ignored while mounted. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the complete directory and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
 

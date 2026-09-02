@@ -1,6 +1,6 @@
 # Project Versions map
 
-Project Versions are immutable logical snapshots of one portable Editor project. `src/project-version` owns the model, compatibility policy, portable object admission and renderer checkout orchestration; Electron main owns physical object writes and publication I/O.
+Project Versions are immutable logical snapshots of one portable Editor project. `src/project-version` owns the model, compatibility policy, portable object admission and renderer checkout orchestration; Project Authoring owns physical object writes and publication I/O.
 
 [`VERSION.md`](../../VERSION.md) owns external payload and compatibility guarantees. [`electron/main/editor-project/README.md`](../../electron/main/editor-project/README.md) maps the repository transaction boundary.
 
@@ -16,7 +16,7 @@ Project Versions are immutable logical snapshots of one portable Editor project.
 | Renderer history/status read | `src/project-version` | [`fx/readProjectVersionHistoryFx.ts`](fx/readProjectVersionHistoryFx.ts) |
 | Renderer checkout handshake | `src/project-version` | [`fx/checkoutProjectVersionFx.ts`](fx/checkoutProjectVersionFx.ts) |
 | Immutable snapshot plan, object-store admission and saved-HEAD proof | `src/project-version` | [`fx/planVersionSnapshotFx.ts`](fx/planVersionSnapshotFx.ts), [`fx/readVersionSnapshotFx.ts`](fx/readVersionSnapshotFx.ts), [`fx/readCommittedProjectHeadFx.ts`](fx/readCommittedProjectHeadFx.ts) |
-| Object writes and Version create/list/diff/tag/checkout I/O | `electron/main/editor-project` | [`../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx.ts`](../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx.ts), [`../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx.ts`](../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx.ts) |
+| Object writes and Version create/list/diff/tag/checkout I/O | `src/project-authoring/filesystem` | [`../project-authoring/filesystem/fx/createVersionSnapshotFx.ts`](../project-authoring/filesystem/fx/createVersionSnapshotFx.ts), [`../project-authoring/filesystem/fx/createVersionOperationsFx.ts`](../project-authoring/filesystem/fx/createVersionOperationsFx.ts) |
 
 ## Dependency shape
 
@@ -24,7 +24,7 @@ Project Versions are immutable logical snapshots of one portable Editor project.
 - `project-version → authoring-session + board-scenario` owns the terminal checkout handshake: release the Editor Board, replace persisted state, discard drafts, republish one fresh Project and recreate the Board session.
 - Project Version schemas compose Game Value identity, Board Scenario names, content hashes, Game Version and Application Version contracts.
 - Project Version snapshot planning consumes the full Game Config, Item, Resource and Scenario payloads to derive immutable object values, hashes and the manifest without writing them.
-- Electron main writes those objects and publishes commits. It implements `ProjectVersionRepositoryService`; renderer code never sees paths, hashes as filesystem authority, locks or native objects.
+- Project Authoring filesystem writes those objects and publishes commits. It implements `ProjectVersionRepositoryService`; renderer code never sees paths, hashes as filesystem authority, locks or native objects.
 
 ## Storage model
 

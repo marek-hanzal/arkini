@@ -3,12 +3,12 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
-import { EditorMcpCommandSchema } from "~electron/contract/editor/EditorMcpCommandSchema";
-import { EditorMcpConfigurationSchema } from "~electron/contract/editor/EditorMcpConfigurationSchema";
-import { EditorMcpProjectContextSchema } from "~electron/contract/editor/EditorMcpProjectContextSchema";
+import { EditorMcpCommandSchema } from "~/authoring-mcp/schema/EditorMcpCommandSchema";
+import { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
-import type { ServerOwnership } from "../http/createEditorMcpOwnershipFx";
+import type { ServerOwnership } from "~/authoring-mcp/http/createEditorMcpOwnershipFx";
 import { requestVersionCheckoutFx } from "./requestVersionCheckoutFx";
 
 let registered = false;
@@ -80,7 +80,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 					runAuthorizedFn(
 						event,
 						Effect.try({
-							try: () => EditorMcpProjectContextSchema.parse(candidate),
+							try: () => IdSchema.parse(candidate),
 							catch: (cause) => cause,
 						}).pipe(
 							Effect.tap((projectId) =>
@@ -104,7 +104,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 					runAuthorizedFn(
 						event,
 						Effect.try({
-							try: () => EditorMcpProjectContextSchema.parse(candidate),
+							try: () => IdSchema.parse(candidate),
 							catch: (cause) => cause,
 						}).pipe(
 							Effect.tap((projectId) =>

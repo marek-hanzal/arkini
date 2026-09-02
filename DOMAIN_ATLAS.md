@@ -22,7 +22,7 @@ The densest islands have local maps:
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Flow and Estimate | Acquisition graph, layout, Canvas and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
 | Versions | Immutable logical snapshots, commit compatibility and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
-| Editor persistence | Electron repository, filesystem transactions, renderer projection and MCP | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
+| Editor persistence | Project Authoring filesystem repository, transactions, renderer projection, MCP and Electron IPC | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 
 ## Change impact
 
@@ -140,18 +140,19 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |
 | `project-note` | Ordered Notes outside Version snapshots | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
 | `project-version` | Immutable snapshots, commit compatibility, saved-HEAD proof and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
-| `authoring-mcp` | Renderer MCP status, settings and checkout presentation | [`src/authoring-mcp/ui/EditorMcp.tsx`](src/authoring-mcp/ui/EditorMcp.tsx) |
+| `authoring-mcp` | MCP schemas, storage, HTTP/tools/tunnel lifecycle and Editor presentation | [`src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts`](src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts) |
 | `flow` | Authored acquisition graph and relation semantics | [`src/flow/fn/createAcquisitionGraphFn.ts`](src/flow/fn/createAcquisitionGraphFn.ts) |
 | `flow-layout` | Deterministic graph layout and worker lifecycle | [`src/flow-layout/fx/layoutInWorkerFx.ts`](src/flow-layout/fx/layoutInWorkerFx.ts) |
 | `flow-canvas` | Flow projections, Canvas painting and interaction | [`src/flow-canvas/ui/EditorGameFlow.tsx`](src/flow-canvas/ui/EditorGameFlow.tsx) |
 | `estimate` | Optimistic acquisition witnesses, index, cache and worker | [`src/estimate/README.md`](src/estimate/README.md) |
 
-The physical Editor repository and IPC path are mapped in [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
+The filesystem Project Repository and Electron IPC composition are mapped in [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 
 ## Application and platform
 
 | Domain | Role | First read |
 | --- | --- | --- |
+| `application-data` | Canonical system-user Arkini data root and complete path tree | [`src/application-data/fn/createArkiniUserDataPathsFn.ts`](src/application-data/fn/createArkiniUserDataPathsFn.ts) |
 | `application-diagnostics` | Shared failure extraction, bounded formatting and transport | [`src/application-diagnostics/fn/formatApplicationDiagnosticTextFn.ts`](src/application-diagnostics/fn/formatApplicationDiagnosticTextFn.ts) |
 | `application-runtime` | Renderer ManagedRuntime, Atom bridge and native lifecycle | [`src/application-runtime/service/RendererRuntime.ts`](src/application-runtime/service/RendererRuntime.ts) |
 | `application-settings` | Appearance, Cheat availability and Settings | [`src/application-settings/atom/SettingsCommandAtom.ts`](src/application-settings/atom/SettingsCommandAtom.ts) |
@@ -163,7 +164,7 @@ The physical Editor repository and IPC path are mapped in [`electron/main/editor
 | `ui` | Cross-product presentation primitives only | [`src/ui/ui`](src/ui/ui) |
 | `@routes` | Route registration, loaders, actions and leaf composition | [`src/@routes`](src/@routes) |
 | `electron/contract` | Pure typed renderer/main transport seam | [`electron/contract/ArkiniElectronApi.ts`](electron/contract/ArkiniElectronApi.ts) |
-| `electron/main` | Filesystem, native window, protocol, MCP and IPC authority | [`electron/main/electronMainFx.ts`](electron/main/electronMainFx.ts) |
+| `electron/main` | Native window, protocol, GUI composition and privileged IPC authority | [`electron/main/electronMainFx.ts`](electron/main/electronMainFx.ts) |
 | `electron/preload` | Transport-only context bridge | [`electron/preload/index.ts`](electron/preload/index.ts) |
 | `electron/security` | Trusted URL, frame and renderer admission | [`electron/security`](electron/security) |
 | `shared` | Immutable cross-process metadata and hard limits | [`shared`](shared) |

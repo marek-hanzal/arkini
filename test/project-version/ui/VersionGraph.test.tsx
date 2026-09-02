@@ -139,7 +139,9 @@ describe("VersionGraph", () => {
 						laneCount: 1,
 						rows: [
 							{
-								activeLanes: [0],
+								activeLanes: [
+									0,
+								],
 								lane: 0,
 								version: {
 									arkini: "0.5.0",

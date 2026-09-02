@@ -37,6 +37,7 @@ export const ProjectInventoryDetail = ({ project }: { readonly project: Project 
 						height={inventory.height}
 						items={project.config.items}
 						mode="detail"
+						projectId={project.projectId}
 						width={inventory.width}
 					/>
 				</DetailSection>

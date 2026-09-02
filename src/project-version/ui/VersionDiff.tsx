@@ -1,3 +1,7 @@
+import type { ReactNode } from "react";
+import { CircleCheckBig } from "lucide-react";
+
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type {
 	ProjectVersionBinaryDiff,
 	ProjectVersionDiff,
@@ -5,6 +9,7 @@ import type {
 } from "~/project-version/type/ProjectVersion";
 import type { ProjectCompatibilityDiffResult } from "~/project-version/type/ProjectCompatibility";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Status } from "~/ui/ui/Status";
 
 const formatValueFn = (value: unknown) => {
 	if (value === undefined) return "—";
@@ -27,8 +32,18 @@ const VersionBump = ({ bump }: { readonly bump?: ProjectCompatibilityDiffResult 
 		</span>
 	);
 
-const ValueChange = ({ change }: { readonly change: ProjectVersionValueChange }) => (
-	<div className="grid gap-2 rounded-lg border border-line bg-surface p-3">
+const ValueChange = ({
+	change,
+	title,
+}: {
+	readonly change: ProjectVersionValueChange;
+	readonly title: ReactNode;
+}) => (
+	<EditorRootCard
+		className="gap-2"
+		dataUi="EditorVersionChangeCard"
+	>
+		<h3 className="text-sm font-semibold">{title}</h3>
 		<div className="flex items-start justify-between gap-3">
 			<div className="min-w-0 break-all text-xs font-semibold text-accent">
 				{change.path || "Entire item"}
@@ -53,81 +68,78 @@ const ValueChange = ({ change }: { readonly change: ProjectVersionValueChange })
 				</pre>
 			</div>
 		</div>
-	</div>
+	</EditorRootCard>
 );
 
-const BinaryChanges = ({
-	changes,
+const BinaryChange = ({
+	change,
 	title,
 }: {
-	readonly changes: ReadonlyArray<ProjectVersionBinaryDiff>;
+	readonly change: ProjectVersionBinaryDiff;
 	readonly title: string;
-}) =>
-	changes.length === 0 ? null : (
-		<section className="grid gap-2">
-			<h4 className="text-sm font-semibold">{title}</h4>
-			<div className="flex flex-wrap gap-2">
-				{changes.map((change) => (
-					<span
-						key={change.id}
-						className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-xs"
-					>
-						<span className="font-semibold capitalize text-accent">
-							{change.change}
-						</span>
-						{change.id}
-						<VersionBump bump={change.bump} />
-					</span>
-				))}
-			</div>
-		</section>
-	);
+}) => (
+	<EditorRootCard
+		className="gap-2"
+		dataUi="EditorVersionChangeCard"
+	>
+		<h3 className="text-sm font-semibold">{title}</h3>
+		<div className="flex flex-wrap gap-2">
+			<span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-xs">
+				<span className="font-semibold capitalize text-accent">{change.change}</span>
+				{change.id}
+				<VersionBump bump={change.bump} />
+			</span>
+		</div>
+	</EditorRootCard>
+);
 
 export const VersionDiff = ({ diff }: { readonly diff: ProjectVersionDiff }) =>
 	diff.hasChanges ? (
 		<div
-			className="grid gap-4"
+			className="grid gap-5"
 			data-ui="EditorVersionDiff"
 		>
-			{diff.project.length === 0 ? null : (
-				<section className="grid gap-2">
-					<h4 className="text-sm font-semibold">Project</h4>
-					{diff.project.map((change) => (
-						<ValueChange
-							key={change.path}
-							change={change}
-						/>
-					))}
-				</section>
-			)}
-			{diff.items.map((item) => (
-				<section
-					key={item.uid}
-					className="grid gap-2"
-				>
-					<h4 className="text-sm font-semibold">
-						Item {item.uid} ·{" "}
-						<span className="capitalize text-accent">{item.change}</span>
-					</h4>
-					{item.values.map((change) => (
-						<ValueChange
-							key={change.path}
-							change={change}
-						/>
-					))}
-				</section>
+			{diff.project.map((change) => (
+				<ValueChange
+					key={change.path}
+					change={change}
+					title="Project"
+				/>
 			))}
-			<BinaryChanges
-				title="Assets"
-				changes={diff.resources}
-			/>
-			<BinaryChanges
-				title="Board scenarios"
-				changes={diff.scenarios}
-			/>
+			{diff.items.flatMap((item) =>
+				item.values.map((change) => (
+					<ValueChange
+						key={`${item.uid}:${change.path}`}
+						change={change}
+						title={
+							<>
+								Item {item.uid} ·{" "}
+								<span className="capitalize text-accent">{item.change}</span>
+							</>
+						}
+					/>
+				)),
+			)}
+			{diff.resources.map((change) => (
+				<BinaryChange
+					key={change.id}
+					change={change}
+					title="Assets"
+				/>
+			))}
+			{diff.scenarios.map((change) => (
+				<BinaryChange
+					key={change.id}
+					change={change}
+					title="Board scenarios"
+				/>
+			))}
 		</div>
 	) : (
-		<p className="rounded-lg bg-surface p-3 text-sm text-muted">
-			These two states are identical.
-		</p>
+		<Status
+			dataUi="EditorVersionDiffIdentical"
+			description="No project, item, asset, or Board scenario changes were found."
+			icon={CircleCheckBig}
+			title="These two states are identical"
+		/>
 	);

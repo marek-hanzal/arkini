@@ -170,21 +170,25 @@ export const VersionGraph = ({
 									</span>
 								)}
 								{status.currentBaseVersionId === row.version.versionId ? (
-									<span className="text-success">Current base</span>
+									<span className="rounded-full border border-success/40 bg-success/15 px-2 py-0.5 font-semibold text-success">
+										Current base
+									</span>
 								) : null}
 							</div>
 						</div>
 					</button>
-					<LinkButton
-						className="invisible mr-3 inline-flex shrink-0 items-center gap-1.5 group-hover:visible"
-						cursorIntent={restorePending ? "progress" : undefined}
-						data-ui="EditorVersionRestore"
-						disabled={restorePending}
-						onClick={() => onRestoreFn(row.version.versionId)}
-					>
-						<RotateCcw className="size-4" />
-						Restore
-					</LinkButton>
+					{status.dirty || status.currentBaseVersionId !== row.version.versionId ? (
+						<LinkButton
+							className="invisible mr-3 inline-flex shrink-0 items-center gap-1.5 group-hover:visible"
+							cursorIntent={restorePending ? "progress" : undefined}
+							data-ui="EditorVersionRestore"
+							disabled={restorePending}
+							onClick={() => onRestoreFn(row.version.versionId)}
+						>
+							<RotateCcw className="size-4" />
+							Restore
+						</LinkButton>
+					) : null}
 				</div>
 			))}
 		</div>

@@ -6,7 +6,8 @@ asarUnpack:
   - node_modules/@ngrok/ngrok-linux-arm64-gnu/**/*.node
   - node_modules/@ngrok/ngrok-linux-x64-gnu/**/*.node
   - node_modules/@ngrok/ngrok-win32-x64-msvc/**/*.node
-npmRebuild: false
+npmRebuild: true
+beforeBuild: ./electron/builder/beforeBuild.mjs
 electronLanguages:
   - cs-CZ
   - en-US
@@ -21,11 +22,14 @@ directories:
 files:
   - '!node_modules/**/*'
   - package.json
-  - node_modules/@ngrok/ngrok/**/*
-  - node_modules/@ngrok/ngrok-darwin-arm64/**/*
-  - node_modules/@ngrok/ngrok-linux-arm64-gnu/**/*
-  - node_modules/@ngrok/ngrok-linux-x64-gnu/**/*
-  - node_modules/@ngrok/ngrok-win32-x64-msvc/**/*
+  - from: node_modules/@ngrok
+    to: node_modules/@ngrok
+    filter:
+      - ngrok/**/*
+      - ngrok-darwin-arm64/**/*
+      - ngrok-linux-arm64-gnu/**/*
+      - ngrok-linux-x64-gnu/**/*
+      - ngrok-win32-x64-msvc/**/*
   - from: .out/desktop/build
     to: app
     filter:

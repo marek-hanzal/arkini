@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Save } from "lucide-react";
+import { LoaderCircle, Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
 import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVersion";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { Status } from "~/ui/ui/Status";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { Tooltip } from "~/ui/ui/Tooltip";
@@ -80,6 +82,28 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 				</section>
 				<section className="min-h-0 overflow-y-auto p-4">
 					<div className="grid gap-5">
+						<EditorRootCard dataUi="EditorVersionCompareCard">
+							<div>
+								<h2 className="font-semibold">Compare</h2>
+								<p className="mt-1 text-xs text-muted">
+									Select the working copy or any saved version on either side.
+								</p>
+							</div>
+							<div className="grid gap-3 sm:grid-cols-2">
+								<EditorVersionReferenceSelect
+									label="Before"
+									onChangeFn={controller.setCompareFromFn}
+									value={controller.compareFrom}
+									versions={versions}
+								/>
+								<EditorVersionReferenceSelect
+									label="After"
+									onChangeFn={controller.setCompareToFn}
+									value={controller.compareTo}
+									versions={versions}
+								/>
+							</div>
+						</EditorRootCard>
 						{controller.error === undefined ? null : (
 							<p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
 								{controller.error}
@@ -92,7 +116,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 								</p>
 							)
 						) : (
-							<article className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5">
+							<EditorRootCard dataUi="EditorVersionInfoCard">
 								<div className="flex flex-wrap items-start justify-between gap-3">
 									<div className="min-w-0">
 										<h2 className="break-words text-lg font-semibold">
@@ -180,35 +204,19 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 										</LinkButton>
 									</div>
 								</label>
-							</article>
+							</EditorRootCard>
 						)}
-						<article className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5">
-							<div>
-								<h3 className="font-semibold">Compare</h3>
-								<p className="mt-1 text-xs text-muted">
-									Select the working copy or any saved version on either side.
-								</p>
-							</div>
-							<div className="grid gap-3 sm:grid-cols-2">
-								<EditorVersionReferenceSelect
-									label="Before"
-									onChangeFn={controller.setCompareFromFn}
-									value={controller.compareFrom}
-									versions={versions}
-								/>
-								<EditorVersionReferenceSelect
-									label="After"
-									onChangeFn={controller.setCompareToFn}
-									value={controller.compareTo}
-									versions={versions}
-								/>
-							</div>
-							{controller.diffPending ? (
-								<p className="text-sm text-muted">Comparing…</p>
-							) : controller.diff === undefined ? null : (
-								<VersionDiff diff={controller.diff} />
-							)}
-						</article>
+						{controller.diffPending ? (
+							<Status
+								dataUi="EditorVersionDiffLoading"
+								description="Reading the differences between the selected states."
+								icon={LoaderCircle}
+								iconSpin
+								title="Comparing versions…"
+							/>
+						) : controller.diff === undefined ? null : (
+							<VersionDiff diff={controller.diff} />
+						)}
 					</div>
 				</section>
 				{controller.confirmVersion === undefined ? null : (

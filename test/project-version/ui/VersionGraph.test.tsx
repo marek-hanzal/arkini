@@ -125,4 +125,51 @@ describe("VersionGraph", () => {
 		expect(onRestoreFn).toHaveBeenCalledExactlyOnceWith("version-one");
 		expect(onSelectFn).not.toHaveBeenCalled();
 	});
+
+	it("does not offer restoring a clean working copy to its current base", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () =>
+			root.render(
+				<VersionGraph
+					layout={{
+						laneCount: 1,
+						rows: [
+							{
+								activeLanes: [0],
+								lane: 0,
+								version: {
+									arkini: "0.5.0",
+									arkpackVersion: "1.0",
+									createdAtMs: 1,
+									projectId: "project-one",
+									sourceRevision: 1,
+									subject: "Current base",
+									versionId: "version-one",
+								},
+							},
+						],
+						workingCopyLane: 0,
+					}}
+					onRestoreFn={vi.fn()}
+					onSelectFn={vi.fn()}
+					onSelectWorkingCopyFn={vi.fn()}
+					restorePending={false}
+					selectedReference="version-one"
+					status={{
+						canCommit: false,
+						currentBaseVersionId: "version-one",
+						currentFingerprint: "a".repeat(64),
+						dirty: false,
+						versionCount: 1,
+					}}
+				/>,
+			),
+		);
+
+		expect(container.querySelector('[data-ui="EditorVersionRestore"]')).toBeNull();
+	});
 });

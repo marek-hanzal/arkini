@@ -55,7 +55,7 @@ All readers, writers and recovery share `editor.lock`.
 
 ```text
 recover any prior journal
-→ validate root, symlinks, containment and target types
+→ validate root, containment and target types
 → compute exact changed writes and removals
 → write and sync transaction record
 → preserve replaced/removed bytes in the journal

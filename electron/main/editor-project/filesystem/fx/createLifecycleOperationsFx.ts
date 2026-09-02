@@ -29,7 +29,6 @@ import { readVersionHistoryFx } from "./readVersionHistoryFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
-import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 
 const encoder = new TextEncoder();
 
@@ -257,10 +256,6 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 		});
 		yield* fileSystem.makeDirectory(paths.versions, {
 			recursive: true,
-		});
-		yield* assertProjectDirectoryFx({
-			root,
-			directory: paths.versions,
 		});
 		yield* fileSystem.makeDirectory(yield* paths.versionDirectoryFx(versionId), {
 			recursive: true,

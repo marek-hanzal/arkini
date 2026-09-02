@@ -8,7 +8,6 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import {
 	createVersionFingerprintFn,
 	hashVersionBytesFn,
@@ -59,10 +58,6 @@ export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function
 		const cached = objectCache?.get(cacheKey);
 		if (cached !== undefined) return cached;
 		const target = path.join(root, "objects", `${hash}.${type}`);
-		if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
-			return yield* Effect.fail(
-				new Error(`Editor version object ${hash} must not be a symbolic link.`),
-			);
 		const bytes = yield* fileSystem.readFile(target);
 		const actual = hashVersionBytesFn(bytes);
 		if (actual !== hash)

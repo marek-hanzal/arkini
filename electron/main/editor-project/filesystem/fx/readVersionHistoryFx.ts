@@ -8,7 +8,6 @@ import { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDes
 import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
 import { VersionManifestSchema } from "~/project-version/schema/VersionManifestSchema";
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 
 const readJsonFx = <Value>(
@@ -38,14 +37,6 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 			versions: new Map(),
 		} satisfies VersionHistory;
 
-	const assertCanonicalPathFx = (target: string) =>
-		Effect.gen(function* () {
-			if (!(yield* isFilesystemPathSafeFx(fileSystem, paths.root, target)))
-				return yield* Effect.fail(
-					new Error(`Editor version path ${target} must not be a symbolic link.`),
-				);
-		});
-	yield* assertCanonicalPathFx(paths.versionHeadFile);
 	const head = yield* readJsonFx(
 		paths.versionHeadFile,
 		(candidate) => VersionHeadFileSchema.parse(candidate),
@@ -55,8 +46,6 @@ export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* 
 	for (const versionId of head.versions) {
 		const descriptorFile = yield* paths.versionDescriptorFileFx(versionId);
 		const manifestFile = yield* paths.versionManifestFileFx(versionId);
-		yield* assertCanonicalPathFx(descriptorFile);
-		yield* assertCanonicalPathFx(manifestFile);
 		const descriptor = yield* readJsonFx(
 			descriptorFile,
 			(candidate) => VersionDescriptorFileSchema.parse(candidate),

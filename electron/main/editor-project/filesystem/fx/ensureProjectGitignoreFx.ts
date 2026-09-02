@@ -16,7 +16,7 @@ export const ensureProjectGitignoreFx = Effect.fn("ensureProjectGitignoreFx")(fu
 	yield* filesystemWrite.withLockFx(
 		paths.lockFile,
 		Effect.gen(function* () {
-			const exists = yield* assertProjectFileFx(fileSystem, paths.root, paths.gitignoreFile);
+			const exists = yield* assertProjectFileFx(fileSystem, paths.gitignoreFile);
 			const source = exists ? yield* fileSystem.readFileString(paths.gitignoreFile) : "";
 			const next = addGitignoreRulesFn(source);
 			if (next === source) return;

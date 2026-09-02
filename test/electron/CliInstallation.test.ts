@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { chmod, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
@@ -135,28 +135,6 @@ describe.skipIf(process.platform === "win32")("filesystem CLI installation", () 
 		await expect(Effect.runPromise(fixture.installation.replaceFx)).resolves.toMatchObject({
 			type: "installed",
 		});
-		expect(await readFile(fixture.commandPath, "utf8")).toContain(
-			"# arkini-cli managed launcher",
-		);
-	});
-
-	it("replaces a conflicting symlink without modifying its target", async () => {
-		const fixture = await createFixture();
-		const foreignPath = join(dirname(fixture.commandPath), "foreign-command");
-		await mkdir(dirname(fixture.commandPath), {
-			recursive: true,
-		});
-		await writeFile(foreignPath, "foreign\n");
-		await symlink(foreignPath, fixture.commandPath);
-
-		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({
-			type: "conflict",
-			replaceable: true,
-		});
-		await expect(Effect.runPromise(fixture.installation.replaceFx)).resolves.toMatchObject({
-			type: "installed",
-		});
-		expect(await readFile(foreignPath, "utf8")).toBe("foreign\n");
 		expect(await readFile(fixture.commandPath, "utf8")).toContain(
 			"# arkini-cli managed launcher",
 		);

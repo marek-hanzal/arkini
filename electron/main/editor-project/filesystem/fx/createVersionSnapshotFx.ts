@@ -9,10 +9,8 @@ import type { VersionManifestSchema } from "~/project-version/schema/VersionMani
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { hashVersionBytesFn } from "~/project-version/fn/createVersionFingerprintFn";
-import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
 
 const encoder = new TextEncoder();
@@ -79,20 +77,6 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 	yield* fileSystem.makeDirectory(paths.objects, {
 		recursive: true,
 	});
-	yield* assertProjectDirectoryFx({
-		root: paths.root,
-		directory: paths.objects,
-	});
-	const readExistingObjectHashFx = Effect.fn("createVersionSnapshotFx.readExistingObjectHashFx")(
-		function* (target: string) {
-			if (!(yield* isFilesystemPathSafeFx(fileSystem, paths.root, target)))
-				return yield* Effect.fail(
-					new Error(`Editor version object ${target} must not be a symbolic link.`),
-				);
-			if (!(yield* fileSystem.exists(target))) return undefined;
-			return hashVersionBytesFn(yield* fileSystem.readFile(target));
-		},
-	);
 	const objectWrites: Array<{
 		readonly target: string;
 		readonly bytes: Uint8Array;
@@ -101,7 +85,10 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 		...plan.jsonObjects,
 	].sort(([left], [right]) => left.localeCompare(right))) {
 		const target = yield* paths.jsonObjectFileFx(hash);
-		if ((yield* readExistingObjectHashFx(target)) === hash) continue;
+		if (yield* fileSystem.exists(target)) {
+			const current = yield* fileSystem.readFile(target);
+			if (hashVersionBytesFn(current) === hash) continue;
+		}
 		objectWrites.push({
 			target,
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
@@ -111,7 +98,10 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 		...plan.pngObjects,
 	].sort(([left], [right]) => left.localeCompare(right))) {
 		const target = yield* paths.pngObjectFileFx(hash);
-		if ((yield* readExistingObjectHashFx(target)) === hash) continue;
+		if (yield* fileSystem.exists(target)) {
+			const current = yield* fileSystem.readFile(target);
+			if (hashVersionBytesFn(current) === hash) continue;
+		}
 		objectWrites.push({
 			target,
 			bytes,

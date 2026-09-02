@@ -29,7 +29,6 @@ import {
 import { createVersionReaderFx } from "./createVersionReaderFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
 import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
-import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
@@ -149,10 +148,6 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			Effect.gen(function* () {
 				yield* fileSystem.makeDirectory(state.paths.versions, {
 					recursive: true,
-				});
-				yield* assertProjectDirectoryFx({
-					root: state.paths.root,
-					directory: state.paths.versions,
 				});
 			}),
 		);

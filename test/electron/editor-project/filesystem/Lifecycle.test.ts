@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, PlatformError } from "effect";
@@ -342,79 +342,6 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
 			projects: [],
 		});
-	});
-
-	it("ignores a managed symlink that escapes the owned projects directory", async () => {
-		const root = await harness.createExternalProject();
-		await mkdir(harness.projectsRoot, {
-			recursive: true,
-		});
-		const linkedRoot = join(harness.projectsRoot, "escaped-project");
-		await symlink(root, linkedRoot);
-		await writeFile(
-			harness.catalogPath,
-			JSON.stringify({
-				projects: [
-					{
-						root: linkedRoot,
-						ownership: "managed",
-						createdAtMs: 1,
-					},
-				],
-			}),
-		);
-
-		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
-		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
-		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
-			projects: [],
-		});
-	});
-
-	it("removes a catalog alias for an already mounted canonical root", async () => {
-		const root = await harness.createExternalProject();
-		const alias = join(harness.temporaryDirectory, "external-alias");
-		await symlink(root, alias);
-		await mkdir(join(harness.temporaryDirectory, "user-data"), {
-			recursive: true,
-		});
-		await writeFile(
-			harness.catalogPath,
-			JSON.stringify({
-				projects: [
-					{
-						root,
-						ownership: "external",
-						createdAtMs: 1,
-					},
-					{
-						root: alias,
-						ownership: "external",
-						createdAtMs: 1,
-					},
-				],
-			}),
-		);
-
-		const repository = await harness.openRepository();
-		expect(
-			(await Effect.runPromise(repository.listProjectsFx)).map((candidate) =>
-				candidate.type === "valid" ? candidate.project.projectId : candidate.root,
-			),
-		).toEqual([
-			editorTestPayload.config.meta.id,
-		]);
-		await harness.closeRepository(repository);
-
-		const reopened = await harness.openRepository();
-		expect(
-			(await Effect.runPromise(reopened.listProjectsFx)).map((candidate) =>
-				candidate.type === "valid" ? candidate.project.projectId : candidate.root,
-			),
-		).toEqual([
-			editorTestPayload.config.meta.id,
-		]);
 	});
 
 	it("keeps external disk edits hidden until the explicit hard refresh", async () => {

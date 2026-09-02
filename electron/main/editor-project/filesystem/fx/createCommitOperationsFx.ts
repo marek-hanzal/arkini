@@ -96,11 +96,13 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		);
 
 	const commitFx = Effect.fn("commitProjectFx")(function* ({
+		allowProjectIdChange = false,
 		state,
 		config,
 		resources,
 		nowMs,
 	}: {
+		readonly allowProjectIdChange?: boolean;
 		readonly state: ProjectState;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
@@ -110,9 +112,16 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			...config,
 			$schema: GameProjectGameSchemaReference,
 		});
-		if (canonicalConfig.meta.id !== state.project.projectId)
+		const previousProjectId = state.project.projectId;
+		const nextProjectId = canonicalConfig.meta.id;
+		const projectIdChanged = nextProjectId !== previousProjectId;
+		if (projectIdChanged && !allowProjectIdChange)
 			return yield* Effect.fail(
-				new Error("The Editor project ID can only change through Refresh from disk."),
+				new Error("This Editor operation cannot change the project ID."),
+			);
+		if (projectIdChanged && states.has(nextProjectId))
+			return yield* Effect.fail(
+				errorFn("replace-config", `Editor project ID ${nextProjectId} is already open.`),
 			);
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
 		const marker = GameProjectManifestSchema.parse({
@@ -121,6 +130,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		});
 		const nextProject: Project = {
 			...state.project,
+			projectId: nextProjectId,
 			title: canonicalConfig.meta.title,
 			version: state.project.version,
 			updatedAtMs,
@@ -150,11 +160,31 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				config: canonicalConfig,
 				resources,
 			},
+			removeVersionHead: projectIdChanged,
 		});
-		states.set(state.project.projectId, {
+		const nextState: ProjectState = {
 			...state,
+			notes: projectIdChanged
+				? state.notes.map((note) => ({
+						...note,
+						projectId: nextProjectId,
+					}))
+				: state.notes,
 			project: nextProject,
-		});
+			scenarios: projectIdChanged
+				? state.scenarios.map((scenario) => ({
+						...scenario,
+						projectId: nextProjectId,
+					}))
+				: state.scenarios,
+			versionHistory: projectIdChanged
+				? {
+						versions: new Map(),
+					}
+				: state.versionHistory,
+		};
+		if (projectIdChanged) states.delete(previousProjectId);
+		states.set(nextProjectId, nextState);
 		return cloneProjectFn(nextProject);
 	});
 
@@ -303,6 +333,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					yield* assertExpectedRevisionFx(state, expectedRevision, "replace-config");
 					return asCommitFn(
 						yield* commitFx({
+							allowProjectIdChange: true,
 							state,
 							config,
 							resources: state.project.resources,

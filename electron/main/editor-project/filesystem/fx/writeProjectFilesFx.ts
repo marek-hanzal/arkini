@@ -186,6 +186,7 @@ export namespace writeProjectFilesFx {
 		readonly previous?: ProjectFiles;
 		readonly next: ProjectFiles;
 		readonly previousScenarioNames?: ReadonlyArray<string>;
+		readonly removeVersionHead?: boolean;
 		readonly scenarios?: ReadonlyArray<BoardScenarioFileSchema.Type>;
 		readonly versionHead?: VersionHeadFileSchema.Type;
 	}
@@ -288,6 +289,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					target: paths.versionHeadFile,
 					bytes: encodeJsonFn(versionHead),
 				});
+			if (props.removeVersionHead === true) deletes.push(paths.versionHeadFile);
 			candidateWrites.push({
 				target: paths.projectFile,
 				bytes: encodeJsonFn(nextSnapshot.marker),

@@ -79,7 +79,11 @@ describe("EditorWelcome project rows", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => {
-			root.render(createElement(EditorWelcome, { recentProjects: [] }));
+			root.render(
+				createElement(EditorWelcome, {
+					recentProjects: [],
+				}),
+			);
 		});
 
 		const open = container.querySelector('[data-ui="EditorProjectCreateOpen"]');

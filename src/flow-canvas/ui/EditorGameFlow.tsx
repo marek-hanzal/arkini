@@ -7,11 +7,13 @@ import {
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useEffect, useState } from "react";
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { OriginFlow } from "~/flow-canvas/ui/OriginFlow";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 interface EditorItemFlowSearchProps {
@@ -57,11 +59,6 @@ const EditorItemFlowSearch = ({ items, onChangeFn, options, value }: EditorItemF
 	</div>
 );
 
-const readGraphFilterDescriptionFn = (direction: OriginFlowDirection) =>
-	direction === "input"
-		? "Search selects an item; Input highlights downstream operations that use it."
-		: "Search selects an item; Output highlights upstream operations that produce it.";
-
 /** Shows the complete authored game graph and lets search navigate to one selected item. */
 export const EditorGameFlow = ({
 	direction,
@@ -97,14 +94,17 @@ export const EditorGameFlow = ({
 							}}
 							to="/editor/$projectId/editor/items/list"
 						/>
-						<span className="flex min-w-0 items-center gap-1 text-sm">
-							<span className="font-semibold text-foreground">Flow</span>
-							<EditorInfoTooltip content={readGraphFilterDescriptionFn(direction)} />
-						</span>
+						<h1 className="text-2xl font-semibold">Flow</h1>
 					</div>
-					<span className="shrink-0 rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
-						{options.length} items
-					</span>
+					<div className="flex shrink-0 items-center gap-2">
+						<span className="rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
+							{options.length} items
+						</span>
+						<EditorPageHelp
+							content={<Mx label="Flow help" />}
+							title={<Tx label="Flow" />}
+						/>
+					</div>
 				</div>
 				<div className="flex min-w-0 items-end gap-2">
 					<div className="min-w-0 flex-1">

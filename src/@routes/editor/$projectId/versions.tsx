@@ -1,19 +1,34 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/ui/Button";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import {
 	editorSectionTabClassName,
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 
 export const Route = createFileRoute("/editor/$projectId/versions")({
 	component: () => {
 		const project = useEditorProject();
+		const matchRouteFn = useMatchRoute();
 		const params = {
 			projectId: project.projectId,
 		};
+		const commitActive =
+			matchRouteFn({
+				to: "/editor/$projectId/versions/commit",
+				params,
+			}) !== false;
+		const historyActive =
+			matchRouteFn({
+				to: "/editor/$projectId/versions/history",
+				params,
+			}) !== false;
 		return (
 			<section
 				className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
@@ -21,6 +36,12 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 			>
 				<div className="border-b border-line px-4 py-3">
 					<EditorSectionNavigation
+						leading={
+							<EditorHistoryBackButton
+								params={params}
+								to="/editor/$projectId/editor/items/list"
+							/>
+						}
 						title={
 							<div>
 								<h1 className="text-xl font-semibold">Versions</h1>
@@ -58,6 +79,19 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 									History
 								</ButtonLink>
 							</EditorSectionTabs>
+						}
+						action={
+							commitActive ? (
+								<EditorPageHelp
+									content={<Mx label="Version commit help" />}
+									title={<Tx label="Commit version" />}
+								/>
+							) : historyActive ? (
+								<EditorPageHelp
+									content={<Mx label="Version history help" />}
+									title={<Tx label="Version history" />}
+								/>
+							) : undefined
 						}
 					/>
 				</div>

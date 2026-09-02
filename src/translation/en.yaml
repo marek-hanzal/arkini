@@ -13,14 +13,52 @@ Charges per item:
   dynamic: true
 Close:
   value: Close
+Commit version:
+  value: Commit version
 Current stack:
   value: Current stack
 Description:
   value: Description
 Estimate:
   value: Estimate
+Flow:
+  value: Flow
+Flow help:
+  value: |
+    Flow is the project's **connection map**. It lets you follow an item in both directions without opening every production line and rule one by one.
+
+    Use it to answer two practical questions:
+
+    - Choose **Input** when you are asking, “Where can this item go?” Flow highlights operations that use the selected item and the items those operations can produce.
+    - Choose **Output** when you are asking, “Where can this item come from?” Flow highlights operations that produce the selected item and the items those operations need.
+
+    ### Using the graph
+
+    - Search for an item to focus its chain.
+    - Click an item card to select it and highlight its connections. Click the item name inside the card to open its full detail.
+    - Click a connection dot on the edge of a card to jump to the item at the other end.
+    - Drag the canvas to move around. The surrounding project stays visible as context.
+
+    Flow shows authored possibilities, not what will happen in one playthrough. It does not simulate placement, timing, rule truth or actual random rolls.
+
+    Press `?` to open the keyboard help inside the graph. It lists shortcuts for moving through items, showing more or less of a chain, returning to your selection and retracing recently visited items.
 Game limit:
   value: Game limit
+Global estimate help:
+  value: |
+    Global Estimate gives you two quick signals for every item: **how soon could a player obtain it, and how much does the rest of the economy rely on it?**
+
+    It reads the authored starting items and production rules and picks one complete route to each item. This is a planning preview, not a playthrough or a balance verdict.
+
+    ### Reading the list
+
+    - **Estimate** is the optimistic time to obtain one item. Independent work can happen in parallel, and random outputs are averaged across the expected number of attempts.
+    - **Demand** adds up how much of this item is needed to obtain one of every reachable item through the selected routes. The percentage compares it with the highest-demand item in this project, not with the total.
+    - **Partial** means the analysis hit a safety limit. **No path** means the authored data contains no complete route from the starting items.
+
+    Use **Fastest first** and **Slowest first** to find pacing outliers, **Highest demand first** to spot heavily reused ingredients or prerequisites, and **Incomplete only** to find broken or unusually complex paths.
+
+    Open an item to see its selected route and the quantities and time behind the estimate.
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
@@ -149,3 +187,25 @@ Type:
   value: Type
 UID:
   value: UID
+Version commit help:
+  value: |
+    A version is a deliberate restore point for the saved project. Create one before a risky change, after a useful milestone, or whenever you want a named state you can compare or return to later.
+
+    Commit captures the current config, every saved asset byte, and every explicitly saved Board scenario. Unsaved form drafts and the current unsaved Board session are not included.
+
+    Give the version a short **Message** so you can recognize it in History. **Details** and **Tag** are optional context for what changed, why the state matters, or what you want to try next.
+
+    After committing, open **History** to compare versions or restore the complete saved state.
+Version history:
+  value: Version history
+Version history help:
+  value: |
+    History is the project's **map of saved restore points**. The working copy sits at the top, and the connecting lines show which saved version each later version came from.
+
+    - **Working copy** is the project currently saved in the Editor. **Dirty** means it has changed since its current base; **Clean** means it still matches.
+    - **Current base** marks the saved version the working copy continues from.
+    - Select a saved version to see its message, details, tag, and parent. The comparison starts with what changed from that version's parent.
+    - Use **Before** and **After** to compare any saved version with another version or the working copy. Changes are grouped into project settings, items, assets, and Board scenarios.
+    - **Major bump** flags a breaking gameplay change. **Minor bump** marks a save-compatible change.
+
+    **Restore version** replaces the complete saved project with that snapshot. If the working copy or an Editor tool has an unsaved draft, Arkini lets you Commit first or restore and discard it.

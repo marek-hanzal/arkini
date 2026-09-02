@@ -69,6 +69,15 @@ argc mcp-inspect
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 
+The installed macOS CLI can run one Editor project's configured MCP server without opening the Editor:
+
+```bash
+arkini-cli editor mcp <projectId>
+arkini-cli editor mcp <projectId> --remote
+```
+
+Local MCP always starts on the port saved by the Editor. `--remote` additionally starts its saved ngrok tunnel. Running the GUI Editor and this command at the same time is unsupported and is not actively prevented.
+
 ## Distribution
 
 `argc preview-macos` launches an unpacked local arm64 app. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.

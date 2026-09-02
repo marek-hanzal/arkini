@@ -220,16 +220,12 @@ export namespace createFilesystemEditorMcpStorageFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
-		readonly protectFx: (value: string) => Effect.Effect<Uint8Array, unknown, never>;
-		readonly unprotectFx: (value: Uint8Array) => Effect.Effect<string, unknown, never>;
 	}
 }
 
 const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function* ({
 	root,
 	fileSystem: providedFileSystem,
-	protectFx,
-	unprotectFx,
 }: createFilesystemEditorMcpStorageFx.Props) {
 	const path = join(root, "mcp.json");
 	const lock = join(root, ".mcp.lock");
@@ -386,13 +382,8 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 		readNgrokFx: Effect.gen(function* () {
 			const ngrok = (yield* readStateFx).ngrok;
 			if (ngrok === undefined) return undefined;
-			const authtoken = yield* unprotectFx(Buffer.from(ngrok.authtoken, "base64"));
 			return yield* Effect.try({
-				try: () =>
-					EditorMcpNgrokSettingsSchema.parse({
-						authtoken,
-						domain: ngrok.domain,
-					}),
+				try: () => EditorMcpNgrokSettingsSchema.parse(ngrok),
 				catch: (cause) => cause,
 			});
 		}).pipe(
@@ -408,12 +399,8 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 					try: () => EditorMcpNgrokSettingsSchema.parse(configuration),
 					catch: (cause) => cause,
 				});
-				const protectedToken = yield* protectFx(parsed.authtoken);
 				yield* mutateFx((next) => {
-					next.ngrok = {
-						authtoken: Buffer.from(protectedToken).toString("base64"),
-						domain: parsed.domain,
-					};
+					next.ngrok = parsed;
 				});
 			}),
 		ensureSecretFx: readStateFx.pipe(Effect.map((current) => current.password)),

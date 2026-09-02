@@ -59,6 +59,8 @@ renderer      → RendererRuntime
 product CLI   → NodeRuntime.runMain
 ```
 
+`arkini-cli editor mcp` is the one deliberate handoff between those roots. The Node CLI launches the installed Arkini executable as a renderer-free Electron-main process so MCP can reuse the installation's filesystem repository and ngrok configuration without creating a window.
+
 Application Runtime also owns the renderer's one process-lifetime Atom registry/runtime bridge. It installs exact lower capabilities and never becomes a second source of their state. Ordinary components, callbacks and IPC handlers do not create private runtimes or Promise schedulers.
 
 Each live Game owns one child Game Session runtime and Scope. HMR may restart application state; it is not an ownership handoff.
@@ -127,7 +129,7 @@ The router uses history routing in development and packaged Electron. `/` owns r
 
 ## Electron and security
 
-Electron main is the only filesystem, native-window, protocol, MCP transport and privileged IPC owner. Renderer domains receive typed capabilities through `electron/contract`; physical paths and native objects never cross it. The CLI is a separate Node process owner.
+Electron main is the only filesystem, native-window, protocol, MCP transport and privileged IPC owner. Renderer domains receive typed capabilities through `electron/contract`; physical paths and native objects never cross it. The CLI is a separate Node process owner; its Editor MCP command only starts and waits for the renderer-free Electron owner described above.
 
 Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
@@ -147,6 +149,8 @@ Game Persistence observes changed Runtime root identity, debounces and always fl
 The Editor's portable current tree is canonical. Electron main implements the Project Repository; renderer project state, forms, object URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and use one recoverable current-tree transaction while preserving `.git` and unrelated files.
 
 External changes are ignored while mounted. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the complete directory and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
+
+The GUI Editor and `arkini-cli editor mcp` are alternative owners of that repository. Running them concurrently is unsupported by contract and is neither detected nor prevented.
 
 Ordinary authoring writes keep the gameplay version frozen. A Version commit derives one strongest major/minor/noop result from its parent diff, applies that version to the current source tree and publishes the immutable snapshot with HEAD. The first commit preserves the starting version; major commits remove current scenarios atomically, while scenario-only commits do not bump the gameplay version. Version IDs, not gameplay version strings, own graph identity.
 

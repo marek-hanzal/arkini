@@ -77,6 +77,7 @@ package_macos_artifacts() {
 		.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/game/arkini.arkpack
 	"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
 		grep -Fx "{\"type\":\"${ARKINI_EXPECTED_PROVENANCE:-community}\"}"
+	"$packaged_cli" editor mcp --help | grep -F -- "--remote"
 	"$packaged_cli" game replay --help | grep -F -- "--until-fatal"
 	"$packaged_cli" diagnostics slice --help | grep -F -- "--session-id"
 	"$packaged_cli" diagnostics slice --help | grep -F -- "--section"

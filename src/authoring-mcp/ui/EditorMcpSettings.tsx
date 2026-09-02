@@ -82,8 +82,9 @@ export const EditorMcpSettings = ({
 				<div>
 					<h2 className="font-semibold">ngrok</h2>
 					<p className="mt-1 text-sm text-muted">
-						Paste your authtoken and assigned Development Domain. Arkini stores both
-						locally and reuses the same public HTTPS address whenever Remote MCP starts.
+						The ngrok authtoken is stored unencrypted on this device. Use a dedicated,
+						revocable authtoken for Arkini. On supported ngrok plans, restrict it to
+						this Development Domain.
 					</p>
 				</div>
 				<label className="grid gap-2">

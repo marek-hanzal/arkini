@@ -17,6 +17,7 @@ Electron main owns the physical Editor project repository. The portable current 
 | Board Scenarios, Notes, Version commit I/O and Build | Their `src/*` contracts plus Electron repository operations | `filesystem/fx/create*OperationsFx.ts` |
 | Current-tree lock, journal and recovery | `electron/main/editor-project` + mechanical `filesystem-write` | [`filesystem/fx/writeProjectFileSetFx.ts`](filesystem/fx/writeProjectFileSetFx.ts), [`filesystem/fx/recoverProjectFileTransactionFx.ts`](filesystem/fx/recoverProjectFileTransactionFx.ts) |
 | IPC authorization and dispatch | `electron/main/editor-project` | [`ipc/registerEditorProjectIpcFx.ts`](ipc/registerEditorProjectIpcFx.ts) |
+| Renderer-free CLI MCP lifecycle | `electron/main/editor-mcp` | [`../editor-mcp/runHeadlessEditorMcpFx.ts`](../editor-mcp/runHeadlessEditorMcpFx.ts) |
 | Mounted renderer projection and replacement guard | `src/authoring-session` | [`../../../src/authoring-session/fx/refreshEditorProjectFx.ts`](../../../src/authoring-session/fx/refreshEditorProjectFx.ts) |
 | Version semantics, snapshot planning, saved-HEAD proof and checkout handshake | `src/project-version` | [`../../../src/project-version/README.md`](../../../src/project-version/README.md) |
 
@@ -33,6 +34,7 @@ This island has deliberate cross-process and lifecycle coupling:
 - `project-version → game-config-compiler + game-config-resource` proves a saved portable tree matches its published HEAD for Build/CLI admission. Electron main supplies physical commit and object publication.
 - `filesystem-write` stays mechanical and imports none of its product consumers. The Editor repository supplies path ownership, file sets, serialization and error meaning.
 - MCP calls the same Project Repository capabilities and revision checks. It never owns a second project store or bypass mutation path.
+- `arkini-cli editor mcp <projectId>` launches a renderer-free Electron main, selects one catalog project and composes the same filesystem MCP storage, HTTP server, tools and optional ngrok tunnel as the GUI Editor.
 
 The top-level domain graph is cyclic; the process authority is not. Physical mutation terminates in this Electron-main repository.
 
@@ -110,6 +112,8 @@ Editor Build and CLI pack both reread the saved portable tree and require its fi
 - Repository failure is serialized as the exact project operation plus bounded message, not leaked native state.
 - Editor persistence may fail independently without preventing gameplay boot; Editor channels report unavailable state.
 - MCP uses the same schema, expected revision, reference checks and repository mutation operations. Successful external mutation emits invalidation; renderer rereads disk.
+- Headless MCP has no renderer projection to invalidate. Version checkout therefore performs the confirmed repository replacement directly with the current saved fingerprint.
+- GUI Editor and headless CLI MCP access are mutually unsupported by contract. No process lock or runtime detection enforces that restriction.
 
 ## Changing this island?
 

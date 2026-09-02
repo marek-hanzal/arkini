@@ -5,6 +5,7 @@ import { Command } from "effect/unstable/cli";
 
 import { ArkpackCommand } from "~/arkini-cli/command/ArkpackCommand";
 import { DiagnosticsCommand } from "~/arkini-cli/command/DiagnosticsCommand";
+import { EditorMcpCommand } from "~/arkini-cli/command/EditorMcpCommand";
 import { PackCommand } from "~/arkini-cli/command/PackCommand";
 import { ReplayCommand } from "~/arkini-cli/command/ReplayCommand";
 import { SchemaCommand } from "~/arkini-cli/command/SchemaCommand";
@@ -28,11 +29,20 @@ const GameCommand = Command.make("game")
 	)
 	.pipe(Command.withDescription("Game authoring, validation and package commands."));
 
+const EditorCommand = Command.make("editor")
+	.pipe(
+		Command.withSubcommands([
+			EditorMcpCommand,
+		]),
+	)
+	.pipe(Command.withDescription("Editor project commands."));
+
 const ArkiniCommand = Command.make("arkini-cli")
 	.pipe(
 		Command.withSubcommands([
 			ArkpackCommand,
 			DiagnosticsCommand,
+			EditorCommand,
 			GameCommand,
 		]),
 	)

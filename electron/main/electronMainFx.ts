@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, protocol, safeStorage } from "electron";
+import { app, BrowserWindow, nativeTheme, protocol } from "electron";
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
@@ -19,7 +19,7 @@ import { createWindowModeControllerOwnershipFx } from "./window/createWindowMode
 import { createArkiniUserDataPathsFn } from "./user-data/fn/createArkiniUserDataPathsFn";
 import type { EditorProjectServiceOwnership } from "./editor-project/EditorProjectServiceOwnership";
 import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
-import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwnershipFx";
+import { createFilesystemEditorMcpOwnershipFx } from "./editor-mcp/createFilesystemEditorMcpOwnershipFx";
 import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
 import { createFilesystemEditorProjectRepositoryFx } from "./editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { createInstallationFx } from "./cli/createInstallationFx";
@@ -27,8 +27,6 @@ import { createCompletionFx } from "./cli/createCompletionFx";
 import { registerCliIpcFx } from "./cli/registerCliIpcFx";
 import { createChatGptViewControllerOwnershipFx } from "./chatgpt/createChatGptViewControllerOwnershipFx";
 import { registerChatGptIpcFx } from "./chatgpt/registerChatGptIpcFx";
-import { createFilesystemEditorMcpStorageFx } from "./editor-mcp/storage/createFilesystemEditorMcpStorageFx";
-import { createNgrokEditorMcpTunnelFx } from "./editor-mcp/tunnel/createNgrokEditorMcpTunnelFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -170,21 +168,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const windowPreferences = yield* createFilesystemWindowPreferencesFx({
 		root: userDataPaths.game.preferences,
 	});
-	const editorMcpStorage = yield* createFilesystemEditorMcpStorageFx({
-		root: userDataPaths.editor.root,
-		protectFx: (value) =>
-			Effect.try({
-				try: () => safeStorage.encryptString(value),
-				catch: (cause) => cause,
-			}),
-		unprotectFx: (value) =>
-			Effect.try({
-				try: () => safeStorage.decryptString(Buffer.from(value)),
-				catch: (cause) => cause,
-			}),
-	});
-	const editorMcpTunnel = yield* createNgrokEditorMcpTunnelFx;
-	const editorMcpOwnership = yield* createEditorMcpOwnershipFx({
+	const editorMcpOwnership = yield* createFilesystemEditorMcpOwnershipFx({
 		editor: editorProjectServiceOwnership,
 		notifyOverviewChangedFn: (overview) => {
 			for (const window of BrowserWindow.getAllWindows()) {
@@ -201,9 +185,8 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 				window.webContents.send(ArkiniElectronApi.channels.editorProjectChanged, projectId);
 			}
 		},
-		storage: editorMcpStorage,
+		root: userDataPaths.editor.root,
 		runPromiseFn: ElectronMainRuntime.runPromise,
-		tunnel: editorMcpTunnel,
 	});
 	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSyncFn));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();

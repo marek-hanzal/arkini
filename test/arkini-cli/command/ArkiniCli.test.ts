@@ -404,8 +404,30 @@ describe("CLI completion", () => {
 			);
 
 			expect(result.stdout).toContain("arkini-cli");
+			expect(result.stdout).toContain("editor");
 			expect(result.stdout).toContain("game");
 			expect(result.stdout).toContain("arkpack");
 		}
 	}, 15_000);
+});
+
+describe("Editor MCP CLI", () => {
+	it("exposes the project argument and optional Remote tunnel without starting Electron", async () => {
+		const result = await execFileAsync(
+			process.execPath,
+			[
+				"node_modules/tsx/dist/cli.mjs",
+				"src/arkini-cli/arkini.ts",
+				"editor",
+				"mcp",
+				"--help",
+			],
+			{
+				env: process.env,
+			},
+		);
+
+		expect(result.stdout).toContain("<projectId>");
+		expect(result.stdout).toContain("--remote");
+	});
 });

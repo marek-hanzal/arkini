@@ -75,8 +75,6 @@ export const createTestStorage = async (
 	const storage = await Effect.runPromise(
 		createFilesystemEditorMcpStorageFx({
 			root: join(directory, "editor"),
-			protectFx: (value) => Effect.succeed(Buffer.from(value)),
-			unprotectFx: (value) => Effect.succeed(Buffer.from(value).toString()),
 		}),
 	);
 	if (port !== undefined) await Effect.runPromise(storage.writePortFx(port));

@@ -8,7 +8,6 @@ import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { encodeFx } from "./encodeFx";
@@ -75,14 +74,6 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 	const pending = path.join(root, `.build.${randomUUID()}.pending`);
 	const previous = path.join(root, `.build.${randomUUID()}.previous`);
 	const filename = readArkpackArtifactNameFn(identity.packageId);
-	if (yield* fileSystem.exists(build)) {
-		const canonicalBuild = yield* fileSystem.realPath(build);
-		if (canonicalBuild !== path.join(root, "build")) {
-			return yield* Effect.fail(
-				new Error(`Project build directory ${build} is a symbolic link.`),
-			);
-		}
-	}
 
 	yield* Effect.gen(function* () {
 		if (assertCurrentFx !== undefined) yield* assertCurrentFx;
@@ -147,10 +138,7 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* (
 		path.join(root, "editor.lock"),
 		Effect.gen(function* () {
 			const recovery = path.join(root, "editor.lock.write");
-			if (
-				!(yield* isFilesystemPathSafeFx(fileSystem, root, recovery)) ||
-				(yield* fileSystem.exists(recovery))
-			)
+			if (yield* fileSystem.exists(recovery))
 				return yield* Effect.fail(
 					new Error(
 						`Project ${root} has an interrupted Editor transaction at ${recovery}; reopen it in the Editor before packing.`,

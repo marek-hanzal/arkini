@@ -3,13 +3,13 @@ import {
 	access,
 	chmod,
 	link,
-	lstat,
 	mkdir,
 	mkdtemp,
 	open,
 	readFile,
 	rename,
 	rm,
+	stat,
 	unlink,
 	writeFile,
 } from "node:fs/promises";
@@ -62,7 +62,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	const inspectFn = async (): Promise<ManagedFileInspection> => {
 		let file;
 		try {
-			file = await lstat(path);
+			file = await stat(path);
 		} catch (cause) {
 			if (isMissingFn(cause)) {
 				return {
@@ -72,13 +72,10 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 			throw cause;
 		}
 		if (!file.isFile()) {
-			const replaceable = file.isSymbolicLink();
 			return {
 				type: "conflict",
-				message: replaceable
-					? `Another file already exists at ${path}.`
-					: `A non-file path already exists at ${path} and cannot be replaced.`,
-				replaceable,
+				message: `A non-file path already exists at ${path} and cannot be replaced.`,
+				replaceable: false,
 			};
 		}
 		const existingContents = await readFile(path, "utf8");
@@ -112,7 +109,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	};
 
 	const repairFn = async () => {
-		const handle = await open(path, constants.O_RDWR | constants.O_NOFOLLOW);
+		const handle = await open(path, "r+");
 		try {
 			await assertManagedHandleFn(handle);
 			await handle.truncate(0);
@@ -151,7 +148,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	};
 
 	const removeFn = async () => {
-		const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);
+		const handle = await open(path, "r");
 		try {
 			const opened = await assertManagedHandleFn(handle);
 			const directory = dirname(path);
@@ -166,7 +163,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 				});
 				throw cause;
 			}
-			const claimed = await lstat(claimedPath);
+			const claimed = await stat(claimedPath);
 			if (claimed.dev !== opened.dev || claimed.ino !== opened.ino) {
 				throw new Error(
 					`${subject} changed during removal. The unexpected file was preserved at ${claimedPath}.`,

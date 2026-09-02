@@ -2,7 +2,7 @@ import * as NodePath from "@effect/platform-node/NodePath";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { execFile } from "node:child_process";
-import { lstat, mkdir, mkdtemp, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -99,53 +99,6 @@ describe("Editor project file transaction", () => {
 			"new-first",
 			"new-second",
 		]);
-	}, 12_000);
-
-	it("refuses recovery through a replaced parent symlink", async () => {
-		const nested = join(root, "nested");
-		const nestedChild = join(nested, "child");
-		const outside = await mkdtemp(join(tmpdir(), "arkini-project-transaction-outside-"));
-		const outsideChild = join(outside, "child");
-		try {
-			await Promise.all([
-				mkdir(nestedChild, {
-					recursive: true,
-				}),
-				mkdir(outsideChild),
-			]);
-			await Promise.all([
-				writeFile(join(nestedChild, "first.json"), "old-first"),
-				writeFile(join(nestedChild, "second.json"), "old-second"),
-				writeFile(join(outsideChild, "first.json"), "outside-first"),
-				writeFile(join(outsideChild, "second.json"), "outside-second"),
-			]);
-			await expect(
-				runFile(process.execPath, [
-					tsx,
-					helper,
-					"nested-partial",
-					root,
-				]),
-			).rejects.toBeDefined();
-			await rename(nested, join(root, "nested-owned"));
-			await symlink(outside, nested);
-
-			const filesystemWrite = await createWrite();
-			await expect(
-				Effect.runPromise(withProjectLockFx(filesystemWrite, root, Effect.void)),
-			).rejects.toThrow("preserved");
-			await expect(readFile(join(outsideChild, "first.json"), "utf8")).resolves.toBe(
-				"outside-first",
-			);
-			await expect(readFile(join(outsideChild, "second.json"), "utf8")).resolves.toBe(
-				"outside-second",
-			);
-		} finally {
-			await rm(outside, {
-				force: true,
-				recursive: true,
-			});
-		}
 	}, 12_000);
 
 	it("preserves the journal and reports its exact location when rollback fails", async () => {

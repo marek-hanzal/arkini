@@ -2,7 +2,7 @@ import * as NodePath from "@effect/platform-node/NodePath";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Option, PlatformError } from "effect";
 import { spawn } from "node:child_process";
-import { lstat, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -320,42 +320,6 @@ describe("FilesystemWrite", () => {
 		await Effect.runPromise(Deferred.await(nestedEntered));
 		await Effect.runPromise(Fiber.await(nested.fiber));
 	});
-
-	it("rejects a symbolic-link target without touching its referent", async () => {
-		const outside = join(root, "outside");
-		const target = join(root, "target");
-		await writeFile(outside, "outside");
-		await symlink(outside, target);
-		const filesystemWrite = await createWrite();
-		await expect(
-			Effect.runPromise(
-				filesystemWrite.replaceFileFx({
-					lock: join(root, ".symlink.lock"),
-					target,
-					bytes: encoder.encode("replaced"),
-				}),
-			),
-		).rejects.toThrow("must not be a symbolic link");
-		await expect(readFile(outside, "utf8")).resolves.toBe("outside");
-	});
-
-	it("preserves a dangling symbolic link occupying the exact staging path", async () => {
-		const target = join(root, "target");
-		const pending = `${target}.arkini-replace`;
-		await symlink(join(root, "missing"), pending);
-		const filesystemWrite = await createWrite();
-		await expect(
-			Effect.runPromise(
-				filesystemWrite.replaceFileFx({
-					lock: join(root, ".symlink.lock"),
-					target,
-					bytes: encoder.encode("replacement"),
-				}),
-			),
-		).rejects.toThrow("staging file");
-		expect((await lstat(pending)).isSymbolicLink()).toBe(true);
-	});
-
 	it("rejects external and non-file targets without recursive cleanup", async () => {
 		const outside = await mkdtemp(join(tmpdir(), "arkini-filesystem-external-"));
 		const outsideFile = join(outside, "outside.json");
@@ -382,7 +346,7 @@ describe("FilesystemWrite", () => {
 						target: directory,
 					}),
 				),
-			).rejects.toThrow("must be canonical");
+			).rejects.toThrow("must be a file");
 			await expect(readFile(outsideFile, "utf8")).resolves.toBe("outside");
 			await expect(readFile(child, "utf8")).resolves.toBe("preserved");
 		} finally {

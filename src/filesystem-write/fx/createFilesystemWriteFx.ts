@@ -3,7 +3,6 @@ import { lock as acquireLock } from "proper-lockfile";
 
 import { FilesystemWriteError } from "../error/FilesystemWriteError";
 import type { FilesystemWrite } from "../service/FilesystemWrite";
-import { isFilesystemPathSafeFx } from "./isFilesystemPathSafeFx";
 import { prepareFilesystemWriteTargetFx } from "./prepareFilesystemWriteTargetFx";
 
 interface FilesystemWritePaths {
@@ -145,20 +144,13 @@ const replaceFileFx = Effect.fn("replaceFileFx")(function* ({
 			}),
 		);
 	const pending = `${prepared.target}.arkini-replace`;
-	if (!(yield* isFilesystemPathSafeFx(fileSystem, paths.parent, pending)))
-		return yield* Effect.fail(
-			new FilesystemWriteError({
-				operation: "replace-file",
-				message: `Filesystem write staging file ${pending} must be canonical and must not be a symbolic link.`,
-			}),
-		);
 	if (yield* fileSystem.exists(pending)) {
 		const info = yield* fileSystem.stat(pending);
 		if (info.type !== "File")
 			return yield* Effect.fail(
 				new FilesystemWriteError({
 					operation: "replace-file",
-					message: `Filesystem write staging file ${pending} must be canonical and must not be a symbolic link.`,
+					message: `Filesystem write staging path ${pending} must be a file.`,
 				}),
 			);
 		yield* fileSystem.remove(pending, {

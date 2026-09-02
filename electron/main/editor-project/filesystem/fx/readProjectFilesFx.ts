@@ -36,33 +36,6 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const paths = yield* createProjectPathsFx(projectRoot);
-	const canonicalRoot = yield* fileSystem.realPath(paths.root);
-	const assertCanonicalPathFx = (target: string) =>
-		Effect.gen(function* () {
-			const actual = yield* fileSystem.realPath(target);
-			const expected = path.join(canonicalRoot, path.relative(paths.root, target));
-			if (actual !== expected)
-				return yield* Effect.fail(
-					new Error(`Editor project path ${target} must not be a symbolic link.`),
-				);
-		});
-	for (const required of [
-		paths.projectFile,
-		paths.schemaFile,
-		paths.gameFile,
-		paths.items,
-	])
-		yield* assertCanonicalPathFx(required);
-	for (const optional of [
-		paths.assets,
-		paths.resources,
-		paths.notes,
-		paths.scenarios,
-		paths.versions,
-		paths.objects,
-	]) {
-		if (yield* fileSystem.exists(optional)) yield* assertCanonicalPathFx(optional);
-	}
 	const marker = yield* parseJsonFx(
 		paths.projectFile,
 		(candidate) => GameProjectManifestSchema.parse(candidate),
@@ -99,7 +72,6 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 
 	for (const relativeFile of itemFiles) {
 		const sourcePath = path.join(paths.items, relativeFile);
-		yield* assertCanonicalPathFx(sourcePath);
 		const segments = relativeFile.replaceAll("\\", "/").split("/");
 		if (segments.length !== 2) {
 			return yield* failInvalidItemFileFx(
@@ -171,7 +143,6 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	const shellResources = new Set(Object.values(config.resources));
 	const resourceIds = new Set<string>();
 	for (const descriptor of descriptors) {
-		yield* assertCanonicalPathFx(descriptor.path);
 		if (resourceIds.has(descriptor.id)) {
 			return yield* Effect.fail(
 				new Error(`Editor PNG resource ID ${descriptor.id} is duplicated.`),

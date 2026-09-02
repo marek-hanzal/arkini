@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { prepareFilesystemWriteTargetFx } from "~/filesystem-write/fx/prepareFilesystemWriteTargetFx";
 
 const recordSchema = z
@@ -39,8 +38,6 @@ const assertFileFx = Effect.fn("recoverProjectFileTransactionFx.assertFileFx")(f
 	required = false,
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
-	if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
-		return yield* failRecoveryFx(root, `Recovery file ${target} is unsafe.`);
 	if (!(yield* fileSystem.exists(target))) {
 		if (required) return yield* failRecoveryFx(root, `Recovery file ${target} is missing.`);
 		return false;
@@ -84,8 +81,6 @@ export const recoverProjectFileTransactionFx = Effect.fn("recoverProjectFileTran
 		const lock = path.join(root, "editor.lock");
 		const active = `${lock}.write`;
 		return yield* Effect.gen(function* () {
-			if (!(yield* isFilesystemPathSafeFx(fileSystem, root, active)))
-				return yield* failRecoveryFx(active, `Recovery directory ${active} is unsafe.`);
 			if (!(yield* fileSystem.exists(active))) return;
 			if ((yield* fileSystem.stat(active)).type !== "Directory")
 				return yield* failRecoveryFx(active, `Recovery path ${active} is not a directory.`);

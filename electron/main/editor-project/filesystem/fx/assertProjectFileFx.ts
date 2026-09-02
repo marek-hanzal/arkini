@@ -1,19 +1,11 @@
 import { Effect, FileSystem } from "effect";
 
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
-
 export const assertProjectFileFx = Effect.fn("assertProjectFileFx")(function* (
 	fileSystem: FileSystem.FileSystem,
-	root: string,
 	target: string,
 ) {
 	if (!(yield* fileSystem.exists(target))) return false;
-	if (
-		!(yield* isFilesystemPathSafeFx(fileSystem, root, target)) ||
-		(yield* fileSystem.stat(target)).type !== "File"
-	)
-		return yield* Effect.fail(
-			new Error(`Editor project file ${target} must not be a symbolic link.`),
-		);
+	if ((yield* fileSystem.stat(target)).type !== "File")
+		return yield* Effect.fail(new Error(`Editor project path ${target} must be a file.`));
 	return true;
 });

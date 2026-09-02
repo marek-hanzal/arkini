@@ -21,7 +21,6 @@ import { readProjectFilesFx } from "./readProjectFilesFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
-import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { createVersionReaderFx } from "./createVersionReaderFx";
 import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
 
@@ -278,21 +277,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 						const build = state.paths.build;
 						if (!(yield* fileSystem.exists(build)))
 							return yield* Effect.fail(new Error("No Editor project build exists."));
-						if (!(yield* isFilesystemPathSafeFx(fileSystem, state.paths.root, build)))
-							return yield* Effect.fail(
-								new Error(`Project build directory ${build} is a symbolic link.`),
-							);
 						const arkpackPath = path.join(build, readArkpackArtifactNameFn(projectId));
-						if (
-							!(yield* isFilesystemPathSafeFx(
-								fileSystem,
-								state.paths.root,
-								arkpackPath,
-							))
-						)
-							return yield* Effect.fail(
-								new Error("The Editor build Arkpack is a symbolic link."),
-							);
 						const info = yield* fileSystem.stat(arkpackPath);
 						if (info.size > ArkpackLimits.maxArkpackBytes)
 							return yield* Effect.fail(

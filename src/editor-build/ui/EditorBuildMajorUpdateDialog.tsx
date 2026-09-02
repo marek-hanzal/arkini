@@ -1,5 +1,8 @@
+import { PackageCheck, X } from "lucide-react";
+
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
-import { Button, DangerButton } from "~/ui/ui/Button";
+import { DangerButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 /** Warns before replacing an installed package across its save compatibility boundary. */
 export const EditorBuildMajorUpdateDialog = ({
@@ -38,19 +41,23 @@ export const EditorBuildMajorUpdateDialog = ({
 					{error}
 				</p>
 			)}
-			<div className="mt-6 flex justify-end gap-2">
-				<Button
+			<div className="mt-6 flex items-center justify-between gap-4">
+				<LinkButton
+					className="inline-flex items-center gap-1.5"
 					disabled={pending}
 					onClick={onCancelFn}
 				>
+					<X className="size-4" />
 					Cancel
-				</Button>
+				</LinkButton>
 				<DangerButton
+					className="gap-1.5"
 					data-ui="EditorBuildMajorUpdateConfirm"
 					disabled={pending}
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={onConfirmFn}
 				>
+					<PackageCheck className="size-4" />
 					Update package
 				</DangerButton>
 			</div>

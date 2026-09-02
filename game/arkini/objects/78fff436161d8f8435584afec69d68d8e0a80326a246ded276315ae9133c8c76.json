@@ -1,0 +1,124 @@
+{
+	"uid": "j4m7egem9n5nagq3sfoxnpag",
+	"id": "producer:pig-farm-t1",
+	"title": "Pig Farm I",
+	"description": "Consumes grain and water to produce piglets.",
+	"asset": {
+		"default": [
+			"producer-pig-farm-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 5,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:pig-farm-t1:piglet",
+			"title": "Piglet",
+			"description": "Runs piglet for Pig Farm I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 32000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:grain"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 4
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:water"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 4
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:piglet",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.35,
+								"drop": [
+									{
+										"itemId": "item:piglet",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.2,
+								"drop": [
+									{
+										"itemId": "item:bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.1,
+								"drop": [
+									{
+										"itemId": "item:trash",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

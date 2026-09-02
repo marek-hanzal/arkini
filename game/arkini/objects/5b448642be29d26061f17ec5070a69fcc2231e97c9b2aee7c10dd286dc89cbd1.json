@@ -1,0 +1,129 @@
+{
+	"$schema": "./schema.json",
+	"meta": {
+		"id": "arkini",
+		"title": "Arkini",
+		"board": {
+			"width": 15,
+			"height": 9
+		},
+		"inventory": {
+			"width": 15,
+			"height": 9
+		},
+		"toolbarSize": 15
+	},
+	"resources": {
+		"hero": "hero",
+		"avatar-01": "avatar-01",
+		"avatar-02": "avatar-02",
+		"avatar-03": "avatar-03",
+		"avatar-04": "avatar-04",
+		"avatar-05": "avatar-05",
+		"avatar-06": "avatar-06",
+		"avatar-07": "avatar-07"
+	},
+	"start": {
+		"currentSpace": 0,
+		"board": [
+			{
+				"x": 1,
+				"y": 0,
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 1,
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 2,
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 1,
+				"space": 0,
+				"itemId": "producer:lumberjack-t1",
+				"quantity": 1
+			},
+			{
+				"x": 4,
+				"y": 3,
+				"space": 0,
+				"itemId": "producer:townhall-t1",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 0,
+				"space": 0,
+				"itemId": "item:rock",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 1,
+				"space": 0,
+				"itemId": "producer:quarry-t1",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
+			},
+			{
+				"x": 9,
+				"y": 5,
+				"space": 0,
+				"itemId": "jump",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 1,
+				"space": 1,
+				"itemId": "producer:armory-t1",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 2,
+				"space": 1,
+				"itemId": "back-to-0",
+				"quantity": 1
+			}
+		],
+		"inventory": [
+			{
+				"itemId": "item:magnifying-glass",
+				"position": {
+					"x": 0,
+					"y": 0
+				},
+				"quantity": 1
+			}
+		],
+		"toolbar": [
+			{
+				"itemId": "item:inventory",
+				"quantity": 1,
+				"position": {
+					"x": 14,
+					"y": 0
+				}
+			}
+		]
+	},
+	"version": "2.4"
+}

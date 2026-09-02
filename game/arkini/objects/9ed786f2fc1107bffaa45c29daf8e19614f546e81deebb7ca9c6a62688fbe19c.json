@@ -1,0 +1,86 @@
+{
+	"uid": "y2jjgcbx4kziztbx47k53chs",
+	"id": "item:blueprint-vegetable-garden-t1",
+	"title": "Vegetable Garden I Blueprint",
+	"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-vegetable-garden-t1"
+		],
+		"sources": [
+			"producer-vegetable-garden-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:vegetable-garden-t1:construct",
+		"title": "Construct Vegetable Garden I",
+		"description": "Consumes construction resources to build Vegetable Garden I.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 16000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:plank"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:water"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:vegetable-garden-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "z3ccuolqihndvgedqq96rb5x",
+	"id": "item:pigment",
+	"title": "Pigment",
+	"description": "Concentrated natural dye powders produced by Dye Workshops for luxury textiles and stained-glass work.",
+	"asset": {
+		"default": [
+			"item-pigment"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

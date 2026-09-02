@@ -64,6 +64,7 @@ describe("editor MCP server", () => {
 			"item_output",
 			"item_estimate",
 			"version_status",
+			"version_commit_preview",
 			"version_list",
 			"version_diff",
 			"version_commit",
@@ -305,10 +306,26 @@ describe("editor MCP server", () => {
 				text: expect.stringContaining("Versions: 0\nWorking copy: dirty"),
 			},
 		]);
+		const initialPreview = await client.callTool({
+			name: "version_commit_preview",
+			arguments: {},
+		});
+		expect(initialPreview.content).toMatchObject([
+			{
+				text: expect.stringContaining("Resulting Arkpack: v1.0\nCompatibility bump: noop"),
+			},
+		]);
+		const initialPreviewText = initialPreview.content.find(({ type }) => type === "text");
+		if (initialPreviewText?.type !== "text") throw new Error("Expected text preview.");
+		const initialFingerprint = /Commit fingerprint: ([a-f0-9]{64})/.exec(
+			initialPreviewText.text,
+		)?.[1];
+		if (initialFingerprint === undefined) throw new Error("Expected commit fingerprint.");
 		const committed = await client.callTool({
 			name: "version_commit",
 			arguments: {
 				message: "Initial snapshot",
+				previewFingerprint: initialFingerprint,
 				tag: "baseline",
 			},
 		});
@@ -346,6 +363,64 @@ describe("editor MCP server", () => {
 				text: expect.stringContaining("config.meta.title · minor bump"),
 			},
 		]);
+		const minorProject = await Effect.runPromise(repository.readProjectFx("version-project"));
+		if (minorProject === null) throw new Error("Expected current project.");
+		await Effect.runPromise(
+			repository.writeBoardScenarioFx({
+				bytes: Uint8Array.of(1, 2, 3),
+				expectedRevision: minorProject.revision,
+				name: "Opening",
+				projectId: "version-project",
+			}),
+		);
+		const minorPreview = await client.callTool({
+			name: "version_commit_preview",
+			arguments: {},
+		});
+		const minorPreviewText = minorPreview.content.find(({ type }) => type === "text");
+		if (minorPreviewText?.type !== "text") throw new Error("Expected text preview.");
+		expect(minorPreviewText.text).toContain(
+			"Compatibility bump: minor\nBoard scenarios deleted by commit: 0",
+		);
+		const minorFingerprint = /Commit fingerprint: ([a-f0-9]{64})/.exec(
+			minorPreviewText.text,
+		)?.[1];
+		if (minorFingerprint === undefined) throw new Error("Expected commit fingerprint.");
+		await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: "version-project",
+				expectedRevision: minorProject.revision,
+				config: {
+					...minorProject.config,
+					meta: {
+						...minorProject.config.meta,
+						board: {
+							...minorProject.config.meta.board,
+							width: minorProject.config.meta.board.width + 1,
+						},
+					},
+				},
+			}),
+		);
+		const staleCommit = await client.callTool({
+			name: "version_commit",
+			arguments: {
+				message: "Stale preview must fail",
+				previewFingerprint: minorFingerprint,
+			},
+		});
+		expect(staleCommit.isError).toBe(true);
+		expect(staleCommit.content).toMatchObject([
+			{
+				text: expect.stringContaining("changed after version_commit_preview"),
+			},
+		]);
+		expect(
+			await Effect.runPromise(repository.listBoardScenariosFx("version-project")),
+		).toHaveLength(1);
+		expect(await Effect.runPromise(repository.listVersionsFx("version-project"))).toHaveLength(
+			1,
+		);
 		const tagged = await client.callTool({
 			name: "version_tag",
 			arguments: {

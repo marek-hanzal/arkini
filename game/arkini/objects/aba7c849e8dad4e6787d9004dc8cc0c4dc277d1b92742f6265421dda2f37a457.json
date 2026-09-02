@@ -1,0 +1,14 @@
+{
+	"uid": "lydms21xchmf26hx8rhfvg2v",
+	"id": "item:nails",
+	"title": "Nails",
+	"description": "Forged fasteners produced by the Blacksmith and consumed by armories and later advanced construction.",
+	"asset": {
+		"default": [
+			"item-nails"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

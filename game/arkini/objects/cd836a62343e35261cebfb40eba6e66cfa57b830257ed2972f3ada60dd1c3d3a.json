@@ -1,0 +1,90 @@
+{
+	"uid": "f7sulwjde764bzinntz2jrm2",
+	"id": "producer:slaughterhouse-t1",
+	"title": "Slaughterhouse I",
+	"description": "Processes piglets into sausage and leather.",
+	"asset": {
+		"default": [
+			"producer-slaughterhouse-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 1,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:slaughterhouse-t1:sausage-raw-hide",
+			"title": "Sausage + Raw Hide",
+			"description": "Runs sausage + raw hide for Slaughterhouse I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 24000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:piglet"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 4
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:sausage",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "item:raw-hide",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.25,
+								"drop": [
+									{
+										"itemId": "item:raw-hide",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

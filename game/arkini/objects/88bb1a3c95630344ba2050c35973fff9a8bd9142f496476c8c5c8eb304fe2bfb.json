@@ -1,0 +1,14 @@
+{
+	"uid": "sflqmeq9us23cfz4h6jr5sfa",
+	"id": "item:bricks",
+	"title": "Bricks",
+	"description": "Fired clay building material prepared for sturdier construction.",
+	"asset": {
+		"default": [
+			"item-bricks"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

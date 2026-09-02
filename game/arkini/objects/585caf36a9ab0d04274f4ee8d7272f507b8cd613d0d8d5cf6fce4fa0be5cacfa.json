@@ -1,0 +1,14 @@
+{
+	"uid": "wfkw70aj08m3fij8epwp7q91",
+	"id": "item:leather-armor",
+	"title": "Leather Armor",
+	"description": "Layered leather armor assembled by the Armory from leather, clothing, and forged nails.",
+	"asset": {
+		"default": [
+			"item-leather-armor"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

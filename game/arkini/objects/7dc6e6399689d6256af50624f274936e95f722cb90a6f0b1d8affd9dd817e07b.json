@@ -1,0 +1,14 @@
+{
+	"uid": "ygxs727gckc3ljlsp56hzjmf",
+	"id": "item:sausage",
+	"title": "Sausage",
+	"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
+	"asset": {
+		"default": [
+			"item-sausage"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

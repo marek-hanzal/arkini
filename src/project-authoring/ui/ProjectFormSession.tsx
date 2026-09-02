@@ -10,7 +10,6 @@ import { ProjectFormProvider } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { useProjectFormController } from "~/project-authoring/ui/useProjectFormController";
-import { ProjectCompatibilityNotice } from "~/project-version/ui/ProjectCompatibilityNotice";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 
@@ -126,12 +125,6 @@ export const ProjectFormSession = ({
 								sectionId,
 							}}
 							to="/editor/$projectId/project/detail/$sectionId"
-						/>
-					}
-					notice={
-						<ProjectCompatibilityNotice
-							compatibility={controller.compatibility}
-							version={project.version}
 						/>
 					}
 					rootCard={false}

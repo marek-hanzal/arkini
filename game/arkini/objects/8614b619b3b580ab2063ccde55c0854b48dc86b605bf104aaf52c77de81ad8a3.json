@@ -1,0 +1,15 @@
+{
+	"uid": "d8b2sxnl9sqvlckmiqzlb7c0",
+	"id": "producer:cathedral",
+	"title": "Cathedral",
+	"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
+	"asset": {
+		"default": [
+			"producer-cathedral"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"type": "simple"
+}

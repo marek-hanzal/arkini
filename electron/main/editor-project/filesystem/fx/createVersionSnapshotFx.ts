@@ -10,9 +10,9 @@ import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchem
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { hashVersionBytesFn } from "./VersionFingerprint";
+import { hashVersionBytesFn } from "~/project-version/fn/createVersionFingerprintFn";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
-import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
+import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
 
 const encoder = new TextEncoder();
 const VersionObjectWriteConcurrency = 4;

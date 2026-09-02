@@ -9,6 +9,7 @@ import {
 } from "./useEditorBuildArtifactController";
 import { useEditorBuildInstallController } from "./useEditorBuildInstallController";
 import { useEditorBuildSaveController } from "./useEditorBuildSaveController";
+import { useProjectVersionStatus } from "~/project-version/ui/useProjectVersionStatus";
 
 type EditorBuildStatus = "building" | "not-built" | "stale" | "valid";
 
@@ -19,6 +20,8 @@ export namespace useEditorBuildController {
 		readonly buildFailure?: EditorBuildFailure;
 		readonly buildPending: boolean;
 		readonly buildStatus: EditorBuildStatus;
+		readonly canBuild: boolean;
+		readonly commitRequired?: boolean;
 		readonly cancelInstallFn: () => void;
 		readonly confirmInstallFn: () => void;
 		readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
@@ -30,6 +33,7 @@ export namespace useEditorBuildController {
 		readonly installPending: boolean;
 		readonly installedPackageId?: string;
 		readonly project: Project;
+		readonly versionStatusError?: string;
 		readonly saveArtifactFn: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;
@@ -39,7 +43,12 @@ export namespace useEditorBuildController {
 /** Composes build, external save, and installation without duplicating artifact truth. */
 export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const project = useEditorProject();
+	const versionState = useProjectVersionStatus(project.projectId);
+	const versionStatus = versionState.status === "ready" ? versionState.versionStatus : undefined;
+	const canBuild =
+		versionStatus?.currentBaseVersionId !== undefined && versionStatus.dirty === false;
 	const artifactController = useEditorBuildArtifactController({
+		canBuild,
 		project,
 	});
 	const saveController = useEditorBuildSaveController({
@@ -56,6 +65,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		buildFailure: artifactController.buildFailure,
 		buildPending: artifactController.buildPending,
 		buildStatus: artifactController.buildStatus,
+		canBuild,
 		cancelInstallFn: installController.cancelInstallFn,
 		confirmInstallFn: installController.confirmInstallFn,
 		diagnostics: artifactController.diagnostics,
@@ -66,9 +76,20 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		installError: installController.installError,
 		installPending: installController.installPending,
 		installedPackageId: installController.installedPackageId,
+		...(versionStatus === undefined
+			? {}
+			: {
+					commitRequired:
+						versionStatus.currentBaseVersionId === undefined || versionStatus.dirty,
+				}),
 		project,
 		saveArtifactFn: saveController.saveArtifactFn,
 		saveError: saveController.saveError,
 		savePending: saveController.savePending,
+		...(versionState.status === "error"
+			? {
+					versionStatusError: versionState.message,
+				}
+			: {}),
 	};
 };

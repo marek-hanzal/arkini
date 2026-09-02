@@ -1,0 +1,14 @@
+{
+	"uid": "vu62v3pwt5olkj8jt5nl6lww",
+	"id": "item:marble-deposit",
+	"title": "Marble Deposit",
+	"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
+	"asset": {
+		"default": [
+			"item-marble-deposit"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

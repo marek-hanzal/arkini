@@ -1,0 +1,99 @@
+{
+	"uid": "o8tlrl7cf6d2frk9qj4ziqt5",
+	"id": "item:blueprint-pig-farm-t1",
+	"title": "Pig Farm I Blueprint",
+	"description": "Build plan that can be filled with resources to construct Pig Farm I.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-pig-farm-t1"
+		],
+		"sources": [
+			"producer-pig-farm-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:pig-farm-t1:construct",
+		"title": "Construct Pig Farm I",
+		"description": "Consumes construction resources to build Pig Farm I.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 20000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:plank"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:grain"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:water"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:pig-farm-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "vf38s8fjec67ie3ss6cho4g5",
+	"id": "item:basic-knowledge",
+	"title": "Basic Knowledge",
+	"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
+	"asset": {
+		"default": [
+			"item-basic-knowledge"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

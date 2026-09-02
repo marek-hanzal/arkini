@@ -1,0 +1,99 @@
+{
+	"uid": "oap2pi7i6zb5eywu0sgepjs3",
+	"id": "item:blueprint-waste-processor-t1",
+	"title": "Waste Processor I Blueprint",
+	"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-waste-processor-t1"
+		],
+		"sources": [
+			"producer-waste-processor-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:waste-processor-t1:construct",
+		"title": "Construct Waste Processor I",
+		"description": "Consumes construction resources to build Waste Processor I.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 34000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:plank"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:stone"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 3,
+					"max": 3
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:water"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:waste-processor-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

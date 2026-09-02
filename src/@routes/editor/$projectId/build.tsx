@@ -10,6 +10,7 @@ import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 const buildStatusLabels = {
 	building: "Building",
@@ -23,11 +24,13 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 		const controller = useEditorBuildController();
 		const InstallIcon = controller.installAction === "update" ? PackageCheck : PackagePlus;
 		const buildSummary =
-			controller.artifact !== undefined
-				? `Revision ${controller.artifact.revision} built with ${controller.artifact.diagnostics.length} non-blocking diagnostic${controller.artifact.diagnostics.length === 1 ? "" : "s"}.`
-				: controller.buildStatus === "stale"
-					? "The project changed after the last build. Build the current revision again."
-					: "Run a build to execute the complete game and resource validation.";
+			controller.commitRequired === true
+				? "Commit the saved working copy before building its Arkpack."
+				: controller.artifact !== undefined
+					? `Revision ${controller.artifact.revision} built with ${controller.artifact.diagnostics.length} non-blocking diagnostic${controller.artifact.diagnostics.length === 1 ? "" : "s"}.`
+					: controller.buildStatus === "stale"
+						? "The project changed after the last build. Build the current revision again."
+						: "Run a build to execute the complete game and resource validation.";
 		const artifactSummary =
 			controller.artifact === undefined
 				? undefined
@@ -48,14 +51,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 					<div>
 						<h1 className="text-2xl font-semibold">Build</h1>
 						<p className="mt-1 text-sm text-muted">
-							Validate one exact saved project revision and publish its canonical
-							Arkpack.
-						</p>
-						<p className="mt-1 text-xs text-subtle">
-							Arkpack v{controller.project.version}. Board scenarios remain stored
-							across project updates. A major save makes older scenarios and published
-							game saves incompatible with the new gameplay version without deleting
-							them.
+							Validate and publish the Arkpack from the committed Version HEAD.
 						</p>
 					</div>
 				</header>
@@ -96,15 +92,33 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							project={controller.project}
 						/>
 					)}
-					<PrimaryButton
-						className="mt-4"
-						disabled={controller.buildPending}
-						cursorIntent={controller.buildPending ? "progress" : undefined}
-						onClick={controller.buildFn}
-					>
-						<PackageCheck className="mr-2 size-4" />
-						Build
-					</PrimaryButton>
+					{controller.commitRequired === true ? (
+						<LinkButtonLink
+							className="mt-4 inline-flex"
+							params={{
+								projectId: controller.project.projectId,
+							}}
+							search={{
+								returnTo: `/editor/${encodeURIComponent(controller.project.projectId)}/build`,
+							}}
+							to="/editor/$projectId/versions/commit"
+						>
+							Commit changes
+						</LinkButtonLink>
+					) : (
+						<PrimaryButton
+							className="mt-4"
+							disabled={!controller.canBuild || controller.buildPending}
+							cursorIntent={controller.buildPending ? "progress" : undefined}
+							onClick={controller.buildFn}
+						>
+							<PackageCheck className="mr-2 size-4" />
+							Build
+						</PrimaryButton>
+					)}
+					{controller.versionStatusError === undefined ? null : (
+						<p className="mt-3 text-sm text-danger">{controller.versionStatusError}</p>
+					)}
 				</article>
 				{artifactSummary === undefined ? null : (
 					<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">

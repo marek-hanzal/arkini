@@ -1,0 +1,79 @@
+{
+	"uid": "wdvm404kn9ttx6s7o6vn4n1e",
+	"id": "producer:tannery-t1",
+	"title": "Tannery I",
+	"description": "Leatherworking producer that turns raw hide and water into leather.",
+	"asset": {
+		"default": [
+			"producer-tannery-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 1,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:tannery-t1:leather",
+			"title": "Leather",
+			"description": "Runs leather for Tannery I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 22000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:raw-hide"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 4
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:water"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 4
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:leather",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

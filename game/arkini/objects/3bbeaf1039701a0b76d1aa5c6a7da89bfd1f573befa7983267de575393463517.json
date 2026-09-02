@@ -1,0 +1,14 @@
+{
+	"uid": "l82fifyipbdcjwvl94uc3pyg",
+	"id": "item:bio-waste",
+	"title": "Bio Waste",
+	"description": "Farm byproduct from animals and messy food chains. It belongs on the board until processed, because pretending manure fits neatly in a pocket is how UI crimes begin.",
+	"asset": {
+		"default": [
+			"item-bio-waste"
+		]
+	},
+	"scope": "board",
+	"maxStackSize": 1,
+	"type": "simple"
+}

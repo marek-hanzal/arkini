@@ -1,0 +1,14 @@
+{
+	"uid": "ucp6o75mu67uqlfik8m2t7si",
+	"id": "item:charcoal",
+	"title": "Charcoal",
+	"description": "Controlled pre-industrial fuel made from logs and used by kilns and furnaces before coal mining is unlocked.",
+	"asset": {
+		"default": [
+			"item-charcoal"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

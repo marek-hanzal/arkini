@@ -191,9 +191,9 @@ UID:
   value: UID
 Version commit help:
   value: |
-    A version is a deliberate restore point for the saved project. Create one before a risky change, after a useful milestone, or whenever you want a named state you can compare or return to later.
+    A version deliberately freezes the saved working copy as a named restore point. Ordinary saves do not change the Arkpack gameplay version; Commit evaluates all saved changes against the current parent and applies at most one compatibility bump.
 
-    Commit captures the current config, every saved asset byte, and every explicitly saved Board scenario. Unsaved form drafts and the current unsaved Board session are not included.
+    The first commit captures the complete project at its starting version. Later commits apply one major bump if any gameplay change is breaking, otherwise one minor bump if any compatible gameplay or asset change exists. Scenario-only changes keep the version unchanged. A major preview lists the current Board scenarios that the commit will delete. Unsaved form drafts and the current unsaved Board session are never included.
 
     Give the version a short **Message** so you can recognize it in History. **Details** and **Tag** are optional context for what changed, why the state matters, or what you want to try next.
 
@@ -209,5 +209,6 @@ Version history help:
     - Select a saved version to see its message, details, tag, and parent. The comparison starts with what changed from that version's parent.
     - Use **Before** and **After** to compare any saved version with another version or the working copy. Changes are grouped into project settings, items, assets, and Board scenarios.
     - **Major bump** flags a breaking gameplay change. **Minor bump** marks a save-compatible change.
+    - Arkpack version badges describe compatibility, not node identity. Sibling commits and scenario-only parent/child commits may share the same version.
 
     **Restore version** replaces the complete saved project with that snapshot. If the working copy or an Editor tool has an unsaved draft, Arkini lets you Commit first or restore and discard it.

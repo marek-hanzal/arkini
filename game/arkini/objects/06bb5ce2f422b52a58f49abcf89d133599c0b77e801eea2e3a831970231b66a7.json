@@ -1,0 +1,14 @@
+{
+	"uid": "qzser9sc8dhka4mjm9vqudrd",
+	"id": "item:magnifying-glass",
+	"title": "Magnifying Glass",
+	"description": "Reusable survey tool used to search exhausted cracks and later other depleted deposits for fresh sources.",
+	"asset": {
+		"default": [
+			"item-magnifying-glass"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

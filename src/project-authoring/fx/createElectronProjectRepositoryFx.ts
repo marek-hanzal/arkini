@@ -49,15 +49,6 @@ const versionDescriptorSchema = z
 		versionId: z.string().min(1),
 	})
 	.strict();
-const versionStatusSchema = z
-	.object({
-		canCommit: z.boolean(),
-		currentBaseVersionId: z.string().min(1).optional(),
-		currentFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-		dirty: z.boolean(),
-		versionCount: z.number().int().nonnegative(),
-	})
-	.strict();
 const versionValueChangeSchema = z
 	.object({
 		path: z.string(),
@@ -107,6 +98,30 @@ const versionDiffSchema = z
 			.array(),
 		resources: versionBinaryDiffSchema.array(),
 		scenarios: versionBinaryDiffSchema.array(),
+	})
+	.strict();
+const versionCommitPreviewSchema = z
+	.object({
+		bump: z.enum([
+			"noop",
+			"minor",
+			"major",
+		]),
+		canCommit: z.boolean(),
+		currentFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+		diff: versionDiffSchema.optional(),
+		initial: z.boolean(),
+		nextArkpackVersion: GameVersionSchema,
+		scenariosToDelete: z.string().array(),
+	})
+	.strict();
+const versionStatusSchema = z
+	.object({
+		canCommit: z.boolean(),
+		currentBaseVersionId: z.string().min(1).optional(),
+		currentFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+		dirty: z.boolean(),
+		versionCount: z.number().int().nonnegative(),
 	})
 	.strict();
 
@@ -250,6 +265,12 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"list-versions",
 				() => window.arkini.editor.listVersionsFn(projectId),
 				(value) => versionDescriptorSchema.array().parse(value),
+			),
+		previewVersionCommitFx: (projectId) =>
+			callFx(
+				"preview-version-commit",
+				() => window.arkini.editor.previewVersionCommitFn(projectId),
+				(value) => versionCommitPreviewSchema.parse(value),
 			),
 		listBoardScenariosFx: (projectId) =>
 			callFx(

@@ -22,6 +22,7 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 	const project = yield* repository.createProjectFx({
 		version: loaded.payload.version,
 		config: loaded.payload.config,
+		initialVersionSubject: `Imported Arkpack v${loaded.payload.version}`,
 		resources: loaded.payload.resources,
 	});
 	return project satisfies ProjectDescriptor;

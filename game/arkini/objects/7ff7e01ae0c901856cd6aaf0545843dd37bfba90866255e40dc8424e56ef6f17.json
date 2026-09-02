@@ -1,0 +1,98 @@
+{
+	"uid": "s18awkeukj377bwscreimf0j",
+	"id": "producer:sawmill-t1",
+	"title": "Sawmill I",
+	"description": "Turns logs into planks when placed near a lumberjack.",
+	"asset": {
+		"default": [
+			"producer-sawmill-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 5,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:sawmill-t1:plank",
+			"title": "Plank",
+			"description": "Runs plank for Sawmill I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 10000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:log"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 4
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:plank",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.25,
+								"drop": [
+									{
+										"itemId": "item:plank",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:lumberjack-t1"
+								},
+								"scope": "board",
+								"distance": "close"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	]
+}

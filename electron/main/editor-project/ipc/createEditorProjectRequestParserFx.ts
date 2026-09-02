@@ -26,6 +26,7 @@ const createProjectSchema = z
 	.object({
 		version: GameVersionSchema,
 		config: GameConfigSchema,
+		initialVersionSubject: ProjectVersionSubjectSchema.optional(),
 		resources: ResourceSchema.array(),
 	})
 	.strict();
@@ -210,6 +211,8 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
 			parseVersionStatusProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-version-status", IdSchema, candidate),
+			parseVersionCommitPreviewProjectIdFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx("preview-version-commit", IdSchema, candidate),
 			parseVersionListProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("list-versions", IdSchema, candidate),
 			parseVersionCommitFx: (

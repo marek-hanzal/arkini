@@ -1,0 +1,14 @@
+{
+	"uid": "ha6318z8vxlj63wfv607yknu",
+	"id": "item:plank",
+	"title": "Plank",
+	"description": "Processed wood material produced by sawmills.",
+	"asset": {
+		"default": [
+			"item-plank"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

@@ -9,6 +9,30 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { waitFor } from "./createGameSession.test/fixture";
 
 describe("createGameSessionFx / synchronous admission", () => {
+	it("closes a subscription when disposal starts reentrantly during its replay", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let replayedTransitions = 0;
+		let disposing: Promise<void> | undefined;
+		const unsubscribe = session.subscribeTransitionsFn(() => {
+			replayedTransitions += 1;
+			disposing ??= Effect.runPromise(session.disposeFx);
+		});
+
+		try {
+			expect(replayedTransitions).toBe(1);
+			expect(disposing).toBeDefined();
+			await disposing;
+			expect(() => unsubscribe()).not.toThrow();
+			expect(replayedTransitions).toBe(1);
+			expect(session.getFatalErrorFn()).toBeNull();
+		} finally {
+			unsubscribe();
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
 	it("opens runtime subscriptions synchronously while a mutation is still planning", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),

@@ -31,9 +31,9 @@ const ItemDetailHelpBySection: Partial<Record<SectionId, EditorPageHelpContent>>
 		content: <Mx label="Item estimate help" />,
 		title: <Tx label="Estimate" />,
 	},
-	"required-by": {
-		content: <Mx label="Item required by help" />,
-		title: <Tx label="Required by" />,
+	connections: {
+		content: <Mx label="Item connections help" />,
+		title: <Tx label="Connections" />,
 	},
 };
 
@@ -55,7 +55,7 @@ export const Detail = ({
 		itemUid: item.uid,
 	};
 	const editableSectionId =
-		sectionId === "estimate" || sectionId === "required-by" || sectionId === "delete"
+		sectionId === "estimate" || sectionId === "connections" || sectionId === "delete"
 			? "identity"
 			: sectionId;
 	const help = ItemDetailHelpBySection[sectionId];
@@ -169,7 +169,7 @@ export const Detail = ({
 			sectionId === "delete" ||
 			sectionId === "estimate" ||
 			sectionId === "merges" ||
-			sectionId === "required-by" ||
+			sectionId === "connections" ||
 			sectionId === "production" ? (
 				children
 			) : (

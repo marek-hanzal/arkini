@@ -6,7 +6,7 @@ export const SectionIds = [
 	"action",
 	"production",
 	"estimate",
-	"required-by",
+	"connections",
 	"delete",
 ] as const;
 

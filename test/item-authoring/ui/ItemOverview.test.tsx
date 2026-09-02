@@ -30,8 +30,8 @@ vi.mock("~/item-authoring/fn/readDeleteBlockersFn", () => ({
 	readDeleteBlockersFn: () => [],
 }));
 
-vi.mock("~/item-authoring/fn/readRequiredByItemsFn", () => ({
-	readRequiredByItemsFn: () => [],
+vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
+	readItemConnectionsFn: () => [],
 }));
 
 vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
@@ -39,12 +39,13 @@ vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
 }));
 
 vi.mock("~/ui/ui/LinkButton", () => ({
-	LinkButtonLink: ({ children, params, to, ...props }: Record<string, unknown>) =>
+	LinkButtonLink: ({ children, params, search, to, ...props }: Record<string, unknown>) =>
 		createElement(
 			"a",
 			{
 				...props,
 				"data-params": JSON.stringify(params),
+				"data-search": JSON.stringify(search),
 				"data-to": to,
 			},
 			children as ReactNode,
@@ -88,7 +89,7 @@ describe("ItemOverview", () => {
 			"charges",
 			"merges",
 			"estimate",
-			"required-by",
+			"connections",
 			"delete",
 		]);
 		for (const link of links) {
@@ -101,5 +102,9 @@ describe("ItemOverview", () => {
 				sectionId: link.dataset.sectionId,
 			});
 		}
+		const connectionsLink = links.find((link) => link.dataset.sectionId === "connections");
+		expect(JSON.parse(connectionsLink?.dataset.search ?? "null")).toEqual({
+			filter: "required-by",
+		});
 	});
 });

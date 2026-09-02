@@ -89,7 +89,7 @@ resolve live facts
 → commit Runtime and events once
 ```
 
-Failure, interruption and an unchanged event-free result publish nothing. Successful Runtime becomes visible immediately; events describe that exact commit and never form another store. Nested Runtime reads during planning see the pinned snapshot.
+Failure, interruption and an unchanged event-free result publish nothing. Successful Runtime becomes visible immediately; events describe that exact commit and never form another store. Nested Runtime reads during planning see the pinned pre-transition snapshot passed to the update, never a partially built candidate.
 
 Subscribers own current-plus-tail observation. Runtime listeners ignore event-only transitions; event listeners receive later batches without historical replay. Slow callbacks may lag without delaying truth, Tick or save. Callback failure cannot roll back its commit, but enters the existing session fail-stop.
 
@@ -148,7 +148,9 @@ The Editor's portable current tree is canonical. Electron main implements the Pr
 
 External changes are ignored while mounted. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the complete directory and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
 
-Versions are immutable complete logical snapshots; Notes stay outside them and Scenarios are included. See [`src/project-version/README.md`](src/project-version/README.md) and [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
+Ordinary authoring writes keep the gameplay version frozen. A Version commit derives one strongest major/minor/noop result from its parent diff, applies that version to the current source tree and publishes the immutable snapshot with HEAD. The first commit preserves the starting version; major commits remove current scenarios atomically, while scenario-only commits do not bump the gameplay version. Version IDs, not gameplay version strings, own graph identity.
+
+Editor Build and CLI pack require the saved current tree to match its published Version HEAD. Versions are immutable complete logical snapshots; Notes stay outside them and Scenarios are included. See [`src/project-version/README.md`](src/project-version/README.md) and [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 
 ## Hosted validation and delivery
 

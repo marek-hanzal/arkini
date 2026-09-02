@@ -1,0 +1,226 @@
+{
+	"uid": "c1r17y878mojojyld1pv05dv",
+	"id": "producer:armory-t1",
+	"title": "Armory I",
+	"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+	"asset": {
+		"default": [
+			"producer-armory-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 1,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:armory-t1:leather-armor",
+			"title": "Leather Armor",
+			"description": "Runs leather armor for Armory I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 30000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:leather"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 6
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:common-clothing"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 3
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:nails"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 7
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:leather-armor",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "line:armory-t1:iron-armor",
+			"title": "Iron Armor",
+			"description": "Runs iron armor for Armory I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 42000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:leather-armor"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 3
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:iron-ingot"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 6
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:nails"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 6
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:charcoal"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 5
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:iron-armor",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.45,
+								"drop": [
+									{
+										"itemId": "item:pollution",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.1,
+								"drop": [
+									{
+										"itemId": "item:pollution",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:purifier-t1"
+								},
+								"scope": "board",
+								"distance": "far"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	]
+}

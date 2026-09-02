@@ -21,7 +21,7 @@ The densest islands have local maps:
 | Retained scene | Game Scene, Tile Presentation, Rendering, Motion and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Flow and Estimate | Acquisition graph, layout, Canvas and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
-| Versions | Immutable logical snapshots and checkout orchestration | [`src/project-version/README.md`](src/project-version/README.md) |
+| Versions | Immutable logical snapshots, commit compatibility and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
 | Editor persistence | Electron repository, filesystem transactions, renderer projection and MCP | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 
 ## Change impact
@@ -139,7 +139,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `board-scenario` | Scenario snapshots and Editor Board Game lifecycle | [`src/board-scenario/fx/createEditorBoardGameResourceFx.ts`](src/board-scenario/fx/createEditorBoardGameResourceFx.ts) |
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |
 | `project-note` | Ordered Notes outside Version snapshots | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
-| `project-version` | Immutable logical snapshots and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
+| `project-version` | Immutable snapshots, commit compatibility, saved-HEAD proof and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
 | `authoring-mcp` | Renderer MCP status, settings and checkout presentation | [`src/authoring-mcp/ui/EditorMcp.tsx`](src/authoring-mcp/ui/EditorMcp.tsx) |
 | `flow` | Authored acquisition graph and relation semantics | [`src/flow/fn/createAcquisitionGraphFn.ts`](src/flow/fn/createAcquisitionGraphFn.ts) |
 | `flow-layout` | Deterministic graph layout and worker lifecycle | [`src/flow-layout/fx/layoutInWorkerFx.ts`](src/flow-layout/fx/layoutInWorkerFx.ts) |

@@ -22,6 +22,7 @@ export type ProjectRepositoryOperation =
 	| "list-projects"
 	| "list-versions"
 	| "open-project-directory"
+	| "preview-version-commit"
 	| "read-project"
 	| "read-project-build"
 	| "read-version-status"

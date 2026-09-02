@@ -6,8 +6,8 @@ import type { ProjectState } from "../ProjectState";
 import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { ProjectVersionReference } from "~/project-version/type/ProjectVersion";
 import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
-import { hashVersionBytesFn } from "./VersionFingerprint";
-import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
+import { hashVersionBytesFn } from "~/project-version/fn/createVersionFingerprintFn";
+import { planVersionSnapshotFx } from "~/project-version/fx/planVersionSnapshotFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
 export namespace createVersionReaderFx {

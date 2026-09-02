@@ -1,0 +1,14 @@
+{
+	"uid": "qf9j29gbir1cp925t2yzcw48",
+	"id": "item:aquamarine",
+	"title": "Aquamarine",
+	"description": "A polished cyan gemstone reserved for late-game treasure economy.",
+	"asset": {
+		"default": [
+			"item-aquamarine"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 20,
+	"type": "simple"
+}

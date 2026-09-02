@@ -10,7 +10,10 @@ import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
-import { createVersionFingerprintFn, hashVersionBytesFn } from "./VersionFingerprint";
+import {
+	createVersionFingerprintFn,
+	hashVersionBytesFn,
+} from "~/project-version/fn/createVersionFingerprintFn";
 
 const decoder = new TextDecoder("utf-8", {
 	fatal: true,

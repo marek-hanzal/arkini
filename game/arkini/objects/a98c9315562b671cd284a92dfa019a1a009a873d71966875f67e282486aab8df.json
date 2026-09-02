@@ -1,0 +1,306 @@
+{
+	"uid": "blahusbsywixnp9x3hw5ngso",
+	"id": "producer:market-t1",
+	"title": "Market",
+	"description": "First trade producer that converts processed food and drink into coins.",
+	"asset": {
+		"default": [
+			"producer-market-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 1,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:market-t1:coin-from-bread",
+			"title": "Coins from Bread",
+			"description": "Runs coins from bread for Market.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 10000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:bread"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 2
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"min": 3,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "line:market-t1:coin-from-sausage",
+			"title": "Coins from Sausage",
+			"description": "Runs coins from sausage for Market.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 11000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:sausage"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 3
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "line:market-t1:coin-from-cheese",
+			"title": "Coins from Cheese",
+			"description": "Runs coins from cheese for Market.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 11000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:cheese"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 3
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "line:market-t1:coin-from-beer",
+			"title": "Coins from Beer",
+			"description": "Runs coins from beer for Market.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 10000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:beer"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 2
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"min": 3,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "line:market-t1:coin-from-wine-glass",
+			"title": "Coins from Wine Glass",
+			"description": "Runs coins from wine glass for Market.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 12000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:wine-glass"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 2
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"min": 4,
+											"max": 4
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "line:market-t1:coin-from-feast",
+			"title": "Coins from Feast",
+			"description": "Runs coins from feast for Market.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 16000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:feast"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 3
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"min": 5,
+											"max": 5
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

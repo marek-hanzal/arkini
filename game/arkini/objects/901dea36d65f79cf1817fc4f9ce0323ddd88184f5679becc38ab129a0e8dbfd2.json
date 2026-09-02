@@ -1,0 +1,99 @@
+{
+	"uid": "x38e4vzmmkleg5rk91mjckz8",
+	"id": "item:blueprint-slaughterhouse-t1",
+	"title": "Slaughterhouse I Blueprint",
+	"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-slaughterhouse-t1"
+		],
+		"sources": [
+			"producer-slaughterhouse-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:slaughterhouse-t1:construct",
+		"title": "Construct Slaughterhouse I",
+		"description": "Consumes construction resources to build Slaughterhouse I.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 24000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:plank"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:stone-block"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:piglet"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:slaughterhouse-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

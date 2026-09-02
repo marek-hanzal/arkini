@@ -1,0 +1,18 @@
+{
+	"uid": "n2exfiffcwc0nsfxn1x6z0hy",
+	"id": "item:wheat-field",
+	"title": "Wheat Field",
+	"description": "Movable grain deposit with 16 harvests for nearby farms.",
+	"asset": {
+		"default": [
+			"item-wheat-field"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 16
+	},
+	"maxQueueSize": 1,
+	"type": "deposit"
+}

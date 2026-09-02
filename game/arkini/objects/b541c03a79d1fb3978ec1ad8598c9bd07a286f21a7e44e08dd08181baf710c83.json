@@ -1,0 +1,14 @@
+{
+	"uid": "uyjq0froedxvzs62kst1r8rl",
+	"id": "item:common-cloth",
+	"title": "Common Cloth",
+	"description": "Plain woven cloth produced from wool by weaver huts.",
+	"asset": {
+		"default": [
+			"item-common-cloth"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

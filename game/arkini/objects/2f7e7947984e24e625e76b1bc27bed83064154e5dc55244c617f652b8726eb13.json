@@ -1,0 +1,174 @@
+{
+	"uid": "fr748t4pkjgi1pss3g42uy2t",
+	"id": "item:blueprint-goldsmith-t1",
+	"title": "Goldsmith I Blueprint",
+	"description": "Build plan that can be filled with resources to construct Goldsmith I.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-goldsmith-t1"
+		],
+		"sources": [
+			"producer-goldsmith-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:goldsmith-t1:construct",
+		"title": "Construct Goldsmith I",
+		"description": "Consumes construction resources to build Goldsmith I.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 72000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:construction-bundle"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:guild-charter"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:glass"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:gold-ingot"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:charcoal"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:coin"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 8,
+					"max": 8
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:goldsmith-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": [
+			{
+				"when": [
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:academy"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					},
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:purifier-t1"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					},
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:smelter-t1"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					}
+				],
+				"type": "enable"
+			}
+		]
+	}
+}

@@ -1,0 +1,125 @@
+{
+	"uid": "b3zvj5zzh1xznija1datnafi",
+	"id": "item:blueprint-sand-pit",
+	"title": "Sand Pit Blueprint",
+	"description": "Build plan that can be filled with resources to construct a Sand Pit.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-sand-pit"
+		],
+		"sources": [
+			"producer-sand-pit"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:sand-pit:construct",
+		"title": "Construct Sand Pit",
+		"description": "Consumes construction resources to build Sand Pit.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 42000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:plank"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 3,
+					"max": 3
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:stone-block"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:building-permit"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:sand-pit",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": [
+			{
+				"when": [
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "item:sand-deposit"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					},
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:academy"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					}
+				],
+				"type": "enable"
+			}
+		]
+	}
+}

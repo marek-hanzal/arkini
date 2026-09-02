@@ -22,6 +22,7 @@ import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
+import { createVersionReaderFx } from "./createVersionReaderFx";
 
 class EditorProjectBuildOperationError extends Data.TaggedError(
 	"EditorProjectBuildOperationError",
@@ -133,6 +134,28 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
+	const { readCurrentSnapshotFx, readDescriptorFx, readHeadFx } = yield* createVersionReaderFx({
+		readStateFx,
+	});
+	const assertCommittedHeadFx = Effect.fn("assertProjectCommittedHeadFx")(function* (
+		state: ProjectState,
+	) {
+		const head = yield* readHeadFx(state);
+		if (head === undefined)
+			return yield* Effect.fail(
+				new EditorProjectBuildOperationError({
+					message: "Commit the initial project version before building.",
+				}),
+			);
+		const current = yield* readCurrentSnapshotFx(state.project.projectId);
+		const descriptor = yield* readDescriptorFx(state, head.current);
+		if (descriptor.contentFingerprint !== current.contentFingerprint)
+			return yield* Effect.fail(
+				new EditorProjectBuildOperationError({
+					message: "Commit the saved project changes before building.",
+				}),
+			);
+	});
 
 	const buildProjectFx: EditorBuildRepositoryService["buildProjectFx"] = ({
 		expectedRevision,
@@ -142,6 +165,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.gen(function* () {
 				const state = yield* readStateFx(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
+				yield* assertCommittedHeadFx(state);
 				const build = yield* providePlatformFx(
 					withProjectLockFx(
 						filesystemWrite,

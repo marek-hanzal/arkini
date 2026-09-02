@@ -14,11 +14,11 @@ Electron main owns the physical Editor project repository. The portable current 
 | Main repository composition | `electron/main/editor-project` | [`filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Discovery, create/open/refresh/delete | `electron/main/editor-project` | [`filesystem/fx/createLifecycleOperationsFx.ts`](filesystem/fx/createLifecycleOperationsFx.ts) |
 | Config, Item and Resource commits | `electron/main/editor-project` | [`filesystem/fx/createCommitOperationsFx.ts`](filesystem/fx/createCommitOperationsFx.ts) |
-| Board Scenarios, Notes, Versions and Build | Their `src/*` contracts plus Electron repository operations | `filesystem/fx/create*OperationsFx.ts` |
+| Board Scenarios, Notes, Version commit I/O and Build | Their `src/*` contracts plus Electron repository operations | `filesystem/fx/create*OperationsFx.ts` |
 | Current-tree lock, journal and recovery | `electron/main/editor-project` + mechanical `filesystem-write` | [`filesystem/fx/writeProjectFileSetFx.ts`](filesystem/fx/writeProjectFileSetFx.ts), [`filesystem/fx/recoverProjectFileTransactionFx.ts`](filesystem/fx/recoverProjectFileTransactionFx.ts) |
 | IPC authorization and dispatch | `electron/main/editor-project` | [`ipc/registerEditorProjectIpcFx.ts`](ipc/registerEditorProjectIpcFx.ts) |
 | Mounted renderer projection and replacement guard | `src/authoring-session` | [`../../../src/authoring-session/fx/refreshEditorProjectFx.ts`](../../../src/authoring-session/fx/refreshEditorProjectFx.ts) |
-| Version semantics and checkout handshake | `src/project-version` | [`../../../src/project-version/README.md`](../../../src/project-version/README.md) |
+| Version semantics, snapshot planning, saved-HEAD proof and checkout handshake | `src/project-version` | [`../../../src/project-version/README.md`](../../../src/project-version/README.md) |
 
 Electron main implements product capabilities; it does not own their schemas or renderer presentation. Renderer code sees no physical path, file handle, native object or mutable repository state.
 
@@ -30,6 +30,7 @@ This island has deliberate cross-process and lifecycle coupling:
 - `project-authoring → electron/contract/editor` is the renderer transport edge. It cannot import Electron main.
 - `authoring-session ↔ project-authoring` is renderer lifecycle composition: session reads and republishes repository results; product operations publish canonical commits into the mounted projection.
 - `project-authoring ↔ project-version`, `board-scenario`, `project-note` and authoring products cross at exact repository or presentation contracts. No root is a generic Editor superdomain.
+- `project-version → game-config-compiler + game-config-resource` proves a saved portable tree matches its published HEAD for Build/CLI admission. Electron main supplies physical commit and object publication.
 - `filesystem-write` stays mechanical and imports none of its product consumers. The Editor repository supplies path ownership, file sets, serialization and error meaning.
 - MCP calls the same Project Repository capabilities and revision checks. It never owns a second project store or bypass mutation path.
 
@@ -94,6 +95,14 @@ acquire replacement admission
 
 External changes are ignored while mounted. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
 
+## Version commit and Build admission
+
+Ordinary Project, Item and Resource commits update the canonical current tree but leave gameplay version and Version HEAD unchanged. Version preview compares that saved tree with the current HEAD and derives exactly one strongest major/minor/noop result.
+
+Electron main publishes missing immutable objects and the Version descriptor/manifest before atomically applying any derived gameplay-version/scenario change together with `versions/head.json`. A major commit removes current scenarios; scenario-only commits keep the gameplay version. The first explicit commit preserves the starting version, while Arkpack import may create the root commit during project creation.
+
+Editor Build and CLI pack both reread the saved portable tree and require its fingerprint plus gameplay version to match the published HEAD. Validation remains allowed on an uncommitted working tree.
+
 ## IPC and MCP
 
 - Main validates the registered Arkini renderer, exact main frame, trusted URL and request schema before dispatch.
@@ -112,6 +121,7 @@ Likely affected:
 - Authoring Session replacement, unsaved changes and Editor Board teardown/recreation.
 - MCP mutation and invalidation when a repository command changes.
 - Versions, Scenarios, Notes or Build only when their repository operation or portable file set changes.
+- Version commit preview/publication and Build/CLI admission when HEAD identity changes.
 
 Usually not affected:
 

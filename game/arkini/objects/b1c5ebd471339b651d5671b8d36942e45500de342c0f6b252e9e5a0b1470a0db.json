@@ -1,0 +1,14 @@
+{
+	"uid": "c5nizod4yfvkrk33384ekexq",
+	"id": "item:clay",
+	"title": "Clay",
+	"description": "Raw clay prepared for brick and ceramic production.",
+	"asset": {
+		"default": [
+			"item-clay"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

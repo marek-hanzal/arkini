@@ -20,7 +20,7 @@ versions/<versionId>/{version.json,manifest.json}
 objects/<sha256>.{json,png}
 ```
 
-Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, notes, scenarios, version history, objects, locks, temporary files, and ignored `build/` artifacts are never compiled.
+Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, notes, scenarios, version history, objects, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` nevertheless require this working source tree to match its published Version HEAD exactly; validation may still inspect an uncommitted working tree.
 
 - `project.json` is the root marker and contains Arkini writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
@@ -100,6 +100,8 @@ The compiler must reject an invalid project without producing a usable artifact.
 ## Editor sidecars
 
 Notes are portable but do not change authoring revision and do not enter Versions, Build, or Arkpack output. Scenarios are explicit portable gameplay-State snapshots included in Versions; the live Editor Board is not persisted. Versions are complete immutable logical snapshots published through `versions/head.json`, not property deltas.
+
+Ordinary Project, Item, and resource saves never change the Arkpack gameplay version. The first explicit Version commit records the complete starting snapshot at its existing version (`1.0` for a fresh project); Arkpack import creates this root commit automatically while preserving the imported version. Each later commit compares the working tree with the current parent snapshot and applies exactly one strongest compatibility result: any major-classified gameplay field produces one major bump, otherwise any minor-classified field or resource change produces one minor bump, and scenario-only changes produce no bump. A major commit deletes every current Board scenario after presenting that consequence in the commit preview. Branch identity is the Version ID, so sibling commits may legitimately carry the same gameplay version and no-op parent/child commits may share one version.
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
 

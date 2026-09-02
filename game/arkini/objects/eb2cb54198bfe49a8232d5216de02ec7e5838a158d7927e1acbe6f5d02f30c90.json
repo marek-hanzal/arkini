@@ -1,0 +1,14 @@
+{
+	"uid": "wpcd60x4w7porpotkd56ueoz",
+	"id": "item:piglet",
+	"title": "Piglet",
+	"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
+	"asset": {
+		"default": [
+			"item-piglet"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 20,
+	"type": "simple"
+}

@@ -29,7 +29,7 @@ Read the smallest entry point needed for the task:
 | Authored source | Foundational values, completed Config, source files, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Artifacts and compatibility | Arkpack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |
 | Editor persistence | Portable repository, renderer project session, IPC, Scenarios, Notes and Build | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
-| Versions | Immutable project snapshots, compatibility diff and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
+| Versions | Immutable project snapshots, commit compatibility, saved-HEAD proof and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
 | Flow and Estimate | Authored acquisition graph, layout, Canvas and static optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
 | Application and platform | Launcher, renderer runtime/shell/settings, routes and Electron | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 

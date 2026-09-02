@@ -1,0 +1,66 @@
+{
+	"uid": "fna5bzx5xnyuwaf3qtjg5vid",
+	"id": "producer:windmill-t1",
+	"title": "Windmill I",
+	"description": "Mills grain into flour.",
+	"asset": {
+		"default": [
+			"producer-windmill-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 1,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:windmill-t1:flour",
+			"title": "Flour",
+			"description": "Runs flour for Windmill I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 12000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:grain"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 4
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:flour",
+										"quantity": {
+											"min": 3,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

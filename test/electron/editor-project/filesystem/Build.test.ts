@@ -10,6 +10,7 @@ import {
 import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
+import type { OwnedEditorProjectRepository } from "~electron/main/editor-project/EditorProjectServiceOwnership";
 
 let harness: ProjectTestHarness;
 
@@ -19,10 +20,70 @@ beforeEach(async () => {
 
 afterEach(async () => harness.close());
 
+const commitCurrent = async (repository: OwnedEditorProjectRepository, projectId: string) => {
+	const status = await Effect.runPromise(repository.readVersionStatusFx(projectId));
+	await Effect.runPromise(
+		repository.createVersionFx({
+			expectedFingerprint: status.currentFingerprint,
+			projectId,
+			subject: "Initial",
+		}),
+	);
+};
+
 describe("filesystem Editor project build", () => {
+	it("requires a committed Version HEAD", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "project-unversioned");
+
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "build-project",
+			message: "Commit the initial project version before building.",
+		});
+	});
+
+	it("rejects saved working-copy changes until they are committed", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "project-dirty");
+		await commitCurrent(repository, project.projectId);
+		const dirty = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+				config: {
+					...project.config,
+					meta: {
+						...project.config.meta,
+						title: "Dirty title",
+					},
+				},
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+					expectedRevision: dirty.revision,
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "build-project",
+			message: "Commit the saved project changes before building.",
+		});
+	});
+
 	it("publishes and reads the one canonical artifact while ignoring build output", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.build");
+		await commitCurrent(repository, project.projectId);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		const artifact = await Effect.runPromise(
@@ -59,6 +120,7 @@ describe("filesystem Editor project build", () => {
 				root,
 			}),
 		);
+		await commitCurrent(repository, project.projectId);
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
 				projectId: project.projectId,
@@ -109,6 +171,7 @@ describe("filesystem Editor project build", () => {
 				root,
 			}),
 		);
+		await commitCurrent(repository, project.projectId);
 
 		await expect(
 			Effect.runPromise(
@@ -143,6 +206,7 @@ describe("filesystem Editor project build", () => {
 				root,
 			}),
 		);
+		await commitCurrent(repository, project.projectId);
 
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
@@ -162,6 +226,7 @@ describe("filesystem Editor project build", () => {
 	it("rejects unrefreshed external source changes before publishing", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.external-change");
+		await commitCurrent(repository, project.projectId);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		const gamePath = join(root, "game.json");
@@ -187,6 +252,7 @@ describe("filesystem Editor project build", () => {
 	it("classifies structurally invalid external edits as requiring Refresh", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.invalid-external-change");
+		await commitCurrent(repository, project.projectId);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		await writeFile(join(root, "game.json"), "{ invalid json");

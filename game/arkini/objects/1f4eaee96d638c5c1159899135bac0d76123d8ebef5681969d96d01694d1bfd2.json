@@ -1,0 +1,15 @@
+{
+	"uid": "ei5b64persvilbuginnz24xv",
+	"id": "item:hop-seed",
+	"title": "Hop Seed",
+	"description": "Hop seed prepared for a future crop-growing lifecycle.",
+	"asset": {
+		"default": [
+			"item-seed",
+			"item-hops"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

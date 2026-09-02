@@ -57,6 +57,76 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
 	});
 
+	it("publishes an imported project with its preserved version as the initial HEAD", async () => {
+		const repository = await harness.openRepository();
+		const created = await Effect.runPromise(
+			repository.createProjectFx({
+				version: "4.2",
+				config: editorTestPayload.config,
+				initialVersionSubject: "Imported Arkpack v4.2",
+				resources: editorTestPayload.resources,
+			}),
+		);
+		expect(
+			await Effect.runPromise(repository.readVersionStatusFx(created.projectId)),
+		).toMatchObject({
+			canCommit: false,
+			dirty: false,
+			versionCount: 1,
+		});
+		expect(await Effect.runPromise(repository.listVersionsFx(created.projectId))).toEqual([
+			expect.objectContaining({
+				arkpackVersion: "4.2",
+				subject: "Imported Arkpack v4.2",
+			}),
+		]);
+
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(
+			await Effect.runPromise(reopened.readVersionStatusFx(created.projectId)),
+		).toMatchObject({
+			dirty: false,
+			versionCount: 1,
+		});
+	});
+
+	it("does not expose a managed project before its complete root is published", async () => {
+		const nodeFileSystem = await Effect.runPromise(
+			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
+		);
+		const fileSystem: FileSystem.FileSystem = {
+			...nodeFileSystem,
+			rename: (from, to) =>
+				String(from).includes(".project-staging") &&
+				!String(to).includes(".project-staging")
+					? Effect.fail(
+							PlatformError.systemError({
+								_tag: "Unknown",
+								module: "FileSystem",
+								method: "rename",
+								description: "injected project publication failure",
+							}),
+						)
+					: nodeFileSystem.rename(from, to),
+		};
+		const repository = await harness.openRepository(fileSystem);
+		await expect(
+			Effect.runPromise(
+				repository.createProjectFx({
+					version: "4.2",
+					config: editorTestPayload.config,
+					initialVersionSubject: "Imported Arkpack v4.2",
+					resources: editorTestPayload.resources,
+				}),
+			),
+		).rejects.toBeDefined();
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
+		expect(
+			(await readdir(harness.projectsRoot)).filter((name) => name !== ".projects.lock"),
+		).toEqual([]);
+	});
+
 	it("reopens managed projects from the user-data catalog", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository, "managed.\ud800");

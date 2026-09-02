@@ -12,8 +12,6 @@ import {
 import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
-import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
-import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -102,13 +100,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		config,
 		resources,
 		nowMs,
-		minimumResult,
 	}: {
 		readonly state: ProjectState;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly nowMs: number;
-		readonly minimumResult?: "minor";
 	}) {
 		const canonicalConfig = GameConfigSchema.parse({
 			...config,
@@ -118,13 +114,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			return yield* Effect.fail(
 				new Error("The Editor project ID can only change through Refresh from disk."),
 			);
-		const compatibility = analyzeProjectCompatibilityFn(state.project.config, canonicalConfig);
-		const result =
-			minimumResult === "minor" && compatibility.result === "noop"
-				? "minor"
-				: compatibility.result;
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
-		const version = bumpArkpackVersionFn(state.project.version, result);
 		const marker = GameProjectManifestSchema.parse({
 			arkini: ArkiniAppVersion,
 			revision: updatedAtMs,
@@ -132,7 +122,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		const nextProject: Project = {
 			...state.project,
 			title: canonicalConfig.meta.title,
-			version,
+			version: state.project.version,
 			updatedAtMs,
 			revision: updatedAtMs,
 			config: canonicalConfig,
@@ -155,7 +145,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				resources: state.project.resources,
 			},
 			next: {
-				arkpack: version,
+				arkpack: state.project.version,
 				marker,
 				config: canonicalConfig,
 				resources,
@@ -358,7 +348,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						config: next.config,
 						resources: next.resources,
 						nowMs,
-						minimumResult: "minor",
 					});
 				}),
 			);

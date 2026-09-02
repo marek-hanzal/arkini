@@ -1,0 +1,14 @@
+{
+	"uid": "dk7trmp81m1ruixd1xk0qlu2",
+	"id": "item:roof-tiles",
+	"title": "Roof Tiles",
+	"description": "Curved fired roof tiles prepared for higher-tier building construction.",
+	"asset": {
+		"default": [
+			"item-roof-tiles"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

@@ -220,6 +220,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioDelete, request),
 		readVersionStatusFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionStatus, projectId),
+		previewVersionCommitFn: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCommitPreview, projectId),
 		listVersionsFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionList, projectId),
 		diffVersionsFn: (request) =>

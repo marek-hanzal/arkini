@@ -1,0 +1,14 @@
+{
+	"uid": "lp7qhbt1cga0n9sb0qp57yte",
+	"id": "item:bread",
+	"title": "Bread",
+	"description": "Baked food produced by bakeries from flour and water.",
+	"asset": {
+		"default": [
+			"item-bread"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

@@ -1,0 +1,109 @@
+{
+	"uid": "pgxhiut7rka185xjnpih57yr",
+	"id": "producer:iron-mine-t1",
+	"title": "Iron Mine I",
+	"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
+	"asset": {
+		"default": [
+			"producer-iron-mine-t1"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"maxQueueSize": 1,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "line:iron-mine-t1:iron-ore",
+			"title": "Iron Ore",
+			"description": "Runs iron ore for Iron Mine I.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 62000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:sausage"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 4
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:beer"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 4
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:common-clothing"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 4
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:iron-ore",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "item:iron-deposit"
+								},
+								"scope": "board",
+								"distance": "close"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	]
+}

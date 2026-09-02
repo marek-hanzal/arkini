@@ -1,0 +1,14 @@
+{
+	"uid": "lq6pb4ch99bdk2t8mcbd8np6",
+	"id": "item:hop-field",
+	"title": "Hop Field",
+	"description": "Movable hop source used by nearby breweries.",
+	"asset": {
+		"default": [
+			"item-hop-field"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

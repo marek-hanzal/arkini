@@ -16,6 +16,8 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
+import { focusFirstInvalidFieldFn } from "~/authoring-form/ui/focusFirstInvalidFieldFn";
+import { runEditorFormSubmissionFn } from "~/authoring-form/ui/runEditorFormSubmissionFn";
 import {
 	readProjectFormDestinationForPathFn,
 	type ProjectFormDestination,
@@ -176,31 +178,25 @@ export const useProjectFormController = ({
 			: undefined,
 	);
 	const runSaveFn = useCallback(
-		async (notify: boolean) => {
-			if (!dirty || submitting) return false;
-			submitSucceeded.current = false;
-			notifyOnSaved.current = notify;
-			try {
-				await form.handleSubmit();
-			} finally {
-				notifyOnSaved.current = true;
-			}
-			if (!submitSucceeded.current) {
-				const result = schema.safeParse(form.state.values);
-				const issue = result.success ? undefined : result.error.issues[0];
-				if (issue !== undefined) {
-					await onInvalidDestinationFn(readProjectFormDestinationForPathFn(issue.path));
-					const focusInvalidFieldFn = () =>
-						document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
-					if (typeof requestAnimationFrame === "function") {
-						requestAnimationFrame(focusInvalidFieldFn);
-					} else {
-						setTimeout(focusInvalidFieldFn, 0);
+		(notify: boolean) =>
+			runEditorFormSubmissionFn({
+				dirty,
+				notify,
+				notifyOnSaved,
+				onInvalidFn: async () => {
+					const result = schema.safeParse(form.state.values);
+					const issue = result.success ? undefined : result.error.issues[0];
+					if (issue !== undefined) {
+						await onInvalidDestinationFn(
+							readProjectFormDestinationForPathFn(issue.path),
+						);
+						focusFirstInvalidFieldFn();
 					}
-				}
-			}
-			return submitSucceeded.current;
-		},
+				},
+				submitFn: () => form.handleSubmit(),
+				submitting,
+				submitSucceeded,
+			}),
 		[
 			dirty,
 			form,

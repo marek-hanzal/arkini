@@ -3,7 +3,6 @@ import { Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
 import type { ProjectVersionDescriptor } from "~/project-version/type/ProjectVersion";
-import { Button, DangerButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
@@ -70,8 +69,10 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 					) : (
 						<VersionGraph
 							layout={controller.graph}
+							onRestoreFn={controller.restoreVersionFn}
 							onSelectFn={controller.selectVersionFn}
 							onSelectWorkingCopyFn={controller.selectWorkingCopyFn}
+							restorePending={controller.checkoutPending}
 							selectedReference={controller.compareTo}
 							status={controller.history.status}
 						/>
@@ -85,11 +86,11 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 							</p>
 						)}
 						{controller.selected === undefined ? (
-							<p className="text-sm text-muted">
-								{controller.compareTo === "current"
-									? "Working copy selected."
-									: "Create or select a saved version."}
-							</p>
+							controller.compareTo === "current" ? null : (
+								<p className="text-sm text-muted">
+									Create or select a saved version.
+								</p>
+							)
 						) : (
 							<article className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5">
 								<div className="flex flex-wrap items-start justify-between gap-3">
@@ -99,8 +100,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 										</h2>
 										<p className="mt-1 text-xs text-muted">
 											Arkini {controller.selected.arkini} · Arkpack{" "}
-											{controller.selected.arkpackVersion} · source revision{" "}
-											{controller.selected.sourceRevision}
+											{controller.selected.arkpackVersion}
 										</p>
 										<dl className="mt-3 grid min-w-0 gap-3 text-xs sm:grid-cols-2">
 											<div>
@@ -146,15 +146,6 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 											</div>
 										</dl>
 									</div>
-									<DangerButton
-										disabled={controller.checkoutPending}
-										cursorIntent={
-											controller.checkoutPending ? "progress" : undefined
-										}
-										onClick={controller.restoreSelectedFn}
-									>
-										Restore version
-									</DangerButton>
 								</div>
 								{controller.selected.body === undefined ? null : (
 									<p className="whitespace-pre-wrap text-sm leading-6 text-muted">
@@ -176,8 +167,8 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 												controller.setTagDraftFn(event.currentTarget.value)
 											}
 										/>
-										<Button
-											className="h-9 min-h-0 shrink-0 gap-2 px-3 py-1.5 whitespace-nowrap"
+										<LinkButton
+											className="inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap"
 											cursorIntent={
 												controller.tagPending ? "progress" : undefined
 											}
@@ -186,7 +177,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 										>
 											<Save className="size-4" />
 											Save
-										</Button>
+										</LinkButton>
 									</div>
 								</label>
 							</article>

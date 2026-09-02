@@ -12,7 +12,6 @@ interface VersionCheckoutProps {
 	readonly project: Project;
 	readonly projectDirty: boolean;
 	readonly reportErrorFn: (error?: unknown) => void;
-	readonly selected?: ProjectVersionDescriptor;
 }
 
 interface VersionCheckoutOutput {
@@ -21,7 +20,7 @@ interface VersionCheckoutOutput {
 	readonly confirmVersion?: ProjectVersionDescriptor;
 	readonly goToCommitFn: () => void;
 	readonly pending: boolean;
-	readonly restoreSelectedFn: () => void;
+	readonly restoreVersionFn: (version: ProjectVersionDescriptor) => void;
 }
 
 /** Owns destructive checkout admission and dirty-state confirmation. */
@@ -29,7 +28,6 @@ export const useVersionCheckout = ({
 	project,
 	projectDirty,
 	reportErrorFn,
-	selected,
 }: VersionCheckoutProps): VersionCheckoutOutput => {
 	const router = useRouter();
 	const restoreAtom = VersionRestoreCommandAtom(project.projectId);
@@ -67,19 +65,20 @@ export const useVersionCheckout = ({
 			restoreState.kind,
 		],
 	);
-	const restoreSelectedFn = useCallback(() => {
-		if (selected === undefined) return;
-		if (projectDirty || unsaved.hasDirtySession) {
-			setConfirmVersionFn(selected);
-			return;
-		}
-		runCheckoutFn(selected, false);
-	}, [
-		projectDirty,
-		runCheckoutFn,
-		selected,
-		unsaved.hasDirtySession,
-	]);
+	const restoreVersionFn = useCallback(
+		(version: ProjectVersionDescriptor) => {
+			if (projectDirty || unsaved.hasDirtySession) {
+				setConfirmVersionFn(version);
+				return;
+			}
+			runCheckoutFn(version, false);
+		},
+		[
+			projectDirty,
+			runCheckoutFn,
+			unsaved.hasDirtySession,
+		],
+	);
 	const confirmFn = useCallback(() => {
 		if (confirmVersion !== undefined) runCheckoutFn(confirmVersion, true);
 	}, [
@@ -112,6 +111,6 @@ export const useVersionCheckout = ({
 				}),
 		goToCommitFn,
 		pending: restoreState.kind === "restoring",
-		restoreSelectedFn,
+		restoreVersionFn,
 	};
 };

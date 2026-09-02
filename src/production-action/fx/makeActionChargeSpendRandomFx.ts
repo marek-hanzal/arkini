@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /** Bump only when intentionally changing immediate charge-depletion random compatibility. */
 const ActionChargeSpendRandomVersion = 2;

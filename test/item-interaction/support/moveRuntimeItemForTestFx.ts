@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";

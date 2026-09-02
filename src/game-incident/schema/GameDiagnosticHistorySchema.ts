@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { DiagnosticValueSchema } from "~electron/contract/diagnostics/DiagnosticRecord";
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import {
 	GameDiagnosticEventSchema,
 	GameDiagnosticItemReferenceSchema,

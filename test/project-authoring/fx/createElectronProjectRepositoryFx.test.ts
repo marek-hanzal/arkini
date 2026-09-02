@@ -126,6 +126,16 @@ const installEditorApi = () => {
 				versionCount: 1,
 			}),
 		),
+		previewVersionCommitFn: vi.fn(async () =>
+			success({
+				bump: "noop" as const,
+				canCommit: false,
+				currentFingerprint: "a".repeat(64),
+				initial: false,
+				nextArkpackVersion: editorTestPayload.version,
+				scenariosToDelete: [],
+			}),
+		),
 		listVersionsFn: vi.fn(async () =>
 			success([
 				version,

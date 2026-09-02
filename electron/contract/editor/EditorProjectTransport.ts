@@ -20,6 +20,7 @@ export namespace EditorProjectTransport {
 		| "list-projects"
 		| "list-versions"
 		| "open-project-directory"
+		| "preview-version-commit"
 		| "read-project"
 		| "read-project-build"
 		| "refresh-project"
@@ -170,6 +171,7 @@ export namespace EditorProjectTransport {
 	export interface CreateProjectRequest {
 		readonly version: string;
 		readonly config: unknown;
+		readonly initialVersionSubject?: string;
 		readonly resources: ReadonlyArray<unknown>;
 	}
 
@@ -239,6 +241,16 @@ export namespace EditorProjectTransport {
 		readonly versionCount: number;
 	}
 
+	export interface VersionCommitPreview {
+		readonly bump: "noop" | "minor" | "major";
+		readonly canCommit: boolean;
+		readonly currentFingerprint: string;
+		readonly diff?: VersionDiff;
+		readonly initial: boolean;
+		readonly nextArkpackVersion: string;
+		readonly scenariosToDelete: ReadonlyArray<string>;
+	}
+
 	export type VersionReference =
 		| {
 				readonly type: "current";
@@ -278,6 +290,7 @@ export namespace EditorProjectTransport {
 		readonly path: string;
 		readonly before?: unknown;
 		readonly after?: unknown;
+		readonly bump?: "minor" | "major";
 	}
 
 	export interface VersionItemDiff {
@@ -288,6 +301,7 @@ export namespace EditorProjectTransport {
 
 	export interface VersionBinaryDiff {
 		readonly change: "added" | "changed" | "deleted";
+		readonly bump?: "minor" | "major";
 		readonly id: string;
 	}
 

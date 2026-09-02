@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 
 /**
  * Save-backed default-line override for each exact live line-owner identity.

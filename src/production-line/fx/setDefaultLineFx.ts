@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";

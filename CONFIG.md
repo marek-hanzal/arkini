@@ -1,6 +1,6 @@
 # Arkini game authoring
 
-This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-config-source`](src/game-config-source) owns exact source files, source schemas, and the generated `schema.json`; [`src/game-config`](src/game-config) owns completed config values; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
+This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-value`](src/game-value) owns the foundational immutable scalar language; [`src/game-config-source`](src/game-config-source) owns exact source files, source schemas, and the generated `schema.json`; [`src/game-config`](src/game-config) owns the completed config aggregate; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
 
 ## Canonical project
 
@@ -20,7 +20,7 @@ versions/<versionId>/{version.json,manifest.json}
 objects/<sha256>.{json,png}
 ```
 
-Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, notes, scenarios, version history, objects, locks, temporary files, and ignored `build/` artifacts are never compiled.
+Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, notes, scenarios, version history, objects, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` nevertheless require this working source tree to match its published Version HEAD exactly; validation may still inspect an uncommitted working tree.
 
 - `project.json` is the root marker and contains Arkini writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
@@ -66,7 +66,7 @@ The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. 
 
 ## Identity and references
 
-All exact IDs use the shared `IdSchema`; prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
+All exact IDs use [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/IdSchema.ts); prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
 
 Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export, Versions, and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item type/UID and its path.
 
@@ -100,6 +100,8 @@ The compiler must reject an invalid project without producing a usable artifact.
 ## Editor sidecars
 
 Notes are portable but do not change authoring revision and do not enter Versions, Build, or Arkpack output. Scenarios are explicit portable gameplay-State snapshots included in Versions; the live Editor Board is not persisted. Versions are complete immutable logical snapshots published through `versions/head.json`, not property deltas.
+
+Ordinary Project, Item, and resource saves never change the Arkpack gameplay version. The first explicit Version commit records the complete starting snapshot at its existing version (`1.0` for a fresh project); Arkpack import creates this root commit automatically while preserving the imported version. Each later commit compares the working tree with the current parent snapshot and applies exactly one strongest compatibility result: any major-classified gameplay field produces one major bump, otherwise any minor-classified field or resource change produces one minor bump, and scenario-only changes produce no bump. A major commit deletes every current Board scenario after presenting that consequence in the commit preview. Branch identity is the Version ID, so sibling commits may legitimately carry the same gameplay version and no-op parent/child commits may share one version.
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
 

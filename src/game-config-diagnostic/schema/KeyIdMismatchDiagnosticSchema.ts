@@ -4,7 +4,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticRecordEntityEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 export const KeyIdMismatchDiagnosticSchema = z

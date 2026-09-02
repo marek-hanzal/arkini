@@ -1,0 +1,14 @@
+{
+	"uid": "grj3514se1qiopmqtqb2gt9l",
+	"id": "item:stone-block",
+	"title": "Stone Block",
+	"description": "Processed stone material produced by stonemasons.",
+	"asset": {
+		"default": [
+			"item-stone-block"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 50,
+	"type": "simple"
+}

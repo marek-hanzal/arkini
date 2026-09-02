@@ -3,8 +3,8 @@ import { z } from "zod";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 export const UnsupportedInputCapacityDiagnosticSchema = z

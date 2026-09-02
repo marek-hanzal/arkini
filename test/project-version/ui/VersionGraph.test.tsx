@@ -119,6 +119,7 @@ describe("VersionGraph", () => {
 		const restore = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorVersionRestore"]',
 		);
+		expect(container.textContent).toContain("v1.0");
 
 		await act(async () => restore?.click());
 

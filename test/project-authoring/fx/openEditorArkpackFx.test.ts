@@ -94,7 +94,6 @@ describe("openEditorArkpackFx", () => {
 			}),
 		);
 		const createProjectFx = vi.fn(() => Effect.succeed(project));
-
 		const result = await runOpen(createRepository(() => Effect.succeed(null), createProjectFx));
 
 		expect(result).toBe(project);
@@ -104,6 +103,7 @@ describe("openEditorArkpackFx", () => {
 		expect(createProjectFx).toHaveBeenCalledWith({
 			version: project.version,
 			config: project.config,
+			initialVersionSubject: "Imported Arkpack v4.2",
 			resources: project.resources,
 		});
 	});

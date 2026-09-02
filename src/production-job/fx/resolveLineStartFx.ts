@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import type { JobQueueResolutionSchema } from "~/production-job/schema/JobQueueResolutionSchema";

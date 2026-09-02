@@ -120,6 +120,16 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 			versionCount: 0,
 		}),
 	),
+	previewVersionCommitFx: vi.fn(() =>
+		Effect.succeed({
+			bump: "noop" as const,
+			canCommit: true,
+			currentFingerprint: "fingerprint",
+			initial: true,
+			nextArkpackVersion: "1.0",
+			scenariosToDelete: [],
+		}),
+	),
 	replaceConfigFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	saveResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),

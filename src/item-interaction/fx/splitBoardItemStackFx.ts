@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";

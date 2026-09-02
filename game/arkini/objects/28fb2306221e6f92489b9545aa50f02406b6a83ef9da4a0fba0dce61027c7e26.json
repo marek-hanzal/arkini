@@ -1,0 +1,132 @@
+{
+	"uid": "sk4emw3mvfazitj1xcelb09p",
+	"id": "item:quest:tavern-commission",
+	"title": "Tavern Commission Quest",
+	"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
+	"asset": {
+		"default": [
+			"item-quest"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "craft",
+	"line": {
+		"id": "line:quest:tavern-commission:complete",
+		"title": "Complete Tavern Commission",
+		"description": "Consumes prepared drinks and payment to complete this tavern commission.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 10000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:beer"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:wine-glass"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:coin"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 3,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "item:feast",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "item:cheese",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "item:feast",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "item:stone-block",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

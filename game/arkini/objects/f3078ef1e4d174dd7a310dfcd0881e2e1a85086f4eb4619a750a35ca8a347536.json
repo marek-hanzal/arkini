@@ -1,0 +1,14 @@
+{
+	"uid": "x7mvr1i5vawo2p3jzzgsmh7r",
+	"id": "item:coal",
+	"title": "Coal Cart",
+	"description": "A mining cart loaded with coal. Used as fuel by smelters.",
+	"asset": {
+		"default": [
+			"item-coal"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 20,
+	"type": "simple"
+}

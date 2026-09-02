@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";

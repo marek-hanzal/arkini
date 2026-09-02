@@ -1,0 +1,223 @@
+{
+	"uid": "zvn41mcupjxb15re6517ytvx",
+	"id": "item:blueprint-construction-yard-t1",
+	"title": "Construction Yard I Blueprint",
+	"description": "Build plan that can be filled with resources to construct Construction Yard I.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"producer-construction-yard-t1"
+		],
+		"sources": [
+			"producer-construction-yard-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "line:blueprint:construction-yard-t1:construct",
+		"title": "Construct Construction Yard I",
+		"description": "Consumes construction resources to build Construction Yard I.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 70000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:plank"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 4,
+					"max": 4
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:stone-block"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 4,
+					"max": 4
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:bricks"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:glass"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:roof-tiles"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 2,
+					"max": 2
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:gold-ingot"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:building-permit"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:luxury-clothing"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "item:morale-t3"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "producer:construction-yard-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": [
+			{
+				"when": [
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:brickyard"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					},
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:glassworks"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					},
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:roof-tile-factory"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					},
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "producer:smelter-t1"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					}
+				],
+				"type": "enable"
+			}
+		]
+	}
+}

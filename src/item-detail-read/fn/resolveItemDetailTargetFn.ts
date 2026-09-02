@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readItemDetailTabsFn } from "~/item-detail-read/fn/readItemDetailTabsFn";
 import type { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
 import { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";

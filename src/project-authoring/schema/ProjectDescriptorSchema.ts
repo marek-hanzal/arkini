@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 /** Stable repository-backed identity used by editor discovery and navigation. */

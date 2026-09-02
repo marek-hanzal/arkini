@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";

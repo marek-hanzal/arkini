@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
-import { TitleSchema } from "~/game-config/schema/TitleSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 
 export const BoardScenarioNameSchema = TitleSchema.max(80);

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";

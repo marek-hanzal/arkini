@@ -13,6 +13,7 @@ export const UnusedEditorProjectRepository = {
 	diffVersionsFx: () => Effect.die("Unexpected editor version diff."),
 	listVersionsFx: () => Effect.die("Unexpected editor version list."),
 	listNotesFx: () => Effect.die("Unexpected editor note list."),
+	previewVersionCommitFx: () => Effect.die("Unexpected editor version commit preview."),
 	readVersionStatusFx: () => Effect.die("Unexpected editor version status."),
 	updateVersionTagFx: () => Effect.die("Unexpected editor version tag update."),
 	updateNoteFx: () => Effect.die("Unexpected editor note update."),
@@ -32,6 +33,7 @@ export const UnusedEditorProjectRepository = {
 	| "diffVersionsFx"
 	| "listVersionsFx"
 	| "listNotesFx"
+	| "previewVersionCommitFx"
 	| "readVersionStatusFx"
 	| "updateVersionTagFx"
 	| "updateNoteFx"

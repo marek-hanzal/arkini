@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NonEmptyStringSchema } from "~/game-config/schema/NonEmptyStringSchema";
+import { NonEmptyStringSchema } from "~/game-value/schema/NonEmptyStringSchema";
 import { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 /**

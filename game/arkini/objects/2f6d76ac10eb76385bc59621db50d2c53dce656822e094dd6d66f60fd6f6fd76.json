@@ -1,0 +1,56 @@
+{
+	"uid": "oeiwznj5hh3ai2p344ngochx",
+	"id": "jump",
+	"title": "Jumper",
+	"description": "Does Space Jump, yaaay",
+	"asset": {
+		"default": [
+			"item-clay"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "space",
+	"space": 1,
+	"enable": false,
+	"input": [
+		{
+			"charges": {
+				"cost": 1,
+				"from": "target"
+			},
+			"type": "deposit",
+			"query": {
+				"selector": {
+					"type": "item",
+					"itemId": "item:tree"
+				},
+				"scope": "board",
+				"distance": "close"
+			}
+		}
+	],
+	"rules": [
+		{
+			"hint": "You need a tree, bro",
+			"when": [
+				{
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "item:tree"
+						},
+						"scope": "board",
+						"distance": "close"
+					},
+					"type": "exists"
+				}
+			],
+			"type": "enable"
+		}
+	]
+}

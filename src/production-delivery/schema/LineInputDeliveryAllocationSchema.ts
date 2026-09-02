@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /** One requested quantity within a concrete line material-input slot. */
 export const LineInputDeliveryAllocationSchema = z

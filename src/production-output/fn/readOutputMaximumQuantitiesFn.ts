@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { readRollMaximumQuantitiesFn } from "~/production-output/fn/readRollMaximumQuantitiesFn";
 

@@ -1,7 +1,7 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";

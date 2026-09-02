@@ -1,0 +1,14 @@
+{
+	"uid": "fcpor5wssd88wompolskbzrl",
+	"id": "item:sand-deposit",
+	"title": "Sand Deposit",
+	"description": "Movable sand source used by nearby sand pits.",
+	"asset": {
+		"default": [
+			"item-sand-deposit"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

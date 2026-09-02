@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import { resolveStartOutputCapacityFx } from "~/production-job/fx/resolveStartOutputCapacityFx";
 import type { LineRun } from "~/production-line/type/LineRun";

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { completeJobTransitionFx } from "~/production-job/fx/completeJobTransitionFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

@@ -256,17 +256,11 @@ describe("project section form session", () => {
 
 		await renderSection(<ProjectGeneralSection />);
 		const navigation = container.querySelector('[data-ui="EditorSectionNavigation"]');
-		const compatibility = container.querySelector<HTMLElement>(
-			'[data-ui="EditorCompatibilityNotice"]',
-		);
-		expect(compatibility?.dataset.uiResult).toBe("noop");
+		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBeNull();
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
 		await changeInput(title, "Changed project");
-		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBe(
-			compatibility,
-		);
-		expect(compatibility?.dataset.uiResult).toBe("minor");
+		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBeNull();
 		await renderSection(<div data-ui="BoardSection">Board</div>);
 		await renderSection(<ProjectGeneralSection />);
 

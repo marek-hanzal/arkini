@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-config/schema/IdSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { LineInputDeliveryTargetSchema } from "~/production-delivery/schema/LineInputDeliveryTargetSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { DeliveryTargetIssueReasonEnumSchema } from "./DeliveryTargetIssueReasonEnumSchema";

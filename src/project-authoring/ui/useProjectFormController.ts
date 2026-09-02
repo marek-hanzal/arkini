@@ -18,8 +18,10 @@ import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
-import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections";
-import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
+import {
+	readProjectFormDestinationForPathFn,
+	type ProjectFormDestination,
+} from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeProjectCompatibilityFn } from "~/project-version/fn/analyzeProjectCompatibilityFn";
@@ -135,7 +137,9 @@ const analyzeProjectStructuralCompatibilityFn = (
 
 export namespace useProjectFormController {
 	export interface Props {
-		readonly onInvalidSectionFn: (section: ProjectSectionId) => void | Promise<void>;
+		readonly onInvalidDestinationFn: (
+			destination: ProjectFormDestination,
+		) => void | Promise<void>;
 		readonly onSavedFn?: () => void | Promise<void>;
 	}
 
@@ -144,7 +148,7 @@ export namespace useProjectFormController {
 }
 
 export const useProjectFormController = ({
-	onInvalidSectionFn,
+	onInvalidDestinationFn,
 	onSavedFn,
 }: useProjectFormController.Props) => {
 	const project = useEditorProject();
@@ -222,7 +226,7 @@ export const useProjectFormController = ({
 				const result = schema.safeParse(form.state.values);
 				const issue = result.success ? undefined : result.error.issues[0];
 				if (issue !== undefined) {
-					await onInvalidSectionFn(readProjectSectionForPathFn(issue.path));
+					await onInvalidDestinationFn(readProjectFormDestinationForPathFn(issue.path));
 					const focusInvalidFieldFn = () =>
 						document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
 					if (typeof requestAnimationFrame === "function") {
@@ -237,7 +241,7 @@ export const useProjectFormController = ({
 		[
 			dirty,
 			form,
-			onInvalidSectionFn,
+			onInvalidDestinationFn,
 			schema,
 			submitting,
 		],

@@ -5,6 +5,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
+import type { ProjectFormDestination } from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 import { ProjectFormProvider } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
@@ -59,14 +60,20 @@ export const ProjectFormSession = ({
 }>) => {
 	const navigateFn = useNavigate();
 	const project = useEditorProject();
-	const onInvalidSectionFn = useCallback(
-		(nextSectionId: ProjectSectionId) =>
+	const onInvalidDestinationFn = useCallback(
+		({ avatar, sectionId: nextSectionId }: ProjectFormDestination) =>
 			navigateFn({
 				to: "/editor/$projectId/project/form/$sectionId",
 				params: {
 					projectId: project.projectId,
 					sectionId: nextSectionId,
 				},
+				search:
+					avatar === undefined
+						? {}
+						: {
+								avatar,
+							},
 			}),
 		[
 			navigateFn,
@@ -74,7 +81,7 @@ export const ProjectFormSession = ({
 		],
 	);
 	const controller = useProjectFormController({
-		onInvalidSectionFn,
+		onInvalidDestinationFn,
 		onSavedFn: () =>
 			navigateFn({
 				to: "/editor/$projectId/project/detail/$sectionId",

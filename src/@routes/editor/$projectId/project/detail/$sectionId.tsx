@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ProjectBoardDetail } from "~/project-authoring/ui/ProjectBoardDetail";
+import { ProjectArtworkDetail } from "~/project-authoring/ui/ProjectArtworkDetail";
 import { ProjectGeneralDetail } from "~/project-authoring/ui/ProjectGeneralDetail";
 import { ProjectInventoryDetail } from "~/project-authoring/ui/ProjectInventoryDetail";
 import { ProjectToolbarDetail } from "~/project-authoring/ui/ProjectToolbarDetail";
@@ -25,6 +26,8 @@ export const Route = createFileRoute("/editor/$projectId/project/detail/$section
 		switch (sectionId as ProjectSectionId) {
 			case "general":
 				return <ProjectGeneralDetail project={project} />;
+			case "artwork":
+				return <ProjectArtworkDetail project={project} />;
 			case "board":
 				return <ProjectBoardDetail project={project} />;
 			case "toolbar":

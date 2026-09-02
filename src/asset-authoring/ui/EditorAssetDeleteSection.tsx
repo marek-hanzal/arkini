@@ -117,7 +117,7 @@ const EditorAssetDeleteBlockerLink = ({
 		<EditorAssetUsageRow
 			dataUi="EditorAssetDeleteBlocker"
 			project={project}
-			title="Project · General"
+			title="Project · Artwork"
 			usage={blocker}
 		/>
 	);

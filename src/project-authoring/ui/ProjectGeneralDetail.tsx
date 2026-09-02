@@ -1,21 +1,9 @@
-import { EditorAssetReference } from "~/asset-authoring/ui/EditorAssetReference";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
-import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import type { Project } from "~/project-authoring/type/Project";
+import { ProjectOverview } from "~/project-authoring/ui/ProjectOverview";
 
 export const ProjectGeneralDetail = ({ project }: { readonly project: Project }) => {
-	const avatars = ProjectAvatarKeys.flatMap((slot) => {
-		const resourceId = project.config.resources[slot];
-		return resourceId === undefined
-			? []
-			: [
-					{
-						resourceId,
-						slot,
-					},
-				];
-	});
 	return (
 		<div className="grid gap-6">
 			<EditorRootCard dataUi="EditorProjectGeneralDetailCard">
@@ -33,29 +21,7 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 					</DetailFacts>
 				</DetailSection>
 			</EditorRootCard>
-			<EditorRootCard dataUi="EditorProjectHeroDetailCard">
-				<DetailSection title="Hero image">
-					<EditorAssetReference resourceId={project.config.resources.hero} />
-				</DetailSection>
-			</EditorRootCard>
-			<EditorRootCard dataUi="EditorProjectAvatarsDetailCard">
-				<DetailSection title="About avatars">
-					{avatars.length === 0 ? (
-						<p className="text-sm text-muted">No About avatars configured.</p>
-					) : (
-						<ul className="grid gap-3">
-							{avatars.map(({ resourceId, slot }) => (
-								<li key={slot}>
-									<EditorAssetReference
-										context={slot}
-										resourceId={resourceId}
-									/>
-								</li>
-							))}
-						</ul>
-					)}
-				</DetailSection>
-			</EditorRootCard>
+			<ProjectOverview project={project} />
 		</div>
 	);
 };

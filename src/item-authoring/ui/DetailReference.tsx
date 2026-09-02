@@ -38,8 +38,10 @@ export const DetailReference = ({
 				size="sm"
 			/>
 			<span className="min-w-0">
-				<span className="block truncate font-medium text-foreground">{item.title}</span>
-				<span className="mt-0.5 block truncate font-mono text-xs font-normal text-muted">
+				<span className="block truncate font-medium text-foreground transition-colors group-hover:text-accent">
+					{item.title}
+				</span>
+				<span className="mt-0.5 block truncate font-mono text-xs font-normal text-muted transition-colors group-hover:text-accent">
 					{item.id}
 				</span>
 			</span>

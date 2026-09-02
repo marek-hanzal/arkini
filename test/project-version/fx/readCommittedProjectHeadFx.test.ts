@@ -1,5 +1,7 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -61,5 +63,32 @@ describe("readCommittedProjectHeadFx", () => {
 		await expect(readHead()).rejects.toThrow(
 			"Commit the saved project changes before building.",
 		);
+	});
+
+	it("rejects a published HEAD with a corrupted non-scenario object", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "corrupted-portable-head");
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Project root is missing.");
+		const status = await Effect.runPromise(repository.readVersionStatusFx(project.projectId));
+		const initial = await Effect.runPromise(
+			repository.createVersionFx({
+				expectedFingerprint: status.currentFingerprint,
+				projectId: project.projectId,
+				subject: "Initial",
+			}),
+		);
+		const manifest = JSON.parse(
+			await readFile(join(root, "versions", initial.versionId, "manifest.json"), "utf8"),
+		) as {
+			readonly game: string;
+		};
+		await writeFile(join(root, "objects", `${manifest.game}.json`), "corrupt\n");
+
+		await expect(
+			Effect.runPromise(
+				readCommittedProjectHeadFx(root).pipe(Effect.provide(NodeServices.layer)),
+			),
+		).rejects.toThrow("does not match its content hash");
 	});
 });

@@ -80,6 +80,35 @@ describe("filesystem Editor project build", () => {
 		});
 	});
 
+	it("rejects a corrupted published Version HEAD object", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "project-corrupt-head");
+		await commitCurrent(repository, project.projectId);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Project root is missing.");
+		const head = JSON.parse(await readFile(join(root, "versions", "head.json"), "utf8")) as {
+			readonly current: string;
+		};
+		const manifest = JSON.parse(
+			await readFile(join(root, "versions", head.current, "manifest.json"), "utf8"),
+		) as {
+			readonly game: string;
+		};
+		await writeFile(join(root, "objects", `${manifest.game}.json`), "corrupt\n");
+
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "build-project",
+			message: "The published Version HEAD is invalid.",
+		});
+	});
+
 	it("publishes and reads the one canonical artifact while ignoring build output", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.build");

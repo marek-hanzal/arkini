@@ -34,6 +34,7 @@ module.exports = {
 					applicationEntrypointPattern,
 					"^src/arkini-cli/arkini[.]ts$",
 					"^electron/(?:main|preload)/index[.]ts$",
+					"^electron/builder/beforeBuild[.]mjs$",
 					"^scripts/[^/]+[.]ts$",
 					"^test/setup[.]ts$",
 					"^(?:electron[.]vite|vitest)[.]config[.]ts$",

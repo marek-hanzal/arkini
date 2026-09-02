@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -14,8 +13,16 @@ const placeholderHeroBytes = Uint8Array.from(
 );
 
 /** Creates one schema-valid empty project through the canonical editor repository. */
-export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(function* () {
-	const projectId = yield* Effect.sync(() => IdSchema.parse(`project-${createId()}`));
+export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(function* (
+	projectIdCandidate: string,
+) {
+	const projectId = yield* Effect.try({
+		try: () => IdSchema.parse(projectIdCandidate),
+		catch: (cause) =>
+			new Error("The new Editor project ID is invalid.", {
+				cause,
+			}),
+	});
 	const config = GameConfigSchema.parse({
 		meta: {
 			id: projectId,

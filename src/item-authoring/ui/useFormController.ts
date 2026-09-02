@@ -7,7 +7,8 @@ import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { FormSchema, type FormValues } from "~/item-authoring/schema/FormSchema";
+import { type FormValues } from "~/item-authoring/schema/FormSchema";
+import { createFormSchema } from "~/item-authoring/schema/createFormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveFx } from "~/item-authoring/fx/saveFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
@@ -20,9 +21,9 @@ import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useE
 const saveCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
-			Atom.fn((item: saveFx.Props["item"]) =>
+			Atom.fn((props: Omit<saveFx.Props, "projectId">) =>
 				saveFx({
-					item,
+					...props,
 					projectId,
 				}).pipe(Effect.provideService(ProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),
@@ -67,6 +68,13 @@ export const useFormController = ({
 			initialItem,
 		],
 	);
+	const schema = useMemo(
+		() => createFormSchema(project, initialItem.uid),
+		[
+			initialItem.uid,
+			project,
+		],
+	);
 	const saveItemAtom = saveCommandAtom(project.projectId);
 	const saveItemResult = useAtomValue(saveItemAtom);
 	const saveItemFn = useAtomSet(saveItemAtom, {
@@ -81,11 +89,15 @@ export const useFormController = ({
 			modeAfterSubmission: "change",
 		}),
 		validators: {
-			onDynamic: FormSchema,
+			onDynamic: schema,
 		},
 		onSubmit: async ({ formApi, value }) => {
-			const item = FormSchema.parse(value);
-			const saved = await saveItemFn(item);
+			const item = schema.parse(value);
+			const saved = await saveItemFn({
+				config: project.config,
+				expectedRevision: project.revision,
+				item,
+			});
 			submitSucceeded.current = true;
 			formApi.reset({
 				...saved,
@@ -142,7 +154,7 @@ export const useFormController = ({
 				notifyOnSaved.current = true;
 			}
 			if (!submitSucceeded.current) {
-				const result = FormSchema.safeParse(form.state.values);
+				const result = schema.safeParse(form.state.values);
 				const issue = result.success ? undefined : result.error.issues[0];
 				if (issue !== undefined) {
 					await onInvalidSectionFn(readSectionForPathFn(issue.path), issue.path);
@@ -161,6 +173,7 @@ export const useFormController = ({
 			dirty,
 			form,
 			onInvalidSectionFn,
+			schema,
 			submitting,
 		],
 	);
@@ -187,7 +200,7 @@ export const useFormController = ({
 		discardFn,
 		id: `item:${project.projectId}:${initialItem.uid}`,
 		isDirtyFn: () => form.state.isDirty,
-		isValidFn: () => FormSchema.safeParse(form.state.values).success,
+		isValidFn: () => schema.safeParse(form.state.values).success,
 		ownsPathnameFn: (pathname) =>
 			pathname.startsWith(
 				`/editor/${project.projectId}/editor/items/${initialItem.uid}/form`,

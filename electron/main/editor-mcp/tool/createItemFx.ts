@@ -29,6 +29,7 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 		uid: createId(),
 	});
 	const { commit, item } = yield* saveWithRepositoryFx({
+		config: project.config,
 		item: {
 			...draft,
 			...input,

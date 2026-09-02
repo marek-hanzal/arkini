@@ -1,6 +1,8 @@
 import { match } from "ts-pattern";
 
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
 	editorSectionTabClassName,
 	EditorSectionTabs,
@@ -33,78 +35,97 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 	const title = section === "server" ? "MCP - Server" : "MCP - Settings";
 	return (
 		<section
-			className="h-full overflow-auto p-6"
+			className="h-full min-h-0"
 			data-ui="EditorMcp"
 		>
-			<div className="mx-auto grid max-w-5xl gap-6">
-				<EditorSectionNavigation
-					title={<h1 className="text-xl font-semibold">{title}</h1>}
-					tabs={
-						<EditorSectionTabs>
-							{EditorMcpSections.map((candidate) => (
-								<ButtonLink
-									key={candidate.id}
-									to="/editor/$projectId/mcp/$sectionId"
-									params={{
-										projectId: project.projectId,
-										sectionId: candidate.id,
-									}}
-									activeOptions={{
-										exact: true,
-									}}
-									activeProps={{
-										"data-ui-selected": true,
-									}}
-									className={editorSectionTabClassName}
-								>
-									{candidate.label}
-								</ButtonLink>
-							))}
-						</EditorSectionTabs>
-					}
-				/>
-				{error === undefined ? null : (
-					<EditorMcpStatus
-						message={error}
-						tone="danger"
+			<EditorSectionPage
+				tabs={
+					<EditorSectionNavigation
+						leading={
+							<EditorHistoryBackButton
+								params={{
+									projectId: project.projectId,
+								}}
+								to="/editor/$projectId/editor/items/list"
+							/>
+						}
+						title={<h1 className="text-xl font-semibold">{title}</h1>}
+						tabs={
+							<EditorSectionTabs>
+								{EditorMcpSections.map((candidate) => (
+									<ButtonLink
+										key={candidate.id}
+										to="/editor/$projectId/mcp/$sectionId"
+										params={{
+											projectId: project.projectId,
+											sectionId: candidate.id,
+										}}
+										activeOptions={{
+											exact: true,
+										}}
+										activeProps={{
+											"data-ui-selected": true,
+										}}
+										className={editorSectionTabClassName}
+									>
+										{candidate.label}
+									</ButtonLink>
+								))}
+							</EditorSectionTabs>
+						}
 					/>
-				)}
-				{overview === undefined ? (
-					<EditorMcpStatus message="Loading MCP settings…" />
-				) : (
-					match(section)
-						.with("server", () => (
-							<EditorMcpServer
-								copied={clipboardController.copied}
-								onCopyFn={clipboardController.copyFn}
-								onResetAuthFn={() => executeFn(overviewController.resetAuthFn)}
-								onStartLocalFn={() => executeFn(overviewController.startLocalFn)}
-								onStartRemoteFn={() => executeFn(overviewController.startRemoteFn)}
-								onStopLocalFn={() => executeFn(overviewController.stopLocalFn)}
-								onStopRemoteFn={() => executeFn(overviewController.stopRemoteFn)}
-								overview={overview}
-								pending={overviewController.pending}
-							/>
-						))
-						.with("settings", () => (
-							<EditorMcpSettings
-								authtoken={settingsController.authtoken}
-								copied={clipboardController.copied}
-								ngrokDomain={settingsController.ngrokDomain}
-								onCopyFn={clipboardController.copyFn}
-								onSaveNgrokFn={settingsController.saveNgrokFn}
-								onSavePortFn={settingsController.savePortFn}
-								onSetAuthtokenFn={settingsController.setAuthtokenFn}
-								onSetNgrokDomainFn={settingsController.setNgrokDomainFn}
-								onSetPortFn={settingsController.setPortFn}
-								overview={overview}
-								pending={overviewController.pending}
-								port={settingsController.port}
-							/>
-						))
-						.exhaustive()
-				)}
-			</div>
+				}
+			>
+				<div className="mx-auto grid max-w-5xl gap-6">
+					{error === undefined ? null : (
+						<EditorMcpStatus
+							message={error}
+							tone="danger"
+						/>
+					)}
+					{overview === undefined ? (
+						<EditorMcpStatus message="Loading MCP settings…" />
+					) : (
+						match(section)
+							.with("server", () => (
+								<EditorMcpServer
+									copied={clipboardController.copied}
+									onCopyFn={clipboardController.copyFn}
+									onResetAuthFn={() => executeFn(overviewController.resetAuthFn)}
+									onStartLocalFn={() =>
+										executeFn(overviewController.startLocalFn)
+									}
+									onStartRemoteFn={() =>
+										executeFn(overviewController.startRemoteFn)
+									}
+									onStopLocalFn={() => executeFn(overviewController.stopLocalFn)}
+									onStopRemoteFn={() =>
+										executeFn(overviewController.stopRemoteFn)
+									}
+									overview={overview}
+									pending={overviewController.pending}
+								/>
+							))
+							.with("settings", () => (
+								<EditorMcpSettings
+									authtoken={settingsController.authtoken}
+									copied={clipboardController.copied}
+									ngrokDomain={settingsController.ngrokDomain}
+									onCopyFn={clipboardController.copyFn}
+									onSaveNgrokFn={settingsController.saveNgrokFn}
+									onSavePortFn={settingsController.savePortFn}
+									onSetAuthtokenFn={settingsController.setAuthtokenFn}
+									onSetNgrokDomainFn={settingsController.setNgrokDomainFn}
+									onSetPortFn={settingsController.setPortFn}
+									overview={overview}
+									pending={overviewController.pending}
+									port={settingsController.port}
+								/>
+							))
+							.exhaustive()
+					)}
+				</div>
+			</EditorSectionPage>
 		</section>
 	);
 };

@@ -27,7 +27,7 @@ export const Fact = ({
 	readonly value: ReactNode;
 }) => (
 	<div
-		className="grid min-w-0 gap-1"
+		className="grid min-w-0 self-start gap-1"
 		data-ui={dataUi}
 		data-label={label}
 	>

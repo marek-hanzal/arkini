@@ -1,4 +1,5 @@
 import {
+	ArrowRight,
 	BatteryCharging,
 	Clock3,
 	Combine,
@@ -13,7 +14,7 @@ import {
 import { type ReactNode, useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { formatItemEstimateResultFn } from "~/estimate/ui/formatItemEstimateResultFn";
 import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
@@ -51,13 +52,12 @@ const ItemOverviewCard = ({
 }) => {
 	if (section.id === "identity") return null;
 	return (
-		<EditorRootCard
-			className="gap-4"
+		<EditorOverviewCard
+			body={children}
 			dataUi={`EditorItemOverview${section.id}Card`}
-		>
-			<div className="grid gap-4">
+			footerRight={
 				<LinkButtonLink
-					className="flex w-fit items-center gap-2"
+					className="inline-flex items-center gap-1.5"
 					data-section-id={section.id}
 					data-ui="EditorItemOverviewLink"
 					params={{
@@ -67,12 +67,13 @@ const ItemOverviewCard = ({
 					}}
 					to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 				>
-					<Icon className="size-4" />
-					<h2 className="font-semibold">{section.label}</h2>
+					{section.label}
+					<ArrowRight className="size-4" />
 				</LinkButtonLink>
-				{children}
-			</div>
-		</EditorRootCard>
+			}
+			icon={Icon}
+			title={section.label}
+		/>
 	);
 };
 
@@ -162,9 +163,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 						projectId={project.projectId}
 						section={section}
 					>
-						<p className="text-lg font-semibold text-foreground">
-							{summaries[section.id]}
-						</p>
+						{summaries[section.id]}
 					</ItemOverviewCard>
 				),
 			)}

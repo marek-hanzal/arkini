@@ -1,49 +1,12 @@
-import {
-	ArrowRight,
-	Boxes,
-	GitBranch,
-	Images,
-	LoaderCircle,
-	PackageCheck,
-	TriangleAlert,
-	type LucideIcon,
-} from "lucide-react";
-import type { ReactNode } from "react";
+import { ArrowRight, Boxes, GitBranch, Images, LoaderCircle, TriangleAlert } from "lucide-react";
 
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import { useProjectVersionStatus } from "~/project-version/ui/useProjectVersionStatus";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
-
-const ProjectOverviewCard = ({
-	action,
-	children,
-	header,
-}: {
-	readonly action: ReactNode;
-	readonly children: ReactNode;
-	readonly header: ReactNode;
-}) => (
-	<EditorRootCard className="gap-4">
-		{header}
-		<div className="text-lg text-foreground">{children}</div>
-		<div className="flex justify-end">{action}</div>
-	</EditorRootCard>
-);
-
-const ProjectOverviewHeading = ({
-	children,
-	icon: Icon,
-}: {
-	readonly children: ReactNode;
-	readonly icon: LucideIcon;
-}) => (
-	<span className="flex items-center gap-2">
-		<Icon className="size-4" />
-		<span className="font-semibold">{children}</span>
-	</span>
-);
 
 /** Presents project-wide repository, content, Estimate, and asset summaries. */
 export const ProjectOverview = ({ project }: { readonly project: Project }) => {
@@ -59,106 +22,185 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				? "Loading…"
 				: "Unavailable"
 			: `${versionStatus.versionCount} saved ${versionStatus.versionCount === 1 ? "version" : "versions"}`;
-	const workingCopySummary =
+	const workingCopyStatus =
 		versionStatus === undefined
 			? versionState.status === "loading"
-				? "Loading…"
-				: "Unavailable"
+				? "loading"
+				: "unavailable"
 			: versionStatus.currentBaseVersionId === undefined
-				? "Unversioned"
+				? "unversioned"
 				: versionStatus.dirty
-					? "Dirty"
-					: "Clean";
+					? "dirty"
+					: "clean";
+	const workingCopySummary = {
+		clean: "Clean",
+		dirty: "Dirty",
+		loading: "Loading…",
+		unavailable: "Unavailable",
+		unversioned: "Unversioned",
+	}[workingCopyStatus];
 	const unreachableCount = estimateState.rows.filter(
 		({ estimate }) => estimate.status === "unreachable",
 	).length;
-	const itemCount = Object.keys(project.config.items).length;
+	const items = Object.values(project.config.items);
+	const itemCount = items.length;
+	const itemTypeCounts = TypeSchema.options.flatMap((type) => {
+		const count = items.filter((item) => item.type === type).length;
+		return count === 0
+			? []
+			: [
+					{
+						count,
+						type,
+					},
+				];
+	});
+	const unreachableSummary =
+		estimateState.status === "loading" ? (
+			<span
+				className="inline-flex items-center gap-1.5 text-muted"
+				data-ui="EditorProjectOverviewUnreachableLoading"
+			>
+				<LoaderCircle className="size-4 animate-spin" />
+				Calculating…
+			</span>
+		) : estimateState.status === "ready" && unreachableCount > 0 ? (
+			<LinkButtonLink
+				className="inline-flex items-center gap-1.5"
+				data-overview-id="unreachable-items"
+				data-ui="EditorProjectOverviewLink"
+				params={{
+					projectId: project.projectId,
+				}}
+				search={{
+					view: "incomplete",
+				}}
+				to="/editor/$projectId/estimate"
+			>
+				<TriangleAlert className="size-4" />
+				{unreachableCount} unreachable {unreachableCount === 1 ? "item" : "items"}
+			</LinkButtonLink>
+		) : null;
 
 	return (
 		<section
 			className="flex flex-col gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorProjectOverview"
 		>
-			<ProjectOverviewCard
-				action={
-					<div className="flex w-full items-end justify-between gap-4">
-						<div className="flex items-center gap-3">
-							<span>{workingCopySummary}</span>
-							<span className="text-subtle">·</span>
-							{versionStatus?.canCommit === true ? (
-								<LinkButtonLink
-									data-overview-id="versions-commit"
-									data-ui="EditorProjectOverviewLink"
-									params={{
-										projectId: project.projectId,
-									}}
-									to="/editor/$projectId/versions/commit"
-								>
-									Commit
-								</LinkButtonLink>
-							) : (
-								<LinkButton
-									data-ui="EditorProjectOverviewCommitUnavailable"
-									disabled
-								>
-									Commit
-								</LinkButton>
-							)}
-							<span className="h-5 w-px bg-line" />
-							<LinkButtonLink
-								data-overview-id="versions-history"
-								data-ui="EditorProjectOverviewLink"
-								params={{
-									projectId: project.projectId,
-								}}
-								to="/editor/$projectId/versions/history"
-							>
-								History
-							</LinkButtonLink>
-						</div>
+			<EditorOverviewCard
+				body={
+					<div className="flex flex-wrap items-center gap-3">
+						<span>{versionCountSummary}</span>
+						<span className="h-5 w-px bg-line" />
+						<span>v{project.version}</span>
+						<span className="text-subtle">·</span>
 						<LinkButtonLink
-							className="inline-flex items-center gap-1.5"
-							data-overview-id="versions"
+							data-overview-id="arkpack-version"
 							data-ui="EditorProjectOverviewLink"
 							params={{
 								projectId: project.projectId,
 							}}
-							to="/editor/$projectId/versions/commit"
+							to="/editor/$projectId/build"
 						>
-							Versions
-							<ArrowRight className="size-4" />
+							Build
 						</LinkButtonLink>
 					</div>
 				}
-				header={<ProjectOverviewHeading icon={GitBranch}>Versions</ProjectOverviewHeading>}
-			>
-				{versionCountSummary}
-			</ProjectOverviewCard>
-			<ProjectOverviewCard
-				action={
+				footerLeft={
+					<div
+						className="group flex items-center gap-3"
+						{...readDataUiFn({
+							dataUi: "EditorProjectOverviewVersionStatus",
+							state: {
+								status: workingCopyStatus,
+							},
+						})}
+					>
+						<span className="size-2 shrink-0 rounded-full bg-muted group-data-[ui-status=clean]:bg-success group-data-[ui-status=dirty]:bg-warning" />
+						<span>{workingCopySummary}</span>
+						<span className="text-subtle">·</span>
+						{versionStatus?.canCommit === true ? (
+							<LinkButtonLink
+								data-overview-id="versions-commit"
+								data-ui="EditorProjectOverviewLink"
+								params={{
+									projectId: project.projectId,
+								}}
+								to="/editor/$projectId/versions/commit"
+							>
+								Commit
+							</LinkButtonLink>
+						) : (
+							<LinkButton
+								data-ui="EditorProjectOverviewCommitUnavailable"
+								disabled
+							>
+								Commit
+							</LinkButton>
+						)}
+						<span className="h-5 w-px bg-line" />
+						<LinkButtonLink
+							data-overview-id="versions-history"
+							data-ui="EditorProjectOverviewLink"
+							params={{
+								projectId: project.projectId,
+							}}
+							to="/editor/$projectId/versions/history"
+						>
+							History
+						</LinkButtonLink>
+					</div>
+				}
+				footerRight={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5"
-						data-overview-id="arkpack-version"
+						data-overview-id="versions"
 						data-ui="EditorProjectOverviewLink"
 						params={{
 							projectId: project.projectId,
 						}}
-						to="/editor/$projectId/build"
+						to="/editor/$projectId/versions/commit"
 					>
-						Build
+						Versions
 						<ArrowRight className="size-4" />
 					</LinkButtonLink>
 				}
-				header={
-					<ProjectOverviewHeading icon={PackageCheck}>
-						Arkpack version
-					</ProjectOverviewHeading>
+				icon={GitBranch}
+				title="Versions"
+			/>
+			<EditorOverviewCard
+				body={
+					<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+						<span>
+							{itemCount} {itemCount === 1 ? "item" : "items"}
+						</span>
+						{unreachableSummary === null && itemTypeCounts.length === 0 ? null : (
+							<span className="h-5 w-px bg-line" />
+						)}
+						{unreachableSummary}
+						{unreachableSummary === null || itemTypeCounts.length === 0 ? null : (
+							<span className="h-5 w-px bg-line" />
+						)}
+						{itemTypeCounts.map(({ count, type }) => (
+							<LinkButtonLink
+								className="capitalize"
+								data-overview-id={`items-type-${type}`}
+								data-ui="EditorProjectOverviewLink"
+								key={type}
+								params={{
+									projectId: project.projectId,
+								}}
+								search={{
+									itemType: type,
+								}}
+								to="/editor/$projectId/editor/items/list"
+							>
+								{type} ({count})
+							</LinkButtonLink>
+						))}
+					</div>
 				}
-			>
-				v{project.version}
-			</ProjectOverviewCard>
-			<ProjectOverviewCard
-				action={
+				footerRight={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5"
 						data-overview-id="items"
@@ -172,47 +214,12 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						<ArrowRight className="size-4" />
 					</LinkButtonLink>
 				}
-				header={<ProjectOverviewHeading icon={Boxes}>Items</ProjectOverviewHeading>}
-			>
-				{itemCount} {itemCount === 1 ? "item" : "items"}
-			</ProjectOverviewCard>
-			<ProjectOverviewCard
-				action={
-					<LinkButtonLink
-						className="inline-flex items-center gap-1.5"
-						data-overview-id="unreachable-items"
-						data-ui="EditorProjectOverviewLink"
-						params={{
-							projectId: project.projectId,
-						}}
-						search={{
-							view: "incomplete",
-						}}
-						to="/editor/$projectId/estimate"
-					>
-						Estimate
-						<ArrowRight className="size-4" />
-					</LinkButtonLink>
-				}
-				header={
-					<ProjectOverviewHeading icon={TriangleAlert}>
-						Unreachable items
-					</ProjectOverviewHeading>
-				}
-			>
-				{estimateState.status === "loading" ? (
-					<span className="inline-flex items-center gap-2">
-						<LoaderCircle className="size-4 animate-spin text-subtle" />
-						Calculating…
-					</span>
-				) : estimateState.status === "error" ? (
-					"Unavailable"
-				) : (
-					`${unreachableCount} unreachable ${unreachableCount === 1 ? "item" : "items"}`
-				)}
-			</ProjectOverviewCard>
-			<ProjectOverviewCard
-				action={
+				icon={Boxes}
+				title="Items"
+			/>
+			<EditorOverviewCard
+				body={`${project.resources.length} ${project.resources.length === 1 ? "asset" : "assets"}`}
+				footerRight={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5"
 						data-overview-id="assets"
@@ -226,10 +233,9 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						<ArrowRight className="size-4" />
 					</LinkButtonLink>
 				}
-				header={<ProjectOverviewHeading icon={Images}>Assets</ProjectOverviewHeading>}
-			>
-				{project.resources.length} {project.resources.length === 1 ? "asset" : "assets"}
-			</ProjectOverviewCard>
+				icon={Images}
+				title="Assets"
+			/>
 		</section>
 	);
 };

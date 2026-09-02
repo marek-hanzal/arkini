@@ -72,7 +72,7 @@ describe("ArkpackSelector catalog tools", () => {
 
 		expect(container.textContent).toContain("Community");
 		expect(container.textContent).toContain("User override");
-		expect(buttonByText(container, "Remove override")).toBeInstanceOf(HTMLButtonElement);
+		expect(buttonByText(container, "Remove")).toBeInstanceOf(HTMLButtonElement);
 
 		await act(async () => {
 			buttonByText(container, "Open Arkpack folder").click();

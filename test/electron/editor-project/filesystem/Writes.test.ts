@@ -19,6 +19,84 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project writes", () => {
+	it("rekeys a renamed package and starts its next Version history at a new root", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		await Effect.runPromise(
+			repository.createVersionFx({
+				projectId: created.projectId,
+				subject: "Initial",
+			}),
+		);
+		await Effect.runPromise(
+			repository.createNoteFx({
+				projectId: created.projectId,
+				content: "Keep this note",
+			}),
+		);
+		const renamed = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: created.projectId,
+				expectedRevision: created.revision,
+				config: {
+					...created.config,
+					meta: {
+						...created.config.meta,
+						id: "project-renamed",
+					},
+				},
+			}),
+		);
+
+		expect(renamed).toMatchObject({
+			projectId: "project-renamed",
+			version: created.version,
+		});
+		expect(await Effect.runPromise(repository.readProjectFx(created.projectId))).toBeNull();
+		expect(await Effect.runPromise(repository.readProjectRootFx(created.projectId))).toBeNull();
+		expect(await Effect.runPromise(repository.readProjectRootFx("project-renamed"))).toBe(root);
+		expect(await Effect.runPromise(repository.listVersionsFx("project-renamed"))).toEqual([]);
+		expect(await Effect.runPromise(repository.listNotesFx("project-renamed"))).toEqual([
+			expect.objectContaining({
+				content: "Keep this note",
+				projectId: "project-renamed",
+			}),
+		]);
+
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.listVersionsFx("project-renamed"))).toEqual([]);
+		expect(await Effect.runPromise(reopened.readProjectFx("project-renamed"))).toMatchObject({
+			projectId: "project-renamed",
+			version: created.version,
+		});
+	});
+
+	it("rejects a project ID already owned by another open project", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		await harness.createProject(repository, "project-taken");
+
+		await expect(
+			Effect.runPromise(
+				repository.replaceConfigFx({
+					projectId: created.projectId,
+					expectedRevision: created.revision,
+					config: {
+						...created.config,
+						meta: {
+							...created.config.meta,
+							id: "project-taken",
+						},
+					},
+				}),
+			),
+		).rejects.toThrow("Editor project ID project-taken is already open");
+		expect(await Effect.runPromise(repository.readProjectFx(created.projectId))).not.toBeNull();
+	});
+
 	it("publishes an item update through only the changed item and project metadata files", async () => {
 		const seedingRepository = await harness.openRepository();
 		const created = await harness.createProject(seedingRepository);

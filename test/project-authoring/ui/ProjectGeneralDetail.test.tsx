@@ -4,11 +4,30 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const identityRename = vi.hoisted(() => ({
+	cancelFn: vi.fn(),
+	confirming: false,
+	error: undefined,
+	openFn: vi.fn(),
+	pending: false,
+	renameFn: vi.fn(),
+}));
+
 vi.mock("~/project-authoring/ui/ProjectOverview", () => ({
 	ProjectOverview: () => null,
 }));
 
+vi.mock("~/project-authoring/ui/useProjectIdentityRenameController", () => ({
+	useProjectIdentityRenameController: () => identityRename,
+}));
+
+vi.mock("~/project-authoring/ui/ProjectIdentityRenameDialog", () => ({
+	ProjectIdentityRenameDialog: () => null,
+}));
+
 vi.mock("~/ui/ui/LinkButton", () => ({
+	LinkButton: ({ children, ...props }: Record<string, unknown>) =>
+		createElement("button", props, children as ReactNode),
 	LinkButtonLink: ({ children, params, to, ...props }: Record<string, unknown>) =>
 		createElement(
 			"a",
@@ -38,6 +57,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	document.body.replaceChildren();
+	identityRename.openFn.mockReset();
 });
 
 describe("ProjectGeneralDetail", () => {
@@ -80,5 +100,11 @@ describe("ProjectGeneralDetail", () => {
 				sectionId: "toolbar",
 			},
 		]);
+		const rename = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Rename",
+		);
+		if (rename === undefined) throw new Error("Project ID rename action missing.");
+		await act(async () => rename.click());
+		expect(identityRename.openFn).toHaveBeenCalledOnce();
 	});
 });

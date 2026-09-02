@@ -1,7 +1,31 @@
+import type { ReactNode } from "react";
+
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import type { Project } from "~/project-authoring/type/Project";
+import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { ProjectOverview } from "~/project-authoring/ui/ProjectOverview";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
+
+const ProjectSectionValueLink = ({
+	children,
+	projectId,
+	sectionId,
+}: {
+	readonly children: ReactNode;
+	readonly projectId: string;
+	readonly sectionId: ProjectSectionId;
+}) => (
+	<LinkButtonLink
+		params={{
+			projectId,
+			sectionId,
+		}}
+		to="/editor/$projectId/project/detail/$sectionId"
+	>
+		{children}
+	</LinkButtonLink>
+);
 
 export const ProjectGeneralDetail = ({ project }: { readonly project: Project }) => {
 	const { board, inventory, toolbarSize = 0 } = project.config.meta;
@@ -22,15 +46,38 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 						<div className="grid min-w-0 gap-3">
 							<DetailFact
 								label="Board"
-								value={`${board.width} × ${board.height} = ${board.width * board.height}`}
+								value={
+									<ProjectSectionValueLink
+										projectId={project.projectId}
+										sectionId="board"
+									>
+										{board.width} × {board.height} ={" "}
+										{board.width * board.height}
+									</ProjectSectionValueLink>
+								}
 							/>
 							<DetailFact
 								label="Inventory"
-								value={`${inventory.width} × ${inventory.height} = ${inventory.width * inventory.height}`}
+								value={
+									<ProjectSectionValueLink
+										projectId={project.projectId}
+										sectionId="inventory"
+									>
+										{inventory.width} × {inventory.height} ={" "}
+										{inventory.width * inventory.height}
+									</ProjectSectionValueLink>
+								}
 							/>
 							<DetailFact
 								label="Toolbar"
-								value={toolbarSize}
+								value={
+									<ProjectSectionValueLink
+										projectId={project.projectId}
+										sectionId="toolbar"
+									>
+										{toolbarSize}
+									</ProjectSectionValueLink>
+								}
 							/>
 						</div>
 					</DetailFacts>

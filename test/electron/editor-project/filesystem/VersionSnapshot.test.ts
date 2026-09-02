@@ -1,5 +1,15 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { mkdir, mkdtemp, readdir, rm, stat, symlink, utimes, writeFile } from "node:fs/promises";
+import {
+	mkdir,
+	mkdtemp,
+	readdir,
+	rename,
+	rm,
+	stat,
+	symlink,
+	utimes,
+	writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -177,5 +187,36 @@ describe("filesystem Editor version objects", () => {
 			),
 		).rejects.toThrow("must not be a symbolic link");
 		expect(await readdir(elsewhere)).toEqual([]);
+	});
+
+	it("rejects a correctly hashed symbolic-link object before deduplicating it", async () => {
+		const paths = await Effect.runPromise(
+			createProjectPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
+		);
+		const snapshot = await Effect.runPromise(
+			writeSnapshotFx({
+				arkpack: editorTestPayload.version,
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+				scenarios: [],
+				paths,
+			}).pipe(Effect.provide(NodeServices.layer)),
+		);
+		const gameObject = await Effect.runPromise(paths.jsonObjectFileFx(snapshot.manifest.game));
+		const linkedObject = join(root, "linked-game-object.json");
+		await rename(gameObject, linkedObject);
+		await symlink(linkedObject, gameObject);
+
+		await expect(
+			Effect.runPromise(
+				writeSnapshotFx({
+					arkpack: editorTestPayload.version,
+					config: editorTestPayload.config,
+					resources: editorTestPayload.resources,
+					scenarios: [],
+					paths,
+				}).pipe(Effect.provide(NodeServices.layer)),
+			),
+		).rejects.toThrow("must not be a symbolic link");
 	});
 });

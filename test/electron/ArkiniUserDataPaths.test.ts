@@ -10,6 +10,7 @@ describe("Arkini user data", () => {
 
 		expect(paths).toEqual({
 			root: join(userDataPath, "arkini"),
+			diagnostics: join(userDataPath, "arkini", "diagnostics"),
 			editor: {
 				root: join(userDataPath, "arkini", "editor"),
 				catalog: join(userDataPath, "arkini", "editor", "projects.json"),
@@ -19,7 +20,6 @@ describe("Arkini user data", () => {
 				root: join(userDataPath, "arkini", "game"),
 				arkpacks: join(userDataPath, "arkini", "game", "arkpacks"),
 				incidents: join(userDataPath, "arkini", "game", "incidents"),
-				logs: join(userDataPath, "arkini", "game", "logs"),
 				preferences: join(userDataPath, "arkini", "game", "preferences"),
 				saves: join(userDataPath, "arkini", "game", "saves"),
 			},

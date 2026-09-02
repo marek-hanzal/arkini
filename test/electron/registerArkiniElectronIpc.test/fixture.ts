@@ -72,6 +72,7 @@ export const createRegisteredIpcHarness = async () => {
 		registerWindowFx: () => Effect.void,
 	};
 	const writeDiagnostic = vi.fn();
+	const writeApplicationLog = vi.fn();
 	const openDiagnosticDirectory = vi.fn();
 
 	await Effect.runPromise(
@@ -111,8 +112,9 @@ export const createRegisteredIpcHarness = async () => {
 				windowModeControllerOwnership,
 				windowPreferences,
 				diagnostics: {
-					directoryPath: userDataPaths.game.logs,
+					directoryPath: userDataPaths.diagnostics,
 					writeFx: (record) => Effect.sync(() => writeDiagnostic(record)),
+					writeApplicationFx: (record) => Effect.sync(() => writeApplicationLog(record)),
 					openDirectoryFx: Effect.sync(openDiagnosticDirectory),
 					closeFx: Effect.void,
 				},
@@ -154,6 +156,7 @@ export const createRegisteredIpcHarness = async () => {
 		untrustedEvent: createInvokeEvent("https://example.com/"),
 		userDataPaths,
 		writeDiagnostic,
+		writeApplicationLog,
 		writeClipboardText: electronHarness.writeClipboardText,
 	};
 };

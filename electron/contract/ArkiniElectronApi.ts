@@ -11,6 +11,7 @@ import type {
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { readPreferredLanguagesFn } from "./localization/readPreferredLanguagesFn";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
+import type { ApplicationLogRecordSchema } from "./diagnostics/ApplicationLogRecord";
 import type { GameIncidentWrite } from "./incident/GameIncidentWrite";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
 import type { EditorSourceExportSchema } from "./editor/EditorSourceExportSchema";
@@ -94,6 +95,7 @@ export namespace ArkiniElectronApi {
 		editorMcpProjectContextClear: "arkini:editor:mcp:project-context:clear",
 		editorMcpVersionCheckoutRequest: "arkini:editor:mcp:version-checkout:request",
 		diagnosticsWrite: "arkini:diagnostics:write",
+		diagnosticsWriteApplication: "arkini:diagnostics:write-application",
 		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
 		incidentWrite: "arkini:incident:write",
 		userDataOpenDirectory: "arkini:user-data:open-directory",
@@ -332,6 +334,7 @@ export namespace ArkiniElectronApi {
 		};
 		readonly diagnostics: {
 			readonly writeFn: (record: DiagnosticRecord) => Promise<void>;
+			readonly writeApplicationFn: (record: ApplicationLogRecordSchema.Type) => Promise<void>;
 			readonly openDirectoryFn: () => Promise<void>;
 		};
 		readonly incident: {

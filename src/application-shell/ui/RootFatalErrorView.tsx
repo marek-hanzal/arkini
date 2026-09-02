@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
 import { openDiagnosticDirectoryFx } from "~/application-diagnostics/fx/openDiagnosticDirectoryFx";
-import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
-import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
+import { writeApplicationLogFx } from "~/application-diagnostics/fx/writeApplicationLogFx";
+import { formatApplicationDiagnosticTextFn } from "~/application-diagnostics/fn/formatApplicationDiagnosticTextFn";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { Button, DangerButton } from "~/ui/ui/Button";
 import { Canvas } from "~/ui/ui/Canvas";
@@ -17,16 +17,13 @@ export const RootFatalErrorView = ({ error, onCloseFn }: RootFatalErrorViewProps
 	useEffect(() => {
 		console.error("Arkini renderer entered the fatal lifecycle boundary.", error);
 		RendererRuntime.runSync(
-			writeDiagnosticRecordFx({
-				category: [
-					"renderer",
-					"fatal-boundary",
-				],
-				event: "root-fatal-error-rendered",
+			writeApplicationLogFx({
 				level: "fatal",
-				data: {
-					error: toDiagnosticValueFn(error),
-				},
+				message: "Renderer entered the fatal boundary",
+				body: formatApplicationDiagnosticTextFn({
+					value: error,
+					prefix: "Boundary: renderer root",
+				}),
 			}),
 		);
 	}, [

@@ -48,6 +48,7 @@ describe("Game fatal-state diagnostics", () => {
 				arkini: {
 					diagnostics: {
 						writeFn: write,
+						writeApplicationFn: () => Promise.resolve(),
 						openDirectoryFn: () => Promise.resolve(),
 					},
 					incident: {

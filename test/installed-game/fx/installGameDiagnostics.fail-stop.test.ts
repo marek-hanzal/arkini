@@ -38,6 +38,7 @@ describe("Game diagnostics fail-stop", () => {
 				arkini: {
 					diagnostics: {
 						writeFn: write,
+						writeApplicationFn: () => Promise.resolve(),
 						openDirectoryFn: () => Promise.resolve(),
 					},
 					incident: {

@@ -127,6 +127,16 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniElectronApi.channels.diagnosticsWriteApplication,
+		[
+			{
+				level: "info",
+				message: "IPC tested",
+				body: "The trusted renderer reached the application log.",
+			},
+		],
+	],
+	[
 		ArkiniElectronApi.channels.diagnosticsOpenDirectory,
 		[],
 	],

@@ -68,7 +68,7 @@ The Editor installation catalog stores discovery roots, managed/external ownersh
 | `.arksave` | MessagePack `{ version, arkini, state }` below the collision-safe encoded package directory. Path owns package identity; payload owns gameplay compatibility, writer provenance, and complete State. |
 | Latest incident environment | Disposable fixed directory `game/incidents/latest/` containing exact `game.arkpack` and `save.arksave` replay inputs plus linked `incident.md`, `failure.md`, `history.md`, and `runtime-state.md` text reports. A later fatal failure hard-overwrites these files; modification time identifies freshness. The report is a debugging projection, not a versioned interchange format; each Arkpack/save retains its own normal compatibility contract. |
 
-Preferences are individual strictly validated scalar JSON files and need no envelope. Diagnostics are library-owned JSONL. OAuth records use the protocol's fields; Arkini validates complete identities but adds no format marker. Public MCP and generated JSON schemas use stable explicit IDs so references are never anonymous or `any`.
+Preferences are individual strictly validated scalar JSON files and need no envelope. Application runtime and fatal diagnostics are bounded rotating Markdown for direct human or LLM inspection; every record identifies the application through the root `package.json` version and marks any truncation. The private gameplay session stream remains library-owned JSONL because the session slicer consumes its structure. OAuth records use the protocol's fields; Arkini validates complete identities but adds no format marker. Public MCP and generated JSON schemas use stable explicit IDs so references are never anonymous or `any`.
 
 ## Release commits
 

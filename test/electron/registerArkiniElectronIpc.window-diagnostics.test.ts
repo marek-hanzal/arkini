@@ -42,6 +42,19 @@ describe("registerArkiniElectronIpcFx native presentation", () => {
 			harness.invoke(ArkiniElectronApi.channels.diagnosticsWrite, event, diagnosticRecord),
 		).resolves.toBeUndefined();
 		expect(harness.writeDiagnostic).toHaveBeenCalledWith(diagnosticRecord);
+		const applicationRecord = {
+			level: "error",
+			message: "Renderer failed",
+			body: "Route: /editor",
+		} as const;
+		await expect(
+			harness.invoke(
+				ArkiniElectronApi.channels.diagnosticsWriteApplication,
+				event,
+				applicationRecord,
+			),
+		).resolves.toBeUndefined();
+		expect(harness.writeApplicationLog).toHaveBeenCalledWith(applicationRecord);
 		await expect(
 			harness.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory, event),
 		).resolves.toBeUndefined();
@@ -58,6 +71,12 @@ describe("registerArkiniElectronIpcFx native presentation", () => {
 			harness.invoke(ArkiniElectronApi.channels.diagnosticsWrite, event, {
 				...diagnosticRecord,
 				event: "",
+			}),
+		).rejects.toThrow();
+		await expect(
+			harness.invoke(ArkiniElectronApi.channels.diagnosticsWriteApplication, event, {
+				...applicationRecord,
+				message: "invalid\nheading",
 			}),
 		).rejects.toThrow();
 	});

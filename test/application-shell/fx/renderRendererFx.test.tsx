@@ -15,15 +15,18 @@ import { renderRendererFx } from "~/application-shell/ui/renderRendererFx";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const writeApplicationLog = vi.fn(() => Promise.resolve());
 
 beforeEach(() => {
 	vi.spyOn(console, "error").mockImplementation(() => undefined);
+	writeApplicationLog.mockClear();
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
 			diagnostics: {
 				openDirectoryFn: () => Promise.resolve(),
 				writeFn: () => Promise.resolve(),
+				writeApplicationFn: writeApplicationLog,
 			},
 		} as unknown as ArkiniElectronApi.Api,
 	});
@@ -61,5 +64,10 @@ describe("renderRendererFx", () => {
 		expect(container.querySelector('[data-ui="RootFatalErrorPage"]')).not.toBeNull();
 		expect(container.textContent).toContain("Something critical failed");
 		expect(container.querySelector('[data-ui="ReadyRenderer"]')).toBeNull();
+		expect(writeApplicationLog).toHaveBeenCalledWith({
+			level: "fatal",
+			message: "Renderer entered the fatal boundary",
+			body: expect.stringContaining("preferred languages unavailable"),
+		});
 	});
 });

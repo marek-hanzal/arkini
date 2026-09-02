@@ -9,11 +9,11 @@ export const createArkiniUserDataPathsFn = (userDataPath: string): ArkiniUserDat
 	const editorRoot = join(root, "editor");
 	return {
 		root,
+		diagnostics: join(root, "diagnostics"),
 		game: {
 			root: gameRoot,
 			arkpacks: join(gameRoot, "arkpacks"),
 			incidents: join(gameRoot, "incidents"),
-			logs: join(gameRoot, "logs"),
 			preferences: join(gameRoot, "preferences"),
 			saves: join(gameRoot, "saves"),
 		},

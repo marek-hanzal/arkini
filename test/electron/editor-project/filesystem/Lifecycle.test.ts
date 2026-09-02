@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, PlatformError } from "effect";
@@ -28,6 +28,35 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project lifecycle", () => {
+	it("creates and reopens a project with no authored items", async () => {
+		const repository = await harness.openRepository();
+		const created = await Effect.runPromise(
+			repository.createProjectFx({
+				version: editorTestPayload.version,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "empty-project",
+					},
+					start: {
+						...editorTestPayload.config.start,
+						board: [],
+					},
+					items: {},
+				},
+				resources: editorTestPayload.resources.filter(({ id }) => id === "hero"),
+			}),
+		);
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		expect(await readdir(join(root, "items"))).toEqual([]);
+
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
+	});
+
 	it("reopens managed projects from the user-data catalog", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository, "managed.\ud800");

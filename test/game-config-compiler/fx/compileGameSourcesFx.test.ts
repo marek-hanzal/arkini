@@ -264,11 +264,14 @@ describe("compileGameSourcesFx", () => {
 		expect(result.config?.$schema).toBe("../schema.json");
 	});
 
-	it("requires explicit completed collection providers", async () => {
+	it("completes an absent item fragment collection as empty", async () => {
 		const result = await compile(
 			GameSourceFileSchema.parse({
 				path: "/game/game.json",
 				value: {
+					resources: {
+						hero: "hero",
+					},
 					meta: {
 						id: "game:test",
 						title: "Test",
@@ -290,17 +293,8 @@ describe("compileGameSourcesFx", () => {
 			}),
 		);
 
-		expect(result.config).toBeUndefined();
-		expect(result.diagnostics).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
-					path: [
-						"items",
-					],
-				}),
-			]),
-		);
+		expect(result.config?.items).toEqual({});
+		expect(result.diagnostics).toEqual([]);
 	});
 
 	it("accepts explicit empty completed collections", async () => {

@@ -8,6 +8,7 @@ import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
+import { ProjectSourceExport } from "~/project-authoring/ui/ProjectSourceExport";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 
@@ -24,18 +25,21 @@ export const ProjectDetail = ({
 			tabs={
 				<EditorSectionNavigation
 					action={
-						<PrimaryButtonLink
-							ref={editActionRef}
-							className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
-							to="/editor/$projectId/project/form/$sectionId"
-							params={{
-								projectId: project.projectId,
-								sectionId,
-							}}
-						>
-							<Pencil className="size-4" />
-							Edit
-						</PrimaryButtonLink>
+						<div className="flex items-center gap-4">
+							<ProjectSourceExport projectId={project.projectId} />
+							<PrimaryButtonLink
+								ref={editActionRef}
+								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+								to="/editor/$projectId/project/form/$sectionId"
+								params={{
+									projectId: project.projectId,
+									sectionId,
+								}}
+							>
+								<Pencil className="size-4" />
+								Edit
+							</PrimaryButtonLink>
+						</div>
 					}
 					leading={
 						<EditorHistoryBackButton

@@ -182,8 +182,6 @@ const api: ArkiniElectronApi.Api = {
 		importJsonDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportJsonDirectory),
 		listProjectsFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
-		openExportDirectoryFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
 		openProjectDirectoryFn: (root) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, root),
 		readProjectFn: (projectId) =>

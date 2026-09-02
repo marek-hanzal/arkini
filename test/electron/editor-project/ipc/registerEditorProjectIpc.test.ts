@@ -123,7 +123,6 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectList,
-	ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
 	ArkiniElectronApi.channels.editorProjectOpenDirectory,
 	ArkiniElectronApi.channels.editorProjectRead,
 	ArkiniElectronApi.channels.editorProjectRefresh,
@@ -298,26 +297,10 @@ describe("registerEditorProjectIpcFx", () => {
 			value: undefined,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
-		).resolves.toEqual({
-			type: "failure",
-			error: {
-				operation: "open-export-directory",
-				message: "No completed Editor project export is available.",
-			},
-		});
-		expect(electron.module.shell.openPath).not.toHaveBeenCalled();
-		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectExportJsonDirectory, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: completedSourceExport,
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory, "/tmp/forged"),
-		).resolves.toEqual({
-			type: "success",
-			value: undefined,
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, replaceConfigRequest),
@@ -442,8 +425,6 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		});
 		expect(repository.deleteProjectFx).toHaveBeenCalledOnce();
-		expect(electron.module.shell.openPath).toHaveBeenCalledWith("/tmp/source");
-		expect(electron.module.shell.openPath).toHaveBeenCalledOnce();
 	});
 
 	it("opens only an exact project root currently listed as invalid", async () => {

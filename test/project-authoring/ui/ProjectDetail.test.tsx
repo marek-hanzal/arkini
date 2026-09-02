@@ -6,6 +6,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
 	edit: vi.fn(),
+	exportProject: vi.fn(async () => ({
+		type: "success" as const,
+		value: null,
+	})),
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -71,6 +75,7 @@ afterEach(async () => {
 	});
 	document.body.replaceChildren();
 	state.edit.mockClear();
+	state.exportProject.mockClear();
 });
 
 describe("project detail", () => {
@@ -79,6 +84,14 @@ describe("project detail", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
+		Object.defineProperty(window, "arkini", {
+			configurable: true,
+			value: {
+				editor: {
+					exportJsonDirectoryFn: state.exportProject,
+				},
+			},
+		});
 		await act(async () => {
 			root.render(
 				<ProjectDetail sectionId="general">
@@ -94,5 +107,12 @@ describe("project detail", () => {
 		);
 
 		expect(state.edit).toHaveBeenCalledOnce();
+
+		const exportButton = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProjectExport"]',
+		);
+		expect(exportButton).not.toBeNull();
+		await act(async () => exportButton?.click());
+		expect(state.exportProject).toHaveBeenCalledWith("project");
 	});
 });

@@ -25,13 +25,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 				data-ui="EditorVersionCommit"
 			>
 				<div className="mx-auto grid w-full max-w-3xl gap-4">
-					<div>
-						<h2 className="text-lg font-semibold">Commit saved project</h2>
-						<p className="mt-1 text-sm text-muted">
-							Captures config, every asset byte, and every explicitly saved Board
-							scenario. Drafts are not included.
-						</p>
-					</div>
+					<h2 className="text-lg font-semibold">Commit saved project</h2>
 					{controller.status?.canCommit === false ? (
 						<Status
 							dataUi="EditorVersionCommitClean"

@@ -25,13 +25,13 @@ interface SegmentedControlProps<Value extends string> {
 
 const SegmentedControlSizeClassName = {
 	compact: "min-h-9 px-3 py-1.5 text-xs",
-	default: "min-h-[var(--ak-control-min-height)] px-3 py-2 text-sm",
+	default: "h-full min-h-0 px-3 py-0 text-sm",
 	large: "h-full min-h-0 px-4 py-0 text-sm",
 } as const;
 
 const SegmentedControlFrameSizeClassName = {
 	compact: "",
-	default: "",
+	default: "h-[var(--ak-control-min-height)] min-h-[var(--ak-control-min-height)]",
 	large: "h-12 min-h-12",
 } as const;
 

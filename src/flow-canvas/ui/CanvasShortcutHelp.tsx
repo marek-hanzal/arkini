@@ -2,6 +2,8 @@ import { X } from "lucide-react";
 import { Fragment } from "react";
 
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 
 interface CanvasShortcutHelpProps {
@@ -62,6 +64,7 @@ export const CanvasShortcutHelp = ({ direction, onCloseFn }: CanvasShortcutHelpP
 	const { onKeyDownFn, overlayRef } = useOverlayFocus({
 		onCloseFn,
 	});
+	const translator = useTranslator();
 	return (
 		<div
 			className="absolute inset-0 z-20 grid place-items-center bg-black/20 p-6 backdrop-blur-[1px]"
@@ -80,13 +83,14 @@ export const CanvasShortcutHelp = ({ direction, onCloseFn }: CanvasShortcutHelpP
 							Shortcuts follow the currently selected item.
 						</p>
 					</div>
-					<button
-						className="grid size-8 shrink-0 place-items-center rounded-md border border-line text-muted hover:bg-surface hover:text-foreground"
+					<LinkButton
+						className="ml-auto inline-flex size-8 shrink-0 items-center justify-center no-underline"
+						data-ui="EditorOriginFlowShortcutHelpClose"
 						onClick={onCloseFn}
-						type="button"
+						title={translator.textFn("Close")}
 					>
-						<X className="size-4" />
-					</button>
+						<X className="size-5" />
+					</LinkButton>
 				</div>
 				<div className="mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
 					{readShortcutRowsFn(direction).map(([key, description]) => (

@@ -4,10 +4,13 @@ import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { ItemEstimateListRow } from "~/estimate/ui/ItemEstimateListRow";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { Status } from "~/ui/ui/Status";
 
 const EstimateViewOptions: ReadonlyArray<EditorSelectOption<ItemEstimateViewSchema.Type>> = [
@@ -87,6 +90,10 @@ export const ItemEstimateList = ({
 					onChangeFn={onViewChangeFn}
 					options={EstimateViewOptions}
 					value={view}
+				/>
+				<EditorPageHelp
+					content={<Mx label="Global estimate help" />}
+					title={<Tx label="Estimate" />}
 				/>
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">

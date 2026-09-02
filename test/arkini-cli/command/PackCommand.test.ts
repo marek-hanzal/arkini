@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
-} from "~test/electron/editor-project/filesystem/support/createProjectTestHarness";
+} from "~test/project-authoring/filesystem/support/createProjectTestHarness";
 
 const execFileAsync = promisify(execFile);
 let harness: ProjectTestHarness;

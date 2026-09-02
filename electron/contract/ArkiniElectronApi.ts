@@ -15,10 +15,10 @@ import type { ApplicationLogRecordSchema } from "./diagnostics/ApplicationLogRec
 import type { GameIncidentWrite } from "./incident/GameIncidentWrite";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
 import type { EditorSourceExportSchema } from "./editor/EditorSourceExportSchema";
-import type { EditorMcpCommandResultSchema } from "./editor/EditorMcpCommandResultSchema";
-import type { EditorMcpCommandSchema } from "./editor/EditorMcpCommandSchema";
-import type { EditorMcpConfigurationSchema } from "./editor/EditorMcpConfigurationSchema";
-import type { EditorMcpOverviewSchema } from "./editor/EditorMcpOverviewSchema";
+import type { EditorMcpCommandResultSchema } from "~/authoring-mcp/schema/EditorMcpCommandResultSchema";
+import type { EditorMcpCommandSchema } from "~/authoring-mcp/schema/EditorMcpCommandSchema";
+import type { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
+import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
 
 export namespace ArkiniElectronApi {

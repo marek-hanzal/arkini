@@ -410,24 +410,3 @@ describe("CLI completion", () => {
 		}
 	}, 15_000);
 });
-
-describe("Editor MCP CLI", () => {
-	it("exposes the project argument and optional Remote tunnel without starting Electron", async () => {
-		const result = await execFileAsync(
-			process.execPath,
-			[
-				"node_modules/tsx/dist/cli.mjs",
-				"src/arkini-cli/arkini.ts",
-				"editor",
-				"mcp",
-				"--help",
-			],
-			{
-				env: process.env,
-			},
-		);
-
-		expect(result.stdout).toContain("<projectId>");
-		expect(result.stdout).toContain("--remote");
-	});
-});

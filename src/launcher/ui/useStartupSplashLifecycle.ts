@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Cause, Effect, Fiber } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/application-runtime/error/RendererLifecycleUnavailableError";
@@ -12,7 +12,6 @@ import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { LauncherVisualReadyAtom } from "~/launcher/atom/LauncherVisualReadyAtom";
 import { retryLauncherStartupAtom } from "~/launcher/atom/retryLauncherStartupAtom";
 
-const blackHoldMs = 500;
 const minimumSplashMs = 5_000;
 
 type StartupSplashContent =
@@ -52,14 +51,14 @@ export const useStartupSplashLifecycle = () => {
 	const retryStartupFn = useAtomSet(retryLauncherStartupAtom);
 	const navigateFn = useNavigate();
 	const [visibleAtMs, setVisibleAtMsFn] = useState<number | null>(null);
-	const [blackHoldComplete, setBlackHoldCompleteFn] = useState(false);
 	const [minimumSplashComplete, setMinimumSplashCompleteFn] = useState(false);
 	const [visibilityError, setVisibilityErrorFn] = useState<unknown | null>(null);
 	const [visibilityAttempt, setVisibilityAttemptFn] = useState(0);
 	const [navigationError, setNavigationErrorFn] = useState<unknown | null>(null);
 	const navigationStartedRef = useRef(false);
-	const canContinue =
-		startup._tag === "Success" && !startup.waiting && blackHoldComplete && visualReady;
+	const startupFailed = startup._tag === "Failure" && !startup.waiting;
+	const splashReady = visibleAtMs !== null && visualReady;
+	const canContinue = startup._tag === "Success" && !startup.waiting && splashReady;
 
 	useEffect(() => {
 		if (lifecycle === undefined) {
@@ -83,22 +82,16 @@ export const useStartupSplashLifecycle = () => {
 	]);
 
 	useEffect(() => {
-		if (visibleAtMs === null) return;
-		const elapsedMs = performance.now() - visibleAtMs;
-		const blackTimer = window.setTimeout(
-			() => setBlackHoldCompleteFn(true),
-			Math.max(0, blackHoldMs - elapsedMs),
-		);
+		if (!splashReady) return;
 		const minimumTimer = window.setTimeout(
 			() => setMinimumSplashCompleteFn(true),
-			Math.max(0, minimumSplashMs - elapsedMs),
+			minimumSplashMs,
 		);
 		return () => {
-			window.clearTimeout(blackTimer);
 			window.clearTimeout(minimumTimer);
 		};
 	}, [
-		visibleAtMs,
+		splashReady,
 	]);
 
 	const completeFn = useCallback(() => {
@@ -212,89 +205,31 @@ export const useStartupSplashLifecycle = () => {
 							: String(lifecycleError),
 				};
 
-	const view: StartupSplashView =
-		visibilityError === null
-			? match([
-					blackHoldComplete,
-					visualReady,
-					startup.waiting,
-					startup,
-				] as const)
-					.with(
-						[
-							false,
-							P._,
-							P._,
-							P._,
-						],
-						(): StartupSplashView => ({
-							kind: "black",
-						}),
-					)
-					.with(
-						[
-							true,
-							false,
-							true,
-							P._,
-						],
-						[
-							true,
-							false,
-							false,
-							{
-								_tag: "Initial",
-							},
-						],
-						[
-							true,
-							false,
-							false,
-							{
-								_tag: "Success",
-							},
-						],
-						(): StartupSplashView => ({
-							kind: "black",
-						}),
-					)
-					.with(
-						[
-							true,
-							false,
-							false,
-							{
-								_tag: "Failure",
-							},
-						],
-						([, , , failed]): StartupSplashView => {
-							const error = Cause.squash(failed.cause);
-							return {
-								kind: "failure",
-								message: error instanceof Error ? error.message : String(error),
-							};
-						},
-					)
-					.with(
-						[
-							true,
-							true,
-							P._,
-							P._,
-						],
-						(): StartupSplashView => ({
-							kind: "scene",
-							content,
-						}),
-					)
-					.exhaustive()
-			: {
-					kind: "failure",
-					message:
-						visibilityError instanceof Error
-							? visibilityError.message
-							: String(visibilityError),
-				};
+	let view: StartupSplashView;
+	if (visibilityError !== null) {
+		view = {
+			kind: "failure",
+			message:
+				visibilityError instanceof Error
+					? visibilityError.message
+					: String(visibilityError),
+		};
+	} else if (startupFailed && !visualReady) {
+		const error = Cause.squash(startup.cause);
+		view = {
+			kind: "failure",
+			message: error instanceof Error ? error.message : String(error),
+		};
+	} else if (splashReady) {
+		view = {
+			kind: "scene",
+			content,
+		};
+	} else {
+		view = {
+			kind: "black",
+		};
+	}
 
 	return {
 		skipFn: completeFn,

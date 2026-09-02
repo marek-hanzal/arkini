@@ -23,6 +23,20 @@
 		linear-gradient(145deg, var(--ak-canvas), var(--ak-surface-raised));
 }
 
+[data-ui="StartupSplashReveal"] {
+	animation: startup-splash-reveal 750ms ease-out both;
+}
+
+@keyframes startup-splash-reveal {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
 .launcher-hero__shadow {
 	z-index: 0;
 	background: radial-gradient(

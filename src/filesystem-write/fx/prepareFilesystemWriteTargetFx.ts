@@ -1,9 +1,8 @@
 import { Effect, FileSystem, Path } from "effect";
 
 import { FilesystemWriteError } from "../error/FilesystemWriteError";
-import { isFilesystemPathSafeFx } from "./isFilesystemPathSafeFx";
 
-/** Resolves one contained target and creates canonical parents only for writes. */
+/** Resolves one contained target and creates missing parents only for writes. */
 export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteTargetFx")(
 	function* ({
 		operation,
@@ -46,31 +45,21 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 				continue;
 			}
 			const info = yield* fileSystem.stat(directory);
-			if (
-				info.type !== "Directory" ||
-				!(yield* isFilesystemPathSafeFx(fileSystem, root, directory))
-			)
+			if (info.type !== "Directory")
 				return yield* Effect.fail(
 					new FilesystemWriteError({
 						operation,
-						message: `Filesystem write directory ${directory} must be canonical and must not be a symbolic link.`,
+						message: `Filesystem write directory ${directory} must be a directory.`,
 					}),
 				);
 		}
-		if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
-			return yield* Effect.fail(
-				new FilesystemWriteError({
-					operation,
-					message: `Filesystem write target ${target} must be canonical and must not be a symbolic link.`,
-				}),
-			);
 		if (yield* fileSystem.exists(target)) {
 			const info = yield* fileSystem.stat(target);
 			if (info.type !== "File")
 				return yield* Effect.fail(
 					new FilesystemWriteError({
 						operation,
-						message: `Filesystem write target ${target} must be canonical and must not be a symbolic link.`,
+						message: `Filesystem write target ${target} must be a file.`,
 					}),
 				);
 		}

@@ -17,7 +17,6 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
 import { addGitignoreRulesFn } from "../fn/addGitignoreRulesFn";
-import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import type { ProjectFiles } from "./ProjectFiles";
 import { assertProjectFileFx } from "./assertProjectFileFx";
 import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
@@ -229,10 +228,6 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 									cause,
 								}),
 						});
-			yield* assertProjectDirectoryFx({
-				root: paths.root,
-				directory: paths.items,
-			});
 			yield* fileSystem.makeDirectory(paths.items, {
 				recursive: true,
 			});
@@ -249,11 +244,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					...nextSnapshot.resources.values(),
 				].sort((left, right) => left.target.localeCompare(right.target)),
 			];
-			const gitignoreExists = yield* assertProjectFileFx(
-				fileSystem,
-				paths.root,
-				paths.gitignoreFile,
-			);
+			const gitignoreExists = yield* assertProjectFileFx(fileSystem, paths.gitignoreFile);
 			const gitignore = gitignoreExists
 				? yield* fileSystem.readFileString(paths.gitignoreFile)
 				: "";
@@ -308,13 +299,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 							candidateWrites,
 							(write) =>
 								Effect.gen(function* () {
-									if (
-										!(yield* assertProjectFileFx(
-											fileSystem,
-											paths.root,
-											write.target,
-										))
-									)
+									if (!(yield* assertProjectFileFx(fileSystem, write.target)))
 										return write;
 									const current = yield* fileSystem.readFile(write.target);
 									return equalBytesFn(current, write.bytes) ? undefined : write;

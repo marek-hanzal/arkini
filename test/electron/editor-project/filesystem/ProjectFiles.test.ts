@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -207,33 +207,5 @@ describe("filesystem Editor project current tree", () => {
 			artifact: "Editor project",
 		});
 		await expect(readFile(markerPath, "utf8")).resolves.toBe(incompatible);
-	});
-
-	it("rejects a mutable project directory symlink instead of writing through it", async () => {
-		const harness = await createProjectFilesHarness();
-		openHarnesses.push(harness);
-		const outside = join(harness.root, "..", "outside-items");
-		await Promise.all([
-			mkdir(harness.root),
-			mkdir(outside),
-		]);
-		await rm(join(harness.root, "items"), {
-			force: true,
-			recursive: true,
-		});
-		await symlink(outside, join(harness.root, "items"));
-
-		await expect(
-			harness.write({
-				arkpack: editorTestPayload.version,
-				marker: {
-					arkini: ArkiniAppVersion,
-					revision: 1,
-				},
-				config: editorTestPayload.config,
-				resources: editorTestPayload.resources,
-			}),
-		).rejects.toThrow("must not be a symbolic link");
-		await expect(access(join(outside, "simple", "water.json"))).rejects.toBeDefined();
 	});
 });

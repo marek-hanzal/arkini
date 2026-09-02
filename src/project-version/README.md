@@ -56,7 +56,7 @@ read one saved current project + scenario snapshot and parent HEAD
 → atomically publish changed current source/scenarios and versions/head.json
 ```
 
-Readers and Build/CLI admission verify every object named by the published manifest and fail closed on missing, linked, malformed or hash-mismatched bytes. Publication leaves an existing correct object untouched and atomically replaces a corrupted object from the canonical planned bytes before publishing the commit.
+Readers and Build/CLI admission verify every object named by the published manifest and fail closed on missing, malformed or hash-mismatched bytes. Publication leaves an existing correct object untouched and atomically replaces a corrupted object from the canonical planned bytes before publishing the commit.
 
 Ordinary Project, Item and Resource saves leave gameplay version and Version HEAD unchanged. The first explicit commit preserves the current gameplay version; an Arkpack import creates that root commit automatically. Later commits bump once by the strongest classified change. Scenario-only commits keep the version, while a major commit deletes every current Board scenario after previewing that consequence. Version ID owns graph identity, so siblings and no-op parent/child commits may share one gameplay version.
 

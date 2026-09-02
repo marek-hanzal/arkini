@@ -74,23 +74,28 @@ export const EditorVersionReferenceSelect = ({
 					"Working copy",
 				],
 			},
-			...versions.map((version) => ({
-				id: version.versionId,
-				label: `${new Date(version.createdAtMs).toLocaleString()} * ${version.subject}`,
-				terms: [
-					version.subject,
-					...(version.body === undefined
-						? []
-						: [
-								version.body,
-							]),
-					...(version.tag === undefined
-						? []
-						: [
-								version.tag,
-							]),
-				],
-			})),
+			...versions.map((version) => {
+				const createdAtLabel = new Date(version.createdAtMs).toLocaleString();
+				return {
+					id: version.versionId,
+					label: `${createdAtLabel} * ${version.subject}`,
+					terms: [
+						createdAtLabel,
+						version.subject,
+						...(version.body === undefined
+							? []
+							: [
+									version.body,
+								]),
+						`v${version.arkpackVersion}`,
+						...(version.tag === undefined
+							? []
+							: [
+									version.tag,
+								]),
+					],
+				};
+			}),
 		],
 		[
 			versions,

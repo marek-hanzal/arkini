@@ -62,7 +62,7 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("EditorVersionReferenceSelect", () => {
-	it("finds and selects versions through subject, body, and tag terms", async () => {
+	it("finds and selects versions through their presented metadata", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -85,7 +85,9 @@ describe("EditorVersionReferenceSelect", () => {
 		for (const query of [
 			"Workshop balance",
 			"granular workshop",
+			"v1.1",
 			"economy-pass",
+			new Date(Date.UTC(2026, 0, 3, 4, 5, 6)).toLocaleString(),
 		]) {
 			await changeInput(input, query);
 			const options = document.body.querySelectorAll<HTMLButtonElement>(

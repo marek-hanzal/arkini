@@ -451,7 +451,7 @@ describe("editor MCP server", () => {
 		});
 		expect(checkedOut.content).toMatchObject([
 			{
-				text: expect.stringContaining("The mounted editor was refreshed in place."),
+				text: expect.stringContaining("The selected project's saved state was replaced."),
 			},
 		]);
 		expect(checkoutRequests).toEqual([

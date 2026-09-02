@@ -83,15 +83,6 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/mcp",
 	},
 	{
-		id: "versions",
-		icon: GitBranch,
-		label: "Versions",
-		matchTo: "/editor/$projectId/versions",
-		separatorAfter: true,
-		shortcut: "Mod+Shift+V",
-		to: "/editor/$projectId/versions/commit",
-	},
-	{
 		id: "board",
 		icon: LayoutGrid,
 		label: "Board",
@@ -99,6 +90,15 @@ export const EditorWorkspaceRoutes = [
 		separatorAfter: true,
 		shortcut: "Mod+Shift+B",
 		to: "/editor/$projectId/board",
+	},
+	{
+		id: "versions",
+		icon: GitBranch,
+		label: "Versions",
+		matchTo: "/editor/$projectId/versions",
+		separatorAfter: true,
+		shortcut: "Mod+Shift+V",
+		to: "/editor/$projectId/versions/commit",
 	},
 	{
 		id: "build",

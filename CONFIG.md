@@ -1,6 +1,6 @@
 # Arkini game authoring
 
-This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-config-source`](src/game-config-source) owns exact source files, source schemas, and the generated `schema.json`; [`src/game-config`](src/game-config) owns completed config values; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
+This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-value`](src/game-value) owns the foundational immutable scalar language; [`src/game-config-source`](src/game-config-source) owns exact source files, source schemas, and the generated `schema.json`; [`src/game-config`](src/game-config) owns the completed config aggregate; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
 
 ## Canonical project
 
@@ -66,7 +66,7 @@ The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. 
 
 ## Identity and references
 
-All exact IDs use the shared `IdSchema`; prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
+All exact IDs use [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/IdSchema.ts); prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
 
 Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export, Versions, and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item type/UID and its path.
 

@@ -64,7 +64,8 @@ src/production-authoring  controlled authored Line, Input, Rule and Output UI
 src/production-output  output, drop and roll schemas, resolution policy and generic output presentation
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, travel advancement, validation and settlement
-src/game-config  authored value/config schemas, explicit non-item resource roles and loaded-config capability
+src/game-value  foundational immutable identity, text, quantity and time schemas
+src/game-config  completed Game Config aggregate, explicit non-item resource roles and loaded-config capability
 src/game-config-compiler  source assembly, completed-config compilation and blocking validation gate
 src/game-config-diagnostic  provenance-aware diagnostic vocabulary, presentation projection and typed validation failure
 src/game-config-resource  embedded resource schemas, bounded PNG admission, references, source discovery, usage and rename semantics

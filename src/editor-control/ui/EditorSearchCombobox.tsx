@@ -36,6 +36,7 @@ interface EditorSearchComboboxProps {
 	readonly onChangeFn: (value: string) => void;
 	readonly onInputChangeFn?: (value: string) => void;
 	readonly optionContentLayout?: "inline" | "stacked";
+	readonly renderOptionContentFn?: (option: EditorSearchOption) => ReactNode;
 	readonly renderPreviewFn: (option: EditorSearchOption) => ReactNode;
 	readonly renderSelectedPreviewFn?: (option: EditorSearchOption) => ReactNode;
 }
@@ -54,6 +55,7 @@ export const EditorSearchCombobox = ({
 	optionContentLayout = "stacked",
 	options,
 	placeholder,
+	renderOptionContentFn,
 	renderPreviewFn,
 	renderSelectedPreviewFn,
 	value,
@@ -262,33 +264,37 @@ export const EditorSearchCombobox = ({
 								})}
 							>
 								{renderPreviewFn(option)}
-								<span
-									className="min-w-0 flex-1 data-[ui-layout=inline]:flex data-[ui-layout=inline]:items-center data-[ui-layout=inline]:gap-1.5"
-									data-ui-layout={optionContentLayout}
-								>
+								{renderOptionContentFn === undefined ? (
 									<span
-										className="block truncate text-sm font-semibold text-foreground data-[ui-layout=inline]:shrink-0"
+										className="min-w-0 flex-1 data-[ui-layout=inline]:flex data-[ui-layout=inline]:items-center data-[ui-layout=inline]:gap-1.5"
 										data-ui-layout={optionContentLayout}
 									>
-										{option.label}
+										<span
+											className="block truncate text-sm font-semibold text-foreground data-[ui-layout=inline]:shrink-0"
+											data-ui-layout={optionContentLayout}
+										>
+											{option.label}
+										</span>
+										{option.meta === undefined ? null : (
+											<>
+												<span
+													className="hidden shrink-0 text-subtle data-[ui-layout=inline]:inline"
+													data-ui-layout={optionContentLayout}
+												>
+													·
+												</span>
+												<span
+													className="mt-0.5 block truncate text-xs text-subtle data-[ui-layout=inline]:mt-0 data-[ui-layout=inline]:min-w-0 data-[ui-layout=inline]:flex-1 data-[ui-layout=inline]:text-sm"
+													data-ui-layout={optionContentLayout}
+												>
+													{option.meta}
+												</span>
+											</>
+										)}
 									</span>
-									{option.meta === undefined ? null : (
-										<>
-											<span
-												className="hidden shrink-0 text-subtle data-[ui-layout=inline]:inline"
-												data-ui-layout={optionContentLayout}
-											>
-												·
-											</span>
-											<span
-												className="mt-0.5 block truncate text-xs text-subtle data-[ui-layout=inline]:mt-0 data-[ui-layout=inline]:min-w-0 data-[ui-layout=inline]:flex-1 data-[ui-layout=inline]:text-sm"
-												data-ui-layout={optionContentLayout}
-											>
-												{option.meta}
-											</span>
-										</>
-									)}
-								</span>
+								) : (
+									renderOptionContentFn(option)
+								)}
 								{option.id === value ? (
 									<Check className="size-4 shrink-0 text-accent" />
 								) : null}

@@ -1,4 +1,3 @@
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 
 const scopeOptions = [
@@ -21,31 +20,19 @@ const scopeOptions = [
 ] as const;
 
 export const IdentitySection = () => {
-	const { canonicalItem, form, isNew } = useFormSession();
+	const { canonicalItem, form } = useFormSession();
 	return (
 		<div className="grid grid-cols-2 items-stretch gap-4">
 			<div className="grid auto-rows-fr gap-4">
-				{isNew ? (
-					<form.AppField name="id">
-						{(field) => (
-							<field.TextField
-								label="Item ID"
-								description="The source ID becomes immutable after the first save."
-								placeholder="item:example"
-							/>
-						)}
-					</form.AppField>
-				) : (
-					<div className="grid content-start gap-1.5 text-sm">
-						<span className="flex min-w-0 items-center gap-1">
-							<span className="font-semibold text-foreground">Item ID</span>
-							<EditorInfoTooltip content="Immutable after the item is first saved." />
-						</span>
-						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 font-mono text-muted">
-							{canonicalItem.id}
-						</span>
-					</div>
-				)}
+				<form.AppField name="id">
+					{(field) => (
+						<field.TextField
+							label="Item ID"
+							description="Renaming updates exact project references and requires a major gameplay version commit."
+							placeholder="item:example"
+						/>
+					)}
+				</form.AppField>
 				<form.AppField name="title">
 					{(field) => <field.TextField label="Title" />}
 				</form.AppField>

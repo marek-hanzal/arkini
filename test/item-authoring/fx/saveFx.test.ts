@@ -45,13 +45,21 @@ const createFixture = () => {
 			},
 		});
 	});
+	const replaceConfigFx = vi.fn<ProjectRepositoryService["replaceConfigFx"]>(({ config }) => {
+		const { resources: _resources, ...commit } = createProject(1);
+		return Effect.succeed({
+			...commit,
+			previousRevision: 0,
+			config,
+		});
+	});
 	const repository: ProjectRepositoryService = {
 		...UnusedEditorProjectRepository,
 		awaitIdleFx: Effect.void,
 		createProjectFx: () => Effect.die("Unexpected create."),
 		listProjectsFx: Effect.die("Unexpected list."),
 		readProjectFx: () => Effect.die("Unexpected read."),
-		replaceConfigFx: () => Effect.die("Unexpected config save."),
+		replaceConfigFx,
 		replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 		deleteItemFx: () => Effect.die("Unexpected item delete."),
 		upsertItemFx,
@@ -60,6 +68,7 @@ const createFixture = () => {
 	return {
 		registry,
 		repository,
+		replaceConfigFx,
 		upsertItemFx,
 	};
 };
@@ -86,6 +95,8 @@ describe("saveFx", () => {
 		};
 		const saved = await Effect.runPromise(
 			saveFx({
+				config: editorTestPayload.config,
+				expectedRevision: 0,
 				projectId: "project",
 				item,
 			}).pipe(
@@ -96,6 +107,7 @@ describe("saveFx", () => {
 
 		expect(saved).toEqual(item);
 		expect(fixture.upsertItemFx).toHaveBeenCalledWith({
+			expectedRevision: 0,
 			projectId: "project",
 			item,
 		});
@@ -103,11 +115,51 @@ describe("saveFx", () => {
 		expect(fixture.registry.get(projectAtom)?.resources).toBe(resources);
 	});
 
+	it("renames one saved UID and every exact reference in one revision-pinned commit", async () => {
+		const fixture = createFixture();
+		const projectAtom = EditorProjectAtom("project");
+		fixture.registry.mount(projectAtom);
+		fixture.registry.set(projectAtom, {
+			project: createProject(),
+		});
+		const saved = await Effect.runPromise(
+			saveFx({
+				config: editorTestPayload.config,
+				expectedRevision: 0,
+				projectId: "project",
+				item: {
+					...editorTestPayload.config.items.water,
+					id: "fresh-water",
+				},
+			}).pipe(
+				Effect.provideService(ProjectRepository, fixture.repository),
+				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+			),
+		);
+
+		expect(fixture.upsertItemFx).not.toHaveBeenCalled();
+		expect(fixture.replaceConfigFx).toHaveBeenCalledWith(
+			expect.objectContaining({
+				expectedRevision: 0,
+				projectId: "project",
+			}),
+		);
+		expect(saved).toMatchObject({
+			id: "fresh-water",
+			uid: editorTestPayload.config.items.water?.uid,
+		});
+		expect(fixture.registry.get(projectAtom)?.config.start.board[0]?.itemId).toBe(
+			"fresh-water",
+		);
+	});
+
 	it("rejects an invalid item before repository admission", async () => {
 		const fixture = createFixture();
 		await expect(
 			Effect.runPromise(
 				saveFx({
+					config: editorTestPayload.config,
+					expectedRevision: 0,
 					projectId: "project",
 					item: {
 						...editorTestPayload.config.items.water,

@@ -230,10 +230,45 @@ describe("item section form session", () => {
 		expect(state.saveItem).toHaveBeenCalledTimes(2);
 		expect(state.saveItem).toHaveBeenLastCalledWith(
 			expect.objectContaining({
-				title: "Saved and leave",
+				item: expect.objectContaining({
+					title: "Saved and leave",
+				}),
 			}),
 		);
 		expect(state.navigate).toHaveBeenCalledOnce();
+	});
+
+	it("marks the item ID field when another UID already owns the draft ID", async () => {
+		const duplicate = {
+			...item,
+			id: "item:duplicate",
+			uid: "duplicate-uid",
+		};
+		(
+			state.project as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config.items[duplicate.id] = duplicate;
+		const { container } = await render(<IdentitySection />);
+		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
+		if (id === null) throw new Error("Missing item ID input.");
+
+		await changeInput(id, duplicate.id);
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await act(async () => {
+			saveButton?.click();
+			await Promise.resolve();
+		});
+
+		expect(state.saveItem).not.toHaveBeenCalled();
+		expect(id.dataset.uiInvalid).toBe("true");
+		expect(container.textContent).toContain(
+			"Item ID item:duplicate is already used by another item.",
+		);
 	});
 
 	it("discards the local draft and returns an existing item to detail without saving", async () => {

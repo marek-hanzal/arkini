@@ -352,7 +352,7 @@ export const registerVersionToolsFn = ({
 		"version_checkout",
 		{
 			description:
-				"Replace the entire open editor project with one applicable version through the renderer checkout handshake. This permanently discards the current saved state and every unsaved draft.",
+				"Replace the entire selected Editor project with one applicable version. This permanently discards the current saved state and every unsaved draft.",
 			inputSchema: VersionCheckoutInputSchema,
 		},
 		async ({ versionId }) =>
@@ -366,7 +366,7 @@ export const registerVersionToolsFn = ({
 							new Error(`Version ${versionId} does not exist.`),
 						);
 					yield* requestVersionCheckoutFx(project.projectId, versionId);
-					return `Version checked out\n${describeVersionFn(version)}\nThe mounted editor was refreshed in place.`;
+					return `Version checked out\n${describeVersionFn(version)}\nThe selected project's saved state was replaced.`;
 				}),
 			),
 	);

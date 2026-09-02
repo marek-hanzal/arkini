@@ -11,8 +11,6 @@ import {
 } from "~electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 
 const directories: string[] = [];
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
 
 afterEach(() => {
 	for (const directory of directories.splice(0))
@@ -29,13 +27,6 @@ const createStorage = () => {
 	return Effect.runPromise(
 		createFilesystemEditorMcpStorageFx({
 			root,
-			protectFx: (value) => Effect.succeed(encoder.encode(`sealed:${value}`)),
-			unprotectFx: (value) => {
-				const protectedValue = decoder.decode(value);
-				return protectedValue.startsWith("sealed:")
-					? Effect.succeed(protectedValue.slice("sealed:".length))
-					: Effect.fail(new Error("Invalid protected value."));
-			},
 		}),
 	).then((storage) => ({
 		directory,
@@ -73,9 +64,6 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		const second = await Effect.runPromise(
 			createFilesystemEditorMcpStorageFx({
 				root: first.root,
-				protectFx: (value) => Effect.succeed(encoder.encode(`sealed:${value}`)),
-				unprotectFx: (value) =>
-					Effect.succeed(decoder.decode(value).slice("sealed:".length)),
 			}),
 		);
 		await Promise.all([
@@ -104,7 +92,7 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		]);
 	});
 
-	it("persists all MCP state in one protected file", async () => {
+	it("persists all MCP state in one local file", async () => {
 		const first = await createStorage();
 		const configured = first.storage;
 		expect(await Effect.runPromise(configured.readPortFx)).toBe(DefaultPort);
@@ -135,9 +123,6 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		const reopened = await Effect.runPromise(
 			createFilesystemEditorMcpStorageFx({
 				root: first.root,
-				protectFx: (value) => Effect.succeed(encoder.encode(`sealed:${value}`)),
-				unprotectFx: (value) =>
-					Effect.succeed(decoder.decode(value).slice("sealed:".length)),
 			}),
 		);
 		expect(await Effect.runPromise(reopened.readPortFx)).toBe(45_678);
@@ -154,10 +139,10 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 
 		const path = join(first.root, "mcp.json");
 		const raw = readFileSync(path, "utf8");
-		expect(raw).not.toContain("ngrok-secret-token");
+		expect(raw).toContain("ngrok-secret-token");
 		expect(JSON.parse(raw)).toMatchObject({
 			ngrok: {
-				authtoken: expect.any(String),
+				authtoken: "ngrok-secret-token",
 			},
 		});
 	});
@@ -214,9 +199,6 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		const reopened = await Effect.runPromise(
 			createFilesystemEditorMcpStorageFx({
 				root: first.root,
-				protectFx: (value) => Effect.succeed(encoder.encode(`sealed:${value}`)),
-				unprotectFx: (value) =>
-					Effect.succeed(decoder.decode(value).slice("sealed:".length)),
 			}),
 		);
 

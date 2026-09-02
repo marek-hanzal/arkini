@@ -46,8 +46,6 @@ const startRemoteHandler = async () => {
 	const storage = await Effect.runPromise(
 		createFilesystemEditorMcpStorageFx({
 			root: join(storageRoot, "editor"),
-			protectFx: (value) => Effect.succeed(Buffer.from(value)),
-			unprotectFx: (value) => Effect.succeed(Buffer.from(value).toString()),
 		}),
 	);
 	const secret = await Effect.runPromise(storage.ensureSecretFx);

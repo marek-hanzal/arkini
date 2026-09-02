@@ -35,7 +35,10 @@ export namespace useFormController {
 	export interface Props {
 		readonly enableCapability?: OptionalCapability;
 		readonly initialItem: ItemSchema.Type;
-		readonly onInvalidSectionFn: (section: SectionId) => void | Promise<void>;
+		readonly onInvalidSectionFn: (
+			section: SectionId,
+			path: ReadonlyArray<PropertyKey>,
+		) => void | Promise<void>;
 		readonly onSavedFn?: (item: ItemSchema.Type) => void | Promise<void>;
 	}
 
@@ -163,7 +166,7 @@ export const useFormController = ({
 				const result = FormSchema.safeParse(form.state.values);
 				const issue = result.success ? undefined : result.error.issues[0];
 				if (issue !== undefined) {
-					await onInvalidSectionFn(readSectionForPathFn(issue.path));
+					await onInvalidSectionFn(readSectionForPathFn(issue.path), issue.path);
 					const focusInvalidFieldFn = () =>
 						document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
 					if (typeof requestAnimationFrame === "function") {

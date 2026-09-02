@@ -5,6 +5,7 @@ import type { useFormController } from "~/item-authoring/ui/useFormController";
 type FormSession = useFormController.Output & {
 	readonly isNew: boolean;
 	readonly itemType?: TypeSchema.Type;
+	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
 };
 

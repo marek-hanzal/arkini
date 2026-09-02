@@ -21,6 +21,7 @@ export const FormSession = ({
 	initialItem,
 	isNew,
 	itemType,
+	mergeIndex,
 	productionLineId,
 	sectionId,
 }: PropsWithChildren<{
@@ -28,13 +29,14 @@ export const FormSession = ({
 	readonly initialItem: ItemSchema.Type;
 	readonly isNew: boolean;
 	readonly itemType?: TypeSchema.Type;
+	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
 	readonly sectionId: SectionId;
 }>) => {
 	const navigateFn = useNavigate();
 	const project = useEditorProject();
 	const onInvalidSectionFn = useCallback(
-		(nextSectionId: SectionId) =>
+		(nextSectionId: SectionId, path: ReadonlyArray<PropertyKey>) =>
 			navigateFn({
 				to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
 				params: {
@@ -42,12 +44,18 @@ export const FormSession = ({
 					itemUid: initialItem.uid,
 					sectionId: nextSectionId,
 				},
-				search:
-					itemType === undefined
+				search: {
+					...(itemType === undefined
 						? {}
 						: {
 								itemType,
-							},
+							}),
+					...(nextSectionId === "merges" && typeof path[1] === "number"
+						? {
+								merge: path[1],
+							}
+						: {}),
+				},
 			}),
 		[
 			initialItem.uid,
@@ -105,12 +113,14 @@ export const FormSession = ({
 			...controller,
 			isNew,
 			itemType,
+			mergeIndex,
 			productionLineId,
 		}),
 		[
 			controller,
 			isNew,
 			itemType,
+			mergeIndex,
 			productionLineId,
 		],
 	);

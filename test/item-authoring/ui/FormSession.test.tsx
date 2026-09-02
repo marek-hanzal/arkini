@@ -277,4 +277,76 @@ describe("item section form session", () => {
 			"Changed water",
 		);
 	});
+
+	it("keeps the invalid merge selected when validation returns to its section", async () => {
+		const itemWithMerges: ItemSchema.Type = {
+			...item,
+			merge: [
+				{
+					action: "consume",
+					effect: "keep",
+					target: {
+						itemId: item.id,
+						type: "item",
+					},
+				},
+				{
+					action: "use",
+					effect: "remove",
+					target: {
+						itemId: item.id,
+						type: "item",
+					},
+				},
+			],
+		};
+		state.persisted = itemWithMerges;
+		(
+			state.canonical as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config.items[item.id] = itemWithMerges;
+		const InvalidMergeProbe = () => {
+			const { form } = useFormSession();
+			return (
+				<button
+					type="button"
+					onClick={() => form.setFieldValue("merge[1].target.itemId", "")}
+				>
+					Invalidate second merge
+				</button>
+			);
+		};
+		const { container } = await render(<InvalidMergeProbe />);
+
+		await act(async () => {
+			[
+				...container.querySelectorAll("button"),
+			]
+				.find((button) => button.textContent === "Invalidate second merge")
+				?.click();
+		});
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await act(async () => {
+			saveButton?.click();
+			await Promise.resolve();
+		});
+
+		expect(state.saveItem).not.toHaveBeenCalled();
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
+			params: {
+				projectId: "editor-test",
+				itemUid: item.uid,
+				sectionId: "merges",
+			},
+			search: {
+				merge: 1,
+			},
+		});
+	});
 });

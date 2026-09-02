@@ -29,6 +29,7 @@ const useDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type => {
 interface FormProps extends PropsWithChildren {
 	readonly enableCapability?: OptionalCapability;
 	readonly itemType?: TypeSchema.Type;
+	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
 	readonly sectionId?: SectionId;
 	readonly uid: string;
@@ -39,6 +40,7 @@ export const Form = ({
 	children,
 	enableCapability,
 	itemType,
+	mergeIndex,
 	productionLineId,
 	sectionId = "identity",
 	uid,
@@ -60,6 +62,7 @@ export const Form = ({
 			initialItem={initialItem}
 			isNew={isNew}
 			itemType={itemType}
+			mergeIndex={mergeIndex}
 			productionLineId={productionLineId}
 			sectionId={sectionId}
 		>

@@ -1,10 +1,11 @@
-import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, BatteryCharging, Combine, type LucideIcon } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { PrimaryButtonLink } from "~/ui/ui/Button";
+import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
@@ -88,62 +89,92 @@ export const ChargesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 
 const MergeDetail = ({
 	index,
+	itemUid,
 	merge,
 }: {
 	readonly index: number;
+	readonly itemUid: string;
 	readonly merge: MergeSchema.Type;
-}) => (
-	<article className="grid gap-4 border-b border-line pb-6 last:border-0 last:pb-0">
-		<h3 className="text-base font-semibold">Merge {index + 1}</h3>
-		<DetailFacts>
-			<DetailFact
-				label="Target"
-				value={<SelectorDetail selector={merge.target} />}
-			/>
-			<DetailFact
-				label="Source action"
-				value={merge.action}
-			/>
-			<DetailFact
-				label="Target effect"
-				value={merge.effect}
-			/>
-			{"result" in merge ? (
+}) => {
+	const project = useEditorProject();
+	return (
+		<EditorRootCard dataUi="EditorItemMergeDetailCard">
+			<h3 className="text-base font-semibold">
+				<ButtonLink
+					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+					params={{
+						projectId: project.projectId,
+						itemUid,
+						sectionId: "merges",
+					}}
+					search={{
+						merge: index,
+					}}
+					className="group inline-flex min-h-0 w-fit max-w-full flex-none items-center justify-start gap-1.5 rounded-none border-0 bg-transparent p-0 text-left text-[inherit] font-[inherit] decoration-accent/55 underline-offset-4 shadow-none hover:border-transparent hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
+					data-ui="EditorItemMergeDetailEditLink"
+				>
+					Merge {index + 1}
+					<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+				</ButtonLink>
+			</h3>
+			<DetailFacts>
 				<DetailFact
-					label="Replacement item"
-					value={<DetailReference itemId={merge.result} />}
+					label="Target"
+					value={<SelectorDetail selector={merge.target} />}
 				/>
-			) : null}
-		</DetailFacts>
-		<OutputDetail
-			emptyLabel="No extra output configured."
-			output={merge.output}
-			title="Extra output"
-		/>
-	</article>
-);
+				<DetailFact
+					label="Source action"
+					value={merge.action}
+				/>
+				<DetailFact
+					label="Target effect"
+					value={merge.effect}
+				/>
+				{"result" in merge ? (
+					<DetailFact
+						label="Replacement item"
+						value={<DetailReference itemId={merge.result} />}
+					/>
+				) : null}
+			</DetailFacts>
+			<OutputDetail
+				emptyLabel="No extra output configured."
+				output={merge.output}
+				title="Extra output"
+			/>
+		</EditorRootCard>
+	);
+};
 
 /** Presents authored merge interactions or their explicit disabled state. */
-export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
-	item.merge === undefined || item.merge.length === 0 ? (
-		<DisabledCapabilityDetail
-			actionLabel="Enable merges"
-			capability="merges"
-			description="Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output."
-			icon={Combine}
-			itemUid={item.uid}
-			title="Merges are disabled"
+export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
+	<div className="grid gap-[var(--ak-viewport-gap)]">
+		<EditorFormSectionDivider
+			description="Interactions triggered when this item is dropped onto a matching target."
+			title="Merges"
 		/>
-	) : (
-		<DetailSection title="Merges">
-			<div className="grid gap-6">
+		{item.merge === undefined || item.merge.length === 0 ? (
+			<EditorRootCard dataUi="EditorItemMergesDisabledCard">
+				<DisabledCapabilityDetail
+					actionLabel="Enable merges"
+					capability="merges"
+					description="Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output."
+					icon={Combine}
+					itemUid={item.uid}
+					title="Merges are disabled"
+				/>
+			</EditorRootCard>
+		) : (
+			<div className="grid gap-3">
 				{item.merge.map((merge, index) => (
 					<MergeDetail
 						key={`${merge.effect}-${index}`}
 						index={index}
+						itemUid={item.uid}
 						merge={merge}
 					/>
 				))}
 			</div>
-		</DetailSection>
-	);
+		)}
+	</div>
+);

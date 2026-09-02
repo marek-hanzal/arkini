@@ -2,8 +2,7 @@ import { ChevronRight, Unlink } from "lucide-react";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
-import { readRequiredByFactIdsFn } from "~/flow/fn/readRequiredByFactIdsFn";
+import { readRequiredByItemsFn } from "~/item-authoring/fn/readRequiredByItemsFn";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { Status } from "~/ui/ui/Status";
 
@@ -11,20 +10,7 @@ import { Status } from "~/ui/ui/Status";
 export const RequiredBySection = ({ itemId }: { readonly itemId: string }) => {
 	const project = useEditorProject();
 	const requiredByItems = useMemo(
-		() =>
-			readRequiredByFactIdsFn(createAcquisitionGraphFn(project.config), itemId)
-				.flatMap((requiredByItemId) => {
-					const item = project.config.items[requiredByItemId];
-					return item === undefined
-						? []
-						: [
-								item,
-							];
-				})
-				.sort(
-					(left, right) =>
-						left.title.localeCompare(right.title) || left.id.localeCompare(right.id),
-				),
+		() => readRequiredByItemsFn(project.config, itemId),
 		[
 			itemId,
 			project.config,

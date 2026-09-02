@@ -4,25 +4,38 @@ import {
 	disposeSync,
 	getLogger,
 	jsonLinesFormatter,
+	type LogRecord,
 	type Logger,
 } from "@logtape/logtape";
-import { shell } from "electron";
+import { app, shell } from "electron";
 import { Effect } from "effect";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
+import type { ApplicationLogRecordSchema } from "~electron/contract/diagnostics/ApplicationLogRecord";
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 /** Process-owned bounded diagnostic log capability exposed to trusted renderer IPC. */
 export interface DiagnosticLog {
 	readonly directoryPath: string;
 	readonly writeFx: (record: DiagnosticRecord) => Effect.Effect<void, unknown, never>;
+	readonly writeApplicationFx: (
+		record: ApplicationLogRecordSchema.Type,
+	) => Effect.Effect<void, unknown, never>;
 	readonly openDirectoryFx: Effect.Effect<void, unknown, never>;
 	readonly closeFx: Effect.Effect<void, unknown, never>;
 }
 
 const MAX_FILE_BYTES = 5 * 1_024 * 1_024;
 const MAX_FILES = 4;
+
+const formatApplicationLogRecordFn = (record: LogRecord, runtimeIdentity: string): string => {
+	const message =
+		typeof record.rawMessage === "string" ? record.rawMessage : record.message.join("");
+	const body = typeof record.properties.body === "string" ? record.properties.body.trim() : "";
+	return `# ${new Date(record.timestamp).toISOString()} [${String(record.level).toUpperCase()}] - ${message}\n\n${runtimeIdentity}\n\n${body}${body === "" ? "" : "\n"}\n`;
+};
 
 const writeRecordFn = (logger: Logger, record: DiagnosticRecord) => {
 	const properties = {
@@ -58,14 +71,44 @@ const writeRecordFn = (logger: Logger, record: DiagnosticRecord) => {
 	}
 };
 
+const writeApplicationRecordFn = (logger: Logger, record: ApplicationLogRecordSchema.Type) => {
+	const properties = {
+		body: record.body,
+	};
+	switch (record.level) {
+		case "debug":
+			logger.debug(record.message, properties);
+			break;
+		case "info":
+			logger.info(record.message, properties);
+			break;
+		case "warning":
+			logger.warn(record.message, properties);
+			break;
+		case "error":
+			logger.error(record.message, properties);
+			break;
+		case "fatal":
+			logger.fatal(record.message, properties);
+			break;
+	}
+};
+
 export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directoryPath: string) =>
 	Effect.sync((): DiagnosticLog => {
 		mkdirSync(directoryPath, {
 			recursive: true,
 		});
+		const runtimeIdentity = `Arkini v${ArkiniAppVersion} · ${app.isPackaged ? "packaged" : "development"} · ${process.platform} ${process.arch}`;
 		configureSync({
 			reset: true,
 			sinks: {
+				application: getRotatingFileSink(join(directoryPath, "application.md"), {
+					bufferSize: 0,
+					formatter: (record) => formatApplicationLogRecordFn(record, runtimeIdentity),
+					maxFiles: MAX_FILES,
+					maxSize: MAX_FILE_BYTES,
+				}),
 				diagnostics: getRotatingFileSink(join(directoryPath, "diagnostics.jsonl"), {
 					bufferSize: 0,
 					formatter: jsonLinesFormatter,
@@ -74,6 +117,14 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 				}),
 			},
 			loggers: [
+				{
+					category: "arkiniApplication",
+					lowestLevel: "debug",
+					parentSinks: "override",
+					sinks: [
+						"application",
+					],
+				},
 				{
 					category: "arkini",
 					lowestLevel: "debug",
@@ -91,6 +142,7 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 			],
 		});
 		const logger = getLogger("arkini");
+		const applicationLogger = getLogger("arkiniApplication");
 		let closed = false;
 
 		return {
@@ -99,6 +151,11 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 				Effect.try(() => {
 					if (closed) return;
 					writeRecordFn(logger, record);
+				}),
+			writeApplicationFx: (record) =>
+				Effect.try(() => {
+					if (closed) return;
+					writeApplicationRecordFn(applicationLogger, record);
 				}),
 			openDirectoryFx: Effect.tryPromise({
 				try: async () => {

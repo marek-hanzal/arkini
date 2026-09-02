@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainError } from "~electron/main/ElectronMainError";
+import type { DiagnosticLog } from "~electron/main/diagnostics/createDiagnosticLogFx";
 import type { EditorProjectServiceOwnership } from "~electron/main/editor-project/EditorProjectServiceOwnership";
 import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
@@ -28,6 +29,14 @@ const completedSourceExport = {
 	revision: 4,
 	root: "/tmp/source",
 };
+const writeApplicationLog = vi.fn();
+const diagnostics = {
+	directoryPath: "/tmp/arkini-diagnostics",
+	writeFx: () => Effect.void,
+	writeApplicationFx: (record) => Effect.sync(() => writeApplicationLog(record)),
+	openDirectoryFx: Effect.void,
+	closeFx: Effect.void,
+} satisfies DiagnosticLog;
 
 vi.mock("~electron/main/editor-project/exportEditorJsonDirectoryFx", () => ({
 	exportEditorJsonDirectoryFx: () => sourceExport.effect,
@@ -105,6 +114,7 @@ const register = (
 ) =>
 	Effect.runSync(
 		registerEditorProjectIpcFx({
+			diagnostics,
 			ownership,
 			trustedRenderer,
 		}),
@@ -141,6 +151,7 @@ const projectChannels = [
 
 beforeEach(async () => {
 	sourceExport.effect = Effect.succeed(completedSourceExport);
+	writeApplicationLog.mockClear();
 	electron.module.shell.openPath.mockClear();
 });
 
@@ -527,6 +538,18 @@ describe("registerEditorProjectIpcFx", () => {
 				message: "Editor storage read failed.",
 			},
 		});
+		expect(writeApplicationLog).toHaveBeenCalledWith({
+			level: "error",
+			message: "Editor operation failed: list-projects",
+			body: expect.stringContaining("Phase: repository execution\n\n"),
+		});
+		expect(writeApplicationLog.mock.calls[0]?.[0]?.body).toContain("private storage detail");
+		expect(writeApplicationLog.mock.calls[0]?.[0]?.body).not.toContain(
+			"operation: list-projects",
+		);
+		expect(writeApplicationLog.mock.calls[0]?.[0]?.body).not.toContain(
+			"_tag: EditorProjectRepositoryError",
+		);
 		for (const channel of projectChannels) expect(electron.handlers.has(channel)).toBe(true);
 		electron.appListeners.get("will-quit")?.();
 		for (const channel of projectChannels) expect(electron.handlers.has(channel)).toBe(false);

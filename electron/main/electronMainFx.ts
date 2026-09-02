@@ -2,7 +2,9 @@ import { app, BrowserWindow, nativeTheme, protocol, safeStorage } from "electron
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
+import { formatApplicationDiagnosticTextFn } from "~/application-diagnostics/fn/formatApplicationDiagnosticTextFn";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
+import type { ApplicationLogRecordSchema } from "../contract/diagnostics/ApplicationLogRecord";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { handleArkiniProtocolRequestFx } from "./handleArkiniProtocolRequestFx";
@@ -52,6 +54,71 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 
 	const userDataPath = app.getPath("userData");
 	const userDataPaths = createArkiniUserDataPathsFn(userDataPath);
+	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.diagnostics).pipe(
+		Effect.catch((cause) =>
+			Effect.sync(() => {
+				console.error("Arkini diagnostic log could not be initialized.", cause);
+				return {
+					directoryPath: "",
+					writeFx: () => Effect.void,
+					writeApplicationFx: () => Effect.void,
+					openDirectoryFx: Effect.void,
+					closeFx: Effect.void,
+				};
+			}),
+		),
+	);
+	const formatCauseTextFn = (cause: unknown) =>
+		formatApplicationDiagnosticTextFn({
+			value: cause,
+		});
+	const writeApplicationSafelyFx = (record: ApplicationLogRecordSchema.Type) =>
+		diagnostics
+			.writeApplicationFx(record)
+			.pipe(Effect.catch((cause) => Effect.sync(() => console.error(cause))));
+	yield* diagnostics
+		.writeApplicationFx({
+			level: "info",
+			message: "Application started",
+			body: "Electron main entered the application lifecycle.",
+		})
+		.pipe(Effect.catch((cause) => Effect.sync(() => console.error(cause))));
+	yield* Effect.sync(() => {
+		const reportFatalProcessErrorFn = (
+			error: Error,
+			origin: NodeJS.UncaughtExceptionOrigin,
+		) => {
+			try {
+				ElectronMainRuntime.runSync(
+					diagnostics.writeApplicationFx({
+						level: "fatal",
+						message: "Main process crashed",
+						body: formatApplicationDiagnosticTextFn({
+							value: error,
+							prefix: `Origin: ${origin}`,
+						}),
+					}),
+				);
+			} catch (cause) {
+				console.error("Arkini could not record the fatal main-process error.", cause);
+			}
+		};
+		process.on("uncaughtExceptionMonitor", reportFatalProcessErrorFn);
+		app.once("will-quit", () => {
+			process.off("uncaughtExceptionMonitor", reportFatalProcessErrorFn);
+			void ElectronMainRuntime.runPromise(
+				diagnostics
+					.writeApplicationFx({
+						level: "info",
+						message: "Application stopping",
+						body: "Electron emitted will-quit.",
+					})
+					.pipe(Effect.andThen(diagnostics.closeFx)),
+			).catch((cause) => {
+				console.error("Arkini diagnostic log could not be closed.", cause);
+			});
+		});
+	});
 	const editorProjectServiceOwnership: EditorProjectServiceOwnership =
 		yield* createFilesystemEditorProjectRepositoryFx({
 			catalogPath: userDataPaths.editor.catalog,
@@ -62,70 +129,35 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 				repository,
 			})),
 			Effect.catch((cause) =>
-				Effect.sync(() => {
-					console.error("Arkini editor storage could not be initialized.", cause);
-					return {
+				writeApplicationSafelyFx({
+					level: "error",
+					message: "Editor storage initialization failed",
+					body: formatCauseTextFn(cause),
+				}).pipe(
+					Effect.tap(() =>
+						Effect.sync(() =>
+							console.error("Arkini editor storage could not be initialized.", cause),
+						),
+					),
+					Effect.as({
 						type: "unavailable" as const,
 						message: "The editor storage could not be initialized.",
-					};
-				}),
+					}),
+				),
 			),
 		);
 	if (editorProjectServiceOwnership.type === "ready") {
+		yield* writeApplicationSafelyFx({
+			level: "info",
+			message: "Editor storage ready",
+			body: `Projects: ${userDataPaths.editor.projects}\nCatalog: ${userDataPaths.editor.catalog}`,
+		});
 		yield* Effect.sync(() => {
 			app.once("will-quit", () => {
 				ElectronMainRuntime.runSync(editorProjectServiceOwnership.repository.closeFx);
 			});
 		});
 	}
-
-	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.game.logs).pipe(
-		Effect.catch((cause) =>
-			Effect.sync(() => {
-				console.error("Arkini diagnostic log could not be initialized.", cause);
-				return {
-					directoryPath: "",
-					writeFx: () => Effect.void,
-					openDirectoryFx: Effect.void,
-					closeFx: Effect.void,
-				};
-			}),
-		),
-	);
-	yield* diagnostics
-		.writeFx({
-			category: [
-				"main",
-				"lifecycle",
-			],
-			event: "application-started",
-			level: "info",
-			data: {
-				version: app.getVersion(),
-				isPackaged: app.isPackaged,
-				platform: process.platform,
-				architecture: process.arch,
-			},
-		})
-		.pipe(Effect.catch((cause) => Effect.sync(() => console.error(cause))));
-	yield* Effect.sync(() => {
-		app.once("will-quit", () => {
-			void ElectronMainRuntime.runPromise(
-				diagnostics
-					.writeFx({
-						category: [
-							"main",
-							"lifecycle",
-						],
-						event: "application-stopping",
-						level: "info",
-					})
-					.pipe(Effect.andThen(diagnostics.closeFx)),
-			).catch((cause) => {
-				console.error("Arkini diagnostic log could not be closed.", cause);
-			});
-		});
-	});
 	const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
 		root: userDataPaths.game.preferences,
 	});
@@ -261,6 +293,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		userDataPaths,
 	});
 	yield* registerEditorProjectIpcFx({
+		diagnostics,
 		trustedRenderer,
 		ownership: editorProjectServiceOwnership,
 	});
@@ -289,12 +322,24 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		),
 	);
 	yield* createWindowFx;
+	yield* writeApplicationSafelyFx({
+		level: "info",
+		message: "Main window loaded",
+		body: "The renderer loaded and the native window was registered.",
+	});
 
 	yield* Effect.sync(() => {
 		app.on("activate", () => {
 			if (BrowserWindow.getAllWindows().length === 0) {
 				void ElectronMainRuntime.runPromise(createWindowFx).catch((error) => {
 					console.error("Arkini could not create a replacement window.", error);
+					void ElectronMainRuntime.runPromise(
+						writeApplicationSafelyFx({
+							level: "error",
+							message: "Replacement window creation failed",
+							body: formatCauseTextFn(error),
+						}),
+					);
 				});
 			}
 		});

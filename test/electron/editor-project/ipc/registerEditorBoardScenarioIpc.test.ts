@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainError } from "~electron/main/ElectronMainError";
+import type { DiagnosticLog } from "~electron/main/diagnostics/createDiagnosticLogFx";
 import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { createEditorProjectIpcRepository } from "./support/createEditorProjectIpcRepository";
@@ -61,6 +62,13 @@ const boardChannels = [
 	ArkiniElectronApi.channels.editorBoardScenarioWrite,
 	ArkiniElectronApi.channels.editorBoardScenarioDelete,
 ];
+const diagnostics = {
+	directoryPath: "/tmp/arkini-diagnostics",
+	writeFx: () => Effect.void,
+	writeApplicationFx: () => Effect.void,
+	openDirectoryFx: Effect.void,
+	closeFx: Effect.void,
+} satisfies DiagnosticLog;
 
 afterEach(() => {
 	electron.getWillQuit()?.();
@@ -72,6 +80,7 @@ describe("editor Board-scenario IPC", () => {
 		const repository = createEditorProjectIpcRepository();
 		Effect.runSync(
 			registerEditorProjectIpcFx({
+				diagnostics,
 				ownership: {
 					type: "ready",
 					repository,
@@ -93,6 +102,7 @@ describe("editor Board-scenario IPC", () => {
 		const repository = createEditorProjectIpcRepository();
 		Effect.runSync(
 			registerEditorProjectIpcFx({
+				diagnostics,
 				ownership: {
 					type: "ready",
 					repository,
@@ -158,6 +168,7 @@ describe("editor Board-scenario IPC", () => {
 	it("rejects an invalid request before reporting unavailable ownership", async () => {
 		Effect.runSync(
 			registerEditorProjectIpcFx({
+				diagnostics,
 				ownership: {
 					type: "unavailable",
 					message: "Editor database could not be opened.",

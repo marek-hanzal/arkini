@@ -270,6 +270,8 @@ const api: ArkiniElectronApi.Api = {
 	diagnostics: {
 		writeFn: (record) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWrite, record),
+		writeApplicationFn: (record) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWriteApplication, record),
 		openDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
 	},

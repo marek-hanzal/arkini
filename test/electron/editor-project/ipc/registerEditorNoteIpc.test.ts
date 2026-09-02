@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { DiagnosticLog } from "~electron/main/diagnostics/createDiagnosticLogFx";
 import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import {
@@ -44,6 +45,13 @@ const trustedRenderer: TrustedRenderer = {
 	assertTrustedIpcSenderFx: () => Effect.void,
 	registerWindowFx: () => Effect.void,
 };
+const diagnostics = {
+	directoryPath: "/tmp/arkini-diagnostics",
+	writeFx: () => Effect.void,
+	writeApplicationFx: () => Effect.void,
+	openDirectoryFx: Effect.void,
+	closeFx: Effect.void,
+} satisfies DiagnosticLog;
 const invoke = (channel: string, candidate?: unknown) => {
 	const handler = electron.handlers.get(channel);
 	if (handler === undefined) throw new Error(`Missing IPC handler ${channel}.`);
@@ -60,6 +68,7 @@ describe("editor project-note IPC", () => {
 		const repository = createEditorProjectIpcRepository();
 		Effect.runSync(
 			registerEditorProjectIpcFx({
+				diagnostics,
 				ownership: {
 					type: "ready",
 					repository,
@@ -123,6 +132,7 @@ describe("editor project-note IPC", () => {
 	it("rejects malformed note content before reporting unavailable ownership", async () => {
 		Effect.runSync(
 			registerEditorProjectIpcFx({
+				diagnostics,
 				ownership: {
 					type: "unavailable",
 					message: "Editor database could not be opened.",

@@ -7,6 +7,7 @@ import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
+import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
@@ -31,6 +32,7 @@ const updateNoteSchema = noteKeySchema
 
 export namespace registerEditorNoteIpcFx {
 	export interface Props {
+		readonly diagnostics: DiagnosticLog;
 		readonly ownership: EditorProjectServiceOwnership;
 		readonly trustedRenderer: TrustedRenderer;
 	}
@@ -38,7 +40,7 @@ export namespace registerEditorNoteIpcFx {
 
 /** Registers project-note IPC over the canonical editor-project repository. */
 export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
-	({ ownership, trustedRenderer }: registerEditorNoteIpcFx.Props) =>
+	({ diagnostics, ownership, trustedRenderer }: registerEditorNoteIpcFx.Props) =>
 		Effect.sync(() => {
 			const handleFn = <Value>(
 				channel: string,
@@ -56,6 +58,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 				executeEditorProjectRepositoryFx(
 					"list-notes",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx("list-notes", IdSchema, candidate),
 					(repository, projectId) => repository.listNotesFx(projectId),
 				),
@@ -64,6 +67,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 				executeEditorProjectRepositoryFx(
 					"create-note",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx("create-note", createNoteSchema, candidate),
 					(repository, request) => repository.createNoteFx(request),
 				),
@@ -72,6 +76,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 				executeEditorProjectRepositoryFx(
 					"update-note",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx("update-note", updateNoteSchema, candidate),
 					(repository, request) => repository.updateNoteFx(request),
 				),
@@ -80,6 +85,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 				executeEditorProjectRepositoryFx(
 					"delete-note",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx("delete-note", noteKeySchema, candidate),
 					(repository, request) => repository.deleteNoteFx(request),
 				),

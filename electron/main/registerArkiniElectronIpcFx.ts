@@ -19,6 +19,7 @@ import { createFilesystemGameSaveFilesFx } from "~/game-persistence/fx/createFil
 import type { ArkiniUserDataPaths } from "./user-data/ArkiniUserDataPaths";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
+import { ApplicationLogRecordSchema } from "../contract/diagnostics/ApplicationLogRecord";
 import { GameIncidentWriteSchema } from "../contract/incident/GameIncidentWrite";
 import type { DiagnosticLog } from "./diagnostics/createDiagnosticLogFx";
 import { writeLatestGameIncidentFx } from "./incident/writeLatestGameIncidentFx";
@@ -153,6 +154,16 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						),
 					),
 				);
+				ipcMain.handle(
+					ArkiniElectronApi.channels.diagnosticsWriteApplication,
+					(event, record) =>
+						runAuthorizedFn(
+							event,
+							Effect.sync(() => ApplicationLogRecordSchema.parse(record)).pipe(
+								Effect.flatMap(diagnostics.writeApplicationFx),
+							),
+						),
+				);
 				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsOpenDirectory, (event) =>
 					runAuthorizedFn(event, diagnostics.openDirectoryFx),
 				);
@@ -279,6 +290,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.saveWrite,
 						ArkiniElectronApi.channels.saveClear,
 						ArkiniElectronApi.channels.diagnosticsWrite,
+						ArkiniElectronApi.channels.diagnosticsWriteApplication,
 						ArkiniElectronApi.channels.diagnosticsOpenDirectory,
 						ArkiniElectronApi.channels.incidentWrite,
 						ArkiniElectronApi.channels.userDataOpenDirectory,

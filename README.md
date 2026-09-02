@@ -94,7 +94,7 @@ src/game-shell  Board, Inventory, playable Game resources and overlay compositio
 src/game-menu  Game Menu lifecycle, save/close commands and navigation intent
 src/game-audio  committed-event cue projection and playable-surface-scoped Web Audio lifecycle
 src/game-cheat  save-scoped Cheat commands, catalog, controls and item-spawn spotlight
-src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
+src/application-diagnostics  shared application failure extraction, visibly bounded human formatting and renderer transport policy
 src/application-runtime  renderer process capability root, Atom bridge and native lifecycle
 src/application-settings  Appearance, Cheat availability and application Settings state, commands and presentation
 src/application-shell  renderer root context, fatal surface and shared route transition/navigation behavior

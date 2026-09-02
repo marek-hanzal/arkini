@@ -5,6 +5,7 @@ import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";
 import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";
@@ -36,6 +37,7 @@ let registered = false;
 
 export namespace registerEditorProjectIpcFx {
 	export interface Props {
+		readonly diagnostics: DiagnosticLog;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly ownership: EditorProjectServiceOwnership;
 	}
@@ -43,7 +45,7 @@ export namespace registerEditorProjectIpcFx {
 
 /** Registers editor-only IPC even when Editor persistence is unavailable. */
 export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx")(
-	({ trustedRenderer, ownership }: registerEditorProjectIpcFx.Props) =>
+	({ diagnostics, trustedRenderer, ownership }: registerEditorProjectIpcFx.Props) =>
 		Effect.gen(function* () {
 			const shouldRegister = yield* Effect.sync(() => {
 				if (registered) return false;
@@ -52,10 +54,12 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 			});
 			if (!shouldRegister) return;
 			const boardScenarioChannels = yield* registerEditorBoardScenarioIpcFx({
+				diagnostics,
 				ownership,
 				trustedRenderer,
 			});
 			const noteChannels = yield* registerEditorNoteIpcFx({
+				diagnostics,
 				ownership,
 				trustedRenderer,
 			});
@@ -119,6 +123,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"build-project",
 						ownership,
+						diagnostics,
 						requestParser.parseBuildProjectFx(candidate),
 						(repository, request) => repository.buildProjectFx(request),
 					),
@@ -127,6 +132,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"read-project-build",
 						ownership,
+						diagnostics,
 						requestParser.parseReadProjectBuildFx(candidate),
 						(repository, request) => repository.readProjectBuildFx(request),
 					),
@@ -135,6 +141,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"save-project-build",
 						ownership,
+						diagnostics,
 						Effect.all({
 							request: requestParser.parseReadProjectBuildFx(candidate),
 							window: readEditorWindowFx(event, "save-project-build"),
@@ -151,6 +158,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"list-projects",
 						ownership,
+						diagnostics,
 						Effect.void,
 						(repository) => repository.listProjectsFx,
 					),
@@ -159,6 +167,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"read-project",
 						ownership,
+						diagnostics,
 						requestParser.parseProjectIdFx(candidate),
 						(repository, projectId) => repository.readProjectFx(projectId),
 					),
@@ -167,6 +176,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"refresh-project",
 						ownership,
+						diagnostics,
 						requestParser.parseProjectIdFx(candidate),
 						(repository, projectId) => repository.refreshProjectFx(projectId),
 					),
@@ -175,6 +185,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"create-project",
 						ownership,
+						diagnostics,
 						requestParser.parseCreateProjectFx(candidate),
 						(repository, request) => repository.createProjectFx(request),
 					),
@@ -183,6 +194,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"delete-project",
 						ownership,
+						diagnostics,
 						requestParser.parseDeleteProjectIdFx(candidate),
 						(repository, projectId) => repository.deleteProjectFx(projectId),
 					),
@@ -193,6 +205,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"export-json-directory",
 							ownership,
+							diagnostics,
 							Effect.all({
 								projectId: requestParser.parseProjectIdFx(candidate),
 								window: readEditorWindowFx(event, "export-json-directory"),
@@ -211,6 +224,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"import-json-directory",
 						ownership,
+						diagnostics,
 						readEditorWindowFx(event, "import-json-directory"),
 						(repository, window) =>
 							importEditorJsonDirectoryFx({
@@ -225,6 +239,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"open-project-directory",
 							ownership,
+							diagnostics,
 							requestParser.parseProjectRootFx(candidate),
 							(repository, root) =>
 								openInvalidEditorProjectDirectoryFx({
@@ -239,6 +254,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"replace-config",
 							ownership,
+							diagnostics,
 							requestParser.parseReplaceConfigFx(candidate),
 							(repository, request) => repository.replaceConfigFx(request),
 						),
@@ -249,6 +265,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"replace-resource",
 							ownership,
+							diagnostics,
 							requestParser.parseReplaceResourceFx(candidate),
 							(repository, request) => repository.replaceResourceFx(request),
 						),
@@ -259,6 +276,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"save-resource",
 							ownership,
+							diagnostics,
 							requestParser.parseSaveResourceFx(candidate),
 							(repository, request) => repository.saveResourceFx(request),
 						),
@@ -267,6 +285,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"upsert-item",
 						ownership,
+						diagnostics,
 						requestParser.parseUpsertItemFx(candidate),
 						(repository, request) => repository.upsertItemFx(request),
 					),
@@ -275,6 +294,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"delete-item",
 						ownership,
+						diagnostics,
 						requestParser.parseDeleteItemFx(candidate),
 						(repository, request) => repository.deleteItemFx(request),
 					),
@@ -285,6 +305,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"delete-resource",
 							ownership,
+							diagnostics,
 							requestParser.parseDeleteResourceFx(candidate),
 							(repository, request) => repository.deleteResourceFx(request),
 						),
@@ -295,6 +316,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"upsert-resource",
 							ownership,
+							diagnostics,
 							requestParser.parseUpsertResourcesFx(candidate),
 							(repository, request) => repository.upsertResourcesFx(request),
 						),
@@ -303,6 +325,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"read-version-status",
 						ownership,
+						diagnostics,
 						requestParser.parseVersionStatusProjectIdFx(candidate),
 						(repository, projectId) => repository.readVersionStatusFx(projectId),
 					),
@@ -311,6 +334,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"list-versions",
 						ownership,
+						diagnostics,
 						requestParser.parseVersionListProjectIdFx(candidate),
 						(repository, projectId) => repository.listVersionsFx(projectId),
 					),
@@ -319,6 +343,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"diff-versions",
 						ownership,
+						diagnostics,
 						requestParser.parseVersionDiffFx(candidate),
 						(repository, request) => repository.diffVersionsFx(request),
 					),
@@ -327,6 +352,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"create-version",
 						ownership,
+						diagnostics,
 						requestParser.parseVersionCommitFx(candidate),
 						(repository, request) => repository.createVersionFx(request),
 					),
@@ -335,6 +361,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"checkout-version",
 						ownership,
+						diagnostics,
 						requestParser.parseVersionCheckoutFx(candidate),
 						(repository, request) => repository.checkoutVersionFx(request),
 					),
@@ -343,6 +370,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"update-version-tag",
 						ownership,
+						diagnostics,
 						requestParser.parseVersionTagFx(candidate),
 						(repository, request) => repository.updateVersionTagFx(request),
 					),

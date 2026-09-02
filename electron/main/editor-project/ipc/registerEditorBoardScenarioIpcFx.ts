@@ -8,6 +8,7 @@ import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { BoardScenarioNameSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
+import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
@@ -27,6 +28,7 @@ const writeBoardScenarioSchema = boardScenarioKeySchema
 
 export namespace registerEditorBoardScenarioIpcFx {
 	export interface Props {
+		readonly diagnostics: DiagnosticLog;
 		readonly ownership: EditorProjectServiceOwnership;
 		readonly trustedRenderer: TrustedRenderer;
 	}
@@ -34,7 +36,7 @@ export namespace registerEditorBoardScenarioIpcFx {
 
 /** Registers Board-scenario IPC over the canonical editor-project repository. */
 export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardScenarioIpcFx")(
-	({ ownership, trustedRenderer }: registerEditorBoardScenarioIpcFx.Props) =>
+	({ diagnostics, ownership, trustedRenderer }: registerEditorBoardScenarioIpcFx.Props) =>
 		Effect.sync(() => {
 			const handleFn = <Value>(
 				channel: string,
@@ -52,6 +54,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 				executeEditorProjectRepositoryFx(
 					"list-board-scenarios",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx("list-board-scenarios", IdSchema, candidate),
 					(repository, projectId) => repository.listBoardScenariosFx(projectId),
 				),
@@ -60,6 +63,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 				executeEditorProjectRepositoryFx(
 					"read-board-scenario",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx(
 						"read-board-scenario",
 						boardScenarioKeySchema,
@@ -72,6 +76,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 				executeEditorProjectRepositoryFx(
 					"write-board-scenario",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx(
 						"write-board-scenario",
 						writeBoardScenarioSchema,
@@ -84,6 +89,7 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 				executeEditorProjectRepositoryFx(
 					"delete-board-scenario",
 					ownership,
+					diagnostics,
 					parseEditorProjectIpcRequestFx(
 						"delete-board-scenario",
 						boardScenarioKeySchema,

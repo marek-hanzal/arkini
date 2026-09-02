@@ -63,7 +63,6 @@ export namespace ArkiniElectronApi {
 		editorProjectExportJsonDirectory: "arkini:editor:project:export-json-directory",
 		editorProjectImportJsonDirectory: "arkini:editor:project:import-json-directory",
 		editorProjectList: "arkini:editor:project:list",
-		editorProjectOpenExportDirectory: "arkini:editor:project:open-export-directory",
 		editorProjectOpenDirectory: "arkini:editor:project:open-directory",
 		editorProjectRead: "arkini:editor:project:read",
 		editorProjectRefresh: "arkini:editor:project:refresh",
@@ -231,7 +230,6 @@ export namespace ArkiniElectronApi {
 					ReadonlyArray<EditorProjectTransport.ProjectCandidate>
 				>
 			>;
-			readonly openExportDirectoryFn: () => Promise<EditorProjectTransport.Result<void>>;
 			readonly openProjectDirectoryFn: (
 				root: string,
 			) => Promise<EditorProjectTransport.Result<void>>;

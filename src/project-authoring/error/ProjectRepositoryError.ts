@@ -21,7 +21,6 @@ export type ProjectRepositoryOperation =
 	| "list-notes"
 	| "list-projects"
 	| "list-versions"
-	| "open-export-directory"
 	| "open-project-directory"
 	| "read-project"
 	| "read-project-build"

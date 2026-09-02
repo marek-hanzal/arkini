@@ -5,8 +5,8 @@ import { Effect } from "effect";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
-import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
-import { withProjectLockFx } from "./filesystem/fx/withProjectLockFx";
+import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
+import { withProjectLockFx } from "~/project-authoring/filesystem/fx/withProjectLockFx";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 export namespace exportEditorJsonDirectoryFx {

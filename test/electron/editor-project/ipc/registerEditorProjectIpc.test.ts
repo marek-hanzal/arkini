@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainError } from "~electron/main/ElectronMainError";
 import type { DiagnosticLog } from "~electron/main/diagnostics/createDiagnosticLogFx";
-import type { EditorProjectServiceOwnership } from "~electron/main/editor-project/EditorProjectServiceOwnership";
+import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";

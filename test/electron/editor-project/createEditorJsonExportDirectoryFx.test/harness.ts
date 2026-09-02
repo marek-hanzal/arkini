@@ -1,10 +1,10 @@
 import { Effect, FileSystem, PlatformError } from "effect";
 
-import { createProjectPathsFx } from "~electron/main/editor-project/filesystem/createProjectPathsFx";
-import { readProjectFilesFx } from "~electron/main/editor-project/filesystem/fx/readProjectFilesFx";
-import { readSidecarsFx } from "~electron/main/editor-project/filesystem/fx/readSidecarsFx";
-import { readVersionHistoryFx } from "~electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
-import { writeProjectFilesFx } from "~electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
+import { createProjectPathsFx } from "~/project-authoring/filesystem/createProjectPathsFx";
+import { readProjectFilesFx } from "~/project-authoring/filesystem/fx/readProjectFilesFx";
+import { readSidecarsFx } from "~/project-authoring/filesystem/fx/readSidecarsFx";
+import { readVersionHistoryFx } from "~/project-authoring/filesystem/fx/readVersionHistoryFx";
+import { writeProjectFilesFx } from "~/project-authoring/filesystem/fx/writeProjectFilesFx";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";

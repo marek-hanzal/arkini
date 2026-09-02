@@ -1,7 +1,7 @@
 import { shell } from "electron";
 import { Effect } from "effect";
 
-import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
+import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 /** Opens only an exact project root currently blocked by complete repository validation. */

@@ -16,7 +16,7 @@ import type { CheatPreferences } from "./cheat/createFilesystemCheatPreferencesF
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { LauncherPreferences } from "./launcher/createFilesystemLauncherPreferencesFx";
 import { createFilesystemGameSaveFilesFx } from "~/game-persistence/fx/createFilesystemGameSaveFilesFx";
-import type { ArkiniUserDataPaths } from "./user-data/ArkiniUserDataPaths";
+import type { ArkiniUserDataPaths } from "~/application-data/fn/createArkiniUserDataPathsFn";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
 import { ApplicationLogRecordSchema } from "../contract/diagnostics/ApplicationLogRecord";

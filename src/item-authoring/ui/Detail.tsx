@@ -164,9 +164,11 @@ export const Detail = ({
 				/>
 			}
 		>
-			{sectionId === "charges" ||
+			{sectionId === "identity" ||
+			sectionId === "charges" ||
 			sectionId === "delete" ||
 			sectionId === "estimate" ||
+			sectionId === "merges" ||
 			sectionId === "required-by" ||
 			sectionId === "production" ? (
 				children

@@ -11,9 +11,11 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 const MergeFields = ({
+	initialSelectedIndex,
 	onChangeFn,
 	value,
 }: {
+	readonly initialSelectedIndex: number;
 	readonly onChangeFn: (value: MergeSchema.Type[] | undefined) => void;
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
@@ -51,11 +53,13 @@ const MergeFields = ({
 					<EditorCollectionSelector
 						addLabel="Add merge"
 						count={merges.length}
+						initialSelectedIndex={initialSelectedIndex}
 						itemLabelFn={(index) => {
 							const itemId = merges[index].target.itemId;
 							return readItemLabelFn(itemId, `Merge ${index + 1}`);
 						}}
 						label="Merges"
+						key={initialSelectedIndex}
 						navigationCard
 						onAddFn={() =>
 							onChangeFn([
@@ -83,11 +87,12 @@ const MergeFields = ({
 };
 
 export const MergesSection = () => {
-	const { form } = useFormSession();
+	const { form, mergeIndex } = useFormSession();
 	return (
 		<form.Subscribe selector={(state) => state.values.merge}>
 			{(merge) => (
 				<MergeFields
+					initialSelectedIndex={mergeIndex ?? 0}
 					value={merge}
 					onChangeFn={(next) => form.setFieldValue("merge", next)}
 				/>

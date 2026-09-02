@@ -3,7 +3,7 @@ import { TriangleAlert } from "lucide-react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
-import { formatDurationFn } from "~/ui/fn/formatDurationFn";
+import { formatItemEstimateResultFn } from "~/estimate/ui/formatItemEstimateResultFn";
 import { ItemEstimateRouteGraph } from "~/estimate/ui/ItemEstimateRouteGraph";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
@@ -11,8 +11,6 @@ import { Status } from "~/ui/ui/Status";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
-
-const formatRuntimeFn = (runtimeMs: number) => formatDurationFn(runtimeMs);
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
@@ -39,11 +37,7 @@ const ItemEstimateSummary = ({ estimate }: { readonly estimate: ItemEstimate }) 
 	<div className="flex min-w-0 flex-1 items-center justify-between gap-4">
 		<ItemEstimateHeading />
 		<p className="shrink-0 font-semibold tabular-nums text-foreground">
-			{estimate.obtainable
-				? `≈ ${formatRuntimeFn(estimate.durationMs)}`
-				: estimate.status === "partial"
-					? "Indeterminate"
-					: "Unreachable"}
+			{formatItemEstimateResultFn(estimate)}
 		</p>
 	</div>
 );

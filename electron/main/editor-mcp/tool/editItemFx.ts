@@ -43,6 +43,7 @@ export const editItemFx = Effect.fn("editItemFx")(function* ({
 		else candidate[field] = value;
 	}
 	const { commit, item } = yield* saveWithRepositoryFx({
+		config: project.config,
 		expectedRevision: input.revision ?? project.revision,
 		item: candidate,
 		projectId: project.projectId,

@@ -12,6 +12,7 @@ Project Versions are immutable logical snapshots of one portable Editor project.
 | Semantic compatibility and Arkpack bump policy | `src/project-version` | [`fn/analyzeProjectCompatibilityFn.ts`](fn/analyzeProjectCompatibilityFn.ts), [`fn/bumpArkpackVersionFn.ts`](fn/bumpArkpackVersionFn.ts) |
 | Commit preview and strongest-bump projection | `src/project-version` | [`fn/createProjectVersionCommitPreviewFn.ts`](fn/createProjectVersionCommitPreviewFn.ts) |
 | Version diff projection | `src/project-version` | [`fn/createProjectVersionDiffFn.ts`](fn/createProjectVersionDiffFn.ts) |
+| Searchable current/Version comparison controls | `src/project-version` | [`ui/EditorVersionReferenceSelect.tsx`](ui/EditorVersionReferenceSelect.tsx), [`ui/useVersionComparison.ts`](ui/useVersionComparison.ts) |
 | Renderer history/status read | `src/project-version` | [`fx/readProjectVersionHistoryFx.ts`](fx/readProjectVersionHistoryFx.ts) |
 | Renderer checkout handshake | `src/project-version` | [`fx/checkoutProjectVersionFx.ts`](fx/checkoutProjectVersionFx.ts) |
 | Immutable snapshot plan and saved-HEAD proof | `src/project-version` | [`fx/planVersionSnapshotFx.ts`](fx/planVersionSnapshotFx.ts), [`fx/readCommittedProjectHeadFx.ts`](fx/readCommittedProjectHeadFx.ts) |

@@ -6,13 +6,10 @@ import type { AssetCollectionInput } from "../AssetCollectionInputSchema";
 export const readAssetCollectionTextFn = (project: Project, input: AssetCollectionInput) => {
 	const assets = project.resources;
 	const matches = input.query === undefined ? assets : searchEditorAssetsFn(assets, input.query);
-	const totalPages = Math.ceil(matches.length / input.pageSize);
-	const pageAssets = matches.slice(
-		(input.page - 1) * input.pageSize,
-		input.page * input.pageSize,
-	);
+	const totalPages = Math.ceil(matches.length / input.limit);
+	const pageAssets = matches.slice((input.page - 1) * input.limit, input.page * input.limit);
 	const hasPreviousPage = input.page > 1;
-	const hasNextPage = input.page * input.pageSize < matches.length;
+	const hasNextPage = input.page * input.limit < matches.length;
 	const renderedAssets = pageAssets
 		.map((asset) => `- Type: ${input.type}\n  ID: ${asset.id}`)
 		.join("\n\n");
@@ -23,7 +20,7 @@ export const readAssetCollectionTextFn = (project: Project, input: AssetCollecti
 		`Matched assets: ${matches.length}`,
 		`Page: ${input.page}`,
 		`Total pages: ${totalPages}`,
-		`Page size: ${input.pageSize}`,
+		`Limit: ${input.limit}`,
 		`Returned assets: ${pageAssets.length}`,
 		`Has previous page: ${hasPreviousPage}`,
 		`Has next page: ${hasNextPage}`,

@@ -5,13 +5,13 @@ import { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema
 export const EstimateInputSchema = z
 	.object({
 		page: z.number().int().min(1).default(1).describe("One-based page number."),
-		pageSize: z
+		limit: z
 			.number()
 			.int()
 			.min(1)
 			.max(100)
 			.default(25)
-			.describe("Estimate rows per page; defaults to 25 and is capped at 100."),
+			.describe("Maximum estimate rows per page; defaults to 25 and is capped at 100."),
 		query: z
 			.string()
 			.optional()

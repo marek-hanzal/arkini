@@ -18,6 +18,7 @@
 	--color-secondary-border: var(--ak-secondary-border);
 	--color-secondary-foreground: var(--ak-secondary-foreground);
 	--color-success: var(--ak-success);
+	--color-success-contrast: var(--ak-success-contrast);
 	--color-warning: var(--ak-warning);
 	--color-danger: var(--ak-danger);
 	--color-danger-contrast: var(--ak-danger-contrast);
@@ -53,6 +54,7 @@
 	--ak-info: light-dark(#4b4da8, #8e90f8);
 	--ak-info-contrast: light-dark(#fff, #0c1030);
 	--ak-success: light-dark(#75508c, #caa9df);
+	--ak-success-contrast: light-dark(#fffaff, #151020);
 	--ak-secondary-subtle: light-dark(#f6eef9, #241b2c);
 	--ak-secondary-hover: light-dark(#ead9f0, #392943);
 	--ak-secondary-selected: light-dark(#dcc0e6, #50365e);

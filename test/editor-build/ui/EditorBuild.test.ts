@@ -165,6 +165,8 @@ import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
+import { createTranslatorFn } from "~/translation/fn/createTranslatorFn";
+import { TranslationContext } from "~/translation/ui/TranslationContext";
 
 const EditorBuild = EditorBuildRouteDefinition.options.component;
 if (EditorBuild === undefined) throw new Error("Editor Build route component is missing.");
@@ -176,6 +178,22 @@ if (EditorBuild === undefined) throw new Error("Editor Build route component is 
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const testTranslator = createTranslatorFn({
+	translations: {
+		Build: {
+			value: "Build",
+		},
+		"Build help": {
+			value: "Build help",
+		},
+		Close: {
+			value: "Close",
+		},
+		"Page help": {
+			value: "Page help",
+		},
+	},
+});
 let controller: ReturnType<typeof useEditorBuildController> | undefined;
 beforeEach(() => {
 	controller = undefined;
@@ -214,7 +232,15 @@ const renderBuild = async () => {
 	roots.push(root);
 	const render = async () => {
 		await act(async () => {
-			root.render(createElement(EditorBuild));
+			root.render(
+				createElement(
+					TranslationContext.Provider,
+					{
+						value: testTranslator,
+					},
+					createElement(EditorBuild),
+				),
+			);
 		});
 	};
 	await render();

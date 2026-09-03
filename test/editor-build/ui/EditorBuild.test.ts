@@ -6,18 +6,34 @@ import { act, createElement, type AnchorHTMLAttributes, type ButtonHTMLAttribute
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const createArtifact = (contentHash: string, revision: number) => ({
+const createArtifact = (
+	contentHash: string,
+	revision: number,
+	diagnostics: GameDiagnosticsSchema.Type = [],
+) => ({
 	projectId: "editor-test",
 	contentHash,
-	diagnostics: [],
+	diagnostics,
 	revision,
 	size: 2,
 });
+
+const unusedResourceDiagnostic = {
+	code: "resource:unused" as const,
+	severity: "warning" as const,
+	message: "The asset is not referenced by the project.",
+	path: [
+		"resources",
+		"unused-asset",
+	],
+	resourceId: "unused-asset",
+};
 
 const state = vi.hoisted(() => ({
 	buildResult: undefined as unknown,
 	catalogState: undefined as unknown,
 	commandSetters: new Map<string, ReturnType<typeof vi.fn>>(),
+	dismissedValidations: new Map<string, unknown>(),
 	exportResults: new Map<string, unknown>(),
 	installResults: new Map<string, unknown>(),
 	project: undefined as unknown,
@@ -40,6 +56,7 @@ vi.mock("effect/unstable/reactivity/Atom", async (importOriginal) => {
 		"build",
 		"install",
 		"save",
+		"dismiss-validation",
 		"export",
 	] as const;
 	let familyIndex = 0;
@@ -85,29 +102,48 @@ vi.mock("~/project-version/ui/useProjectVersionStatus", () => ({
 
 vi.mock("@effect/atom-react", () => ({
 	useAtomSet: (atom: {
-		readonly kind: "build" | "catalog" | "export" | "install" | "open-export" | "save";
+		readonly kind:
+			| "build"
+			| "catalog"
+			| "dismiss-validation"
+			| "export"
+			| "install"
+			| "open-export"
+			| "save";
 		readonly key: string;
 	}) => {
 		const key = `${atom.kind}:${atom.key}`;
 		const current = state.commandSetters.get(key);
 		if (current !== undefined) return current;
-		const setter = vi.fn();
+		const setter =
+			atom.kind === "dismiss-validation"
+				? vi.fn((value: unknown) => state.dismissedValidations.set(atom.key, value))
+				: vi.fn();
 		state.commandSetters.set(key, setter);
 		return setter;
 	},
 	useAtomValue: (atom: {
-		readonly kind: "build" | "catalog" | "export" | "install" | "open-export" | "save";
+		readonly kind:
+			| "build"
+			| "catalog"
+			| "dismiss-validation"
+			| "export"
+			| "install"
+			| "open-export"
+			| "save";
 		readonly key: string;
 	}) =>
 		atom.kind === "build"
 			? state.buildResult
-			: atom.kind === "catalog"
-				? state.catalogState
-				: atom.kind === "install"
-					? (state.installResults.get(atom.key) ?? AsyncResult.initial())
-					: atom.kind === "export"
-						? (state.exportResults.get(atom.key) ?? AsyncResult.initial())
-						: AsyncResult.initial(),
+			: atom.kind === "dismiss-validation"
+				? state.dismissedValidations.get(atom.key)
+				: atom.kind === "catalog"
+					? state.catalogState
+					: atom.kind === "install"
+						? (state.installResults.get(atom.key) ?? AsyncResult.initial())
+						: atom.kind === "export"
+							? (state.exportResults.get(atom.key) ?? AsyncResult.initial())
+							: AsyncResult.initial(),
 }));
 
 vi.mock("~/arkpack-catalog/atom/CatalogAtom", () => ({
@@ -231,6 +267,7 @@ beforeEach(() => {
 		arkpacks: [],
 	};
 	state.commandSetters.clear();
+	state.dismissedValidations.clear();
 	state.exportResults.clear();
 	state.installResults.clear();
 });
@@ -301,6 +338,22 @@ describe("EditorBuild", () => {
 				(button) => button.textContent?.trim() === "Build",
 			),
 		).toBe(false);
+	});
+
+	it("presents a committed unbuilt Version as the next Build status", async () => {
+		const { container } = await renderBuild();
+
+		const status = container.querySelector('[data-ui="EditorBuildActionStatus"]');
+		expect(status?.textContent).toContain("Build Version v1.0");
+		expect(status?.textContent).toContain(
+			"Validate Version v1.0 and create an Arkpack ready to install or save.",
+		);
+		expect(
+			Array.from(status?.querySelectorAll("button") ?? []).some(
+				(button) => button.textContent?.trim() === "Build",
+			),
+		).toBe(true);
+		expect(container.querySelector('[data-ui="EditorBuildValidation"]')).toBeNull();
 	});
 
 	it("keeps structured validation diagnostics distinct from operational failures", async () => {
@@ -390,7 +443,8 @@ describe("EditorBuild", () => {
 
 		const { container } = await renderBuild();
 
-		expect(container.textContent).toContain("Project validation blocked the Arkpack build.");
+		expect(container.textContent).toContain("Build blocked by validation");
+		expect(container.textContent).toContain("2 blocking errors · 1 warning");
 		expect(container.textContent).toContain("Unsupported input capacity");
 		expect(
 			container.querySelector(
@@ -436,6 +490,54 @@ describe("EditorBuild", () => {
 		await render();
 		expect(controller?.buildStatus).toBe("stale");
 		expect(controller?.artifact).toBeUndefined();
+	});
+
+	it("presents the committed Arkpack version instead of the internal project revision", async () => {
+		state.project = {
+			...(state.project as Record<string, unknown>),
+			revision: 1_788_449_167_035,
+			version: "4.2",
+		};
+		state.buildResult = AsyncResult.success(
+			createArtifact("a".repeat(64), 1_788_449_167_035, [
+				unusedResourceDiagnostic,
+			]),
+		);
+
+		const { container } = await renderBuild();
+		const validation = container.querySelector('[data-ui="EditorBuildValidation"]');
+
+		expect(validation?.textContent).toContain("Version v4.2 · 1 warning");
+		expect(validation?.textContent).not.toContain("1788449167035");
+		expect(validation?.querySelector("strong")?.textContent).toBe("v4.2");
+	});
+
+	it("dismisses the current validation while retaining its Build output", async () => {
+		state.buildResult = AsyncResult.success(
+			createArtifact("a".repeat(64), 0, [
+				unusedResourceDiagnostic,
+			]),
+		);
+		const { container, render } = await renderBuild();
+		const validation = container.querySelector('[data-ui="EditorBuildValidation"]');
+		const dismiss = validation?.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorBuildValidationDismiss"]',
+		);
+
+		expect(dismiss?.textContent).toBe("Dismiss");
+		expect(validation?.textContent).toContain("Validation findings");
+		expect(
+			Array.from(validation?.querySelectorAll("button") ?? []).some(
+				(button) => button.textContent?.trim() === "Build",
+			),
+		).toBe(false);
+
+		await act(async () => dismiss?.click());
+		await render();
+
+		expect(container.querySelector('[data-ui="EditorBuildValidation"]')).toBeNull();
+		expect(container.textContent).toContain("Build output");
+		expect(container.querySelector('[data-ui="EditorBuildSave"]')).not.toBeNull();
 	});
 
 	it("does not show an install result from a different artifact hash", async () => {

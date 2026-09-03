@@ -1,4 +1,5 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { match, P } from "ts-pattern";
 
@@ -23,7 +24,15 @@ export type EditorBuildFailure =
 
 type EditorBuildStatus = "building" | "not-built" | "stale" | "valid";
 
+interface DismissedEditorBuildValidation {
+	readonly contentHash: string;
+	readonly revision: number;
+}
+
 const emptyDiagnostics: ReadonlyArray<GameDiagnosticSchema.Type> = [];
+const DismissedEditorBuildValidationAtom = Atom.family((_projectId: string) =>
+	Atom.make<DismissedEditorBuildValidation | undefined>(undefined).pipe(Atom.keepAlive),
+);
 
 const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefined => {
 	if (error === undefined) return undefined;
@@ -60,7 +69,9 @@ export namespace useEditorBuildArtifactController {
 		readonly buildFailure?: EditorBuildFailure;
 		readonly buildPending: boolean;
 		readonly buildStatus: EditorBuildStatus;
+		readonly dismissValidationFn: () => void;
 		readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
+		readonly validationVisible: boolean;
 	}
 }
 
@@ -72,6 +83,9 @@ export const useEditorBuildArtifactController = ({
 	const buildAtom = BuildCommandAtoms.build(project.projectId);
 	const buildResult = useAtomValue(buildAtom);
 	const runBuildFn = useAtomSet(buildAtom);
+	const dismissedValidationAtom = DismissedEditorBuildValidationAtom(project.projectId);
+	const dismissedValidation = useAtomValue(dismissedValidationAtom);
+	const setDismissedValidationFn = useAtomSet(dismissedValidationAtom);
 	const builtArtifact =
 		AsyncResult.isSuccess(buildResult) && !buildResult.waiting ? buildResult.value : undefined;
 	const artifact = builtArtifact?.revision === project.revision ? builtArtifact : undefined;
@@ -117,6 +131,17 @@ export const useEditorBuildArtifactController = ({
 		buildFailure,
 		buildPending: buildResult.waiting,
 		buildStatus,
+		dismissValidationFn: () => {
+			if (artifact === undefined) return;
+			setDismissedValidationFn({
+				contentHash: artifact.contentHash,
+				revision: artifact.revision,
+			});
+		},
 		diagnostics,
+		validationVisible:
+			artifact === undefined ||
+			dismissedValidation?.contentHash !== artifact.contentHash ||
+			dismissedValidation.revision !== artifact.revision,
 	};
 };

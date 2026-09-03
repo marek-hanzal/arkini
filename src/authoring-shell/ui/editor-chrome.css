@@ -1,5 +1,6 @@
 .ak-editor-page-header {
-	position: relative;
+	position: sticky;
+	top: 0;
 	z-index: 20;
 	display: grid;
 	min-height: calc(3rem + 1.5rem + 1px);

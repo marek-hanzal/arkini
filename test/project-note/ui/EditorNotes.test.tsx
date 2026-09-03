@@ -19,6 +19,12 @@ vi.mock("~/project-note/atom/NoteCommandAtoms", async () => {
 		NoteCommandAtoms: EditorNotesTestCommandAtoms,
 	};
 });
+vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: () => null,
+}));
+vi.mock("~/translation/ui/Tx", () => ({
+	Tx: ({ label }: { readonly label: string }) => label,
+}));
 vi.mock("~/ui/ui/Tooltip", () => ({
 	Tooltip: ({
 		children,

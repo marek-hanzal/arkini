@@ -10,6 +10,7 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 - Domain Atlas and local READMEs navigate current source; they do not override an active global contract or executable evidence. Keep them short, link exact public owners, distinguish behavior, value-contract, and type-only edges, and record both likely impact and explicit non-impact. Add a local map only when several peer owners form a genuinely dense island.
 - If code and an active contract disagree, stop and resolve the contradiction in the same change.
 - Repository commands live only in [`Argcfile.sh`](Argcfile.sh). Run them through local `argc` (`argc typecheck`, `argc test [paths...]`, `argc check`); never infer npm scripts from history.
+- Always pass `--build` when running a platform preview command (for example, `argc preview-macos --build`) so UI verification uses the current source instead of a cached application bundle.
 - Follow [`VERSION.md`](VERSION.md): readers gate on major only. Until the owner declares a stable baseline, add no migrations, legacy readers, obsolete-shape fixtures, or minor/patch-conditional paths unless explicitly requested.
 - Accessibility is not an Arkini concern. Do not add or preserve ARIA, screen-reader semantics, accessibility-only focus presentation, keyboard-only paths, tests, or review. Pointer, keyboard, and focus behavior is valid only when it is deliberate product UX, never for accessibility compliance.
 - Gameplay motion is intentional; do not add reduced-motion branches.

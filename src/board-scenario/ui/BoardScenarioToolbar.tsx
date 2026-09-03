@@ -21,7 +21,7 @@ export const BoardScenarioToolbar = ({
 	});
 	return (
 		<header
-			className="grid shrink-0 grid-cols-[auto_minmax(16rem,32rem)_auto_minmax(0,1fr)] items-center gap-2 border-b border-line bg-surface px-3 py-2"
+			className="grid shrink-0 grid-cols-[auto_minmax(16rem,32rem)_auto_minmax(0,1fr)] items-center gap-2"
 			data-ui="EditorBoardScenarioToolbar"
 		>
 			<EditorHistoryBackButton

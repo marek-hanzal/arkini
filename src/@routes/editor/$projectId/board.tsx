@@ -12,6 +12,7 @@ import { EditorBoardItemDetailLink } from "~/board-scenario/ui/EditorBoardItemDe
 import { EditorBoardProductionLineLink } from "~/board-scenario/ui/EditorBoardProductionLineLink";
 import { BoardScenarioToolbar } from "~/board-scenario/ui/BoardScenarioToolbar";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 
 type EditorGameResource = GameEngineResource<EditorBoardGame>;
 
@@ -71,27 +72,36 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 			state.resource.game.projectId === project.projectId &&
 			state.resource.game.projectRevision === project.revision;
 		return (
-			<section className="grid size-full min-h-0 grid-rows-[auto_minmax(0,1fr)]">
-				<BoardScenarioToolbar
-					game={ready ? state.resource.game : undefined}
-					project={project}
-				/>
-				{ready ? (
-					<EditorBoardReady resource={state.resource} />
-				) : state.type === "failed" &&
-					state.projectId === project.projectId &&
-					state.projectRevision === project.revision ? (
-					<EditorBoardStatus
-						detail={String(state.error)}
-						title="Editor game could not synchronize"
+			<EditorSectionPage
+				contentMode="viewport"
+				header={
+					<BoardScenarioToolbar
+						game={ready ? state.resource.game : undefined}
+						project={project}
 					/>
-				) : (
-					<EditorBoardStatus
-						detail="Starting a fresh game from the latest project revision."
-						title="Preparing editor game…"
-					/>
-				)}
-			</section>
+				}
+			>
+				<section
+					className="size-full min-h-0"
+					data-ui="EditorBoard"
+				>
+					{ready ? (
+						<EditorBoardReady resource={state.resource} />
+					) : state.type === "failed" &&
+						state.projectId === project.projectId &&
+						state.projectRevision === project.revision ? (
+						<EditorBoardStatus
+							detail={String(state.error)}
+							title="Editor game could not synchronize"
+						/>
+					) : (
+						<EditorBoardStatus
+							detail="Starting a fresh game from the latest project revision."
+							title="Preparing editor game…"
+						/>
+					)}
+				</section>
+			</EditorSectionPage>
 		);
 	},
 });

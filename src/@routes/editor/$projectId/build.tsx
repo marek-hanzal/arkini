@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, PackageCheck, PackagePlus } from "lucide-react";
+import { Download, GitCommitHorizontal, PackageCheck, PackagePlus } from "lucide-react";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
@@ -12,10 +12,11 @@ import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajor
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Button, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { LinkButtonLink } from "~/ui/ui/LinkButton";
+import { Status } from "~/ui/ui/Status";
 
 const buildStatusLabels = {
 	building: "Building",
@@ -27,15 +28,14 @@ const buildStatusLabels = {
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {
 		const controller = useEditorBuildController();
+		const translator = useTranslator();
 		const InstallIcon = controller.installAction === "update" ? PackageCheck : PackagePlus;
 		const buildSummary =
-			controller.commitRequired === true
-				? "Commit the saved working copy before building its Arkpack."
-				: controller.artifact !== undefined
-					? `Revision ${controller.artifact.revision} built with ${controller.artifact.diagnostics.length} non-blocking diagnostic${controller.artifact.diagnostics.length === 1 ? "" : "s"}.`
-					: controller.buildStatus === "stale"
-						? "The project changed after the last build. Build the current revision again."
-						: "Run a build to execute the complete game and resource validation.";
+			controller.artifact !== undefined
+				? `Revision ${controller.artifact.revision} built with ${controller.artifact.diagnostics.length} non-blocking diagnostic${controller.artifact.diagnostics.length === 1 ? "" : "s"}.`
+				: controller.buildStatus === "stale"
+					? "The project changed after the last build. Build the current revision again."
+					: "Run a build to execute the complete game and resource validation.";
 		const artifactSummary =
 			controller.artifact === undefined
 				? undefined
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 
 		return (
 			<EditorSectionPage
-				tabs={
+				header={
 					<EditorSectionNavigation
 						action={
 							<EditorPageHelp
@@ -71,125 +71,149 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 					className="grid content-start gap-3"
 					data-ui="EditorBuild"
 				>
-					<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
-						<div className="flex flex-wrap items-center justify-between gap-3">
-							<div>
-								<h2 className="text-lg font-semibold">Project validation</h2>
-								<p className="mt-1 text-sm text-muted">{buildSummary}</p>
-							</div>
-							<span
-								className="rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold text-muted uppercase tracking-wider data-[ui-status=valid]:bg-success/15 data-[ui-status=valid]:text-success"
-								{...readDataUiFn({
-									dataUi: "EditorBuildStatus",
-									state: {
-										status: controller.buildStatus,
-									},
-								})}
-							>
-								{buildStatusLabels[controller.buildStatus]}
-							</span>
-						</div>
-						{controller.buildFailure?.type === "operational" ? (
-							<div className="mt-4 rounded-lg bg-danger/10 p-3 text-danger">
-								<h3 className="text-sm font-semibold">Build operation failed</h3>
-								<p className="mt-1 text-sm">
-									{controller.buildFailure.detail ??
-										"The Editor project could not be built because of an unknown error."}
-								</p>
-							</div>
-						) : controller.buildFailure?.type === "validation" ? (
-							<p className="mt-4 text-sm font-medium text-danger">
-								Project validation blocked the Arkpack build.
-							</p>
-						) : null}
-						{controller.diagnostics.length === 0 ? null : (
-							<EditorBuildDiagnostics
-								diagnostics={controller.diagnostics}
-								project={controller.project}
-							/>
-						)}
-						{controller.commitRequired === true ? (
-							<LinkButtonLink
-								className="mt-4 inline-flex"
-								params={{
-									projectId: controller.project.projectId,
-								}}
-								search={{
-									returnTo: `/editor/${encodeURIComponent(controller.project.projectId)}/build`,
-								}}
-								to="/editor/$projectId/versions/commit"
-							>
-								Commit changes
-							</LinkButtonLink>
-						) : (
-							<PrimaryButton
-								className="mt-4"
-								disabled={!controller.canBuild || controller.buildPending}
-								cursorIntent={controller.buildPending ? "progress" : undefined}
-								onClick={controller.buildFn}
-							>
-								<PackageCheck className="mr-2 size-4" />
-								Build
-							</PrimaryButton>
-						)}
-						{controller.versionStatusError === undefined ? null : (
-							<p className="mt-3 text-sm text-danger">
-								{controller.versionStatusError}
-							</p>
-						)}
-					</article>
-					{artifactSummary === undefined ? null : (
-						<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
-							<h2 className="text-lg font-semibold">Build output</h2>
-							<p className="mt-2 break-all text-sm text-muted">{artifactSummary}</p>
-							<div className="mt-4 flex flex-wrap gap-3">
-								<PrimaryButton
-									data-ui="EditorBuildInstall"
-									disabled={
-										controller.installPending || !controller.installAvailable
-									}
-									cursorIntent={
-										controller.installPending ? "progress" : undefined
-									}
-									onClick={controller.installArtifactFn}
+					{controller.commitRequired === true ? (
+						<Status
+							action={
+								<PrimaryButtonLink
+									className="gap-2"
+									params={{
+										projectId: controller.project.projectId,
+									}}
+									search={{
+										returnTo: `/editor/${encodeURIComponent(controller.project.projectId)}/build`,
+									}}
+									to="/editor/$projectId/versions/commit"
 								>
-									<InstallIcon className="mr-2 size-4" />
-									{controller.installAction === "update" ? "Update" : "Install"}
-								</PrimaryButton>
-								<Button
-									className="border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
-									data-ui="EditorBuildSave"
-									disabled={controller.savePending}
-									cursorIntent={controller.savePending ? "progress" : undefined}
-									onClick={controller.saveArtifactFn}
-								>
-									<Download className="mr-2 size-4" />
-									Save as…
-								</Button>
-							</div>
-							{controller.saveError === undefined ? null : (
-								<p className="mt-3 text-sm text-danger">{controller.saveError}</p>
-							)}
-							{controller.installError === undefined ? null : (
-								<p className="mt-3 text-sm text-danger">
-									{controller.installError}
-								</p>
-							)}
-							{controller.installedPackageId === undefined ? null : (
-								<p className="mt-3 text-sm text-success">
-									Installed as {controller.installedPackageId}.
-								</p>
-							)}
-						</article>
-					)}
-					{controller.installConfirmation === undefined ? null : (
-						<EditorBuildMajorUpdateDialog
-							confirmation={controller.installConfirmation}
-							error={controller.installError}
-							pending={controller.installPending}
-							onCancelFn={controller.cancelInstallFn}
-							onConfirmFn={controller.confirmInstallFn}
+									<GitCommitHorizontal className="size-4" />
+									<Tx label="Review and commit" />
+								</PrimaryButtonLink>
+							}
+							dataUi="EditorBuildCommitRequired"
+							description={translator.textFn("Build dirty description")}
+							icon={GitCommitHorizontal}
+							title={translator.textFn("Build dirty title")}
 						/>
+					) : (
+						<>
+							<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
+								<div className="flex flex-wrap items-center justify-between gap-3">
+									<div>
+										<h2 className="text-lg font-semibold">
+											Project validation
+										</h2>
+										<p className="mt-1 text-sm text-muted">{buildSummary}</p>
+									</div>
+									<span
+										className="rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold text-muted uppercase tracking-wider data-[ui-status=valid]:bg-success/15 data-[ui-status=valid]:text-success"
+										{...readDataUiFn({
+											dataUi: "EditorBuildStatus",
+											state: {
+												status: controller.buildStatus,
+											},
+										})}
+									>
+										{buildStatusLabels[controller.buildStatus]}
+									</span>
+								</div>
+								{controller.buildFailure?.type === "operational" ? (
+									<div className="mt-4 rounded-lg bg-danger/10 p-3 text-danger">
+										<h3 className="text-sm font-semibold">
+											Build operation failed
+										</h3>
+										<p className="mt-1 text-sm">
+											{controller.buildFailure.detail ??
+												"The Editor project could not be built because of an unknown error."}
+										</p>
+									</div>
+								) : controller.buildFailure?.type === "validation" ? (
+									<p className="mt-4 text-sm font-medium text-danger">
+										Project validation blocked the Arkpack build.
+									</p>
+								) : null}
+								{controller.diagnostics.length === 0 ? null : (
+									<EditorBuildDiagnostics
+										diagnostics={controller.diagnostics}
+										project={controller.project}
+									/>
+								)}
+								<PrimaryButton
+									className="mt-4"
+									disabled={!controller.canBuild || controller.buildPending}
+									cursorIntent={controller.buildPending ? "progress" : undefined}
+									onClick={controller.buildFn}
+								>
+									<PackageCheck className="mr-2 size-4" />
+									Build
+								</PrimaryButton>
+								{controller.versionStatusError === undefined ? null : (
+									<p className="mt-3 text-sm text-danger">
+										{controller.versionStatusError}
+									</p>
+								)}
+							</article>
+							{artifactSummary === undefined ? null : (
+								<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
+									<h2 className="text-lg font-semibold">Build output</h2>
+									<p className="mt-2 break-all text-sm text-muted">
+										{artifactSummary}
+									</p>
+									<div className="mt-4 flex flex-wrap gap-3">
+										<PrimaryButton
+											data-ui="EditorBuildInstall"
+											disabled={
+												controller.installPending ||
+												!controller.installAvailable
+											}
+											cursorIntent={
+												controller.installPending ? "progress" : undefined
+											}
+											onClick={controller.installArtifactFn}
+										>
+											<InstallIcon className="mr-2 size-4" />
+											{controller.installAction === "update"
+												? "Update"
+												: "Install"}
+										</PrimaryButton>
+										<Button
+											className="border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
+											data-ui="EditorBuildSave"
+											disabled={controller.savePending}
+											cursorIntent={
+												controller.savePending ? "progress" : undefined
+											}
+											onClick={controller.saveArtifactFn}
+										>
+											<Download className="mr-2 size-4" />
+											Save as…
+										</Button>
+									</div>
+									{controller.saveError === undefined ? null : (
+										<p className="mt-3 text-sm text-danger">
+											{controller.saveError}
+										</p>
+									)}
+									{controller.installError === undefined ? null : (
+										<p className="mt-3 text-sm text-danger">
+											{controller.installError}
+										</p>
+									)}
+									{controller.installedPackageId === undefined ? null : (
+										<p className="mt-3 text-sm text-success">
+											Installed as {controller.installedPackageId}.
+										</p>
+									)}
+								</article>
+							)}
+							{controller.installConfirmation === undefined ? null : (
+								<EditorBuildMajorUpdateDialog
+									confirmation={controller.installConfirmation}
+									error={controller.installError}
+									pending={controller.installPending}
+									onCancelFn={controller.cancelInstallFn}
+									onConfirmFn={controller.confirmInstallFn}
+								/>
+							)}
+						</>
 					)}
 				</section>
 			</EditorSectionPage>

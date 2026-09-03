@@ -9,6 +9,7 @@ import { Tooltip } from "~/ui/ui/Tooltip";
 import { useEffect, useState } from "react";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { OriginFlow } from "~/flow-canvas/ui/OriginFlow";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
@@ -81,33 +82,20 @@ export const EditorGameFlow = ({
 		itemId,
 	]);
 	return (
-		<section
-			className="grid h-full min-h-0 grid-rows-[auto_1fr] gap-3 p-3"
-			data-ui="EditorGameFlow"
-		>
-			<div className="grid min-w-0 gap-1.5">
-				<div className="flex min-w-0 items-center justify-between gap-3">
-					<div className="flex min-w-0 items-center gap-2">
-						<EditorHistoryBackButton
-							params={{
-								projectId,
-							}}
-							to="/editor/$projectId/editor/items/list"
-						/>
-						<h1 className="text-2xl font-semibold">Flow</h1>
-					</div>
-					<div className="flex shrink-0 items-center gap-2">
-						<span className="rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
-							{options.length} items
-						</span>
-						<EditorPageHelp
-							content={<Mx label="Flow help" />}
-							title={<Tx label="Flow" />}
-						/>
-					</div>
-				</div>
-				<div className="flex min-w-0 items-end gap-2">
-					<div className="min-w-0 flex-1">
+		<EditorSectionPage
+			contentMode="viewport"
+			header={
+				<header className="grid min-w-0 grid-cols-[auto_auto_minmax(12rem,1fr)_auto_auto_auto] items-center gap-2">
+					<EditorHistoryBackButton
+						params={{
+							projectId,
+						}}
+						to="/editor/$projectId/editor/items/list"
+					/>
+					<h1 className="shrink-0 text-xl font-semibold">
+						<Tx label="Flow" />
+					</h1>
+					<div className="min-w-64 flex-1">
 						<EditorItemFlowSearch
 							items={items}
 							onChangeFn={(value) => void onItemIdChangeFn(value)}
@@ -131,14 +119,27 @@ export const EditorGameFlow = ({
 						]}
 						value={direction}
 					/>
-				</div>
+					<span className="shrink-0 rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
+						{options.length} items
+					</span>
+					<EditorPageHelp
+						content={<Mx label="Flow help" />}
+						title={<Tx label="Flow" />}
+					/>
+				</header>
+			}
+		>
+			<div
+				className="h-full min-h-0 p-3"
+				data-ui="EditorGameFlow"
+			>
+				<OriginFlow
+					direction={direction}
+					focusItemId={itemId || undefined}
+					focusRequestKey={focusRequestKey}
+					onFocusItemChangeFn={onItemIdChangeFn}
+				/>
 			</div>
-			<OriginFlow
-				direction={direction}
-				focusItemId={itemId || undefined}
-				focusRequestKey={focusRequestKey}
-				onFocusItemChangeFn={onItemIdChangeFn}
-			/>
-		</section>
+		</EditorSectionPage>
 	);
 };

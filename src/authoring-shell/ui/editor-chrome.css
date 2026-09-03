@@ -1,7 +1,9 @@
 .ak-editor-page-header {
-	position: sticky;
-	top: 0;
+	position: relative;
 	z-index: 20;
+	display: grid;
+	min-height: calc(3rem + 1.5rem + 1px);
+	align-items: center;
 	border-bottom: 1px solid color-mix(in srgb, var(--ak-line-strong) 64%, transparent);
 	background: linear-gradient(
 		180deg,

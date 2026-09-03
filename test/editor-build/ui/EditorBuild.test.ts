@@ -28,6 +28,12 @@ type MockButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	readonly cursorIntent?: string;
 };
 
+type MockButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+	readonly params: Record<string, string>;
+	readonly search?: Record<string, string>;
+	readonly to: string;
+};
+
 vi.mock("effect/unstable/reactivity/Atom", async (importOriginal) => {
 	const original = await importOriginal<typeof import("effect/unstable/reactivity/Atom")>();
 	const familyKinds = [
@@ -132,34 +138,36 @@ vi.mock("~/ui/ui/LinkButton", () => ({
 		createElement("a", props, children),
 }));
 
-vi.mock("~/ui/ui/Button", () => ({
-	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
-		createElement("button", props, children),
-	PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
-		createElement("button", props, children),
-	DangerButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
-		createElement("button", props, children),
-	ButtonLink: ({
-		children,
-		to,
-		params,
-		...props
-	}: AnchorHTMLAttributes<HTMLAnchorElement> & {
-		readonly to: string;
-		readonly params: Record<string, string>;
-	}) =>
-		createElement(
+vi.mock("~/ui/ui/Button", () => {
+	const MockButtonLink = ({ children, params, search, to, ...props }: MockButtonLinkProps) => {
+		const pathname = Object.entries(params).reduce(
+			(path, [key, value]) => path.replace(`$${key}`, value),
+			to,
+		);
+		const href =
+			search === undefined
+				? pathname
+				: `${pathname}?${new URLSearchParams(search).toString()}`;
+		return createElement(
 			"a",
 			{
 				...props,
-				href: Object.entries(params).reduce(
-					(path, [key, value]) => path.replace(`$${key}`, value),
-					to,
-				),
+				href,
 			},
 			children,
-		),
-}));
+		);
+	};
+	return {
+		Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
+			createElement("button", props, children),
+		PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
+			createElement("button", props, children),
+		DangerButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
+			createElement("button", props, children),
+		ButtonLink: MockButtonLink,
+		PrimaryButtonLink: MockButtonLink,
+	};
+});
 
 import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
@@ -186,11 +194,20 @@ const testTranslator = createTranslatorFn({
 		"Build help": {
 			value: "Build help",
 		},
+		"Build dirty description": {
+			value: "Build uses the committed Version HEAD. Review the saved changes and create a Version commit; Arkini will bring you back here to build the resulting Arkpack.",
+		},
+		"Build dirty title": {
+			value: "Commit the working copy first",
+		},
 		Close: {
 			value: "Close",
 		},
 		"Page help": {
 			value: "Page help",
+		},
+		"Review and commit": {
+			value: "Review & commit",
 		},
 	},
 });
@@ -271,10 +288,14 @@ describe("EditorBuild", () => {
 		state.versionDirty = true;
 		const { container } = await renderBuild();
 
-		expect(container.textContent).toContain(
-			"Commit the saved working copy before building its Arkpack.",
-		);
-		expect(container.textContent).toContain("Commit changes");
+		const status = container.querySelector('[data-ui="EditorBuildCommitRequired"]');
+		expect(status?.textContent).toContain("Commit the working copy first");
+		expect(status?.textContent).toContain("Review & commit");
+		expect(
+			status?.querySelector(
+				'a[href="/editor/editor-test/versions/commit?returnTo=%2Feditor%2Feditor-test%2Fbuild"]',
+			),
+		).not.toBeNull();
 		expect(
 			Array.from(container.querySelectorAll("button")).some(
 				(button) => button.textContent?.trim() === "Build",

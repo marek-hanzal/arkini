@@ -78,29 +78,37 @@ export const EditorAssetDetail = ({
 	const resource = useEditorAssetById(resourceId);
 	if (resource === undefined) {
 		return (
-			<Status
-				dataUi="EditorAssetNotFound"
-				description={`Resource ${resourceId} is not present in this project.`}
-				icon={FileQuestion}
-				title="Asset not found"
-				action={
-					<EditorHistoryBackButton
-						to="/editor/$projectId/assets"
-						params={{
-							projectId: project.projectId,
-						}}
-						search={{
-							filter,
-							query,
-						}}
+			<EditorSectionPage
+				header={
+					<EditorSectionNavigation
+						leading={
+							<EditorHistoryBackButton
+								to="/editor/$projectId/assets"
+								params={{
+									projectId: project.projectId,
+								}}
+								search={{
+									filter,
+									query,
+								}}
+							/>
+						}
+						title={<h1 className="truncate text-xl font-semibold">{resourceId}</h1>}
 					/>
 				}
-			/>
+			>
+				<Status
+					dataUi="EditorAssetNotFound"
+					description={`Resource ${resourceId} is not present in this project.`}
+					icon={FileQuestion}
+					title="Asset not found"
+				/>
+			</EditorSectionPage>
 		);
 	}
 	return (
 		<EditorSectionPage
-			tabs={
+			header={
 				<EditorSectionNavigation
 					leading={
 						<EditorHistoryBackButton

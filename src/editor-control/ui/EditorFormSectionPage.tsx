@@ -73,7 +73,7 @@ export const EditorFormSectionPage = ({
 	readonly title?: ReactNode;
 }>) => (
 	<EditorSectionPage
-		tabs={
+		header={
 			<EditorSectionNavigation
 				leading={leading}
 				title={title}

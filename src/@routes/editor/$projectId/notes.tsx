@@ -8,6 +8,11 @@ import { EditorTextarea } from "~/editor-control/ui/EditorTextarea";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useNotesController } from "~/project-note/ui/useNotesController";
 import { Status } from "~/ui/ui/Status";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
+import { Tx } from "~/translation/ui/Tx";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -46,18 +51,34 @@ const noteMotion = {
 export const Route = createFileRoute("/editor/$projectId/notes")({
 	component: () => {
 		const controller = useNotesController();
+		const project = useEditorProject();
 		return (
-			<div
-				className="h-full min-h-0 overflow-y-auto p-4"
-				data-ui="EditorNotes"
+			<EditorSectionPage
+				header={
+					<EditorSectionNavigation
+						leading={
+							<EditorHistoryBackButton
+								params={{
+									projectId: project.projectId,
+								}}
+								to="/editor/$projectId/editor/items/list"
+							/>
+						}
+						title={
+							<h1 className="text-xl font-semibold">
+								<Tx label="Notes" />
+							</h1>
+						}
+					/>
+				}
 			>
-				<div className="mx-auto grid w-full max-w-3xl gap-6">
-					<header>
-						<h1 className="text-2xl font-semibold">Notes</h1>
-						<p className="mt-1 text-sm text-muted">
-							Project notes stay in the Editor and are not included in the arkpack.
-						</p>
-					</header>
+				<div
+					className="mx-auto grid w-full max-w-3xl gap-6"
+					data-ui="EditorNotes"
+				>
+					<p className="text-sm text-muted">
+						Project notes stay in the Editor and are not included in the arkpack.
+					</p>
 					<section className="grid gap-3 rounded-2xl border border-line bg-surface-raised/60 p-5">
 						<EditorTextarea
 							maxLength={NoteContentMaxLength}
@@ -246,7 +267,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 						)}
 					</section>
 				</div>
-			</div>
+			</EditorSectionPage>
 		);
 	},
 });

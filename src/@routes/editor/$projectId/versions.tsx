@@ -5,6 +5,7 @@ import { ButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
 	editorSectionTabClassName,
 	EditorSectionTabs,
@@ -30,16 +31,9 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 				params,
 			}) !== false;
 		return (
-			<section
-				className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
-				data-ui="EditorVersions"
-			>
-				<div
-					className="border-b border-line px-4 py-3"
-					style={{
-						viewTransitionName: "arkini-editor-section-navigation",
-					}}
-				>
+			<EditorSectionPage
+				contentMode="viewport"
+				header={
 					<EditorSectionNavigation
 						leading={
 							<EditorHistoryBackButton
@@ -96,9 +90,15 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 							) : undefined
 						}
 					/>
+				}
+			>
+				<div
+					className="h-full min-h-0"
+					data-ui="EditorVersions"
+				>
+					<Outlet />
 				</div>
-				<Outlet />
-			</section>
+			</EditorSectionPage>
 		);
 	},
 });

@@ -7,6 +7,10 @@ Board editing help:
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
 Build:
   value: Build
+Build dirty description:
+  value: Build uses the committed Version HEAD. Review the saved changes and create a Version commit; Arkini will bring you back here to build the resulting Arkpack.
+Build dirty title:
+  value: Commit the working copy first
 Build help:
   value: |
     Build turns the project's committed Version HEAD into a portable Arkpack. Before producing the file, it runs the complete project and resource validation used by the game.
@@ -39,6 +43,29 @@ Current stack:
   value: Current stack
 Description:
   value: Description
+Editor MCP:
+  value: Editor MCP
+Editor MCP help:
+  value: |
+    MCP lets AI tools work with the project currently open in Arkini. A connected client can inspect and edit project data, run validation, explore item relationships, and work with Versions.
+
+    > **Treat every connection as full project access.** Only connect clients you trust, and keep the intended project open in Arkini while they work.
+
+    ### Local MCP
+
+    Use **Local MCP** for Codex or another MCP client running on this Mac. Start the local server, then copy its loopback endpoint into the client. Local MCP stays on this computer and does not require ngrok.
+
+    ### Remote MCP
+
+    Remote MCP exposes the open project through an OAuth-protected HTTPS endpoint. It requires:
+
+    1. An **ngrok account** with a Development Domain.
+    2. A dedicated, revocable **ngrok authtoken**.
+    3. A remote MCP client that supports OAuth.
+
+    Open **Settings**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
+
+    On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
 Estimate:
   value: Estimate
 Flow:
@@ -192,6 +219,8 @@ New game required:
   value: New game required
 No-op Version commit consequence:
   value: Only Editor-only content changed. The Arkpack version and save compatibility stay unchanged.
+Notes:
+  value: Notes
 Owned:
   value: Owned
 Page help:
@@ -213,6 +242,8 @@ Rename project ID help:
     > **Version history starts fresh.**
     >
     > Existing Version commits become unreachable from this project. Gameplay version stays the same; the next Version commit becomes a new history root.
+Review and commit:
+  value: Review & commit
 Stack capacity:
   value: Stack capacity
 Starting layout controls help:

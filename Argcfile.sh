@@ -267,17 +267,39 @@ build() {
 	install_game_arkpack
 }
 
-# @cmd Build and open the unpacked macOS arm64 application
+# @cmd Open the unpacked macOS arm64 application
+# @flag --build Force a rebuild before opening the application
 preview-macos() {
-	clean_desktop
-	build
-	electron-builder \
-		--config electron-builder.yml \
-		--mac \
-		--arm64 \
-		--dir \
-		--publish never
-	open .out/desktop/release/mac-arm64/Arkini.app
+	local application
+	application=.out/desktop/release/mac-arm64/Arkini.app
+	if [[ "${argc_build:-0}" == 1 || ! -d "$application" ]]; then
+		clean_desktop
+		build
+		electron-builder \
+			--config electron-builder.yml \
+			--mac \
+			--arm64 \
+			--dir \
+			--publish never
+	fi
+	open "$application"
+}
+
+# @cmd Run the compiled Arkini CLI
+# @flag --build Force a rebuild before running the CLI
+# @arg arguments~ Arguments passed to arkini-cli
+preview-cli() {
+	local cli
+	cli=.out/desktop/build/main/cli/arkini.js
+	if [[ "${argc_build:-0}" == 1 || ! -f "$cli" ]]; then
+		clean_desktop
+		build
+	fi
+	if [[ -n "${argc_arguments+x}" ]]; then
+		node "$cli" "${argc_arguments[@]}"
+		return
+	fi
+	node "$cli"
 }
 
 # @cmd Build macOS arm64 release artifacts

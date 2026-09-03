@@ -407,6 +407,8 @@ describe("CLI completion", () => {
 			expect(result.stdout).toContain("editor");
 			expect(result.stdout).toContain("game");
 			expect(result.stdout).toContain("arkpack");
+			expect(result.stdout).toContain("project");
+			expect(result.stdout).toContain("list");
 		}
 	}, 15_000);
 });

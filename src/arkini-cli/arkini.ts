@@ -7,6 +7,7 @@ import { ArkpackCommand } from "~/arkini-cli/command/ArkpackCommand";
 import { DiagnosticsCommand } from "~/arkini-cli/command/DiagnosticsCommand";
 import { EditorMcpCommand } from "~/arkini-cli/command/EditorMcpCommand";
 import { PackCommand } from "~/arkini-cli/command/PackCommand";
+import { ProjectCommand } from "~/arkini-cli/command/ProjectCommand";
 import { ReplayCommand } from "~/arkini-cli/command/ReplayCommand";
 import { SchemaCommand } from "~/arkini-cli/command/SchemaCommand";
 import { ValidateCommand } from "~/arkini-cli/command/ValidateCommand";
@@ -44,6 +45,7 @@ const ArkiniCommand = Command.make("arkini-cli")
 			DiagnosticsCommand,
 			EditorCommand,
 			GameCommand,
+			ProjectCommand,
 		]),
 	)
 	.pipe(Command.withDescription("Arkini game authoring and Arkpack commands."));

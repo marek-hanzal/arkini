@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Route as EditorVersionCommitRouteDefinition } from "~/@routes/editor/$projectId/versions/commit";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 const EditorVersionCommit = EditorVersionCommitRouteDefinition.options.component;
 if (EditorVersionCommit === undefined)
@@ -75,7 +76,13 @@ describe("EditorVersionCommit", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		const render = async () => {
-			await act(async () => root.render(<EditorVersionCommit />));
+			await act(async () =>
+				root.render(
+					<TranslationTestProvider>
+						<EditorVersionCommit />
+					</TranslationTestProvider>,
+				),
+			);
 		};
 
 		await render();
@@ -107,12 +114,20 @@ describe("EditorVersionCommit", () => {
 		const root = createRoot(container);
 		roots.push(root);
 
-		await act(async () => root.render(<EditorVersionCommit />));
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					<EditorVersionCommit />
+				</TranslationTestProvider>,
+			),
+		);
 
 		expect(container.textContent).toContain("Resulting Arkpack · v2.0");
-		expect(container.querySelector('[data-ui="EditorVersionCommitBump"]')?.textContent).toBe(
-			"major",
-		);
+		expect(
+			container
+				.querySelector('[data-ui="EditorVersionCommitBump"]')
+				?.getAttribute("data-ui-bump"),
+		).toBe("major");
 		expect(
 			container.querySelector('[data-ui="EditorVersionCommitScenarioDeletion"]')?.textContent,
 		).toContain("delete 2 Board scenarios: Opening, Variant");

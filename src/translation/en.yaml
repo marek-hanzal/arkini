@@ -70,6 +70,8 @@ Global estimate help:
     Use **Fastest first** and **Slowest first** to find pacing outliers, **Highest demand first** to spot heavily reused ingredients or prerequisites, and **Incomplete only** to find broken or unusually complex paths.
 
     Open an item to see its selected route and the quantities and time behind the estimate.
+Initial Version commit consequence:
+  value: The first Version commit records the complete project without changing its starting version.
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
@@ -173,6 +175,14 @@ Item type description - temporary:
   dynamic: true
 Location:
   value: Location
+Major Version commit consequence:
+  value: Major versions are incompatible with existing saves. Players must start a new game.
+Minor Version commit consequence:
+  value: Existing saves remain compatible with this minor version.
+New game required:
+  value: New game required
+No-op Version commit consequence:
+  value: Only Editor-only content changed. The Arkpack version and save compatibility stay unchanged.
 Owned:
   value: Owned
 Page help:

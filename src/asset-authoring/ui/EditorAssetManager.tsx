@@ -12,6 +12,7 @@ import { memo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import type { Project } from "~/project-authoring/type/Project";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
@@ -255,56 +256,56 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 	);
 
 	return (
-		<section
-			className="h-full min-h-0 overflow-y-auto overscroll-contain"
-			data-scroll-restoration-id="editor-asset-list"
-			data-ui="EditorAssetManager"
+		<EditorSectionPage
+			header={
+				<header className="flex min-w-0 flex-wrap items-center gap-2">
+					<EditorHistoryBackButton
+						params={{
+							projectId: project.projectId,
+						}}
+						to="/editor/$projectId/editor/items/list"
+					/>
+					<input
+						ref={controller.arkpackInputRef}
+						type="file"
+						accept=".arkpack"
+						className="hidden"
+						data-ui="EditorAssetArkpackInput"
+						disabled={controller.importPending}
+						onChange={controller.onArkpackChangeFn}
+					/>
+					<input
+						ref={controller.filesInputRef}
+						type="file"
+						accept="image/png,.png"
+						multiple
+						className="hidden"
+						data-ui="EditorAssetImportInput"
+						disabled={controller.importPending}
+						onChange={controller.onFilesChangeFn}
+					/>
+					<input
+						type="search"
+						value={props.query}
+						className="h-12 min-h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						data-ui="EditorAssetSearch"
+						placeholder="Search assets…"
+						onChange={(event) => props.onQueryChangeFn(event.currentTarget.value)}
+					/>
+					<SegmentedControl
+						dataUi="EditorAssetFilters"
+						onChangeFn={props.onFilterChangeFn}
+						optionDataUi="EditorAssetFilter"
+						options={assetFilters}
+						size="large"
+						value={props.filter}
+					/>
+					{controller.catalogState === "empty" ? null : importButton}
+				</header>
+			}
+			scrollRestorationId="editor-asset-list"
 		>
-			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
-				<EditorHistoryBackButton
-					params={{
-						projectId: project.projectId,
-					}}
-					to="/editor/$projectId/editor/items/list"
-				/>
-				<input
-					ref={controller.arkpackInputRef}
-					type="file"
-					accept=".arkpack"
-					className="hidden"
-					data-ui="EditorAssetArkpackInput"
-					disabled={controller.importPending}
-					onChange={controller.onArkpackChangeFn}
-				/>
-				<input
-					ref={controller.filesInputRef}
-					type="file"
-					accept="image/png,.png"
-					multiple
-					className="hidden"
-					data-ui="EditorAssetImportInput"
-					disabled={controller.importPending}
-					onChange={controller.onFilesChangeFn}
-				/>
-				<input
-					type="search"
-					value={props.query}
-					className="h-12 min-h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
-					data-ui="EditorAssetSearch"
-					placeholder="Search assets…"
-					onChange={(event) => props.onQueryChangeFn(event.currentTarget.value)}
-				/>
-				<SegmentedControl
-					dataUi="EditorAssetFilters"
-					onChangeFn={props.onFilterChangeFn}
-					optionDataUi="EditorAssetFilter"
-					options={assetFilters}
-					size="large"
-					value={props.filter}
-				/>
-				{controller.catalogState === "empty" ? null : importButton}
-			</header>
-			<div className="px-3 pt-3 pb-3">
+			<div data-ui="EditorAssetManager">
 				{importError === undefined ? null : (
 					<p
 						className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
@@ -336,6 +337,6 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					resources={controller.resources}
 				/>
 			</div>
-		</section>
+		</EditorSectionPage>
 	);
 };

@@ -1,6 +1,7 @@
 import { match } from "ts-pattern";
 
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
@@ -8,6 +9,8 @@ import {
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { ButtonLink } from "~/ui/ui/Button";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServer } from "./EditorMcpServer";
@@ -39,8 +42,14 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 			data-ui="EditorMcp"
 		>
 			<EditorSectionPage
-				tabs={
+				header={
 					<EditorSectionNavigation
+						action={
+							<EditorPageHelp
+								content={<Mx label="Editor MCP help" />}
+								title={<Tx label="Editor MCP" />}
+							/>
+						}
 						leading={
 							<EditorHistoryBackButton
 								params={{

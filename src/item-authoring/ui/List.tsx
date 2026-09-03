@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { ListRow } from "~/item-authoring/ui/ListRow";
@@ -69,34 +70,37 @@ export const List = ({
 		/>
 	);
 	return (
-		<section
-			className="h-full min-h-0 overflow-y-auto overscroll-contain"
-			data-scroll-restoration-id="editor-item-list"
-			data-ui="EditorItemList"
+		<EditorSectionPage
+			header={
+				<header className="flex min-w-0 flex-wrap items-center gap-2">
+					<EditorHistoryBackButton to="/editor/welcome" />
+					<input
+						type="search"
+						value={query}
+						className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						placeholder="Search item title, ID or type…"
+						onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
+					/>
+					{itemType === undefined ? null : (
+						<button
+							type="button"
+							className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
+							data-ui="EditorItemTypeFilter"
+							onClick={() => onItemTypeChangeFn(undefined)}
+						>
+							{itemType}
+							<span>×</span>
+						</button>
+					)}
+					{empty ? null : newItemMenu}
+				</header>
+			}
+			scrollRestorationId="editor-item-list"
 		>
-			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
-				<EditorHistoryBackButton to="/editor/welcome" />
-				<input
-					type="search"
-					value={query}
-					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
-					placeholder="Search item title, ID or type…"
-					onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
-				/>
-				{itemType === undefined ? null : (
-					<button
-						type="button"
-						className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
-						data-ui="EditorItemTypeFilter"
-						onClick={() => onItemTypeChangeFn(undefined)}
-					>
-						{itemType}
-						<span>×</span>
-					</button>
-				)}
-				{empty ? null : newItemMenu}
-			</header>
-			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">
+			<div
+				className="ak-list grid content-start gap-2"
+				data-ui="EditorItemList"
+			>
 				{empty ? (
 					<Status
 						dataUi="EditorItemsEmpty"
@@ -124,6 +128,6 @@ export const List = ({
 					/>
 				))}
 			</div>
-		</section>
+		</EditorSectionPage>
 	);
 };

@@ -85,7 +85,7 @@ export const OriginFlow = ({
 
 	return (
 		<section
-			className="h-full min-h-[34rem] overflow-hidden rounded-lg border border-l-2 border-line bg-surface-raised"
+			className="h-full min-h-0 overflow-hidden rounded-lg border border-l-2 border-line bg-surface-raised"
 			data-ui="EditorOriginFlowSection"
 		>
 			{isReady ? (

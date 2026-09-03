@@ -35,11 +35,11 @@ vi.mock("~/authoring-shell/ui/EditorSectionNavigation", () => ({
 vi.mock("~/authoring-shell/ui/EditorSectionPage", () => ({
 	EditorSectionPage: ({
 		children,
-		tabs,
+		header,
 	}: {
 		readonly children?: ReactNode;
-		readonly tabs?: ReactNode;
-	}) => createElement("div", null, tabs, children),
+		readonly header?: ReactNode;
+	}) => createElement("div", null, header, children),
 }));
 
 vi.mock("~/editor-control/ui/EditorFormContent", () => ({

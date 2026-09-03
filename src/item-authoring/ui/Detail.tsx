@@ -62,7 +62,7 @@ export const Detail = ({
 	const sections = readSectionsFn(item);
 	return (
 		<EditorSectionPage
-			tabs={
+			header={
 				<EditorSectionNavigation
 					leading={
 						<EditorHistoryBackButton

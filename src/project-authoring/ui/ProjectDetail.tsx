@@ -22,7 +22,7 @@ export const ProjectDetail = ({
 	const editActionRef = useEditorEditShortcut();
 	return (
 		<EditorSectionPage
-			tabs={
+			header={
 				<EditorSectionNavigation
 					action={
 						<div className="flex items-center gap-4">

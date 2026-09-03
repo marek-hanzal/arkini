@@ -69,9 +69,10 @@ argc mcp-inspect
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 
-The installed macOS CLI can run one Editor project's configured MCP server without opening the Editor:
+The installed macOS CLI can list Editor projects and run one project's configured MCP server without opening the Editor:
 
 ```bash
+arkini-cli project list
 arkini-cli editor mcp <projectId>
 arkini-cli editor mcp <projectId> --remote
 ```

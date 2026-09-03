@@ -112,10 +112,14 @@ export const VersionDiff = ({ diff }: { readonly diff: ProjectVersionDiff }) =>
 						key={`${item.uid}:${change.path}`}
 						change={change}
 						title={
-							<>
-								Item {item.uid} ·{" "}
-								<span className="capitalize text-accent">{item.change}</span>
-							</>
+							item.change === "changed" ? (
+								<>Item {item.uid}</>
+							) : (
+								<>
+									Item {item.uid} ·{" "}
+									<span className="capitalize text-accent">{item.change}</span>
+								</>
+							)
 						}
 					/>
 				)),

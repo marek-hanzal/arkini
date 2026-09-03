@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CircleCheckBig, GitCommitHorizontal } from "lucide-react";
+import { CircleCheckBig, GitCommitHorizontal, TriangleAlert } from "lucide-react";
 
 import { PrimaryButton } from "~/ui/ui/Button";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorTextarea } from "~/editor-control/ui/EditorTextarea";
 import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Status } from "~/ui/ui/Status";
 import { useVersionCommitController } from "~/project-version/ui/useVersionCommitController";
 import { VersionDiff } from "~/project-version/ui/VersionDiff";
@@ -22,6 +25,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 				: undefined,
 	}),
 	component: () => {
+		const translator = useTranslator();
 		const controller = useVersionCommitController();
 		const { preview } = controller;
 		return (
@@ -49,19 +53,51 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 													? `Initial snapshot · v${preview.nextArkpackVersion}`
 													: `Resulting Arkpack · v${preview.nextArkpackVersion}`}
 											</h3>
-											<p className="mt-1 text-sm text-muted">
+											<p
+												className="mt-1 text-sm text-muted data-[ui-bump=major]:font-semibold data-[ui-bump=major]:text-danger"
+												{...readDataUiFn({
+													dataUi: "EditorVersionCommitConsequence",
+													state: {
+														bump: preview.bump,
+													},
+												})}
+											>
 												{preview.initial
-													? "The first commit records the complete project without bumping its starting version."
+													? translator.textFn(
+															"Initial Version commit consequence",
+														)
 													: preview.bump === "noop"
-														? "Only Editor-only content changed, so the Arkpack version stays unchanged."
-														: `This commit applies one ${preview.bump} compatibility bump.`}
+														? translator.textFn(
+																"No-op Version commit consequence",
+															)
+														: preview.bump === "major"
+															? translator.textFn(
+																	"Major Version commit consequence",
+																)
+															: translator.textFn(
+																	"Minor Version commit consequence",
+																)}
 											</p>
 										</div>
 										<span
-											className="rounded-full border border-line px-2.5 py-1 text-xs font-semibold uppercase tracking-wider"
-											data-ui="EditorVersionCommitBump"
+											className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-xs font-semibold uppercase tracking-wider data-[ui-bump=major]:border-danger data-[ui-bump=major]:bg-danger data-[ui-bump=major]:px-3 data-[ui-bump=major]:py-1.5 data-[ui-bump=major]:font-bold data-[ui-bump=major]:text-danger-contrast data-[ui-bump=major]:shadow-lg data-[ui-bump=major]:ring-4 data-[ui-bump=major]:ring-danger/20"
+											{...readDataUiFn({
+												dataUi: "EditorVersionCommitBump",
+												state: {
+													bump: preview.bump,
+												},
+											})}
 										>
+											{preview.bump === "major" ? (
+												<TriangleAlert className="size-4" />
+											) : null}
 											{preview.bump}
+											{preview.bump === "major" ? (
+												<>
+													<span>·</span>
+													<Tx label="New game required" />
+												</>
+											) : null}
 										</span>
 									</div>
 									{preview.scenariosToDelete.length === 0 ? null : (

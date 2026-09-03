@@ -77,7 +77,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 									)}
 								</EditorFormCard>
 							)}
-							<div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] gap-4">
+							<div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(28rem,32rem)] gap-4">
 								{preview?.diff === undefined ? null : (
 									<div
 										className="col-start-1 row-start-1 min-h-0 overflow-y-auto overscroll-contain pr-1"

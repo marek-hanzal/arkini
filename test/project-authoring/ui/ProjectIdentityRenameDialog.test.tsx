@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProjectIdentityRenameDialog } from "~/project-authoring/ui/ProjectIdentityRenameDialog";
 import type { Project } from "~/project-authoring/type/Project";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -56,10 +57,14 @@ describe("ProjectIdentityRenameDialog", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(ProjectIdentityRenameDialog, {
-					controller,
-					project,
-				}),
+				createElement(
+					TranslationTestProvider,
+					undefined,
+					createElement(ProjectIdentityRenameDialog, {
+						controller,
+						project,
+					}),
+				),
 			);
 		});
 

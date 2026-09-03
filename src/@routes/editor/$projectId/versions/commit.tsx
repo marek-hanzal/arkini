@@ -26,10 +26,10 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 		const { preview } = controller;
 		return (
 			<div
-				className="h-full min-h-0 overflow-y-auto p-4"
+				className="h-full min-h-0 overflow-hidden p-4"
 				data-ui="EditorVersionCommit"
 			>
-				<div className="mx-auto grid w-full max-w-3xl gap-4">
+				<div className="mx-auto grid h-full min-h-0 w-full max-w-6xl grid-rows-[auto_minmax(0,1fr)] gap-4">
 					<h2 className="text-lg font-semibold">Commit project</h2>
 					{preview?.canCommit === false ? (
 						<Status
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 							title="Working copy is clean"
 						/>
 					) : (
-						<>
+						<div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-4">
 							{preview === undefined ? null : (
 								<EditorFormCard>
 									<div className="flex flex-wrap items-start justify-between gap-3">
@@ -77,79 +77,93 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 									)}
 								</EditorFormCard>
 							)}
-							{preview?.diff === undefined ? null : (
-								<VersionDiff diff={preview.diff} />
-							)}
-							<EditorFormCard>
-								<label className="grid gap-1.5 text-sm">
-									<EditorValueLabel
-										description="Required. Give this restore point a short name you will recognize in History and comparison selectors."
-										label="Message"
-									/>
-									<input
-										className={editorInputClassName}
-										maxLength={120}
-										placeholder="Describe this saved state"
-										value={controller.subject}
-										onChange={(event) =>
-											controller.setSubjectFn(event.currentTarget.value)
-										}
-									/>
-									<span className="text-xs text-subtle">
-										{controller.subject.trim().length}/120
-									</span>
-								</label>
-							</EditorFormCard>
-							<EditorFormCard>
-								<label className="grid gap-1.5 text-sm">
-									<EditorValueLabel
-										description="Explain what changed, why this state matters, or what you want to try next."
-										label="Details · Optional"
-									/>
-									<EditorTextarea
-										maxLength={4000}
-										maxRows={6}
-										minRows={2}
-										placeholder="Why this state matters, what changed, or what to try next"
-										value={controller.body}
-										onChange={(event) =>
-											controller.setBodyFn(event.currentTarget.value)
-										}
-									/>
-								</label>
-							</EditorFormCard>
-							<EditorFormCard>
-								<label className="grid gap-1.5 text-sm">
-									<EditorValueLabel
-										description="Add a personal marker for finding related versions. A tag does not create or name a branch."
-										label="Tag · Optional"
-									/>
-									<input
-										className={editorInputClassName}
-										maxLength={80}
-										placeholder="safe, balance pass, weird but useful…"
-										value={controller.tag}
-										onChange={(event) =>
-											controller.setTagFn(event.currentTarget.value)
-										}
-									/>
-								</label>
-							</EditorFormCard>
-							{controller.error === undefined ? null : (
-								<p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
-									{controller.error}
-								</p>
-							)}
-							<PrimaryButton
-								className="justify-self-end gap-2"
-								disabled={!controller.canCommit || controller.pending}
-								cursorIntent={controller.pending ? "progress" : undefined}
-								onClick={controller.commitFn}
-							>
-								<GitCommitHorizontal className="size-4" />
-								Commit
-							</PrimaryButton>
-						</>
+							<div className="grid min-h-0 grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] gap-4">
+								<div
+									className="grid content-start gap-4"
+									data-ui="EditorVersionCommitForm"
+								>
+									<EditorFormCard>
+										<label className="grid gap-1.5 text-sm">
+											<EditorValueLabel
+												description="Required. Give this restore point a short name you will recognize in History and comparison selectors."
+												label="Message"
+											/>
+											<input
+												className={editorInputClassName}
+												maxLength={120}
+												placeholder="Describe this saved state"
+												value={controller.subject}
+												onChange={(event) =>
+													controller.setSubjectFn(
+														event.currentTarget.value,
+													)
+												}
+											/>
+											<span className="text-xs text-subtle">
+												{controller.subject.trim().length}/120
+											</span>
+										</label>
+									</EditorFormCard>
+									<EditorFormCard>
+										<label className="grid gap-1.5 text-sm">
+											<EditorValueLabel
+												description="Explain what changed, why this state matters, or what you want to try next."
+												label="Details · Optional"
+											/>
+											<EditorTextarea
+												maxLength={4000}
+												maxRows={6}
+												minRows={2}
+												placeholder="Why this state matters, what changed, or what to try next"
+												value={controller.body}
+												onChange={(event) =>
+													controller.setBodyFn(event.currentTarget.value)
+												}
+											/>
+										</label>
+									</EditorFormCard>
+									<EditorFormCard>
+										<label className="grid gap-1.5 text-sm">
+											<EditorValueLabel
+												description="Add a personal marker for finding related versions. A tag does not create or name a branch."
+												label="Tag · Optional"
+											/>
+											<input
+												className={editorInputClassName}
+												maxLength={80}
+												placeholder="safe, balance pass, weird but useful…"
+												value={controller.tag}
+												onChange={(event) =>
+													controller.setTagFn(event.currentTarget.value)
+												}
+											/>
+										</label>
+									</EditorFormCard>
+									{controller.error === undefined ? null : (
+										<p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
+											{controller.error}
+										</p>
+									)}
+									<PrimaryButton
+										className="justify-self-end gap-2"
+										disabled={!controller.canCommit || controller.pending}
+										cursorIntent={controller.pending ? "progress" : undefined}
+										onClick={controller.commitFn}
+									>
+										<GitCommitHorizontal className="size-4" />
+										Commit
+									</PrimaryButton>
+								</div>
+								{preview?.diff === undefined ? null : (
+									<div
+										className="min-h-0 overflow-y-auto overscroll-contain pr-1"
+										data-ui="EditorVersionCommitChanges"
+									>
+										<VersionDiff diff={preview.diff} />
+									</div>
+								)}
+							</div>
+						</div>
 					)}
 				</div>
 			</div>

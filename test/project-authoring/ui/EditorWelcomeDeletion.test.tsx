@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorWelcome } from "~/project-authoring/ui/EditorWelcome";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -80,9 +81,13 @@ describe("EditorWelcome project rows", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(EditorWelcome, {
-					recentProjects: [],
-				}),
+				createElement(
+					TranslationTestProvider,
+					undefined,
+					createElement(EditorWelcome, {
+						recentProjects: [],
+					}),
+				),
 			);
 		});
 
@@ -116,32 +121,36 @@ describe("EditorWelcome project rows", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(EditorWelcome, {
-					recentProjects: [
-						{
-							type: "valid",
-							ownership: "managed",
-							project: {
-								projectId: "project-one",
-								title: "Arkini",
-								version: "1.0",
-								createdAtMs: 1,
-								updatedAtMs: 2,
+				createElement(
+					TranslationTestProvider,
+					undefined,
+					createElement(EditorWelcome, {
+						recentProjects: [
+							{
+								type: "valid",
+								ownership: "managed",
+								project: {
+									projectId: "project-one",
+									title: "Arkini",
+									version: "1.0",
+									createdAtMs: 1,
+									updatedAtMs: 2,
+								},
 							},
-						},
-						{
-							type: "valid",
-							ownership: "external",
-							project: {
-								projectId: "project-two",
-								title: "Custom folder",
-								version: "1.0",
-								createdAtMs: 1,
-								updatedAtMs: 1,
+							{
+								type: "valid",
+								ownership: "external",
+								project: {
+									projectId: "project-two",
+									title: "Custom folder",
+									version: "1.0",
+									createdAtMs: 1,
+									updatedAtMs: 1,
+								},
 							},
-						},
-					],
-				}),
+						],
+					}),
+				),
 			);
 		});
 
@@ -188,16 +197,20 @@ describe("EditorWelcome project rows", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(EditorWelcome, {
-					recentProjects: [
-						{
-							type: "invalid",
-							root: "/projects/broken",
-							title: "broken",
-							validationError: "game.json is invalid",
-						},
-					],
-				}),
+				createElement(
+					TranslationTestProvider,
+					undefined,
+					createElement(EditorWelcome, {
+						recentProjects: [
+							{
+								type: "invalid",
+								root: "/projects/broken",
+								title: "broken",
+								validationError: "game.json is invalid",
+							},
+						],
+					}),
+				),
 			);
 		});
 

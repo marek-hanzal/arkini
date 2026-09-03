@@ -9,9 +9,10 @@ import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuanti
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { AssetCollectionInputSchema } from "./AssetCollectionInputSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
-import { CreateItemInputSchemas, type CreateItemInput } from "./CreateItemInputSchemas";
-import { EditItemInputSchemas, type EditItemInput } from "./EditItemInputSchemas";
+import { CreateItemInputSchemaIds, CreateItemInputSchemas } from "./CreateItemInputSchemas";
+import { EditItemInputSchemaIds, EditItemInputSchemas } from "./EditItemInputSchemas";
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
+import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
 import { readAssetCollectionTextFn } from "./fn/readAssetCollectionTextFn";
@@ -19,8 +20,10 @@ import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
+import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerVersionToolsFn } from "./registerVersionTools";
+import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
 const itemTypes = [
 	"simple",
@@ -96,6 +99,22 @@ const ItemEstimateInputSchema = z
 		$id: "urn:arkini:schema:mcp:item-estimate-input",
 		title: "Item estimate tool input",
 		description: "The target item and quantity for one authored dependency estimate.",
+	});
+
+const SchemaDetailInputSchema = z
+	.object({
+		id: z
+			.string()
+			.min(1)
+			.describe(
+				"The exact case-sensitive schema ID named by a tool description or a returned $ref.",
+			),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:schema-detail-input",
+		title: "Schema detail tool input",
+		description: "The exact registered schema identity to read.",
 	});
 
 const errorTextFn = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
@@ -244,51 +263,70 @@ const createServerFn = (
 		},
 		{
 			instructions:
-				"Every tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON config; no tool dumps complete game configs or snapshot binaries. Create, edit, and version tools persist canonical saved editor state; version_checkout performs an explicit destructive hard reset.",
+				"Every project tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail and resolve each returned $ref through schema_detail again. Create, edit, and version tools persist canonical saved editor state; version_checkout performs an explicit destructive hard reset.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
+	server.registerTool(
+		"schema_detail",
+		{
+			description:
+				"Read one JSON Schema by its exact case-sensitive Zod registry ID. A returned $ref is another exact ID that can be read through schema_detail. This tool does not require an open project.",
+			inputSchema: SchemaDetailInputSchema,
+		},
+		async ({ id }) => runToolFn(readSchemaDetailTextFx(id)),
+	);
 	for (const type of itemTypes) {
+		const schemaId = CreateItemInputSchemaIds[type];
 		server.registerTool(
 			`create_${type}_item`,
 			{
-				description: `Create and persist one ${type} item in the open project. Omitted fields use the same defaults as a new ${type}-item form in the Editor UI.`,
-				inputSchema: CreateItemInputSchemas[type],
+				description: `Create and persist one ${type} item in the open project. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Omitted fields use the same defaults as a new ${type}-item form in the Editor UI.`,
+				inputSchema: JsonToolInputSchema,
 			},
-			async (input: CreateItemInput) =>
+			async ({ input }) =>
 				runToolFn(
-					readProjectFx().pipe(
-						Effect.flatMap((project) =>
-							createItemFx({
-								input,
-								notifyProjectChangedFn,
-								project,
-								repository,
-								type,
-							}),
+					parseToolInputJsonFx(input, CreateItemInputSchemas[type]).pipe(
+						Effect.flatMap((decodedInput) =>
+							readProjectFx().pipe(
+								Effect.flatMap((project) =>
+									createItemFx({
+										input: decodedInput,
+										notifyProjectChangedFn,
+										project,
+										repository,
+										type,
+									}),
+								),
+							),
 						),
 					),
 				),
 		);
 	}
 	for (const type of itemTypes) {
+		const schemaId = EditItemInputSchemaIds[type];
 		server.registerTool(
 			`edit_${type}_item`,
 			{
-				description: `Patch one existing ${type} item. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, charges, merge, line, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
-				inputSchema: EditItemInputSchemas[type],
+				description: `Patch one existing ${type} item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, charges, merge, line, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
+				inputSchema: JsonToolInputSchema,
 			},
-			async (input: EditItemInput) =>
+			async ({ input }) =>
 				runToolFn(
-					readProjectFx().pipe(
-						Effect.flatMap((project) =>
-							editItemFx({
-								input,
-								notifyProjectChangedFn,
-								project,
-								repository,
-								type,
-							}),
+					parseToolInputJsonFx(input, EditItemInputSchemas[type]).pipe(
+						Effect.flatMap((decodedInput) =>
+							readProjectFx().pipe(
+								Effect.flatMap((project) =>
+									editItemFx({
+										input: decodedInput,
+										notifyProjectChangedFn,
+										project,
+										repository,
+										type,
+									}),
+								),
+							),
 						),
 					),
 				),

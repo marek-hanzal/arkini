@@ -24,6 +24,10 @@ export const cleanupMcpHarnesses = async () => {
 	for (const cleanup of cleanups.splice(0).reverse()) await cleanup();
 };
 
+export const jsonToolInputFn = (input: unknown) => ({
+	input: JSON.stringify(input),
+});
+
 export const createProjectRepository = async (
 	registerCleanup: (cleanup: () => Promise<void>) => void = registerMcpCleanup,
 ): Promise<OwnedEditorProjectRepository> => {

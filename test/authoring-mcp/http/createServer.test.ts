@@ -30,6 +30,7 @@ describe("editor MCP server", () => {
 		});
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
+			"schema_detail",
 			"create_simple_item",
 			"create_space_item",
 			"create_producer_item",
@@ -112,17 +113,56 @@ describe("editor MCP server", () => {
 			],
 			type: "string",
 		});
-		const schemaIds = tools.tools.map(({ inputSchema, name }) => {
-			const expectedId =
-				name === "item_input" || name === "item_output"
-					? `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-relation`
-					: `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-input`;
-			expectNamedJsonSchemaGraph(inputSchema, {
-				id: expectedId,
+		const jsonInputToolNames = new Set([
+			...[
+				"simple",
+				"space",
+				"producer",
+				"craft",
+				"blueprint",
+				"deposit",
+				"stash",
+				"temporary",
+				"inventory",
+			].flatMap((type) => [
+				`create_${type}_item`,
+				`edit_${type}_item`,
+			]),
+			"edit_project",
+		]);
+		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {
+			expectNamedJsonSchemaGraph(tool.inputSchema, {
+				id: "urn:arkini:schema:mcp:json-tool-input",
 			});
-			return inputSchema.$id;
-		});
-		expect(new Set(schemaIds).size).toBe(tools.tools.length);
+			expect(tool.inputSchema).toMatchObject({
+				additionalProperties: false,
+				properties: {
+					input: {
+						minLength: 1,
+						type: "string",
+					},
+				},
+				required: [
+					"input",
+				],
+			});
+			expect(tool.description).toContain(
+				`"urn:arkini:schema:mcp:${tool.name.replaceAll("_", "-")}-input"`,
+			);
+		}
+		const schemaIds = tools.tools
+			.filter(({ name }) => !jsonInputToolNames.has(name))
+			.map(({ inputSchema, name }) => {
+				const expectedId =
+					name === "item_input" || name === "item_output"
+						? `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-relation`
+						: `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-input`;
+				expectNamedJsonSchemaGraph(inputSchema, {
+					id: expectedId,
+				});
+				return inputSchema.$id;
+			});
+		expect(new Set(schemaIds).size).toBe(schemaIds.length);
 		expect(
 			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
 		).toMatchObject({

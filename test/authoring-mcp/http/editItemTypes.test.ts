@@ -9,6 +9,7 @@ import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
 	createMcpHarness,
+	jsonToolInputFn,
 } from "./support/createMcpHarness";
 
 const projectId = "edit-item-types-project";
@@ -171,10 +172,10 @@ describe.sequential("editor MCP typed item editing", () => {
 		for (const [type, patch] of cases) {
 			const edited = await client.callTool({
 				name: `edit_${type}_item`,
-				arguments: {
+				arguments: jsonToolInputFn({
 					itemId: itemId(type),
 					patch,
-				},
+				}),
 			});
 			expect(edited.isError, type).not.toBe(true);
 			expect(edited.content, type).toMatchObject([
@@ -218,10 +219,10 @@ describe.sequential("editor MCP typed item editing", () => {
 		for (const type of rejectedTypes) {
 			const rejected = await client.callTool({
 				name: `edit_${type}_item`,
-				arguments: {
+				arguments: jsonToolInputFn({
 					itemId: itemId(type),
 					patch: {},
-				},
+				}),
 			});
 			expect(rejected.isError, type).toBe(true);
 		}

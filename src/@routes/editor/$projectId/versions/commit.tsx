@@ -29,7 +29,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 				className="h-full min-h-0 overflow-hidden p-4"
 				data-ui="EditorVersionCommit"
 			>
-				<div className="mx-auto grid h-full min-h-0 w-full max-w-6xl grid-rows-[auto_minmax(0,1fr)] gap-4">
+				<div className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)] gap-4">
 					<h2 className="text-lg font-semibold">Commit project</h2>
 					{preview?.canCommit === false ? (
 						<Status
@@ -77,9 +77,17 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 									)}
 								</EditorFormCard>
 							)}
-							<div className="grid min-h-0 grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] gap-4">
+							<div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] gap-4">
+								{preview?.diff === undefined ? null : (
+									<div
+										className="col-start-1 row-start-1 min-h-0 overflow-y-auto overscroll-contain pr-1"
+										data-ui="EditorVersionCommitChanges"
+									>
+										<VersionDiff diff={preview.diff} />
+									</div>
+								)}
 								<div
-									className="grid content-start gap-4"
+									className="col-start-2 row-start-1 grid content-start gap-4"
 									data-ui="EditorVersionCommitForm"
 								>
 									<EditorFormCard>
@@ -154,14 +162,6 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 										Commit
 									</PrimaryButton>
 								</div>
-								{preview?.diff === undefined ? null : (
-									<div
-										className="min-h-0 overflow-y-auto overscroll-contain pr-1"
-										data-ui="EditorVersionCommitChanges"
-									>
-										<VersionDiff diff={preview.diff} />
-									</div>
-								)}
 							</div>
 						</div>
 					)}

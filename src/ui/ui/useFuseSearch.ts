@@ -1,16 +1,11 @@
-import Fuse from "fuse.js";
 import { useMemo } from "react";
+
+import { createFuzzySearchFn } from "~/fuzzy-search/fn/createFuzzySearchFn";
 
 export interface FuseSearchCandidate<Identity extends string> {
 	readonly identity: Identity;
 	readonly terms: readonly string[];
 }
-
-interface FuseDocument<Identity extends string> extends FuseSearchCandidate<Identity> {
-	readonly order: number;
-}
-
-const normalizeExactTermFn = (value: string) => value.trim().toLocaleLowerCase();
 
 /** Searches explicit authorized presentation terms while retaining a stable Fuse corpus by identity. */
 export const useFuseSearch = <Identity extends string>(
@@ -23,51 +18,23 @@ export const useFuseSearch = <Identity extends string>(
 			terms,
 		]),
 	);
-	const documents = useMemo<readonly FuseDocument<Identity>[]>(
+	const fuzzyFn = useMemo(
 		() =>
-			candidates.map((candidate, order) => ({
-				...candidate,
-				order,
-			})),
+			createFuzzySearchFn({
+				candidates: candidates.map(({ identity, terms }) => ({
+					terms,
+					value: identity,
+				})),
+			}),
 		[
 			corpusKey,
 		],
 	);
-	const fuse = useMemo(
-		() =>
-			new Fuse(documents, {
-				keys: [
-					"terms",
-				],
-				threshold: 0.28,
-				ignoreLocation: true,
-				includeScore: true,
-				useTokenSearch: true,
-				tokenMatch: "all",
-			}),
+	return useMemo(
+		() => fuzzyFn(query),
 		[
-			documents,
+			fuzzyFn,
+			query,
 		],
 	);
-	const normalizedQuery = query.trim();
-	return useMemo(() => {
-		if (normalizedQuery === "") return documents.map(({ identity }) => identity);
-		const exactQuery = normalizeExactTermFn(normalizedQuery);
-		const exact = documents.filter(({ terms }) =>
-			terms.some((term) => normalizeExactTermFn(term) === exactQuery),
-		);
-		if (exact.length > 0) return exact.map(({ identity }) => identity);
-		return fuse
-			.search(normalizedQuery)
-			.sort(
-				(first, second) =>
-					(first.score ?? 1) - (second.score ?? 1) ||
-					first.item.order - second.item.order,
-			)
-			.map(({ item }) => item.identity);
-	}, [
-		documents,
-		fuse,
-		normalizedQuery,
-	]);
 };

@@ -58,6 +58,7 @@ describe("editor MCP server", () => {
 			"item_meta",
 			"estimate",
 			"item_collection",
+			"asset_collection",
 			"item_detail",
 			"item_config",
 			"item_input",
@@ -89,6 +90,26 @@ describe("editor MCP server", () => {
 			: {};
 		expect(collectionDefinitions.ItemTypeSchema).toMatchObject({
 			enum: TypeSchema.options,
+			type: "string",
+		});
+		const assetCollectionSchema = tools.tools.find(
+			({ name }) => name === "asset_collection",
+		)?.inputSchema;
+		expect(assetCollectionSchema?.properties).toMatchObject({
+			page: expect.any(Object),
+			pageSize: expect.any(Object),
+			query: expect.any(Object),
+			type: {
+				$ref: "#/$defs/AssetTypeSchema",
+			},
+		});
+		const assetCollectionDefinitions = isJsonSchemaRecord(assetCollectionSchema?.$defs)
+			? assetCollectionSchema.$defs
+			: {};
+		expect(assetCollectionDefinitions.AssetTypeSchema).toMatchObject({
+			enum: [
+				"image",
+			],
 			type: "string",
 		});
 		const schemaIds = tools.tools.map(({ inputSchema, name }) => {
@@ -176,12 +197,24 @@ describe("editor MCP server", () => {
 			name: "project",
 			arguments: {},
 		});
+		const assets = await client.callTool({
+			name: "asset_collection",
+			arguments: {
+				query: "item-water",
+				type: "image",
+			},
+		});
 		expect(project.content).toMatchObject([
 			{
 				text: expect.stringContaining("Project ID: project-context"),
 			},
 		]);
-		expect(runtimeCalls).toBe(1);
+		expect(assets.content).toMatchObject([
+			{
+				text: expect.stringContaining("- Type: image\n  ID: item-water"),
+			},
+		]);
+		expect(runtimeCalls).toBe(2);
 		ownership.clearProjectContextFn("project-context");
 		expect(ownership.readProjectContextFn()).toBeUndefined();
 	});

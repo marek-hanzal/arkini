@@ -2,8 +2,8 @@ import { useMemo } from "react";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { searchEditorAssetsFn } from "~/asset-authoring/fn/searchEditorAssetsFn";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
-import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
 interface UseEditorAssetLibraryProps {
 	readonly filter: "all" | "unused";
@@ -29,51 +29,19 @@ export const useEditorAssetLibrary = ({
 			usages,
 		],
 	);
-	const candidates = useMemo(
+	const resources = useMemo(
 		() =>
-			project.resources
-				.filter((resource) => filter === "all" || !usedResourceIds.has(resource.id))
-				.map((resource) => ({
-					identity: resource.id,
-					terms: [
-						resource.id,
-						resource.mime,
-						"PNG",
-						"image",
-					],
-				})),
+			searchEditorAssetsFn(
+				project.resources.filter(
+					(resource) => filter === "all" || !usedResourceIds.has(resource.id),
+				),
+				query,
+			),
 		[
 			filter,
 			project.resources,
+			query,
 			usedResourceIds,
-		],
-	);
-	const matchingResourceIds = useFuseSearch(candidates, query);
-	const resourcesById = useMemo(
-		() =>
-			new Map(
-				project.resources.map((resource) => [
-					resource.id,
-					resource,
-				]),
-			),
-		[
-			project.resources,
-		],
-	);
-	const resources = useMemo(
-		() =>
-			matchingResourceIds.flatMap((resourceId) => {
-				const resource = resourcesById.get(resourceId);
-				return resource === undefined
-					? []
-					: [
-							resource,
-						];
-			}),
-		[
-			matchingResourceIds,
-			resourcesById,
 		],
 	);
 

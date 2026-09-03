@@ -10,7 +10,14 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
-export type FormValues = Omit<BaseSchema.Type, "merge"> & {
+export type FormValues = Omit<BaseSchema.Type, "asset" | "merge"> & {
+	readonly asset: {
+		readonly default: [
+			string,
+			string,
+		];
+		readonly sources: string[];
+	};
 	readonly type: TypeSchema.Type;
 	readonly durationMs?: number;
 	readonly enable?: boolean;
@@ -24,6 +31,30 @@ export type FormValues = Omit<BaseSchema.Type, "merge"> & {
 	readonly space?: number;
 };
 
+/** Removes empty optional artwork slots from the local form representation. */
+export const readCanonicalItemArtworkFn = (
+	asset: FormValues["asset"],
+): ItemSchema.Type["asset"] => {
+	const overlay = asset.default[1];
+	const sources = asset.sources.filter((resourceId) => resourceId !== "");
+	return {
+		default:
+			overlay === ""
+				? [
+						asset.default[0],
+					]
+				: [
+						asset.default[0],
+						overlay,
+					],
+		...(sources.length === 0
+			? {}
+			: {
+					sources,
+				}),
+	};
+};
+
 /**
  * Validates the local item-form representation and emits one canonical item.
  *
@@ -31,7 +62,10 @@ export type FormValues = Omit<BaseSchema.Type, "merge"> & {
  * at their exact field path instead of silently coercing them to zero.
  */
 export const FormSchema = z.custom<FormValues>().transform((candidate, context) => {
-	const result = ItemSchema.safeParse(candidate);
+	const result = ItemSchema.safeParse({
+		...candidate,
+		asset: readCanonicalItemArtworkFn(candidate.asset),
+	});
 	if (result.success) return result.data;
 	for (const issue of result.error.issues) {
 		context.addIssue({

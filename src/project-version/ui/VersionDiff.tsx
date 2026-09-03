@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 import { CircleCheckBig } from "lucide-react";
 
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { DetailReference } from "~/item-authoring/ui/DetailReference";
+import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import type {
 	ProjectVersionBinaryDiff,
 	ProjectVersionDiff,
+	ProjectVersionItemDiff,
 	ProjectVersionValueChange,
 } from "~/project-version/type/ProjectVersion";
 import type { ProjectCompatibilityDiffResult } from "~/project-version/type/ProjectCompatibility";
@@ -32,6 +34,54 @@ const VersionBump = ({ bump }: { readonly bump?: ProjectCompatibilityDiffResult 
 		</span>
 	);
 
+const ChangeKind = ({ change }: { readonly change: ProjectVersionItemDiff["change"] }) =>
+	change === "changed" ? null : (
+		<span
+			className="shrink-0 text-xs font-semibold capitalize text-accent data-[ui-change=added]:text-success data-[ui-change=deleted]:text-danger"
+			{...readDataUiFn({
+				dataUi: "EditorVersionChangeKind",
+				state: {
+					change,
+				},
+			})}
+		>
+			{change}
+		</span>
+	);
+
+const ItemChangeTitle = ({
+	change,
+	uid,
+}: {
+	readonly change: ProjectVersionItemDiff["change"];
+	readonly uid: string;
+}) => {
+	const item = useItemByUid(uid);
+	return (
+		<div
+			className="flex min-w-0 items-center gap-3"
+			{...readDataUiFn({
+				dataUi: "EditorVersionItemReference",
+				state: {
+					available: item !== undefined,
+				},
+			})}
+		>
+			{item === undefined ? (
+				<span className="min-w-0">
+					<span className="block text-sm font-semibold">Item</span>
+					<span className="mt-0.5 block break-all font-mono text-xs font-normal text-muted">
+						{uid}
+					</span>
+				</span>
+			) : (
+				<DetailReference itemId={item.id} />
+			)}
+			<ChangeKind change={change} />
+		</div>
+	);
+};
+
 const ValueChange = ({
 	change,
 	title,
@@ -39,18 +89,20 @@ const ValueChange = ({
 	readonly change: ProjectVersionValueChange;
 	readonly title: ReactNode;
 }) => (
-	<EditorRootCard
-		className="gap-2"
-		dataUi="EditorVersionChangeCard"
+	<article
+		className="ak-list-row grid gap-3 rounded-xl px-4 py-3"
+		data-ui="EditorVersionChangeRow"
 	>
-		<h3 className="text-sm font-semibold">{title}</h3>
 		<div className="flex items-start justify-between gap-3">
-			<div className="min-w-0 break-all text-xs font-semibold text-accent">
-				{change.path || "Entire item"}
+			<div className="min-w-0 flex-1">
+				<div className="min-w-0 text-sm font-semibold">{title}</div>
+				<div className="mt-2 min-w-0 break-all text-xs font-semibold text-accent">
+					{change.path || "Entire item"}
+				</div>
 			</div>
 			<VersionBump bump={change.bump} />
 		</div>
-		<div className="grid gap-2 lg:grid-cols-2">
+		<div className="grid gap-3 border-t border-line/60 pt-3 lg:grid-cols-2">
 			<div className="min-w-0">
 				<div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-subtle">
 					Before
@@ -68,7 +120,7 @@ const ValueChange = ({
 				</pre>
 			</div>
 		</div>
-	</EditorRootCard>
+	</article>
 );
 
 const BinaryChange = ({
@@ -78,25 +130,29 @@ const BinaryChange = ({
 	readonly change: ProjectVersionBinaryDiff;
 	readonly title: string;
 }) => (
-	<EditorRootCard
-		className="gap-2"
-		dataUi="EditorVersionChangeCard"
+	<article
+		className="ak-list-row grid gap-2 rounded-xl px-4 py-3"
+		data-ui="EditorVersionChangeRow"
 	>
-		<h3 className="text-sm font-semibold">{title}</h3>
-		<div className="flex flex-wrap gap-2">
-			<span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-xs">
-				<span className="font-semibold capitalize text-accent">{change.change}</span>
-				{change.id}
-				<VersionBump bump={change.bump} />
-			</span>
+		<div className="flex items-start justify-between gap-3">
+			<div className="min-w-0">
+				<h3 className="text-sm font-semibold">{title}</h3>
+				<div className="mt-1 flex min-w-0 items-center gap-2">
+					<ChangeKind change={change.change} />
+					<span className="min-w-0 break-all font-mono text-xs text-muted">
+						{change.id}
+					</span>
+				</div>
+			</div>
+			<VersionBump bump={change.bump} />
 		</div>
-	</EditorRootCard>
+	</article>
 );
 
 export const VersionDiff = ({ diff }: { readonly diff: ProjectVersionDiff }) =>
 	diff.hasChanges ? (
 		<div
-			className="grid gap-5"
+			className="ak-list grid gap-2"
 			data-ui="EditorVersionDiff"
 		>
 			{diff.project.map((change) => (
@@ -112,14 +168,10 @@ export const VersionDiff = ({ diff }: { readonly diff: ProjectVersionDiff }) =>
 						key={`${item.uid}:${change.path}`}
 						change={change}
 						title={
-							item.change === "changed" ? (
-								<>Item {item.uid}</>
-							) : (
-								<>
-									Item {item.uid} ·{" "}
-									<span className="capitalize text-accent">{item.change}</span>
-								</>
-							)
+							<ItemChangeTitle
+								change={item.change}
+								uid={item.uid}
+							/>
 						}
 					/>
 				)),

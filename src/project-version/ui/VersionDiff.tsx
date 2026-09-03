@@ -15,6 +15,7 @@ import { Status } from "~/ui/ui/Status";
 
 const formatValueFn = (value: unknown) => {
 	if (value === undefined) return "—";
+	if (typeof value === "string") return value;
 	const json = JSON.stringify(value, null, 2);
 	return json ?? String(value);
 };
@@ -107,17 +108,17 @@ const ValueChange = ({
 				<div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-subtle">
 					Before
 				</div>
-				<pre className="max-h-44 overflow-auto whitespace-pre-wrap break-words text-xs text-muted">
+				<code className="block max-h-44 overflow-auto whitespace-pre-wrap break-words rounded bg-surface px-2 py-1.5 font-mono text-xs font-normal text-muted">
 					{formatValueFn(change.before)}
-				</pre>
+				</code>
 			</div>
 			<div className="min-w-0">
 				<div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-subtle">
 					After
 				</div>
-				<pre className="max-h-44 overflow-auto whitespace-pre-wrap break-words text-xs text-foreground">
+				<code className="block max-h-44 overflow-auto whitespace-pre-wrap break-words rounded bg-surface px-2 py-1.5 font-mono text-xs font-bold text-foreground">
 					{formatValueFn(change.after)}
-				</pre>
+				</code>
 			</div>
 		</div>
 	</article>

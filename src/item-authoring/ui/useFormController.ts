@@ -46,6 +46,30 @@ export namespace useFormController {
 	export type Output = ReturnType<typeof useFormController>;
 }
 
+const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
+	...item,
+	asset: {
+		default: [
+			item.asset.default[0],
+			item.asset.default[1] ?? "",
+		],
+		sources:
+			item.asset.sources === undefined
+				? [
+						"",
+					]
+				: [
+						...item.asset.sources,
+					],
+	},
+	merge:
+		item.merge === undefined
+			? undefined
+			: [
+					...item.merge,
+				],
+});
+
 /** Owns the one local TanStack Form session shared by all item section leaves. */
 export const useFormController = ({
 	enableCapability,
@@ -54,16 +78,8 @@ export const useFormController = ({
 	onSavedFn,
 }: useFormController.Props) => {
 	const project = useEditorProject();
-	const canonicalItem = useMemo<FormValues>(
-		() => ({
-			...initialItem,
-			merge:
-				initialItem.merge === undefined
-					? undefined
-					: [
-							...initialItem.merge,
-						],
-		}),
+	const formValues = useMemo<FormValues>(
+		() => readFormValuesFn(initialItem),
 		[
 			initialItem,
 		],
@@ -83,7 +99,7 @@ export const useFormController = ({
 	const submitSucceeded = useRef(false);
 	const notifyOnSaved = useRef(true);
 	const form = useAppForm({
-		defaultValues: canonicalItem,
+		defaultValues: formValues,
 		validationLogic: revalidateLogic({
 			mode: "submit",
 			modeAfterSubmission: "change",
@@ -99,15 +115,7 @@ export const useFormController = ({
 				item,
 			});
 			submitSucceeded.current = true;
-			formApi.reset({
-				...saved,
-				merge:
-					saved.merge === undefined
-						? undefined
-						: [
-								...saved.merge,
-							],
-			});
+			formApi.reset(readFormValuesFn(saved));
 			if (notifyOnSaved.current) await onSavedFn?.(saved);
 		},
 	});
@@ -191,10 +199,10 @@ export const useFormController = ({
 		],
 	);
 	const discardFn = useCallback(
-		() => form.reset(canonicalItem),
+		() => form.reset(formValues),
 		[
-			canonicalItem,
 			form,
+			formValues,
 		],
 	);
 	useEditorUnsavedChangesRegistration({
@@ -212,7 +220,7 @@ export const useFormController = ({
 		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ?? validationError;
 	return useMemo(
 		() => ({
-			canonicalItem,
+			canonicalItem: initialItem,
 			discardFn,
 			error,
 			isDirty: dirty,
@@ -224,7 +232,6 @@ export const useFormController = ({
 			saveFn,
 		}),
 		[
-			canonicalItem,
 			discardFn,
 			dirty,
 			error,

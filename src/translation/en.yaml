@@ -32,6 +32,10 @@ Close:
   value: Close
 Commit version:
   value: Commit version
+Connection search empty:
+  value: No connection matches this search.
+Connection search placeholder:
+  value: Search connections…
 Connections:
   value: Connections
 Create project:
@@ -113,6 +117,8 @@ Inventory editing:
 Inventory editing help:
   value: |
     Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
+Item:
+  value: Item
 Item ID:
   value: Item ID
 Item connections help:
@@ -123,7 +129,7 @@ Item connections help:
     - **Inputs** shows those same direct inputs and positive conditions from the selected owner's side.
     - **Produces** lists the direct outputs of authored operations owned by the selected item.
 
-    Pick another item or open any result to keep exploring without losing the selected relationship.
+    Use the search to find an item in the active relationship list. Open any result to inspect that item without losing the selected relationship.
 Item estimate help:
   value: |
     Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.

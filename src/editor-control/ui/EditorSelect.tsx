@@ -6,7 +6,7 @@ import {
 	FloatingPortal,
 	offset,
 	shift,
-	size,
+	size as floatingSize,
 	useClick,
 	useDismiss,
 	useFloating,
@@ -28,11 +28,13 @@ export const EditorSelect = <Value extends string>({
 	label,
 	onChangeFn,
 	options,
+	size = "large",
 	value,
 }: {
 	readonly label: string;
 	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<EditorSelectOption<Value>>;
+	readonly size?: "control" | "large";
 	readonly value: Value;
 }) => {
 	const [open, setOpenFn] = useState(false);
@@ -44,7 +46,7 @@ export const EditorSelect = <Value extends string>({
 			shift({
 				padding: 8,
 			}),
-			size({
+			floatingSize({
 				padding: 8,
 				apply: ({ elements, rects }) => {
 					elements.floating.style.width = `${rects.reference.width}px`;
@@ -66,10 +68,15 @@ export const EditorSelect = <Value extends string>({
 		<>
 			<Button
 				ref={refs.setReference}
-				className="h-12 min-h-12 min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none"
-				data-ui="EditorSelectTrigger"
+				className="h-[var(--ak-control-min-height)] min-h-[var(--ak-control-min-height)] min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none data-[ui-size=large]:h-12 data-[ui-size=large]:min-h-12"
 				title={label}
 				{...getReferencePropsFn()}
+				{...readDataUiFn({
+					dataUi: "EditorSelectTrigger",
+					state: {
+						size,
+					},
+				})}
 			>
 				<span>{selected?.label ?? value}</span>
 				<ChevronDown className="size-4 shrink-0 text-muted" />

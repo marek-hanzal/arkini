@@ -1,6 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
-import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { ChargesDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
@@ -35,12 +34,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		});
 	},
 	component: () => {
-		const { itemUid, projectId, sectionId } = Route.useParams();
+		const { itemUid, sectionId } = Route.useParams();
 		const search = Route.useSearch();
 		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
-		const project = useEditorProject();
 		const item = useItemByUid(itemUid);
 		if (item === undefined) return <NotFound uid={itemUid} />;
 		const section = sectionId as SectionId;
@@ -87,20 +85,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 								}),
 							})
 						}
-						onItemIdChangeFn={(nextItemId) => {
-							const nextItem = project.config.items[nextItemId];
-							if (nextItem === undefined) return;
-							void navigateFn({
-								params: {
-									itemUid: nextItem.uid,
-									projectId,
-									sectionId: "connections",
-								},
-								search: {
-									filter,
-								},
-							});
-						}}
 					/>
 				);
 			}

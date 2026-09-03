@@ -13,8 +13,30 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						default: [],
 					},
 					id: "consumer",
+					description: "Consumes the selected item.",
 					title: "Consumer",
+					type: "simple",
 					uid: "consumer-uid",
+				},
+				peer: {
+					asset: {
+						default: [],
+					},
+					description: "Also consumes the selected item.",
+					id: "peer",
+					title: "Peer",
+					type: "simple",
+					uid: "peer-uid",
+				},
+				unrelated: {
+					asset: {
+						default: [],
+					},
+					description: "Not connected.",
+					id: "unrelated",
+					title: "Unrelated",
+					type: "simple",
+					uid: "unrelated-uid",
 				},
 			},
 		},
@@ -22,20 +44,52 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	}),
 }));
 
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (label: string) => label,
+	}),
+}));
+
 vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 	readItemConnectionsFn: () => [
 		{
+			asset: {
+				default: [],
+			},
+			description: "Consumes the selected item.",
 			id: "consumer",
+			title: "Consumer",
+			type: "simple",
+			uid: "consumer-uid",
+		},
+		{
+			asset: {
+				default: [],
+			},
+			description: "Also consumes the selected item.",
+			id: "peer",
+			title: "Peer",
+			type: "simple",
+			uid: "peer-uid",
 		},
 	],
 }));
 
-vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
-	EditorItemReferenceControl: ({ onChangeFn }: { onChangeFn: (itemId: string) => void }) =>
+vi.mock("~/editor-control/ui/EditorSearchCombobox", () => ({
+	EditorSearchCombobox: ({
+		onChangeFn,
+		options,
+	}: {
+		onChangeFn: (itemId: string) => void;
+		options: ReadonlyArray<{
+			readonly id: string;
+		}>;
+	}) =>
 		createElement(
 			"button",
 			{
-				"data-ui": "ItemPicker",
+				"data-options": options.map(({ id }) => id).join(","),
+				"data-ui": "ConnectionSearch",
 				onClick: () => onChangeFn("consumer"),
 				type: "button",
 			},
@@ -92,9 +146,8 @@ afterEach(async () => {
 });
 
 describe("ConnectionsSection", () => {
-	it("binds both route inputs and preserves the filter through result navigation", async () => {
+	it("searches only the active connection list and preserves the filter through result navigation", async () => {
 		const onFilterChangeFn = vi.fn();
-		const onItemIdChangeFn = vi.fn();
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -106,17 +159,21 @@ describe("ConnectionsSection", () => {
 					filter="inputs"
 					itemId="material"
 					onFilterChangeFn={onFilterChangeFn}
-					onItemIdChangeFn={onItemIdChangeFn}
 				/>,
 			);
 		});
 
+		const search = container.querySelector<HTMLButtonElement>('[data-ui="ConnectionSearch"]');
+		expect(search?.dataset.options).toBe("consumer,peer");
+		expect(container.querySelectorAll('[data-ui="EditorItemConnectionsRow"]')).toHaveLength(2);
 		await act(async () => {
-			container.querySelector<HTMLButtonElement>('[data-ui="ItemPicker"]')?.click();
+			search?.click();
+		});
+		expect(container.querySelectorAll('[data-ui="EditorItemConnectionsRow"]')).toHaveLength(1);
+
+		await act(async () => {
 			container.querySelector<HTMLButtonElement>('[data-ui="ConnectionFilter"]')?.click();
 		});
-
-		expect(onItemIdChangeFn).toHaveBeenCalledWith("consumer");
 		expect(onFilterChangeFn).toHaveBeenCalledWith("produces");
 		const link = container.querySelector<HTMLAnchorElement>("a");
 		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/detail/$sectionId");

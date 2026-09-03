@@ -85,7 +85,7 @@ export const EditorGameFlow = ({
 		<EditorSectionPage
 			contentMode="viewport"
 			header={
-				<header className="grid min-w-0 grid-cols-[auto_auto_minmax(12rem,1fr)_auto_auto_auto] items-center gap-2">
+				<header className="grid min-w-0 grid-cols-[auto_auto_minmax(12rem,1fr)_auto_auto] items-center gap-2">
 					<EditorHistoryBackButton
 						params={{
 							projectId,
@@ -119,9 +119,6 @@ export const EditorGameFlow = ({
 						]}
 						value={direction}
 					/>
-					<span className="shrink-0 rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
-						{options.length} items
-					</span>
 					<EditorPageHelp
 						content={<Mx label="Flow help" />}
 						title={<Tx label="Flow" />}

@@ -6,13 +6,14 @@ import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { deleteItemFx } from "./deleteItemFx";
-import { EditProjectInputSchema, EditProjectInputSchemaId } from "./EditProjectInputSchema";
+import { EditProjectInputSchema } from "./EditProjectInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { editProjectFx } from "./editProjectFx";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 import { readProjectValidationTextFx } from "./readProjectValidationTextFx";
 import { renameItemFx } from "./renameItemFx";
+import { resolveSchemaId } from "./resolveSchemaId";
 
 interface ToolResult {
 	[key: string]: unknown;
@@ -143,6 +144,7 @@ export const registerGameplayDesignToolsFn = ({
 	readonly runToolFn: (effect: Effect.Effect<string, unknown, never>) => Promise<ToolResult>;
 	readonly server: McpServer;
 }) => {
+	const editProjectInputSchemaId = resolveSchemaId(EditProjectInputSchema);
 	server.registerTool(
 		"project_config",
 		{
@@ -155,7 +157,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"edit_project",
 		{
-			description: `Patch the open project's non-item config. Pass input as a serialized JSON object matching schema ${JSON.stringify(EditProjectInputSchemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_config first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed.`,
+			description: `Patch the open project's non-item config. Pass input as a serialized JSON object matching schema ${JSON.stringify(editProjectInputSchemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_config first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>

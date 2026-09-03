@@ -1,10 +1,12 @@
+import { Pencil, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import type { useProjectIdentityRenameController } from "~/project-authoring/ui/useProjectIdentityRenameController";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 export const ProjectIdentityRenameDialog = ({
 	controller,
@@ -37,9 +39,13 @@ export const ProjectIdentityRenameDialog = ({
 			>
 				<h2 className="text-lg font-semibold">Rename project ID</h2>
 				<p className="mt-2 text-sm leading-6 text-muted">
-					The new ID is a different game to existing saves. Gameplay version stays the
-					same and the next Version commit starts a new history root.
+					The new ID makes this a different game to existing saves.
 				</p>
+				<div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm leading-6 text-warning">
+					<strong className="block font-semibold">Version history starts fresh.</strong>
+					Existing Version commits become unreachable from this project. Gameplay version
+					stays the same; the next Version commit becomes a new history root.
+				</div>
 				<div className="mt-4">
 					<EditorTextControl
 						error={fieldError}
@@ -56,19 +62,22 @@ export const ProjectIdentityRenameDialog = ({
 							: String(controller.error)}
 					</p>
 				)}
-				<div className="mt-6 flex justify-end gap-2">
-					<Button
+				<div className="mt-6 flex items-center justify-between gap-4">
+					<LinkButton
+						className="inline-flex items-center gap-1.5"
 						disabled={controller.pending}
 						onClick={controller.cancelFn}
-						type="button"
 					>
+						<X className="size-4" />
 						Cancel
-					</Button>
+					</LinkButton>
 					<PrimaryButton
+						className="gap-1.5"
 						disabled={controller.pending}
 						cursorIntent={controller.pending ? "progress" : undefined}
 						type="submit"
 					>
+						<Pencil className="size-4" />
 						Rename project
 					</PrimaryButton>
 				</div>

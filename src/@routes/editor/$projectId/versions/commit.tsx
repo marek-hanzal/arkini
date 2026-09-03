@@ -33,8 +33,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 				className="h-full min-h-0 overflow-hidden p-4"
 				data-ui="EditorVersionCommit"
 			>
-				<div className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)] gap-4">
-					<h2 className="text-lg font-semibold">Commit project</h2>
+				<div className="h-full min-h-0 w-full">
 					{preview?.canCommit === false ? (
 						<Status
 							dataUi="EditorVersionCommitClean"
@@ -43,7 +42,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 							title="Working copy is clean"
 						/>
 					) : (
-						<div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-4">
+						<div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-4">
 							{preview === undefined ? null : (
 								<EditorFormCard>
 									<div className="flex flex-wrap items-start justify-between gap-3">

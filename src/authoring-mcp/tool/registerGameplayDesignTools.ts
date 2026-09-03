@@ -5,15 +5,21 @@ import { z } from "zod";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { StartLocationSchema } from "~/game-start/schema/StartLocationSchema";
+import { SizeSchema } from "~/item-location/schema/SizeSchema";
+import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
+import { editProjectLayoutFx } from "./editProjectLayoutFx";
 import { editProjectFx } from "./editProjectFx";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 import { readProjectValidationTextFx } from "./readProjectValidationTextFx";
 import { renameItemFx } from "./renameItemFx";
 import { resolveSchemaId } from "./resolveSchemaId";
+import { updateStartItemFx } from "./updateStartItemFx";
 
 interface ToolResult {
 	[key: string]: unknown;
@@ -79,6 +85,60 @@ const DeleteItemInputSchema = z
 		$id: "urn:arkini:schema:mcp:delete-item-input",
 		title: "Delete item tool input",
 		description: "A revision-guarded safe or forced item deletion request.",
+	});
+
+const EditProjectLayoutInputSchema = z
+	.object({
+		revision: RevisionSchema,
+		board: SizeSchema.optional().describe("The complete replacement board size."),
+		inventory: SizeSchema.optional().describe("The complete replacement inventory size."),
+		toolbarSize: ToolbarSizeSchema.optional().describe(
+			"The replacement toolbar slot count; zero disables the toolbar.",
+		),
+	})
+	.strict()
+	.refine(
+		({ board, inventory, toolbarSize }) =>
+			board !== undefined || inventory !== undefined || toolbarSize !== undefined,
+		"At least one layout value must be supplied.",
+	)
+	.meta({
+		$id: "urn:arkini:schema:mcp:edit-project-layout-input",
+		minProperties: 2,
+		title: "Edit project layout tool input",
+		description: "A revision-pinned patch of the board, inventory, and toolbar capacities.",
+	});
+
+const SetStartItemInputSchema = z
+	.object({
+		revision: RevisionSchema,
+		location: StartLocationSchema.describe(
+			"The exact initial slot to set. Board locations require an explicit numeric space.",
+		),
+		itemId: IdSchema.describe("The exact canonical item ID to place initially."),
+		quantity: PositiveIntegerSchema.default(1).describe(
+			"The initial stack quantity; defaults to one.",
+		),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:set-start-item-input",
+		title: "Set start item tool input",
+		description: "One exact initial stack to insert or replace at a grid location.",
+	});
+
+const RemoveStartItemInputSchema = z
+	.object({
+		revision: RevisionSchema,
+		location: StartLocationSchema.describe(
+			"The exact initial slot to clear. Board locations require an explicit numeric space.",
+		),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:remove-start-item-input",
+		title: "Remove start item tool input",
+		description: "The exact occupied initial grid location to clear.",
 	});
 
 const readProjectConfigTextFn = (project: Project) =>
@@ -174,6 +234,82 @@ export const registerGameplayDesignToolsFn = ({
 								}),
 							),
 						),
+					),
+				),
+			),
+	);
+	server.registerTool(
+		"edit_project_layout",
+		{
+			description:
+				"Patch one or more project layout capacities without replacing unrelated metadata. Shrinking rejects every authored start item that would fall outside the new board, inventory, or toolbar instead of deleting it. Read project_config first and copy its revision.",
+			inputSchema: EditProjectLayoutInputSchema,
+		},
+		async ({ board, inventory, revision, toolbarSize }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) =>
+						editProjectLayoutFx({
+							board,
+							inventory,
+							notifyProjectChangedFn,
+							project,
+							repository,
+							revision,
+							toolbarSize,
+						}),
+					),
+				),
+			),
+	);
+	server.registerTool(
+		"set_start_item",
+		{
+			description:
+				"Insert or replace one exact initial item stack. A board location must include its numeric space; inventory and toolbar locations are global. The item must exist, support the target storage scope, fit the layout, and respect its stack limit. Read project_config first and copy its revision.",
+			inputSchema: SetStartItemInputSchema,
+		},
+		async ({ itemId, location, quantity, revision }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) =>
+						updateStartItemFx({
+							change: {
+								itemId,
+								quantity,
+								type: "set",
+							},
+							location,
+							notifyProjectChangedFn,
+							project,
+							repository,
+							revision,
+						}),
+					),
+				),
+			),
+	);
+	server.registerTool(
+		"remove_start_item",
+		{
+			description:
+				"Remove the item stack at one exact initial location. A board location must include its numeric space, so equal coordinates in another space remain untouched. Inventory and toolbar locations are global. Read project_config first and copy its revision.",
+			inputSchema: RemoveStartItemInputSchema,
+		},
+		async ({ location, revision }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) =>
+						updateStartItemFx({
+							change: {
+								type: "remove",
+							},
+							location,
+							notifyProjectChangedFn,
+							project,
+							repository,
+							revision,
+						}),
 					),
 				),
 			),

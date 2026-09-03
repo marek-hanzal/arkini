@@ -6,6 +6,7 @@ import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
 	createMcpHarness,
+	jsonToolInputFn,
 } from "./support/createMcpHarness";
 
 afterEach(cleanupMcpHarnesses);
@@ -61,7 +62,7 @@ describe("editor MCP project configuration", () => {
 
 		const edited = await client.callTool({
 			name: "edit_project",
-			arguments: {
+			arguments: jsonToolInputFn({
 				revision: config.revision,
 				patch: {
 					meta: {
@@ -77,7 +78,7 @@ describe("editor MCP project configuration", () => {
 						toolbarSize: 2,
 					},
 				},
-			},
+			}),
 		});
 		expect(edited.content).toMatchObject([
 			{
@@ -102,24 +103,24 @@ describe("editor MCP project configuration", () => {
 
 		const stale = await client.callTool({
 			name: "edit_project",
-			arguments: {
+			arguments: jsonToolInputFn({
 				revision: created.revision,
 				patch: {
 					resources: editorTestPayload.config.resources,
 				},
-			},
+			}),
 		});
 		expect(stale.isError).toBe(true);
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
 
 		const misspelled = await client.callTool({
 			name: "edit_project",
-			arguments: {
+			arguments: jsonToolInputFn({
 				patch: {
 					resources: editorTestPayload.config.resources,
 					starts: editorTestPayload.config.start,
 				},
-			},
+			}),
 		});
 		expect(misspelled.isError).toBe(true);
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();

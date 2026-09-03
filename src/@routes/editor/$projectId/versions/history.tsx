@@ -45,15 +45,10 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 						/>
 					)}
 				</section>
-				<section className="min-h-0 overflow-y-auto p-4">
-					<div className="grid gap-5">
+				<section className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)]">
+					<div className="border-b border-line p-4">
 						<EditorRootCard dataUi="EditorVersionCompareCard">
-							<div>
-								<h2 className="font-semibold">Compare</h2>
-								<p className="mt-1 text-xs text-muted">
-									Select the working copy or any saved version on either side.
-								</p>
-							</div>
+							<h2 className="font-semibold">Compare</h2>
 							<div className="grid gap-3 sm:grid-cols-2">
 								<EditorVersionReferenceSelect
 									label="Before"
@@ -69,6 +64,11 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 								/>
 							</div>
 						</EditorRootCard>
+					</div>
+					<div
+						className="grid min-h-0 content-start gap-5 overflow-y-auto overscroll-contain p-4"
+						data-ui="EditorVersionHistoryChanges"
+					>
 						{controller.error === undefined ? null : (
 							<p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
 								{controller.error}

@@ -18,7 +18,7 @@ type BuildRequest = Omit<
 	"projectId"
 >;
 
-/** Keeps build command settlement keyed to the exact project or artifact identity it mutates. */
+/** Keeps project Build settlement across routed surfaces and artifact commands at exact identity. */
 export const BuildCommandAtoms = RendererRuntime.runSync(
 	Effect.map(EditorBuildRepository, (repository) => ({
 		build: Atom.family((projectId: string) =>
@@ -27,7 +27,7 @@ export const BuildCommandAtoms = RendererRuntime.runSync(
 					...request,
 					projectId,
 				}),
-			).pipe(Atom.setIdleTTL(0)),
+			).pipe(Atom.keepAlive),
 		),
 		install: Atom.family((contentHash: string) =>
 			Atom.fn(

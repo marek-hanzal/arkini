@@ -24,6 +24,7 @@ export namespace useEditorBuildController {
 		readonly commitRequired?: boolean;
 		readonly cancelInstallFn: () => void;
 		readonly confirmInstallFn: () => void;
+		readonly dismissValidationFn: () => void;
 		readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
 		readonly installAction: "install" | "update";
 		readonly installArtifactFn: () => void;
@@ -37,6 +38,7 @@ export namespace useEditorBuildController {
 		readonly saveArtifactFn: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;
+		readonly validationVisible: boolean;
 	}
 }
 
@@ -68,6 +70,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		canBuild,
 		cancelInstallFn: installController.cancelInstallFn,
 		confirmInstallFn: installController.confirmInstallFn,
+		dismissValidationFn: artifactController.dismissValidationFn,
 		diagnostics: artifactController.diagnostics,
 		installAction: installController.installAction,
 		installArtifactFn: installController.installArtifactFn,
@@ -86,6 +89,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		saveArtifactFn: saveController.saveArtifactFn,
 		saveError: saveController.saveError,
 		savePending: saveController.savePending,
+		validationVisible: artifactController.validationVisible,
 		...(versionState.status === "error"
 			? {
 					versionStatusError: versionState.message,

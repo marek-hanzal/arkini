@@ -217,7 +217,7 @@ export const EditorBuildDiagnostics = ({
 	readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
 	readonly project: Pick<Project, "projectId" | "config" | "resources">;
 }) => (
-	<ul className="mt-4 grid gap-3">
+	<ul className="grid gap-3">
 		{diagnostics.map((diagnostic, index) => {
 			const printed = printEditorGameDiagnosticFn(diagnostic, project);
 			return (

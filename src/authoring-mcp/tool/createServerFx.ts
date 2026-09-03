@@ -7,12 +7,14 @@ import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { AssetCollectionInputSchema } from "./AssetCollectionInputSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchemas, type CreateItemInput } from "./CreateItemInputSchemas";
 import { EditItemInputSchemas, type EditItemInput } from "./EditItemInputSchemas";
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
+import { readAssetCollectionTextFn } from "./fn/readAssetCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
@@ -339,6 +341,20 @@ const createServerFn = (
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.map((project) => readItemCollectionTextFn(project, input)),
+				),
+			),
+	);
+	server.registerTool(
+		"asset_collection",
+		{
+			description:
+				"List one page of assets by type and the Editor Asset library's fuzzy search. Each result contains only its public type and exact ID.",
+			inputSchema: AssetCollectionInputSchema,
+		},
+		async (input) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.map((project) => readAssetCollectionTextFn(project, input)),
 				),
 			),
 	);

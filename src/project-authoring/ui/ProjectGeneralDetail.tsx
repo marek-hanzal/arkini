@@ -55,43 +55,42 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 									</span>
 								}
 							/>
-							<div className="grid min-w-0 gap-3">
-								<DetailFact
-									label="Board"
-									value={
-										<ProjectSectionValueLink
-											projectId={project.projectId}
-											sectionId="board"
-										>
-											{board.width} × {board.height} ={" "}
-											{board.width * board.height}
-										</ProjectSectionValueLink>
-									}
-								/>
-								<DetailFact
-									label="Inventory"
-									value={
-										<ProjectSectionValueLink
-											projectId={project.projectId}
-											sectionId="inventory"
-										>
-											{inventory.width} × {inventory.height} ={" "}
-											{inventory.width * inventory.height}
-										</ProjectSectionValueLink>
-									}
-								/>
-								<DetailFact
-									label="Toolbar"
-									value={
-										<ProjectSectionValueLink
-											projectId={project.projectId}
-											sectionId="toolbar"
-										>
-											{toolbarSize}
-										</ProjectSectionValueLink>
-									}
-								/>
-							</div>
+							<div className="hidden min-[48rem]:block" />
+							<DetailFact
+								label="Board"
+								value={
+									<ProjectSectionValueLink
+										projectId={project.projectId}
+										sectionId="board"
+									>
+										{board.width} × {board.height} ={" "}
+										{board.width * board.height}
+									</ProjectSectionValueLink>
+								}
+							/>
+							<DetailFact
+								label="Inventory"
+								value={
+									<ProjectSectionValueLink
+										projectId={project.projectId}
+										sectionId="inventory"
+									>
+										{inventory.width} × {inventory.height} ={" "}
+										{inventory.width * inventory.height}
+									</ProjectSectionValueLink>
+								}
+							/>
+							<DetailFact
+								label="Toolbar"
+								value={
+									<ProjectSectionValueLink
+										projectId={project.projectId}
+										sectionId="toolbar"
+									>
+										{toolbarSize}
+									</ProjectSectionValueLink>
+								}
+							/>
 						</DetailFacts>
 					</DetailSection>
 				</EditorRootCard>

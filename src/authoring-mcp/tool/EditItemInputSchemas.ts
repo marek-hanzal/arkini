@@ -30,7 +30,7 @@ const nullableBaseItemFields = {
 	merge: BaseSchema.shape.merge.nullable(),
 } as const;
 
-export const EditItemInputSchemaIds = {
+const editItemInputSchemaIds = {
 	simple: "urn:arkini:schema:mcp:edit-simple-item-input",
 	space: "urn:arkini:schema:mcp:edit-space-item-input",
 	producer: "urn:arkini:schema:mcp:edit-producer-item-input",
@@ -165,47 +165,47 @@ const editItemInputFn = <Schema extends z.ZodType<Record<string, unknown>>>(
 /** Type-owned replace patches; omitted fields remain untouched and null clears optional fields. */
 export const EditItemInputSchemas = {
 	simple: editItemInputFn(simplePatch, {
-		schemaId: EditItemInputSchemaIds.simple,
+		schemaId: editItemInputSchemaIds.simple,
 		title: "Edit simple item tool input",
 		description: "Identity, revision, and replacement patch for one simple item.",
 	}),
 	space: editItemInputFn(spacePatch, {
-		schemaId: EditItemInputSchemaIds.space,
+		schemaId: editItemInputSchemaIds.space,
 		title: "Edit space item tool input",
 		description: "Identity, revision, and replacement patch for one space item.",
 	}),
 	producer: editItemInputFn(producerPatch, {
-		schemaId: EditItemInputSchemaIds.producer,
+		schemaId: editItemInputSchemaIds.producer,
 		title: "Edit producer item tool input",
 		description: "Identity, revision, and replacement patch for one producer item.",
 	}),
 	craft: editItemInputFn(craftPatch, {
-		schemaId: EditItemInputSchemaIds.craft,
+		schemaId: editItemInputSchemaIds.craft,
 		title: "Edit craft item tool input",
 		description: "Identity, revision, and replacement patch for one craft item.",
 	}),
 	blueprint: editItemInputFn(blueprintPatch, {
-		schemaId: EditItemInputSchemaIds.blueprint,
+		schemaId: editItemInputSchemaIds.blueprint,
 		title: "Edit blueprint item tool input",
 		description: "Identity, revision, and replacement patch for one blueprint item.",
 	}),
 	deposit: editItemInputFn(depositPatch, {
-		schemaId: EditItemInputSchemaIds.deposit,
+		schemaId: editItemInputSchemaIds.deposit,
 		title: "Edit deposit item tool input",
 		description: "Identity, revision, and replacement patch for one deposit item.",
 	}),
 	stash: editItemInputFn(stashPatch, {
-		schemaId: EditItemInputSchemaIds.stash,
+		schemaId: editItemInputSchemaIds.stash,
 		title: "Edit stash item tool input",
 		description: "Identity, revision, and replacement patch for one stash item.",
 	}),
 	temporary: editItemInputFn(temporaryPatch, {
-		schemaId: EditItemInputSchemaIds.temporary,
+		schemaId: editItemInputSchemaIds.temporary,
 		title: "Edit temporary item tool input",
 		description: "Identity, revision, and replacement patch for one temporary item.",
 	}),
 	inventory: editItemInputFn(inventoryPatch, {
-		schemaId: EditItemInputSchemaIds.inventory,
+		schemaId: editItemInputSchemaIds.inventory,
 		title: "Edit inventory item tool input",
 		description: "Identity, revision, and replacement patch for one inventory item.",
 	}),

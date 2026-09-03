@@ -27,7 +27,7 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 	"Optional maximum parallel queue size; defaults to one.",
 );
 
-export const CreateItemInputSchemaIds = {
+const createItemInputSchemaIds = {
 	simple: "urn:arkini:schema:mcp:create-simple-item-input",
 	space: "urn:arkini:schema:mcp:create-space-item-input",
 	producer: "urn:arkini:schema:mcp:create-producer-item-input",
@@ -55,8 +55,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.simple,
-			$id: CreateItemInputSchemaIds.simple,
+			id: createItemInputSchemaIds.simple,
+			$id: createItemInputSchemaIds.simple,
 			title: "Create simple item tool input",
 			description: "Authoring fields accepted when creating one simple item.",
 		}),
@@ -80,8 +80,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.space,
-			$id: CreateItemInputSchemaIds.space,
+			id: createItemInputSchemaIds.space,
+			$id: createItemInputSchemaIds.space,
 			title: "Create space item tool input",
 			description: "Authoring fields accepted when creating one space item.",
 		}),
@@ -107,8 +107,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.producer,
-			$id: CreateItemInputSchemaIds.producer,
+			id: createItemInputSchemaIds.producer,
+			$id: createItemInputSchemaIds.producer,
 			title: "Create producer item tool input",
 			description: "Authoring fields accepted when creating one producer item.",
 		}),
@@ -130,8 +130,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.craft,
-			$id: CreateItemInputSchemaIds.craft,
+			id: createItemInputSchemaIds.craft,
+			$id: createItemInputSchemaIds.craft,
 			title: "Create craft item tool input",
 			description: "Authoring fields accepted when creating one craft item.",
 		}),
@@ -155,8 +155,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.blueprint,
-			$id: CreateItemInputSchemaIds.blueprint,
+			id: createItemInputSchemaIds.blueprint,
+			$id: createItemInputSchemaIds.blueprint,
 			title: "Create blueprint item tool input",
 			description: "Authoring fields accepted when creating one blueprint item.",
 		}),
@@ -178,8 +178,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.deposit,
-			$id: CreateItemInputSchemaIds.deposit,
+			id: createItemInputSchemaIds.deposit,
+			$id: createItemInputSchemaIds.deposit,
 			title: "Create deposit item tool input",
 			description: "Authoring fields accepted when creating one deposit item.",
 		}),
@@ -201,8 +201,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.stash,
-			$id: CreateItemInputSchemaIds.stash,
+			id: createItemInputSchemaIds.stash,
+			$id: createItemInputSchemaIds.stash,
 			title: "Create stash item tool input",
 			description: "Authoring fields accepted when creating one stash item.",
 		}),
@@ -222,8 +222,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.temporary,
-			$id: CreateItemInputSchemaIds.temporary,
+			id: createItemInputSchemaIds.temporary,
+			$id: createItemInputSchemaIds.temporary,
 			title: "Create temporary item tool input",
 			description: "Authoring fields accepted when creating one temporary item.",
 		}),
@@ -240,8 +240,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: CreateItemInputSchemaIds.inventory,
-			$id: CreateItemInputSchemaIds.inventory,
+			id: createItemInputSchemaIds.inventory,
+			$id: createItemInputSchemaIds.inventory,
 			title: "Create inventory item tool input",
 			description: "Authoring fields accepted when creating one inventory item.",
 		}),

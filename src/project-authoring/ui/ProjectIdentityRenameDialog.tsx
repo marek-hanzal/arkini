@@ -5,6 +5,9 @@ import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import type { useProjectIdentityRenameController } from "~/project-authoring/ui/useProjectIdentityRenameController";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
@@ -15,14 +18,15 @@ export const ProjectIdentityRenameDialog = ({
 	readonly controller: useProjectIdentityRenameController.Output;
 	readonly project: Project;
 }) => {
+	const translator = useTranslator();
 	const [projectId, setProjectIdFn] = useState(project.projectId);
 	const [submitted, setSubmittedFn] = useState(false);
 	const parsed = IdSchema.safeParse(projectId);
 	const fieldError =
 		submitted && !parsed.success
-			? "Project ID is required."
+			? translator.textFn("Project ID is required.")
 			: submitted && projectId === project.projectId
-				? "Choose a different Project ID."
+				? translator.textFn("Choose a different Project ID.")
 				: undefined;
 	const submitFn = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -37,19 +41,16 @@ export const ProjectIdentityRenameDialog = ({
 				data-ui="EditorProjectIdentityRenameDialog"
 				onSubmit={submitFn}
 			>
-				<h2 className="text-lg font-semibold">Rename project ID</h2>
-				<p className="mt-2 text-sm leading-6 text-muted">
-					The new ID makes this a different game to existing saves.
-				</p>
-				<div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm leading-6 text-warning">
-					<strong className="block font-semibold">Version history starts fresh.</strong>
-					Existing Version commits become unreachable from this project. Gameplay version
-					stays the same; the next Version commit becomes a new history root.
+				<h2 className="text-lg font-semibold">
+					<Tx label="Rename project ID" />
+				</h2>
+				<div className="mt-2">
+					<Mx label="Rename project ID help" />
 				</div>
 				<div className="mt-4">
 					<EditorTextControl
 						error={fieldError}
-						label="Project ID"
+						label={translator.textFn("Project ID")}
 						name="projectId"
 						onChangeFn={setProjectIdFn}
 						value={projectId}
@@ -69,7 +70,7 @@ export const ProjectIdentityRenameDialog = ({
 						onClick={controller.cancelFn}
 					>
 						<X className="size-4" />
-						Cancel
+						<Tx label="Cancel" />
 					</LinkButton>
 					<PrimaryButton
 						className="gap-1.5"
@@ -78,7 +79,7 @@ export const ProjectIdentityRenameDialog = ({
 						type="submit"
 					>
 						<Pencil className="size-4" />
-						Rename project
+						<Tx label="Rename project" />
 					</PrimaryButton>
 				</div>
 			</form>

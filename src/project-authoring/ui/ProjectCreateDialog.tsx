@@ -1,9 +1,14 @@
 import { createId } from "@paralleldrive/cuid2";
+import { FilePlus2, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 interface ProjectCreateDialogProps {
 	readonly error?: unknown;
@@ -19,6 +24,7 @@ export const ProjectCreateDialog = ({
 	onCancelFn,
 	onCreateFn,
 }: ProjectCreateDialogProps) => {
+	const translator = useTranslator();
 	const [projectId, setProjectIdFn] = useState(() => `project-${createId()}`);
 	const [submitted, setSubmittedFn] = useState(false);
 	const parsed = IdSchema.safeParse(projectId);
@@ -35,18 +41,23 @@ export const ProjectCreateDialog = ({
 				data-ui="EditorProjectCreateDialog"
 				onSubmit={submitFn}
 			>
-				<h2 className="text-lg font-semibold">Create project</h2>
-				<p className="mt-2 text-sm leading-6 text-muted">
-					Choose the package identity used by builds and gameplay saves. It can be renamed
-					later, which makes the project a different game to existing saves.
-				</p>
+				<h2 className="text-lg font-semibold">
+					<Tx label="Create project" />
+				</h2>
+				<div className="mt-2">
+					<Mx label="Create project help" />
+				</div>
 				<div className="mt-4">
 					<EditorTextControl
-						error={submitted && !parsed.success ? "Project ID is required." : undefined}
-						label="Project ID"
+						error={
+							submitted && !parsed.success
+								? translator.textFn("Project ID is required.")
+								: undefined
+						}
+						label={translator.textFn("Project ID")}
 						name="projectId"
 						onChangeFn={setProjectIdFn}
-						placeholder="project:example"
+						placeholder={translator.textFn("Project ID example")}
 						value={projectId}
 					/>
 				</div>
@@ -55,20 +66,23 @@ export const ProjectCreateDialog = ({
 						{error instanceof Error ? error.message : String(error)}
 					</p>
 				)}
-				<div className="mt-6 flex justify-end gap-2">
-					<Button
+				<div className="mt-6 flex items-center justify-between gap-4">
+					<LinkButton
+						className="inline-flex items-center gap-1.5"
 						disabled={pending}
 						onClick={onCancelFn}
-						type="button"
 					>
-						Cancel
-					</Button>
+						<X className="size-4" />
+						<Tx label="Cancel" />
+					</LinkButton>
 					<PrimaryButton
+						className="gap-1.5"
 						disabled={pending}
 						cursorIntent={pending ? "progress" : undefined}
 						type="submit"
 					>
-						Create project
+						<FilePlus2 className="size-4" />
+						<Tx label="Create project" />
 					</PrimaryButton>
 				</div>
 			</form>

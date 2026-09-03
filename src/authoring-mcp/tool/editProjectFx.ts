@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import type { EditProjectInput } from "./EditProjectInputSchema";
-import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
+import { commitProjectConfigFx } from "./commitProjectConfigFx";
 
 /** Replaces supplied whole project sections and exact-pins the read-to-commit revision. */
 export const editProjectFx = Effect.fn("editProjectFx")(function* ({
@@ -17,12 +17,6 @@ export const editProjectFx = Effect.fn("editProjectFx")(function* ({
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 }) {
-	if (input.revision !== undefined && input.revision !== project.revision)
-		return yield* Effect.fail(
-			new Error(
-				`Revision ${input.revision} is stale; the open project is at revision ${project.revision}. Read project_config again before replacing a section.`,
-			),
-		);
 	const config = {
 		...project.config,
 		...input.patch,
@@ -34,12 +28,13 @@ export const editProjectFx = Effect.fn("editProjectFx")(function* ({
 						id: project.config.meta.id,
 					},
 	};
-	const commit = yield* repository.replaceConfigFx({
+	const commit = yield* commitProjectConfigFx({
 		config,
-		expectedRevision: input.revision ?? project.revision,
-		projectId: project.projectId,
+		notifyProjectChangedFn,
+		project,
+		repository,
+		revision: input.revision,
 	});
-	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		"Edited project configuration.",
 		`Project ID: ${project.projectId}`,

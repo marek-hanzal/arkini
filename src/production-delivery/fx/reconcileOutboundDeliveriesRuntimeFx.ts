@@ -16,6 +16,10 @@ import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorF
 
 export namespace reconcileOutboundDeliveriesRuntimeFx {
 	export interface Props {
+		readonly returnLineIdsByOwnerItemId?: ReadonlyMap<
+			IdSchema.Type,
+			ReadonlySet<IdSchema.Type>
+		>;
 		readonly returnFromByOwnerItemId?: ReadonlyMap<IdSchema.Type, GridLocationSchema.Type>;
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -24,13 +28,18 @@ export namespace reconcileOutboundDeliveriesRuntimeFx {
 /**
  * Reconciles every outbound soft claim against current physical input truth.
  *
- * Earlier runtime order wins. Claims shrink but never grow; a delivery with no remaining useful
- * allocation becomes a canonical return using the target owner's current board position as the
- * persisted return origin.
+ * Earlier runtime order wins. Claims shrink but never grow; callers may invalidate exact owner-line
+ * targets when their pending intent is removed. A delivery with no remaining useful allocation
+ * becomes a canonical return using the target owner's current board position as the persisted
+ * return origin.
  */
 export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 	"reconcileOutboundDeliveriesRuntimeFx",
-)(function* ({ returnFromByOwnerItemId, runtime }: reconcileOutboundDeliveriesRuntimeFx.Props) {
+)(function* ({
+	returnFromByOwnerItemId,
+	returnLineIdsByOwnerItemId,
+	runtime,
+}: reconcileOutboundDeliveriesRuntimeFx.Props) {
 	const remainingTargetBySlot = new Map<string, number>();
 	let nextRuntime = runtime;
 
@@ -54,8 +63,14 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 			readonly quantity: number;
 		}[] = [];
 		let unallocatedQuantity = current.quantity;
+		const returnRequested =
+			returnLineIdsByOwnerItemId?.get(target.ownerItemId)?.has(target.lineId) === true;
 
-		if (owner?.location.scope === LocationScopeEnumSchema.enum.Board && line !== undefined) {
+		if (
+			!returnRequested &&
+			owner?.location.scope === LocationScopeEnumSchema.enum.Board &&
+			line !== undefined
+		) {
 			for (const allocation of target.input) {
 				const input = line.input[allocation.inputIndex];
 				if (

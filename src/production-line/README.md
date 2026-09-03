@@ -61,6 +61,12 @@ Tick: ready Job in stable ID order
 → release buffered inputs
 → relocate reserved material
 → commit all or nothing
+
+clear pending owner queue
+→ preserve active Job and its consumed/reserved material
+→ return buffered roots for the cleared request lines
+→ reverse their outbound deliveries
+→ commit all or nothing
 ```
 
 A queued request owns no time, material, charges or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
@@ -68,6 +74,7 @@ A queued request owns no time, material, charges or output reservation. Input fi
 ## Important invariants
 
 - The FIFO head retries from fresh Runtime state and cannot be overtaken or silently removed.
+- Clearing pending work returns its unused line-input material without cancelling active work.
 - Start re-resolves all live facts and atomically applies input ownership, charge spending, stack isolation, reservation and Job creation.
 - Active Jobs reserve the worst possible output quantity; queued requests reserve nothing.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.

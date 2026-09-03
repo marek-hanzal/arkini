@@ -7,6 +7,7 @@ import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
 	createMcpHarness,
+	jsonToolInputFn,
 } from "./support/createMcpHarness";
 
 afterEach(cleanupMcpHarnesses);
@@ -80,14 +81,14 @@ describe("editor MCP item editing", () => {
 
 		const edited = await client.callTool({
 			name: "edit_simple_item",
-			arguments: {
+			arguments: jsonToolInputFn({
 				itemId: "water",
 				revision: waterConfig.revision,
 				patch: {
 					maxCount: null,
 					title: "Fresh Water",
 				},
-			},
+			}),
 		});
 		const project = await Effect.runPromise(repository.readProjectFx("edit-simple-project"));
 		if (project === null) throw new Error("Expected the edited project.");
@@ -111,13 +112,13 @@ describe("editor MCP item editing", () => {
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("edit-simple-project");
 		const stale = await client.callTool({
 			name: "edit_simple_item",
-			arguments: {
+			arguments: jsonToolInputFn({
 				itemId: "water",
 				revision: waterConfig.revision,
 				patch: {
 					title: "Stale title",
 				},
-			},
+			}),
 		});
 		expect(stale).toMatchObject({
 			isError: true,
@@ -144,21 +145,21 @@ describe("editor MCP item editing", () => {
 		]) {
 			const rejected = await client.callTool({
 				name: "edit_simple_item",
-				arguments: {
+				arguments: jsonToolInputFn({
 					itemId: "water",
 					patch,
-				},
+				}),
 			});
 			expect(rejected.isError, JSON.stringify(patch)).toBe(true);
 		}
 		const wrongType = await client.callTool({
 			name: "edit_simple_item",
-			arguments: {
+			arguments: jsonToolInputFn({
 				itemId: producer.id,
 				patch: {
 					title: "Must not change",
 				},
-			},
+			}),
 		});
 		expect(wrongType).toMatchObject({
 			isError: true,

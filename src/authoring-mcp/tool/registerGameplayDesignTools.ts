@@ -6,8 +6,10 @@ import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { deleteItemFx } from "./deleteItemFx";
-import { EditProjectInputSchema } from "./EditProjectInputSchema";
+import { EditProjectInputSchema, EditProjectInputSchemaId } from "./EditProjectInputSchema";
+import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { editProjectFx } from "./editProjectFx";
+import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 import { readProjectValidationTextFx } from "./readProjectValidationTextFx";
 import { renameItemFx } from "./renameItemFx";
@@ -153,20 +155,23 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"edit_project",
 		{
-			description:
-				"Patch the open project's non-item config. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_config first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed.",
-			inputSchema: EditProjectInputSchema,
+			description: `Patch the open project's non-item config. Pass input as a serialized JSON object matching schema ${JSON.stringify(EditProjectInputSchemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_config first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed.`,
+			inputSchema: JsonToolInputSchema,
 		},
-		async (input) =>
+		async ({ input }) =>
 			runToolFn(
-				readProjectFx().pipe(
-					Effect.flatMap((project) =>
-						editProjectFx({
-							input,
-							notifyProjectChangedFn,
-							project,
-							repository,
-						}),
+				parseToolInputJsonFx(input, EditProjectInputSchema).pipe(
+					Effect.flatMap((decodedInput) =>
+						readProjectFx().pipe(
+							Effect.flatMap((project) =>
+								editProjectFx({
+									input: decodedInput,
+									notifyProjectChangedFn,
+									project,
+									repository,
+								}),
+							),
+						),
 					),
 				),
 			),

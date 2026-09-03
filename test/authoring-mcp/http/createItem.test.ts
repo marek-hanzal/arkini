@@ -6,6 +6,7 @@ import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
 	createMcpHarness,
+	jsonToolInputFn,
 } from "./support/createMcpHarness";
 
 afterEach(cleanupMcpHarnesses);
@@ -72,11 +73,11 @@ describe("editor MCP item creation", () => {
 
 		const created = await client.callTool({
 			name: "create_simple_item",
-			arguments: {
+			arguments: jsonToolInputFn({
 				id: "item:mcp-simple",
 				title: "MCP Simple",
 				description: "Created through the editor MCP.",
-			},
+			}),
 		});
 		const project = await Effect.runPromise(repository.readProjectFx("create-item-project"));
 		if (project === null) throw new Error("Expected the project with the created item.");
@@ -107,13 +108,30 @@ describe("editor MCP item creation", () => {
 		expect(item?.uid).not.toBe(item?.id);
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("create-item-project");
 
-		const collision = await client.callTool({
+		const rejectedStructuredInput = await client.callTool({
 			name: "create_simple_item",
 			arguments: {
+				id: "item:legacy-structured-input",
+				title: "Legacy structured input",
+				description: "Must not bypass the serialized schema boundary.",
+			},
+		});
+		expect(rejectedStructuredInput.isError).toBe(true);
+		const rejectedInvalidJson = await client.callTool({
+			name: "create_simple_item",
+			arguments: {
+				input: "{",
+			},
+		});
+		expect(rejectedInvalidJson.isError).toBe(true);
+
+		const collision = await client.callTool({
+			name: "create_simple_item",
+			arguments: jsonToolInputFn({
 				id: "item:mcp-simple",
 				title: "Duplicate",
 				description: "Must not replace the existing item.",
-			},
+			}),
 		});
 		expect(collision).toMatchObject({
 			isError: true,
@@ -126,6 +144,10 @@ describe("editor MCP item creation", () => {
 			],
 		});
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
+		expect(
+			(await Effect.runPromise(repository.readProjectFx("create-item-project")))?.config
+				.items["item:legacy-structured-input"],
+		).toBeUndefined();
 	});
 
 	it.each(typeGroups)("$name", async ({ projectId, types }) => {
@@ -155,7 +177,7 @@ describe("editor MCP item creation", () => {
 			const id = `${type === "producer" ? "producer" : "item"}:mcp-${type}`;
 			const result = await client.callTool({
 				name: `create_${type}_item`,
-				arguments: {
+				arguments: jsonToolInputFn({
 					id,
 					title: `MCP ${type}`,
 					description: `Created ${type} item.`,
@@ -164,7 +186,7 @@ describe("editor MCP item creation", () => {
 								space: 4,
 							}
 						: {}),
-				},
+				}),
 			});
 			expect(result.isError, type).not.toBe(true);
 			expect(result.content, type).toMatchObject([
@@ -193,13 +215,13 @@ describe("editor MCP item creation", () => {
 		if (has("simple")) {
 			const discriminatorOverride = await client.callTool({
 				name: "create_simple_item",
-				arguments: {
+				arguments: jsonToolInputFn({
 					id: "item:invalid-override",
 					title: "Invalid override",
 					description: "Must remain a simple item.",
 					type: "producer",
 					uid: "forced-uid",
-				},
+				}),
 			});
 			expect(discriminatorOverride.isError).toBe(true);
 			expect(
@@ -235,11 +257,11 @@ describe("editor MCP item creation", () => {
 
 		const created = await client.callTool({
 			name: "create_simple_item",
-			arguments: {
+			arguments: jsonToolInputFn({
 				id: "item:committed",
 				title: "Committed",
 				description: "Persists before renderer notification.",
-			},
+			}),
 		});
 		expect(created.isError).not.toBe(true);
 		expect(created.content).toMatchObject([

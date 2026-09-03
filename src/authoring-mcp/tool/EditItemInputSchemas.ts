@@ -13,10 +13,11 @@ import { StashSchema } from "~/item-definition/schema/StashSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 
 const requireReplacementFn = <Schema extends z.ZodType<Record<string, unknown>>>(patch: Schema) =>
-	patch.refine(
-		(value) => Object.keys(value).length > 0,
-		"Patch must replace at least one field.",
-	);
+	patch
+		.refine((value) => Object.keys(value).length > 0, "Patch must replace at least one field.")
+		.meta({
+			minProperties: 1,
+		});
 
 const immutableItemFields = {
 	id: true,
@@ -27,6 +28,18 @@ const nullableBaseItemFields = {
 	charges: BaseSchema.shape.charges.nullable(),
 	maxCount: BaseSchema.shape.maxCount.nullable(),
 	merge: BaseSchema.shape.merge.nullable(),
+} as const;
+
+export const EditItemInputSchemaIds = {
+	simple: "urn:arkini:schema:mcp:edit-simple-item-input",
+	space: "urn:arkini:schema:mcp:edit-space-item-input",
+	producer: "urn:arkini:schema:mcp:edit-producer-item-input",
+	craft: "urn:arkini:schema:mcp:edit-craft-item-input",
+	blueprint: "urn:arkini:schema:mcp:edit-blueprint-item-input",
+	deposit: "urn:arkini:schema:mcp:edit-deposit-item-input",
+	stash: "urn:arkini:schema:mcp:edit-stash-item-input",
+	temporary: "urn:arkini:schema:mcp:edit-temporary-item-input",
+	inventory: "urn:arkini:schema:mcp:edit-inventory-item-input",
 } as const;
 
 const simplePatch = requireReplacementFn(
@@ -143,6 +156,7 @@ const editItemInputFn = <Schema extends z.ZodType<Record<string, unknown>>>(
 		})
 		.strict()
 		.meta({
+			id: identity.schemaId,
 			$id: identity.schemaId,
 			title: identity.title,
 			description: identity.description,
@@ -151,47 +165,47 @@ const editItemInputFn = <Schema extends z.ZodType<Record<string, unknown>>>(
 /** Type-owned replace patches; omitted fields remain untouched and null clears optional fields. */
 export const EditItemInputSchemas = {
 	simple: editItemInputFn(simplePatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-simple-item-input",
+		schemaId: EditItemInputSchemaIds.simple,
 		title: "Edit simple item tool input",
 		description: "Identity, revision, and replacement patch for one simple item.",
 	}),
 	space: editItemInputFn(spacePatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-space-item-input",
+		schemaId: EditItemInputSchemaIds.space,
 		title: "Edit space item tool input",
 		description: "Identity, revision, and replacement patch for one space item.",
 	}),
 	producer: editItemInputFn(producerPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-producer-item-input",
+		schemaId: EditItemInputSchemaIds.producer,
 		title: "Edit producer item tool input",
 		description: "Identity, revision, and replacement patch for one producer item.",
 	}),
 	craft: editItemInputFn(craftPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-craft-item-input",
+		schemaId: EditItemInputSchemaIds.craft,
 		title: "Edit craft item tool input",
 		description: "Identity, revision, and replacement patch for one craft item.",
 	}),
 	blueprint: editItemInputFn(blueprintPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-blueprint-item-input",
+		schemaId: EditItemInputSchemaIds.blueprint,
 		title: "Edit blueprint item tool input",
 		description: "Identity, revision, and replacement patch for one blueprint item.",
 	}),
 	deposit: editItemInputFn(depositPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-deposit-item-input",
+		schemaId: EditItemInputSchemaIds.deposit,
 		title: "Edit deposit item tool input",
 		description: "Identity, revision, and replacement patch for one deposit item.",
 	}),
 	stash: editItemInputFn(stashPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-stash-item-input",
+		schemaId: EditItemInputSchemaIds.stash,
 		title: "Edit stash item tool input",
 		description: "Identity, revision, and replacement patch for one stash item.",
 	}),
 	temporary: editItemInputFn(temporaryPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-temporary-item-input",
+		schemaId: EditItemInputSchemaIds.temporary,
 		title: "Edit temporary item tool input",
 		description: "Identity, revision, and replacement patch for one temporary item.",
 	}),
 	inventory: editItemInputFn(inventoryPatch, {
-		schemaId: "urn:arkini:schema:mcp:edit-inventory-item-input",
+		schemaId: EditItemInputSchemaIds.inventory,
 		title: "Edit inventory item tool input",
 		description: "Identity, revision, and replacement patch for one inventory item.",
 	}),

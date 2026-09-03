@@ -27,6 +27,18 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 	"Optional maximum parallel queue size; defaults to one.",
 );
 
+export const CreateItemInputSchemaIds = {
+	simple: "urn:arkini:schema:mcp:create-simple-item-input",
+	space: "urn:arkini:schema:mcp:create-space-item-input",
+	producer: "urn:arkini:schema:mcp:create-producer-item-input",
+	craft: "urn:arkini:schema:mcp:create-craft-item-input",
+	blueprint: "urn:arkini:schema:mcp:create-blueprint-item-input",
+	deposit: "urn:arkini:schema:mcp:create-deposit-item-input",
+	stash: "urn:arkini:schema:mcp:create-stash-item-input",
+	temporary: "urn:arkini:schema:mcp:create-temporary-item-input",
+	inventory: "urn:arkini:schema:mcp:create-inventory-item-input",
+} as const;
+
 /** Human-facing create inputs; omitted fields use the matching Editor form's draft values. */
 export const CreateItemInputSchemas = {
 	simple: SimpleSchema.omit({
@@ -43,7 +55,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-simple-item-input",
+			id: CreateItemInputSchemaIds.simple,
+			$id: CreateItemInputSchemaIds.simple,
 			title: "Create simple item tool input",
 			description: "Authoring fields accepted when creating one simple item.",
 		}),
@@ -67,7 +80,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-space-item-input",
+			id: CreateItemInputSchemaIds.space,
+			$id: CreateItemInputSchemaIds.space,
 			title: "Create space item tool input",
 			description: "Authoring fields accepted when creating one space item.",
 		}),
@@ -93,7 +107,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-producer-item-input",
+			id: CreateItemInputSchemaIds.producer,
+			$id: CreateItemInputSchemaIds.producer,
 			title: "Create producer item tool input",
 			description: "Authoring fields accepted when creating one producer item.",
 		}),
@@ -115,7 +130,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-craft-item-input",
+			id: CreateItemInputSchemaIds.craft,
+			$id: CreateItemInputSchemaIds.craft,
 			title: "Create craft item tool input",
 			description: "Authoring fields accepted when creating one craft item.",
 		}),
@@ -139,7 +155,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-blueprint-item-input",
+			id: CreateItemInputSchemaIds.blueprint,
+			$id: CreateItemInputSchemaIds.blueprint,
 			title: "Create blueprint item tool input",
 			description: "Authoring fields accepted when creating one blueprint item.",
 		}),
@@ -161,7 +178,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-deposit-item-input",
+			id: CreateItemInputSchemaIds.deposit,
+			$id: CreateItemInputSchemaIds.deposit,
 			title: "Create deposit item tool input",
 			description: "Authoring fields accepted when creating one deposit item.",
 		}),
@@ -183,7 +201,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-stash-item-input",
+			id: CreateItemInputSchemaIds.stash,
+			$id: CreateItemInputSchemaIds.stash,
 			title: "Create stash item tool input",
 			description: "Authoring fields accepted when creating one stash item.",
 		}),
@@ -203,7 +222,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-temporary-item-input",
+			id: CreateItemInputSchemaIds.temporary,
+			$id: CreateItemInputSchemaIds.temporary,
 			title: "Create temporary item tool input",
 			description: "Authoring fields accepted when creating one temporary item.",
 		}),
@@ -220,7 +240,8 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			$id: "urn:arkini:schema:mcp:create-inventory-item-input",
+			id: CreateItemInputSchemaIds.inventory,
+			$id: CreateItemInputSchemaIds.inventory,
 			title: "Create inventory item tool input",
 			description: "Authoring fields accepted when creating one inventory item.",
 		}),

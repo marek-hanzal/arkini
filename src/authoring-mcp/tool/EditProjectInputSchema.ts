@@ -4,6 +4,8 @@ import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { RolesSchema } from "~/game-config/schema/RolesSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
 
+export const EditProjectInputSchemaId = "urn:arkini:schema:mcp:edit-project-input";
+
 export const EditProjectInputSchema = z
 	.object({
 		revision: z
@@ -30,7 +32,11 @@ export const EditProjectInputSchema = z
 					"Complete replacement of the initial board, inventory, and toolbar state.",
 				),
 			})
-			.strict(),
+			.strict()
+			.meta({
+				minProperties: 1,
+				description: "At least one complete project section to replace.",
+			}),
 	})
 	.strict()
 	.refine(({ patch }) => Object.keys(patch).length > 0, {
@@ -40,7 +46,8 @@ export const EditProjectInputSchema = z
 		],
 	})
 	.meta({
-		$id: "urn:arkini:schema:mcp:edit-project-input",
+		id: EditProjectInputSchemaId,
+		$id: EditProjectInputSchemaId,
 		title: "Edit project tool input",
 		description:
 			"A revision-guarded replacement patch for the editable non-item project configuration.",

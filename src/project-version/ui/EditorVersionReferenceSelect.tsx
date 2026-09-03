@@ -21,7 +21,7 @@ const VersionReferenceOptionContent = ({
 				>
 					{createdAt.toLocaleString()}
 				</time>
-				<span className="shrink-0 text-subtle">*</span>
+				<span className="shrink-0 text-subtle">·</span>
 				<span className="min-w-0 truncate font-semibold">{version.subject}</span>
 			</span>
 			{version.body === undefined ? null : (
@@ -33,7 +33,7 @@ const VersionReferenceOptionContent = ({
 				</span>
 				{version.tag === undefined ? null : (
 					<>
-						<span className="shrink-0">*</span>
+						<span className="shrink-0">·</span>
 						<span className="min-w-0 truncate">{version.tag}</span>
 					</>
 				)}
@@ -78,7 +78,7 @@ export const EditorVersionReferenceSelect = ({
 				const createdAtLabel = new Date(version.createdAtMs).toLocaleString();
 				return {
 					id: version.versionId,
-					label: `${createdAtLabel} * ${version.subject}`,
+					label: `${createdAtLabel} · ${version.subject}`,
 					terms: [
 						createdAtLabel,
 						version.subject,

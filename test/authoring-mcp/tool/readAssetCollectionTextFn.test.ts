@@ -22,13 +22,13 @@ describe("readAssetCollectionTextFn", () => {
 		};
 		const fuzzyMatch = readAssetCollectionTextFn(project, {
 			page: 1,
-			pageSize: 25,
+			limit: 25,
 			query: "frge",
 			type: "image",
 		});
 		const lastPage = readAssetCollectionTextFn(project, {
 			page: 2,
-			pageSize: 1,
+			limit: 1,
 			type: "image",
 		});
 

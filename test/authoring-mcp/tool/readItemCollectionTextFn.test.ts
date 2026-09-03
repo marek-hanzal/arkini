@@ -11,12 +11,12 @@ describe("readItemCollectionTextFn", () => {
 				"producer",
 			],
 			page: 1,
-			pageSize: 25,
+			limit: 25,
 			query: "frge",
 		});
 		const lastPage = readItemCollectionTextFn(project, {
 			page: 3,
-			pageSize: 2,
+			limit: 2,
 		});
 
 		expect(producers).toContain("Item type filter (OR): producer");

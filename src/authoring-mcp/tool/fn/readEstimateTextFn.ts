@@ -44,10 +44,10 @@ export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 		view: input.view,
 	});
 	const maximumDemand = Math.max(0, ...entries.map(({ demand }) => demand));
-	const pageRows = rows.slice((input.page - 1) * input.pageSize, input.page * input.pageSize);
-	const totalPages = Math.ceil(rows.length / input.pageSize);
+	const pageRows = rows.slice((input.page - 1) * input.limit, input.page * input.limit);
+	const totalPages = Math.ceil(rows.length / input.limit);
 	const hasPreviousPage = input.page > 1;
-	const hasNextPage = input.page * input.pageSize < rows.length;
+	const hasNextPage = input.page * input.limit < rows.length;
 	return [
 		"Global estimate",
 		"Method: approximate bounded-distribution authored dependency graph",
@@ -65,7 +65,7 @@ export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 		`Matched items: ${rows.length}`,
 		`Page: ${input.page}`,
 		`Total pages: ${totalPages}`,
-		`Page size: ${input.pageSize}`,
+		`Limit: ${input.limit}`,
 		`Returned items: ${pageRows.length}`,
 		`Has previous page: ${hasPreviousPage}`,
 		`Has next page: ${hasNextPage}`,

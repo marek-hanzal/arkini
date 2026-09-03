@@ -7,13 +7,13 @@ const readEstimate = (
 	view: "demand" | "fastest" | "incomplete" | "slowest",
 	options: {
 		readonly page?: number;
-		readonly pageSize?: number;
+		readonly limit?: number;
 		readonly query?: string;
 	} = {},
 ) =>
 	readEstimateTextFn(createGraphProject(), {
 		page: options.page ?? 1,
-		pageSize: options.pageSize ?? 25,
+		limit: options.limit ?? 25,
 		query: options.query,
 		view,
 	});
@@ -21,12 +21,12 @@ const readEstimate = (
 describe("readEstimateTextFn", () => {
 	it("formats the selected global Estimate order as a bounded page", () => {
 		const text = readEstimate("slowest", {
-			pageSize: 2,
+			limit: 2,
 		});
 
 		expect(text).toContain("View: slowest");
 		expect(text).toContain("Page: 1");
-		expect(text).toContain("Page size: 2");
+		expect(text).toContain("Limit: 2");
 		expect(text).toContain("Returned items: 2");
 		expect(text).toContain("Has next page: true");
 	});

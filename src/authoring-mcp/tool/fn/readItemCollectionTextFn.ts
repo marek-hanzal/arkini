@@ -20,10 +20,10 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 		allowedTypes === undefined ? items : items.filter((item) => allowedTypes.has(item.type));
 	const matches =
 		input.query === undefined ? typeFilteredItems : searchFn(typeFilteredItems, input.query);
-	const totalPages = Math.ceil(matches.length / input.pageSize);
-	const pageItems = matches.slice((input.page - 1) * input.pageSize, input.page * input.pageSize);
+	const totalPages = Math.ceil(matches.length / input.limit);
+	const pageItems = matches.slice((input.page - 1) * input.limit, input.page * input.limit);
 	const hasPreviousPage = input.page > 1;
-	const hasNextPage = input.page * input.pageSize < matches.length;
+	const hasNextPage = input.page * input.limit < matches.length;
 	const renderedItems = pageItems
 		.map((item) =>
 			[
@@ -47,7 +47,7 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 		`Matched items: ${matches.length}`,
 		`Page: ${input.page}`,
 		`Total pages: ${totalPages}`,
-		`Page size: ${input.pageSize}`,
+		`Limit: ${input.limit}`,
 		`Returned items: ${pageItems.length}`,
 		`Has previous page: ${hasPreviousPage}`,
 		`Has next page: ${hasNextPage}`,

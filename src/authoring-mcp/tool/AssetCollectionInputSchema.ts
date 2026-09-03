@@ -12,13 +12,13 @@ const AssetTypeSchema = z
 export const AssetCollectionInputSchema = z
 	.object({
 		page: z.number().int().min(1).default(1).describe("One-based page number."),
-		pageSize: z
+		limit: z
 			.number()
 			.int()
 			.min(1)
 			.max(100)
 			.default(25)
-			.describe("Assets per page; defaults to 25 and is capped at 100."),
+			.describe("Maximum assets per page; defaults to 25 and is capped at 100."),
 		query: z.string().optional().describe("Optional fuzzy search across asset ID and type."),
 		type: AssetTypeSchema.describe("The asset type to list."),
 	})

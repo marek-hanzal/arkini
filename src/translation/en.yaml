@@ -5,6 +5,15 @@ Board editing help:
     Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
 
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
+Build:
+  value: Build
+Build help:
+  value: |
+    Build turns the project's committed Version HEAD into a portable Arkpack. Before producing the file, it runs the complete project and resource validation used by the game.
+
+    Only committed project state can be built. If the saved working copy changed after its current Version, open **Commit** first and create a new restore point. Blocking diagnostics link back to the exact Editor surface that needs fixing; non-blocking diagnostics remain attached to the finished artifact.
+
+    After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
 Cancel:
   value: Cancel
 Charges:

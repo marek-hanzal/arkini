@@ -14,29 +14,22 @@ const VersionReferenceOptionContent = ({
 	const createdAt = new Date(version.createdAtMs);
 	return (
 		<span className="grid min-w-0 flex-1 gap-0.5">
-			<span className="flex min-w-0 items-baseline gap-1.5 text-sm text-foreground">
+			<span className="min-w-0 truncate text-sm font-semibold text-foreground">
+				{version.subject}
+			</span>
+			{version.body === undefined ? null : (
+				<span className="min-w-0 truncate text-xs text-muted">{version.body}</span>
+			)}
+			<span className="flex min-w-0 items-center justify-between gap-3 text-xs text-subtle">
 				<time
-					className="shrink-0 text-xs text-muted"
+					className="min-w-0 truncate"
 					dateTime={createdAt.toISOString()}
 				>
 					{createdAt.toLocaleString()}
 				</time>
-				<span className="shrink-0 text-subtle">·</span>
-				<span className="min-w-0 truncate font-semibold">{version.subject}</span>
-			</span>
-			{version.body === undefined ? null : (
-				<span className="truncate text-xs text-muted">{version.body}</span>
-			)}
-			<span className="flex min-w-0 items-center gap-1.5 text-xs text-subtle">
 				<span className="shrink-0 font-semibold text-accent">
 					v{version.arkpackVersion}
 				</span>
-				{version.tag === undefined ? null : (
-					<>
-						<span className="shrink-0">·</span>
-						<span className="min-w-0 truncate">{version.tag}</span>
-					</>
-				)}
 			</span>
 		</span>
 	);
@@ -78,7 +71,7 @@ export const EditorVersionReferenceSelect = ({
 				const createdAtLabel = new Date(version.createdAtMs).toLocaleString();
 				return {
 					id: version.versionId,
-					label: `${createdAtLabel} · ${version.subject}`,
+					label: version.subject,
 					terms: [
 						createdAtLabel,
 						version.subject,

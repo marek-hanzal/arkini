@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CircleCheckBig } from "lucide-react";
 
+import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import type {
@@ -13,6 +14,51 @@ import type { ProjectCompatibilityDiffResult } from "~/project-version/type/Proj
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Status } from "~/ui/ui/Status";
 
+/** Keeps generic string diffs from being mistaken for project asset references. */
+const projectAssetReferenceKeys = new Set([
+	"hero",
+	"avatar-01",
+	"avatar-02",
+	"avatar-03",
+	"avatar-04",
+	"avatar-05",
+	"avatar-06",
+	"avatar-07",
+]);
+const itemAssetReferenceKeys = new Set([
+	"default",
+	"sources",
+]);
+
+const readAssetReferenceIdsFn = (path: string, value: unknown) => {
+	const [owner, key, index, extra] = path.split(".");
+	if (key === undefined || extra !== undefined) return undefined;
+	if (owner === "resources")
+		return index === undefined &&
+			projectAssetReferenceKeys.has(key) &&
+			typeof value === "string"
+			? [
+					value,
+				]
+			: undefined;
+	if (owner !== "asset" || !itemAssetReferenceKeys.has(key)) return undefined;
+	if (index === undefined)
+		return Array.isArray(value) && value.every((candidate) => typeof candidate === "string")
+			? [
+					...value,
+				]
+			: undefined;
+	const numericIndex = Number(index);
+	return Number.isInteger(numericIndex) &&
+		numericIndex >= 0 &&
+		String(numericIndex) === index &&
+		typeof value === "string"
+		? [
+				value,
+			]
+		: undefined;
+};
+
 const formatValueFn = (value: unknown) => {
 	if (value === undefined) return "—";
 	if (typeof value === "string") return value;
@@ -20,10 +66,45 @@ const formatValueFn = (value: unknown) => {
 	return json ?? String(value);
 };
 
+const DiffValue = ({
+	path,
+	side,
+	value,
+}: {
+	readonly path: string;
+	readonly side: "after" | "before";
+	readonly value: unknown;
+}) => {
+	const assetReferenceIds = readAssetReferenceIdsFn(path, value);
+	return assetReferenceIds === undefined ? (
+		<code
+			className="block max-h-44 overflow-auto whitespace-pre-wrap break-words rounded bg-surface px-2 py-1.5 font-mono text-xs text-muted data-[ui-side=after]:font-bold data-[ui-side=after]:text-foreground data-[ui-side=before]:font-normal"
+			{...readDataUiFn({
+				dataUi: "EditorVersionDiffValue",
+				state: {
+					side,
+				},
+			})}
+		>
+			{formatValueFn(value)}
+		</code>
+	) : (
+		<span className="flex min-w-0 flex-wrap gap-2">
+			{assetReferenceIds.map((resourceId, index) => (
+				<EditorAssetThumbnail
+					key={`${index}:${resourceId}`}
+					resourceId={resourceId}
+					size="lg"
+				/>
+			))}
+		</span>
+	);
+};
+
 const VersionBump = ({ bump }: { readonly bump?: ProjectCompatibilityDiffResult }) =>
 	bump === undefined ? null : (
 		<span
-			className="shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider data-[ui-bump=major]:border-danger/40 data-[ui-bump=major]:bg-danger/10 data-[ui-bump=major]:text-danger data-[ui-bump=minor]:border-success/40 data-[ui-bump=minor]:bg-success/10 data-[ui-bump=minor]:text-success"
+			className="shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider data-[ui-bump=major]:border-danger/40 data-[ui-bump=major]:bg-danger/10 data-[ui-bump=major]:text-danger data-[ui-bump=minor]:border-success data-[ui-bump=minor]:bg-success data-[ui-bump=minor]:font-bold data-[ui-bump=minor]:text-success-contrast"
 			{...readDataUiFn({
 				dataUi: "EditorVersionBump",
 				state: {
@@ -31,7 +112,7 @@ const VersionBump = ({ bump }: { readonly bump?: ProjectCompatibilityDiffResult 
 				},
 			})}
 		>
-			{bump} bump
+			{bump}
 		</span>
 	);
 
@@ -108,17 +189,21 @@ const ValueChange = ({
 				<div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-subtle">
 					Before
 				</div>
-				<code className="block max-h-44 overflow-auto whitespace-pre-wrap break-words rounded bg-surface px-2 py-1.5 font-mono text-xs font-normal text-muted">
-					{formatValueFn(change.before)}
-				</code>
+				<DiffValue
+					path={change.path}
+					side="before"
+					value={change.before}
+				/>
 			</div>
 			<div className="min-w-0">
 				<div className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-subtle">
 					After
 				</div>
-				<code className="block max-h-44 overflow-auto whitespace-pre-wrap break-words rounded bg-surface px-2 py-1.5 font-mono text-xs font-bold text-foreground">
-					{formatValueFn(change.after)}
-				</code>
+				<DiffValue
+					path={change.path}
+					side="after"
+					value={change.after}
+				/>
 			</div>
 		</div>
 	</article>

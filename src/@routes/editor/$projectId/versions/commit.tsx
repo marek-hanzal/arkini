@@ -79,7 +79,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 											</p>
 										</div>
 										<span
-											className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-xs font-semibold uppercase tracking-wider data-[ui-bump=major]:border-danger data-[ui-bump=major]:bg-danger data-[ui-bump=major]:px-3 data-[ui-bump=major]:py-1.5 data-[ui-bump=major]:font-bold data-[ui-bump=major]:text-danger-contrast data-[ui-bump=major]:shadow-lg data-[ui-bump=major]:ring-4 data-[ui-bump=major]:ring-danger/20"
+											className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-xs font-semibold uppercase tracking-wider data-[ui-bump=major]:border-danger data-[ui-bump=major]:bg-danger data-[ui-bump=major]:px-3 data-[ui-bump=major]:py-1.5 data-[ui-bump=major]:font-bold data-[ui-bump=major]:text-danger-contrast data-[ui-bump=major]:shadow-lg data-[ui-bump=major]:ring-4 data-[ui-bump=major]:ring-danger/20 data-[ui-bump=minor]:border-success data-[ui-bump=minor]:bg-success data-[ui-bump=minor]:font-bold data-[ui-bump=minor]:text-success-contrast"
 											{...readDataUiFn({
 												dataUi: "EditorVersionCommitBump",
 												state: {

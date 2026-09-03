@@ -48,7 +48,6 @@ export const EditorWorkspaceNavigation = ({
 	>
 		<nav className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1">
 			{EditorWorkspaceRoutes.map((workspace) => {
-				if ("hiddenFromNavigation" in workspace) return null;
 				const { icon: Icon, id, label, shortcut, to } = workspace;
 				return (
 					<Fragment key={id}>

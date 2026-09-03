@@ -97,7 +97,7 @@ describe("editor MCP server", () => {
 		)?.inputSchema;
 		expect(assetCollectionSchema?.properties).toMatchObject({
 			page: expect.any(Object),
-			pageSize: expect.any(Object),
+			limit: expect.any(Object),
 			query: expect.any(Object),
 			type: {
 				$ref: "#/$defs/AssetTypeSchema",
@@ -127,7 +127,7 @@ describe("editor MCP server", () => {
 			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
 		).toMatchObject({
 			page: expect.any(Object),
-			pageSize: expect.any(Object),
+			limit: expect.any(Object),
 			query: expect.any(Object),
 			view: {
 				default: "fastest",
@@ -204,6 +204,13 @@ describe("editor MCP server", () => {
 				type: "image",
 			},
 		});
+		const rejectedLegacyPagination = await client.callTool({
+			name: "asset_collection",
+			arguments: {
+				pageSize: 1,
+				type: "image",
+			},
+		});
 		expect(project.content).toMatchObject([
 			{
 				text: expect.stringContaining("Project ID: project-context"),
@@ -214,6 +221,14 @@ describe("editor MCP server", () => {
 				text: expect.stringContaining("- Type: image\n  ID: item-water"),
 			},
 		]);
+		expect(rejectedLegacyPagination).toMatchObject({
+			isError: true,
+			content: [
+				{
+					text: expect.stringContaining('Unrecognized key: "pageSize"'),
+				},
+			],
+		});
 		expect(runtimeCalls).toBe(2);
 		ownership.clearProjectContextFn("project-context");
 		expect(ownership.readProjectContextFn()).toBeUndefined();
@@ -247,7 +262,7 @@ describe("editor MCP server", () => {
 		const globalEstimate = await client.callTool({
 			name: "estimate",
 			arguments: {
-				pageSize: 2,
+				limit: 2,
 				view: "incomplete",
 			},
 		});

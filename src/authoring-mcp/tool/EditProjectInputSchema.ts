@@ -4,7 +4,7 @@ import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { RolesSchema } from "~/game-config/schema/RolesSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
 
-export const EditProjectInputSchemaId = "urn:arkini:schema:mcp:edit-project-input";
+const editProjectInputSchemaId = "urn:arkini:schema:mcp:edit-project-input";
 
 export const EditProjectInputSchema = z
 	.object({
@@ -46,8 +46,8 @@ export const EditProjectInputSchema = z
 		],
 	})
 	.meta({
-		id: EditProjectInputSchemaId,
-		$id: EditProjectInputSchemaId,
+		id: editProjectInputSchemaId,
+		$id: editProjectInputSchemaId,
 		title: "Edit project tool input",
 		description:
 			"A revision-guarded replacement patch for the editable non-item project configuration.",

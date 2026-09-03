@@ -9,8 +9,8 @@ import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuanti
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { AssetCollectionInputSchema } from "./AssetCollectionInputSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
-import { CreateItemInputSchemaIds, CreateItemInputSchemas } from "./CreateItemInputSchemas";
-import { EditItemInputSchemaIds, EditItemInputSchemas } from "./EditItemInputSchemas";
+import { CreateItemInputSchemas } from "./CreateItemInputSchemas";
+import { EditItemInputSchemas } from "./EditItemInputSchemas";
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
@@ -23,6 +23,7 @@ import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerVersionToolsFn } from "./registerVersionTools";
+import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
 const itemTypes = [
@@ -277,7 +278,7 @@ const createServerFn = (
 		async ({ id }) => runToolFn(readSchemaDetailTextFx(id)),
 	);
 	for (const type of itemTypes) {
-		const schemaId = CreateItemInputSchemaIds[type];
+		const schemaId = resolveSchemaId(CreateItemInputSchemas[type]);
 		server.registerTool(
 			`create_${type}_item`,
 			{
@@ -305,7 +306,7 @@ const createServerFn = (
 		);
 	}
 	for (const type of itemTypes) {
-		const schemaId = EditItemInputSchemaIds[type];
+		const schemaId = resolveSchemaId(EditItemInputSchemas[type]);
 		server.registerTool(
 			`edit_${type}_item`,
 			{

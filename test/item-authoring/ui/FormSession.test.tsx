@@ -74,6 +74,7 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 		createElement("span", null, label),
 }));
 import { Form } from "~/item-authoring/ui/Form";
+import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import type { SectionId } from "~/item-authoring/type/Section";
@@ -191,6 +192,12 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it("omits the artwork progression preview until a progress asset is selected", async () => {
+		const { container } = await render(<ArtworkSection />);
+
+		expect(container.querySelector('[data-ui="EditorItemArtworkProgression"]')).toBeNull();
+	});
+
 	it("does not republish the form Context when parent inputs are unchanged", async () => {
 		let consumerRenders = 0;
 		const Probe = memo(() => {

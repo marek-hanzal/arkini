@@ -7,9 +7,11 @@ import {
 	offset,
 	shift,
 	size,
+	useDismiss,
 	useFloating,
+	useInteractions,
 } from "@floating-ui/react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
@@ -69,9 +71,18 @@ export const EditorSearchCombobox = ({
 	const [query, setQueryFn] = useState(selectedLabel);
 	const [open, setOpenFn] = useState(false);
 	const [activeIndex, setActiveIndexFn] = useState(0);
-	const { floatingStyles, refs } = useFloating({
+	const handleOpenChangeFn = useCallback(
+		(nextOpen: boolean) => {
+			setOpenFn(nextOpen);
+			if (!nextOpen) setQueryFn(selectedLabel);
+		},
+		[
+			selectedLabel,
+		],
+	);
+	const { context, floatingStyles, refs } = useFloating({
 		open,
-		onOpenChange: setOpenFn,
+		onOpenChange: handleOpenChangeFn,
 		placement: "bottom-start",
 		middleware: [
 			offset(4),
@@ -89,6 +100,11 @@ export const EditorSearchCombobox = ({
 		],
 		whileElementsMounted: autoUpdate,
 	});
+	const dismiss = useDismiss(context);
+	const { getFloatingProps: getFloatingPropsFn, getReferenceProps: getReferencePropsFn } =
+		useInteractions([
+			dismiss,
+		]);
 	const candidates = useMemo(
 		() =>
 			options.map(({ id, terms }) => ({
@@ -162,6 +178,7 @@ export const EditorSearchCombobox = ({
 				<span
 					ref={refs.setReference}
 					className="relative min-w-0 flex-1"
+					{...getReferencePropsFn()}
 				>
 					<Search className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
 					<input
@@ -171,8 +188,7 @@ export const EditorSearchCombobox = ({
 						className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
-							setOpenFn(false);
-							setQueryFn(selectedLabel);
+							handleOpenChangeFn(false);
 							onBlurFn?.();
 						}}
 						onChange={(event) => {
@@ -185,8 +201,7 @@ export const EditorSearchCombobox = ({
 						onFocus={beginSearchFn}
 						onKeyDown={(event) => {
 							if (event.key === "Escape") {
-								setOpenFn(false);
-								setQueryFn(selectedLabel);
+								handleOpenChangeFn(false);
 								return;
 							}
 							if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -241,6 +256,7 @@ export const EditorSearchCombobox = ({
 						ref={refs.setFloating}
 						style={floatingStyles}
 						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
+						{...getFloatingPropsFn()}
 					>
 						{matches.length === 0 ? (
 							<span className="px-3 py-4 text-center text-xs text-muted">

@@ -108,7 +108,10 @@ const ArtworkPreview = ({
 	readonly selectedProgressIndex: number;
 }) => (
 	<EditorFormCard>
-		<header className="flex items-center gap-1">
+		<header
+			className="flex items-center gap-1"
+			data-ui="EditorItemArtworkProgression"
+		>
 			<h2 className="text-base font-semibold">Artwork progression</h2>
 			<EditorInfoTooltip content="The default composition starts at 0%. Progress assets replace the complete composition at the evenly distributed thresholds shown below, matching the runtime engine." />
 		</header>
@@ -134,13 +137,17 @@ export const ArtworkSection = () => {
 				/>
 			</EditorFormCard>
 			<form.Subscribe selector={(state) => state.values.asset}>
-				{(asset) => (
-					<ArtworkPreview
-						asset={readCanonicalItemArtworkFn(asset)}
-						onSelectProgressFn={setSelectedProgressIndexFn}
-						selectedProgressIndex={selectedProgressIndex}
-					/>
-				)}
+				{(asset) => {
+					const canonicalAsset = readCanonicalItemArtworkFn(asset);
+					if (canonicalAsset.sources === undefined) return null;
+					return (
+						<ArtworkPreview
+							asset={canonicalAsset}
+							onSelectProgressFn={setSelectedProgressIndexFn}
+							selectedProgressIndex={selectedProgressIndex}
+						/>
+					);
+				}}
 			</form.Subscribe>
 		</div>
 	);

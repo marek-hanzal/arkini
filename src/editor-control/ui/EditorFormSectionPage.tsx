@@ -104,7 +104,13 @@ export const EditorFormSectionPage = ({
 				rootCard={rootCard}
 				saveFn={saveFn}
 			>
-				{children}
+				<fieldset
+					className="contents"
+					disabled={saving}
+					inert={saving}
+				>
+					{children}
+				</fieldset>
 			</EditorFormContent>
 		</div>
 	</EditorSectionPage>

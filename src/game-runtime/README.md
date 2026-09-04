@@ -89,7 +89,7 @@ stop Tick
 
 Fatal quiesce additionally closes transition subscriptions before final disposal so observers cannot keep processing after the first failure.
 
-Concurrent cleanup callers join the same attempt. Failed ordinary final save freezes the session for retry; reset and Editor replacement use discard-only disposal.
+Concurrent cleanup callers join the same attempt. Failed ordinary final save freezes the underlying session for retry or explicit discard. Installed Game adds a terminal finalization boundary: it retains one critical error and blocks successors instead of retrying that session. Reset and Editor replacement use discard-only disposal.
 
 ## Changing this island?
 

@@ -41,67 +41,81 @@ export const createNoteCommandAtomsFx = Effect.fn("createEditorNotesCommandAtoms
 					Atom.setIdleTTL(0),
 				),
 			);
+			// Background refresh has its own result so it cannot settle or erase a write.
+			const refreshFn = Atom.family((projectId: string) =>
+				Atom.fn(() =>
+					repository
+						.listNotesFx(projectId)
+						.pipe(Effect.flatMap((notes) => Atom.set(streamFn(projectId), notes))),
+				).pipe(Atom.withLabel(`EditorNotesRefresh:${projectId}`), Atom.setIdleTTL(0)),
+			);
 			const commandFn = Atom.family((projectId: string) => {
 				const projectStream = streamFn(projectId);
-				return Atom.fn((input: createNoteCommandAtomsFx.Command) => {
-					switch (input.action) {
-						case "load":
-							return repository
-								.listNotesFx(projectId)
-								.pipe(Effect.flatMap((notes) => Atom.set(projectStream, notes)));
-						case "create":
-							return repository
-								.createNoteFx({
-									projectId,
-									content: input.content,
-								})
-								.pipe(
-									Effect.flatMap((created) =>
-										Atom.update(projectStream, (notes) => [
-											created,
-											...(notes ?? []),
-										]),
-									),
-								);
-						case "update":
-							return repository
-								.updateNoteFx({
-									projectId,
-									noteId: input.noteId,
-									content: input.content,
-									expectedUpdatedAtMs: input.expectedUpdatedAtMs,
-								})
-								.pipe(
-									Effect.flatMap((updated) =>
-										Atom.update(projectStream, (notes) => [
-											updated,
-											...(notes ?? []).filter(
-												(note) => note.noteId !== updated.noteId,
-											),
-										]),
-									),
-								);
-						case "delete":
-							return repository
-								.deleteNoteFx({
-									projectId,
-									noteId: input.noteId,
-									expectedUpdatedAtMs: input.expectedUpdatedAtMs,
-								})
-								.pipe(
-									Effect.andThen(
-										Atom.update(projectStream, (notes) =>
-											(notes ?? []).filter(
-												(note) => note.noteId !== input.noteId,
+				return Atom.fn(
+					(
+						input: Exclude<
+							createNoteCommandAtomsFx.Command,
+							{
+								readonly action: "load";
+							}
+						>,
+					) => {
+						switch (input.action) {
+							case "create":
+								return repository
+									.createNoteFx({
+										projectId,
+										content: input.content,
+									})
+									.pipe(
+										Effect.flatMap((created) =>
+											Atom.update(projectStream, (notes) => [
+												created,
+												...(notes ?? []),
+											]),
+										),
+									);
+							case "update":
+								return repository
+									.updateNoteFx({
+										projectId,
+										noteId: input.noteId,
+										content: input.content,
+										expectedUpdatedAtMs: input.expectedUpdatedAtMs,
+									})
+									.pipe(
+										Effect.flatMap((updated) =>
+											Atom.update(projectStream, (notes) => [
+												updated,
+												...(notes ?? []).filter(
+													(note) => note.noteId !== updated.noteId,
+												),
+											]),
+										),
+									);
+							case "delete":
+								return repository
+									.deleteNoteFx({
+										projectId,
+										noteId: input.noteId,
+										expectedUpdatedAtMs: input.expectedUpdatedAtMs,
+									})
+									.pipe(
+										Effect.andThen(
+											Atom.update(projectStream, (notes) =>
+												(notes ?? []).filter(
+													(note) => note.noteId !== input.noteId,
+												),
 											),
 										),
-									),
-								);
-					}
-				}).pipe(Atom.withLabel(`EditorNotesCommand:${projectId}`), Atom.setIdleTTL(0));
+									);
+						}
+					},
+				).pipe(Atom.withLabel(`EditorNotesCommand:${projectId}`), Atom.setIdleTTL(0));
 			});
 			return {
 				commandFn,
+				refreshFn,
 				streamFn,
 			};
 		}),

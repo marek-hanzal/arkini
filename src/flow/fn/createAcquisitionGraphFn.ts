@@ -15,6 +15,10 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { compileAcquisitionRootsFn } from "~/flow/fn/compileAcquisitionRootsFn";
 
+// Authored IDs are unrestricted strings; tuple encoding preserves every ownership boundary.
+const readAcquisitionIdentityFn = (...parts: ReadonlyArray<string | number>) =>
+	JSON.stringify(parts);
+
 const combineRequirementsFn = (
 	...groups: ReadonlyArray<AcquisitionRoute["requirements"]>
 ): AcquisitionRoute["requirements"] => ({
@@ -137,7 +141,7 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 		chargeCostsByItemId,
 		line,
 		operation: {
-			id: `source:${owner.id}:line:${line.id}`,
+			id: readAcquisitionIdentityFn("source", owner.id, "line", line.id),
 			inputs: readLineOperationInputsFn(line),
 		},
 		owner,
@@ -189,7 +193,13 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 						chargeUses,
 					}),
 			durationMs: descriptor.line.runtimeMs,
-			id: `line-output:${descriptor.owner.id}:${descriptor.line.id}:${occurrence.id}:${occurrence.factId}`,
+			id: readAcquisitionIdentityFn(
+				"line-output",
+				descriptor.owner.id,
+				descriptor.line.id,
+				occurrence.id,
+				occurrence.factId,
+			),
 			metadata: {
 				kind: "line-output",
 				lineId: descriptor.line.id,
@@ -218,7 +228,14 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 			routes.push({
 				chargeUses: chargeUses.filter(({ payerFactId }) => payerFactId !== chargedItemId),
 				durationMs: descriptor.line.runtimeMs,
-				id: `line-charge-depletion:${descriptor.owner.id}:${descriptor.line.id}:${chargedItemId}:${occurrence.id}:${occurrence.factId}`,
+				id: readAcquisitionIdentityFn(
+					"line-charge-depletion",
+					descriptor.owner.id,
+					descriptor.line.id,
+					chargedItemId,
+					occurrence.id,
+					occurrence.factId,
+				),
 				metadata: {
 					chargedItemId,
 					kind: "line-charge-depletion",
@@ -227,7 +244,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 					ownerItemId: descriptor.owner.id,
 				},
 				operation: {
-					id: `source:${chargedItemId}:charges`,
+					id: readAcquisitionIdentityFn("source", chargedItemId, "charges"),
 					inputs: [],
 					...(chargeOutputModel.compilation === "complete"
 						? {}
@@ -305,7 +322,7 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 		const outputModel = readAcquisitionOutputOccurrencesFn(merge.output);
 		const replacementOutputGroupId = "output:replacement";
 		const operation = {
-			id: `source:${source.id}:merge:${mergeIndex}`,
+			id: readAcquisitionIdentityFn("source", source.id, "merge", mergeIndex),
 			inputs: [
 				{
 					factId: merge.target.itemId,
@@ -337,7 +354,13 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 		if (merge.effect === "replace")
 			routes.push({
 				durationMs: 0,
-				id: `merge-replacement:${source.id}:${merge.target.itemId}:${mergeIndex}:${merge.result}`,
+				id: readAcquisitionIdentityFn(
+					"merge-replacement",
+					source.id,
+					merge.target.itemId,
+					mergeIndex,
+					merge.result,
+				),
 				metadata,
 				operation,
 				output: {
@@ -365,7 +388,14 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 		for (const output of outputModel.occurrences)
 			routes.push({
 				durationMs: 0,
-				id: `merge-output:${source.id}:${merge.target.itemId}:${mergeIndex}:${output.id}:${output.factId}`,
+				id: readAcquisitionIdentityFn(
+					"merge-output",
+					source.id,
+					merge.target.itemId,
+					mergeIndex,
+					output.id,
+					output.factId,
+				),
 				metadata,
 				operation,
 				output: {
@@ -396,13 +426,13 @@ const readTemporaryRoutesFn = (item: ItemSchema.Type) => {
 	return outputModel.occurrences.map(
 		(output): AcquisitionRoute => ({
 			durationMs: item.durationMs,
-			id: `temporary-expiry:${item.id}:${output.id}:${output.factId}`,
+			id: readAcquisitionIdentityFn("temporary-expiry", item.id, output.id, output.factId),
 			metadata: {
 				itemId: item.id,
 				kind: "temporary-expiry",
 			},
 			operation: {
-				id: `source:${item.id}:expiry`,
+				id: readAcquisitionIdentityFn("source", item.id, "expiry"),
 				inputs: [],
 				...(outputModel.compilation === "complete"
 					? {}

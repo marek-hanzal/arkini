@@ -281,10 +281,13 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 									}),
 								);
 							}
+							// The running sampler reads current item/geometry itself; Tick must not
+							// restart its easing before the retained actor reaches the destination.
 							if (
-								actor.container.x !== pose.x ||
-								actor.container.y !== pose.y ||
-								actor.container.scale.x !== 1
+								(actor.container.x !== pose.x ||
+									actor.container.y !== pose.y ||
+									actor.container.scale.x !== 1) &&
+								!RendererRuntime.runSync(animator.isChannelActiveFx(actor, "pose"))
 							) {
 								RendererRuntime.runSync(
 									animateRetargetablePoseFx({

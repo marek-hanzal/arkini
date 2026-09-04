@@ -96,21 +96,23 @@ const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function*
 /**
  * Advances one canonical fixed simulation step from one shared step-start snapshot.
  *
- * Queue-only owners dispatch first. Runnable decisions and eligible identities are
- * then frozen and sorted by stable id before any draft mutation; later completions
- * may remove those identities but cannot change who earned this step. Completed
- * owners dispatch one FIFO successor before ready temporary items expire.
+ * Temporary eligibility is frozen at step start. Queue-only owners then dispatch
+ * before job identities and runnable decisions are frozen in stable id order.
+ * Later completions may remove those identities but cannot change who earned
+ * this step. Completed owners dispatch one FIFO successor before ready temporaries expire.
  */
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {
+	// Queue admission may emit external charge-depletion output. New temporary
+	// identities earn time only from the next boundary, regardless of that output path.
+	const temporaryItems = sortTemporaryItemsFn(stepStart);
 	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesRuntimeFx(boundaryStart.runtime);
 	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime: deliveryStart.runtime,
 	});
 	const jobs = sortJobsFn(deliveryStart.runtime.jobs);
-	const temporaryItems = sortTemporaryItemsFn(deliveryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
 	for (const job of jobs) {
 		runnableByJobId.set(

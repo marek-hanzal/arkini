@@ -1,6 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { NoteCommandAtoms } from "~/project-note/atom/NoteCommandAtoms";
@@ -22,39 +23,55 @@ export namespace useProjectNotes {
 /** Mounts the canonical project Notes stream and refreshes it after external mutations. */
 export const useProjectNotes = (projectId: string): useProjectNotes.Output => {
 	const commandAtom = NoteCommandAtoms.commandFn(projectId);
+	const refreshAtom = NoteCommandAtoms.refreshFn(projectId);
 	const streamAtom = NoteCommandAtoms.streamFn(projectId);
 	const commandResult = useAtomValue(commandAtom);
+	const refreshResult = useAtomValue(refreshAtom);
 	const notes = useAtomValue(streamAtom);
-	const runFn = useAtomSet(commandAtom, {
+	const [refreshRequested, setRefreshRequestedFn] = useState(false);
+	const mutateFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
+	const resetCommandFn = useAtomSet(commandAtom);
+	const refreshFn = useAtomSet(refreshAtom, {
+		mode: "promise",
+	});
+	const pending = commandResult.waiting || refreshResult.waiting;
+	const runFn = (command: createNoteCommandAtomsFx.Command) => {
+		if (command.action !== "load") return mutateFn(command);
+		resetCommandFn(Atom.Reset);
+		return refreshFn(undefined);
+	};
 
 	useEffect(() => {
-		if (notes !== undefined || !AsyncResult.isInitial(commandResult)) return;
-		void runFn({
-			action: "load",
-		}).catch(() => undefined);
+		if (pending) return;
+		if (!refreshRequested && (notes !== undefined || !AsyncResult.isInitial(refreshResult)))
+			return;
+		setRefreshRequestedFn(false);
+		void refreshFn(undefined).catch(() => undefined);
 	}, [
-		commandResult,
 		notes,
-		runFn,
+		pending,
+		refreshFn,
+		refreshResult,
+		refreshRequested,
 	]);
 	useEffect(
 		() =>
 			window.arkini.editor.onProjectChangedFn((changedProjectId) => {
 				if (changedProjectId !== projectId) return;
-				void runFn({
-					action: "load",
-				}).catch(() => undefined);
+				// Publish the next read only after any pending write has settled.
+				setRefreshRequestedFn(true);
 			}),
 		[
 			projectId,
-			runFn,
 		],
 	);
 
 	const loaded = notes !== undefined;
-	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(commandResult));
+	const commandError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(commandResult));
+	const refreshError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(refreshResult));
+	const error = commandError ?? refreshError;
 	return {
 		...(error === undefined
 			? {}
@@ -62,9 +79,9 @@ export const useProjectNotes = (projectId: string): useProjectNotes.Output => {
 					error,
 				}),
 		loaded,
-		loading: !loaded && (AsyncResult.isInitial(commandResult) || commandResult.waiting),
+		loading: !loaded && (AsyncResult.isInitial(refreshResult) || pending),
 		notes: notes ?? [],
-		pending: commandResult.waiting,
+		pending,
 		runFn,
 	};
 };

@@ -14,10 +14,10 @@ export const validateGameResourcesFn = ({
 }: {
 	config: GameConfigSchema.Type;
 	provenance: GameSourceProvenanceSchema.Type;
-	resources: ReadonlyArray<ResourceDescriptorSchema.Type>;
+	resources: ReadonlyArray<Pick<ResourceDescriptorSchema.Type, "id" | "path">>;
 }) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
-	const firstById = new Map<string, ResourceDescriptorSchema.Type>();
+	const firstById = new Map<string, Pick<ResourceDescriptorSchema.Type, "id" | "path">>();
 	for (const resource of resources) {
 		const first = firstById.get(resource.id);
 		if (first === undefined) {

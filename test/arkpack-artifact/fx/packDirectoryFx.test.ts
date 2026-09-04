@@ -3,11 +3,16 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Path, Ref } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
+import sharp from "sharp";
 
 import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
 import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
-import { png, writeGameProjectFixtureFx } from "./packDirectoryFx.test/gameProjectFixture";
+import {
+	assetPng,
+	png,
+	writeGameProjectFixtureFx,
+} from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx game-project contract", () => {
 	it.effect("derives package identity from a portable game project", () =>
@@ -35,19 +40,32 @@ describe("packDirectoryFx game-project contract", () => {
 						id: "project-game",
 					},
 				},
-				resources: expect.arrayContaining([
-					{
-						id: "hero",
-						mime: "image/png",
-						bytes: png,
-					},
-					{
-						id: "item-water",
-						mime: "image/png",
-						bytes: png,
-					},
-				]),
 			});
+			const hero = payload.resources.find(({ id }) => id === "hero");
+			const itemWater = payload.resources.find(({ id }) => id === "item-water");
+			if (itemWater === undefined) throw new Error("Missing packed item-water asset.");
+			expect(hero).toEqual({
+				id: "hero",
+				mime: "image/png",
+				bytes: png,
+			});
+			expect(itemWater).toMatchObject({
+				id: "item-water",
+				mime: "image/png",
+			});
+			expect(itemWater.bytes).not.toEqual(assetPng);
+			const normalized = yield* Effect.promise(() =>
+				sharp(itemWater.bytes).raw().toBuffer({
+					resolveWithObject: true,
+				}),
+			);
+			expect(normalized.info).toMatchObject({
+				width: 256,
+				height: 64,
+				channels: 4,
+				hasAlpha: true,
+			});
+			expect(normalized.data[3]).toBe(128);
 			expect(payload.config).not.toHaveProperty("arkpack");
 			expect(payload.config.items.portal).toMatchObject({
 				type: "space",

@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 
-import {
-	PngResourceLimits,
-	validatePngResourceFx,
-} from "~/game-config-resource/fx/validatePngResourceFx";
+import { PngResourceLimits } from "~/game-config-resource/constant/PngResourceLimits";
+import { validatePngResourceFx } from "~/game-config-resource/fx/validatePngResourceFx";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";

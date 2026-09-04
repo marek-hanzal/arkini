@@ -8,6 +8,14 @@ export const createTestPngBytes = (): Uint8Array<ArrayBuffer> =>
 		),
 	);
 
+export const createAlternateTestPngBytes = (): Uint8Array<ArrayBuffer> =>
+	Uint8Array.from(
+		Buffer.from(
+			"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=",
+			"base64",
+		),
+	);
+
 export const installTestPngDecoder = () => {
 	const close = vi.fn();
 	vi.stubGlobal(

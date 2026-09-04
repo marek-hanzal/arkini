@@ -32,7 +32,6 @@ describe("validateGameResourcesFn", () => {
 			].map((id) => ({
 				id,
 				path: `${id}.png`,
-				mime: "image/png" as const,
 			})),
 		});
 
@@ -54,7 +53,6 @@ describe("validateGameResourcesFn", () => {
 				{
 					id: "hero",
 					path: "hero.png",
-					mime: "image/png" as const,
 				},
 			],
 		});
@@ -93,12 +91,10 @@ describe("validateGameResourcesFn", () => {
 				{
 					id: "hero",
 					path: "a/hero.png",
-					mime: "image/png",
 				},
 				{
 					id: "hero",
 					path: "b/hero.png",
-					mime: "image/png",
 				},
 			],
 		});
@@ -277,7 +273,6 @@ describe("validateGameResourcesFn", () => {
 			].map((id) => ({
 				id,
 				path: `${id}.png`,
-				mime: "image/png" as const,
 			})),
 		});
 

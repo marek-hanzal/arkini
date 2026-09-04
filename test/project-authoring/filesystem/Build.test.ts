@@ -3,6 +3,7 @@ import { readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { createTestPngBytes } from "~/../test/arkpack-support/fn/createTestPngBytes";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -222,13 +223,7 @@ describe("filesystem Editor project build", () => {
 
 	it("keeps successful Build warnings project-relative", async () => {
 		const root = await harness.createExternalProject("project-warning");
-		await writeFile(
-			join(root, "assets", "unused.png"),
-			new Uint8Array([
-				1,
-				2,
-			]),
-		);
+		await writeFile(join(root, "assets", "unused.png"), createTestPngBytes());
 		const repository = await harness.openRepository();
 		const project = await Effect.runPromise(
 			repository.openProjectFx({

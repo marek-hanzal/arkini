@@ -30,7 +30,6 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 			provenance,
 			resources: project.resources.map(({ id }) => ({
 				id,
-				mime: "image/png" as const,
 				path: `${source}/resources/${id}.png`,
 			})),
 		}),

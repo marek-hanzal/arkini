@@ -19,12 +19,13 @@ export const readResourceDescriptorsFx = Effect.fn("readResourceDescriptorsFx")(
 		input,
 	});
 
-	return files.png.map(
-		(resourcePath) =>
-			({
-				id: path.basename(resourcePath, path.extname(resourcePath)),
-				path: resourcePath,
-				mime: "image/png",
-			}) satisfies ResourceDescriptorSchema.Type,
-	);
+	return files.png.map((resourcePath) => {
+		const relative = path.relative(files.root, resourcePath).replaceAll("\\", "/");
+		return {
+			id: path.basename(resourcePath, path.extname(resourcePath)),
+			kind: relative.startsWith("assets/") ? "asset" : "resource",
+			path: resourcePath,
+			mime: "image/png",
+		} satisfies ResourceDescriptorSchema.Type;
+	});
 });

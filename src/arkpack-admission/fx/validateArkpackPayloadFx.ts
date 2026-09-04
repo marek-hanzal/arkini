@@ -42,7 +42,6 @@ export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(fu
 			provenance,
 			resources: payload.resources.map((resource) => ({
 				id: resource.id,
-				mime: "image/png" as const,
 				path: `arkpack:${resource.id}`,
 			})),
 		}),

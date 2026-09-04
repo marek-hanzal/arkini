@@ -42,6 +42,7 @@ export default defineConfig(({ command }) => {
 				rollupOptions: {
 					external: [
 						/^@ngrok\/ngrok(?:$|-)/,
+						"sharp",
 					],
 					input: {
 						index: resolve("electron/main/index.ts"),

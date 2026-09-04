@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "zgq9yn9qox2wf6oo468xugzj",
+		"id": "inventory",
+		"title": "Inventory",
+		"description": "Here you have all the clutter you don't want on the board. Yaay!",
+		"asset": {
+			"default": [
+				"inventory"
+			]
+		},
+		"scope": "board",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"type": "inventory"
+	}
+}

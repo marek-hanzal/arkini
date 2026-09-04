@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "uugdqcs2ghv34ol6rxal8fk5",
+		"id": "stone-deposit-deplated",
+		"title": "Once upon a time, here was stone",
+		"description": "Stone is no longer here, but you can use some tools to find a new deposit!",
+		"asset": {
+			"default": [
+				"stone-source-depleted"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

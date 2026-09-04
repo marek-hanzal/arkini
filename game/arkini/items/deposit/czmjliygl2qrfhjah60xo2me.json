@@ -1,0 +1,21 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "czmjliygl2qrfhjah60xo2me",
+		"id": "tree",
+		"title": "Tree",
+		"description": "This is a tree. You can use it to get logs. Whole civilization is based on the wood!",
+		"asset": {
+			"default": [
+				"tree"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 8
+		},
+		"maxQueueSize": 1,
+		"type": "deposit"
+	}
+}

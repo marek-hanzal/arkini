@@ -540,6 +540,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				cue,
 				cueKey,
 				magneticField,
+				isCueActiveFn: () => !closed && cueLifecycleByKey.get(cueKey)?.started === true,
 				onCompleteFn: () => completeCue(cue),
 				onSwapLegSettledFn: (actorId) => {
 					settleSwapLeg(cueKey, actorId);
@@ -632,22 +633,55 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			.exhaustive();
 
 	return {
-		handoffSpawnsFx: Effect.fn("MotionRuntime.handoffSpawnsFx")(function* (
+		handoffDeliveriesFx: Effect.fn("MotionRuntime.handoffDeliveriesFx")(function* (
 			actorIds: ReadonlySet<string>,
 		) {
 			if (closed) return;
 			const superseded = readCuesFn().filter(
-				(cue) => cue.kind === "spawn" && actorIds.has(cue.actorId),
+				(cue) =>
+					(cue.kind === "spawn" && actorIds.has(cue.actorId)) ||
+					(cue.kind === "input" && actorIds.has(cue.sourceActorId)),
 			);
 			if (superseded.length === 0) return;
 			const keys = new Set(superseded.map(readCueKeyFn));
 			const releasedActorIds = new Set<string>();
 			for (const cue of superseded) {
 				const key = readCueKeyFn(cue);
-				const started = cueLifecycleByKey.get(key)?.started === true;
+				const lifecycle = cueLifecycleByKey.get(key);
+				const started = lifecycle?.started === true;
 				// Retire before cancellation: callbacks must not settle or restart this cue.
 				cueLifecycleByKey.delete(key);
+				if (cue.kind === "input") {
+					yield* animator.cancelFx(`motion:${key}:consume`);
+				}
 				yield* animator.cancelFx(`motion:${key}`);
+				if (cue.kind === "input" && started) {
+					const payload = lifecycle?.payloadActor ?? null;
+					const actor = payload ?? actorStore.actors.get(cue.sourceActorId);
+					if (actor !== undefined && !actor.container.destroyed) {
+						yield* magneticField.releaseFx({
+							sourceActorId: actor.item.id,
+							sourceInstanceId: actor.instanceId,
+							sourceKind: "motion",
+						});
+						if (payload !== null) {
+							yield* animator.cancelActorFx(payload);
+							yield* destroyTileActorFx(payload);
+						} else {
+							// The real source survives for delivery; retire any input contact fade.
+							yield* animator.setFx({
+								actor,
+								channel: "lifecycle-opacity",
+								alpha: 1,
+							});
+							yield* animator.setFx({
+								actor,
+								channel: "lifecycle-scale",
+								scale: 1,
+							});
+						}
+					}
+				}
 				if (!started && cue.kind === "spawn") {
 					const actor = actorStore.actors.get(cue.actorId);
 					if (actor !== undefined)

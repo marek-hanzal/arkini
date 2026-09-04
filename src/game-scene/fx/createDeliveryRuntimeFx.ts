@@ -259,6 +259,9 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 				yield* animator.cancelChannelFx(active.actor, "pose");
 				const canonical = actorStore.canonicalItems.get(itemId);
 				if (canonical !== undefined) {
+					// Off-screen delivery geometry must not hide its settled grid identity.
+					active.actor.container.visible = true;
+					yield* application.frames.invalidateFx;
 					activeByItemId.delete(itemId);
 					yield* drag.attachActorFx(active.actor);
 					continue;

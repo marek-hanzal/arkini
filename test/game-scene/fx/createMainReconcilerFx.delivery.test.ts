@@ -28,7 +28,7 @@ describe("main reconciliation / delivery retention", () => {
 			],
 			motion: {
 				...createMotion(),
-				handoffSpawnsFx: (ids) =>
+				handoffDeliveriesFx: (ids) =>
 					Effect.sync(() => {
 						expect(ids).toEqual(
 							new Set([

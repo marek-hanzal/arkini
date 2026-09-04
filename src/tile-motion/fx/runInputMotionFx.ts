@@ -32,6 +32,7 @@ export namespace runInputMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly magneticField: MagneticField;
+		readonly isCueActiveFn: () => boolean;
 		readonly onCompleteFn: () => void;
 		readonly onRemainderRevealedFn: () => void;
 		readonly readSourceSurvivesFn: () => boolean;
@@ -163,6 +164,7 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	cue,
 	cueKey,
 	magneticField,
+	isCueActiveFn,
 	onCompleteFn,
 	source,
 	sourceHome,
@@ -174,6 +176,7 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	readonly cue: TileInputMotionCue;
 	readonly cueKey: string;
 	readonly magneticField: MagneticField;
+	readonly isCueActiveFn: () => boolean;
 	readonly onCompleteFn: () => void;
 	readonly source: PixiTileActor | null;
 	readonly sourceHome: ActorPose;
@@ -205,6 +208,7 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 		fallbackTarget: sourceHome,
 		onPoseFn: magneticProjector.projectPoseFn,
 		onSettledFn: () => {
+			if (!isCueActiveFn()) return;
 			magneticProjector.releaseFn();
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
@@ -260,6 +264,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	magneticField,
+	isCueActiveFn,
 	onCompleteFn,
 	onRemainderRevealedFn,
 	onPayloadCreatedFn,
@@ -362,6 +367,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		fallbackTarget: target,
 		onPoseFn: magneticProjector.projectPoseFn,
 		onSettledFn: () => {
+			if (!isCueActiveFn()) return;
 			magneticProjector.releaseFn();
 			RendererRuntime.runSync(
 				flashMotionTargetFx({
@@ -377,8 +383,10 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 							animator,
 							cueKey,
 							onCompleteFn: () => {
+								if (!isCueActiveFn()) return;
 								RendererRuntime.runSync(
 									returnInputRemainderFx({
+										isCueActiveFn,
 										actorStore,
 										animator,
 										cue,
@@ -393,6 +401,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 								);
 							},
 							onRemainderRevealedFn: () => {
+								if (!isCueActiveFn()) return;
 								if (source === null) {
 									RendererRuntime.runSync(
 										updateTileActorFx({
@@ -434,7 +443,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 				Effect.gen(function* () {
 					let settled = false;
 					const settleFn = () => {
-						if (settled) return;
+						if (settled || !isCueActiveFn()) return;
 						settled = true;
 						RendererRuntime.runSync(
 							finishConsumedStackFx({

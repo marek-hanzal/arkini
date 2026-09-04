@@ -121,6 +121,7 @@ const runRefresh = async (
 	try {
 		const exit = await Effect.runPromiseExit(
 			refreshEditorProjectFx({
+				isNavigationPendingFn: () => false,
 				projectId: project.projectId,
 			}).pipe(
 				Effect.provideService(ProjectRepository, repository),
@@ -186,7 +187,9 @@ describe("refreshEditorProjectFx", () => {
 
 	it("reports replacement ownership collisions without touching mounted state", async () => {
 		const writeAdmission = Effect.runSync(createProjectWriteAdmissionFx);
-		const releaseFx = Effect.runSync(writeAdmission.acquireReplacementFx("checkout-version"));
+		const releaseFx = Effect.runSync(
+			writeAdmission.acquireReplacementFx("checkout-version", () => false),
+		);
 		try {
 			const result = await runRefresh("same", writeAdmission);
 			expect(Exit.isFailure(result.exit)).toBe(true);

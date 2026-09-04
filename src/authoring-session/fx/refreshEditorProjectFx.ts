@@ -15,6 +15,7 @@ import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProj
 
 export namespace refreshEditorProjectFx {
 	export interface Props {
+		readonly isNavigationPendingFn: () => boolean;
 		readonly projectId: string;
 	}
 }
@@ -30,15 +31,16 @@ const requestRefreshFx = (projectId: string) =>
 		responseMessage: "The editor project refresh response is invalid.",
 	});
 
-const acquireProjectRefreshFx = Effect.flatMap(ProjectWriteAdmission, (admission) =>
-	admission.acquireReplacementFx("refresh-project"),
-);
+const acquireProjectRefreshFx = (isNavigationPendingFn: () => boolean) =>
+	Effect.flatMap(ProjectWriteAdmission, (admission) =>
+		admission.acquireReplacementFx("refresh-project", isNavigationPendingFn),
+	);
 
 /** Hard-replaces the mounted project with its authoritative Editor-folder state. */
 export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
-	({ projectId }: refreshEditorProjectFx.Props) =>
+	({ isNavigationPendingFn, projectId }: refreshEditorProjectFx.Props) =>
 		Effect.acquireUseRelease(
-			acquireProjectRefreshFx,
+			acquireProjectRefreshFx(isNavigationPendingFn),
 			() =>
 				Effect.gen(function* () {
 					const repository = yield* ProjectRepository;

@@ -96,6 +96,10 @@ acquire replacement admission
 → recreate Editor Board Game
 ```
 
+Project Write Admission rejects replacement during an already pending route transition, reading current router state before taking the lock. Once acquired, it excludes ordinary writes and route changes until this replacement handshake finishes, including MCP checkout and hard Refresh. Navigation reads the live admission before and after any asynchronous draft decision, so replacement cannot discard drafts or resynchronize a Board belonging to a successor route.
+
+An identity rename first resolves the current draft leave decision, then holds the same admission authority from its revision-pinned write through navigation to the new project ID. This excludes replacement and unrelated navigation; ordinary writes keep repository revision checks. Only the rename's terminal route bypasses the navigation guard while its lease is live. Failure releases admission and remains visible in the rename dialog.
+
 External changes are ignored while mounted. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Version commit and Build admission

@@ -40,6 +40,7 @@ export const bootstrapEditorMcpVersionCheckoutFx = Effect.fn("bootstrapEditorMcp
 					await rendererRuntime.runPromise(
 						checkoutProjectVersionFx({
 							confirmDiscardCurrentChanges: true,
+							isNavigationPendingFn: () => router.state.status === "pending",
 							projectId: request.projectId,
 							versionId: request.versionId,
 						}),

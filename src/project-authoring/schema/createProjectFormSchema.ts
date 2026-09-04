@@ -193,5 +193,43 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			}
 			inventoryLocations.add(key);
 		});
+
+		const startItemQuantities = new Map<string, number>();
+		const validateMaxCountFn = (
+			itemId: string,
+			quantity: number,
+			path: (string | number)[],
+		) => {
+			const nextQuantity = (startItemQuantities.get(itemId) ?? 0) + quantity;
+			startItemQuantities.set(itemId, nextQuantity);
+			const item = project.config.items[itemId];
+			if (item?.maxCount === undefined || nextQuantity <= item.maxCount) return;
+			context.addIssue({
+				code: "custom",
+				message: `${item.title} may exist at most ${item.maxCount} times, but this start state would contain ${nextQuantity}.`,
+				path,
+			});
+		};
+		value.start.board.forEach((startItem, index) =>
+			validateMaxCountFn(startItem.itemId, startItem.quantity, [
+				"start",
+				"board",
+				index,
+			]),
+		);
+		value.start.inventory.forEach((startItem, index) =>
+			validateMaxCountFn(startItem.itemId, startItem.quantity, [
+				"start",
+				"inventory",
+				index,
+			]),
+		);
+		value.start.toolbar.forEach((startItem, index) =>
+			validateMaxCountFn(startItem.itemId, startItem.quantity, [
+				"start",
+				"toolbar",
+				index,
+			]),
+		);
 	});
 };

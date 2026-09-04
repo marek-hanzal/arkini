@@ -127,6 +127,58 @@ describe("planStartFx", () => {
 		]);
 	});
 
+	it("materializes the inventory opener on the Board", () => {
+		const result = Effect.runSync(
+			planStartFx({
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
+					},
+					currentSpace: 0,
+					items: [],
+					jobs: [],
+					jobQueue: [],
+
+					defaultLineByOwnerItemId: {},
+				},
+				start: {
+					currentSpace: 0,
+					board: [
+						{
+							itemId: "backpack",
+							space: 0,
+							x: 1,
+							y: 1,
+						},
+					],
+					inventory: [],
+					toolbar: [],
+				},
+			}).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(result.items).toEqual([
+			expect.objectContaining({
+				item: startTestConfig.items.backpack,
+				location: {
+					space: 0,
+					position: {
+						x: 1,
+						y: 1,
+					},
+					scope: "board",
+				},
+				quantity: 1,
+			}),
+		]);
+	});
+
 	it("materializes exact stacked board, toolbar, and positioned inventory starts", () => {
 		const result = Effect.runSync(
 			planStartFx({

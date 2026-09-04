@@ -18,6 +18,35 @@ const createProject = (overrides?: Partial<Project>): Project => ({
 	...overrides,
 });
 
+const createInventoryProject = () =>
+	createProject({
+		config: GameConfigSchema.parse({
+			...editorTestPayload.config,
+			meta: {
+				...editorTestPayload.config.meta,
+				toolbarSize: 1,
+			},
+			items: {
+				...editorTestPayload.config.items,
+				backpack: {
+					uid: "backpack",
+					id: "backpack",
+					type: "inventory",
+					title: "Backpack",
+					description: "Backpack",
+					asset: {
+						default: [
+							"item-water",
+						],
+					},
+					scope: "board",
+					maxCount: 1,
+					maxStackSize: 1,
+				},
+			},
+		}),
+	});
+
 const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 	title: project.config.meta.title,
 	hero: project.config.resources.hero,
@@ -121,34 +150,7 @@ describe("ProjectFormSchema", () => {
 	});
 
 	it("accepts the inventory control item in the initial toolbar", () => {
-		const config = GameConfigSchema.parse({
-			...editorTestPayload.config,
-			meta: {
-				...editorTestPayload.config.meta,
-				toolbarSize: 1,
-			},
-			items: {
-				...editorTestPayload.config.items,
-				backpack: {
-					uid: "backpack",
-					id: "backpack",
-					type: "inventory",
-					title: "Backpack",
-					description: "Backpack",
-					asset: {
-						default: [
-							"item-water",
-						],
-					},
-					scope: "board",
-					maxCount: 1,
-					maxStackSize: 1,
-				},
-			},
-		});
-		const project = createProject({
-			config,
-		});
+		const project = createInventoryProject();
 
 		expect(
 			createProjectFormSchema(project).safeParse({
@@ -168,5 +170,43 @@ describe("ProjectFormSchema", () => {
 				},
 			}).success,
 		).toBe(true);
+	});
+
+	it("rejects initial item quantities above the canonical max count across grids", () => {
+		const project = createInventoryProject();
+		const result = createProjectFormSchema(project).safeParse({
+			...createValidFormValue(project),
+			start: {
+				currentSpace: 0,
+				board: [
+					{
+						itemId: "backpack",
+						quantity: 1,
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+				toolbar: [
+					{
+						itemId: "backpack",
+						position: {
+							x: 0,
+							y: 0,
+						},
+						quantity: 1,
+					},
+				],
+			},
+		});
+
+		expect(result.success).toBe(false);
+		if (result.success) return;
+		expect(result.error.issues.map(({ path }) => path)).toContainEqual([
+			"start",
+			"toolbar",
+			0,
+		]);
 	});
 });

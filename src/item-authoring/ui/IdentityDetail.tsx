@@ -3,6 +3,7 @@ import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { ItemOverview } from "~/item-authoring/ui/ItemOverview";
 
 /** Presents the authored identity and storage contract of one item. */
@@ -11,7 +12,11 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorRootCard dataUi="EditorItemDetailCard">
-				<div className="grid gap-x-8 gap-y-3 min-[64rem]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+				<div className="grid gap-x-8 gap-y-5 min-[64rem]:grid-cols-[auto_minmax(0,2fr)_minmax(0,1fr)]">
+					<EditorItemThumbnail
+						resourceIds={item.asset.default}
+						size="xl"
+					/>
 					<FactList>
 						<Fact
 							label={translator.textFn("Type")}

@@ -505,79 +505,94 @@ describe("item section form session", () => {
 		expect(document.activeElement).toBe(duration);
 	});
 
-	it("pins dirty values through MCP refresh and renews the revision after discard and save", async () => {
-		let project = {
-			...(state.project as Project),
-			revision: 1,
-		};
-		state.project = project;
-		const { container, renderSection } = await render(<IdentitySection />);
-		const publishItem = async (canonical: ItemSchema.Type) => {
-			project = {
-				...project,
-				revision: project.revision + 1,
-				config: {
-					...project.config,
-					items: {
-						[canonical.id]: canonical,
-					},
-				},
+	it.each([
+		"edited",
+		"blurred",
+	] as const)(
+		"pins %s item values through MCP refresh and renews the revision after discard and save",
+		async (interaction) => {
+			let project = {
+				...(state.project as Project),
+				revision: 1,
 			};
 			state.project = project;
-			state.persisted = canonical;
-			await renderSection(<IdentitySection />);
-		};
-		await publishItem({
-			...item,
-			title: "First MCP title",
-		});
-		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
-		if (title === null) throw new Error("Missing item title input.");
-		expect(title.value).toBe("First MCP title");
-		await changeInput(title, "Local title");
-		await publishItem({
-			...item,
-			description: "Second MCP description",
-		});
-		state.saveItem.mockImplementation(async ({ expectedRevision, item: candidate }) => {
-			if (expectedRevision !== project.revision) throw new Error("Stale draft");
-			await publishItem(candidate);
-			return candidate;
-		});
-		await act(async () => {
-			await expect(state.unsavedSession?.saveFn()).rejects.toThrow("Stale draft");
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				expectedRevision: 2,
-				item: expect.objectContaining({
-					title: "Local title",
-					description: item.description,
+			const { container, renderSection } = await render(<IdentitySection />);
+			const publishItem = async (canonical: ItemSchema.Type) => {
+				project = {
+					...project,
+					revision: project.revision + 1,
+					config: {
+						...project.config,
+						items: {
+							[canonical.id]: canonical,
+						},
+					},
+				};
+				state.project = project;
+				state.persisted = canonical;
+				await renderSection(<IdentitySection />);
+			};
+			await publishItem({
+				...item,
+				title: "First MCP title",
+			});
+			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+			if (title === null) throw new Error("Missing item title input.");
+			expect(title.value).toBe("First MCP title");
+			if (interaction === "edited") await changeInput(title, "Local title");
+			else
+				await act(async () => {
+					title.focus();
+					title.blur();
+				});
+			await publishItem({
+				...item,
+				description: "Second MCP description",
+			});
+			if (interaction === "blurred") {
+				expect(title.value).toBe("First MCP title");
+				await changeInput(title, "Local title");
+			}
+			state.saveItem.mockImplementation(async ({ expectedRevision, item: candidate }) => {
+				if (expectedRevision !== project.revision) throw new Error("Stale draft");
+				await publishItem(candidate);
+				return candidate;
+			});
+			await act(async () => {
+				await expect(state.unsavedSession?.saveFn()).rejects.toThrow("Stale draft");
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 2,
+					item: expect.objectContaining({
+						title: "Local title",
+						description: item.description,
+					}),
 				}),
-			}),
-		);
-		expect(title.value).toBe("Local title");
-		await act(async () => state.unsavedSession?.discardFn());
-		await changeInput(title, "Saved title");
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				expectedRevision: 3,
-				item: expect.objectContaining({
-					description: "Second MCP description",
+			);
+			expect(title.value).toBe("Local title");
+			await act(async () => state.unsavedSession?.discardFn());
+			await changeInput(title, "Saved title");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 3,
+					item: expect.objectContaining({
+						description: "Second MCP description",
+					}),
 				}),
-			}),
-		);
-		await changeInput(title, "Saved again");
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				expectedRevision: 4,
-			}),
-		);
-	});
+			);
+			await changeInput(title, "Saved again");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 4,
+				}),
+			);
+		},
+	);
 });

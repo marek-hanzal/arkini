@@ -2,6 +2,7 @@ const artworkSizeClassName = {
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-11",
+	xl: "size-36",
 } as const;
 
 export interface ItemArtworkProps {

@@ -9,7 +9,7 @@ import {
 	type GameResourceUrls,
 } from "~/playable-game/fx/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
-import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
+import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";

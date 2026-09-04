@@ -36,6 +36,8 @@ import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
+import type { TileDelivery } from "~/game-scene/fx/readTileDeliveriesFx";
+import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 
 const projectionState = vi.hoisted(() => ({
 	cues: [] as unknown[],
@@ -447,6 +449,7 @@ export const createDrag = () => {
 export const createMotion = () =>
 	({
 		beginInteractionHandoffFx: () => Effect.succeed(false),
+		handoffSpawnsFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
 		redirectTargetFx: () => Effect.void,
@@ -462,6 +465,8 @@ export const createMotion = () =>
 
 export const createReconcilerHarness = ({
 	actor,
+	viewedDeliveries = [],
+	syncDeliveryFx = () => Effect.void,
 	motion = createMotion(),
 	pose = {
 		size: 80,
@@ -471,6 +476,8 @@ export const createReconcilerHarness = ({
 	readPose = true,
 }: {
 	readonly actor: PixiTileActor;
+	readonly viewedDeliveries?: ReadonlyArray<TileDelivery>;
+	readonly syncDeliveryFx?: DeliveryRuntime["syncFx"];
 	readonly motion?: MotionRuntime;
 	readonly pose?: {
 		readonly size: number;
@@ -504,7 +511,7 @@ export const createReconcilerHarness = ({
 				readonly kind: "tile-actors" | "tile-deliveries";
 				readonly surface: "inventory" | "main";
 			};
-			if (projection.kind === "tile-deliveries") return [];
+			if (projection.kind === "tile-deliveries") return viewedDeliveries;
 			if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
 			return projectionState[projection.surface];
 		},
@@ -524,7 +531,7 @@ export const createReconcilerHarness = ({
 				readSnapshotFx: Effect.succeed({
 					retainedActorIds: new Set(),
 				}),
-				syncFx: () => Effect.void,
+				syncFx: syncDeliveryFx,
 			},
 			dropPresentation,
 			game,

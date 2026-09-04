@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
-import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
+import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 

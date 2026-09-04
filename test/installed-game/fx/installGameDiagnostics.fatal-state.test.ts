@@ -14,7 +14,7 @@ import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import type { GameTransition } from "~/game-session/type/GameSession";
-import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
+import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 

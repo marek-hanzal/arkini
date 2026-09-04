@@ -632,6 +632,59 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			.exhaustive();
 
 	return {
+		handoffSpawnsFx: Effect.fn("MotionRuntime.handoffSpawnsFx")(function* (
+			actorIds: ReadonlySet<string>,
+		) {
+			if (closed) return;
+			const superseded = readCuesFn().filter(
+				(cue) => cue.kind === "spawn" && actorIds.has(cue.actorId),
+			);
+			if (superseded.length === 0) return;
+			const keys = new Set(superseded.map(readCueKeyFn));
+			const releasedActorIds = new Set<string>();
+			for (const cue of superseded) {
+				const key = readCueKeyFn(cue);
+				const started = cueLifecycleByKey.get(key)?.started === true;
+				// Retire before cancellation: callbacks must not settle or restart this cue.
+				cueLifecycleByKey.delete(key);
+				yield* animator.cancelFx(`motion:${key}`);
+				if (!started && cue.kind === "spawn") {
+					const actor = actorStore.actors.get(cue.actorId);
+					if (actor !== undefined)
+						yield* startActorEnterFx({
+							actor,
+							animator,
+						});
+				}
+				for (const actorId of readTileMotionActorClaimsFn(cue)) {
+					if (!actorIds.has(actorId)) releasedActorIds.add(actorId);
+				}
+			}
+			motionLanes = {
+				active: motionLanes.active.filter((cue) => !keys.has(readCueKeyFn(cue))),
+				pending: motionLanes.pending.filter((cue) => !keys.has(readCueKeyFn(cue))),
+			};
+			if (detachedSwapLegByActorId.size === 0) {
+				motionLanes = updateTileMotionLanesFn({
+					action: {
+						type: "enqueue",
+						cues: [],
+					},
+					state: motionLanes,
+				});
+			}
+			yield* finalizeMotionActorsFx({
+				actorIds: releasedActorIds,
+				actorStore,
+				animator,
+				application,
+				readPaletteFn,
+				stillClaimedActorIds: readRetainedActorIdsFn(),
+				surface,
+				textures,
+			});
+			// Reconciliation finishes the delivery takeover before startFx starts successors.
+		}),
 		beginInteractionHandoffFx: Effect.fn("MotionRuntime.beginInteractionHandoffFx")((actorId) =>
 			Effect.gen(function* () {
 				if (closed) return false;

@@ -22,50 +22,24 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies ItemDetailLines.Result;
 
-const readLineDisabledCauseFn = (
+const readLineDisabledHintFn = (
 	line: LineSchema.Type,
 	resolution: LineRun.Resolution,
-): Extract<
-	ItemDetailLines.UnavailableReason,
-	{
-		readonly kind: "line-disabled";
-	}
->["cause"] => {
+): string | undefined => {
+	// The first disable veto owns disclosure, even when it has no authored hint.
 	for (const [ruleIndex, result] of resolution.rules.entries()) {
 		if (result.type !== RuleTypeSchema.enum.Disable || !result.active) continue;
 		const rule = line.rules[ruleIndex];
 		if (rule?.type !== RuleTypeSchema.enum.Disable) continue;
-		if (rule.hint === undefined)
-			return {
-				kind: "static",
-			};
-		return {
-			kind: "disable-rule",
-			hint: rule.hint,
-			ruleIndex,
-			when: rule.when,
-		};
+		return rule.hint;
 	}
 	for (const [ruleIndex, result] of resolution.rules.entries()) {
 		if (result.type !== RuleTypeSchema.enum.Enable || result.active) continue;
 		const rule = line.rules[ruleIndex];
 		if (rule?.type !== RuleTypeSchema.enum.Enable) continue;
-		if (rule.hint === undefined)
-			return {
-				kind: "static",
-			};
-		const whenIndex = result.failedWhenIndex ?? 0;
-		return {
-			kind: "enable-rule",
-			hint: rule.hint,
-			ruleIndex,
-			whenIndex,
-			when: rule.when[whenIndex] ?? rule.when[0],
-		};
+		return rule.hint;
 	}
-	return {
-		kind: "static",
-	};
+	return undefined;
 };
 
 const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
@@ -133,7 +107,7 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 				kind: "unavailable",
 				reason: {
 					kind: "line-disabled",
-					cause: readLineDisabledCauseFn(line, resolution),
+					hint: readLineDisabledHintFn(line, resolution),
 				},
 			}
 		: directOutputBlock !== undefined

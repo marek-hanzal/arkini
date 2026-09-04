@@ -65,28 +65,6 @@ export namespace ItemDetailLinesProjection {
 		readonly definitionItemId?: string;
 	}
 
-	interface DisabledConditionContext {
-		readonly selector: Selector;
-		readonly locationLabel: string;
-		readonly detail?: ItemDetailReference;
-	}
-
-	export type DisabledCondition = DisabledConditionContext &
-		(
-			| {
-					readonly kind: "exists";
-			  }
-			| {
-					readonly kind: "count";
-					readonly count: number;
-			  }
-			| {
-					readonly kind: "range";
-					readonly min: number;
-					readonly max: number;
-			  }
-		);
-
 	export type DisabledReason =
 		| {
 				readonly kind: "owner-stored";
@@ -94,25 +72,7 @@ export namespace ItemDetailLinesProjection {
 		  }
 		| {
 				readonly kind: "line-disabled";
-				readonly cause:
-					| {
-							readonly kind: "static";
-					  }
-					| {
-							readonly kind: "enable-rule";
-							readonly hint: string;
-							readonly ruleIndex: number;
-							readonly whenIndex: number;
-							readonly condition: DisabledCondition;
-					  }
-					| {
-							readonly kind: "disable-rule";
-							readonly hint: string;
-							readonly ruleIndex: number;
-							readonly condition: readonly DisabledCondition[];
-					  };
-				readonly messageBeforeDetail?: string;
-				readonly messageAfterDetail?: string;
+				readonly hint: string | undefined;
 				readonly message: string;
 		  }
 		| {

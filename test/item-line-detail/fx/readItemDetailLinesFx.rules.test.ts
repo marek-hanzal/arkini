@@ -10,7 +10,7 @@ import {
 import type { RuntimeSchema } from "../support/readItemDetailLinesFxFixture";
 
 describe("readItemDetailLinesFx / rule projection", () => {
-	it("keeps unhinted rule causes private and gives disable veto deterministic priority", () => {
+	it("keeps unhinted rule conditions private", () => {
 		const job = {
 			id: "job:workshop",
 			ownerItemId: "runtime:workshop",
@@ -26,15 +26,6 @@ describe("readItemDetailLinesFx / rule projection", () => {
 				job,
 			],
 		});
-		const disableVeto = readLines({
-			...lineRunRuntime({
-				blocker: true,
-				permit: false,
-			}),
-			jobs: [
-				job,
-			],
-		});
 		const enabled = readLines({
 			...lineRunRuntime({
 				permit: true,
@@ -43,11 +34,7 @@ describe("readItemDetailLinesFx / rule projection", () => {
 				job,
 			],
 		});
-		if (
-			missingPermit.kind !== "available" ||
-			disableVeto.kind !== "available" ||
-			enabled.kind !== "available"
-		) {
+		if (missingPermit.kind !== "available" || enabled.kind !== "available") {
 			throw new Error("Expected live line projections.");
 		}
 
@@ -55,72 +42,63 @@ describe("readItemDetailLinesFx / rule projection", () => {
 			kind: "unavailable",
 			reason: {
 				kind: "line-disabled",
-				cause: {
-					kind: "static",
-				},
-			},
-		});
-		expect(disableVeto.line[0]?.availability).toEqual({
-			kind: "unavailable",
-			reason: {
-				kind: "line-disabled",
-				cause: {
-					kind: "static",
-				},
+				hint: undefined,
 			},
 		});
 		expect(enabled.line[0]?.availability).toMatchObject({
 			kind: "available",
 		});
 	});
-	it("projects only active authored rule hints and uses hints for disabled causes", () => {
+	it("keeps active hints and lets the first disable veto own disclosure even without a hint", () => {
 		const workshop = lineRunTestConfig.items.workshop;
 		if (workshop.type !== "producer") throw new Error("Expected producer workshop.");
-		const hintedConfig = GameConfigSchema.parse({
-			...lineRunTestConfig,
-			items: {
-				...lineRunTestConfig.items,
-				workshop: {
-					...workshop,
-					lines: workshop.lines.map((line) => ({
-						...line,
-						rules: line.rules.map((rule) => ({
-							...rule,
-							hint:
-								rule.type === "enable"
-									? "A permit is required."
-									: rule.type === "disable"
-										? "A blocker prevents this line."
-										: rule.type === "runtime:multiplier"
-											? "A booster speeds up production."
-											: undefined,
+		const readHintedLines = (runtime: RuntimeSchema.Type, disableHint: string | undefined) => {
+			const hintedConfig = GameConfigSchema.parse({
+				...lineRunTestConfig,
+				items: {
+					...lineRunTestConfig.items,
+					workshop: {
+						...workshop,
+						lines: workshop.lines.map((line) => ({
+							...line,
+							rules: line.rules.map((rule) => ({
+								...rule,
+								hint:
+									rule.type === "enable"
+										? "A permit is required."
+										: rule.type === "disable"
+											? disableHint
+											: rule.type === "runtime:multiplier"
+												? "A booster speeds up production."
+												: undefined,
+							})),
 						})),
-					})),
+					},
 				},
-			},
-		});
-		const hintedRuntime = (runtime: RuntimeSchema.Type) =>
-			({
-				...runtime,
-				items: runtime.items.map((item) =>
-					item.id === "runtime:workshop"
-						? {
-								...item,
-								item: hintedConfig.items.workshop,
-							}
-						: item,
-				),
-			}) satisfies RuntimeSchema.Type;
+			});
+			return readLines(
+				{
+					...runtime,
+					items: runtime.items.map((item) =>
+						item.id === "runtime:workshop"
+							? {
+									...item,
+									item: hintedConfig.items.workshop,
+								}
+							: item,
+					),
+				},
+				"runtime:workshop",
+				hintedConfig,
+			);
+		};
 
-		const active = readLines(
-			hintedRuntime(
-				lineRunRuntime({
-					permit: true,
-					booster: true,
-				}),
-			),
-			"runtime:workshop",
-			hintedConfig,
+		const active = readHintedLines(
+			lineRunRuntime({
+				permit: true,
+				booster: true,
+			}),
+			undefined,
 		);
 		if (active.kind !== "available") throw new Error("Expected active line hints.");
 		expect(active.line[0]?.activeRuleHints).toEqual([
@@ -128,32 +106,48 @@ describe("readItemDetailLinesFx / rule projection", () => {
 			"A booster speeds up production.",
 		]);
 
-		const disabled = readLines(
-			hintedRuntime({
-				...lineRunRuntime({}),
-				jobs: [
-					{
-						id: "job:workshop",
-						ownerItemId: "runtime:workshop",
-						lineId: "line:workshop:build",
-						durationMs: 1_000,
-						remainingMs: 400,
-					},
-				],
-			}),
-			"runtime:workshop",
-			hintedConfig,
-		);
+		const pendingRuntime = {
+			...lineRunRuntime({}),
+			jobs: [
+				{
+					id: "job:workshop",
+					ownerItemId: "runtime:workshop",
+					lineId: "line:workshop:build",
+					durationMs: 1_000,
+					remainingMs: 400,
+				},
+			],
+		};
+		const disabled = readHintedLines(pendingRuntime, undefined);
 		if (disabled.kind !== "available") throw new Error("Expected disabled line detail.");
 		expect(disabled.line[0]?.availability).toMatchObject({
 			kind: "unavailable",
 			reason: {
 				kind: "line-disabled",
-				cause: {
-					kind: "enable-rule",
-					hint: "A permit is required.",
-				},
+				hint: "A permit is required.",
 			},
 		});
+		for (const hint of [
+			undefined,
+			"A blocker prevents this line.",
+		]) {
+			const vetoed = readHintedLines(
+				{
+					...lineRunRuntime({
+						blocker: true,
+					}),
+					jobs: pendingRuntime.jobs,
+				},
+				hint,
+			);
+			if (vetoed.kind !== "available") throw new Error("Expected disabled line detail.");
+			expect(vetoed.line[0]?.availability).toEqual({
+				kind: "unavailable",
+				reason: {
+					kind: "line-disabled",
+					hint,
+				},
+			});
+		}
 	});
 });

@@ -81,7 +81,7 @@ Local MCP always starts on the port saved by the Editor. `--remote` additionally
 
 ## Distribution
 
-`argc preview-macos --build` rebuilds and launches an unpacked local arm64 app. Always pass `--build` to platform preview commands so the opened application reflects the current source. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.
+`argc preview-macos --build` rebuilds and launches an unpacked local arm64 app. Always pass `--build` to platform preview commands so the opened application reflects the current source. A failed Arkpack rebuild is reported but does not block this interactive preview: it keeps the last successful bundled Arkpack when available, or starts without one. `argc build`, repository checks, and native package commands remain strict. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.
 
 Working branches run the complete repository gate on hosted Linux and the focused platform gate on macOS and Windows; every platform builds and verifies a Community Arkpack. `main` deliberately runs nothing. Prerelease tags repeat those gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release.
 

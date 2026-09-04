@@ -10,6 +10,7 @@ import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { startFx } from "~/game-start/fx/startFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace createEditorBoardGameFx {
@@ -44,6 +45,13 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			resources: project.resources,
 		});
 		if (state === undefined) yield* session.runFx(startFx());
+		if (state === undefined) {
+			yield* session.runFx(
+				setInstantGameplayFx({
+					enabled: true,
+				}),
+			);
+		}
 		yield* session.runFx(
 			setCheatEnabledFx({
 				enabled: true,

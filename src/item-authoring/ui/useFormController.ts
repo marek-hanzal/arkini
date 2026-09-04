@@ -250,9 +250,10 @@ export const useFormController = ({
 		enableCapability,
 		form,
 	]);
-	const itemId = useStore(form.store, (state) => state.values.id);
 	const dirty = useStore(form.store, (state) => state.isDirty);
-	const draftRevision = useAuthoringDraftRevision(project.revision, dirty);
+	const touched = useStore(form.store, (state) => state.isTouched);
+	const draftRevision = useAuthoringDraftRevision(project.revision, touched);
+	const itemId = useStore(form.store, (state) => state.values.id);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);

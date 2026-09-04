@@ -222,7 +222,8 @@ export const useProjectFormController = ({
 		},
 	});
 	const dirty = useStore(form.store, (state) => state.isDirty);
-	const draftRevision = useAuthoringDraftRevision(project.revision, dirty);
+	const touched = useStore(form.store, (state) => state.isTouched);
+	const draftRevision = useAuthoringDraftRevision(project.revision, touched);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);

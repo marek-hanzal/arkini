@@ -14,8 +14,9 @@ export const ProjectBoardSection = () => {
 	const { form } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.board.width);
 	const height = useStore(form.store, (state) => state.values.board.height);
-	const currentSpace = useStore(form.store, (state) => state.values.start.currentSpace);
-	const startBoard = useStore(form.store, (state) => state.values.start.board);
+	const start = useStore(form.store, (state) => state.values.start);
+	const currentSpace = start.currentSpace;
+	const startBoard = start.board;
 	const [selectedSpace, setSelectedSpaceFn] = useState(currentSpace);
 	const [spaceInput, setSpaceInputFn] = useState(String(currentSpace));
 	const cells = startBoard
@@ -94,6 +95,7 @@ export const ProjectBoardSection = () => {
 					])
 				}
 				scope="board"
+				start={start}
 				width={width}
 			/>
 		</div>

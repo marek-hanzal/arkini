@@ -233,6 +233,8 @@ Location:
   value: Location
 Major Version commit consequence:
   value: Major versions are incompatible with existing saves. Players must start a new game.
+Max count reached:
+  value: Max count reached
 Minor Version commit consequence:
   value: Existing saves remain compatible with this minor version.
 New game required:

@@ -26,9 +26,14 @@ beforeEach(() => {
 	chatGptElectronState.views.length = 0;
 });
 
-const attachSurface = async () => {
+const attachSurface = async (ngrokDomain?: string) => {
 	const harness = createWindowHarness();
-	const controller = await Effect.runPromise(createChatGptViewControllerFx(harness.window));
+	const controller = await Effect.runPromise(
+		createChatGptViewControllerFx({
+			readMcpNgrokDomainFx: Effect.succeed(ngrokDomain),
+			window: harness.window,
+		}),
+	);
 	await Effect.runPromise(
 		controller.setSurfaceFx({
 			projectId: "project-one",
@@ -230,6 +235,50 @@ describe("ChatGPT WebContentsView controller", () => {
 		};
 		contents.emit("will-navigate", hiddenExternal);
 		expect(hiddenExternal.preventDefault).toHaveBeenCalledOnce();
+		harness.close();
+	});
+
+	it("retains the configured ngrok page when the ChatGPT workspace is reopened", async () => {
+		const { controller, harness, view } = await attachSurface("stable-example.ngrok-free.app");
+		const contents = view.webContents as unknown as TestWebContents;
+		contents.setCurrentUrl("https://stable-example.ngrok-free.app/remote/mcp/login");
+		await Effect.runPromise(controller.setSurfaceFx(null));
+		const loadsBeforeReentry = contents.loadURL.mock.calls.length;
+		const attachmentsBeforeReentry = harness.contentView.addChildView.mock.calls.length;
+
+		await Effect.runPromise(
+			controller.setSurfaceFx({
+				projectId: "project-one",
+				bounds: {
+					x: 0,
+					y: 0,
+					width: 500,
+					height: 350,
+				},
+			}),
+		);
+
+		expect(contents.loadURL).toHaveBeenCalledTimes(loadsBeforeReentry);
+		expect(harness.contentView.addChildView).toHaveBeenCalledTimes(
+			attachmentsBeforeReentry + 1,
+		);
+
+		contents.setCurrentUrl("https://stable-example.ngrok-free.app.example.com/remote/mcp");
+		await Effect.runPromise(controller.setSurfaceFx(null));
+		const loadsBeforeLookalikeReentry = contents.loadURL.mock.calls.length;
+		await Effect.runPromise(
+			controller.setSurfaceFx({
+				projectId: "project-one",
+				bounds: {
+					x: 0,
+					y: 0,
+					width: 500,
+					height: 350,
+				},
+			}),
+		);
+		expect(contents.loadURL).toHaveBeenCalledTimes(loadsBeforeLookalikeReentry + 1);
+		expect(contents.loadURL).toHaveBeenLastCalledWith("https://chatgpt.com/");
 		harness.close();
 	});
 

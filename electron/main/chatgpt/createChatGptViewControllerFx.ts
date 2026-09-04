@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { EditorMcpNgrokDomainSchema } from "~/authoring-mcp/schema/EditorMcpNgrokDomainSchema";
 import {
 	ChatGptAssetCandidateFilenameMaxLength,
 	ChatGptAssetCandidateMaxBytes,
@@ -26,6 +27,17 @@ export interface ChatGptViewController {
 	) => Effect.Effect<void, unknown, never>;
 }
 
+export namespace createChatGptViewControllerFx {
+	export interface Props {
+		readonly readMcpNgrokDomainFx: Effect.Effect<
+			EditorMcpNgrokDomainSchema.Type | undefined,
+			unknown,
+			never
+		>;
+		readonly window: BrowserWindow;
+	}
+}
+
 const CHAT_GPT_URL = "https://chatgpt.com/";
 const CHAT_GPT_ORIGIN = new URL(CHAT_GPT_URL).origin;
 const CHAT_GPT_PARTITION = "persist:arkini-chatgpt";
@@ -39,9 +51,16 @@ const isWebNavigationFn = (candidate: string) => {
 	}
 };
 
-const isChatGptNavigationFn = (candidate: string) => {
+const isRetainedNavigationFn = (
+	candidate: string,
+	ngrokDomain: EditorMcpNgrokDomainSchema.Type | undefined,
+) => {
 	try {
-		return new URL(candidate).origin === CHAT_GPT_ORIGIN;
+		const origin = new URL(candidate).origin;
+		return (
+			origin === CHAT_GPT_ORIGIN ||
+			(ngrokDomain !== undefined && origin === `https://${ngrokDomain}`)
+		);
 	} catch {
 		return false;
 	}
@@ -54,7 +73,7 @@ const isAbortedNavigationFn = (cause: unknown) =>
 
 /** Creates the isolated browser surface and bounded download owner for one window. */
 export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControllerFx")(
-	(window: BrowserWindow) =>
+	({ readMcpNgrokDomainFx, window }: createChatGptViewControllerFx.Props) =>
 		Effect.gen(function* () {
 			let view: WebContentsView | undefined;
 			let viewSession: Session | undefined;
@@ -64,6 +83,8 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 				type: "loading",
 			};
 			let allowDetachedMainFrameNavigation = false;
+			let configuredNgrokDomain: EditorMcpNgrokDomainSchema.Type | undefined;
+			let surfaceRequestGeneration = 0;
 			let surfaceGeneration = 0;
 			let candidatePending = false;
 			let activeDownload:
@@ -91,6 +112,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 				detachFn();
 			};
 			const clearSurfaceFn = () => {
+				surfaceRequestGeneration += 1;
 				allowDetachedMainFrameNavigation = false;
 				surface = null;
 				candidatePending = false;
@@ -284,7 +306,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 					if (
 						event.isMainFrame &&
 						!allowDetachedMainFrameNavigation &&
-						!isChatGptNavigationFn(event.url)
+						!isRetainedNavigationFn(event.url, configuredNgrokDomain)
 					)
 						event.preventDefault();
 				};
@@ -346,6 +368,7 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 			window.webContents.on("did-start-navigation", onArkiniNavigationFn);
 			window.webContents.on("render-process-gone", onArkiniRendererGoneFn);
 			window.once("closed", () => {
+				surfaceRequestGeneration += 1;
 				const temporaryPath = activeDownload?.path;
 				activeDownload?.item.cancel();
 				activeDownload = undefined;
@@ -374,38 +397,56 @@ export const createChatGptViewControllerFx = Effect.fn("createChatGptViewControl
 			});
 
 			return {
-				setSurfaceFx: (candidate) => {
-					const updateFx = Effect.sync(() => {
-						if (candidate === null) {
-							clearSurfaceFn();
-							return;
-						}
-						const reenteringSurface = surface === null;
-						if (surface !== null && surface.projectId !== candidate.projectId)
-							surfaceGeneration += 1;
-						surface = candidate;
-						const existing = view !== undefined;
-						const currentView = ensureViewFn();
-						const mustResetBeforeAttach =
-							existing &&
-							reenteringSurface &&
-							(state.type === "loading" ||
-								state.type === "unavailable" ||
-								!isChatGptNavigationFn(currentView.webContents.getURL()));
-						if (mustResetBeforeAttach) {
-							loadFn(currentView.webContents);
-							sendStateFn();
-							return;
-						}
-						if (state.type === "loading") {
-							sendStateFn();
-							return;
-						}
-						attachFn(candidate);
-						sendStateFn();
-					});
-					return updateFx;
-				},
+				setSurfaceFx: (candidate) =>
+					candidate === null
+						? Effect.sync(clearSurfaceFn)
+						: Effect.gen(function* () {
+								const request = yield* Effect.sync(() => {
+									surfaceRequestGeneration += 1;
+									return {
+										generation: surfaceRequestGeneration,
+										refreshNgrokDomain: surface === null,
+									};
+								});
+								const ngrokDomain = request.refreshNgrokDomain
+									? yield* readMcpNgrokDomainFx.pipe(
+											Effect.catch(() => Effect.succeed(undefined)),
+										)
+									: configuredNgrokDomain;
+								yield* Effect.sync(() => {
+									if (request.generation !== surfaceRequestGeneration) return;
+									configuredNgrokDomain = ngrokDomain;
+									const reenteringSurface = surface === null;
+									if (
+										surface !== null &&
+										surface.projectId !== candidate.projectId
+									)
+										surfaceGeneration += 1;
+									surface = candidate;
+									const existing = view !== undefined;
+									const currentView = ensureViewFn();
+									const mustResetBeforeAttach =
+										existing &&
+										reenteringSurface &&
+										(state.type === "loading" ||
+											state.type === "unavailable" ||
+											!isRetainedNavigationFn(
+												currentView.webContents.getURL(),
+												configuredNgrokDomain,
+											));
+									if (mustResetBeforeAttach) {
+										loadFn(currentView.webContents);
+										sendStateFn();
+										return;
+									}
+									if (state.type === "loading") {
+										sendStateFn();
+										return;
+									}
+									attachFn(candidate);
+									sendStateFn();
+								});
+							}),
 			} satisfies ChatGptViewController;
 		}),
 );

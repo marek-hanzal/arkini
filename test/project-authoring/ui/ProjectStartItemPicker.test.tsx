@@ -5,6 +5,8 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectStartItemPicker } from "~/project-authoring/ui/ProjectStartItemPicker";
+import { startTestConfig } from "~test/game-start/support/startTestConfig";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -49,7 +51,15 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => void }) => {
+const PickerHarness = ({
+	onSelect,
+	scope = "inventory",
+	start = startTestConfig.start,
+}: {
+	readonly onSelect: (itemId: string) => void;
+	readonly scope?: "board" | "inventory" | "toolbar";
+	readonly start?: typeof startTestConfig.start;
+}) => {
 	const [open, setOpen] = useState(false);
 	return (
 		<>
@@ -64,20 +74,31 @@ const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => vo
 				<ProjectStartItemPicker
 					onCloseFn={() => setOpen(false)}
 					onSelectFn={onSelect}
-					scope="inventory"
+					scope={scope}
+					start={start}
 				/>
 			) : null}
 		</>
 	);
 };
 
-const renderPicker = async (onSelect: (itemId: string) => void) => {
+const renderPicker = async (
+	onSelect: (itemId: string) => void,
+	props?: Omit<Parameters<typeof PickerHarness>[0], "onSelect">,
+) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
 	await act(async () => {
-		root.render(<PickerHarness onSelect={onSelect} />);
+		root.render(
+			<TranslationTestProvider>
+				<PickerHarness
+					{...props}
+					onSelect={onSelect}
+				/>
+			</TranslationTestProvider>,
+		);
 	});
 	const opener = container.querySelector<HTMLButtonElement>('[data-ui="PickerOpener"]');
 	if (opener === null) throw new Error("Expected picker opener.");
@@ -143,5 +164,37 @@ describe("ProjectStartItemPicker", () => {
 		});
 		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).toBeNull();
 		expect(document.activeElement).toBe(opener);
+	});
+
+	it("keeps a scope-compatible item visible but inert after reaching max count", async () => {
+		const onSelect = vi.fn();
+		const { container } = await renderPicker(onSelect, {
+			scope: "toolbar",
+			start: {
+				currentSpace: 0,
+				board: [
+					{
+						itemId: "backpack",
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+				toolbar: [],
+			},
+		});
+		const backpack = container.querySelector<HTMLButtonElement>(
+			'button[data-item-id="backpack"]',
+		);
+		if (backpack === null) throw new Error("Expected visible Backpack option.");
+
+		expect(backpack.disabled).toBe(true);
+		expect(
+			backpack.querySelector('[data-ui="ItemSpotlightOptionDisabledReason"]'),
+		).not.toBeNull();
+		await act(async () => backpack.click());
+		expect(onSelect).not.toHaveBeenCalled();
+		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).not.toBeNull();
 	});
 });

@@ -18,6 +18,7 @@ const errorMessageFn = (error: unknown) =>
 
 export namespace useCheatItemSpotlightController {
 	export interface Item {
+		readonly compositeUrl?: string;
 		readonly itemId: string;
 		readonly sourceUrl: string;
 		readonly title: string;
@@ -54,9 +55,14 @@ export const useCheatItemSpotlightController = ({
 	const items = useMemo(() => {
 		const exit = game.readFn(readCheatItemCatalogFx());
 		if (Exit.isFailure(exit)) throw exit.cause;
-		return exit.value.map(({ itemId, sourceResourceId, title }) => ({
+		return exit.value.map(({ itemId, sourceResourceIds, title }) => ({
+			...(sourceResourceIds[1] === undefined
+				? {}
+				: {
+						compositeUrl: game.getResourceUrlFn(sourceResourceIds[1]),
+					}),
 			itemId,
-			sourceUrl: game.getResourceUrlFn(sourceResourceId),
+			sourceUrl: game.getResourceUrlFn(sourceResourceIds[0]),
 			title,
 		}));
 	}, [

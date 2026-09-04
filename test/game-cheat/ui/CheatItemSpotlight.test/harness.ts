@@ -66,13 +66,18 @@ export const createGame = (): Game =>
 			Exit.succeed([
 				{
 					itemId: "item:alpha",
+					sourceResourceIds: [
+						"alpha",
+					],
 					title: "Alpha",
-					sourceResourceId: "alpha",
 				},
 				{
 					itemId: "item:beta",
+					sourceResourceIds: [
+						"beta",
+						"beta-overlay",
+					],
 					title: "Beta",
-					sourceResourceId: "beta",
 				},
 			]),
 		runFx: ((effect: Effect.Effect<unknown, unknown>) => {

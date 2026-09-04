@@ -122,4 +122,17 @@ describe("CheatItemSpotlight", () => {
 		expect(options).toHaveLength(1);
 		expect(options[0]?.dataset.itemId).toBe("item:beta");
 	});
+
+	it("renders the complete default artwork composition", async () => {
+		const { container } = await renderSpotlight();
+		await toggleSpotlight();
+
+		const images = container.querySelectorAll(
+			'[data-item-id="item:beta"] img',
+		);
+		expect(Array.from(images, (image) => image.getAttribute("src"))).toEqual([
+			"blob:beta",
+			"blob:beta-overlay",
+		]);
+	});
 });

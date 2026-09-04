@@ -7,6 +7,10 @@
 	background: var(--ak-accent);
 }
 
+.ak-search-input::-webkit-search-cancel-button {
+	display: none;
+}
+
 .ak-list {
 	isolation: isolate;
 }

@@ -10,6 +10,7 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { ListRow } from "~/item-authoring/ui/ListRow";
 import { Status } from "~/ui/ui/Status";
+import { SearchInput } from "~/ui/ui/SearchInput";
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
@@ -74,12 +75,12 @@ export const List = ({
 			header={
 				<header className="flex min-w-0 flex-wrap items-center gap-2">
 					<EditorHistoryBackButton to="/editor/welcome" />
-					<input
-						type="search"
+					<SearchInput
 						value={query}
-						className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						containerClassName="min-w-64 flex-1"
+						className="h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder="Search item title, ID or type…"
-						onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
+						onValueChangeFn={onQueryChangeFn}
 					/>
 					{itemType === undefined ? null : (
 						<button

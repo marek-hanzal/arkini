@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 
-/** Keeps the revision of a dirty draft until its values return to a canonical baseline. */
-export const useAuthoringDraftRevision = (revision: number, dirty: boolean) => {
+/** TanStack adopts refreshed defaults only while untouched; keep the same revision boundary. */
+export const useAuthoringDraftRevision = (revision: number, touched: boolean) => {
 	const draftRevision = useRef(revision);
 	useLayoutEffect(() => {
-		if (!dirty) draftRevision.current = revision;
+		if (!touched) draftRevision.current = revision;
 	}, [
-		dirty,
+		touched,
 		revision,
 	]);
 	return draftRevision;

@@ -662,102 +662,117 @@ describe("project section form session", () => {
 		]);
 	});
 
-	it("pins dirty project values through MCP refresh until discard or successful save", async () => {
-		let project: Project = {
-			...boardSpaceProject,
-			revision: 1,
-		};
-		state.project = project;
-		state.section = <ProjectGeneralSection />;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		const renderProject = async () => {
-			await act(async () => root.render(createElement(EditorProjectForm)));
-		};
-		const publishConfig = async (config: Project["config"]) => {
-			project = {
-				...project,
-				revision: project.revision + 1,
-				config,
+	it.each([
+		"edited",
+		"blurred",
+	] as const)(
+		"pins %s project values through MCP refresh until discard or successful save",
+		async (interaction) => {
+			let project: Project = {
+				...boardSpaceProject,
+				revision: 1,
 			};
 			state.project = project;
+			state.section = <ProjectGeneralSection />;
+			const container = document.createElement("div");
+			document.body.append(container);
+			const root = createRoot(container);
+			roots.push(root);
+			const renderProject = async () => {
+				await act(async () => root.render(createElement(EditorProjectForm)));
+			};
+			const publishConfig = async (config: Project["config"]) => {
+				project = {
+					...project,
+					revision: project.revision + 1,
+					config,
+				};
+				state.project = project;
+				await renderProject();
+			};
 			await renderProject();
-		};
-		await renderProject();
-		await publishConfig({
-			...project.config,
-			meta: {
-				...project.config.meta,
-				title: "First MCP title",
-				board: {
-					width: 30,
-					height: 30,
+			await publishConfig({
+				...project.config,
+				meta: {
+					...project.config.meta,
+					title: "First MCP title",
+					board: {
+						width: 30,
+						height: 30,
+					},
 				},
-			},
-		});
-		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
-		if (title === null) throw new Error("Missing project title input.");
-		expect(title.value).toBe("First MCP title");
-		await changeInput(title, "Local project title");
-		await publishConfig({
-			...project.config,
-			meta: {
-				...project.config.meta,
-				board: {
-					width: 31,
-					height: 31,
+			});
+			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+			if (title === null) throw new Error("Missing project title input.");
+			expect(title.value).toBe("First MCP title");
+			if (interaction === "edited") await changeInput(title, "Local project title");
+			else
+				await act(async () => {
+					title.focus();
+					title.blur();
+				});
+			await publishConfig({
+				...project.config,
+				meta: {
+					...project.config.meta,
+					board: {
+						width: 31,
+						height: 31,
+					},
 				},
-			},
-		});
-		state.saveConfig.mockImplementation(async ({ config, expectedRevision }) => {
-			if (expectedRevision !== project.revision) throw new Error("Stale draft");
-			await publishConfig(config);
-		});
-		await act(async () => {
-			await expect(state.unsavedSession?.saveFn()).rejects.toThrow("Stale draft");
-		});
-		expect(state.saveConfig).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				expectedRevision: 2,
-				config: expect.objectContaining({
-					meta: expect.objectContaining({
-						board: {
-							width: 30,
-							height: 30,
-						},
+			});
+			if (interaction === "blurred") {
+				expect(title.value).toBe("First MCP title");
+				await changeInput(title, "Local project title");
+			}
+			state.saveConfig.mockImplementation(async ({ config, expectedRevision }) => {
+				if (expectedRevision !== project.revision) throw new Error("Stale draft");
+				await publishConfig(config);
+			});
+			await act(async () => {
+				await expect(state.unsavedSession?.saveFn()).rejects.toThrow("Stale draft");
+			});
+			expect(state.saveConfig).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 2,
+					config: expect.objectContaining({
+						meta: expect.objectContaining({
+							board: {
+								width: 30,
+								height: 30,
+							},
+						}),
 					}),
 				}),
-			}),
-		);
-		expect(title.value).toBe("Local project title");
-		await act(async () => state.unsavedSession?.discardFn());
-		await changeInput(title, "Saved project title");
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveConfig).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				expectedRevision: 3,
-				config: expect.objectContaining({
-					meta: expect.objectContaining({
-						board: {
-							width: 31,
-							height: 31,
-						},
+			);
+			expect(title.value).toBe("Local project title");
+			await act(async () => state.unsavedSession?.discardFn());
+			await changeInput(title, "Saved project title");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveConfig).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 3,
+					config: expect.objectContaining({
+						meta: expect.objectContaining({
+							board: {
+								width: 31,
+								height: 31,
+							},
+						}),
 					}),
 				}),
-			}),
-		);
-		await changeInput(title, "Saved again");
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveConfig).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				expectedRevision: 4,
-			}),
-		);
-	});
+			);
+			await changeInput(title, "Saved again");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveConfig).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 4,
+				}),
+			);
+		},
+	);
 });

@@ -99,7 +99,11 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		lineId,
 		runtime,
 	});
-	const activeJobOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
+	// Pending work owns the source identity even before a Job starts.
+	const busyOwnerItemIds = new Set([
+		...runtime.jobs.map((job) => job.ownerItemId),
+		...runtime.jobQueue.map((request) => request.ownerItemId),
+	]);
 
 	const candidates: GridRuntimeItemSchema.Type[] = [];
 	for (const candidate of runtime.items) {
@@ -107,7 +111,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		if (
 			gridCandidate === undefined ||
 			gridCandidate.id === owner.id ||
-			activeJobOwnerItemIds.has(gridCandidate.id) ||
+			busyOwnerItemIds.has(gridCandidate.id) ||
 			!isLineInputAutofillSourceLocationFn({
 				location: gridCandidate.location,
 				ownerSpace: owner.location.space,

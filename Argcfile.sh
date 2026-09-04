@@ -26,24 +26,42 @@ build_desktop() {
 }
 
 install_game_arkpack() {
-	local source target verdict
+	local source source_dir target verdict
 	target=game/arkini/build/arkini.arkpack
 	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" ]]; then
-		node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini
+		node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini || return $?
 	else
-		source=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd)/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
+		source_dir=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd) || return $?
+		source=$source_dir/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
 		if [[ ! -f "$source" ]]; then
 			echo "Prebuilt Arkpack does not exist: $source" >&2
-			exit 1
+			return 1
 		fi
-		rm -rf game/arkini/build
-		mkdir -p game/arkini/build
-		cp "$source" "$target"
-		cmp "$source" "$target"
+		rm -rf game/arkini/build || return $?
+		mkdir -p game/arkini/build || return $?
+		cp "$source" "$target" || return $?
+		cmp "$source" "$target" || return $?
 	fi
 	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
 	node .out/desktop/build/main/cli/arkini.js arkpack verify "$target" |
-		grep -Fx "{\"type\":\"$verdict\"}"
+		grep -Fx "{\"type\":\"$verdict\"}" || return $?
+}
+
+install_preview_game_arkpack() {
+	local arkpack_exit_code target
+	target=game/arkini/build/arkini.arkpack
+	if install_game_arkpack; then
+		return
+	else
+		arkpack_exit_code=$?
+	fi
+	echo "Arkpack build failed with exit code $arkpack_exit_code; continuing application preview." >&2
+	if [[ -f "$target" ]]; then
+		echo "Using the last successfully built Arkpack: $target" >&2
+		return
+	fi
+	mkdir -p game/arkini/build
+	echo "No previously built Arkpack is available; continuing without a bundled game." >&2
 }
 
 format_check() {
@@ -274,7 +292,8 @@ preview-macos() {
 	application=.out/desktop/release/mac-arm64/Arkini.app
 	if [[ "${argc_build:-0}" == 1 || ! -d "$application" ]]; then
 		clean_desktop
-		build
+		build_desktop
+		install_preview_game_arkpack
 		electron-builder \
 			--config electron-builder.yml \
 			--mac \

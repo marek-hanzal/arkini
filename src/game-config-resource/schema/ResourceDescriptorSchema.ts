@@ -6,6 +6,12 @@ import { NonEmptyStringSchema } from "~/game-value/schema/NonEmptyStringSchema";
 export const ResourceDescriptorSchema = z
 	.object({
 		id: IdSchema.describe("The exact resource ID derived from the filename basename."),
+		kind: z
+			.enum([
+				"asset",
+				"resource",
+			])
+			.describe("The canonical source directory that owns this PNG."),
 		path: NonEmptyStringSchema.describe("The source path of this resource."),
 		mime: z.literal("image/png"),
 	})

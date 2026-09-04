@@ -41,6 +41,7 @@ read marker + schema + exact source paths
 → completed GameConfig parse
 → semantic and PNG-resource validation
 → assert no errors
+→ bounded RGBA normalization for `assets/`; byte-preserving `resources/`
 → MessagePack encode
 → gzip Arkpack
 ```
@@ -60,7 +61,7 @@ arkini-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-sessi
 
 Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files. Its bounded text report distinguishes a reproduced fatal failure from a timeout, includes semantic history, and compares the initial and final runtime without dumping duplicate complete states. The common rotating diagnostic directory contains human-readable application runtime and fatal history in `application.md` beside the private gameplay session stream in `diagnostics.jsonl`. Every application record carries severity, the `package.json` application version, packaged/development mode, platform, and architecture; any bounded normalization or final text truncation is visible in the record. Diagnostic slicing defaults to the latest failed gameplay session, accepts the fixed text incident or that rotating JSONL stream, reports malformed input without physical paths, and renders only stable human/LLM-readable text. `--session-id` selects only JSONL sessions; `--section runtime` reads only the fixed incident's complete runtime projection. The fixed incident directory links `incident.md`, `failure.md`, `history.md`, and `runtime-state.md`; Item references include runtime ID, authored ID, and immutable configured UID whenever resolution is possible.
 
-The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary local and Editor builds are Community.
+The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary local and Editor builds are Community. Item artwork from `assets/` is compiled to an aspect-preserving RGBA PNG no larger than 256 × 256 pixels without enlarging smaller artwork. Package-shell PNGs from `resources/` retain their exact source bytes and dimensions.
 
 [`Argcfile.sh`](Argcfile.sh) `version` updates `package.json`, `package-lock.json`, and the official `project.json.arkini` writer stamp as one repository operation.
 

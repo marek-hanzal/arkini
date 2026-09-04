@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { PngResourceLimits } from "~/game-config-resource/constant/PngResourceLimits";
+
 const pngMagic = [
 	137,
 	80,
@@ -10,12 +12,6 @@ const pngMagic = [
 	26,
 	10,
 ] as const;
-
-export const PngResourceLimits = {
-	maxBytes: 16 * 1024 * 1024,
-	maxDimension: 8192,
-	maxPixels: 16 * 1024 * 1024,
-} as const;
 
 /** Admits one bounded PNG resource and releases the temporary browser bitmap. */
 export const validatePngResourceFx = Effect.fn("validatePngResourceFx")(

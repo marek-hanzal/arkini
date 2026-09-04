@@ -1,3 +1,7 @@
+import {
+	createAlternateTestPngBytes,
+	createTestPngBytes,
+} from "~/../test/arkpack-support/fn/createTestPngBytes";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
@@ -55,18 +59,12 @@ export const editorTestPayload: PayloadSchema.Type = {
 		{
 			id: "hero",
 			mime: "image/png",
-			bytes: new Uint8Array([
-				1,
-				2,
-			]),
+			bytes: createTestPngBytes(),
 		},
 		{
 			id: "item-water",
 			mime: "image/png",
-			bytes: new Uint8Array([
-				3,
-				4,
-			]),
+			bytes: createAlternateTestPngBytes(),
 		},
 	],
 };

@@ -5,17 +5,20 @@ import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJs
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
-/** Smallest signature-bearing PNG fixture needed by artifact packing. */
-export const png = new Uint8Array([
-	0x89,
-	0x50,
-	0x4e,
-	0x47,
-	0x0d,
-	0x0a,
-	0x1a,
-	0x0a,
-]);
+export const png = Uint8Array.from(
+	Buffer.from(
+		"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+		"base64",
+	),
+);
+
+/** 512 × 128 RGBA PNG with uniform half-opacity for resize and alpha assertions. */
+export const assetPng = Uint8Array.from(
+	Buffer.from(
+		"iVBORw0KGgoAAAANSUhEUgAAAgAAAACACAYAAAB9V9ELAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAB0UlEQVR42u3WMQ0AAAjAMOSgCTXIQxY2SOhRA7sWk9UAwC8hAgAYAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAAAwAACAAQAADAAAYAAAAAMAABgAAMAAAAAGAAAwAACAAQAADAAAYAAAAAMAABgAAMAAAAAGAAAwAABgAAAAAwAAGAAAwAAAAAYAADAAAIABAAAMAABgAAAAAwAAGAAAwAAAAAYAADAAAIABAAAMAABgAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAADAAACAARACAAwAAGAAAAADAAAYAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAADAAAAABgAAMAAAgAEAAAMgAgAYAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAADAAAAABgAAMAAAgAEAAAwAAGAAAAADAAAYAAAwAACAAQAADAAAYAAAAAMAABgAAMAAAAAGAAAwAACAAQAADAAAYAAAAAMAABgAAMAAAAAGAAAwAABgAAAAAwAAGAAAwAAAAAYAADAAAMBtC+C0GtcxrB0UAAAAAElFTkSuQmCC",
+		"base64",
+	),
+);
 
 const config = GameConfigSchema.parse({
 	meta: {
@@ -127,7 +130,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		}),
 	);
 	yield* fileSystem.writeFile(path.join(resources, "hero.png"), png);
-	yield* fileSystem.writeFile(path.join(assets, "item-water.png"), png);
+	yield* fileSystem.writeFile(path.join(assets, "item-water.png"), assetPng);
 
 	return input;
 });

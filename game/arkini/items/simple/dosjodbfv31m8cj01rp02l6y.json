@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dosjodbfv31m8cj01rp02l6y",
+		"id": "grapes",
+		"title": "Grapes",
+		"description": "Yummy",
+		"asset": {
+			"default": [
+				"grapes"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"type": "simple"
+	}
+}

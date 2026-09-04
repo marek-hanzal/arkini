@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "oqd4xlccpvvyx2ouqj4cype3",
+		"id": "grape-seed",
+		"title": "Grape Seed",
+		"description": "Wine Time!",
+		"asset": {
+			"default": [
+				"seed",
+				"grapes"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"type": "simple"
+	}
+}

@@ -82,6 +82,44 @@
 						"type": "enable"
 					}
 				]
+			},
+			{
+				"id": "lubmer-camp-blueprint",
+				"title": "Lumber Camp Blueprint",
+				"description": "Takes lumber camp and prints it on a new blueprint, so you can build a new one. Cool.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "lumber-camp-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
 			}
 		]
 	}

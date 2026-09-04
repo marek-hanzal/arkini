@@ -25,7 +25,19 @@
 				"runtimeMs": 10000,
 				"input": [
 					{
-						"type": "simple"
+						"charges": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "deposit",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "stone-deposit"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
 					}
 				],
 				"output": {

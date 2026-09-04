@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "m3bp1730f21d2vwwevt41xlv",
+		"id": "empty-field",
+		"title": "Empty Field",
+		"description": "Wanna grow something?",
+		"asset": {
+			"default": [
+				"empty-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

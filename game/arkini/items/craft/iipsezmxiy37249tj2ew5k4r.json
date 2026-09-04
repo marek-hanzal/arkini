@@ -1,0 +1,84 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "iipsezmxiy37249tj2ew5k4r",
+		"id": "tree-seed",
+		"title": "Tree Seed",
+		"description": "More trees, tree lovers!",
+		"asset": {
+			"default": [
+				"seed",
+				"tree"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"charges": {
+			"amount": 1
+		},
+		"type": "craft",
+		"line": {
+			"id": "tree",
+			"title": "Grow a tree",
+			"description": "Newborn tree.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 30000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "water"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 4,
+						"max": 4
+					},
+					"capacity": 0
+				},
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "deposit",
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "tree-seed"
+						},
+						"scope": "board",
+						"distance": "self"
+					}
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "tree",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	}
+}

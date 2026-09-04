@@ -59,28 +59,14 @@
 				"y": 0,
 				"space": 0,
 				"itemId": "stone",
-				"quantity": 1
+				"quantity": 8
 			},
 			{
 				"x": 1,
 				"y": 0,
 				"space": 0,
 				"itemId": "wood",
-				"quantity": 1
-			},
-			{
-				"x": 1,
-				"y": 1,
-				"space": 0,
-				"itemId": "lumer-camp",
-				"quantity": 1
-			},
-			{
-				"x": 14,
-				"y": 1,
-				"space": 0,
-				"itemId": "stonemason-camp",
-				"quantity": 1
+				"quantity": 8
 			}
 		],
 		"inventory": [],

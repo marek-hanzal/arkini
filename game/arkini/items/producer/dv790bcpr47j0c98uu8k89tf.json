@@ -1,0 +1,83 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dv790bcpr47j0c98uu8k89tf",
+		"id": "stoneworks",
+		"title": "Stoneworks",
+		"description": "Even this one is good to advance - stone would be better stone. Everybody likes better stones!",
+		"asset": {
+			"default": [
+				"stoneworks"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "stone-block",
+				"title": "Stone Block",
+				"description": "You'll get better stone from simple good old stone boulder.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 10
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "stone-block",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.5,
+									"drop": [
+										{
+											"itemId": "stone-block",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

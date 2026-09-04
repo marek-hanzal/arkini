@@ -1,31 +1,54 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "uugdqcs2ghv34ol6rxal8fk5",
-		"id": "stone-deposit-deplated",
-		"title": "Once upon a time, here was stone",
-		"description": "Stone is no longer here, but you can use some tools to find a new deposit!",
+		"uid": "fs7g7flliyj78y8bw6t3djrt",
+		"id": "well",
+		"title": "Well",
+		"description": "Source of water. This one is full.",
 		"asset": {
 			"default": [
-				"stone-source-depleted"
+				"well"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
 		"charges": {
-			"amount": 1
+			"amount": 12,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-well",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
 		},
-		"maxQueueSize": 1,
-		"type": "producer",
+		"maxQueueSize": 8,
+		"type": "deposit",
 		"lines": [
 			{
-				"id": "stone-deposit",
-				"title": "Search Stone Deposit",
-				"description": "Describe what this producer line consumes and produces.",
+				"id": "water",
+				"title": "Water",
+				"description": "Get some water for you infrastructure. Fresh, from deepness of earth!",
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 0,
+				"runtimeMs": 6000,
 				"input": [
 					{
 						"charges": {
@@ -36,7 +59,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-deposit-deplated"
+								"itemId": "well"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -52,12 +75,12 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "stone-deposit",
+											"itemId": "water",
 											"quantity": {
 												"min": 1,
 												"max": 1
 											},
-											"placement": "random",
+											"placement": "drop",
 											"rules": []
 										}
 									]

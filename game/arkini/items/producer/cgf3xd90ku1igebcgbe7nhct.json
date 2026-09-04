@@ -1,0 +1,58 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "cgf3xd90ku1igebcgbe7nhct",
+		"id": "grain-farm",
+		"title": "Grain Farm",
+		"description": "Some food? Basic stuff here!",
+		"asset": {
+			"default": [
+				"grain-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "grain-field",
+				"title": "Grain Field",
+				"description": "We need a field, Huston!",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grain-field",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

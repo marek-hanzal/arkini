@@ -13,7 +13,30 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"charges": {
-			"amount": 8
+			"amount": 8,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "tree-seed",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
 		},
 		"maxQueueSize": 1,
 		"type": "deposit"

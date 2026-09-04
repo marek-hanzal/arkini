@@ -1,0 +1,249 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "x8z9v8tn5wa7qse7c7izy6b0",
+		"id": "base-camp",
+		"title": "Base Camp",
+		"description": "This is the start of your journey. Here you can build more stuff as you progress!",
+		"asset": {
+			"default": [
+				"base-camp"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 2,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "lumber-camp-blueprint",
+				"title": "Lumber Camp Blueprint",
+				"description": "If you need wood, here you go.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 8000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "wood"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "lumber-camp-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "stonemason-camp-blueprint",
+				"title": "Stonemason Camp Blueprint",
+				"description": "Stone time!",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "stonemason-camp-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "townhall-t1-blueprint",
+				"title": "Townhall I Blueprint",
+				"description": "Time to get better stuff, here you go!",
+				"default": false,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 6,
+							"max": 6
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "wood"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 6,
+							"max": 6
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "townhall-t1-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "You need lumber camp",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "lumer-camp"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
+					{
+						"hint": "You need stonemaseon.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stonemason-camp"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "well-blueprint",
+				"title": "Well Blueprint",
+				"description": "It's time to construct a well.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 12000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

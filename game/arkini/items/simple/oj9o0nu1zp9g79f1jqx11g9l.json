@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "oj9o0nu1zp9g79f1jqx11g9l",
+		"id": "empty-cauldron",
+		"title": "Empty Cauldron",
+		"description": "This is a good friend used for brew stuff.",
+		"asset": {
+			"default": [
+				"empty-cauldron"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

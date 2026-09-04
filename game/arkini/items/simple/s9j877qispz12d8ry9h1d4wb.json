@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "s9j877qispz12d8ry9h1d4wb",
+		"id": "water",
+		"title": "Water",
+		"description": "Everybody needs to drink.",
+		"asset": {
+			"default": [
+				"water-bucket"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

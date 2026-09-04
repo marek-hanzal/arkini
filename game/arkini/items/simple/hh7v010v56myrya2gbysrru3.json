@@ -1,0 +1,29 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hh7v010v56myrya2gbysrru3",
+		"id": "grain-seed",
+		"title": "Grain Seed",
+		"description": "Bio",
+		"asset": {
+			"default": [
+				"seed",
+				"grain"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "grain-field"
+			}
+		],
+		"type": "simple"
+	}
+}

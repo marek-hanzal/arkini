@@ -3,6 +3,7 @@ import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldError
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 interface EditorItemAutocompleteFieldProps {
 	readonly description?: string;
@@ -40,6 +41,10 @@ export const EditorItemAutocompleteField = ({
 };
 
 interface EditorItemReferenceControlProps {
+	readonly description?: string;
+	readonly emptyLabel?: string;
+	readonly error?: string;
+	readonly includeItemFn?: (item: ItemSchema.Type) => boolean;
 	readonly label: string;
 	readonly onChangeFn: (itemId: string) => void;
 	readonly value: string;
@@ -47,15 +52,21 @@ interface EditorItemReferenceControlProps {
 
 /** Reuses the canonical item autocomplete outside direct TanStack field bindings. */
 export const EditorItemReferenceControl = ({
+	description,
+	emptyLabel = "No known item matches this search.",
+	error,
+	includeItemFn,
 	label,
 	onChangeFn,
 	value,
 }: EditorItemReferenceControlProps) => {
-	const { items, options } = useEditorItemSearchOptions();
+	const { items, options } = useEditorItemSearchOptions(includeItemFn);
 	return (
 		<EditorSearchCombobox
+			description={description}
 			label={label}
-			emptyLabel="No known item matches this search."
+			emptyLabel={emptyLabel}
+			error={error}
 			options={options}
 			required
 			value={value}

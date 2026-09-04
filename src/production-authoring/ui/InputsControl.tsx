@@ -4,6 +4,8 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 import { InputControl } from "~/production-authoring/ui/InputControl";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
+import { useFormSession } from "~/item-authoring/ui/FormContext";
+import { useStore } from "@tanstack/react-form";
 
 interface InputsControlProps {
 	readonly allowMaterials?: boolean;
@@ -20,6 +22,11 @@ export const InputsControl = ({
 	value,
 }: InputsControlProps) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const { form } = useFormSession();
+	const selfChargesEnabled = useStore(
+		form.store,
+		(state) => state.values.charges !== undefined,
+	);
 	const replaceAtFn = (index: number, input: LineInputSchema.Type) => {
 		const next = value.map((current, currentIndex) =>
 			currentIndex === index ? input : current,
@@ -32,7 +39,7 @@ export const InputsControl = ({
 				description={
 					allowMaterials
 						? "Inputs belong only to this production line. At least one explicit input contract is required, and every configured contract must be satisfiable before a job can start. A Simple input explicitly requires no material."
-						: "Optional requirements settled when this action activates. Simple can spend an owner charge, while Deposit targets and may spend charges from a matching board item."
+						: "Optional requirements settled when this action activates. Simple adds no external item requirement, while Deposit targets a matching board item and may spend its charges."
 				}
 				title="Inputs"
 				variant="secondary"
@@ -71,6 +78,7 @@ export const InputsControl = ({
 					<InputControl
 						allowMaterials={allowMaterials}
 						input={value[index]}
+						selfChargesEnabled={selfChargesEnabled}
 						onChangeFn={(next) => replaceAtFn(index, next)}
 					/>
 				)}

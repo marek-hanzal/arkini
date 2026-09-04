@@ -1,15 +1,13 @@
-import { BatteryMedium, Trash2 } from "lucide-react";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { match } from "ts-pattern";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
-import { Button } from "~/ui/ui/Button";
-import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
-import { Tooltip } from "~/ui/ui/Tooltip";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
 const inputTypeOptions = [
 	{
@@ -50,98 +48,80 @@ type MaterialInput = Extract<
 	}
 >;
 
-const InputCharges = ({
+const hasChargesFn = (item: ItemSchema.Type) => item.charges !== undefined;
+
+const DepositPaidByControl = ({
+	input,
+	onChangeFn,
+	selfChargesEnabled,
+}: {
+	readonly input: DepositInput;
+	readonly onChangeFn: (input: DepositInput) => void;
+	readonly selfChargesEnabled: boolean;
+}) => {
+	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
+	return (
+		<EditorChoiceControl
+			label="Paid by"
+			value={charges.from}
+			options={[
+				{
+					description:
+						"The board item resolved by a Deposit input pays the charge cost in place. Only Deposit inputs may charge their target.",
+					label: "Target",
+					value: "target",
+				},
+				{
+					description: selfChargesEnabled
+						? "The item that owns this action pays the charge cost. It must define enough available charges."
+						: "Enable Charges on this item before selecting Self to pay its Deposit charge cost.",
+					disabled: !selfChargesEnabled,
+					label: "Self",
+					value: "self",
+				},
+			]}
+			onChangeFn={(from) =>
+				onChangeFn({
+					...input,
+					charges: {
+						...charges,
+						from,
+					},
+				})
+			}
+		/>
+	);
+};
+
+const DepositSelfChargeCostControl = ({
 	input,
 	onChangeFn,
 }: {
-	readonly input: LineInputSchema.Type;
-	readonly onChangeFn: (input: LineInputSchema.Type) => void;
+	readonly input: DepositInput;
+	readonly onChangeFn: (input: DepositInput) => void;
 }) => {
-	const charges = input.charges;
+	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
 	return (
-		<div className="grid gap-3">
+		<div className="grid gap-3" data-ui="EditorInputChargeCost">
 			<EditorFormSectionDivider
-				description="Optional charge payment when this input requirement settles."
+				description="Charge payment made by the item that owns this action when the Deposit input settles."
 				title="Charge cost"
 				variant="secondary"
 			/>
-			{charges === undefined ? (
-				<EditorCapabilityStatus
-					actionLabel="Enable charge cost"
-					description="This input currently settles without spending charges. Enable a cost to charge its owner or selected target when the action starts."
-					icon={BatteryMedium}
-					onEnableFn={() =>
-						onChangeFn({
-							...input,
-							charges: {
-								cost: 1,
-								from: "self",
-							},
-						})
-					}
-					title="Charge cost is disabled"
-				/>
-			) : (
-				<div className="grid items-end gap-3 sm:grid-cols-2">
-					<EditorChoiceControl
-						label="Paid by"
-						value={charges.from}
-						options={[
-							{
-								description:
-									"The item that owns this action pays the charge cost. It must define enough available charges.",
-								label: "Self",
-								value: "self",
-							},
-							{
-								description:
-									"The board item resolved by a Deposit input pays the charge cost in place. Only Deposit inputs may charge their target.",
-								label: "Target",
-								value: "target",
-							},
-						]}
-						onChangeFn={(from) =>
-							onChangeFn({
-								...input,
-								charges: {
-									...charges,
-									from,
-								},
-							})
-						}
-					/>
-					<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
-						<EditorNumberControl
-							label="Cost"
-							value={charges.cost}
-							min={1}
-							onChangeFn={(cost) =>
-								onChangeFn({
-									...input,
-									charges: {
-										...charges,
-										cost,
-									},
-								})
-							}
-						/>
-						<Tooltip content="Disable charge cost">
-							<Button
-								className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
-								data-ui="EditorInputChargeDisableButton"
-								onClick={() =>
-									onChangeFn({
-										...input,
-										charges: undefined,
-									})
-								}
-							>
-								<Trash2 className="size-4" />
-							</Button>
-						</Tooltip>
-					</div>
-				</div>
-			)}
+			<EditorNumberControl
+				label="Cost"
+				value={charges.cost}
+				min={1}
+				onChangeFn={(cost) =>
+					onChangeFn({
+						...input,
+						charges: {
+							...charges,
+							cost,
+						},
+					})
+				}
+			/>
 		</div>
 	);
 };
@@ -224,35 +204,85 @@ const MaterialInputControl = ({
 	</div>
 );
 
-const DepositInputControl = ({
+const DepositTargetChargeCostControl = ({
 	input,
 	onChangeFn,
 }: {
 	readonly input: DepositInput;
 	readonly onChangeFn: (input: DepositInput) => void;
-}) => (
-	<SelectorControl
-		value={input.query.selector}
-		onChangeFn={(selector) =>
-			onChangeFn({
-				...input,
-				query: {
-					...input.query,
-					selector,
-				},
-			})
-		}
-	/>
-);
+}) => {
+	const project = useEditorProject();
+	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
+	const selectedItem = project.config.items[input.query.selector.itemId];
+	const targetMissingCharges =
+		selectedItem !== undefined && selectedItem.charges === undefined;
+	return (
+		<div className="grid gap-3" data-ui="EditorInputChargeCost">
+			<EditorFormSectionDivider
+				description="Charge payment made by the selected Deposit target when this input settles."
+				title="Charge cost"
+				variant="secondary"
+			/>
+			<SelectorControl
+				description="Only items with Charges enabled are shown because the selected target pays this Deposit charge cost."
+				emptyLabel="No item with Charges enabled matches this search."
+				error={
+					targetMissingCharges ? "Selected target must have Charges enabled." : undefined
+				}
+				includeItemFn={hasChargesFn}
+				value={input.query.selector}
+				onChangeFn={(selector) =>
+					onChangeFn({
+						...input,
+						charges,
+						query: {
+							...input.query,
+							selector,
+						},
+					})
+				}
+			/>
+			<div className="grid items-end gap-3 sm:grid-cols-[auto_minmax(0,1fr)]">
+				<BoardDistanceControl
+					value={input.query}
+					onChangeFn={(query) => {
+						if (query.scope === "board")
+							onChangeFn({
+								...input,
+								charges,
+								query,
+							});
+					}}
+				/>
+				<EditorNumberControl
+					label="Cost"
+					value={charges.cost}
+					min={1}
+					onChangeFn={(cost) =>
+						onChangeFn({
+							...input,
+							charges: {
+								...charges,
+								cost,
+							},
+						})
+					}
+				/>
+			</div>
+		</div>
+	);
+};
 
 export const InputControl = ({
 	allowMaterials = true,
 	input,
 	onChangeFn,
+	selfChargesEnabled,
 }: {
 	readonly allowMaterials?: boolean;
 	readonly input: LineInputSchema.Type;
 	readonly onChangeFn: (input: LineInputSchema.Type) => void;
+	readonly selfChargesEnabled: boolean;
 }) => (
 	<article className="grid gap-4">
 		<div className="flex flex-wrap items-start justify-between gap-4">
@@ -269,36 +299,18 @@ export const InputControl = ({
 				)}
 				onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.inputs[type]))}
 			/>
-			{match(input)
-				.with(
-					{
-						type: "materials",
-					},
-					(material) => (
-						<MaterialModeControl
-							input={material}
-							onChangeFn={onChangeFn}
-						/>
-					),
-				)
-				.with(
-					{
-						type: "deposit",
-					},
-					(deposit) => (
-						<BoardDistanceControl
-							value={deposit.query}
-							onChangeFn={(query) => {
-								if (query.scope === "board")
-									onChangeFn({
-										...deposit,
-										query,
-									});
-							}}
-						/>
-					),
-				)
-				.otherwise(() => null)}
+			{input.type === "materials" ? (
+				<MaterialModeControl
+					input={input}
+					onChangeFn={onChangeFn}
+				/>
+			) : input.type === "deposit" ? (
+				<DepositPaidByControl
+					input={input}
+					selfChargesEnabled={selfChargesEnabled}
+					onChangeFn={onChangeFn}
+				/>
+			) : null}
 		</div>
 		{match(input)
 			.with(
@@ -322,17 +334,21 @@ export const InputControl = ({
 				{
 					type: "deposit",
 				},
-				(deposit) => (
-					<DepositInputControl
-						input={deposit}
-						onChangeFn={onChangeFn}
-					/>
-				),
+				(deposit) => {
+					const charges = deposit.charges ?? DraftDefaults.inputs.deposit.charges;
+					return charges.from === "target" ? (
+						<DepositTargetChargeCostControl
+							input={deposit}
+							onChangeFn={onChangeFn}
+						/>
+					) : (
+						<DepositSelfChargeCostControl
+							input={deposit}
+							onChangeFn={onChangeFn}
+						/>
+					);
+				},
 			)
 			.exhaustive()}
-		<InputCharges
-			input={input}
-			onChangeFn={onChangeFn}
-		/>
 	</article>
 );

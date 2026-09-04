@@ -2,14 +2,20 @@ import { useCallback, useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobox";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+
+const includeEveryItemFn = (_item: ItemSchema.Type) => true;
 
 /** Builds one canonical-item Fuse corpus used by every item reference picker. */
-export const useEditorItemSearchOptions = () => {
+export const useEditorItemSearchOptions = (
+	includeItemFn: (item: ItemSchema.Type) => boolean = includeEveryItemFn,
+) => {
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};
 	const options = useMemo(
 		() =>
 			Object.values(items)
+				.filter(includeItemFn)
 				.sort((left, right) => left.title.localeCompare(right.title))
 				.map(
 					(item) =>
@@ -26,6 +32,7 @@ export const useEditorItemSearchOptions = () => {
 						}) satisfies EditorSearchOption,
 				),
 		[
+			includeItemFn,
 			items,
 		],
 	);

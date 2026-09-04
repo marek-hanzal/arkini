@@ -241,6 +241,7 @@ export const EditorChoiceControl = <Value extends string>({
 	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<{
 		readonly description?: ReactNode;
+		readonly disabled?: boolean;
 		readonly label: string;
 		readonly value: Value;
 	}>;

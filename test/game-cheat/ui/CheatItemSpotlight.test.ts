@@ -127,9 +127,7 @@ describe("CheatItemSpotlight", () => {
 		const { container } = await renderSpotlight();
 		await toggleSpotlight();
 
-		const images = container.querySelectorAll(
-			'[data-item-id="item:beta"] img',
-		);
+		const images = container.querySelectorAll('[data-item-id="item:beta"] img');
 		expect(Array.from(images, (image) => image.getAttribute("src"))).toEqual([
 			"blob:beta",
 			"blob:beta-overlay",

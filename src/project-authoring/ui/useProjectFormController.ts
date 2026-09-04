@@ -16,13 +16,13 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
+import { useAuthoringFormValidation } from "~/authoring-form/ui/useAuthoringFormValidation";
 import {
 	readProjectFormDestinationForPathFn,
 	type ProjectFormDestination,
 } from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
-import { readEditorFormValidationMessageFn } from "~/editor-control/fn/readEditorFormValidationMessageFn";
 
 const ProjectFormPathLabelBySegment = {
 	avatars: "About avatars",
@@ -224,20 +224,11 @@ export const useProjectFormController = ({
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);
-	const validationIssues = useMemo(() => {
-		if (submissionAttempts === 0) return [];
-		const result = schema.safeParse(currentValues);
-		return result.success
-			? []
-			: result.error.issues.map((issue) => ({
-					message: readEditorFormValidationMessageFn(issue),
-					path: issue.path,
-				}));
-	}, [
-		currentValues,
+	const validationIssues = useAuthoringFormValidation({
 		schema,
 		submissionAttempts,
-	]);
+		values: currentValues,
+	});
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (!dirty || submitting) return false;

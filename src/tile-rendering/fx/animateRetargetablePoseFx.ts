@@ -44,20 +44,21 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 			toX: target.x,
 			toY: target.y,
 		});
+	const readTargetPoseFn = () => {
+		const latest = readTargetFn() ?? target;
+		return {
+			scale: readSizeFn() / Math.max(1, actor.size),
+			x: latest.x,
+			y: latest.y,
+		};
+	};
 	const readPoseFn = yield* createRetargetablePoseSamplerFx({
 		from: {
 			scale: actor.container.scale.x,
 			x: actor.container.x,
 			y: actor.container.y,
 		},
-		readTargetFn: () => {
-			const latest = readTargetFn() ?? target;
-			return {
-				scale: readSizeFn() / Math.max(1, actor.size),
-				x: latest.x,
-				y: latest.y,
-			};
-		},
+		readTargetFn: readTargetPoseFn,
 	});
 	yield* animator.animateFx({
 		actor,
@@ -67,6 +68,8 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 		onCancelFn,
 		onCompleteFn,
 		ownerKey,
-		readPoseFn,
+		// Layout settling has no follow-up leg: a dropped final frame must still
+		// land on the latest target before releasing the pose channel.
+		readPoseFn: (progress) => (progress === 1 ? readTargetPoseFn() : readPoseFn(progress)),
 	});
 });

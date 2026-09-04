@@ -68,6 +68,7 @@ const sceneState = vi.hoisted(() => ({
 	close: vi.fn(),
 	createContainer: undefined as (() => FakeContainer) | undefined,
 	deferFiniteTweens: false,
+	finiteTweenProgress: null as number | null,
 	drop: vi.fn(),
 	particleTextureClose: vi.fn(),
 	particleTextures: {
@@ -308,12 +309,15 @@ vi.mock("~/tile-rendering/fx/createAnimationDriverFx", async () => {
 					EffectModule.sync(() => {
 						const deferred = durationMs === 1_760 || sceneState.deferFiniteTweens;
 						onUpdateFn(
-							durationMs === 1_760 || durationMs === feedbackDurationMs ? 0.5 : to,
+							durationMs === 1_760 || durationMs === feedbackDurationMs
+								? 0.5
+								: (sceneState.finiteTweenProgress ?? to),
 						);
 						let active = true;
 						const complete = () => {
 							if (!active) return;
 							active = false;
+							if (sceneState.finiteTweenProgress !== null) onUpdateFn(to);
 							onCompleteFn?.();
 						};
 						if (deferred) {
@@ -665,6 +669,7 @@ beforeEach(() => {
 	sceneState.afterRenderWork.length = 0;
 	sceneState.close.mockClear();
 	sceneState.deferFiniteTweens = false;
+	sceneState.finiteTweenProgress = null;
 	sceneState.drop.mockClear();
 	sceneState.particleTextureClose.mockClear();
 	sceneState.items = [

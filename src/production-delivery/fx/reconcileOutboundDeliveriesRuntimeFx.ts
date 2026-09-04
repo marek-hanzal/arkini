@@ -91,7 +91,11 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 					continue;
 				}
 
-				const key = `${owner.id}:${line.id}:${allocation.inputIndex}`;
+				const key = JSON.stringify([
+					owner.id,
+					line.id,
+					allocation.inputIndex,
+				]);
 				let remainingTarget = remainingTargetBySlot.get(key);
 				if (remainingTarget === undefined) {
 					const storedQuantity = nextRuntime.items.reduce((total, candidate) => {

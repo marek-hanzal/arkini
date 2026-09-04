@@ -55,6 +55,24 @@ Description:
   value: Description
 Edit:
   value: Edit
+Editor Board:
+  value: Editor Board
+Editor Board help:
+  value: |
+    Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, charges, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
+
+    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Instant** removes waiting time while preserving normal requirements, placement, charges, and lifecycle rules; switch to **Common** to test the authored durations.
+
+    ### Scenarios
+
+    Scenarios are named snapshots of the current live game state. They are useful for instantly returning to different test setups and checking that specific configurations behave correctly—for example when reproducing an edge case, comparing production setups, or tuning runtimes and pacing without rebuilding the Board by hand.
+
+    - Choose a saved Scenario to restore it immediately.
+    - Use **+** to prepare a new name, then press **Save** to capture the current Board state.
+    - Press **Save** on a selected Scenario to update its snapshot.
+    - Deleting a Scenario removes only the saved snapshot; the current live Board stays unchanged.
+
+    Nothing is saved automatically. The live Board session itself is disposable.
 Editor MCP:
   value: Editor MCP
 Editor MCP help:
@@ -78,24 +96,6 @@ Editor MCP help:
     Open **Settings**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
 
     On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
-Editor Board:
-  value: Editor Board
-Editor Board help:
-  value: |
-    Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, charges, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
-
-    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Instant** removes waiting time while preserving normal requirements, placement, charges, and lifecycle rules; switch to **Common** to test the authored durations.
-
-    ### Scenarios
-
-    Scenarios are named snapshots of the current live game state. They are useful for instantly returning to different test setups and checking that specific configurations behave correctly—for example when reproducing an edge case, comparing production setups, or tuning runtimes and pacing without rebuilding the Board by hand.
-
-    - Choose a saved Scenario to restore it immediately.
-    - Use **+** to prepare a new name, then press **Save** to capture the current Board state.
-    - Press **Save** on a selected Scenario to update its snapshot.
-    - Deleting a Scenario removes only the saved snapshot; the current live Board stays unchanged.
-
-    Nothing is saved automatically. The live Board session itself is disposable.
 Estimate:
   value: Estimate
 Flow:

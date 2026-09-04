@@ -71,6 +71,8 @@ beforeEach(() => {
 		},
 	});
 	state.createFailures = 0;
+	state.listFailures = 0;
+	state.beforeCreateFn = undefined;
 	state.nextNote = 2;
 	state.notes = [
 		{
@@ -138,6 +140,57 @@ const click = async (element: Element | null) => {
 };
 
 describe("EditorNotes", () => {
+	it("clears an initial Notes read failure after explicit Retry succeeds", async () => {
+		state.listFailures = 1;
+		const container = await renderNotes();
+		expect(container.textContent).toContain("Notes could not be loaded.");
+		await click(
+			[
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === "Retry loading notes") ?? null,
+		);
+		expect(container.textContent).toContain("Existing note");
+		expect(container.textContent).not.toContain("Notes could not be loaded.");
+	});
+
+	it.each([
+		false,
+		true,
+	])("settles create before MCP refresh and retains failure: %s", async (failCreate) => {
+		state.createFailures = failCreate ? 1 : 0;
+		let completeCreateFn: (() => void) | undefined;
+		const createGate = new Promise<void>((resolveFn) => {
+			completeCreateFn = resolveFn;
+		});
+		state.beforeCreateFn = () => createGate;
+		const container = await renderNotes();
+		const composer = container.querySelector<HTMLTextAreaElement>("textarea");
+		if (composer === null) throw new Error("Missing note composer.");
+		await changeTextarea(composer, "Pending note");
+		const createButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Create note");
+		await click(createButton ?? null);
+		await act(async () => projectChangedFn?.("project-one"));
+
+		expect(composer.value).toBe("Pending note");
+		expect(createButton?.disabled).toBe(true);
+		expect(state.notes).toHaveLength(1);
+
+		await act(async () => completeCreateFn?.());
+		if (failCreate) {
+			expect(composer.value).toBe("Pending note");
+			expect(container.textContent).toContain("Note could not be saved.");
+			expect(state.notes).toHaveLength(1);
+			return;
+		}
+		expect(state.notes[0]?.content).toBe("Pending note");
+		expect(container.querySelector('[data-ui="EditorNote"]')?.textContent).toContain(
+			"Pending note",
+		);
+		expect(composer.value).toBe("");
+	});
+
 	it("renders stored note content as Markdown without embedded HTML", async () => {
 		state.notes[0] = {
 			...state.notes[0],

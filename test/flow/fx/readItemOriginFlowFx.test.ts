@@ -174,7 +174,12 @@ describe("readItemOriginFlow", () => {
 		);
 		expect(itemNode(flow, "ingot")).toEqual(
 			expect.objectContaining({
-				acquisitionSourceId: "source:forge:line:line:forge:run",
+				acquisitionSourceId: JSON.stringify([
+					"source",
+					"forge",
+					"line",
+					"line:forge:run",
+				]),
 			}),
 		);
 		expect(flow.edges).toEqual(

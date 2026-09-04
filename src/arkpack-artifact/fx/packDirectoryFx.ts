@@ -14,6 +14,7 @@ import { encodeFx } from "./encodeFx";
 import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
+import { resizePngAssetFx } from "~/game-config-resource/fx/resizePngAssetFx";
 
 const gzipAsyncFn = promisify(gzip);
 
@@ -52,16 +53,22 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 	});
 	const config = yield* assertGameConfigValidFx(compilation);
 	const identity = compilation.projectIdentity!;
-	const pngAssets = yield* Effect.forEach(compilation.resources, ({ path: assetPath }) =>
-		readPngResourceFx({
-			path: assetPath,
-		}),
+	const pngResources = yield* Effect.forEach(
+		compilation.resources,
+		({ kind, path: resourcePath }) =>
+			readPngResourceFx({
+				path: resourcePath,
+			}).pipe(
+				Effect.flatMap((resource) =>
+					kind === "asset" ? resizePngAssetFx(resource) : Effect.succeed(resource),
+				),
+			),
 	);
 	const bytes = yield* encodeFx({
 		version: identity.version,
 		arkini: ArkiniVersionSchema.parse(ArkiniAppVersion),
 		config,
-		resources: pngAssets,
+		resources: pngResources,
 	});
 	const compressed = yield* Effect.promise(async () => new Uint8Array(await gzipAsyncFn(bytes)));
 	const arkpack = yield* encodeArkpackEnvelopeFx({
@@ -119,7 +126,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		packageId: identity.packageId,
 		version: identity.version,
 		json: compilation.json,
-		png: pngAssets.length,
+		png: pngResources.length,
 		bytes: arkpack.byteLength,
 		content: arkpack,
 		contentHash,

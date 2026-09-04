@@ -9,7 +9,7 @@ This map separates authored values, portable source, diagnostics, semantic valid
 | `game-value` | Foundational immutable identity, required text, quantity and whole-millisecond time schemas | [`../game-value/schema/IdSchema.ts`](../game-value/schema/IdSchema.ts), [`../game-value/schema/TimeSchema.ts`](../game-value/schema/TimeSchema.ts) |
 | `game-config` | Completed authored aggregate and loaded-config capability | [`schema/GameConfigSchema.ts`](schema/GameConfigSchema.ts), [`context/GameConfigFx.ts`](context/GameConfigFx.ts) |
 | `game-config-source` | Portable filenames, source schemas, discovery, parsing and generated JSON Schema | [`../game-config-source/schema/ProjectSchema.ts`](../game-config-source/schema/ProjectSchema.ts), [`../game-config-source/fx/collectSourceFilesFx.ts`](../game-config-source/fx/collectSourceFilesFx.ts) |
-| `game-config-resource` | Embedded PNG/source descriptors, usage, rename, discovery and byte admission | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/readPngResourceFx.ts`](../game-config-resource/fx/readPngResourceFx.ts) |
+| `game-config-resource` | Embedded PNG/source descriptors, usage, rename, discovery, byte admission and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/readPngResourceFx.ts`](../game-config-resource/fx/readPngResourceFx.ts), [`../game-config-resource/fx/resizePngAssetFx.ts`](../game-config-resource/fx/resizePngAssetFx.ts) |
 | `game-config-diagnostic` | Provenance-aware diagnostic vocabulary and presentation | [`../game-config-diagnostic/schema/GameDiagnosticsSchema.ts`](../game-config-diagnostic/schema/GameDiagnosticsSchema.ts), [`../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts`](../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts) |
 | `game-config-validation` | Completed-config semantic validation and blocking diagnostics | [`../game-config-validation/fx/validateGameConfigFx.ts`](../game-config-validation/fx/validateGameConfigFx.ts) |
 | `game-config-compiler` | Deterministic source assembly, validation orchestration and compilation result | [`../game-config-compiler/fx/compileGameDirectoryFx.ts`](../game-config-compiler/fx/compileGameDirectoryFx.ts) |
@@ -46,7 +46,7 @@ project.json + schema.json + game.json + items + PNG resources
 → semantic and PNG validation
 → blocking-diagnostic gate
 → completed Game Config
-→ Arkpack encoding or Editor preview
+→ Arkpack-only Item-artwork normalization and encoding, or Editor preview
 ```
 
 Source, validation, Editor Build, CLI and packing must not create variants of this flow. Conflicts remain diagnostics with exact source provenance and never silently overwrite another provider.
@@ -56,6 +56,7 @@ Source, validation, Editor Build, CLI and packing must not create variants of th
 - `game-config` owns values only; it imports no source, validation, compiler, Editor, renderer, route or Electron behavior.
 - `game-value` owns only reusable scalar schemas and imports no Arkini domain.
 - Source reads exact allowlisted paths. Arbitrary recursive JSON is not game source.
+- Source resource descriptors retain whether a PNG came from `assets/` or `resources/`; Arkpack compilation normalizes only `assets/` and preserves `resources/` bytes.
 - The generated `schema.json` comes from the current project source-schema union and uses stable references.
 - Validation extends beyond Zod shape parsing and preserves source/entity provenance.
 - The compiler rejects blocking diagnostics and cannot publish a usable invalid result.

@@ -1,10 +1,8 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-	PngResourceLimits,
-	validatePngResourceFx,
-} from "~/game-config-resource/fx/validatePngResourceFx";
+import { PngResourceLimits } from "~/game-config-resource/constant/PngResourceLimits";
+import { validatePngResourceFx } from "~/game-config-resource/fx/validatePngResourceFx";
 
 afterEach(() => {
 	vi.unstubAllGlobals();

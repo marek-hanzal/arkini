@@ -1,13 +1,10 @@
-import { useAtomSet } from "@effect/atom-react";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
+import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
-import { runInventoryReleaseAtom } from "~/tile-interaction/atom/runInventoryReleaseAtom";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { createInventoryRuntimeFx } from "~/game-scene/fx/createInventoryRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
@@ -27,17 +24,9 @@ export const PixiInventorySurface = ({
 	readonly onSpaceActivatedFn: () => void;
 }) => {
 	const game = useGameEngine();
+	const { releaseInventoryItemFn, runSpaceActivationFn, runDropFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { interaction, textures } = usePixiGameRuntime();
-	const releaseInventoryItemFn = useAtomSet(runInventoryReleaseAtom(game), {
-		mode: "promise",
-	});
-	const runSpaceActivationFn = useAtomSet(runSpaceActivationAtom(game), {
-		mode: "promise",
-	});
-	const runDropFn = useAtomSet(runTileDropAtom(game), {
-		mode: "promise",
-	});
 	const hostRef = useRef<HTMLDivElement>(null);
 	const runtimeRef = useRef<InventoryRuntime | null>(null);
 	const controlsRef = useRef({

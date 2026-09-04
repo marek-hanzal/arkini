@@ -111,6 +111,7 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 			}),
 		)
 			.then(async () => {
+				setPendingFn(false);
 				if (
 					returnTo !== undefined &&
 					returnTo.startsWith(`/editor/${encodeURIComponent(project.projectId)}/`)

@@ -75,6 +75,8 @@ settle repository writes
 
 A failure before persisted replacement leaves the prior project authoritative. If persisted checkout succeeds but renderer refresh cannot recover, the renderer reloads rather than publishing a split projection.
 
+Project Write Admission rejects checkout while an already accepted route transition is pending; the three renderer replacement entrypoints pass a live router-state reader into the synchronous acquisition. Once acquired, admission excludes route changes for the complete checkout handshake. The navigation guard reads that authority when a transition is requested and again after an asynchronous draft decision. MCP checkout therefore finishes disk and renderer replacement in its admitted project; its final history navigation runs after replacement admission is released.
+
 ## Important invariants
 
 - `versions/head.json` is the only publication point for Version visibility.

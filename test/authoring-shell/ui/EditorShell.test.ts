@@ -9,11 +9,17 @@ import {
 	Outlet,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Effect, Exit } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
+import { checkoutProjectVersionFx } from "~/project-version/fx/checkoutProjectVersionFx";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";
@@ -171,6 +177,11 @@ const createTestRouter = ({
 	});
 	return createRouter({
 		routeTree: rootRoute.addChildren([
+			createRoute({
+				getParentRoute: () => rootRoute,
+				path: "/main-menu",
+				component: () => createElement("p", null, "Main menu"),
+			}),
 			editorRoute.addChildren([
 				route("assets", assetsLoader),
 				route("build"),
@@ -283,7 +294,7 @@ describe("EditorShell", () => {
 		const { container } = await renderRouter(router);
 
 		let projectNavigation!: Promise<void>;
-		act(() => {
+		await act(async () => {
 			projectNavigation = router.navigate({
 				to: "/editor/$projectId/project",
 				params: {
@@ -292,7 +303,7 @@ describe("EditorShell", () => {
 			});
 		});
 		let assetsNavigation!: Promise<void>;
-		act(() => {
+		await act(async () => {
 			assetsNavigation = router.navigate({
 				to: "/editor/$projectId/assets",
 				params: {
@@ -311,6 +322,91 @@ describe("EditorShell", () => {
 		expect(router.state.location.pathname).toBe("/editor/editor-test/assets");
 		expect(readActiveWorkspace(container)).toBe("assets");
 	});
+
+	it.each([
+		"checkout",
+		"refresh",
+	] as const)(
+		"keeps Close usable after %s rejects while exit is waiting for writes",
+		async (operation) => {
+			const router = createTestRouter({});
+			const { container } = await renderRouter(router);
+			const exitIdle = gate();
+			const replacement = gate();
+			const replacementStarted = gate();
+			const awaitIdleFn = vi.fn(async () => ({
+				type: "success" as const,
+				value: undefined,
+			}));
+			awaitIdleFn.mockImplementationOnce(async () => {
+				await exitIdle.promise;
+				return {
+					type: "success" as const,
+					value: undefined,
+				};
+			});
+			Object.defineProperty(window.arkini, "editor", {
+				configurable: true,
+				value: {
+					awaitIdleFn,
+				},
+			});
+			const close = container.querySelector<HTMLButtonElement>('[data-ui="EditorExit"]')!;
+			await act(async () => close.click());
+			await vi.waitFor(() => expect(awaitIdleFn).toHaveBeenCalledOnce());
+			expect(close.disabled).toBe(true);
+			const replacementFx =
+				operation === "checkout"
+					? checkoutProjectVersionFx({
+							confirmDiscardCurrentChanges: true,
+							isNavigationPendingFn: () => router.state.status === "pending",
+							projectId: "editor-test",
+							versionId: "version-one",
+						})
+					: refreshEditorProjectFx({
+							isNavigationPendingFn: () => router.state.status === "pending",
+							projectId: "editor-test",
+						});
+			const repository = RendererRuntime.runSync(ProjectRepository);
+			const pending = RendererRuntime.runPromiseExit(
+				replacementFx.pipe(
+					Effect.provideService(ProjectRepository, {
+						...repository,
+						awaitIdleFx: Effect.sync(() => replacementStarted.resolve()).pipe(
+							Effect.andThen(Effect.promise(() => replacement.promise)),
+							Effect.andThen(
+								Effect.fail(
+									new ProjectRepositoryError({
+										operation: "await-idle",
+										message: "Pending replacement failed.",
+									}),
+								),
+							),
+						),
+					}),
+				),
+			);
+			try {
+				await replacementStarted.promise;
+				await act(async () => {
+					exitIdle.resolve();
+					await exitIdle.promise;
+				});
+				await act(async () => {
+					replacement.resolve();
+					expect(Exit.isFailure(await pending)).toBe(true);
+				});
+				expect(router.state.location.pathname).toBe("/editor/editor-test/build");
+				expect(close.disabled).toBe(false);
+				await act(async () => close.click());
+				await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+			} finally {
+				exitIdle.resolve();
+				replacement.resolve();
+				await pending;
+			}
+		},
+	);
 
 	it("keeps a dirty draft mounted when workspace navigation is canceled", async () => {
 		const router = createTestRouter({

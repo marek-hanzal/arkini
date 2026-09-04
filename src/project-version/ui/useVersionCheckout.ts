@@ -47,6 +47,7 @@ export const useVersionCheckout = ({
 			reportErrorFn();
 			restoreFn({
 				confirmDiscardCurrentChanges,
+				isNavigationPendingFn: () => router.state.status === "pending",
 				onFailureFn: (cause) => {
 					if (cause instanceof ProjectVersionCheckoutConfirmationRequired) {
 						setConfirmVersionFn(version);
@@ -61,6 +62,7 @@ export const useVersionCheckout = ({
 		},
 		[
 			reportErrorFn,
+			router,
 			restoreFn,
 			restoreState.kind,
 		],

@@ -1,0 +1,10 @@
+{
+	"parentVersionId": "v-328320053ff4f3158cc29d9d3f8a540610fb8cbdc9b365ead73efc027fd0c313",
+	"subject": "Publish farm building artwork",
+	"body": "Add chicken coop, chicken farm and cow pen artwork; update pig pen and sheep pen artwork.",
+	"arkini": "0.5.0",
+	"version": "1.1",
+	"sourceRevision": 1788553678135,
+	"contentFingerprint": "609c03db1ec95dd92a87a99853c1f5663af2feefcc2eee76d51c96e7b3b8d8ae",
+	"createdAtMs": 1788553678135
+}

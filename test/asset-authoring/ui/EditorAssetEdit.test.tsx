@@ -5,15 +5,19 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
+	assetIdError: undefined as string | undefined,
 	file: undefined as File | undefined,
+	fileError: undefined as string | undefined,
 }));
 
 vi.mock("~/asset-authoring/ui/useEditorAssetEditController", () => ({
 	useEditorAssetEditController: () => ({
+		assetIdError: state.assetIdError,
 		currentUrl: "blob:canonical",
 		dirty: true,
 		error: undefined,
 		file: state.file,
+		fileError: state.fileError,
 		nextId: "hero",
 		projectId: "project",
 		resourceFound: true,
@@ -61,11 +65,39 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	state.file = undefined;
+	state.assetIdError = undefined;
+	state.fileError = undefined;
 	document.body.replaceChildren();
 	vi.restoreAllMocks();
 });
 
 describe("EditorAssetEdit", () => {
+	it("targets draft validation at the exact asset control", async () => {
+		state.assetIdError = "Enter a value.";
+		state.fileError = "Choose a valid PNG.";
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () =>
+			root.render(
+				createElement(EditorAssetEdit, {
+					filter: "all",
+					query: "",
+					resourceId: "hero",
+				}),
+			),
+		);
+
+		expect(container.querySelector('input[data-ui-invalid="true"]')).not.toBeNull();
+		expect(
+			container
+				.querySelector('button[data-ui="EditorAssetImageDropZone"]')
+				?.getAttribute("data-ui-invalid"),
+		).toBe("true");
+	});
+
 	it("owns the selected local PNG URL until unmount", async () => {
 		const createObjectUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:selected");
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});

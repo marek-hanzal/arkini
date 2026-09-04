@@ -111,10 +111,15 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 	ProjectStartGrid: ({
 		cells,
+		invalidCells = [],
 		onCellsChangeFn,
 		width,
 	}: {
 		readonly cells: ReadonlyArray<TestStartGridCell>;
+		readonly invalidCells?: ReadonlyArray<{
+			readonly x: number;
+			readonly y: number;
+		}>;
 		readonly onCellsChangeFn: (cells: ReadonlyArray<TestStartGridCell>) => void;
 		readonly width: number;
 	}) =>
@@ -124,6 +129,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 				"data-cells": cells
 					.map(({ itemId, quantity, x, y }) => `${itemId}:${quantity}:${x}:${y}`)
 					.join("|"),
+				"data-invalid-cells": invalidCells.map(({ x, y }) => `${x}:${y}`).join("|"),
 				"data-ui": "EditorProjectStartGrid",
 				"data-width": width,
 				onClick: () =>
@@ -511,6 +517,60 @@ describe("project section form session", () => {
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");
 		expect(readGridCells()).toBe("water:1:0:0");
+	});
+
+	it("routes a start-item validation issue to its exact Board space and cell", async () => {
+		state.project = {
+			...boardSpaceProject,
+			config: {
+				...boardSpaceProject.config,
+				start: {
+					...boardSpaceProject.config.start,
+					board: [
+						boardSpaceProject.config.start.board[0],
+						{
+							...boardSpaceProject.config.start.board[1],
+							space: 0,
+							x: 0,
+							y: 0,
+						},
+					],
+				},
+			},
+		} satisfies Project;
+		state.section = <ProjectBoardSection />;
+		state.sectionId = "board";
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
+
+		const widthInput = container.querySelector<HTMLInputElement>('input[name="board.width"]');
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		if (widthInput === null || saveButton === undefined)
+			throw new Error("Missing Board validation controls.");
+		await changeInput(widthInput, "14");
+		await act(async () => {
+			saveButton.click();
+			await Promise.resolve();
+		});
+
+		const grid = container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]');
+		expect(container.textContent).toContain("Initial board → space 0 → slot 1, 1:");
+		expect(
+			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
+		).toBe("0");
+		expect(grid?.dataset.cells).toBe("water:1:0:0|water:2:0:0");
+		expect(grid?.dataset.invalidCells).toBe("0:0");
 	});
 
 	it("caps a pasted Board dimension before projecting it to the grid", async () => {

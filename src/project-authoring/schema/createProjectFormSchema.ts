@@ -116,7 +116,10 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				context.addIssue({
 					code: "custom",
 					message: `Initial board item ${startItem.itemId} at ${startItem.x}, ${startItem.y} does not fit inside the board.`,
-					path,
+					path: [
+						"board",
+						startItem.x >= value.board.width ? "width" : "height",
+					],
 				});
 			}
 			const key = `${startItem.space}:${startItem.x}:${startItem.y}`;
@@ -147,7 +150,9 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				context.addIssue({
 					code: "custom",
 					message: `Initial toolbar item ${startItem.itemId} at slot ${startItem.position.x + 1} does not fit inside the toolbar.`,
-					path,
+					path: [
+						"toolbarSize",
+					],
 				});
 			}
 			if (toolbarLocations.has(startItem.position.x)) {
@@ -180,7 +185,10 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				context.addIssue({
 					code: "custom",
 					message: `Initial inventory item ${startItem.itemId} at ${startItem.position.x}, ${startItem.position.y} does not fit inside the inventory.`,
-					path,
+					path: [
+						"inventory",
+						startItem.position.x >= value.inventory.width ? "width" : "height",
+					],
 				});
 			}
 			const key = `${startItem.position.x}:${startItem.position.y}`;

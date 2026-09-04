@@ -8,6 +8,7 @@ import { ProjectIdentityRenameDialog } from "~/project-authoring/ui/ProjectIdent
 import type { Project } from "~/project-authoring/type/Project";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
 (
 	globalThis as {
@@ -93,5 +94,34 @@ describe("ProjectIdentityRenameDialog", () => {
 		await act(async () => submit.click());
 
 		expect(renameFn).toHaveBeenCalledWith("project-new");
+
+		await act(async () => {
+			root.render(
+				createElement(
+					TranslationTestProvider,
+					undefined,
+					createElement(ProjectIdentityRenameDialog, {
+						controller: {
+							...controller,
+							error: new ProjectRepositoryError({
+								operation: "replace-config",
+								message: "Editor project ID project-new is already open.",
+							}),
+						},
+						project,
+					}),
+				),
+			);
+		});
+		await act(
+			() =>
+				new Promise<void>((resolve) => {
+					requestAnimationFrame(() => resolve());
+				}),
+		);
+
+		expect(input.dataset.uiInvalid).toBe("true");
+		expect(container.textContent).toContain("A project with this ID is already open.");
+		expect(document.activeElement).toBe(input);
 	});
 });

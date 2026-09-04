@@ -15,6 +15,7 @@ interface SegmentedControlProps<Value extends string> {
 	readonly dataUi: string;
 	readonly disabled?: boolean;
 	readonly fill?: boolean;
+	readonly invalid?: boolean;
 	readonly onChangeFn: (value: Value) => void;
 	readonly optionDataUi: string;
 	readonly options: ReadonlyArray<SegmentedControlOption<Value>>;
@@ -40,6 +41,7 @@ export const SegmentedControl = <Value extends string>({
 	dataUi,
 	disabled = false,
 	fill = false,
+	invalid = false,
 	onChangeFn,
 	optionDataUi,
 	options,
@@ -48,18 +50,18 @@ export const SegmentedControl = <Value extends string>({
 	value,
 }: SegmentedControlProps<Value>) => (
 	<div
-		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex w-fit max-w-full self-start"} ${SegmentedControlFrameSizeClassName[size]} min-w-0 overflow-x-auto rounded-lg border border-line-strong bg-canvas/70 p-1`}
+		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex w-fit max-w-full self-start"} ${SegmentedControlFrameSizeClassName[size]} min-w-0 overflow-x-auto rounded-lg border border-line-strong bg-canvas/70 p-1 data-[ui-invalid=true]:border-danger`}
 		{...readDataUiFn({
 			dataUi,
 			state: {
 				fill,
+				invalid,
 			},
 		})}
 	>
 		{options.map((option, optionIndex) => {
 			const optionDisabled = disabled || pending || option.disabled === true;
-			const disabledTooltipReference =
-				optionDisabled && option.description !== undefined;
+			const disabledTooltipReference = optionDisabled && option.description !== undefined;
 			const overlapClassName = optionIndex === 0 ? "" : "-ml-px";
 			const edgeClassName = `${optionIndex === 0 ? "rounded-l-md" : ""} ${optionIndex === options.length - 1 ? "rounded-r-md" : ""}`;
 			const button = (

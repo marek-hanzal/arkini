@@ -5,7 +5,9 @@ import { EditorNumberControl, EditorValueLabel } from "~/editor-control/ui/Edito
 interface QuantityControlProps {
 	readonly description?: ReactNode;
 	readonly label?: string;
+	readonly maximumError?: string;
 	readonly maximumDescription?: string;
+	readonly minimumError?: string;
 	readonly minimumDescription?: string;
 	readonly onChangeFn: (quantity: QuantitySchema.Type) => void;
 	readonly value: QuantitySchema.Type;
@@ -13,7 +15,9 @@ interface QuantityControlProps {
 
 /** Renders the reusable minimum and maximum quantity fields without imposing layout. */
 export const QuantityFields = ({
+	maximumError,
 	maximumDescription,
+	minimumError,
 	minimumDescription,
 	onChangeFn,
 	value,
@@ -21,6 +25,7 @@ export const QuantityFields = ({
 	<>
 		<EditorNumberControl
 			description={minimumDescription}
+			error={minimumError}
 			label="Minimum"
 			value={value.min}
 			min={1}
@@ -33,6 +38,7 @@ export const QuantityFields = ({
 		/>
 		<EditorNumberControl
 			description={maximumDescription}
+			error={maximumError}
 			label="Maximum"
 			value={value.max}
 			min={value.min}
@@ -51,7 +57,9 @@ export const QuantityControl = ({
 	description,
 	label = "Quantity",
 	maximumDescription,
+	maximumError,
 	minimumDescription,
+	minimumError,
 	onChangeFn,
 	value,
 }: QuantityControlProps) => (
@@ -64,7 +72,9 @@ export const QuantityControl = ({
 		</div>
 		<div className="grid gap-3 sm:grid-cols-2">
 			<QuantityFields
+				maximumError={maximumError}
 				maximumDescription={maximumDescription}
+				minimumError={minimumError}
 				minimumDescription={minimumDescription}
 				value={value}
 				onChangeFn={onChangeFn}

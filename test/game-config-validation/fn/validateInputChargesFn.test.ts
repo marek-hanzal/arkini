@@ -262,7 +262,7 @@ describe("validateInputChargesFn", () => {
 		).toEqual([]);
 	});
 
-	it("rejects target costs outside deposit inputs and Line deposit self costs", async () => {
+	it("rejects target costs outside deposit inputs and allows charged Line owners to pay Deposit costs", async () => {
 		const materialTarget = createProducerItem({
 			id: "material-target",
 			input: [
@@ -289,9 +289,19 @@ describe("validateInputChargesFn", () => {
 			...createProducerItem({
 				id: "deposit-self",
 				input: [
-					depositInput("material", {
-						from: "self",
-					}),
+					{
+						...depositInput("deposit-self", {
+							from: "self",
+						}),
+						query: {
+							scope: "board" as const,
+							distance: "self" as const,
+							selector: {
+								type: "item" as const,
+								itemId: "deposit-self",
+							},
+						},
+					},
 				],
 			}),
 			charges: {
@@ -305,16 +315,11 @@ describe("validateInputChargesFn", () => {
 				[depositSelf.id]: depositSelf,
 				material: createSimpleItem("material"),
 			}),
-		).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					reason: InvalidInputChargesReasonEnumSchema.enum.TargetRequiresDeposit,
-				}),
-				expect.objectContaining({
-					reason: InvalidInputChargesReasonEnumSchema.enum.DepositMustTarget,
-				}),
-			]),
-		);
+		).toEqual([
+			expect.objectContaining({
+				reason: InvalidInputChargesReasonEnumSchema.enum.TargetRequiresDeposit,
+			}),
+		]);
 	});
 
 	it("allows a Space deposit requirement to charge its action owner", async () => {

@@ -22,9 +22,11 @@ const boardDistanceOptions = [
 ] as const;
 
 export const BoardDistanceControl = ({
+	error,
 	onChangeFn,
 	value,
 }: {
+	readonly error?: string;
 	readonly onChangeFn: (query: QuerySchema.Type) => void;
 	readonly value: Extract<
 		QuerySchema.Type,
@@ -34,6 +36,7 @@ export const BoardDistanceControl = ({
 	>;
 }) => (
 	<EditorChoiceControl
+		error={error}
 		label="Board distance"
 		value={value.distance}
 		options={boardDistanceOptions}

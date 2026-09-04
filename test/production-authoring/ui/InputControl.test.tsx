@@ -65,6 +65,7 @@ const renderInput = async (
 		root.render(
 			<InputControl
 				input={input}
+				ownerItemId="owner"
 				selfChargesEnabled={selfChargesEnabled}
 				onChangeFn={onChangeFn}
 			/>,
@@ -90,9 +91,9 @@ const readChoiceValues = (control: Element) =>
 	);
 
 const findChoiceControl = (container: Element, label: string) => {
-	const control = Array.from(
-		container.querySelectorAll('[data-ui="EditorChoiceControl"]'),
-	).find((candidate) => candidate.querySelector("legend")?.textContent === label);
+	const control = Array.from(container.querySelectorAll('[data-ui="EditorChoiceControl"]')).find(
+		(candidate) => candidate.querySelector("legend")?.textContent === label,
+	);
 	if (control === undefined) throw new Error(`Expected ${label} choice control.`);
 	return control;
 };
@@ -179,13 +180,9 @@ describe("InputControl", () => {
 			"far",
 		]);
 		expect(
-			paidBy
-				.querySelector('[data-ui-value="target"]')
-				?.getAttribute("data-ui-selected"),
+			paidBy.querySelector('[data-ui-value="target"]')?.getAttribute("data-ui-selected"),
 		).toBe("true");
-		expect(
-			chargeCost.querySelector('[data-ui="EditorSearchComboboxInput"]'),
-		).not.toBeNull();
+		expect(chargeCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).not.toBeNull();
 		expect(chargeCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("1");
 	});
 
@@ -207,11 +204,70 @@ describe("InputControl", () => {
 
 		expect(self.disabled).toBe(false);
 		expect(self.getAttribute("data-ui-selected")).toBe("true");
-		expect(
-			chargeCost.querySelector('[data-ui="EditorSearchComboboxInput"]'),
-		).toBeNull();
+		expect(chargeCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).toBeNull();
 		expect(chargeCost.querySelector('[data-ui="EditorChoiceControl"]')).toBeNull();
 		expect(chargeCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("2");
+	});
+
+	it("binds a self-paid Deposit to the owning item instead of a hidden empty target", async () => {
+		const { container, root } = createContainer();
+		const onChangeFn = vi.fn();
+		await renderInput(root, unchargedDepositInput, onChangeFn);
+
+		const self = findChoiceControl(container, "Paid by").querySelector<HTMLButtonElement>(
+			'[data-ui-value="self"]',
+		);
+		if (self === null) throw new Error("Expected Self charge source option.");
+		await act(async () => self.click());
+
+		expect(onChangeFn).toHaveBeenCalledWith({
+			...unchargedDepositInput,
+			charges: {
+				cost: 1,
+				from: "self",
+			},
+			query: {
+				scope: "board",
+				distance: "self",
+				selector: {
+					type: "item",
+					itemId: "owner",
+				},
+			},
+		});
+	});
+
+	it("marks the exact invalid Deposit control and shows its local error", async () => {
+		const { container, root } = createContainer();
+		await act(async () => {
+			root.render(
+				<InputControl
+					input={unchargedDepositInput}
+					issues={[
+						{
+							message: "Choose a charged target.",
+							path: [
+								"query",
+								"selector",
+								"itemId",
+							],
+						},
+					]}
+					onChangeFn={() => undefined}
+					ownerItemId="owner"
+					selfChargesEnabled
+				/>,
+			);
+		});
+
+		const selectedItem = container.querySelector<HTMLInputElement>(
+			'[data-ui="EditorSearchComboboxInput"]',
+		);
+		expect(selectedItem?.dataset.uiInvalid).toBe("true");
+		expect(container.textContent).toContain("Choose a charged target.");
+		expect(findChoiceControl(container, "Paid by").getAttribute("data-ui-invalid")).toBe(
+			"false",
+		);
 	});
 
 	it("disables Self when the owning item has no Charges", async () => {

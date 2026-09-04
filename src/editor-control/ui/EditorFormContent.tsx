@@ -31,7 +31,7 @@ export const EditorFormContent = ({
 				{children}
 			</EditorFormCard>
 		) : (
-			<div>
+			<div className="grid gap-3">
 				{error === undefined ? null : (
 					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
 						{error instanceof Error ? error.message : String(error)}

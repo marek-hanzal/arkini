@@ -7,6 +7,7 @@ import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
@@ -55,6 +56,52 @@ export const readCanonicalItemArtworkFn = (
 	};
 };
 
+/** Keeps the schema-required query deterministic while Self intentionally hides target controls. */
+const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchema.Type>>(
+	inputs: Inputs,
+	ownerItemId: string,
+): Inputs =>
+	inputs.map((input) =>
+		input.type === "deposit" && input.charges?.from === "self"
+			? {
+					...input,
+					query: {
+						scope: "board" as const,
+						distance: "self" as const,
+						selector: {
+							type: "item" as const,
+							itemId: ownerItemId,
+						},
+					},
+				}
+			: input,
+	) as unknown as Inputs;
+
+const bindSelfPaidDepositsToOwnerFn = (candidate: FormValues): FormValues => ({
+	...candidate,
+	...(candidate.input === undefined
+		? {}
+		: {
+				input: bindSelfPaidInputsToOwnerFn(candidate.input, candidate.id),
+			}),
+	...(candidate.line === undefined
+		? {}
+		: {
+				line: {
+					...candidate.line,
+					input: bindSelfPaidInputsToOwnerFn(candidate.line.input, candidate.id),
+				},
+			}),
+	...(candidate.lines === undefined
+		? {}
+		: {
+				lines: candidate.lines.map((line) => ({
+					...line,
+					input: bindSelfPaidInputsToOwnerFn(line.input, candidate.id),
+				})),
+			}),
+});
+
 /**
  * Validates the local item-form representation and emits one canonical item.
  *
@@ -62,16 +109,18 @@ export const readCanonicalItemArtworkFn = (
  * at their exact field path instead of silently coercing them to zero.
  */
 export const FormSchema = z.custom<FormValues>().transform((candidate, context) => {
+	const normalized = bindSelfPaidDepositsToOwnerFn(candidate);
 	const result = ItemSchema.safeParse({
-		...candidate,
-		asset: readCanonicalItemArtworkFn(candidate.asset),
+		...normalized,
+		asset: readCanonicalItemArtworkFn(normalized.asset),
 	});
 	if (result.success) return result.data;
 	for (const issue of result.error.issues) {
 		context.addIssue({
-			code: "custom",
-			message: issue.message,
-			path: issue.path,
+			...issue,
+			path: [
+				...issue.path,
+			],
 		});
 	}
 	return z.NEVER;

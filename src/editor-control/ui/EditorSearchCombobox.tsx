@@ -193,7 +193,7 @@ export const EditorSearchCombobox = ({
 					<SearchInput
 						value={query}
 						autoComplete="off"
-						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
+						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							handleOpenChangeFn(false);

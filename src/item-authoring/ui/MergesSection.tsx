@@ -12,10 +12,12 @@ import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearc
 
 const MergeFields = ({
 	initialSelectedIndex,
+	invalidMergeIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly initialSelectedIndex: number;
+	readonly invalidMergeIndex?: number;
 	readonly onChangeFn: (value: MergeSchema.Type[] | undefined) => void;
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
@@ -72,6 +74,7 @@ const MergeFields = ({
 							onChangeFn(next.length === 0 ? undefined : next);
 						}}
 						removeLabel="Remove merge"
+						selectedIndex={invalidMergeIndex}
 					>
 						{(index) => (
 							<MergeField
@@ -87,12 +90,16 @@ const MergeFields = ({
 };
 
 export const MergesSection = () => {
-	const { form, mergeIndex } = useFormSession();
+	const { form, mergeIndex, validationIssues } = useFormSession();
+	const invalidMergeIndex = validationIssues.find(
+		(issue) => issue.path[0] === "merge" && typeof issue.path[1] === "number",
+	)?.path[1] as number | undefined;
 	return (
 		<form.Subscribe selector={(state) => state.values.merge}>
 			{(merge) => (
 				<MergeFields
 					initialSelectedIndex={mergeIndex ?? 0}
+					invalidMergeIndex={invalidMergeIndex}
 					value={merge}
 					onChangeFn={(next) => form.setFieldValue("merge", next)}
 				/>

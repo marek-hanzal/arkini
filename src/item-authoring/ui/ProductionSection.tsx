@@ -24,11 +24,12 @@ const defaultProductionFieldValues: ProductionFieldValues = {
 const ProductionFields = withFieldGroupFn({
 	defaultValues: defaultProductionFieldValues,
 	props: {
+		invalidLineIndex: undefined as number | undefined,
 		kind: "producer" as "deposit" | "producer",
 		ownerId: "",
 		selectedLineId: undefined as string | undefined,
 	},
-	render: ({ group, kind, ownerId, selectedLineId }) => (
+	render: ({ group, invalidLineIndex, kind, ownerId, selectedLineId }) => (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormCard>
 				<group.AppField name="maxQueueSize">
@@ -115,6 +116,7 @@ const ProductionFields = withFieldGroupFn({
 								0,
 								lines.findIndex((line) => line.id === selectedLineId),
 							)}
+							selectedIndex={invalidLineIndex}
 							label={`${kind === "deposit" ? "Production" : "Product"} lines`}
 							navigationCard
 							onAddFn={addLineFn}
@@ -147,7 +149,10 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const { canonicalItem, form, itemId, productionLineId } = useFormSession();
+	const { canonicalItem, form, itemId, productionLineId, validationIssues } = useFormSession();
+	const invalidLineIndex = validationIssues.find(
+		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
+	)?.path[1] as number | undefined;
 	const content = match(canonicalItem)
 		.with(
 			{
@@ -161,6 +166,7 @@ export const ProductionSection = () => {
 						lines: "lines",
 					}}
 					kind="deposit"
+					invalidLineIndex={invalidLineIndex}
 					ownerId={itemId}
 					selectedLineId={productionLineId}
 				/>
@@ -178,6 +184,7 @@ export const ProductionSection = () => {
 						lines: "lines",
 					}}
 					kind="producer"
+					invalidLineIndex={invalidLineIndex}
 					ownerId={itemId}
 					selectedLineId={productionLineId}
 				/>

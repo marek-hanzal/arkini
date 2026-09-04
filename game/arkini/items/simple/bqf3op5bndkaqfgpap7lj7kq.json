@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "bqf3op5bndkaqfgpap7lj7kq",
+		"id": "resource-research",
+		"title": "Resource research",
+		"description": "A magical item, which may find new resources!",
+		"asset": {
+			"default": [
+				"resource-search"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

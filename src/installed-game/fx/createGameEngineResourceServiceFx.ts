@@ -2,17 +2,16 @@ import { Cause, Deferred, Effect, Exit, Fiber, Option, Ref, Scope, Semaphore } f
 
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
-import type { GameEngineLease } from "~/installed-game/service/GameEngineResourceFx";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import {
 	GameEngineResourceFx,
+	type GameEngineLease,
 	type GameEngineResourceFxService,
 } from "~/installed-game/service/GameEngineResourceFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
 interface AcquisitionOwner {
-	readonly id: number;
 	readonly packageId: string;
 	/** Native-close claims that keep provisional acquisition alive across navigation. */
 	readonly closeClaims: Set<symbol>;
@@ -506,8 +505,6 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					}),
 			);
 
-			let nextOwnerId = 0;
-
 			const settleAcquisitionFx = Effect.fn("GameEngineAcquisitionFx.settleAcquisitionFx")(
 				(owner: AcquisitionOwner, exit: Exit.Exit<InstalledGameEngineResource, unknown>) =>
 					withLifecycleLockFx(
@@ -528,14 +525,13 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 								});
 								return;
 							}
-							if (Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)) {
+							if (Cause.hasInterruptsOnly(exit.cause)) {
 								yield* Ref.set(stateRef, {
 									_tag: "Idle",
 									lastFinalized: undefined,
 								});
 								return;
 							}
-							if (Exit.isSuccess(exit)) return;
 							const failure = readExactCauseFailureFn(exit.cause);
 							yield* Ref.set(
 								stateRef,
@@ -634,20 +630,20 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 								}
 								if (state._tag === "Finalizing") {
 									return {
-										_tag: "WaitFinalization" as const,
-										completion: state.finalization.completion,
+										_tag: "Wait" as const,
+										waitFx: Deferred.await(state.finalization.completion),
 									};
 								}
 								if (state._tag === "Cancelling") {
 									return {
-										_tag: "WaitCancellation" as const,
-										completion: state.cancellation.completion,
+										_tag: "Wait" as const,
+										waitFx: Deferred.await(state.cancellation.completion),
 									};
 								}
 								if (state._tag === "RecoveringFailedSave") {
 									return {
-										_tag: "WaitRecovery" as const,
-										completion: state.recovery.completion,
+										_tag: "Wait" as const,
+										waitFx: Deferred.await(state.recovery.completion),
 									};
 								}
 								if (
@@ -674,7 +670,6 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 										unknown
 									>();
 									owner = {
-										id: ++nextOwnerId,
 										packageId,
 										closeClaims: new Set(),
 										consumers: new Set(),
@@ -710,24 +705,8 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 								return Effect.failCause(decision.cause);
 							case "Resource":
 								return makeLeaseFx(decision.resource, decision.record);
-							case "WaitFinalization":
-								return Effect.exit(Deferred.await(decision.completion)).pipe(
-									Effect.andThen(
-										acquireLeaseFx({
-											packageId,
-										}),
-									),
-								);
-							case "WaitCancellation":
-								return Effect.exit(Deferred.await(decision.completion)).pipe(
-									Effect.andThen(
-										acquireLeaseFx({
-											packageId,
-										}),
-									),
-								);
-							case "WaitRecovery":
-								return Effect.exit(Deferred.await(decision.completion)).pipe(
+							case "Wait":
+								return Effect.exit(decision.waitFx).pipe(
 									Effect.andThen(
 										acquireLeaseFx({
 											packageId,
@@ -825,13 +804,11 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 								),
 							);
 						}
-						const exactFailure = readExactCauseFailureFn(state.cause);
-						const failure: Option.Option<GameSaveBootstrapError> =
-							Option.isSome(exactFailure) &&
-							exactFailure.value instanceof GameSaveBootstrapError
-								? Option.some(exactFailure.value)
-								: Option.none();
-						if (Option.isSome(failure)) {
+						const failure = readExactCauseFailureFn(state.cause);
+						if (
+							Option.isSome(failure) &&
+							failure.value instanceof GameSaveBootstrapError
+						) {
 							return yield* Effect.fail(
 								new Error(
 									"Verified save failures require exact save cleanup before exit.",
@@ -914,13 +891,11 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 										),
 									} as const;
 								}
-								const exactFailure = readExactCauseFailureFn(state.cause);
-								const failure: Option.Option<GameSaveBootstrapError> =
-									Option.isSome(exactFailure) &&
-									exactFailure.value instanceof GameSaveBootstrapError
-										? Option.some(exactFailure.value)
-										: Option.none();
-								if (Option.isNone(failure)) {
+								const failure = readExactCauseFailureFn(state.cause);
+								if (
+									Option.isNone(failure) ||
+									!(failure.value instanceof GameSaveBootstrapError)
+								) {
 									return {
 										_tag: "Failure",
 										cause: new Error(
@@ -1097,8 +1072,8 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 									};
 								case "Cancelling":
 									return {
-										_tag: "WaitCancellation" as const,
-										completion: state.cancellation.completion,
+										_tag: "Wait" as const,
+										waitFx: Deferred.await(state.cancellation.completion),
 									};
 								case "Active":
 									return {
@@ -1107,13 +1082,13 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 									};
 								case "Finalizing":
 									return {
-										_tag: "WaitFinalization" as const,
-										completion: state.finalization.completion,
+										_tag: "Wait" as const,
+										waitFx: Deferred.await(state.finalization.completion),
 									};
 								case "RecoveringFailedSave":
 									return {
-										_tag: "WaitRecovery" as const,
-										completion: state.recovery.completion,
+										_tag: "Wait" as const,
+										waitFx: Deferred.await(state.recovery.completion),
 									};
 								case "Idle":
 								case "BootstrapFailed":
@@ -1128,12 +1103,8 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 							switch (decision._tag) {
 								case "Cancel":
 									return beginCancellationFx(decision.owner, true);
-								case "WaitCancellation":
-									return Deferred.await(decision.completion);
-								case "WaitFinalization":
-									return Deferred.await(decision.completion);
-								case "WaitRecovery":
-									return Deferred.await(decision.completion);
+								case "Wait":
+									return decision.waitFx;
 								case "Release":
 									return finalizeFx(
 										decision.resource,

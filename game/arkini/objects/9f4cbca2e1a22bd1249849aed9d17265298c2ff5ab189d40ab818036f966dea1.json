@@ -1,0 +1,14 @@
+{
+	"uid": "m8mbr1hwj5yvzr54h4thejr8",
+	"id": "brewery",
+	"title": "Brewery",
+	"description": "Wanna some cold beer?",
+	"asset": {
+		"default": [
+			"brewery"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

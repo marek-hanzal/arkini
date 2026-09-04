@@ -1,0 +1,123 @@
+{
+	"uid": "vrjsj1cqzlky11b0wvd6ye0l",
+	"id": "lumer-camp",
+	"title": "Lumber camp",
+	"description": "That place you get wood from. You need this one.",
+	"asset": {
+		"default": [
+			"lumber-camp"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"maxQueueSize": 8,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "wood",
+			"title": "Chop the wood from a tree",
+			"description": "Get the wood from a tree. Find the tree. No tree, no wood. Really.",
+			"default": true,
+			"show": true,
+			"enable": false,
+			"runtimeMs": 6000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "target"
+					},
+					"type": "deposit",
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "tree"
+						},
+						"scope": "board",
+						"distance": "close"
+					}
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "wood",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"hint": "You need a tree in close distance (next to the camp).",
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "tree"
+								},
+								"scope": "board",
+								"distance": "close"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		},
+		{
+			"id": "lubmer-camp-blueprint",
+			"title": "Lumber Camp Blueprint",
+			"description": "Takes lumber camp and prints it on a new blueprint, so you can build a new one. Cool.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 30000,
+			"input": [
+				{
+					"type": "simple"
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "lumber-camp-blueprint",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

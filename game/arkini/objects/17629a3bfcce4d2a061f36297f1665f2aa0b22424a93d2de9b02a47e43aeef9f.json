@@ -1,0 +1,68 @@
+{
+	"uid": "xx2gqafu2hfas7hj6vl8k8qc",
+	"id": "well-blueprint",
+	"title": "Well Blueprint",
+	"description": "Wanna some well?",
+	"asset": {
+		"default": [
+			"blueprint",
+			"well"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "well",
+		"title": "Well",
+		"description": "Build a well well.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 30000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "deposit",
+				"query": {
+					"selector": {
+						"type": "item",
+						"itemId": "well-blueprint"
+					},
+					"scope": "board",
+					"distance": "self"
+				}
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "well",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

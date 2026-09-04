@@ -1,0 +1,14 @@
+{
+	"uid": "b1z61l4bbwdtc75nt189hzze",
+	"id": "stone",
+	"title": "Stone",
+	"description": "Finally, you've found a stone. Now you can use it for various interesting things!",
+	"asset": {
+		"default": [
+			"stone"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 8,
+	"type": "simple"
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "bqf3op5bndkaqfgpap7lj7kq",
+	"id": "resource-research",
+	"title": "Resource research",
+	"description": "A magical item, which may find new resources!",
+	"asset": {
+		"default": [
+			"resource-search"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"type": "simple"
+}

@@ -1,0 +1,68 @@
+{
+	"uid": "gr30098zsatmrlc4vorfmjgm",
+	"id": "grain-farm-blueprint",
+	"title": "Grain Farm Blueprint",
+	"description": "Blueprint for Grain Farm. Usual boring stuff.",
+	"asset": {
+		"default": [
+			"blueprint",
+			"grain-farm"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "grain-farm",
+		"title": "Grain Farm",
+		"description": "Soon there will be some farming simulator available...",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 30000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "deposit",
+				"query": {
+					"selector": {
+						"type": "item",
+						"itemId": "grain-farm-blueprint"
+					},
+					"scope": "board",
+					"distance": "self"
+				}
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "grain-farm",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

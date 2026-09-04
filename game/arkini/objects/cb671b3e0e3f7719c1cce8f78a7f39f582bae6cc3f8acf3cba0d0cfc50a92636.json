@@ -1,0 +1,67 @@
+{
+	"uid": "eheyi27mvxb5ggoh90s3nyjm",
+	"id": "townhall-t1-blueprint",
+	"title": "Townhall I blueprint",
+	"description": "So it's time for upgrade?",
+	"asset": {
+		"default": [
+			"blueprint",
+			"townhall"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "townhall-t1",
+		"title": "Townhall I",
+		"description": "Longer wait, bigger gain!",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 120000,
+		"input": [
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "base-camp"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "townhall-t1",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

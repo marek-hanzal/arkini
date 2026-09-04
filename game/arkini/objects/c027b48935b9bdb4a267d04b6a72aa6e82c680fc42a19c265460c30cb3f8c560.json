@@ -1,0 +1,14 @@
+{
+	"uid": "ad0tzhtjqhxt6xn4xhiin2ig",
+	"id": "planks",
+	"title": "Planks",
+	"description": "Really complex piece of wood. Just planks, I'm kidding.",
+	"asset": {
+		"default": [
+			"planks"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

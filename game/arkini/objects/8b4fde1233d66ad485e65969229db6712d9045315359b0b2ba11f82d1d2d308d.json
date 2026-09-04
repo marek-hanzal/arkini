@@ -1,0 +1,15 @@
+{
+	"uid": "k09s8288fyyq6zhmho5xp9wm",
+	"id": "townhall-t1",
+	"title": "Townhall I",
+	"description": "Better village management, really.",
+	"asset": {
+		"default": [
+			"townhall"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -1,0 +1,85 @@
+{
+	"uid": "clmb5usqob6j1z5udyd487m5",
+	"id": "stonemason-camp",
+	"title": "Stonemason Camp",
+	"description": "So, I heard you need a stone?",
+	"asset": {
+		"default": [
+			"stonemason-camp"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"maxQueueSize": 8,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "stone",
+			"title": "Stone",
+			"description": "Get the stone from stone deposit.",
+			"default": true,
+			"show": true,
+			"enable": false,
+			"runtimeMs": 10000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "target"
+					},
+					"type": "deposit",
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "stone-deposit"
+						},
+						"scope": "board",
+						"distance": "close"
+					}
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "stone",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"hint": "If you want stone, you need to put next stone deposit.",
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "stone-deposit"
+								},
+								"scope": "board",
+								"distance": "close"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	]
+}

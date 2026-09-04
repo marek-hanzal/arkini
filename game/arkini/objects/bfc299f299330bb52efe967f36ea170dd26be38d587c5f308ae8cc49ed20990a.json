@@ -1,0 +1,14 @@
+{
+	"uid": "kwkucgj71atfynrxw5sugzpe",
+	"id": "wood",
+	"title": "Wood",
+	"description": "Raw wood, so you can be creative with it to make new nice things.",
+	"asset": {
+		"default": [
+			"wood"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 8,
+	"type": "simple"
+}

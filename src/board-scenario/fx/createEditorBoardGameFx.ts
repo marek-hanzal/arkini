@@ -12,6 +12,7 @@ import { startFx } from "~/game-start/fx/startFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
+import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 
 export namespace createEditorBoardGameFx {
 	export interface Props {
@@ -59,12 +60,22 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 		);
 
 		const liveResourceUrls = resourceUrls;
+		const diagnostics = yield* installGameDiagnosticsFx({
+			projectId: project.projectId,
+			projectRevision: project.revision,
+			config: project.config,
+			restored: state !== undefined,
+			runRendererEffectFn: Effect.runSync,
+			session,
+		});
 		const disposeFx = session.disposeWithoutSaveFx.pipe(
+			Effect.tap(() => Effect.sync(() => diagnostics.close("discarded"))),
 			Effect.andThen(liveResourceUrls.releaseFx),
 		);
 		const game: EditorBoardGame = {
 			...session,
 			config: project.config,
+			diagnosticSessionId: diagnostics.sessionId,
 			disposeFx,
 			disposeWithoutSaveFx: disposeFx,
 			projectId: project.projectId,

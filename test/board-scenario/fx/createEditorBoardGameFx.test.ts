@@ -5,6 +5,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
 
 const project: Project = {
 	projectId: "editor-board",
@@ -19,10 +20,23 @@ const project: Project = {
 
 afterEach(() => {
 	vi.restoreAllMocks();
+	vi.unstubAllGlobals();
 });
 
 describe("Board Scenario createEditorBoardGameFx", () => {
 	it("owns one fresh revision-pinned game and discards it without package persistence", async () => {
+		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>(() => Promise.resolve());
+		const writeIncident = vi.fn(() => Promise.resolve());
+		vi.stubGlobal("window", {
+			arkini: {
+				diagnostics: {
+					writeFn: write,
+				},
+				incident: {
+					writeFn: writeIncident,
+				},
+			},
+		});
 		const createObjectUrl = vi
 			.spyOn(URL, "createObjectURL")
 			.mockReturnValueOnce("blob:editor-hero")
@@ -68,8 +82,34 @@ describe("Board Scenario createEditorBoardGameFx", () => {
 			}),
 		);
 		expect(game.getSnapshotFn().items).toHaveLength(2);
+		expect(write.mock.calls.map(([record]) => record)).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					event: "session-started",
+					sessionId: game.diagnosticSessionId,
+					data: expect.objectContaining({
+						projectId: project.projectId,
+						projectRevision: 7,
+					}),
+				}),
+				expect.objectContaining({
+					event: "runtime-committed",
+					sessionId: game.diagnosticSessionId,
+				}),
+			]),
+		);
+		game.failStopFn("presentation", new Error("Board presentation failed"));
+		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+			event: "session-failed",
+			sessionId: game.diagnosticSessionId,
+		});
+		expect(writeIncident).not.toHaveBeenCalled();
 
 		await Effect.runPromise(game.disposeFx);
+		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+			event: "session-ended",
+			sessionId: game.diagnosticSessionId,
+		});
 		expect(revokeObjectUrl.mock.calls).toEqual([
 			[
 				"blob:editor-hero",

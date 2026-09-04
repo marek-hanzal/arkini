@@ -99,7 +99,7 @@ The complete mutation, Tick and session navigation is in [`src/game-runtime/READ
 
 ## Session and installed Game
 
-Game Session composes Runtime, Tick, save, command/listener scopes and first-failure publication. Playable Game adds resource URLs and presentation fail-stop without package identity. Installed Game adds Arkpack/save bootstrap, diagnostics, resource leases and serialized package lifecycle.
+Game Session composes Runtime, Tick, save, command/listener scopes and first-failure publication. Playable Game adds resource URLs and presentation fail-stop without package identity. Game Incident records session transitions and failures for both Installed Game and Editor Board; only installed packages produce Arkpack-backed incident archives. Installed Game adds Arkpack/save bootstrap, resource leases and serialized package lifecycle.
 
 React mount state is never desired-Game state. Same-package acquisition shares one provisional lease; explicit load adopts it. A different package finalizes the current resource before acquisition.
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
+import type { TileDelivery } from "~/game-scene/fx/readTileDeliveriesFx";
 
 import {
 	boardLocation,
@@ -14,6 +15,40 @@ import {
 } from "./createMainReconcilerFx.test/fixture";
 
 describe("main reconciliation / delivery retention", () => {
+	it("retires spawn ownership before a delivery replaces its pose writer", () => {
+		const actor = createActor(createItem("water", boardLocation));
+		let handedOff = false;
+		const delivery = {
+			item: actor.item,
+		} as TileDelivery;
+		const harness = createReconcilerHarness({
+			actor,
+			viewedDeliveries: [
+				delivery,
+			],
+			motion: {
+				...createMotion(),
+				handoffSpawnsFx: (ids) =>
+					Effect.sync(() => {
+						expect(ids).toEqual(
+							new Set([
+								actor.item.id,
+							]),
+						);
+						handedOff = true;
+					}),
+			},
+			syncDeliveryFx: (deliveries) =>
+				Effect.sync(() => {
+					expect(handedOff).toBe(true);
+					expect(deliveries).toEqual([
+						delivery,
+					]);
+				}),
+		});
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		expect(handedOff).toBe(true);
+	});
 	it("holds an input source at its pre-contact quantity and suppresses early feedback", () => {
 		const previous = createItem("runtime:input-source", boardLocation, {
 			badgeCount: 7,

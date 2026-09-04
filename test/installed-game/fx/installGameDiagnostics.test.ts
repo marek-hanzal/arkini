@@ -8,7 +8,7 @@ import {
 } from "~electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { GameSession, GameTransition } from "~/game-session/type/GameSession";
-import { installGameDiagnosticsFx } from "~/installed-game/fx/installGameDiagnosticsFx";
+import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import { RuntimeInvalidError } from "~/game-runtime/error/RuntimeInvalidError";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";

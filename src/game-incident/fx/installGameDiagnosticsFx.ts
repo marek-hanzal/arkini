@@ -33,27 +33,30 @@ type GameDiagnosticsSession = Pick<
 >;
 
 export namespace installGameDiagnosticsFx {
-	export interface Props {
-		readonly arkpack: ArkpackDescriptor;
-		readonly arkpackBytes: Uint8Array;
+	export type Props = {
 		readonly config: GameConfigSchema.Type;
 		readonly restored: boolean;
 		readonly runRendererEffectFn: <Value>(effect: Effect.Effect<Value, never, never>) => Value;
 		readonly session: GameDiagnosticsSession;
-	}
+	} & (
+		| {
+				readonly arkpack: ArkpackDescriptor;
+				readonly arkpackBytes: Uint8Array;
+		  }
+		| {
+				readonly projectId: string;
+				readonly projectRevision: number;
+		  }
+	);
 }
 
 const fatalStateDiagnosticLengthLimit = 14 * 1_024;
 const fatalErrorDiagnosticLengthLimit = 24 * 1_024;
 
-export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(function* ({
-	arkpack,
-	arkpackBytes,
-	config,
-	restored,
-	runRendererEffectFn,
-	session,
-}: installGameDiagnosticsFx.Props) {
+export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(function* (
+	props: installGameDiagnosticsFx.Props,
+) {
+	const { config, restored, runRendererEffectFn, session } = props;
 	const sessionId = crypto.randomUUID();
 	const startedAtMs = yield* Clock.currentTimeMillis;
 	const startedAt = new Date(startedAtMs).toISOString();
@@ -74,10 +77,17 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 		sessionId,
 		data: {
 			applicationVersion: ArkiniAppVersion,
-			packageId: arkpack.packageId,
-			contentHash: arkpack.contentHash,
-			arkini: arkpack.arkini,
-			gameVersion: arkpack.version,
+			...("arkpack" in props
+				? {
+						packageId: props.arkpack.packageId,
+						contentHash: props.arkpack.contentHash,
+						arkini: props.arkpack.arkini,
+						gameVersion: props.arkpack.version,
+					}
+				: {
+						projectId: props.projectId,
+						projectRevision: props.projectRevision,
+					}),
 			restored,
 			startedAt,
 		},
@@ -195,6 +205,10 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 					relatedItemsTruncated: failure.relatedItemsTruncated,
 				},
 			} satisfies DiagnosticRecord;
+			runRendererEffectFn(writeDiagnosticRecordFx(fatalRecord));
+			// Board sessions have project identity and logs, but no installed package to archive.
+			if (!("arkpack" in props)) return;
+			const { arkpack, arkpackBytes } = props;
 			const report = {
 				capturedAt: observedAt,
 				diagnostics: {
@@ -223,20 +237,16 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 				runtime,
 			} satisfies GameIncidentReport;
 			runRendererEffectFn(
-				writeDiagnosticRecordFx(fatalRecord).pipe(
-					Effect.andThen(
-						writeLastGameIncidentFx({
-							arkpackBytes: new Uint8Array(arkpackBytes),
-							saveBytes: encodeArkiniSaveFn({
-								version: arkpack.version,
-								state: fromRuntimeFn({
-									runtime: transition.runtime,
-								}),
-							}),
-							report,
+				writeLastGameIncidentFx({
+					arkpackBytes: new Uint8Array(arkpackBytes),
+					saveBytes: encodeArkiniSaveFn({
+						version: arkpack.version,
+						state: fromRuntimeFn({
+							runtime: transition.runtime,
 						}),
-					),
-				),
+					}),
+					report,
+				}),
 			);
 		} catch (cause) {
 			runRendererEffectFn(

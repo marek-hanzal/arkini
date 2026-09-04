@@ -55,7 +55,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-session` | One Runtime/Tick/save execution scope and fail-stop lifecycle | [`src/game-session/fx/createGameSessionFx.ts`](src/game-session/fx/createGameSessionFx.ts) |
 | `playable-game` | Package-independent live Game capability and resource URLs | [`src/playable-game/type/PlayableGame.ts`](src/playable-game/type/PlayableGame.ts) |
 | `installed-game` | Arkpack/save bootstrap, leases, diagnostics and finalization | [`src/installed-game/fx/createGameEngineResourceServiceFx.ts`](src/installed-game/fx/createGameEngineResourceServiceFx.ts) |
-| `game-incident` | Failed-session diagnostic model and text rendering | [`src/game-incident/fx/readGameIncidentTextFx.ts`](src/game-incident/fx/readGameIncidentTextFx.ts) |
+| `game-incident` | Session diagnostics, failed-session model and text rendering | [`src/game-incident/fx/installGameDiagnosticsFx.ts`](src/game-incident/fx/installGameDiagnosticsFx.ts) |
 | `game-start` | Initial placement plan and atomic empty-runtime start | [`src/game-start/fx/planStartFx.ts`](src/game-start/fx/planStartFx.ts) |
 | `item-revision` | Opaque live Item revision and stale-write rejection | [`src/item-revision/fx/assertRevisionFx.ts`](src/item-revision/fx/assertRevisionFx.ts) |
 | `item-definition` | Immutable authored Item vocabulary and selectors | [`src/item-definition/schema/ItemSchema.ts`](src/item-definition/schema/ItemSchema.ts) |

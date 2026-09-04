@@ -262,14 +262,14 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
-		yield* delivery.syncFx(
-			game.readOrThrowFn(
-				readTileDeliveriesFx({
-					game,
-					runtime: transition.runtime,
-				}),
-			),
+		const deliveries = game.readOrThrowFn(
+			readTileDeliveriesFx({
+				game,
+				runtime: transition.runtime,
+			}),
 		);
+		yield* motion.handoffSpawnsFx(new Set(deliveries.map((delivery) => delivery.item.id)));
+		yield* delivery.syncFx(deliveries);
 		const deliverySnapshot = yield* delivery.readSnapshotFx;
 		const compiledCues = presentCommittedEffects
 			? [

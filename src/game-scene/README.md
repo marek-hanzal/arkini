@@ -42,6 +42,8 @@ The concrete module graph remains acyclic. These edge labels describe why the to
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
 
+Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn cue through `MotionRuntime.handoffSpawnsFx`. The actor keeps its live pose; the released producer and remaining cue lanes settle normally. Cancelling the pose writer alone does not release cue ownership.
+
 ## Interaction
 
 - Board/Toolbar left click runs the primary action; `Ctrl+left click` fills remaining default-line queue capacity; `Shift+left click` splits a Board stack; right click opens Item Detail.

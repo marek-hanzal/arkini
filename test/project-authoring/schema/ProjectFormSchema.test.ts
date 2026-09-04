@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Project } from "~/project-authoring/type/Project";
 import { createProjectFormSchema } from "~/project-authoring/schema/createProjectFormSchema";
 import type { ProjectFormSchema } from "~/project-authoring/schema/ProjectFormSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (overrides?: Partial<Project>): Project => ({
@@ -117,5 +118,55 @@ describe("ProjectFormSchema", () => {
 				0,
 			],
 		]);
+	});
+
+	it("accepts the inventory control item in the initial toolbar", () => {
+		const config = GameConfigSchema.parse({
+			...editorTestPayload.config,
+			meta: {
+				...editorTestPayload.config.meta,
+				toolbarSize: 1,
+			},
+			items: {
+				...editorTestPayload.config.items,
+				backpack: {
+					uid: "backpack",
+					id: "backpack",
+					type: "inventory",
+					title: "Backpack",
+					description: "Backpack",
+					asset: {
+						default: [
+							"item-water",
+						],
+					},
+					scope: "board",
+					maxCount: 1,
+					maxStackSize: 1,
+				},
+			},
+		});
+		const project = createProject({
+			config,
+		});
+
+		expect(
+			createProjectFormSchema(project).safeParse({
+				...createValidFormValue(project),
+				start: {
+					...createValidFormValue(project).start,
+					toolbar: [
+						{
+							itemId: "backpack",
+							position: {
+								x: 0,
+								y: 0,
+							},
+							quantity: 1,
+						},
+					],
+				},
+			}).success,
+		).toBe(true);
 	});
 });

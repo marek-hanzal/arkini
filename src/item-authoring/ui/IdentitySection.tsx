@@ -1,4 +1,5 @@
 import { useFormSession } from "~/item-authoring/ui/FormContext";
+import { Tx } from "~/translation/ui/Tx";
 
 const scopeOptions = [
 	{
@@ -40,7 +41,11 @@ export const IdentitySection = () => {
 					<div className="grid content-start gap-1.5 text-sm">
 						<span className="font-semibold text-foreground">Storage scope</span>
 						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
-							Board — fixed by {canonicalItem.type} contract
+							{canonicalItem.type === "inventory" ? (
+								<Tx label="Inventory item storage scope form" />
+							) : (
+								"Board — fixed by temporary contract"
+							)}
 						</span>
 					</div>
 				) : (

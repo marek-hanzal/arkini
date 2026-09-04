@@ -97,7 +97,10 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 				]),
 		{
 			label: translator.textFn("Storage"),
-			value: translator.textFn(`Item storage scope - ${detail.storageScope}`),
+			value:
+				detail.itemType === "inventory"
+					? translator.textFn("Item storage scope - inventory-control")
+					: translator.textFn(`Item storage scope - ${detail.storageScope}`),
 		},
 		...(detail.currentStack === undefined
 			? []

@@ -140,6 +140,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project/form";
 import { ProjectBoardSection } from "~/project-authoring/ui/ProjectBoardSection";
 import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSection";
+import { ProjectToolbarSection } from "~/project-authoring/ui/ProjectToolbarSection";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
@@ -507,5 +508,74 @@ describe("project section form session", () => {
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");
 		expect(readGridCells()).toBe("water:1:0:0");
+	});
+
+	it("submits an edited initial Toolbar cell without leaking grid coordinates", async () => {
+		const project = {
+			...boardSpaceProject,
+			config: {
+				...boardSpaceProject.config,
+				meta: {
+					...boardSpaceProject.config.meta,
+					toolbarSize: 1,
+				},
+				start: {
+					...boardSpaceProject.config.start,
+					toolbar: [
+						{
+							itemId: "water",
+							position: {
+								x: 0,
+								y: 0,
+							},
+							quantity: 1,
+						},
+					],
+				},
+			},
+		} satisfies Project;
+		state.project = project;
+		state.section = <ProjectToolbarSection />;
+		state.sectionId = "toolbar";
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
+
+		const gridButton = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProjectStartGrid"]',
+		);
+		const form = container.querySelector("form");
+		if (gridButton === null || form === null) throw new Error("Missing Toolbar form controls.");
+		await act(async () => gridButton.click());
+		await act(async () => {
+			form.dispatchEvent(
+				new SubmitEvent("submit", {
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		expect(state.saveConfig).toHaveBeenCalledOnce();
+		const [{ config }] = state.saveConfig.mock.calls[0] ?? [];
+		expect(config.start.toolbar).toEqual([
+			{
+				itemId: "water",
+				position: {
+					x: 0,
+					y: 0,
+				},
+				quantity: 2,
+			},
+		]);
 	});
 });

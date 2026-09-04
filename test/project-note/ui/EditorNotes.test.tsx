@@ -22,22 +22,25 @@ vi.mock("~/project-note/atom/NoteCommandAtoms", async () => {
 vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 	EditorHistoryBackButton: () => null,
 }));
-vi.mock("~/translation/ui/Tx", () => ({
-	Tx: ({ label }: { readonly label: string }) => label,
-}));
 vi.mock("~/ui/ui/Tooltip", () => ({
 	Tooltip: ({
 		children,
 		content,
 	}: {
 		readonly children: React.ReactNode;
-		readonly content: string;
-	}) => <span data-tooltip={content}>{children}</span>,
+		readonly content: React.ReactNode;
+	}) => (
+		<span>
+			{children}
+			<span hidden>{content}</span>
+		</span>
+	),
 }));
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
 import { Route as EditorNotesRouteDefinition } from "~/@routes/editor/$projectId/notes";
 import { editorNotesTestState as state } from "~test/project-note/support/EditorNotesFixture";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 const EditorNotes = EditorNotesRouteDefinition.options.component;
 if (EditorNotes === undefined) throw new Error("Editor Notes route component is missing.");
@@ -50,8 +53,23 @@ if (EditorNotes === undefined) throw new Error("Editor Notes route component is 
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: Array<AtomRegistry.AtomRegistry> = [];
+let projectChangedFn: ((projectId: string) => void) | undefined;
 
 beforeEach(() => {
+	projectChangedFn = undefined;
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			editor: {
+				onProjectChangedFn: (listenerFn: (projectId: string) => void) => {
+					projectChangedFn = listenerFn;
+					return () => {
+						projectChangedFn = undefined;
+					};
+				},
+			},
+		},
+	});
 	state.createFailures = 0;
 	state.nextNote = 2;
 	state.notes = [
@@ -71,6 +89,7 @@ afterEach(async () => {
 	});
 	document.body.replaceChildren();
 	for (const registry of registries.splice(0)) registry.dispose();
+	Reflect.deleteProperty(window, "arkini");
 });
 
 const renderNotes = async () => {
@@ -85,11 +104,15 @@ const renderNotes = async () => {
 	await act(async () =>
 		root.render(
 			createElement(
-				RegistryContext.Provider,
-				{
-					value: registry,
-				},
-				createElement(EditorNotes),
+				TranslationTestProvider,
+				null,
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: registry,
+					},
+					createElement(EditorNotes),
+				),
 			),
 		),
 	);
@@ -115,6 +138,30 @@ const click = async (element: Element | null) => {
 };
 
 describe("EditorNotes", () => {
+	it("renders stored note content as Markdown without embedded HTML", async () => {
+		state.notes[0] = {
+			...state.notes[0],
+			content:
+				"**Bold idea**\n\n- First thought\n- Second thought\n\n<script>unsafe</script>",
+		};
+		const container = await renderNotes();
+		await act(async () =>
+			vi.waitFor(() => expect(container.textContent).toContain("Bold idea")),
+		);
+
+		const markdown = container.querySelector('[data-ui="EditorNote"] [data-ui="Markdown"]');
+		expect(markdown?.querySelector("strong")?.textContent).toBe("Bold idea");
+		expect(
+			[
+				...container.querySelectorAll('[data-ui="EditorNote"] li'),
+			].map((item) => item.textContent),
+		).toEqual([
+			"First thought",
+			"Second thought",
+		]);
+		expect(markdown?.querySelector("script")).toBeNull();
+	});
+
 	it("persists a new note into the live stream", async () => {
 		const container = await renderNotes();
 		await act(async () =>
@@ -157,5 +204,61 @@ describe("EditorNotes", () => {
 			vi.waitFor(() => expect(container.textContent).toContain("Retry me")),
 		);
 		expect(composer.value).toBe("");
+	});
+
+	it("preserves a local edit draft on MCP refresh and closes it when the note disappears", async () => {
+		const container = await renderNotes();
+		await act(async () =>
+			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
+		);
+		const editTooltip = [
+			...container.querySelectorAll("span[hidden]"),
+		].find((element) => element.textContent === "Edit");
+		await click(editTooltip?.parentElement?.querySelector("button") ?? null);
+		const editor = container.querySelector<HTMLTextAreaElement>(
+			'[data-ui="EditorNote"] textarea',
+		);
+		if (editor === null) throw new Error("Missing note editor.");
+		await changeTextarea(editor, "Local draft");
+
+		state.notes = [
+			{
+				...state.notes[0],
+				content: "MCP update",
+				updatedAtMs: 2,
+			},
+		];
+		await act(async () => projectChangedFn?.("project-one"));
+		await act(async () =>
+			vi.waitFor(() => {
+				expect(editor.value).toBe("Local draft");
+				const saveButton = [
+					...container.querySelectorAll<HTMLButtonElement>("button"),
+				].find((button) => button.parentElement?.textContent === "Save");
+				expect(saveButton?.disabled).toBe(false);
+			}),
+		);
+
+		const saveTooltip = [
+			...container.querySelectorAll("span[hidden]"),
+		].find((element) => element.textContent === "Save");
+		await click(saveTooltip?.parentElement?.querySelector("button") ?? null);
+		await act(async () =>
+			vi.waitFor(() =>
+				expect(container.textContent).toContain(
+					"Editor note note-one changed after it was read.",
+				),
+			),
+		);
+		expect(editor.value).toBe("Local draft");
+
+		state.notes = [];
+		await act(async () => projectChangedFn?.("project-one"));
+		await act(async () =>
+			vi.waitFor(() => {
+				expect(container.querySelector('[data-ui="EditorNote"]')).toBeNull();
+				expect(container.textContent).toContain("Notes empty title");
+			}),
+		);
 	});
 });

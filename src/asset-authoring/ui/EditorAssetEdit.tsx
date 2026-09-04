@@ -8,6 +8,7 @@ import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavig
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
+import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";
 import { Status } from "~/ui/ui/Status";
 
@@ -167,8 +168,11 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 					error={controller.error}
 					saveFn={controller.saveFn}
 				>
-					<label className="grid gap-1.5 text-sm font-semibold">
-						Asset ID
+					<label className="grid gap-1.5 text-sm">
+						<EditorValueLabel
+							label="Asset ID"
+							required
+						/>
 						<input
 							className={editorInputClassName}
 							value={controller.nextId}

@@ -13,7 +13,7 @@ import {
 } from "@floating-ui/react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -33,6 +33,7 @@ interface EditorSearchComboboxProps {
 	readonly error?: string;
 	readonly options: readonly EditorSearchOption[];
 	readonly placeholder?: string;
+	readonly required?: boolean;
 	readonly value: string;
 	readonly onBlurFn?: () => void;
 	readonly onChangeFn: (value: string) => void;
@@ -57,6 +58,7 @@ export const EditorSearchCombobox = ({
 	optionContentLayout = "stacked",
 	options,
 	placeholder,
+	required = false,
 	renderOptionContentFn,
 	renderPreviewFn,
 	renderSelectedPreviewFn,
@@ -161,10 +163,11 @@ export const EditorSearchCombobox = ({
 	return (
 		<label className="grid min-w-0 content-start gap-1.5 text-sm">
 			{labelVisible ? (
-				<span className="flex min-w-0 items-center gap-1">
-					<span className="font-semibold text-foreground">{label}</span>
-					{description === undefined ? null : <EditorInfoTooltip content={description} />}
-				</span>
+				<EditorValueLabel
+					description={description}
+					label={label}
+					required={required}
+				/>
 			) : null}
 			<span className="flex min-w-0 items-center gap-2">
 				{selectedPreview === undefined || selectedPreview === null ? null : (

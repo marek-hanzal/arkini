@@ -41,7 +41,7 @@ export const ProjectToolbarSection = () => {
 						onCellsChangeFn={(nextCells) =>
 							form.setFieldValue(
 								"start.toolbar",
-								nextCells.map(({ x, ...cell }) => ({
+								nextCells.map(({ x, y: _y, ...cell }) => ({
 									...cell,
 									position: {
 										x,

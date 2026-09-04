@@ -5,6 +5,7 @@ import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { Project } from "~/project-authoring/type/Project";
+import { ProjectNotesOverview } from "~/project-note/ui/ProjectNotesOverview";
 import { useProjectVersionStatus } from "~/project-version/ui/useProjectVersionStatus";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
@@ -88,6 +89,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 			className="flex flex-col gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorProjectOverview"
 		>
+			<ProjectNotesOverview projectId={project.projectId} />
 			<EditorOverviewCard
 				body={
 					<div className="flex flex-wrap items-center gap-3">

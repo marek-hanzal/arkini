@@ -12,13 +12,18 @@ import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
 interface AssetAutocompleteFieldProps {
 	readonly description?: string;
 	readonly label: string;
+	readonly optional?: boolean;
 }
 
 const readAssetNameFn = (id: string) =>
 	id.replaceAll(/[-_]+/g, " ").replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase());
 
 /** Picks one PNG asset known by the active editor project. */
-export const AssetAutocompleteField = ({ description, label }: AssetAutocompleteFieldProps) => {
+export const AssetAutocompleteField = ({
+	description,
+	label,
+	optional = false,
+}: AssetAutocompleteFieldProps) => {
 	const field = useFieldContext<string>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const project = useEditorProject();
@@ -47,6 +52,7 @@ export const AssetAutocompleteField = ({ description, label }: AssetAutocomplete
 			emptyLabel="No known asset matches this search."
 			error={error}
 			options={options}
+			required={!optional}
 			value={field.state.value}
 			onBlurFn={field.handleBlur}
 			onChangeFn={field.handleChange}

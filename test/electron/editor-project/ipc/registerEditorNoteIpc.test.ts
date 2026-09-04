@@ -79,6 +79,7 @@ describe("editor project-note IPC", () => {
 		const key = {
 			projectId: "project-one",
 			noteId: editorProjectIpcNote.noteId,
+			expectedUpdatedAtMs: editorProjectIpcNote.updatedAtMs,
 		};
 
 		await expect(
@@ -108,7 +109,8 @@ describe("editor project-note IPC", () => {
 		).resolves.toMatchObject({
 			type: "success",
 			value: {
-				...key,
+				projectId: key.projectId,
+				noteId: key.noteId,
 				content: "Updated note",
 			},
 		});

@@ -10,9 +10,13 @@ import { useNotesController } from "~/project-note/ui/useNotesController";
 import { Status } from "~/ui/ui/Status";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
+import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Markdown } from "~/ui/ui/Markdown";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -52,10 +56,17 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 	component: () => {
 		const controller = useNotesController();
 		const project = useEditorProject();
+		const translator = useTranslator();
 		return (
 			<EditorSectionPage
 				header={
 					<EditorSectionNavigation
+						action={
+							<EditorPageHelp
+								content={<Mx label="Notes help" />}
+								title={<Tx label="Notes" />}
+							/>
+						}
 						leading={
 							<EditorHistoryBackButton
 								params={{
@@ -76,15 +87,12 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 					className="mx-auto grid w-full max-w-3xl gap-6"
 					data-ui="EditorNotes"
 				>
-					<p className="text-sm text-muted">
-						Project notes stay in the Editor and are not included in the arkpack.
-					</p>
 					<section className="grid gap-3 rounded-2xl border border-line bg-surface-raised/60 p-5">
 						<EditorTextarea
 							maxLength={NoteContentMaxLength}
 							maxRows={12}
 							minRows={6}
-							placeholder="Write a note…"
+							placeholder={translator.textFn("Write a note…")}
 							disabled={controller.pending}
 							value={controller.newContent}
 							onChange={(event) =>
@@ -97,7 +105,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 								cursorIntent={controller.pending ? "progress" : undefined}
 								onClick={controller.createFn}
 							>
-								Create note
+								<Tx label="Create note" />
 							</PrimaryButton>
 						</div>
 					</section>
@@ -110,10 +118,14 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 					)}
 					<section className="grid gap-4">
 						{controller.loading ? (
-							<p className="text-sm text-muted">Loading notes…</p>
+							<p className="text-sm text-muted">
+								<Tx label="Loading notes…" />
+							</p>
 						) : !controller.loaded ? (
 							<div className="flex justify-end">
-								<Button onClick={controller.retryFn}>Retry loading notes</Button>
+								<Button onClick={controller.retryFn}>
+									<Tx label="Retry loading notes" />
+								</Button>
 							</div>
 						) : (
 							<AnimatePresence
@@ -128,9 +140,11 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 									>
 										<Status
 											dataUi="EditorNotesEmpty"
-											description="Write the first one above to start a lightweight project journal."
+											description={translator.textFn(
+												"Notes empty description",
+											)}
 											icon={NotebookPen}
-											title="Your notes will live here"
+											title={translator.textFn("Notes empty title")}
 										/>
 									</motion.div>
 								) : (
@@ -152,7 +166,9 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 														{editing ? (
 															<>
 																<Tooltip
-																	content="Cancel edit"
+																	content={
+																		<Tx label="Cancel edit" />
+																	}
 																	placement="top"
 																>
 																	<Button
@@ -170,7 +186,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																	</Button>
 																</Tooltip>
 																<Tooltip
-																	content="Save"
+																	content={<Tx label="Save" />}
 																	placement="top"
 																>
 																	<Button
@@ -196,7 +212,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 														) : (
 															<>
 																<Tooltip
-																	content="Edit"
+																	content={<Tx label="Edit" />}
 																	placement="top"
 																>
 																	<Button
@@ -218,7 +234,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																	</Button>
 																</Tooltip>
 																<Tooltip
-																	content="Delete"
+																	content={<Tx label="Delete" />}
 																	placement="top"
 																>
 																	<Button
@@ -230,7 +246,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																		}
 																		onClick={() =>
 																			controller.removeFn(
-																				note.noteId,
+																				note,
 																			)
 																		}
 																	>
@@ -255,9 +271,9 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 														}
 													/>
 												) : (
-													<p className="whitespace-pre-wrap break-words text-sm leading-6">
-														{note.content}
-													</p>
+													<div className="min-w-0 break-words">
+														<Markdown>{note.content}</Markdown>
+													</div>
 												)}
 											</motion.article>
 										);

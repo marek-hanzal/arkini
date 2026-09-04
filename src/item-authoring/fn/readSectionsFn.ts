@@ -62,6 +62,9 @@ export const readSectionsFn = (
 		)
 			return false;
 		switch (section.id) {
+			case "charges":
+			case "merges":
+				return item.type !== "inventory";
 			case "production":
 				return ProductionItemTypes.has(item.type);
 			case "action":

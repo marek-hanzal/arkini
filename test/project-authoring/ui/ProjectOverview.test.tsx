@@ -32,6 +32,14 @@ vi.mock("~/project-version/ui/useProjectVersionStatus", () => ({
 	}),
 }));
 
+vi.mock("~/project-note/ui/ProjectNotesOverview", () => ({
+	ProjectNotesOverview: ({ projectId }: { readonly projectId: string }) =>
+		createElement("div", {
+			"data-project-id": projectId,
+			"data-ui": "EditorProjectNotesOverview",
+		}),
+}));
+
 vi.mock("~/ui/ui/LinkButton", () => ({
 	LinkButton: ({ children, cursorIntent: _cursorIntent, ...props }: Record<string, unknown>) =>
 		createElement("button", props, children as ReactNode),
@@ -130,6 +138,14 @@ describe("ProjectOverview", () => {
 		expect(container.textContent).toContain("Calculating…");
 		expect(container.querySelector(".animate-spin")).not.toBeNull();
 		expect(container.querySelector('[data-overview-id="unreachable-items"]')).toBeNull();
+		expect(
+			container.querySelector('[data-ui="EditorProjectOverview"]')?.firstElementChild,
+		).toMatchObject({
+			dataset: {
+				projectId: project.projectId,
+				ui: "EditorProjectNotesOverview",
+			},
+		});
 	});
 
 	it("links an actual unreachable count to the incomplete Estimate view", async () => {

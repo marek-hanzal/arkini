@@ -21,10 +21,12 @@ export namespace createNoteCommandAtomsFx {
 		| {
 				readonly action: "update";
 				readonly content: string;
+				readonly expectedUpdatedAtMs: number;
 				readonly noteId: string;
 		  }
 		| {
 				readonly action: "delete";
+				readonly expectedUpdatedAtMs: number;
 				readonly noteId: string;
 		  };
 }
@@ -67,6 +69,7 @@ export const createNoteCommandAtomsFx = Effect.fn("createEditorNotesCommandAtoms
 									projectId,
 									noteId: input.noteId,
 									content: input.content,
+									expectedUpdatedAtMs: input.expectedUpdatedAtMs,
 								})
 								.pipe(
 									Effect.flatMap((updated) =>
@@ -83,6 +86,7 @@ export const createNoteCommandAtomsFx = Effect.fn("createEditorNotesCommandAtoms
 								.deleteNoteFx({
 									projectId,
 									noteId: input.noteId,
+									expectedUpdatedAtMs: input.expectedUpdatedAtMs,
 								})
 								.pipe(
 									Effect.andThen(

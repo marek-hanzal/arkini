@@ -1,12 +1,8 @@
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { useEffect, useState } from "react";
 
-import { NoteCommandAtoms } from "~/project-note/atom/NoteCommandAtoms";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { NoteContentMaxLength, type NoteSchema } from "~/project-note/schema/NoteSchema";
-import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
+import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
 
 export namespace useNotesController {
 	export interface Output {
@@ -22,7 +18,7 @@ export namespace useNotesController {
 		readonly newContent: string;
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly pending: boolean;
-		readonly removeFn: (noteId: string) => void;
+		readonly removeFn: (note: NoteSchema.Type) => void;
 		readonly retryFn: () => void;
 		readonly saveEditFn: () => void;
 		readonly setEditContentFn: (content: string) => void;
@@ -33,32 +29,24 @@ export namespace useNotesController {
 
 export const useNotesController = (): useNotesController.Output => {
 	const project = useEditorProject();
-	const commandAtom = NoteCommandAtoms.commandFn(project.projectId);
-	const streamAtom = NoteCommandAtoms.streamFn(project.projectId);
-	const commandResult = useAtomValue(commandAtom);
-	const notes = useAtomValue(streamAtom);
-	const runFn = useAtomSet(commandAtom, {
-		mode: "promise",
-	});
+	const { error, loaded, loading, notes, pending, runFn } = useProjectNotes(project.projectId);
 	const [editContent, setEditContentFn] = useState("");
-	const [editingNoteId, setEditingNoteIdFn] = useState<string>();
+	const [editingNote, setEditingNoteFn] = useState<
+		Pick<NoteSchema.Type, "noteId" | "updatedAtMs"> | undefined
+	>();
 	const [newContent, setNewContentFn] = useState("");
+	const editingNoteId = editingNote?.noteId;
 
 	useEffect(() => {
-		if (notes !== undefined || !AsyncResult.isInitial(commandResult)) return;
-		void runFn({
-			action: "load",
-		}).catch(() => undefined);
+		if (editingNoteId === undefined || notes.some((note) => note.noteId === editingNoteId))
+			return;
+		setEditingNoteFn(undefined);
+		setEditContentFn("");
 	}, [
-		commandResult,
+		editingNoteId,
 		notes,
-		runFn,
 	]);
 
-	const loaded = notes !== undefined;
-	const loading = !loaded && (AsyncResult.isInitial(commandResult) || commandResult.waiting);
-	const pending = commandResult.waiting;
-	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(commandResult));
 	const newContentLength = newContent.trim().length;
 	const editContentLength = editContent.trim().length;
 	const canCreate =
@@ -75,32 +63,37 @@ export const useNotesController = (): useNotesController.Output => {
 			.catch(() => undefined);
 	};
 	const startEditFn = (note: NoteSchema.Type) => {
-		setEditingNoteIdFn(note.noteId);
+		setEditingNoteFn({
+			noteId: note.noteId,
+			updatedAtMs: note.updatedAtMs,
+		});
 		setEditContentFn(note.content);
 	};
 	const cancelEditFn = () => {
 		if (pending) return;
-		setEditingNoteIdFn(undefined);
+		setEditingNoteFn(undefined);
 		setEditContentFn("");
 	};
 	const saveEditFn = () => {
-		if (!canSaveEdit || editingNoteId === undefined) return;
+		if (!canSaveEdit || editingNote === undefined) return;
 		void runFn({
 			action: "update",
-			noteId: editingNoteId,
+			noteId: editingNote.noteId,
 			content: editContent,
+			expectedUpdatedAtMs: editingNote.updatedAtMs,
 		})
 			.then(() => {
-				setEditingNoteIdFn(undefined);
+				setEditingNoteFn(undefined);
 				setEditContentFn("");
 			})
 			.catch(() => undefined);
 	};
-	const removeFn = (noteId: string) => {
+	const removeFn = (note: NoteSchema.Type) => {
 		if (pending) return;
 		void runFn({
 			action: "delete",
-			noteId,
+			noteId: note.noteId,
+			expectedUpdatedAtMs: note.updatedAtMs,
 		}).catch(() => undefined);
 	};
 	const retryFn = () => {
@@ -129,7 +122,7 @@ export const useNotesController = (): useNotesController.Output => {
 		loading,
 		loaded,
 		newContent,
-		notes: notes ?? [],
+		notes,
 		pending,
 		removeFn,
 		retryFn,

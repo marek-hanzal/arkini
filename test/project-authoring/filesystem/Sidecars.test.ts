@@ -18,6 +18,57 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project sidecars", () => {
+	it("rejects stale note updates and deletes without changing the current note", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const created = await Effect.runPromise(
+			repository.createNoteFx({
+				projectId: project.projectId,
+				content: "Original note",
+			}),
+		);
+		const updated = await Effect.runPromise(
+			repository.updateNoteFx({
+				projectId: project.projectId,
+				noteId: created.noteId,
+				content: "Current note",
+				expectedUpdatedAtMs: created.updatedAtMs,
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				repository.updateNoteFx({
+					projectId: project.projectId,
+					noteId: created.noteId,
+					content: "Stale overwrite",
+					expectedUpdatedAtMs: created.updatedAtMs,
+				}),
+			),
+		).rejects.toThrow(`Editor note ${created.noteId} changed after it was read.`);
+		await expect(
+			Effect.runPromise(
+				repository.deleteNoteFx({
+					projectId: project.projectId,
+					noteId: created.noteId,
+					expectedUpdatedAtMs: created.updatedAtMs,
+				}),
+			),
+		).rejects.toThrow(`Editor note ${created.noteId} changed after it was read.`);
+		expect(await Effect.runPromise(repository.listNotesFx(project.projectId))).toEqual([
+			updated,
+		]);
+
+		await Effect.runPromise(
+			repository.deleteNoteFx({
+				projectId: project.projectId,
+				noteId: created.noteId,
+				expectedUpdatedAtMs: updated.updatedAtMs,
+			}),
+		);
+		expect(await Effect.runPromise(repository.listNotesFx(project.projectId))).toEqual([]);
+	});
+
 	it("refreshes and reopens notes whose exact IDs contain lone surrogates", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);

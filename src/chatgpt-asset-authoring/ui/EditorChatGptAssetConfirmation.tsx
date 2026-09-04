@@ -1,5 +1,6 @@
 import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
+import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import type { useEditorChatGptController } from "~/chatgpt-asset-authoring/ui/useEditorChatGptController";
 
 export const EditorChatGptAssetConfirmation = ({
@@ -36,8 +37,11 @@ export const EditorChatGptAssetConfirmation = ({
 					<h1 className="text-xl font-semibold text-foreground">Save image as asset</h1>
 					<p className="truncate text-sm text-muted">{candidate.filename}</p>
 				</div>
-				<label className="grid gap-1.5 text-sm font-semibold text-foreground">
-					Asset ID
+				<label className="grid gap-1.5 text-sm text-foreground">
+					<EditorValueLabel
+						label="Asset ID"
+						required
+					/>
 					<input
 						className={editorInputClassName}
 						value={controller.resourceId}

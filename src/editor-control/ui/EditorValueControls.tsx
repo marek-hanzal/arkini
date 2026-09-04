@@ -10,6 +10,7 @@ interface EditorValueControlProps {
 	readonly description?: ReactNode;
 	readonly error?: string;
 	readonly label: string;
+	readonly required?: boolean;
 }
 
 interface EditorNamedValueControlProps extends EditorValueControlProps {
@@ -29,9 +30,11 @@ interface EditorNumericControlProps extends EditorNamedValueControlProps {
 export const EditorValueLabel = ({
 	description,
 	label,
-}: Pick<EditorValueControlProps, "description" | "label">) => (
+	required = false,
+}: Pick<EditorValueControlProps, "description" | "label" | "required">) => (
 	<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
 		<span className="font-semibold text-foreground">{label}</span>
+		{required ? <span className="size-1.5 shrink-0 rounded-full bg-accent" /> : null}
 		{description === undefined ? null : <EditorInfoTooltip content={description} />}
 	</span>
 );
@@ -42,6 +45,7 @@ const EditorValueField = ({
 	error,
 	fill = false,
 	label,
+	required = true,
 }: {
 	readonly children: ReactNode;
 	readonly fill?: boolean;
@@ -52,6 +56,7 @@ const EditorValueField = ({
 		<EditorValueLabel
 			description={description}
 			label={label}
+			required={required}
 		/>
 		{children}
 		{error === undefined ? null : (
@@ -70,6 +75,7 @@ const EditorNumericControl = ({
 	name,
 	onBlurFn,
 	onChangeFn,
+	required,
 	step,
 	value,
 }: EditorNumericControlProps) => (
@@ -77,6 +83,7 @@ const EditorNumericControl = ({
 		description={description}
 		error={error}
 		label={label}
+		required={required}
 	>
 		<input
 			type="number"
@@ -109,6 +116,7 @@ export const EditorTextControl = ({
 	onChangeFn,
 	placeholder,
 	readOnly,
+	required,
 	value,
 }: {
 	readonly autoComplete?: string;
@@ -121,6 +129,7 @@ export const EditorTextControl = ({
 		description={description}
 		error={error}
 		label={label}
+		required={required}
 	>
 		<input
 			type="text"
@@ -151,6 +160,7 @@ export const EditorTextAreaControl = ({
 	onBlurFn,
 	onChangeFn,
 	placeholder,
+	required,
 	rows = 4,
 	value,
 }: {
@@ -165,6 +175,7 @@ export const EditorTextAreaControl = ({
 		error={error}
 		fill={fill}
 		label={label}
+		required={required}
 	>
 		<textarea
 			name={name}
@@ -223,6 +234,7 @@ export const EditorChoiceControl = <Value extends string>({
 	label,
 	onChangeFn,
 	options,
+	required = true,
 	value,
 }: {
 	readonly compact?: boolean;
@@ -247,6 +259,7 @@ export const EditorChoiceControl = <Value extends string>({
 			<EditorValueLabel
 				description={description}
 				label={label}
+				required={required}
 			/>
 		</legend>
 		<SegmentedControl

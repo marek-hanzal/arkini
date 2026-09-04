@@ -1,13 +1,14 @@
 import { z } from "zod";
 
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
 
 /** Portable note body whose project identity is owned by its containing directory. */
 export const NoteFileSchema = z
 	.object({
 		content: NoteContentSchema,
-		createdAtMs: z.number().int().nonnegative(),
-		updatedAtMs: z.number().int().nonnegative(),
+		createdAtMs: NonNegativeIntegerSchema,
+		updatedAtMs: NonNegativeIntegerSchema,
 	})
 	.strict()
 	.refine(({ createdAtMs, updatedAtMs }) => updatedAtMs >= createdAtMs, {

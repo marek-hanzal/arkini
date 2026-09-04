@@ -22,6 +22,7 @@ import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
+import { registerNoteToolsFn } from "./registerNoteTools";
 import { registerVersionToolsFn } from "./registerVersionTools";
 import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
@@ -397,6 +398,13 @@ const createServerFn = (
 				),
 			),
 	);
+	registerNoteToolsFn({
+		notifyProjectChangedFn,
+		readProjectFx,
+		repository,
+		runToolFn,
+		server,
+	});
 	server.registerTool(
 		"item_detail",
 		{

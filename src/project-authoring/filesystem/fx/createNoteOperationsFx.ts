@@ -8,6 +8,7 @@ import { ProjectRepositoryError } from "~/project-authoring/error/ProjectReposit
 import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
 import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { withProjectLockFx } from "./withProjectLockFx";
@@ -150,12 +151,16 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 		projectId,
 		noteId: candidateId,
 		content: candidate,
+		expectedUpdatedAtMs: candidateExpectedUpdatedAtMs,
 	}) =>
 		Effect.gen(function* () {
-			const { noteId, content } = yield* Effect.try({
+			const { noteId, content, expectedUpdatedAtMs } = yield* Effect.try({
 				try: () => ({
 					noteId: IdSchema.parse(candidateId),
 					content: NoteContentSchema.parse(candidate),
+					expectedUpdatedAtMs: NonNegativeIntegerSchema.parse(
+						candidateExpectedUpdatedAtMs,
+					),
 				}),
 				catch: (cause) =>
 					errorFn("update-note", "The Editor project note is invalid.", cause),
@@ -171,6 +176,13 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 							errorFn(
 								"update-note",
 								`Editor note ${noteId} does not exist in project ${projectId}.`,
+							),
+						);
+					if (previous.updatedAtMs !== expectedUpdatedAtMs)
+						return yield* Effect.fail(
+							errorFn(
+								"update-note",
+								`Editor note ${noteId} changed after it was read.`,
 							),
 						);
 					const latest = notes[0]?.updatedAtMs ?? previous.updatedAtMs;
@@ -210,21 +222,38 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 			),
 		);
 
-	const deleteNoteFx: Operations["deleteNoteFx"] = ({ projectId, noteId: candidateId }) =>
+	const deleteNoteFx: Operations["deleteNoteFx"] = ({
+		projectId,
+		noteId: candidateId,
+		expectedUpdatedAtMs: candidateExpectedUpdatedAtMs,
+	}) =>
 		Effect.gen(function* () {
-			const noteId = yield* Effect.try({
-				try: () => IdSchema.parse(candidateId),
+			const { noteId, expectedUpdatedAtMs } = yield* Effect.try({
+				try: () => ({
+					noteId: IdSchema.parse(candidateId),
+					expectedUpdatedAtMs: NonNegativeIntegerSchema.parse(
+						candidateExpectedUpdatedAtMs,
+					),
+				}),
 				catch: (cause) => errorFn("delete-note", "The Editor note key is invalid.", cause),
 			});
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
 					const state = yield* readStateFx(projectId);
+					const previous = state.notes.find((note) => note.noteId === noteId);
 					const target = yield* state.paths.noteFileFx(noteId);
-					if (!(yield* fileSystem.exists(target)))
+					if (previous === undefined || !(yield* fileSystem.exists(target)))
 						return yield* Effect.fail(
 							errorFn(
 								"delete-note",
 								`Editor note ${noteId} does not exist in project ${projectId}.`,
+							),
+						);
+					if (previous.updatedAtMs !== expectedUpdatedAtMs)
+						return yield* Effect.fail(
+							errorFn(
+								"delete-note",
+								`Editor note ${noteId} changed after it was read.`,
 							),
 						);
 					yield* withProjectLockFx(

@@ -130,6 +130,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 											<EditorValueLabel
 												description="Required. Give this restore point a short name you will recognize in History and comparison selectors."
 												label="Message"
+												required
 											/>
 											<input
 												className={editorInputClassName}

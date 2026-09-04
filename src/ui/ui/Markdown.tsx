@@ -7,7 +7,7 @@ export namespace Markdown {
 	}
 }
 
-/** Renders trusted application-authored Markdown without admitting embedded HTML. */
+/** Renders Markdown without admitting embedded HTML. */
 export const Markdown = ({ children, components, ...props }: Markdown.Props) => (
 	<div
 		className="grid gap-3 text-sm leading-6 text-muted"

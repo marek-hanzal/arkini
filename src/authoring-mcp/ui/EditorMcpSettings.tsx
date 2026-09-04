@@ -1,6 +1,8 @@
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import { EditorMcpCopyableUrl } from "./EditorMcpCopy";
 import { EditorMcpStatus } from "./EditorMcpStatus";
 
@@ -52,25 +54,31 @@ export const EditorMcpSettings = ({
 						computer.
 					</p>
 				</div>
-				<label className="grid gap-2">
-					<span className="text-sm font-semibold">Port</span>
-					<input
-						type="number"
-						min={1_024}
-						max={65_535}
-						value={port}
-						className={editorMcpInputClassName}
-						disabled={portDisabled}
-						onChange={(event) => onSetPortFn(event.currentTarget.value)}
-					/>
-				</label>
-				<Button
-					className="justify-self-start"
-					disabled={pending}
-					onClick={onSavePortFn}
-				>
-					Save port
-				</Button>
+				<div className="grid gap-2">
+					<div className="text-sm">
+						<EditorValueLabel
+							label="Port"
+							required
+						/>
+					</div>
+					<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+						<input
+							type="number"
+							min={1_024}
+							max={65_535}
+							value={port}
+							className={editorMcpInputClassName}
+							disabled={portDisabled}
+							onChange={(event) => onSetPortFn(event.currentTarget.value)}
+						/>
+						<LinkButton
+							disabled={pending}
+							onClick={onSavePortFn}
+						>
+							Save
+						</LinkButton>
+					</div>
+				</div>
 				<EditorMcpCopyableUrl
 					copied={copied === "local-url"}
 					label="Local endpoint"
@@ -88,7 +96,12 @@ export const EditorMcpSettings = ({
 					</p>
 				</div>
 				<label className="grid gap-2">
-					<span className="text-sm font-semibold">Development domain</span>
+					<div className="text-sm">
+						<EditorValueLabel
+							label="Development domain"
+							required
+						/>
+					</div>
 					<input
 						value={ngrokDomain}
 						className={editorMcpInputClassName}
@@ -98,7 +111,12 @@ export const EditorMcpSettings = ({
 					/>
 				</label>
 				<label className="grid gap-2">
-					<span className="text-sm font-semibold">Authtoken</span>
+					<div className="text-sm">
+						<EditorValueLabel
+							label="Authtoken"
+							required
+						/>
+					</div>
 					<input
 						type="password"
 						value={authtoken}

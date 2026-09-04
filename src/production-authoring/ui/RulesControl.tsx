@@ -268,6 +268,7 @@ const RuleControl = ({
 		<EditorTextControl
 			label="Hint"
 			placeholder="Optional explanation shown while this rule applies"
+			required={false}
 			value={rule.hint ?? ""}
 			onChangeFn={(hint) =>
 				onChangeFn({

@@ -40,7 +40,12 @@ const ArtworkFields = withFieldGroupFn({
 			</group.AppField>
 			<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
 				<group.AppField name="default[1]">
-					{(field) => <field.AssetField label="Overlay asset" />}
+					{(field) => (
+						<field.AssetField
+							label="Overlay asset"
+							optional
+						/>
+					)}
 				</group.AppField>
 				<Button
 					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
@@ -85,7 +90,12 @@ const ArtworkFields = withFieldGroupFn({
 								{(index) => (
 									<div className="grid gap-2">
 										<group.AppField name={`sources[${index}]`}>
-											{(field) => <field.AssetField label="Asset" />}
+											{(field) => (
+												<field.AssetField
+													label="Asset"
+													optional
+												/>
+											)}
 										</group.AppField>
 									</div>
 								)}

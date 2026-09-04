@@ -17,7 +17,7 @@ export const EditorOverviewCard = ({
 	readonly footerLeft?: ReactNode;
 	readonly footerRight?: ReactNode;
 	readonly icon?: LucideIcon;
-	readonly title: string;
+	readonly title: ReactNode;
 }) => (
 	<EditorRootCard
 		className="gap-4"

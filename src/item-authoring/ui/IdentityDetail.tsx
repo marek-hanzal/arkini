@@ -19,7 +19,11 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						/>
 						<Fact
 							label={translator.textFn("Storage")}
-							value={translator.textFn(`Item storage scope - ${item.scope}`)}
+							value={
+								item.type === "inventory"
+									? translator.textFn("Item storage scope - inventory-control")
+									: translator.textFn(`Item storage scope - ${item.scope}`)
+							}
 						/>
 						<Fact
 							label={translator.textFn("Stack capacity")}

@@ -112,7 +112,8 @@ Editor Build and CLI pack both reread the saved portable tree and require its fi
 - Renderer validates every result again through the pure transport contract.
 - Repository failure is serialized as the exact project operation plus bounded message, not leaked native state.
 - Editor persistence may fail independently without preventing gameplay boot; Editor channels report unavailable state.
-- MCP uses the same schema, expected revision, reference checks and repository mutation operations. Successful external mutation emits invalidation; renderer rereads disk.
+- MCP uses the same schema, expected revision, reference checks and repository mutation operations. Note edits and deletes use the exact `updatedAtMs` returned by the last read as their freshness token.
+- Successful MCP mutation emits invalidation; the renderer rereads canonical repository state. Notes preserve a local draft across refresh, reject a stale save and leave edit mode only when its note was deleted.
 - CLI MCP has no renderer projection to invalidate. Version checkout therefore performs the confirmed repository replacement directly with the current saved fingerprint.
 - GUI Editor and CLI MCP access are mutually unsupported by contract. No process lock or runtime detection enforces that restriction.
 

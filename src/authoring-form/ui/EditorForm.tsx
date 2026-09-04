@@ -112,6 +112,7 @@ const EditorNumberField = ({
 			onChangeFn={(nextValue) =>
 				field.handleChange(optional && Number.isNaN(nextValue) ? undefined : nextValue)
 			}
+			required={!optional}
 			step={step}
 			value={value ?? Number.NaN}
 		/>

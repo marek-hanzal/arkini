@@ -268,7 +268,7 @@ export namespace ArkiniElectronApi {
 				request: EditorProjectTransport.UpdateNoteRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Note>>;
 			readonly deleteNoteFn: (
-				request: EditorProjectTransport.NoteKeyRequest,
+				request: EditorProjectTransport.DeleteNoteRequest,
 			) => Promise<EditorProjectTransport.Result<void>>;
 			readonly listBoardScenariosFn: (
 				projectId: string,

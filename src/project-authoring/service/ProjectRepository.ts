@@ -91,8 +91,13 @@ export namespace ProjectRepository {
 		readonly content: string;
 	}
 
+	export interface DeleteNoteProps extends NoteKey {
+		readonly expectedUpdatedAtMs: number;
+	}
+
 	export interface UpdateNoteProps extends NoteKey {
 		readonly content: string;
+		readonly expectedUpdatedAtMs: number;
 	}
 }
 
@@ -109,7 +114,7 @@ export interface ProjectRepositoryService extends ProjectVersionRepositoryServic
 		props: ProjectRepository.CreateNoteProps,
 	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError, never>;
 	readonly deleteNoteFx: (
-		key: ProjectRepository.NoteKey,
+		props: ProjectRepository.DeleteNoteProps,
 	) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly deleteItemFx: (
 		props: ProjectRepository.DeleteItemProps,

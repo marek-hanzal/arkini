@@ -154,7 +154,11 @@ export namespace EditorProjectTransport {
 		readonly noteId: string;
 	}
 
-	export interface UpdateNoteRequest extends NoteKeyRequest {
+	export interface DeleteNoteRequest extends NoteKeyRequest {
+		readonly expectedUpdatedAtMs: number;
+	}
+
+	export interface UpdateNoteRequest extends DeleteNoteRequest {
 		readonly content: string;
 	}
 

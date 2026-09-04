@@ -20,6 +20,8 @@ Build help:
     After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
 Cancel:
   value: Cancel
+Cancel edit:
+  value: Cancel edit
 Charges:
   value: Charges
   dynamic: true
@@ -38,6 +40,8 @@ Connection search placeholder:
   value: Search connections…
 Connections:
   value: Connections
+Create note:
+  value: Create note
 Create project:
   value: Create project
 Create project help:
@@ -45,13 +49,17 @@ Create project help:
     Choose the package identity used by builds and gameplay saves. It can be renamed later, which makes the project a different game to existing saves.
 Current stack:
   value: Current stack
+Delete:
+  value: Delete
 Description:
   value: Description
+Edit:
+  value: Edit
 Editor MCP:
   value: Editor MCP
 Editor MCP help:
   value: |
-    MCP lets AI tools work with the project currently open in Arkini. A connected client can inspect and edit project data, run validation, explore item relationships, and work with Versions.
+    MCP lets AI tools work with the project currently open in Arkini. A connected client can inspect and edit project data and Notes, run validation, explore item relationships, and work with Versions.
 
     > **Treat every connection as full project access.** Only connect clients you trust, and keep the intended project open in Arkini while they work.
 
@@ -117,6 +125,8 @@ Inventory editing:
 Inventory editing help:
   value: |
     Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
+Inventory item storage scope form:
+  value: Board & Toolbar — fixed by the Inventory item contract
 Item:
   value: Item
 Item ID:
@@ -155,6 +165,8 @@ Item storage scope - board:
 Item storage scope - inventory:
   value: Inventory only
   dynamic: true
+Item storage scope - inventory-control:
+  value: Board & Toolbar
 Item storage scope - toolbar:
   value: Toolbar only
   dynamic: true
@@ -215,6 +227,8 @@ Item type description - stash:
 Item type description - temporary:
   value: A board-only effect that expires after an authored duration.
   dynamic: true
+Loading notes…:
+  value: Loading notes…
 Location:
   value: Location
 Major Version commit consequence:
@@ -227,6 +241,17 @@ No-op Version commit consequence:
   value: Only Editor-only content changed. The Arkpack version and save compatibility stay unchanged.
 Notes:
   value: Notes
+Notes empty description:
+  value: Capture an idea, reminder, rough plan, or any other project note above.
+Notes empty title:
+  value: Your notes will live here
+Notes help:
+  value: |
+    Notes are a free-form space for ideas, design thoughts, reminders, rough plans, and any other useful project stuff.
+
+    Write them in **Markdown**. Notes stay with the Editor project, but **they are not versioned with it**: creating or restoring a Version does not capture or roll back your notes. They are also excluded from the built Arkpack, so they never affect the game.
+Notes unavailable:
+  value: Notes are unavailable.
 Owned:
   value: Owned
 Page help:
@@ -248,8 +273,12 @@ Rename project ID help:
     > **Version history starts fresh.**
     >
     > Existing Version commits become unreachable from this project. Gameplay version stays the same; the next Version commit becomes a new history root.
+Retry loading notes:
+  value: Retry loading notes
 Review and commit:
   value: Review & commit
+Save:
+  value: Save
 Stack capacity:
   value: Stack capacity
 Starting layout controls help:
@@ -294,3 +323,5 @@ Version history help:
     - Arkpack version badges describe compatibility, not node identity. Sibling commits and scenario-only parent/child commits may share the same version.
 
     **Restore version** replaces the complete saved project with that snapshot. If the working copy or an Editor tool has an unsaved draft, Arkini lets you Commit first or restore and discard it.
+Write a note…:
+  value: Write a note…

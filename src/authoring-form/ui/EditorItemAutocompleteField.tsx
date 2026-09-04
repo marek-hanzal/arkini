@@ -24,6 +24,7 @@ export const EditorItemAutocompleteField = ({
 			emptyLabel="No known item matches this search."
 			error={error}
 			options={options}
+			required
 			value={field.state.value}
 			onBlurFn={field.handleBlur}
 			onChangeFn={field.handleChange}
@@ -56,6 +57,7 @@ export const EditorItemReferenceControl = ({
 			label={label}
 			emptyLabel="No known item matches this search."
 			options={options}
+			required
 			value={value}
 			onChangeFn={onChangeFn}
 			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}

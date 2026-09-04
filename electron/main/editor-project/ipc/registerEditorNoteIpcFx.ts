@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
@@ -24,7 +25,12 @@ const noteKeySchema = z
 		noteId: IdSchema,
 	})
 	.strict();
-const updateNoteSchema = noteKeySchema
+const deleteNoteSchema = noteKeySchema
+	.extend({
+		expectedUpdatedAtMs: NonNegativeIntegerSchema,
+	})
+	.strict();
+const updateNoteSchema = deleteNoteSchema
 	.extend({
 		content: NoteContentSchema,
 	})
@@ -86,7 +92,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					"delete-note",
 					ownership,
 					diagnostics,
-					parseEditorProjectIpcRequestFx("delete-note", noteKeySchema, candidate),
+					parseEditorProjectIpcRequestFx("delete-note", deleteNoteSchema, candidate),
 					(repository, request) => repository.deleteNoteFx(request),
 				),
 			);

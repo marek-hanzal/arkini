@@ -314,6 +314,7 @@ describe("createElectronProjectRepositoryFx", () => {
 			repository.updateNoteFx({
 				projectId: "project-one",
 				noteId: "note-one",
+				expectedUpdatedAtMs: 1,
 				content: "Updated",
 			}),
 		);

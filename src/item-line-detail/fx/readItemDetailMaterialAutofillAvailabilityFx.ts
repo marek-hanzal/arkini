@@ -40,12 +40,15 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		owner?.location.scope === LocationScopeEnumSchema.enum.Board
 			? owner.location.space
 			: runtime.currentSpace;
-	const activeJobOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
+	const busyOwnerItemIds = new Set([
+		...runtime.jobs.map((job) => job.ownerItemId),
+		...runtime.jobQueue.map((request) => request.ownerItemId),
+	]);
 	let availableQuantity = 0;
 	for (const candidate of runtime.items) {
 		if (
 			candidate.id === ownerItemId ||
-			activeJobOwnerItemIds.has(candidate.id) ||
+			busyOwnerItemIds.has(candidate.id) ||
 			!isMaterialInputEligibleFn(candidate.item) ||
 			!matchesItemSelectorFn({
 				item: candidate.item,

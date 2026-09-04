@@ -358,7 +358,7 @@ export const mountController = ({
 	} satisfies MagneticField;
 	const motion = {
 		beginInteractionHandoffFx: (actorId) => Effect.sync(() => beginInteractionHandoff(actorId)),
-		handoffSpawnsFx: () => Effect.void,
+		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
 		redirectTargetFx: (redirect) =>

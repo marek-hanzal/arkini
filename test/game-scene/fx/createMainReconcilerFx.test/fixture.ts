@@ -449,7 +449,7 @@ export const createDrag = () => {
 export const createMotion = () =>
 	({
 		beginInteractionHandoffFx: () => Effect.succeed(false),
-		handoffSpawnsFx: () => Effect.void,
+		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
 		redirectTargetFx: () => Effect.void,

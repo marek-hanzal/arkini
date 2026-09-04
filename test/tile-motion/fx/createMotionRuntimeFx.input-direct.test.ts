@@ -99,6 +99,7 @@ describe("direct input remainder", () => {
 
 		Effect.runSync(
 			runMotionCueFx({
+				isCueActiveFn: () => true,
 				actorStore: createActorStore({
 					actors,
 					canonicalItems,

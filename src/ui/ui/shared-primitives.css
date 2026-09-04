@@ -124,6 +124,10 @@
 		background-color: var(--ak-spotlight-option-hover-surface);
 		border-color: var(--ak-spotlight-option-emphasis-border);
 	}
+
+	.ak-spotlight-option:disabled:hover {
+		background-color: var(--ak-spotlight-option-hover-surface);
+	}
 }
 
 .ak-spotlight-option[data-ui-selected="true"] {

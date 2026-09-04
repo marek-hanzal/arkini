@@ -109,9 +109,15 @@ const EditorNumberField = ({
 			min={min}
 			name={field.name}
 			onBlurFn={field.handleBlur}
-			onChangeFn={(nextValue) =>
-				field.handleChange(optional && Number.isNaN(nextValue) ? undefined : nextValue)
-			}
+			onChangeFn={(nextValue) => {
+				const boundedValue =
+					max === undefined || Number.isNaN(nextValue)
+						? nextValue
+						: Math.min(nextValue, max);
+				field.handleChange(
+					optional && Number.isNaN(boundedValue) ? undefined : boundedValue,
+				);
+			}}
 			required={!optional}
 			step={step}
 			value={value ?? Number.NaN}

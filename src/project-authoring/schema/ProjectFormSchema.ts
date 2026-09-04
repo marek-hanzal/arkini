@@ -21,6 +21,15 @@ export const ProjectAvatarKeys = [
 	"avatar-07",
 ] as const;
 
+export const EditorProjectSizeMax = 42;
+
+const EditorProjectSizeSchema = SizeSchema.extend({
+	height: SizeSchema.shape.height.max(EditorProjectSizeMax),
+	width: SizeSchema.shape.width.max(EditorProjectSizeMax),
+});
+
+const EditorProjectToolbarSizeSchema = ToolbarSizeSchema.max(EditorProjectSizeMax);
+
 const ProjectStartBoardItemSchema = BoardItemSchema.extend({
 	quantity: PositiveIntegerSchema,
 });
@@ -37,9 +46,9 @@ export const ProjectFormBaseSchema = z
 		title: TitleSchema,
 		hero: IdSchema,
 		avatars: z.array(IdSchema).max(ProjectAvatarKeys.length),
-		board: SizeSchema,
-		inventory: SizeSchema,
-		toolbarSize: ToolbarSizeSchema,
+		board: EditorProjectSizeSchema,
+		inventory: EditorProjectSizeSchema,
+		toolbarSize: EditorProjectToolbarSizeSchema,
 		start: z
 			.object({
 				currentSpace: NonNegativeIntegerSchema,

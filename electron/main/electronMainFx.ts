@@ -295,6 +295,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		Effect.flatMap((windowMode) =>
 			createMainWindowFx({
 				chatGptViewControllerOwnership,
+				readMcpNgrokDomainFx: editorMcpOwnership.readOverviewFx.pipe(
+					Effect.map((overview) => overview.ngrokDomain),
+				),
 				trustedRenderer,
 				windowMode,
 				windowModeControllerOwnership,

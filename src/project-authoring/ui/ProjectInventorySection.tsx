@@ -10,7 +10,8 @@ export const ProjectInventorySection = () => {
 	const { form } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.inventory.width);
 	const height = useStore(form.store, (state) => state.values.inventory.height);
-	const startInventory = useStore(form.store, (state) => state.values.start.inventory);
+	const start = useStore(form.store, (state) => state.values.start);
+	const startInventory = start.inventory;
 	const cells = startInventory.map((entry) => ({
 		itemId: entry.itemId,
 		quantity: entry.quantity,
@@ -63,6 +64,7 @@ export const ProjectInventorySection = () => {
 						)
 					}
 					scope="inventory"
+					start={start}
 					width={width}
 				/>
 			</EditorFormSection>

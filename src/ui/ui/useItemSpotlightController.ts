@@ -13,6 +13,8 @@ import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 export namespace useItemSpotlightController {
 	export interface Option {
 		readonly artwork: ReactNode;
+		readonly disabled?: boolean;
+		readonly disabledReason?: ReactNode;
 		readonly itemId: string;
 		readonly label: string;
 		readonly secondary: string;
@@ -101,6 +103,8 @@ export const useItemSpotlightController = ({
 		onQueryChangeFn?.(value);
 	};
 	const selectItemFn = ({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
+		const option = results[index];
+		if (option?.itemId !== itemId || option.disabled === true) return;
 		setSelectedIndexFn(index);
 		onSelectItemFn(itemId);
 	};

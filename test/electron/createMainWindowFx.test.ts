@@ -121,7 +121,9 @@ const createTestMainWindowFx = Effect.fn("createTestMainWindowFx")(
 	(
 		props: Omit<
 			createMainWindowFx.Props,
-			"chatGptViewControllerOwnership" | "windowModeControllerOwnership"
+			| "chatGptViewControllerOwnership"
+			| "readMcpNgrokDomainFx"
+			| "windowModeControllerOwnership"
 		>,
 	) =>
 		Effect.gen(function* () {
@@ -130,6 +132,7 @@ const createTestMainWindowFx = Effect.fn("createTestMainWindowFx")(
 			return yield* createMainWindowFx({
 				...props,
 				chatGptViewControllerOwnership,
+				readMcpNgrokDomainFx: Effect.succeed(undefined),
 				windowModeControllerOwnership,
 			});
 		}),

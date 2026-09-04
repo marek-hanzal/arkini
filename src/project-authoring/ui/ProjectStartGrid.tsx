@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { StartSchema } from "~/game-start/schema/StartSchema";
 import type { ProjectStartScope } from "~/project-authoring/type/ProjectStartScope";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
@@ -36,6 +37,7 @@ interface ProjectStartGridEditProps extends ProjectStartGridCommonProps {
 	readonly mode: "edit";
 	readonly onCellsChangeFn: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
 	readonly scope: ProjectStartScope;
+	readonly start: StartSchema.Type;
 }
 
 type ProjectStartGridProps = ProjectStartGridDetailProps | ProjectStartGridEditProps;
@@ -354,6 +356,7 @@ const ProjectStartGridEdit = ({
 	height,
 	onCellsChangeFn,
 	scope,
+	start,
 	width,
 }: ProjectStartGridEditProps) => {
 	const { items } = useEditorItemSearchOptions();
@@ -443,6 +446,7 @@ const ProjectStartGridEdit = ({
 						}))
 					}
 					scope={scope}
+					start={start}
 				/>
 			)}
 			{dragVisual === undefined ? null : (

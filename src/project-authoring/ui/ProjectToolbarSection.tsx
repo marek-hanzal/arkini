@@ -8,7 +8,8 @@ import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext
 export const ProjectToolbarSection = () => {
 	const { form } = useProjectFormSession();
 	const size = useStore(form.store, (state) => state.values.toolbarSize);
-	const startToolbar = useStore(form.store, (state) => state.values.start.toolbar);
+	const start = useStore(form.store, (state) => state.values.start);
+	const startToolbar = start.toolbar;
 	const cells = startToolbar.map((entry) => ({
 		itemId: entry.itemId,
 		quantity: entry.quantity,
@@ -51,6 +52,7 @@ export const ProjectToolbarSection = () => {
 							)
 						}
 						scope="toolbar"
+						start={start}
 						width={size}
 					/>
 				)}

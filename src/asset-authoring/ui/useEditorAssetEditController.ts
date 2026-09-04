@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import { editEditorAssetFx } from "~/asset-authoring/fx/editEditorAssetFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/fx/validateEditorAssetFileFx";
@@ -114,18 +114,55 @@ export const useEditorAssetEditController = ({
 	});
 	const [nextId, setNextIdStateFn] = useState(resourceId);
 	const [file, setFileStateFn] = useState<File>();
+	const [saving, setSavingFn] = useState(false);
+	const mountedRef = useRef(false);
+	const draftEpochRef = useRef(0);
+	const pendingSaveRef = useRef<number | undefined>(undefined);
+	const commandEpochRef = useRef<number | undefined>(undefined);
+	useLayoutEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+			draftEpochRef.current += 1;
+			pendingSaveRef.current = undefined;
+		};
+	}, [
+		project.projectId,
+		resourceId,
+	]);
+	const invalidateSaveFn = useCallback(() => {
+		draftEpochRef.current += 1;
+		pendingSaveRef.current = undefined;
+		setSavingFn(false);
+	}, []);
 	const [validationIssue, setValidationIssueFn] = useState<{
 		readonly field: "assetId" | "file";
 		readonly message: string;
 	}>();
-	const setNextIdFn = useCallback((value: string) => {
-		setNextIdStateFn(value);
-		setValidationIssueFn((current) => (current?.field === "assetId" ? undefined : current));
-	}, []);
-	const setFileFn = useCallback((value: File | undefined) => {
-		setFileStateFn(value);
-		setValidationIssueFn((current) => (current?.field === "file" ? undefined : current));
-	}, []);
+	const setNextIdFn = useCallback(
+		(value: string) => {
+			if (pendingSaveRef.current !== undefined || result.waiting) return;
+			invalidateSaveFn();
+			setNextIdStateFn(value);
+			setValidationIssueFn((current) => (current?.field === "assetId" ? undefined : current));
+		},
+		[
+			invalidateSaveFn,
+			result.waiting,
+		],
+	);
+	const setFileFn = useCallback(
+		(value: File | undefined) => {
+			if (pendingSaveRef.current !== undefined || result.waiting) return;
+			invalidateSaveFn();
+			setFileStateFn(value);
+			setValidationIssueFn((current) => (current?.field === "file" ? undefined : current));
+		},
+		[
+			invalidateSaveFn,
+			result.waiting,
+		],
+	);
 	const showValidationIssueFn = useCallback(
 		(issue: { readonly field: "assetId" | "file"; readonly message: string }) => {
 			setValidationIssueFn(issue);
@@ -147,52 +184,73 @@ export const useEditorAssetEditController = ({
 	const dirtyRef = useRef(dirty);
 	dirtyRef.current = dirty;
 	const persistFn = useCallback(async () => {
-		if (!dirty || result.waiting) return false;
-		const validation = await RendererRuntime.runPromise(
-			validateEditorAssetDraftFx({
-				currentId: resourceId,
-				file,
-				resources: project.resources,
-				resourceId: nextId,
-			}).pipe(
-				Effect.match({
-					onFailure: (issue) => ({
-						issue,
-					}),
-					onSuccess: () => ({}),
-				}),
-			),
-		);
-		if ("issue" in validation) {
-			showValidationIssueFn({
-				field: validation.issue.reason === "invalid-asset" ? "file" : "assetId",
-				message: validation.issue.message,
-			});
+		if (
+			!mountedRef.current ||
+			!dirtyRef.current ||
+			pendingSaveRef.current !== undefined ||
+			result.waiting
+		)
 			return false;
-		}
-		setValidationIssueFn(undefined);
-		const id = nextId.trim();
+		const epoch = draftEpochRef.current;
+		const isCurrentFn = () => mountedRef.current && draftEpochRef.current === epoch;
+		pendingSaveRef.current = epoch;
+		setSavingFn(true);
 		try {
-			await mutateFn({
-				currentId: resourceId,
-				file,
-				resourceId: id,
-			});
-		} catch (error) {
-			if (isAssetIdCollisionFn(error, id)) {
+			const validation = await RendererRuntime.runPromise(
+				validateEditorAssetDraftFx({
+					currentId: resourceId,
+					file,
+					resources: project.resources,
+					resourceId: nextId,
+				}).pipe(
+					Effect.match({
+						onFailure: (issue) => ({
+							issue,
+						}),
+						onSuccess: () => ({}),
+					}),
+				),
+			);
+			// Validation is outside the command Atom: a discarded draft must never submit later.
+			if (!isCurrentFn()) return false;
+			if ("issue" in validation) {
 				showValidationIssueFn({
-					field: "assetId",
-					message: `Asset ID ${id} is already used by another asset.`,
+					field: validation.issue.reason === "invalid-asset" ? "file" : "assetId",
+					message: validation.issue.message,
 				});
+				return false;
 			}
-			return false;
+			setValidationIssueFn(undefined);
+			const id = nextId.trim();
+			try {
+				commandEpochRef.current = epoch;
+				await mutateFn({
+					currentId: resourceId,
+					file,
+					resourceId: id,
+				});
+			} catch (error) {
+				if (!isCurrentFn()) return false;
+				if (isAssetIdCollisionFn(error, id)) {
+					showValidationIssueFn({
+						field: "assetId",
+						message: `Asset ID ${id} is already used by another asset.`,
+					});
+				}
+				return false;
+			}
+			if (!isCurrentFn()) return false;
+			dirtyRef.current = false;
+			setNextIdStateFn(id);
+			setFileStateFn(undefined);
+			return true;
+		} finally {
+			if (pendingSaveRef.current === epoch) {
+				pendingSaveRef.current = undefined;
+				if (mountedRef.current) setSavingFn(false);
+			}
 		}
-		dirtyRef.current = false;
-		setNextIdStateFn(id);
-		setFileStateFn(undefined);
-		return true;
 	}, [
-		dirty,
 		file,
 		mutateFn,
 		nextId,
@@ -202,7 +260,9 @@ export const useEditorAssetEditController = ({
 		showValidationIssueFn,
 	]);
 	const saveFn = useCallback(async () => {
-		if (!(await persistFn())) return false;
+		const epoch = draftEpochRef.current;
+		if (!(await persistFn()) || !mountedRef.current || draftEpochRef.current !== epoch)
+			return false;
 		const id = nextId.trim();
 		await navigateFn({
 			to: "/editor/$projectId/assets/$resourceId/detail/overview",
@@ -227,9 +287,11 @@ export const useEditorAssetEditController = ({
 	]);
 	useEditorUnsavedChangesRegistration({
 		discardFn: () => {
+			invalidateSaveFn();
 			dirtyRef.current = false;
-			setNextIdFn(resourceId);
-			setFileFn(undefined);
+			setNextIdStateFn(resourceId);
+			setFileStateFn(undefined);
+			setValidationIssueFn(undefined);
 		},
 		id: `asset:${project.projectId}:${resourceId}`,
 		isDirtyFn: () => dirtyRef.current,
@@ -248,7 +310,9 @@ export const useEditorAssetEditController = ({
 			pathname.startsWith(`/editor/${project.projectId}/assets/${resourceId}/edit`),
 		saveFn: persistFn,
 	});
-	const persistenceError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
+	const settledError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
+	const persistenceError =
+		commandEpochRef.current === draftEpochRef.current ? settledError : undefined;
 	const error =
 		validationIssue === undefined
 			? persistenceError
@@ -266,7 +330,7 @@ export const useEditorAssetEditController = ({
 		projectId: project.projectId,
 		resourceFound,
 		saveFn,
-		saving: result.waiting,
+		saving: saving || result.waiting,
 		setFileFn,
 		setNextIdFn,
 	};

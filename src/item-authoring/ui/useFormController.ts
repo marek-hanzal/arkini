@@ -14,6 +14,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveFx } from "~/item-authoring/fx/saveFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import { useAuthoringFormValidation } from "~/authoring-form/ui/useAuthoringFormValidation";
+import { useAuthoringDraftRevision } from "~/authoring-form/ui/useAuthoringDraftRevision";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
@@ -217,7 +218,7 @@ export const useFormController = ({
 			const item = schema.parse(value);
 			const saved = await saveItemFn({
 				config: project.config,
-				expectedRevision: project.revision,
+				expectedRevision: draftRevision.current,
 				item,
 			});
 			submitSucceeded.current = true;
@@ -251,6 +252,7 @@ export const useFormController = ({
 	]);
 	const itemId = useStore(form.store, (state) => state.values.id);
 	const dirty = useStore(form.store, (state) => state.isDirty);
+	const draftRevision = useAuthoringDraftRevision(project.revision, dirty);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);

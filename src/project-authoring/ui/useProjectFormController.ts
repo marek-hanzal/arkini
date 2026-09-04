@@ -17,6 +17,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import { useAuthoringFormValidation } from "~/authoring-form/ui/useAuthoringFormValidation";
+import { useAuthoringDraftRevision } from "~/authoring-form/ui/useAuthoringDraftRevision";
 import {
 	readProjectFormDestinationForPathFn,
 	type ProjectFormDestination,
@@ -213,7 +214,7 @@ export const useProjectFormController = ({
 			const config = createProjectConfigFn(project, parsed);
 			await saveConfigFn({
 				config,
-				expectedRevision: project.revision,
+				expectedRevision: draftRevision.current,
 			});
 			submitSucceeded.current = true;
 			formApi.reset(parsed);
@@ -221,6 +222,7 @@ export const useProjectFormController = ({
 		},
 	});
 	const dirty = useStore(form.store, (state) => state.isDirty);
+	const draftRevision = useAuthoringDraftRevision(project.revision, dirty);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);

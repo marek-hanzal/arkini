@@ -173,18 +173,23 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 					error={controller.error}
 					saveFn={controller.saveFn}
 				>
-					<EditorTextControl
-						error={controller.assetIdError}
-						label="Asset ID"
-						onChangeFn={controller.setNextIdFn}
-						value={controller.nextId}
-					/>
-					<EditorAssetImageDropZone
-						currentUrl={controller.currentUrl}
-						error={controller.fileError}
-						file={controller.file}
-						onFileFn={controller.setFileFn}
-					/>
+					<fieldset
+						disabled={controller.saving}
+						className="contents"
+					>
+						<EditorTextControl
+							error={controller.assetIdError}
+							label="Asset ID"
+							onChangeFn={controller.setNextIdFn}
+							value={controller.nextId}
+						/>
+						<EditorAssetImageDropZone
+							currentUrl={controller.currentUrl}
+							error={controller.fileError}
+							file={controller.file}
+							onFileFn={controller.setFileFn}
+						/>
+					</fieldset>
 				</EditorFormContent>
 			</div>
 		</EditorSectionPage>

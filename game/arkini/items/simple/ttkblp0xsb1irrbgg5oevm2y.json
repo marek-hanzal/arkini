@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ttkblp0xsb1irrbgg5oevm2y",
+		"id": "paper",
+		"title": "Paper",
+		"description": "If you want to persist your knowledge or get better stuff, paper is the way to go!",
+		"asset": {
+			"default": [
+				"paper"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 16,
+		"type": "simple"
+	}
+}

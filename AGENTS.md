@@ -16,6 +16,44 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 - Gameplay motion is intentional; do not add reduced-motion branches.
 - Comments explain ownership, invariants, temporal boundaries, or why a simpler-looking design is wrong. Do not narrate syntax or preserve dead history.
 
+## Game image generation
+
+Apply these defaults automatically whenever the user asks for a game image; the current explicit request always wins, and the user does not need to repeat the defaults.
+
+### Visual canon
+
+- Inspect [`game/arkini/resources/hero.png`](game/arkini/resources/hero.png) before generating. It is the default canon for palette, contrast, lighting, material rendering, sharpness, and degree of stylization, not a subject or composition template.
+- A directly edited image outranks every other reference. Otherwise the latest user-approved asset from the same series is the structural reference, with `hero.png` continuing to govern the general color and rendering profile.
+- Do not copy unicorns, pink hair, gears, pipes, lettering, or other concrete motifs from `hero.png` unless the request calls for them.
+- Render premium stylized fantasy art for a casual/merge game: strong 2.5D volume, rounded and slightly exaggerated proportions, a clean silhouette, saturated colors, clearly separated materials, broad gradients, soft hand-painted shading, contact shadows, ambient occlusion, and controlled edge highlights.
+- Avoid book illustration, watercolor, oil painting, realistic concept art, photorealism, flat vector art, generic clipart, raw plastic 3D rendering, photographic depth of field, film grain, chromatic aberration, random surface noise, and excessive bloom.
+
+### Color profile
+
+- Use bright pink, magenta, raspberry, and violet as the expressive axis; warm cream for highlights; gold, brass, copper, and dark bronze for construction and metal; deep plum, wine-brown, and warm dark purple for shadows; and turquoise or sky blue only as a rare small accent.
+- Orientation swatches are pink and magenta `#F49BE4`, `#EC69DF`, `#D765A2`; violet and lavender `#9B63D8`, `#7853AD`, `#582A51`; cream `#F6DCE2`; gold and copper `#E0A24A`, `#C18E4A`, `#9D5920`; bronze shadows `#6D4627`, `#592915`; deep shadows `#31192B`, `#110506`; and rare blue accent `#55D8F2`.
+- Swatches guide color relationships rather than impose quotas. Preserve logical local material colors, never make every surface pink and gold, and never apply a universal magenta filter. Put the strongest saturation and contrast around the primary functional detail.
+
+### Camera, composition, and readability
+
+- Default world assets to an isometric three-quarter view with orthographic or very weak perspective, about 45° rotation and a 30–35° top-down angle. Point the principal or front face down-right and light it from the upper-left.
+- Place one complete object in the center of the square canvas with no cropping and about 8–12% free space. Keep the center of mass stable and avoid dramatic tilt or wide-angle distortion.
+- Make the asset unmistakable at 96–128 px through one strong primary silhouette, a few large secondary volumes, and a limited number of clear functional details. Avoid ornamental noise, repeated tiny decorations, thin wires, fragile projections, unreadable micro-detail, and construction that makes no functional sense.
+- Create cuteness through shape, volume, and proportions; do not automatically add faces to inanimate objects.
+- A building may use only a small compact terrain base that anchors its footprint. Standalone items, tools, and resources have no terrain base by default.
+
+### Output
+
+- Unless explicitly requested otherwise, generate exactly one 512 × 512 px image on a visible regular checkerboard background. The checkerboard is an intentional part of the generator output.
+- The user owns background removal. Do not remove the checkerboard, create an alpha channel, validate transparency, or spend time on transparency post-processing unless explicitly asked.
+- Keep the whole asset inside the canvas. Do not add a scene, landscape, room, gradient panel, contact sheet, multiple variants, text, pseudo-text, numbers, logo, frame, signature, or watermark.
+
+### Iteration and tiers
+
+- During an edit, treat every property the user did not mention as locked, especially identity, camera, silhouette, footprint, proportions, scale, palette, lighting, materials, canvas position, and approved details. A localized change is not permission for a redesign.
+- A higher tier remains visibly the same object. Preserve its base silhouette, camera, footprint, primary colors, and identity anchors; add functional volume, capacity, construction, and better materials before decoration or magical effects.
+- Keep Tier 1 simple, complete, iconic, and intentionally restrained so later tiers have structural and visual room to grow.
+
 ## Architecture defaults
 
 - One canonical runtime truth; React, Pixi, events, caches, and persistence never become mirrors.

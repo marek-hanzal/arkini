@@ -13,6 +13,8 @@ import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/Ed
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { Tooltip } from "~/ui/ui/Tooltip";
+import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
+import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 
 type DropListValue = [
 	DropSchema.Type,
@@ -35,72 +37,87 @@ const DropControl = ({
 }: {
 	readonly onChangeFn: (drop: DropSchema.Type) => void;
 	readonly value: DropSchema.Type;
-}) => (
-	<div className="grid gap-3">
-		<EditorItemReferenceControl
-			label="Dropped item"
-			value={value.itemId}
-			onChangeFn={(itemId) =>
-				onChangeFn({
-					...value,
-					itemId,
-				})
-			}
-		/>
-		<div className="flex flex-wrap items-end justify-between gap-3">
-			<div className="min-w-0 basis-full sm:basis-1/2">
-				<QuantityControl
-					value={value.quantity}
-					onChangeFn={(quantity) =>
+}) => {
+	const validationIssues = useFormValidationIssues(value);
+	return (
+		<div className="grid gap-3">
+			<EditorItemReferenceControl
+				error={readEditorFormValidationErrorFn(validationIssues, "itemId")}
+				label="Dropped item"
+				value={value.itemId}
+				onChangeFn={(itemId) =>
+					onChangeFn({
+						...value,
+						itemId,
+					})
+				}
+			/>
+			<div className="flex flex-wrap items-end justify-between gap-3">
+				<div className="min-w-0 basis-full sm:basis-1/2">
+					<QuantityControl
+						minimumError={readEditorFormValidationErrorFn(
+							validationIssues,
+							"quantity",
+							"min",
+						)}
+						maximumError={readEditorFormValidationErrorFn(
+							validationIssues,
+							"quantity",
+							"max",
+						)}
+						value={value.quantity}
+						onChangeFn={(quantity) =>
+							onChangeFn({
+								...value,
+								quantity,
+							})
+						}
+					/>
+				</div>
+				<EditorChoiceControl
+					error={readEditorFormValidationErrorFn(validationIssues, "placement")}
+					label="Board placement"
+					value={value.placement}
+					options={[
+						{
+							description:
+								"Starts board placement at the production origin, then places stack-first into the nearest available cells.",
+							label: "Local drop",
+							value: "drop",
+						},
+						{
+							description:
+								"Chooses a random cell in the current board space as the placement origin, then places stack-first into the nearest available cells.",
+							label: "Random",
+							value: "random",
+						},
+					]}
+					onChangeFn={(placement) =>
 						onChangeFn({
 							...value,
-							quantity,
+							placement,
 						})
 					}
 				/>
 			</div>
-			<EditorChoiceControl
-				label="Board placement"
-				value={value.placement}
-				options={[
-					{
-						description:
-							"Starts board placement at the production origin, then places stack-first into the nearest available cells.",
-						label: "Local drop",
-						value: "drop",
-					},
-					{
-						description:
-							"Chooses a random cell in the current board space as the placement origin, then places stack-first into the nearest available cells.",
-						label: "Random",
-						value: "random",
-					},
+			<RulesControl
+				rules={value.rules}
+				target="drop"
+				description="These rules belong only to this item drop. Every condition inside a rule must pass. Enable rules gate this drop and any matching disable rule vetoes it when the roll resolves."
+				allowedTypes={[
+					"enable",
+					"disable",
 				]}
-				onChangeFn={(placement) =>
+				onChangeFn={(rules) =>
 					onChangeFn({
 						...value,
-						placement,
+						rules: rules as DropSchema.Type["rules"],
 					})
 				}
 			/>
 		</div>
-		<RulesControl
-			rules={value.rules}
-			target="drop"
-			description="These rules belong only to this item drop. Every condition inside a rule must pass. Enable rules gate this drop and any matching disable rule vetoes it when the roll resolves."
-			allowedTypes={[
-				"enable",
-				"disable",
-			]}
-			onChangeFn={(rules) =>
-				onChangeFn({
-					...value,
-					rules: rules as DropSchema.Type["rules"],
-				})
-			}
-		/>
-	</div>
-);
+	);
+};
 
 const DropList = ({
 	onChangeFn,
@@ -110,6 +127,9 @@ const DropList = ({
 	readonly value: DropListValue;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const validationIssues = useFormValidationIssues(value);
+	const invalidDropIndex = validationIssues.find((issue) => typeof issue.path[0] === "number")
+		?.path[0] as number | undefined;
 	return (
 		<section className="grid gap-3">
 			<EditorFormSectionDivider
@@ -138,6 +158,7 @@ const DropList = ({
 							)
 				}
 				removeLabel="Remove drop"
+				selectedIndex={invalidDropIndex}
 			>
 				{(index) => (
 					<DropControl
@@ -199,6 +220,10 @@ const WeightedRollControl = ({
 	readonly roll: WeightedRoll;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const validationIssues = useFormValidationIssues(roll);
+	const invalidCandidateIndex = validationIssues.find(
+		(issue) => issue.path[0] === "drop" && typeof issue.path[1] === "number",
+	)?.path[1] as number | undefined;
 	return (
 		<div className="grid gap-4">
 			<div className="grid gap-3">
@@ -225,6 +250,16 @@ const WeightedRollControl = ({
 				</div>
 				<div className="grid gap-3 sm:grid-cols-2">
 					<QuantityFields
+						minimumError={readEditorFormValidationErrorFn(
+							validationIssues,
+							"quantity",
+							"min",
+						)}
+						maximumError={readEditorFormValidationErrorFn(
+							validationIssues,
+							"quantity",
+							"max",
+						)}
 						minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
 						maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
 						value={roll.quantity}
@@ -275,6 +310,7 @@ const WeightedRollControl = ({
 							})
 				}
 				removeLabel="Remove weighted candidate"
+				selectedIndex={invalidCandidateIndex}
 			>
 				{(candidateIndex) => {
 					const candidate = roll.drop[candidateIndex];
@@ -290,6 +326,12 @@ const WeightedRollControl = ({
 					return (
 						<div className="grid gap-3">
 							<EditorNumberControl
+								error={readEditorFormValidationErrorFn(
+									validationIssues,
+									"drop",
+									candidateIndex,
+									"weight",
+								)}
 								label={`Candidate ${candidateIndex + 1} weight`}
 								value={candidate.weight}
 								min={1}
@@ -339,72 +381,42 @@ const RollControl = ({
 }: {
 	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
 	readonly value: RollSchema.Type;
-}) => (
-	<div className="grid gap-4">
-		<EditorChoiceControl
-			label="Roll type"
-			value={value.type}
-			options={[
-				{
-					description:
-						"Emits every configured drop whenever this roll's rules allow it. No probability check is performed.",
-					label: "Guaranteed",
-					value: "guaranteed",
-				},
-				{
-					description:
-						"Performs one probability check from 0% to 100% and emits every configured drop only when that check succeeds.",
-					label: "Chance",
-					value: "chance",
-				},
-				{
-					description:
-						"Makes the configured number of independent selections. Each selection chooses one candidate by relative weight, and candidates may repeat.",
-					label: "Weighted",
-					value: "weight",
-				},
-			]}
-			onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
-		/>
-		{match(value)
-			.with(
-				{
-					type: "guaranteed",
-				},
-				(roll) => (
-					<DropList
-						value={roll.drop}
-						onChangeFn={(drop) =>
-							drop === undefined
-								? onChangeFn(undefined)
-								: onChangeFn({
-										...roll,
-										drop,
-									})
-						}
-					/>
-				),
-			)
-			.with(
-				{
-					type: "chance",
-				},
-				(roll) => (
-					<div className="grid gap-3">
-						<EditorNumberControl
-							description="Probability that this roll emits its configured drops. The editor converts the percentage to the engine's internal 0–1 value."
-							label="Chance (%)"
-							value={readChancePercentFn(roll.chance)}
-							min={0}
-							max={100}
-							step={0.01}
-							onChangeFn={(chancePercent) =>
-								onChangeFn({
-									...roll,
-									chance: chancePercent / 100,
-								})
-							}
-						/>
+}) => {
+	const validationIssues = useFormValidationIssues(value);
+	return (
+		<div className="grid gap-4">
+			<EditorChoiceControl
+				error={readEditorFormValidationErrorFn(validationIssues, "type")}
+				label="Roll type"
+				value={value.type}
+				options={[
+					{
+						description:
+							"Emits every configured drop whenever this roll's rules allow it. No probability check is performed.",
+						label: "Guaranteed",
+						value: "guaranteed",
+					},
+					{
+						description:
+							"Performs one probability check from 0% to 100% and emits every configured drop only when that check succeeds.",
+						label: "Chance",
+						value: "chance",
+					},
+					{
+						description:
+							"Makes the configured number of independent selections. Each selection chooses one candidate by relative weight, and candidates may repeat.",
+						label: "Weighted",
+						value: "weight",
+					},
+				]}
+				onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
+			/>
+			{match(value)
+				.with(
+					{
+						type: "guaranteed",
+					},
+					(roll) => (
 						<DropList
 							value={roll.drop}
 							onChangeFn={(drop) =>
@@ -416,23 +428,58 @@ const RollControl = ({
 										})
 							}
 						/>
-					</div>
-				),
-			)
-			.with(
-				{
-					type: "weight",
-				},
-				(roll) => (
-					<WeightedRollControl
-						roll={roll}
-						onChangeFn={onChangeFn}
-					/>
-				),
-			)
-			.exhaustive()}
-	</div>
-);
+					),
+				)
+				.with(
+					{
+						type: "chance",
+					},
+					(roll) => (
+						<div className="grid gap-3">
+							<EditorNumberControl
+								error={readEditorFormValidationErrorFn(validationIssues, "chance")}
+								description="Probability that this roll emits its configured drops. The editor converts the percentage to the engine's internal 0–1 value."
+								label="Chance (%)"
+								value={readChancePercentFn(roll.chance)}
+								min={0}
+								max={100}
+								step={0.01}
+								onChangeFn={(chancePercent) =>
+									onChangeFn({
+										...roll,
+										chance: chancePercent / 100,
+									})
+								}
+							/>
+							<DropList
+								value={roll.drop}
+								onChangeFn={(drop) =>
+									drop === undefined
+										? onChangeFn(undefined)
+										: onChangeFn({
+												...roll,
+												drop,
+											})
+								}
+							/>
+						</div>
+					),
+				)
+				.with(
+					{
+						type: "weight",
+					},
+					(roll) => (
+						<WeightedRollControl
+							roll={roll}
+							onChangeFn={onChangeFn}
+						/>
+					),
+				)
+				.exhaustive()}
+		</div>
+	);
+};
 
 export const RollSetControl = ({
 	index,
@@ -444,9 +491,14 @@ export const RollSetControl = ({
 	readonly value: RollSetSchema.Type;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const validationIssues = useFormValidationIssues(value);
+	const invalidRollIndex = validationIssues.find(
+		(issue) => issue.path[0] === "roll" && typeof issue.path[1] === "number",
+	)?.path[1] as number | undefined;
 	return (
 		<section className="grid gap-3">
 			<EditorNumberControl
+				error={readEditorFormValidationErrorFn(validationIssues, "weight")}
 				label="Relative set weight"
 				value={value.weight}
 				min={1}
@@ -494,6 +546,7 @@ export const RollSetControl = ({
 							})
 				}
 				removeLabel="Remove roll"
+				selectedIndex={invalidRollIndex}
 			>
 				{(rollIndex) => (
 					<RollControl

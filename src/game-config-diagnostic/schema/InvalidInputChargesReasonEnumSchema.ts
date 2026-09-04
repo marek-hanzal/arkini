@@ -4,7 +4,6 @@ import { z } from "zod";
 export const InvalidInputChargesReasonEnumSchema = z
 	.enum({
 		DepositMissingTargetCost: "deposit-missing-target-cost",
-		DepositMustTarget: "deposit-must-target",
 		DepositSelfRequiresDepositOwner: "deposit-self-requires-deposit-owner",
 		TargetRequiresDeposit: "target-requires-deposit",
 		SelfMissingCharges: "self-missing-charges",

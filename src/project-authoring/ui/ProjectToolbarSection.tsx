@@ -7,7 +7,7 @@ import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext
 import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 export const ProjectToolbarSection = () => {
-	const { form } = useProjectFormSession();
+	const { form, validationIssues } = useProjectFormSession();
 	const size = useStore(form.store, (state) => state.values.toolbarSize);
 	const start = useStore(form.store, (state) => state.values.start);
 	const startToolbar = start.toolbar;
@@ -17,6 +17,16 @@ export const ProjectToolbarSection = () => {
 		x: entry.position.x,
 		y: entry.position.y,
 	}));
+	const invalidCells = validationIssues.flatMap((issue) => {
+		const [head, scope, index] = issue.path;
+		if (head !== "start" || scope !== "toolbar" || typeof index !== "number") return [];
+		const entry = startToolbar[index];
+		return entry === undefined
+			? []
+			: [
+					entry.position,
+				];
+	});
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection title="Toolbar size">
@@ -39,6 +49,7 @@ export const ProjectToolbarSection = () => {
 					<ProjectStartGrid
 						cells={cells}
 						height={1}
+						invalidCells={invalidCells}
 						mode="edit"
 						onCellsChangeFn={(nextCells) =>
 							form.setFieldValue(

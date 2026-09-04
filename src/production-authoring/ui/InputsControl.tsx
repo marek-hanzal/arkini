@@ -6,6 +6,8 @@ import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useStore } from "@tanstack/react-form";
+import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
+import { readEditorFormValidationIssuesFn } from "~/editor-control/fn/readEditorFormValidationIssuesFn";
 
 interface InputsControlProps {
 	readonly allowMaterials?: boolean;
@@ -22,11 +24,15 @@ export const InputsControl = ({
 	value,
 }: InputsControlProps) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
-	const { form } = useFormSession();
-	const selfChargesEnabled = useStore(
-		form.store,
-		(state) => state.values.charges !== undefined,
+	const { form, itemId } = useFormSession();
+	const selfChargesEnabled = useStore(form.store, (state) => state.values.charges !== undefined);
+	const validationIssues = useFormValidationIssues(value);
+	const issuesByInput = value.map((_input, index) =>
+		readEditorFormValidationIssuesFn(validationIssues, [
+			index,
+		]),
 	);
+	const invalidInputIndex = issuesByInput.findIndex((issues) => issues.length > 0);
 	const replaceAtFn = (index: number, input: LineInputSchema.Type) => {
 		const next = value.map((current, currentIndex) =>
 			currentIndex === index ? input : current,
@@ -51,6 +57,8 @@ export const InputsControl = ({
 					const input = value[index];
 					if (input.type === "materials")
 						return `${readItemLabelFn(input.selector.itemId, `Material input ${index + 1}`)} — Materials`;
+					if (input.type === "deposit" && input.charges?.from === "self")
+						return `Self-paid Deposit input ${index + 1}`;
 					if (input.type === "deposit")
 						return `${readItemLabelFn(input.query.selector.itemId, `Deposit input ${index + 1}`)} — Deposit`;
 					return `Simple input ${index + 1}`;
@@ -73,11 +81,14 @@ export const InputsControl = ({
 								)
 				}
 				removeLabel="Remove input"
+				selectedIndex={invalidInputIndex < 0 ? undefined : invalidInputIndex}
 			>
 				{(index) => (
 					<InputControl
 						allowMaterials={allowMaterials}
 						input={value[index]}
+						issues={issuesByInput[index]}
+						ownerItemId={itemId}
 						selfChargesEnabled={selfChargesEnabled}
 						onChangeFn={(next) => replaceAtFn(index, next)}
 					/>

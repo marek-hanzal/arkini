@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
@@ -12,7 +12,7 @@ import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSche
 const MaxEditorSpaceIndex = 31;
 
 export const ProjectBoardSection = () => {
-	const { form } = useProjectFormSession();
+	const { form, validationIssues } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.board.width);
 	const height = useStore(form.store, (state) => state.values.board.height);
 	const start = useStore(form.store, (state) => state.values.start);
@@ -20,6 +20,24 @@ export const ProjectBoardSection = () => {
 	const startBoard = start.board;
 	const [selectedSpace, setSelectedSpaceFn] = useState(currentSpace);
 	const [spaceInput, setSpaceInputFn] = useState(String(currentSpace));
+	const invalidEntries = validationIssues.flatMap((issue) => {
+		const [head, scope, index] = issue.path;
+		if (head !== "start" || scope !== "board" || typeof index !== "number") return [];
+		const entry = startBoard[index];
+		return entry === undefined
+			? []
+			: [
+					entry,
+				];
+	});
+	const firstInvalidSpace = invalidEntries[0]?.space;
+	useEffect(() => {
+		if (firstInvalidSpace === undefined) return;
+		setSelectedSpaceFn(firstInvalidSpace);
+		setSpaceInputFn(String(firstInvalidSpace));
+	}, [
+		firstInvalidSpace,
+	]);
 	const cells = startBoard
 		.filter((entry) => entry.space === selectedSpace)
 		.map((entry) => ({
@@ -87,6 +105,12 @@ export const ProjectBoardSection = () => {
 			<ProjectStartGrid
 				cells={cells}
 				height={height}
+				invalidCells={invalidEntries
+					.filter((entry) => entry.space === selectedSpace)
+					.map(({ x, y }) => ({
+						x,
+						y,
+					}))}
 				mode="edit"
 				onCellsChangeFn={(nextCells) =>
 					form.setFieldValue("start.board", [

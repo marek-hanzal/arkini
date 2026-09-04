@@ -72,12 +72,33 @@ vi.mock("~/authoring-form/ui/AssetAutocompleteField", () => ({
 vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 	EditorItemAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
+	EditorItemReferenceControl: ({
+		error,
+		label,
+	}: {
+		readonly error?: string;
+		readonly label: string;
+	}) =>
+		createElement(
+			"label",
+			null,
+			label,
+			createElement("input", {
+				"data-ui-invalid": error === undefined ? undefined : "true",
+			}),
+			error === undefined ? null : createElement("span", null, error),
+		),
 }));
 import { Form } from "~/item-authoring/ui/Form";
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
+import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import type { SectionId } from "~/item-authoring/type/Section";
+import {
+	createOutput,
+	createProducerItem,
+} from "~test/game-config-validation/support/gameValidationTestSource";
 
 (
 	globalThis as {
@@ -390,5 +411,95 @@ describe("item section form session", () => {
 				merge: 1,
 			},
 		});
+	});
+
+	it("selects and focuses the exact invalid control inside a nested output", async () => {
+		const producer = createProducerItem({
+			id: "producer",
+			output: createOutput([
+				{
+					itemId: item.id,
+				},
+			]),
+		});
+		state.persisted = producer;
+		const config = (
+			state.project as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config;
+		config.items = {
+			[item.id]: item,
+			[producer.id]: producer,
+		};
+		const { container } = await render(<ProductionSection />);
+		const addOutputSet = container.querySelector<HTMLButtonElement>(
+			'button[title="Add output set"]',
+		);
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		if (addOutputSet === null || saveButton === undefined)
+			throw new Error("Missing nested output controls.");
+
+		await act(async () => addOutputSet.click());
+		await act(async () => {
+			saveButton.click();
+			await Promise.resolve();
+		});
+
+		const invalid = container.querySelector<HTMLInputElement>('input[data-ui-invalid="true"]');
+		expect(container.textContent).toContain(
+			"Production line 1 → Output → Output set 2 → Roll 1 → Drop 1 → Dropped item: Select an item.",
+		);
+		await act(
+			() =>
+				new Promise<void>((resolve) => {
+					requestAnimationFrame(() => resolve());
+				}),
+		);
+		expect(document.activeElement).toBe(invalid);
+	});
+
+	it("names and focuses the invalid temporary duration", async () => {
+		const temporary: ItemSchema.Type = {
+			...item,
+			type: "temporary",
+			scope: "board",
+			durationMs: 2_000,
+		};
+		state.persisted = temporary;
+		(
+			state.project as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config.items[item.id] = temporary;
+		const { container } = await render(<ProductionSection />);
+		const duration = container.querySelector<HTMLInputElement>('input[name="durationMs"]');
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		if (duration === null || saveButton === undefined)
+			throw new Error("Missing temporary duration form.");
+
+		await changeInput(duration, "");
+		await act(async () => {
+			saveButton.click();
+			await Promise.resolve();
+		});
+
+		expect(container.textContent).toContain("Duration: Enter a valid number.");
+		expect(duration.dataset.uiInvalid).toBe("true");
+		await act(
+			() =>
+				new Promise<void>((resolve) => {
+					requestAnimationFrame(() => resolve());
+				}),
+		);
+		expect(document.activeElement).toBe(duration);
 	});
 });

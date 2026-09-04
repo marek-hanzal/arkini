@@ -70,6 +70,7 @@ export const validateInputChargesFn = ({ config, provenance }: validateInputChar
 				if (
 					input.type === TypeSchema.enum.Deposit &&
 					input.query.distance === DistanceSchema.enum.Self &&
+					input.charges?.from !== ChargeSourceSchema.enum.Self &&
 					item.type !== ItemTypeSchema.enum.Deposit
 				) {
 					diagnostics.push({
@@ -109,23 +110,6 @@ export const validateInputChargesFn = ({ config, provenance }: validateInputChar
 				if (input.charges === undefined) continue;
 
 				if (input.charges.from === ChargeSourceSchema.enum.Self) {
-					if (
-						input.type === TypeSchema.enum.Deposit &&
-						item.type !== ItemTypeSchema.enum.Space
-					) {
-						diagnostics.push({
-							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
-							severity: DiagnosticSeverityEnumSchema.enum.Error,
-							path: diagnosticPath,
-							source: provenance.items[itemId],
-							message: `Deposit input ${inputIndex} of action ${actionId} must charge its target, not its owner.`,
-							ownerItemId: itemId,
-							lineId: actionId,
-							inputIndex,
-							reason: InvalidInputChargesReasonEnumSchema.enum.DepositMustTarget,
-						});
-						continue;
-					}
 					if (item.charges === undefined) {
 						diagnostics.push({
 							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,

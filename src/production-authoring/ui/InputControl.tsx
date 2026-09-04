@@ -8,6 +8,8 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import type { EditorFormValidationIssue } from "~/editor-control/type/EditorFormValidationIssue";
+import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 
 const inputTypeOptions = [
 	{
@@ -51,17 +53,22 @@ type MaterialInput = Extract<
 const hasChargesFn = (item: ItemSchema.Type) => item.charges !== undefined;
 
 const DepositPaidByControl = ({
+	error,
 	input,
 	onChangeFn,
+	ownerItemId,
 	selfChargesEnabled,
 }: {
+	readonly error?: string;
 	readonly input: DepositInput;
 	readonly onChangeFn: (input: DepositInput) => void;
+	readonly ownerItemId: string;
 	readonly selfChargesEnabled: boolean;
 }) => {
 	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
 	return (
 		<EditorChoiceControl
+			error={error}
 			label="Paid by"
 			value={charges.from}
 			options={[
@@ -80,35 +87,55 @@ const DepositPaidByControl = ({
 					value: "self",
 				},
 			]}
-			onChangeFn={(from) =>
+			onChangeFn={(from) => {
+				const switchingBackToTarget = from === "target" && charges.from === "self";
 				onChangeFn({
 					...input,
 					charges: {
 						...charges,
 						from,
 					},
-				})
-			}
+					query:
+						from === "self"
+							? {
+									scope: "board",
+									distance: "self",
+									selector: {
+										type: "item",
+										itemId: ownerItemId,
+									},
+								}
+							: switchingBackToTarget
+								? structuredClone(DraftDefaults.inputs.deposit.query)
+								: input.query,
+				});
+			}}
 		/>
 	);
 };
 
 const DepositSelfChargeCostControl = ({
+	error,
 	input,
 	onChangeFn,
 }: {
+	readonly error?: string;
 	readonly input: DepositInput;
 	readonly onChangeFn: (input: DepositInput) => void;
 }) => {
 	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
 	return (
-		<div className="grid gap-3" data-ui="EditorInputChargeCost">
+		<div
+			className="grid gap-3"
+			data-ui="EditorInputChargeCost"
+		>
 			<EditorFormSectionDivider
 				description="Charge payment made by the item that owns this action when the Deposit input settles."
 				title="Charge cost"
 				variant="secondary"
 			/>
 			<EditorNumberControl
+				error={error}
 				label="Cost"
 				value={charges.cost}
 				min={1}
@@ -127,13 +154,16 @@ const DepositSelfChargeCostControl = ({
 };
 
 const MaterialModeControl = ({
+	error,
 	input,
 	onChangeFn,
 }: {
+	readonly error?: string;
 	readonly input: MaterialInput;
 	readonly onChangeFn: (input: MaterialInput) => void;
 }) => (
 	<EditorChoiceControl
+		error={error}
 		label="Material mode"
 		value={input.mode}
 		options={[
@@ -161,13 +191,16 @@ const MaterialModeControl = ({
 
 const MaterialInputControl = ({
 	input,
+	issues,
 	onChangeFn,
 }: {
 	readonly input: MaterialInput;
+	readonly issues: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: MaterialInput) => void;
 }) => (
 	<div className="grid gap-4">
 		<SelectorControl
+			error={readEditorFormValidationErrorFn(issues, "selector")}
 			value={input.selector}
 			onChangeFn={(selector) =>
 				onChangeFn({
@@ -178,6 +211,8 @@ const MaterialInputControl = ({
 		/>
 		<div className="grid gap-3 sm:grid-cols-3">
 			<QuantityFields
+				minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
+				maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
 				minimumDescription="Minimum matching material quantity required before this line can start. If this amount is available, the run becomes ready."
 				maximumDescription="Maximum matching material quantity one run consumes or reserves. A ready run uses what is currently stored, capped at this amount."
 				value={input.quantity}
@@ -189,6 +224,7 @@ const MaterialInputControl = ({
 				}
 			/>
 			<EditorNumberControl
+				error={readEditorFormValidationErrorFn(issues, "capacity")}
 				description="Additional quantity this input may hold above Maximum. The buffer does not increase how much one run consumes or reserves."
 				label="Buffer"
 				value={input.capacity}
@@ -206,18 +242,23 @@ const MaterialInputControl = ({
 
 const DepositTargetChargeCostControl = ({
 	input,
+	issues,
 	onChangeFn,
 }: {
 	readonly input: DepositInput;
+	readonly issues: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: DepositInput) => void;
 }) => {
 	const project = useEditorProject();
 	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
 	const selectedItem = project.config.items[input.query.selector.itemId];
-	const targetMissingCharges =
-		selectedItem !== undefined && selectedItem.charges === undefined;
+	const targetMissingCharges = selectedItem !== undefined && selectedItem.charges === undefined;
+	const selectedItemError = readEditorFormValidationErrorFn(issues, "query", "selector");
 	return (
-		<div className="grid gap-3" data-ui="EditorInputChargeCost">
+		<div
+			className="grid gap-3"
+			data-ui="EditorInputChargeCost"
+		>
 			<EditorFormSectionDivider
 				description="Charge payment made by the selected Deposit target when this input settles."
 				title="Charge cost"
@@ -227,7 +268,11 @@ const DepositTargetChargeCostControl = ({
 				description="Only items with Charges enabled are shown because the selected target pays this Deposit charge cost."
 				emptyLabel="No item with Charges enabled matches this search."
 				error={
-					targetMissingCharges ? "Selected target must have Charges enabled." : undefined
+					targetMissingCharges
+						? "Selected target must have Charges enabled."
+						: input.query.selector.itemId === "" && selectedItemError !== undefined
+							? "Select an item with Charges enabled."
+							: selectedItemError
 				}
 				includeItemFn={hasChargesFn}
 				value={input.query.selector}
@@ -244,6 +289,7 @@ const DepositTargetChargeCostControl = ({
 			/>
 			<div className="grid items-end gap-3 sm:grid-cols-[auto_minmax(0,1fr)]">
 				<BoardDistanceControl
+					error={readEditorFormValidationErrorFn(issues, "query", "distance")}
 					value={input.query}
 					onChangeFn={(query) => {
 						if (query.scope === "board")
@@ -255,6 +301,7 @@ const DepositTargetChargeCostControl = ({
 					}}
 				/>
 				<EditorNumberControl
+					error={readEditorFormValidationErrorFn(issues, "charges", "cost")}
 					label="Cost"
 					value={charges.cost}
 					min={1}
@@ -276,17 +323,22 @@ const DepositTargetChargeCostControl = ({
 export const InputControl = ({
 	allowMaterials = true,
 	input,
+	issues = [],
 	onChangeFn,
+	ownerItemId,
 	selfChargesEnabled,
 }: {
 	readonly allowMaterials?: boolean;
 	readonly input: LineInputSchema.Type;
+	readonly issues?: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: LineInputSchema.Type) => void;
+	readonly ownerItemId: string;
 	readonly selfChargesEnabled: boolean;
 }) => (
 	<article className="grid gap-4">
 		<div className="flex flex-wrap items-start justify-between gap-4">
 			<EditorChoiceControl
+				error={readEditorFormValidationErrorFn(issues, "type")}
 				label="Input type"
 				description={
 					allowMaterials
@@ -301,12 +353,15 @@ export const InputControl = ({
 			/>
 			{input.type === "materials" ? (
 				<MaterialModeControl
+					error={readEditorFormValidationErrorFn(issues, "mode")}
 					input={input}
 					onChangeFn={onChangeFn}
 				/>
 			) : input.type === "deposit" ? (
 				<DepositPaidByControl
+					error={readEditorFormValidationErrorFn(issues, "charges", "from")}
 					input={input}
+					ownerItemId={ownerItemId}
 					selfChargesEnabled={selfChargesEnabled}
 					onChangeFn={onChangeFn}
 				/>
@@ -326,6 +381,7 @@ export const InputControl = ({
 				(material) => (
 					<MaterialInputControl
 						input={material}
+						issues={issues}
 						onChangeFn={onChangeFn}
 					/>
 				),
@@ -339,10 +395,12 @@ export const InputControl = ({
 					return charges.from === "target" ? (
 						<DepositTargetChargeCostControl
 							input={deposit}
+							issues={issues}
 							onChangeFn={onChangeFn}
 						/>
 					) : (
 						<DepositSelfChargeCostControl
+							error={readEditorFormValidationErrorFn(issues, "charges", "cost")}
 							input={deposit}
 							onChangeFn={onChangeFn}
 						/>

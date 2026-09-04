@@ -34,6 +34,7 @@ interface ProjectStartGridDetailProps extends ProjectStartGridCommonProps {
 }
 
 interface ProjectStartGridEditProps extends ProjectStartGridCommonProps {
+	readonly invalidCells?: ReadonlyArray<ProjectStartGridPosition>;
 	readonly mode: "edit";
 	readonly onCellsChangeFn: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
 	readonly scope: ProjectStartScope;
@@ -90,6 +91,7 @@ const ProjectStartGridSlot = ({
 	full,
 	isDragSource,
 	isDragTarget,
+	invalid,
 	item,
 	onDecrementFn,
 	onDeleteFn,
@@ -104,6 +106,7 @@ const ProjectStartGridSlot = ({
 	readonly full: boolean;
 	readonly isDragSource: boolean;
 	readonly isDragTarget: boolean;
+	readonly invalid: boolean;
 	readonly item: ItemSchema.Type | undefined;
 	readonly onDecrementFn: () => void;
 	readonly onDeleteFn: () => void;
@@ -118,7 +121,7 @@ const ProjectStartGridSlot = ({
 	readonly suppressClickRef: RefObject<boolean>;
 }) => (
 	<button
-		className="relative grid size-[4.5rem] place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:border-line-strong enabled:hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas"
+		className="relative grid size-[4.5rem] place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:border-line-strong enabled:hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
 		data-start-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
@@ -129,6 +132,7 @@ const ProjectStartGridSlot = ({
 			state: {
 				dragSource: isDragSource,
 				dragTarget: isDragTarget,
+				invalid,
 			},
 		})}
 		onClick={(event) => {
@@ -205,6 +209,7 @@ const ProjectStartGridSurface = ({
 			readonly targetKey?: string;
 		};
 		readonly gridRef: RefObject<HTMLDivElement | null>;
+		readonly invalidPositionKeys: ReadonlySet<string>;
 		readonly onDecrementFn: (position: ProjectStartGridPosition) => void;
 		readonly onDeleteFn: (position: ProjectStartGridPosition) => void;
 		readonly onIncrementFn: (position: ProjectStartGridPosition) => void;
@@ -303,6 +308,7 @@ const ProjectStartGridSurface = ({
 							}
 							isDragSource={isDragSource}
 							isDragTarget={edit.dragVisual?.targetKey === key}
+							invalid={edit.invalidPositionKeys.has(key)}
 							item={item}
 							key={key}
 							onDecrementFn={() => edit.onDecrementFn(position)}
@@ -354,6 +360,7 @@ const ProjectStartGridDragPreview = ({
 const ProjectStartGridEdit = ({
 	cells,
 	height,
+	invalidCells = [],
 	onCellsChangeFn,
 	scope,
 	start,
@@ -362,6 +369,7 @@ const ProjectStartGridEdit = ({
 	const { items } = useEditorItemSearchOptions();
 	const gridRef = useRef<HTMLDivElement>(null);
 	const [pickerCell, setPickerCellFn] = useState<ProjectStartGridPosition>();
+	const invalidPositionKeys = new Set(invalidCells.map(positionKeyFn));
 	const { dragPreviewRef, dragVisual, startDragFn, suppressClickRef } = useProjectStartGridDrag({
 		gridRef,
 		onMoveFn: (source, target) => onCellsChangeFn(moveCellFn(cells, source, target)),
@@ -415,6 +423,7 @@ const ProjectStartGridEdit = ({
 				edit={{
 					dragVisual,
 					gridRef,
+					invalidPositionKeys,
 					onDecrementFn: decrementFn,
 					onDeleteFn: (position) => changeCellFn(position, () => undefined),
 					onIncrementFn: incrementFn,

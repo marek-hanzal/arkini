@@ -51,7 +51,23 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 		}
 		for (const collection of readInputCollectionsFn(item)) {
 			for (const [inputIndex, input] of collection.input.entries()) {
-				if (input.type !== "deposit" || input.charges?.from !== "target") continue;
+				if (input.type !== "deposit") continue;
+				if (input.charges?.from === "self") {
+					if (item.charges !== undefined) continue;
+					context.addIssue({
+						code: "custom",
+						message: "Enable Charges on this item before selecting Self.",
+						path: [
+							...collection.path,
+							"input",
+							inputIndex,
+							"charges",
+							"from",
+						],
+					});
+					continue;
+				}
+				if (input.charges?.from !== "target") continue;
 				const selectedItem = project.config.items[input.query.selector.itemId];
 				const target = selectedItem?.uid === item.uid ? item : selectedItem;
 				if (target === undefined || target.charges !== undefined) continue;

@@ -8,7 +8,7 @@ import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValu
 import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 export const ProjectInventorySection = () => {
-	const { form } = useProjectFormSession();
+	const { form, validationIssues } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.inventory.width);
 	const height = useStore(form.store, (state) => state.values.inventory.height);
 	const start = useStore(form.store, (state) => state.values.start);
@@ -19,6 +19,16 @@ export const ProjectInventorySection = () => {
 		x: entry.position.x,
 		y: entry.position.y,
 	}));
+	const invalidCells = validationIssues.flatMap((issue) => {
+		const [head, scope, index] = issue.path;
+		if (head !== "start" || scope !== "inventory" || typeof index !== "number") return [];
+		const entry = startInventory[index];
+		return entry === undefined
+			? []
+			: [
+					entry.position,
+				];
+	});
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection title="Inventory size">
@@ -53,6 +63,7 @@ export const ProjectInventorySection = () => {
 				<ProjectStartGrid
 					cells={cells}
 					height={height}
+					invalidCells={invalidCells}
 					mode="edit"
 					onCellsChangeFn={(nextCells) =>
 						form.setFieldValue(

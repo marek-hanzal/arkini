@@ -265,6 +265,7 @@ export const EditorChoiceControl = <Value extends string>({
 		</legend>
 		<SegmentedControl
 			dataUi="EditorChoiceControlOptions"
+			invalid={error !== undefined}
 			onChangeFn={onChangeFn}
 			optionDataUi="EditorChoiceControlOption"
 			options={options}

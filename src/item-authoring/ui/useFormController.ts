@@ -17,6 +17,7 @@ import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
+import { readEditorFormValidationMessageFn as readSharedValidationMessageFn } from "~/editor-control/fn/readEditorFormValidationMessageFn";
 
 const saveCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -69,6 +70,112 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 					...item.merge,
 				],
 });
+
+const FormPathLabelBySegment = {
+	action: "Source action",
+	adjustMs: "Runtime adjustment",
+	amount: "Amount",
+	asset: "Artwork",
+	capacity: "Buffer",
+	chance: "Chance",
+	charges: "Charges",
+	cost: "Cost",
+	default: "Default",
+	description: "Description",
+	distance: "Board distance",
+	durationMs: "Duration",
+	effect: "Target effect",
+	enable: "Enabled",
+	from: "Paid by",
+	hint: "Hint",
+	id: "ID",
+	max: "Maximum",
+	maxCount: "Maximum global count",
+	maxQueueSize: "Maximum parallel jobs",
+	maxStackSize: "Maximum stack size",
+	min: "Minimum",
+	mode: "Material mode",
+	multiplier: "Runtime multiplier",
+	output: "Output",
+	placement: "Board placement",
+	quantity: "Quantity",
+	result: "Replacement item",
+	runtimeMs: "Runtime",
+	selector: "Selected item",
+	show: "Visible",
+	space: "Space",
+	target: "Target item",
+	title: "Title",
+	type: "Type",
+	weight: "Weight",
+} as const satisfies Partial<Record<string, string>>;
+
+const FormIndexedPathLabelBySegment = {
+	input: "Input",
+	lines: "Production line",
+	merge: "Merge",
+	roll: "Roll",
+	rules: "Rule",
+	set: "Output set",
+	sources: "Alternate artwork",
+	when: "Condition",
+} as const satisfies Partial<Record<string, string>>;
+
+const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
+	const labels: string[] = [];
+	const dropCollectionCount = path.filter(
+		(segment, index) => segment === "drop" && typeof path[index + 1] === "number",
+	).length;
+	let dropCollectionIndex = 0;
+	for (let index = 0; index < path.length; index += 1) {
+		const segment = path[index];
+		const nestedIndex = path[index + 1];
+		const indexedLabel =
+			typeof segment === "string" && typeof nestedIndex === "number"
+				? FormIndexedPathLabelBySegment[
+						segment as keyof typeof FormIndexedPathLabelBySegment
+					]
+				: undefined;
+		if (indexedLabel !== undefined && typeof nestedIndex === "number") {
+			labels.push(`${indexedLabel} ${nestedIndex + 1}`);
+			index += 1;
+			continue;
+		}
+		if (segment === "line") {
+			labels.push("Product line");
+			continue;
+		}
+		if (segment === "drop" && typeof nestedIndex === "number") {
+			labels.push(
+				dropCollectionCount > 1 && dropCollectionIndex === 0
+					? `Weighted candidate ${nestedIndex + 1}`
+					: `Drop ${nestedIndex + 1}`,
+			);
+			dropCollectionIndex += 1;
+			index += 1;
+			continue;
+		}
+		if (segment === "query") continue;
+		if (segment === "itemId") {
+			if (path[index - 1] === "selector") continue;
+			if (path.includes("drop")) labels.push("Dropped item");
+			else if (labels.at(-1) !== "Target item") labels.push("Item");
+			continue;
+		}
+		if (typeof segment !== "string") continue;
+		const label = FormPathLabelBySegment[segment as keyof typeof FormPathLabelBySegment];
+		if (label !== undefined && labels.at(-1) !== label) labels.push(label);
+	}
+	return labels.length === 0 ? "Item" : labels.join(" → ");
+};
+
+const readFormValidationMessageFn = (
+	path: ReadonlyArray<PropertyKey>,
+	issue: Parameters<typeof readSharedValidationMessageFn>[0],
+) =>
+	path.at(-1) === "itemId" && issue.code === "too_small"
+		? "Select an item."
+		: readSharedValidationMessageFn(issue);
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
 export const useFormController = ({
@@ -146,11 +253,22 @@ export const useFormController = ({
 	const itemId = useStore(form.store, (state) => state.values.id);
 	const dirty = useStore(form.store, (state) => state.isDirty);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
-	const validationError = useStore(form.store, (state) =>
-		state.submissionAttempts > 0 && !state.isValid
-			? "Fix the highlighted item fields before saving."
-			: undefined,
-	);
+	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
+	const currentValues = useStore(form.store, (state) => state.values);
+	const validationIssues = useMemo(() => {
+		if (submissionAttempts === 0) return [];
+		const result = schema.safeParse(currentValues);
+		return result.success
+			? []
+			: result.error.issues.map((issue) => ({
+					message: readFormValidationMessageFn(issue.path, issue),
+					path: issue.path,
+				}));
+	}, [
+		currentValues,
+		schema,
+		submissionAttempts,
+	]);
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (submitting || !dirty) return false;
@@ -170,7 +288,11 @@ export const useFormController = ({
 
 			await onInvalidSectionFn(readSectionForPathFn(issue.path), issue.path);
 			const focusInvalidFieldFn = () =>
-				document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
+				document
+					.querySelector<HTMLElement>(
+						"input[data-ui-invalid='true'], textarea[data-ui-invalid='true'], [data-ui-invalid='true'] input, [data-ui-invalid='true'] textarea, [data-ui-invalid='true'] button",
+					)
+					?.focus();
 			if (typeof requestAnimationFrame === "function") {
 				requestAnimationFrame(focusInvalidFieldFn);
 			} else {
@@ -216,8 +338,13 @@ export const useFormController = ({
 			),
 		saveFn: saveDraftFn,
 	});
+	const persistenceError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult));
+	const firstValidationIssue = validationIssues[0];
 	const error =
-		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ?? validationError;
+		persistenceError ??
+		(firstValidationIssue === undefined
+			? undefined
+			: `${readFormValidationLocationFn(firstValidationIssue.path)}: ${firstValidationIssue.message}`);
 	return useMemo(
 		() => ({
 			canonicalItem: initialItem,
@@ -230,6 +357,7 @@ export const useFormController = ({
 			itemId,
 			project,
 			saveFn,
+			validationIssues,
 		}),
 		[
 			discardFn,
@@ -241,6 +369,7 @@ export const useFormController = ({
 			project,
 			saveFn,
 			submitting,
+			validationIssues,
 		],
 	);
 };

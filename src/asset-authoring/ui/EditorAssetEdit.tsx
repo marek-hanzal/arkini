@@ -6,9 +6,8 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
-import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";
 import { Status } from "~/ui/ui/Status";
 
@@ -16,10 +15,12 @@ interface EditorAssetEditProps extends useEditorAssetEditController.Props {}
 
 const EditorAssetImageDropZone = ({
 	currentUrl,
+	error,
 	file,
 	onFileFn,
 }: {
 	readonly currentUrl?: string;
+	readonly error?: string;
 	readonly file?: File;
 	readonly onFileFn: (file: File | undefined) => void;
 }) => {
@@ -55,7 +56,7 @@ const EditorAssetImageDropZone = ({
 			/>
 			<button
 				type="button"
-				className="grid min-h-48 w-full cursor-pointer place-items-center rounded-xl border border-dashed border-line-strong bg-surface p-6 text-center data-[ui-dragging=true]:border-accent data-[ui-dragging=true]:bg-accent/10"
+				className="grid min-h-48 w-full cursor-pointer place-items-center rounded-xl border border-dashed border-line-strong bg-surface p-6 text-center data-[ui-dragging=true]:border-accent data-[ui-dragging=true]:bg-accent/10 data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
 				onClick={() => inputRef.current?.click()}
 				onDragEnter={(event) => {
 					event.preventDefault();
@@ -71,6 +72,7 @@ const EditorAssetImageDropZone = ({
 					dataUi: "EditorAssetImageDropZone",
 					state: {
 						dragging,
+						invalid: error !== undefined,
 					},
 				})}
 			>
@@ -91,6 +93,9 @@ const EditorAssetImageDropZone = ({
 					</span>
 				</span>
 			</button>
+			{error === undefined ? null : (
+				<span className="text-xs leading-5 text-danger">{error}</span>
+			)}
 		</>
 	);
 };
@@ -168,19 +173,15 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 					error={controller.error}
 					saveFn={controller.saveFn}
 				>
-					<label className="grid gap-1.5 text-sm">
-						<EditorValueLabel
-							label="Asset ID"
-							required
-						/>
-						<input
-							className={editorInputClassName}
-							value={controller.nextId}
-							onChange={(event) => controller.setNextIdFn(event.currentTarget.value)}
-						/>
-					</label>
+					<EditorTextControl
+						error={controller.assetIdError}
+						label="Asset ID"
+						onChangeFn={controller.setNextIdFn}
+						value={controller.nextId}
+					/>
 					<EditorAssetImageDropZone
 						currentUrl={controller.currentUrl}
+						error={controller.fileError}
 						file={controller.file}
 						onFileFn={controller.setFileFn}
 					/>

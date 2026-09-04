@@ -193,14 +193,11 @@ describe("ProjectFormSchema", () => {
 		if (result.success) return;
 		expect(result.error.issues.map(({ path }) => path)).toEqual([
 			[
-				"start",
 				"board",
-				0,
+				"width",
 			],
 			[
-				"start",
-				"toolbar",
-				0,
+				"toolbarSize",
 			],
 		]);
 	});

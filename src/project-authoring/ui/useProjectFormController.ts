@@ -22,6 +22,58 @@ import {
 } from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
+import { readEditorFormValidationMessageFn } from "~/editor-control/fn/readEditorFormValidationMessageFn";
+
+const ProjectFormPathLabelBySegment = {
+	avatars: "About avatars",
+	board: "Board",
+	height: "Height",
+	hero: "Hero asset",
+	inventory: "Inventory",
+	quantity: "Quantity",
+	start: "Initial layout",
+	title: "Title",
+	toolbar: "Toolbar",
+	toolbarSize: "Toolbar slots",
+	width: "Width",
+} as const satisfies Partial<Record<string, string>>;
+
+const readProjectFormValidationLocationFn = (
+	path: ReadonlyArray<PropertyKey>,
+	values: ProjectFormSchema.Type,
+) => {
+	const [head, second, third] = path;
+	if (head === "avatars" && typeof second === "number") return `About avatar ${second + 1}`;
+	if (head === "start" && second === "board" && typeof third === "number") {
+		const entry = values.start.board[third];
+		return entry === undefined
+			? `Initial board item ${third + 1}`
+			: `Initial board → space ${entry.space} → slot ${entry.x + 1}, ${entry.y + 1}`;
+	}
+	if (head === "start" && second === "inventory" && typeof third === "number") {
+		const entry = values.start.inventory[third];
+		return entry === undefined
+			? `Initial inventory item ${third + 1}`
+			: `Initial inventory → slot ${entry.position.x + 1}, ${entry.position.y + 1}`;
+	}
+	if (head === "start" && second === "toolbar" && typeof third === "number") {
+		const entry = values.start.toolbar[third];
+		return entry === undefined
+			? `Initial toolbar item ${third + 1}`
+			: `Initial toolbar → slot ${entry.position.x + 1}`;
+	}
+	const labels = path.flatMap((segment) => {
+		if (typeof segment !== "string") return [];
+		const label =
+			ProjectFormPathLabelBySegment[segment as keyof typeof ProjectFormPathLabelBySegment];
+		return label === undefined
+			? []
+			: [
+					label,
+				];
+	});
+	return labels.length === 0 ? "Project" : labels.join(" → ");
+};
 
 const createProjectConfigFn = (
 	project: Pick<Project, "config">,
@@ -170,11 +222,22 @@ export const useProjectFormController = ({
 	});
 	const dirty = useStore(form.store, (state) => state.isDirty);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
-	const validationError = useStore(form.store, (state) =>
-		state.submissionAttempts > 0 && !state.isValid
-			? "Fix the highlighted project fields before saving."
-			: undefined,
-	);
+	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
+	const currentValues = useStore(form.store, (state) => state.values);
+	const validationIssues = useMemo(() => {
+		if (submissionAttempts === 0) return [];
+		const result = schema.safeParse(currentValues);
+		return result.success
+			? []
+			: result.error.issues.map((issue) => ({
+					message: readEditorFormValidationMessageFn(issue),
+					path: issue.path,
+				}));
+	}, [
+		currentValues,
+		schema,
+		submissionAttempts,
+	]);
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (!dirty || submitting) return false;
@@ -191,7 +254,11 @@ export const useProjectFormController = ({
 				if (issue !== undefined) {
 					await onInvalidDestinationFn(readProjectFormDestinationForPathFn(issue.path));
 					const focusInvalidFieldFn = () =>
-						document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
+						document
+							.querySelector<HTMLElement>(
+								"input[data-ui-invalid='true'], textarea[data-ui-invalid='true'], button[data-ui-invalid='true'], [data-ui-invalid='true'] input, [data-ui-invalid='true'] textarea, [data-ui-invalid='true'] button",
+							)
+							?.focus();
 					if (typeof requestAnimationFrame === "function") {
 						requestAnimationFrame(focusInvalidFieldFn);
 					} else {
@@ -237,8 +304,12 @@ export const useProjectFormController = ({
 			pathname.startsWith(`/editor/${project.projectId}/project/form`),
 		saveFn: saveDraftFn,
 	});
+	const firstValidationIssue = validationIssues[0];
 	const error =
-		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError;
+		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ??
+		(firstValidationIssue === undefined
+			? undefined
+			: `${readProjectFormValidationLocationFn(firstValidationIssue.path, currentValues)}: ${firstValidationIssue.message}`);
 	return useMemo(
 		() => ({
 			canonicalValues,
@@ -249,6 +320,7 @@ export const useProjectFormController = ({
 			isSaving: submitting,
 			project,
 			saveFn,
+			validationIssues,
 		}),
 		[
 			canonicalValues,
@@ -259,6 +331,7 @@ export const useProjectFormController = ({
 			project,
 			saveFn,
 			submitting,
+			validationIssues,
 		],
 	);
 };

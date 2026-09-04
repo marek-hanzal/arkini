@@ -17,6 +17,8 @@ import {
 	EditorSecondsControl,
 	EditorTextControl,
 } from "~/editor-control/ui/EditorValueControls";
+import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
+import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 
 type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
@@ -46,13 +48,16 @@ const queryScopeOptions = [
 ] as const;
 
 const QueryScopeControl = ({
+	error,
 	onChangeFn,
 	value,
 }: {
+	readonly error?: string;
 	readonly onChangeFn: (query: QuerySchema.Type) => void;
 	readonly value: QuerySchema.Type;
 }) => (
 	<EditorChoiceControl
+		error={error}
 		label="Query scope"
 		value={value.scope}
 		options={queryScopeOptions}
@@ -101,139 +106,144 @@ const WhenControl = ({
 }: {
 	readonly onChangeFn: (when: WhenSchema.Type) => void;
 	readonly value: WhenSchema.Type;
-}) => (
-	<div className="grid min-w-0 gap-3">
-		<EditorChoiceControl
-			label="Condition type"
-			value={value.type}
-			options={[
-				{
-					description: "Passes when the query finds any positive item quantity.",
-					label: "Exists",
-					value: "exists",
-				},
-				{
-					description:
-						"Passes only when the query finds exactly the configured total item quantity.",
-					label: "Exact count",
-					value: "count",
-				},
-				{
-					description:
-						"Passes when the query finds a total item quantity inside the configured inclusive range.",
-					label: "Count range",
-					value: "range",
-				},
-			]}
-			onChangeFn={(type) =>
-				onChangeFn(
-					type === "exists"
-						? {
-								type,
-								query: value.query,
-							}
-						: type === "count"
+}) => {
+	const validationIssues = useFormValidationIssues(value);
+	return (
+		<div className="grid min-w-0 gap-3">
+			<EditorChoiceControl
+				error={readEditorFormValidationErrorFn(validationIssues, "type")}
+				label="Condition type"
+				value={value.type}
+				options={[
+					{
+						description: "Passes when the query finds any positive item quantity.",
+						label: "Exists",
+						value: "exists",
+					},
+					{
+						description:
+							"Passes only when the query finds exactly the configured total item quantity.",
+						label: "Exact count",
+						value: "count",
+					},
+					{
+						description:
+							"Passes when the query finds a total item quantity inside the configured inclusive range.",
+						label: "Count range",
+						value: "range",
+					},
+				]}
+				onChangeFn={(type) =>
+					onChangeFn(
+						type === "exists"
 							? {
 									type,
 									query: value.query,
-									count: 1,
 								}
-							: {
-									type,
-									query: value.query,
-									min: 1,
-									max: 1,
-								},
-				)
-			}
-		/>
-		<div className="flex min-w-0 flex-wrap items-end gap-3">
-			<div className="min-w-64 flex-1">
-				<SelectorControl
-					value={value.query.selector}
-					onChangeFn={(selector) =>
-						onChangeFn({
-							...value,
-							query: {
-								...value.query,
-								selector,
-							},
-						})
-					}
-				/>
-			</div>
-			{match(value)
-				.with(
-					{
-						type: "exists",
-					},
-					() => null,
-				)
-				.with(
-					{
-						type: "count",
-					},
-					(when) => (
-						<div className="min-w-64">
-							<EditorNumberControl
-								label="Exact count"
-								value={when.count}
-								min={0}
-								onChangeFn={(count) =>
-									onChangeFn({
-										...when,
-										count,
-									})
-								}
-							/>
-						</div>
-					),
-				)
-				.with(
-					{
-						type: "range",
-					},
-					(when) => (
-						<div className="grid min-w-96 grid-cols-2 gap-3">
-							<EditorNumberControl
-								label="Minimum count"
-								value={when.min}
-								min={0}
-								onChangeFn={(min) =>
-									onChangeFn({
-										...when,
-										min,
-									})
-								}
-							/>
-							<EditorNumberControl
-								label="Maximum count"
-								value={when.max}
-								min={when.min}
-								onChangeFn={(max) =>
-									onChangeFn({
-										...when,
-										max,
-									})
-								}
-							/>
-						</div>
-					),
-				)
-				.exhaustive()}
-		</div>
-		<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-			<QueryScopeControl
-				value={value.query}
-				onChangeFn={(query) =>
-					onChangeFn({
-						...value,
-						query,
-					})
+							: type === "count"
+								? {
+										type,
+										query: value.query,
+										count: 1,
+									}
+								: {
+										type,
+										query: value.query,
+										min: 1,
+										max: 1,
+									},
+					)
 				}
 			/>
-			{value.query.scope !== "board" ? null : (
-				<BoardDistanceControl
+			<div className="flex min-w-0 flex-wrap items-end gap-3">
+				<div className="min-w-64 flex-1">
+					<SelectorControl
+						error={readEditorFormValidationErrorFn(
+							validationIssues,
+							"query",
+							"selector",
+						)}
+						value={value.query.selector}
+						onChangeFn={(selector) =>
+							onChangeFn({
+								...value,
+								query: {
+									...value.query,
+									selector,
+								},
+							})
+						}
+					/>
+				</div>
+				{match(value)
+					.with(
+						{
+							type: "exists",
+						},
+						() => null,
+					)
+					.with(
+						{
+							type: "count",
+						},
+						(when) => (
+							<div className="min-w-64">
+								<EditorNumberControl
+									error={readEditorFormValidationErrorFn(
+										validationIssues,
+										"count",
+									)}
+									label="Exact count"
+									value={when.count}
+									min={0}
+									onChangeFn={(count) =>
+										onChangeFn({
+											...when,
+											count,
+										})
+									}
+								/>
+							</div>
+						),
+					)
+					.with(
+						{
+							type: "range",
+						},
+						(when) => (
+							<div className="grid min-w-96 grid-cols-2 gap-3">
+								<EditorNumberControl
+									error={readEditorFormValidationErrorFn(validationIssues, "min")}
+									label="Minimum count"
+									value={when.min}
+									min={0}
+									onChangeFn={(min) =>
+										onChangeFn({
+											...when,
+											min,
+										})
+									}
+								/>
+								<EditorNumberControl
+									error={readEditorFormValidationErrorFn(validationIssues, "max")}
+									label="Maximum count"
+									value={when.max}
+									min={when.min}
+									onChangeFn={(max) =>
+										onChangeFn({
+											...when,
+											max,
+										})
+									}
+								/>
+							</div>
+						),
+					)
+					.exhaustive()}
+			</div>
+			<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+				<QueryScopeControl
+					error={readEditorFormValidationErrorFn(validationIssues, "query", "scope")}
 					value={value.query}
 					onChangeFn={(query) =>
 						onChangeFn({
@@ -242,10 +252,26 @@ const WhenControl = ({
 						})
 					}
 				/>
-			)}
+				{value.query.scope !== "board" ? null : (
+					<BoardDistanceControl
+						error={readEditorFormValidationErrorFn(
+							validationIssues,
+							"query",
+							"distance",
+						)}
+						value={value.query}
+						onChangeFn={(query) =>
+							onChangeFn({
+								...value,
+								query,
+							})
+						}
+					/>
+				)}
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 const RuleControl = ({
 	allowedTypes,
@@ -263,121 +289,135 @@ const RuleControl = ({
 	readonly ruleIndex: number;
 	readonly ruleTarget: RuleTarget;
 	readonly ruleTypeDescription: string;
-}) => (
-	<article className="grid gap-3">
-		<EditorTextControl
-			label="Hint"
-			placeholder="Optional explanation shown while this rule applies"
-			required={false}
-			value={rule.hint ?? ""}
-			onChangeFn={(hint) =>
-				onChangeFn({
-					...rule,
-					...(hint.trim() === ""
-						? {
-								hint: undefined,
-							}
-						: {
-								hint,
-							}),
-				})
-			}
-		/>
-		<div className="flex items-end gap-3">
-			<div className="min-w-0 flex-1">
-				<EditorChoiceControl
-					label="Rule type"
-					description={ruleTypeDescription}
-					value={rule.type}
-					options={allowedTypes.map((type) => ({
-						description: readRuleTypeDescriptionFn(type, ruleTarget),
-						label: type,
-						value: type,
-					}))}
-					onChangeFn={(type) => {
-						const next = createRuleFn(type);
-						onChangeFn({
-							...next,
-							...(rule.hint === undefined
-								? {}
-								: {
-										hint: rule.hint,
-									}),
-							when: rule.when,
-						});
-					}}
-				/>
-			</div>
-		</div>
-		{rule.type !== "runtime:multiplier" ? null : (
-			<EditorNumberControl
-				label="Runtime multiplier"
-				value={rule.multiplier}
-				min={0.01}
-				step={0.01}
-				onChangeFn={(multiplier) =>
+}) => {
+	const validationIssues = useFormValidationIssues(rule);
+	const invalidWhenIndex = validationIssues.find(
+		(issue) => issue.path[0] === "when" && typeof issue.path[1] === "number",
+	)?.path[1] as number | undefined;
+	return (
+		<article className="grid gap-3">
+			<EditorTextControl
+				error={readEditorFormValidationErrorFn(validationIssues, "hint")}
+				label="Hint"
+				placeholder="Optional explanation shown while this rule applies"
+				required={false}
+				value={rule.hint ?? ""}
+				onChangeFn={(hint) =>
 					onChangeFn({
 						...rule,
-						multiplier,
+						...(hint.trim() === ""
+							? {
+									hint: undefined,
+								}
+							: {
+									hint,
+								}),
 					})
 				}
 			/>
-		)}
-		{rule.type !== "runtime:adjust" ? null : (
-			<EditorSecondsControl
-				label="Runtime adjustment (seconds)"
-				value={rule.adjustMs / 1_000}
-				onChangeFn={(adjustSeconds) =>
-					onChangeFn({
-						...rule,
-						adjustMs: Math.round(adjustSeconds * 1_000),
-					})
-				}
-			/>
-		)}
-		<EditorCollectionSelector
-			addLabel="Add condition"
-			count={rule.when.length}
-			itemLabelFn={(whenIndex) => `Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`}
-			label={`Rule ${ruleIndex + 1} conditions`}
-			onAddFn={() =>
-				onChangeFn({
-					...rule,
-					when: [
-						...rule.when,
-						structuredClone(DraftDefaults.when),
-					],
-				})
-			}
-			onRemoveFn={
-				rule.when.length === 1
-					? undefined
-					: (whenIndex) =>
+			<div className="flex items-end gap-3">
+				<div className="min-w-0 flex-1">
+					<EditorChoiceControl
+						error={readEditorFormValidationErrorFn(validationIssues, "type")}
+						label="Rule type"
+						description={ruleTypeDescription}
+						value={rule.type}
+						options={allowedTypes.map((type) => ({
+							description: readRuleTypeDescriptionFn(type, ruleTarget),
+							label: type,
+							value: type,
+						}))}
+						onChangeFn={(type) => {
+							const next = createRuleFn(type);
 							onChangeFn({
-								...rule,
-								when: rule.when.filter(
-									(_candidate, candidateIndex) => candidateIndex !== whenIndex,
-								) as typeof rule.when,
-							})
-			}
-			removeLabel="Remove condition"
-		>
-			{(whenIndex) => (
-				<WhenControl
-					value={rule.when[whenIndex]}
-					onChangeFn={(next) =>
+								...next,
+								...(rule.hint === undefined
+									? {}
+									: {
+											hint: rule.hint,
+										}),
+								when: rule.when,
+							});
+						}}
+					/>
+				</div>
+			</div>
+			{rule.type !== "runtime:multiplier" ? null : (
+				<EditorNumberControl
+					error={readEditorFormValidationErrorFn(validationIssues, "multiplier")}
+					label="Runtime multiplier"
+					value={rule.multiplier}
+					min={0.01}
+					step={0.01}
+					onChangeFn={(multiplier) =>
 						onChangeFn({
 							...rule,
-							when: rule.when.map((candidate, candidateIndex) =>
-								candidateIndex === whenIndex ? next : candidate,
-							) as typeof rule.when,
+							multiplier,
 						})
 					}
 				/>
 			)}
-		</EditorCollectionSelector>
-	</article>
-);
+			{rule.type !== "runtime:adjust" ? null : (
+				<EditorSecondsControl
+					error={readEditorFormValidationErrorFn(validationIssues, "adjustMs")}
+					label="Runtime adjustment (seconds)"
+					value={rule.adjustMs / 1_000}
+					onChangeFn={(adjustSeconds) =>
+						onChangeFn({
+							...rule,
+							adjustMs: Math.round(adjustSeconds * 1_000),
+						})
+					}
+				/>
+			)}
+			<EditorCollectionSelector
+				addLabel="Add condition"
+				count={rule.when.length}
+				itemLabelFn={(whenIndex) =>
+					`Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
+				}
+				label={`Rule ${ruleIndex + 1} conditions`}
+				onAddFn={() =>
+					onChangeFn({
+						...rule,
+						when: [
+							...rule.when,
+							structuredClone(DraftDefaults.when),
+						],
+					})
+				}
+				onRemoveFn={
+					rule.when.length === 1
+						? undefined
+						: (whenIndex) =>
+								onChangeFn({
+									...rule,
+									when: rule.when.filter(
+										(_candidate, candidateIndex) =>
+											candidateIndex !== whenIndex,
+									) as typeof rule.when,
+								})
+				}
+				removeLabel="Remove condition"
+				selectedIndex={invalidWhenIndex}
+			>
+				{(whenIndex) => (
+					<WhenControl
+						value={rule.when[whenIndex]}
+						onChangeFn={(next) =>
+							onChangeFn({
+								...rule,
+								when: rule.when.map((candidate, candidateIndex) =>
+									candidateIndex === whenIndex ? next : candidate,
+								) as typeof rule.when,
+							})
+						}
+					/>
+				)}
+			</EditorCollectionSelector>
+		</article>
+	);
+};
 
 /** Assembles the shared conditional Rule collection used by lines and selected drops. */
 export const RulesControl = ({
@@ -393,6 +433,9 @@ export const RulesControl = ({
 	readonly rules: ReadonlyArray<RuleValue>;
 	readonly target: RuleTarget;
 }) => {
+	const validationIssues = useFormValidationIssues(rules as object);
+	const invalidRuleIndex = validationIssues.find((issue) => typeof issue.path[0] === "number")
+		?.path[0] as number | undefined;
 	const createRuleFn = (type: RuleType): LineRuleSchema.Type =>
 		({
 			type,
@@ -431,6 +474,7 @@ export const RulesControl = ({
 					onChangeFn(rules.filter((_current, index) => index !== ruleIndex))
 				}
 				removeLabel="Remove rule"
+				selectedIndex={invalidRuleIndex}
 			>
 				{(ruleIndex) => (
 					<RuleControl

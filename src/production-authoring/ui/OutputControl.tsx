@@ -5,6 +5,7 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
+import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 
 const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
@@ -17,6 +18,10 @@ interface OutputControlProps {
 /** Edits weighted output sets through their concrete RollSet domain. */
 export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const validationIssues = useFormValidationIssues(value);
+	const invalidSetIndex = validationIssues.find(
+		(issue) => issue.path[0] === "set" && typeof issue.path[1] === "number",
+	)?.path[1] as number | undefined;
 	return (
 		<section className="grid gap-3">
 			<EditorFormSectionDivider
@@ -59,6 +64,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 							})
 				}
 				removeLabel="Remove output set"
+				selectedIndex={invalidSetIndex}
 			>
 				{(index) => (
 					<RollSetControl

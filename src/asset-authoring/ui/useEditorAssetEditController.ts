@@ -10,6 +10,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
+import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
@@ -23,10 +24,16 @@ interface EditEditorAssetCommandProps {
 }
 
 const validateEditorAssetDraftFx = Effect.fn("validateEditorAssetDraftFx")(function* ({
+	currentId,
 	file,
+	resources,
 	resourceId: candidateId,
 }: {
+	readonly currentId: string;
 	readonly file?: File;
+	readonly resources: ReadonlyArray<{
+		readonly id: string;
+	}>;
 	readonly resourceId: string;
 }) {
 	const resourceId = yield* Effect.try({
@@ -38,8 +45,21 @@ const validateEditorAssetDraftFx = Effect.fn("validateEditorAssetDraftFx")(funct
 				cause,
 			}),
 	});
+	if (resourceId !== currentId && resources.some(({ id }) => id === resourceId)) {
+		return yield* Effect.fail(
+			new ProjectOperationError({
+				reason: "invalid-resource-id",
+				message: `Asset ID ${resourceId} is already used by another asset.`,
+			}),
+		);
+	}
 	if (file !== undefined) yield* validateEditorAssetFileFx(file, resourceId);
 });
+
+const isAssetIdCollisionFn = (error: unknown, resourceId: string) =>
+	error instanceof ProjectRepositoryError &&
+	error.operation === "replace-resource" &&
+	error.message === `Resource ID ${resourceId} already exists.`;
 
 const editEditorAssetCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -62,10 +82,12 @@ export namespace useEditorAssetEditController {
 	}
 
 	export interface Output {
+		readonly assetIdError?: string;
 		readonly currentUrl?: string;
 		readonly dirty: boolean;
 		readonly error: unknown;
 		readonly file?: File;
+		readonly fileError?: string;
 		readonly nextId: string;
 		readonly projectId: string;
 		readonly resourceFound: boolean;
@@ -90,30 +112,94 @@ export const useEditorAssetEditController = ({
 	const mutateFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
-	const [nextId, setNextIdFn] = useState(resourceId);
-	const [file, setFileFn] = useState<File>();
+	const [nextId, setNextIdStateFn] = useState(resourceId);
+	const [file, setFileStateFn] = useState<File>();
+	const [validationIssue, setValidationIssueFn] = useState<{
+		readonly field: "assetId" | "file";
+		readonly message: string;
+	}>();
+	const setNextIdFn = useCallback((value: string) => {
+		setNextIdStateFn(value);
+		setValidationIssueFn((current) => (current?.field === "assetId" ? undefined : current));
+	}, []);
+	const setFileFn = useCallback((value: File | undefined) => {
+		setFileStateFn(value);
+		setValidationIssueFn((current) => (current?.field === "file" ? undefined : current));
+	}, []);
+	const showValidationIssueFn = useCallback(
+		(issue: { readonly field: "assetId" | "file"; readonly message: string }) => {
+			setValidationIssueFn(issue);
+			const focusInvalidFieldFn = () =>
+				document
+					.querySelector<HTMLElement>(
+						"input[data-ui-invalid='true'], button[data-ui-invalid='true']",
+					)
+					?.focus();
+			if (typeof requestAnimationFrame === "function") {
+				requestAnimationFrame(focusInvalidFieldFn);
+			} else {
+				setTimeout(focusInvalidFieldFn, 0);
+			}
+		},
+		[],
+	);
 	const dirty = nextId.trim() !== resourceId || file !== undefined;
 	const dirtyRef = useRef(dirty);
 	dirtyRef.current = dirty;
 	const persistFn = useCallback(async () => {
 		if (!dirty || result.waiting) return false;
+		const validation = await RendererRuntime.runPromise(
+			validateEditorAssetDraftFx({
+				currentId: resourceId,
+				file,
+				resources: project.resources,
+				resourceId: nextId,
+			}).pipe(
+				Effect.match({
+					onFailure: (issue) => ({
+						issue,
+					}),
+					onSuccess: () => ({}),
+				}),
+			),
+		);
+		if ("issue" in validation) {
+			showValidationIssueFn({
+				field: validation.issue.reason === "invalid-asset" ? "file" : "assetId",
+				message: validation.issue.message,
+			});
+			return false;
+		}
+		setValidationIssueFn(undefined);
 		const id = nextId.trim();
-		await mutateFn({
-			currentId: resourceId,
-			file,
-			resourceId: id,
-		});
+		try {
+			await mutateFn({
+				currentId: resourceId,
+				file,
+				resourceId: id,
+			});
+		} catch (error) {
+			if (isAssetIdCollisionFn(error, id)) {
+				showValidationIssueFn({
+					field: "assetId",
+					message: `Asset ID ${id} is already used by another asset.`,
+				});
+			}
+			return false;
+		}
 		dirtyRef.current = false;
-		setNextIdFn(id);
-		setFileFn(undefined);
+		setNextIdStateFn(id);
+		setFileStateFn(undefined);
 		return true;
 	}, [
 		dirty,
 		file,
 		mutateFn,
 		nextId,
+		project.resources,
 		resourceId,
 		result.waiting,
+		showValidationIssueFn,
 	]);
 	const saveFn = useCallback(async () => {
 		if (!(await persistFn())) return false;
@@ -151,7 +237,9 @@ export const useEditorAssetEditController = ({
 			Exit.isSuccess(
 				await RendererRuntime.runPromiseExit(
 					validateEditorAssetDraftFx({
+						currentId: resourceId,
 						file,
+						resources: project.resources,
 						resourceId: nextId,
 					}),
 				),
@@ -160,14 +248,20 @@ export const useEditorAssetEditController = ({
 			pathname.startsWith(`/editor/${project.projectId}/assets/${resourceId}/edit`),
 		saveFn: persistFn,
 	});
-	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
+	const persistenceError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
+	const error =
+		validationIssue === undefined
+			? persistenceError
+			: `${validationIssue.field === "assetId" ? "Asset ID" : "Image"}: ${validationIssue.message}`;
 	const resourceFound = resource !== undefined;
 
 	return {
+		assetIdError: validationIssue?.field === "assetId" ? validationIssue.message : undefined,
 		currentUrl,
 		dirty,
 		error,
 		file,
+		fileError: validationIssue?.field === "file" ? validationIssue.message : undefined,
 		nextId,
 		projectId: project.projectId,
 		resourceFound,

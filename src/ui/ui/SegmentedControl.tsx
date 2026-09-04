@@ -56,13 +56,17 @@ export const SegmentedControl = <Value extends string>({
 			},
 		})}
 	>
-		{options.map((option) => {
+		{options.map((option, optionIndex) => {
 			const optionDisabled = disabled || pending || option.disabled === true;
+			const disabledTooltipReference =
+				optionDisabled && option.description !== undefined;
+			const overlapClassName = optionIndex === 0 ? "" : "-ml-px";
+			const edgeClassName = `${optionIndex === 0 ? "rounded-l-md" : ""} ${optionIndex === options.length - 1 ? "rounded-r-md" : ""}`;
 			const button = (
 				<button
 					key={option.value}
 					type="button"
-					className={`ak-segmented-option relative -ml-px inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border font-semibold first:ml-0 first:rounded-l-md last:rounded-r-md ${fill ? "flex-1" : ""} ${SegmentedControlSizeClassName[size]}`}
+					className={`ak-segmented-option relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border font-semibold ${disabledTooltipReference ? "w-full pointer-events-none" : overlapClassName} ${edgeClassName} ${fill ? "flex-1" : ""} ${SegmentedControlSizeClassName[size]}`}
 					disabled={optionDisabled}
 					onClick={() => onChangeFn(option.value)}
 					{...readDataUiFn({
@@ -81,8 +85,18 @@ export const SegmentedControl = <Value extends string>({
 					)}
 				</button>
 			);
-			return option.description === undefined ? (
-				button
+			if (option.description === undefined) return button;
+			return disabledTooltipReference ? (
+				<Tooltip
+					content={option.description}
+					key={option.value}
+				>
+					<span
+						className={`${overlapClassName} inline-flex shrink-0 cursor-not-allowed ${fill ? "flex-1" : ""}`}
+					>
+						{button}
+					</span>
+				</Tooltip>
 			) : (
 				<Tooltip
 					content={option.description}

@@ -95,6 +95,10 @@ export const DraftDefaults = {
 		},
 		deposit: {
 			type: "deposit",
+			charges: {
+				cost: 1,
+				from: "target",
+			},
 			query: {
 				scope: "board",
 				distance: "close",

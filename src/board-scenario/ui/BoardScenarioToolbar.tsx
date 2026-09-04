@@ -5,7 +5,36 @@ import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
 import { useBoardScenarioToolbar } from "~/board-scenario/ui/useBoardScenarioToolbar";
 import { Button } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
+import { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
+
+const BoardGameplayModeControl = ({ game }: { readonly game: EditorBoardGame }) => {
+	const cheats = useCheatsModel(game);
+	return (
+		<SegmentedControl
+			dataUi="EditorBoardGameplayMode"
+			onChangeFn={(mode) => cheats.setInstantGameplayFn(mode === "instant")}
+			optionDataUi="EditorBoardGameplayModeOption"
+			options={[
+				{
+					label: "Instant",
+					value: "instant",
+				},
+				{
+					label: "Common",
+					value: "common",
+				},
+			]}
+			pending={cheats.blocked}
+			size="compact"
+			value={cheats.instantGameplay ? "instant" : "common"}
+		/>
+	);
+};
 
 /** Presents the explicit named scenario selector without owning persistence rules. */
 export const BoardScenarioToolbar = ({
@@ -21,7 +50,7 @@ export const BoardScenarioToolbar = ({
 	});
 	return (
 		<header
-			className="grid shrink-0 grid-cols-[auto_minmax(16rem,32rem)_auto_minmax(0,1fr)] items-center gap-2"
+			className="grid shrink-0 grid-cols-[auto_minmax(16rem,32rem)_auto_minmax(0,1fr)_auto_auto] items-center gap-2"
 			data-ui="EditorBoardScenarioToolbar"
 		>
 			<EditorHistoryBackButton
@@ -68,6 +97,11 @@ export const BoardScenarioToolbar = ({
 				</Button>
 			</div>
 			<p className="truncate text-xs text-muted">{controller.message}</p>
+			{game === undefined ? null : <BoardGameplayModeControl game={game} />}
+			<EditorPageHelp
+				content={<Mx label="Editor Board help" />}
+				title={<Tx label="Editor Board" />}
+			/>
 		</header>
 	);
 };

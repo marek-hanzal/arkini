@@ -39,7 +39,7 @@ describe("Board Scenario createEditorBoardGameFx", () => {
 		expect(game.getSnapshotFn().cheats).toEqual({
 			enabled: true,
 			everEnabled: true,
-			instantGameplay: false,
+			instantGameplay: true,
 		});
 		expect(game.getSnapshotFn().items).toEqual([
 			expect.objectContaining({

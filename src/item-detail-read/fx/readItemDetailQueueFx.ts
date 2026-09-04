@@ -10,7 +10,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 
 interface ItemDetailQueueRequest {
@@ -133,51 +132,21 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 							runtime,
 						}),
 					);
-					if (Result.isFailure(hardConditions)) {
-						status = "blocked-condition";
-						const line = lineById.get(request.lineId);
-						const outputItemId = readPrimaryOutputItemIdFn(line);
-						return {
-							requestId: request.id,
-							lineId: request.lineId,
-							title: line?.title ?? request.lineId,
-							...(outputItemId === undefined
-								? {}
-								: {
-										outputItemId,
-									}),
-							status,
-						} satisfies ItemDetailQueueRequest;
-					}
-					const coverage = yield* readLineInputAutofillCoverageFx({
-						ownerItemId: owner.id,
-						lineId: request.lineId,
-						runtime,
-					});
-					if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
-						status = "waiting-inputs";
-						missingQuantity =
-							coverage.selectedQuantity +
-							(coverage.type === "incomplete" ? coverage.missingQuantity : 0);
-					} else {
-						const candidate = yield* resolveLineStartFx({
+					if (Result.isSuccess(hardConditions)) {
+						const coverage = yield* readLineInputAutofillCoverageFx({
 							ownerItemId: owner.id,
 							lineId: request.lineId,
 							runtime,
 						});
-						const output = yield* Effect.result(
-							assertOutputCapacityFx({
-								candidateId: request.id,
-								ownerItemId: owner.id,
-								lineId: request.lineId,
-								plan: candidate.run.plan,
-								runtime,
-							}),
-						);
-						status =
-							candidate.run.ready && Result.isSuccess(output)
-								? "inputs-ready"
-								: "blocked-condition";
+						if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
+							status = "waiting-inputs";
+							missingQuantity =
+								coverage.selectedQuantity +
+								(coverage.type === "incomplete" ? coverage.missingQuantity : 0);
+						} else {
+							// Capacity is already checked; coverage only reads this same snapshot.
+							status = start.run.ready ? "inputs-ready" : "blocked-condition";
+						}
 					}
 				}
 			}

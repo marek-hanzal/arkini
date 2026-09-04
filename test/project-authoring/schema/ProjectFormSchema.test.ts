@@ -72,6 +72,62 @@ const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 });
 
 describe("ProjectFormSchema", () => {
+	it("limits Editor-authored Board, Inventory and Toolbar sizes to 42", () => {
+		const project = createProject();
+		const validValue = createValidFormValue(project);
+		expect(
+			createProjectFormSchema(project).safeParse({
+				...validValue,
+				board: {
+					height: 42,
+					width: 42,
+				},
+				inventory: {
+					height: 42,
+					width: 42,
+				},
+				toolbarSize: 42,
+			}).success,
+		).toBe(true);
+
+		const result = createProjectFormSchema(project).safeParse({
+			...validValue,
+			board: {
+				height: 43,
+				width: 43,
+			},
+			inventory: {
+				height: 43,
+				width: 43,
+			},
+			toolbarSize: 43,
+		});
+
+		expect(result.success).toBe(false);
+		if (result.success) return;
+		expect(result.error.issues.map(({ path }) => path)).toEqual([
+			[
+				"board",
+				"width",
+			],
+			[
+				"board",
+				"height",
+			],
+			[
+				"inventory",
+				"width",
+			],
+			[
+				"inventory",
+				"height",
+			],
+			[
+				"toolbarSize",
+			],
+		]);
+	});
+
 	it("rejects missing and duplicate appearance resources", () => {
 		const project = createProject();
 		const result = createProjectFormSchema(project).safeParse({

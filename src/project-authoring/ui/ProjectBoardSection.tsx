@@ -7,6 +7,7 @@ import { editorInputClassName } from "~/editor-control/constant/EditorInputClass
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValue";
+import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 const MaxEditorSpaceIndex = 31;
 
@@ -37,6 +38,7 @@ export const ProjectBoardSection = () => {
 								{(field) => (
 									<field.NumberField
 										label="Width"
+										max={EditorProjectSizeMax}
 										min={1}
 									/>
 								)}
@@ -45,6 +47,7 @@ export const ProjectBoardSection = () => {
 								{(field) => (
 									<field.NumberField
 										label="Height"
+										max={EditorProjectSizeMax}
 										min={1}
 									/>
 								)}
@@ -60,7 +63,7 @@ export const ProjectBoardSection = () => {
 							<input
 								type="number"
 								value={spaceInput}
-								className={`${editorInputClassName} w-28`}
+								className={`${editorInputClassName} w-56`}
 								max={MaxEditorSpaceIndex}
 								min={0}
 								step={1}

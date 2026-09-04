@@ -112,9 +112,11 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 	ProjectStartGrid: ({
 		cells,
 		onCellsChangeFn,
+		width,
 	}: {
 		readonly cells: ReadonlyArray<TestStartGridCell>;
 		readonly onCellsChangeFn: (cells: ReadonlyArray<TestStartGridCell>) => void;
+		readonly width: number;
 	}) =>
 		createElement(
 			"button",
@@ -123,6 +125,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 					.map(({ itemId, quantity, x, y }) => `${itemId}:${quantity}:${x}:${y}`)
 					.join("|"),
 				"data-ui": "EditorProjectStartGrid",
+				"data-width": width,
 				onClick: () =>
 					onCellsChangeFn(
 						cells.map((cell) => ({
@@ -508,6 +511,25 @@ describe("project section form session", () => {
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");
 		expect(readGridCells()).toBe("water:1:0:0");
+	});
+
+	it("caps a pasted Board dimension before projecting it to the grid", async () => {
+		state.project = boardSpaceProject;
+		state.section = <ProjectBoardSection />;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(EditorProjectForm)));
+
+		const widthInput = container.querySelector<HTMLInputElement>('input[name="board.width"]');
+		const grid = container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]');
+		if (widthInput === null || grid === null) throw new Error("Missing Board size controls.");
+
+		await changeInput(widthInput, "1500");
+
+		expect(widthInput.value).toBe("42");
+		expect(grid.dataset.width).toBe("42");
 	});
 
 	it("submits an edited initial Toolbar cell without leaking grid coordinates", async () => {

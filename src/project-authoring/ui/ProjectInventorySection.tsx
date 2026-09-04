@@ -5,6 +5,7 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValue";
+import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 export const ProjectInventorySection = () => {
 	const { form } = useProjectFormSession();
@@ -27,6 +28,7 @@ export const ProjectInventorySection = () => {
 							{(field) => (
 								<field.NumberField
 									label="Width"
+									max={EditorProjectSizeMax}
 									min={1}
 								/>
 							)}
@@ -35,6 +37,7 @@ export const ProjectInventorySection = () => {
 							{(field) => (
 								<field.NumberField
 									label="Height"
+									max={EditorProjectSizeMax}
 									min={1}
 								/>
 							)}

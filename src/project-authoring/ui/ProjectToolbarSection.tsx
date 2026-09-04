@@ -4,6 +4,7 @@ import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
+import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 export const ProjectToolbarSection = () => {
 	const { form } = useProjectFormSession();
@@ -25,7 +26,7 @@ export const ProjectToolbarSection = () => {
 							<field.NumberField
 								label="Slots"
 								min={0}
-								max={64}
+								max={EditorProjectSizeMax}
 							/>
 						)}
 					</form.AppField>

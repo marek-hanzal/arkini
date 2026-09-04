@@ -192,6 +192,56 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("project section form session", () => {
+	it("locks project editing until the pending snapshot is saved", async () => {
+		state.project = boardSpaceProject;
+		state.section = <ProjectGeneralSection />;
+		state.navigate.mockImplementationOnce(() => new Promise<void>(() => undefined));
+		let completeSave!: () => void;
+		state.saveConfig.mockImplementationOnce(
+			() =>
+				new Promise<void>((resolve) => {
+					completeSave = resolve;
+				}),
+		);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing project title input.");
+		await changeInput(title, "Pending project title");
+		const save = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await act(async () => save?.click());
+		expect(state.saveConfig).toHaveBeenCalledOnce();
+		expect(title.matches(":disabled")).toBe(true);
+		expect(state.navigate).not.toHaveBeenCalled();
+		state.project = {
+			...boardSpaceProject,
+			config: state.saveConfig.mock.calls[0]?.[0].config,
+			revision: boardSpaceProject.revision + 1,
+		};
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
+		await act(async () => completeSave());
+		expect(title.value).toBe("Pending project title");
+		expect(title.matches(":disabled")).toBe(false);
+		expect(state.navigate).toHaveBeenCalledOnce();
+	});
+
 	it("exposes routed page help only for a section that owns guidance", async () => {
 		state.project = boardSpaceProject;
 		state.section = <div />;

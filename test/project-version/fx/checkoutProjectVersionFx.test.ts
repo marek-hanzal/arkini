@@ -127,6 +127,7 @@ const runCheckout = async ({
 		const exit = await Effect.runPromiseExit(
 			checkoutProjectVersionFx({
 				confirmDiscardCurrentChanges: confirm,
+				isNavigationPendingFn: () => false,
 				projectId: project.projectId,
 				versionId: "version-one",
 			}).pipe(
@@ -200,7 +201,9 @@ describe("checkoutProjectVersionFx", () => {
 
 	it("reports a concurrent project replacement as a typed failure", async () => {
 		const writeAdmission = Effect.runSync(createProjectWriteAdmissionFx);
-		const releaseFx = Effect.runSync(writeAdmission.acquireReplacementFx("refresh-project"));
+		const releaseFx = Effect.runSync(
+			writeAdmission.acquireReplacementFx("refresh-project", () => false),
+		);
 		try {
 			const result = await runCheckout({
 				writeAdmission,

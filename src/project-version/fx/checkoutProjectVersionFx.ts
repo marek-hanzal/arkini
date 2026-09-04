@@ -26,20 +26,27 @@ const reloadProjectAfterVersionRefreshFailureFx = Effect.fn(
 export namespace checkoutProjectVersionFx {
 	export interface Props {
 		readonly confirmDiscardCurrentChanges: boolean;
+		readonly isNavigationPendingFn: () => boolean;
 		readonly projectId: string;
 		readonly versionId: string;
 	}
 }
 
-const acquireProjectVersionCheckoutFx = Effect.flatMap(ProjectWriteAdmission, (admission) =>
-	admission.acquireReplacementFx("checkout-version"),
-);
+const acquireProjectVersionCheckoutFx = (isNavigationPendingFn: () => boolean) =>
+	Effect.flatMap(ProjectWriteAdmission, (admission) =>
+		admission.acquireReplacementFx("checkout-version", isNavigationPendingFn),
+	);
 
 /** Performs the terminal renderer handshake before one persisted project replacement. */
 export const checkoutProjectVersionFx = Effect.fn("checkoutEditorProjectVersionFx")(
-	({ confirmDiscardCurrentChanges, projectId, versionId }: checkoutProjectVersionFx.Props) =>
+	({
+		confirmDiscardCurrentChanges,
+		isNavigationPendingFn,
+		projectId,
+		versionId,
+	}: checkoutProjectVersionFx.Props) =>
 		Effect.acquireUseRelease(
-			acquireProjectVersionCheckoutFx,
+			acquireProjectVersionCheckoutFx(isNavigationPendingFn),
 			() =>
 				Effect.gen(function* () {
 					const repository = yield* ProjectRepository;

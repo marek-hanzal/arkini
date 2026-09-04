@@ -13,6 +13,7 @@ const completedFrameDurationMs = 240;
 export namespace VersionRestoreCommandAtom {
 	export interface Command {
 		readonly confirmDiscardCurrentChanges: boolean;
+		readonly isNavigationPendingFn: () => boolean;
 		readonly onFailureFn: (cause: unknown) => void;
 		readonly subject: string;
 		readonly versionId: string;
@@ -47,6 +48,7 @@ export const VersionRestoreCommandAtom = RendererRuntime.runSync(
 						const exit = yield* Effect.exit(
 							checkoutProjectVersionFx({
 								confirmDiscardCurrentChanges: command.confirmDiscardCurrentChanges,
+								isNavigationPendingFn: command.isNavigationPendingFn,
 								projectId,
 								versionId: command.versionId,
 							}).pipe(

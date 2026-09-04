@@ -20,8 +20,11 @@ const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 		const unsavedChanges = yield* EditorUnsavedChanges;
 		return Atom.family((projectId: string) =>
 			Atom.fn(
-				() =>
+				({
+					isNavigationPendingFn,
+				}: Pick<refreshEditorProjectFx.Props, "isNavigationPendingFn">) =>
 					refreshEditorProjectFx({
+						isNavigationPendingFn,
 						projectId,
 					}).pipe(
 						Effect.provideService(ProjectRepository, repository),
@@ -66,7 +69,9 @@ export const useEditorProjectRefreshController = ({
 	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const refreshFn = () => {
 		if (disabled) return;
-		void runFn(undefined)
+		void runFn({
+			isNavigationPendingFn: () => router.state.status === "pending",
+		})
 			.then((fresh) => {
 				if (fresh.projectId === projectId) return;
 				const currentRoot = `/editor/${encodeURIComponent(projectId)}`;

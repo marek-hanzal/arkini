@@ -13,6 +13,7 @@ import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { Status } from "~/ui/ui/Status";
+import { SearchInput } from "~/ui/ui/SearchInput";
 
 const EstimateViewOptions: ReadonlyArray<EditorSelectOption<ItemEstimateViewSchema.Type>> = [
 	{
@@ -65,12 +66,12 @@ export const ItemEstimateList = ({
 						}}
 						to="/editor/$projectId/editor/items/list"
 					/>
-					<input
-						type="search"
+					<SearchInput
 						value={query}
-						className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						containerClassName="min-w-64 flex-1"
+						className="h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder="Search item title or ID…"
-						onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
+						onValueChangeFn={onQueryChangeFn}
 					/>
 					{itemType === undefined ? null : (
 						<button

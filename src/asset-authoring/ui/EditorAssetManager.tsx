@@ -20,6 +20,7 @@ import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { Status } from "~/ui/ui/Status";
+import { SearchInput } from "~/ui/ui/SearchInput";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
 	readonly onFilterChangeFn: (filter: useEditorAssetManagerController.Filter) => void;
@@ -284,13 +285,13 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						disabled={controller.importPending}
 						onChange={controller.onFilesChangeFn}
 					/>
-					<input
-						type="search"
+					<SearchInput
 						value={props.query}
-						className="h-12 min-h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						containerClassName="min-w-64 flex-1"
+						className="h-12 min-h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 						data-ui="EditorAssetSearch"
 						placeholder="Search assets…"
-						onChange={(event) => props.onQueryChangeFn(event.currentTarget.value)}
+						onValueChangeFn={props.onQueryChangeFn}
 					/>
 					<SegmentedControl
 						dataUi="EditorAssetFilters"

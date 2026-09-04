@@ -1,4 +1,4 @@
-import { Check, Search, X } from "lucide-react";
+import { Check, Search } from "lucide-react";
 
 import {
 	autoUpdate,
@@ -16,6 +16,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { SearchInput } from "~/ui/ui/SearchInput";
 
 export interface EditorSearchOption {
 	readonly id: string;
@@ -159,6 +160,11 @@ export const EditorSearchCombobox = ({
 		if (!open && query === selectedLabel) setQueryFn("");
 		setOpenFn(true);
 	};
+	const updateQueryFn = (nextQuery: string) => {
+		setQueryFn(nextQuery);
+		onInputChangeFn?.(nextQuery);
+		setOpenFn(true);
+	};
 
 	return (
 		<label className="grid min-w-0 content-start gap-1.5 text-sm">
@@ -184,22 +190,16 @@ export const EditorSearchCombobox = ({
 					{...getReferencePropsFn()}
 				>
 					<Search className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
-					<input
-						type="search"
+					<SearchInput
 						value={query}
 						autoComplete="off"
-						className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
+						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							handleOpenChangeFn(false);
 							onBlurFn?.();
 						}}
-						onChange={(event) => {
-							const value = event.currentTarget.value;
-							setQueryFn(value);
-							onInputChangeFn?.(value);
-							setOpenFn(true);
-						}}
+						onValueChangeFn={updateQueryFn}
 						onClick={beginSearchFn}
 						onFocus={beginSearchFn}
 						onKeyDown={(event) => {
@@ -233,21 +233,6 @@ export const EditorSearchCombobox = ({
 							},
 						})}
 					/>
-					{query.length === 0 ? null : (
-						<button
-							type="button"
-							className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center rounded-r-lg border-y border-r border-transparent text-muted hover:border-line-strong hover:bg-surface-raised hover:text-foreground"
-							title="Clear search"
-							onMouseDown={(event) => event.preventDefault()}
-							onClick={() => {
-								setQueryFn("");
-								onInputChangeFn?.("");
-								setOpenFn(true);
-							}}
-						>
-							<X className="size-5" />
-						</button>
-					)}
 				</span>
 			</span>
 			{error === undefined ? null : (

@@ -1,5 +1,7 @@
 import type { RefObject } from "react";
 
+import { SearchInput } from "~/ui/ui/SearchInput";
+
 interface SpotlightSearchInputProps {
 	readonly inputRef: RefObject<HTMLInputElement | null>;
 	readonly onEnterFn: () => void;
@@ -22,13 +24,12 @@ export const SpotlightSearchInput = ({
 	resultCount,
 	selectedIndex,
 }: SpotlightSearchInputProps) => (
-	<input
+	<SearchInput
 		className="w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none"
 		placeholder={placeholder}
 		ref={inputRef}
-		type="search"
 		value={query}
-		onChange={(event) => onQueryChangeFn(event.currentTarget.value)}
+		onValueChangeFn={onQueryChangeFn}
 		onKeyDown={(event) => {
 			if (event.key === "ArrowDown") {
 				event.preventDefault();

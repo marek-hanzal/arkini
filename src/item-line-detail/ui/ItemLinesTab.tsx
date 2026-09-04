@@ -12,6 +12,7 @@ import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/Item
 import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
 import { Scrollable } from "~/ui/ui/Scrollable";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
+import { SearchInput } from "~/ui/ui/SearchInput";
 
 const autoFocusPadding = 12;
 const autoFocusLayoutAttempts = 24;
@@ -193,12 +194,11 @@ export const ItemLinesTab = ({
 					data-ui="ItemLinesSearch"
 					transition={itemDetailMotionTransition}
 				>
-					<input
-						type="search"
+					<SearchInput
 						value={query}
 						className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder="Search lines…"
-						onChange={(event) => setQueryFn(event.currentTarget.value)}
+						onValueChangeFn={setQueryFn}
 					/>
 				</motion.div>
 				<AnimatePresence initial={false}>

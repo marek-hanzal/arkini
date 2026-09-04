@@ -1,7 +1,3 @@
-.ak-editor-search-input::-webkit-search-cancel-button {
-	display: none;
-}
-
 .ak-editor-workspace-tab {
 	transition: none;
 }

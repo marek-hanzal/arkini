@@ -1,5 +1,6 @@
 import { useCheatItemSpotlightController } from "~/game-cheat/ui/useCheatItemSpotlightController";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
 
 interface CheatItemSpotlightProps extends useCheatItemSpotlightController.Props {}
@@ -32,9 +33,9 @@ export const CheatItemSpotlight = (props: CheatItemSpotlightProps) => {
 			onSelectItemFn={controller.selectItemFn}
 			options={controller.items.map((item) => ({
 				artwork: (
-					<img
-						className="size-11 object-contain"
-						src={item.sourceUrl}
+					<ItemArtwork
+						compositeUrl={item.compositeUrl}
+						sourceUrl={item.sourceUrl}
 					/>
 				),
 				itemId: item.itemId,

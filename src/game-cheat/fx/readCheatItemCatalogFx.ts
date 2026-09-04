@@ -2,12 +2,13 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 interface CheatItemCatalogEntry {
 	readonly itemId: IdSchema.Type;
+	readonly sourceResourceIds: AssetSchema.Type["default"];
 	readonly title: string;
-	readonly sourceResourceId: IdSchema.Type;
 }
 
 /** Reads the immutable Board-spawnable item catalog for Cheat Spotlight. */
@@ -21,8 +22,8 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 		.map(
 			(item): CheatItemCatalogEntry => ({
 				itemId: item.id,
+				sourceResourceIds: item.asset.default,
 				title: item.title,
-				sourceResourceId: item.asset.default[0],
 			}),
 		)
 		.sort(

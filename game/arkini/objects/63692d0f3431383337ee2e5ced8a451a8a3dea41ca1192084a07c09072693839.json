@@ -1,0 +1,124 @@
+{
+	"uid": "imrcxilbuisx6f02q5rt7pp3",
+	"id": "grain-field",
+	"title": "Grain Field",
+	"description": "A field. Of grain.",
+	"asset": {
+		"default": [
+			"grain-field"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 16,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "empty-field",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	"maxQueueSize": 4,
+	"type": "deposit",
+	"lines": [
+		{
+			"id": "grain",
+			"title": "Grain",
+			"description": "Get some grain. You can eat it if you want.",
+			"default": true,
+			"show": true,
+			"enable": false,
+			"runtimeMs": 24000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "deposit",
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "grain-field"
+						},
+						"scope": "board",
+						"distance": "self"
+					}
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "water"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "grain",
+										"quantity": {
+											"min": 2,
+											"max": 4
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"hint": "If you want running field, it must be next to the farm.",
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "grain-farm"
+								},
+								"scope": "board",
+								"distance": "close"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "yye90ax5ubh1szpy9clzp3o9",
+	"id": "stone-block",
+	"title": "Stone Block",
+	"description": "It's squarish.",
+	"asset": {
+		"default": [
+			"stone-block"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

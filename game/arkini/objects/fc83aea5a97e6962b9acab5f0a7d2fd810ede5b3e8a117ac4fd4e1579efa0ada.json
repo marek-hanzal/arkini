@@ -1,0 +1,68 @@
+{
+	"uid": "dmuw8kdzv7f6jz94yret4jhe",
+	"id": "stonemason-camp-blueprint",
+	"title": "Stonemason Camp Blueprint",
+	"description": "Stone Access: Granted!",
+	"asset": {
+		"default": [
+			"blueprint",
+			"stonemason-camp"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "stonemason-camp",
+		"title": "Stonemason Camp",
+		"description": "After this, you'll be master of Stones!",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 30000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "deposit",
+				"query": {
+					"selector": {
+						"type": "item",
+						"itemId": "stonemason-camp-blueprint"
+					},
+					"scope": "board",
+					"distance": "self"
+				}
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "stonemason-camp",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

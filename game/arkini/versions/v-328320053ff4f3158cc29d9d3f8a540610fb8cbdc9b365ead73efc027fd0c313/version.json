@@ -1,0 +1,9 @@
+{
+	"subject": "Record the initial official Arkini project",
+	"body": "Capture the current authored game after correcting the Grain Field material input capacity so repository builds have a valid published Version HEAD.",
+	"arkini": "0.5.0",
+	"version": "1.0",
+	"sourceRevision": 1788549171011,
+	"contentFingerprint": "763051961827804e32eaa1c9c4a4a889ccc20b61170211617d4ed9f6aedd7de7",
+	"createdAtMs": 1788551934204
+}

@@ -76,7 +76,7 @@
 							"min": 2,
 							"max": 2
 						},
-						"capacity": 4
+						"capacity": 0
 					}
 				],
 				"output": {

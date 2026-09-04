@@ -1,0 +1,80 @@
+{
+	"uid": "r171qefgjo6x0m7pnl3vgtfj",
+	"id": "empty-well",
+	"title": "Empty Well",
+	"description": "No more water. Yay.",
+	"asset": {
+		"default": [
+			"empty-well"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "craft",
+	"line": {
+		"id": "well",
+		"title": "Well",
+		"description": "Find a new well",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 30000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "deposit",
+				"query": {
+					"selector": {
+						"type": "item",
+						"itemId": "empty-well"
+					},
+					"scope": "board",
+					"distance": "self"
+				}
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "resource-research"
+				},
+				"mode": "reserve",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "well",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "random",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

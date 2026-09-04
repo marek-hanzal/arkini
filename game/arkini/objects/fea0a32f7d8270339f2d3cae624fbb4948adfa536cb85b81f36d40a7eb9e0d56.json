@@ -1,0 +1,56 @@
+{
+	"uid": "uoratu4uyxa3lg0eom8ubjcy",
+	"id": "sawmill-blueprint",
+	"title": "Sawmill Blueprint",
+	"description": "What about some stuff sawing other stuff?",
+	"asset": {
+		"default": [
+			"blueprint",
+			"sawmill"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "sawmill",
+		"title": "Build Sawmill",
+		"description": "Let's build sawmill",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 30000,
+		"input": [
+			{
+				"type": "simple"
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "sawmill",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

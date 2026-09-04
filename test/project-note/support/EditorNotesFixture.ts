@@ -5,7 +5,9 @@ import { ProjectRepositoryError } from "~/project-authoring/error/ProjectReposit
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 
 export const editorNotesTestState = {
+	beforeCreateFn: undefined as (() => Promise<void>) | undefined,
 	createFailures: 0,
+	listFailures: 0,
 	nextNote: 2,
 	notes: [
 		{
@@ -22,34 +24,49 @@ const repository: Pick<
 	ProjectRepositoryService,
 	"listNotesFx" | "createNoteFx" | "updateNoteFx" | "deleteNoteFx"
 > = {
-	listNotesFx: () => Effect.succeed(editorNotesTestState.notes),
-	createNoteFx: ({ projectId, content }: { projectId: string; content: string }) =>
-		Effect.try({
-			try: () => {
-				if (editorNotesTestState.createFailures > 0) {
-					editorNotesTestState.createFailures -= 1;
-					throw new Error("Note could not be saved.");
-				}
-				const note = {
-					noteId: `note-${editorNotesTestState.nextNote++}`,
-					projectId,
-					content,
-					createdAtMs: editorNotesTestState.nextNote,
-					updatedAtMs: editorNotesTestState.nextNote,
-				};
-				editorNotesTestState.notes = [
-					note,
-					...editorNotesTestState.notes,
-				];
-				return note;
-			},
-			catch: (cause) =>
+	listNotesFx: () =>
+		Effect.suspend(() => {
+			if (editorNotesTestState.listFailures === 0)
+				return Effect.succeed(editorNotesTestState.notes);
+			editorNotesTestState.listFailures -= 1;
+			return Effect.fail(
 				new ProjectRepositoryError({
-					operation: "create-note",
-					message: cause instanceof Error ? cause.message : String(cause),
-					cause,
+					operation: "list-notes",
+					message: "Notes could not be loaded.",
 				}),
+			);
 		}),
+	createNoteFx: ({ projectId, content }: { projectId: string; content: string }) =>
+		Effect.promise(() => editorNotesTestState.beforeCreateFn?.() ?? Promise.resolve()).pipe(
+			Effect.andThen(
+				Effect.try({
+					try: () => {
+						if (editorNotesTestState.createFailures > 0) {
+							editorNotesTestState.createFailures -= 1;
+							throw new Error("Note could not be saved.");
+						}
+						const note = {
+							noteId: `note-${editorNotesTestState.nextNote++}`,
+							projectId,
+							content,
+							createdAtMs: editorNotesTestState.nextNote,
+							updatedAtMs: editorNotesTestState.nextNote,
+						};
+						editorNotesTestState.notes = [
+							note,
+							...editorNotesTestState.notes,
+						];
+						return note;
+					},
+					catch: (cause) =>
+						new ProjectRepositoryError({
+							operation: "create-note",
+							message: cause instanceof Error ? cause.message : String(cause),
+							cause,
+						}),
+				}),
+			),
+		),
 	updateNoteFx: ({ projectId, noteId, content, expectedUpdatedAtMs }) =>
 		Effect.try({
 			try: () => {

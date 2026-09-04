@@ -103,7 +103,7 @@ Game Session composes Runtime, Tick, save, command/listener scopes and first-fai
 
 React mount state is never desired-Game state. Same-package acquisition shares one provisional lease; explicit load adopts it. A different package finalizes the current resource before acquisition.
 
-Ordinary shutdown stops Tick, stops command producers, flushes or discards the latest stable Runtime as requested, then releases the owner scope with its subscriptions and runtime. Fatal quiesce closes transition subscriptions earlier. Concurrent cleanup joins the same attempt. Failed ordinary final save freezes the resource for retry; reset and Editor replacement use discard-only disposal.
+Ordinary shutdown stops Tick, stops command producers, flushes or discards the latest stable Runtime as requested, then releases the owner scope with its subscriptions and runtime. Fatal quiesce closes transition subscriptions earlier. Concurrent cleanup joins the same attempt. A failed final save leaves the underlying Game Session frozen and capable of retry or explicit discard. Installed Game finalization treats that failure as terminal: its renderer authority retains one critical error and rejects successor acquisition rather than retrying. Reset and Editor replacement use discard-only disposal.
 
 The Editor owns a separate revision-pinned `EditorBoardGameResource`. It uses the same gameplay surface without installed-package identity or autosave. Installed and Editor Games never share lifecycle ownership.
 

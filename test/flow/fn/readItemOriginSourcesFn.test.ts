@@ -105,7 +105,12 @@ describe("readItemOriginSourcesFn", () => {
 			"ingot",
 		]);
 		expect(sources[0]).toMatchObject({
-			id: "source:forge:line:line:forge:run",
+			id: JSON.stringify([
+				"source",
+				"forge",
+				"line",
+				"line:forge:run",
+			]),
 			outputs: [
 				expect.objectContaining({
 					requirements: {

@@ -22,6 +22,7 @@ const decodeReferenceFn = (value: string): ProjectVersionReference =>
 			};
 
 interface VersionComparisonProps {
+	readonly currentFingerprint: string | undefined;
 	readonly enabled: boolean;
 	readonly projectId: string;
 	readonly reportErrorFn: (error: unknown) => void;
@@ -40,6 +41,7 @@ interface VersionComparisonOutput {
 
 /** Owns the arbitrary saved-version versus working-copy comparison. */
 export const useVersionComparison = ({
+	currentFingerprint,
 	enabled,
 	projectId,
 	reportErrorFn,
@@ -79,6 +81,7 @@ export const useVersionComparison = ({
 	}, [
 		compareFrom,
 		compareTo,
+		currentFingerprint,
 		enabled,
 		projectId,
 		reportErrorFn,

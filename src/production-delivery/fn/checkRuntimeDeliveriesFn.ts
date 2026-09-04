@@ -119,7 +119,11 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 	for (const current of validClaims) {
 		const target = current.delivery.location;
 		if (target.phase !== "outbound") continue;
-		const key = `${target.target.ownerItemId}:${target.target.lineId}:${current.inputIndex}`;
+		const key = JSON.stringify([
+			target.target.ownerItemId,
+			target.target.lineId,
+			current.inputIndex,
+		]);
 		if (checkedSlots.has(key)) continue;
 		checkedSlots.add(key);
 

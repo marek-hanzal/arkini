@@ -4,6 +4,7 @@ import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import type { z } from "zod";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -12,6 +13,7 @@ import { createFormSchema } from "~/item-authoring/schema/createFormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveFx } from "~/item-authoring/fx/saveFx";
 import { useAppForm } from "~/authoring-form/ui/EditorForm";
+import { useAuthoringFormValidation } from "~/authoring-form/ui/useAuthoringFormValidation";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
@@ -169,11 +171,8 @@ const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
 	return labels.length === 0 ? "Item" : labels.join(" → ");
 };
 
-const readFormValidationMessageFn = (
-	path: ReadonlyArray<PropertyKey>,
-	issue: Parameters<typeof readSharedValidationMessageFn>[0],
-) =>
-	path.at(-1) === "itemId" && issue.code === "too_small"
+const readFormValidationMessageFn = (issue: z.core.$ZodIssue) =>
+	issue.path.at(-1) === "itemId" && issue.code === "too_small"
 		? "Select an item."
 		: readSharedValidationMessageFn(issue);
 
@@ -255,20 +254,12 @@ export const useFormController = ({
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);
-	const validationIssues = useMemo(() => {
-		if (submissionAttempts === 0) return [];
-		const result = schema.safeParse(currentValues);
-		return result.success
-			? []
-			: result.error.issues.map((issue) => ({
-					message: readFormValidationMessageFn(issue.path, issue),
-					path: issue.path,
-				}));
-	}, [
-		currentValues,
+	const validationIssues = useAuthoringFormValidation({
+		readMessageFn: readFormValidationMessageFn,
 		schema,
 		submissionAttempts,
-	]);
+		values: currentValues,
+	});
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (submitting || !dirty) return false;

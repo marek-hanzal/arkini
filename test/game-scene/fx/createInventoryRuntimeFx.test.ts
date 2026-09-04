@@ -8,12 +8,57 @@ import {
 	createGame,
 	inventoryItem,
 	mountScene,
+	moveInventoryItem,
+	readTestInventoryLayout,
 	publishItems,
 	inventorySceneProbe as sceneState,
 } from "./createInventoryRuntimeFx.test/fixture";
 import type { GameTransition } from "./createInventoryRuntimeFx.test/fixture";
 
 describe("Inventory runtime / feedback and hydration", () => {
+	it("keeps Inventory travel running through unrelated committed transitions", async () => {
+		const { actor, runtime } = await mountScene();
+		const initialX = actor.container.x;
+		sceneState.deferFiniteTweens = true;
+		sceneState.finiteTweenProgress = 0.25;
+		const moved = moveInventoryItem(1);
+
+		publishItems([
+			moved,
+		]);
+		const presentedX = actor.container.x;
+		expect(presentedX).toBeGreaterThan(initialX);
+		expect(sceneState.pendingTweenCompletions).toHaveLength(1);
+
+		for (let tick = 0; tick < 4; tick += 1) {
+			publishItems([
+				moved,
+			]);
+		}
+
+		expect(sceneState.pendingTweenCompletions).toHaveLength(1);
+		expect(actor.container.x).toBe(presentedX);
+		sceneState.pendingTweenCompletions[0]?.();
+		expect(actor.container.x).toBe(initialX + readTestInventoryLayout().surface.cellSize);
+		await Effect.runPromise(runtime.closeFx);
+	});
+	it("lands at the latest Inventory slot when retargeting is first sampled on the final frame", async () => {
+		const { actor, runtime } = await mountScene();
+		const initialX = actor.container.x;
+		sceneState.deferFiniteTweens = true;
+		sceneState.finiteTweenProgress = 0.25;
+		publishItems([
+			moveInventoryItem(1),
+		]);
+		publishItems([
+			moveInventoryItem(2),
+		]);
+
+		expect(sceneState.pendingTweenCompletions).toHaveLength(1);
+		sceneState.pendingTweenCompletions[0]?.();
+		expect(actor.container.x).toBe(initialX + readTestInventoryLayout().surface.cellSize * 2);
+		await Effect.runPromise(runtime.closeFx);
+	});
 	it("owns and drains the same running particle effect as the Board scene", async () => {
 		sceneState.items = [
 			{

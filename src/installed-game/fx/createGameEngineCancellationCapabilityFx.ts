@@ -93,6 +93,28 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 							owner.fiber === undefined
 								? Exit.failCause(Cause.interrupt())
 								: yield* Fiber.await(owner.fiber);
+						// Acquisition can fail while discarding a partial Game before a resource
+						// is published. Cancellation must retain that ownership failure.
+						if (
+							Exit.isFailure(fiberExit) &&
+							(Cause.hasDies(fiberExit.cause) ||
+								fiberExit.cause.reasons.some(
+									(reason) =>
+										Cause.isFailReason(reason) &&
+										reason.error instanceof CriticalGameLifecycleError,
+								))
+						) {
+							const failure = readExactCauseFailureFn(fiberExit.cause);
+							return yield* Effect.fail(
+								Option.isSome(failure) &&
+									failure.value instanceof CriticalGameLifecycleError
+									? failure.value
+									: new CriticalGameLifecycleError({
+											operation: "engine-ownership",
+											cause: fiberExit.cause,
+										}),
+							);
+						}
 						const resource =
 							owner.resource ??
 							(Exit.isSuccess(fiberExit) ? fiberExit.value : undefined);

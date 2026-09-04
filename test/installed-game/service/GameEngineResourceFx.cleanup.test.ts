@@ -1,10 +1,42 @@
 import { describe, expect, it, vi } from "vitest";
-import { Cause, Effect, Option } from "effect";
+import { Cause, Deferred, Effect, Option } from "effect";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
+import { acquireGameEngineResourceFx } from "~/installed-game/fx/acquireGameEngineResourceFx";
 
 import { createHarness, makeResource } from "./GameEngineResourceFx.test/fixture";
 
 describe("GameEngineResourceFx / provisional cleanup", () => {
+	it("keeps failed bootstrap cleanup critical when its last lease cancels acquisition", async () => {
+		const cleanupFailure = new Error("interrupted bootstrap cleanup failed");
+		const resource = makeResource({
+			packageId: "package:cancelled",
+			disposeWithoutSaveFx: Effect.fail(cleanupFailure),
+		});
+		const adoptionStarted = Effect.runSync(Deferred.make<void>());
+		const createResourceFx = vi.fn((packageId: string) =>
+			acquireGameEngineResourceFx({
+				packageId,
+				createGameFx: () => Effect.succeed(resource.game),
+				rememberPackageFx: () =>
+					Deferred.succeed(adoptionStarted, undefined).pipe(Effect.andThen(Effect.never)),
+			}),
+		);
+		const harness = createHarness(createResourceFx);
+		const first = harness.startLease("package:cancelled");
+		void first.promise.catch(() => undefined);
+		await Effect.runPromise(Deferred.await(adoptionStarted));
+		await first.close();
+
+		const failure = await harness.current().then(
+			() => undefined,
+			(cause: unknown) => cause,
+		);
+		expect(failure).toBeInstanceOf(CriticalGameLifecycleError);
+		const successor = harness.startLease("package:next");
+		await expect(successor.promise).rejects.toBe(failure);
+		expect(createResourceFx).toHaveBeenCalledOnce();
+		await successor.close();
+	});
 	it("canonicalizes a provisional cleanup defect and blocks every successor", async () => {
 		const cleanupDefect = new Error("provisional cleanup defect");
 		const firstResource = makeResource({

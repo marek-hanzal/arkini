@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { readProjectVersionHistoryFx } from "~/project-version/fx/readProjectVersionHistoryFx";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -56,23 +56,29 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 	const project = useEditorProject();
 	const [error, setErrorFn] = useState<string>();
 	const [history, setHistoryFn] = useState<HistoryState>();
+	const historyRequestRef = useRef(0);
 	const reportErrorFn = useCallback(
 		(cause?: unknown) => setErrorFn(cause === undefined ? undefined : messageFn(cause)),
 		[],
 	);
 	const comparison = useVersionComparison({
+		currentFingerprint: history?.status.currentFingerprint,
 		enabled: history !== undefined,
 		projectId: project.projectId,
 		reportErrorFn,
 	});
 	const loadHistoryFn = useCallback(() => {
+		const request = ++historyRequestRef.current;
 		reportErrorFn();
 		void RendererRuntime.runPromise(readProjectVersionHistoryFx(project.projectId))
 			.then((next) => {
+				if (historyRequestRef.current !== request) return;
 				setHistoryFn(next);
 				comparison.resetToBaseFn(next.status.currentBaseVersionId);
 			})
-			.catch(reportErrorFn);
+			.catch((cause) => {
+				if (historyRequestRef.current === request) reportErrorFn(cause);
+			});
 	}, [
 		comparison.resetToBaseFn,
 		project.projectId,
@@ -81,9 +87,13 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 
 	useEffect(() => {
 		loadHistoryFn();
-		return window.arkini.editor.onProjectChangedFn((projectId) => {
+		const unsubscribeFn = window.arkini.editor.onProjectChangedFn((projectId) => {
 			if (projectId === project.projectId) loadHistoryFn();
 		});
+		return () => {
+			historyRequestRef.current += 1;
+			unsubscribeFn();
+		};
 	}, [
 		loadHistoryFn,
 		project.projectId,

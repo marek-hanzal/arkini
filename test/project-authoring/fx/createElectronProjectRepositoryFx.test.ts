@@ -364,7 +364,9 @@ describe("createElectronProjectRepositoryFx", () => {
 	it("blocks save-resource IPC while a hard project replacement owns writes", async () => {
 		const editor = installEditorApi();
 		const { admission, repository } = createRepository();
-		const releaseFx = Effect.runSync(admission.acquireReplacementFx("checkout-version"));
+		const releaseFx = Effect.runSync(
+			admission.acquireReplacementFx("checkout-version", () => false),
+		);
 		try {
 			const failure = await readTypedFailure(
 				repository.saveResourceFx({

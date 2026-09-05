@@ -41,29 +41,19 @@ const boardState = vi.hoisted(() => ({
 	unregisterInteraction: vi.fn(),
 }));
 
-const tileAtoms = vi.hoisted(() => ({
-	drop: {
-		kind: "drop",
-	},
-	split: {
-		kind: "split",
-	},
-	space: {
-		kind: "space",
-	},
-}));
-
 vi.mock("@effect/atom-react", () => ({
 	useAtom: () => [
 		boardState.enqueueLineState,
 		boardState.enqueueLine,
 	],
-	useAtomSet: (atom: unknown) =>
-		atom === tileAtoms.split
-			? boardState.splitStack
-			: atom === tileAtoms.space
-				? boardState.runSpaceActivation
-				: boardState.runDrop,
+}));
+
+vi.mock("~/tile-interaction/ui/useTileCommands", () => ({
+	useTileCommands: () => ({
+		runDropFn: boardState.runDrop,
+		runSpaceActivationFn: boardState.runSpaceActivation,
+		runSplitFn: boardState.splitStack,
+	}),
 }));
 
 vi.mock("~/game-presentation/ui/useGameEngine", () => ({
@@ -79,18 +69,6 @@ vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 
 vi.mock("~/tile-interaction/atom/TileDefaultLineCommandAtom", () => ({
 	TileDefaultLineCommandAtom: () => ({}),
-}));
-
-vi.mock("~/tile-interaction/atom/runTileDropAtom", () => ({
-	runTileDropAtom: () => tileAtoms.drop,
-}));
-
-vi.mock("~/tile-interaction/atom/runTileSplitAtom", () => ({
-	runTileSplitAtom: () => tileAtoms.split,
-}));
-
-vi.mock("~/tile-interaction/atom/runSpaceActivationAtom", () => ({
-	runSpaceActivationAtom: () => tileAtoms.space,
 }));
 
 vi.mock("~/game-menu/ui/GameMenuProvider", () => ({

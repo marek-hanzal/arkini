@@ -35,9 +35,10 @@ export interface EditorBoardGameResource {
 	readonly syncFx: (project: Project) => Effect.Effect<void, never, never>;
 	/** Synchronizes a committed revision only while its project still owns the route. */
 	readonly publishFx: (project: Project) => Effect.Effect<void, never, never>;
-	/** Replaces the current same-revision session after an explicit scenario selection. */
+	/** Replaces only the exact lifecycle snapshot that originated the scenario read. */
 	readonly replaceFx: (
 		project: Project,
+		expected: EditorBoardGameResource.State,
 		state?: StateSchema.Type,
 	) => Effect.Effect<void, unknown, never>;
 	readonly releaseCurrentFx: Effect.Effect<void, unknown, never>;

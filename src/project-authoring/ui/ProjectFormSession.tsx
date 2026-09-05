@@ -81,15 +81,16 @@ export const ProjectFormSession = ({
 	);
 	const controller = useProjectFormController({
 		onInvalidDestinationFn,
-		onSavedFn: () =>
-			navigateFn({
+		onSavedFn: () => {
+			void navigateFn({
 				to: "/editor/$projectId/project/detail/$sectionId",
 				params: {
 					projectId: project.projectId,
 					sectionId,
 				},
 				replace: true,
-			}),
+			}).catch(() => undefined);
+		},
 	});
 	const discardFn = useCallback(async () => {
 		controller.discardFn();

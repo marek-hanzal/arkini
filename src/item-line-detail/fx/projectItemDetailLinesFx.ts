@@ -8,17 +8,8 @@ import type { ItemDetailLines as EngineItemDetailLines } from "~/item-line-detai
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { projectItemDetailReferenceFx } from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
-import { TypeSchema } from "~/production-condition/schema/TypeSchema";
-import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
-
-type ProjectedLineDisabledCause = Extract<
-	ItemDetailLinesProjection.DisabledReason,
-	{
-		readonly kind: "line-disabled";
-	}
->["cause"];
 
 const projectItemDetailSelectorFn = ({
 	items,
@@ -144,40 +135,6 @@ const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputRollFx")
 		.exhaustive();
 });
 
-const readQueryLocationLabelFn = (query: WhenSchema.Type["query"]) =>
-	match(query)
-		.with(
-			{
-				scope: "board",
-			},
-			({ distance }) => `Board · ${distance}`,
-		)
-		.with(
-			{
-				scope: "inventory",
-			},
-			() => "Inventory",
-		)
-		.with(
-			{
-				scope: "toolbar",
-			},
-			() => "Toolbar",
-		)
-		.with(
-			{
-				scope: "any",
-			},
-			() => "Board, inventory or toolbar",
-		)
-		.with(
-			{
-				scope: "universe",
-			},
-			() => "Anywhere",
-		)
-		.exhaustive();
-
 const readMaxCountMessageAfterTitleFn = ({
 	liveQuantity,
 	maxCount,
@@ -188,86 +145,6 @@ const readMaxCountMessageAfterTitleFn = ({
 	liveQuantity >= maxCount
 		? `limit reached (${liveQuantity}/${maxCount}).`
 		: `would exceed limit (${liveQuantity}/${maxCount} currently).`;
-
-const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(function* ({
-	game,
-	runtime,
-	when,
-}: {
-	readonly game: GameEngine;
-	readonly runtime: RuntimeSchema.Type;
-	readonly when: WhenSchema.Type;
-}) {
-	const selector = projectItemDetailSelectorFn({
-		items: game.config.items,
-		selector: when.query.selector,
-	});
-	const locationLabel = readQueryLocationLabelFn(when.query);
-	const detail = yield* projectItemDetailReferenceFx({
-		game,
-		itemId: when.query.selector.itemId,
-		runtime,
-	});
-	return match(when)
-		.with(
-			{
-				type: TypeSchema.enum.Exists,
-			},
-			() => ({
-				condition: {
-					kind: "exists",
-					locationLabel,
-					selector,
-					...(detail === undefined
-						? {}
-						: {
-								detail,
-							}),
-				} satisfies ItemDetailLinesProjection.DisabledCondition,
-				phrase: selector.label,
-			}),
-		)
-		.with(
-			{
-				type: TypeSchema.enum.Count,
-			},
-			({ count }) => ({
-				condition: {
-					kind: "count",
-					locationLabel,
-					selector,
-					count,
-					...(detail === undefined
-						? {}
-						: {
-								detail,
-							}),
-				} satisfies ItemDetailLinesProjection.DisabledCondition,
-				phrase: `${count} ${selector.label}`,
-			}),
-		)
-		.with(
-			{
-				type: TypeSchema.enum.Range,
-			},
-			({ max, min }) => ({
-				condition: {
-					kind: "range",
-					locationLabel,
-					selector,
-					min,
-					max,
-					...(detail === undefined
-						? {}
-						: {
-								detail,
-							}),
-				} satisfies ItemDetailLinesProjection.DisabledCondition,
-				phrase: `${min}-${max} ${selector.label}`,
-			}),
-		)
-		.exhaustive();
-});
 
 const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(function* ({
 	game,
@@ -394,51 +271,14 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 				},
 			},
 			({ reason }) =>
-				Effect.gen(function* () {
-					let cause: ProjectedLineDisabledCause;
-					if (reason.cause.kind === "static") {
-						cause = reason.cause;
-					} else if (reason.cause.kind === "enable-rule") {
-						const projected = yield* projectDisabledConditionFx({
-							game,
-							runtime,
-							when: reason.cause.when,
-						});
-						cause = {
-							kind: reason.cause.kind,
-							hint: reason.cause.hint,
-							ruleIndex: reason.cause.ruleIndex,
-							whenIndex: reason.cause.whenIndex,
-							condition: projected.condition,
-						};
-					} else {
-						const projected = yield* Effect.all(
-							reason.cause.when.map((when) =>
-								projectDisabledConditionFx({
-									game,
-									runtime,
-									when,
-								}),
-							),
-						);
-						cause = {
-							kind: reason.cause.kind,
-							hint: reason.cause.hint,
-							ruleIndex: reason.cause.ruleIndex,
-							condition: projected.map(({ condition }) => condition),
-						};
-					}
-					const message =
-						cause.kind === "static" ? "This line is currently disabled." : cause.hint;
-					return {
-						kind: "unavailable",
-						reason: {
-							kind: "line-disabled",
-							cause,
-							message,
-						},
-					} as const;
-				}),
+				Effect.succeed({
+					kind: "unavailable",
+					reason: {
+						kind: "line-disabled",
+						hint: reason.hint,
+						message: reason.hint ?? "This line is currently disabled.",
+					},
+				} as const),
 		)
 		.with(
 			{

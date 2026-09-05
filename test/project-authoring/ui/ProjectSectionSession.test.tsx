@@ -79,6 +79,7 @@ const state = vi.hoisted(() => ({
 	unsavedSession: undefined as
 		| {
 				readonly saveFn: () => Promise<boolean>;
+				readonly discardFn: () => void;
 		  }
 		| undefined,
 }));
@@ -191,6 +192,56 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("project section form session", () => {
+	it("locks project editing until the pending snapshot is saved", async () => {
+		state.project = boardSpaceProject;
+		state.section = <ProjectGeneralSection />;
+		state.navigate.mockImplementationOnce(() => new Promise<void>(() => undefined));
+		let completeSave!: () => void;
+		state.saveConfig.mockImplementationOnce(
+			() =>
+				new Promise<void>((resolve) => {
+					completeSave = resolve;
+				}),
+		);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing project title input.");
+		await changeInput(title, "Pending project title");
+		const save = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await act(async () => save?.click());
+		expect(state.saveConfig).toHaveBeenCalledOnce();
+		expect(title.matches(":disabled")).toBe(true);
+		expect(state.navigate).not.toHaveBeenCalled();
+		state.project = {
+			...boardSpaceProject,
+			config: state.saveConfig.mock.calls[0]?.[0].config,
+			revision: boardSpaceProject.revision + 1,
+		};
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			),
+		);
+		await act(async () => completeSave());
+		expect(title.value).toBe("Pending project title");
+		expect(title.matches(":disabled")).toBe(false);
+		expect(state.navigate).toHaveBeenCalledOnce();
+	});
+
 	it("exposes routed page help only for a section that owns guidance", async () => {
 		state.project = boardSpaceProject;
 		state.section = <div />;
@@ -660,4 +711,118 @@ describe("project section form session", () => {
 			},
 		]);
 	});
+
+	it.each([
+		"edited",
+		"blurred",
+	] as const)(
+		"pins %s project values through MCP refresh until discard or successful save",
+		async (interaction) => {
+			let project: Project = {
+				...boardSpaceProject,
+				revision: 1,
+			};
+			state.project = project;
+			state.section = <ProjectGeneralSection />;
+			const container = document.createElement("div");
+			document.body.append(container);
+			const root = createRoot(container);
+			roots.push(root);
+			const renderProject = async () => {
+				await act(async () => root.render(createElement(EditorProjectForm)));
+			};
+			const publishConfig = async (config: Project["config"]) => {
+				project = {
+					...project,
+					revision: project.revision + 1,
+					config,
+				};
+				state.project = project;
+				await renderProject();
+			};
+			await renderProject();
+			await publishConfig({
+				...project.config,
+				meta: {
+					...project.config.meta,
+					title: "First MCP title",
+					board: {
+						width: 30,
+						height: 30,
+					},
+				},
+			});
+			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+			if (title === null) throw new Error("Missing project title input.");
+			expect(title.value).toBe("First MCP title");
+			if (interaction === "edited") await changeInput(title, "Local project title");
+			else
+				await act(async () => {
+					title.focus();
+					title.blur();
+				});
+			await publishConfig({
+				...project.config,
+				meta: {
+					...project.config.meta,
+					board: {
+						width: 31,
+						height: 31,
+					},
+				},
+			});
+			if (interaction === "blurred") {
+				expect(title.value).toBe("First MCP title");
+				await changeInput(title, "Local project title");
+			}
+			state.saveConfig.mockImplementation(async ({ config, expectedRevision }) => {
+				if (expectedRevision !== project.revision) throw new Error("Stale draft");
+				await publishConfig(config);
+			});
+			await act(async () => {
+				await expect(state.unsavedSession?.saveFn()).rejects.toThrow("Stale draft");
+			});
+			expect(state.saveConfig).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 2,
+					config: expect.objectContaining({
+						meta: expect.objectContaining({
+							board: {
+								width: 30,
+								height: 30,
+							},
+						}),
+					}),
+				}),
+			);
+			expect(title.value).toBe("Local project title");
+			await act(async () => state.unsavedSession?.discardFn());
+			await changeInput(title, "Saved project title");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveConfig).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 3,
+					config: expect.objectContaining({
+						meta: expect.objectContaining({
+							board: {
+								width: 31,
+								height: 31,
+							},
+						}),
+					}),
+				}),
+			);
+			await changeInput(title, "Saved again");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveConfig).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 4,
+				}),
+			);
+		},
+	);
 });

@@ -24,8 +24,10 @@ export interface MotionSnapshot {
 }
 
 export interface MotionRuntime {
-	/** Retires spawn cues before canonical deliveries take their actors at the live pose. */
-	readonly handoffSpawnsFx: (actorIds: ReadonlySet<string>) => Effect.Effect<void, never, never>;
+	/** Retires spawn, input, and swap cues before canonical deliveries take their actors at the live pose. */
+	readonly handoffDeliveriesFx: (
+		actorIds: ReadonlySet<string>,
+	) => Effect.Effect<void, never, never>;
 	/** Releases interruptible spawn or swap ownership at its live pose for direct interaction. */
 	readonly beginInteractionHandoffFx: (actorId: string) => Effect.Effect<boolean, never, never>;
 	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void, never, never>;

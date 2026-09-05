@@ -71,7 +71,8 @@ describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 			});
 
 			yield* owner.syncFx(project);
-			yield* owner.replaceFx(project, state);
+			const expected = yield* SubscriptionRef.get(owner.state);
+			yield* owner.replaceFx(project, expected, state);
 
 			expect(events).toEqual([
 				"create-fresh",
@@ -107,8 +108,9 @@ describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 			};
 
 			yield* owner.syncFx(project);
+			const expected = yield* SubscriptionRef.get(owner.state);
 			yield* owner.publishFx(newerProject);
-			const failure = yield* Effect.flip(owner.replaceFx(project, state));
+			const failure = yield* Effect.flip(owner.replaceFx(project, expected, state));
 			expect(failure).toBeInstanceOf(Error);
 			expect((failure as Error).message).toContain("is no longer active");
 
@@ -134,8 +136,9 @@ describe("Board Scenario EditorBoardGameResource.replaceFx", () => {
 			});
 
 			yield* owner.syncFx(project);
+			const expected = yield* SubscriptionRef.get(owner.state);
 			yield* owner.releaseCurrentFx;
-			const failure = yield* Effect.flip(owner.replaceFx(project, state));
+			const failure = yield* Effect.flip(owner.replaceFx(project, expected, state));
 			expect(failure).toBeInstanceOf(Error);
 			expect((failure as Error).message).toContain("is no longer active");
 

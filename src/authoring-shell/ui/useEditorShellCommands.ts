@@ -9,6 +9,7 @@ import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOw
 import { useEditorProjectRefreshController } from "~/authoring-session/ui/useEditorProjectRefreshController";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 
 const waitForEditorProjectWritesCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -47,6 +48,7 @@ export const useEditorShellCommands = ({
 	projectId,
 }: useEditorShellCommands.Props): useEditorShellCommands.Output => {
 	const owner = useEditorUnsavedChangesOwner();
+	const writeAdmission = RendererRuntime.runSync(ProjectWriteAdmission);
 	const router = useRouter();
 	const waitForProjectWritesFn = useAtomSet(waitForEditorProjectWritesCommandAtom, {
 		mode: "promise",
@@ -60,18 +62,20 @@ export const useEditorShellCommands = ({
 	useEffect(() => window.arkini.lifecycle.onCloseFailedFn(() => setExitPendingFn(false)), []);
 
 	const closeFn = async () => {
-		if (exitPending || refresh.pending) return;
+		if (exitPending || refresh.pending || writeAdmission.isNavigationBlockedFn()) return;
 		setExitPendingFn(true);
 		try {
-			if (!(await owner.requestLeaveFn("/main-menu"))) {
-				setExitPendingFn(false);
-				return;
-			}
+			if (!(await owner.requestLeaveFn("/main-menu"))) return;
 			await waitForProjectWritesFn(undefined);
-			await router.navigate({
-				to: "/main-menu",
-			});
+			if (writeAdmission.isNavigationBlockedFn()) return;
+			void router
+				.navigate({
+					to: "/main-menu",
+				})
+				.catch(() => undefined);
 		} catch {
+			// A failed write wait leaves the Editor available for another exit attempt.
+		} finally {
 			setExitPendingFn(false);
 		}
 	};

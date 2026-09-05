@@ -32,7 +32,9 @@ export const useVersionTag = ({
 	useEffect(
 		() => setDraftFn(selected?.tag ?? ""),
 		[
-			selected,
+			projectId,
+			selected?.versionId,
+			selected?.tag,
 		],
 	);
 	const saveFn = useCallback(() => {

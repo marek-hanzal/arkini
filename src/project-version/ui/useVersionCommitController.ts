@@ -1,6 +1,6 @@
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -39,6 +39,13 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 	const [preview, setPreviewFn] = useState<ProjectVersionCommitPreview>();
 	const [subject, setSubjectFn] = useState("");
 	const [tag, setTagFn] = useState("");
+	const mountedRef = useRef(false);
+	useLayoutEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
 
 	const loadPreviewFn = useCallback(() => {
 		let mounted = true;
@@ -83,6 +90,7 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 		preview?.canCommit === true && subject.trim().length > 0 && subject.trim().length <= 120;
 	const commitFn = () => {
 		if (!canCommit || preview === undefined || pending) return;
+		const location = router.state.location;
 		setPendingFn(true);
 		setErrorFn(undefined);
 		void RendererRuntime.runPromise(
@@ -111,6 +119,10 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 			}),
 		)
 			.then(async () => {
+				// The accepted write survives navigation; only its mounted screen may redirect.
+				if (!mountedRef.current) return;
+				setPendingFn(false);
+				if (router.state.location !== location) return;
 				if (
 					returnTo !== undefined &&
 					returnTo.startsWith(`/editor/${encodeURIComponent(project.projectId)}/`)
@@ -126,6 +138,7 @@ export const useVersionCommitController = (): useVersionCommitController.Output 
 				});
 			})
 			.catch((cause) => {
+				if (!mountedRef.current) return;
 				setErrorFn(messageFn(cause));
 				setPendingFn(false);
 			});

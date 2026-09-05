@@ -123,11 +123,12 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 			);
 			const replaceFx: EditorBoardGameResource["replaceFx"] = Effect.fn(
 				"EditorBoardGameResourceFx.replaceFx",
-			)((project, nextState) =>
+			)((project, expected, nextState) =>
 				lifecycle.withPermits(1)(
 					Effect.gen(function* () {
 						const snapshot = yield* SubscriptionRef.get(state);
 						if (
+							snapshot !== expected ||
 							routedProjectId !== project.projectId ||
 							!ownsExactRevisionFn(snapshot, project) ||
 							(current !== undefined && !ownsRevisionFn(current, project))

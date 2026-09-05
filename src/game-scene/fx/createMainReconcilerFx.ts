@@ -268,7 +268,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				runtime: transition.runtime,
 			}),
 		);
-		yield* motion.handoffSpawnsFx(new Set(deliveries.map((delivery) => delivery.item.id)));
+		yield* motion.handoffDeliveriesFx(new Set(deliveries.map((delivery) => delivery.item.id)));
 		yield* delivery.syncFx(deliveries);
 		const deliverySnapshot = yield* delivery.readSnapshotFx;
 		const compiledCues = presentCommittedEffects

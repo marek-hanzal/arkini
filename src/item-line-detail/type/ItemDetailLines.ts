@@ -8,7 +8,6 @@ import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumS
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 
 interface ItemDetailLineChargeCost {
@@ -75,23 +74,7 @@ export namespace ItemDetailLines {
 	export type UnavailableReason =
 		| {
 				readonly kind: "line-disabled";
-				readonly cause:
-					| {
-							readonly kind: "static";
-					  }
-					| {
-							readonly kind: "enable-rule";
-							readonly hint: string;
-							readonly ruleIndex: number;
-							readonly whenIndex: number;
-							readonly when: WhenSchema.Type;
-					  }
-					| {
-							readonly kind: "disable-rule";
-							readonly hint: string;
-							readonly ruleIndex: number;
-							readonly when: readonly WhenSchema.Type[];
-					  };
+				readonly hint: string | undefined;
 		  }
 		| {
 				readonly kind: "owner-stored";

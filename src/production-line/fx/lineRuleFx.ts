@@ -9,7 +9,6 @@ import { whenFx } from "~/production-condition/fx/whenFx";
 
 interface ConditionalRuleResult {
 	readonly active: boolean;
-	readonly failedWhenIndex?: number;
 }
 
 export namespace lineRuleFx {

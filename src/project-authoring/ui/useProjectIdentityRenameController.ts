@@ -1,5 +1,5 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useState } from "react";
@@ -7,20 +7,47 @@ import { useCallback, useState } from "react";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { renameProjectIdentityFx } from "~/project-authoring/fx/renameProjectIdentityFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
+import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import type { Project } from "~/project-authoring/type/Project";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const renameProjectIdentityCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<renameProjectIdentityFx.Props, "projectId">) =>
-				renameProjectIdentityFx({
-					...props,
-					projectId,
-				}).pipe(Effect.provideService(ProjectRepository, repository)),
+	Effect.gen(function* () {
+		const repository = yield* ProjectRepository;
+		const admission = yield* ProjectWriteAdmission;
+		return Atom.family((projectId: string) =>
+			Atom.fn(
+				({
+					isNavigationPendingFn,
+					onRenamedFn,
+					...props
+				}: Omit<renameProjectIdentityFx.Props, "projectId"> & {
+					readonly isNavigationPendingFn: () => boolean;
+					readonly onRenamedFn: (projectId: string) => Promise<void>;
+				}) =>
+					Effect.acquireUseRelease(
+						admission.acquireIdentityRenameFx(isNavigationPendingFn),
+						() =>
+							renameProjectIdentityFx({
+								...props,
+								projectId,
+							}).pipe(
+								Effect.provideService(ProjectRepository, repository),
+								Effect.tap((commit) =>
+									Effect.tryPromise({
+										try: () => onRenamedFn(commit.projectId),
+										catch: (cause) => cause,
+									}),
+								),
+								// A committed namespace must reach its route before another replacement can start.
+								Effect.uninterruptible,
+							),
+						(releaseFx) => releaseFx,
+					),
 			).pipe(Atom.setIdleTTL(0)),
-		),
-	),
+		);
+	}),
 );
 
 export namespace useProjectIdentityRenameController {
@@ -43,6 +70,8 @@ export const useProjectIdentityRenameController = ({
 	project,
 }: useProjectIdentityRenameController.Props): useProjectIdentityRenameController.Output => {
 	const navigateFn = useNavigate();
+	const router = useRouter();
+	const unsavedOwner = useEditorUnsavedChangesOwner();
 	const commandAtom = renameProjectIdentityCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
 	const runRenameFn = useAtomSet(commandAtom, {
@@ -62,19 +91,28 @@ export const useProjectIdentityRenameController = ({
 	const renameFn = useCallback(
 		async (newProjectId: string) => {
 			if (!confirming || result.waiting) return;
+			if (
+				!(await unsavedOwner.requestLeaveFn(
+					`/editor/${encodeURIComponent(newProjectId)}/project/detail/general`,
+				))
+			)
+				return;
 			try {
-				const commit = await runRenameFn({
+				await runRenameFn({
 					config: project.config,
 					expectedRevision: project.revision,
 					newProjectId,
-				});
-				await navigateFn({
-					to: "/editor/$projectId/project/detail/$sectionId",
-					params: {
-						projectId: commit.projectId,
-						sectionId: "general",
-					},
-					replace: true,
+					isNavigationPendingFn: () => router.state.status === "pending",
+					onRenamedFn: (projectId) =>
+						navigateFn({
+							to: "/editor/$projectId/project/detail/$sectionId",
+							params: {
+								projectId,
+								sectionId: "general",
+							},
+							ignoreBlocker: true,
+							replace: true,
+						}),
 				});
 			} catch {
 				// The settled command error remains visible in the confirmation dialog.
@@ -87,6 +125,8 @@ export const useProjectIdentityRenameController = ({
 			project.revision,
 			result.waiting,
 			runRenameFn,
+			router,
+			unsavedOwner,
 		],
 	);
 	return {

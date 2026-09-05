@@ -94,7 +94,7 @@ describe("spawn ownership transfer to delivery", () => {
 				]),
 			);
 			Effect.runSync(
-				runtime.handoffSpawnsFx(
+				runtime.handoffDeliveriesFx(
 					new Set([
 						spawned.item.id,
 					]),

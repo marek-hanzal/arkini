@@ -85,6 +85,7 @@ describe("Inventory input travel", () => {
 
 		Effect.runSync(
 			runInputMotionFx({
+				isCueActiveFn: () => true,
 				actorStore: createActorStore({
 					actors,
 					canonicalItems: createItemMap(owner.item),

@@ -62,6 +62,7 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 		[],
 	);
 	const comparison = useVersionComparison({
+		currentBaseVersionId: history?.status.currentBaseVersionId,
 		currentFingerprint: history?.status.currentFingerprint,
 		enabled: history !== undefined,
 		projectId: project.projectId,
@@ -74,13 +75,11 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 			.then((next) => {
 				if (historyRequestRef.current !== request) return;
 				setHistoryFn(next);
-				comparison.resetToBaseFn(next.status.currentBaseVersionId);
 			})
 			.catch((cause) => {
 				if (historyRequestRef.current === request) reportErrorFn(cause);
 			});
 	}, [
-		comparison.resetToBaseFn,
 		project.projectId,
 		reportErrorFn,
 	]);
@@ -130,9 +129,6 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 		if (version === undefined) return;
 		comparison.compareVersionFn(version);
 	};
-	const selectWorkingCopyFn = () => {
-		comparison.resetToBaseFn(history?.status.currentBaseVersionId);
-	};
 	const restoreVersionFn = (versionId: string) => {
 		const version = history?.versions.find((candidate) => candidate.versionId === versionId);
 		if (version !== undefined) checkout.restoreVersionFn(version);
@@ -175,7 +171,7 @@ export const useVersionHistoryController = (): useVersionHistoryController.Outpu
 		restoreVersionFn,
 		saveTagFn: tag.saveFn,
 		selectVersionFn,
-		selectWorkingCopyFn,
+		selectWorkingCopyFn: comparison.resetToBaseFn,
 		...(selected === undefined
 			? {}
 			: {

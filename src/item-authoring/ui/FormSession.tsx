@@ -67,8 +67,8 @@ export const FormSession = ({
 		enableCapability,
 		initialItem,
 		onInvalidSectionFn,
-		onSavedFn: (saved) =>
-			navigateFn({
+		onSavedFn: (saved) => {
+			void navigateFn({
 				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 				params: {
 					projectId: project.projectId,
@@ -76,7 +76,8 @@ export const FormSession = ({
 					sectionId,
 				},
 				replace: true,
-			}),
+			}).catch(() => undefined);
+		},
 	});
 	const discardFn = useCallback(async () => {
 		controller.discardFn();

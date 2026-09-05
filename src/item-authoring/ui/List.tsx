@@ -11,6 +11,7 @@ import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { ListRow } from "~/item-authoring/ui/ListRow";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
@@ -25,6 +26,7 @@ export const List = ({
 	readonly query: string;
 }) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const items = useMemo(
 		() =>
 			Object.values(project.config?.items ?? {}).sort((left, right) =>
@@ -79,7 +81,7 @@ export const List = ({
 						value={query}
 						containerClassName="min-w-64 flex-1"
 						className="h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
-						placeholder="Search item title, ID or type…"
+						placeholder={`${translator.textFn("Search item title, ID or type…")} (${filteredItems.length})`}
 						onValueChangeFn={onQueryChangeFn}
 					/>
 					{itemType === undefined ? null : (

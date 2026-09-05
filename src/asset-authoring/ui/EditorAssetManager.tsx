@@ -21,6 +21,7 @@ import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorA
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
 	readonly onFilterChangeFn: (filter: useEditorAssetManagerController.Filter) => void;
@@ -230,6 +231,7 @@ const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps
 
 export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const controller = useEditorAssetManagerController({
 		filter: props.filter,
 		query: props.query,
@@ -290,7 +292,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						containerClassName="min-w-64 flex-1"
 						className="h-12 min-h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 						data-ui="EditorAssetSearch"
-						placeholder="Search assets…"
+						placeholder={`${translator.textFn("Search assets…")} (${controller.resources.length})`}
 						onValueChangeFn={props.onQueryChangeFn}
 					/>
 					<SegmentedControl

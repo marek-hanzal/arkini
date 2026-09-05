@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dhe4iu2x5g3h4lvdw8neaha2",
+		"id": "wick",
+		"title": "Wick",
+		"description": "I heard - a candle?",
+		"asset": {
+			"default": [
+				"wick"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 10,
+		"type": "simple"
+	}
+}

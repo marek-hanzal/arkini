@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "qjzlwiulk3mpdsxs52nzpr8n",
+		"id": "honey",
+		"title": "Honey",
+		"description": "So sweet",
+		"asset": {
+			"default": [
+				"honey"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

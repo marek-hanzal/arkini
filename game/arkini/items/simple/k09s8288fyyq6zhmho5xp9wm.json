@@ -7,7 +7,7 @@
 		"description": "Better village management, really.",
 		"asset": {
 			"default": [
-				"townhall"
+				"townhall-t1"
 			]
 		},
 		"scope": "any",

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wh5fvg4la9xioq59jj3tjv96",
+		"id": "sheep",
+		"title": "Sheep",
+		"description": "Shaun the Sheep!",
+		"asset": {
+			"default": [
+				"sheep"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

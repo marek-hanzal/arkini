@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hohe1cgesvcpvak5dh9ewti2",
+		"id": "hide",
+		"title": "Hide",
+		"description": "Raw stuff to make a nice leather",
+		"asset": {
+			"default": [
+				"hide"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"type": "simple"
+	}
+}

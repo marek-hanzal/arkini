@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hdlk91uftu8kz25gohztvaqd",
+		"id": "glass",
+		"title": "Glass",
+		"description": "A bit more complex buildings needs windows. They're quite useful, really.",
+		"asset": {
+			"default": [
+				"glass"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

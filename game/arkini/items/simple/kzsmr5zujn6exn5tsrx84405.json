@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "kzsmr5zujn6exn5tsrx84405",
+		"id": "sapphire",
+		"title": "Sapphire",
+		"description": "You're rich now!",
+		"asset": {
+			"default": [
+				"sapphire"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

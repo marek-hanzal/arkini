@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "s5z9wc6yevl1yzs693yr1z7z",
+		"id": "coin",
+		"title": "Coint",
+		"description": "Everybody wanna be rich.",
+		"asset": {
+			"default": [
+				"coin"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 10,
+		"type": "simple"
+	}
+}

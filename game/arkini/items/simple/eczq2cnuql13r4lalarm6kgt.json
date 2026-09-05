@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "eczq2cnuql13r4lalarm6kgt",
+		"id": "eggs",
+		"title": "Eggs",
+		"description": "Some eggs you may cook.",
+		"asset": {
+			"default": [
+				"eggs"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

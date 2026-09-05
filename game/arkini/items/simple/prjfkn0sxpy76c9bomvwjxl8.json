@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "prjfkn0sxpy76c9bomvwjxl8",
+		"id": "coin-stack",
+		"title": "Coin Stack",
+		"description": "Quite valuable thing, keep an eye on them!",
+		"asset": {
+			"default": [
+				"coin-stack"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

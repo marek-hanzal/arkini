@@ -1,0 +1,59 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "s5a9uulb6fimbylb01npp8du",
+		"id": "cow-farm-blueprint",
+		"title": "Cow Farm Blueprint",
+		"description": "It's time for some boos!",
+		"asset": {
+			"default": [
+				"blueprint",
+				"cow-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "Cow Farm",
+			"title": "Cow Farm",
+			"description": "Wanna cows?",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 30000,
+			"input": [
+				{
+					"type": "simple"
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "cow-farm",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	}
+}

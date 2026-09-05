@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wsxdo9qr3r9cl8s8ay0buttc",
+		"id": "beer-mug",
+		"title": "Beer Bug",
+		"description": "Good cold beer, ach!",
+		"asset": {
+			"default": [
+				"beer-mug"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

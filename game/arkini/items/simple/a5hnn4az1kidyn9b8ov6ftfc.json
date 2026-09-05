@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "a5hnn4az1kidyn9b8ov6ftfc",
+		"id": "milk",
+		"title": "Milk",
+		"description": "Fresh yummi milk",
+		"asset": {
+			"default": [
+				"milk"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

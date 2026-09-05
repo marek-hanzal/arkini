@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ijqc5zx4i743u0fg74qfbj32",
+		"id": "ruby",
+		"title": "Ruby",
+		"description": "This one is quite nice and shiny",
+		"asset": {
+			"default": [
+				"ruby"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

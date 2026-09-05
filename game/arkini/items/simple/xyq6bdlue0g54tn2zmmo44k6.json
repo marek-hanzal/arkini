@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "xyq6bdlue0g54tn2zmmo44k6",
+		"id": "coin-chest",
+		"title": "Coin Chest",
+		"description": "Most valuable thing of coins you can get. Take care of them!",
+		"asset": {
+			"default": [
+				"coin-chest"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

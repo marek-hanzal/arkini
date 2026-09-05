@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "f5o2vqdxqh3zhg05fyd1xf1m",
+		"id": "cow",
+		"title": "Cow",
+		"description": "Booo!",
+		"asset": {
+			"default": [
+				"cow"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

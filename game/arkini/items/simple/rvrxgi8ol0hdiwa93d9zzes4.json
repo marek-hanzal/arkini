@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "rvrxgi8ol0hdiwa93d9zzes4",
+		"id": "cheese",
+		"title": "Cheese",
+		"description": "Cheese you want to chew in!",
+		"asset": {
+			"default": [
+				"cheese"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

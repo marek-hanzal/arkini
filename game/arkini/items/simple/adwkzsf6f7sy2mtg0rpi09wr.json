@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "adwkzsf6f7sy2mtg0rpi09wr",
+		"id": "waste",
+		"title": "Waste",
+		"description": "Not a useful stuff. You should get rid of it.",
+		"asset": {
+			"default": [
+				"waste"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

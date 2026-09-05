@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hqqtqugyyvkvinxwebfelmsg",
+		"id": "diamond",
+		"title": "Diamond",
+		"description": "You're incredibly rich!",
+		"asset": {
+			"default": [
+				"diamond"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

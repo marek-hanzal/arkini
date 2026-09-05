@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "l70n80ujrm55lpl6z2n4hcty",
+		"id": "bio-waste",
+		"title": "Bio-Waste",
+		"description": "Stuff produced by life. From the other side.",
+		"asset": {
+			"default": [
+				"bio-waste"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

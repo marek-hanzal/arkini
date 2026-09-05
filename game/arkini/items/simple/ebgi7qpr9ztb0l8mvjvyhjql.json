@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ebgi7qpr9ztb0l8mvjvyhjql",
+		"id": "wine",
+		"title": "Wine",
+		"description": "Get drunk. Don't tell mom.",
+		"asset": {
+			"default": [
+				"wine"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

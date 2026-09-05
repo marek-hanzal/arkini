@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "zmwriqm945einhxbj2lcwa2h",
+		"id": "hops",
+		"title": "Hops",
+		"description": "Core ingredient for a beer.",
+		"asset": {
+			"default": [
+				"hops"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"type": "simple"
+	}
+}

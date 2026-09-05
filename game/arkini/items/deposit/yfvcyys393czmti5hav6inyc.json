@@ -1,0 +1,73 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "yfvcyys393czmti5hav6inyc",
+		"id": "iron-mine",
+		"title": "Iron Mine",
+		"description": "We need raw ore, dudes",
+		"asset": {
+			"default": [
+				"iron-mine"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 24
+		},
+		"maxQueueSize": 4,
+		"type": "deposit",
+		"lines": [
+			{
+				"id": "iron-ore",
+				"title": "Iron Ore",
+				"description": "Get the ore",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "deposit",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "iron-mine"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "iron-ore",
+											"quantity": {
+												"min": 1,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "auytswhc89z64o4fm0f7swj7",
+		"id": "iron-ore",
+		"title": "Iron Ore",
+		"description": "Metal, let's rock",
+		"asset": {
+			"default": [
+				"iron-ore"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

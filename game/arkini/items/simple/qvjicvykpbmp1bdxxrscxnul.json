@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "qvjicvykpbmp1bdxxrscxnul",
+		"id": "axe",
+		"title": "Axe",
+		"description": "Chop something down?",
+		"asset": {
+			"default": [
+				"axe"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

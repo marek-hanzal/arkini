@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "n39h14x4q171b0ohxfxtab30",
+		"id": "wool",
+		"title": "Wool",
+		"description": "Winter is comming",
+		"asset": {
+			"default": [
+				"wool"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

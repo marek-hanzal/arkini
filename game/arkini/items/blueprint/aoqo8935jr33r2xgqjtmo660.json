@@ -1,0 +1,71 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "aoqo8935jr33r2xgqjtmo660",
+		"id": "vegetable-garden-blueprint",
+		"title": "Vegetable Garden Blueprint",
+		"description": "Good stuff to eat",
+		"asset": {
+			"default": [
+				"blueprint",
+				"vegetable-garden"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "vegetable-garden",
+			"title": "Vegetable Garden",
+			"description": "Build a new vegetable garden",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 30000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "deposit",
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "vegetable-garden-blueprint"
+						},
+						"scope": "board",
+						"distance": "self"
+					}
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "vegetable-garden",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	}
+}

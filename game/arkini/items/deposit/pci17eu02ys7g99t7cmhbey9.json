@@ -1,0 +1,44 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "pci17eu02ys7g99t7cmhbey9",
+		"id": "coal-deposit",
+		"title": "Coal Deposit",
+		"description": "Industrial times starts here",
+		"asset": {
+			"default": [
+				"coal-source"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 32,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "earth-deposit-deplated",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"type": "deposit"
+	}
+}

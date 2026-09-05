@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "i0lolk9ls7gqgyxclbpscfg2",
+		"id": "iron-ingot",
+		"title": "Iron Ingot",
+		"description": "Heavy stuff, heavy machinery",
+		"asset": {
+			"default": [
+				"iron-ingot"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

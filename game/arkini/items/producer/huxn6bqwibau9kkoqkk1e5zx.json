@@ -1,0 +1,68 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "huxn6bqwibau9kkoqkk1e5zx",
+		"id": "dairy",
+		"title": "Dairy",
+		"description": "What is the smell here...? Ah, tasty cheese!",
+		"asset": {
+			"default": [
+				"dairy"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "cheese",
+				"title": "Cheese",
+				"description": "Make a yummi cheese",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 42000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "milk"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cheese",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "lnfhd4ad0alfiudkvp8d3fqz",
+		"id": "treasure-chest",
+		"title": "Treasure Chest",
+		"description": "You're rich now!",
+		"asset": {
+			"default": [
+				"treasure-chest"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

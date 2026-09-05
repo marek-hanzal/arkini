@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "q68zwrmfnp4ld3hey4iph973",
+		"id": "copper-ingot",
+		"title": "Copper Ingot",
+		"description": "Quite shiny piece of metal",
+		"asset": {
+			"default": [
+				"copper-ingot"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

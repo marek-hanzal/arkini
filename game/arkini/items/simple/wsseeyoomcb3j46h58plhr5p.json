@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wsseeyoomcb3j46h58plhr5p",
+		"id": "vegetables",
+		"title": "Vegetables",
+		"description": "Fresh vegetables you want to eat",
+		"asset": {
+			"default": [
+				"vegetable-crate"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

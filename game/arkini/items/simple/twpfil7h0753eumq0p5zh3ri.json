@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "twpfil7h0753eumq0p5zh3ri",
+		"id": "colored-glass",
+		"title": "Colored Glass",
+		"description": "Rainbooow!",
+		"asset": {
+			"default": [
+				"colored-glass"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

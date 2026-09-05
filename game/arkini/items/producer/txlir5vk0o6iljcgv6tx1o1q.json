@@ -1,0 +1,68 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "txlir5vk0o6iljcgv6tx1o1q",
+		"id": "vegetable-garden",
+		"title": "Vegetable Garden",
+		"description": "Grows some vegetables",
+		"asset": {
+			"default": [
+				"vegetable-garden"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "vegetables",
+				"title": "Vegetables",
+				"description": "It's bio. It's yummi bio",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 26000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "vegetables",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "o5gjq3l9rvrand7xcerrcny4",
+		"id": "construction-set-t3",
+		"title": "Construction Set - Tier 3",
+		"description": "Coolest and most complex stuff for constructing stuff",
+		"asset": {
+			"default": [
+				"construction-material-box-t3"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

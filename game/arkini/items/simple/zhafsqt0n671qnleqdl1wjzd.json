@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "zhafsqt0n671qnleqdl1wjzd",
+		"id": "construction-set-t2",
+		"title": "Construction Set - Tier 2",
+		"description": "Quite better construction stuff",
+		"asset": {
+			"default": [
+				"construction-material-box-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

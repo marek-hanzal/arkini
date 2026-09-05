@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ahl16lhzbb05zw0kexi92r12",
+		"id": "copper-ore",
+		"title": "Copper Ore",
+		"description": "It wanna became a Copper Ingot!",
+		"asset": {
+			"default": [
+				"copper-ore"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

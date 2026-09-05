@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import { useGameFx } from "~test/support/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { createOutput } from "~test/game-config-validation/support/gameValidationTestSource";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,
@@ -42,7 +43,7 @@ describe("readItemDetailQueue", () => {
 			permit: true,
 		});
 		const runtime = {
-			...base,
+			...queuedRuntime(base),
 			jobs: [
 				{
 					id: "job:active",
@@ -50,13 +51,6 @@ describe("readItemDetailQueue", () => {
 					lineId: "line:workshop:build",
 					durationMs: 1_000,
 					remainingMs: 600,
-				},
-			],
-			jobQueue: [
-				{
-					id: "job:queued",
-					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -91,12 +85,15 @@ describe("readItemDetailQueue", () => {
 		});
 	});
 
-	it("is available at capacity one and unavailable only for stale or non-line owners", () => {
+	it("keeps an already queued ready head ready at capacity one and rejects unavailable owners", () => {
 		const runtime = lineRunRuntime({
 			permit: true,
+			water: [
+				3,
+			],
 		});
 		const singleSlotRuntime = {
-			...runtime,
+			...queuedRuntime(runtime),
 			items: runtime.items.map((item) =>
 				item.id === "runtime:workshop" && item.item.type === "producer"
 					? {
@@ -119,7 +116,14 @@ describe("readItemDetailQueue", () => {
 			itemId: "runtime:workshop",
 			capacity: 1,
 			active: [],
-			request: [],
+			request: [
+				{
+					requestId: "job:queued",
+					lineId: "line:workshop:build",
+					title: "Build",
+					status: "inputs-ready",
+				},
+			],
 		});
 		expect(
 			readQueue({
@@ -160,34 +164,16 @@ describe("readItemDetailQueue", () => {
 			],
 		});
 
-		const workshop = lineRunTestConfig.items.workshop;
+		const chargedConfig = structuredClone(lineRunTestConfig);
+		const workshop = chargedConfig.items.workshop;
 		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
-		const chargedConfig = GameConfigSchema.parse({
-			...lineRunTestConfig,
-			items: {
-				...lineRunTestConfig.items,
-				workshop: {
-					...workshop,
-					charges: {
-						amount: 1,
-					},
-					lines: workshop.lines.map((line) => ({
-						...line,
-						input: line.input.map((input, index) =>
-							index === 0 && input.type === "materials"
-								? {
-										...input,
-										charges: {
-											cost: 2,
-											from: "self",
-										},
-									}
-								: input,
-						),
-					})),
-				},
-			},
-		});
+		workshop.charges = {
+			amount: 1,
+		};
+		workshop.lines[0].input[0].charges = {
+			cost: 2,
+			from: "self",
+		};
 		const blocked = queuedRuntime({
 			...waiting,
 			items: waiting.items.map((item) =>
@@ -215,5 +201,48 @@ describe("readItemDetailQueue", () => {
 				},
 			],
 		});
+	});
+
+	it("blocks a material-ready head at the output cap without reporting missing inputs", () => {
+		const config = structuredClone(lineRunTestConfig);
+		config.items.permit.maxCount = 1;
+		const workshop = config.items.workshop;
+		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
+		workshop.lines[0].output = createOutput([
+			{
+				itemId: "permit",
+			},
+		]);
+		const base = queuedRuntime(
+			lineRunRuntime({
+				permit: true,
+				water: [
+					3,
+				],
+			}),
+		);
+		const result = readQueue(
+			{
+				itemId: "runtime:workshop",
+				runtime: {
+					...base,
+					items: base.items.map((item) => ({
+						...item,
+						item: config.items[item.item.id],
+					})),
+				},
+			},
+			config,
+		);
+		if (result.kind !== "available") throw new Error("Expected an available queue.");
+		expect(result.request).toEqual([
+			{
+				requestId: "job:queued",
+				lineId: "line:workshop:build",
+				title: "Build",
+				outputItemId: "permit",
+				status: "blocked-condition",
+			},
+		]);
 	});
 });

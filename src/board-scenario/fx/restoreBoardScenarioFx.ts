@@ -1,4 +1,4 @@
-import { Effect, Result } from "effect";
+import { Effect, Result, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { Project } from "~/project-authoring/type/Project";
@@ -7,7 +7,6 @@ import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBo
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
-import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
 
 export namespace restoreBoardScenarioFx {
@@ -21,15 +20,6 @@ export namespace restoreBoardScenarioFx {
 		  };
 }
 
-const replaceGameFx = (project: Project, state?: StateSchema.Type) =>
-	Atom.get(EditorBoardGameResourceOwnerAtom).pipe(
-		Effect.flatMap((owner) =>
-			owner === undefined
-				? Effect.fail(new Error("Editor Board game owner is not configured."))
-				: owner.replaceFx(project, state),
-		),
-	);
-
 const errorMessageFn = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
 /** Strictly validates one persisted scenario before replacing the live editor session. */
@@ -40,6 +30,11 @@ export const restoreBoardScenarioFx = Effect.fn("restoreEditorBoardScenarioFx")(
 	readonly project: Project;
 	readonly name: string;
 }) {
+	const owner = yield* Atom.get(EditorBoardGameResourceOwnerAtom);
+	if (owner === undefined)
+		return yield* Effect.fail(new Error("Editor Board game owner is not configured."));
+	// A routed successor may share the project revision but must not inherit this restore.
+	const expected = yield* SubscriptionRef.get(owner.state);
 	const repository = yield* ProjectRepository;
 	const record = yield* repository.readBoardScenarioFx({
 		projectId: project.projectId,
@@ -72,7 +67,7 @@ export const restoreBoardScenarioFx = Effect.fn("restoreEditorBoardScenarioFx")(
 		}),
 	);
 	if (Result.isSuccess(validated)) {
-		yield* replaceGameFx(project, validated.success);
+		yield* owner.replaceFx(project, expected, validated.success);
 		return {
 			type: "restored",
 		} satisfies restoreBoardScenarioFx.Result;

@@ -55,6 +55,18 @@ export const resolveActionChargeFx = Effect.fn("resolveActionChargeFx")(function
 			ready: false,
 		} satisfies resolveActionChargeFx.Result;
 	}
+	// An idle external payer cannot be removed while its queue owns the identity.
+	// Include earlier input costs; self starts and active payers retain a job through depletion.
+	if (
+		itemId !== ownerItemId &&
+		remainingCharges === reservedCost + charges.cost &&
+		runtime.jobQueue.some((request) => request.ownerItemId === itemId) &&
+		!runtime.jobs.some((job) => job.ownerItemId === itemId)
+	) {
+		return {
+			ready: false,
+		} satisfies resolveActionChargeFx.Result;
+	}
 
 	return {
 		ready: true,

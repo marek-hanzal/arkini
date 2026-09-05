@@ -15,6 +15,7 @@ import { makeJobCompletionRandomFx } from "~/production-job/fx/makeJobCompletion
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const isJobRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
@@ -36,7 +37,11 @@ interface CompleteJobTransitionProps {
 	runtime: RuntimeSchema.Type;
 }
 
-/** Resolves one ready job once and applies line output plus charge depletion lifecycle. */
+/**
+ * Resolves one ready job once and applies line output plus charge depletion lifecycle.
+ * Output conditions share this completion's input snapshot, including earlier Tick
+ * transitions but excluding this completion's partial candidate.
+ */
 export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(function* ({
 	jobId,
 	runtime,
@@ -112,7 +117,11 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 			owner: completionOwner,
 			reservations,
 			runtime: completionRuntime,
-		}),
+		}).pipe(
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(runtime),
+			}),
+		),
 	});
 	return {
 		events: completion.events,

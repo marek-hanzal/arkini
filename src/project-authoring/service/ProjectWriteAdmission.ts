@@ -8,8 +8,13 @@ import type {
 export type ProjectReplacementOperation = "checkout-version" | "refresh-project";
 
 export interface ProjectWriteAdmissionService {
+	readonly isNavigationBlockedFn: () => boolean;
+	readonly acquireIdentityRenameFx: (
+		isNavigationPendingFn: () => boolean,
+	) => Effect.Effect<Effect.Effect<void, never, never>, ProjectRepositoryError, never>;
 	readonly acquireReplacementFx: (
 		operation: ProjectReplacementOperation,
+		isNavigationPendingFn: () => boolean,
 	) => Effect.Effect<Effect.Effect<void, never, never>, ProjectRepositoryError, never>;
 	readonly admitWriteFx: <Value, Error, Requirements>(
 		operation: ProjectRepositoryOperation,
@@ -17,7 +22,7 @@ export interface ProjectWriteAdmissionService {
 	) => Effect.Effect<Value, Error | ProjectRepositoryError, Requirements>;
 }
 
-/** Renderer-lifecycle authority that excludes ordinary writes during project replacement. */
+/** Excludes writes and navigation during replacement, and navigation through an identity rename's terminal route. */
 export class ProjectWriteAdmission extends Context.Service<
 	ProjectWriteAdmission,
 	ProjectWriteAdmissionService

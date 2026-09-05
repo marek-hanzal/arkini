@@ -162,9 +162,8 @@ export const ItemLineStatus = ({
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const disclosedDisabledHint =
 		line.availability.kind === "unavailable" &&
-		line.availability.reason.kind === "line-disabled" &&
-		line.availability.reason.cause.kind !== "static"
-			? line.availability.reason.message
+		line.availability.reason.kind === "line-disabled"
+			? line.availability.reason.hint
 			: undefined;
 	const activeRuleHints =
 		disclosedDisabledHint === undefined

@@ -90,4 +90,68 @@ describe("EditorUnsavedChanges", () => {
 		]);
 		expect(session.saveFn).toHaveBeenCalledOnce();
 	});
+
+	it("settles a discarded validation and never republishes its stale prompt", async () => {
+		const owner = Effect.runSync(createEditorUnsavedChangesOwnerFx());
+		const validated = Effect.runSync(Deferred.make<boolean>());
+		const session = createSession();
+		const unregister = owner.registerFn("asset", {
+			...session,
+			isValidFn: () => Effect.runPromise(Deferred.await(validated)),
+		});
+		const leaving = owner.requestLeaveFn();
+		owner.discardAllFn();
+		unregister();
+		await expect(leaving).resolves.toBe(false);
+		Effect.runSync(Deferred.succeed(validated, true));
+		await new Promise<void>((resolve) => setTimeout(resolve, 0));
+		expect(owner.getSnapshotFn()).toMatchObject({
+			promptOpen: false,
+			hasDirtySession: false,
+		});
+	});
+
+	it.each([
+		true,
+		false,
+	])("ignores a replaced Save finishing with %s while a successor prompts", async (saved) => {
+		const owner = Effect.runSync(createEditorUnsavedChangesOwnerFx());
+		const completion = Effect.runSync(Deferred.make<boolean>());
+		const previous = createSession();
+		previous.saveFn.mockImplementation(() => Effect.runPromise(Deferred.await(completion)));
+		const unregister = owner.registerFn("item", previous);
+		const leaving = owner.requestLeaveFn();
+		await vi.waitFor(() => expect(owner.getSnapshotFn().promptOpen).toBe(true));
+		const saving = owner.decideFn("save");
+		owner.discardAllFn();
+		await expect(leaving).resolves.toBe(false);
+		const successor = createSession();
+		owner.registerFn("item", successor);
+		unregister();
+		const nextLeave = owner.requestLeaveFn();
+		await vi.waitFor(() => expect(owner.getSnapshotFn().promptOpen).toBe(true));
+		Effect.runSync(Deferred.succeed(completion, saved));
+		await saving;
+		expect(owner.getSnapshotFn()).toMatchObject({
+			promptOpen: true,
+			error: undefined,
+			saving: false,
+		});
+		expect(successor.saveFn).not.toHaveBeenCalled();
+		await owner.decideFn("cancel");
+		await expect(nextLeave).resolves.toBe(false);
+	});
+
+	it("cancels a removed session's request without invalidating ordinary refreshes", async () => {
+		const owner = Effect.runSync(createEditorUnsavedChangesOwnerFx());
+		const session = createSession();
+		const unregister = owner.registerFn("item", session);
+		const leaving = owner.requestLeaveFn();
+		owner.refreshFn();
+		owner.registerFn("item", session);
+		expect(owner.requestLeaveFn()).toBe(leaving);
+		unregister();
+		await expect(leaving).resolves.toBe(false);
+		expect(owner.getSnapshotFn().promptOpen).toBe(false);
+	});
 });

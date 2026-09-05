@@ -75,6 +75,7 @@ const runRestore = async ({
 			Effect.provideService(AtomRegistry.AtomRegistry, registry),
 		),
 	);
+	const expected = Effect.runSync(SubscriptionRef.get(owner.state));
 	const deleteBoardScenarioFx = vi.fn(() => Effect.void);
 	const repository: ProjectRepositoryService = {
 		...UnusedEditorProjectRepository,
@@ -113,6 +114,7 @@ const runRestore = async ({
 			result,
 			deleteBoardScenarioFx,
 			restoredProject,
+			expected,
 		};
 	} finally {
 		registry.dispose();
@@ -153,7 +155,7 @@ describe("restoreBoardScenarioFx", () => {
 				state,
 			});
 			const replaceFx = vi.fn<EditorBoardGameResource["replaceFx"]>(() => Effect.void);
-			const { result, deleteBoardScenarioFx, restoredProject } = await runRestore({
+			const { result, deleteBoardScenarioFx, restoredProject, expected } = await runRestore({
 				bytes,
 				replaceFx,
 				...versions,
@@ -163,7 +165,7 @@ describe("restoreBoardScenarioFx", () => {
 			if (Exit.isFailure(result)) throw new Error("Expected same-major scenario restore.");
 			expect(result.value.type).toBe("restored");
 			expect(deleteBoardScenarioFx).not.toHaveBeenCalled();
-			expect(replaceFx).toHaveBeenCalledWith(restoredProject, state);
+			expect(replaceFx).toHaveBeenCalledWith(restoredProject, expected, state);
 		},
 	);
 
@@ -194,13 +196,13 @@ describe("restoreBoardScenarioFx", () => {
 		const replaceFx = vi.fn<EditorBoardGameResource["replaceFx"]>(() =>
 			Effect.fail(new Error("resource URL allocation failed")),
 		);
-		const { result, deleteBoardScenarioFx } = await runRestore({
+		const { result, deleteBoardScenarioFx, expected } = await runRestore({
 			bytes,
 			replaceFx,
 		});
 
 		expect(Exit.isFailure(result)).toBe(true);
 		expect(deleteBoardScenarioFx).not.toHaveBeenCalled();
-		expect(replaceFx).toHaveBeenCalledWith(project, state);
+		expect(replaceFx).toHaveBeenCalledWith(project, expected, state);
 	});
 });

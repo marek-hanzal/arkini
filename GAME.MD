@@ -35,6 +35,8 @@ Only after required material has settled may a later queue pass create the job a
 
 Effect Clock is the production wall-clock source; simulation advances in canonical 100 ms fixed steps. A long elapsed interval equals the same sequence of explicit steps. Session-only observation/remainder state is not persisted, and an attempted complete step is acknowledged once even when advancement fails.
 
+Output conditions for each start, completion, and expiry use that operation's pre-operation Runtime snapshot. Earlier lifecycle results in the same Tick are visible; partial changes within the current operation are not.
+
 Jobs persist only:
 
 ```text
@@ -61,7 +63,7 @@ Removing an authored idle Board owner releases its buffered roots through canoni
 
 An item may author finite `charges.amount` and optional depletion output. Missing live `remainingCharges` means the fresh full amount and remains pure. Input costs charge either the line owner (`self`) or the deterministic Board target of a deposit input (`target`). Queueing pays nothing.
 
-Start reserves charge budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound charge state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes.
+Start reserves charge budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound charge state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers with queued work are skipped when the aggregated cost would fully deplete them. Eligible idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes.
 
 Completion removes the ready job and consumed roots in one candidate, keeps reserved roots live, then applies this order:
 

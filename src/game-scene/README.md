@@ -42,7 +42,7 @@ The concrete module graph remains acyclic. These edge labels describe why the to
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
 
-Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn cue through `MotionRuntime.handoffSpawnsFx`. The actor keeps its live pose; the released producer and remaining cue lanes settle normally. Cancelling the pose writer alone does not release cue ownership.
+Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn/input/swap cues and detached swap legs through `MotionRuntime.handoffDeliveriesFx`. The real actor keeps its live pose; input-only payloads are destroyed, and released producers/receivers and remaining cue lanes settle normally. A superseded swap releases both writers and settles its other grid actor from the live pose. Cancelling the pose writer alone does not release cue ownership.
 
 ## Interaction
 
@@ -50,7 +50,7 @@ Before delivery takes an existing actor's pose, reconciliation retires its activ
 - Inventory left click releases the item; right click opens Item Detail.
 - Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented; there is no ghost, screenshot, duplicate tile, or pointer-frequency React render.
 - The Engine drop preview owns validity and magnetic eligibility. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
-- Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown.
+- Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown. [`useTileCommands`](../tile-interaction/ui/useTileCommands.ts) binds each submission to its exact Game and returns an independent Promise; concurrent callers never share an Atom result.
 
 ## Invariants
 

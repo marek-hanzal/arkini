@@ -1,5 +1,6 @@
 import { Effect, Random } from "effect";
 
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -105,10 +106,15 @@ const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	return yield* makeTemporaryExpiryRandomFx({
 		item,
 		program: Effect.gen(function* () {
+			// Pin this expiry's input, not the outer Tick transaction or removed-item draft.
 			const output = yield* outputFx({
 				origin,
 				output: configuredOutput,
-			});
+			}).pipe(
+				Effect.provideService(RuntimeFx, {
+					read: Effect.succeed(runtime),
+				}),
+			);
 			if (output.drop.length === 0) {
 				return {
 					events: [

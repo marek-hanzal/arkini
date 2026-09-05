@@ -1,14 +1,12 @@
-import { useAtom, useAtomSet } from "@effect/atom-react";
+import { useAtom } from "@effect/atom-react";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
+import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";
 import { TileDefaultLineCommandAtom } from "~/tile-interaction/atom/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
-import { runTileSplitAtom } from "~/tile-interaction/atom/runTileSplitAtom";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
@@ -31,19 +29,11 @@ interface PixiBoardToolbarSurfaceProps {
 
 export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarSurfaceProps) => {
 	const game = useGameEngine();
+	const { runSpaceActivationFn, runDropFn, runSplitFn } = useTileCommands(game);
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const { interaction, textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
-	const runDropFn = useAtomSet(runTileDropAtom(game), {
-		mode: "promise",
-	});
-	const runSplitFn = useAtomSet(runTileSplitAtom(game), {
-		mode: "promise",
-	});
-	const runSpaceActivationFn = useAtomSet(runSpaceActivationAtom(game), {
-		mode: "promise",
-	});
 	const hostRef = useRef<HTMLDivElement>(null);
 	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
 	const runtimeRef = useRef<MainRuntime | null>(null);

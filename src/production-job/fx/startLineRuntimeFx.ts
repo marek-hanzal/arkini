@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { TimeSchema } from "~/game-value/schema/TimeSchema";
@@ -146,6 +148,8 @@ export namespace startLineRuntimeFx {
  * Pure output admission runs before job identity creation or mutation. The job
  * identity is then created before inputs move because consumed and reserved
  * material locations refer to it. Stateful owner stacks are isolated last.
+ * Depletion output conditions use this start's input snapshot, including prior
+ * Tick transitions, rather than the outer transaction or partially applied inputs.
  */
 export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	ownerItemId,
@@ -188,7 +192,11 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		job,
 		plan,
 		runtime: inputTransition.runtime,
-	});
+	}).pipe(
+		Effect.provideService(RuntimeFx, {
+			read: Effect.succeed(runtime),
+		}),
+	);
 	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
 		ownerItemId,
 		runtime: charged.runtime,

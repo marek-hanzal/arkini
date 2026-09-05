@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import type { Project } from "~/project-authoring/type/Project";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
@@ -46,6 +47,7 @@ const state = vi.hoisted(() => ({
 	unsavedSession: undefined as
 		| {
 				readonly saveFn: () => Promise<boolean>;
+				readonly discardFn: () => void;
 		  }
 		| undefined,
 }));
@@ -213,6 +215,43 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it("locks the item draft for the pending save snapshot and unlocks after failure", async () => {
+		let rejectSave!: (cause: Error) => void;
+		state.saveItem.mockImplementationOnce(
+			() =>
+				new Promise((_resolve, reject) => {
+					rejectSave = reject;
+				}),
+		);
+		const { container } = await render(<IdentitySection />);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing title input.");
+		await changeInput(title, "Pending item title");
+		const save = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await act(async () => save?.click());
+		expect(state.saveItem).toHaveBeenCalledOnce();
+		expect(title.matches(":disabled")).toBe(true);
+		expect(state.saveItem.mock.calls[0]?.[0].item.title).toBe("Pending item title");
+		await act(async () => rejectSave(new Error("Save failed")));
+		expect(title.matches(":disabled")).toBe(false);
+		expect(title.value).toBe("Pending item title");
+		expect(state.navigate).not.toHaveBeenCalled();
+		state.navigate.mockImplementationOnce(() => new Promise<void>(() => undefined));
+		await changeInput(title, "Retry item title");
+		await act(async () => save?.click());
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					title: "Retry item title",
+				}),
+			}),
+		);
+		expect(state.navigate).toHaveBeenCalledOnce();
+		expect(title.matches(":disabled")).toBe(false);
+	});
+
 	it("omits the artwork progression preview until a progress asset is selected", async () => {
 		const { container } = await render(<ArtworkSection />);
 
@@ -502,4 +541,95 @@ describe("item section form session", () => {
 		);
 		expect(document.activeElement).toBe(duration);
 	});
+
+	it.each([
+		"edited",
+		"blurred",
+	] as const)(
+		"pins %s item values through MCP refresh and renews the revision after discard and save",
+		async (interaction) => {
+			let project = {
+				...(state.project as Project),
+				revision: 1,
+			};
+			state.project = project;
+			const { container, renderSection } = await render(<IdentitySection />);
+			const publishItem = async (canonical: ItemSchema.Type) => {
+				project = {
+					...project,
+					revision: project.revision + 1,
+					config: {
+						...project.config,
+						items: {
+							[canonical.id]: canonical,
+						},
+					},
+				};
+				state.project = project;
+				state.persisted = canonical;
+				await renderSection(<IdentitySection />);
+			};
+			await publishItem({
+				...item,
+				title: "First MCP title",
+			});
+			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+			if (title === null) throw new Error("Missing item title input.");
+			expect(title.value).toBe("First MCP title");
+			if (interaction === "edited") await changeInput(title, "Local title");
+			else
+				await act(async () => {
+					title.focus();
+					title.blur();
+				});
+			await publishItem({
+				...item,
+				description: "Second MCP description",
+			});
+			if (interaction === "blurred") {
+				expect(title.value).toBe("First MCP title");
+				await changeInput(title, "Local title");
+			}
+			state.saveItem.mockImplementation(async ({ expectedRevision, item: candidate }) => {
+				if (expectedRevision !== project.revision) throw new Error("Stale draft");
+				await publishItem(candidate);
+				return candidate;
+			});
+			await act(async () => {
+				await expect(state.unsavedSession?.saveFn()).rejects.toThrow("Stale draft");
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 2,
+					item: expect.objectContaining({
+						title: "Local title",
+						description: item.description,
+					}),
+				}),
+			);
+			expect(title.value).toBe("Local title");
+			await act(async () => state.unsavedSession?.discardFn());
+			await changeInput(title, "Saved title");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 3,
+					item: expect.objectContaining({
+						description: "Second MCP description",
+					}),
+				}),
+			);
+			await changeInput(title, "Saved again");
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					expectedRevision: 4,
+				}),
+			);
+		},
+	);
 });

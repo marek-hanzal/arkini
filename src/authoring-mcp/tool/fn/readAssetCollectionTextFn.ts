@@ -1,11 +1,16 @@
 import type { Project } from "~/project-authoring/type/Project";
-import { searchEditorAssetsFn } from "~/asset-authoring/fn/searchEditorAssetsFn";
+import { readAssetCollectionFn } from "~/asset-authoring/fn/readAssetCollectionFn";
 import type { AssetCollectionInput } from "../AssetCollectionInputSchema";
 
 /** Filters, pages, and formats one asset_collection response. */
 export const readAssetCollectionTextFn = (project: Project, input: AssetCollectionInput) => {
 	const assets = project.resources;
-	const matches = input.query === undefined ? assets : searchEditorAssetsFn(assets, input.query);
+	const matches = readAssetCollectionFn({
+		config: project.config,
+		filter: input.filter,
+		query: input.query ?? "",
+		resources: assets,
+	});
 	const totalPages = Math.ceil(matches.length / input.limit);
 	const pageAssets = matches.slice((input.page - 1) * input.limit, input.page * input.limit);
 	const hasPreviousPage = input.page > 1;
@@ -16,6 +21,7 @@ export const readAssetCollectionTextFn = (project: Project, input: AssetCollecti
 	return [
 		"Asset collection",
 		`Project assets: ${assets.length}`,
+		`Usage filter: ${input.filter}`,
 		`Asset type filter: ${input.type}`,
 		`Matched assets: ${matches.length}`,
 		`Page: ${input.page}`,

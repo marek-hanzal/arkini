@@ -388,7 +388,7 @@ const createServerFn = (
 		"asset_collection",
 		{
 			description:
-				"List one page of assets by type and the Editor Asset library's fuzzy search. Each result contains only its public type and exact ID.",
+				"List one page of assets with the Editor Asset library's usage filter and fuzzy search. Each result contains only its public type and exact ID.",
 			inputSchema: AssetCollectionInputSchema,
 		},
 		async (input) =>

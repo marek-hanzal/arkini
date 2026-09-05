@@ -105,6 +105,9 @@ describe("editor MCP server", () => {
 			({ name }) => name === "asset_collection",
 		)?.inputSchema;
 		expect(assetCollectionSchema?.properties).toMatchObject({
+			filter: {
+				$ref: "#/$defs/AssetCollectionFilterSchema",
+			},
 			page: expect.any(Object),
 			limit: expect.any(Object),
 			query: expect.any(Object),
@@ -118,6 +121,13 @@ describe("editor MCP server", () => {
 		expect(assetCollectionDefinitions.AssetTypeSchema).toMatchObject({
 			enum: [
 				"image",
+			],
+			type: "string",
+		});
+		expect(assetCollectionDefinitions.AssetCollectionFilterSchema).toMatchObject({
+			enum: [
+				"all",
+				"unused",
 			],
 			type: "string",
 		});

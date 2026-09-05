@@ -2,11 +2,11 @@ import { useMemo } from "react";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { searchEditorAssetsFn } from "~/asset-authoring/fn/searchEditorAssetsFn";
-import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
+import { readAssetCollectionFn } from "~/asset-authoring/fn/readAssetCollectionFn";
+import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
 
 interface UseEditorAssetLibraryProps {
-	readonly filter: "all" | "unused";
+	readonly filter: AssetCollectionFilterSchema.Type;
 	readonly query: string;
 }
 
@@ -22,26 +22,19 @@ export const useEditorAssetLibrary = ({
 	query,
 }: UseEditorAssetLibraryProps): UseEditorAssetLibraryOutput => {
 	const project = useEditorProject();
-	const usages = useEditorResourceUsages();
-	const usedResourceIds = useMemo(
-		() => new Set(usages.map(({ resourceId }) => resourceId)),
-		[
-			usages,
-		],
-	);
 	const resources = useMemo(
 		() =>
-			searchEditorAssetsFn(
-				project.resources.filter(
-					(resource) => filter === "all" || !usedResourceIds.has(resource.id),
-				),
+			readAssetCollectionFn({
+				config: project.config,
+				filter,
 				query,
-			),
+				resources: project.resources,
+			}),
 		[
 			filter,
+			project.config,
 			project.resources,
 			query,
-			usedResourceIds,
 		],
 	);
 

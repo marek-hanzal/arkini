@@ -11,47 +11,44 @@ import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
 const useDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type => {
 	const project = useEditorProject();
-	return useMemo(
-		() => {
-			const draft = createDraftFn({
-				resourceId: project.resources[0]?.id ?? "missing-asset",
-				type,
-				uid,
-			});
-			if (draft.type !== "blueprint") return draft;
-			return {
-				...draft,
-				charges: {
-					amount: 1,
-				},
-				line: {
-					...draft.line,
-					input: [
-						{
-							type: "deposit",
-							charges: {
-								cost: 1,
-								from: "self",
-							},
-							query: {
-								scope: "board",
-								distance: "self",
-								selector: {
-									type: "item",
-									itemId: draft.id,
-								},
-							},
-						},
-					],
-				},
-			} satisfies ItemSchema.Type;
-		},
-		[
-			project.resources,
+	return useMemo(() => {
+		const draft = createDraftFn({
+			resourceId: project.resources[0]?.id ?? "missing-asset",
 			type,
 			uid,
-		],
-	);
+		});
+		if (draft.type !== "blueprint") return draft;
+		return {
+			...draft,
+			charges: {
+				amount: 1,
+			},
+			line: {
+				...draft.line,
+				input: [
+					{
+						type: "deposit",
+						charges: {
+							cost: 1,
+							from: "self",
+						},
+						query: {
+							scope: "board",
+							distance: "self",
+							selector: {
+								type: "item",
+								itemId: draft.id,
+							},
+						},
+					},
+				],
+			},
+		} satisfies ItemSchema.Type;
+	}, [
+		project.resources,
+		type,
+		uid,
+	]);
 };
 
 interface FormProps extends PropsWithChildren {

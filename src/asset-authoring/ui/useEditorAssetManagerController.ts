@@ -10,10 +10,11 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
 import type { Project } from "~/project-authoring/type/Project";
+import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
 
 export namespace useEditorAssetManagerController {
 	export type CatalogState = "empty" | "no-matches" | "unused-empty";
-	export type Filter = "all" | "unused";
+	export type Filter = AssetCollectionFilterSchema.Type;
 
 	export interface Props {
 		readonly filter: Filter;

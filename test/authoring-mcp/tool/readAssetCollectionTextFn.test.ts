@@ -5,8 +5,16 @@ import { createGraphProject } from "./support/createToolProject";
 
 describe("readAssetCollectionTextFn", () => {
 	it("shares the Editor Asset fuzzy query and preserves the collection page boundary", () => {
+		const baseProject = createGraphProject();
 		const project = {
-			...createGraphProject(),
+			...baseProject,
+			config: {
+				...baseProject.config,
+				resources: {
+					...baseProject.config.resources,
+					hero: "hero",
+				},
+			},
 			resources: [
 				{
 					bytes: new Uint8Array(),
@@ -21,14 +29,22 @@ describe("readAssetCollectionTextFn", () => {
 			],
 		};
 		const fuzzyMatch = readAssetCollectionTextFn(project, {
+			filter: "all",
 			page: 1,
 			limit: 25,
 			query: "frge",
 			type: "image",
 		});
 		const lastPage = readAssetCollectionTextFn(project, {
+			filter: "all",
 			page: 2,
 			limit: 1,
+			type: "image",
+		});
+		const unused = readAssetCollectionTextFn(project, {
+			filter: "unused",
+			page: 1,
+			limit: 25,
 			type: "image",
 		});
 
@@ -39,5 +55,8 @@ describe("readAssetCollectionTextFn", () => {
 		expect(lastPage).toContain("- Type: image\n  ID: forge-image");
 		expect(lastPage).not.toContain("bytes");
 		expect(lastPage).not.toContain("image/png");
+		expect(unused).toContain("Usage filter: unused");
+		expect(unused).toContain("- Type: image\n  ID: forge-image");
+		expect(unused).not.toContain("- Type: image\n  ID: hero");
 	});
 });

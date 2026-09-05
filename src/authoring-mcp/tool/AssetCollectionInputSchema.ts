@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
+
 const AssetTypeSchema = z
 	.enum([
 		"image",
@@ -11,6 +13,9 @@ const AssetTypeSchema = z
 
 export const AssetCollectionInputSchema = z
 	.object({
+		filter: AssetCollectionFilterSchema.default("all").describe(
+			"The Editor Asset library usage filter; defaults to all assets.",
+		),
 		page: z.number().int().min(1).default(1).describe("One-based page number."),
 		limit: z
 			.number()
@@ -26,7 +31,7 @@ export const AssetCollectionInputSchema = z
 	.meta({
 		$id: "urn:arkini:schema:mcp:asset-collection-input",
 		title: "Asset collection tool input",
-		description: "Pagination, type filtering, and search for the asset collection tool.",
+		description: "Pagination, usage filtering, type filtering, and search for assets.",
 	});
 
 export type AssetCollectionInput = z.output<typeof AssetCollectionInputSchema>;

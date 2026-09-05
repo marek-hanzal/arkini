@@ -24,7 +24,7 @@ export interface MotionSnapshot {
 }
 
 export interface MotionRuntime {
-	/** Retires spawn and input cues before canonical deliveries take their actors at the live pose. */
+	/** Retires spawn, input, and swap cues before canonical deliveries take their actors at the live pose. */
 	readonly handoffDeliveriesFx: (
 		actorIds: ReadonlySet<string>,
 	) => Effect.Effect<void, never, never>;

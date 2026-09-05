@@ -36,7 +36,7 @@ Important invariants:
 
 - Every write resolves live facts, plans from one pinned snapshot, validates the complete candidate, then publishes once.
 - Runtime and events become visible in the same `CommittedTransition`; events are never a second store.
-- Nested `RuntimeFx` reads inside a write see the pinned pre-transition snapshot passed to the update; they never observe a partially built candidate.
+- Nested `RuntimeFx` reads inside a write default to the pinned pre-transition snapshot passed to the update. Explicit-snapshot operations scope nested reads to their own immutable input, so successive Tick lifecycle operations see earlier results without exposing their partially built candidates.
 - Failure, interruption and an unchanged event-free result publish nothing.
 
 ## Neighboring owners

@@ -637,24 +637,39 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			actorIds: ReadonlySet<string>,
 		) {
 			if (closed) return;
+			let releasedDetachedLeg = false;
+			for (const actorId of actorIds) {
+				const detached = detachedSwapLegByActorId.get(actorId);
+				if (detached === undefined) continue;
+				detachedSwapLegByActorId.delete(actorId);
+				cueLifecycleByKey.get(detached.cueKey)?.activeSwapLegActorIds.delete(actorId);
+				releaseDetachedCueLifecycleIfSettledFn(detached.cueKey);
+				yield* animator.cancelFx(detached.ownerKey);
+				releasedDetachedLeg = true;
+			}
 			const superseded = readCuesFn().filter(
 				(cue) =>
 					(cue.kind === "spawn" && actorIds.has(cue.actorId)) ||
-					(cue.kind === "input" && actorIds.has(cue.sourceActorId)),
+					(cue.kind === "input" && actorIds.has(cue.sourceActorId)) ||
+					(cue.kind === "swap" &&
+						(actorIds.has(cue.actorId) || actorIds.has(cue.counterpartActorId))),
 			);
-			if (superseded.length === 0) return;
+			if (superseded.length === 0 && !releasedDetachedLeg) return;
 			const keys = new Set(superseded.map(readCueKeyFn));
 			const releasedActorIds = new Set<string>();
+			const releasedSwapActorIds = new Set<string>();
 			for (const cue of superseded) {
 				const key = readCueKeyFn(cue);
 				const lifecycle = cueLifecycleByKey.get(key);
 				const started = lifecycle?.started === true;
 				// Retire before cancellation: callbacks must not settle or restart this cue.
 				cueLifecycleByKey.delete(key);
-				if (cue.kind === "input") {
-					yield* animator.cancelFx(`motion:${key}:consume`);
+				for (const animationKey of readMotionAnimationKeysFn({
+					cue,
+					cueKey: key,
+				})) {
+					yield* animator.cancelFx(animationKey);
 				}
-				yield* animator.cancelFx(`motion:${key}`);
 				if (cue.kind === "input" && started) {
 					const payload = lifecycle?.payloadActor ?? null;
 					const actor = payload ?? actorStore.actors.get(cue.sourceActorId);
@@ -691,7 +706,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 						});
 				}
 				for (const actorId of readTileMotionActorClaimsFn(cue)) {
-					if (!actorIds.has(actorId)) releasedActorIds.add(actorId);
+					if (actorIds.has(actorId)) continue;
+					releasedActorIds.add(actorId);
+					if (cue.kind === "swap") releasedSwapActorIds.add(actorId);
 				}
 			}
 			motionLanes = {
@@ -717,6 +734,11 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				surface,
 				textures,
 			});
+			// Both swap writers were retired; its remaining grid actor settles from its live pose.
+			const stillClaimedActorIds = readRetainedActorIdsFn();
+			for (const actorId of releasedSwapActorIds) {
+				if (!stillClaimedActorIds.has(actorId)) yield* settleReleasedActorFx(actorId);
+			}
 			// Reconciliation finishes the delivery takeover before startFx starts successors.
 		}),
 		beginInteractionHandoffFx: Effect.fn("MotionRuntime.beginInteractionHandoffFx")((actorId) =>

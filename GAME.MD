@@ -35,6 +35,8 @@ Only after required material has settled may a later queue pass create the job a
 
 Effect Clock is the production wall-clock source; simulation advances in canonical 100 ms fixed steps. A long elapsed interval equals the same sequence of explicit steps. Session-only observation/remainder state is not persisted, and an attempted complete step is acknowledged once even when advancement fails.
 
+Output conditions for each start, completion, and expiry use that operation's pre-operation Runtime snapshot. Earlier lifecycle results in the same Tick are visible; partial changes within the current operation are not.
+
 Jobs persist only:
 
 ```text

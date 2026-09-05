@@ -13,7 +13,30 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"charges": {
-			"amount": 32
+			"amount": 32,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-mine",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
 		},
 		"maxQueueSize": 1,
 		"type": "deposit",

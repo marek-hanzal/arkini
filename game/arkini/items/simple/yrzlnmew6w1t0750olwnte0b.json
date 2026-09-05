@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "yrzlnmew6w1t0750olwnte0b",
+		"id": "fruits",
+		"title": "Fruits",
+		"description": "Yammy",
+		"asset": {
+			"default": [
+				"fruit-crate"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

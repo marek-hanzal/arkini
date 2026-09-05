@@ -22,6 +22,7 @@ const decodeReferenceFn = (value: string): ProjectVersionReference =>
 			};
 
 interface VersionComparisonProps {
+	readonly currentBaseVersionId: string | undefined;
 	readonly currentFingerprint: string | undefined;
 	readonly enabled: boolean;
 	readonly projectId: string;
@@ -34,20 +35,22 @@ interface VersionComparisonOutput {
 	readonly compareVersionFn: (version: ProjectVersionDescriptor) => void;
 	readonly diff?: ProjectVersionDiff;
 	readonly pending: boolean;
-	readonly resetToBaseFn: (versionId?: string) => void;
+	readonly resetToBaseFn: () => void;
 	readonly setCompareFromFn: (value: string) => void;
 	readonly setCompareToFn: (value: string) => void;
 }
 
 /** Owns the arbitrary saved-version versus working-copy comparison. */
 export const useVersionComparison = ({
+	currentBaseVersionId,
 	currentFingerprint,
 	enabled,
 	projectId,
 	reportErrorFn,
 }: VersionComparisonProps): VersionComparisonOutput => {
-	const [compareFrom, setCompareFromFn] = useState("current");
+	const [compareFromOverride, setCompareFromFn] = useState<string>();
 	const [compareTo, setCompareToFn] = useState("current");
+	const compareFrom = compareFromOverride ?? currentBaseVersionId ?? "current";
 	const [diff, setDiffFn] = useState<ProjectVersionDiff>();
 	const [pending, setPendingFn] = useState(false);
 
@@ -91,8 +94,8 @@ export const useVersionComparison = ({
 		setCompareFromFn(version.parentVersionId ?? version.versionId);
 		setCompareToFn(version.versionId);
 	}, []);
-	const resetToBaseFn = useCallback((versionId?: string) => {
-		setCompareFromFn(versionId ?? "current");
+	const resetToBaseFn = useCallback(() => {
+		setCompareFromFn(undefined);
 		setCompareToFn("current");
 	}, []);
 

@@ -81,6 +81,8 @@ Project Write Admission rejects checkout while an already accepted route transit
 
 - `versions/head.json` is the only publication point for Version visibility.
 - Current project tree is canonical authoring state; Version objects are immutable history, not a second live store.
+- History refresh preserves explicit comparison references and an unchanged selected Version's tag draft; working-copy comparison follows the current HEAD until the user overrides its base.
+- An accepted Version commit survives leaving its screen. Its completion may navigate only while that screen remains mounted at the originating router location.
 - Checkout uses the same recoverable current-tree transaction as ordinary project replacement.
 - Fingerprints cover the complete logical versioned set, including scenario identity; metadata-only edits do not invent content changes.
 - Editor Build and CLI pack require the saved current tree to match the published HEAD exactly; validation may still inspect an uncommitted tree.

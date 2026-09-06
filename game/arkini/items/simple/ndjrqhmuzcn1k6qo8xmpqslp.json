@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ndjrqhmuzcn1k6qo8xmpqslp",
+		"id": "beeswax",
+		"title": "Beeswax",
+		"description": "Candles are created using this",
+		"asset": {
+			"default": [
+				"beeswax"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

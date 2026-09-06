@@ -1,0 +1,44 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wh01db4tsschuz3nf4xfr0pi",
+		"id": "beer-barrel",
+		"title": "Beer Barrel",
+		"description": "Beer source",
+		"asset": {
+			"default": [
+				"beer-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 24,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-beer-barrel",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"type": "deposit"
+	}
+}

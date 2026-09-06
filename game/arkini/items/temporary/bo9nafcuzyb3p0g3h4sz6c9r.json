@@ -13,7 +13,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"type": "temporary",
-		"durationMs": 10000,
+		"durationMs": 120000,
 		"output": {
 			"set": [
 				{

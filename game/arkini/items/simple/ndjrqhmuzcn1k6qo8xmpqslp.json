@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 6,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cauldron"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cauldron-with-beeswax"
+			}
+		],
 		"type": "simple"
 	}
 }

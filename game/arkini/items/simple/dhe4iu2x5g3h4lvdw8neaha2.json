@@ -12,6 +12,40 @@
 		},
 		"scope": "any",
 		"maxStackSize": 10,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cauldron-with-boiling-beeswax"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "unlit-candle",
+											"quantity": {
+												"min": 2,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "empty-cauldron"
+			}
+		],
 		"type": "simple"
 	}
 }

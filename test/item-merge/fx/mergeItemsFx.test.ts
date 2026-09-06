@@ -98,6 +98,15 @@ const depositRule = {
 	effect: "keep",
 } satisfies MergeSchema.Type;
 
+const targetDepositRule = {
+	target: {
+		type: "item",
+		itemId: "target",
+	},
+	action: "consume",
+	effect: "deposit",
+} satisfies MergeSchema.Type;
+
 const combinations: ReadonlyArray<{
 	action: SourceActionSchema.Type;
 	effect: TargetEffectSchema.Type;
@@ -338,6 +347,111 @@ describe("mergeItemsFx", () => {
 			},
 		]);
 		expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
+	});
+
+	it("spends one real charge from a Deposit merge target", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: targetDepositRule,
+						targetCharges: {
+							amount: 2,
+						},
+					}),
+					state: makeState(),
+				}),
+			),
+		);
+
+		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
+			quantity: 1,
+			remainingCharges: 1,
+		});
+		expect(result.transition.events).toEqual([
+			result.event,
+			{
+				type: GameEventEnumSchema.enum.ItemChargeSpent,
+				itemId: "runtime:target",
+				canonicalItemId: "target",
+				location: result.before.items.find((item) => item.id === "runtime:target")
+					?.location,
+				previousCharges: 2,
+				resultingCharges: 1,
+			},
+		]);
+	});
+
+	it("runs the standard depletion output after the last deposited target charge", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: targetDepositRule,
+						targetCharges: {
+							amount: 1,
+							output: guaranteedMergeOutput(),
+						},
+					}),
+					state: makeState(),
+				}),
+			),
+		);
+		const output = result.after.items.find((item) => item.item.id === "output");
+		if (output === undefined) throw new Error("Expected target depletion output.");
+
+		expect(result.transition.events).toEqual([
+			result.event,
+			{
+				type: GameEventEnumSchema.enum.ItemDepleted,
+				itemId: "runtime:target",
+				canonicalItemId: "target",
+				location: result.before.items.find((item) => item.id === "runtime:target")
+					?.location,
+				previousQuantity: 1,
+				resultingQuantity: 0,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: output.id,
+				canonicalItemId: "output",
+				originItemId: "runtime:target",
+				location: output.location,
+				quantity: 1,
+			},
+		]);
+		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
+	});
+
+	it("rejects a Deposit target without Charges without changing runtime", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.result(runMergeFx());
+				return {
+					after: yield* readRuntimeFx(),
+					attempt,
+					before,
+				};
+			}).pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: targetDepositRule,
+					}),
+					state: makeState(),
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
+				_tag: "ItemChargesUnavailableError",
+				itemId: "runtime:target",
+				remainingCharges: 0,
+			});
+		}
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("uses the first source-owned matching rule and never synthesizes the reverse direction", () => {

@@ -122,6 +122,7 @@ export const readTileActorFeedbackCuesFn = (
 									SourceActionSchema.enum.Deposit,
 								),
 								effect: P.union(
+									TargetEffectSchema.enum.Deposit,
 									TargetEffectSchema.enum.Keep,
 									TargetEffectSchema.enum.Remove,
 								),

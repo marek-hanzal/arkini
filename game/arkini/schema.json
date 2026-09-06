@@ -1102,6 +1102,9 @@
 		"MergeSchema": {
 			"oneOf": [
 				{
+					"$ref": "urn:arkini:schema:project#/$defs/merge.DepositSchema"
+				},
+				{
 					"$ref": "urn:arkini:schema:project#/$defs/merge.KeepSchema"
 				},
 				{
@@ -1112,6 +1115,46 @@
 				}
 			],
 			"description": "A discriminated target-specific directional item merge."
+		},
+		"merge.DepositSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:arkini:schema:project#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:arkini:schema:project#/$defs/merge.SourceActionSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"deposit"
+					],
+					"description": "Identifies this merge as one that spends a charge from its selected target."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that spends one charge from its selected receiving item."
+		},
+		"merge.SourceActionSchema": {
+			"type": "string",
+			"enum": [
+				"use",
+				"consume",
+				"deposit"
+			],
+			"description": "The action applied to a source item after it initiates a merge."
 		},
 		"merge.KeepSchema": {
 			"type": "object",
@@ -1143,15 +1186,6 @@
 			],
 			"additionalProperties": false,
 			"description": "A merge that leaves its selected receiving item unchanged."
-		},
-		"merge.SourceActionSchema": {
-			"type": "string",
-			"enum": [
-				"use",
-				"consume",
-				"deposit"
-			],
-			"description": "The action applied to a source item after it initiates a merge."
 		},
 		"merge.RemoveSchema": {
 			"type": "object",

@@ -4,6 +4,7 @@ import { z } from "zod";
 export const InvalidMergeReasonEnumSchema = z
 	.enum({
 		SourceChargesDisabled: "source-charges-disabled",
+		TargetChargesDisabled: "target-charges-disabled",
 		TargetUnavailable: "target-unavailable",
 		ResultUnavailable: "result-unavailable",
 		SelfTargetUnavailable: "self-target-unavailable",

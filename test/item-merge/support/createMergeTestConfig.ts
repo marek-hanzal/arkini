@@ -55,6 +55,7 @@ export const createMergeTestConfig = ({
 	sourceMaxStackSize = 10,
 	sourceScope = "any",
 	targetMaxStackSize = 10,
+	targetCharges,
 }: {
 	board?: {
 		width: number;
@@ -77,6 +78,7 @@ export const createMergeTestConfig = ({
 	sourceMaxStackSize?: number;
 	sourceScope?: "any" | "board" | "inventory";
 	targetMaxStackSize?: number;
+	targetCharges?: ChargeSchema.Type;
 }) =>
 	GameConfigSchema.parse({
 		resources: {
@@ -108,6 +110,7 @@ export const createMergeTestConfig = ({
 				scope: sourceScope,
 			}),
 			target: simpleItem({
+				charges: targetCharges,
 				id: "target",
 				maxStackSize: targetMaxStackSize,
 			}),

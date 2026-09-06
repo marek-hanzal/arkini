@@ -20,7 +20,7 @@ const readOwnerItemIdFn = (route: AcquisitionRoute) => {
 		case "merge-output":
 			return route.metadata.sourceItemId;
 		case "merge-charge-depletion":
-			return route.metadata.sourceItemId;
+			return route.metadata.chargedItemId;
 		case "temporary-expiry":
 			return route.metadata.itemId;
 	}

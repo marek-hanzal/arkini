@@ -10,18 +10,23 @@ import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { MergeField } from "~/item-authoring/ui/MergeField";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const MergeFields = ({
+	currentItemUid,
 	initialSelectedIndex,
 	invalidMergeIndex,
 	onChangeFn,
 	sourceChargesEnabled,
+	targetItems,
 	value,
 }: {
+	readonly currentItemUid: string;
 	readonly initialSelectedIndex: number;
 	readonly invalidMergeIndex?: number;
 	readonly onChangeFn: (value: MergeSchema.Type[] | undefined) => void;
 	readonly sourceChargesEnabled: boolean;
+	readonly targetItems: GameConfigSchema.Type["items"];
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
@@ -84,6 +89,12 @@ const MergeFields = ({
 								merge={merges[index]}
 								onChangeFn={(merge) => updateFn(index, merge)}
 								sourceChargesEnabled={sourceChargesEnabled}
+								targetChargesEnabled={
+									targetItems[merges[index].target.itemId]?.uid === currentItemUid
+										? sourceChargesEnabled
+										: targetItems[merges[index].target.itemId]?.charges !==
+											undefined
+								}
 							/>
 						)}
 					</EditorCollectionSelector>
@@ -94,7 +105,7 @@ const MergeFields = ({
 };
 
 export const MergesSection = () => {
-	const { form, mergeIndex, validationIssues } = useFormSession();
+	const { canonicalItem, form, mergeIndex, project, validationIssues } = useFormSession();
 	const sourceChargesEnabled = useStore(
 		form.store,
 		(state) => state.values.charges !== undefined,
@@ -106,9 +117,11 @@ export const MergesSection = () => {
 		<form.Subscribe selector={(state) => state.values.merge}>
 			{(merge) => (
 				<MergeFields
+					currentItemUid={canonicalItem.uid}
 					initialSelectedIndex={mergeIndex ?? 0}
 					invalidMergeIndex={invalidMergeIndex}
 					sourceChargesEnabled={sourceChargesEnabled}
+					targetItems={project.config.items}
 					value={merge}
 					onChangeFn={(next) => form.setFieldValue("merge", next)}
 				/>

@@ -51,6 +51,19 @@ const RemoveSchema = z
 		description: "A merge that removes its selected receiving item.",
 	});
 
+const DepositSchema = z
+	.object({
+		...BaseSchema.shape,
+		effect: TargetEffectSchema.extract([
+			"Deposit",
+		]).describe("Identifies this merge as one that spends a charge from its selected target."),
+	})
+	.strict()
+	.meta({
+		id: "merge.DepositSchema",
+		description: "A merge that spends one charge from its selected receiving item.",
+	});
+
 const ReplaceSchema = z
 	.object({
 		...BaseSchema.shape,
@@ -74,6 +87,7 @@ const ReplaceSchema = z
  */
 export const MergeSchema = z
 	.discriminatedUnion("effect", [
+		DepositSchema,
 		KeepSchema,
 		RemoveSchema,
 		ReplaceSchema,

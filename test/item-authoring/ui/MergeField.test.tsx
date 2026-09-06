@@ -62,24 +62,68 @@ describe("MergeField", () => {
 						merge={merge}
 						onChangeFn={onChangeFn}
 						sourceChargesEnabled={sourceChargesEnabled}
+						targetChargesEnabled={false}
 					/>,
 				);
 			});
 		};
 
 		await renderField(false);
-		let deposit = container.querySelector<HTMLButtonElement>('button[data-ui-value="deposit"]');
+		let deposit = container.querySelectorAll<HTMLButtonElement>(
+			'button[data-ui-value="deposit"]',
+		)[0];
 		if (deposit === null) throw new Error("Expected Deposit source action.");
 		expect(deposit.disabled).toBe(true);
 
 		await renderField(true);
-		deposit = container.querySelector<HTMLButtonElement>('button[data-ui-value="deposit"]');
+		deposit = container.querySelectorAll<HTMLButtonElement>(
+			'button[data-ui-value="deposit"]',
+		)[0];
 		if (deposit === null) throw new Error("Expected Deposit source action.");
 		expect(deposit.disabled).toBe(false);
 		await act(async () => deposit.click());
 		expect(onChangeFn).toHaveBeenCalledWith({
 			...merge,
 			action: "deposit",
+		});
+	});
+
+	it("enables Deposit only when the selected target item has Charges", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const onChangeFn = vi.fn();
+		const renderField = async (targetChargesEnabled: boolean) => {
+			await act(async () => {
+				root.render(
+					<MergeField
+						merge={merge}
+						onChangeFn={onChangeFn}
+						sourceChargesEnabled={false}
+						targetChargesEnabled={targetChargesEnabled}
+					/>,
+				);
+			});
+		};
+
+		await renderField(false);
+		let deposit = container.querySelectorAll<HTMLButtonElement>(
+			'button[data-ui-value="deposit"]',
+		)[1];
+		if (deposit === undefined) throw new Error("Expected Deposit target effect.");
+		expect(deposit.disabled).toBe(true);
+
+		await renderField(true);
+		deposit = container.querySelectorAll<HTMLButtonElement>(
+			'button[data-ui-value="deposit"]',
+		)[1];
+		if (deposit === undefined) throw new Error("Expected Deposit target effect.");
+		expect(deposit.disabled).toBe(false);
+		await act(async () => deposit.click());
+		expect(onChangeFn).toHaveBeenCalledWith({
+			...merge,
+			effect: "deposit",
 		});
 	});
 });

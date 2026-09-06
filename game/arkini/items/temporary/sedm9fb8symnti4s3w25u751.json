@@ -12,6 +12,17 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-lantern"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "lantern"
+			}
+		],
 		"type": "temporary",
 		"durationMs": 300000
 	}

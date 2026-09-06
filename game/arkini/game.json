@@ -60,6 +60,13 @@
 				"space": 0,
 				"itemId": "forest",
 				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 4,
+				"space": 0,
+				"itemId": "foundation-chest",
+				"quantity": 1
 			}
 		],
 		"inventory": [],

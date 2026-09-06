@@ -39,6 +39,21 @@
 						"max": 1
 					},
 					"capacity": 0
+				},
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "deposit",
+					"query": {
+						"selector": {
+							"type": "item",
+							"itemId": "townhall-t1-blueprint"
+						},
+						"scope": "board",
+						"distance": "self"
+					}
 				}
 			],
 			"output": {

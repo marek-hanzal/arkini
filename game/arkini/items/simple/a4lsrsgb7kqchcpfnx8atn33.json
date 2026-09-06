@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "a4lsrsgb7kqchcpfnx8atn33",
+		"id": "compost",
+		"title": "Compost",
+		"description": "Nice thing, flowers would like it.",
+		"asset": {
+			"default": [
+				"compost"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

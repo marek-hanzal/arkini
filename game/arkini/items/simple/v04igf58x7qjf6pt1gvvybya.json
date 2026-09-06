@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "v04igf58x7qjf6pt1gvvybya",
+		"id": "book-t3",
+		"title": "Book - Tier 3",
+		"description": "Quite a good book",
+		"asset": {
+			"default": [
+				"book-t3"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

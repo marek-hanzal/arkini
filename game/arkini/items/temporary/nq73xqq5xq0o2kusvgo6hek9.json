@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "nq73xqq5xq0o2kusvgo6hek9",
+		"id": "campfire-burning",
+		"title": "Campfire Burning",
+		"description": "Warm place",
+		"asset": {
+			"default": [
+				"campfire-burning"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000
+	}
+}

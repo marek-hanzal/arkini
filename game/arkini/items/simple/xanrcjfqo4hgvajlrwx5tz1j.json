@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "xanrcjfqo4hgvajlrwx5tz1j",
+		"id": "book-t4",
+		"title": "Book - Tier 4",
+		"description": "You wan to read this one. Or write. Or both.",
+		"asset": {
+			"default": [
+				"book-t4"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 2,
+		"type": "simple"
+	}
+}

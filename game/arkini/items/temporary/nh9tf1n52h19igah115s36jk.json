@@ -13,6 +13,6 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"type": "temporary",
-		"durationMs": 600000
+		"durationMs": 1200000
 	}
 }

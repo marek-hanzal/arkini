@@ -1,0 +1,28 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "j8d36shyw3d5sp0jd2bqtkd7",
+		"id": "cauldron-with-beeswax",
+		"title": "Cauldron With Beeswax",
+		"description": "Try to make it warm",
+		"asset": {
+			"default": [
+				"cauldron-with-beeswax"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "campfire-burning"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cauldron-with-boiling-beeswax"
+			}
+		],
+		"type": "simple"
+	}
+}

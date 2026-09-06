@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "rwcge6psbenwyid7ywyif96q",
+		"id": "roof-tiles",
+		"title": "Roof Tiles",
+		"description": "This thing should be put on top of buildings.",
+		"asset": {
+			"default": [
+				"roof-tiles"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

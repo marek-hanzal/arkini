@@ -24,6 +24,15 @@
 				"action": "deposit",
 				"effect": "replace",
 				"result": "candle"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "campfire"
+				},
+				"action": "deposit",
+				"effect": "replace",
+				"result": "campfire-burning"
 			}
 		],
 		"type": "simple"

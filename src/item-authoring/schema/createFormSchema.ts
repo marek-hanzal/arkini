@@ -50,14 +50,27 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 			});
 		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
-			if (merge.action !== "deposit" || item.charges !== undefined) continue;
+			if (merge.action === "deposit" && item.charges === undefined)
+				context.addIssue({
+					code: "custom",
+					message: "Enable Charges on this item before selecting Deposit.",
+					path: [
+						"merge",
+						mergeIndex,
+						"action",
+					],
+				});
+			if (merge.effect !== "deposit") continue;
+			const selectedItem = project.config.items[merge.target.itemId];
+			const target = selectedItem?.uid === item.uid ? item : selectedItem;
+			if (target === undefined || target.charges !== undefined) continue;
 			context.addIssue({
 				code: "custom",
-				message: "Enable Charges on this item before selecting Deposit.",
+				message: "Selected target must have Charges enabled before choosing Deposit.",
 				path: [
 					"merge",
 					mergeIndex,
-					"action",
+					"effect",
 				],
 			});
 		}

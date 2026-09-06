@@ -15,10 +15,12 @@ export const MergeField = ({
 	merge,
 	onChangeFn,
 	sourceChargesEnabled,
+	targetChargesEnabled,
 }: {
 	readonly merge: MergeSchema.Type;
 	readonly onChangeFn: (merge: MergeSchema.Type) => void;
 	readonly sourceChargesEnabled: boolean;
+	readonly targetChargesEnabled: boolean;
 }) => {
 	const validationIssues = useFormValidationIssues(merge);
 	return (
@@ -90,6 +92,14 @@ export const MergeField = ({
 									"Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent charges carry over only to a compatible charged replacement; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle.",
 								label: "Replace",
 								value: "replace",
+							},
+							{
+								description: targetChargesEnabled
+									? "Spends one actual charge from the selected target. Spending its last charge depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill."
+									: "Select a target item with Charges enabled before choosing Deposit. Target Deposit spends one actual target charge and emits that item's configured depletion output after the last use.",
+								disabled: !targetChargesEnabled,
+								label: "Deposit",
+								value: "deposit",
 							},
 						]}
 						onChangeFn={(effect) =>

@@ -280,7 +280,7 @@ const compileAcquisitionLineRoutesFn = (config: GameConfigSchema.Type) => {
 	return routes;
 };
 
-const readMergeRoutesFn = (source: ItemSchema.Type) => {
+const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	const matchedTargetItemIds = new Set<string>();
 	for (const [mergeIndex, merge] of (source.merge ?? []).entries()) {
@@ -308,21 +308,42 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 						: {}),
 					quantity: 1,
 					source: "merge-target",
-					usage: merge.effect === "keep" ? "one-time" : "consume",
+					usage:
+						merge.effect === "remove" || merge.effect === "replace"
+							? "consume"
+							: "one-time",
 				},
 			],
 			anyOf: [],
 		};
-		const chargeUses =
-			merge.action === "deposit" && source.charges !== undefined
+		const target = config.items[merge.target.itemId];
+		const chargeParticipants = [
+			...(merge.action === "deposit" && source.charges !== undefined
 				? [
 						{
-							accounting: "single-payer-exact" as const,
-							payerFactId: source.id,
-							usableActionRuns: source.charges.amount,
+							charges: source.charges,
+							itemId: source.id,
+							requirementSource: "merge-source" as const,
+							role: "source" as const,
 						},
 					]
-				: [];
+				: []),
+			...(merge.effect === "deposit" && target?.charges !== undefined
+				? [
+						{
+							charges: target.charges,
+							itemId: target.id,
+							requirementSource: "merge-target" as const,
+							role: "target" as const,
+						},
+					]
+				: []),
+		];
+		const chargeUses = chargeParticipants.map(({ charges, itemId }) => ({
+			accounting: "single-payer-exact" as const,
+			payerFactId: itemId,
+			usableActionRuns: charges.amount,
+		}));
 		const metadata = {
 			kind: "merge-output",
 			mergeIndex,
@@ -428,56 +449,66 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 				runMultiplier: 1,
 			});
 
-		if (merge.action !== "deposit" || source.charges?.output === undefined) continue;
-		const chargeOutputModel = readAcquisitionOutputOccurrencesFn(source.charges.output);
-		const depletionRequirements: AcquisitionRoute["requirements"] = {
-			...requirements,
-			allOf: requirements.allOf.map((requirement) =>
-				requirement.factId === source.id && requirement.source === "merge-source"
-					? {
-							...requirement,
-							source: "charged-item" as const,
-							usage: "consume" as const,
-						}
-					: requirement,
-			),
-		};
-		for (const output of chargeOutputModel.occurrences)
-			routes.push({
-				durationMs: 0,
-				id: readAcquisitionIdentityFn(
-					"merge-charge-depletion",
-					source.id,
-					merge.target.itemId,
-					mergeIndex,
-					output.id,
-					output.factId,
+		for (const [participantIndex, participant] of chargeParticipants.entries()) {
+			if (participant.charges.output === undefined) continue;
+			const chargeOutputModel = readAcquisitionOutputOccurrencesFn(
+				participant.charges.output,
+			);
+			const depletionRequirements: AcquisitionRoute["requirements"] = {
+				...requirements,
+				allOf: requirements.allOf.map((requirement) =>
+					requirement.factId === participant.itemId &&
+					requirement.source === participant.requirementSource
+						? {
+								...requirement,
+								source: "charged-item" as const,
+								usage: "consume" as const,
+							}
+						: requirement,
 				),
-				metadata: {
-					kind: "merge-charge-depletion",
-					mergeIndex,
-					sourceItemId: source.id,
-					targetItemId: merge.target.itemId,
-				},
-				operation: {
-					id: readAcquisitionIdentityFn("source", source.id, "charges"),
-					inputs: [],
-					...(chargeOutputModel.compilation === "complete"
-						? {}
-						: {
-								outputCompilation: chargeOutputModel.compilation,
-							}),
-					outputDistribution: chargeOutputModel.outputDistribution,
-				},
-				output: {
-					annotation: output.annotation,
-					factId: output.factId,
-					operationOutputGroupId: output.operationOutputGroupId,
-					quantityDistribution: output.quantityDistribution,
-				},
-				requirements: combineRequirementsFn(depletionRequirements, output.requirements),
-				runMultiplier: source.charges.amount,
-			});
+			};
+			for (const output of chargeOutputModel.occurrences)
+				routes.push({
+					chargeUses: chargeUses.filter(
+						(_chargeUse, index) => index !== participantIndex,
+					),
+					durationMs: 0,
+					id: readAcquisitionIdentityFn(
+						"merge-charge-depletion",
+						source.id,
+						merge.target.itemId,
+						mergeIndex,
+						participant.role,
+						output.id,
+						output.factId,
+					),
+					metadata: {
+						chargedItemId: participant.itemId,
+						kind: "merge-charge-depletion",
+						mergeIndex,
+						sourceItemId: source.id,
+						targetItemId: merge.target.itemId,
+					},
+					operation: {
+						id: readAcquisitionIdentityFn("source", participant.itemId, "charges"),
+						inputs: [],
+						...(chargeOutputModel.compilation === "complete"
+							? {}
+							: {
+									outputCompilation: chargeOutputModel.compilation,
+								}),
+						outputDistribution: chargeOutputModel.outputDistribution,
+					},
+					output: {
+						annotation: output.annotation,
+						factId: output.factId,
+						operationOutputGroupId: output.operationOutputGroupId,
+						quantityDistribution: output.quantityDistribution,
+					},
+					requirements: combineRequirementsFn(depletionRequirements, output.requirements),
+					runMultiplier: participant.charges.amount,
+				});
+		}
 	}
 	return routes;
 };
@@ -486,7 +517,7 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items)) {
-		routes.push(...readMergeRoutesFn(item));
+		routes.push(...readMergeRoutesFn(config, item));
 	}
 	return routes;
 };

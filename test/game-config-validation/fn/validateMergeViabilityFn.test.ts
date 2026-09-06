@@ -32,7 +32,7 @@ const mergeSource = ({
 	charges?: {
 		amount: number;
 	};
-	effect?: "keep" | "replace";
+	effect?: "deposit" | "keep" | "replace";
 	maxCount?: number;
 	result?: string;
 	target: {
@@ -106,6 +106,58 @@ describe("validateMergeViabilityFn", () => {
 			},
 		});
 		const target = createSimpleItem("target");
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+				[target.id]: target,
+			}),
+		).toEqual([]);
+	});
+
+	it("requires Charges on the selected target of a Deposit effect", async () => {
+		const source = mergeSource({
+			effect: "deposit",
+			target: {
+				type: "item",
+				itemId: "target",
+			},
+		});
+		const target = createSimpleItem("target");
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+				[target.id]: target,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				path: [
+					"items",
+					"source",
+					"merge",
+					0,
+					"effect",
+				],
+				reason: InvalidMergeReasonEnumSchema.enum.TargetChargesDisabled,
+			}),
+		]);
+	});
+
+	it("accepts a Deposit effect when the selected target has Charges", async () => {
+		const source = mergeSource({
+			effect: "deposit",
+			target: {
+				type: "item",
+				itemId: "target",
+			},
+		});
+		const target = {
+			...createSimpleItem("target"),
+			charges: {
+				amount: 2,
+			},
+		};
 
 		expect(
 			await mergeDiagnostics({

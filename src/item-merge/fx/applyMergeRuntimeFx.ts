@@ -171,15 +171,32 @@ const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementCharg
 });
 
 const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function* ({
+	actionId,
+	ownerItemId,
 	rule,
 	runtime,
 	target,
 }: {
+	readonly actionId: string;
+	readonly ownerItemId: string;
 	readonly rule: MergeSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 	readonly target: BoardRuntimeItemSchema.Type;
 }) {
 	return yield* match(rule)
+		.with(
+			{
+				effect: TargetEffectSchema.enum.Deposit,
+			},
+			() =>
+				spendActionChargesFx({
+					actionId,
+					cost: 1,
+					itemId: target.id,
+					ownerItemId,
+					runtime,
+				}),
+		)
 		.with(
 			{
 				effect: TargetEffectSchema.enum.Keep,
@@ -349,6 +366,8 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		source,
 	});
 	const targetEffect = yield* applyMergeTargetEffectFx({
+		actionId: `merge:${ruleIndex}:target`,
+		ownerItemId: source.id,
 		rule,
 		runtime: sourceAction.runtime,
 		target,

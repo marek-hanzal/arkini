@@ -43,6 +43,29 @@ export const validateMergeViabilityFn = ({
 					reason: InvalidMergeReasonEnumSchema.enum.SourceChargesDisabled,
 				});
 			}
+			const exactTarget = config.items[merge.target.itemId];
+			if (
+				merge.effect === TargetEffectSchema.enum.Deposit &&
+				exactTarget !== undefined &&
+				exactTarget.charges === undefined
+			) {
+				diagnostics.push({
+					code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
+					path: [
+						"items",
+						ownerItemId,
+						"merge",
+						mergeIndex,
+						"effect",
+					],
+					source: provenance.items[ownerItemId],
+					message: `Merge ${mergeIndex} of item ${ownerItemId} deposits a target charge, but selected target ${merge.target.itemId} has no charges.`,
+					ownerItemId,
+					mergeIndex,
+					reason: InvalidMergeReasonEnumSchema.enum.TargetChargesDisabled,
+				});
+			}
 			const missingExactTarget = config.items[merge.target.itemId] === undefined;
 			if (!missingExactTarget) {
 				const exactSelfTargetUnavailable =

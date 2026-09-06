@@ -256,6 +256,74 @@ describe("createAcquisitionGraphFn", () => {
 		});
 	});
 
+	it("models a Deposit target as finite charge use with the target's depletion output", () => {
+		const config = createMergeTestConfig({
+			rule: {
+				action: "consume",
+				effect: "deposit",
+				output: guaranteedMergeOutput(),
+				target: {
+					itemId: "target",
+					type: "item",
+				},
+			},
+			targetCharges: {
+				amount: 4,
+				output: guaranteedMergeOutput({
+					itemId: "output:a",
+				}),
+			},
+		});
+		const graph = createAcquisitionGraphFn(config);
+		const mergeOutput = graph.routes.find(
+			(route) => route.metadata.kind === "merge-output" && route.output.factId === "output",
+		);
+		const depletionOutput = graph.routes.find(
+			(route) =>
+				route.metadata.kind === "merge-charge-depletion" &&
+				route.metadata.chargedItemId === "target" &&
+				route.output.factId === "output:a",
+		);
+
+		expect(mergeOutput).toMatchObject({
+			chargeUses: [
+				{
+					accounting: "single-payer-exact",
+					payerFactId: "target",
+					usableActionRuns: 4,
+				},
+			],
+			requirements: {
+				allOf: expect.arrayContaining([
+					expect.objectContaining({
+						factId: "target",
+						source: "merge-target",
+						usage: "one-time",
+					}),
+				]),
+			},
+		});
+		expect(depletionOutput).toMatchObject({
+			metadata: {
+				chargedItemId: "target",
+				kind: "merge-charge-depletion",
+				mergeIndex: 0,
+				sourceItemId: "source",
+				targetItemId: "target",
+			},
+			runMultiplier: 4,
+			requirements: {
+				allOf: expect.arrayContaining([
+					expect.objectContaining({
+						factId: "target",
+						source: "charged-item",
+						usage: "consume",
+					}),
+				]),
+			},
+		});
+	});
+
 	it("keeps replacement and authored output as correlated operation groups", () => {
 		const config = createMergeTestConfig({
 			rule: {

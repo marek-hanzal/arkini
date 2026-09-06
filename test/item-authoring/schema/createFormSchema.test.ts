@@ -76,6 +76,80 @@ describe("createFormSchema", () => {
 		);
 	});
 
+	it("rejects a Deposit target effect when the selected item has no Charges", () => {
+		const target = createSimpleItem("target");
+		const source = {
+			...createSimpleItem("source"),
+			merge: [
+				{
+					action: "consume" as const,
+					effect: "deposit" as const,
+					target: {
+						type: "item" as const,
+						itemId: target.id,
+					},
+				},
+			],
+		} satisfies ItemSchema.Type;
+		const project = {
+			config: {
+				items: {
+					[source.id]: source,
+					[target.id]: target,
+				},
+			} as GameConfigSchema.Type,
+		};
+
+		const result = createFormSchema(project, source.uid).safeParse(readFormValues(source));
+
+		expect(result.success).toBe(false);
+		if (result.success) return;
+		expect(result.error.issues).toContainEqual(
+			expect.objectContaining({
+				message: "Selected target must have Charges enabled before choosing Deposit.",
+				path: [
+					"merge",
+					0,
+					"effect",
+				],
+			}),
+		);
+	});
+
+	it("accepts a Deposit target effect when the selected item has Charges", () => {
+		const target = {
+			...createSimpleItem("target"),
+			charges: {
+				amount: 2,
+			},
+		};
+		const source = {
+			...createSimpleItem("source"),
+			merge: [
+				{
+					action: "consume" as const,
+					effect: "deposit" as const,
+					target: {
+						type: "item" as const,
+						itemId: target.id,
+					},
+				},
+			],
+		} satisfies ItemSchema.Type;
+		const project = {
+			config: {
+				items: {
+					[source.id]: source,
+					[target.id]: target,
+				},
+			} as GameConfigSchema.Type,
+		};
+
+		expect(
+			createFormSchema(project, source.uid).safeParse(readFormValues(source)).success,
+		).toBe(true);
+	});
+
 	it("rejects a target-paid Deposit that selects an item without Charges", () => {
 		const target = createSimpleItem("target");
 		const producer = createProducerItem({

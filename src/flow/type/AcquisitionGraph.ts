@@ -84,6 +84,7 @@ export type AcquisitionRouteMetadata =
 			readonly targetItemId: string;
 	  }
 	| {
+			readonly chargedItemId: string;
 			readonly kind: "merge-charge-depletion";
 			readonly mergeIndex: number;
 			readonly sourceItemId: string;

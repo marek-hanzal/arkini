@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "v67fm181mw3z03k6dyrq65ct",
+		"id": "yarn",
+		"title": "Yarn",
+		"description": "Tangled.",
+		"asset": {
+			"default": [
+				"yarn"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

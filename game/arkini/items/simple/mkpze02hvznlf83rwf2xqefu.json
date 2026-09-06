@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "mkpze02hvznlf83rwf2xqefu",
+		"id": "honeycomb",
+		"title": "Honeycomb",
+		"description": "Sweet stuff",
+		"asset": {
+			"default": [
+				"honeycomb"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

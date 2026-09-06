@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "aduyq89hus4lyoh7q3yx2m7y",
+		"id": "empty-honeycomb",
+		"title": "Empty Honeycomb",
+		"description": "So you want to make some candles?",
+		"asset": {
+			"default": [
+				"empty-honeycomb"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

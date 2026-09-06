@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ccy83y4vq9xchgjrqyccijwn",
+		"id": "linen-thread",
+		"title": "Linen Thread",
+		"description": "Something to make other things tangled.",
+		"asset": {
+			"default": [
+				"linen-thread"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

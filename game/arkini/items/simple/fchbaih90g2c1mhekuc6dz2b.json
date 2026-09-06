@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "fchbaih90g2c1mhekuc6dz2b",
+		"id": "gold-ingot",
+		"title": "Gold Ingot",
+		"description": "Shiny shiny",
+		"asset": {
+			"default": [
+				"gold-ingot"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

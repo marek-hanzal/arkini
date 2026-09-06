@@ -78,6 +78,14 @@
 					"x": 14,
 					"y": 0
 				}
+			},
+			{
+				"itemId": "forest-portal",
+				"quantity": 1,
+				"position": {
+					"x": 0,
+					"y": 0
+				}
 			}
 		]
 	},

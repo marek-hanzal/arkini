@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ap7nay1ux4dm2xlm9zh764gk",
+		"id": "colored-window",
+		"title": "Colored Window",
+		"description": "Colors, hehehe",
+		"asset": {
+			"default": [
+				"colored-window"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

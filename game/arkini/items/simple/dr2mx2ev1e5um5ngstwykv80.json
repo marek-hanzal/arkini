@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dr2mx2ev1e5um5ngstwykv80",
+		"id": "cotton-cloth",
+		"title": "Cotton Cloth",
+		"description": "Cotton cloth",
+		"asset": {
+			"default": [
+				"cotton-cloth"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

@@ -62,7 +62,38 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "lumber-camp-blueprint"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "lumer-camp"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
 			},
 			{
 				"id": "stonemason-camp-blueprint",
@@ -110,7 +141,38 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stonemason-camp-blueprint"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stonemason-camp"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
 			},
 			{
 				"id": "townhall-t1-blueprint",
@@ -203,6 +265,21 @@
 							}
 						],
 						"type": "enable"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "townhall-t1-blueprint"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
 					}
 				]
 			},
@@ -229,6 +306,75 @@
 									"drop": [
 										{
 											"itemId": "well-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "well-blueprint"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "well"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "house-t1-blueprint",
+				"title": "House - Tier 1 Blueprint",
+				"description": "House blueprint",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 120000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "house-t1-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

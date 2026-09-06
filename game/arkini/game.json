@@ -55,18 +55,95 @@
 				"quantity": 1
 			},
 			{
-				"x": 13,
-				"y": 0,
-				"space": 0,
-				"itemId": "stone",
-				"quantity": 8
-			},
-			{
 				"x": 1,
 				"y": 0,
 				"space": 0,
-				"itemId": "wood",
-				"quantity": 8
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 0,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 3,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 6,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 4,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 7,
+				"space": 1,
+				"itemId": "well",
+				"quantity": 1
+			},
+			{
+				"x": 9,
+				"y": 3,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 1,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 13,
+				"y": 8,
+				"space": 1,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 5,
+				"space": 1,
+				"itemId": "vegetable-garden",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 4,
+				"space": 1,
+				"itemId": "fruit-garden",
+				"quantity": 1
 			}
 		],
 		"inventory": [],
@@ -80,7 +157,7 @@
 				}
 			},
 			{
-				"itemId": "forest-portal",
+				"itemId": "homeland-portal",
 				"quantity": 1,
 				"position": {
 					"x": 0,

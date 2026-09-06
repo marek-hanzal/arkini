@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 12,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "grape-field"
+			}
+		],
 		"type": "simple"
 	}
 }

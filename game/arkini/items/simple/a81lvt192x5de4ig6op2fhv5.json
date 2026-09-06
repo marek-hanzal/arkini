@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "a81lvt192x5de4ig6op2fhv5",
+		"id": "cotton-seed",
+		"title": "Cotton Seed",
+		"description": "Cotton. Want. To. Grow",
+		"asset": {
+			"default": [
+				"seed",
+				"cotton"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

@@ -10,8 +10,9 @@
 				"vegetable-crate"
 			]
 		},
-		"scope": "any",
-		"maxStackSize": 4,
-		"type": "simple"
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 600000
 	}
 }

@@ -4,14 +4,15 @@
 		"uid": "sedm9fb8symnti4s3w25u751",
 		"id": "candle",
 		"title": "Candle",
-		"description": "Warm, nice light source",
+		"description": "Warm, nice light source; be careful, it will fade over time.",
 		"asset": {
 			"default": [
 				"candle"
 			]
 		},
-		"scope": "any",
-		"maxStackSize": 6,
-		"type": "simple"
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000
 	}
 }

@@ -65,6 +65,7 @@ export namespace ArkiniElectronApi {
 		editorProjectImportJsonDirectory: "arkini:editor:project:import-json-directory",
 		editorProjectList: "arkini:editor:project:list",
 		editorProjectOpenDirectory: "arkini:editor:project:open-directory",
+		editorProjectOptimizeResources: "arkini:editor:project:optimize-resources",
 		editorProjectRead: "arkini:editor:project:read",
 		editorProjectRefresh: "arkini:editor:project:refresh",
 		editorProjectChanged: "arkini:editor:project:changed",
@@ -243,6 +244,11 @@ export namespace ArkiniElectronApi {
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly onProjectChangedFn: (listenerFn: (projectId: string) => void) => () => void;
+			readonly optimizeResourcesFn: (
+				request: EditorProjectTransport.OptimizeResourcesRequest,
+			) => Promise<
+				EditorProjectTransport.Result<EditorProjectTransport.OptimizeResourcesResult>
+			>;
 			readonly replaceConfigFn: (
 				request: EditorProjectTransport.ReplaceConfigRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;

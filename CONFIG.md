@@ -26,7 +26,7 @@ Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.pn
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
 - `game.json` is the strict complete non-item root and owns `$schema`, package metadata/ID, gameplay version, resources, and start state.
 - Each item file is a strict `{ $schema, item }` document. Its path owns canonical type and immutable encoded UID; its item owns the human-authored ID.
-- `resources/` contains package-shell resources and `assets/` item artwork. The current source contract accepts PNG bytes; schema support does not imply another runtime resource type.
+- `resources/` contains package-shell resources and `assets/` item artwork. The current source contract accepts PNG bytes; schema support does not imply another runtime resource type. The explicit Editor Assets **Optimize** action losslessly re-encodes every 8-bit PNG in both directories at its original dimensions, normalizes it to RGBA, and clears RGB below fully transparent pixels. This source-maintenance write is separate from Build and Arkpack artwork baking.
 
 There is no free-form recursive JSON-fragment grammar. JSON outside the exact root and item paths is ignored as game source, and a missing/invalid marker, schema, root, path identity, or reference is a diagnostic.
 

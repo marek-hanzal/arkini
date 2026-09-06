@@ -71,6 +71,18 @@ export namespace ProjectRepository {
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}
 
+	export interface OptimizeResourcesProps {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+	}
+
+	export interface OptimizeResourcesResult {
+		readonly optimizedResourceCount: number;
+		readonly originalBytes: number;
+		readonly optimizedBytes: number;
+		readonly project: Project;
+	}
+
 	export interface BoardScenarioKey {
 		readonly projectId: string;
 		readonly name: string;
@@ -127,6 +139,9 @@ export interface ProjectRepositoryService extends ProjectVersionRepositoryServic
 		ProjectRepositoryError,
 		never
 	>;
+	readonly optimizeResourcesFx: (
+		props: ProjectRepository.OptimizeResourcesProps,
+	) => Effect.Effect<ProjectRepository.OptimizeResourcesResult, ProjectRepositoryError, never>;
 	readonly listNotesFx: (
 		projectId: string,
 	) => Effect.Effect<ReadonlyArray<NoteSchema.Type>, ProjectRepositoryError, never>;

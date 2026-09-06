@@ -13,6 +13,7 @@ interface UseEditorAssetLibraryProps {
 interface UseEditorAssetLibraryOutput {
 	readonly empty: boolean;
 	readonly projectId: string;
+	readonly projectRevision: number;
 	readonly resources: ReadonlyArray<Project.Resource>;
 }
 
@@ -41,6 +42,7 @@ export const useEditorAssetLibrary = ({
 	return {
 		empty: project.resources.length === 0,
 		projectId: project.projectId,
+		projectRevision: project.revision,
 		resources,
 	};
 };

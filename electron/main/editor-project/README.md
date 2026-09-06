@@ -84,6 +84,8 @@ capture expected revision
 → publish it to the still-mounted project Atom
 ```
 
+Assets **Optimize** follows this same write path. Main holds the repository semaphore while it losslessly normalizes every current `assets/` and `resources/` PNG, then publishes all changed bytes through one current-tree transaction and one fresh Project projection. It does not invoke Arkpack Build or its 256 px Item-artwork bake.
+
 Hard Refresh, Version checkout, project replacement and scenario restore use a stronger boundary:
 
 ```text

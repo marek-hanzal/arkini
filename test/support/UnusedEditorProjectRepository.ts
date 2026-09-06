@@ -10,6 +10,7 @@ export const UnusedEditorProjectRepository = {
 	deleteNoteFx: () => Effect.die("Unexpected editor note delete."),
 	deleteProjectFx: () => Effect.die("Unexpected editor project deletion."),
 	deleteResourceFx: () => Effect.die("Unexpected editor resource deletion."),
+	optimizeResourcesFx: () => Effect.die("Unexpected editor resource optimization."),
 	diffVersionsFx: () => Effect.die("Unexpected editor version diff."),
 	listVersionsFx: () => Effect.die("Unexpected editor version list."),
 	listNotesFx: () => Effect.die("Unexpected editor note list."),
@@ -26,6 +27,7 @@ export const UnusedEditorProjectRepository = {
 	ProjectRepositoryService,
 	| "deleteProjectFx"
 	| "deleteResourceFx"
+	| "optimizeResourcesFx"
 	| "checkoutVersionFx"
 	| "createVersionFx"
 	| "createNoteFx"

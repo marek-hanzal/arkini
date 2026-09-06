@@ -5,6 +5,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type ChangeEventHandler, type RefObject, useRef } from "react";
 
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
+import { optimizeEditorResourcesFx } from "~/asset-authoring/fx/optimizeEditorResourcesFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
@@ -32,6 +33,10 @@ export namespace useEditorAssetManagerController {
 		readonly onFilesChangeFn: ChangeEventHandler<HTMLInputElement>;
 		readonly openArkpackImportFn: () => void;
 		readonly openFilesImportFn: () => void;
+		readonly onOptimizeFn: () => void;
+		readonly optimizeError?: unknown;
+		readonly optimizePending: boolean;
+		readonly optimization?: ProjectRepository.OptimizeResourcesResult;
 		readonly resources: ReadonlyArray<Project.Resource>;
 	}
 }
@@ -58,6 +63,16 @@ const importEditorAssetsCommandAtom = RendererRuntime.runSync(
 	),
 );
 
+const optimizeEditorResourcesCommandAtom = RendererRuntime.runSync(
+	Effect.map(ProjectRepository, (repository) =>
+		Atom.fn((variables: ProjectRepository.OptimizeResourcesProps) =>
+			optimizeEditorResourcesFx(variables).pipe(
+				Effect.provideService(ProjectRepository, repository),
+			),
+		).pipe(Atom.withLabel("EditorResourcesOptimize"), Atom.setIdleTTL(0)),
+	),
+);
+
 export const useEditorAssetManagerController = ({
 	filter,
 	query,
@@ -70,11 +85,19 @@ export const useEditorAssetManagerController = ({
 	const filesInputRef = useRef<HTMLInputElement>(null);
 	const result = useAtomValue(importEditorAssetsCommandAtom);
 	const importAssetsFn = useAtomSet(importEditorAssetsCommandAtom);
+	const optimizeResult = useAtomValue(optimizeEditorResourcesCommandAtom);
+	const optimizeResourcesFn = useAtomSet(optimizeEditorResourcesCommandAtom);
 	const importPending = result.waiting;
+	const optimizePending = optimizeResult.waiting;
 	const importError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const importedCount =
 		AsyncResult.isSuccess(result) && !importPending
 			? result.value.resourceIds.length
+			: undefined;
+	const optimizeError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(optimizeResult));
+	const optimization =
+		AsyncResult.isSuccess(optimizeResult) && !optimizePending
+			? optimizeResult.value
 			: undefined;
 	const catalogState: useEditorAssetManagerController.CatalogState | undefined = library.empty
 		? "empty"
@@ -109,6 +132,12 @@ export const useEditorAssetManagerController = ({
 			source: "files",
 		});
 	};
+	const onOptimizeFn = () => {
+		optimizeResourcesFn({
+			expectedRevision: library.projectRevision,
+			projectId: library.projectId,
+		});
+	};
 
 	return {
 		arkpackInputRef,
@@ -119,8 +148,12 @@ export const useEditorAssetManagerController = ({
 		importedCount,
 		onArkpackChangeFn,
 		onFilesChangeFn,
+		onOptimizeFn,
 		openArkpackImportFn,
 		openFilesImportFn,
+		optimization,
+		optimizeError,
+		optimizePending,
 		resources: library.resources,
 	};
 };

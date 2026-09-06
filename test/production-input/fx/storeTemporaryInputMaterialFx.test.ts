@@ -78,12 +78,11 @@ const config = GameConfigSchema.parse({
 });
 
 describe("temporary material input eligibility", () => {
-	it("rejects the source before mutation and publishes no event", async () => {
+	it("stores the same temporary identity with its remaining lifetime", async () => {
 		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 60_000,
 		});
-		const batches: unknown[] = [];
 		try {
 			await session.runFn(
 				spawnItemFx({
@@ -115,32 +114,29 @@ describe("temporary material input eligibility", () => {
 					quantity: 1,
 				}),
 			);
-			const before = await session.runFn(readRuntimeFx());
-			const unsubscribe = session.subscribeEventsFn((batch) => {
-				batches.push(batch);
-			});
-			try {
-				await expect(
-					session.runFn(
-						storeInputMaterialFx({
-							ownerItemId: "runtime:owner",
-							lineId: "line:owner",
-							inputIndex: 0,
-							sourceItemId: temporary.id,
-							sourceItemRevision: temporary.revision,
-							quantity: 1,
-						}),
-					),
-				).rejects.toMatchObject({
-					_tag: "InputMaterialUnavailableError",
+			await session.runFn(
+				storeInputMaterialFx({
+					ownerItemId: "runtime:owner",
+					lineId: "line:owner",
+					inputIndex: 0,
 					sourceItemId: temporary.id,
-				});
-				const after = await session.runFn(readRuntimeFx());
-				expect(after).toEqual(before);
-				expect(batches).toEqual([]);
-			} finally {
-				unsubscribe();
-			}
+					sourceItemRevision: temporary.revision,
+					quantity: 1,
+				}),
+			);
+			const stored = (await session.runFn(readRuntimeFx())).items.find(
+				(item) => item.id === temporary.id,
+			);
+			expect(stored).toMatchObject({
+				id: temporary.id,
+				location: {
+					scope: "input",
+					ownerItemId: "runtime:owner",
+					lineId: "line:owner",
+					inputIndex: 0,
+				},
+				remainingDurationMs: 600,
+			});
 		} finally {
 			await Effect.runPromise(session.disposeFx);
 		}

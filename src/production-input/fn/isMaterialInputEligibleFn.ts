@@ -10,7 +10,7 @@ export const isMaterialInputEligibleFn = (item: ItemSchema.Type) =>
 			{
 				type: TypeSchema.enum.Temporary,
 			},
-			() => false,
+			() => true,
 		)
 		.with(
 			{

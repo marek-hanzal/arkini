@@ -517,7 +517,7 @@ describe("temporary item lifetime", () => {
 		expect(replaced?.revision).not.toBe(result.target.revision);
 	});
 
-	it("reports temporary items outside the board", () => {
+	it("reports temporary items in passive storage", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const temporary = yield* spawnTemporaryFx({});
@@ -562,7 +562,7 @@ describe("temporary item lifetime", () => {
 							y: 0,
 						},
 					},
-					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.NotBoard,
+					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnsupportedLocation,
 				},
 			]),
 		);

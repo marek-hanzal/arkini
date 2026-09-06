@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import { advanceDeliveriesRuntimeFx } from "~/production-delivery/fx/advanceDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -30,6 +31,23 @@ const sortTemporaryItemsFn = (runtime: RuntimeSchema.Type) =>
 	runtime.items
 		.filter((item) => item.item.type === TypeSchema.enum.Temporary)
 		.sort((first, second) => first.id.localeCompare(second.id));
+
+const readReadyTemporaryJobIdsFn = (runtime: RuntimeSchema.Type) =>
+	new Set(
+		runtime.items.flatMap((item) => {
+			if (
+				item.item.type !== TypeSchema.enum.Temporary ||
+				item.remainingDurationMs !== 0 ||
+				(item.location.scope !== LocationScopeEnumSchema.enum.Job &&
+					item.location.scope !== LocationScopeEnumSchema.enum.Reserved)
+			) {
+				return [];
+			}
+			return [
+				item.location.jobId,
+			];
+		}),
+	);
 
 const replaceJobFn = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSchema.Type => ({
 	...runtime,
@@ -99,7 +117,8 @@ const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function*
  * Temporary eligibility is frozen at step start. Queue-only owners then dispatch
  * before job identities and runnable decisions are frozen in stable id order.
  * Later completions may remove those identities but cannot change who earned
- * this step. Completed owners dispatch one FIFO successor before ready temporaries expire.
+ * this step. A completion tied with newly ready material wins; material that was
+ * already ready at the boundary blocks its job until expiry can settle.
  */
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
@@ -113,6 +132,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		runtime: deliveryStart.runtime,
 	});
 	const jobs = sortJobsFn(deliveryStart.runtime.jobs);
+	const readyTemporaryJobIds = readReadyTemporaryJobIdsFn(deliveryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
 	for (const job of jobs) {
 		runnableByJobId.set(
@@ -147,7 +167,12 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	const completedOwnerItemIds: IdSchema.Type[] = [];
 	for (const job of jobs) {
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
-		if (liveJob === undefined || liveJob.remainingMs !== 0) continue;
+		if (
+			liveJob === undefined ||
+			liveJob.remainingMs !== 0 ||
+			readyTemporaryJobIds.has(liveJob.id)
+		)
+			continue;
 		const owner = draft.items.find((item) => item.id === liveJob.ownerItemId);
 		if (owner !== undefined && isPassiveStorageLocationFn(owner.location)) continue;
 		const completion = yield* attemptJobCompletionFx({
@@ -172,6 +197,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		events.push(...dispatched.events);
 	}
 
+	let didExpireTemporaryItem = false;
 	for (const temporaryItem of temporaryItems) {
 		const liveItem = draft.items.find((candidate) => candidate.id === temporaryItem.id);
 		if (liveItem?.item.type !== TypeSchema.enum.Temporary || liveItem.remainingDurationMs !== 0)
@@ -183,6 +209,12 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (expiry.type === "blocked") continue;
 		draft = expiry.runtime;
 		events.push(...expiry.events);
+		didExpireTemporaryItem = true;
+	}
+	if (didExpireTemporaryItem) {
+		const dispatched = yield* dispatchIdleQueueHeadsFx(draft);
+		draft = dispatched.runtime;
+		events.push(...dispatched.events);
 	}
 	return {
 		events,

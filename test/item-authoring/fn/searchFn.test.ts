@@ -25,10 +25,10 @@ describe("searchFn", () => {
 				],
 				"i\u0307tem",
 			),
-			).toEqual([
-				dottedUppercaseI,
-				ascii,
-			]);
+		).toEqual([
+			dottedUppercaseI,
+			ascii,
+		]);
 	});
 
 	it("requires every fuzzy query token while ignoring its word order", () => {

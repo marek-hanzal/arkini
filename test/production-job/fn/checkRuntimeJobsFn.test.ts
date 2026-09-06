@@ -59,9 +59,21 @@ describe("checkRuntimeJobsFn", () => {
 					location: {
 						scope: "reserved",
 						jobId: "job:missing",
+						inputIndex: 1,
 					},
 					quantity: 1,
 					revision: "revision:tool:missing-job",
+				},
+				{
+					id: "runtime:tool:wrong-input",
+					item: config.items.tool,
+					location: {
+						scope: "job",
+						jobId: "job:third",
+						inputIndex: 0,
+					},
+					quantity: 1,
+					revision: "revision:tool:wrong-input",
 				},
 			],
 			jobs: [
@@ -103,6 +115,7 @@ describe("checkRuntimeJobsFn", () => {
 				RuntimeCheckIssueEnumSchema.enum.JobQueueExceeded,
 				RuntimeCheckIssueEnumSchema.enum.JobTimeInvalid,
 				RuntimeCheckIssueEnumSchema.enum.JobMaterialOrphan,
+				RuntimeCheckIssueEnumSchema.enum.JobMaterialInput,
 			]),
 		);
 	});
@@ -150,6 +163,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		location: {
 			scope: "job",
 			jobId: "job:outer",
+			inputIndex: 0,
 		},
 	} satisfies RuntimeItemSchema.Type;
 	const runtime = {

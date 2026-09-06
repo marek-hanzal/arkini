@@ -195,6 +195,7 @@ describe("queryFx", () => {
 				item("reserved-hidden", {
 					scope: "reserved",
 					jobId: "job:hidden",
+					inputIndex: 0,
 				}),
 			],
 		});

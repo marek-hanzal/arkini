@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One consumed material root committed to an active product-line job. */
@@ -12,6 +13,10 @@ export const JobLocationSchema = z
 		]),
 		/** Stable identity of the active job consuming this material. */
 		jobId: IdSchema.describe("The active job consuming this material root."),
+		/** Input slot that committed this material. */
+		inputIndex: NonNegativeIntegerSchema.describe(
+			"The zero-based material input that committed this root.",
+		),
 	})
 	.strict()
 	.meta({

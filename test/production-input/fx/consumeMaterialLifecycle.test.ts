@@ -240,6 +240,7 @@ describe("consume material lifecycle", () => {
 		expect(result.running.items.find((item) => item.id === "runtime:inner")?.location).toEqual({
 			scope: "job",
 			jobId: result.jobId,
+			inputIndex: 0,
 		});
 		expect(result.running.items.some((item) => item.id === "runtime:middle")).toBe(false);
 		expect(result.running.items.some((item) => item.id === "runtime:payload")).toBe(false);

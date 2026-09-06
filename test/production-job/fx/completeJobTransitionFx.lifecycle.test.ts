@@ -409,6 +409,7 @@ describe("job completion charge lifecycle", () => {
 					location: {
 						scope: "job",
 						jobId: "job:trader",
+						inputIndex: 0,
 					},
 					quantity: 1,
 				},

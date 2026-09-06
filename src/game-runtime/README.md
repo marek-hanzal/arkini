@@ -46,7 +46,7 @@ Important invariants:
 | `game-event` | Strict downstream event vocabulary and committed-result projection | [`../game-event/schema/GameEventSchema.ts`](../game-event/schema/GameEventSchema.ts) |
 | `simulation-time` | Fixed simulation quantum | [`../simulation-time/constant/SimulationStepMs.ts`](../simulation-time/constant/SimulationStepMs.ts) |
 | `game-tick` | Elapsed budget, fixed-step replay, lifecycle order and loop | [`../game-tick/fx/advanceRuntimeStepFx.ts`](../game-tick/fx/advanceRuntimeStepFx.ts) |
-| `temporary-item` | Duration advancement and atomic expiry output | [`../temporary-item/fx/attemptTemporaryItemExpiryFx.ts`](../temporary-item/fx/attemptTemporaryItemExpiryFx.ts) |
+| `temporary-item` | Duration advancement, visible-origin expiry and atomic job reconciliation | [`../temporary-item/fx/attemptTemporaryItemExpiryFx.ts`](../temporary-item/fx/attemptTemporaryItemExpiryFx.ts) |
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`../game-persistence/schema/StateSchema.ts`](../game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save scope, command admission, subscriptions and fail-stop | [`../game-session/fx/createGameSessionFx.ts`](../game-session/fx/createGameSessionFx.ts) |
 | `playable-game` | Package-independent Game capability and resource URLs | [`../playable-game/type/PlayableGame.ts`](../playable-game/type/PlayableGame.ts) |

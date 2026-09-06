@@ -102,6 +102,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 									location: {
 										scope: "reserved" as const,
 										jobId: busyId,
+										inputIndex: 1,
 									},
 									quantity: 1,
 									revision: "revision:job-material",

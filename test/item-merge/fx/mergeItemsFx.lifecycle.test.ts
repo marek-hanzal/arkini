@@ -75,16 +75,20 @@ const createLifecycleConfig = ({
 	sourceProducer = false,
 	targetProducer = false,
 	resultCharges,
+	resultDurationMs,
 	sourceInputItemId = "material",
 	targetCharges,
+	targetDurationMs,
 	ownerInputItemId = "material",
 }: {
 	action?: "consume" | "use";
 	effect?: "keep" | "remove" | "replace";
 	resultCharges?: number;
+	resultDurationMs?: number;
 	sourceInputItemId?: string;
 	sourceProducer?: boolean;
 	targetCharges?: number;
+	targetDurationMs?: number;
 	targetProducer?: boolean;
 	ownerInputItemId?: string;
 } = {}) => {
@@ -126,18 +130,28 @@ const createLifecycleConfig = ({
 		? producerItem({
 				id: "target",
 			})
-		: {
-				...baseItem({
-					id: "target",
-				}),
-				charges:
-					targetCharges === undefined
-						? undefined
-						: {
-								amount: targetCharges,
-							},
-				type: "simple" as const,
-			};
+		: targetDurationMs === undefined
+			? {
+					...baseItem({
+						id: "target",
+					}),
+					charges:
+						targetCharges === undefined
+							? undefined
+							: {
+									amount: targetCharges,
+								},
+					type: "simple" as const,
+				}
+			: {
+					...baseItem({
+						id: "target",
+					}),
+					durationMs: targetDurationMs,
+					maxStackSize: 1,
+					scope: "board" as const,
+					type: "temporary" as const,
+				};
 
 	return GameConfigSchema.parse({
 		resources: {
@@ -164,18 +178,29 @@ const createLifecycleConfig = ({
 			child: producerItem({
 				id: "child",
 			}),
-			result: {
-				...baseItem({
-					id: "result",
-				}),
-				charges:
-					resultCharges === undefined
-						? undefined
-						: {
-								amount: resultCharges,
-							},
-				type: "simple",
-			},
+			result:
+				resultDurationMs === undefined
+					? {
+							...baseItem({
+								id: "result",
+							}),
+							charges:
+								resultCharges === undefined
+									? undefined
+									: {
+											amount: resultCharges,
+										},
+							type: "simple",
+						}
+					: {
+							...baseItem({
+								id: "result",
+							}),
+							durationMs: resultDurationMs,
+							maxStackSize: 1,
+							scope: "board",
+							type: "temporary",
+						},
 			material: {
 				...baseItem({
 					id: "material",
@@ -252,6 +277,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						: {
 								scope,
 								jobId: "job:owner",
+								inputIndex: 0,
 							};
 				const state = {
 					cheats: {
@@ -640,6 +666,47 @@ describe("mergeItemsFx participant lifecycle", () => {
 			remainingCharges: undefined,
 		});
 		expect(replaced?.revision).not.toBe(beforeTarget?.revision);
+	});
+
+	it("replaces a temporary target and initializes the result's own lifetime", () => {
+		const config = createLifecycleConfig({
+			effect: "replace",
+			resultDurationMs: 10_000,
+			targetDurationMs: 300_000,
+		});
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardItem("source", 0),
+				{
+					...boardItem("target", 1),
+					remainingDurationMs: 123_000,
+				},
+			],
+			jobQueue: [],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(
+			attemptMergeFx().pipe(
+				useGameFx({
+					config,
+					state,
+				}),
+			),
+		);
+
+		expect(Result.isSuccess(result.attempt)).toBe(true);
+		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
+			item: {
+				id: "result",
+			},
+			remainingDurationMs: 10_000,
+		});
 	});
 
 	it("preserves spent charges through a compatible replacement", () => {

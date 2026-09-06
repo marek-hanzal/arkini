@@ -58,7 +58,8 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 						item.location.scope === LocationScopeEnumSchema.enum.Input &&
 						item.location.ownerItemId === ownerItemId &&
 						item.location.lineId === lineId &&
-						item.location.inputIndex === inputIndex,
+						item.location.inputIndex === inputIndex &&
+						item.remainingDurationMs !== 0,
 				);
 				return resolveInputMaterialRunFx({
 					input,

@@ -244,6 +244,7 @@ describe("reserved material lifecycle", () => {
 			location: {
 				scope: "reserved",
 				jobId: result.job.id,
+				inputIndex: 0,
 			},
 		});
 		expect(result.completed.items.find((item) => item.id === "runtime:worker")).toMatchObject({
@@ -262,6 +263,7 @@ describe("reserved material lifecycle", () => {
 			previousLocation: {
 				scope: "reserved",
 				jobId: result.job.id,
+				inputIndex: 0,
 			},
 			location: returnedWorker.location,
 			quantity: 1,
@@ -323,6 +325,7 @@ describe("reserved material lifecycle", () => {
 		).toEqual({
 			scope: "reserved",
 			jobId: result.job.id,
+			inputIndex: 0,
 		});
 		expect(
 			result.reserved.items.find((item) => item.id === "runtime:payload")?.location,
@@ -482,6 +485,7 @@ describe("reserved material lifecycle", () => {
 			{
 				scope: "reserved",
 				jobId: result.job.id,
+				inputIndex: 0,
 			},
 		);
 		expect(

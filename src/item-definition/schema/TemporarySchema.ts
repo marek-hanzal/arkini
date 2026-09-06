@@ -9,11 +9,11 @@ import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
 
 /**
- * A board-only item authoring contract with a configured lifetime.
+ * A Board-authored item contract with a configured lifetime.
  *
  * Every committed runtime instance starts with the authored duration, advances
- * only through canonical fixed Tick steps, and atomically expires with its
- * optional output.
+ * through canonical fixed Tick steps across Board and production ownership, and
+ * atomically expires with its optional output at the visible Board origin.
  */
 export const TemporarySchema = z
 	.object({
@@ -48,14 +48,14 @@ export const TemporarySchema = z
 		 * Optional result resolved atomically when the item expires.
 		 */
 		output: OutputSchema.optional().describe(
-			"The optional output intended for the released board cell after expiry.",
+			"The optional output placed from the temporary identity's visible Board origin after expiry.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "item.TemporarySchema",
 		description:
-			"A board-only, non-stackable item configuration with lifetime and optional expiry output.",
+			"A Board-authored, non-stackable item configuration with lifetime and optional expiry output.",
 	});
 
 export type TemporarySchema = typeof TemporarySchema;

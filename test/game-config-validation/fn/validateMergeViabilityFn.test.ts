@@ -21,11 +21,17 @@ const compileDiagnostics = async (items: Record<string, unknown>) =>
 	).diagnostics;
 
 const mergeSource = ({
+	action = "consume",
+	charges,
 	effect = "keep",
 	maxCount,
 	result,
 	target,
 }: {
+	action?: "consume" | "deposit";
+	charges?: {
+		amount: number;
+	};
 	effect?: "keep" | "replace";
 	maxCount?: number;
 	result?: string;
@@ -35,18 +41,19 @@ const mergeSource = ({
 	};
 }) => ({
 	...createSimpleItem("source"),
+	charges,
 	maxCount,
 	merge: [
 		effect === "replace"
 			? {
 					target,
-					action: "consume" as const,
+					action,
 					effect,
 					result: result ?? "result",
 				}
 			: {
 					target,
-					action: "consume" as const,
+					action,
 					effect,
 				},
 	],
@@ -58,6 +65,56 @@ const mergeDiagnostics = async (items: Record<string, unknown>) =>
 	);
 
 describe("validateMergeViabilityFn", () => {
+	it("requires Charges on a source that uses the Deposit action", async () => {
+		const source = mergeSource({
+			action: "deposit",
+			target: {
+				type: "item",
+				itemId: "target",
+			},
+		});
+		const target = createSimpleItem("target");
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+				[target.id]: target,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				path: [
+					"items",
+					"source",
+					"merge",
+					0,
+					"action",
+				],
+				reason: InvalidMergeReasonEnumSchema.enum.SourceChargesDisabled,
+			}),
+		]);
+	});
+
+	it("accepts Deposit when the merge source has Charges", async () => {
+		const source = mergeSource({
+			action: "deposit",
+			charges: {
+				amount: 2,
+			},
+			target: {
+				type: "item",
+				itemId: "target",
+			},
+		});
+		const target = createSimpleItem("target");
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+				[target.id]: target,
+			}),
+		).toEqual([]);
+	});
+
 	it("rejects an exact inventory-only merge target", async () => {
 		const source = mergeSource({
 			target: {

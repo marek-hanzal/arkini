@@ -157,6 +157,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 			const mergeTransition = yield* makeMergeRandomFx({
 				program: applyMergeRuntimeFx({
 					rule: resolved.rule,
+					ruleIndex: resolved.index,
 					runtime,
 					source,
 					target,

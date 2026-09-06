@@ -12,6 +12,7 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
+import { spendActionChargesFx } from "~/production-action/fx/spendActionChargesFx";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
@@ -29,10 +30,12 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function* ({
 	action,
+	actionId,
 	runtime,
 	source,
 }: {
 	readonly action: SourceActionSchema.Type;
+	readonly actionId: string;
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: GridRuntimeItemSchema.Type;
 }) {
@@ -40,6 +43,23 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 		ownerItemId: source.id,
 		runtime,
 	});
+	if (action === SourceActionSchema.enum.Deposit) {
+		const spent = yield* spendActionChargesFx({
+			actionId,
+			cost: 1,
+			itemId: source.id,
+			ownerItemId: source.id,
+			runtime,
+		});
+		return {
+			events: spent.events,
+			runtime: spent.runtime,
+		} satisfies {
+			readonly events: readonly GameEventSchema.Type[];
+			readonly returnDrop?: dropFx.Result;
+			readonly runtime: RuntimeSchema.Type;
+		};
+	}
 
 	if (action === SourceActionSchema.enum.Use) {
 		const pure = isItemPureFn({
@@ -82,6 +102,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	}
 
 	return {
+		events: [],
 		returnDrop:
 			action === SourceActionSchema.enum.Use
 				? {
@@ -92,6 +113,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 				: undefined,
 		runtime: draft,
 	} satisfies {
+		readonly events: readonly GameEventSchema.Type[];
 		readonly returnDrop?: dropFx.Result;
 		readonly runtime: RuntimeSchema.Type;
 	};
@@ -300,6 +322,7 @@ const returnMergeSourceFx = Effect.fn("returnMergeSourceFx")(function* ({
 
 interface ApplyMergeRuntimeProps {
 	readonly rule: MergeSchema.Type;
+	readonly ruleIndex: number;
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: GridRuntimeItemSchema.Type;
 	readonly target: BoardRuntimeItemSchema.Type;
@@ -313,12 +336,14 @@ interface ApplyMergeRuntimeResult {
 /** Applies one resolved directional merge to an immutable candidate runtime. */
 export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	rule,
+	ruleIndex,
 	runtime,
 	source,
 	target,
 }: ApplyMergeRuntimeProps) {
 	const sourceAction = yield* applyMergeSourceActionFx({
 		action: rule.action,
+		actionId: `merge:${ruleIndex}`,
 		runtime,
 		source,
 	});
@@ -333,6 +358,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		runtime: targetEffect.runtime,
 	});
 	const events = [
+		...sourceAction.events,
 		...targetEffect.events,
 	];
 

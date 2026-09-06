@@ -144,8 +144,14 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				ownerItemId: item.id,
 				runtime,
 			});
-			const badgeCount =
-				queueBadgeCount === undefined ? readTileActorBadgeCountFn(item) : queueBadgeCount;
+			const charged = item.item.charges !== undefined;
+			const badgeCount = queueBadgeCount ?? readTileActorBadgeCountFn(item);
+			const badgeKind =
+				queueBadgeCount !== undefined
+					? ("queue" as const)
+					: charged
+						? ("charges" as const)
+						: undefined;
 			const progressRatio = readProgressRatioFn({
 				activeJob,
 				item,
@@ -158,10 +164,10 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					: {
 							badgeCount,
 						}),
-				...(queueBadgeCount === undefined
+				...(badgeKind === undefined
 					? {}
 					: {
-							badgeKind: "queue" as const,
+							badgeKind,
 						}),
 				id: item.id,
 				itemType: item.item.type,

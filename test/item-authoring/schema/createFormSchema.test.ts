@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { FormValues } from "~/item-authoring/schema/FormSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { createFormSchema } from "~/item-authoring/schema/createFormSchema";
 import {
 	createProducerItem,
@@ -24,7 +25,7 @@ const createTargetPaidInput = (itemId: string) => ({
 	},
 });
 
-const readFormValues = (item: ReturnType<typeof createProducerItem>): FormValues => ({
+const readFormValues = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	asset: {
 		default: [
@@ -36,6 +37,45 @@ const readFormValues = (item: ReturnType<typeof createProducerItem>): FormValues
 });
 
 describe("createFormSchema", () => {
+	it("rejects a Deposit merge action after Charges are disabled on its source", () => {
+		const target = createSimpleItem("target");
+		const source = {
+			...createSimpleItem("source"),
+			merge: [
+				{
+					action: "deposit" as const,
+					effect: "keep" as const,
+					target: {
+						type: "item" as const,
+						itemId: target.id,
+					},
+				},
+			],
+		} satisfies ItemSchema.Type;
+		const project = {
+			config: {
+				items: {
+					[source.id]: source,
+					[target.id]: target,
+				},
+			} as GameConfigSchema.Type,
+		};
+		const result = createFormSchema(project, source.uid).safeParse(readFormValues(source));
+
+		expect(result.success).toBe(false);
+		if (result.success) return;
+		expect(result.error.issues).toContainEqual(
+			expect.objectContaining({
+				message: "Enable Charges on this item before selecting Deposit.",
+				path: [
+					"merge",
+					0,
+					"action",
+				],
+			}),
+		);
+	});
+
 	it("rejects a target-paid Deposit that selects an item without Charges", () => {
 		const target = createSimpleItem("target");
 		const producer = createProducerItem({

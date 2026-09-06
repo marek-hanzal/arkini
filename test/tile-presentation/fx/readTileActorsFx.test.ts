@@ -61,6 +61,13 @@ describe("readTileActorsFx", () => {
 		});
 	});
 
+	it("projects remaining uses for an idle charged non-deposit item", () => {
+		expect(readMainActor(createProgressAssetRuntime())).toMatchObject({
+			badgeCount: 1,
+			badgeKind: "charges",
+		});
+	});
+
 	it("projects temporary lifetime without an activity effect", () => {
 		expect(readMainActor(createTemporaryProgressRuntime())).toMatchObject({
 			activityEffect: false,

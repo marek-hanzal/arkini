@@ -8,8 +8,12 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
-import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
+import {
+	createMergeTestConfig,
+	guaranteedMergeOutput,
+} from "~test/item-merge/support/createMergeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 
 const makeState = ({
 	sourceLocation = {
@@ -76,12 +80,23 @@ const runMergeFx = () =>
 			targetRevision: target.revision,
 		});
 		const after = yield* readRuntimeFx();
+		const transition = yield* (yield* CommittedTransitionsFx).read;
 		return {
 			after,
 			before,
 			event,
+			transition,
 		};
 	});
+
+const depositRule = {
+	target: {
+		type: "item",
+		itemId: "target",
+	},
+	action: "deposit",
+	effect: "keep",
+} satisfies MergeSchema.Type;
 
 const combinations: ReadonlyArray<{
 	action: SourceActionSchema.Type;
@@ -218,6 +233,111 @@ describe("mergeItemsFx", () => {
 		expect(targetRemainder?.location).not.toEqual(
 			result.before.items.find((item) => item.id === "runtime:target")?.location,
 		);
+	});
+
+	it("spends one real source charge for a Deposit merge", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: depositRule,
+						sourceCharges: {
+							amount: 2,
+						},
+					}),
+					state: makeState({
+						sourceQuantity: 1,
+					}),
+				}),
+			),
+		);
+
+		expect(result.after.items.find((item) => item.id === "runtime:source")).toMatchObject({
+			quantity: 1,
+			remainingCharges: 1,
+		});
+		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
+			item: {
+				id: "target",
+			},
+			quantity: 1,
+		});
+	});
+
+	it("rejects a Deposit merge when the source has no charges without changing runtime", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.result(runMergeFx());
+				return {
+					after: yield* readRuntimeFx(),
+					attempt,
+					before,
+				};
+			}).pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: depositRule,
+					}),
+					state: makeState({
+						sourceQuantity: 1,
+					}),
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
+				_tag: "ItemChargesUnavailableError",
+				itemId: "runtime:source",
+				remainingCharges: 0,
+			});
+		}
+		expect(result.after).toEqual(result.before);
+	});
+
+	it("runs the standard depletion output after the last deposited source charge", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: depositRule,
+						sourceCharges: {
+							amount: 1,
+							output: guaranteedMergeOutput(),
+						},
+					}),
+					state: makeState({
+						sourceQuantity: 1,
+					}),
+				}),
+			),
+		);
+		const output = result.after.items.find((item) => item.item.id === "output");
+		if (output === undefined) throw new Error("Expected depletion output.");
+
+		expect(result.transition.events).toEqual([
+			result.event,
+			{
+				type: GameEventEnumSchema.enum.ItemDepleted,
+				itemId: "runtime:source",
+				canonicalItemId: "source",
+				location: result.before.items.find((item) => item.id === "runtime:source")
+					?.location,
+				previousQuantity: 1,
+				resultingQuantity: 0,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: output.id,
+				canonicalItemId: "output",
+				originItemId: "runtime:source",
+				location: output.location,
+				quantity: 1,
+			},
+		]);
+		expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
 	});
 
 	it("uses the first source-owned matching rule and never synthesizes the reverse direction", () => {

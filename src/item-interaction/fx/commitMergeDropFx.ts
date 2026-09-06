@@ -116,6 +116,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 				),
 		}),
 		Effect.catchTags({
+			ItemChargesUnavailableError: rejectBlockedFx,
 			ItemStatefulError: rejectBlockedFx,
 			PlacementUnavailableError: rejectBlockedFx,
 			JobOwnerBusyError: rejectBlockedFx,

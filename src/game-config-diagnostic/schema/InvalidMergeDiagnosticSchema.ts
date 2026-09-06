@@ -7,7 +7,7 @@ import { InvalidMergeReasonEnumSchema } from "~/game-config-diagnostic/schema/In
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
-/** One authored merge rule cannot participate in the board-only runtime topology. */
+/** One authored merge rule cannot execute with its configured source and board topology. */
 export const InvalidMergeDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
@@ -24,7 +24,7 @@ export const InvalidMergeDiagnosticSchema = z
 	.strict()
 	.meta({
 		id: "InvalidMergeDiagnosticSchema",
-		description: "An authored merge rule cannot execute through the board-only merge topology.",
+		description: "An authored merge rule cannot execute with its configured source and target.",
 	});
 
 export type InvalidMergeDiagnosticSchema = typeof InvalidMergeDiagnosticSchema;

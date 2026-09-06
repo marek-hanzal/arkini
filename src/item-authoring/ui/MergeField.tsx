@@ -14,9 +14,11 @@ import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorF
 export const MergeField = ({
 	merge,
 	onChangeFn,
+	sourceChargesEnabled,
 }: {
 	readonly merge: MergeSchema.Type;
 	readonly onChangeFn: (merge: MergeSchema.Type) => void;
+	readonly sourceChargesEnabled: boolean;
 }) => {
 	const validationIssues = useFormValidationIssues(merge);
 	return (
@@ -39,6 +41,14 @@ export const MergeField = ({
 									"Permanently removes one source quantity instead of returning it. This consumes the item itself, not one charge. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears.",
 								label: "Consume",
 								value: "consume",
+							},
+							{
+								description: sourceChargesEnabled
+									? "Spends one actual source charge. Spending the last charge depletes one source item and emits its configured depletion output. Example: Flint And Steel + Unlit Candle → Candle; Flint And Steel loses one use."
+									: "Enable Charges on this source item before selecting Deposit. Deposit spends one actual charge and emits its configured depletion output after the last use.",
+								disabled: !sourceChargesEnabled,
+								label: "Deposit",
+								value: "deposit",
 							},
 						]}
 						onChangeFn={(action) =>

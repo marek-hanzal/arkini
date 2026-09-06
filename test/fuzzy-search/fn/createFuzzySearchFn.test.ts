@@ -8,7 +8,7 @@ const candidate = (value: string, ...terms: string[]) => ({
 });
 
 describe("createFuzzySearchFn", () => {
-	it("owns empty, exact, and fuzzy query handling in caller order", () => {
+	it("keeps exact matches first without hiding broader fuzzy matches", () => {
 		const fuzzyFn = createFuzzySearchFn({
 			candidates: [
 				candidate("exact:first", "Bakery I Blueprint"),
@@ -25,6 +25,7 @@ describe("createFuzzySearchFn", () => {
 		expect(fuzzyFn("BAKERY I BLUEPRINT")).toEqual([
 			"exact:first",
 			"exact:second",
+			"fuzzy",
 		]);
 	});
 

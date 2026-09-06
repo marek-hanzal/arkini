@@ -13,7 +13,7 @@ const item = (id: string, title: string) =>
 	}) as ItemSchema.Type;
 
 describe("searchFn", () => {
-	it("uses deterministic Unicode casing for exact matches", () => {
+	it("uses deterministic Unicode casing to rank exact matches first", () => {
 		const dottedUppercaseI = item("dotted", "İTEM");
 		const ascii = item("ascii", "ITEM");
 
@@ -25,9 +25,10 @@ describe("searchFn", () => {
 				],
 				"i\u0307tem",
 			),
-		).toEqual([
-			dottedUppercaseI,
-		]);
+			).toEqual([
+				dottedUppercaseI,
+				ascii,
+			]);
 	});
 
 	it("requires every fuzzy query token while ignoring its word order", () => {

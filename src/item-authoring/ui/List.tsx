@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2";
 import { PackageOpen, Plus } from "lucide-react";
 import { useMemo } from "react";
 
@@ -37,16 +36,6 @@ export const List = ({
 		],
 	);
 	const empty = items.length === 0;
-	const newItemUidByType = useMemo(
-		() =>
-			Object.fromEntries(
-				TypeSchema.options.map((type) => [
-					type,
-					createId(),
-				]),
-			) as Record<TypeSchema.Type, string>,
-		[],
-	);
 	const filteredItems = useMemo(
 		() =>
 			searchFn(
@@ -66,7 +55,6 @@ export const List = ({
 			icon={Plus}
 			label="New item"
 			projectId={project.projectId}
-			readItemUidFn={(type) => newItemUidByType[type]}
 			triggerClassName={empty ? "gap-2" : "h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"}
 			types={TypeSchema.options}
 			variant="primary"

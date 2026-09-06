@@ -140,9 +140,9 @@ export const Detail = ({
 								dataUi="EditorItemConvertMenu"
 								description="Compatible data is kept; unsupported fields are removed on Save."
 								icon={Replace}
+								itemUid={item.uid}
 								label="Convert"
 								projectId={project.projectId}
-								readItemUidFn={() => item.uid}
 								triggerClassName="h-10 min-h-10 gap-2"
 								types={TypeSchema.options.filter((type) => type !== item.type)}
 							/>

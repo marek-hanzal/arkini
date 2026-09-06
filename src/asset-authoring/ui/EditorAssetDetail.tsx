@@ -1,10 +1,13 @@
-import { FileQuestion, Pencil } from "lucide-react";
+import { FileQuestion, PackagePlus, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import {
+	EditorSectionNavigation,
+	EditorSectionNavigationSeparator,
+} from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
 	editorSectionTabClassName,
@@ -13,6 +16,9 @@ import {
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
+import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { Status } from "~/ui/ui/Status";
 
 type EditorAssetDetailPath =
@@ -160,22 +166,37 @@ export const EditorAssetDetail = ({
 						</EditorSectionTabs>
 					}
 					action={
-						<PrimaryButtonLink
-							ref={editActionRef}
-							to="/editor/$projectId/assets/$resourceId/edit"
-							params={{
-								projectId: project.projectId,
-								resourceId,
-							}}
-							search={{
-								filter,
-								query,
-							}}
-							className="min-h-0 gap-2 px-4 py-2 text-sm"
-						>
-							<Pencil className="size-4" />
-							Edit
-						</PrimaryButtonLink>
+						<div className="flex items-center gap-2">
+							<ItemTypeMenu
+								dataUi="EditorAssetCreateItemMenu"
+								defaultItemId={resource.id}
+								defaultTitle={readAssetNameFn(resource.id)}
+								description="Choose the item type to create with this asset."
+								icon={PackagePlus}
+								label="Create item"
+								projectId={project.projectId}
+								resourceId={resource.id}
+								triggerClassName="h-10 min-h-10 gap-2"
+								types={TypeSchema.options}
+							/>
+							<EditorSectionNavigationSeparator />
+							<PrimaryButtonLink
+								ref={editActionRef}
+								to="/editor/$projectId/assets/$resourceId/edit"
+								params={{
+									projectId: project.projectId,
+									resourceId,
+								}}
+								search={{
+									filter,
+									query,
+								}}
+								className="min-h-0 gap-2 px-4 py-2 text-sm"
+							>
+								<Pencil className="size-4" />
+								Edit
+							</PrimaryButtonLink>
+						</div>
 					}
 				/>
 			}

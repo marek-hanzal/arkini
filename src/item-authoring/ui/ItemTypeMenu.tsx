@@ -1,29 +1,37 @@
+import { createId } from "@paralleldrive/cuid2";
 import { FloatingPortal } from "@floating-ui/react";
 import type { LucideIcon } from "lucide-react";
+import { useMemo } from "react";
 
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
 
 /** Selects an item discriminator before opening its standard explicit-save form. */
 export const ItemTypeMenu = ({
 	dataUi,
+	defaultItemId,
+	defaultTitle,
 	description,
 	icon: Icon,
+	itemUid,
 	label,
 	projectId,
-	readItemUidFn,
+	resourceId,
 	triggerClassName,
 	types,
 	variant = "default",
 }: {
 	readonly dataUi: string;
+	readonly defaultItemId?: string;
+	readonly defaultTitle?: string;
 	readonly description: string;
 	readonly icon: LucideIcon;
+	readonly itemUid?: string;
 	readonly label: string;
 	readonly projectId: string;
-	readonly readItemUidFn: (type: TypeSchema.Type) => string;
+	readonly resourceId?: string;
 	readonly triggerClassName?: string;
 	readonly types: ReadonlyArray<TypeSchema.Type>;
 	readonly variant?: "default" | "primary";
@@ -35,6 +43,16 @@ export const ItemTypeMenu = ({
 		open,
 		refs,
 	} = useEditorFloatingMenu();
+	const newItemUidByType = useMemo(
+		() =>
+			Object.fromEntries(
+				TypeSchema.options.map((type) => [
+					type,
+					createId(),
+				]),
+			) as Record<TypeSchema.Type, string>,
+		[],
+	);
 	const Trigger = variant === "primary" ? PrimaryButton : Button;
 	return (
 		<>
@@ -63,11 +81,26 @@ export const ItemTypeMenu = ({
 								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 								params={{
 									projectId,
-									itemUid: readItemUidFn(type),
+									itemUid: itemUid ?? newItemUidByType[type],
 									sectionId: "identity",
 								}}
 								search={{
+									...(defaultItemId === undefined
+										? {}
+										: {
+												defaultItemId,
+											}),
+									...(defaultTitle === undefined
+										? {}
+										: {
+												defaultTitle,
+											}),
 									itemType: type,
+									...(resourceId === undefined
+										? {}
+										: {
+												resourceId,
+											}),
 								}}
 								className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
 							>

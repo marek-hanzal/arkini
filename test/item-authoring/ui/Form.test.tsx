@@ -84,4 +84,48 @@ describe("Form", () => {
 			uid,
 		});
 	});
+
+	it("seeds asset entry-point defaults through the complete blueprint draft", async () => {
+		state.project = project;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(Form, {
+					defaultItemId: "selected_asset-name",
+					defaultTitle: "Selected Asset Name",
+					itemType: "blueprint",
+					resourceId: "selected_asset-name",
+					uid: "draft-with-selected-asset",
+				}),
+			);
+		});
+		const draft = JSON.parse(
+			container.querySelector("output")?.textContent ?? "null",
+		) as ItemSchema.Type;
+		expect(draft).toMatchObject({
+			asset: {
+				default: [
+					"selected_asset-name",
+				],
+			},
+			id: "selected_asset-name",
+			line: {
+				id: "line:selected_asset-name:default",
+				input: [
+					{
+						query: {
+							selector: {
+								itemId: "selected_asset-name",
+							},
+						},
+					},
+				],
+			},
+			title: "Selected Asset Name",
+			type: "blueprint",
+		});
+	});
 });

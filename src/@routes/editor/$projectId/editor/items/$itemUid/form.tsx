@@ -6,16 +6,29 @@ import type { SectionId } from "~/item-authoring/type/Section";
 type OptionalCapability = "charges" | "merges";
 
 interface EditorItemFormSearch {
+	readonly defaultItemId?: string;
+	readonly defaultTitle?: string;
 	readonly enable?: OptionalCapability;
 	readonly itemType?: TypeSchema.Type;
 	readonly lineId?: string;
 	readonly merge?: number;
+	readonly resourceId?: string;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form")({
 	validateSearch: (search): EditorItemFormSearch => {
 		const merge = typeof search.merge === "number" ? search.merge : Number.NaN;
 		return {
+			...(typeof search.defaultItemId === "string" && search.defaultItemId.length > 0
+				? {
+						defaultItemId: search.defaultItemId,
+					}
+				: {}),
+			...(typeof search.defaultTitle === "string" && search.defaultTitle.length > 0
+				? {
+						defaultTitle: search.defaultTitle,
+					}
+				: {}),
 			...(search.enable === "charges" || search.enable === "merges"
 				? {
 						enable: search.enable,
@@ -36,11 +49,17 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						merge,
 					}
 				: {}),
+			...(typeof search.resourceId === "string" && search.resourceId.length > 0
+				? {
+						resourceId: search.resourceId,
+					}
+				: {}),
 		};
 	},
 	component: () => {
 		const { itemUid } = Route.useParams();
-		const { enable, itemType, lineId, merge } = Route.useSearch();
+		const { defaultItemId, defaultTitle, enable, itemType, lineId, merge, resourceId } =
+			Route.useSearch();
 		const params = useParams({
 			strict: false,
 		});
@@ -49,10 +68,13 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		) as SectionId;
 		return (
 			<Form
+				defaultItemId={defaultItemId}
+				defaultTitle={defaultTitle}
 				enableCapability={enable}
 				itemType={itemType}
 				mergeIndex={merge}
 				productionLineId={lineId}
+				resourceId={resourceId}
 				sectionId={sectionId}
 				uid={itemUid}
 			>

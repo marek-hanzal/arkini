@@ -11,16 +11,22 @@ const inactiveProps = {
 } as const;
 
 export const SectionLink = ({
+	defaultItemId,
+	defaultTitle,
 	destination = "form",
 	itemType,
 	itemUid,
 	projectId,
+	resourceId,
 	section,
 }: {
+	readonly defaultItemId?: string;
+	readonly defaultTitle?: string;
 	readonly destination?: "detail" | "form";
 	readonly itemType?: TypeSchema.Type;
 	readonly itemUid: string;
 	readonly projectId: string;
+	readonly resourceId?: string;
 	readonly section: SectionDescriptor;
 }) => (
 	<ButtonLink
@@ -34,13 +40,28 @@ export const SectionLink = ({
 			itemUid,
 			sectionId: section.id,
 		}}
-		search={
-			itemType === undefined
+		search={{
+			...(defaultItemId === undefined
+				? {}
+				: {
+						defaultItemId,
+					}),
+			...(defaultTitle === undefined
+				? {}
+				: {
+						defaultTitle,
+					}),
+			...(itemType === undefined
 				? {}
 				: {
 						itemType,
-					}
-		}
+					}),
+			...(resourceId === undefined
+				? {}
+				: {
+						resourceId,
+					}),
+		}}
 		activeProps={activeProps}
 		inactiveProps={inactiveProps}
 		className={editorSectionTabClassName}

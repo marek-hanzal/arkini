@@ -16,20 +16,26 @@ import { useFormController } from "~/item-authoring/ui/useFormController";
 /** Owns navigation, controller state, tabs, and save presentation for one item form lifecycle. */
 export const FormSession = ({
 	children,
+	defaultItemId,
+	defaultTitle,
 	enableCapability,
 	initialItem,
 	isNew,
 	itemType,
 	mergeIndex,
 	productionLineId,
+	resourceId,
 	sectionId,
 }: PropsWithChildren<{
+	readonly defaultItemId?: string;
+	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
 	readonly initialItem: ItemSchema.Type;
 	readonly isNew: boolean;
 	readonly itemType?: TypeSchema.Type;
 	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
+	readonly resourceId?: string;
 	readonly sectionId: SectionId;
 }>) => {
 	const navigateFn = useNavigate();
@@ -44,10 +50,25 @@ export const FormSession = ({
 					sectionId: nextSectionId,
 				},
 				search: {
+					...(defaultItemId === undefined
+						? {}
+						: {
+								defaultItemId,
+							}),
+					...(defaultTitle === undefined
+						? {}
+						: {
+								defaultTitle,
+							}),
 					...(itemType === undefined
 						? {}
 						: {
 								itemType,
+							}),
+					...(resourceId === undefined
+						? {}
+						: {
+								resourceId,
 							}),
 					...(nextSectionId === "merges" && typeof path[1] === "number"
 						? {
@@ -57,10 +78,13 @@ export const FormSession = ({
 				},
 			}),
 		[
+			defaultItemId,
+			defaultTitle,
 			initialItem.uid,
 			itemType,
 			navigateFn,
 			project.projectId,
+			resourceId,
 		],
 	);
 	const controller = useFormController({
@@ -172,10 +196,13 @@ export const FormSession = ({
 						<EditorSectionTabs>
 							{sections.map((candidate) => (
 								<SectionLink
+									defaultItemId={defaultItemId}
+									defaultTitle={defaultTitle}
 									key={candidate.id}
 									itemType={itemType}
 									itemUid={params.itemUid}
 									projectId={params.projectId}
+									resourceId={resourceId}
 									section={candidate}
 								/>
 							))}

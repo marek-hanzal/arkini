@@ -8,15 +8,13 @@ import {
 	type EditorSearchOption,
 } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
+import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
 
 interface AssetAutocompleteFieldProps {
 	readonly description?: string;
 	readonly label: string;
 	readonly optional?: boolean;
 }
-
-const readAssetNameFn = (id: string) =>
-	id.replaceAll(/[-_]+/g, " ").replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase());
 
 /** Picks one PNG asset known by the active editor project. */
 export const AssetAutocompleteField = ({

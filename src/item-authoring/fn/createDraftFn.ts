@@ -7,14 +7,20 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 interface CreateDraftFnProps {
+	readonly itemId?: string;
 	readonly resourceId: string;
 	readonly type: TypeSchema.Type;
 	readonly uid: string;
 }
 
 /** Creates the canonical starting shape shared by UI, MCP, and type conversions. */
-export const createDraftFn = ({ resourceId, type, uid }: CreateDraftFnProps): ItemSchema.Type => {
-	const itemId = type === "producer" ? "producer:new-item" : "item:new-item";
+export const createDraftFn = ({
+	itemId: requestedItemId,
+	resourceId,
+	type,
+	uid,
+}: CreateDraftFnProps): ItemSchema.Type => {
+	const itemId = requestedItemId ?? (type === "producer" ? "producer:new-item" : "item:new-item");
 	const base = {
 		uid,
 		id: itemId,

@@ -9,22 +9,36 @@ import type { OptionalCapability, SectionId } from "~/item-authoring/type/Sectio
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
-const useDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type => {
+const useDraft = (
+	defaultItemId: string | undefined,
+	defaultTitle: string | undefined,
+	type: TypeSchema.Type,
+	uid: string,
+	resourceId?: string,
+): ItemSchema.Type => {
 	const project = useEditorProject();
 	return useMemo(() => {
 		const draft = createDraftFn({
-			resourceId: project.resources[0]?.id ?? "missing-asset",
+			itemId: defaultItemId,
+			resourceId: resourceId ?? project.resources[0]?.id ?? "missing-asset",
 			type,
 			uid,
 		});
-		if (draft.type !== "blueprint") return draft;
+		const namedDraft =
+			defaultTitle === undefined
+				? draft
+				: {
+						...draft,
+						title: defaultTitle,
+					};
+		if (namedDraft.type !== "blueprint") return namedDraft;
 		return {
-			...draft,
+			...namedDraft,
 			charges: {
 				amount: 1,
 			},
 			line: {
-				...draft.line,
+				...namedDraft.line,
 				input: [
 					{
 						type: "deposit",
@@ -37,7 +51,7 @@ const useDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type => {
 							distance: "self",
 							selector: {
 								type: "item",
-								itemId: draft.id,
+								itemId: namedDraft.id,
 							},
 						},
 					},
@@ -45,17 +59,23 @@ const useDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type => {
 			},
 		} satisfies ItemSchema.Type;
 	}, [
+		defaultItemId,
+		defaultTitle,
 		project.resources,
+		resourceId,
 		type,
 		uid,
 	]);
 };
 
 interface FormProps extends PropsWithChildren {
+	readonly defaultItemId?: string;
+	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
 	readonly itemType?: TypeSchema.Type;
 	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
+	readonly resourceId?: string;
 	readonly sectionId?: SectionId;
 	readonly uid: string;
 }
@@ -63,15 +83,24 @@ interface FormProps extends PropsWithChildren {
 /** Resolves a canonical item by UID or seeds its first local form from itemType. */
 export const Form = ({
 	children,
+	defaultItemId,
+	defaultTitle,
 	enableCapability,
 	itemType,
 	mergeIndex,
 	productionLineId,
+	resourceId,
 	sectionId = "identity",
 	uid,
 }: FormProps) => {
 	const persistedItem = useItemByUid(uid);
-	const draft = useDraft(itemType ?? persistedItem?.type ?? "simple", uid);
+	const draft = useDraft(
+		defaultItemId,
+		defaultTitle,
+		itemType ?? persistedItem?.type ?? "simple",
+		uid,
+		resourceId,
+	);
 	if (persistedItem === undefined && itemType === undefined) return <NotFound uid={uid} />;
 	const initialItem =
 		persistedItem === undefined
@@ -83,12 +112,15 @@ export const Form = ({
 	return (
 		<FormSession
 			key={`${initialItem.uid}:${initialItem.type}`}
+			defaultItemId={defaultItemId}
+			defaultTitle={defaultTitle}
 			enableCapability={enableCapability}
 			initialItem={initialItem}
 			isNew={isNew}
 			itemType={itemType}
 			mergeIndex={mergeIndex}
 			productionLineId={productionLineId}
+			resourceId={resourceId}
 			sectionId={sectionId}
 		>
 			{children}

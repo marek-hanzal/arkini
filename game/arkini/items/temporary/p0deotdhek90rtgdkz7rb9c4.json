@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "p0deotdhek90rtgdkz7rb9c4",
+		"id": "bread-basket",
+		"title": "Bread Basket",
+		"description": "Some fresh bread and stuff",
+		"asset": {
+			"default": [
+				"bread-basket"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 600000
+	}
+}

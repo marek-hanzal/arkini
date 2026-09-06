@@ -1,0 +1,74 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ovv04m3gxvmdrl88lalr4qn8",
+		"id": "marek",
+		"title": "Marek",
+		"description": "The Author",
+		"asset": {
+			"default": [
+				"avatar-02"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sarka"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "weight",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"drop": [
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "tomasek",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "bobik",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
+		"type": "simple"
+	}
+}

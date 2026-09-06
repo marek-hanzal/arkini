@@ -1,0 +1,109 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "sy01gwgqbum87oa96usrv67x",
+		"id": "cotton-field",
+		"title": "Cotton Field",
+		"description": "Grows cotton",
+		"asset": {
+			"default": [
+				"cotton-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 24,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 4,
+		"type": "deposit",
+		"lines": [
+			{
+				"id": "cotton",
+				"title": "Cotton",
+				"description": "Cotton",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "deposit",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cotton-field"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cotton",
+											"quantity": {
+												"min": 1,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

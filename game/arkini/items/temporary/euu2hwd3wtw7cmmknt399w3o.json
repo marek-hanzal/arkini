@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "euu2hwd3wtw7cmmknt399w3o",
+		"id": "toy-sloth",
+		"title": "Toy Sloth",
+		"description": "This one gets lost too",
+		"asset": {
+			"default": [
+				"avatar-06"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 120000
+	}
+}

@@ -58,9 +58,15 @@ export const createFuzzySearchFn = <Value>({
 		const exact = documents.filter(({ terms }) =>
 			terms.some((term) => normalizeExactTermFn(term) === exactQuery),
 		);
-		if (exact.length > 0) return exact.map(({ value }) => value);
 		const fuzzyMatches = fuse.search(normalizedQuery);
 		fuzzyMatches.sort(compareSearchResultFn);
-		return fuzzyMatches.map(({ item }) => item.value);
+		if (exact.length === 0) return fuzzyMatches.map(({ item }) => item.value);
+		const exactOrders = new Set(exact.map(({ order }) => order));
+		return [
+			...exact.map(({ value }) => value),
+			...fuzzyMatches
+				.filter(({ item }) => !exactOrders.has(item.order))
+				.map(({ item }) => item.value),
+		];
 	};
 };

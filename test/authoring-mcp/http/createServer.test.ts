@@ -244,7 +244,17 @@ describe("editor MCP server", () => {
 						id: "project-context",
 					},
 				},
-				resources: editorTestPayload.resources,
+				resources: [
+					...editorTestPayload.resources,
+					{
+						...editorTestPayload.resources[0],
+						id: "cow",
+					},
+					{
+						...editorTestPayload.resources[0],
+						id: "cow-farm",
+					},
+				],
 			}),
 		);
 		ownership.setProjectContextFn("project-context");
@@ -258,7 +268,7 @@ describe("editor MCP server", () => {
 		const assets = await client.callTool({
 			name: "asset_collection",
 			arguments: {
-				query: "item-water",
+				query: "cow",
 				type: "image",
 			},
 		});
@@ -276,7 +286,9 @@ describe("editor MCP server", () => {
 		]);
 		expect(assets.content).toMatchObject([
 			{
-				text: expect.stringContaining("- Type: image\n  ID: item-water"),
+				text: expect.stringMatching(
+					/- Type: image\n  ID: cow\n\n- Type: image\n  ID: cow-farm/,
+				),
 			},
 		]);
 		expect(rejectedLegacyPagination).toMatchObject({

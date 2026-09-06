@@ -11,6 +11,7 @@ export const RuntimeCheckIssueEnumSchema = z
 		JobQueueExceeded: "job:queue-exceeded",
 		JobTimeInvalid: "job:time-invalid",
 		JobMaterialOrphan: "job:material-orphan",
+		JobMaterialInput: "job:material-input",
 		JobConsumedMaterialState: "job:consumed-material-state",
 		DuplicateItemId: "item:id:duplicate",
 		ItemMaxCount: "item:max-count",

@@ -6,7 +6,7 @@ export const ItemTemporaryDurationIssueReasonEnumSchema = z
 		MissingState: "missing-state",
 		UnexpectedState: "unexpected-state",
 		ExceedsDuration: "exceeds-duration",
-		NotBoard: "not-board",
+		UnsupportedLocation: "unsupported-location",
 	})
 	.meta({
 		id: "ItemTemporaryDurationIssueReasonEnumSchema",

@@ -85,7 +85,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - line input is passive; Enqueue and Tick own execution;
-- material selectors name items capable of input storage; temporary Board identities are invalid material;
+- material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
 - positive extra material capacity is supported only for producer-owned lines;
 - `self` charge costs use the line owner, while `target` is valid only for a deposit input and its deterministic Board payer;
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode;

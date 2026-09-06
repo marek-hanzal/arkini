@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One live runtime item temporarily reserved by an active job. */
@@ -12,6 +13,10 @@ export const ReservedLocationSchema = z
 		]),
 		/** Stable identity of the active job retaining this item. */
 		jobId: IdSchema.describe("The active job retaining this runtime item."),
+		/** Input slot that reserved this material. */
+		inputIndex: NonNegativeIntegerSchema.describe(
+			"The zero-based material input that reserved this item.",
+		),
 	})
 	.strict()
 	.meta({

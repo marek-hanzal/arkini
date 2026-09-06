@@ -8,6 +8,7 @@ import { JobOwnerMultipleActiveIssueSchema } from "~/production-job/schema/JobOw
 import { JobOwnerNotOnGridIssueSchema } from "~/production-job/schema/JobOwnerNotOnGridIssueSchema";
 import { JobQueueExceededIssueSchema } from "~/production-job/schema/JobQueueExceededIssueSchema";
 import { JobConsumedMaterialStateIssueSchema } from "~/production-job/schema/JobConsumedMaterialStateIssueSchema";
+import { JobMaterialInputIssueSchema } from "~/production-job/schema/JobMaterialInputIssueSchema";
 import { JobMaterialOrphanIssueSchema } from "~/production-job/schema/JobMaterialOrphanIssueSchema";
 import { JobTimeInvalidIssueSchema } from "~/production-job/schema/JobTimeInvalidIssueSchema";
 import { InputCapacityExceededIssueSchema } from "~/production-input/schema/InputCapacityExceededIssueSchema";
@@ -39,6 +40,7 @@ export const RuntimeCheckIssueSchema = z
 		JobQueueExceededIssueSchema,
 		JobTimeInvalidIssueSchema,
 		JobMaterialOrphanIssueSchema,
+		JobMaterialInputIssueSchema,
 		JobConsumedMaterialStateIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,

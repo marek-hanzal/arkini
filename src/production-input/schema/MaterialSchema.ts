@@ -35,7 +35,8 @@ export const MaterialSchema = z
 		 * A reserved input retains the same live instance in reserved scope and uses
 		 * canonical existing-item placement when work completes. A consumed input
 		 * discards passive owned state when the job starts and its committed root when
-		 * the job completes. Started jobs are not cancellable.
+		 * the job completes. Expired temporary material may abort an active job whose
+		 * remaining committed quantity no longer satisfies this input's minimum.
 		 */
 		mode: ModeSchema.default(ModeSchema.enum.Consume).describe(
 			"Whether this input is consumed or reserved; defaults to consume.",

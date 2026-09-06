@@ -30,10 +30,11 @@ const owner = {
 };
 const consumedRoot = {
 	id: "runtime:consumed-root",
-	itemId: "forge",
+	itemId: "water",
 	location: {
 		scope: "job" as const,
 		jobId: job.id,
+		inputIndex: 0,
 	},
 	quantity: 1,
 };
@@ -75,6 +76,12 @@ describe("fromStateFx job material invariants", () => {
 		const chargedConfig = createJobTestConfig();
 		const worker = chargedConfig.items.forge;
 		if (worker.type !== "producer") throw new Error("Expected producer fixture.");
+		const reservedInput = worker.lines[0].input[1];
+		if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
+		reservedInput.selector = {
+			type: "item",
+			itemId: "forge",
+		};
 		worker.charges = {
 			amount: 2,
 		};
@@ -93,6 +100,7 @@ describe("fromStateFx job material invariants", () => {
 					location: {
 						scope: "reserved" as const,
 						jobId: job.id,
+						inputIndex: 1,
 					},
 					remainingCharges: 1,
 					quantity: 1,
@@ -129,6 +137,7 @@ describe("fromStateFx job material invariants", () => {
 			location: {
 				scope: "reserved",
 				jobId: job.id,
+				inputIndex: 1,
 			},
 		});
 		expect(
@@ -300,6 +309,7 @@ describe("fromStateFx job material invariants", () => {
 					location: {
 						scope: "reserved" as const,
 						jobId: childJob.id,
+						inputIndex: 1,
 					},
 					quantity: 1,
 				},

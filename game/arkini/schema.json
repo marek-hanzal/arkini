@@ -2288,7 +2288,7 @@
 					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
 				},
 				"output": {
-					"description": "The optional output intended for the released board cell after expiry.",
+					"description": "The optional output placed from the temporary identity's visible Board origin after expiry.",
 					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
 				}
 			},
@@ -2304,7 +2304,7 @@
 				"durationMs"
 			],
 			"additionalProperties": false,
-			"description": "A board-only, non-stackable item configuration with lifetime and optional expiry output."
+			"description": "A Board-authored, non-stackable item configuration with lifetime and optional expiry output."
 		},
 		"item.InventorySchema": {
 			"type": "object",

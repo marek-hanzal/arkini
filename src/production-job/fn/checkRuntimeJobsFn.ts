@@ -9,6 +9,7 @@ import type { JobOwnerMultipleActiveIssueSchema } from "~/production-job/schema/
 import type { JobOwnerNotOnGridIssueSchema } from "~/production-job/schema/JobOwnerNotOnGridIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/production-job/schema/JobQueueExceededIssueSchema";
 import type { JobConsumedMaterialStateIssueSchema } from "~/production-job/schema/JobConsumedMaterialStateIssueSchema";
+import type { JobMaterialInputIssueSchema } from "~/production-job/schema/JobMaterialInputIssueSchema";
 import type { JobMaterialOrphanIssueSchema } from "~/production-job/schema/JobMaterialOrphanIssueSchema";
 import type { JobTimeInvalidIssueSchema } from "~/production-job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
@@ -18,6 +19,8 @@ import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemS
 import { readRuntimeItemOwnedStateFn } from "~/game-runtime/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
+import { TypeSchema as InputTypeSchema } from "~/production-input/schema/TypeSchema";
 
 export namespace checkRuntimeJobsFn {
 	export interface Props {
@@ -35,6 +38,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
 	const materialOrphanIssues: JobMaterialOrphanIssueSchema.Type[] = [];
+	const materialInputIssues: JobMaterialInputIssueSchema.Type[] = [];
 	const consumedStateIssues: JobConsumedMaterialStateIssueSchema.Type[] = [];
 	const queue = runtime.jobQueue;
 	const entries = [
@@ -129,12 +133,46 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 		)
 			continue;
 		const location = item.location;
-		if (!runtime.jobs.some((job) => job.id === location.jobId)) {
+		const job = runtime.jobs.find((candidate) => candidate.id === location.jobId);
+		if (job === undefined) {
 			materialOrphanIssues.push({
 				itemId: item.id,
 				jobId: location.jobId,
 				location,
 				type: RuntimeCheckIssueEnumSchema.enum.JobMaterialOrphan,
+			});
+			continue;
+		}
+		const owner = runtime.items.find((candidate) => candidate.id === job.ownerItemId);
+		if (owner === undefined) continue;
+		const line = readItemLineFn({
+			item: owner.item,
+			lineId: job.lineId,
+		});
+		if (line === undefined) continue;
+		const input = line.input[location.inputIndex];
+		if (input === undefined || input.type !== InputTypeSchema.enum.Materials) {
+			materialInputIssues.push({
+				itemId: item.id,
+				jobId: job.id,
+				location,
+				reason: "slot-invalid",
+				type: RuntimeCheckIssueEnumSchema.enum.JobMaterialInput,
+			});
+			continue;
+		}
+		if (
+			!matchesItemSelectorFn({
+				item: item.item,
+				selector: input.selector,
+			})
+		) {
+			materialInputIssues.push({
+				itemId: item.id,
+				jobId: job.id,
+				location,
+				reason: "selector-mismatch",
+				type: RuntimeCheckIssueEnumSchema.enum.JobMaterialInput,
 			});
 		}
 	}
@@ -178,6 +216,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 		...queueIssues,
 		...timeIssues,
 		...materialOrphanIssues,
+		...materialInputIssues,
 		...consumedStateIssues,
 	];
 };

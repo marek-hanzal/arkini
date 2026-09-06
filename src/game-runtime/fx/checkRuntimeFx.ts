@@ -209,14 +209,17 @@ const checkRuntimeItemTemporaryDurationsFn = (runtime: RuntimeSchema.Type) => {
 			continue;
 		}
 
-		if (item.location.scope !== LocationScopeEnumSchema.enum.Board) {
+		if (
+			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
+		) {
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 				itemId: item.id,
 				durationMs: item.item.durationMs,
 				remainingDurationMs: item.remainingDurationMs,
 				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.NotBoard,
+				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnsupportedLocation,
 			});
 		}
 		if (item.remainingDurationMs === undefined) {

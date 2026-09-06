@@ -62,6 +62,13 @@ Tick: ready Job in stable ID order
 → relocate reserved material
 → commit all or nothing
 
+Tick: ready temporary material after completion settlement
+→ remove the temporary identity and place expiry output from the visible owner origin
+→ keep the Job when every material minimum still holds
+→ otherwise remove the Job and consumed roots, then relocate reservations
+→ retry idle FIFO queue heads
+→ commit all or nothing
+
 clear pending owner queue
 → preserve active Job and its consumed/reserved material
 → return buffered roots for the cleared request lines

@@ -48,7 +48,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 	);
 
 describe("validateMaterialInputEligibilityFn", () => {
-	it("rejects an exact temporary material candidate", async () => {
+	it("accepts an exact temporary material candidate", async () => {
 		const owner = createProducerItem({
 			id: "producer:test",
 			input: materialInput({
@@ -63,14 +63,7 @@ describe("validateMaterialInputEligibilityFn", () => {
 				[owner.id]: owner,
 				[temporary.id]: temporary,
 			}),
-		).toEqual([
-			expect.objectContaining({
-				ownerItemId: owner.id,
-				lineId: "line:test",
-				inputIndex: 0,
-				candidateItemId: temporary.id,
-			}),
-		]);
+		).toEqual([]);
 	});
 
 	it("leaves a missing exact candidate to reference validation", async () => {

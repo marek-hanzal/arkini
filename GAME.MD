@@ -44,9 +44,11 @@ durationMs
 remainingMs
 ```
 
-Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. Started jobs cannot be cancelled.
+Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. There is no player cancellation command for an active job; expiry of committed temporary material is the one engine-owned abort path.
 
-Temporary items are Board-only, identity-bound, and non-stackable. Each persists `remainingDurationMs`, initialized from authored `durationMs`; identities present at a step boundary lose one step. Job output created in the current step starts at full duration. Ready temporaries expire after job completion in stable runtime-ID order. Expiry removes the item, resolves optional deterministic output from its released origin, and rolls back to the same zero-duration item if placement fails.
+Temporary items are Board-authored, identity-bound, and non-stackable. Each persists `remainingDurationMs`, initialized from authored `durationMs`; identities present at a step boundary lose one step while on the Board, in delivery, in an input buffer, or committed to a job. Inventory and Toolbar remain invalid temporary storage. Job output created in the current step starts at full duration.
+
+Ready temporaries expire after job completion in stable runtime-ID order, so a job completion tied with its material expiry wins. Expiry output uses the visible Board origin: the item's own cell, its delivery lease, its input owner, or its job owner. The expiry, optional deterministic output, affected-job reconciliation, and reservation returns commit atomically. Failed placement leaves the same zero-duration item in place; an affected active job stays frozen until expiry can settle.
 
 ## Material ownership
 
@@ -55,7 +57,9 @@ Material input uses one exact canonical item selector and one of two modes:
 - `consume`: the material stays intact while buffered; start discards its passive owned subtree, moves only the inaccessible root into `job` scope, and completion destroys it permanently. Conversion is not charge depletion and emits no depletion output.
 - `reserve`: start moves the same live instance into `reserved` scope. Completion relocates it from the owner's current Board origin. Pure material may normalize into ordinary stacks/identities; impure material preserves exact identity and needs one exclusive cell.
 
-Neither mode remembers historical stack, slot, or position. Job-owned material is inaccessible to generic mutations. A zero-capacity material input closes while its line runs; positive capacity remains open as storage. Temporary items cannot enter material input.
+Neither mode remembers historical stack, slot, or position. Each committed root retains its material input index so live requirements remain attributable. Job-owned material is inaccessible to generic mutations. A zero-capacity material input closes while its line runs; positive capacity remains open as storage. Temporary items may enter material input and keep aging through buffering and active work.
+
+When committed temporary material expires, the job rechecks every material input against its required minimum. Enough remaining committed quantity lets the job continue. Otherwise the engine removes the job and its remaining consumed roots, returns every reservation through canonical placement, preserves queued intent, and produces no line output. Charges spent at start are not refunded. A successful expiry immediately retries idle FIFO queue heads against the resulting Runtime.
 
 Removing an authored idle Board owner releases its buffered roots through canonical existing-item placement in the same transition. A loaded passive owner must return to a Board first because no passive coordinate is reinterpreted as a Board origin. Any blocked release rolls the removal back.
 
@@ -99,7 +103,7 @@ validate live + reserved maxCount
 
 `drop` starts from the supplied origin; `random` chooses one Board origin, including occupied cells, then uses the same stack-first, nearest-first policy. An `any` item may fall back Board → Inventory → Toolbar, never another Board. Existing pure items may normalize; impure items keep exact identity and require one empty cell. Partial placement is forbidden and rolls back the owning mutation.
 
-Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed, used, or charged through `deposit`; one Board target is kept/removed/replaced; and optional output uses ordinary placement. `use` returns the source through ordinary placement without spending charges. `deposit` spends one real source charge and runs the standard depletion output when the last charge is spent. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
+Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed, used, or charged through `deposit`; one Board target is kept/removed/replaced; and optional output uses ordinary placement. Replacing a temporary target discards its remaining lifetime and initializes the replacement through its own canonical item state. `use` returns the source through ordinary placement without spending charges. `deposit` spends one real source charge and runs the standard depletion output when the last charge is spent. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
 
 ## Cheats, save, and presentation
 
@@ -111,4 +115,4 @@ Serializable State contains items, deliveries, jobs, queues, current space, and 
 
 Presentation may trail canonical Runtime and may redirect, shorten, collapse, or skip choreography. It never determines readiness, validity, placement, queue/job state, Tick progress, save, or event publication; a new subscriber never receives old events merely because another surface is still animating them.
 
-Do not add job cancellation, wall-clock job timestamps, reverse reservation history, queue overtaking, partial output, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.
+Do not add player-driven job cancellation, wall-clock job timestamps, reverse reservation history, queue overtaking, partial output, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.

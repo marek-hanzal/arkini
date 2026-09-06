@@ -132,6 +132,7 @@ const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementCharg
 		item: {
 			...target,
 			remainingCharges: undefined,
+			remainingDurationMs: undefined,
 		},
 		runtime,
 	});

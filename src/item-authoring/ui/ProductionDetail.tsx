@@ -1,10 +1,12 @@
 import { Factory } from "lucide-react";
 
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { DetailFact, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { Status } from "~/ui/ui/Status";
 
 /** Dispatches production-capable lines, temporary lifetime, or the disabled contract. */
@@ -32,18 +34,22 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 			/>
 		);
 	return (
-		<div className="grid gap-6">
-			<DetailSection title="Lifetime">
-				<DetailFact
-					label="Duration"
-					value={`${item.durationMs} ms`}
+		<div className="grid gap-3">
+			<EditorRootCard dataUi="EditorTemporaryLifetimeCard">
+				<DetailSection title="Lifetime">
+					<DetailFact
+						label="Duration"
+						value={formatDurationFn(item.durationMs)}
+					/>
+				</DetailSection>
+			</EditorRootCard>
+			<EditorRootCard dataUi="EditorTemporaryExpiryOutputCard">
+				<OutputDetail
+					emptyLabel="No expiry output configured."
+					output={item.output}
+					title="Expiry output"
 				/>
-			</DetailSection>
-			<OutputDetail
-				emptyLabel="No expiry output configured."
-				output={item.output}
-				title="Expiry output"
-			/>
+			</EditorRootCard>
 		</div>
 	);
 };

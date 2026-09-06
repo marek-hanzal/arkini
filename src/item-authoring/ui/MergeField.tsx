@@ -30,13 +30,13 @@ export const MergeField = ({
 						options={[
 							{
 								description:
-									"Uses one source quantity for the merge and returns that same source item to the board afterward. The source must not own state such as charges or jobs.",
+									"Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend charges. A source instance with spent charges, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all charges unchanged.",
 								label: "Use",
 								value: "use",
 							},
 							{
 								description:
-									"Permanently consumes one source quantity when the merge resolves, including state owned by that consumed source.",
+									"Permanently removes one source quantity instead of returning it. This consumes the item itself, not one charge. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears.",
 								label: "Consume",
 								value: "consume",
 							},
@@ -65,19 +65,19 @@ export const MergeField = ({
 						options={[
 							{
 								description:
-									"Leaves the matched target item unchanged after the merge resolves.",
+									"Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged.",
 								label: "Keep",
 								value: "keep",
 							},
 							{
 								description:
-									"Removes one quantity from the matched target. A larger target stack keeps its remaining quantity.",
+									"Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action.",
 								label: "Remove",
 								value: "remove",
 							},
 							{
 								description:
-									"Replaces one quantity of the matched target with the selected replacement item. Any remaining target stack is placed back nearby.",
+									"Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent charges carry over only to a compatible charged replacement; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle.",
 								label: "Replace",
 								value: "replace",
 							},

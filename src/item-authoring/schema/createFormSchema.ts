@@ -49,6 +49,18 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 				],
 			});
 		}
+		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
+			if (merge.action !== "deposit" || item.charges !== undefined) continue;
+			context.addIssue({
+				code: "custom",
+				message: "Enable Charges on this item before selecting Deposit.",
+				path: [
+					"merge",
+					mergeIndex,
+					"action",
+				],
+			});
+		}
 		for (const collection of readInputCollectionsFn(item)) {
 			for (const [inputIndex, input] of collection.input.entries()) {
 				if (input.type !== "deposit") continue;

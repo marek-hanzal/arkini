@@ -1,14 +1,17 @@
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { ChargeSchema } from "~/item-definition/schema/ChargeSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({
+	charges,
 	id,
 	maxCount,
 	maxStackSize = 10,
 	merge,
 	scope = "any",
 }: {
+	charges?: ChargeSchema.Type;
 	id: string;
 	maxCount?: number;
 	maxStackSize?: number;
@@ -22,6 +25,7 @@ const simpleItem = ({
 	id,
 	title: id,
 	description: id,
+	charges,
 	asset: {
 		default: [
 			`asset:${id}`,
@@ -46,6 +50,7 @@ export const createMergeTestConfig = ({
 	outputMaxStackSize = 10,
 	resultMaxCount,
 	rule,
+	sourceCharges,
 	sourceMaxCount,
 	sourceMaxStackSize = 10,
 	sourceScope = "any",
@@ -67,6 +72,7 @@ export const createMergeTestConfig = ({
 				MergeSchema.Type,
 				...MergeSchema.Type[],
 		  ];
+	sourceCharges?: ChargeSchema.Type;
 	sourceMaxCount?: number;
 	sourceMaxStackSize?: number;
 	sourceScope?: "any" | "board" | "inventory";
@@ -87,6 +93,7 @@ export const createMergeTestConfig = ({
 		},
 		items: {
 			source: simpleItem({
+				charges: sourceCharges,
 				id: "source",
 				maxCount: sourceMaxCount,
 				maxStackSize: sourceMaxStackSize,

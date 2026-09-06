@@ -1148,7 +1148,8 @@
 			"type": "string",
 			"enum": [
 				"use",
-				"consume"
+				"consume",
+				"deposit"
 			],
 			"description": "The action applied to a source item after it initiates a merge."
 		},

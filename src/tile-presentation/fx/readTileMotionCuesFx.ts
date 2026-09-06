@@ -159,6 +159,11 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 			: {
 					badgeCount,
 				}),
+		...(source.item.charges === undefined
+			? {}
+			: {
+					badgeKind: "charges" as const,
+				}),
 		id: source.id,
 		itemType: source.item.type,
 		location: source.location,

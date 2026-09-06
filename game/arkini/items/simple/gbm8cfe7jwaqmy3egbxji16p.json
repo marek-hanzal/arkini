@@ -21,7 +21,7 @@
 					"type": "item",
 					"itemId": "unlit-candle"
 				},
-				"action": "use",
+				"action": "deposit",
 				"effect": "replace",
 				"result": "candle"
 			}

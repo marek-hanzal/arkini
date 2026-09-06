@@ -48,7 +48,7 @@ const fitSingleLineTextFx = Effect.fn("fitSingleLineTextFx")(
 
 const tileToSlotRatio = 0.8;
 const layeredArtworkToFaceRatio = 0.75;
-const formatTileBadgeLabelFn = (count: number, kind?: "queue") =>
+const formatTileBadgeLabelFn = (count: number, kind?: "charges" | "queue") =>
 	`${kind === "queue" ? "x" : ""}${count > 99 ? "99+" : String(count)}`;
 
 /** Applies one complete logical face revision to one private visual slot. */

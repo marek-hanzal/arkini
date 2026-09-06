@@ -19,6 +19,8 @@ const readOwnerItemIdFn = (route: AcquisitionRoute) => {
 			return route.metadata.chargedItemId;
 		case "merge-output":
 			return route.metadata.sourceItemId;
+		case "merge-charge-depletion":
+			return route.metadata.sourceItemId;
 		case "temporary-expiry":
 			return route.metadata.itemId;
 	}
@@ -39,6 +41,10 @@ const readReferenceFn = (route: AcquisitionRoute): ItemOriginSourceReference => 
 			return {
 				ruleNumber: route.metadata.mergeIndex + 1,
 				type: "merge",
+			};
+		case "merge-charge-depletion":
+			return {
+				type: "charges",
 			};
 		case "temporary-expiry":
 			return {
@@ -105,6 +111,8 @@ const readLabelFn = (route: AcquisitionRoute) => {
 			return "Depletion";
 		case "merge-output":
 			return "Merge";
+		case "merge-charge-depletion":
+			return "Depletion";
 		case "temporary-expiry":
 			return "Expiry";
 	}
@@ -118,13 +126,17 @@ const readKindFn = (route: AcquisitionRoute): ItemOriginSource["kind"] => {
 			return "charges";
 		case "merge-output":
 			return "merge";
+		case "merge-charge-depletion":
+			return "charges";
 		case "temporary-expiry":
 			return "expiry";
 	}
 };
 
 const readRuntimeMsFn = (route: AcquisitionRoute) =>
-	route.metadata.kind === "merge-output" || route.metadata.kind === "line-charge-depletion"
+	route.metadata.kind === "merge-output" ||
+	route.metadata.kind === "merge-charge-depletion" ||
+	route.metadata.kind === "line-charge-depletion"
 		? undefined
 		: route.durationMs;
 

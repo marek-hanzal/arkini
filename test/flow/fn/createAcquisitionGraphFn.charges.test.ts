@@ -199,6 +199,63 @@ describe("createAcquisitionGraphFn", () => {
 		);
 	});
 
+	it("models Deposit merges as finite charge use with their depletion output", () => {
+		const config = createMergeTestConfig({
+			rule: {
+				action: "deposit",
+				effect: "keep",
+				output: guaranteedMergeOutput(),
+				target: {
+					itemId: "target",
+					type: "item",
+				},
+			},
+			sourceCharges: {
+				amount: 3,
+				output: guaranteedMergeOutput({
+					itemId: "output:a",
+				}),
+			},
+		});
+		const graph = createAcquisitionGraphFn(config);
+		const mergeOutput = graph.routes.find(
+			(route) => route.metadata.kind === "merge-output" && route.output.factId === "output",
+		);
+		const depletionOutput = graph.routes.find(
+			(route) =>
+				route.metadata.kind === "merge-charge-depletion" &&
+				route.output.factId === "output:a",
+		);
+
+		expect(mergeOutput).toMatchObject({
+			chargeUses: [
+				{
+					accounting: "single-payer-exact",
+					payerFactId: "source",
+					usableActionRuns: 3,
+				},
+			],
+		});
+		expect(depletionOutput).toMatchObject({
+			metadata: {
+				kind: "merge-charge-depletion",
+				mergeIndex: 0,
+				sourceItemId: "source",
+				targetItemId: "target",
+			},
+			runMultiplier: 3,
+			requirements: {
+				allOf: expect.arrayContaining([
+					expect.objectContaining({
+						factId: "source",
+						source: "charged-item",
+						usage: "consume",
+					}),
+				]),
+			},
+		});
+	});
+
 	it("keeps replacement and authored output as correlated operation groups", () => {
 		const config = createMergeTestConfig({
 			rule: {

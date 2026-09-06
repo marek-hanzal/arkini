@@ -1,4 +1,5 @@
 import { Combine } from "lucide-react";
+import { useStore } from "@tanstack/react-form";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
@@ -14,11 +15,13 @@ const MergeFields = ({
 	initialSelectedIndex,
 	invalidMergeIndex,
 	onChangeFn,
+	sourceChargesEnabled,
 	value,
 }: {
 	readonly initialSelectedIndex: number;
 	readonly invalidMergeIndex?: number;
 	readonly onChangeFn: (value: MergeSchema.Type[] | undefined) => void;
+	readonly sourceChargesEnabled: boolean;
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
@@ -80,6 +83,7 @@ const MergeFields = ({
 							<MergeField
 								merge={merges[index]}
 								onChangeFn={(merge) => updateFn(index, merge)}
+								sourceChargesEnabled={sourceChargesEnabled}
 							/>
 						)}
 					</EditorCollectionSelector>
@@ -91,6 +95,10 @@ const MergeFields = ({
 
 export const MergesSection = () => {
 	const { form, mergeIndex, validationIssues } = useFormSession();
+	const sourceChargesEnabled = useStore(
+		form.store,
+		(state) => state.values.charges !== undefined,
+	);
 	const invalidMergeIndex = validationIssues.find(
 		(issue) => issue.path[0] === "merge" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
@@ -100,6 +108,7 @@ export const MergesSection = () => {
 				<MergeFields
 					initialSelectedIndex={mergeIndex ?? 0}
 					invalidMergeIndex={invalidMergeIndex}
+					sourceChargesEnabled={sourceChargesEnabled}
 					value={merge}
 					onChangeFn={(next) => form.setFieldValue("merge", next)}
 				/>

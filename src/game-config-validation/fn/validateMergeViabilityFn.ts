@@ -7,6 +7,7 @@ import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { InvalidMergeReasonEnumSchema } from "~/game-config-diagnostic/schema/InvalidMergeReasonEnumSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
+import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 
 export namespace validateMergeViabilityFn {
 	export interface Props {
@@ -24,6 +25,24 @@ export const validateMergeViabilityFn = ({
 
 	for (const [ownerItemId, owner] of Object.entries(config.items)) {
 		for (const [mergeIndex, merge] of (owner.merge ?? []).entries()) {
+			if (merge.action === SourceActionSchema.enum.Deposit && owner.charges === undefined) {
+				diagnostics.push({
+					code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
+					path: [
+						"items",
+						ownerItemId,
+						"merge",
+						mergeIndex,
+						"action",
+					],
+					source: provenance.items[ownerItemId],
+					message: `Merge ${mergeIndex} of item ${ownerItemId} deposits a source charge, but the item has no charges.`,
+					ownerItemId,
+					mergeIndex,
+					reason: InvalidMergeReasonEnumSchema.enum.SourceChargesDisabled,
+				});
+			}
 			const missingExactTarget = config.items[merge.target.itemId] === undefined;
 			if (!missingExactTarget) {
 				const exactSelfTargetUnavailable =

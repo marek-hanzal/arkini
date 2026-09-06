@@ -23,7 +23,7 @@ const runtimeItem = (overrides: {
 	}) as unknown as RuntimeItemSchema.Type;
 
 describe("tile actor overlay projection", () => {
-	it("shows stack quantity only above one and always projects deposit charges", () => {
+	it("shows stack quantity only above one and projects charges for every item type", () => {
 		const single = runtimeItem({
 			item: {
 				type: TypeSchema.enum.Simple,
@@ -52,10 +52,29 @@ describe("tile actor overlay projection", () => {
 			},
 			remainingCharges: 4,
 		});
+		const freshChargedItem = runtimeItem({
+			item: {
+				charges: {
+					amount: 8,
+				},
+				type: TypeSchema.enum.Simple,
+			},
+		});
+		const usedChargedItem = runtimeItem({
+			item: {
+				charges: {
+					amount: 8,
+				},
+				type: TypeSchema.enum.Simple,
+			},
+			remainingCharges: 3,
+		});
 
 		expect(readTileActorBadgeCountFn(single)).toBeUndefined();
 		expect(readTileActorBadgeCountFn(stack)).toBe(120);
 		expect(readTileActorBadgeCountFn(freshDeposit)).toBe(12);
 		expect(readTileActorBadgeCountFn(usedDeposit)).toBe(4);
+		expect(readTileActorBadgeCountFn(freshChargedItem)).toBe(8);
+		expect(readTileActorBadgeCountFn(usedChargedItem)).toBe(3);
 	});
 });

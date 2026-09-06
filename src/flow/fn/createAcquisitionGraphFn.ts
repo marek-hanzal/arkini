@@ -313,6 +313,16 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 			],
 			anyOf: [],
 		};
+		const chargeUses =
+			merge.action === "deposit" && source.charges !== undefined
+				? [
+						{
+							accounting: "single-payer-exact" as const,
+							payerFactId: source.id,
+							usableActionRuns: source.charges.amount,
+						},
+					]
+				: [];
 		const metadata = {
 			kind: "merge-output",
 			mergeIndex,
@@ -353,6 +363,11 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 		} satisfies AcquisitionOperation;
 		if (merge.effect === "replace")
 			routes.push({
+				...(chargeUses.length === 0
+					? {}
+					: {
+							chargeUses,
+						}),
 				durationMs: 0,
 				id: readAcquisitionIdentityFn(
 					"merge-replacement",
@@ -387,6 +402,11 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 			});
 		for (const output of outputModel.occurrences)
 			routes.push({
+				...(chargeUses.length === 0
+					? {}
+					: {
+							chargeUses,
+						}),
 				durationMs: 0,
 				id: readAcquisitionIdentityFn(
 					"merge-output",
@@ -406,6 +426,57 @@ const readMergeRoutesFn = (source: ItemSchema.Type) => {
 				},
 				requirements: combineRequirementsFn(requirements, output.requirements),
 				runMultiplier: 1,
+			});
+
+		if (merge.action !== "deposit" || source.charges?.output === undefined) continue;
+		const chargeOutputModel = readAcquisitionOutputOccurrencesFn(source.charges.output);
+		const depletionRequirements: AcquisitionRoute["requirements"] = {
+			...requirements,
+			allOf: requirements.allOf.map((requirement) =>
+				requirement.factId === source.id && requirement.source === "merge-source"
+					? {
+							...requirement,
+							source: "charged-item" as const,
+							usage: "consume" as const,
+						}
+					: requirement,
+			),
+		};
+		for (const output of chargeOutputModel.occurrences)
+			routes.push({
+				durationMs: 0,
+				id: readAcquisitionIdentityFn(
+					"merge-charge-depletion",
+					source.id,
+					merge.target.itemId,
+					mergeIndex,
+					output.id,
+					output.factId,
+				),
+				metadata: {
+					kind: "merge-charge-depletion",
+					mergeIndex,
+					sourceItemId: source.id,
+					targetItemId: merge.target.itemId,
+				},
+				operation: {
+					id: readAcquisitionIdentityFn("source", source.id, "charges"),
+					inputs: [],
+					...(chargeOutputModel.compilation === "complete"
+						? {}
+						: {
+								outputCompilation: chargeOutputModel.compilation,
+							}),
+					outputDistribution: chargeOutputModel.outputDistribution,
+				},
+				output: {
+					annotation: output.annotation,
+					factId: output.factId,
+					operationOutputGroupId: output.operationOutputGroupId,
+					quantityDistribution: output.quantityDistribution,
+				},
+				requirements: combineRequirementsFn(depletionRequirements, output.requirements),
+				runMultiplier: source.charges.amount,
 			});
 	}
 	return routes;

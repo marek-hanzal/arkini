@@ -448,6 +448,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				const attempt = yield* Effect.result(
 					applyMergeRuntimeFx({
 						rule,
+						ruleIndex: 0,
 						runtime,
 						source,
 						target,

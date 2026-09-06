@@ -79,6 +79,46 @@
 					"x": 0,
 					"y": 0
 				}
+			},
+			{
+				"itemId": "farmland-portal",
+				"quantity": 1,
+				"position": {
+					"x": 1,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "forest-portal",
+				"quantity": 1,
+				"position": {
+					"x": 2,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "industrial-portal",
+				"quantity": 1,
+				"position": {
+					"x": 3,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "mining-portal",
+				"quantity": 1,
+				"position": {
+					"x": 4,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "workshop-portal",
+				"quantity": 1,
+				"position": {
+					"x": 5,
+					"y": 0
+				}
 			}
 		]
 	},

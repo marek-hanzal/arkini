@@ -96,6 +96,7 @@ import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
+import { SpaceActionSection } from "~/item-authoring/ui/SpaceActionSection";
 import type { SectionId } from "~/item-authoring/type/Section";
 import {
 	createOutput,
@@ -256,6 +257,46 @@ describe("item section form session", () => {
 		const { container } = await render(<ArtworkSection />);
 
 		expect(container.querySelector('[data-ui="EditorItemArtworkProgression"]')).toBeNull();
+	});
+
+	it("picks both bounds of the reserved random space range into the local draft", async () => {
+		const spaceItem = {
+			...item,
+			type: "space",
+			space: 0,
+			enable: true,
+			input: [],
+			rules: [],
+		} satisfies ItemSchema.Type;
+		state.persisted = spaceItem;
+		(
+			state.project as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config.items[item.id] = spaceItem;
+		const random = vi
+			.spyOn(Math, "random")
+			.mockReturnValueOnce(0)
+			.mockReturnValueOnce(1 - Number.EPSILON);
+		try {
+			const { container } = await render(<SpaceActionSection />);
+			const input = container.querySelector<HTMLInputElement>('input[name="space"]');
+			const pickRandomSpaceButton = [
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === "Pick random space");
+			if (input === null || pickRandomSpaceButton === undefined)
+				throw new Error("Missing Space action controls.");
+
+			await act(async () => pickRandomSpaceButton.click());
+			expect(input.value).toBe("128");
+			await act(async () => pickRandomSpaceButton.click());
+			expect(input.value).toBe("1024");
+			expect(state.saveItem).not.toHaveBeenCalled();
+		} finally {
+			random.mockRestore();
+		}
 	});
 
 	it("does not republish the form Context when parent inputs are unchanged", async () => {

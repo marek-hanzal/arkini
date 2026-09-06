@@ -7,6 +7,10 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
+import { LinkButton } from "~/ui/ui/LinkButton";
+
+const RandomSpaceMinimum = 128;
+const RandomSpaceMaximum = 1_024;
 
 /** Authors one immediate Space action through the shared input and availability controls. */
 export const SpaceActionSection = () => {
@@ -23,11 +27,26 @@ export const SpaceActionSection = () => {
 				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
 					<form.AppField name="space">
 						{(field) => (
-							<field.NumberField
-								description="The board space entered after successful activation. One-way navigation is allowed."
-								label="Target space"
-								min={0}
-							/>
+							<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+								<field.NumberField
+									description="The board space entered after successful activation. One-way navigation is allowed."
+									label="Target space"
+									min={0}
+								/>
+								<LinkButton
+									className="flex h-[var(--ak-control-min-height)] items-center whitespace-nowrap"
+									onClick={() =>
+										field.handleChange(
+											Math.floor(
+												Math.random() *
+													(RandomSpaceMaximum - RandomSpaceMinimum + 1),
+											) + RandomSpaceMinimum,
+										)
+									}
+								>
+									Pick random space
+								</LinkButton>
+							</div>
 						)}
 					</form.AppField>
 					<form.AppField name="enable">

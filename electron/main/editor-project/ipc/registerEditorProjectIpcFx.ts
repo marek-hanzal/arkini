@@ -249,6 +249,17 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
+					ArkiniElectronApi.channels.editorProjectOptimizeResources,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"optimize-resources",
+							ownership,
+							diagnostics,
+							requestParser.parseOptimizeResourcesFx(candidate),
+							(repository, request) => repository.optimizeResourcesFx(request),
+						),
+				);
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -400,6 +411,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectList,
 					ArkiniElectronApi.channels.editorProjectOpenDirectory,
+					ArkiniElectronApi.channels.editorProjectOptimizeResources,
 					ArkiniElectronApi.channels.editorProjectRead,
 					ArkiniElectronApi.channels.editorProjectRefresh,
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,

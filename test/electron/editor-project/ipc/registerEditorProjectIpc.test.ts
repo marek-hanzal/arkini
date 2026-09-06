@@ -134,6 +134,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectList,
 	ArkiniElectronApi.channels.editorProjectOpenDirectory,
+	ArkiniElectronApi.channels.editorProjectOptimizeResources,
 	ArkiniElectronApi.channels.editorProjectRead,
 	ArkiniElectronApi.channels.editorProjectRefresh,
 	ArkiniElectronApi.channels.editorProjectReplaceConfig,
@@ -227,6 +228,10 @@ describe("registerEditorProjectIpcFx", () => {
 			resources: [
 				editorTestPayload.resources[0],
 			],
+		};
+		const optimizeResourcesRequest = {
+			expectedRevision: 0,
+			projectId: "project-one",
 		};
 
 		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
@@ -332,6 +337,10 @@ describe("registerEditorProjectIpcFx", () => {
 			ArkiniElectronApi.channels.editorProjectUpsertResources,
 			upsertResourcesRequest,
 		);
+		await invoke(
+			ArkiniElectronApi.channels.editorProjectOptimizeResources,
+			optimizeResourcesRequest,
+		);
 		const versionReference = {
 			type: "version" as const,
 			versionId: editorProjectIpcVersion.versionId,
@@ -416,6 +425,7 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.deleteItemFx).toHaveBeenCalledWith(deleteItemRequest);
 		expect(repository.deleteResourceFx).toHaveBeenCalledWith(deleteResourceRequest);
 		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
+		expect(repository.optimizeResourcesFx).toHaveBeenCalledWith(optimizeResourcesRequest);
 		expect(repository.readVersionStatusFx).toHaveBeenCalledWith("project-one");
 		expect(repository.previewVersionCommitFx).toHaveBeenCalledWith("project-one");
 		expect(repository.listVersionsFx).toHaveBeenCalledWith("project-one");

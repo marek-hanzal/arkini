@@ -7,6 +7,7 @@ import {
 	type LucideIcon,
 	PackageOpen,
 	SearchX,
+	Sparkles,
 } from "lucide-react";
 import { memo } from "react";
 
@@ -22,6 +23,7 @@ import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
 	readonly onFilterChangeFn: (filter: useEditorAssetManagerController.Filter) => void;
@@ -250,11 +252,24 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 		controller.importedCount === undefined
 			? undefined
 			: `Imported ${controller.importedCount} asset${controller.importedCount === 1 ? "" : "s"}.`;
+	const optimizeError =
+		controller.optimizeError === undefined
+			? undefined
+			: controller.optimizeError instanceof Error
+				? controller.optimizeError.message
+				: String(controller.optimizeError);
+	const optimizationSuccess =
+		controller.optimization === undefined
+			? undefined
+			: controller.optimization.optimizedResourceCount === 0
+				? `All ${project.resources.length} PNGs are already optimized.`
+				: `Optimized ${controller.optimization.optimizedResourceCount} of ${project.resources.length} PNGs · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup"}.`;
+	const busy = controller.importPending || controller.optimizePending;
 	const importButton = (
 		<EditorAssetImportMenu
 			onImportArkpackFn={controller.openArkpackImportFn}
 			onImportFilesFn={controller.openFilesImportFn}
-			pending={controller.importPending}
+			pending={busy}
 		/>
 	);
 
@@ -274,7 +289,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						accept=".arkpack"
 						className="hidden"
 						data-ui="EditorAssetArkpackInput"
-						disabled={controller.importPending}
+						disabled={busy}
 						onChange={controller.onArkpackChangeFn}
 					/>
 					<input
@@ -284,7 +299,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						multiple
 						className="hidden"
 						data-ui="EditorAssetImportInput"
-						disabled={controller.importPending}
+						disabled={busy}
 						onChange={controller.onFilesChangeFn}
 					/>
 					<SearchInput
@@ -295,6 +310,18 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						placeholder={`${translator.textFn("Search assets…")} (${controller.resources.length})`}
 						onValueChangeFn={props.onQueryChangeFn}
 					/>
+					{controller.catalogState === "empty" ? null : (
+						<Button
+							className="h-12 min-h-0 shrink-0 gap-2 px-4 py-0"
+							cursorIntent={busy ? "progress" : undefined}
+							data-ui="EditorAssetsOptimize"
+							disabled={busy}
+							onClick={controller.onOptimizeFn}
+						>
+							<Sparkles className="size-4" />
+							Optimize
+						</Button>
+					)}
 					<SegmentedControl
 						dataUi="EditorAssetFilters"
 						onChangeFn={props.onFilterChangeFn}
@@ -323,6 +350,22 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						data-ui="EditorAssetImportSuccess"
 					>
 						{importSuccess}
+					</p>
+				)}
+				{optimizeError === undefined ? null : (
+					<p
+						className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
+						data-ui="EditorAssetsOptimizeError"
+					>
+						{optimizeError}
+					</p>
+				)}
+				{optimizationSuccess === undefined ? null : (
+					<p
+						className="mb-3 text-sm text-success"
+						data-ui="EditorAssetsOptimizeSuccess"
+					>
+						{optimizationSuccess}
 					</p>
 				)}
 				{catalogStatus === undefined ? null : (

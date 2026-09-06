@@ -7,11 +7,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
 	importAssets: vi.fn(),
+	optimizeResources: vi.fn(),
+	setAtomCall: 0,
 }));
 
 vi.mock("@effect/atom-react", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@effect/atom-react")>()),
-	useAtomSet: () => state.importAssets,
+	useAtomSet: () =>
+		[
+			state.importAssets,
+			state.optimizeResources,
+		][state.setAtomCall++] ?? state.importAssets,
 	useAtomValue: () => AsyncResult.initial(),
 }));
 
@@ -19,6 +25,7 @@ vi.mock("~/asset-authoring/ui/useEditorAssetLibrary", () => ({
 	useEditorAssetLibrary: () => ({
 		empty: false,
 		projectId: "editor-test",
+		projectRevision: 42,
 		resources: [],
 	}),
 }));
@@ -55,6 +62,8 @@ const changeEvent = (files: ReadonlyArray<File>) => {
 
 beforeEach(async () => {
 	state.importAssets.mockReset();
+	state.optimizeResources.mockReset();
+	state.setAtomCall = 0;
 	controller = undefined;
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -108,6 +117,15 @@ describe("useEditorAssetManagerController", () => {
 			],
 			projectId: "editor-test",
 			source: "files",
+		});
+	});
+
+	it("runs whole-project PNG optimization against the current revision", () => {
+		controller?.onOptimizeFn();
+
+		expect(state.optimizeResources).toHaveBeenCalledWith({
+			expectedRevision: 42,
+			projectId: "editor-test",
 		});
 	});
 });

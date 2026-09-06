@@ -80,6 +80,14 @@ const installEditorApi = () => {
 		deleteNoteFn: vi.fn(async () => success(undefined)),
 		deleteItemFn: vi.fn(async () => success(commit)),
 		deleteResourceFn: vi.fn(async () => success(project)),
+		optimizeResourcesFn: vi.fn(async () =>
+			success({
+				optimizedResourceCount: 0,
+				originalBytes: 0,
+				optimizedBytes: 0,
+				project,
+			}),
+		),
 		exportJsonDirectoryFn: vi.fn(async () => success(null)),
 		importJsonDirectoryFn: vi.fn(async () => success(descriptor)),
 		listProjectsFn: vi.fn(async () =>
@@ -350,6 +358,12 @@ describe("createElectronProjectRepositoryFx", () => {
 				],
 			}),
 		);
+		const optimized = await Effect.runPromise(
+			repository.optimizeResourcesFx({
+				expectedRevision: project.revision,
+				projectId: project.projectId,
+			}),
+		);
 
 		const request = vi.mocked(editor.upsertResourcesFn).mock.calls[0]?.[0];
 		expect(request?.resources[0]).toMatchObject({
@@ -359,6 +373,11 @@ describe("createElectronProjectRepositoryFx", () => {
 		});
 		expect(saved.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
 		expect(saved.resources[0]?.bytes).not.toBe(project.resources[0]?.bytes);
+		expect(editor.optimizeResourcesFn).toHaveBeenCalledWith({
+			expectedRevision: project.revision,
+			projectId: project.projectId,
+		});
+		expect(optimized.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
 	});
 
 	it("blocks save-resource IPC while a hard project replacement owns writes", async () => {

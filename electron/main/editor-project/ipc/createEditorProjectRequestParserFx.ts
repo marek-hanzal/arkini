@@ -65,6 +65,12 @@ const deleteResourceSchema = z
 		resourceId: IdSchema,
 	})
 	.strict();
+const optimizeResourcesSchema = z
+	.object({
+		expectedRevision: z.number().int().nonnegative(),
+		projectId: IdSchema,
+	})
+	.strict();
 const replaceConfigSchema = z
 	.object({
 		projectId: IdSchema,
@@ -177,6 +183,18 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				ProjectRepositoryError,
 				never
 			> => parseEditorProjectIpcRequestFx("delete-resource", deleteResourceSchema, candidate),
+			parseOptimizeResourcesFx: (
+				candidate: unknown,
+			): Effect.Effect<
+				ProjectRepository.OptimizeResourcesProps,
+				ProjectRepositoryError,
+				never
+			> =>
+				parseEditorProjectIpcRequestFx(
+					"optimize-resources",
+					optimizeResourcesSchema,
+					candidate,
+				),
 			parseReplaceConfigFx: (
 				candidate: unknown,
 			): Effect.Effect<ProjectRepository.ReplaceConfigProps, ProjectRepositoryError, never> =>

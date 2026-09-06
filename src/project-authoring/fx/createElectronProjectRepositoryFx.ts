@@ -135,6 +135,14 @@ const parseBoardScenarioFn = (candidate: unknown) => {
 
 const parseCommitFn = (candidate: unknown) => ProjectCommitPayloadSchema.parse(candidate);
 const parseProjectFn = (candidate: unknown) => ProjectPayloadSchema.parse(candidate);
+const optimizeResourcesResultSchema = z
+	.object({
+		optimizedResourceCount: z.number().int().nonnegative(),
+		originalBytes: z.number().int().nonnegative(),
+		optimizedBytes: z.number().int().nonnegative(),
+		project: ProjectPayloadSchema,
+	})
+	.strict();
 
 const callFx = <Value, Parsed>(
 	operation: ProjectRepositoryOperation,
@@ -249,6 +257,15 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 			() => window.arkini.editor.listProjectsFn(),
 			(value) => ProjectCandidateSchema.array().parse(value),
 		),
+		optimizeResourcesFx: (request) =>
+			writeFx(
+				"optimize-resources",
+				callFx(
+					"optimize-resources",
+					() => window.arkini.editor.optimizeResourcesFn(request),
+					(value) => optimizeResourcesResultSchema.parse(value),
+				),
+			),
 		listNotesFx: (projectId) =>
 			callFx(
 				"list-notes",

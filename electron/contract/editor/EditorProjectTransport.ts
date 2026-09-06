@@ -20,6 +20,7 @@ export namespace EditorProjectTransport {
 		| "list-projects"
 		| "list-versions"
 		| "open-project-directory"
+		| "optimize-resources"
 		| "preview-version-commit"
 		| "read-project"
 		| "read-project-build"
@@ -222,6 +223,18 @@ export namespace EditorProjectTransport {
 	export interface UpsertResourcesRequest {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<unknown>;
+	}
+
+	export interface OptimizeResourcesRequest {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+	}
+
+	export interface OptimizeResourcesResult {
+		readonly optimizedResourceCount: number;
+		readonly originalBytes: number;
+		readonly optimizedBytes: number;
+		readonly project: Project;
 	}
 
 	export interface VersionDescriptor {

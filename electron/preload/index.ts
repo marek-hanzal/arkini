@@ -192,6 +192,8 @@ const api: ArkiniElectronApi.Api = {
 			editorProjectChangedListeners.add(listenerFn);
 			return () => editorProjectChangedListeners.delete(listenerFn);
 		},
+		optimizeResourcesFn: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOptimizeResources, request),
 		replaceConfigFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
 		replaceResourceFn: (request) =>

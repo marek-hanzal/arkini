@@ -16,6 +16,7 @@ import { GameProjectGameSchemaReference } from "~/game-config-source/constant/Ga
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import { optimizePngResourceFx } from "~/game-config-resource/fx/optimizePngResourceFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
@@ -26,6 +27,7 @@ type Operations = Pick<
 	| "deleteItemFx"
 	| "deleteResourceFx"
 	| "replaceConfigFx"
+	| "optimizeResourcesFx"
 	| "replaceResourceFx"
 	| "saveResourceFx"
 	| "upsertItemFx"
@@ -455,6 +457,61 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			),
 		);
 
+	const optimizeResourcesFx: Operations["optimizeResourcesFx"] = ({
+		expectedRevision,
+		projectId,
+	}) =>
+		operations
+			.withPermits(1)(
+				Effect.gen(function* () {
+					const state = yield* readStateFx(projectId);
+					yield* assertExpectedRevisionFx(state, expectedRevision, "optimize-resources");
+					const results = yield* Effect.forEach(
+						state.project.resources,
+						(resource) => optimizePngResourceFx(resource),
+						{
+							concurrency: 2,
+						},
+					);
+					const optimizedResourceCount = results.reduce(
+						(count, result) => count + (result.changed ? 1 : 0),
+						0,
+					);
+					const originalBytes = results.reduce(
+						(total, result) => total + result.originalBytes,
+						0,
+					);
+					const optimizedBytes = results.reduce(
+						(total, result) => total + result.optimizedBytes,
+						0,
+					);
+					const project =
+						optimizedResourceCount === 0
+							? cloneProjectFn(state.project)
+							: yield* commitFx({
+									state,
+									config: state.project.config,
+									resources: results.map(({ resource }) => resource),
+									nowMs: yield* Clock.currentTimeMillis,
+								});
+					return {
+						optimizedResourceCount,
+						originalBytes,
+						optimizedBytes,
+						project,
+					};
+				}),
+			)
+			.pipe(
+				Effect.mapError((cause) =>
+					errorFn(
+						"optimize-resources",
+						`Resources could not be optimized in project ${projectId}.`,
+						cause,
+					),
+				),
+			);
+
 	const deleteResourceFx: Operations["deleteResourceFx"] = ({
 		expectedRevision,
 		projectId,
@@ -547,6 +604,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	return {
 		deleteItemFx,
 		deleteResourceFx,
+		optimizeResourcesFx,
 		replaceConfigFx,
 		replaceResourceFx,
 		saveResourceFx,

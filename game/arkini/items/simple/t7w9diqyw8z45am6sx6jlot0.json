@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "t7w9diqyw8z45am6sx6jlot0",
+		"id": "civilian-clothes",
+		"title": "Civilian Clothes",
+		"description": "Common clothes",
+		"asset": {
+			"default": [
+				"civilian-clothes"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

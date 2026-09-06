@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "g72br1worveoduk5pejp15j4",
+		"id": "dye-plants",
+		"title": "Dye Plants",
+		"description": "Colors everywhere",
+		"asset": {
+			"default": [
+				"dye-plants"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

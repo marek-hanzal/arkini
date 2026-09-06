@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ejcs57zv68bas7jmizm7286p",
+		"id": "labor-t1",
+		"title": "Labor - Tier 1",
+		"description": "Work needs labor tokens, here you go",
+		"asset": {
+			"default": [
+				"labor-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

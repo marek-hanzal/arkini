@@ -27,13 +27,6 @@
 		"currentSpace": 0,
 		"board": [
 			{
-				"x": 7,
-				"y": 4,
-				"space": 0,
-				"itemId": "base-camp",
-				"quantity": 1
-			},
-			{
 				"x": 0,
 				"y": 0,
 				"space": 0,
@@ -55,14 +48,21 @@
 				"quantity": 1
 			},
 			{
-				"x": 8,
-				"y": 4,
+				"x": 6,
+				"y": 3,
+				"space": 0,
+				"itemId": "base-camp",
+				"quantity": 1
+			},
+			{
+				"x": 7,
+				"y": 3,
 				"space": 0,
 				"itemId": "foundation-chest",
 				"quantity": 1
 			},
 			{
-				"x": 6,
+				"x": 12,
 				"y": 0,
 				"space": 0,
 				"itemId": "stone-deposit",

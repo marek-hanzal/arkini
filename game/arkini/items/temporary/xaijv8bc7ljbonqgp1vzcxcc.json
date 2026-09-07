@@ -1,28 +1,17 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "g8oi8iw4hidud9t24h8lv0p4",
-		"id": "animal-fat",
-		"title": "Animal Fat",
-		"description": "Fat",
+		"uid": "xaijv8bc7ljbonqgp1vzcxcc",
+		"id": "hunted-game",
+		"title": "Hunted Game",
+		"description": "Some raw hunted stuff you shall process",
 		"asset": {
 			"default": [
-				"animal-fat"
+				"hunted-game"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "cauldron-with-lye"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "cauldron-with-soap"
-			}
-		],
 		"type": "temporary",
 		"durationMs": 600000,
 		"output": {
@@ -37,7 +26,7 @@
 									"itemId": "bio-waste",
 									"quantity": {
 										"min": 1,
-										"max": 1
+										"max": 2
 									},
 									"placement": "drop",
 									"rules": []

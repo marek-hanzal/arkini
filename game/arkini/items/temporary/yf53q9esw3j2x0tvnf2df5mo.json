@@ -12,6 +12,17 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "copper-pan"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "copper-pan-with-raw-steak"
+			}
+		],
 		"type": "temporary",
 		"durationMs": 300000,
 		"output": {

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "j9ni85pox4gjt7uu3ud04kkj",
+		"id": "bow",
+		"title": "Bow",
+		"description": "Bow. Hunt something",
+		"asset": {
+			"default": [
+				"bow"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

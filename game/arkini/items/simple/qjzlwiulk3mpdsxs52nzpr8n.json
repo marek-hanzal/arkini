@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fruits"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "honeyed-fruit"
+			}
+		],
 		"type": "simple"
 	}
 }

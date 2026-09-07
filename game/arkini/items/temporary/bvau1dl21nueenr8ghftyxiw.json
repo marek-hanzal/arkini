@@ -1,0 +1,92 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "bvau1dl21nueenr8ghftyxiw",
+		"id": "copper-pan-with-roasted-coffee-beans",
+		"title": "Copper Pan With Roasted Coffee Beans",
+		"description": "Now you can grind it",
+		"asset": {
+			"default": [
+				"copper-pan-with-roasted-coffee-beans"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cafe"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "copper-pan",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "cup-of-coffee",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
+		"type": "temporary",
+		"durationMs": 600000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "copper-pan",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "bio-waste",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

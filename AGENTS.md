@@ -23,10 +23,28 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 ### Visual canon
 
 - Inspect [`game/arkini/resources/hero.png`](game/arkini/resources/hero.png) before generating. It is the default canon for palette, contrast, lighting, material rendering, sharpness, and degree of stylization, not a subject or composition template.
-- A directly edited image outranks every other reference. Otherwise the latest user-approved asset from the same series is the structural reference, with `hero.png` continuing to govern the general color and rendering profile.
+- Inspect only one or two relevant approved assets in addition to `hero.png`; do not preload the whole asset directory. A directly edited image outranks every other reference. Otherwise the latest user-approved asset from the same series is the structural reference, with `hero.png` continuing to govern the general color and rendering profile.
 - Do not copy unicorns, pink hair, gears, pipes, lettering, or other concrete motifs from `hero.png` unless the request calls for them.
 - Render premium stylized fantasy art for a casual/merge game: strong 2.5D volume, rounded and slightly exaggerated proportions, a clean silhouette, saturated colors, clearly separated materials, broad gradients, soft hand-painted shading, contact shadows, ambient occlusion, and controlled edge highlights.
 - Avoid book illustration, watercolor, oil painting, realistic concept art, photorealism, flat vector art, generic clipart, raw plastic 3D rendering, photographic depth of field, film grain, chromatic aberration, random surface noise, and excessive bloom.
+
+### Reference routing
+
+- For a simple or early-game building, inspect [`house-t1.png`](game/arkini/assets/house-t1.png) or [`base-camp.png`](game/arkini/assets/base-camp.png). They define the restrained amount of structure and detail, not a house or tent motif to copy.
+- For a production building or workshop, inspect [`pottery-workshop.png`](game/arkini/assets/pottery-workshop.png), [`roof-tile-workshop.png`](game/arkini/assets/roof-tile-workshop.png), or [`foundry.png`](game/arkini/assets/foundry.png). They define a readable functional centerpiece, colorful rounded construction, and a lively compact base.
+- For a field or farm plot, inspect [`empty-field.png`](game/arkini/assets/empty-field.png) and the closest crop variant such as [`hop-field.png`](game/arkini/assets/hop-field.png). Preserve the shared footprint and three-row language when the series calls for it; vary plants naturally rather than cloning one specimen.
+- For a natural source or world deposit, inspect [`coal-source.png`](game/arkini/assets/coal-source.png) or [`forest.png`](game/arkini/assets/forest.png). The terrain silhouette and material color should carry the identity without turning into a miniature building.
+- For a standalone item, tool, or processed material, inspect [`hammer.png`](game/arkini/assets/hammer.png), [`cheese.png`](game/arkini/assets/cheese.png), or [`coin.png`](game/arkini/assets/coin.png). Use one dominant object, no terrain base, and only a few supporting details.
+- For an animal or animal enclosure, inspect [`cow.png`](game/arkini/assets/cow.png) or [`cow-pen.png`](game/arkini/assets/cow-pen.png). Animals stay anatomically coherent and expressive; pens use lush grass and an irregular hand-built fence.
+- For a tiered series, the approved previous tier is the mandatory structural reference. For an alternate, filled, depleted, lit, or recolored state, the corresponding approved base asset is mandatory and all unrelated properties remain locked.
+
+### Shape and mood
+
+- The fast style test is: **rounded, playful, bright, hand-built, and readable**. Prefer plump volumes, gently bowed rooflines, chunky beams, soft corners, and slight asymmetry. The object may be imperfect, but it must still look stable and intentionally constructed.
+- Keep midtones cheerful and saturated while retaining real shading. More wealth or a higher tier may look cleaner and richer, never automatically darker, colder, sharper, or more sterile.
+- Give every production building one unmistakable functional anchor and at most a few large supporting props. Function must read before ornament at 96–128 px.
+- Building and field bases use lively, uneven terrain: fluffy grass tufts, small dirt interruptions, varied stones, and a few colorful flowers. Avoid flat lawns, perfect rectangles, uniform borders, repeated copy-paste vegetation, and tiny decorative clutter.
+- Preserve logical material colors and construction. Cuteness comes from volume, proportion, color, and controlled irregularity—not faces on objects, impossible supports, random machinery, or chaotic silhouettes.
 
 ### Color profile
 
@@ -42,11 +60,21 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 - Create cuteness through shape, volume, and proportions; do not automatically add faces to inanimate objects.
 - A building may use only a small compact terrain base that anchors its footprint. Standalone items, tools, and resources have no terrain base by default.
 
-### Output
+### Generator output and key background
 
-- Unless explicitly requested otherwise, generate exactly one 512 × 512 px image on a visible regular checkerboard background. The checkerboard is an intentional part of the generator output.
-- The user owns background removal. Do not remove the checkerboard, create an alpha channel, validate transparency, or spend time on transparency post-processing unless explicitly asked.
-- Keep the whole asset inside the canvas. Do not add a scene, landscape, room, gradient panel, contact sheet, multiple variants, text, pseudo-text, numbers, logo, frame, signature, or watermark.
+- Unless explicitly requested otherwise, generate exactly one square image at the generator's native output resolution on a flat, visually uniform chroma-key green background targeting `#00FF00`. A small color deviation or minor variation is acceptable only when the key field remains clearly distinct from every legitimate foreground color and can be removed safely into a clean alpha channel. Never request or accept a checkerboard, transparency grid, gradient, texture, horizon, vignette, floor, or environment behind the asset.
+- The key background is a temporary technical surface, not part of the art. It must reach every canvas edge, stay unlit, contain no cast or contact shadow, and produce no green bounce, reflection, outline, or spill on the subject. Do not use the background key color or a confusingly similar chroma green anywhere in the foreground; natural grass uses its normal yellow- and olive-green range instead.
+- Keep contact shading inside the object or its terrain footprint. Do not paint a detached gray shadow blob onto the key background.
+- Keep the whole asset inside the canvas. Do not add a scene, landscape, room, contact sheet, multiple variants, text, pseudo-text, numbers, logo, frame, signature, or watermark.
+- Preserve the generator's native output resolution when saving unless the user explicitly asks to rescale it.
+
+### Approval and alpha workflow
+
+- Generate and show the keyed candidate first. Do not write it into [`game/arkini/assets`](game/arkini/assets) until the user explicitly approves it with an instruction such as `ulozit`, `prepsat`, or equivalent.
+- On approval, remove the keyed background into a true alpha channel. Protect legitimate foreground greens; remove the edge-connected key field plus keyed regions visible through real openings such as handles, arches, windows, and gaps. Preserve smooth antialiased edges and eliminate green fringe instead of merely making the exact center color transparent.
+- Translucent subjects such as glass need explicit inspection: preserve their rim, highlights, body, and foot while clearing the key visible through them. Never leave the key as an opaque fill inside a transparent object.
+- Inspect the finished PNG over both a dark-plum background and a warm light background. Check the complete silhouette, thin projections, holes, terrain fringe, and absence of detached shadows or key-colored pixels. Also inspect it once at 96–128 px for gameplay readability.
+- Save the approved PNG under a semantic kebab-case name in [`game/arkini/assets`](game/arkini/assets). Before reporting success, reopen the saved file and verify the requested subject, exact path, dimensions, sRGBA/alpha presence, transparent corners, and Git status. When replacing an asset, verify that the intended existing path was actually overwritten.
 
 ### Iteration and tiers
 

@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "foundry"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "foundry-extinguished"
+			}
+		],
 		"type": "simple"
 	}
 }

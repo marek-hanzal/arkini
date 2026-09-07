@@ -33,6 +33,15 @@
 				"action": "deposit",
 				"effect": "replace",
 				"result": "campfire-burning"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "foundry-extinguished"
+				},
+				"action": "deposit",
+				"effect": "replace",
+				"result": "foundry"
 			}
 		],
 		"type": "simple"

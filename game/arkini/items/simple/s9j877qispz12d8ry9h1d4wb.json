@@ -21,6 +21,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "foundry-extinguished"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "dye-workshop"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "dye-workshop-washed"
 			}
 		],
 		"type": "simple"

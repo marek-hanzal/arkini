@@ -22,7 +22,7 @@
 				"default": true,
 				"show": true,
 				"enable": false,
-				"runtimeMs": 42000,
+				"runtimeMs": 30000,
 				"input": [
 					{
 						"type": "materials",

@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 4,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "dye-workshop"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "dye-workshop-milk"
+			}
+		],
 		"type": "simple"
 	}
 }

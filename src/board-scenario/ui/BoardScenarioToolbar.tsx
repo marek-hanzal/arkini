@@ -21,17 +21,17 @@ const BoardGameplayModeControl = ({ game }: { readonly game: EditorBoardGame }) 
 			optionDataUi="EditorBoardGameplayModeOption"
 			options={[
 				{
-					label: "Instant",
-					value: "instant",
+					label: "Default",
+					value: "default",
 				},
 				{
-					label: "Common",
-					value: "common",
+					label: "Instant",
+					value: "instant",
 				},
 			]}
 			pending={cheats.blocked}
 			size="compact"
-			value={cheats.instantGameplay ? "instant" : "common"}
+			value={cheats.instantGameplay ? "instant" : "default"}
 		/>
 	);
 };

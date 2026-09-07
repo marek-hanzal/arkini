@@ -4,14 +4,14 @@
 		"id": "arkini",
 		"title": "Arkini",
 		"board": {
-			"width": 15,
-			"height": 9
+			"width": 13,
+			"height": 7
 		},
 		"inventory": {
 			"width": 15,
 			"height": 9
 		},
-		"toolbarSize": 15
+		"toolbarSize": 13
 	},
 	"resources": {
 		"hero": "hero",
@@ -48,13 +48,6 @@
 				"quantity": 1
 			},
 			{
-				"x": 14,
-				"y": 0,
-				"space": 0,
-				"itemId": "stone-deposit",
-				"quantity": 1
-			},
-			{
 				"x": 1,
 				"y": 0,
 				"space": 0,
@@ -67,18 +60,17 @@
 				"space": 0,
 				"itemId": "foundation-chest",
 				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 0,
+				"space": 0,
+				"itemId": "stone-deposit",
+				"quantity": 1
 			}
 		],
 		"inventory": [],
 		"toolbar": [
-			{
-				"itemId": "inventory",
-				"quantity": 1,
-				"position": {
-					"x": 14,
-					"y": 0
-				}
-			},
 			{
 				"itemId": "homeland-portal",
 				"quantity": 1,
@@ -124,6 +116,14 @@
 				"quantity": 1,
 				"position": {
 					"x": 5,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "inventory",
+				"quantity": 1,
+				"position": {
+					"x": 12,
 					"y": 0
 				}
 			}

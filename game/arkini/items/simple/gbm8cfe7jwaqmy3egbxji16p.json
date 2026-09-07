@@ -42,6 +42,15 @@
 				"action": "deposit",
 				"effect": "replace",
 				"result": "foundry"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "oven-with-wood"
+				},
+				"action": "deposit",
+				"effect": "replace",
+				"result": "burning-oven"
 			}
 		],
 		"type": "simple"

@@ -1,19 +1,19 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "bsm7hrvufre2fiexr4o0eo4q",
-		"id": "burning-oven",
-		"title": "Burning Oven",
-		"description": "It's hot",
+		"uid": "yf53q9esw3j2x0tvnf2df5mo",
+		"id": "raw-steak",
+		"title": "Raw Steak",
+		"description": "It's soooo tasty",
 		"asset": {
 			"default": [
-				"burning-oven"
+				"raw-steak"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
 		"type": "temporary",
-		"durationMs": 900000,
+		"durationMs": 300000,
 		"output": {
 			"set": [
 				{
@@ -23,19 +23,10 @@
 							"type": "guaranteed",
 							"drop": [
 								{
-									"itemId": "oven-with-ash",
+									"itemId": "bio-waste",
 									"quantity": {
 										"min": 1,
 										"max": 1
-									},
-									"placement": "drop",
-									"rules": []
-								},
-								{
-									"itemId": "ash",
-									"quantity": {
-										"min": 1,
-										"max": 2
 									},
 									"placement": "drop",
 									"rules": []

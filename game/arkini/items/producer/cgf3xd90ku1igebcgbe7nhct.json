@@ -51,7 +51,25 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "toxic-waste"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "runtime:multiplier",
+						"multiplier": 1.98
+					}
+				]
 			}
 		]
 	}

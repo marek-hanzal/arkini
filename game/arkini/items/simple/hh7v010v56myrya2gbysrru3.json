@@ -17,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-field"
+					"itemId": "fertilized-field"
 				},
 				"action": "consume",
 				"effect": "replace",

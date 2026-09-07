@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wk8b9br2abcjn0fz4xsldfhx",
+		"id": "toxic-waste",
+		"title": "Toxic Waste",
+		"description": "It's dangerous. And it's ugly",
+		"asset": {
+			"default": [
+				"toxic-waste"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "nedhtr45dy6ivqytenk234mp",
+		"id": "coffee-seed",
+		"title": "Coffee Seed",
+		"description": "Grow your caffeine",
+		"asset": {
+			"default": [
+				"seed",
+				"coffee-plant"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

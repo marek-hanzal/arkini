@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "w5khsgl6koe2p6asgojn7g3q",
+		"id": "pot",
+		"title": "Pot",
+		"description": "You can put something in there",
+		"asset": {
+			"default": [
+				"pot"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

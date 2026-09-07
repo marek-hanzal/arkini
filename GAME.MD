@@ -107,7 +107,7 @@ Directional merge is one canonical gameplay command. The source item owns ordere
 
 ## Cheats, save, and presentation
 
-Cheat availability is application preference; enabled cheat state, including Instant gameplay, is Runtime state. Instant settles valid time-based jobs and temporary lifetimes through the same authoritative engine without changing Tick units. Hard reset is renderer lifecycle: discard the exact Game without final save, clear only its verified save, then acquire a fresh Game. It is not an authored item command.
+Cheat availability is application preference; enabled cheat state, including Instant gameplay, is Runtime state. A fresh Editor Board enables cheats with Default authored timing; restored scenarios retain their saved gameplay mode. Instant settles valid time-based jobs and temporary lifetimes through the same authoritative engine without changing Tick units. Hard reset is renderer lifecycle: discard the exact Game without final save, clear only its verified save, then acquire a fresh Game. It is not an authored item command.
 
 Serializable State contains items, deliveries, jobs, queues, current space, and gameplay cheat state—not wall-clock timestamps, Tick observation cursors, transient events, or UI state. Hydration strictly validates the current shape and invariants. Matching-major compatibility is defined only by [`VERSION.md`](VERSION.md).
 

@@ -61,7 +61,7 @@ Editor Board help:
   value: |
     Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, charges, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
 
-    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Instant** removes waiting time while preserving normal requirements, placement, charges, and lifecycle rules; switch to **Common** to test the authored durations.
+    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Instant** removes waiting time while preserving normal requirements, placement, charges, and lifecycle rules.
 
     ### Scenarios
 

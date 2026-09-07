@@ -44,6 +44,38 @@
 				},
 				"effect": "replace",
 				"result": "dye-workshop-beer"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "toilet"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-mug",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "toilet-beer"
 			}
 		],
 		"type": "simple"

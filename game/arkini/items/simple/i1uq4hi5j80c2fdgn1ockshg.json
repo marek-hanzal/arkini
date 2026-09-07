@@ -1,35 +1,35 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "p7by927p0a8sqxebscar9lik",
-		"id": "hammer",
-		"title": "Hammer",
-		"description": "Can break something",
+		"uid": "i1uq4hi5j80c2fdgn1ockshg",
+		"id": "sword",
+		"title": "Sword",
+		"description": "Just a sword. You can cut a bread using it",
 		"asset": {
 			"default": [
-				"hammer"
+				"sword"
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 1,
+		"maxStackSize": 6,
 		"merge": [
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-extinguished"
+					"itemId": "bear"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "clutter"
+				"result": "hunted-game"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "broken-toilet"
+					"itemId": "wolf"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "clutter"
+				"result": "hunted-game"
 			}
 		],
 		"type": "simple"

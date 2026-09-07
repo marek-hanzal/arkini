@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "y7p0xa3nu9tvculm2xybfm4w",
+		"id": "explosive-compound",
+		"title": "Explosive Compound",
+		"description": "Kaboom in the bottle",
+		"asset": {
+			"default": [
+				"explosive-compound"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wguid5c2feyy5ti9za1m3tsy",
+		"id": "kitchen-knife",
+		"title": "Kitchen Knife",
+		"description": "Sharp.",
+		"asset": {
+			"default": [
+				"kitchen-knife"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,50 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "q5dg0snrffh09fxp6gzmri5j",
+		"id": "cup-of-coffee",
+		"title": "Cup Of Coffee",
+		"description": "Fresh coffee",
+		"asset": {
+			"default": [
+				"cup-of-coffee"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "clay-mug",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "bio-waste",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

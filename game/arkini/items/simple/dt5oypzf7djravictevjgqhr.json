@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dt5oypzf7djravictevjgqhr",
+		"id": "colored-glassware",
+		"title": "Colored Glassware",
+		"description": "Glass. And colors",
+		"asset": {
+			"default": [
+				"colored-glassware"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

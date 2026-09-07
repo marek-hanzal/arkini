@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "mdlyzmsttu7165vwtqp3gbhx",
+		"id": "glass-pitcher",
+		"title": "Glass Pitcher",
+		"description": "Be careful",
+		"asset": {
+			"default": [
+				"glass-pitcher"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

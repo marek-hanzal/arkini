@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "e4u0hep343mib8is2x1g8fbx",
+		"id": "coffee-plant",
+		"title": "Coffee Plant",
+		"description": "You need caffeine",
+		"asset": {
+			"default": [
+				"coffee-plant"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

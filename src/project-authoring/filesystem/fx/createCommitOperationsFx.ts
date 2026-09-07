@@ -459,6 +459,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 
 	const optimizeResourcesFx: Operations["optimizeResourcesFx"] = ({
 		expectedRevision,
+		onProgressFn,
 		projectId,
 	}) =>
 		operations
@@ -466,9 +467,30 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				Effect.gen(function* () {
 					const state = yield* readStateFx(projectId);
 					yield* assertExpectedRevisionFx(state, expectedRevision, "optimize-resources");
+					let completedResourceCount = 0;
+					const totalResourceCount = state.project.resources.length;
+					yield* Effect.sync(() =>
+						onProgressFn?.({
+							completedResourceCount,
+							phase: "optimizing",
+							totalResourceCount,
+						}),
+					);
 					const results = yield* Effect.forEach(
 						state.project.resources,
-						(resource) => optimizePngResourceFx(resource),
+						(resource) =>
+							optimizePngResourceFx(resource).pipe(
+								Effect.tap(() =>
+									Effect.sync(() => {
+										completedResourceCount += 1;
+										onProgressFn?.({
+											completedResourceCount,
+											phase: "optimizing",
+											totalResourceCount,
+										});
+									}),
+								),
+							),
 						{
 							concurrency: 2,
 						},
@@ -484,6 +506,13 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					const optimizedBytes = results.reduce(
 						(total, result) => total + result.optimizedBytes,
 						0,
+					);
+					yield* Effect.sync(() =>
+						onProgressFn?.({
+							completedResourceCount,
+							phase: "saving",
+							totalResourceCount,
+						}),
 					);
 					const project =
 						optimizedResourceCount === 0

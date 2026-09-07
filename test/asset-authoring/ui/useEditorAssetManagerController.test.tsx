@@ -27,6 +27,7 @@ vi.mock("~/asset-authoring/ui/useEditorAssetLibrary", () => ({
 		projectId: "editor-test",
 		projectRevision: 42,
 		resources: [],
+		totalResourceCount: 7,
 	}),
 }));
 
@@ -125,7 +126,7 @@ describe("useEditorAssetManagerController", () => {
 
 		expect(state.optimizeResources).toHaveBeenCalledWith({
 			expectedRevision: 42,
-			projectId: "editor-test",
+			totalResourceCount: 7,
 		});
 	});
 });

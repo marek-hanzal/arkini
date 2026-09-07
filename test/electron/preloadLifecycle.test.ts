@@ -59,6 +59,22 @@ const reportEditorProjectChanged = (projectId: string) => {
 	handler(undefined, projectId);
 };
 
+const reportEditorResourceOptimizationProgress = (
+	progress: ArkiniElectronApi.Api["editor"] extends {
+		readonly onOptimizeResourcesProgressFn: (
+			listenerFn: (value: infer Progress) => void,
+		) => () => void;
+	}
+		? Progress
+		: never,
+) => {
+	const handler = electron.handlers.get(
+		ArkiniElectronContract.channels.editorProjectOptimizeResourcesProgress,
+	);
+	if (handler === undefined) throw new Error("Expected resource optimization listener.");
+	handler(undefined, progress);
+};
+
 const reportChatGptState = (state: { readonly type: "loading" | "ready" }) => {
 	const handler = electron.handlers.get(ArkiniElectronContract.channels.chatGptStateChanged);
 	if (handler === undefined) throw new Error("Expected ChatGPT state listener registration.");
@@ -189,6 +205,28 @@ describe("Electron preload lifecycle", () => {
 		reportEditorProjectChanged("project-two");
 
 		expect(listener).toHaveBeenCalledExactlyOnceWith("project-one");
+	});
+
+	it("subscribes the renderer to resource optimization progress", async () => {
+		const api = await loadPreload();
+		const listener = vi.fn();
+		const unsubscribe = api.editor.onOptimizeResourcesProgressFn(listener);
+		const progress = {
+			completedResourceCount: 3,
+			expectedRevision: 7,
+			phase: "optimizing" as const,
+			projectId: "project-one",
+			totalResourceCount: 8,
+		};
+
+		reportEditorResourceOptimizationProgress(progress);
+		unsubscribe();
+		reportEditorResourceOptimizationProgress({
+			...progress,
+			completedResourceCount: 4,
+		});
+
+		expect(listener).toHaveBeenCalledExactlyOnceWith(progress);
 	});
 
 	it("returns renderer MCP version checkout completion through its private port", async () => {

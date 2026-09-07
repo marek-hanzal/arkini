@@ -104,6 +104,7 @@ const installEditorApi = () => {
 		readProjectFn: vi.fn(async () => success(project)),
 		refreshProjectFn: vi.fn(async () => success(project)),
 		onProjectChangedFn: vi.fn(() => () => undefined),
+		onOptimizeResourcesProgressFn: vi.fn(() => () => undefined),
 		replaceConfigFn: vi.fn(async () => success(commit)),
 		replaceResourceFn: vi.fn(async () => success(project)),
 		saveResourceFn: vi.fn(async () => success(project)),
@@ -378,6 +379,56 @@ describe("createElectronProjectRepositoryFx", () => {
 			projectId: project.projectId,
 		});
 		expect(optimized.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
+	});
+
+	it("forwards matching resource optimization progress and releases the listener", async () => {
+		const editor = installEditorApi();
+		const { repository } = createRepository();
+		const onProgressFn = vi.fn();
+		const unsubscribeFn = vi.fn();
+		let reportProgressFn:
+			| Parameters<Window["arkini"]["editor"]["onOptimizeResourcesProgressFn"]>[0]
+			| undefined;
+		vi.mocked(editor.onOptimizeResourcesProgressFn).mockImplementation((listenerFn) => {
+			reportProgressFn = listenerFn;
+			return unsubscribeFn;
+		});
+		vi.mocked(editor.optimizeResourcesFn).mockImplementation(async (request) => {
+			reportProgressFn?.({
+				...request,
+				completedResourceCount: 1,
+				phase: "optimizing",
+				totalResourceCount: 2,
+			});
+			reportProgressFn?.({
+				completedResourceCount: 9,
+				expectedRevision: request.expectedRevision,
+				phase: "optimizing",
+				projectId: "another-project",
+				totalResourceCount: 9,
+			});
+			return success({
+				optimizedResourceCount: 0,
+				originalBytes: 0,
+				optimizedBytes: 0,
+				project,
+			});
+		});
+
+		await Effect.runPromise(
+			repository.optimizeResourcesFx({
+				expectedRevision: project.revision,
+				onProgressFn,
+				projectId: project.projectId,
+			}),
+		);
+
+		expect(onProgressFn).toHaveBeenCalledExactlyOnceWith({
+			completedResourceCount: 1,
+			phase: "optimizing",
+			totalResourceCount: 2,
+		});
+		expect(unsubscribeFn).toHaveBeenCalledOnce();
 	});
 
 	it("blocks save-resource IPC while a hard project replacement owns writes", async () => {

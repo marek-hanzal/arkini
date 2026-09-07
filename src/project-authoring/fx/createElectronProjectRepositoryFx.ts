@@ -18,6 +18,7 @@ import {
 	ProjectPayloadSchema,
 } from "~/project-authoring/schema/ProjectPayloadSchema";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
@@ -143,6 +144,18 @@ const optimizeResourcesResultSchema = z
 		project: ProjectPayloadSchema,
 	})
 	.strict();
+const optimizeResourcesProgressSchema = z
+	.object({
+		completedResourceCount: z.number().int().nonnegative(),
+		expectedRevision: z.number().int().nonnegative(),
+		phase: z.enum([
+			"optimizing",
+			"saving",
+		]),
+		projectId: IdSchema,
+		totalResourceCount: z.number().int().nonnegative(),
+	})
+	.strict();
 
 const callFx = <Value, Parsed>(
 	operation: ProjectRepositoryOperation,
@@ -257,13 +270,36 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 			() => window.arkini.editor.listProjectsFn(),
 			(value) => ProjectCandidateSchema.array().parse(value),
 		),
-		optimizeResourcesFx: (request) =>
+		optimizeResourcesFx: ({ onProgressFn, ...request }) =>
 			writeFx(
 				"optimize-resources",
-				callFx(
-					"optimize-resources",
-					() => window.arkini.editor.optimizeResourcesFn(request),
-					(value) => optimizeResourcesResultSchema.parse(value),
+				Effect.acquireUseRelease(
+					Effect.sync(() =>
+						onProgressFn === undefined
+							? undefined
+							: window.arkini.editor.onOptimizeResourcesProgressFn((progress) => {
+									const parsed =
+										optimizeResourcesProgressSchema.safeParse(progress);
+									if (!parsed.success) return;
+									if (
+										parsed.data.projectId === request.projectId &&
+										parsed.data.expectedRevision === request.expectedRevision
+									)
+										onProgressFn({
+											completedResourceCount:
+												parsed.data.completedResourceCount,
+											phase: parsed.data.phase,
+											totalResourceCount: parsed.data.totalResourceCount,
+										});
+								}),
+					),
+					() =>
+						callFx(
+							"optimize-resources",
+							() => window.arkini.editor.optimizeResourcesFn(request),
+							(value) => optimizeResourcesResultSchema.parse(value),
+						),
+					(unsubscribeFn) => Effect.sync(() => unsubscribeFn?.()),
 				),
 			),
 		listNotesFx: (projectId) =>

@@ -13,6 +13,9 @@ const chatGptAssetCandidateListeners = new Set<
 const editorProjectChangedListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChangedFn"]>[0]
 >();
+const editorResourceOptimizationProgressListeners = new Set<
+	Parameters<ArkiniElectronApi.Api["editor"]["onOptimizeResourcesProgressFn"]>[0]
+>();
 const editorMcpVersionCheckoutListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editorMcp"]["onVersionCheckoutRequestedFn"]>[0]
 >();
@@ -49,6 +52,14 @@ ipcRenderer.on(ArkiniElectronApi.channels.windowModeChanged, (_event, mode) => {
 ipcRenderer.on(ArkiniElectronApi.channels.editorProjectChanged, (_event, projectId) => {
 	for (const listenerFn of Array.from(editorProjectChangedListeners)) listenerFn(projectId);
 });
+
+ipcRenderer.on(
+	ArkiniElectronApi.channels.editorProjectOptimizeResourcesProgress,
+	(_event, progress) => {
+		for (const listenerFn of Array.from(editorResourceOptimizationProgressListeners))
+			listenerFn(progress);
+	},
+);
 
 ipcRenderer.on(ArkiniElectronApi.channels.editorMcpOverviewChanged, (_event, overview) => {
 	for (const listenerFn of Array.from(editorMcpOverviewListeners)) listenerFn(overview);
@@ -191,6 +202,10 @@ const api: ArkiniElectronApi.Api = {
 		onProjectChangedFn: (listenerFn) => {
 			editorProjectChangedListeners.add(listenerFn);
 			return () => editorProjectChangedListeners.delete(listenerFn);
+		},
+		onOptimizeResourcesProgressFn: (listenerFn) => {
+			editorResourceOptimizationProgressListeners.add(listenerFn);
+			return () => editorResourceOptimizationProgressListeners.delete(listenerFn);
 		},
 		optimizeResourcesFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOptimizeResources, request),

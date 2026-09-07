@@ -49,15 +49,43 @@ describe("filesystem Editor PNG optimization", () => {
 		);
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		if (root === null) throw new Error("Managed project root missing.");
+		const progress: Array<{
+			readonly completedResourceCount: number;
+			readonly phase: "optimizing" | "saving";
+			readonly totalResourceCount: number;
+		}> = [];
 
 		const result = await Effect.runPromise(
 			repository.optimizeResourcesFx({
 				expectedRevision: created.revision,
+				onProgressFn: (value) => progress.push(value),
 				projectId: created.projectId,
 			}),
 		);
 
 		expect(result.optimizedResourceCount).toBe(2);
+		expect(progress).toEqual([
+			{
+				completedResourceCount: 0,
+				phase: "optimizing",
+				totalResourceCount: 2,
+			},
+			{
+				completedResourceCount: 1,
+				phase: "optimizing",
+				totalResourceCount: 2,
+			},
+			{
+				completedResourceCount: 2,
+				phase: "optimizing",
+				totalResourceCount: 2,
+			},
+			{
+				completedResourceCount: 2,
+				phase: "saving",
+				totalResourceCount: 2,
+			},
+		]);
 		expect(result.optimizedBytes).toBeLessThan(result.originalBytes);
 		expect(result.project.revision).toBeGreaterThan(created.revision);
 		for (const [resourceId, source] of [

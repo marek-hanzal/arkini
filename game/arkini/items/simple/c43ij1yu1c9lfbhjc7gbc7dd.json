@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "c43ij1yu1c9lfbhjc7gbc7dd",
+		"id": "soap",
+		"title": "Soap",
+		"description": "You can clean yourself",
+		"asset": {
+			"default": [
+				"soap"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

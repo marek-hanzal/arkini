@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "laqx08cmv2c9mqs5qz5tv8yj",
+		"id": "amethyst",
+		"title": "Amethyst",
+		"description": "A colorful stone",
+		"asset": {
+			"default": [
+				"amethyst"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -12,6 +12,17 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cauldron-with-boiling-water"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cauldron-with-jam"
+			}
+		],
 		"type": "temporary",
 		"durationMs": 300000,
 		"output": {

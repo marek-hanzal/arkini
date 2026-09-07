@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "bsm7hrvufre2fiexr4o0eo4q",
+		"id": "burning-oven",
+		"title": "Burning Oven",
+		"description": "It's hot",
+		"asset": {
+			"default": [
+				"burning-oven"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 900000
+	}
+}

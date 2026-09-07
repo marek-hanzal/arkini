@@ -1,27 +1,18 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "ndjrqhmuzcn1k6qo8xmpqslp",
-		"id": "beeswax",
-		"title": "Beeswax",
-		"description": "Candles are created using this",
+		"uid": "ul3bpq59ybg8xeq1uuvmto99",
+		"id": "water-mug",
+		"title": "Water Mug",
+		"description": "A mug. With a water. Really?!",
 		"asset": {
 			"default": [
-				"beeswax"
+				"water-mug"
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 6,
+		"maxStackSize": 1,
 		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-cauldron"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "cauldron-with-beeswax"
-			},
 			{
 				"target": {
 					"type": "item",
@@ -37,7 +28,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "air-pollution",
+											"itemId": "empty-mug",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -51,7 +42,8 @@
 						}
 					]
 				},
-				"effect": "keep"
+				"effect": "replace",
+				"result": "campfire-extinguished"
 			}
 		],
 		"type": "simple"

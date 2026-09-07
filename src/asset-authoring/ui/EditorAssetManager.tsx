@@ -265,6 +265,20 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 				? `All ${project.resources.length} PNGs are already optimized.`
 				: `Optimized ${controller.optimization.optimizedResourceCount} of ${project.resources.length} PNGs · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup"}.`;
 	const busy = controller.importPending || controller.optimizePending;
+	const optimizationPercent =
+		controller.optimizationProgress === undefined ||
+		controller.optimizationProgress.totalResourceCount === 0
+			? 0
+			: controller.optimizationProgress.phase === "saving"
+				? 100
+				: Math.min(
+						95,
+						Math.round(
+							(controller.optimizationProgress.completedResourceCount /
+								controller.optimizationProgress.totalResourceCount) *
+								95,
+						),
+					);
 	const importButton = (
 		<EditorAssetImportMenu
 			onImportArkpackFn={controller.openArkpackImportFn}
@@ -312,14 +326,29 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					/>
 					{controller.catalogState === "empty" ? null : (
 						<Button
-							className="h-12 min-h-0 shrink-0 gap-2 px-4 py-0"
+							className="relative isolate h-12 min-h-0 min-w-36 shrink-0 gap-2 overflow-hidden px-4 py-0"
 							cursorIntent={busy ? "progress" : undefined}
 							data-ui="EditorAssetsOptimize"
 							disabled={busy}
 							onClick={controller.onOptimizeFn}
 						>
-							<Sparkles className="size-4" />
-							Optimize
+							{controller.optimizePending ? (
+								<span
+									className="absolute inset-y-0 left-0 z-0 bg-accent/20 transition-[width] duration-200 ease-linear"
+									data-ui="EditorAssetsOptimizeProgress"
+									style={{
+										width: `${optimizationPercent}%`,
+									}}
+								/>
+							) : null}
+							<span className="relative z-10 inline-flex items-center gap-2">
+								<Sparkles className="size-4" />
+								{controller.optimizePending
+									? controller.optimizationProgress?.phase === "saving"
+										? "Saving…"
+										: `Optimizing ${optimizationPercent}%`
+									: "Optimize"}
+							</span>
 						</Button>
 					)}
 					<SegmentedControl

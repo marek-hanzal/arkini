@@ -230,6 +230,12 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 	}
 
+	export interface OptimizeResourcesProgress extends OptimizeResourcesRequest {
+		readonly completedResourceCount: number;
+		readonly phase: "optimizing" | "saving";
+		readonly totalResourceCount: number;
+	}
+
 	export interface OptimizeResourcesResult {
 		readonly optimizedResourceCount: number;
 		readonly originalBytes: number;

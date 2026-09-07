@@ -73,7 +73,14 @@ export namespace ProjectRepository {
 
 	export interface OptimizeResourcesProps {
 		readonly expectedRevision: number;
+		readonly onProgressFn?: (progress: OptimizeResourcesProgress) => void;
 		readonly projectId: string;
+	}
+
+	export interface OptimizeResourcesProgress {
+		readonly completedResourceCount: number;
+		readonly phase: "optimizing" | "saving";
+		readonly totalResourceCount: number;
 	}
 
 	export interface OptimizeResourcesResult {

@@ -18,7 +18,11 @@ import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 
 const readEditorWindowFx = (
 	event: IpcMainInvokeEvent,
-	operation: "export-json-directory" | "import-json-directory" | "save-project-build",
+	operation:
+		| "export-json-directory"
+		| "import-json-directory"
+		| "optimize-resources"
+		| "save-project-build",
 ) =>
 	Effect.sync(() => BrowserWindow.fromWebContents(event.sender)).pipe(
 		Effect.flatMap((window) =>
@@ -250,13 +254,30 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 				);
 				handleFn(
 					ArkiniElectronApi.channels.editorProjectOptimizeResources,
-					(_event, candidate) =>
+					(event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"optimize-resources",
 							ownership,
 							diagnostics,
-							requestParser.parseOptimizeResourcesFx(candidate),
-							(repository, request) => repository.optimizeResourcesFx(request),
+							Effect.all({
+								request: requestParser.parseOptimizeResourcesFx(candidate),
+								window: readEditorWindowFx(event, "optimize-resources"),
+							}),
+							(repository, { request, window }) =>
+								repository.optimizeResourcesFx({
+									...request,
+									onProgressFn: (progress) => {
+										if (window.isDestroyed()) return;
+										window.webContents.send(
+											ArkiniElectronApi.channels
+												.editorProjectOptimizeResourcesProgress,
+											{
+												...request,
+												...progress,
+											},
+										);
+									},
+								}),
 						),
 				);
 				handleFn(

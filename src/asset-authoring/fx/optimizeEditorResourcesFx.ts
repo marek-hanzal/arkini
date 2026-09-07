@@ -5,6 +5,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 
 interface OptimizeEditorResourcesProps {
 	readonly expectedRevision: number;
+	readonly onProgressFn?: ProjectRepository.OptimizeResourcesProps["onProgressFn"];
 	readonly projectId: string;
 }
 

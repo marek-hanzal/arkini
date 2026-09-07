@@ -66,6 +66,7 @@ export namespace ArkiniElectronApi {
 		editorProjectList: "arkini:editor:project:list",
 		editorProjectOpenDirectory: "arkini:editor:project:open-directory",
 		editorProjectOptimizeResources: "arkini:editor:project:optimize-resources",
+		editorProjectOptimizeResourcesProgress: "arkini:editor:project:optimize-resources:progress",
 		editorProjectRead: "arkini:editor:project:read",
 		editorProjectRefresh: "arkini:editor:project:refresh",
 		editorProjectChanged: "arkini:editor:project:changed",
@@ -249,6 +250,9 @@ export namespace ArkiniElectronApi {
 			) => Promise<
 				EditorProjectTransport.Result<EditorProjectTransport.OptimizeResourcesResult>
 			>;
+			readonly onOptimizeResourcesProgressFn: (
+				listenerFn: (progress: EditorProjectTransport.OptimizeResourcesProgress) => void,
+			) => () => void;
 			readonly replaceConfigFn: (
 				request: EditorProjectTransport.ReplaceConfigRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;

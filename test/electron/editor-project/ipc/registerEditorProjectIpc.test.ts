@@ -45,8 +45,15 @@ vi.mock("~electron/main/editor-project/exportEditorJsonDirectoryFx", () => ({
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (event: unknown, candidate?: unknown) => unknown>();
 	const appListeners = new Map<string, () => void>();
+	const editorWindow = {
+		isDestroyed: vi.fn(() => false),
+		webContents: {
+			send: vi.fn(),
+		},
+	};
 	return {
 		appListeners,
+		editorWindow,
 		handlers,
 		module: {
 			app: {
@@ -55,7 +62,7 @@ const electron = vi.hoisted(() => {
 				once: (event: string, listener: () => void) => appListeners.set(event, listener),
 			},
 			BrowserWindow: {
-				fromWebContents: () => ({}),
+				fromWebContents: () => editorWindow,
 			},
 			ipcMain: {
 				handle: (
@@ -155,6 +162,8 @@ beforeEach(async () => {
 	sourceExport.effect = Effect.succeed(completedSourceExport);
 	writeApplicationLog.mockClear();
 	electron.module.shell.openPath.mockClear();
+	electron.editorWindow.isDestroyed.mockClear();
+	electron.editorWindow.webContents.send.mockClear();
 });
 
 afterEach(() => {
@@ -425,7 +434,19 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.deleteItemFx).toHaveBeenCalledWith(deleteItemRequest);
 		expect(repository.deleteResourceFx).toHaveBeenCalledWith(deleteResourceRequest);
 		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
-		expect(repository.optimizeResourcesFx).toHaveBeenCalledWith(optimizeResourcesRequest);
+		expect(repository.optimizeResourcesFx).toHaveBeenCalledWith({
+			...optimizeResourcesRequest,
+			onProgressFn: expect.any(Function),
+		});
+		expect(electron.editorWindow.webContents.send).toHaveBeenCalledWith(
+			ArkiniElectronApi.channels.editorProjectOptimizeResourcesProgress,
+			{
+				...optimizeResourcesRequest,
+				completedResourceCount: 1,
+				phase: "optimizing",
+				totalResourceCount: 2,
+			},
+		);
 		expect(repository.readVersionStatusFx).toHaveBeenCalledWith("project-one");
 		expect(repository.previewVersionCommitFx).toHaveBeenCalledWith("project-one");
 		expect(repository.listVersionsFx).toHaveBeenCalledWith("project-one");

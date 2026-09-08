@@ -3,7 +3,7 @@ import { Effect, Random } from "effect";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 
 /** Bump only when intentionally changing completion random compatibility. */
-const JobCompletionRandomVersion = 2;
+const JobCompletionRandomVersion = 3;
 
 /**
  * Runs the owned program with the deterministic random stream for one stable job completion.

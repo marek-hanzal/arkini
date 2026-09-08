@@ -22,7 +22,7 @@ import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceB
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
-const MergeRandomVersion = 2;
+const MergeRandomVersion = 3;
 
 const readRemainingChargesSeedFn = (item: RuntimeItemSchema.Type) => {
 	return item.remainingCharges ?? item.item.charges?.amount ?? "full";

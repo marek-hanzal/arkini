@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /** Bump only when intentionally changing immediate charge-depletion random compatibility. */
-const ActionChargeSpendRandomVersion = 2;
+const ActionChargeSpendRandomVersion = 3;
 
 /** Runs charge-depletion work with deterministic random for one concrete action. */
 export const makeActionChargeSpendRandomFx = Effect.fn("makeActionChargeSpendRandomFx")(function* <

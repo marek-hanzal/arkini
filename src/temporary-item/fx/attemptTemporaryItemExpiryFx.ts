@@ -20,7 +20,7 @@ import { reconcileJobAfterTemporaryMaterialExpiryFx } from "~/production-job/fx/
 import { outputFx } from "~/production-output/fx/outputFx";
 
 /** Bump only when intentionally changing temporary-expiry random compatibility. */
-const TemporaryExpiryRandomVersion = 2;
+const TemporaryExpiryRandomVersion = 3;
 
 interface AttemptTemporaryItemExpiryProps {
 	itemId: IdSchema.Type;

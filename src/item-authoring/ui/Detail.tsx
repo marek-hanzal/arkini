@@ -1,4 +1,4 @@
-import { LogIn, LogOut, Pencil, Replace } from "lucide-react";
+import { Pencil, Replace } from "lucide-react";
 import type { PropsWithChildren } from "react";
 import { Link } from "@tanstack/react-router";
 
@@ -22,7 +22,6 @@ import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
-import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 
@@ -106,36 +105,12 @@ export const Detail = ({
 					}
 					action={
 						<div className="flex items-center gap-2">
-							<LinkButtonLink
-								className="inline-flex items-center gap-2 px-1 text-sm"
-								params={{
-									projectId: project.projectId,
-								}}
-								search={{
-									direction: "input",
-									itemId: item.id,
-								}}
-								to="/editor/$projectId/flow"
-							>
-								<LogIn className="size-4" />
-								Inputs
-							</LinkButtonLink>
-							<LinkButtonLink
-								className="inline-flex items-center gap-2 px-1 text-sm"
-								params={{
-									projectId: project.projectId,
-								}}
-								search={{
-									direction: "output",
-									itemId: item.id,
-								}}
-								to="/editor/$projectId/flow"
-							>
-								<LogOut className="size-4" />
-								Outputs
-							</LinkButtonLink>
-							{help === undefined ? null : <EditorPageHelp {...help} />}
-							<EditorSectionNavigationSeparator />
+							{help === undefined ? null : (
+								<>
+									<EditorPageHelp {...help} />
+									<EditorSectionNavigationSeparator />
+								</>
+							)}
 							<ItemTypeMenu
 								dataUi="EditorItemConvertMenu"
 								description="Compatible data is kept; unsupported fields are removed on Save."

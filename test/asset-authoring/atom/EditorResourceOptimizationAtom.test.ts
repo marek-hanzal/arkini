@@ -14,11 +14,14 @@ const state = vi.hoisted(() => ({
 	optimize: vi.fn(),
 	request: undefined as
 		| {
+				readonly expectedRevision: number;
 				readonly onProgressFn?: (progress: {
 					readonly completedResourceCount: number;
 					readonly phase: "optimizing" | "saving";
 					readonly totalResourceCount: number;
 				}) => void;
+				readonly projectId: string;
+				readonly resourceIds: ReadonlyArray<string>;
 		  }
 		| undefined,
 }));
@@ -70,6 +73,7 @@ beforeEach(() => {
 				optimizedBytes: 10,
 				optimizedResourceCount: 2,
 				originalBytes: 20,
+				processedResourceCount: 4,
 				project,
 			}),
 		);
@@ -92,9 +96,24 @@ describe("EditorResourceOptimizationAtom", () => {
 
 		registry.set(optimizationAtom, {
 			expectedRevision: project.revision,
-			totalResourceCount: 4,
+			resourceIds: [
+				"one",
+				"two",
+				"three",
+				"four",
+			],
 		});
 		await vi.waitFor(() => expect(state.request).toBeDefined());
+		expect(state.request).toMatchObject({
+			expectedRevision: project.revision,
+			projectId: project.projectId,
+			resourceIds: [
+				"one",
+				"two",
+				"three",
+				"four",
+			],
+		});
 		state.request?.onProgressFn?.({
 			completedResourceCount: 2,
 			phase: "optimizing",

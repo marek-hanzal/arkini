@@ -241,6 +241,10 @@ describe("registerEditorProjectIpcFx", () => {
 		const optimizeResourcesRequest = {
 			expectedRevision: 0,
 			projectId: "project-one",
+			resourceIds: [
+				"hero",
+				"item-water",
+			],
 		};
 
 		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
@@ -441,9 +445,10 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(electron.editorWindow.webContents.send).toHaveBeenCalledWith(
 			ArkiniElectronApi.channels.editorProjectOptimizeResourcesProgress,
 			{
-				...optimizeResourcesRequest,
 				completedResourceCount: 1,
+				expectedRevision: optimizeResourcesRequest.expectedRevision,
 				phase: "optimizing",
+				projectId: optimizeResourcesRequest.projectId,
 				totalResourceCount: 2,
 			},
 		);

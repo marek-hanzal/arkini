@@ -83,6 +83,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 				optimizedResourceCount: 0,
 				originalBytes: 0,
 				optimizedBytes: 0,
+				processedResourceCount: 2,
 				project: editorProjectIpcProject,
 			}),
 		),

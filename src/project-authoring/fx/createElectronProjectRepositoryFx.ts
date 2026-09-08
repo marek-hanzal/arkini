@@ -141,6 +141,7 @@ const optimizeResourcesResultSchema = z
 		optimizedResourceCount: z.number().int().nonnegative(),
 		originalBytes: z.number().int().nonnegative(),
 		optimizedBytes: z.number().int().nonnegative(),
+		processedResourceCount: z.number().int().nonnegative(),
 		project: ProjectPayloadSchema,
 	})
 	.strict();

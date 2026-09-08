@@ -85,6 +85,7 @@ const installEditorApi = () => {
 				optimizedResourceCount: 0,
 				originalBytes: 0,
 				optimizedBytes: 0,
+				processedResourceCount: 1,
 				project,
 			}),
 		),
@@ -363,6 +364,9 @@ describe("createElectronProjectRepositoryFx", () => {
 			repository.optimizeResourcesFx({
 				expectedRevision: project.revision,
 				projectId: project.projectId,
+				resourceIds: [
+					"hero",
+				],
 			}),
 		);
 
@@ -377,6 +381,9 @@ describe("createElectronProjectRepositoryFx", () => {
 		expect(editor.optimizeResourcesFn).toHaveBeenCalledWith({
 			expectedRevision: project.revision,
 			projectId: project.projectId,
+			resourceIds: [
+				"hero",
+			],
 		});
 		expect(optimized.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
 	});
@@ -395,9 +402,10 @@ describe("createElectronProjectRepositoryFx", () => {
 		});
 		vi.mocked(editor.optimizeResourcesFn).mockImplementation(async (request) => {
 			reportProgressFn?.({
-				...request,
 				completedResourceCount: 1,
+				expectedRevision: request.expectedRevision,
 				phase: "optimizing",
+				projectId: request.projectId,
 				totalResourceCount: 2,
 			});
 			reportProgressFn?.({
@@ -411,6 +419,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				optimizedResourceCount: 0,
 				originalBytes: 0,
 				optimizedBytes: 0,
+				processedResourceCount: 2,
 				project,
 			});
 		});
@@ -420,6 +429,10 @@ describe("createElectronProjectRepositoryFx", () => {
 				expectedRevision: project.revision,
 				onProgressFn,
 				projectId: project.projectId,
+				resourceIds: [
+					"hero",
+					"item-water",
+				],
 			}),
 		);
 

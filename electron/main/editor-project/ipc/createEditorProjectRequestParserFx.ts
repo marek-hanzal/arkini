@@ -69,6 +69,11 @@ const optimizeResourcesSchema = z
 	.object({
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
+		resourceIds: IdSchema.array()
+			.min(1)
+			.refine((ids) => new Set(ids).size === ids.length, {
+				message: "Resource IDs must be unique.",
+			}),
 	})
 	.strict();
 const replaceConfigSchema = z

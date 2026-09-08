@@ -26,8 +26,18 @@ vi.mock("~/asset-authoring/ui/useEditorAssetLibrary", () => ({
 		empty: false,
 		projectId: "editor-test",
 		projectRevision: 42,
-		resources: [],
-		totalResourceCount: 7,
+		resources: [
+			{
+				bytes: new Uint8Array(),
+				id: "visible-one",
+				mime: "image/png",
+			},
+			{
+				bytes: new Uint8Array(),
+				id: "visible-two",
+				mime: "image/png",
+			},
+		],
 	}),
 }));
 
@@ -121,12 +131,15 @@ describe("useEditorAssetManagerController", () => {
 		});
 	});
 
-	it("runs whole-project PNG optimization against the current revision", () => {
+	it("optimizes exactly the resources visible through the current collection", () => {
 		controller?.onOptimizeFn();
 
 		expect(state.optimizeResources).toHaveBeenCalledWith({
 			expectedRevision: 42,
-			totalResourceCount: 7,
+			resourceIds: [
+				"visible-one",
+				"visible-two",
+			],
 		});
 	});
 });

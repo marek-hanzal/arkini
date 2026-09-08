@@ -262,8 +262,8 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 		controller.optimization === undefined
 			? undefined
 			: controller.optimization.optimizedResourceCount === 0
-				? `All ${project.resources.length} PNGs are already optimized.`
-				: `Optimized ${controller.optimization.optimizedResourceCount} of ${project.resources.length} PNGs · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup"}.`;
+				? `All ${controller.optimization.processedResourceCount} selected PNGs are already optimized.`
+				: `Optimized ${controller.optimization.optimizedResourceCount} of ${controller.optimization.processedResourceCount} selected PNGs · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup"}.`;
 	const busy = controller.importPending || controller.optimizePending;
 	const optimizationPercent =
 		controller.optimizationProgress === undefined ||
@@ -337,7 +337,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 							className="relative isolate h-12 min-h-0 min-w-36 shrink-0 gap-2 overflow-hidden px-4 py-0"
 							cursorIntent={busy ? "progress" : undefined}
 							data-ui="EditorAssetsOptimize"
-							disabled={busy}
+							disabled={busy || controller.resources.length === 0}
 							onClick={controller.onOptimizeFn}
 						>
 							{controller.optimizePending ? (

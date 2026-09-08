@@ -2,6 +2,7 @@ import { FloatingPortal } from "@floating-ui/react";
 import {
 	BadgeCheck,
 	ChevronDown,
+	CircleAlert,
 	Image as ImageIcon,
 	Images,
 	type LucideIcon,
@@ -24,6 +25,8 @@ import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface EditorAssetManagerProps extends useEditorAssetManagerController.Props {
 	readonly onFilterChangeFn: (filter: useEditorAssetManagerController.Filter) => void;
@@ -34,6 +37,12 @@ interface EditorAssetImportMenuProps {
 	readonly onImportArkpackFn: () => void;
 	readonly onImportFilesFn: () => void;
 	readonly pending: boolean;
+}
+
+interface EditorAssetOptimizationAlertProps {
+	readonly message: string;
+	readonly onDismissFn: () => void;
+	readonly tone: "danger" | "success";
 }
 
 const assetFilters = [
@@ -167,6 +176,36 @@ const EditorAssetImportMenu = ({
 	);
 };
 
+const EditorAssetOptimizationAlert = ({
+	message,
+	onDismissFn,
+	tone,
+}: EditorAssetOptimizationAlertProps) => (
+	<div
+		className="mb-3 flex min-h-12 items-center gap-3 rounded-xl border-l-2 bg-surface-raised/60 px-4 py-3 text-sm data-[ui-tone=danger]:border-danger data-[ui-tone=danger]:bg-danger/10 data-[ui-tone=success]:border-success data-[ui-tone=success]:bg-success/10"
+		{...readDataUiFn({
+			dataUi: "EditorAssetsOptimizeAlert",
+			state: {
+				tone,
+			},
+		})}
+	>
+		{tone === "success" ? (
+			<BadgeCheck className="size-5 shrink-0 text-success" />
+		) : (
+			<CircleAlert className="size-5 shrink-0 text-danger" />
+		)}
+		<p className="min-w-0 flex-1">{message}</p>
+		<LinkButton
+			className="shrink-0"
+			data-ui="EditorAssetsOptimizeAlertDismiss"
+			onClick={onDismissFn}
+		>
+			Dismiss
+		</LinkButton>
+	</div>
+);
+
 const EditorAssetCard = ({
 	filter,
 	query,
@@ -264,6 +303,18 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 			: controller.optimization.optimizedResourceCount === 0
 				? `All ${controller.optimization.processedResourceCount} selected PNGs are already optimized.`
 				: `Optimized ${controller.optimization.optimizedResourceCount} of ${controller.optimization.processedResourceCount} selected PNGs · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup"}.`;
+	const optimizationAlert =
+		optimizeError === undefined
+			? optimizationSuccess === undefined
+				? undefined
+				: {
+						message: optimizationSuccess,
+						tone: "success" as const,
+					}
+			: {
+					message: optimizeError,
+					tone: "danger" as const,
+				};
 	const busy = controller.importPending || controller.optimizePending;
 	const optimizationPercent =
 		controller.optimizationProgress === undefined ||
@@ -381,21 +432,12 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						{importSuccess}
 					</p>
 				)}
-				{optimizeError === undefined ? null : (
-					<p
-						className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-						data-ui="EditorAssetsOptimizeError"
-					>
-						{optimizeError}
-					</p>
-				)}
-				{optimizationSuccess === undefined ? null : (
-					<p
-						className="mb-3 text-sm text-success"
-						data-ui="EditorAssetsOptimizeSuccess"
-					>
-						{optimizationSuccess}
-					</p>
+				{optimizationAlert === undefined ? null : (
+					<EditorAssetOptimizationAlert
+						message={optimizationAlert.message}
+						onDismissFn={controller.onOptimizationDismissFn}
+						tone={optimizationAlert.tone}
+					/>
 				)}
 				{catalogStatus === undefined ? null : (
 					<Status

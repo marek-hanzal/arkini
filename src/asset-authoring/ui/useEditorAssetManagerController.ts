@@ -33,6 +33,7 @@ export namespace useEditorAssetManagerController {
 		readonly onFilesChangeFn: ChangeEventHandler<HTMLInputElement>;
 		readonly openArkpackImportFn: () => void;
 		readonly openFilesImportFn: () => void;
+		readonly onOptimizationDismissFn: () => void;
 		readonly onOptimizeFn: () => void;
 		readonly optimizeError?: unknown;
 		readonly optimizePending: boolean;
@@ -129,7 +130,13 @@ export const useEditorAssetManagerController = ({
 		if (library.resources.length === 0) return;
 		optimizeResourcesFn({
 			expectedRevision: library.projectRevision,
+			kind: "optimize",
 			resourceIds: library.resources.map(({ id }) => id),
+		});
+	};
+	const onOptimizationDismissFn = () => {
+		optimizeResourcesFn({
+			kind: "dismiss",
 		});
 	};
 
@@ -142,6 +149,7 @@ export const useEditorAssetManagerController = ({
 		importedCount,
 		onArkpackChangeFn,
 		onFilesChangeFn,
+		onOptimizationDismissFn,
 		onOptimizeFn,
 		openArkpackImportFn,
 		openFilesImportFn,

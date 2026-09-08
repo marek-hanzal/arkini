@@ -37,7 +37,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "cup-of-coffee",
+											"itemId": "clay-mug-with-coffee",
 											"quantity": {
 												"min": 1,
 												"max": 1

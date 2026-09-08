@@ -1,0 +1,50 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gowelydmmo177puaatmcboii",
+		"id": "clay-jug-with-milk",
+		"title": "Clay Jug With Milk",
+		"description": "More milk",
+		"asset": {
+			"default": [
+				"clay-jug-with-milk"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "clay-jug",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "bio-waste",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

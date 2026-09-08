@@ -1,0 +1,50 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ueuxr2ac2q6p666r5wswv352",
+		"id": "well-fed-sarka",
+		"title": "Well Fed Sarka",
+		"description": "Fully belly",
+		"asset": {
+			"default": [
+				"well-fed-sarka"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 5000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "sarka",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "bio-waste",
+									"quantity": {
+										"min": 2,
+										"max": 3
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

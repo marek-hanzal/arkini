@@ -2,12 +2,12 @@
 	"$schema": "../../schema.json",
 	"item": {
 		"uid": "q5dg0snrffh09fxp6gzmri5j",
-		"id": "cup-of-coffee",
-		"title": "Cup Of Coffee",
+		"id": "clay-mug-with-coffee",
+		"title": "Clay Mug With Coffee",
 		"description": "Fresh coffee",
 		"asset": {
 			"default": [
-				"cup-of-coffee"
+				"clay-mug-with-coffee"
 			]
 		},
 		"scope": "board",

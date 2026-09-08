@@ -1,0 +1,50 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "y5xwsvtgyxy5npclxyzwngo2",
+		"id": "honeyed-fruit-pancake",
+		"title": "Honeyed Fruit Pancake",
+		"description": "Yammi",
+		"asset": {
+			"default": [
+				"honeyed-fruit-pancake"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "clay-plate",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								},
+								{
+									"itemId": "bio-waste",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

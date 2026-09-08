@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "shp343joyeuwkqsic8viao7j",
+		"id": "copper-bathtub-with-bio-waste",
+		"title": "Copper Bathtub With Bio Waste",
+		"description": "You cannot help yourself?",
+		"asset": {
+			"default": [
+				"copper-bathtub-with-bio-waste"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

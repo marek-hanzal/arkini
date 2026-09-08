@@ -71,6 +71,37 @@
 				},
 				"effect": "replace",
 				"result": "building-ruins"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bio-waste"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 48,
+												"max": 72
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "remove"
 			}
 		],
 		"type": "simple"

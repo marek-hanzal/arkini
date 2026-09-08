@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "pdf7wsiugl78cqtmeym6tda7",
+		"id": "silenced-bow",
+		"title": "Silenced Bow",
+		"description": "It makes less noise",
+		"asset": {
+			"default": [
+				"silenced-bow"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

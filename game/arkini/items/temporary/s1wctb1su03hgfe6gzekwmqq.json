@@ -1,0 +1,52 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "s1wctb1su03hgfe6gzekwmqq",
+		"id": "pancake",
+		"title": "Pancake",
+		"description": "You can make it better",
+		"asset": {
+			"default": [
+				"pancake"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "clay-plate"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "clay-plate-with-pancake"
+			}
+		],
+		"type": "temporary",
+		"durationMs": 120000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "bio-waste",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

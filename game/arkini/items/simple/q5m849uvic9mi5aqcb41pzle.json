@@ -21,6 +21,70 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "bed-t1"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bed-milk"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "bed-t1"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bed-biowaste"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "bed-t1"
 			}
 		],
 		"type": "simple"

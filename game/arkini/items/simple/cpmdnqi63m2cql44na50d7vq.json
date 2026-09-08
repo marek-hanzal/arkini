@@ -21,6 +21,15 @@
 				"action": "use",
 				"effect": "replace",
 				"result": "paper-boat"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sheep"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "shorn-sheep"
 			}
 		],
 		"type": "simple"

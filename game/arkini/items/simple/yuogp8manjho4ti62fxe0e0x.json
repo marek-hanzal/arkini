@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "yuogp8manjho4ti62fxe0e0x",
+		"id": "key-t5",
+		"title": "Key - Tier 5",
+		"description": "Cool key",
+		"asset": {
+			"default": [
+				"key-t5"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 2,
+		"type": "simple"
+	}
+}

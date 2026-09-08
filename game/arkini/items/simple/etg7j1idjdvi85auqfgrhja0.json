@@ -21,6 +21,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "bedding"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bow-and-arrows"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "silenced-bow"
 			}
 		],
 		"type": "simple"

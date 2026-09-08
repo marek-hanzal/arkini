@@ -12,6 +12,17 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "clay-vase"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "clay-vase-with-flowers"
+			}
+		],
 		"type": "temporary",
 		"durationMs": 900000,
 		"output": {

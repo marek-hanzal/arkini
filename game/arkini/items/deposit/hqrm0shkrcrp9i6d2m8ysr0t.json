@@ -1,0 +1,44 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hqrm0shkrcrp9i6d2m8ysr0t",
+		"id": "sugar-beet-field",
+		"title": "Sugar Beet Field",
+		"description": "Here you go",
+		"asset": {
+			"default": [
+				"sugar-beet-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 32,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"type": "deposit"
+	}
+}

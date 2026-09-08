@@ -1,13 +1,13 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "cpmdnqi63m2cql44na50d7vq",
-		"id": "scissors",
-		"title": "Scissors",
-		"description": "Sharp. Keep children away",
+		"uid": "q5m849uvic9mi5aqcb41pzle",
+		"id": "bedding",
+		"title": "Bedding",
+		"description": "Sleep well",
 		"asset": {
 			"default": [
-				"scissors"
+				"bedding"
 			]
 		},
 		"scope": "any",
@@ -16,11 +16,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "paper"
+					"itemId": "empty-bed-t1"
 				},
-				"action": "use",
+				"action": "consume",
 				"effect": "replace",
-				"result": "paper-boat"
+				"result": "bed-t1"
 			}
 		],
 		"type": "simple"

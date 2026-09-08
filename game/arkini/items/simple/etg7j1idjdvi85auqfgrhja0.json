@@ -1,0 +1,28 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "etg7j1idjdvi85auqfgrhja0",
+		"id": "pillow",
+		"title": "Pillow",
+		"description": "Your neck may thank you",
+		"asset": {
+			"default": [
+				"pillow"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "duvet"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bedding"
+			}
+		],
+		"type": "simple"
+	}
+}

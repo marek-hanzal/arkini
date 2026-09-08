@@ -1,0 +1,78 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "p7k5gkd5e6gufjoggz22acvx",
+		"id": "toxic-waste-purifier",
+		"title": "Toxic Waste Purifier",
+		"description": "Throw those ugly chemicals into the river... oh, filter it out in pure nature way",
+		"asset": {
+			"default": [
+				"toxic-waste-purifier"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 6,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "toxic-waste",
+				"title": "Process Toxic Waste",
+				"description": "You should get rid of that ugly thing",
+				"default": true,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "toxic-waste"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 4
+						},
+						"capacity": 0
+					},
+					{
+						"charges": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "deposit",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "toxic-filter"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"rules": [
+					{
+						"hint": "You want to remove toxic stuff? You should have a filter",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "toxic-filter"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
+	}
+}

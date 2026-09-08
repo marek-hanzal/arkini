@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "lknmzmrbwrl2401n3vozrgbs",
+		"id": "shield",
+		"title": "Shield",
+		"description": "It may protect you",
+		"asset": {
+			"default": [
+				"shield"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

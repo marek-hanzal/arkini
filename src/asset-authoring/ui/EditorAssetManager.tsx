@@ -324,6 +324,14 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						placeholder={`${translator.textFn("Search assets…")} (${controller.resources.length})`}
 						onValueChangeFn={props.onQueryChangeFn}
 					/>
+					<SegmentedControl
+						dataUi="EditorAssetFilters"
+						onChangeFn={props.onFilterChangeFn}
+						optionDataUi="EditorAssetFilter"
+						options={assetFilters}
+						size="large"
+						value={props.filter}
+					/>
 					{controller.catalogState === "empty" ? null : (
 						<Button
 							className="relative isolate h-12 min-h-0 min-w-36 shrink-0 gap-2 overflow-hidden px-4 py-0"
@@ -351,14 +359,6 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 							</span>
 						</Button>
 					)}
-					<SegmentedControl
-						dataUi="EditorAssetFilters"
-						onChangeFn={props.onFilterChangeFn}
-						optionDataUi="EditorAssetFilter"
-						options={assetFilters}
-						size="large"
-						value={props.filter}
-					/>
 					{controller.catalogState === "empty" ? null : importButton}
 				</header>
 			}

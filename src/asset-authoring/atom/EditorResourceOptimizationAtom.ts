@@ -6,10 +6,17 @@ import { optimizeEditorResourcesFx } from "~/asset-authoring/fx/optimizeEditorRe
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 
 export namespace EditorResourceOptimizationAtom {
-	export interface Command {
+	export interface OptimizeCommand {
 		readonly expectedRevision: number;
+		readonly kind: "optimize";
 		readonly resourceIds: ProjectRepository.OptimizeResourcesProps["resourceIds"];
 	}
+
+	export type Command =
+		| {
+				readonly kind: "dismiss";
+		  }
+		| OptimizeCommand;
 
 	export type State =
 		| {
@@ -37,7 +44,7 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 				kind: "idle",
 			}).pipe(Atom.keepAlive);
 			const runnerAtom = Atom.fn(
-				(command: EditorResourceOptimizationAtom.Command, get) =>
+				(command: EditorResourceOptimizationAtom.OptimizeCommand, get) =>
 					Effect.gen(function* () {
 						const exit = yield* Effect.exit(
 							optimizeEditorResourcesFx({
@@ -77,7 +84,14 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 					return get(stateAtom);
 				},
 				(context, command: EditorResourceOptimizationAtom.Command) => {
-					if (context.get(stateAtom).kind === "optimizing") return;
+					const state = context.get(stateAtom);
+					if (state.kind === "optimizing") return;
+					if (command.kind === "dismiss") {
+						context.set(stateAtom, {
+							kind: "idle",
+						});
+						return;
+					}
 					context.set(stateAtom, {
 						kind: "optimizing",
 						progress: {

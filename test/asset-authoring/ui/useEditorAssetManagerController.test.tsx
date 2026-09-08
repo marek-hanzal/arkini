@@ -136,10 +136,19 @@ describe("useEditorAssetManagerController", () => {
 
 		expect(state.optimizeResources).toHaveBeenCalledWith({
 			expectedRevision: 42,
+			kind: "optimize",
 			resourceIds: [
 				"visible-one",
 				"visible-two",
 			],
+		});
+	});
+
+	it("dismisses the persistent optimization result", () => {
+		controller?.onOptimizationDismissFn();
+
+		expect(state.optimizeResources).toHaveBeenCalledWith({
+			kind: "dismiss",
 		});
 	});
 });

@@ -96,6 +96,7 @@ describe("EditorResourceOptimizationAtom", () => {
 
 		registry.set(optimizationAtom, {
 			expectedRevision: project.revision,
+			kind: "optimize",
 			resourceIds: [
 				"one",
 				"two",
@@ -154,5 +155,40 @@ describe("EditorResourceOptimizationAtom", () => {
 			}),
 		);
 		remount();
+	});
+
+	it("clears a settled result when dismissed", async () => {
+		const registry = AtomRegistry.make({
+			defaultIdleTTL: 10,
+			scheduleTask,
+		});
+		registries.push(registry);
+		const optimizationAtom = EditorResourceOptimizationAtom(project.projectId);
+		const unmount = registry.mount(optimizationAtom);
+
+		registry.set(optimizationAtom, {
+			expectedRevision: project.revision,
+			kind: "optimize",
+			resourceIds: [
+				"one",
+			],
+		});
+		await vi.waitFor(() => expect(state.request).toBeDefined());
+		if (state.gate === undefined) throw new Error("Expected optimization gate.");
+		Effect.runSync(Deferred.succeed(state.gate, undefined));
+		await vi.waitFor(() =>
+			expect(registry.get(optimizationAtom)).toMatchObject({
+				kind: "success",
+			}),
+		);
+
+		registry.set(optimizationAtom, {
+			kind: "dismiss",
+		});
+
+		expect(registry.get(optimizationAtom)).toEqual({
+			kind: "idle",
+		});
+		unmount();
 	});
 });

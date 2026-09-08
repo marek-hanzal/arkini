@@ -132,23 +132,26 @@ export const spendActionChargesFx = Effect.fn("spendActionChargesFx")(function* 
 	let placement: applyOutputPlacementFx.Result = {
 		drop: [],
 	};
-	if (item.item.charges?.output !== undefined) {
-		const output = yield* makeActionChargeSpendRandomFx({
+	const depletionOutput = item.item.charges?.output;
+	if (depletionOutput !== undefined) {
+		const [outputPlacement, withOutput] = yield* makeActionChargeSpendRandomFx({
 			actionId,
 			cost,
 			itemId: item.id,
 			ownerItemId,
-			program: outputFx({
-				origin: item.location,
-				output: item.item.charges.output,
+			program: Effect.gen(function* () {
+				const output = yield* outputFx({
+					origin: item.location,
+					output: depletionOutput,
+				});
+				return yield* applyOutputPlacementFx({
+					origin: item.location,
+					output,
+					runtime: draft,
+				});
 			}),
 			quantity: item.quantity,
 			remainingCharges,
-		});
-		const [outputPlacement, withOutput] = yield* applyOutputPlacementFx({
-			origin: item.location,
-			output,
-			runtime: draft,
 		});
 		placement = outputPlacement;
 		draft = withOutput;

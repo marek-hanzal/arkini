@@ -352,7 +352,7 @@ describe("drop placement transition", () => {
 		]);
 	});
 
-	it("uses one occupied random origin for the complete standard placement", () => {
+	it("uses a fresh random board origin for every quantity unit in a ranged drop", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
@@ -361,19 +361,18 @@ describe("drop placement transition", () => {
 					location: boardLocation(0),
 					quantity: 1,
 				});
-				yield* spawnItemFx({
-					id: "runtime:blocker",
-					itemId: "blocker",
-					location: boardLocation(2),
-					quantity: 1,
-				});
-
 				const placement = yield* placeDropForTestFx({
-					drop: configuredDrop({
-						itemId: "board-only",
-						placement: "random",
-						quantity: 2,
-					}),
+					drop: {
+						...configuredDrop({
+							itemId: "board-only",
+							placement: "random",
+							quantity: 2,
+						}),
+						quantity: {
+							min: 2,
+							max: 3,
+						},
+					},
 					originItemId: "runtime:origin",
 				});
 				const nextRandom = yield* Random.next;
@@ -386,8 +385,10 @@ describe("drop placement transition", () => {
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([
-						0.5,
+						0,
 						0.75,
+						0.25,
+						0.5,
 					]),
 				),
 				useGameFx({
@@ -400,13 +401,13 @@ describe("drop placement transition", () => {
 
 		expect(placement.placement.spawn).toEqual([
 			expect.objectContaining({
-				location: boardLocation(1),
-			}),
-			expect.objectContaining({
 				location: boardLocation(3),
 			}),
+			expect.objectContaining({
+				location: boardLocation(1),
+			}),
 		]);
-		expect(result.nextRandom).toBe(0.75);
+		expect(result.nextRandom).toBe(0.5);
 	});
 
 	it("orders stack-first placement around the random origin", () => {

@@ -272,8 +272,9 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 											ArkiniElectronApi.channels
 												.editorProjectOptimizeResourcesProgress,
 											{
-												...request,
+												expectedRevision: request.expectedRevision,
 												...progress,
+												projectId: request.projectId,
 											},
 										);
 									},

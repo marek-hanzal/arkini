@@ -13,6 +13,7 @@ import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchem
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { ProjectVersionRepositoryService } from "~/project-version/type/ProjectVersion";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 export namespace ProjectRepository {
 	export interface CreateProjectProps {
@@ -75,6 +76,7 @@ export namespace ProjectRepository {
 		readonly expectedRevision: number;
 		readonly onProgressFn?: (progress: OptimizeResourcesProgress) => void;
 		readonly projectId: string;
+		readonly resourceIds: ReadonlyArray<IdSchema.Type>;
 	}
 
 	export interface OptimizeResourcesProgress {
@@ -87,6 +89,7 @@ export namespace ProjectRepository {
 		readonly optimizedResourceCount: number;
 		readonly originalBytes: number;
 		readonly optimizedBytes: number;
+		readonly processedResourceCount: number;
 		readonly project: Project;
 	}
 

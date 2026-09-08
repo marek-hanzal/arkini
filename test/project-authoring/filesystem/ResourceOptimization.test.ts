@@ -60,10 +60,15 @@ describe("filesystem Editor PNG optimization", () => {
 				expectedRevision: created.revision,
 				onProgressFn: (value) => progress.push(value),
 				projectId: created.projectId,
+				resourceIds: [
+					"hero",
+					"item-water",
+				],
 			}),
 		);
 
 		expect(result.optimizedResourceCount).toBe(2);
+		expect(result.processedResourceCount).toBe(2);
 		expect(progress).toEqual([
 			{
 				completedResourceCount: 0,
@@ -117,10 +122,55 @@ describe("filesystem Editor PNG optimization", () => {
 				repository.optimizeResourcesFx({
 					expectedRevision: created.revision,
 					projectId: created.projectId,
+					resourceIds: [
+						"hero",
+						"item-water",
+					],
 				}),
 			),
 		).rejects.toThrow(
 			`changed from revision ${created.revision} to ${result.project.revision}`,
 		);
+	});
+
+	it("rewrites only the explicitly selected resource", async () => {
+		const dirtyPng = await createDirtyPng();
+		const repository = await harness.openRepository();
+		const created = await Effect.runPromise(
+			repository.createProjectFx({
+				version: editorTestPayload.version,
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources.map((resource) => ({
+					...resource,
+					bytes: new Uint8Array(dirtyPng),
+				})),
+			}),
+		);
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+
+		const result = await Effect.runPromise(
+			repository.optimizeResourcesFx({
+				expectedRevision: created.revision,
+				projectId: created.projectId,
+				resourceIds: [
+					"item-water",
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			optimizedResourceCount: 1,
+			processedResourceCount: 1,
+		});
+		expect(new Uint8Array(await readFile(join(root, "resources/hero.png")))).toEqual(
+			new Uint8Array(dirtyPng),
+		);
+		expect(
+			await sharp(await readFile(join(root, "assets/item-water.png")))
+				.ensureAlpha()
+				.raw()
+				.toBuffer(),
+		).toEqual(Buffer.from(Uint8Array.of(0, 0, 0, 0, 20, 40, 60, 255)));
 	});
 });

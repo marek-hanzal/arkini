@@ -15,7 +15,6 @@ interface UseEditorAssetLibraryOutput {
 	readonly projectId: string;
 	readonly projectRevision: number;
 	readonly resources: ReadonlyArray<Project.Resource>;
-	readonly totalResourceCount: number;
 }
 
 /** Projects the canonical resource catalog through its usage and fuzzy-search filters. */
@@ -45,6 +44,5 @@ export const useEditorAssetLibrary = ({
 		projectId: project.projectId,
 		projectRevision: project.revision,
 		resources,
-		totalResourceCount: project.resources.length,
 	};
 };

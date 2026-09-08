@@ -8,7 +8,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 export namespace EditorResourceOptimizationAtom {
 	export interface Command {
 		readonly expectedRevision: number;
-		readonly totalResourceCount: number;
+		readonly resourceIds: ProjectRepository.OptimizeResourcesProps["resourceIds"];
 	}
 
 	export type State =
@@ -49,6 +49,7 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 									});
 								},
 								projectId,
+								resourceIds: command.resourceIds,
 							}).pipe(Effect.provideService(ProjectRepository, repository)),
 						);
 						if (Exit.isFailure(exit)) {
@@ -82,7 +83,7 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 						progress: {
 							completedResourceCount: 0,
 							phase: "optimizing",
-							totalResourceCount: command.totalResourceCount,
+							totalResourceCount: command.resourceIds.length,
 						},
 					});
 					context.set(runnerAtom, command);

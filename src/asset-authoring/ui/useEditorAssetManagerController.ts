@@ -126,9 +126,10 @@ export const useEditorAssetManagerController = ({
 		});
 	};
 	const onOptimizeFn = () => {
+		if (library.resources.length === 0) return;
 		optimizeResourcesFn({
 			expectedRevision: library.projectRevision,
-			totalResourceCount: library.totalResourceCount,
+			resourceIds: library.resources.map(({ id }) => id),
 		});
 	};
 

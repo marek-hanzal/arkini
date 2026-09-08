@@ -461,14 +461,47 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		expectedRevision,
 		onProgressFn,
 		projectId,
+		resourceIds,
 	}) =>
 		operations
 			.withPermits(1)(
 				Effect.gen(function* () {
 					const state = yield* readStateFx(projectId);
 					yield* assertExpectedRevisionFx(state, expectedRevision, "optimize-resources");
+					if (resourceIds.length === 0)
+						return yield* Effect.fail(
+							errorFn(
+								"optimize-resources",
+								"At least one resource must be selected for optimization.",
+							),
+						);
+					const selectedResourceIds = new Set(resourceIds);
+					if (selectedResourceIds.size !== resourceIds.length)
+						return yield* Effect.fail(
+							errorFn(
+								"optimize-resources",
+								"Each selected resource may appear only once.",
+							),
+						);
+					const resources = state.project.resources.filter(({ id }) =>
+						selectedResourceIds.has(id),
+					);
+					if (resources.length !== resourceIds.length) {
+						const currentResourceIds = new Set(
+							state.project.resources.map(({ id }) => id),
+						);
+						const missingResourceIds = resourceIds.filter(
+							(resourceId) => !currentResourceIds.has(resourceId),
+						);
+						return yield* Effect.fail(
+							errorFn(
+								"optimize-resources",
+								`Selected resources do not exist in project ${projectId}: ${missingResourceIds.join(", ")}.`,
+							),
+						);
+					}
 					let completedResourceCount = 0;
-					const totalResourceCount = state.project.resources.length;
+					const totalResourceCount = resources.length;
 					yield* Effect.sync(() =>
 						onProgressFn?.({
 							completedResourceCount,
@@ -477,7 +510,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						}),
 					);
 					const results = yield* Effect.forEach(
-						state.project.resources,
+						resources,
 						(resource) =>
 							optimizePngResourceFx(resource).pipe(
 								Effect.tap(() =>
@@ -507,6 +540,12 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						(total, result) => total + result.optimizedBytes,
 						0,
 					);
+					const optimizedResources = new Map(
+						results.map(({ resource }) => [
+							resource.id,
+							resource,
+						]),
+					);
 					yield* Effect.sync(() =>
 						onProgressFn?.({
 							completedResourceCount,
@@ -520,13 +559,17 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							: yield* commitFx({
 									state,
 									config: state.project.config,
-									resources: results.map(({ resource }) => resource),
+									resources: state.project.resources.map(
+										(resource) =>
+											optimizedResources.get(resource.id) ?? resource,
+									),
 									nowMs: yield* Clock.currentTimeMillis,
 								});
 					return {
 						optimizedResourceCount,
 						originalBytes,
 						optimizedBytes,
+						processedResourceCount: results.length,
 						project,
 					};
 				}),

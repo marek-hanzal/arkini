@@ -7,9 +7,10 @@ interface OptimizeEditorResourcesProps {
 	readonly expectedRevision: number;
 	readonly onProgressFn?: ProjectRepository.OptimizeResourcesProps["onProgressFn"];
 	readonly projectId: string;
+	readonly resourceIds: ProjectRepository.OptimizeResourcesProps["resourceIds"];
 }
 
-/** Optimizes every authored PNG and publishes the resulting canonical project. */
+/** Optimizes the selected authored PNGs and publishes the resulting canonical project. */
 export const optimizeEditorResourcesFx = Effect.fn("optimizeEditorResourcesFx")(function* (
 	props: OptimizeEditorResourcesProps,
 ) {

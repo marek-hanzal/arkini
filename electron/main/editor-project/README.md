@@ -84,7 +84,7 @@ capture expected revision
 → publish it to the still-mounted project Atom
 ```
 
-Assets **Optimize** follows this same write path. Main holds the repository semaphore while it losslessly normalizes every current `assets/` and `resources/` PNG, then publishes all changed bytes through one current-tree transaction and one fresh Project projection. It does not invoke Arkpack Build or its 256 px Item-artwork bake.
+Assets **Optimize** follows this same write path. The renderer passes the exact resource IDs selected by the current Assets search and usage filter. Main holds the repository semaphore while it losslessly normalizes only those current `assets/` and `resources/` PNGs, then publishes all changed bytes through one current-tree transaction and one fresh Project projection. The same repository operation can optimize one resource by receiving one ID. It does not invoke Arkpack Build or its 256 px Item-artwork bake.
 The filesystem operation reports completed PNGs over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
 
 Hard Refresh, Version checkout, project replacement and scenario restore use a stronger boundary:

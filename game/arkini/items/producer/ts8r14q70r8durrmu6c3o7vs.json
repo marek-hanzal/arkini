@@ -1,0 +1,88 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ts8r14q70r8durrmu6c3o7vs",
+		"id": "bubble-maker",
+		"title": "Bubble Maker",
+		"description": "Make some bubbles",
+		"asset": {
+			"default": [
+				"bubble-maker"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "bubbles",
+				"title": "Bubbles",
+				"description": "World will be nicer with some bubbles around",
+				"default": true,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "deposit",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bubble-reservoir"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bubble",
+											"quantity": {
+												"min": 4,
+												"max": 8
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "You've to put source of bubble solution next to bubble maker",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "bubble-reservoir"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
+	}
+}

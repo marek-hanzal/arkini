@@ -61,6 +61,7 @@ const isSameMainSceneVisualFn = (left: TileActorItem, right: TileActorItem) => {
 		left.badgeCount === right.badgeCount &&
 		left.badgeKind === right.badgeKind &&
 		left.compositeUrl === right.compositeUrl &&
+		left.location.scope === right.location.scope &&
 		left.quantity === right.quantity &&
 		left.running === right.running &&
 		left.sourceUrl === right.sourceUrl &&

@@ -31,6 +31,14 @@ const useDraft = (
 						...draft,
 						title: defaultTitle,
 					};
+		if (namedDraft.type === "deposit") {
+			return {
+				...namedDraft,
+				charges: {
+					amount: 1,
+				},
+			} satisfies ItemSchema.Type;
+		}
 		if (namedDraft.type !== "blueprint") return namedDraft;
 		return {
 			...namedDraft,

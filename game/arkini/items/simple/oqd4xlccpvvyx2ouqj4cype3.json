@@ -17,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-field"
+					"itemId": "fertilized-grape-field"
 				},
 				"action": "consume",
 				"effect": "replace",

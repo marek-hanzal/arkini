@@ -21,6 +21,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "fertilized-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-grain-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-grain-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-grape-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-grape-field"
 			}
 		],
 		"type": "simple"

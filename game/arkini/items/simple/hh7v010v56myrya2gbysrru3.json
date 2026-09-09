@@ -17,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-field"
+					"itemId": "fertilized-grain-field"
 				},
 				"action": "consume",
 				"effect": "replace",

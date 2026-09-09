@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "p9x1eqx05d197gb37okicf4s",
+		"id": "empty-grain-field",
+		"title": "Empty Grain Field",
+		"description": "Ready for another grain cycle.",
+		"asset": {
+			"default": [
+				"empty-grain-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

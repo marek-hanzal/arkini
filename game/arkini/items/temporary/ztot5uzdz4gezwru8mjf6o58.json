@@ -23,7 +23,7 @@
 							"type": "guaranteed",
 							"drop": [
 								{
-									"itemId": "bio-waste",
+									"itemId": "spoiled-cacao-pod",
 									"quantity": {
 										"min": 1,
 										"max": 1

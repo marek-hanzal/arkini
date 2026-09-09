@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "z9kmevssxxawg1tbaz1o14wp",
+		"id": "spoiled-cacao-pod",
+		"title": "Spoiled Cacao Pod",
+		"description": "Bleh",
+		"asset": {
+			"default": [
+				"spoiled-cacao-pod"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

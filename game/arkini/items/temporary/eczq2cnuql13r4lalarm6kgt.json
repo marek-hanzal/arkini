@@ -1,30 +1,19 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "wty33h4avbqmgblvysq7e3ql",
-		"id": "flowers",
-		"title": "Flowers",
-		"description": "Flowers",
+		"uid": "eczq2cnuql13r4lalarm6kgt",
+		"id": "eggs",
+		"title": "Eggs",
+		"description": "Some eggs you may cook.",
 		"asset": {
 			"default": [
-				"flowers"
+				"eggs"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "clay-vase"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "clay-vase-with-flowers"
-			}
-		],
 		"type": "temporary",
-		"durationMs": 900000,
+		"durationMs": 300000,
 		"output": {
 			"set": [
 				{
@@ -34,7 +23,7 @@
 							"type": "guaranteed",
 							"drop": [
 								{
-									"itemId": "spoiled-flowers",
+									"itemId": "spoiled-eggs",
 									"quantity": {
 										"min": 1,
 										"max": 1

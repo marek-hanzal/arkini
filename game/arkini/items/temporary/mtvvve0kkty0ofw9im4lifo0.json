@@ -20,11 +20,10 @@
 					"weight": 1,
 					"roll": [
 						{
-							"type": "chance",
-							"chance": 0.5,
+							"type": "guaranteed",
 							"drop": [
 								{
-									"itemId": "bio-waste",
+									"itemId": "spoiled-sausage",
 									"quantity": {
 										"min": 1,
 										"max": 1

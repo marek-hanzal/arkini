@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "coin-bag"
+			}
+		],
 		"type": "simple"
 	}
 }

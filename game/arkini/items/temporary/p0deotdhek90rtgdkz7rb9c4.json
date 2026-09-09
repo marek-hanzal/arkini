@@ -13,6 +13,29 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"type": "temporary",
-		"durationMs": 600000
+		"durationMs": 600000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "spoiled-bread-basket",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
 	}
 }

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "rhfumnzi3t8y75j9osu9mqrj",
+		"id": "spoiled-beer-barrel",
+		"title": "Spoiled Beer Barrel",
+		"description": "Beer Deluxe Edition",
+		"asset": {
+			"default": [
+				"spoiled-beer-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

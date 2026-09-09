@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dklkl7eyajzg2ago6dvmzn49",
+		"id": "spoiled-cauldron",
+		"title": "Spoiled Cauldron",
+		"description": "Bada-fuj",
+		"asset": {
+			"default": [
+				"spoiled-cauldron"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

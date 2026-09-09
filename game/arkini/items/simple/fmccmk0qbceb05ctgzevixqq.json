@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "fmccmk0qbceb05ctgzevixqq",
+		"id": "spoiled-pralines",
+		"title": "Spoiled Pralines",
+		"description": "You didn't like them?",
+		"asset": {
+			"default": [
+				"spoiled-pralines"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

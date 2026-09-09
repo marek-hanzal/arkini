@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "y0p9s1c8s27yr1iytpyhluy1",
+		"id": "spoiled-copper-bathtub",
+		"title": "Spoiled Copper Bathtub",
+		"description": "You're welcome to bath. Not really",
+		"asset": {
+			"default": [
+				"spoiled-copper-bathtub"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

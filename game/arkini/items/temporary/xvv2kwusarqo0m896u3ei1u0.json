@@ -1,0 +1,41 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "xvv2kwusarqo0m896u3ei1u0",
+		"id": "cauldron-with-wine",
+		"title": "Cauldron With Wine",
+		"description": "A lot of wine",
+		"asset": {
+			"default": [
+				"cauldron-with-wine"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "spoiled-cauldron",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

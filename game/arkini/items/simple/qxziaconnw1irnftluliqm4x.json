@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "qxziaconnw1irnftluliqm4x",
+		"id": "spoiled-bread-basket",
+		"title": "Spoiled Bread Basket",
+		"description": "Poor ugly thing",
+		"asset": {
+			"default": [
+				"spoiled-bread-basket"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

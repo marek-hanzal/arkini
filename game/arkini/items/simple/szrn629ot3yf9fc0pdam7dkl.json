@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "szrn629ot3yf9fc0pdam7dkl",
+		"id": "spoiled-bucket",
+		"title": "Spoiled Bucket",
+		"description": "Ugly",
+		"asset": {
+			"default": [
+				"spoiled-bucket"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

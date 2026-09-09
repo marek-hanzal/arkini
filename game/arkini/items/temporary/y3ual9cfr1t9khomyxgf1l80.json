@@ -10,7 +10,7 @@
 				"cauldron-with-coffee"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{
@@ -46,6 +46,30 @@
 				"result": "well-with-coffee"
 			}
 		],
-		"type": "simple"
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "spoiled-cauldron",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
 	}
 }

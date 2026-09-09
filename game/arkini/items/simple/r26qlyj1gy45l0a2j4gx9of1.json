@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "r26qlyj1gy45l0a2j4gx9of1",
+		"id": "spoiled-mug",
+		"title": "Spoiled Mug",
+		"description": "Bleh",
+		"asset": {
+			"default": [
+				"spoiled-mug"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

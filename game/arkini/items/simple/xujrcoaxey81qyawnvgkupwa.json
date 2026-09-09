@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "xujrcoaxey81qyawnvgkupwa",
+		"id": "spoiled-clay-mug",
+		"title": "Spoiled Clay Mug",
+		"description": "It's spoiled",
+		"asset": {
+			"default": [
+				"spoiled-clay-mug"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

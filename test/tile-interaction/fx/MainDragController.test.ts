@@ -10,6 +10,38 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: pointer", () => {
+	it("does not activate a right release exactly at the screen threshold after fractional zoom", async () => {
+		const mounted = mountController();
+		const scale = 800 / 2432;
+		mounted.stage.container.scale.set(scale);
+		mounted.stage.container.position.set((1000 - 2048 * scale) / 2, (800 - 2176 * scale) / 2);
+		mounted.actorEvents.emit("pointerdown", pointer(201, 200, 2));
+		mounted.stage.emit("pointerup", pointer(207, 200, 2));
+		await Promise.resolve();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+	});
+
+	it("keeps the drag threshold in screen pixels and submits world coordinates after zoom and pan", () => {
+		const mounted = mountController();
+		mounted.stage.container.scale.set(0.5);
+		mounted.stage.container.position.set(100, 200);
+		mounted.actorEvents.emit("pointerdown", pointer(105, 210));
+		mounted.stage.emit("globalpointermove", pointer(107, 210));
+		mounted.flushFrame();
+		expect(mounted.actor.dragging).toBe(false);
+		mounted.stage.emit("globalpointermove", pointer(135, 210));
+		mounted.flushFrame();
+		expect(mounted.actor.container.x).toBe(70);
+		mounted.stage.emit("pointerup", pointer(140, 215));
+		expect(mounted.dropTargetReads.at(-1)).toEqual({
+			x: 80,
+			y: 30,
+		});
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+	});
+
 	it("coalesces a raw pointer burst into one latest-sample drag update", () => {
 		const mounted = mountController();
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));

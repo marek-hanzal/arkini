@@ -1,0 +1,51 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "my9bfiki5q32m5rgvcmq66h1",
+		"id": "soapy-scrubbing-brush",
+		"title": "Soapy Scrubbing Brush",
+		"description": "Make things clean again",
+		"asset": {
+			"default": [
+				"soapy-scrubbing-brush"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "toilet-biowaste"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "dirty-scrubbing-brush",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "toilet"
+			}
+		],
+		"type": "simple"
+	}
+}

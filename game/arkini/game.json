@@ -67,6 +67,230 @@
 				"space": 0,
 				"itemId": "stone-deposit",
 				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 7,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
 			}
 		],
 		"inventory": [],

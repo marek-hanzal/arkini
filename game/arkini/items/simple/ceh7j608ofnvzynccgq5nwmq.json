@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ceh7j608ofnvzynccgq5nwmq",
+		"id": "dye-field",
+		"title": "Dye Field",
+		"description": "Dye field. Da colors",
+		"asset": {
+			"default": [
+				"dye-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

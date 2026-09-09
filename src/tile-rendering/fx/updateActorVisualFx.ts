@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { CanvasTextMetrics, type TextStyle } from "pixi.js";
 
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
@@ -96,6 +97,8 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 		style: visual.titleStyle,
 		text: item.title,
 	});
+	visual.title.visible = item.location.scope !== LocationScopeEnumSchema.enum.Board;
+	visual.titleBackground.visible = visual.title.visible;
 	visual.title.x = inset + titlePaddingX;
 	visual.title.y = inset + faceSize - visual.title.height - titlePaddingY * 2;
 	visual.titleBackground

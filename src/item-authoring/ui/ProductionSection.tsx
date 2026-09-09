@@ -263,11 +263,16 @@ export const ProductionSection = () => {
 		)
 		.exhaustive();
 	if (content === null) return null;
+	const temporary = canonicalItem.type === "temporary";
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormSectionDivider
-				description="Defines this item's timed behavior, including concurrency, production lines, inputs, outputs, runtime and rules where supported."
-				title="Production"
+				description={
+					temporary
+						? "Defines how long this temporary item remains active and what it emits when it expires."
+						: "Defines this item's timed behavior, including concurrency, production lines, inputs, outputs, runtime and rules where supported."
+				}
+				title={temporary ? "Temporary" : "Production"}
 			/>
 			{content}
 		</div>

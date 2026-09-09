@@ -76,7 +76,7 @@ export const createDraftFn = ({
 			type: matchedType,
 			scope: "board" as const,
 			maxStackSize: 1,
-			durationMs: 500,
+			durationMs: 300_000,
 		}))
 		.with("deposit", (matchedType) => ({
 			...base,

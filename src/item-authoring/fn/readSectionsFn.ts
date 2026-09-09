@@ -72,4 +72,11 @@ export const readSectionsFn = (
 			default:
 				return true;
 		}
-	});
+	}).map((section) =>
+		section.id === "production" && item.type === "temporary"
+			? {
+					...section,
+					label: "Temporary",
+				}
+			: section,
+	);

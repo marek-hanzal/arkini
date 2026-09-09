@@ -1,0 +1,14 @@
+{
+	"uid": "o9k395imr6ghqfd3a58ikir5",
+	"id": "key-t4",
+	"title": "Key - Tier 4",
+	"description": "You want this one.",
+	"asset": {
+		"default": [
+			"key-t4"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

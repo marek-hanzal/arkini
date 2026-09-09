@@ -1,0 +1,51 @@
+{
+	"uid": "i5fpduh7s05jm3hautorgz5k",
+	"id": "bow-and-arrows",
+	"title": "Bow And Arrows",
+	"description": "You can hunt stuff yourself",
+	"asset": {
+		"default": [
+			"bow-and-arrows"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 8,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "bow",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "bear"
+			},
+			"action": "deposit",
+			"effect": "replace",
+			"result": "hunted-game"
+		}
+	],
+	"type": "simple"
+}

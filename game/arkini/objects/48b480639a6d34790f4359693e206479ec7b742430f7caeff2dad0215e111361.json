@@ -1,0 +1,14 @@
+{
+	"uid": "py4l2gkn3baf614fxhkuykwq",
+	"id": "steam-dye-workshop",
+	"title": "Steam Dye Workshop",
+	"description": "Dye",
+	"asset": {
+		"default": [
+			"steam-dye-workshop"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

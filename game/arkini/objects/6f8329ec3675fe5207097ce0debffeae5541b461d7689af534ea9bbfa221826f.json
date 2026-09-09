@@ -1,0 +1,14 @@
+{
+	"uid": "xfq4ydbjkzpn8cyr9t8d7gr4",
+	"id": "marble-block",
+	"title": "Marble Block",
+	"description": "Nicer marble stuff",
+	"asset": {
+		"default": [
+			"marble-block"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

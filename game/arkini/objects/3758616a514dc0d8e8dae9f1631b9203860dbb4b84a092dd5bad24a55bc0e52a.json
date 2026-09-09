@@ -1,0 +1,47 @@
+{
+	"uid": "zf4ybafwpgsgu9dp2lqiuyvr",
+	"id": "cutting-board-with-bread",
+	"title": "Cutting Board With Bread",
+	"description": "Bread",
+	"asset": {
+		"default": [
+			"cutting-board-with-bread"
+		]
+	},
+	"scope": "board",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "cutting-board",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							},
+							{
+								"itemId": "bio-waste",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

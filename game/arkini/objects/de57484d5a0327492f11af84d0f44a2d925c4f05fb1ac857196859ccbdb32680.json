@@ -1,0 +1,48 @@
+{
+	"uid": "wguid5c2feyy5ti9za1m3tsy",
+	"id": "kitchen-knife",
+	"title": "Kitchen Knife",
+	"description": "Sharp.",
+	"asset": {
+		"default": [
+			"kitchen-knife"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "fawn"
+			},
+			"action": "use",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "hide",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "raw-game-meat"
+		}
+	],
+	"type": "simple"
+}

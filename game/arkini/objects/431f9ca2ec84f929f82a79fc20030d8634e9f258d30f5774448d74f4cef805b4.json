@@ -1,0 +1,14 @@
+{
+	"uid": "fbj07pw11dg44pnvdqwgm1dw",
+	"id": "bed-wine",
+	"title": "Bed Wine",
+	"description": "Don't lick it",
+	"asset": {
+		"default": [
+			"bed-wine"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

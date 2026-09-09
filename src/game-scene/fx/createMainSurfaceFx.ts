@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics, Rectangle } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -47,6 +47,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			let latestTransition = game.getTransitionSnapshotFn();
 			let layoutRevision = 0;
 			let layout: MainLayout = readMainLayoutFn({
+				fixedCellSize: 512,
 				boardHeight: game.config.meta.board.height,
 				boardWidth: game.config.meta.board.width,
 				height: application.app.screen.height,
@@ -342,18 +343,14 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				redrawFx: Effect.gen(function* () {
 					layoutRevision += 1;
 					layout = readMainLayoutFn({
+						fixedCellSize: 512,
 						boardHeight: game.config.meta.board.height,
 						boardWidth: game.config.meta.board.width,
 						height: application.app.screen.height,
 						toolbarSize: game.config.meta.toolbarSize ?? 0,
 						width: application.app.screen.width,
 					});
-					application.stage.hitArea = new Rectangle(
-						0,
-						0,
-						application.app.screen.width,
-						application.app.screen.height,
-					);
+
 					yield* drawSurfaceFx({
 						graphics: boardGrid,
 						lineColor: palette.line,

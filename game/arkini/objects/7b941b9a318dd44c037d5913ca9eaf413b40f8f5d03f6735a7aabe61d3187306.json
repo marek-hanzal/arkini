@@ -1,0 +1,14 @@
+{
+	"uid": "dfahbcgze831v0jdu02eico7",
+	"id": "spoiled-coffee-plant",
+	"title": "Spoiled Coffee Plant",
+	"description": "Bleh-Coffee",
+	"asset": {
+		"default": [
+			"spoiled-coffee-plant"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

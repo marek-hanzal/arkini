@@ -1,0 +1,95 @@
+{
+	"uid": "nw61q7vfe9qpdh58ocjp0gpx",
+	"id": "foundation-chest",
+	"title": "Foundation Chest",
+	"description": "Initial stuff",
+	"asset": {
+		"default": [
+			"foundation-chest"
+		]
+	},
+	"scope": "any",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "stash",
+	"line": {
+		"id": "founder-chest",
+		"title": "Get the initial loot",
+		"description": "Hele you'll get everything you need to get started with the game.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 18000,
+		"input": [
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "deposit",
+				"query": {
+					"selector": {
+						"type": "item",
+						"itemId": "foundation-chest"
+					},
+					"scope": "board",
+					"distance": "self"
+				}
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "paper",
+									"quantity": {
+										"min": 4,
+										"max": 4
+									},
+									"placement": "random",
+									"rules": []
+								},
+								{
+									"itemId": "wood",
+									"quantity": {
+										"min": 8,
+										"max": 8
+									},
+									"placement": "random",
+									"rules": []
+								},
+								{
+									"itemId": "stone",
+									"quantity": {
+										"min": 10,
+										"max": 10
+									},
+									"placement": "random",
+									"rules": []
+								},
+								{
+									"itemId": "flint-and-steel",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "random",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": []
+	}
+}

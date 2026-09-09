@@ -1,0 +1,72 @@
+{
+	"uid": "y3ual9cfr1t9khomyxgf1l80",
+	"id": "cauldron-with-coffee",
+	"title": "Cauldron With Coffee",
+	"description": "A lot of coffee",
+	"asset": {
+		"default": [
+			"cauldron-with-coffee"
+		]
+	},
+	"scope": "board",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "empty-well"
+			},
+			"action": "consume",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-cauldron",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "well-with-coffee"
+		}
+	],
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-cauldron",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

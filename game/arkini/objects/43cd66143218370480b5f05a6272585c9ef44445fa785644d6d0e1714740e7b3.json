@@ -1,0 +1,14 @@
+{
+	"uid": "aypezdd5mxtcclnmhi7kphyv",
+	"id": "inkwell",
+	"title": "Inkwell",
+	"description": "Write something nice",
+	"asset": {
+		"default": [
+			"inkwell"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"type": "simple"
+}

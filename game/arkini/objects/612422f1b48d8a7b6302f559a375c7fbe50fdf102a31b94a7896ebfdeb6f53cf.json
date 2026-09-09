@@ -1,0 +1,14 @@
+{
+	"uid": "ubexhgyrqm23lx9qn734f385",
+	"id": "clay-plate",
+	"title": "Clay Plate",
+	"description": "So sad",
+	"asset": {
+		"default": [
+			"clay-plate"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

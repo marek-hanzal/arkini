@@ -1,0 +1,25 @@
+{
+	"uid": "our0pxaqz9ce08z8tdyhek44",
+	"id": "campfire",
+	"title": "Campfire",
+	"description": "Do you like marshmallows?",
+	"asset": {
+		"default": [
+			"campfire"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "cauldron-with-beeswax"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "cauldron-with-boiling-beeswax"
+		}
+	],
+	"type": "simple"
+}

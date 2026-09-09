@@ -1,0 +1,14 @@
+{
+	"uid": "nlq6h1fpv2636r4m5cxrqp2p",
+	"id": "clay-mug-with-lye",
+	"title": "Clay Mug With Lye",
+	"description": "A present for your enemy",
+	"asset": {
+		"default": [
+			"clay-mug-with-lye"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"type": "simple"
+}

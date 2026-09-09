@@ -1,0 +1,14 @@
+{
+	"uid": "ysdkouxd4qpd0ztziy07k2ss",
+	"id": "copper-bathtub",
+	"title": "Copper Bathtub",
+	"description": "You may bath yourself",
+	"asset": {
+		"default": [
+			"copper-bathtub"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

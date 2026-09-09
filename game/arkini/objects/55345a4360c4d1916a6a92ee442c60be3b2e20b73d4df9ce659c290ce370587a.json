@@ -1,0 +1,15 @@
+{
+	"uid": "nh9tf1n52h19igah115s36jk",
+	"id": "air-pollution",
+	"title": "Air Pollution",
+	"description": "Ugly thing, it will disappear by itself, but you can also clear it by yourself.",
+	"asset": {
+		"default": [
+			"air-pollution"
+		]
+	},
+	"scope": "board",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 1200000
+}

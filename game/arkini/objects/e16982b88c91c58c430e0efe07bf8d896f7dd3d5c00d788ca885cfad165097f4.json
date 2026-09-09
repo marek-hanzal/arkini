@@ -1,0 +1,14 @@
+{
+	"uid": "gvax907u1g5ix77uftniiscj",
+	"id": "window",
+	"title": "Window",
+	"description": "Just a window(s)",
+	"asset": {
+		"default": [
+			"window"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

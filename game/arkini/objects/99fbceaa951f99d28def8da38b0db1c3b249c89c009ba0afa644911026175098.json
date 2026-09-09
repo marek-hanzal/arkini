@@ -1,0 +1,14 @@
+{
+	"uid": "whi66vmmh1gkexce0d9p47lv",
+	"id": "gear-t4",
+	"title": "Gear - Tier 4",
+	"description": "Only masters can build this",
+	"asset": {
+		"default": [
+			"gear-t4"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

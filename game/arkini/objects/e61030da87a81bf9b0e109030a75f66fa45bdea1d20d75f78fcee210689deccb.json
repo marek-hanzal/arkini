@@ -1,0 +1,55 @@
+{
+	"uid": "gbm8cfe7jwaqmy3egbxji16p",
+	"id": "flint-and-steel",
+	"title": "Flint And Steel",
+	"description": "Can make a fire. Be carefull. Don't use it next to the flammable objects. You've been warned.",
+	"asset": {
+		"default": [
+			"flint-and-steel"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"charges": {
+		"amount": 24
+	},
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "unlit-candle"
+			},
+			"action": "deposit",
+			"effect": "replace",
+			"result": "candle"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "campfire"
+			},
+			"action": "deposit",
+			"effect": "replace",
+			"result": "campfire-burning"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "foundry-extinguished"
+			},
+			"action": "deposit",
+			"effect": "replace",
+			"result": "foundry"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "oven-with-wood"
+			},
+			"action": "deposit",
+			"effect": "replace",
+			"result": "burning-oven"
+		}
+	],
+	"type": "simple"
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "zg25vgaju0u2p8o3alw8com9",
+	"id": "clay-bowl-with-water",
+	"title": "Clay Bowl With Water",
+	"description": "Bit of water",
+	"asset": {
+		"default": [
+			"clay-bowl-with-water"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"type": "simple"
+}

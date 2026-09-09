@@ -4,6 +4,7 @@ interface ReadMainLayoutProps {
 	readonly boardHeight: number;
 	readonly boardWidth: number;
 	readonly height: number;
+	readonly fixedCellSize?: number;
 	readonly toolbarSize: number;
 	readonly width: number;
 }
@@ -13,11 +14,12 @@ const maximumViewportPadding = 48;
 const viewportPaddingRatio = 0.04;
 const toolbarGapInBoardCells = 0.25;
 
-/** Fits Board and optional Toolbar into the full-screen native Pixi viewport. */
+/** Uses fixed world cells when requested; Inventory retains its fitted reference scale. */
 export const readMainLayoutFn = ({
 	boardHeight,
 	boardWidth,
 	height,
+	fixedCellSize,
 	toolbarSize,
 	width,
 }: ReadMainLayoutProps): MainLayout => {
@@ -36,13 +38,15 @@ export const readMainLayoutFn = ({
 		boardHeight / boardWidth +
 		(toolbarSize > 0 ? toolbarGapInBoardCells / boardWidth + 1 / toolbarSize : 0);
 	const sceneWidth = Math.max(1, Math.min(availableWidth, availableHeight / heightPerSceneWidth));
-	const boardCellSize = sceneWidth / boardWidth;
-	const toolbarCellSize = toolbarSize > 0 ? sceneWidth / toolbarSize : 0;
+	const boardCellSize = fixedCellSize ?? sceneWidth / boardWidth;
+	const toolbarCellSize = toolbarSize > 0 ? (fixedCellSize ?? sceneWidth / toolbarSize) : 0;
 	const toolbarGap = toolbarSize > 0 ? boardCellSize * toolbarGapInBoardCells : 0;
 	const sceneHeight =
 		boardHeight * boardCellSize + (toolbarSize > 0 ? toolbarGap + toolbarCellSize : 0);
-	const originX = viewportPadding + (availableWidth - sceneWidth) / 2;
-	const originY = viewportPadding + (availableHeight - sceneHeight) / 2;
+	const originX =
+		fixedCellSize === undefined ? viewportPadding + (availableWidth - sceneWidth) / 2 : 0;
+	const originY =
+		fixedCellSize === undefined ? viewportPadding + (availableHeight - sceneHeight) / 2 : 0;
 
 	return {
 		board: {
@@ -51,7 +55,7 @@ export const readMainLayoutFn = ({
 			height: boardHeight * boardCellSize,
 			kind: "board",
 			rows: boardHeight,
-			width: sceneWidth,
+			width: boardWidth * boardCellSize,
 			x: originX,
 			y: originY,
 		},
@@ -64,11 +68,13 @@ export const readMainLayoutFn = ({
 						height: toolbarCellSize,
 						kind: "toolbar",
 						rows: 1,
-						width: sceneWidth,
-						x: originX,
+						width: toolbarSize * toolbarCellSize,
+						x:
+							originX +
+							(boardWidth * boardCellSize - toolbarSize * toolbarCellSize) / 2,
 						y: originY + boardHeight * boardCellSize + toolbarGap,
 					},
 		toolbarGap,
-		viewportPadding,
+		viewportPadding: fixedCellSize === undefined ? viewportPadding : 0,
 	};
 };

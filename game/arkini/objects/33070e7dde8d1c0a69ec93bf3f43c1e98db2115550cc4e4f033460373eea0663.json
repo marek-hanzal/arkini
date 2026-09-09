@@ -1,0 +1,14 @@
+{
+	"uid": "s73fhh4zxbnufyn0ze6y4f8t",
+	"id": "raw-amethyst",
+	"title": "Raw Amethyst",
+	"description": "Purple",
+	"asset": {
+		"default": [
+			"raw-amethyst"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

@@ -1,0 +1,25 @@
+{
+	"uid": "ww797h0lugbws2jsb61ldy7g",
+	"id": "empty-bucket",
+	"title": "Empty Bucket",
+	"description": "I suppose you would be creative with this one",
+	"asset": {
+		"default": [
+			"empty-bucket"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 8,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "bio-waste"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "bio-waste-bucket"
+		}
+	],
+	"type": "simple"
+}

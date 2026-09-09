@@ -1,0 +1,34 @@
+{
+	"uid": "etg7j1idjdvi85auqfgrhja0",
+	"id": "pillow",
+	"title": "Pillow",
+	"description": "Your neck may thank you",
+	"asset": {
+		"default": [
+			"pillow"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "duvet"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "bedding"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "bow-and-arrows"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "silenced-bow"
+		}
+	],
+	"type": "simple"
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "khhjiqer051bo8c6931ze935",
+	"id": "spoiled-wine",
+	"title": "Spoiled Wine",
+	"description": "You've forgot it in the corner month ago?",
+	"asset": {
+		"default": [
+			"spoiled-wine"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

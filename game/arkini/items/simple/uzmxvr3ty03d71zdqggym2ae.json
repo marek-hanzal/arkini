@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "uzmxvr3ty03d71zdqggym2ae",
+		"id": "clay-jug-with-lye",
+		"title": "Clay Jug With Lye",
+		"description": "Some chemical experiments awaits",
+		"asset": {
+			"default": [
+				"clay-jug-with-lye"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 3,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "mroh4s4rsygi6qlncjqbqu2k",
+		"id": "empty-sack",
+		"title": "Empty Sack",
+		"description": "You can put things inside",
+		"asset": {
+			"default": [
+				"empty-sack"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"type": "simple"
+	}
+}

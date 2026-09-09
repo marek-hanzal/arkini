@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "nqflnwavzbre8wshpgqa0qqv",
+		"id": "clay-bowl-with-lye",
+		"title": "Clay Bowl With Lye",
+		"description": "Don't drink it.",
+		"asset": {
+			"default": [
+				"clay-bowl-with-lye"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

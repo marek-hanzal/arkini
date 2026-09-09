@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "u4wxguurcf68x3g9puehs70l",
+		"id": "clay-mug-with-water",
+		"title": "Clay Mug With Water",
+		"description": "Drinkable",
+		"asset": {
+			"default": [
+				"clay-mug-with-water"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

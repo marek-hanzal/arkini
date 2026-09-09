@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gjef87athde31uyhwvipcuti",
+		"id": "cocoa-powder",
+		"title": "Cocoa Powder",
+		"description": "Can you smell it?",
+		"asset": {
+			"default": [
+				"cocoa-powder"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "simple"
+	}
+}

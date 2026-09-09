@@ -1,0 +1,14 @@
+{
+	"uid": "fenhlvaj45ssocm5r935nqli",
+	"id": "campfire-extinguished",
+	"title": "Campfire Extinguished",
+	"description": "No more light here",
+	"asset": {
+		"default": [
+			"campfire-extinguished"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

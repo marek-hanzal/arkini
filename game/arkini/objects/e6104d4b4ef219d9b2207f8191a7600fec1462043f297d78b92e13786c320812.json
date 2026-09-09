@@ -1,0 +1,14 @@
+{
+	"uid": "ebepo6ezk56mp0419gksd5hz",
+	"id": "spoiled-sack",
+	"title": "Spoiled Sack",
+	"description": "Things have life-times. This one is over",
+	"asset": {
+		"default": [
+			"spoiled-sack"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "ed8pqi581jxck52cf90btj5g",
+	"id": "raw-emerald",
+	"title": "Raw Emerald",
+	"description": "This one still remembers it's home",
+	"asset": {
+		"default": [
+			"raw-emerald"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"type": "simple"
+}

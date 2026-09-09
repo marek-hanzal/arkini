@@ -1,0 +1,26 @@
+{
+	"uid": "oqd4xlccpvvyx2ouqj4cype3",
+	"id": "grape-seed",
+	"title": "Grape Seed",
+	"description": "Wine Time!",
+	"asset": {
+		"default": [
+			"seed",
+			"grapes"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 12,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "fertilized-field"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "grape-field"
+		}
+	],
+	"type": "simple"
+}

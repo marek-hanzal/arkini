@@ -1,0 +1,38 @@
+{
+	"uid": "lfxtap8427k9e4nn6uwjgxyo",
+	"id": "wolf",
+	"title": "Wolf",
+	"description": "He is dangerous. But he may walk away",
+	"asset": {
+		"default": [
+			"wolf"
+		]
+	},
+	"scope": "board",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 1200000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "bio-waste",
+								"quantity": {
+									"min": 1,
+									"max": 2
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

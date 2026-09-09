@@ -1,0 +1,34 @@
+{
+	"uid": "i1uq4hi5j80c2fdgn1ockshg",
+	"id": "sword",
+	"title": "Sword",
+	"description": "Just a sword. You can cut a bread using it",
+	"asset": {
+		"default": [
+			"sword"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 6,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "bear"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "hunted-game"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "wolf"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "hunted-game"
+		}
+	],
+	"type": "simple"
+}

@@ -1,0 +1,15 @@
+{
+	"uid": "wsseeyoomcb3j46h58plhr5p",
+	"id": "vegetables",
+	"title": "Vegetables",
+	"description": "Fresh vegetables you want to eat",
+	"asset": {
+		"default": [
+			"vegetable-crate"
+		]
+	},
+	"scope": "board",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 600000
+}

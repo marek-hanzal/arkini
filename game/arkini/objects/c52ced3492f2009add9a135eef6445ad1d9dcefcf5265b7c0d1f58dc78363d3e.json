@@ -1,0 +1,14 @@
+{
+	"uid": "pektmrtnnwg2te0zso1ezkwc",
+	"id": "empty-oven",
+	"title": "Empty Oven",
+	"description": "Heat source",
+	"asset": {
+		"default": [
+			"empty-oven"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

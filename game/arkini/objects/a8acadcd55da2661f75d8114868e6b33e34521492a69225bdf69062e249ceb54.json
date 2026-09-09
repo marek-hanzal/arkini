@@ -1,0 +1,14 @@
+{
+	"uid": "ooiwjpnx0wgz8wnhvgp342hj",
+	"id": "book-t1",
+	"title": "Book - Tier 1",
+	"description": "Just a book. It could be empty. Or has some poem. Or whatever.",
+	"asset": {
+		"default": [
+			"book-t1"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"type": "simple"
+}

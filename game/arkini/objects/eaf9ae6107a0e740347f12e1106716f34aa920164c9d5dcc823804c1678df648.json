@@ -1,0 +1,41 @@
+{
+	"uid": "ujmvqe9lnv83894jst1507ng",
+	"id": "toxic-filter",
+	"title": "Toxic Filter",
+	"description": "Your waste, my business",
+	"asset": {
+		"default": [
+			"toxic-filter"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 8,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "toxic-filter-depleted",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	"maxQueueSize": 1,
+	"type": "deposit"
+}

@@ -1,0 +1,34 @@
+{
+	"uid": "cn5kq3j8nakp42uklsd2enhz",
+	"id": "battle-axe",
+	"title": "Battle Axe",
+	"description": "Slice through things",
+	"asset": {
+		"default": [
+			"battle-axe"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "bear"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "hunted-game"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "wolf"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "hunted-game"
+		}
+	],
+	"type": "simple"
+}

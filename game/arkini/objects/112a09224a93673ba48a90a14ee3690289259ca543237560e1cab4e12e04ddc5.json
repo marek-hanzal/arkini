@@ -1,0 +1,14 @@
+{
+	"uid": "tir9q2bkepnsc8xybkhk3zk4",
+	"id": "spoiled-vegetable-crate",
+	"title": "Spoiled Vegetable Crate",
+	"description": "Not so healthy anymore",
+	"asset": {
+		"default": [
+			"spoiled-vegetable-crate"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

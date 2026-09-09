@@ -1,0 +1,14 @@
+{
+	"uid": "ogm52bsqfqk27a566mmabg3q",
+	"id": "spoiled-copper-pan",
+	"title": "Spoiled Copper Pan",
+	"description": "Pan. Offline",
+	"asset": {
+		"default": [
+			"spoiled-copper-pan"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "k8oi3es3s9nnmuher20orcli",
+	"id": "spoiled-chocolate",
+	"title": "Spoiled Chocolate",
+	"description": "...",
+	"asset": {
+		"default": [
+			"spoiled-chocolate"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

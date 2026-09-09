@@ -1,0 +1,14 @@
+{
+	"uid": "ecihjakbzjlagfsrswt4cdji",
+	"id": "toilet",
+	"title": "Toilet",
+	"description": "Universal bio remover",
+	"asset": {
+		"default": [
+			"toilet"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

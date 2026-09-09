@@ -1,0 +1,14 @@
+{
+	"uid": "cjijyjzndv1nxzxxyx3wmgq5",
+	"id": "knowledge-t3",
+	"title": "Knowledge - Tier 3",
+	"description": "Quite a lot of knowledge of something",
+	"asset": {
+		"default": [
+			"knowledge-t3"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 4,
+	"type": "simple"
+}

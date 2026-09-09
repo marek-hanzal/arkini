@@ -1,0 +1,14 @@
+{
+	"uid": "jb0oofz4p45ukg7zigziiq5y",
+	"id": "spoiled-dye-plants",
+	"title": "Spoiled Dye Plants",
+	"description": "Colors not found",
+	"asset": {
+		"default": [
+			"spoiled-dye-plants"
+		]
+	},
+	"scope": "any",
+	"maxStackSize": 1,
+	"type": "simple"
+}

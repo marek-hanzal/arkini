@@ -24,6 +24,8 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscriptionReplayGateFx";
+import { createMainCameraFx } from "~/game-scene/fx/createMainCameraFx";
+import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
 import type { MainRuntime } from "~/game-scene/service/MainRuntime";
@@ -160,6 +162,20 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(drag.closeFx);
+		const camera = yield* createMainCameraFx({
+			application,
+			drag,
+			dragThreshold,
+			layout: readMainLayoutFn({
+				boardHeight: game.config.meta.board.height,
+				boardWidth: game.config.meta.board.width,
+				fixedCellSize: 512,
+				height: application.app.screen.height,
+				toolbarSize: game.config.meta.toolbarSize ?? 0,
+				width: application.app.screen.width,
+			}),
+		});
+		registerRollbackFn(camera.closeFx);
 		const delivery = yield* createDeliveryRuntimeFx({
 			actorStore,
 			animator,
@@ -208,7 +224,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			scheduleAfterRenderFn: (workFn) =>
 				RendererRuntime.runSync(application.frames.scheduleAfterRenderFx(workFn)),
 			setInteractionBlockedFn: (blocked) =>
-				RendererRuntime.runSync(drag.setInteractionBlockedFx(blocked)),
+				RendererRuntime.runSync(camera.setInteractionBlockedFx(blocked)),
 		});
 		registerRollbackFn(transitionPresenter.closeFx);
 		replayCurrentTransitionFn = () =>
@@ -255,7 +271,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 
 		return {
 			canvas: application.app.canvas,
-			cancelInteractionFx: drag.cancelInteractionFx,
+			cancelInteractionFx: camera.cancelInteractionFx,
 			setInteractionBlockedFx: transitionPresenter.setInteractionBlockedFx,
 			closeFx: Effect.gen(function* () {
 				if (closed) return;

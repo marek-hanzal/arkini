@@ -58,6 +58,8 @@ interface ActiveDragBase extends createMainDragPreviewFx.State {
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;
+	readonly pressScreenX: number;
+	readonly pressScreenY: number;
 	readonly startX: number;
 	readonly startY: number;
 	lastPointerX: number;
@@ -439,18 +441,20 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		drag.lastPointerY = sample.y;
 	};
 
-	const recordThresholdCrossingFn = (sample: createPointerFrameSamplerFx.Sample) => {
+	const recordThresholdCrossingFn = (event: FederatedPointerEvent) => {
 		const drag = activeDrag;
 		if (
 			thresholdCrossed ||
 			drag === null ||
-			drag.pointerId !== sample.pointerId ||
+			drag.pointerId !== event.pointerId ||
 			drag.phase !== "pressed"
-		) {
+		)
 			return;
-		}
+		// Keep admission in original screen coordinates: a world round-trip can round an exact
+		// threshold below the camera's threshold and let one right release both pan and activate.
 		thresholdCrossed =
-			Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= dragThreshold;
+			Math.hypot(event.global.x - drag.pressScreenX, event.global.y - drag.pressScreenY) >=
+			dragThreshold;
 	};
 
 	const recoverPointerFailureFn = (cause: unknown, fallbackDrag?: ActiveDrag) => {
@@ -481,12 +485,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	const onPointerMoveFn = (event: FederatedPointerEvent) => {
 		const drag = activeDrag;
 		if (drag === null || event.pointerId !== drag.pointerId) return;
+		const point = application.stage.toLocal(event.global);
 		const sample = {
 			pointerId: event.pointerId,
-			x: event.global.x,
-			y: event.global.y,
+			x: point.x,
+			y: point.y,
 		};
-		recordThresholdCrossingFn(sample);
+		recordThresholdCrossingFn(event);
 		RendererRuntime.runSync(pointerSampler.scheduleFx(sample));
 	};
 
@@ -495,12 +500,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (pendingDrag === null || event.pointerId !== pendingDrag.pointerId) {
 			return;
 		}
+		const point = application.stage.toLocal(event.global);
 		const releaseSample = {
 			pointerId: event.pointerId,
-			x: event.global.x,
-			y: event.global.y,
+			x: point.x,
+			y: point.y,
 		};
-		recordThresholdCrossingFn(releaseSample);
+		recordThresholdCrossingFn(event);
 		RendererRuntime.runSync(pointerSampler.flushFx(releaseSample));
 		const drag = activeDrag;
 		if (drag === null || event.pointerId !== drag.pointerId) return;
@@ -535,7 +541,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		}
 		try {
 			const targetFacts = RendererRuntime.runSync(
-				surface.readTargetFactsFx(event.global.x, event.global.y),
+				surface.readTargetFactsFx(point.x, point.y),
 			);
 			// Canonical state may have changed beneath a held pointer while the target
 			// coordinates stayed stable. Freeze fresh release-time preview facts.
@@ -719,6 +725,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					} catch {
 						// Pixi still receives in-canvas pointer events without DOM capture.
 					}
+					const point = application.stage.toLocal(event.global);
 					activeDrag = {
 						activationIntent:
 							event.button === 2
@@ -732,10 +739,12 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 						attractionEligibilityByActorId: new Map(),
 						eligibleAttractionActorIds: new Set(),
 						pointerId: event.pointerId,
-						pressX: event.global.x,
-						pressY: event.global.y,
-						lastPointerX: event.global.x,
-						lastPointerY: event.global.y,
+						pressScreenX: event.global.x,
+						pressScreenY: event.global.y,
+						pressX: point.x,
+						pressY: point.y,
+						lastPointerX: point.x,
+						lastPointerY: point.y,
 						previewKind: null,
 						previewSource: null,
 						mode: gestureMode,

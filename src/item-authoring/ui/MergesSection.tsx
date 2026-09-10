@@ -66,8 +66,14 @@ const MergeFields = ({
 						initialSelectedIndex={initialSelectedIndex}
 						itemLabelFn={(index) => {
 							const itemId = merges[index].target.itemId;
-							return readItemLabelFn(itemId, `Merge ${index + 1}`);
+							return `Merge ${index + 1} — ${readItemLabelFn(
+								itemId,
+								"No item selected",
+							)}`;
 						}}
+						itemSearchTermsFn={(index) => [
+							merges[index].target.itemId,
+						]}
 						label="Merges"
 						key={initialSelectedIndex}
 						navigationCard

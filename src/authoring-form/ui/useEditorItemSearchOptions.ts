@@ -50,7 +50,7 @@ export const useEditorItemOptionLabel = () => {
 		(itemId: string, fallback: string) => {
 			if (itemId.length === 0) return fallback;
 			const title = items[itemId]?.title;
-			return title === undefined || title.length === 0 ? itemId : `${itemId} — ${title}`;
+			return title === undefined || title.length === 0 ? fallback : title;
 		},
 		[
 			items,

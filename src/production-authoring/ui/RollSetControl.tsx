@@ -30,6 +30,11 @@ type WeightedRoll = Extract<
 const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
 const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
+const RollTypeLabelByType = {
+	chance: "Chance",
+	guaranteed: "Guaranteed",
+	weight: "Weighted",
+} as const satisfies Record<RollSchema.Type["type"], string>;
 
 const DropControl = ({
 	onChangeFn,
@@ -140,7 +145,15 @@ const DropList = ({
 			<EditorCollectionSelector
 				addLabel="Add drop"
 				count={value.length}
-				itemLabelFn={(index) => readItemLabelFn(value[index].itemId, `Drop ${index + 1}`)}
+				itemLabelFn={(index) =>
+					`Drop ${index + 1} — ${readItemLabelFn(
+						value[index].itemId,
+						"No item selected",
+					)}`
+				}
+				itemSearchTermsFn={(index) => [
+					value[index].itemId,
+				]}
 				label="Drops"
 				onAddFn={() =>
 					onChangeFn([
@@ -282,7 +295,18 @@ const WeightedRollControl = ({
 				count={roll.drop.length}
 				itemLabelFn={(candidateIndex) => {
 					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
-					return readItemLabelFn(itemId ?? "", `Candidate ${candidateIndex + 1}`);
+					return `Candidate ${candidateIndex + 1} — ${readItemLabelFn(
+						itemId ?? "",
+						"No item selected",
+					)}`;
+				}}
+				itemSearchTermsFn={(candidateIndex) => {
+					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
+					return itemId === undefined
+						? []
+						: [
+								itemId,
+							];
 				}}
 				label="Weighted candidates"
 				onAddFn={() =>
@@ -520,10 +544,18 @@ export const RollSetControl = ({
 				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
 					const itemId = readFirstRollItemIdFn(roll);
-					return `${roll.type} roll ${rollIndex + 1} — ${readItemLabelFn(
+					return `${RollTypeLabelByType[roll.type]} roll ${rollIndex + 1} — ${readItemLabelFn(
 						itemId ?? "",
 						"No item selected",
 					)}`;
+				}}
+				itemSearchTermsFn={(rollIndex) => {
+					const itemId = readFirstRollItemIdFn(value.roll[rollIndex]);
+					return itemId === undefined
+						? []
+						: [
+								itemId,
+							];
 				}}
 				label={`Output set ${index + 1} rolls`}
 				onAddFn={() =>

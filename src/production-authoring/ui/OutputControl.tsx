@@ -40,6 +40,15 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 						"No item selected",
 					)}`;
 				}}
+				itemSearchTermsFn={(index) => {
+					const roll = value.set[index].roll[0];
+					const itemId = roll === undefined ? undefined : readFirstRollItemIdFn(roll);
+					return itemId === undefined
+						? []
+						: [
+								itemId,
+							];
+				}}
 				label="Output sets"
 				onAddFn={() =>
 					onChangeFn({

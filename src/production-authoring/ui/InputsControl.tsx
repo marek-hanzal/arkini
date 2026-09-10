@@ -56,12 +56,30 @@ export const InputsControl = ({
 				itemLabelFn={(index) => {
 					const input = value[index];
 					if (input.type === "materials")
-						return `${readItemLabelFn(input.selector.itemId, `Material input ${index + 1}`)} — Materials`;
+						return `Material input ${index + 1} — ${readItemLabelFn(
+							input.selector.itemId,
+							"No item selected",
+						)}`;
 					if (input.type === "deposit" && input.charges?.from === "self")
 						return `Self-paid Deposit input ${index + 1}`;
 					if (input.type === "deposit")
-						return `${readItemLabelFn(input.query.selector.itemId, `Deposit input ${index + 1}`)} — Deposit`;
+						return `Deposit input ${index + 1} — ${readItemLabelFn(
+							input.query.selector.itemId,
+							"No item selected",
+						)}`;
 					return `Simple input ${index + 1}`;
+				}}
+				itemSearchTermsFn={(index) => {
+					const input = value[index];
+					if (input.type === "materials")
+						return [
+							input.selector.itemId,
+						];
+					if (input.type === "deposit")
+						return [
+							input.query.selector.itemId,
+						];
+					return [];
 				}}
 				label={allowMaterials ? "Line inputs" : "Action inputs"}
 				onAddFn={() =>

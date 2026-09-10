@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "bpk4mu2dz3pcurcft0ojmq4s",
+		"id": "dirty-rum-bottle",
+		"title": "Dirty Rum Bottle",
+		"asset": {
+			"default": [
+				"dirty-rum-bottle"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

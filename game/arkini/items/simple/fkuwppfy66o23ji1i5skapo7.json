@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "fkuwppfy66o23ji1i5skapo7",
+		"id": "rum-bottle",
+		"title": "Rum Bottle",
+		"description": "It has one special ability",
+		"asset": {
+			"default": [
+				"rum-bottle"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "simple"
+	}
+}

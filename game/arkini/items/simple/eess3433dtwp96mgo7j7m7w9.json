@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "eess3433dtwp96mgo7j7m7w9",
+		"id": "dirty-clay-bowl",
+		"title": "Dirty Clay Bowl",
+		"description": "Don't reuse it like this",
+		"asset": {
+			"default": [
+				"dirty-clay-bowl"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

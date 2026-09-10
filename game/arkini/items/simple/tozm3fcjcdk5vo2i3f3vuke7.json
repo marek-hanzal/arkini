@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "tozm3fcjcdk5vo2i3f3vuke7",
+		"id": "faith",
+		"title": "Faith",
+		"asset": {
+			"default": [
+				"faith"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

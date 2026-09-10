@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "i5fuhf30o5rwou8oydrm5v0b",
+		"id": "dirty-bucket",
+		"title": "Dirty Bucket",
+		"asset": {
+			"default": [
+				"dirty-bucket"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

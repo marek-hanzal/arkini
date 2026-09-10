@@ -17,7 +17,7 @@ export interface MainLayout {
 }
 
 export interface InventoryLayout {
-	/** Inventory actors and slots share the Board-derived cell scale. */
+	/** Inventory actors and slots share fixed world-cell geometry. */
 	readonly actorSize: number;
 	readonly surface: SurfaceLayout;
 }

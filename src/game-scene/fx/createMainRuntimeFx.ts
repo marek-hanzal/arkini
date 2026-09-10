@@ -24,7 +24,7 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscriptionReplayGateFx";
-import { createMainCameraFx } from "~/game-scene/fx/createMainCameraFx";
+import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
@@ -162,18 +162,27 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(drag.closeFx);
-		const camera = yield* createMainCameraFx({
+		const layout = readMainLayoutFn({
+			boardHeight: game.config.meta.board.height,
+			boardWidth: game.config.meta.board.width,
+			fixedCellSize: 512,
+			height: application.app.screen.height,
+			toolbarSize: game.config.meta.toolbarSize ?? 0,
+			width: application.app.screen.width,
+		});
+		const camera = yield* createBoardCameraFx({
 			application,
 			drag,
 			dragThreshold,
-			layout: readMainLayoutFn({
-				boardHeight: game.config.meta.board.height,
-				boardWidth: game.config.meta.board.width,
-				fixedCellSize: 512,
-				height: application.app.screen.height,
-				toolbarSize: game.config.meta.toolbarSize ?? 0,
-				width: application.app.screen.width,
-			}),
+			surfaces:
+				layout.toolbar === null
+					? [
+							layout.board,
+						]
+					: [
+							layout.board,
+							layout.toolbar,
+						],
 		});
 		registerRollbackFn(camera.closeFx);
 		const delivery = yield* createDeliveryRuntimeFx({

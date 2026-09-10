@@ -10,6 +10,8 @@ import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { InventoryActorStore } from "~/game-scene/service/InventoryActorStore";
 import type { ParticleTextures } from "~/tile-rendering/service/ParticleTextures";
+import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
+import { readInventoryLayoutFn } from "~/game-scene/fn/readInventoryLayoutFn";
 import { createInventoryActorStoreFx } from "~/game-scene/fx/createInventoryActorStoreFx";
 import { createParticleTexturesFx } from "~/tile-rendering/fx/createParticleTexturesFx";
 import { createActorAnimatorFx } from "~/tile-rendering/fx/createActorAnimatorFx";
@@ -71,6 +73,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 	let actorStore: InventoryActorStore | null = null;
 	let particleTextures: ParticleTextures | null = null;
 	let drag: InventoryDragController | null = null;
+	let camera: createBoardCameraFx.Output | null = null;
 	let removeResizeListenerFn: (() => void) | null = null;
 	let appearanceObserver: MutationObserver | null = null;
 	let unsubscribeTransitionsFn: (() => void) | null = null;
@@ -98,6 +101,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 		if (releaseResizeFn !== null) {
 			yield* ignoreCleanupFailureFx(Effect.sync(releaseResizeFn));
 		}
+		if (camera !== null) yield* ignoreCleanupFailureFx(camera.closeFx);
 		if (drag !== null) yield* ignoreCleanupFailureFx(drag.closeFx);
 		if (actorStore !== null) yield* ignoreCleanupFailureFx(actorStore.closeFx);
 		processedFeedbackKeys.clear();
@@ -148,6 +152,18 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 			surface: createdSurface,
 		});
 		drag = createdDrag;
+		const createdCamera = yield* createBoardCameraFx({
+			application,
+			drag: createdDrag,
+			dragThreshold,
+			surfaces: [
+				readInventoryLayoutFn({
+					columns: game.config.meta.inventory.width,
+					rows: game.config.meta.inventory.height,
+				}).surface,
+			],
+		});
+		camera = createdCamera;
 		let latestTransition: GameTransition = game.getTransitionSnapshotFn();
 		const subscriptionReplayGate = yield* createSubscriptionReplayGateFx(
 			latestTransition.sequence,
@@ -255,7 +271,8 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 
 		return {
 			canvas: application.app.canvas,
-			cancelInteractionFx: createdDrag.cancelInteractionFx,
+			cancelInteractionFx: createdCamera.cancelInteractionFx,
+			setInteractionBlockedFx: createdCamera.setInteractionBlockedFx,
 			projectSpaceActivationFx,
 			closeFx,
 		} satisfies InventoryRuntime;

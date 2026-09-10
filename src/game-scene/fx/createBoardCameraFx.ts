@@ -3,17 +3,22 @@ import { Rectangle } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
-import type { MainLayout } from "~/game-scene/type/SceneLayout";
+import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
 interface Props {
 	readonly application: PixiApplicationOwner;
-	readonly drag: MainDragController;
+	readonly drag: {
+		readonly cancelInteractionFx: Effect.Effect<void>;
+		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
+	};
 	readonly dragThreshold: number;
-	readonly layout: MainLayout;
+	readonly surfaces: readonly [
+		SurfaceLayout,
+		...SurfaceLayout[],
+	];
 }
 
-export namespace createMainCameraFx {
+export namespace createBoardCameraFx {
 	export interface Output {
 		readonly cancelInteractionFx: Effect.Effect<void>;
 		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
@@ -21,12 +26,12 @@ export namespace createMainCameraFx {
 	}
 }
 
-/** One camera transforms every main-scene layer; actor and drop coordinates remain world-local. */
-export const createMainCameraFx = Effect.fn("createMainCameraFx")(function* ({
+/** One camera transforms every canvas layer; actor and drop coordinates remain world-local. */
+export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	application,
 	drag,
 	dragThreshold,
-	layout,
+	surfaces,
 }: Props) {
 	const { app, stage, frames } = application;
 	const canvas = app.canvas;
@@ -40,15 +45,10 @@ export const createMainCameraFx = Effect.fn("createMainCameraFx")(function* ({
 		x: number;
 		y: number;
 	} | null = null;
-	const left = Math.min(layout.board.x, layout.toolbar?.x ?? layout.board.x);
-	const right = Math.max(
-		layout.board.x + layout.board.width,
-		(layout.toolbar?.x ?? 0) + (layout.toolbar?.width ?? 0),
-	);
-	const bottom =
-		layout.toolbar === null
-			? layout.board.y + layout.board.height
-			: layout.toolbar.y + layout.toolbar.height;
+	const left = Math.min(...surfaces.map((surface) => surface.x));
+	const top = Math.min(...surfaces.map((surface) => surface.y));
+	const right = Math.max(...surfaces.map((surface) => surface.x + surface.width));
+	const bottom = Math.max(...surfaces.map((surface) => surface.y + surface.height));
 
 	const invalidateFn = () => {
 		// Pixi hitArea is local even though it covers the whole screen, including empty space.
@@ -61,9 +61,12 @@ export const createMainCameraFx = Effect.fn("createMainCameraFx")(function* ({
 		RendererRuntime.runSync(frames.invalidateFx);
 	};
 	const fitFn = () => {
-		const scale = Math.min(width / (right - left + 256), height / (bottom + 256), 1);
+		const scale = Math.min(width / (right - left + 256), height / (bottom - top + 256), 1);
 		stage.scale.set(scale);
-		stage.position.set((width - (right + left) * scale) / 2, (height - bottom * scale) / 2);
+		stage.position.set(
+			(width - (right + left) * scale) / 2,
+			(height - (bottom + top) * scale) / 2,
+		);
 		invalidateFn();
 	};
 	const updateInteractionFn = () => {
@@ -215,5 +218,5 @@ export const createMainCameraFx = Effect.fn("createMainCameraFx")(function* ({
 			canvas.removeEventListener("wheel", wheelFn);
 			document.removeEventListener("visibilitychange", visibilityFn);
 		}),
-	} satisfies createMainCameraFx.Output;
+	} satisfies createBoardCameraFx.Output;
 });

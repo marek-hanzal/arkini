@@ -1,20 +1,19 @@
 import { useAtom } from "@effect/atom-react";
 import { match } from "ts-pattern";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { TileDefaultLineCommandAtom } from "~/tile-interaction/atom/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
+import { useBoardRuntime } from "~/game-scene/ui/useBoardRuntime";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
-import type { MainRuntime } from "~/game-scene/service/MainRuntime";
 
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
@@ -30,16 +29,10 @@ interface PixiBoardToolbarSurfaceProps {
 export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarSurfaceProps) => {
 	const game = useGameEngine();
 	const { runSpaceActivationFn, runDropFn, runSplitFn } = useTileCommands(game);
-	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const { interaction, textures } = usePixiGameRuntime();
+	const { textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
-	const hostRef = useRef<HTMLDivElement>(null);
 	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
-	const runtimeRef = useRef<MainRuntime | null>(null);
-	const interactionBlockedRef = useRef(false);
-	const interactionBlocked = gameMenu.phase !== "closed" || itemDetail.state.phase !== "closed";
-	interactionBlockedRef.current = interactionBlocked;
 	const controlsRef = useRef({
 		itemDetail,
 	});
@@ -127,6 +120,28 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 		],
 	);
 
+	const createRuntimeFx = useCallback(
+		(host: HTMLElement) =>
+			createMainRuntimeFx({
+				dragThreshold: PointerDragThreshold,
+				game,
+				host,
+				onActivateFn: activateFn,
+				onDropFn: runDropFn,
+				textures,
+			}),
+		[
+			activateFn,
+			game,
+			runDropFn,
+			textures,
+		],
+	);
+	const { hostRef, blocked: interactionBlocked } = useBoardRuntime({
+		createRuntimeFx,
+		game,
+	});
+
 	useEffect(() => {
 		if (enqueueLineState.kind !== "error") return;
 		enqueueLineFn({
@@ -153,69 +168,6 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 	}, [
 		interactionBlocked,
 		onOpenInventoryFn,
-	]);
-
-	useLayoutEffect(() => {
-		const host = hostRef.current;
-		if (host === null) return;
-		let cancelled = false;
-		let runtime: MainRuntime | null = null;
-		let unregisterInteractionFn: () => void = () => undefined;
-		void RendererRuntime.runPromise(
-			createMainRuntimeFx({
-				dragThreshold: PointerDragThreshold,
-				game,
-				host,
-				onActivateFn: activateFn,
-				onDropFn: runDropFn,
-				textures,
-			}),
-		)
-			.then((created) => {
-				if (cancelled) {
-					return RendererRuntime.runPromise(created.closeFx);
-				}
-				runtime = created;
-				runtimeRef.current = created;
-				RendererRuntime.runSync(
-					created.setInteractionBlockedFx(interactionBlockedRef.current),
-				);
-				unregisterInteractionFn = RendererRuntime.runSync(
-					interaction.registerFx(() =>
-						RendererRuntime.runSync(created.cancelInteractionFx),
-					),
-				);
-			})
-			.catch((cause) => {
-				if (cancelled) return;
-				game.reportCriticalFailureFn("game-presentation", cause);
-			});
-
-		return () => {
-			cancelled = true;
-			unregisterInteractionFn();
-			if (runtimeRef.current === runtime) runtimeRef.current = null;
-			if (runtime !== null) {
-				void RendererRuntime.runPromise(runtime.closeFx).catch((cause) => {
-					console.error("Pixi Board + Toolbar scene failed to close.", cause);
-				});
-			}
-		};
-	}, [
-		activateFn,
-		game,
-		interaction,
-		runDropFn,
-		textures,
-	]);
-
-	useEffect(() => {
-		const runtime = runtimeRef.current;
-		if (runtime !== null) {
-			RendererRuntime.runSync(runtime.setInteractionBlockedFx(interactionBlocked));
-		}
-	}, [
-		interactionBlocked,
 	]);
 
 	return (

@@ -121,6 +121,40 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 					}).pipe(Effect.uninterruptible),
 				),
 			);
+			const advanceNoopFx: EditorBoardGameResource["advanceNoopFx"] = Effect.fn(
+				"EditorBoardGameResourceFx.advanceNoopFx",
+			)((project, expectedPreviousRevision) =>
+				lifecycle.withPermits(1)(
+					Effect.gen(function* () {
+						if (routedProjectId !== project.projectId) return;
+						const snapshot = yield* SubscriptionRef.get(state);
+						if (ownsNewerRevisionFn(snapshot, project)) return;
+						if (
+							snapshot.type !== "ready" ||
+							current === undefined ||
+							snapshot.resource !== current ||
+							current.game.projectId !== project.projectId ||
+							current.game.projectRevision !== expectedPreviousRevision
+						) {
+							yield* syncOwnedProjectFx(project);
+							return;
+						}
+						const advanced: EditorBoardGameResource.Resource = {
+							...current,
+							game: {
+								...current.game,
+								config: project.config,
+								projectRevision: project.revision,
+							},
+						};
+						current = advanced;
+						yield* SubscriptionRef.set(state, {
+							type: "ready",
+							resource: advanced,
+						});
+					}).pipe(Effect.uninterruptible),
+				),
+			);
 			const replaceFx: EditorBoardGameResource["replaceFx"] = Effect.fn(
 				"EditorBoardGameResourceFx.replaceFx",
 			)((project, expected, nextState) =>
@@ -194,6 +228,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 				state,
 				syncFx,
 				publishFx,
+				advanceNoopFx,
 				replaceFx,
 				releaseCurrentFx,
 				shutdownFx: releaseCurrentFx.pipe(Effect.ignore),

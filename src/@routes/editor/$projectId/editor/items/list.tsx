@@ -3,12 +3,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { List } from "~/item-authoring/ui/List";
 
 interface EditorItemsRouteSearch {
+	readonly draft?: true;
 	readonly itemType?: TypeSchema.Type;
 	readonly query?: string;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 	validateSearch: (search): EditorItemsRouteSearch => ({
+		draft: search.draft === true ? true : undefined,
 		itemType:
 			TypeSchema.options.find((type) => type === search.itemType) === undefined
 				? undefined
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 		});
 		return (
 			<List
+				draft={search.draft === true}
 				itemType={search.itemType}
 				query={search.query ?? ""}
 				onItemTypeChangeFn={(itemType) =>
@@ -31,6 +34,15 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 						search: (current) => ({
 							...current,
 							itemType,
+						}),
+					})
+				}
+				onDraftChangeFn={(draft) =>
+					void navigateFn({
+						replace: true,
+						search: (current) => ({
+							...current,
+							draft: draft ? true : undefined,
 						}),
 					})
 				}

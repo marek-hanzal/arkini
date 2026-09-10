@@ -109,6 +109,114 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 		}),
 	);
 
+	it.effect("advances a version-noop revision without replacing the game session", () =>
+		Effect.gen(function* () {
+			const created: number[] = [];
+			const released: number[] = [];
+			const createResourceFx = (project: Project) =>
+				Effect.gen(function* () {
+					created.push(project.revision);
+					const game = yield* createEditorBoardGameFx({
+						project,
+					});
+					const resource = yield* createGameEngineResourceFx(game);
+					const disposeWithoutSaveFx = Effect.sync(() => {
+						released.push(project.revision);
+					}).pipe(Effect.andThen(game.disposeWithoutSaveFx));
+					return {
+						...resource,
+						game: {
+							...resource.game,
+							disposeFx: disposeWithoutSaveFx,
+							disposeWithoutSaveFx,
+						},
+					} satisfies GameEngineResource<EditorBoardGame>;
+				});
+			const owner = yield* createEditorBoardGameResourceFx({
+				createResourceFx,
+			});
+			yield* owner.syncFx(createProject(1));
+			const before = yield* SubscriptionRef.get(owner.state);
+			if (before.type !== "ready") throw new Error("Initial editor game is missing.");
+			const water = editorTestPayload.config.items.water;
+			if (water === undefined) throw new Error("Missing water fixture.");
+			const project = {
+				...createProject(2),
+				config: {
+					...editorTestPayload.config,
+					items: {
+						...editorTestPayload.config.items,
+						water: {
+							...water,
+							draft: true,
+						},
+					},
+				},
+			};
+
+			yield* owner.advanceNoopFx(project, 1);
+
+			const after = yield* SubscriptionRef.get(owner.state);
+			if (after.type !== "ready") throw new Error("Advanced editor game is missing.");
+			expect(created).toEqual([
+				1,
+			]);
+			expect(released).toEqual([]);
+			expect(after.resource.game.projectRevision).toBe(2);
+			expect(after.resource.game.config.items.water?.draft).toBe(true);
+			expect(after.resource.game.runFx).toBe(before.resource.game.runFx);
+
+			yield* owner.releaseCurrentFx;
+			expect(released).toEqual([
+				1,
+			]);
+		}),
+	);
+
+	it.effect("rebuilds when a version-noop does not follow the running revision", () =>
+		Effect.gen(function* () {
+			const created: number[] = [];
+			const released: number[] = [];
+			const createResourceFx = (project: Project) =>
+				Effect.gen(function* () {
+					created.push(project.revision);
+					const game = yield* createEditorBoardGameFx({
+						project,
+					});
+					const resource = yield* createGameEngineResourceFx(game);
+					const disposeWithoutSaveFx = Effect.sync(() => {
+						released.push(project.revision);
+					}).pipe(Effect.andThen(game.disposeWithoutSaveFx));
+					return {
+						...resource,
+						game: {
+							...resource.game,
+							disposeFx: disposeWithoutSaveFx,
+							disposeWithoutSaveFx,
+						},
+					} satisfies GameEngineResource<EditorBoardGame>;
+				});
+			const owner = yield* createEditorBoardGameResourceFx({
+				createResourceFx,
+			});
+			yield* owner.syncFx(createProject(1));
+
+			yield* owner.advanceNoopFx(createProject(3), 2);
+
+			const state = yield* SubscriptionRef.get(owner.state);
+			expect(state.type).toBe("ready");
+			if (state.type !== "ready") throw new Error("Rebuilt editor game is missing.");
+			expect(state.resource.game.projectRevision).toBe(3);
+			expect(created).toEqual([
+				1,
+				3,
+			]);
+			expect(released).toEqual([
+				1,
+			]);
+		}),
+	);
+
 	it.effect(
 		"keeps a failed disposal visible and retries it before creating the next revision",
 		() =>

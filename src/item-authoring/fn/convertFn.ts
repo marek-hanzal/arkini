@@ -15,6 +15,7 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 		uid: item.uid,
 		id: item.id,
 		title: item.title,
+		draft: item.draft,
 		...(item.description === undefined
 			? {}
 			: {

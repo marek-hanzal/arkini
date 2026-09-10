@@ -119,6 +119,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 		),
 		syncFx,
 		publishFx: () => Effect.void,
+		advanceNoopFx: () => Effect.void,
 		replaceFx: () => Effect.void,
 		shutdownFx: Effect.void,
 		releaseCurrentFx: Deferred.succeed(releaseStarted, undefined).pipe(

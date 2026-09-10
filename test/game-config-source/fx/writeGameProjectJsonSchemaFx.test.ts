@@ -35,6 +35,14 @@ describe("writeGameProjectJsonSchemaFx", () => {
 			});
 		expect(new Set(schemas.map(([schema]) => schema.$id)).size).toBe(schemas.length);
 		expect(GameProjectJsonSchema.$defs).toHaveProperty("item.CompositionSchema");
+		const simpleItemSchema = GameProjectJsonSchema.$defs?.["item.SimpleSchema"] as
+			| {
+					readonly properties?: Record<string, unknown>;
+					readonly required?: ReadonlyArray<string>;
+			  }
+			| undefined;
+		expect(simpleItemSchema?.properties).toHaveProperty("draft");
+		expect(simpleItemSchema?.required).not.toContain("draft");
 	});
 
 	it.effect("writes the portable game-project JSON Schema", () =>

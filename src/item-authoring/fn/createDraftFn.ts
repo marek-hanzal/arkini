@@ -7,6 +7,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 interface CreateDraftFnProps {
+	readonly draft?: boolean;
 	readonly itemId?: string;
 	readonly resourceId: string;
 	readonly type: TypeSchema.Type;
@@ -15,6 +16,7 @@ interface CreateDraftFnProps {
 
 /** Creates the canonical starting shape shared by UI, MCP, and type conversions. */
 export const createDraftFn = ({
+	draft = false,
 	itemId: requestedItemId,
 	resourceId,
 	type,
@@ -25,6 +27,7 @@ export const createDraftFn = ({
 		uid,
 		id: itemId,
 		title: "",
+		draft,
 		asset: {
 			default: [
 				resourceId,

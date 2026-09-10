@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createProjectVersionDiffFn } from "~/project-version/fn/createProjectVersionDiffFn";
+import { createProjectVersionCommitPreviewFn } from "~/project-version/fn/createProjectVersionCommitPreviewFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
@@ -31,6 +32,64 @@ const readConfigDiff = (before: GameConfigSchema.Type, after: GameConfigSchema.T
 	);
 
 describe("createProjectVersionDiffFn", () => {
+	it("keeps a draft-status change committable without an Arkpack bump", () => {
+		const water = editorTestPayload.config.items.water;
+		if (water === undefined) throw new Error("Missing water fixture.");
+		const afterConfig = GameConfigSchema.parse({
+			...editorTestPayload.config,
+			items: {
+				...editorTestPayload.config.items,
+				water: {
+					...water,
+					draft: true,
+				},
+			},
+		});
+		const diff = createProjectVersionDiffFn(
+			from,
+			to,
+			{
+				arkpackVersion: "1.0",
+				config: editorTestPayload.config,
+				resources: new Map(),
+				scenarios: new Map(),
+			},
+			{
+				arkpackVersion: "1.0",
+				config: afterConfig,
+				resources: new Map(),
+				scenarios: new Map(),
+			},
+		);
+
+		expect(diff.hasChanges).toBe(true);
+		expect(diff.items).toEqual([
+			{
+				change: "changed",
+				uid: water.uid,
+				values: [
+					{
+						after: true,
+						before: false,
+						path: "draft",
+					},
+				],
+			},
+		]);
+		expect(
+			createProjectVersionCommitPreviewFn({
+				baseArkpackVersion: "1.0",
+				currentFingerprint: "a".repeat(64),
+				currentScenarioNames: [],
+				diff,
+			}),
+		).toMatchObject({
+			bump: "noop",
+			canCommit: true,
+			nextArkpackVersion: "1.0",
+		});
+	});
+
 	it("keeps an item ID rename under its UID when another item releases that ID", () => {
 		const reserved = {
 			...editorTestPayload.config.items.water,

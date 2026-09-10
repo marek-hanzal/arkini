@@ -178,6 +178,7 @@ export const EditorAssetDetail = ({
 						<div className="flex items-center gap-2">
 							<ItemTypeMenu
 								dataUi="EditorAssetCreateItemMenu"
+								defaultDraft
 								defaultItemId={resource.id}
 								defaultTitle={readAssetNameFn(resource.id)}
 								description="Choose the item type to create with this asset."

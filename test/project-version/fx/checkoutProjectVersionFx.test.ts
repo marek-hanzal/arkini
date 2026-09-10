@@ -55,6 +55,7 @@ const runCheckout = async ({
 		syncFx: (nextProject) =>
 			Effect.sync(() => events.push(`board-sync-${nextProject.revision}`)),
 		publishFx: () => Effect.void,
+		advanceNoopFx: () => Effect.void,
 		replaceFx: () => Effect.void,
 		releaseCurrentFx: Effect.sync(() => events.push("board-release")),
 		shutdownFx: Effect.void,

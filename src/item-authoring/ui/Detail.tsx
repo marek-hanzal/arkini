@@ -22,6 +22,7 @@ import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
+import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 
@@ -114,6 +115,8 @@ export const Detail = ({
 									<EditorSectionNavigationSeparator />
 								</>
 							)}
+							<ItemDraftToggle item={item} />
+							<EditorSectionNavigationSeparator />
 							<ItemTypeMenu
 								dataUi="EditorItemConvertMenu"
 								description="Compatible data is kept; unsupported fields are removed on Save."

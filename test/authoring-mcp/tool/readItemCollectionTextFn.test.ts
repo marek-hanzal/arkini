@@ -22,6 +22,7 @@ describe("readItemCollectionTextFn", () => {
 		expect(producers).toContain("Item type filter (OR): producer");
 		expect(producers).toContain("Type-filtered items: 1");
 		expect(producers).toContain("- forge\n  ID: forge\n  Type: producer");
+		expect(producers).toContain("Draft: false");
 		expect(lastPage).toContain("Page: 3\nTotal pages: 3");
 		expect(lastPage).toContain("Previous page: 2");
 	});

@@ -1,7 +1,7 @@
-import { PackageOpen, Plus } from "lucide-react";
+import { FilePenLine, PackageOpen, Plus } from "lucide-react";
 import { useMemo } from "react";
 
-import { searchFn } from "~/item-authoring/fn/searchFn";
+import { filterFn } from "~/item-authoring/fn/filterFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
@@ -11,15 +11,21 @@ import { ListRow } from "~/item-authoring/ui/ListRow";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
+	draft,
 	itemType,
+	onDraftChangeFn,
 	onItemTypeChangeFn,
 	onQueryChangeFn,
 	query,
 }: {
+	readonly draft: boolean;
 	readonly itemType?: TypeSchema.Type;
+	readonly onDraftChangeFn: (draft: boolean) => void;
 	readonly onItemTypeChangeFn: (itemType: TypeSchema.Type | undefined) => void;
 	readonly onQueryChangeFn: (query: string) => void;
 	readonly query: string;
@@ -38,11 +44,13 @@ export const List = ({
 	const empty = items.length === 0;
 	const filteredItems = useMemo(
 		() =>
-			searchFn(
-				items.filter((item) => itemType === undefined || item.type === itemType),
+			filterFn(items, {
+				draft,
+				itemType,
 				query,
-			),
+			}),
 		[
+			draft,
 			itemType,
 			items,
 			query,
@@ -51,6 +59,7 @@ export const List = ({
 	const newItemMenu = (
 		<ItemTypeMenu
 			dataUi="EditorNewItemMenu"
+			defaultDraft={false}
 			description="Choose the item type to start authoring."
 			icon={Plus}
 			label="New item"
@@ -60,6 +69,7 @@ export const List = ({
 			variant="primary"
 		/>
 	);
+	const DraftFilterButton = draft ? PrimaryButton : Button;
 	return (
 		<EditorSectionPage
 			header={
@@ -83,6 +93,19 @@ export const List = ({
 							<span>×</span>
 						</button>
 					)}
+					<DraftFilterButton
+						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
+						onClick={() => onDraftChangeFn(!draft)}
+						{...readDataUiFn({
+							dataUi: "EditorItemDraftFilter",
+							state: {
+								selected: draft,
+							},
+						})}
+					>
+						<FilePenLine className="size-4" />
+						Draft
+					</DraftFilterButton>
 					{empty ? null : newItemMenu}
 				</header>
 			}
@@ -106,7 +129,7 @@ export const List = ({
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemSearchEmpty"
 					>
-						No items match the current search and type filter.
+						No items match the active filters.
 					</p>
 				) : null}
 				{filteredItems.map((item) => (

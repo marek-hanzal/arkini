@@ -100,6 +100,7 @@ describe("editor MCP item creation", () => {
 				],
 			},
 			description: "Created through the editor MCP.",
+			draft: false,
 			id: "item:mcp-simple",
 			title: "MCP Simple",
 			type: "simple",
@@ -107,6 +108,26 @@ describe("editor MCP item creation", () => {
 		expect(item?.uid).toEqual(expect.any(String));
 		expect(item?.uid).not.toBe(item?.id);
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("create-item-project");
+		const detail = await client.callTool({
+			name: "item_detail",
+			arguments: {
+				id: "item:mcp-simple",
+			},
+		});
+		expect(detail.content).toMatchObject([
+			{
+				text: expect.stringContaining("Draft: false"),
+			},
+		]);
+		const collection = await client.callTool({
+			name: "item_collection",
+			arguments: {},
+		});
+		expect(collection.content).toMatchObject([
+			{
+				text: expect.stringMatching(/ID: item:mcp-simple\n  Type: simple\n  Draft: false/),
+			},
+		]);
 
 		const rejectedStructuredInput = await client.callTool({
 			name: "create_simple_item",
@@ -181,6 +202,11 @@ describe("editor MCP item creation", () => {
 					id,
 					title: `MCP ${type}`,
 					description: `Created ${type} item.`,
+					...(type === "simple"
+						? {
+								draft: true,
+							}
+						: {}),
 					...(type === "space"
 						? {
 								space: 4,
@@ -207,6 +233,7 @@ describe("editor MCP item creation", () => {
 						editorTestPayload.resources[0]?.id,
 					],
 				},
+				draft: type === "simple",
 				type,
 			});
 		}

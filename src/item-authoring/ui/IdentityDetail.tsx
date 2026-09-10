@@ -55,12 +55,14 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							value={item.uid}
 						/>
 					</FactList>
-					<FactList columns={1}>
-						<Fact
-							label={translator.textFn("Description")}
-							value={item.description || "No player-facing description."}
-						/>
-					</FactList>
+					{item.description === undefined ? null : (
+						<FactList columns={1}>
+							<Fact
+								label={translator.textFn("Description")}
+								value={item.description}
+							/>
+						</FactList>
+					)}
 				</div>
 			</EditorRootCard>
 			<ItemOverview item={item} />

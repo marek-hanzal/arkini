@@ -25,7 +25,6 @@ export const createDraftFn = ({
 		uid,
 		id: itemId,
 		title: "",
-		description: "",
 		asset: {
 			default: [
 				resourceId,

@@ -41,7 +41,7 @@ export namespace readItemDetailInfoFn {
 		| {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
-				readonly description: string;
+				readonly description?: string;
 				readonly itemType: TypeSchema.Type;
 				readonly storageScope: StorageSchema.Type;
 				readonly location: Location;

@@ -52,6 +52,7 @@ export namespace useFormController {
 
 const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 	...item,
+	description: item.description ?? "",
 	asset: {
 		default: [
 			item.asset.default[0],

@@ -51,6 +51,7 @@ interface EditorTextAreaFieldProps {
 	readonly description?: string;
 	readonly fill?: boolean;
 	readonly label: string;
+	readonly optional?: boolean;
 	readonly placeholder?: string;
 	readonly rows?: number;
 }
@@ -59,6 +60,7 @@ const EditorTextAreaField = ({
 	description,
 	fill = false,
 	label,
+	optional = false,
 	placeholder,
 	rows = 4,
 }: EditorTextAreaFieldProps) => {
@@ -74,6 +76,7 @@ const EditorTextAreaField = ({
 			onBlurFn={field.handleBlur}
 			onChangeFn={field.handleChange}
 			placeholder={placeholder}
+			required={!optional}
 			rows={rows}
 			value={field.state.value}
 		/>

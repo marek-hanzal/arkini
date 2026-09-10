@@ -2,7 +2,6 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
-import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 import {
@@ -16,18 +15,9 @@ import {
 import type { FakeContainer } from "./createInventoryRuntimeFx.test/fixture";
 
 describe("Inventory runtime / activation lifecycle", () => {
-	it("uses the Board actor size and routes an ordinary click to Inventory activation", async () => {
+	it("routes an ordinary click on the fitted Inventory canvas to activation", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
-		const expectedBoardSize = readMainLayoutFn({
-			boardHeight: 7,
-			boardWidth: 11,
-			height: 480,
-			toolbarSize: 8,
-			width: 800,
-		}).board.cellSize;
 
-		expect(actor.size).toBe(expectedBoardSize);
-		expect(sceneState.roundRects).toBeGreaterThanOrEqual(3);
 		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
 		stage.emit("pointerup", slotPointer(0));
 		await Promise.resolve();

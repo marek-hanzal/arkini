@@ -171,7 +171,7 @@ describe("Inventory runtime / drop settlement", () => {
 		expect(onActivate).not.toHaveBeenCalled();
 		await Effect.runPromise(runtime.closeFx);
 	});
-	it("settles a dragged actor at the latest physical size after a live resize", async () => {
+	it("cancels a held item when resize changes camera framing", async () => {
 		const { actor, runtime, stage } = await mountScene();
 		const originalBaseSize = actor.size;
 		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
@@ -186,13 +186,11 @@ describe("Inventory runtime / drop settlement", () => {
 			}
 		).width = 600;
 		sceneState.resize();
-		expect(actor.dragging).toBe(true);
-		expect(actor.size).toBe(originalBaseSize);
-
-		Effect.runSync(runtime.cancelInteractionFx);
-
 		expect(actor.dragging).toBe(false);
-		expect(actor.size * actor.container.scale.x).toBe(readTestInventoryLayout(600).actorSize);
+		expect(actor.size).toBe(originalBaseSize);
+		expect(actor.container.x).toBe(0);
+		stage.emit("pointerup", slotPointer(1));
+		expect(sceneState.drop).not.toHaveBeenCalled();
 		await Effect.runPromise(runtime.closeFx);
 	});
 });

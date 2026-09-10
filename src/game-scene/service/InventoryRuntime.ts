@@ -6,6 +6,7 @@ import type { GameTransition } from "~/game-session/type/GameSession";
 export interface InventoryRuntime {
 	readonly canvas: HTMLCanvasElement;
 	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
+	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
 	readonly projectSpaceActivationFx: (
 		transition: GameTransition,
 	) => Effect.Effect<void, never, never>;

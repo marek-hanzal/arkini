@@ -4,17 +4,23 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createMainCameraFx } from "~/game-scene/fx/createMainCameraFx";
+import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
+import { readInventoryLayoutFn } from "~/game-scene/fn/readInventoryLayoutFn";
+import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
 const cleanup: Array<() => void> = [];
 afterEach(() => {
 	for (const closeFn of cleanup.splice(0)) closeFn();
 });
 
-const mountFn = () => {
+const mountFn = (
+	surfaces: readonly [
+		SurfaceLayout,
+		...SurfaceLayout[],
+	],
+) => {
 	const canvas = document.createElement("canvas");
 	document.body.append(canvas);
 	let captured: number | null = null;
@@ -40,7 +46,7 @@ const mountFn = () => {
 	};
 	let resizeFn = () => {};
 	const camera = Effect.runSync(
-		createMainCameraFx({
+		createBoardCameraFx({
 			dragThreshold: 5,
 			application: {
 				app: {
@@ -62,15 +68,8 @@ const mountFn = () => {
 			drag: {
 				cancelInteractionFx: Effect.sync(cancelFn),
 				setInteractionBlockedFx: (blocked: boolean) => Effect.sync(() => blockFn(blocked)),
-			} as unknown as MainDragController,
-			layout: readMainLayoutFn({
-				boardHeight: 3,
-				boardWidth: 4,
-				toolbarSize: 2,
-				fixedCellSize: 512,
-				width: 1000,
-				height: 800,
-			}),
+			},
+			surfaces,
 		}),
 	);
 	cleanup.push(() => {
@@ -118,9 +117,41 @@ const mountFn = () => {
 	};
 };
 
-describe("main camera", () => {
+const mainLayout = readMainLayoutFn({
+	boardHeight: 3,
+	boardWidth: 4,
+	toolbarSize: 2,
+	fixedCellSize: 512,
+	width: 1000,
+	height: 800,
+});
+const cases: Array<{
+	name: string;
+	surfaces: readonly [
+		SurfaceLayout,
+		...SurfaceLayout[],
+	];
+}> = [
+	{
+		name: "Board + Toolbar",
+		surfaces: [
+			mainLayout.board,
+			mainLayout.toolbar!,
+		],
+	},
+	{
+		name: "Inventory",
+		surfaces: [
+			readInventoryLayoutFn({
+				columns: 5,
+				rows: 4,
+			}).surface,
+		],
+	},
+];
+describe.each(cases)("$name camera", ({ surfaces }) => {
 	it("resets the shared game/editor camera with 0 while respecting text fields and overlays", () => {
-		const mounted = mountFn();
+		const mounted = mountFn(surfaces);
 		const initial = {
 			x: mounted.stage.x,
 			y: mounted.stage.y,
@@ -164,7 +195,7 @@ describe("main camera", () => {
 	});
 
 	it("lets short right clicks reach tiles but claims a right drag before tile activation", () => {
-		const mounted = mountFn();
+		const mounted = mountFn(surfaces);
 		const tileDownFn = vi.fn();
 		const tileUpFn = vi.fn();
 		mounted.canvas.addEventListener("pointerdown", tileDownFn);
@@ -186,7 +217,7 @@ describe("main camera", () => {
 	});
 
 	it("anchors zoom at the pointer and preserves world framing through resize", () => {
-		const mounted = mountFn();
+		const mounted = mountFn(surfaces);
 		const before = mounted.stage.toLocal({
 			x: 300,
 			y: 200,
@@ -218,7 +249,7 @@ describe("main camera", () => {
 	});
 
 	it("releases right-drag on blur, overlays and teardown", () => {
-		const mounted = mountFn();
+		const mounted = mountFn(surfaces);
 		const x = mounted.stage.x;
 		mounted.pointerFn("pointerdown", 100, 100, 0);
 		mounted.pointerFn("pointermove", 150, 120, 0);

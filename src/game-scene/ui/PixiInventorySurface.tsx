@@ -1,15 +1,15 @@
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { useBoardRuntime } from "~/game-scene/ui/useBoardRuntime";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { createInventoryRuntimeFx } from "~/game-scene/fx/createInventoryRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
-import type { InventoryRuntime } from "~/game-scene/service/InventoryRuntime";
 
 /**
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
@@ -26,9 +26,7 @@ export const PixiInventorySurface = ({
 	const game = useGameEngine();
 	const { releaseInventoryItemFn, runSpaceActivationFn, runDropFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
-	const { interaction, textures } = usePixiGameRuntime();
-	const hostRef = useRef<HTMLDivElement>(null);
-	const runtimeRef = useRef<InventoryRuntime | null>(null);
+	const { textures } = usePixiGameRuntime();
 	const controlsRef = useRef({
 		itemDetail,
 		onSpaceActivatedFn,
@@ -87,13 +85,8 @@ export const PixiInventorySurface = ({
 		[],
 	);
 
-	useLayoutEffect(() => {
-		const host = hostRef.current;
-		if (host === null) return;
-		let cancelled = false;
-		let runtime: InventoryRuntime | null = null;
-		let unregisterInteractionFn: () => void = () => undefined;
-		void RendererRuntime.runPromise(
+	const createRuntimeFx = useCallback(
+		(host: HTMLElement) =>
 			createInventoryRuntimeFx({
 				dragThreshold: PointerDragThreshold,
 				game,
@@ -102,40 +95,17 @@ export const PixiInventorySurface = ({
 				onDropFn: runDropFn,
 				textures,
 			}),
-		)
-			.then((created) => {
-				if (cancelled) {
-					return RendererRuntime.runPromise(created.closeFx);
-				}
-				runtime = created;
-				runtimeRef.current = created;
-				unregisterInteractionFn = RendererRuntime.runSync(
-					interaction.registerFx(() =>
-						RendererRuntime.runSync(created.cancelInteractionFx),
-					),
-				);
-			})
-			.catch((cause) => {
-				if (cancelled) return;
-				game.reportCriticalFailureFn("game-presentation", cause);
-			});
-		return () => {
-			cancelled = true;
-			unregisterInteractionFn();
-			if (runtime !== null) {
-				if (runtimeRef.current === runtime) runtimeRef.current = null;
-				void RendererRuntime.runPromise(runtime.closeFx).catch((cause) => {
-					console.error("Pixi Inventory scene failed to close.", cause);
-				});
-			}
-		};
-	}, [
-		activateFn,
+		[
+			activateFn,
+			game,
+			runDropFn,
+			textures,
+		],
+	);
+	const { hostRef, runtimeRef } = useBoardRuntime({
+		createRuntimeFx,
 		game,
-		interaction,
-		runDropFn,
-		textures,
-	]);
+	});
 
 	return (
 		<div

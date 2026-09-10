@@ -32,6 +32,7 @@ import type {
 export interface InventoryDragController {
 	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
+	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly refreshPreviewFx: Effect.Effect<void, never, never>;
 	readonly removeActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
@@ -57,6 +58,8 @@ interface ActiveInventoryDrag {
 	readonly actor: PixiTileActor;
 	readonly openDetail: boolean;
 	readonly pointerId: number;
+	readonly pressScreenX: number;
+	readonly pressScreenY: number;
 	readonly pressX: number;
 	readonly pressY: number;
 	readonly sourceItem: TileActorItem;
@@ -104,6 +107,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 		const removalFeedbackGenerationByActorId = new Map<string, number>();
 		let activeDrag: ActiveInventoryDrag | null = null;
 		let closed = false;
+		let blocked = false;
 
 		const releasePointerCaptureFn = (pointerId: number) => {
 			try {
@@ -336,10 +340,22 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 		};
 
 		const onPointerMoveFn = (event: FederatedPointerEvent) => {
-			const pointer = readPointerOffsetFn(event, activeDrag);
+			const point = application.stage.toLocal(event.global);
+			const pointer = readPointerOffsetFn(
+				{
+					pointerId: event.pointerId,
+					global: point,
+				},
+				activeDrag,
+			);
 			if (pointer === null) return;
 			const { drag, offsetX, offsetY } = pointer;
-			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
+			if (
+				drag.phase === "pressed" &&
+				Math.hypot(event.global.x - drag.pressScreenX, event.global.y - drag.pressScreenY) <
+					dragThreshold
+			)
+				return;
 			if (drag.phase === "pressed" && drag.openDetail) {
 				releasePointerCaptureFn(drag.pointerId);
 				activeDrag = null;
@@ -363,11 +379,13 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			);
 			previewTargetFn(
 				drag,
-				RendererRuntime.runSync(surface.readDropTargetFx(event.global.x, event.global.y)),
+				RendererRuntime.runSync(surface.readDropTargetFx(point.x, point.y)),
 			);
 		};
 
 		const finishPointerFn = (event: FederatedPointerEvent) => {
+			onPointerMoveFn(event);
+			const point = application.stage.toLocal(event.global);
 			const drag = activeDrag;
 			if (
 				drag === null ||
@@ -382,9 +400,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				activateActorFn(drag.actor, drag.openDetail);
 				return;
 			}
-			const target = RendererRuntime.runSync(
-				surface.readDropTargetFx(event.global.x, event.global.y),
-			);
+			const target = RendererRuntime.runSync(surface.readDropTargetFx(point.x, point.y));
 			// The occupant may have changed while the pointer remained over this slot.
 			const sourceItem = previewTargetFn(drag, target, true);
 			if (sourceItem === null) return;
@@ -478,6 +494,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					const onPointerDownFn = (event: FederatedPointerEvent) => {
 						if (
 							closed ||
+							blocked ||
 							activeDrag !== null ||
 							!event.isPrimary ||
 							(event.button !== 0 && event.button !== 2)
@@ -490,12 +507,15 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 						} catch {
 							// Pixi continues to receive in-canvas events without DOM capture.
 						}
+						const point = application.stage.toLocal(event.global);
 						activeDrag = {
 							actor,
 							openDetail: event.button === 2,
 							pointerId: event.pointerId,
-							pressX: event.global.x,
-							pressY: event.global.y,
+							pressX: point.x,
+							pressY: point.y,
+							pressScreenX: event.global.x,
+							pressScreenY: event.global.y,
 							phase: "pressed",
 							sourceItem: actor.item,
 							startX: actor.container.x,
@@ -514,6 +534,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				}),
 			),
 			cancelInteractionFx: Effect.sync(cancelInteractionFn),
+			setInteractionBlockedFx: (nextBlocked: boolean) =>
+				Effect.sync(() => {
+					blocked = nextBlocked;
+					if (blocked) cancelInteractionFn();
+				}),
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;

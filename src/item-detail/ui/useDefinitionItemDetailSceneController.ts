@@ -31,7 +31,7 @@ export namespace useDefinitionItemDetailSceneController {
 				readonly title: string;
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
-				readonly description: string;
+				readonly description?: string;
 				readonly itemType: TypeSchema.Type;
 				readonly storageScope: StorageSchema.Type;
 				readonly maxStackSize: number;

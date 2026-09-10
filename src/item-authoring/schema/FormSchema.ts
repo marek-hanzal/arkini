@@ -11,7 +11,7 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
-export type FormValues = Omit<BaseSchema.Type, "asset" | "merge"> & {
+export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"> & {
 	readonly asset: {
 		readonly default: [
 			string,
@@ -19,6 +19,7 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "merge"> & {
 		];
 		readonly sources: string[];
 	};
+	readonly description: string;
 	readonly type: TypeSchema.Type;
 	readonly durationMs?: number;
 	readonly enable?: boolean;
@@ -110,8 +111,14 @@ const bindSelfPaidDepositsToOwnerFn = (candidate: FormValues): FormValues => ({
  */
 export const FormSchema = z.custom<FormValues>().transform((candidate, context) => {
 	const normalized = bindSelfPaidDepositsToOwnerFn(candidate);
+	const { description, ...item } = normalized;
 	const result = ItemSchema.safeParse({
-		...normalized,
+		...item,
+		...(description.trim() === ""
+			? {}
+			: {
+					description,
+				}),
 		asset: readCanonicalItemArtworkFn(normalized.asset),
 	});
 	if (result.success) return result.data;

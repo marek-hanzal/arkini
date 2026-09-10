@@ -86,6 +86,7 @@ export const IdentitySection = () => {
 					<field.TextAreaField
 						fill
 						label="Description"
+						optional
 					/>
 				)}
 			</form.AppField>

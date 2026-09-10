@@ -6,10 +6,11 @@ import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { Scrollable } from "~/ui/ui/Scrollable";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export namespace ItemInfoTab {
 	export interface Detail {
-		readonly description: string;
+		readonly description?: string;
 		readonly itemType: TypeSchema.Type;
 		readonly storageScope: StorageSchema.Type;
 		readonly location?: readItemDetailInfoFn.Location;
@@ -140,16 +141,26 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 			className="h-full pr-1"
 			data-ui="ItemInfoTab"
 		>
-			<section className="pb-5">
-				<p
-					className="max-w-4xl text-pretty text-base leading-relaxed text-muted"
-					data-ui="ItemInfoDescription"
-				>
-					{detail.description}
-				</p>
-			</section>
+			{detail.description === undefined ? null : (
+				<section className="pb-5">
+					<p
+						className="max-w-4xl text-pretty text-base leading-relaxed text-muted"
+						data-ui="ItemInfoDescription"
+					>
+						{detail.description}
+					</p>
+				</section>
+			)}
 
-			<section className="border-t border-line pt-2">
+			<section
+				className="pt-2 data-[ui-has-description=true]:border-t data-[ui-has-description=true]:border-line"
+				{...readDataUiFn({
+					dataUi: "ItemInfoFacts",
+					state: {
+						hasDescription: detail.description !== undefined,
+					},
+				})}
+			>
 				<FactList>
 					{fact.map((entry) => (
 						<Fact

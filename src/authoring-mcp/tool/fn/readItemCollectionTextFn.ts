@@ -30,8 +30,12 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 				`- ${item.title}`,
 				`  ID: ${item.id}`,
 				`  Type: ${item.type}`,
-				"  Description:",
-				indentTextFn(item.description),
+				...(item.description === undefined
+					? []
+					: [
+							"  Description:",
+							indentTextFn(item.description),
+						]),
 			].join("\n"),
 		)
 		.join("\n\n");

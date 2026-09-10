@@ -27,6 +27,7 @@ const createTargetPaidInput = (itemId: string) => ({
 
 const readFormValues = (item: ItemSchema.Type): FormValues => ({
 	...item,
+	description: item.description ?? "",
 	asset: {
 		default: [
 			item.asset.default[0],

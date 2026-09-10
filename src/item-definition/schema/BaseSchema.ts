@@ -33,10 +33,10 @@ export const BaseSchema = z
 		 */
 		title: TitleSchema.describe("The human-readable title of this item."),
 		/**
-		 * Human-readable explanation of this item's purpose.
+		 * Optional human-readable explanation of this item's purpose.
 		 */
-		description: DescriptionSchema.describe(
-			"The human-readable explanation of this item's purpose.",
+		description: DescriptionSchema.optional().describe(
+			"The optional human-readable explanation of this item's purpose.",
 		),
 		/**
 		 * Visual asset definition used to render this item.

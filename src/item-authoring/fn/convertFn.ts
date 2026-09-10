@@ -15,7 +15,11 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 		uid: item.uid,
 		id: item.id,
 		title: item.title,
-		description: item.description,
+		...(item.description === undefined
+			? {}
+			: {
+					description: item.description,
+				}),
 		asset: item.asset,
 		scope: item.scope,
 		...(item.maxCount === undefined

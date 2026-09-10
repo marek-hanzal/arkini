@@ -171,8 +171,12 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 			`ID: ${item.id}`,
 			`UID: ${item.uid}`,
 			`Type: ${item.type}`,
-			"Description:",
-			...item.description.split("\n").map((line) => `  ${line}`),
+			...(item.description === undefined
+				? []
+				: [
+						"Description:",
+						...item.description.split("\n").map((line) => `  ${line}`),
+					]),
 			`Storage: ${item.scope}`,
 			`Stack capacity: ${item.maxStackSize}`,
 			...(item.maxCount === undefined
@@ -374,7 +378,7 @@ const createServerFn = (
 		"item_collection",
 		{
 			description:
-				"List one page of items with collection metadata, title, ID, complete description, and type, optionally filtered by item types and the editor's fuzzy search.",
+				"List one page of items with collection metadata, title, ID, optional description, and type, optionally filtered by item types and the editor's fuzzy search.",
 			inputSchema: ItemCollectionInputSchema,
 		},
 		async (input) =>

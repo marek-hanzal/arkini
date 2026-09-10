@@ -6,6 +6,7 @@ import type { SectionId } from "~/item-authoring/type/Section";
 type OptionalCapability = "charges" | "merges";
 
 interface EditorItemFormSearch {
+	readonly defaultDraft?: boolean;
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enable?: OptionalCapability;
@@ -19,6 +20,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	validateSearch: (search): EditorItemFormSearch => {
 		const merge = typeof search.merge === "number" ? search.merge : Number.NaN;
 		return {
+			...(typeof search.defaultDraft === "boolean"
+				? {
+						defaultDraft: search.defaultDraft,
+					}
+				: {}),
 			...(typeof search.defaultItemId === "string" && search.defaultItemId.length > 0
 				? {
 						defaultItemId: search.defaultItemId,
@@ -58,8 +64,16 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	},
 	component: () => {
 		const { itemUid } = Route.useParams();
-		const { defaultItemId, defaultTitle, enable, itemType, lineId, merge, resourceId } =
-			Route.useSearch();
+		const {
+			defaultDraft,
+			defaultItemId,
+			defaultTitle,
+			enable,
+			itemType,
+			lineId,
+			merge,
+			resourceId,
+		} = Route.useSearch();
 		const params = useParams({
 			strict: false,
 		});
@@ -68,6 +82,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		) as SectionId;
 		return (
 			<Form
+				defaultDraft={defaultDraft}
 				defaultItemId={defaultItemId}
 				defaultTitle={defaultTitle}
 				enableCapability={enable}

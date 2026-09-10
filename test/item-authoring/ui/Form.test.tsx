@@ -80,6 +80,7 @@ describe("Form", () => {
 					project.resources[0]?.id,
 				],
 			},
+			draft: false,
 			type: "simple",
 			uid,
 		});
@@ -94,6 +95,7 @@ describe("Form", () => {
 		await act(async () => {
 			root.render(
 				createElement(Form, {
+					defaultDraft: true,
 					defaultItemId: "selected_asset-name",
 					defaultTitle: "Selected Asset Name",
 					itemType: "blueprint",
@@ -111,6 +113,7 @@ describe("Form", () => {
 					"selected_asset-name",
 				],
 			},
+			draft: true,
 			id: "selected_asset-name",
 			line: {
 				id: "line:selected_asset-name:default",

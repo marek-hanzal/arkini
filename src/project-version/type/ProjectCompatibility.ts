@@ -5,6 +5,7 @@ export type ProjectCompatibilityRule =
 	| "about-avatar"
 	| "game-title"
 	| "item-default-artwork"
+	| "item-draft-status"
 	| "item-progress-artwork"
 	| "item-title"
 	| "item-description"
@@ -19,7 +20,7 @@ export type ProjectCompatibilityRule =
 interface ProjectCompatibilityContextBase {
 	readonly message: string;
 	readonly path: ProjectCompatibilityPath;
-	readonly result: ProjectCompatibilityDiffResult;
+	readonly result: ProjectCompatibilityResult;
 	readonly rule: ProjectCompatibilityRule;
 }
 

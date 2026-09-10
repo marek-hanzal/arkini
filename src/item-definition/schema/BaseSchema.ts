@@ -33,6 +33,18 @@ export const BaseSchema = z
 		 */
 		title: TitleSchema.describe("The human-readable title of this item."),
 		/**
+		 * Lightweight Editor authoring status with no gameplay semantics.
+		 *
+		 * Older item files omit this field and remain equivalent to an explicitly
+		 * completed item.
+		 */
+		draft: z
+			.boolean()
+			.optional()
+			.describe(
+				"Whether this item still needs authoring work in the Editor; omitted means false.",
+			),
+		/**
 		 * Optional human-readable explanation of this item's purpose.
 		 */
 		description: DescriptionSchema.optional().describe(

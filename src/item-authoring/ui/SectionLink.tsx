@@ -11,6 +11,7 @@ const inactiveProps = {
 } as const;
 
 export const SectionLink = ({
+	defaultDraft,
 	defaultItemId,
 	defaultTitle,
 	destination = "form",
@@ -20,6 +21,7 @@ export const SectionLink = ({
 	resourceId,
 	section,
 }: {
+	readonly defaultDraft?: boolean;
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly destination?: "detail" | "form";
@@ -41,6 +43,11 @@ export const SectionLink = ({
 			sectionId: section.id,
 		}}
 		search={{
+			...(defaultDraft === undefined
+				? {}
+				: {
+						defaultDraft,
+					}),
 			...(defaultItemId === undefined
 				? {}
 				: {

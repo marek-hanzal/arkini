@@ -11,6 +11,7 @@ import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
 /** Selects an item discriminator before opening its standard explicit-save form. */
 export const ItemTypeMenu = ({
 	dataUi,
+	defaultDraft,
 	defaultItemId,
 	defaultTitle,
 	description,
@@ -24,6 +25,7 @@ export const ItemTypeMenu = ({
 	variant = "default",
 }: {
 	readonly dataUi: string;
+	readonly defaultDraft?: boolean;
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly description: string;
@@ -85,6 +87,11 @@ export const ItemTypeMenu = ({
 									sectionId: "identity",
 								}}
 								search={{
+									...(defaultDraft === undefined
+										? {}
+										: {
+												defaultDraft,
+											}),
 									...(defaultItemId === undefined
 										? {}
 										: {

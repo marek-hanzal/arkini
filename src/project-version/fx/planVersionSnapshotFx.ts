@@ -86,9 +86,11 @@ const materializePlanFn = ({
 			throw new Error(`Editor item ${item.uid} is stored under mismatched ID ${id}.`);
 		if (itemUids.has(item.uid)) throw new Error(`Editor item UID ${item.uid} is duplicated.`);
 		itemUids.add(item.uid);
+		const versionItem =
+			item.draft === true ? item : (({ draft: _draft, ...versioned }) => versioned)(item);
 		itemHashes.push([
 			item.uid,
-			addJsonFn(item),
+			addJsonFn(versionItem),
 		]);
 	}
 

@@ -344,6 +344,10 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
@@ -1734,6 +1738,10 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
@@ -1824,6 +1832,10 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
@@ -1894,6 +1906,10 @@
 				"title": {
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
+				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
 				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
@@ -2014,6 +2030,10 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
@@ -2105,6 +2125,10 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
@@ -2181,6 +2205,10 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
@@ -2256,6 +2284,10 @@
 				"title": {
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
+				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
 				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
@@ -2346,6 +2378,10 @@
 				"title": {
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
+				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
 				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",

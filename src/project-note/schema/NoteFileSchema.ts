@@ -1,12 +1,13 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
+import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
 
 /** Portable note body whose project identity is owned by its containing directory. */
 export const NoteFileSchema = z
 	.object({
 		content: NoteContentSchema,
+		itemUids: NoteSchema.shape.itemUids.optional().default([]),
 		createdAtMs: NonNegativeIntegerSchema,
 		updatedAtMs: NonNegativeIntegerSchema,
 	})

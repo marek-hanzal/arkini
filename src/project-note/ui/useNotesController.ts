@@ -1,35 +1,51 @@
 import { useEffect, useState } from "react";
 
-import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { NoteContentMaxLength, type NoteSchema } from "~/project-note/schema/NoteSchema";
-import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
+import type { useProjectNotes } from "~/project-note/ui/useProjectNotes";
 
 export namespace useNotesController {
+	export interface Props {
+		readonly collection: useProjectNotes.Output;
+		readonly notes: ReadonlyArray<NoteSchema.Type>;
+		readonly requiredCurrentItemUid?: string;
+		readonly defaultItemUids: ReadonlyArray<string>;
+	}
 	export interface Output {
 		readonly cancelEditFn: () => void;
 		readonly canCreate: boolean;
 		readonly canSaveEdit: boolean;
 		readonly createFn: () => void;
 		readonly editContent: string;
+		readonly editItemUids: ReadonlyArray<string>;
 		readonly editingNoteId?: string;
 		readonly error?: unknown;
 		readonly loaded: boolean;
 		readonly loading: boolean;
 		readonly newContent: string;
+		readonly newItemUids: ReadonlyArray<string>;
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly pending: boolean;
 		readonly removeFn: (note: NoteSchema.Type) => void;
 		readonly retryFn: () => void;
 		readonly saveEditFn: () => void;
+		readonly setEditItemUidsFn: (itemUids: ReadonlyArray<string>) => void;
+		readonly setNewItemUidsFn: (itemUids: ReadonlyArray<string>) => void;
+		readonly unlinkFn: (note: NoteSchema.Type, itemUid: string) => void;
 		readonly setEditContentFn: (content: string) => void;
 		readonly setNewContentFn: (content: string) => void;
 		readonly startEditFn: (note: NoteSchema.Type) => void;
 	}
 }
 
-export const useNotesController = (): useNotesController.Output => {
-	const project = useEditorProject();
-	const { error, loaded, loading, notes, pending, runFn } = useProjectNotes(project.projectId);
+export const useNotesController = ({
+	collection,
+	notes,
+	requiredCurrentItemUid,
+	defaultItemUids,
+}: useNotesController.Props): useNotesController.Output => {
+	const { error, loaded, loading, pending, runFn } = collection;
+	const [newItemUids, setNewItemUidsFn] = useState(defaultItemUids);
+	const [editItemUids, setEditItemUidsFn] = useState<ReadonlyArray<string>>([]);
 	const [editContent, setEditContentFn] = useState("");
 	const [editingNote, setEditingNoteFn] = useState<
 		Pick<NoteSchema.Type, "noteId" | "updatedAtMs"> | undefined
@@ -58,8 +74,21 @@ export const useNotesController = (): useNotesController.Output => {
 		void runFn({
 			action: "create",
 			content: newContent,
+			itemUids: [
+				...new Set(
+					requiredCurrentItemUid === undefined
+						? newItemUids
+						: [
+								...newItemUids,
+								requiredCurrentItemUid,
+							],
+				),
+			],
 		})
-			.then(() => setNewContentFn(""))
+			.then(() => {
+				setNewContentFn("");
+				setNewItemUidsFn(defaultItemUids);
+			})
 			.catch(() => undefined);
 	};
 	const startEditFn = (note: NoteSchema.Type) => {
@@ -68,6 +97,7 @@ export const useNotesController = (): useNotesController.Output => {
 			updatedAtMs: note.updatedAtMs,
 		});
 		setEditContentFn(note.content);
+		setEditItemUidsFn(note.itemUids);
 	};
 	const cancelEditFn = () => {
 		if (pending) return;
@@ -80,6 +110,9 @@ export const useNotesController = (): useNotesController.Output => {
 			action: "update",
 			noteId: editingNote.noteId,
 			content: editContent,
+			itemUids: [
+				...editItemUids,
+			],
 			expectedUpdatedAtMs: editingNote.updatedAtMs,
 		})
 			.then(() => {
@@ -96,6 +129,16 @@ export const useNotesController = (): useNotesController.Output => {
 			expectedUpdatedAtMs: note.updatedAtMs,
 		}).catch(() => undefined);
 	};
+	const unlinkFn = (note: NoteSchema.Type, itemUid: string) => {
+		if (pending || editingNote !== undefined) return;
+		void runFn({
+			action: "update",
+			noteId: note.noteId,
+			content: note.content,
+			itemUids: note.itemUids.filter((linkedUid) => linkedUid !== itemUid),
+			expectedUpdatedAtMs: note.updatedAtMs,
+		}).catch(() => undefined);
+	};
 	const retryFn = () => {
 		if (pending) return;
 		void runFn({
@@ -109,6 +152,7 @@ export const useNotesController = (): useNotesController.Output => {
 		canSaveEdit,
 		createFn,
 		editContent,
+		editItemUids,
 		...(editingNoteId === undefined
 			? {}
 			: {
@@ -122,12 +166,16 @@ export const useNotesController = (): useNotesController.Output => {
 		loading,
 		loaded,
 		newContent,
+		newItemUids,
 		notes,
 		pending,
 		removeFn,
 		retryFn,
 		saveEditFn,
 		setEditContentFn,
+		setEditItemUidsFn,
+		setNewItemUidsFn,
+		unlinkFn,
 		setNewContentFn,
 		startEditFn,
 	};

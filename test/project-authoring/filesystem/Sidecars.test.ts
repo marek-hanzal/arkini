@@ -23,12 +23,14 @@ describe("filesystem Editor project sidecars", () => {
 		const project = await harness.createProject(repository);
 		const created = await Effect.runPromise(
 			repository.createNoteFx({
+				itemUids: [],
 				projectId: project.projectId,
 				content: "Original note",
 			}),
 		);
 		const updated = await Effect.runPromise(
 			repository.updateNoteFx({
+				itemUids: [],
 				projectId: project.projectId,
 				noteId: created.noteId,
 				content: "Current note",
@@ -39,6 +41,7 @@ describe("filesystem Editor project sidecars", () => {
 		await expect(
 			Effect.runPromise(
 				repository.updateNoteFx({
+					itemUids: [],
 					projectId: project.projectId,
 					noteId: created.noteId,
 					content: "Stale overwrite",
@@ -91,24 +94,28 @@ describe("filesystem Editor project sidecars", () => {
 		]);
 
 		await Effect.runPromise(repository.refreshProjectFx(project.projectId));
-		expect(
-			(await Effect.runPromise(repository.listNotesFx(project.projectId))).map(
-				(note) => note.noteId,
-			),
-		).toEqual([
-			"\udc00",
-			"\ud800",
+		expect(await Effect.runPromise(repository.listNotesFx(project.projectId))).toEqual([
+			expect.objectContaining({
+				noteId: "\udc00",
+				itemUids: [],
+			}),
+			expect.objectContaining({
+				noteId: "\ud800",
+				itemUids: [],
+			}),
 		]);
 
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
-		expect(
-			(await Effect.runPromise(reopened.listNotesFx(project.projectId))).map(
-				(note) => note.noteId,
-			),
-		).toEqual([
-			"\udc00",
-			"\ud800",
+		expect(await Effect.runPromise(reopened.listNotesFx(project.projectId))).toEqual([
+			expect.objectContaining({
+				noteId: "\udc00",
+				itemUids: [],
+			}),
+			expect.objectContaining({
+				noteId: "\ud800",
+				itemUids: [],
+			}),
 		]);
 	});
 
@@ -119,6 +126,7 @@ describe("filesystem Editor project sidecars", () => {
 		if (root === null) throw new Error("Expected the managed project root.");
 		const note = await Effect.runPromise(
 			repository.createNoteFx({
+				itemUids: [],
 				projectId: project.projectId,
 				content: "Editor-owned note",
 			}),

@@ -32,6 +32,7 @@ describe("filesystem Editor project writes", () => {
 		);
 		await Effect.runPromise(
 			repository.createNoteFx({
+				itemUids: [],
 				projectId: created.projectId,
 				content: "Keep this note",
 			}),
@@ -61,6 +62,7 @@ describe("filesystem Editor project writes", () => {
 		expect(await Effect.runPromise(repository.listNotesFx("project-renamed"))).toEqual([
 			expect.objectContaining({
 				content: "Keep this note",
+				itemUids: [],
 				projectId: "project-renamed",
 			}),
 		]);

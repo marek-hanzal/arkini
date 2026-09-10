@@ -138,6 +138,26 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				}))
 				.sort((left, right) => left.id.localeCompare(right.id)),
 		};
+		// Reconcile against the completed config: force cleanup may remove additional owners.
+		// Notes and the item tree share the journal and become visible only after it commits.
+		const remainingItemUids = new Set(
+			Object.values(canonicalConfig.items).map((item) => item.uid),
+		);
+		const noteUpdatedAtMs = state.notes.reduce(
+			(latest, note) => Math.max(latest, note.updatedAtMs + 1),
+			nowMs,
+		);
+		const notes = state.notes.map((note) => {
+			const itemUids = note.itemUids.filter((uid) => remainingItemUids.has(uid));
+			return itemUids.length === note.itemUids.length
+				? note
+				: {
+						...note,
+						itemUids,
+						updatedAtMs: noteUpdatedAtMs,
+					};
+		});
+		const noteUpdates = notes.filter((note, index) => note !== state.notes[index]);
 		yield* writeProjectFx({
 			root: state.paths.root,
 			previous: {
@@ -156,15 +176,20 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				resources,
 			},
 			removeVersionHead: projectIdChanged,
+			noteUpdates,
 		});
 		const nextState: ProjectState = {
 			...state,
-			notes: projectIdChanged
-				? state.notes.map((note) => ({
-						...note,
-						projectId: nextProjectId,
-					}))
-				: state.notes,
+			notes: notes
+				.map((note) => ({
+					...note,
+					projectId: nextProjectId,
+				}))
+				.sort(
+					(left, right) =>
+						right.updatedAtMs - left.updatedAtMs ||
+						right.noteId.localeCompare(left.noteId),
+				),
 			project: nextProject,
 			scenarios: projectIdChanged
 				? state.scenarios.map((scenario) => ({

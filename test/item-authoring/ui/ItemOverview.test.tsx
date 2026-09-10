@@ -90,6 +90,7 @@ describe("ItemOverview", () => {
 			"merges",
 			"estimate",
 			"connections",
+			"notes",
 			"delete",
 		]);
 		for (const link of links) {

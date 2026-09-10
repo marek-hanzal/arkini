@@ -14,6 +14,25 @@ import { SpaceActionDetail } from "~/item-authoring/ui/SpaceActionDetail";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { ProjectNotes } from "~/project-note/ui/ProjectNotes";
+import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
+
+const ItemNotes = ({ itemUid }: { readonly itemUid: string }) => {
+	const project = useEditorProject();
+	const collection = useProjectNotes(project.projectId);
+	return (
+		<ProjectNotes
+			collection={collection}
+			notes={collection.notes.filter((note) => note.itemUids.includes(itemUid))}
+			requiredCurrentItemUid={itemUid}
+			defaultItemUids={[
+				itemUid,
+			]}
+		/>
+	);
+};
+
 interface EditorItemDetailRouteSearch {
 	readonly filter?: ItemConnectionFilter;
 }
@@ -88,6 +107,13 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 					/>
 				);
 			}
+			case "notes":
+				return (
+					<ItemNotes
+						key={item.uid}
+						itemUid={item.uid}
+					/>
+				);
 			case "delete":
 				return <DeleteSection item={item} />;
 		}

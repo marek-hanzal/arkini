@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import type { Project } from "~/project-authoring/type/Project";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { NoteContentSchema, type NoteSchema } from "~/project-note/schema/NoteSchema";
+import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 
@@ -29,6 +29,7 @@ const NoteCollectionInputSchema = z
 			.max(100)
 			.default(25)
 			.describe("Maximum notes per page; defaults to 25 and is capped at 100."),
+		itemUid: IdSchema.optional().describe("Only notes linked to this immutable item UID."),
 		query: z
 			.string()
 			.optional()
@@ -38,7 +39,8 @@ const NoteCollectionInputSchema = z
 	.meta({
 		$id: "urn:arkini:schema:mcp:note-collection-input",
 		title: "Note collection tool input",
-		description: "Pagination and full-content search for the project note collection.",
+		description:
+			"Item filtering, pagination and full-content search for the project note collection.",
 	});
 
 const NoteDetailInputSchema = z
@@ -55,12 +57,15 @@ const NoteDetailInputSchema = z
 const CreateNoteInputSchema = z
 	.object({
 		content: NoteContentSchema.describe("The complete Markdown note content."),
+		itemUids: NoteSchema.shape.itemUids.describe(
+			"Complete unique list of existing immutable item UIDs; use [] for a global unlinked note.",
+		),
 	})
 	.strict()
 	.meta({
 		$id: "urn:arkini:schema:mcp:create-note-input",
 		title: "Create note tool input",
-		description: "The complete content of a new project note.",
+		description: "The complete content and item relationships of a new project note.",
 	});
 
 const noteMutationSchema = z
@@ -75,6 +80,9 @@ const noteMutationSchema = z
 const EditNoteInputSchema = noteMutationSchema
 	.extend({
 		content: NoteContentSchema.describe("The complete replacement Markdown content."),
+		itemUids: NoteSchema.shape.itemUids.describe(
+			"Complete replacement list of immutable item UIDs; omitting a previous UID unlinks it.",
+		),
 	})
 	.strict()
 	.meta({
@@ -99,15 +107,29 @@ const readExcerptFn = (content: string) => {
 	return characters.length <= 240 ? normalized : `${characters.slice(0, 240).join("")}…`;
 };
 
+const readLinkedItemsFn = (note: NoteSchema.Type, project: Project) =>
+	note.itemUids.map((uid) => {
+		const item = Object.values(project.config.items).find((candidate) => candidate.uid === uid);
+		return {
+			uid,
+			id: item?.id ?? null,
+			title: item?.title ?? null,
+		};
+	});
+
 const readNoteCollectionTextFn = (
 	notes: ReadonlyArray<NoteSchema.Type>,
 	input: NoteCollectionInput,
+	project: Project,
 ) => {
 	const query = input.query?.trim().toLowerCase();
-	const matches =
-		query === undefined || query.length === 0
-			? notes
-			: notes.filter((note) => note.content.toLowerCase().includes(query));
+	const matches = notes.filter(
+		(note) =>
+			(input.itemUid === undefined || note.itemUids.includes(input.itemUid)) &&
+			(query === undefined ||
+				query.length === 0 ||
+				note.content.toLowerCase().includes(query)),
+	);
 	const totalPages = Math.ceil(matches.length / input.limit);
 	const pageNotes = matches.slice((input.page - 1) * input.limit, input.page * input.limit);
 	const hasPreviousPage = input.page > 1;
@@ -140,6 +162,7 @@ const readNoteCollectionTextFn = (
 					.map((note) =>
 						[
 							`- ${note.noteId}`,
+							`  Linked items: ${JSON.stringify(readLinkedItemsFn(note, project))}`,
 							`  Created: ${new Date(note.createdAtMs).toISOString()}`,
 							`  Updated: ${new Date(note.updatedAtMs).toISOString()}`,
 							`  Updated at ms: ${note.updatedAtMs}`,
@@ -197,14 +220,21 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Search matches complete note content before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Versions or Arkpacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid filters by immutable item UID. Linked items include their current authored IDs and human titles. Content search and item filtering run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Versions or Arkpacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => repository.listNotesFx(project.projectId)),
-					Effect.map((notes) => readNoteCollectionTextFn(notes, input)),
+					Effect.flatMap((project) =>
+						repository
+							.listNotesFx(project.projectId)
+							.pipe(
+								Effect.map((notes) =>
+									readNoteCollectionTextFn(notes, input, project),
+								),
+							),
+					),
 				),
 			),
 	);
@@ -212,14 +242,26 @@ export const registerNoteToolsFn = ({
 		"note_detail",
 		{
 			description:
-				"Read one complete project note as canonical JSON. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
+				"Read one complete project note as JSON, including linked item UIDs and resolved current authored IDs and human titles. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
 			inputSchema: NoteDetailInputSchema,
 		},
 		async ({ noteId }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readNoteFx(repository, project.projectId, noteId)),
-					Effect.map((note) => JSON.stringify(note, null, 2)),
+					Effect.flatMap((project) =>
+						readNoteFx(repository, project.projectId, noteId).pipe(
+							Effect.map((note) =>
+								JSON.stringify(
+									{
+										...note,
+										linkedItems: readLinkedItemsFn(note, project),
+									},
+									null,
+									2,
+								),
+							),
+						),
+					),
 				),
 			),
 	);
@@ -230,7 +272,7 @@ export const registerNoteToolsFn = ({
 				"Create and persist one Markdown note in the open project. Notes remain outside project Versions and Arkpacks.",
 			inputSchema: CreateNoteInputSchema,
 		},
-		async ({ content }) =>
+		async ({ content, itemUids }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
@@ -238,6 +280,7 @@ export const registerNoteToolsFn = ({
 							.createNoteFx({
 								projectId: project.projectId,
 								content,
+								itemUids,
 							})
 							.pipe(
 								Effect.tap(() =>
@@ -256,10 +299,10 @@ export const registerNoteToolsFn = ({
 		"edit_note",
 		{
 			description:
-				"Replace one complete Markdown note only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
+				"Replace complete Markdown content and item links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
 			inputSchema: EditNoteInputSchema,
 		},
-		async ({ content, expectedUpdatedAtMs, noteId }) =>
+		async ({ content, expectedUpdatedAtMs, itemUids, noteId }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
@@ -267,6 +310,7 @@ export const registerNoteToolsFn = ({
 							.updateNoteFx({
 								projectId: project.projectId,
 								content,
+								itemUids,
 								expectedUpdatedAtMs,
 								noteId,
 							})

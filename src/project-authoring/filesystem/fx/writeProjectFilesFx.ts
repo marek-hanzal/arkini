@@ -12,6 +12,8 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
+import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
+import { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
@@ -187,6 +189,7 @@ export namespace writeProjectFilesFx {
 		readonly next: ProjectFiles;
 		readonly previousScenarioNames?: ReadonlyArray<string>;
 		readonly removeVersionHead?: boolean;
+		readonly noteUpdates?: ReadonlyArray<NoteSchema.Type>;
 		readonly scenarios?: ReadonlyArray<BoardScenarioFileSchema.Type>;
 		readonly versionHead?: VersionHeadFileSchema.Type;
 	}
@@ -283,6 +286,21 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					const target = yield* paths.scenarioFileFx(name);
 					if (!scenarioTargets.has(target)) deletes.push(target);
 				}
+			}
+			for (const note of props.noteUpdates ?? []) {
+				const target = yield* paths.noteFileFx(note.noteId);
+				const body = yield* Effect.try(() =>
+					NoteFileSchema.parse({
+						content: note.content,
+						itemUids: note.itemUids,
+						createdAtMs: note.createdAtMs,
+						updatedAtMs: note.updatedAtMs,
+					}),
+				);
+				candidateWrites.push({
+					target,
+					bytes: encodeJsonFn(body),
+				});
 			}
 			if (versionHead !== undefined)
 				candidateWrites.push({

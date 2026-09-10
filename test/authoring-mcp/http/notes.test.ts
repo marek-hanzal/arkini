@@ -39,12 +39,14 @@ describe("editor MCP project notes", () => {
 			repository.createNoteFx({
 				projectId: "note-reading",
 				content: firstContent,
+				itemUids: [],
 			}),
 		);
 		const second = await Effect.runPromise(
 			repository.createNoteFx({
 				projectId: "note-reading",
 				content: "Second idea",
+				itemUids: [],
 			}),
 		);
 		ownership.setProjectContextFn("note-reading");
@@ -86,7 +88,10 @@ describe("editor MCP project notes", () => {
 				}),
 			),
 		);
-		expect(detail).toEqual(first);
+		expect(detail).toEqual({
+			...first,
+			linkedItems: [],
+		});
 	});
 
 	it("creates, freshness-guards, and deletes notes while notifying only committed mutations", async () => {
@@ -116,6 +121,7 @@ describe("editor MCP project notes", () => {
 			name: "create_note",
 			arguments: {
 				content: "**MCP idea**",
+				itemUids: [],
 			},
 		});
 		expect(createdResult.isError).not.toBe(true);
@@ -130,6 +136,7 @@ describe("editor MCP project notes", () => {
 				noteId: created.noteId,
 				expectedUpdatedAtMs: created.updatedAtMs,
 				content: "Updated by MCP",
+				itemUids: [],
 			},
 		});
 		expect(editedResult.isError).not.toBe(true);
@@ -144,6 +151,7 @@ describe("editor MCP project notes", () => {
 				noteId: created.noteId,
 				expectedUpdatedAtMs: created.updatedAtMs,
 				content: "Stale overwrite",
+				itemUids: [],
 			},
 		});
 		expect(staleEdit.isError).toBe(true);

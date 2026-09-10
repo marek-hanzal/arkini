@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { NoteContentSchema } from "~/project-note/schema/NoteSchema";
+import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import type { DiagnosticLog } from "../../diagnostics/createDiagnosticLogFx";
@@ -17,6 +17,7 @@ const createNoteSchema = z
 	.object({
 		projectId: IdSchema,
 		content: NoteContentSchema,
+		itemUids: NoteSchema.shape.itemUids,
 	})
 	.strict();
 const noteKeySchema = z
@@ -33,6 +34,7 @@ const deleteNoteSchema = noteKeySchema
 const updateNoteSchema = deleteNoteSchema
 	.extend({
 		content: NoteContentSchema,
+		itemUids: NoteSchema.shape.itemUids,
 	})
 	.strict();
 

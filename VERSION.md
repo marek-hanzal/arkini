@@ -51,7 +51,7 @@ Use the smallest non-derivable payload:
 | `game.json` | `$schema`, gameplay `version`, and complete non-item config; `meta.id` is package identity. |
 | `items/<type>/<uid>.json` | `$schema` plus direct `item`; path owns type/UID, item owns gameplay ID. |
 | `assets/<id>.png`, `resources/<id>.png` | Path owns ID/kind; extension owns current MIME. |
-| `notes/<noteId>.json` | Content and ordering timestamps; path owns note ID. |
+| `notes/<noteId>.json` | Markdown content, optional unique immutable `itemUids` links, and ordering/freshness timestamps; path owns note ID. |
 | `scenarios/<hash>.json` | Human name, revision, gameplay version, State bytes, and timestamps; hash path is content-safe identity. |
 | `versions/head.json` | Published current/list order. |
 | `versions/<versionId>/version.json` | Parent, subject/body/tag, writer/gameplay provenance, source revision, fingerprint, time; directory owns ID. |

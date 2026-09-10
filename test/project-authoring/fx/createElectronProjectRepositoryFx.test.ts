@@ -67,11 +67,12 @@ const installEditorApi = () => {
 		})),
 		awaitIdleFn: vi.fn(async () => success(undefined)),
 		createProjectFn: vi.fn(async () => success(project)),
-		createNoteFn: vi.fn(async ({ projectId, content }) =>
+		createNoteFn: vi.fn(async ({ projectId, content, itemUids }) =>
 			success({
 				noteId: "note-one",
 				projectId,
 				content,
+				itemUids,
 				createdAtMs: 12,
 				updatedAtMs: 12,
 			}),
@@ -165,11 +166,12 @@ const installEditorApi = () => {
 		createVersionFn: vi.fn(async () => success(version)),
 		checkoutVersionFn: vi.fn(async () => success(undefined)),
 		updateVersionTagFn: vi.fn(async () => success(version)),
-		updateNoteFn: vi.fn(async ({ projectId, noteId, content }) =>
+		updateNoteFn: vi.fn(async ({ projectId, noteId, content, itemUids }) =>
 			success({
 				noteId,
 				projectId,
 				content,
+				itemUids,
 				createdAtMs: 12,
 				updatedAtMs: 13,
 			}),
@@ -303,6 +305,7 @@ describe("createElectronProjectRepositoryFx", () => {
 					noteId: "foreign-note",
 					projectId: "another-project",
 					content: "Foreign",
+					itemUids: [],
 					createdAtMs: 1,
 					updatedAtMs: 1,
 				},
@@ -313,6 +316,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				noteId: "another-note",
 				projectId: "project-one",
 				content: "Wrong identity",
+				itemUids: [],
 				createdAtMs: 1,
 				updatedAtMs: 2,
 			}),
@@ -322,6 +326,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		const listFailure = await readTypedFailure(repository.listNotesFx("project-one"));
 		const updateFailure = await readTypedFailure(
 			repository.updateNoteFx({
+				itemUids: [],
 				projectId: "project-one",
 				noteId: "note-one",
 				expectedUpdatedAtMs: 1,

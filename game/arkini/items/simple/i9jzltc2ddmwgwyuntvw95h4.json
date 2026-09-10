@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "i9jzltc2ddmwgwyuntvw95h4",
+		"id": "amethyst-cow",
+		"title": "Amethyst Cow",
+		"draft": true,
+		"asset": {
+			"default": [
+				"amethyst-cow"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "t4k0262ytjcke16i1ap3y0we",
+		"id": "spoiled-popcorn",
+		"title": "Spoiled Popcorn",
+		"draft": true,
+		"asset": {
+			"default": [
+				"spoiled-popcorn"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

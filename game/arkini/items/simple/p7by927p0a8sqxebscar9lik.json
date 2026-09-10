@@ -30,6 +30,70 @@
 				"action": "use",
 				"effect": "replace",
 				"result": "clutter"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pot-with-coins"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "clutter",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "coin-stack"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "piggy-bank"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "clutter",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "coin-stack"
 			}
 		],
 		"type": "simple"

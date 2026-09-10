@@ -1,0 +1,20 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ucn64xjdrhaqucacp07bm6kh",
+		"id": "corrupted-deer",
+		"title": "Corrupted Deer",
+		"draft": true,
+		"asset": {
+			"default": [
+				"corrupted-deer"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 12
+		},
+		"type": "simple"
+	}
+}

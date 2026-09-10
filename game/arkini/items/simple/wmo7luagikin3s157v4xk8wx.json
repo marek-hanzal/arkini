@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wmo7luagikin3s157v4xk8wx",
+		"id": "empty-hop-field",
+		"title": "Empty Hop Field",
+		"asset": {
+			"default": [
+				"empty-hop-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

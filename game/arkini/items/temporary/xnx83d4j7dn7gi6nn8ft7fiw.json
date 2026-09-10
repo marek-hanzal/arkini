@@ -23,7 +23,7 @@
 							"type": "guaranteed",
 							"drop": [
 								{
-									"itemId": "bio-waste",
+									"itemId": "spoiled-raw-game-meat",
 									"quantity": {
 										"min": 2,
 										"max": 3

@@ -20,6 +20,33 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "holy-shit"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "toilet"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "faith-toilet"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bear"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "faith-bear"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wolf"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-puppy"
 			}
 		],
 		"type": "simple"

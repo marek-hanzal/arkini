@@ -1,5 +1,10 @@
 {
 	"content": "Labor tokeny + zlataky -> vyssi labor token (alias vyuka)",
+	"itemUids": [
+		"ejcs57zv68bas7jmizm7286p",
+		"s5z9wc6yevl1yzs693yr1z7z"
+	],
+	"resourceIds": [],
 	"createdAtMs": 1788722006220,
-	"updatedAtMs": 1788722006220
+	"updatedAtMs": 1789061603381
 }

@@ -43,6 +43,15 @@
 					]
 				},
 				"effect": "deposit"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wood"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "firewood"
 			}
 		],
 		"type": "simple"

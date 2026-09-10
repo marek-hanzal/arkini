@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "amethyst-cow"
+			}
+		],
 		"type": "simple"
 	}
 }

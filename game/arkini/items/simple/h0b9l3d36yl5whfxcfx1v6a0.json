@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "h0b9l3d36yl5whfxcfx1v6a0",
+		"id": "piggy-bank",
+		"title": "Piggy Bank",
+		"draft": true,
+		"asset": {
+			"default": [
+				"piggy-bank"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 10,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pig"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "piggy-bank"
+			}
+		],
 		"type": "simple"
 	}
 }

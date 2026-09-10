@@ -1,19 +1,19 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "tr0824w2ffr1v5ce8stvd2w9",
-		"id": "food",
-		"title": "Food",
-		"description": "Small tasty food",
+		"uid": "kc2zoia1eodjkm1b9no9umgb",
+		"id": "copper-bathtub-with-chocolate",
+		"title": "Copper Bathtub With Chocolate",
+		"draft": true,
 		"asset": {
 			"default": [
-				"food"
+				"copper-bathtub-with-chocolate"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
 		"type": "temporary",
-		"durationMs": 180000,
+		"durationMs": 300000,
 		"output": {
 			"set": [
 				{
@@ -23,7 +23,7 @@
 							"type": "guaranteed",
 							"drop": [
 								{
-									"itemId": "bio-waste",
+									"itemId": "spoiled-copper-bathtub",
 									"quantity": {
 										"min": 1,
 										"max": 1

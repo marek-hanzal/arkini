@@ -11,6 +11,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bear"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "corrupted-faith-bear"
+			}
+		],
 		"type": "simple"
 	}
 }

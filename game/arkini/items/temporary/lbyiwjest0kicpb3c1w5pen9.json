@@ -12,6 +12,17 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bed-t1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bed-with-teddy-bear"
+			}
+		],
 		"type": "temporary",
 		"durationMs": 300000,
 		"output": {

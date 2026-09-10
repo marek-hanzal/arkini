@@ -1,0 +1,28 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "jml833htnpikvhdtswrnfn3a",
+		"id": "beagle-puppy",
+		"title": "Beagle Puppy",
+		"draft": true,
+		"asset": {
+			"default": [
+				"beagle-puppy"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bio-waste"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle"
+			}
+		],
+		"type": "simple"
+	}
+}

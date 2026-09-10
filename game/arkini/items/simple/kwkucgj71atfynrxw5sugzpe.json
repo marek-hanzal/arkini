@@ -12,58 +12,6 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "campfire-extinguished"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "campfire"
-			},
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-oven"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "oven-with-wood"
-			},
-			{
-				"target": {
-					"type": "item",
-					"itemId": "oven-with-ash"
-				},
-				"action": "consume",
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "ash",
-											"quantity": {
-												"min": 1,
-												"max": 2
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"effect": "replace",
-				"result": "oven-with-wood"
-			}
-		],
 		"type": "simple"
 	}
 }

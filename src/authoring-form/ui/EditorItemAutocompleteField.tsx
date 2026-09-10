@@ -68,7 +68,6 @@ export const EditorItemReferenceControl = ({
 			emptyLabel={emptyLabel}
 			error={error}
 			options={options}
-			required
 			value={value}
 			onChangeFn={onChangeFn}
 			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}

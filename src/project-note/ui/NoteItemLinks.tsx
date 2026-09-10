@@ -33,6 +33,7 @@ export const NoteItemLinks = ({
 			itemUids,
 		],
 	);
+	if (itemUids.length === 0 && onChangeFn === undefined) return null;
 	return (
 		<div
 			className="grid gap-3"

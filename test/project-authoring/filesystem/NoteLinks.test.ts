@@ -32,6 +32,7 @@ describe("repository note item relationships", () => {
 				itemUids: [
 					"water",
 				],
+				resourceIds: [],
 			}),
 		);
 		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(
@@ -99,6 +100,7 @@ describe("repository note item relationships", () => {
 				projectId: project.projectId,
 				content: "Preserve",
 				itemUids: [],
+				resourceIds: [],
 			}),
 		);
 		for (const itemUids of [
@@ -116,6 +118,7 @@ describe("repository note item relationships", () => {
 						projectId: project.projectId,
 						content: "Rejected",
 						itemUids,
+						resourceIds: [],
 					}),
 				),
 			).rejects.toBeDefined();
@@ -167,6 +170,7 @@ describe("repository note item relationships", () => {
 					"water",
 					"stable-oil",
 				],
+				resourceIds: [],
 			}),
 		);
 		const global = await Effect.runPromise(
@@ -174,6 +178,7 @@ describe("repository note item relationships", () => {
 				projectId: project.projectId,
 				content: "Global",
 				itemUids: [],
+				resourceIds: [],
 			}),
 		);
 		await Effect.runPromise(
@@ -269,6 +274,7 @@ describe("repository note item relationships", () => {
 					projectId: project.projectId,
 					content: "Retain this Markdown",
 					itemUids,
+					resourceIds: [],
 				}),
 			);
 		}

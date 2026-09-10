@@ -3,6 +3,7 @@ import { createFileRoute, Outlet, useMatchRoute, useSearch } from "@tanstack/rea
 import { EditorAssetDetail } from "~/asset-authoring/ui/EditorAssetDetail";
 
 const FlatAssetDetailRoutes = [
+	"/editor/$projectId/assets/$resourceId/detail/notes",
 	"/editor/$projectId/assets/$resourceId/detail/usage",
 	"/editor/$projectId/assets/$resourceId/detail/delete",
 ] as const;

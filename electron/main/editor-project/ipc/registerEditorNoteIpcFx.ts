@@ -18,6 +18,7 @@ const createNoteSchema = z
 		projectId: IdSchema,
 		content: NoteContentSchema,
 		itemUids: NoteSchema.shape.itemUids,
+		resourceIds: NoteSchema.shape.resourceIds,
 	})
 	.strict();
 const noteKeySchema = z
@@ -35,6 +36,7 @@ const updateNoteSchema = deleteNoteSchema
 	.extend({
 		content: NoteContentSchema,
 		itemUids: NoteSchema.shape.itemUids,
+		resourceIds: NoteSchema.shape.resourceIds,
 	})
 	.strict();
 

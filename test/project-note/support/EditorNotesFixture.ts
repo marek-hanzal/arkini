@@ -9,7 +9,18 @@ export const editorNotesTestProject: Project = {
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 1,
-	resources: [],
+	resources: [
+		{
+			id: "asset-water",
+			mime: "image/png",
+			bytes: new Uint8Array(),
+		},
+		{
+			id: "asset-wood",
+			mime: "image/png",
+			bytes: new Uint8Array(),
+		},
+	],
 	config: {
 		...editorTestConfig,
 		items: {
@@ -42,6 +53,7 @@ export const editorNotesTestState = {
 			projectId: "project-one",
 			content: "Existing note",
 			itemUids: [] as string[],
+			resourceIds: [] as string[],
 			createdAtMs: 1,
 			updatedAtMs: 1,
 		},
@@ -64,7 +76,7 @@ const repository: Pick<
 				}),
 			);
 		}),
-	createNoteFx: ({ projectId, content, itemUids }) =>
+	createNoteFx: ({ projectId, content, itemUids, resourceIds }) =>
 		Effect.promise(() => editorNotesTestState.beforeCreateFn?.() ?? Promise.resolve()).pipe(
 			Effect.andThen(
 				Effect.try({
@@ -77,6 +89,9 @@ const repository: Pick<
 							noteId: `note-${editorNotesTestState.nextNote++}`,
 							projectId,
 							content,
+							resourceIds: [
+								...resourceIds,
+							],
 							itemUids: [
 								...itemUids,
 							],
@@ -98,7 +113,7 @@ const repository: Pick<
 				}),
 			),
 		),
-	updateNoteFx: ({ projectId, noteId, content, itemUids, expectedUpdatedAtMs }) =>
+	updateNoteFx: ({ projectId, noteId, content, itemUids, resourceIds, expectedUpdatedAtMs }) =>
 		Effect.try({
 			try: () => {
 				const previous = editorNotesTestState.notes.find((note) => note.noteId === noteId);
@@ -110,6 +125,9 @@ const repository: Pick<
 					...previous,
 					projectId,
 					content,
+					resourceIds: [
+						...resourceIds,
+					],
 					itemUids: [
 						...itemUids,
 					],

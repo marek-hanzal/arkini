@@ -293,6 +293,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					NoteFileSchema.parse({
 						content: note.content,
 						itemUids: note.itemUids,
+						resourceIds: note.resourceIds,
 						createdAtMs: note.createdAtMs,
 						updatedAtMs: note.updatedAtMs,
 					}),

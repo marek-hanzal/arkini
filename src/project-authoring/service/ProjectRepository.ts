@@ -112,6 +112,7 @@ export namespace ProjectRepository {
 		readonly projectId: string;
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
+		readonly resourceIds: ReadonlyArray<string>;
 	}
 
 	export interface DeleteNoteProps extends NoteKey {
@@ -121,6 +122,7 @@ export namespace ProjectRepository {
 	export interface UpdateNoteProps extends NoteKey {
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
+		readonly resourceIds: ReadonlyArray<string>;
 		readonly expectedUpdatedAtMs: number;
 	}
 }

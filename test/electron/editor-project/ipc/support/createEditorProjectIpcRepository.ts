@@ -50,6 +50,7 @@ export const editorProjectIpcNote = {
 	projectId: editorProjectIpcProject.projectId,
 	content: "A project note",
 	itemUids: [],
+	resourceIds: [],
 	createdAtMs: 4,
 	updatedAtMs: 4,
 };
@@ -62,13 +63,16 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	createVersionFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
 	checkoutVersionFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
-	createNoteFx: vi.fn(({ projectId, content, itemUids }) =>
+	createNoteFx: vi.fn(({ projectId, content, itemUids, resourceIds }) =>
 		Effect.succeed({
 			...editorProjectIpcNote,
 			projectId,
 			content,
 			itemUids: [
 				...itemUids,
+			],
+			resourceIds: [
+				...resourceIds,
 			],
 		}),
 	),
@@ -157,7 +161,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	updateVersionTagFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
-	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids }) =>
+	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids, resourceIds }) =>
 		Effect.succeed({
 			...editorProjectIpcNote,
 			projectId,
@@ -165,6 +169,9 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 			content,
 			itemUids: [
 				...itemUids,
+			],
+			resourceIds: [
+				...resourceIds,
 			],
 			updatedAtMs: 5,
 		}),

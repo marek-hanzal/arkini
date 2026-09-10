@@ -9,6 +9,8 @@ export namespace useNotesController {
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly requiredCurrentItemUid?: string;
 		readonly defaultItemUids: ReadonlyArray<string>;
+		readonly requiredCurrentResourceId?: string;
+		readonly defaultResourceIds: ReadonlyArray<string>;
 	}
 	export interface Output {
 		readonly cancelEditFn: () => void;
@@ -17,17 +19,22 @@ export namespace useNotesController {
 		readonly createFn: () => void;
 		readonly editContent: string;
 		readonly editItemUids: ReadonlyArray<string>;
+		readonly editResourceIds: ReadonlyArray<string>;
 		readonly editingNoteId?: string;
 		readonly error?: unknown;
 		readonly loaded: boolean;
 		readonly loading: boolean;
 		readonly newContent: string;
 		readonly newItemUids: ReadonlyArray<string>;
+		readonly newResourceIds: ReadonlyArray<string>;
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly pending: boolean;
 		readonly removeFn: (note: NoteSchema.Type) => void;
 		readonly retryFn: () => void;
 		readonly saveEditFn: () => void;
+		readonly setEditResourceIdsFn: (resourceIds: ReadonlyArray<string>) => void;
+		readonly setNewResourceIdsFn: (resourceIds: ReadonlyArray<string>) => void;
+		readonly unlinkResourceFn: (note: NoteSchema.Type, resourceId: string) => void;
 		readonly setEditItemUidsFn: (itemUids: ReadonlyArray<string>) => void;
 		readonly setNewItemUidsFn: (itemUids: ReadonlyArray<string>) => void;
 		readonly unlinkFn: (note: NoteSchema.Type, itemUid: string) => void;
@@ -42,8 +49,12 @@ export const useNotesController = ({
 	notes,
 	requiredCurrentItemUid,
 	defaultItemUids,
+	requiredCurrentResourceId,
+	defaultResourceIds,
 }: useNotesController.Props): useNotesController.Output => {
 	const { error, loaded, loading, pending, runFn } = collection;
+	const [newResourceIds, setNewResourceIdsFn] = useState(defaultResourceIds);
+	const [editResourceIds, setEditResourceIdsFn] = useState<ReadonlyArray<string>>([]);
 	const [newItemUids, setNewItemUidsFn] = useState(defaultItemUids);
 	const [editItemUids, setEditItemUidsFn] = useState<ReadonlyArray<string>>([]);
 	const [editContent, setEditContentFn] = useState("");
@@ -74,6 +85,16 @@ export const useNotesController = ({
 		void runFn({
 			action: "create",
 			content: newContent,
+			resourceIds: [
+				...new Set(
+					requiredCurrentResourceId === undefined
+						? newResourceIds
+						: [
+								...newResourceIds,
+								requiredCurrentResourceId,
+							],
+				),
+			],
 			itemUids: [
 				...new Set(
 					requiredCurrentItemUid === undefined
@@ -88,6 +109,7 @@ export const useNotesController = ({
 			.then(() => {
 				setNewContentFn("");
 				setNewItemUidsFn(defaultItemUids);
+				setNewResourceIdsFn(defaultResourceIds);
 			})
 			.catch(() => undefined);
 	};
@@ -98,6 +120,7 @@ export const useNotesController = ({
 		});
 		setEditContentFn(note.content);
 		setEditItemUidsFn(note.itemUids);
+		setEditResourceIdsFn(note.resourceIds);
 	};
 	const cancelEditFn = () => {
 		if (pending) return;
@@ -110,6 +133,9 @@ export const useNotesController = ({
 			action: "update",
 			noteId: editingNote.noteId,
 			content: editContent,
+			resourceIds: [
+				...editResourceIds,
+			],
 			itemUids: [
 				...editItemUids,
 			],
@@ -135,7 +161,19 @@ export const useNotesController = ({
 			action: "update",
 			noteId: note.noteId,
 			content: note.content,
+			resourceIds: note.resourceIds,
 			itemUids: note.itemUids.filter((linkedUid) => linkedUid !== itemUid),
+			expectedUpdatedAtMs: note.updatedAtMs,
+		}).catch(() => undefined);
+	};
+	const unlinkResourceFn = (note: NoteSchema.Type, resourceId: string) => {
+		if (pending || editingNote !== undefined) return;
+		void runFn({
+			action: "update",
+			noteId: note.noteId,
+			content: note.content,
+			itemUids: note.itemUids,
+			resourceIds: note.resourceIds.filter((linkedId) => linkedId !== resourceId),
 			expectedUpdatedAtMs: note.updatedAtMs,
 		}).catch(() => undefined);
 	};
@@ -153,6 +191,7 @@ export const useNotesController = ({
 		createFn,
 		editContent,
 		editItemUids,
+		editResourceIds,
 		...(editingNoteId === undefined
 			? {}
 			: {
@@ -167,6 +206,7 @@ export const useNotesController = ({
 		loaded,
 		newContent,
 		newItemUids,
+		newResourceIds,
 		notes,
 		pending,
 		removeFn,
@@ -174,6 +214,9 @@ export const useNotesController = ({
 		saveEditFn,
 		setEditContentFn,
 		setEditItemUidsFn,
+		setEditResourceIdsFn,
+		setNewResourceIdsFn,
+		unlinkResourceFn,
 		setNewItemUidsFn,
 		unlinkFn,
 		setNewContentFn,

@@ -33,6 +33,7 @@ describe("filesystem Editor project writes", () => {
 		await Effect.runPromise(
 			repository.createNoteFx({
 				itemUids: [],
+				resourceIds: [],
 				projectId: created.projectId,
 				content: "Keep this note",
 			}),

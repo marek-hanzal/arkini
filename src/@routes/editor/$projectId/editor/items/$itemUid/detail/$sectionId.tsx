@@ -23,6 +23,7 @@ const ItemNotes = ({ itemUid }: { readonly itemUid: string }) => {
 	const collection = useProjectNotes(project.projectId);
 	return (
 		<ProjectNotes
+			defaultResourceIds={[]}
 			collection={collection}
 			notes={collection.notes.filter((note) => note.itemUids.includes(itemUid))}
 			requiredCurrentItemUid={itemUid}

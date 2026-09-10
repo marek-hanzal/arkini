@@ -107,6 +107,7 @@ beforeEach(() => {
 			projectId: "project-one",
 			content: "Existing note",
 			itemUids: [],
+			resourceIds: [],
 			createdAtMs: 1,
 			updatedAtMs: 1,
 		},
@@ -126,6 +127,7 @@ const ItemNotes = ({ itemUid }: { readonly itemUid: string }) => {
 	const collection = useProjectNotes("project-one");
 	return (
 		<ProjectNotes
+			defaultResourceIds={[]}
 			collection={collection}
 			notes={collection.notes.filter((note) => note.itemUids.includes(itemUid))}
 			requiredCurrentItemUid={itemUid}
@@ -208,6 +210,7 @@ describe("EditorNotes", () => {
 		await click(saveTooltip?.parentElement?.querySelector("button") ?? null);
 		expect(state.notes[0]).toMatchObject({
 			itemUids: [],
+			resourceIds: [],
 			content: "Existing note",
 			noteId: "note-one",
 		});
@@ -289,6 +292,7 @@ describe("EditorNotes", () => {
 		state.notes[0] = {
 			...state.notes[0],
 			itemUids: [],
+			resourceIds: [],
 			updatedAtMs: 2,
 		};
 		await act(async () => {

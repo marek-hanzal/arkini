@@ -30,6 +30,9 @@ const NoteCollectionInputSchema = z
 			.default(25)
 			.describe("Maximum notes per page; defaults to 25 and is capped at 100."),
 		itemUid: IdSchema.optional().describe("Only notes linked to this immutable item UID."),
+		resourceId: IdSchema.optional().describe(
+			"Only notes linked to this asset resource ID; all supplied filters must match.",
+		),
 		query: z
 			.string()
 			.optional()
@@ -40,7 +43,7 @@ const NoteCollectionInputSchema = z
 		$id: "urn:arkini:schema:mcp:note-collection-input",
 		title: "Note collection tool input",
 		description:
-			"Item filtering, pagination and full-content search for the project note collection.",
+			"Item and asset filtering, pagination and full-content search for the project note collection.",
 	});
 
 const NoteDetailInputSchema = z
@@ -58,14 +61,17 @@ const CreateNoteInputSchema = z
 	.object({
 		content: NoteContentSchema.describe("The complete Markdown note content."),
 		itemUids: NoteSchema.shape.itemUids.describe(
-			"Complete unique list of existing immutable item UIDs; use [] for a global unlinked note.",
+			"Complete unique list of existing immutable item UIDs; use [] for no item links.",
+		),
+		resourceIds: NoteSchema.shape.resourceIds.describe(
+			"Complete unique list of existing asset resource IDs; use [] for no asset links.",
 		),
 	})
 	.strict()
 	.meta({
 		$id: "urn:arkini:schema:mcp:create-note-input",
 		title: "Create note tool input",
-		description: "The complete content and item relationships of a new project note.",
+		description: "The complete content, item and asset relationships of a new project note.",
 	});
 
 const noteMutationSchema = z
@@ -82,6 +88,9 @@ const EditNoteInputSchema = noteMutationSchema
 		content: NoteContentSchema.describe("The complete replacement Markdown content."),
 		itemUids: NoteSchema.shape.itemUids.describe(
 			"Complete replacement list of immutable item UIDs; omitting a previous UID unlinks it.",
+		),
+		resourceIds: NoteSchema.shape.resourceIds.describe(
+			"Complete replacement list of asset resource IDs; omitting a previous ID unlinks it.",
 		),
 	})
 	.strict()
@@ -117,6 +126,16 @@ const readLinkedItemsFn = (note: NoteSchema.Type, project: Project) =>
 		};
 	});
 
+const readLinkedAssetsFn = (note: NoteSchema.Type, project: Project) =>
+	note.resourceIds.map((id) => {
+		const resource = project.resources.find((candidate) => candidate.id === id);
+		return {
+			id,
+			type: resource === undefined ? null : "image",
+			mime: resource?.mime ?? null,
+		};
+	});
+
 const readNoteCollectionTextFn = (
 	notes: ReadonlyArray<NoteSchema.Type>,
 	input: NoteCollectionInput,
@@ -126,6 +145,7 @@ const readNoteCollectionTextFn = (
 	const matches = notes.filter(
 		(note) =>
 			(input.itemUid === undefined || note.itemUids.includes(input.itemUid)) &&
+			(input.resourceId === undefined || note.resourceIds.includes(input.resourceId)) &&
 			(query === undefined ||
 				query.length === 0 ||
 				note.content.toLowerCase().includes(query)),
@@ -163,6 +183,8 @@ const readNoteCollectionTextFn = (
 						[
 							`- ${note.noteId}`,
 							`  Linked items: ${JSON.stringify(readLinkedItemsFn(note, project))}`,
+							`  Resource IDs: ${JSON.stringify(note.resourceIds)}`,
+							`  Linked assets: ${JSON.stringify(readLinkedAssetsFn(note, project))}`,
 							`  Created: ${new Date(note.createdAtMs).toISOString()}`,
 							`  Updated: ${new Date(note.updatedAtMs).toISOString()}`,
 							`  Updated at ms: ${note.updatedAtMs}`,
@@ -220,7 +242,7 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid filters by immutable item UID. Linked items include their current authored IDs and human titles. Content search and item filtering run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Versions or Arkpacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and asset links. Linked items include their current authored IDs and human titles; linked assets include resource IDs, image type and MIME. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Versions or Arkpacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
@@ -242,7 +264,7 @@ export const registerNoteToolsFn = ({
 		"note_detail",
 		{
 			description:
-				"Read one complete project note as JSON, including linked item UIDs and resolved current authored IDs and human titles. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
+				"Read one complete project note as JSON, including item UIDs, current authored IDs and human titles, resource IDs and resolved asset type and MIME. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
 			inputSchema: NoteDetailInputSchema,
 		},
 		async ({ noteId }) =>
@@ -255,6 +277,7 @@ export const registerNoteToolsFn = ({
 									{
 										...note,
 										linkedItems: readLinkedItemsFn(note, project),
+										linkedAssets: readLinkedAssetsFn(note, project),
 									},
 									null,
 									2,
@@ -272,7 +295,7 @@ export const registerNoteToolsFn = ({
 				"Create and persist one Markdown note in the open project. Notes remain outside project Versions and Arkpacks.",
 			inputSchema: CreateNoteInputSchema,
 		},
-		async ({ content, itemUids }) =>
+		async ({ content, itemUids, resourceIds }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
@@ -281,6 +304,7 @@ export const registerNoteToolsFn = ({
 								projectId: project.projectId,
 								content,
 								itemUids,
+								resourceIds,
 							})
 							.pipe(
 								Effect.tap(() =>
@@ -299,10 +323,10 @@ export const registerNoteToolsFn = ({
 		"edit_note",
 		{
 			description:
-				"Replace complete Markdown content and item links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
+				"Replace complete Markdown content, item and asset links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
 			inputSchema: EditNoteInputSchema,
 		},
-		async ({ content, expectedUpdatedAtMs, itemUids, noteId }) =>
+		async ({ content, expectedUpdatedAtMs, itemUids, resourceIds, noteId }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
@@ -311,6 +335,7 @@ export const registerNoteToolsFn = ({
 								projectId: project.projectId,
 								content,
 								itemUids,
+								resourceIds,
 								expectedUpdatedAtMs,
 								noteId,
 							})

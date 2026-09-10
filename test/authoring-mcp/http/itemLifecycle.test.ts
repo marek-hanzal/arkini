@@ -49,6 +49,7 @@ describe("editor MCP item lifecycle", () => {
 			repository.createNoteFx({
 				projectId: "item-lifecycle",
 				content: "Keep the design after deletion",
+				resourceIds: [],
 				itemUids: [
 					"water",
 				],
@@ -129,6 +130,7 @@ describe("editor MCP item lifecycle", () => {
 		expect(notes).toEqual([
 			{
 				...note,
+				resourceIds: [],
 				itemUids: [],
 				updatedAtMs: expect.any(Number),
 			},

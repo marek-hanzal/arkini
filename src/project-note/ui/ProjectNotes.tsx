@@ -11,6 +11,8 @@ import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Markdown } from "~/ui/ui/Markdown";
 
+import { NoteAssetLinks } from "~/project-note/ui/NoteAssetLinks";
+import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
 import { NoteItemLinks } from "~/project-note/ui/NoteItemLinks";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -47,7 +49,10 @@ const noteMotion = {
 	},
 } as const;
 
-interface ProjectNotesProps extends useNotesController.Props {}
+interface ProjectNotesProps extends useNotesController.Props {
+	readonly assetFilter?: AssetCollectionFilterSchema.Type;
+	readonly assetQuery?: string;
+}
 
 /** Shared composer and list for the global collection and item-filtered Notes. */
 export const ProjectNotes = (props: ProjectNotesProps) => {
@@ -73,6 +78,14 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 					requiredItemUid={props.requiredCurrentItemUid}
 					disabled={controller.pending}
 					onChangeFn={controller.setNewItemUidsFn}
+				/>
+				<NoteAssetLinks
+					resourceIds={controller.newResourceIds}
+					requiredResourceId={props.requiredCurrentResourceId}
+					disabled={controller.pending}
+					onChangeFn={controller.setNewResourceIdsFn}
+					filter={props.assetFilter}
+					query={props.assetQuery}
 				/>
 				<div className="flex items-center justify-end">
 					<PrimaryButton
@@ -116,15 +129,19 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 								<Status
 									dataUi="EditorNotesEmpty"
 									description={translator.textFn(
-										props.requiredCurrentItemUid === undefined
-											? "Notes empty description"
-											: "Item notes empty description",
+										props.requiredCurrentResourceId !== undefined
+											? "Asset notes empty description"
+											: props.requiredCurrentItemUid === undefined
+												? "Notes empty description"
+												: "Item notes empty description",
 									)}
 									icon={NotebookPen}
 									title={translator.textFn(
-										props.requiredCurrentItemUid === undefined
-											? "Notes empty title"
-											: "Item notes empty title",
+										props.requiredCurrentResourceId !== undefined
+											? "Asset notes empty title"
+											: props.requiredCurrentItemUid === undefined
+												? "Notes empty title"
+												: "Item notes empty title",
 									)}
 								/>
 							</motion.div>
@@ -236,24 +253,66 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 												<Markdown>{note.content}</Markdown>
 											</div>
 										)}
-										<NoteItemLinks
-											itemUids={
-												editing ? controller.editItemUids : note.itemUids
-											}
-											disabled={
-												controller.pending ||
-												(!editing && controller.editingNoteId !== undefined)
-											}
-											onChangeFn={
-												editing ? controller.setEditItemUidsFn : undefined
-											}
-											onUnlinkFn={
-												editing
-													? undefined
-													: (itemUid) =>
-															controller.unlinkFn(note, itemUid)
-											}
-										/>
+										{editing ||
+										note.itemUids.length > 0 ||
+										note.resourceIds.length > 0 ? (
+											<div className="flex flex-wrap items-start gap-3">
+												<NoteItemLinks
+													itemUids={
+														editing
+															? controller.editItemUids
+															: note.itemUids
+													}
+													disabled={
+														controller.pending ||
+														(!editing &&
+															controller.editingNoteId !== undefined)
+													}
+													onChangeFn={
+														editing
+															? controller.setEditItemUidsFn
+															: undefined
+													}
+													onUnlinkFn={
+														editing
+															? undefined
+															: (itemUid) =>
+																	controller.unlinkFn(
+																		note,
+																		itemUid,
+																	)
+													}
+												/>
+												<NoteAssetLinks
+													resourceIds={
+														editing
+															? controller.editResourceIds
+															: note.resourceIds
+													}
+													disabled={
+														controller.pending ||
+														(!editing &&
+															controller.editingNoteId !== undefined)
+													}
+													onChangeFn={
+														editing
+															? controller.setEditResourceIdsFn
+															: undefined
+													}
+													onUnlinkFn={
+														editing
+															? undefined
+															: (resourceId) =>
+																	controller.unlinkResourceFn(
+																		note,
+																		resourceId,
+																	)
+													}
+													filter={props.assetFilter}
+													query={props.assetQuery}
+												/>
+											</div>
+										) : null}
 									</motion.article>
 								);
 							})

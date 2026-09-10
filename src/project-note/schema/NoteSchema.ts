@@ -18,6 +18,9 @@ export const NoteSchema = z
 		itemUids: IdSchema.array().refine((uids) => new Set(uids).size === uids.length, {
 			message: "Each linked item UID must be unique.",
 		}),
+		resourceIds: IdSchema.array().refine((ids) => new Set(ids).size === ids.length, {
+			message: "Each linked resource ID must be unique.",
+		}),
 		createdAtMs: NonNegativeIntegerSchema,
 		updatedAtMs: NonNegativeIntegerSchema,
 	})

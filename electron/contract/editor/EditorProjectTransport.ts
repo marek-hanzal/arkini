@@ -142,6 +142,7 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
+		readonly resourceIds: ReadonlyArray<string>;
 		readonly createdAtMs: number;
 		readonly updatedAtMs: number;
 	}
@@ -150,6 +151,7 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
+		readonly resourceIds: ReadonlyArray<string>;
 	}
 
 	export interface NoteKeyRequest {
@@ -164,6 +166,7 @@ export namespace EditorProjectTransport {
 	export interface UpdateNoteRequest extends DeleteNoteRequest {
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
+		readonly resourceIds: ReadonlyArray<string>;
 	}
 
 	export interface BoardScenarioKeyRequest {

@@ -12,8 +12,6 @@ import { feedbackDurationMs } from "~/tile-rendering/fx/runActivityParticlesFx";
 
 import { Effect } from "effect";
 
-import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
-
 import { readInventoryLayoutFn } from "~/game-scene/fn/readInventoryLayoutFn";
 
 import { createInventoryRuntimeFx } from "~/game-scene/fx/createInventoryRuntimeFx";
@@ -38,6 +36,13 @@ export interface FakeContainer {
 	cursor: string;
 	destroyed: boolean;
 	eventMode: string;
+	position: {
+		set: (x: number, y: number) => void;
+	};
+	toLocal: (point: { x: number; y: number }) => {
+		x: number;
+		y: number;
+	};
 	hitArea: unknown;
 	mask: unknown;
 	pivot: {
@@ -115,6 +120,18 @@ vi.mock("pixi.js", () => {
 		};
 		x = 0;
 		y = 0;
+		position = {
+			set: (x: number, y: number) => {
+				this.x = x;
+				this.y = y;
+			},
+		};
+		toLocal(point: { x: number; y: number }) {
+			return {
+				x: (point.x - this.x) / this.scale.x,
+				y: (point.y - this.y) / this.scale.y,
+			};
+		}
 		zIndex = 0;
 		private readonly listeners = new Map<string, Set<(payload: FakePointerEvent) => void>>();
 
@@ -156,6 +173,19 @@ vi.mock("pixi.js", () => {
 				number,
 			]
 		> = [];
+
+		moveTo() {
+			return this;
+		}
+		lineTo() {
+			return this;
+		}
+		quadraticCurveTo() {
+			return this;
+		}
+		closePath() {
+			return this;
+		}
 
 		clear() {
 			return this;
@@ -212,6 +242,7 @@ vi.mock("~/tile-rendering/fx/createApplicationOwnerFx", async () => {
 				if (createContainer === undefined) throw new Error("Pixi mock is not ready.");
 				const stage = createContainer();
 				const canvas = document.createElement("canvas");
+				canvas.hasPointerCapture = vi.fn(() => false);
 				canvas.setPointerCapture = vi.fn();
 				canvas.releasePointerCapture = vi.fn();
 				canvas.getBoundingClientRect = () => ({
@@ -226,6 +257,7 @@ vi.mock("~/tile-rendering/fx/createApplicationOwnerFx", async () => {
 					y: 0,
 				});
 				host.replaceChildren(canvas);
+				const resizeListeners = new Set<() => void>();
 				const owner = {
 					app: {
 						canvas,
@@ -250,9 +282,13 @@ vi.mock("~/tile-rendering/fx/createApplicationOwnerFx", async () => {
 					},
 					addResizeListenerFx: (listener: () => void) =>
 						EffectModule.sync(() => {
-							sceneState.resize = listener;
+							resizeListeners.add(listener);
+							sceneState.resize = () => {
+								for (const resizeFn of resizeListeners) resizeFn();
+							};
 							return () => {
-								sceneState.resize = null;
+								resizeListeners.delete(listener);
+								if (resizeListeners.size === 0) sceneState.resize = null;
 							};
 						}),
 					closeFx: EffectModule.sync(sceneState.close),
@@ -526,28 +562,19 @@ export const pointer = (x: number, y: number, button = 0): FakePointerEvent => (
 	stopPropagation: vi.fn(),
 });
 
-export const readTestInventoryLayout = (width = 800, height = 480) => {
-	const preferredCellSize = readMainLayoutFn({
-		boardHeight: 7,
-		boardWidth: 11,
-		height,
-		toolbarSize: 8,
-		width,
-	}).board.cellSize;
-	return readInventoryLayoutFn({
+export const readTestInventoryLayout = () =>
+	readInventoryLayoutFn({
 		columns: 5,
-		height,
-		preferredCellSize,
 		rows: 4,
-		width,
 	});
-};
 
 export const slotPointer = (x: number, button = 0) => {
 	const { surface } = readTestInventoryLayout();
 	return pointer(
-		surface.x + (x + 0.5) * surface.cellSize,
-		surface.y + surface.cellSize * 0.5,
+		(sceneState.owner?.stage.x ?? 0) +
+			(surface.x + (x + 0.5) * surface.cellSize) * (sceneState.owner?.stage.scale.x ?? 1),
+		(sceneState.owner?.stage.y ?? 0) +
+			(surface.y + surface.cellSize * 0.5) * (sceneState.owner?.stage.scale.y ?? 1),
 		button,
 	);
 };

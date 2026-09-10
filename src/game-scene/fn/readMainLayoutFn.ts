@@ -14,7 +14,7 @@ const maximumViewportPadding = 48;
 const viewportPaddingRatio = 0.04;
 const toolbarGapInBoardCells = 0.25;
 
-/** Uses fixed world cells when requested; Inventory retains its fitted reference scale. */
+/** Computes Board and Toolbar geometry, with fixed world cells for camera-controlled scenes. */
 export const readMainLayoutFn = ({
 	boardHeight,
 	boardWidth,

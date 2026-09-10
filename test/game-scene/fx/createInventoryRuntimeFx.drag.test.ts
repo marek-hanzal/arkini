@@ -12,10 +12,74 @@ import {
 	publishItems,
 	inventorySceneProbe as sceneState,
 	slotPointer,
+	pointer,
 } from "./createInventoryRuntimeFx.test/fixture";
 import type { FakeContainer } from "./createInventoryRuntimeFx.test/fixture";
 
 describe("Inventory runtime / drag authority", () => {
+	it("keeps the drag threshold in screen pixels and releases into world slots after zoom and pan", async () => {
+		const { actor, onActivate, runtime, stage } = await mountScene();
+		stage.scale.set(0.137);
+		stage.position.set(27.3, -16.9);
+		const pressed = slotPointer(0);
+		(actor.container as unknown as FakeContainer).emit("pointerdown", pressed);
+		stage.emit("globalpointermove", pointer(pressed.global.x + 5, pressed.global.y));
+		expect(actor.dragging).toBe(false);
+		stage.emit("globalpointermove", pointer(pressed.global.x + 6, pressed.global.y));
+		expect(actor.dragging).toBe(true);
+		expect(actor.container.x).toBeCloseTo(6 / 0.137);
+		// Release owns the final slot even when there was no move event at that position.
+		stage.emit("pointerup", slotPointer(2));
+		expect(sceneState.drop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				target: {
+					kind: "slot",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 2,
+							y: 0,
+						},
+					},
+					occupant: null,
+				},
+			}),
+		);
+		expect(onActivate).not.toHaveBeenCalled();
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("reset cancels a held item and restores the fitted Inventory camera without submitting a drop", async () => {
+		const { actor, onActivate, runtime, stage } = await mountScene();
+		const initial = {
+			x: stage.x,
+			y: stage.y,
+			scale: stage.scale.x,
+		};
+		stage.scale.set(0.6);
+		stage.position.set(-100, 30);
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		expect(actor.dragging).toBe(true);
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				key: "0",
+				cancelable: true,
+			}),
+		);
+		expect({
+			x: stage.x,
+			y: stage.y,
+			scale: stage.scale.x,
+		}).toEqual(initial);
+		expect(actor.dragging).toBe(false);
+		expect(actor.container.x).toBe(0);
+		stage.emit("pointerup", slotPointer(1));
+		expect(sceneState.drop).not.toHaveBeenCalled();
+		expect(onActivate).not.toHaveBeenCalled();
+		await Effect.runPromise(runtime.closeFx);
+	});
+
 	it("drags only between Inventory slots and commits the release through the engine command boundary", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const initialX = actor.container.x;

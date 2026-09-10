@@ -178,7 +178,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (children: ReactNode) => {
+const render = async (children: ReactNode, newItem = false) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -187,6 +187,13 @@ const render = async (children: ReactNode) => {
 		await act(async () => {
 			root.render(
 				<Form
+					{...(newItem
+						? {
+								defaultItemId: "dirty-bucket",
+								defaultTitle: "Dirty Bucket",
+								itemType: "simple" as const,
+							}
+						: {})}
 					sectionId={sectionId}
 					uid={item.uid}
 				>
@@ -216,6 +223,32 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it("saves a valid untouched new item draft", async () => {
+		state.persisted = undefined;
+		state.saveItem.mockImplementation(async ({ item: saved }) => saved);
+		const { container } = await render(<IdentitySection />, true);
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		if (saveButton === undefined) throw new Error("Missing item Save action.");
+
+		expect(saveButton.disabled).toBe(false);
+		await act(async () => {
+			saveButton.click();
+			await Promise.resolve();
+		});
+
+		expect(state.saveItem).toHaveBeenCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					id: "dirty-bucket",
+					title: "Dirty Bucket",
+				}),
+			}),
+		);
+		expect(state.navigate).toHaveBeenCalledOnce();
+	});
+
 	it("locks the item draft for the pending save snapshot and unlocks after failure", async () => {
 		let rejectSave!: (cause: Error) => void;
 		state.saveItem.mockImplementationOnce(

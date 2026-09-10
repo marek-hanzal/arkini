@@ -116,7 +116,6 @@ export const ProjectFormSession = ({
 			>
 				<EditorFormSectionPage
 					discardFn={discardFn}
-					dirty={controller.isDirty}
 					error={controller.error}
 					help={ProjectFormHelpBySection[sectionId]}
 					leading={
@@ -129,6 +128,7 @@ export const ProjectFormSession = ({
 						/>
 					}
 					rootCard={false}
+					saveEnabled={controller.isDirty}
 					saveFn={controller.saveFn}
 					saving={controller.isSaving}
 					tabs={

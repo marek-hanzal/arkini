@@ -13,12 +13,12 @@ import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
 
 const EditorFormActions = ({
 	discardFn,
-	dirty,
+	saveEnabled,
 	saving,
 	saveFn,
 }: {
 	readonly discardFn: () => Promise<void>;
-	readonly dirty: boolean;
+	readonly saveEnabled: boolean;
 	readonly saving: boolean;
 	readonly saveFn: () => Promise<boolean>;
 }) => (
@@ -35,7 +35,7 @@ const EditorFormActions = ({
 		<PrimaryButton
 			type="button"
 			className="min-h-0 gap-1.5 px-4 py-2"
-			disabled={!dirty || saving}
+			disabled={!saveEnabled || saving}
 			cursorIntent={saving ? "progress" : undefined}
 			onClick={() => void saveFn().catch(() => undefined)}
 		>
@@ -49,24 +49,24 @@ const EditorFormActions = ({
 export const EditorFormSectionPage = ({
 	children,
 	discardFn,
-	dirty,
 	error,
 	help,
 	leading,
 	notice,
 	rootCard,
+	saveEnabled,
 	saveFn,
 	saving,
 	tabs,
 	title,
 }: PropsWithChildren<{
 	readonly discardFn: () => Promise<void>;
-	readonly dirty: boolean;
 	readonly error: unknown;
 	readonly help?: EditorPageHelpContent;
 	readonly leading?: ReactNode;
 	readonly notice?: ReactNode;
 	readonly rootCard?: boolean;
+	readonly saveEnabled: boolean;
 	readonly saveFn: () => Promise<boolean>;
 	readonly saving: boolean;
 	readonly tabs: ReactNode;
@@ -88,7 +88,7 @@ export const EditorFormSectionPage = ({
 						)}
 						<EditorFormActions
 							discardFn={discardFn}
-							dirty={dirty}
+							saveEnabled={saveEnabled}
 							saving={saving}
 							saveFn={saveFn}
 						/>

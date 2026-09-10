@@ -2,14 +2,35 @@
 
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { act, createElement } from "react";
+import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("~/authoring-session/ui/useEditorProject", () => ({
-	useEditorProject: () => ({
-		projectId: "project-one",
-	}),
+vi.mock("~/authoring-session/ui/useEditorProject", async () => {
+	const { editorNotesTestProject } = await import(
+		"~test/project-note/support/EditorNotesFixture"
+	);
+	return {
+		useEditorProject: () => editorNotesTestProject,
+	};
+});
+vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
+	useResourceUrl: () => undefined,
+}));
+vi.mock("@tanstack/react-router", async (importOriginalFn) => ({
+	...(await importOriginalFn<typeof import("@tanstack/react-router")>()),
+	Link: ({ children, params, to, ...props }: Record<string, unknown>) =>
+		createElement(
+			"a",
+			{
+				...props,
+				href: String(to)
+					.replace("$projectId", (params as Record<string, string>).projectId)
+					.replace("$itemUid", (params as Record<string, string>).itemUid)
+					.replace("$sectionId", (params as Record<string, string>).sectionId),
+			},
+			children as ReactNode,
+		),
 }));
 vi.mock("~/project-note/atom/NoteCommandAtoms", async () => {
 	const { EditorNotesTestCommandAtoms } = await import(
@@ -39,7 +60,13 @@ vi.mock("~/ui/ui/Tooltip", () => ({
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
 import { Route as EditorNotesRouteDefinition } from "~/@routes/editor/$projectId/notes";
-import { editorNotesTestState as state } from "~test/project-note/support/EditorNotesFixture";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
+import { ProjectNotes } from "~/project-note/ui/ProjectNotes";
+import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
+import {
+	editorNotesTestProject,
+	editorNotesTestState as state,
+} from "~test/project-note/support/EditorNotesFixture";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 const EditorNotes = EditorNotesRouteDefinition.options.component;
@@ -79,6 +106,7 @@ beforeEach(() => {
 			noteId: "note-one",
 			projectId: "project-one",
 			content: "Existing note",
+			itemUids: [],
 			createdAtMs: 1,
 			updatedAtMs: 1,
 		},
@@ -94,7 +122,21 @@ afterEach(async () => {
 	Reflect.deleteProperty(window, "arkini");
 });
 
-const renderNotes = async () => {
+const ItemNotes = ({ itemUid }: { readonly itemUid: string }) => {
+	const collection = useProjectNotes("project-one");
+	return (
+		<ProjectNotes
+			collection={collection}
+			notes={collection.notes.filter((note) => note.itemUids.includes(itemUid))}
+			requiredCurrentItemUid={itemUid}
+			defaultItemUids={[
+				itemUid,
+			]}
+		/>
+	);
+};
+
+const renderNotes = async (itemUid?: string) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -113,7 +155,11 @@ const renderNotes = async () => {
 					{
 						value: registry,
 					},
-					createElement(EditorNotes),
+					itemUid === undefined
+						? createElement(EditorNotes)
+						: createElement(ItemNotes, {
+								itemUid,
+							}),
 				),
 			),
 		),
@@ -140,6 +186,126 @@ const click = async (element: Element | null) => {
 };
 
 describe("EditorNotes", () => {
+	it("keeps an unavailable linked UID removable while editing a retained note", async () => {
+		state.notes[0].itemUids = [
+			"missing-item",
+		];
+		const container = await renderNotes();
+		expect(container.querySelector('[data-ui="EditorNoteMissingItem"]')?.textContent).toContain(
+			"missing-item",
+		);
+		expect(container.querySelector('[data-ui="EditorNoteItemLink"]')).toBeNull();
+		const editTooltip = [
+			...container.querySelectorAll("span[hidden]"),
+		].find((element) => element.textContent === "Edit");
+		await click(editTooltip?.parentElement?.querySelector("button") ?? null);
+		await click(
+			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteUnlinkItem"]'),
+		);
+		const saveTooltip = [
+			...container.querySelectorAll("span[hidden]"),
+		].find((element) => element.textContent === "Save");
+		await click(saveTooltip?.parentElement?.querySelector("button") ?? null);
+		expect(state.notes[0]).toMatchObject({
+			itemUids: [],
+			content: "Existing note",
+			noteId: "note-one",
+		});
+	});
+	it("creates from an item tab with its required UID and unlinks only that relationship", async () => {
+		const container = await renderNotes("water");
+		const requiredUnlink = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorNoteUnlinkItem"]',
+		);
+		expect(requiredUnlink?.disabled).toBe(true);
+		const composer = container.querySelector<HTMLTextAreaElement>("textarea");
+		if (composer === null) throw new Error("Missing composer.");
+		await changeTextarea(composer, "Water design");
+		await click(container.querySelector('[data-ui="EditorSearchComboboxInput"]'));
+		await click(document.querySelector('[data-ui="EditorSearchComboboxOption"]'));
+		await click(
+			[
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === "Create note") ?? null,
+		);
+		const created = state.notes[0];
+		expect(created.itemUids).toEqual([
+			"water",
+			"wood",
+		]);
+		expect(container.querySelectorAll('[data-ui="EditorNote"]')).toHaveLength(1);
+		await click(
+			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteUnlinkItem"]'),
+		);
+		expect(container.querySelector('[data-ui="EditorNote"]')).toBeNull();
+		expect(state.notes[0]).toMatchObject({
+			noteId: created.noteId,
+			content: created.content,
+			itemUids: [
+				"wood",
+			],
+			createdAtMs: created.createdAtMs,
+		});
+		expect(state.notes[0].updatedAtMs).toBeGreaterThan(created.updatedAtMs);
+	});
+
+	it("uses the searchable selector to attach stable UIDs and opens the renamed item's Notes by UID", async () => {
+		const container = await renderNotes();
+		const composer = container.querySelector<HTMLTextAreaElement>("textarea");
+		if (composer === null) throw new Error("Missing composer.");
+		await changeTextarea(composer, "Shared design");
+		const picker = container.querySelector('[data-ui="EditorSearchComboboxInput"]');
+		await click(picker);
+		await click(
+			[
+				...document.querySelectorAll('[data-ui="EditorSearchComboboxOption"]'),
+			].find((option) => option.textContent?.includes("Water")) ?? null,
+		);
+		await click(
+			[
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === "Create note") ?? null,
+		);
+		expect(state.notes[0].itemUids).toEqual([
+			"water",
+		]);
+		const preview = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorNote"] [data-ui="EditorNoteItemLink"]',
+		);
+		expect(preview?.textContent).toContain("Water");
+		expect(preview?.getAttribute("href")).toBe(
+			"/editor/project-one/editor/items/water/detail/notes",
+		);
+	});
+
+	it("refreshes pruned relationships on a local canonical project commit without an MCP event", async () => {
+		state.notes[0].itemUids = [
+			"water",
+		];
+		const container = await renderNotes();
+		expect(
+			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteItemLink"]'),
+		).not.toBeNull();
+		state.notes[0] = {
+			...state.notes[0],
+			itemUids: [],
+			updatedAtMs: 2,
+		};
+		await act(async () => {
+			registries[0].set(EditorProjectAtom("project-one"), {
+				project: {
+					...editorNotesTestProject,
+					revision: 2,
+				},
+			});
+		});
+		expect(
+			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteItemLink"]'),
+		).toBeNull();
+		expect(container.querySelector('[data-ui="EditorNote"]')?.textContent).toContain(
+			"Existing note",
+		);
+	});
 	it("clears an initial Notes read failure after explicit Retry succeeds", async () => {
 		state.listFailures = 1;
 		const container = await renderNotes();
@@ -260,6 +426,9 @@ describe("EditorNotes", () => {
 	});
 
 	it("preserves a local edit draft on MCP refresh and closes it when the note disappears", async () => {
+		state.notes[0].itemUids = [
+			"water",
+		];
 		const container = await renderNotes();
 		await act(async () =>
 			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
@@ -273,11 +442,17 @@ describe("EditorNotes", () => {
 		);
 		if (editor === null) throw new Error("Missing note editor.");
 		await changeTextarea(editor, "Local draft");
+		await click(
+			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteUnlinkItem"]'),
+		);
 
 		state.notes = [
 			{
 				...state.notes[0],
 				content: "MCP update",
+				itemUids: [
+					"wood",
+				],
 				updatedAtMs: 2,
 			},
 		];
@@ -304,6 +479,12 @@ describe("EditorNotes", () => {
 			),
 		);
 		expect(editor.value).toBe("Local draft");
+		expect(
+			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteItemLink"]'),
+		).toBeNull();
+		expect(state.notes[0].itemUids).toEqual([
+			"wood",
+		]);
 
 		state.notes = [];
 		await act(async () => projectChangedFn?.("project-one"));

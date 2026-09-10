@@ -69,7 +69,7 @@ recover any prior journal
 → recover/clean the exact journal
 ```
 
-Unowned, ambiguous, escaped or missing durable artifacts fail closed. Recovery restores an old-or-new complete portable tree; it never guesses a partial state. Single-file mechanics belong to `src/filesystem-write`; the multi-file journal belongs here.
+Unowned, ambiguous, escaped or missing durable artifacts fail closed. Recovery restores an old-or-new complete portable tree; it never guesses a partial state. Item/config commits reconcile Note links against the final set of item UIDs and include affected note files in that same transaction. A failed note rewrite rolls back the item tree and all earlier note rewrites before repository state is published. Single-file mechanics belong to `src/filesystem-write`; the multi-file journal belongs here.
 
 ## Renderer replacement flow
 
@@ -119,8 +119,8 @@ Editor Build and CLI pack both reread the saved portable tree and require its fi
 - Renderer validates every result again through the pure transport contract.
 - Repository failure is serialized as the exact project operation plus bounded message, not leaked native state.
 - Editor persistence may fail independently without preventing gameplay boot; Editor channels report unavailable state.
-- MCP uses the same schema, expected revision, reference checks and repository mutation operations. Note edits and deletes use the exact `updatedAtMs` returned by the last read as their freshness token.
-- Successful MCP mutation emits invalidation; the renderer rereads canonical repository state. Notes preserve a local draft across refresh, reject a stale save and leave edit mode only when its note was deleted.
+- MCP uses the same schema, expected revision, reference checks and repository mutation operations. Note edits, relationship removal and deletes use the exact `updatedAtMs` returned by the last read as their freshness token. Notes MCP collection supports one item UID filter alongside content search and pagination; collection/detail resolve human item labels from the current config.
+- Successful MCP mutation emits invalidation; the renderer rereads canonical repository state. Notes also refresh after a local project revision changes. They preserve a local draft across refresh, reject a stale save and leave edit mode when its note disappears from the active global/item collection.
 - CLI MCP has no renderer projection to invalidate. Version checkout therefore performs the confirmed repository replacement directly with the current saved fingerprint.
 - GUI Editor and CLI MCP access are mutually unsupported by contract. No process lock or runtime detection enforces that restriction.
 

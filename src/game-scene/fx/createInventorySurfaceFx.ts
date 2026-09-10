@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics, Rectangle } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -12,7 +12,6 @@ import { drawMaskFx } from "~/game-scene/fx/drawMaskFx";
 import { drawSurfaceFx } from "~/game-scene/fx/drawSurfaceFx";
 import { readSlotFn } from "~/game-scene/fn/readSlotFn";
 import { readInventoryLayoutFn } from "~/game-scene/fn/readInventoryLayoutFn";
-import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import type { InventoryLayout } from "~/game-scene/type/SceneLayout";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type {
@@ -54,26 +53,10 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 	application.stage.eventMode = "static";
 	let closed = false;
 
-	const createLayoutFn = () => {
-		const width = Math.max(1, application.app.screen.width);
-		const height = Math.max(1, application.app.screen.height);
-		const preferredCellSize = readMainLayoutFn({
-			boardHeight: game.config.meta.board.height,
-			boardWidth: game.config.meta.board.width,
-			height,
-			toolbarSize: game.config.meta.toolbarSize ?? 0,
-			width,
-		}).board.cellSize;
-		return readInventoryLayoutFn({
-			columns: game.config.meta.inventory.width,
-			height,
-			preferredCellSize,
-			rows: game.config.meta.inventory.height,
-			width,
-		});
-	};
-
-	let layout: InventoryLayout = createLayoutFn();
+	const layout: InventoryLayout = readInventoryLayoutFn({
+		columns: game.config.meta.inventory.width,
+		rows: game.config.meta.inventory.height,
+	});
 
 	const readActorPoseFx = Effect.fn("InventorySurface.readActorPoseFx")((item: TileActorItem) =>
 		Effect.sync((): InventoryActorPose | null => {
@@ -115,13 +98,6 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 	);
 
 	const redrawFx = Effect.gen(function* () {
-		layout = createLayoutFn();
-		application.stage.hitArea = new Rectangle(
-			0,
-			0,
-			application.app.screen.width,
-			application.app.screen.height,
-		);
 		yield* drawSurfaceFx({
 			graphics: grid,
 			lineColor: palette.line,

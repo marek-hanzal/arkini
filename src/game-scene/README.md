@@ -10,7 +10,8 @@ The root has only direct grammar layers: `ui/` for React canvas composition, `fx
 
 | Area | Owner |
 | --- | --- |
-| Main-scene camera, zoom and pan | `fx/createMainCameraFx.ts` |
+| Shared Board/Inventory camera, zoom and pan | `fx/createBoardCameraFx.ts` |
+| Routed canvas acquisition, overlay blocking and teardown | `ui/useBoardRuntime.ts` |
 | Canvas, resize, demand rendering | `src/tile-rendering/fx/createApplicationOwnerFx.ts` |
 | Semantic actors, feedback, replacements, motion intents | `src/tile-presentation/{type,fn,fx}` |
 | Native actors, visuals, readiness and particles | `src/tile-rendering/{type,service,fn,fx}` |
@@ -47,7 +48,7 @@ Before delivery takes an existing actor's pose, reconciliation retires its activ
 
 ## Interaction
 
-- Board and Toolbar use fixed 512 px world cells under one camera, including masks, feedback and transient actors. The initial camera fits the whole scene; wheel/pinch zoom anchors at the pointer and right drag pans freely. A short right click still opens Item Detail; crossing the screen-space drag threshold gives the gesture to the camera. `0` restores the fitted default view in Game and Editor Board. Resize preserves the viewed world center and zoom. Pointer coordinates enter world space before tile gestures; the drag threshold stays in screen pixels. Camera gestures cancel tile gestures, and overlays block both.
+- Board + Toolbar and Inventory use fixed 512 px world cells under the same camera implementation, with one camera per canvas, including masks, feedback and transient actors. The initial camera fits the whole scene; wheel/pinch zoom anchors at the pointer and right drag pans freely. A short right click still opens Item Detail; crossing the screen-space drag threshold gives the gesture to the camera. `0` restores the fitted default view for the mounted board or inventory in both Game and Editor. Resize preserves the viewed world center and zoom. Pointer coordinates enter world space before tile gestures; the drag threshold stays in screen pixels. Camera gestures cancel tile gestures, and overlays block both.
 - Board/Toolbar left click runs the primary action; `Ctrl+left click` fills remaining default-line queue capacity; `Shift+left click` splits a Board stack; right click opens Item Detail.
 - Inventory left click releases the item; right click opens Item Detail.
 - Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented; there is no ghost, screenshot, duplicate tile, or pointer-frequency React render.

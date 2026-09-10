@@ -119,10 +119,19 @@ vi.mock("~/space-action/fx/activateSpaceItemFx", () => ({
 
 vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
+		state: {
+			phase: "closed",
+		},
 		openItemDetailFx: (props: unknown) =>
 			Effect.sync(() => {
 				surfaceState.detail(props);
 			}),
+	}),
+}));
+
+vi.mock("~/game-menu/ui/GameMenuProvider", () => ({
+	useGameMenuControl: () => ({
+		phase: "closed",
 	}),
 }));
 
@@ -146,6 +155,7 @@ vi.mock("~/game-scene/fx/createInventoryRuntimeFx", () => ({
 			return {
 				canvas: document.createElement("canvas"),
 				cancelInteractionFx: Effect.sync(surfaceState.interactionCancel),
+				setInteractionBlockedFx: () => Effect.void,
 				projectSpaceActivationFx: (transition: GameTransition) =>
 					Effect.promise(() => {
 						surfaceState.projectSpaceActivation(transition);

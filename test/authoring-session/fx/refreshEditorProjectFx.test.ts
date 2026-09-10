@@ -48,6 +48,7 @@ const runRefresh = async (
 			Effect.sync(() => events.push(`board-sync-${nextProject.revision}`)),
 		publishFx: (nextProject) =>
 			Effect.sync(() => events.push(`board-publish-${nextProject.revision}`)),
+		advanceNoopFx: () => Effect.void,
 		replaceFx: () => Effect.void,
 		releaseCurrentFx: Effect.sync(() => events.push("board-release")),
 		shutdownFx: Effect.void,

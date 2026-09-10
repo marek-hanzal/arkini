@@ -98,11 +98,9 @@ describe("ItemDraftToggle", () => {
 		await act(async () => button.click());
 		expect(state.save).toHaveBeenCalledWith({
 			config: state.project?.config,
+			draft: true,
 			expectedRevision: 7,
-			item: {
-				...item,
-				draft: true,
-			},
+			itemId: item.id,
 		});
 
 		state.result = AsyncResult.fail(new Error("Write failed"), {

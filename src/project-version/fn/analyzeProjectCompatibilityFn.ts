@@ -1,8 +1,8 @@
 import {
 	type ProjectCompatibility,
 	type ProjectCompatibilityContext,
-	type ProjectCompatibilityDiffResult,
 	type ProjectCompatibilityPath,
+	type ProjectCompatibilityResult,
 	type ProjectCompatibilityRule,
 } from "~/project-version/type/ProjectCompatibility";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -61,8 +61,6 @@ const readObjectValueFn = (value: Record<string, unknown>, key: string): DiffVal
 
 const readSemanticValueFn = (value: DiffValue, path: ProjectCompatibilityPath): DiffValue => {
 	if (value.type === "present") return value;
-	if (path.length === 2 && path[0] === "meta" && path[1] === "toolbarSize")
-		return presentDiffValueFn(0);
 	if (
 		path.length === 3 &&
 		path[0] === "items" &&
@@ -70,6 +68,8 @@ const readSemanticValueFn = (value: DiffValue, path: ProjectCompatibilityPath): 
 		path[2] === "draft"
 	)
 		return presentDiffValueFn(false);
+	if (path.length === 2 && path[0] === "meta" && path[1] === "toolbarSize")
+		return presentDiffValueFn(0);
 	if (
 		path.length === 4 &&
 		path[0] === "start" &&
@@ -315,7 +315,7 @@ const readProjectSemanticDiffsFn = (
 
 interface CompatibilityDecision {
 	readonly message: string;
-	readonly result: ProjectCompatibilityDiffResult;
+	readonly result: ProjectCompatibilityResult;
 	readonly rule: ProjectCompatibilityRule;
 }
 
@@ -379,15 +379,6 @@ const minorPathRules: ReadonlyArray<MinorPathRule> = [
 			"description",
 		],
 		rule: "item-description",
-	},
-	{
-		message: "Editor item draft status has no gameplay semantics.",
-		path: [
-			"items",
-			AnyStringPathSegment,
-			"draft",
-		],
-		rule: "item-draft-status",
 	},
 	{
 		message: "Default item artwork changes are explicitly minor-compatible.",
@@ -552,6 +543,18 @@ const classifyDiffFn = (
 	previous: GameConfigSchema.Type,
 	next: GameConfigSchema.Type,
 ): CompatibilityDecision => {
+	if (
+		matchesPathFn(diff.path, [
+			"items",
+			AnyStringPathSegment,
+			"draft",
+		])
+	)
+		return {
+			message: "Editor item draft status has no gameplay semantics.",
+			result: "noop",
+			rule: "item-draft-status",
+		};
 	const pathRule = minorPathRules.find((rule) => matchesPathFn(diff.path, rule.path));
 	if (pathRule !== undefined)
 		return {
@@ -615,7 +618,9 @@ export const analyzeProjectCompatibilityFn = (
 				? "noop"
 				: context.some(({ result }) => result === "major")
 					? "major"
-					: "minor",
+					: context.some(({ result }) => result === "minor")
+						? "minor"
+						: "noop",
 	};
 	return compatibility;
 };

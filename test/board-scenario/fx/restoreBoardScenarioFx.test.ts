@@ -66,6 +66,7 @@ const runRestore = async ({
 		),
 		syncFx: () => Effect.void,
 		publishFx: () => Effect.void,
+		advanceNoopFx: () => Effect.void,
 		replaceFx,
 		releaseCurrentFx: Effect.void,
 		shutdownFx: Effect.void,

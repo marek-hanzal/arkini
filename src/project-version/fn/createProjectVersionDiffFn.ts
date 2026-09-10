@@ -24,8 +24,12 @@ const materializeContextFn = (
 	path: string,
 ): ProjectVersionValueChange => {
 	const base = {
-		bump: context.result,
 		path,
+		...(context.result === "noop"
+			? {}
+			: {
+					bump: context.result,
+				}),
 	};
 	if (context.operation === "add")
 		return {

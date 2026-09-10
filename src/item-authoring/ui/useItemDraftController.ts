@@ -6,7 +6,7 @@ import { useCallback } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { saveFx } from "~/item-authoring/fx/saveFx";
+import { saveDraftStatusFx } from "~/item-authoring/fx/saveDraftStatusFx";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
@@ -14,8 +14,8 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 const saveDraftStatusCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<saveFx.Props, "projectId">) =>
-				saveFx({
+			Atom.fn((props: Omit<saveDraftStatusFx.Props, "projectId">) =>
+				saveDraftStatusFx({
 					...props,
 					projectId,
 				}).pipe(Effect.provideService(ProjectRepository, repository)),
@@ -51,11 +51,9 @@ export const useItemDraftController = ({
 		try {
 			await saveFn({
 				config: project.config,
+				draft: !readDraftFn(item),
 				expectedRevision: project.revision,
-				item: {
-					...item,
-					draft: !readDraftFn(item),
-				},
+				itemId: item.id,
 			});
 		} catch {
 			// The settled command error remains visible beside the action.

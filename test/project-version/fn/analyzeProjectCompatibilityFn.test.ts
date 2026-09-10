@@ -38,7 +38,7 @@ const withProducer = () => {
 };
 
 describe("analyzeProjectCompatibilityFn", () => {
-	it("keeps Editor draft-status changes minor-compatible", () => {
+	it("keeps Editor draft-status changes as a Version noop", () => {
 		const water = editorTestConfig.items.water;
 		if (water === undefined) throw new Error("Missing water fixture.");
 		const next = GameConfigSchema.parse({
@@ -53,7 +53,7 @@ describe("analyzeProjectCompatibilityFn", () => {
 		});
 
 		expect(analyze(editorTestConfig, next)).toMatchObject({
-			result: "minor",
+			result: "noop",
 			context: [
 				{
 					path: [
@@ -61,7 +61,7 @@ describe("analyzeProjectCompatibilityFn", () => {
 						"water",
 						"draft",
 					],
-					result: "minor",
+					result: "noop",
 					rule: "item-draft-status",
 				},
 			],

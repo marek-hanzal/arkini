@@ -20,7 +20,7 @@ export type ProjectCompatibilityRule =
 interface ProjectCompatibilityContextBase {
 	readonly message: string;
 	readonly path: ProjectCompatibilityPath;
-	readonly result: ProjectCompatibilityDiffResult;
+	readonly result: ProjectCompatibilityResult;
 	readonly rule: ProjectCompatibilityRule;
 }
 

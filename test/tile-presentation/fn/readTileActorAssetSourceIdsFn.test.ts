@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
 	createProgressAssetRuntime,
+	createTemporaryProgressRuntime,
 	progressAssetTestConfig,
 	readProgressAssetOwner,
 } from "~test/tile-presentation/support/progressAssetTestFixture";
@@ -59,4 +60,45 @@ describe("readTileActorAssetSourceIdsFn", () => {
 			"asset:material-unused-stage",
 		]);
 	});
+
+	it.each([
+		{
+			assetId: "asset:temporary-stage-0",
+			label: "default",
+			remainingDurationMs: 1_000,
+		},
+		{
+			assetId: "asset:temporary-stage-1",
+			label: "first",
+			remainingDurationMs: 750,
+		},
+		{
+			assetId: "asset:temporary-stage-2",
+			label: "second",
+			remainingDurationMs: 500,
+		},
+		{
+			assetId: "asset:temporary-stage-3",
+			label: "final",
+			remainingDurationMs: 250,
+		},
+	])(
+		"distributes the temporary $label artwork across its lifetime",
+		({ assetId, remainingDurationMs }) => {
+			const runtime = createTemporaryProgressRuntime({
+				remainingDurationMs,
+			});
+			const temporary = runtime.items[0];
+			if (temporary === undefined) throw new Error("Missing temporary item.");
+
+			expect(
+				readTileActorAssetSourceIdsFn({
+					item: temporary,
+					runtime,
+				}),
+			).toEqual([
+				assetId,
+			]);
+		},
+	);
 });

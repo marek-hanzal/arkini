@@ -46,7 +46,7 @@ remainingMs
 
 Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. There is no player cancellation command for an active job; expiry of committed temporary material is the one engine-owned abort path.
 
-Temporary items are Board-authored, identity-bound, and non-stackable. Each persists `remainingDurationMs`, initialized from authored `durationMs`; identities present at a step boundary lose one step while on the Board, in delivery, in an input buffer, or committed to a job. Inventory and Toolbar remain invalid temporary storage. Job output created in the current step starts at full duration.
+Temporary items are Board-authored, identity-bound, and non-stackable. Each persists `remainingDurationMs`, initialized from authored `durationMs`; identities present at a step boundary lose one step while on the Board, in delivery, in an input buffer, or committed to a job. When progress artwork exists, the default composition and every ordered progress asset occupy an equal share of that lifetime. Inventory and Toolbar remain invalid temporary storage. Job output created in the current step starts at full duration.
 
 Ready temporaries expire after job completion in stable runtime-ID order, so a job completion tied with its material expiry wins. Expiry output uses the visible Board origin: the item's own cell, its delivery lease, its input owner, or its job owner. The expiry, optional deterministic output, affected-job reconciliation, and reservation returns commit atomically. Failed placement leaves the same zero-duration item in place; an affected active job stays frozen until expiry can settle.
 

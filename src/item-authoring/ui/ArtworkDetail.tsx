@@ -31,6 +31,7 @@ export const ArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
 			<DetailSection title="Progress artwork">
 				<ArtworkTimeline
 					asset={item.asset}
+					itemType={item.type}
 					linkAssets
 				/>
 			</DetailSection>

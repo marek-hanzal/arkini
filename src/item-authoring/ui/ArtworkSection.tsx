@@ -110,10 +110,12 @@ const ArtworkFields = withFieldGroupFn({
 
 const ArtworkPreview = ({
 	asset,
+	itemType,
 	onSelectProgressFn,
 	selectedProgressIndex,
 }: {
 	readonly asset: ItemSchema.Type["asset"];
+	readonly itemType: ItemSchema.Type["type"];
 	readonly onSelectProgressFn: (index: number) => void;
 	readonly selectedProgressIndex: number;
 }) => (
@@ -127,6 +129,7 @@ const ArtworkPreview = ({
 		</header>
 		<ArtworkTimeline
 			asset={asset}
+			itemType={itemType}
 			onSelectProgressFn={onSelectProgressFn}
 			selectedProgressIndex={selectedProgressIndex}
 		/>
@@ -153,6 +156,7 @@ export const ArtworkSection = () => {
 					return (
 						<ArtworkPreview
 							asset={canonicalAsset}
+							itemType={form.state.values.type}
 							onSelectProgressFn={setSelectedProgressIndexFn}
 							selectedProgressIndex={selectedProgressIndex}
 						/>

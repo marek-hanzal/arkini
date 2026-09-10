@@ -113,7 +113,12 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			type: "temporary",
 			asset: {
 				default: [
-					"asset:temporary",
+					"asset:temporary-stage-0",
+				],
+				sources: [
+					"asset:temporary-stage-1",
+					"asset:temporary-stage-2",
+					"asset:temporary-stage-3",
 				],
 			},
 			durationMs: 1_000,
@@ -218,7 +223,11 @@ export const readProgressAssetOwner = (runtime: RuntimeSchema.Type) => {
 	return owner;
 };
 
-export const createTemporaryProgressRuntime = () =>
+export const createTemporaryProgressRuntime = ({
+	remainingDurationMs = 600,
+}: {
+	readonly remainingDurationMs?: number;
+} = {}) =>
 	RuntimeSchema.parse({
 		cheats: {
 			enabled: false,
@@ -233,7 +242,7 @@ export const createTemporaryProgressRuntime = () =>
 				item: progressAssetTestConfig.items.temporary,
 				location: boardLocation,
 				quantity: 1,
-				remainingDurationMs: 600,
+				remainingDurationMs,
 			},
 		],
 		jobs: [],

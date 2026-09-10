@@ -1,13 +1,16 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { readProgressArtworkThresholdsFn } from "~/tile-presentation/fn/readProgressArtworkThresholdsFn";
 
 const formatProgressFn = (progress: number) =>
 	`${Number.isInteger(progress) ? progress : progress.toFixed(1)}%`;
 
 interface ArtworkTimelineProps {
 	readonly asset: ItemSchema.Type["asset"];
+	readonly itemType: TypeSchema.Type;
 	readonly linkAssets?: boolean;
 	readonly onSelectProgressFn?: (index: number) => void;
 	readonly selectedProgressIndex?: number;
@@ -39,11 +42,16 @@ const ResourceLabel = ({
 /** Shows the runtime artwork thresholds shared by read-only and editable item views. */
 export const ArtworkTimeline = ({
 	asset,
+	itemType,
 	linkAssets = false,
 	onSelectProgressFn,
 	selectedProgressIndex,
 }: ArtworkTimelineProps) => {
 	const sources = asset.sources ?? [];
+	const thresholds = readProgressArtworkThresholdsFn({
+		itemType,
+		sourceCount: sources.length,
+	});
 	return (
 		<>
 			<div className="flex items-center gap-4">
@@ -94,7 +102,7 @@ export const ArtworkTimeline = ({
 							<span className="max-w-32 truncate text-xs font-medium">Default</span>
 						</li>
 						{sources.map((resourceId, index) => {
-							const threshold = ((index + 1) / sources.length) * 100;
+							const threshold = (thresholds[index] ?? 0) * 100;
 							const thumbnail = (
 								<EditorItemThumbnail
 									resourceIds={[

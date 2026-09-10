@@ -21,6 +21,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "coin-bag"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pot"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "pot-with-coins"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pillow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "pillow-with-coins"
 			}
 		],
 		"type": "simple"

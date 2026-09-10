@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "om31d2frwk86m6dhiirx7kw6",
+		"id": "corn-field",
+		"title": "Corn Field",
+		"asset": {
+			"default": [
+				"corn-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

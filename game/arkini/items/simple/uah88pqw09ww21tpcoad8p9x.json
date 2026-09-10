@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "uah88pqw09ww21tpcoad8p9x",
+		"id": "faith-cauldron",
+		"title": "Faith Cauldron",
+		"asset": {
+			"default": [
+				"faith-cauldron"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

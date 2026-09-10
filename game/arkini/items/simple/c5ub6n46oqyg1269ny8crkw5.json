@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "c5ub6n46oqyg1269ny8crkw5",
+		"id": "mana-vessel",
+		"title": "Mana Vessel",
+		"asset": {
+			"default": [
+				"mana-vessel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

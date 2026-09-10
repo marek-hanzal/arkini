@@ -1,0 +1,16 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "kgwuy9zokikfg1oo8417by1s",
+		"id": "corruption",
+		"title": "Corruption",
+		"asset": {
+			"default": [
+				"corruption"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

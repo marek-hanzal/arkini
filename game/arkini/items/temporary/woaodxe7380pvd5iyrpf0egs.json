@@ -1,0 +1,40 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "woaodxe7380pvd5iyrpf0egs",
+		"id": "fertilized-flax-field",
+		"title": "Fertilized Flax Field",
+		"asset": {
+			"default": [
+				"fertilized-flax-field"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 120000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "empty-flax-field",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

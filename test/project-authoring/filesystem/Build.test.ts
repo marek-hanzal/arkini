@@ -139,6 +139,29 @@ describe("filesystem Editor project build", () => {
 			}),
 		);
 		expect(content.bytes.byteLength).toBe(artifact.size);
+		const status = await Effect.runPromise(repository.readVersionStatusFx(project.projectId));
+		await Effect.runPromise(
+			repository.createNoteFx({
+				projectId: project.projectId,
+				content: "Linked authoring notes stay outside gameplay artifacts",
+				itemUids: [
+					"water",
+				],
+			}),
+		);
+		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(
+			status,
+		);
+		const rebuilt = await Effect.runPromise(
+			repository.buildProjectFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+			}),
+		);
+		expect(rebuilt.contentHash).toBe(artifact.contentHash);
+		expect(await readFile(join(root, "build", "project%2Ebuild.arkpack"))).toEqual(
+			Buffer.from(content.bytes),
+		);
 	});
 
 	it("rejects changed bytes and preserves a user's existing gitignore content", async () => {

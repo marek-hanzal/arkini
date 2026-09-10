@@ -1,4 +1,31 @@
 import { Effect } from "effect";
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
+import type { Project } from "~/project-authoring/type/Project";
+
+export const editorNotesTestProject: Project = {
+	projectId: "project-one",
+	title: "Notes test",
+	version: "1.0",
+	createdAtMs: 1,
+	updatedAtMs: 1,
+	revision: 1,
+	resources: [],
+	config: {
+		...editorTestConfig,
+		items: {
+			wood: {
+				...editorTestConfig.items.water,
+				uid: "wood",
+				id: "wood",
+				title: "Timber",
+			},
+			"renamed-water": {
+				...editorTestConfig.items.water,
+				id: "renamed-water",
+			},
+		},
+	},
+};
 
 import { createNoteCommandAtomsFx } from "~/project-note/fx/createNoteCommandAtomsFx";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
@@ -14,6 +41,7 @@ export const editorNotesTestState = {
 			noteId: "note-one",
 			projectId: "project-one",
 			content: "Existing note",
+			itemUids: [] as string[],
 			createdAtMs: 1,
 			updatedAtMs: 1,
 		},
@@ -36,7 +64,7 @@ const repository: Pick<
 				}),
 			);
 		}),
-	createNoteFx: ({ projectId, content }: { projectId: string; content: string }) =>
+	createNoteFx: ({ projectId, content, itemUids }) =>
 		Effect.promise(() => editorNotesTestState.beforeCreateFn?.() ?? Promise.resolve()).pipe(
 			Effect.andThen(
 				Effect.try({
@@ -49,6 +77,9 @@ const repository: Pick<
 							noteId: `note-${editorNotesTestState.nextNote++}`,
 							projectId,
 							content,
+							itemUids: [
+								...itemUids,
+							],
 							createdAtMs: editorNotesTestState.nextNote,
 							updatedAtMs: editorNotesTestState.nextNote,
 						};
@@ -67,7 +98,7 @@ const repository: Pick<
 				}),
 			),
 		),
-	updateNoteFx: ({ projectId, noteId, content, expectedUpdatedAtMs }) =>
+	updateNoteFx: ({ projectId, noteId, content, itemUids, expectedUpdatedAtMs }) =>
 		Effect.try({
 			try: () => {
 				const previous = editorNotesTestState.notes.find((note) => note.noteId === noteId);
@@ -79,6 +110,9 @@ const repository: Pick<
 					...previous,
 					projectId,
 					content,
+					itemUids: [
+						...itemUids,
+					],
 					updatedAtMs: Math.max(
 						editorNotesTestState.nextNote++,
 						...editorNotesTestState.notes.map((note) => note.updatedAtMs + 1),

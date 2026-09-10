@@ -7,6 +7,7 @@ import {
 	Image as ImageIcon,
 	MapPinned,
 	Network,
+	NotebookPen,
 	ShieldAlert,
 	ShieldCheck,
 	type LucideIcon,
@@ -35,6 +36,7 @@ const OverviewIconBySection = {
 	merges: Combine,
 	production: Factory,
 	connections: Network,
+	notes: NotebookPen,
 } as const satisfies Record<Exclude<SectionId, "identity">, LucideIcon>;
 
 const ItemOverviewCard = ({
@@ -138,6 +140,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				</div>
 			</div>
 		),
+		notes: "Ideas and decisions linked to this item",
 		charges: item.charges === undefined ? "Disabled" : "Enabled",
 		delete:
 			deleteBlockers.length === 0

@@ -54,7 +54,10 @@ export const Detail = ({
 		itemUid: item.uid,
 	};
 	const editableSectionId =
-		sectionId === "estimate" || sectionId === "connections" || sectionId === "delete"
+		sectionId === "estimate" ||
+		sectionId === "connections" ||
+		sectionId === "delete" ||
+		sectionId === "notes"
 			? "identity"
 			: sectionId;
 	const help = ItemDetailHelpBySection[sectionId];
@@ -142,6 +145,7 @@ export const Detail = ({
 			{sectionId === "identity" ||
 			sectionId === "charges" ||
 			sectionId === "delete" ||
+			sectionId === "notes" ||
 			sectionId === "estimate" ||
 			sectionId === "merges" ||
 			sectionId === "connections" ||

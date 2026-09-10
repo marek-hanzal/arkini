@@ -45,6 +45,15 @@ describe("editor MCP item lifecycle", () => {
 				resources: editorTestPayload.resources,
 			}),
 		);
+		const note = await Effect.runPromise(
+			repository.createNoteFx({
+				projectId: "item-lifecycle",
+				content: "Keep the design after deletion",
+				itemUids: [
+					"water",
+				],
+			}),
+		);
 		ownership.setProjectContextFn("item-lifecycle");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
@@ -116,5 +125,14 @@ describe("editor MCP item lifecycle", () => {
 		expect(project?.config.items["fresh-water"]).toBeUndefined();
 		expect(project?.config.start.board).toEqual([]);
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(2);
+		const notes = await Effect.runPromise(repository.listNotesFx("item-lifecycle"));
+		expect(notes).toEqual([
+			{
+				...note,
+				itemUids: [],
+				updatedAtMs: expect.any(Number),
+			},
+		]);
+		expect(notes[0]?.updatedAtMs).toBeGreaterThan(note.updatedAtMs);
 	});
 });

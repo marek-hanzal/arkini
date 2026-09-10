@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameTransition } from "~/game-session/type/GameSession";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { readSpaceActionPresentationPhasesFn } from "~/game-scene/fn/readSpaceActionPresentationPhasesFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorFeedbackCuesFn } from "~/tile-presentation/fn/readTileActorFeedbackCuesFn";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
@@ -78,14 +77,12 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 	let appearanceObserver: MutationObserver | null = null;
 	let unsubscribeTransitionsFn: (() => void) | null = null;
 	let closed = false;
-	const pendingProjectionResumes = new Set<() => void>();
 	const processedFeedbackKeys = new Set<string>();
 	const ignoreCleanupFailureFx = (cleanupFx: Effect.Effect<void, never, never>) =>
 		cleanupFx.pipe(Effect.catchCause(() => Effect.void));
 	const closeFx = Effect.gen(function* () {
 		if (closed) return;
 		closed = true;
-		for (const resumeFn of Array.from(pendingProjectionResumes)) resumeFn();
 		const releaseTransitionsFn = unsubscribeTransitionsFn;
 		unsubscribeTransitionsFn = null;
 		if (releaseTransitionsFn !== null) {
@@ -236,44 +233,10 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 				reportCriticalFailureFn(cause);
 			}
 		});
-		const projectSpaceActivationFx = (transition: GameTransition) =>
-			Effect.gen(function* () {
-				if (closed) return;
-				const phases = readSpaceActionPresentationPhasesFn(transition);
-				const accounting = phases[0];
-				if (accounting?.kind !== "accounting") return;
-				if (transition.sequence >= latestTransition.sequence) {
-					reconcileFn(accounting.transition, true);
-				}
-				yield* Effect.callback<void>((resumeEffectFn) => {
-					let settled = false;
-					let cancelFrameFn: () => void = () => undefined;
-					const resumeFn = () => {
-						if (settled) return;
-						settled = true;
-						pendingProjectionResumes.delete(resumeFn);
-						cancelFrameFn();
-						resumeEffectFn(Effect.void);
-					};
-					pendingProjectionResumes.add(resumeFn);
-					cancelFrameFn = RendererRuntime.runSync(
-						application.frames.scheduleAfterRenderFx(resumeFn),
-					);
-					if (closed) resumeFn();
-					return Effect.sync(() => {
-						if (settled) return;
-						settled = true;
-						pendingProjectionResumes.delete(resumeFn);
-						cancelFrameFn();
-					});
-				});
-			});
-
 		return {
 			canvas: application.app.canvas,
 			cancelInteractionFx: createdCamera.cancelInteractionFx,
 			setInteractionBlockedFx: createdCamera.setInteractionBlockedFx,
-			projectSpaceActivationFx,
 			closeFx,
 		} satisfies InventoryRuntime;
 	}).pipe(Effect.onError(() => closeFx));

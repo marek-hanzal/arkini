@@ -3,8 +3,23 @@ import { Effect } from "effect";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-import { run, sourceLocation, spawnInventoryOpenerFx } from "../support/dropItemFixture";
+import {
+	configInput,
+	run,
+	sourceLocation,
+	spawnInventoryOpenerFx,
+} from "../support/dropItemFixture";
+
+const toolbarReleaseConfig = GameConfigSchema.parse({
+	...configInput,
+	meta: {
+		...configInput.meta,
+		id: "game:release-inventory-item-toolbar",
+		toolbarSize: 2,
+	},
+});
 
 describe("releaseInventoryItemFx placement", () => {
 	it("releases the whole Inventory stack through board-first placement", () => {
@@ -152,5 +167,80 @@ describe("releaseInventoryItemFx placement", () => {
 		expect(result.runtime.items.filter((item) => item.location.scope === "board")).toHaveLength(
 			6,
 		);
+	});
+
+	it("releases an any-scoped item into Toolbar when the current Board is full", () => {
+		const inventoryLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const result = run(
+			Effect.gen(function* () {
+				yield* spawnInventoryOpenerFx();
+				let blockerIndex = 0;
+				for (let y = 0; y < 2; y += 1) {
+					for (let x = 0; x < 3; x += 1) {
+						yield* spawnItemFx({
+							id: `runtime:toolbar-fallback-blocker:${blockerIndex}`,
+							itemId: "stone",
+							location: {
+								scope: "board",
+								space: 0,
+								position: {
+									x,
+									y,
+								},
+							},
+							quantity: 1,
+						});
+						blockerIndex += 1;
+					}
+				}
+				const inventoryItem = yield* spawnItemFx({
+					id: "runtime:inventory-water",
+					itemId: "water",
+					location: inventoryLocation,
+					quantity: 1,
+				});
+				const outcome = yield* releaseInventoryItemFx({
+					itemId: inventoryItem.id,
+					revision: inventoryItem.revision,
+					location: inventoryLocation,
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+			toolbarReleaseConfig,
+		);
+
+		expect(result.outcome.events).toEqual([
+			expect.objectContaining({
+				canonicalItemId: "water",
+				location: {
+					scope: "toolbar",
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				type: "item:spawned",
+			}),
+		]);
+		expect(
+			result.runtime.items.find(
+				(item) => item.item.id === "water" && item.location.scope === "toolbar",
+			)?.location,
+		).toEqual({
+			scope: "toolbar",
+			position: {
+				x: 1,
+				y: 0,
+			},
+		});
 	});
 });

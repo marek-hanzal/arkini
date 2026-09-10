@@ -15,8 +15,6 @@ import { PixiInventorySurface } from "~/game-scene/ui/PixiInventorySurface";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const hoistedSurfaceState = vi.hoisted(() => ({
-	activationGate: Promise.resolve(),
-	activateSpace: vi.fn(),
 	createProps: null as {
 		readonly onActivateFn: (
 			item: TileActorItem,
@@ -28,39 +26,11 @@ const hoistedSurfaceState = vi.hoisted(() => ({
 	interactionCancel: vi.fn(),
 	interactionRegister: vi.fn(),
 	interactionUnregister: vi.fn(),
-	projectSpaceActivation: vi.fn(),
-	projection: Promise.resolve(),
 	release: vi.fn(),
-	spaceActivated: vi.fn(),
-	spaceActivationSucceeds: true,
-	spaceActivationTransition: null as GameTransition | null,
 	textures: {} as object,
 }));
 
 export const surfaceState = hoistedSurfaceState;
-
-export const spaceTransition = {
-	events: [
-		{
-			type: "current-space:changed",
-			previousSpace: 0,
-			currentSpace: 1,
-		},
-	],
-	previousRuntime: {
-		currentSpace: 0,
-	} as never,
-	runtime: {
-		currentSpace: 1,
-	} as never,
-	sequence: 1,
-} as GameTransition;
-
-const unrelatedTransition = {
-	...spaceTransition,
-	events: [],
-	sequence: 2,
-} as GameTransition;
 
 const game = {
 	config: {
@@ -76,7 +46,17 @@ const game = {
 			toolbarSize: 8,
 		},
 	},
-	getTransitionSnapshotFn: () => unrelatedTransition,
+	getTransitionSnapshotFn: () =>
+		({
+			events: [],
+			previousRuntime: {
+				currentSpace: 0,
+			} as never,
+			runtime: {
+				currentSpace: 0,
+			} as never,
+			sequence: 1,
+		}) as GameTransition,
 	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
 } as GameEngine;
 
@@ -96,25 +76,6 @@ vi.mock("~/item-interaction/fx/releaseInventoryItemFx", () => ({
 		Effect.sync(() => {
 			surfaceState.release(props);
 		}),
-}));
-
-vi.mock("~/space-action/fx/activateSpaceItemFx", () => ({
-	activateSpaceItemWithTransitionFx: (props: unknown) =>
-		Effect.sync(() => {
-			surfaceState.activateSpace(props);
-		}).pipe(
-			Effect.andThen(Effect.promise(() => surfaceState.activationGate)),
-			Effect.andThen(
-				Effect.suspend(() =>
-					surfaceState.spaceActivationSucceeds
-						? Effect.succeed({
-								result: 1,
-								transition: surfaceState.spaceActivationTransition,
-							})
-						: Effect.fail("space-action-unavailable"),
-				),
-			),
-		),
 }));
 
 vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
@@ -156,11 +117,6 @@ vi.mock("~/game-scene/fx/createInventoryRuntimeFx", () => ({
 				canvas: document.createElement("canvas"),
 				cancelInteractionFx: Effect.sync(surfaceState.interactionCancel),
 				setInteractionBlockedFx: () => Effect.void,
-				projectSpaceActivationFx: (transition: GameTransition) =>
-					Effect.promise(() => {
-						surfaceState.projectSpaceActivation(transition);
-						return surfaceState.projection;
-					}),
 				closeFx: Effect.void,
 			};
 		}),
@@ -169,19 +125,12 @@ vi.mock("~/game-scene/fx/createInventoryRuntimeFx", () => ({
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 export const resetPixiInventorySurfaceFixture = () => {
-	surfaceState.activationGate = Promise.resolve();
-	surfaceState.activateSpace.mockClear();
 	surfaceState.createProps = null;
 	surfaceState.detail.mockClear();
 	surfaceState.interactionCancel.mockClear();
 	surfaceState.interactionRegister.mockClear();
 	surfaceState.interactionUnregister.mockClear();
-	surfaceState.projectSpaceActivation.mockClear();
-	surfaceState.projection = Promise.resolve();
 	surfaceState.release.mockClear();
-	surfaceState.spaceActivated.mockClear();
-	surfaceState.spaceActivationSucceeds = true;
-	surfaceState.spaceActivationTransition = spaceTransition;
 	surfaceState.textures = {};
 };
 
@@ -191,11 +140,7 @@ export const renderPixiInventorySurface = async () => {
 	const root = createRoot(host);
 	roots.push(root);
 	await act(async () => {
-		root.render(
-			createElement(PixiInventorySurface, {
-				onSpaceActivatedFn: surfaceState.spaceActivated,
-			}),
-		);
+		root.render(createElement(PixiInventorySurface));
 		await Promise.resolve();
 	});
 	const scene = surfaceState.createProps;
@@ -204,18 +149,6 @@ export const renderPixiInventorySurface = async () => {
 		root,
 		scene,
 	};
-};
-
-export const replacePixiInventorySurfaceRuntime = async (root: ReturnType<typeof createRoot>) => {
-	surfaceState.textures = {};
-	await act(async () => {
-		root.render(
-			createElement(PixiInventorySurface, {
-				onSpaceActivatedFn: surfaceState.spaceActivated,
-			}),
-		);
-		await Promise.resolve();
-	});
 };
 
 export const unmountPixiInventorySurface = async (root: ReturnType<typeof createRoot>) => {

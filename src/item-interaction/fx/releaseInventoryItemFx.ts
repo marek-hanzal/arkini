@@ -3,13 +3,13 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
+import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
@@ -27,7 +27,7 @@ export namespace releaseInventoryItemFx {
 	}
 }
 
-/** Places one whole exact Inventory tile from the first available Board seed. */
+/** Releases one whole exact Inventory tile to its permitted Board or Toolbar scope. */
 export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(function* ({
 	itemId,
 	revision,
@@ -72,28 +72,27 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				itemId,
 				runtime,
 			});
-			const canOwnBoardLocation = isItemLocationScopeAllowedFn({
-				item: item.item,
-				locationScope: LocationScopeEnumSchema.enum.Board,
-			});
 			const config = yield* GameConfigFx;
 			const boardLocations = readBoardLocationsFn({
 				size: config.meta.board,
 				space: runtime.currentSpace,
 			});
 			const [origin] = boardLocations;
-			if (!canOwnBoardLocation || origin === undefined) {
+			if (origin === undefined) {
 				return yield* Effect.fail(
 					new PlacementUnavailableError({
 						itemId: item.item.id,
 						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
-						reason: PlacementUnavailableError.Reason.BoardFull,
+						reason: PlacementUnavailableError.Reason.BoardOriginUnavailable,
 						remainingQuantity: item.quantity,
 					}),
 				);
 			}
 			const placed = yield* placeRuntimeItemFx({
+				excludedLocations: readInventoryLocationsFn({
+					size: config.meta.inventory,
+				}),
 				itemId,
 				origin,
 				originItemId: inventoryOpener.id,
@@ -103,7 +102,8 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				placed.events.some(
 					(event) =>
 						!("location" in event) ||
-						event.location.scope !== LocationScopeEnumSchema.enum.Board,
+						(event.location.scope !== LocationScopeEnumSchema.enum.Board &&
+							event.location.scope !== LocationScopeEnumSchema.enum.Toolbar),
 				)
 			) {
 				return yield* Effect.fail(
@@ -111,7 +111,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 						itemId: item.item.id,
 						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
-						reason: PlacementUnavailableError.Reason.BoardFull,
+						reason: PlacementUnavailableError.Reason.ToolbarFull,
 						remainingQuantity: item.quantity,
 					}),
 				);

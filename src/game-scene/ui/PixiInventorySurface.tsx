@@ -15,38 +15,27 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
  *
  * Ordinary activation releases the canonical Inventory item from the engine-owned physical
- * opener. Space activation instead commits its action before returning to the Board. Right click
- * opens Item Detail and never initiates either command.
+ * opener. Right click opens Item Detail and never initiates the release command.
  */
-export const PixiInventorySurface = ({
-	onSpaceActivatedFn,
-}: {
-	readonly onSpaceActivatedFn: () => void;
-}) => {
+export const PixiInventorySurface = () => {
 	const game = useGameEngine();
-	const { releaseInventoryItemFn, runSpaceActivationFn, runDropFn } = useTileCommands(game);
+	const { releaseInventoryItemFn, runDropFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
 	const controlsRef = useRef({
 		itemDetail,
-		onSpaceActivatedFn,
 		releaseInventoryItemFn,
-		runSpaceActivationFn,
 	});
 	controlsRef.current = {
 		itemDetail,
-		onSpaceActivatedFn,
 		releaseInventoryItemFn,
-		runSpaceActivationFn,
 	};
 
 	const activateFn = useCallback(
 		(item: TileActorItem, openDetail: boolean, origin: HTMLElement) => {
 			const {
 				itemDetail: currentItemDetail,
-				onSpaceActivatedFn: currentOnSpaceActivatedFn,
 				releaseInventoryItemFn: currentReleaseInventoryItemFn,
-				runSpaceActivationFn: currentRunSpaceActivationFn,
 			} = controlsRef.current;
 			if (openDetail) {
 				RendererRuntime.runSync(
@@ -58,24 +47,6 @@ export const PixiInventorySurface = ({
 				return;
 			}
 			if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
-			if (item.primaryAction.kind === "activate-space") {
-				const runtime = runtimeRef.current;
-				if (runtime === null) return;
-				return currentRunSpaceActivationFn({
-					currentSpace: item.primaryAction.currentSpace,
-					itemId: item.id,
-					location: item.location,
-					revision: item.revision,
-				}).then(async (result) => {
-					if (result === null || runtimeRef.current !== runtime) return;
-					if (result.transition !== null) {
-						await RendererRuntime.runPromise(
-							runtime.projectSpaceActivationFx(result.transition),
-						);
-					}
-					if (runtimeRef.current === runtime) currentOnSpaceActivatedFn();
-				});
-			}
 			return currentReleaseInventoryItemFn({
 				itemId: item.id,
 				location: item.location,
@@ -102,7 +73,7 @@ export const PixiInventorySurface = ({
 			textures,
 		],
 	);
-	const { hostRef, runtimeRef } = useBoardRuntime({
+	const { hostRef } = useBoardRuntime({
 		createRuntimeFx,
 		game,
 	});

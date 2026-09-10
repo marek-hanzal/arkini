@@ -204,8 +204,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 
 		const activateActorFn = (actor: PixiTileActor, openDetail: boolean) => {
 			const item = actor.item;
-			const presentsOptimisticRemoval =
-				!openDetail && item.primaryAction.kind !== "activate-space";
+			const presentsOptimisticRemoval = !openDetail;
 			if (!openDetail && removalFeedbackGenerationByActorId.has(item.id)) return;
 			const removalFeedbackGeneration = openDetail
 				? null

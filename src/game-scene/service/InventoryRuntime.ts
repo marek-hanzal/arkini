@@ -1,14 +1,9 @@
 import type { Effect } from "effect";
 
-import type { GameTransition } from "~/game-session/type/GameSession";
-
-/** Routed Inventory canvas lifetime and transition projection capability. */
+/** Routed Inventory canvas lifetime. */
 export interface InventoryRuntime {
 	readonly canvas: HTMLCanvasElement;
 	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
 	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
-	readonly projectSpaceActivationFx: (
-		transition: GameTransition,
-	) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }

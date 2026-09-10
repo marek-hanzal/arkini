@@ -12,6 +12,7 @@ interface EditorCollectionSelectorProps {
 	readonly dataUi?: string;
 	readonly itemLabelFn: (index: number) => string;
 	readonly itemMetaFn?: (index: number) => string | undefined;
+	readonly itemSearchTermsFn?: (index: number) => ReadonlyArray<string>;
 	readonly initialSelectedIndex?: number;
 	readonly label: string;
 	readonly navigationCard?: boolean;
@@ -32,6 +33,7 @@ export const EditorCollectionSelector = ({
 	dataUi = "EditorCollectionSelector",
 	itemLabelFn,
 	itemMetaFn,
+	itemSearchTermsFn,
 	initialSelectedIndex = 0,
 	label,
 	navigationCard = false,
@@ -83,6 +85,7 @@ export const EditorCollectionSelector = ({
 											: [
 													optionMeta,
 												]),
+										...(itemSearchTermsFn?.(index) ?? []),
 									],
 								};
 							},

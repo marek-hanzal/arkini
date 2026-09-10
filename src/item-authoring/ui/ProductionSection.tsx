@@ -109,9 +109,12 @@ const ProductionFields = withFieldGroupFn({
 							itemLabelFn={(index) => {
 								const line = lines[index];
 								return line.title.length === 0
-									? line.id
-									: `${line.id} — ${line.title}`;
+									? `Production line ${index + 1}`
+									: line.title;
 							}}
+							itemSearchTermsFn={(index) => [
+								lines[index].id,
+							]}
 							initialSelectedIndex={Math.max(
 								0,
 								lines.findIndex((line) => line.id === selectedLineId),

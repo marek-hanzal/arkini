@@ -39,6 +39,7 @@ export namespace useFormController {
 	export interface Props {
 		readonly enableCapability?: OptionalCapability;
 		readonly initialItem: ItemSchema.Type;
+		readonly isNew: boolean;
 		readonly onInvalidSectionFn: (
 			section: SectionId,
 			path: ReadonlyArray<PropertyKey>,
@@ -182,6 +183,7 @@ const readFormValidationMessageFn = (issue: z.core.$ZodIssue) =>
 export const useFormController = ({
 	enableCapability,
 	initialItem,
+	isNew,
 	onInvalidSectionFn,
 	onSavedFn,
 }: useFormController.Props) => {
@@ -266,7 +268,7 @@ export const useFormController = ({
 	});
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
-			if (submitting || !dirty) return false;
+			if (submitting || (!dirty && !isNew)) return false;
 			notifyOnSaved.current = notify;
 			submitSucceeded.current = false;
 			try {
@@ -298,6 +300,7 @@ export const useFormController = ({
 		[
 			dirty,
 			form,
+			isNew,
 			onInvalidSectionFn,
 			schema,
 			submitting,

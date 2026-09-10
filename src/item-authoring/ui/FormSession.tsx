@@ -90,6 +90,7 @@ export const FormSession = ({
 	const controller = useFormController({
 		enableCapability,
 		initialItem,
+		isNew,
 		onInvalidSectionFn,
 		onSavedFn: (saved) => {
 			void navigateFn({
@@ -162,7 +163,6 @@ export const FormSession = ({
 			>
 				<EditorFormSectionPage
 					discardFn={discardFn}
-					dirty={controller.isDirty}
 					error={controller.error}
 					rootCard={
 						sectionId !== "action" &&
@@ -171,6 +171,7 @@ export const FormSession = ({
 						sectionId !== "merges" &&
 						sectionId !== "production"
 					}
+					saveEnabled={isNew || controller.isDirty}
 					saveFn={controller.saveFn}
 					saving={controller.isSaving}
 					leading={

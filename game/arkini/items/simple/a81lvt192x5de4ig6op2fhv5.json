@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 6,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-cotton-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cotton-field"
+			}
+		],
 		"type": "simple"
 	}
 }

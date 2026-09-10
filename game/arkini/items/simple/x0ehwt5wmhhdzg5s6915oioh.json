@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "x0ehwt5wmhhdzg5s6915oioh",
+		"id": "empty-rum-bottle",
+		"title": "Empty Rum Bottle",
+		"description": "A bottle",
+		"asset": {
+			"default": [
+				"empty-rum-bottle"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"type": "simple"
+	}
+}

@@ -39,6 +39,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "fertilized-grape-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cotton-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-cotton-field"
 			}
 		],
 		"type": "simple"

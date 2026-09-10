@@ -7,7 +7,7 @@ import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryIt
 import { run, spawnInventoryOpenerFx } from "../support/dropItemFixture";
 
 describe("releaseInventoryItemFx rejection", () => {
-	it("rejects a release that could only fall back into passive storage", () => {
+	it("rejects a release when both Board and Toolbar are full", () => {
 		const inventoryLocation = {
 			scope: "inventory" as const,
 			position: {
@@ -63,7 +63,7 @@ describe("releaseInventoryItemFx rejection", () => {
 		if (Result.isFailure(result.outcome)) {
 			expect(result.outcome.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
-				reason: "board:full",
+				reason: "toolbar:full",
 			});
 		}
 		expect(result.after).toEqual(result.before);

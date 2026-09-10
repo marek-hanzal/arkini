@@ -62,7 +62,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 		expect(actor.container.destroyed).toBe(true);
 		await Effect.runPromise(runtime.closeFx);
 	});
-	it("keeps a Space actor committed while its authoritative activation is pending", async () => {
+	it("presents Inventory release feedback for a Space item", async () => {
 		let resolveActivation: () => void = () => undefined;
 		const activation = new Promise<void>((resolve) => {
 			resolveActivation = resolve;
@@ -91,7 +91,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 		await Promise.resolve();
 
 		expect(onActivate).toHaveBeenCalledOnce();
-		expect(actor.container.alpha).toBe(1);
+		expect(actor.container.alpha).toBe(0);
 		expect(actor.container.destroyed).toBe(false);
 
 		resolveActivation();

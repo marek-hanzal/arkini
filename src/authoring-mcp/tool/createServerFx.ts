@@ -18,6 +18,7 @@ import { editItemFx } from "./editItemFx";
 import { readAssetCollectionTextFn } from "./fn/readAssetCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
+import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
@@ -171,6 +172,7 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 			`ID: ${item.id}`,
 			`UID: ${item.uid}`,
 			`Type: ${item.type}`,
+			`Draft: ${readDraftFn(item)}`,
 			...(item.description === undefined
 				? []
 				: [
@@ -378,7 +380,7 @@ const createServerFn = (
 		"item_collection",
 		{
 			description:
-				"List one page of items with collection metadata, title, ID, optional description, and type, optionally filtered by item types and the editor's fuzzy search.",
+				"List one page of items with collection metadata, title, ID, optional description, type, and Editor draft status, optionally filtered by item types and the editor's fuzzy search.",
 			inputSchema: ItemCollectionInputSchema,
 		},
 		async (input) =>
@@ -413,7 +415,7 @@ const createServerFn = (
 		"item_detail",
 		{
 			description:
-				"Read the simplified identity and storage detail of one item in the open project.",
+				"Read the simplified identity, Editor draft status, and storage detail of one item in the open project.",
 			inputSchema: ItemDetailInputSchema,
 		},
 		async ({ id }) =>

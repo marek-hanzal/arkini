@@ -38,6 +38,36 @@ const withProducer = () => {
 };
 
 describe("analyzeProjectCompatibilityFn", () => {
+	it("keeps Editor draft-status changes minor-compatible", () => {
+		const water = editorTestConfig.items.water;
+		if (water === undefined) throw new Error("Missing water fixture.");
+		const next = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				...editorTestConfig.items,
+				water: {
+					...water,
+					draft: true,
+				},
+			},
+		});
+
+		expect(analyze(editorTestConfig, next)).toMatchObject({
+			result: "minor",
+			context: [
+				{
+					path: [
+						"items",
+						"water",
+						"draft",
+					],
+					result: "minor",
+					rule: "item-draft-status",
+				},
+			],
+		});
+	});
+
 	it("reports every explicitly whitelisted copy and timing change as minor", () => {
 		const previous = withProducer();
 		const producer = previous.items.producer;

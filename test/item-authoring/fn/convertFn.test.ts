@@ -28,7 +28,10 @@ describe("convertFn", () => {
 	});
 
 	it("preserves a craft line when promoted to a producer", () => {
-		const craft = createItem("craft");
+		const craft = {
+			...createItem("craft"),
+			draft: true,
+		};
 		if (craft.type !== "craft") throw new Error("Expected craft fixture.");
 		const producer = convertFn(craft, "producer");
 
@@ -39,6 +42,7 @@ describe("convertFn", () => {
 		]);
 		expect(producer.id).toBe(craft.id);
 		expect(producer.uid).toBe(craft.uid);
+		expect(producer.draft).toBe(true);
 	});
 
 	it("keeps the first producer line when converted to a single-line type", () => {

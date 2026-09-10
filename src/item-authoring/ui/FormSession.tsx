@@ -16,6 +16,7 @@ import { useFormController } from "~/item-authoring/ui/useFormController";
 /** Owns navigation, controller state, tabs, and save presentation for one item form lifecycle. */
 export const FormSession = ({
 	children,
+	defaultDraft,
 	defaultItemId,
 	defaultTitle,
 	enableCapability,
@@ -27,6 +28,7 @@ export const FormSession = ({
 	resourceId,
 	sectionId,
 }: PropsWithChildren<{
+	readonly defaultDraft?: boolean;
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
@@ -50,6 +52,11 @@ export const FormSession = ({
 					sectionId: nextSectionId,
 				},
 				search: {
+					...(defaultDraft === undefined
+						? {}
+						: {
+								defaultDraft,
+							}),
 					...(defaultItemId === undefined
 						? {}
 						: {
@@ -78,6 +85,7 @@ export const FormSession = ({
 				},
 			}),
 		[
+			defaultDraft,
 			defaultItemId,
 			defaultTitle,
 			initialItem.uid,
@@ -197,6 +205,7 @@ export const FormSession = ({
 						<EditorSectionTabs>
 							{sections.map((candidate) => (
 								<SectionLink
+									defaultDraft={defaultDraft}
 									defaultItemId={defaultItemId}
 									defaultTitle={defaultTitle}
 									key={candidate.id}

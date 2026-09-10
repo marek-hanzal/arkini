@@ -64,6 +64,13 @@ const readSemanticValueFn = (value: DiffValue, path: ProjectCompatibilityPath): 
 	if (path.length === 2 && path[0] === "meta" && path[1] === "toolbarSize")
 		return presentDiffValueFn(0);
 	if (
+		path.length === 3 &&
+		path[0] === "items" &&
+		typeof path[1] === "string" &&
+		path[2] === "draft"
+	)
+		return presentDiffValueFn(false);
+	if (
 		path.length === 4 &&
 		path[0] === "start" &&
 		(path[1] === "board" || path[1] === "toolbar") &&
@@ -372,6 +379,15 @@ const minorPathRules: ReadonlyArray<MinorPathRule> = [
 			"description",
 		],
 		rule: "item-description",
+	},
+	{
+		message: "Editor item draft status has no gameplay semantics.",
+		path: [
+			"items",
+			AnyStringPathSegment,
+			"draft",
+		],
+		rule: "item-draft-status",
 	},
 	{
 		message: "Default item artwork changes are explicitly minor-compatible.",

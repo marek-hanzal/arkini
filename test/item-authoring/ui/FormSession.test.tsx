@@ -27,8 +27,20 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("~/ui/ui/Button", () => ({
 	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
-	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
-		createElement("a", null, children),
+	ButtonLink: ({
+		children,
+		search,
+	}: {
+		readonly children?: ReactNode;
+		readonly search?: unknown;
+	}) =>
+		createElement(
+			"a",
+			{
+				"data-search": JSON.stringify(search),
+			},
+			children,
+		),
 	PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
 }));
@@ -178,7 +190,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (children: ReactNode, newItem = false) => {
+const render = async (children: ReactNode, newItem = false, defaultDraft?: boolean) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -189,6 +201,7 @@ const render = async (children: ReactNode, newItem = false) => {
 				<Form
 					{...(newItem
 						? {
+								defaultDraft,
 								defaultItemId: "dirty-bucket",
 								defaultTitle: "Dirty Bucket",
 								itemType: "simple" as const,
@@ -223,6 +236,22 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it("keeps an asset-origin draft seed in routed section links", async () => {
+		state.persisted = undefined;
+		const { container } = await render(<IdentitySection />, true, true);
+		const artworkLink = [
+			...container.querySelectorAll<HTMLAnchorElement>("a"),
+		].find((link) => link.textContent === "Artwork");
+		if (artworkLink === undefined) throw new Error("Missing Artwork section link.");
+
+		expect(JSON.parse(artworkLink.dataset.search ?? "null")).toMatchObject({
+			defaultDraft: true,
+			defaultItemId: "dirty-bucket",
+			defaultTitle: "Dirty Bucket",
+			itemType: "simple",
+		});
+	});
+
 	it("saves a valid untouched new item draft", async () => {
 		state.persisted = undefined;
 		state.saveItem.mockImplementation(async ({ item: saved }) => saved);

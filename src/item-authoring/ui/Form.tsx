@@ -10,6 +10,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
 const useDraft = (
+	defaultDraft: boolean | undefined,
 	defaultItemId: string | undefined,
 	defaultTitle: string | undefined,
 	type: TypeSchema.Type,
@@ -19,6 +20,7 @@ const useDraft = (
 	const project = useEditorProject();
 	return useMemo(() => {
 		const draft = createDraftFn({
+			draft: defaultDraft,
 			itemId: defaultItemId,
 			resourceId: resourceId ?? project.resources[0]?.id ?? "missing-asset",
 			type,
@@ -67,6 +69,7 @@ const useDraft = (
 			},
 		} satisfies ItemSchema.Type;
 	}, [
+		defaultDraft,
 		defaultItemId,
 		defaultTitle,
 		project.resources,
@@ -77,6 +80,7 @@ const useDraft = (
 };
 
 interface FormProps extends PropsWithChildren {
+	readonly defaultDraft?: boolean;
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
@@ -91,6 +95,7 @@ interface FormProps extends PropsWithChildren {
 /** Resolves a canonical item by UID or seeds its first local form from itemType. */
 export const Form = ({
 	children,
+	defaultDraft,
 	defaultItemId,
 	defaultTitle,
 	enableCapability,
@@ -103,6 +108,7 @@ export const Form = ({
 }: FormProps) => {
 	const persistedItem = useItemByUid(uid);
 	const draft = useDraft(
+		defaultDraft,
 		defaultItemId,
 		defaultTitle,
 		itemType ?? persistedItem?.type ?? "simple",
@@ -120,6 +126,7 @@ export const Form = ({
 	return (
 		<FormSession
 			key={`${initialItem.uid}:${initialItem.type}`}
+			defaultDraft={defaultDraft}
 			defaultItemId={defaultItemId}
 			defaultTitle={defaultTitle}
 			enableCapability={enableCapability}

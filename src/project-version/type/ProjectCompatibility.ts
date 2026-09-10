@@ -5,6 +5,7 @@ export type ProjectCompatibilityRule =
 	| "about-avatar"
 	| "game-title"
 	| "item-default-artwork"
+	| "item-draft-status"
 	| "item-progress-artwork"
 	| "item-title"
 	| "item-description"

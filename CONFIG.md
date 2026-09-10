@@ -84,6 +84,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
+- item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
 - positive extra material capacity is supported only for producer-owned lines;

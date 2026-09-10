@@ -61,6 +61,26 @@ describe("analyzeProjectCompatibilityFn semantic diff", () => {
 		});
 	});
 
+	it("treats an omitted item draft status as false", () => {
+		const water = editorTestConfig.items.water;
+		if (water === undefined) throw new Error("Missing water fixture.");
+		const next = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				...editorTestConfig.items,
+				water: {
+					...water,
+					draft: false,
+				},
+			},
+		});
+
+		expect(analyze(editorTestConfig, next)).toEqual({
+			result: "noop",
+			context: [],
+		});
+	});
+
 	it("correlates lines by stable ID while treating order and output changes as major", () => {
 		const previous = withProducer();
 		const producer = previous.items.producer;

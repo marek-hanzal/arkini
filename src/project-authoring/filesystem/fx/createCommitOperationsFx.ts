@@ -95,12 +95,19 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		state,
 		config,
 		resources,
+		resourceDelete,
+		resourceRename,
 		nowMs,
 	}: {
 		readonly allowProjectIdChange?: boolean;
 		readonly state: ProjectState;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
+		readonly resourceDelete?: string;
+		readonly resourceRename?: {
+			readonly from: string;
+			readonly to: string;
+		};
 		readonly nowMs: number;
 	}) {
 		const canonicalConfig = GameConfigSchema.parse({
@@ -149,11 +156,26 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		);
 		const notes = state.notes.map((note) => {
 			const itemUids = note.itemUids.filter((uid) => remainingItemUids.has(uid));
-			return itemUids.length === note.itemUids.length
+			const reconciledResourceIds =
+				resourceRename === undefined
+					? resourceDelete === undefined
+						? note.resourceIds
+						: note.resourceIds.filter((id) => id !== resourceDelete)
+					: note.resourceIds.map((id) =>
+							id === resourceRename.from ? resourceRename.to : id,
+						);
+			const resourceIds = [
+				...new Set(reconciledResourceIds),
+			];
+			const resourceIdsChanged =
+				resourceIds.length !== note.resourceIds.length ||
+				resourceIds.some((id, index) => id !== note.resourceIds[index]);
+			return itemUids.length === note.itemUids.length && !resourceIdsChanged
 				? note
 				: {
 						...note,
 						itemUids,
+						resourceIds,
 						updatedAtMs: noteUpdatedAtMs,
 					};
 		});
@@ -184,6 +206,12 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				.map((note) => ({
 					...note,
 					projectId: nextProjectId,
+					itemUids: [
+						...note.itemUids,
+					],
+					resourceIds: [
+						...note.resourceIds,
+					],
 				}))
 				.sort(
 					(left, right) =>
@@ -381,6 +409,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			{
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ResourceSchema.Type>;
+				readonly resourceDelete?: string;
+				readonly resourceRename?: {
+					readonly from: string;
+					readonly to: string;
+				};
 			},
 			ProjectRepositoryError,
 			never
@@ -398,6 +431,16 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						state,
 						config: next.config,
 						resources: next.resources,
+						...(next.resourceDelete === undefined
+							? {}
+							: {
+									resourceDelete: next.resourceDelete,
+								}),
+						...(next.resourceRename === undefined
+							? {}
+							: {
+									resourceRename: next.resourceRename,
+								}),
 						nowMs,
 					});
 				}),
@@ -634,6 +677,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				return {
 					config: state.project.config,
 					resources: state.project.resources.filter(({ id }) => id !== resourceId),
+					resourceDelete: resourceId,
 				};
 			}),
 		).pipe(
@@ -689,6 +733,14 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							...state.project.resources.filter(({ id }) => id !== currentId),
 							resource,
 						],
+						...(resource.id === currentId
+							? {}
+							: {
+									resourceRename: {
+										from: currentId,
+										to: resource.id,
+									},
+								}),
 					});
 				},
 			);

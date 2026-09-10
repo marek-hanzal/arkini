@@ -39,6 +39,7 @@ describe("editor MCP project notes", () => {
 			repository.createNoteFx({
 				projectId: "note-reading",
 				content: firstContent,
+				resourceIds: [],
 				itemUids: [],
 			}),
 		);
@@ -46,6 +47,7 @@ describe("editor MCP project notes", () => {
 			repository.createNoteFx({
 				projectId: "note-reading",
 				content: "Second idea",
+				resourceIds: [],
 				itemUids: [],
 			}),
 		);
@@ -90,6 +92,7 @@ describe("editor MCP project notes", () => {
 		);
 		expect(detail).toEqual({
 			...first,
+			linkedAssets: [],
 			linkedItems: [],
 		});
 	});
@@ -121,6 +124,7 @@ describe("editor MCP project notes", () => {
 			name: "create_note",
 			arguments: {
 				content: "**MCP idea**",
+				resourceIds: [],
 				itemUids: [],
 			},
 		});
@@ -136,6 +140,7 @@ describe("editor MCP project notes", () => {
 				noteId: created.noteId,
 				expectedUpdatedAtMs: created.updatedAtMs,
 				content: "Updated by MCP",
+				resourceIds: [],
 				itemUids: [],
 			},
 		});
@@ -151,6 +156,7 @@ describe("editor MCP project notes", () => {
 				noteId: created.noteId,
 				expectedUpdatedAtMs: created.updatedAtMs,
 				content: "Stale overwrite",
+				resourceIds: [],
 				itemUids: [],
 			},
 		});

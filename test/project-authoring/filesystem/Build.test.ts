@@ -147,6 +147,7 @@ describe("filesystem Editor project build", () => {
 				itemUids: [
 					"water",
 				],
+				resourceIds: [],
 			}),
 		);
 		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(

@@ -97,6 +97,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
+				resourceIds: [],
 			}),
 		).resolves.toMatchObject({
 			type: "success",
@@ -105,6 +106,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
+				resourceIds: [],
 			},
 		});
 		await expect(
@@ -114,6 +116,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
+				resourceIds: [],
 			}),
 		).resolves.toMatchObject({
 			type: "success",
@@ -124,6 +127,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
+				resourceIds: [],
 			},
 		});
 		await expect(invoke(ArkiniElectronApi.channels.editorNoteDelete, key)).resolves.toEqual({
@@ -138,6 +142,7 @@ describe("editor project-note IPC", () => {
 			itemUids: [
 				"water",
 			],
+			resourceIds: [],
 		});
 		expect(repository.updateNoteFx).toHaveBeenCalledWith({
 			...key,
@@ -145,6 +150,7 @@ describe("editor project-note IPC", () => {
 			itemUids: [
 				"water",
 			],
+			resourceIds: [],
 		});
 		expect(repository.deleteNoteFx).toHaveBeenCalledWith(key);
 	});

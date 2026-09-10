@@ -25,7 +25,8 @@ type EditorAssetDetailPath =
 	| "/editor/$projectId/assets/$resourceId/detail/overview"
 	| "/editor/$projectId/assets/$resourceId/detail/usage"
 	| "/editor/$projectId/assets/$resourceId/detail/technical"
-	| "/editor/$projectId/assets/$resourceId/detail/delete";
+	| "/editor/$projectId/assets/$resourceId/detail/delete"
+	| "/editor/$projectId/assets/$resourceId/detail/notes";
 
 const EditorAssetDetailTab = ({
 	filter,
@@ -154,6 +155,14 @@ export const EditorAssetDetail = ({
 								query={query}
 								resourceId={resourceId}
 								to="/editor/$projectId/assets/$resourceId/detail/technical"
+							/>
+							<EditorAssetDetailTab
+								filter={filter}
+								label="Notes"
+								projectId={project.projectId}
+								query={query}
+								resourceId={resourceId}
+								to="/editor/$projectId/assets/$resourceId/detail/notes"
 							/>
 							<EditorAssetDetailTab
 								filter={filter}

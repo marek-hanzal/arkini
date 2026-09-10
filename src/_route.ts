@@ -70,6 +70,7 @@ import { Route as EditorProjectIdProjectFormIndexRouteImport } from "./@routes/e
 import { Route as EditorProjectIdProjectFormSectionIdRouteImport } from "./@routes/editor/$projectId/project/form/$sectionId"
 import { Route as EditorProjectIdAssetsResourceIdDetailIndexRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/index"
 import { Route as EditorProjectIdAssetsResourceIdDetailDeleteRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/delete"
+import { Route as EditorProjectIdAssetsResourceIdDetailNotesRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/notes"
 import { Route as EditorProjectIdAssetsResourceIdDetailOverviewRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/overview"
 import { Route as EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/technical"
 import { Route as EditorProjectIdAssetsResourceIdDetailUsageRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/usage"
@@ -410,6 +411,12 @@ const EditorProjectIdAssetsResourceIdDetailDeleteRoute =
     path: "/delete",
     getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
   } as any)
+const EditorProjectIdAssetsResourceIdDetailNotesRoute =
+  EditorProjectIdAssetsResourceIdDetailNotesRouteImport.update({
+    id: "/notes",
+    path: "/notes",
+    getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
+  } as any)
 const EditorProjectIdAssetsResourceIdDetailOverviewRoute =
   EditorProjectIdAssetsResourceIdDetailOverviewRouteImport.update({
     id: "/overview",
@@ -518,6 +525,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/project/detail/": typeof EditorProjectIdProjectDetailIndexRoute
   "/editor/$projectId/project/form/": typeof EditorProjectIdProjectFormIndexRoute
   "/editor/$projectId/assets/$resourceId/detail/delete": typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
+  "/editor/$projectId/assets/$resourceId/detail/notes": typeof EditorProjectIdAssetsResourceIdDetailNotesRoute
   "/editor/$projectId/assets/$resourceId/detail/overview": typeof EditorProjectIdAssetsResourceIdDetailOverviewRoute
   "/editor/$projectId/assets/$resourceId/detail/technical": typeof EditorProjectIdAssetsResourceIdDetailTechnicalRoute
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
@@ -577,6 +585,7 @@ export interface FileRoutesByTo {
   "/editor/$projectId/project/detail": typeof EditorProjectIdProjectDetailIndexRoute
   "/editor/$projectId/project/form": typeof EditorProjectIdProjectFormIndexRoute
   "/editor/$projectId/assets/$resourceId/detail/delete": typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
+  "/editor/$projectId/assets/$resourceId/detail/notes": typeof EditorProjectIdAssetsResourceIdDetailNotesRoute
   "/editor/$projectId/assets/$resourceId/detail/overview": typeof EditorProjectIdAssetsResourceIdDetailOverviewRoute
   "/editor/$projectId/assets/$resourceId/detail/technical": typeof EditorProjectIdAssetsResourceIdDetailTechnicalRoute
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
@@ -648,6 +657,7 @@ export interface FileRoutesById {
   "/editor/$projectId/project/detail/": typeof EditorProjectIdProjectDetailIndexRoute
   "/editor/$projectId/project/form/": typeof EditorProjectIdProjectFormIndexRoute
   "/editor/$projectId/assets/$resourceId/detail/delete": typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
+  "/editor/$projectId/assets/$resourceId/detail/notes": typeof EditorProjectIdAssetsResourceIdDetailNotesRoute
   "/editor/$projectId/assets/$resourceId/detail/overview": typeof EditorProjectIdAssetsResourceIdDetailOverviewRoute
   "/editor/$projectId/assets/$resourceId/detail/technical": typeof EditorProjectIdAssetsResourceIdDetailTechnicalRoute
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
@@ -719,6 +729,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/project/detail/"
     | "/editor/$projectId/project/form/"
     | "/editor/$projectId/assets/$resourceId/detail/delete"
+    | "/editor/$projectId/assets/$resourceId/detail/notes"
     | "/editor/$projectId/assets/$resourceId/detail/overview"
     | "/editor/$projectId/assets/$resourceId/detail/technical"
     | "/editor/$projectId/assets/$resourceId/detail/usage"
@@ -778,6 +789,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/project/detail"
     | "/editor/$projectId/project/form"
     | "/editor/$projectId/assets/$resourceId/detail/delete"
+    | "/editor/$projectId/assets/$resourceId/detail/notes"
     | "/editor/$projectId/assets/$resourceId/detail/overview"
     | "/editor/$projectId/assets/$resourceId/detail/technical"
     | "/editor/$projectId/assets/$resourceId/detail/usage"
@@ -848,6 +860,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/project/detail/"
     | "/editor/$projectId/project/form/"
     | "/editor/$projectId/assets/$resourceId/detail/delete"
+    | "/editor/$projectId/assets/$resourceId/detail/notes"
     | "/editor/$projectId/assets/$resourceId/detail/overview"
     | "/editor/$projectId/assets/$resourceId/detail/technical"
     | "/editor/$projectId/assets/$resourceId/detail/usage"
@@ -1298,6 +1311,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailDeleteRouteImport
       parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
     }
+    "/editor/$projectId/assets/$resourceId/detail/notes": {
+      id: "/editor/$projectId/assets/$resourceId/detail/notes"
+      path: "/notes"
+      fullPath: "/editor/$projectId/assets/$resourceId/detail/notes"
+      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailNotesRouteImport
+      parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
+    }
     "/editor/$projectId/assets/$resourceId/detail/overview": {
       id: "/editor/$projectId/assets/$resourceId/detail/overview"
       path: "/overview"
@@ -1394,6 +1414,7 @@ const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
 
 interface EditorProjectIdAssetsResourceIdDetailRouteChildren {
   EditorProjectIdAssetsResourceIdDetailDeleteRoute: typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
+  EditorProjectIdAssetsResourceIdDetailNotesRoute: typeof EditorProjectIdAssetsResourceIdDetailNotesRoute
   EditorProjectIdAssetsResourceIdDetailOverviewRoute: typeof EditorProjectIdAssetsResourceIdDetailOverviewRoute
   EditorProjectIdAssetsResourceIdDetailTechnicalRoute: typeof EditorProjectIdAssetsResourceIdDetailTechnicalRoute
   EditorProjectIdAssetsResourceIdDetailUsageRoute: typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
@@ -1404,6 +1425,8 @@ const EditorProjectIdAssetsResourceIdDetailRouteChildren: EditorProjectIdAssetsR
   {
     EditorProjectIdAssetsResourceIdDetailDeleteRoute:
       EditorProjectIdAssetsResourceIdDetailDeleteRoute,
+    EditorProjectIdAssetsResourceIdDetailNotesRoute:
+      EditorProjectIdAssetsResourceIdDetailNotesRoute,
     EditorProjectIdAssetsResourceIdDetailOverviewRoute:
       EditorProjectIdAssetsResourceIdDetailOverviewRoute,
     EditorProjectIdAssetsResourceIdDetailTechnicalRoute:

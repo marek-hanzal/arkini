@@ -78,21 +78,10 @@ vi.mock("~/item-authoring/ui/useItemByUid", () => ({
 	useItemByUid: () => state.persisted,
 }));
 
-vi.mock("~/authoring-form/ui/AssetAutocompleteField", async () => {
-	const { useFieldContext } = await import("~/editor-control/ui/EditorFormContexts");
-	return {
-		AssetAutocompleteField: ({ label }: { readonly label: string }) => {
-			const field = useFieldContext<string>();
-			return createElement(
-				"span",
-				{
-					"data-field-name": field.name,
-				},
-				label,
-			);
-		},
-	};
-});
+vi.mock("~/authoring-form/ui/AssetAutocompleteField", () => ({
+	AssetAutocompleteField: ({ label }: { readonly label: string }) =>
+		createElement("span", null, label),
+}));
 
 vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 	EditorItemAutocompleteField: ({ label }: { readonly label: string }) =>
@@ -115,7 +104,6 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 		),
 }));
 import { Form } from "~/item-authoring/ui/Form";
-import { NeighborhoodArtworkRules } from "~/item-authoring/ui/NeighborhoodArtworkRules";
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
@@ -363,167 +351,6 @@ describe("item section form session", () => {
 		expect(scaledItem.asset.scale).toBe(0.65);
 	});
 
-	it("clones neighborhood rules independently, selects an exact diagonal item and saves authored priority", async () => {
-		const rule = {
-			sourceId: "asset:corner",
-			neighbors: {
-				nw: {
-					type: "ignore",
-				},
-				n: {
-					type: "empty",
-				},
-				ne: {
-					type: "ignore",
-				},
-				w: {
-					type: "filled",
-				},
-				e: {
-					type: "ignore",
-				},
-				sw: {
-					type: "ignore",
-				},
-				s: {
-					type: "ignore",
-				},
-				se: {
-					type: "ignore",
-				},
-			},
-		} as const;
-		state.persisted = {
-			...item,
-			asset: {
-				...item.asset,
-				neighbors: [
-					rule,
-				],
-			},
-		};
-		state.saveItem.mockImplementation(async ({ item: saved }) => saved);
-		const { container } = await render(<NeighborhoodArtworkRules />);
-		const click = async (selector: string) => {
-			const button = container.querySelector<HTMLButtonElement>(selector);
-			if (button === null) throw new Error(`Missing button ${selector}`);
-			await act(async () => button.click());
-		};
-		await click('button[title="Clone neighborhood rule"]');
-		await click('[data-ui-position="se"] > button');
-		await click('[data-ui-position="se"] > button');
-		await click('[data-ui-position="se"] > button');
-		await click(
-			`[data-ui="NeighborhoodArtworkItemSpotlight"] button[data-item-id="${item.id}"]`,
-		);
-		await click('button[title="Move neighborhood rule up"]');
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenCalledOnce();
-		expect(state.saveItem.mock.calls[0]?.[0].item.asset.neighbors).toEqual([
-			{
-				...rule,
-				neighbors: {
-					...rule.neighbors,
-					se: {
-						type: "item",
-						itemId: item.id,
-					},
-				},
-			},
-			rule,
-		]);
-		expect(rule.neighbors.se).toEqual({
-			type: "ignore",
-		});
-	});
-
-	it("removes the last neighborhood rule without persisting an empty override list", async () => {
-		state.persisted = {
-			...item,
-			asset: {
-				...item.asset,
-				neighbors: [
-					{
-						sourceId: "asset:corner",
-						neighbors: {
-							nw: {
-								type: "ignore",
-							},
-							n: {
-								type: "ignore",
-							},
-							ne: {
-								type: "ignore",
-							},
-							w: {
-								type: "ignore",
-							},
-							e: {
-								type: "ignore",
-							},
-							sw: {
-								type: "ignore",
-							},
-							s: {
-								type: "ignore",
-							},
-							se: {
-								type: "ignore",
-							},
-						},
-					},
-				],
-			},
-		};
-		const { container } = await render(<NeighborhoodArtworkRules />);
-		await act(async () =>
-			container
-				.querySelector<HTMLButtonElement>('button[title="Remove neighborhood rule"]')
-				?.click(),
-		);
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenCalledOnce();
-		expect(state.saveItem.mock.calls[0]?.[0].item.asset).not.toHaveProperty("neighbors");
-	});
-
-	it("offers the unsaved draft itself to the neighbor picker and preserves a condition when the picker is cancelled", async () => {
-		state.persisted = undefined;
-		const { container } = await render(<NeighborhoodArtworkRules />, true);
-		const click = async (selector: string) => {
-			const button = container.querySelector<HTMLButtonElement>(selector);
-			if (button === null) throw new Error(`Missing button ${selector}`);
-			await act(async () => button.click());
-		};
-		await click('button[title="Add neighborhood rule"]');
-		await click('[data-ui-position="nw"] > button');
-		await click('[data-ui-position="nw"] > button');
-		await click('[data-ui-position="nw"] > button');
-		const picker = container.querySelector('[data-ui="NeighborhoodArtworkItemSpotlight"]');
-		expect(picker?.querySelector('button[data-item-id="dirty-bucket"]')).not.toBeNull();
-		await act(async () =>
-			picker?.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					key: "Escape",
-					bubbles: true,
-				}),
-			),
-		);
-		expect(
-			container.querySelector('[data-ui-position="nw"]')?.getAttribute("data-ui-condition"),
-		).toBe("filled");
-		await click('[data-ui-position="nw"] > button');
-		await click(
-			'[data-ui="NeighborhoodArtworkItemSpotlight"] button[data-item-id="dirty-bucket"]',
-		);
-		expect(
-			container.querySelector('[data-ui-position="nw"]')?.getAttribute("data-ui-condition"),
-		).toBe("item");
-	});
-
 	it("picks both bounds of the reserved random space range into the local draft", async () => {
 		const spaceItem = {
 			...item,
@@ -684,77 +511,6 @@ describe("item section form session", () => {
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed water",
 		);
-	});
-
-	it("navigates a hidden neighborhood failure to Neighbors and selects its exact rule", async () => {
-		state.persisted = {
-			...item,
-			asset: {
-				...item.asset,
-				neighbors: [
-					{
-						sourceId: "asset:corner",
-						neighbors: {
-							nw: {
-								type: "ignore",
-							},
-							n: {
-								type: "ignore",
-							},
-							ne: {
-								type: "ignore",
-							},
-							w: {
-								type: "ignore",
-							},
-							e: {
-								type: "ignore",
-							},
-							sw: {
-								type: "ignore",
-							},
-							s: {
-								type: "ignore",
-							},
-							se: {
-								type: "ignore",
-							},
-						},
-					},
-				],
-			},
-		};
-		const { container, renderSection } = await render(<NeighborhoodArtworkRules />);
-		const add = container.querySelector<HTMLButtonElement>(
-			'button[title="Add neighborhood rule"]',
-		);
-		if (add === null) throw new Error("Missing Add neighborhood rule action.");
-		await act(async () => add.click());
-		await renderSection(<ArtworkSection />, "artwork");
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).not.toHaveBeenCalled();
-		expect(state.navigate).toHaveBeenCalledWith({
-			to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
-			params: {
-				projectId: "editor-test",
-				itemUid: item.uid,
-				sectionId: "neighbors",
-			},
-			search: {},
-		});
-		await renderSection(<NeighborhoodArtworkRules />, "neighbors");
-		expect(
-			container.querySelector('[data-field-name="asset.neighbors[1].sourceId"]'),
-		).not.toBeNull();
-		expect(
-			container.querySelector('[data-field-name="asset.neighbors[0].sourceId"]'),
-		).toBeNull();
-		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Move neighborhood rule up"]')
-				?.disabled,
-		).toBe(false);
 	});
 
 	it("keeps the invalid merge selected when validation returns to its section", async () => {

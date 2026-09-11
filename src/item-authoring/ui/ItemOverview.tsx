@@ -4,7 +4,6 @@ import {
 	Clock3,
 	Combine,
 	Factory,
-	Grid3X3,
 	Image as ImageIcon,
 	MapPinned,
 	Network,
@@ -31,7 +30,6 @@ import { LinkButtonLink } from "~/ui/ui/LinkButton";
 const OverviewIconBySection = {
 	action: MapPinned,
 	artwork: ImageIcon,
-	neighbors: Grid3X3,
 	charges: BatteryCharging,
 	delete: ShieldCheck,
 	estimate: Clock3,
@@ -142,7 +140,6 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				</div>
 			</div>
 		),
-		neighbors: `${item.asset.neighbors?.length ?? 0} neighborhood rules`,
 		notes: "Ideas and decisions linked to this item",
 		charges: item.charges === undefined ? "Disabled" : "Enabled",
 		delete:

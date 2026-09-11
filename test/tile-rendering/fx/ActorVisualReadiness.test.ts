@@ -287,13 +287,12 @@ describe("texture readiness", () => {
 		"loading",
 	] as const)(
 		"reconciles a reversal to the current artwork while the superseded face is %s",
-		async (fallbackState) => {
+		async (replacementState) => {
 			const { resolves, textures } = createControlledTextures();
-			const canonical = {
-				...createItem(),
-				nativeArtwork: {
-					sourceUrl: "resource:native",
-				},
+			const canonical = createItem();
+			const next = {
+				...canonical,
+				sourceUrl: "resource:next",
 			};
 			const { actor, frames } = createActor({
 				item: canonical,
@@ -338,16 +337,15 @@ describe("texture readiness", () => {
 			originalResolveFn?.(Texture.WHITE);
 			await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
 			const original = actor.currentVisual;
-			actor.dragging = true;
-			refreshFn(canonical);
-			const fallback = actor.pendingVisual;
-			expect(fallback?.item.sourceUrl).toBe("resource:native");
-			expect(fallback?.container.alpha).toBe(0);
+			refreshFn(next);
+			const replacement = actor.pendingVisual;
+			expect(replacement?.item.sourceUrl).toBe("resource:next");
+			expect(replacement?.container.alpha).toBe(0);
 			expect(actor.currentVisual).toBe(original);
-			expect(actor.item).toBe(canonical);
-			await vi.waitFor(() => expect(resolves.has("resource:native")).toBe(true));
-			if (fallbackState === "fading") {
-				resolves.get("resource:native")?.(Texture.WHITE);
+			expect(actor.item).toBe(next);
+			await vi.waitFor(() => expect(resolves.has("resource:next")).toBe(true));
+			if (replacementState === "fading") {
+				resolves.get("resource:next")?.(Texture.WHITE);
 				await vi.waitFor(() =>
 					expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true),
 				);
@@ -358,33 +356,24 @@ describe("texture readiness", () => {
 				fade.outgoing.alpha = 0.6;
 				expect(actor.currentVisual).toBe(original);
 			}
-			const latest = {
-				...canonical,
-				sourceUrl: "resource:latest",
-			};
-			refreshFn(latest);
-			expect(actor.item).toBe(latest);
-			expect(actor.pendingVisual ?? actor.currentVisual).toBe(fallback);
-			expect(resolves.has("resource:latest")).toBe(false);
 			const previousFadeCount = animations.filter(
 				({ channel }) => channel === "visual-mix",
 			).length;
-			actor.dragging = false;
-			// The desired rule has reverted to the still-current A while B is pending.
+			// The desired artwork has reverted to the still-current A while B is pending.
 			expect(refreshFn(canonical)).toBe("visual");
 			const restored = actor.pendingVisual;
 			expect(restored?.item.sourceUrl).toBe("resource:old");
 			expect(actor.item).toBe(canonical);
-			if (fallbackState === "fading") {
+			if (replacementState === "fading") {
 				expect(original.container.alpha).toBe(0.6);
-				expect(fallback?.container.alpha).toBe(0.4);
+				expect(replacement?.container.alpha).toBe(0.4);
 				animations.find(({ channel }) => channel === "visual-mix")?.onCompleteFn?.();
 				expect(actor.pendingVisual).toBe(restored);
 			}
 			expect(restored?.container.alpha).toBe(0);
-			if (fallbackState === "loading") {
-				resolves.get("resource:native")?.(Texture.WHITE);
-				await vi.waitFor(() => expect(fallback?.textureState).toBe("ready"));
+			if (replacementState === "loading") {
+				resolves.get("resource:next")?.(Texture.WHITE);
+				await vi.waitFor(() => expect(replacement?.textureState).toBe("ready"));
 				expect(animations.filter(({ channel }) => channel === "visual-mix")).toHaveLength(
 					previousFadeCount,
 				);
@@ -406,7 +395,7 @@ describe("texture readiness", () => {
 			expect(actor.currentVisual).not.toBe(restored);
 			restoredFade?.onCompleteFn?.();
 			expect(actor.currentVisual).toBe(restored);
-			expect(fallback?.container.destroyed).toBe(true);
+			expect(replacement?.container.destroyed).toBe(true);
 			actor.container.destroy({
 				children: true,
 			});

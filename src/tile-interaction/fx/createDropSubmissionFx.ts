@@ -55,7 +55,6 @@ interface Props {
 	readonly onAcceptedDropFn: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly surface: MainInteractionSurface;
-	readonly refreshActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
 }
 
 const inventoryShortcutTravelOwnerPrefix = "inventory-shortcut-travel";
@@ -205,7 +204,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	onAcceptedDropFn,
 	onDropFn,
 	surface,
-	refreshActorFx,
 }: Props) {
 	let closed = false;
 
@@ -217,7 +215,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 				surface,
 			}),
 		);
-		RendererRuntime.runSync(refreshActorFx(actor));
 	};
 
 	const restoreOptimisticRemovalFn = ({
@@ -372,7 +369,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								actorStore.actors.get(sourceItem.id) === actor ? actor : null;
 							if (retainedSource !== null) {
 								retainedSource.dragging = false;
-								RendererRuntime.runSync(refreshActorFx(retainedSource));
 								retainedSource.container.zIndex = 0;
 								retainedSource.container.cursor = readActorCursorFn({
 									phase: "idle",

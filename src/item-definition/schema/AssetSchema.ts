@@ -2,15 +2,13 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { CompositionSchema } from "./CompositionSchema";
-import { NeighborhoodArtworkRuleSchema } from "./NeighborhoodArtworkRuleSchema";
 
 /**
  * Describes the visual representation of a game item.
  *
  * `default` is the complete one- or two-layer composition shown when the engine
  * does not project progress. Optional `sources` are later single-layer progress
- * states. Ordered `neighbors` rules can override either composition on the Board.
- * The asset contract itself is item-type agnostic.
+ * states. The asset contract itself is item-type agnostic.
  */
 export const AssetSchema = z
 	.object({
@@ -25,13 +23,6 @@ export const AssetSchema = z
 		default: CompositionSchema.describe(
 			"The default one- or two-layer visual composition in back-to-front order.",
 		),
-		neighbors: z
-			.array(NeighborhoodArtworkRuleSchema)
-			.min(1)
-			.optional()
-			.describe(
-				"Ordered same-layer Board artwork rules. The first match overrides default and progress artwork; dragging uses ordinary artwork.",
-			),
 		/**
 		 * Later single-layer states selected by engine-owned progress.
 		 */

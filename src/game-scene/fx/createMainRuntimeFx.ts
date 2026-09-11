@@ -170,8 +170,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			layer: TileActorItem["layer"],
 		) {
 			yield* drag.cancelInteractionFx;
-			for (const actor of actorStore.actors.values())
-				yield* animator.cancelChannelFx(actor, "layer-release");
 			yield* surface.setInteractionLayerFx(layer);
 		});
 		yield* applyBoardLayerFx(yield* boardLayer.readLayerFx);

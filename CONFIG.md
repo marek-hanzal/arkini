@@ -83,6 +83,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 
 - every item requires `layer: "content" | "ground"`; new items start as `content`, type conversion preserves it, and only Board placement/presentation uses the layer;
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
+- initial Board editing and preview select `Content` or `Ground` (default `Content`); editing preserves the other layer and the item picker admits only the selected Board layer;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics; its Version diff is `noop`;

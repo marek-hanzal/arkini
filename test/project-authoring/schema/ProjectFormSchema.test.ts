@@ -4,6 +4,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { createProjectFormSchema } from "~/project-authoring/schema/createProjectFormSchema";
 import type { ProjectFormSchema } from "~/project-authoring/schema/ProjectFormSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { layeredBoardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (overrides?: Partial<Project>): Project => ({
@@ -73,6 +74,36 @@ const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 });
 
 describe("ProjectFormSchema", () => {
+	it("allows colocated Board layers but rejects a second occupant of the same layer", () => {
+		const schema = createProjectFormSchema(layeredBoardSpaceProject);
+		const value = createValidFormValue(layeredBoardSpaceProject);
+		expect(schema.safeParse(value).success).toBe(true);
+		const result = schema.safeParse({
+			...value,
+			start: {
+				...value.start,
+				board: [
+					...value.start.board,
+					{
+						itemId: "path",
+						quantity: 1,
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
+			},
+		});
+		expect(result.success).toBe(false);
+		if (result.success) throw new Error("Expected same-layer collision.");
+		expect(result.error.issues.map((issue) => issue.path)).toEqual([
+			[
+				"start",
+				"board",
+				3,
+			],
+		]);
+	});
 	it("limits Editor-authored Board, Inventory and Toolbar sizes to 42", () => {
 		const project = createProject();
 		const validValue = createValidFormValue(project);

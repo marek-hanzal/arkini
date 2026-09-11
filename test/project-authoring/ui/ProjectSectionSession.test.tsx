@@ -153,7 +153,10 @@ import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSect
 import { ProjectToolbarSection } from "~/project-authoring/ui/ProjectToolbarSection";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
+import {
+	boardSpaceProject,
+	layeredBoardSpaceProject,
+} from "~test/project-authoring/support/BoardSpaceProject";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
@@ -515,8 +518,8 @@ describe("project section form session", () => {
 		});
 	});
 
-	it("edits initial Board cells in the zero-based space selected live", async () => {
-		state.project = boardSpaceProject;
+	it("edits the selected initial Board layer and Space without replacing other occupants", async () => {
+		state.project = layeredBoardSpaceProject;
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -536,6 +539,23 @@ describe("project section form session", () => {
 		if (spaceInput === null) throw new Error("Missing initial Board space selector.");
 
 		expect(spaceInput.value).toBe("0");
+		expect(readGridCells()).toBe("water:1:0:0");
+		const selectLayer = async (layer: string) => {
+			const button = container.querySelector<HTMLButtonElement>(
+				`[data-ui="EditorProjectBoardLayerOption"][data-ui-value="${layer}"]`,
+			);
+			if (button === null) throw new Error("Missing Board layer selector.");
+			await act(async () => button.click());
+		};
+		await selectLayer("ground");
+		expect(readGridCells()).toBe("path:1:0:0");
+		const groundGrid = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProjectStartGrid"]',
+		);
+		if (groundGrid === null) throw new Error("Missing ground grid.");
+		await act(async () => groundGrid.click());
+		expect(readGridCells()).toBe("path:2:0:0");
+		await selectLayer("content");
 		expect(readGridCells()).toBe("water:1:0:0");
 		await changeInput(spaceInput, "-1");
 		expect(readGridCells()).toBe("water:1:0:0");
@@ -559,6 +579,36 @@ describe("project section form session", () => {
 		expect(readGridCells()).toBe("water:1:0:0");
 		await changeInput(spaceInput, "1");
 		expect(readGridCells()).toBe("water:3:1:1");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveConfig).toHaveBeenCalledOnce();
+		expect(state.saveConfig.mock.calls[0]?.[0].config.start.board).toEqual(
+			expect.arrayContaining([
+				{
+					itemId: "water",
+					quantity: 1,
+					space: 0,
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "water",
+					quantity: 3,
+					space: 1,
+					x: 1,
+					y: 1,
+				},
+				{
+					itemId: "path",
+					quantity: 2,
+					space: 0,
+					x: 0,
+					y: 0,
+				},
+			]),
+		);
+		expect(state.saveConfig.mock.calls[0]?.[0].config.start.board).toHaveLength(3);
 
 		state.section = <ProjectGeneralSection />;
 		await act(async () => root.render(createElement(EditorProjectForm)));

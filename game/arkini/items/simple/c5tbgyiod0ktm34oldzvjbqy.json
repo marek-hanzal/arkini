@@ -1,14 +1,14 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "emiiw9gv68bc740g2k7az5ov",
-		"id": "stone-path-vertical",
-		"title": "Stone Path Vertical",
-		"draft": false,
+		"uid": "c5tbgyiod0ktm34oldzvjbqy",
+		"id": "grass-tile-ne",
+		"title": "Grass Tile Ne",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"stone-path-vertical"
+				"grass-tile-ne"
 			]
 		},
 		"scope": "any",

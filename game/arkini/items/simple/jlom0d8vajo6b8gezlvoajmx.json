@@ -26,6 +26,15 @@
 				"action": "deposit",
 				"effect": "replace",
 				"result": "mouse-with-bandaged-tail"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-cow"
+				},
+				"action": "deposit",
+				"effect": "replace",
+				"result": "recovering-cow"
 			}
 		],
 		"type": "simple"

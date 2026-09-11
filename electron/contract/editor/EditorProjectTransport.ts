@@ -27,7 +27,6 @@ export namespace EditorProjectTransport {
 		| "refresh-project"
 		| "replace-config"
 		| "replace-resource"
-		| "save-resource"
 		| "save-project-build"
 		| "upsert-item"
 		| "upsert-resource"
@@ -195,13 +194,6 @@ export namespace EditorProjectTransport {
 		readonly config: unknown;
 		readonly currentId: string;
 		readonly expectedRevision: number;
-		readonly projectId: string;
-		readonly resource: unknown;
-	}
-
-	export interface SaveResourceRequest {
-		readonly expectedRevision: number;
-		readonly overwrite: boolean;
 		readonly projectId: string;
 		readonly resource: unknown;
 	}

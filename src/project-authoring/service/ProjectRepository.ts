@@ -54,13 +54,6 @@ export namespace ProjectRepository {
 		readonly resource: ResourceSchema.Type;
 	}
 
-	export interface SaveResourceProps {
-		readonly expectedRevision: number;
-		readonly overwrite: boolean;
-		readonly projectId: string;
-		readonly resource: ResourceSchema.Type;
-	}
-
 	export interface UpsertResourcesProps {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
@@ -151,9 +144,6 @@ export interface ProjectRepositoryService {
 	) => Effect.Effect<ProjectCommit, ProjectRepositoryError, never>;
 	readonly replaceResourceFx: (
 		props: ProjectRepository.ReplaceResourceProps,
-	) => Effect.Effect<Project, ProjectRepositoryError, never>;
-	readonly saveResourceFx: (
-		props: ProjectRepository.SaveResourceProps,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly upsertItemFx: (
 		props: ProjectRepository.UpsertItemProps,

@@ -6,7 +6,6 @@ import {
 	GitFork,
 	Images,
 	LayoutGrid,
-	MessageCircleMore,
 	NotebookPen,
 	PackageCheck,
 	RadioTower,
@@ -62,14 +61,6 @@ export const EditorWorkspaceRoutes = [
 		separatorAfter: true,
 		shortcut: "Mod+Shift+F",
 		to: "/editor/$projectId/flow",
-	},
-	{
-		id: "chatgpt",
-		icon: MessageCircleMore,
-		label: "ChatGPT",
-		matchTo: "/editor/$projectId/chatgpt",
-		shortcut: "Mod+Shift+C",
-		to: "/editor/$projectId/chatgpt",
 	},
 	{
 		id: "mcp",

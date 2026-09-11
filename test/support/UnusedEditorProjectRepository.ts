@@ -11,7 +11,6 @@ export const UnusedEditorProjectRepository = {
 	optimizeResourcesFx: () => Effect.die("Unexpected editor resource optimization."),
 	listNotesFx: () => Effect.die("Unexpected editor note list."),
 	updateNoteFx: () => Effect.die("Unexpected editor note update."),
-	saveResourceFx: () => Effect.die("Unexpected single resource save."),
 } satisfies Pick<
 	ProjectRepositoryService,
 	| "deleteProjectFx"
@@ -21,5 +20,4 @@ export const UnusedEditorProjectRepository = {
 	| "deleteNoteFx"
 	| "listNotesFx"
 	| "updateNoteFx"
-	| "saveResourceFx"
 >;

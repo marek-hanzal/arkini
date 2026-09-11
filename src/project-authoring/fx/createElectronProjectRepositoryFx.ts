@@ -200,15 +200,6 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					parseProjectFn,
 				),
 			),
-		saveResourceFx: (request) =>
-			writeFx(
-				"save-resource",
-				callFx(
-					"save-resource",
-					() => window.arkini.editor.saveResourceFn(request),
-					parseProjectFn,
-				),
-			),
 		upsertItemFx: (request) =>
 			writeFx(
 				"upsert-item",

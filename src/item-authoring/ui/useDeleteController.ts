@@ -11,7 +11,6 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { deleteFx } from "~/item-authoring/fx/deleteFx";
-import { useEditorHistoryBack } from "~/authoring-shell/ui/useEditorHistoryBack";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import type { Project } from "~/project-authoring/type/Project";
 
@@ -52,7 +51,6 @@ export const useDeleteController = ({
 }: useDeleteController.Props): useDeleteController.Output => {
 	const project = useEditorProject();
 	const navigateFn = useNavigate();
-	const historyBackFn = useEditorHistoryBack();
 	const commandAtom = deleteCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
 	const removeFn = useAtomSet(commandAtom, {
@@ -107,7 +105,6 @@ export const useDeleteController = ({
 				force: confirming === "force",
 				itemUid: item.uid,
 			});
-			if (historyBackFn(() => undefined)) return;
 			await navigateFn({
 				to: "/editor/$projectId/editor/items/list",
 				params: {
@@ -121,7 +118,6 @@ export const useDeleteController = ({
 	}, [
 		blockers.length,
 		confirming,
-		historyBackFn,
 		item.uid,
 		navigateFn,
 		project.projectId,

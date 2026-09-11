@@ -15,49 +15,6 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: recovery", () => {
-	it.each([
-		"cancel",
-		"blocked",
-		"closed",
-		"reject",
-		"failure",
-		"accepted",
-	] as const)(
-		"refreshes drag artwork at the threshold and restores it after %s",
-		async (ending) => {
-			const mounted = mountController();
-			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-			mounted.stage.emit("globalpointermove", pointer(12, 20));
-			mounted.flushFrame();
-			expect(mounted.artworkRefreshes).toEqual([]);
-			mounted.stage.emit("globalpointermove", pointer(45, 20));
-			mounted.flushFrame();
-			expect(mounted.artworkRefreshes).toEqual([
-				true,
-			]);
-			if (ending === "cancel") {
-				mounted.stage.emit("pointercancel", pointer(45, 20));
-			} else if (ending === "blocked") {
-				Effect.runSync(mounted.controller.setInteractionBlockedFx(true));
-			} else if (ending === "closed") {
-				Effect.runSync(mounted.controller.closeFx);
-			} else {
-				if (ending === "reject")
-					mounted.onDrop.mockResolvedValueOnce({
-						kind: "reject",
-					} as never);
-				if (ending === "failure")
-					mounted.onDrop.mockRejectedValueOnce(new Error("drop failed"));
-				mounted.stage.emit("pointerup", pointer(45, 20));
-				await flushMicrotasks();
-			}
-			expect(mounted.actor.dragging).toBe(false);
-			expect(mounted.artworkRefreshes.at(-1)).toBe(false);
-			Effect.runSync(mounted.controller.closeFx);
-			Effect.runSync(mounted.dropSubmission.closeFx);
-		},
-	);
-
 	it("restores and settles the optimistic Inventory actor after a command error", async () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const mounted = mountController({

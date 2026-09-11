@@ -86,7 +86,6 @@ describe("ItemOverview", () => {
 		);
 		expect(links.map((link) => link.dataset.sectionId)).toEqual([
 			"artwork",
-			"neighbors",
 			"charges",
 			"merges",
 			"estimate",

@@ -5,7 +5,6 @@ import { vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
-import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type {
 	ActorAnimation,
@@ -431,11 +430,6 @@ export const mountController = ({
 		renderDropFeedbackFx: () => Effect.void,
 		transientActorLayer,
 	} satisfies MainInteractionSurface;
-	const artworkRefreshes: boolean[] = [];
-	const refreshActorFx = (actor: PixiTileActor) =>
-		Effect.sync(() => {
-			artworkRefreshes.push(actor.dragging);
-		});
 	const dropSubmission = Effect.runSync(
 		createDropSubmissionFx({
 			actorStore,
@@ -447,7 +441,6 @@ export const mountController = ({
 			motion,
 			onAcceptedDropFn: onAcceptedDrop,
 			onDropFn: onDrop as never,
-			refreshActorFx,
 			surface,
 		}),
 	);
@@ -492,7 +485,6 @@ export const mountController = ({
 				motion,
 				onActivateFn: onActivate,
 				readAckTintFn: () => 0x57d7b2,
-				refreshActorFx,
 				surface,
 			}),
 		);
@@ -510,7 +502,6 @@ export const mountController = ({
 	return {
 		actor,
 		actorEvents,
-		artworkRefreshes,
 		actorStore: actorStore as MainActorStore,
 		actors,
 		animations,

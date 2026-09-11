@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { readActorVisualItemFn } from "~/tile-rendering/fn/readActorVisualItemFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -53,17 +52,13 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 	animator,
 	durationMs,
 	frames,
-	item: canonicalItem,
+	item,
 	onDiscardFn,
 	ownerKey,
 	palette,
 	size,
 	textures,
 }: transitionActorVisualFx.Props) {
-	const item = readActorVisualItemFn({
-		dragging: actor.dragging,
-		item: canonicalItem,
-	});
 	const generation = ++actor.visualTransitionGeneration;
 	yield* animator.cancelChannelFx(actor, "visual-mix");
 

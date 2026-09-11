@@ -7,11 +7,6 @@ import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 
 /** One exact live grid identity projected for the shared Canvas tile actor layer. */
 export interface TileActorItem extends TileActorVisual {
-	/** Ordinary progress/default artwork restored while a neighborhood-styled actor is dragged. */
-	readonly nativeArtwork?: {
-		readonly sourceUrl: string;
-		readonly compositeUrl?: string;
-	};
 	readonly badgeCount?: number;
 	readonly badgeKind?: "charges" | "queue";
 	readonly id: string;

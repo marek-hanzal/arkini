@@ -51,6 +51,7 @@ interface Props {
 	) => void | PromiseLike<void>;
 	readonly readAckTintFn: () => number;
 	readonly surface: MainInteractionSurface;
+	readonly refreshActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
 }
 
 interface ActiveDragBase extends createMainDragPreviewFx.State {
@@ -206,6 +207,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	onActivateFn,
 	readAckTintFn,
 	surface,
+	refreshActorFx,
 }: Props) {
 	let activeDrag: ActiveDrag | null = null;
 	let closed = false;
@@ -230,6 +232,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				surface,
 			}),
 		);
+		RendererRuntime.runSync(refreshActorFx(actor));
 	};
 
 	const releaseDragPointerFn = (pointerId: number) => {
@@ -274,6 +277,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		RendererRuntime.runSync(magneticField.resetFx);
 		RendererRuntime.runSync(cursorGrab.finishFx(actor));
 		actor.dragging = false;
+		RendererRuntime.runSync(refreshActorFx(actor));
 		actor.container.cursor = "default";
 	};
 
@@ -351,6 +355,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				return;
 			}
 			drag.actor.dragging = true;
+			RendererRuntime.runSync(refreshActorFx(drag.actor));
 			drag.actor.container.cursor = "grabbing";
 			surface.transientActorLayer.addChild(drag.actor.container);
 			drag.actor.container.zIndex = 10_000;
@@ -466,6 +471,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				RendererRuntime.runSync(pointerSampler.cancelFx);
 				activeDrag = null;
 				drag.actor.dragging = false;
+				RendererRuntime.runSync(refreshActorFx(drag.actor));
 				drag.actor.container.cursor = "default";
 			}
 		} else {

@@ -114,6 +114,24 @@ export const readGameResourceUsagesFn = (
 				],
 			});
 		});
+		item.asset.neighbors?.forEach(({ sourceId }, index) => {
+			usages.push({
+				resourceId: sourceId,
+				owner: "item",
+				ownerId: itemId,
+				ownerUid: item.uid,
+				ownerLabel: item.title,
+				roleLabel: `Neighborhood artwork ${index + 1}`,
+				path: [
+					"items",
+					itemId,
+					"asset",
+					"neighbors",
+					index,
+					"sourceId",
+				],
+			});
+		});
 	}
 	return usages;
 };

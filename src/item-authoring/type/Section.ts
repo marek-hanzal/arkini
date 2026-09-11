@@ -1,6 +1,7 @@
 export const SectionIds = [
 	"identity",
 	"artwork",
+	"neighbors",
 	"charges",
 	"merges",
 	"action",

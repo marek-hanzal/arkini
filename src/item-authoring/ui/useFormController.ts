@@ -56,6 +56,7 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 	description: item.description ?? "",
 	asset: {
 		scale: item.asset.scale,
+		neighbors: item.asset.neighbors === undefined ? [] : structuredClone(item.asset.neighbors),
 		default: [
 			item.asset.default[0],
 			item.asset.default[1] ?? "",
@@ -109,6 +110,7 @@ const FormPathLabelBySegment = {
 	result: "Replacement item",
 	runtimeMs: "Runtime",
 	scale: "Base tile scale",
+	sourceId: "Result asset",
 	selector: "Selected item",
 	show: "Visible",
 	space: "Space",
@@ -126,6 +128,7 @@ const FormIndexedPathLabelBySegment = {
 	rules: "Rule",
 	set: "Output set",
 	sources: "Alternate artwork",
+	neighbors: "Neighborhood rule",
 	when: "Condition",
 } as const satisfies Partial<Record<string, string>>;
 

@@ -375,6 +375,27 @@ export const validateConfigReferencesFn = ({
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
+		for (const [ruleIndex, rule] of (item.asset.neighbors ?? []).entries()) {
+			for (const [direction, condition] of Object.entries(rule.neighbors)) {
+				if (condition.type !== "item") continue;
+				diagnostics.push(
+					...validateSelectorReferenceFn({
+						config,
+						selector: condition,
+						path: [
+							"items",
+							itemId,
+							"asset",
+							"neighbors",
+							ruleIndex,
+							"neighbors",
+							direction,
+						],
+						source,
+					}),
+				);
+			}
+		}
 		if (item.type === "space") {
 			diagnostics.push(
 				...validateActionReferencesFn({

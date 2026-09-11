@@ -29,7 +29,7 @@ export const createDraftFn = ({
 		title: "",
 		draft,
 		asset: {
-			scale: 0.8,
+			scale: 1,
 			default: [
 				resourceId,
 			] as [

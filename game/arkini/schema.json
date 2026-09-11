@@ -473,6 +473,518 @@
 			],
 			"description": "A one- or two-layer visual asset composition in back-to-front order."
 		},
+		"NeighborhoodArtworkRuleSchema": {
+			"type": "object",
+			"properties": {
+				"neighbors": {
+					"type": "object",
+					"properties": {
+						"nw": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"n": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"ne": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"w": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"e": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"sw": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"s": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						},
+						"se": {
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "ignore"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "empty"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "filled"
+										}
+									},
+									"required": [
+										"type"
+									],
+									"additionalProperties": false
+								},
+								{
+									"type": "object",
+									"properties": {
+										"type": {
+											"type": "string",
+											"const": "item"
+										},
+										"itemId": {
+											"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+										}
+									},
+									"required": [
+										"type",
+										"itemId"
+									],
+									"additionalProperties": false
+								}
+							]
+						}
+					},
+					"required": [
+						"nw",
+						"n",
+						"ne",
+						"w",
+						"e",
+						"sw",
+						"s",
+						"se"
+					],
+					"additionalProperties": false,
+					"description": "Eight same-layer neighbors; north is decreasing board Y. Outside the Board is empty. All conditions must match."
+				},
+				"sourceId": {
+					"description": "The single asset replacing the complete artwork when this rule is the first match.",
+					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"neighbors",
+				"sourceId"
+			],
+			"additionalProperties": false,
+			"description": "One ordered visual-only Board neighborhood rule."
+		},
 		"AssetSchema": {
 			"type": "object",
 			"properties": {
@@ -485,6 +997,14 @@
 				"default": {
 					"description": "The default one- or two-layer visual composition in back-to-front order.",
 					"$ref": "urn:arkini:schema:project#/$defs/item.CompositionSchema"
+				},
+				"neighbors": {
+					"description": "Ordered same-layer Board artwork rules. The first match overrides default and progress artwork; dragging uses ordinary artwork.",
+					"minItems": 1,
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/NeighborhoodArtworkRuleSchema"
+					}
 				},
 				"sources": {
 					"description": "The optional ordered single-layer progress states after the default.",

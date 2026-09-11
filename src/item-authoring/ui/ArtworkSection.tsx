@@ -34,28 +34,6 @@ const ArtworkFields = withFieldGroupFn({
 	},
 	render: ({ group, onSelectedProgressIndexChangeFn, selectedProgressIndex }) => (
 		<>
-			<div className="max-w-48">
-				<group.AppField name="scale">
-					{(field) => (
-						<EditorNumberControl
-							label="Base tile scale"
-							description="Ratio from 0.25 to 1. 0.8 is 80%; 1 fills the tile at 100%."
-							error={readEditorFieldErrorFn(field.state.meta.errors)}
-							min={0.25}
-							max={1}
-							step={0.01}
-							name={field.name}
-							value={field.state.value}
-							onBlurFn={field.handleBlur}
-							onChangeFn={field.handleChange}
-						/>
-					)}
-				</group.AppField>
-			</div>
-			<p className="text-sm text-muted">
-				Scale changes artwork only. Occupied cells, storage, interaction reach and image
-				resolution stay the same. Transparent padding inside the PNG remains visible.
-			</p>
 			<EditorFormSectionDivider
 				description="The default visual composition shown before any runtime progress artwork applies."
 				title="Default artwork"
@@ -130,6 +108,28 @@ const ArtworkFields = withFieldGroupFn({
 					);
 				}}
 			</group.AppField>
+			<div className="max-w-48">
+				<group.AppField name="scale">
+					{(field) => (
+						<EditorNumberControl
+							label="Base tile scale"
+							description="Ratio from 0.25 to 1. 0.8 is 80%; 1 fills the tile at 100%."
+							error={readEditorFieldErrorFn(field.state.meta.errors)}
+							min={0.25}
+							max={1}
+							step={0.01}
+							name={field.name}
+							value={field.state.value}
+							onBlurFn={field.handleBlur}
+							onChangeFn={field.handleChange}
+						/>
+					)}
+				</group.AppField>
+			</div>
+			<p className="text-sm text-muted">
+				Scale changes artwork only. Occupied cells, storage, interaction reach and image
+				resolution stay the same. Transparent padding inside the PNG remains visible.
+			</p>
 		</>
 	),
 });

@@ -29,7 +29,7 @@ export const TilePaintingImagePicker = ({
 	return (
 		<fieldset
 			disabled={session.busy}
-			className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-3 data-[ui-compact=true]:w-auto data-[ui-compact=true]:grid-cols-[minmax(0,14rem)_auto]"
+			className="grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)_auto] items-end gap-3 data-[ui-compact=true]:w-[32rem]"
 			{...readDataUiFn({
 				dataUi: "TilePaintingImagePicker",
 				state: {

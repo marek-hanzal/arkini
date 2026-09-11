@@ -113,7 +113,7 @@ export const makeTilePaintingSessionFx = Effect.fn("makeTilePaintingSessionFx")(
 		outputResourceId: loaded.outputResourceId,
 		activeLayerId: loaded.document.layers.at(-1)?.id ?? null,
 		paintAllLayers: false,
-		tool: "reveal",
+		tool: "hide",
 		brush: storedBrush,
 		scatterSpacing: 40,
 		previewOpacity: 1,
@@ -362,8 +362,7 @@ export const makeTilePaintingSessionFx = Effect.fn("makeTilePaintingSessionFx")(
 							const current = history.present;
 							const existing = current.images.find(
 								(candidate) =>
-									candidate.sourceResourceId === image.sourceResourceId &&
-									candidate.png === image.png,
+									candidate.sourceResourceId === image.sourceResourceId,
 							);
 							const next = yield* Effect.sync(() =>
 								applyFn(

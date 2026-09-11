@@ -18,7 +18,7 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	};
 });
 vi.mock("~/tile-painting/fx/createTilePaintingRendererFx", () => ({
-	createTilePaintingRendererFx: () => decoders(),
+	createTilePaintingRendererFx: (...args: unknown[]) => decoders(...args),
 }));
 
 let scope: Scope.Closeable;
@@ -36,7 +36,6 @@ const painting: TilePaintingDocumentSchema.Type = {
 			id: "dirt",
 			label: "Dirt",
 			sourceResourceId: "item-water",
-			png: "data:image/png;base64,YQ==",
 		},
 	],
 	layers: [
@@ -92,6 +91,7 @@ const mountFn = async () => {
 	scope = Effect.runSync(Scope.make());
 	owner = Effect.runSync(
 		attachTilePaintingCanvasFx({
+			resources: [],
 			session,
 			viewportElement: surface,
 			canvas,
@@ -229,6 +229,88 @@ describe("native painting gesture settlement", () => {
 		Effect.runSync(session.redoFx);
 		expect(session.readFn().document).toBe(committed);
 	});
+	it("recovers from failed brush decoding when Circle removes the broken source dependency", async () => {
+		const unused = {
+			id: "broken",
+			label: "Broken",
+			sourceResourceId: "broken-asset",
+		};
+		Effect.runSync(
+			session.editFx({
+				...painting,
+				images: [
+					...painting.images,
+					unused,
+				],
+			}),
+		);
+		await vi.advanceTimersByTimeAsync(0);
+		decoders.mockImplementationOnce(() => Effect.fail(new Error("Broken brush")));
+		Effect.runSync(
+			session.setBrushFx({
+				...session.readFn().brush,
+				shape: "image",
+				brushImageId: "broken",
+			}),
+		);
+		await vi.advanceTimersByTimeAsync(0);
+		expect(session.readFn().error).toBe("Broken brush");
+		Effect.runSync(
+			session.setBrushFx({
+				...session.readFn().brush,
+				shape: "circle",
+			}),
+		);
+		await vi.advanceTimersByTimeAsync(0);
+		expect(decoders.mock.lastCall?.[0]).toEqual(painting.images);
+		expect(session.readFn().error).toBeNull();
+		pointerFn("pointerdown");
+		pointerFn("pointerup");
+		expect(session.readFn().document.layers[0].strokes).toHaveLength(1);
+	});
+
+	it("resolves only used Assets and admits a retained brush when it becomes active", async () => {
+		const unused = {
+			id: "unused",
+			label: "Unused",
+			sourceResourceId: "unused-asset",
+		};
+		Effect.runSync(
+			session.editFx({
+				...painting,
+				images: [
+					...painting.images,
+					unused,
+				],
+			}),
+		);
+		Effect.runSync(
+			owner.setResourcesFx([
+				{
+					id: "unused-asset",
+					mime: "image/png",
+					bytes: new Uint8Array(),
+				},
+			]),
+		);
+		await Promise.resolve();
+		expect(decoders.mock.lastCall?.[0]).toEqual(painting.images);
+		const count = decoders.mock.calls.length;
+		Effect.runSync(
+			session.setBrushFx({
+				...session.readFn().brush,
+				shape: "image",
+				brushImageId: "unused",
+			}),
+		);
+		await Promise.resolve();
+		expect(decoders.mock.calls.length).toBe(count + 1);
+		expect(decoders.mock.lastCall?.[0]).toEqual([
+			...painting.images,
+			unused,
+		]);
+	});
+
 	it("keeps the next stroke active after the preceding commit", () => {
 		pointerFn("pointerdown", 300);
 		pointerFn("pointerup", 300);

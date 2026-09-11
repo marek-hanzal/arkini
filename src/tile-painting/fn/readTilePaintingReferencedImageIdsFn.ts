@@ -1,6 +1,6 @@
 import type { TilePaintingDocumentSchema } from "~/tile-painting/schema/TilePaintingDocumentSchema";
 
-/** References used by persisted painting setup; unused captured images have no source dependency. */
+/** References used by persisted painting setup; unused image entries have no source dependency. */
 export const readTilePaintingReferencedImageIdsFn = (
 	document: TilePaintingDocumentSchema.Type,
 ): ReadonlySet<string> => {

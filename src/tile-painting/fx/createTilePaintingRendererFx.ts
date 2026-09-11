@@ -1,3 +1,5 @@
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import { readTilePaintingPngSupportFn } from "~/tile-painting/fn/readTilePaintingPngSupportFn";
 import { TilePaintingDefaultShadow } from "~/tile-painting/constant/TilePaintingDefaultShadow";
 import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCanvasSize";
 import { Effect } from "effect";
@@ -147,7 +149,7 @@ const readContextFx = (canvas: HTMLCanvasElement) =>
 		return context;
 	});
 
-const loadImageFx = (source: TilePaintingDocumentSchema.Image) =>
+const loadImageFx = (source: TilePaintingDocumentSchema.Image, url: string) =>
 	Effect.callback<HTMLImageElement, TilePaintingRenderError>((resume) => {
 		const image = new Image();
 		image.onload = () => resume(Effect.succeed(image));
@@ -159,7 +161,7 @@ const loadImageFx = (source: TilePaintingDocumentSchema.Image) =>
 					}),
 				),
 			);
-		image.src = source.png;
+		image.src = url;
 		return Effect.sync(() => {
 			image.onload = null;
 			image.onerror = null;
@@ -169,18 +171,46 @@ const loadImageFx = (source: TilePaintingDocumentSchema.Image) =>
 /** Masks and composites are disposable projections; the document's dab/stamp commands remain canonical. */
 export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendererFx")(function* (
 	sources: ReadonlyArray<TilePaintingDocumentSchema.Image>,
+	resources: ReadonlyArray<ResourceSchema.Type>,
 ): Effect.fn.Return<createTilePaintingRendererFx.Output, TilePaintingRenderError> {
+	const assets = new Map(
+		resources.map((resource) => [
+			resource.id,
+			resource,
+		]),
+	);
 	const decoded = yield* Effect.forEach(
 		sources,
 		(source) =>
-			Effect.map(
-				loadImageFx(source),
-				(image) =>
-					[
-						source.id,
-						image,
-					] as const,
-			),
+			Effect.gen(function* () {
+				const resource = assets.get(source.sourceResourceId);
+				if (resource === undefined || !readTilePaintingPngSupportFn(resource.bytes))
+					return yield* Effect.fail(
+						new TilePaintingRenderError({
+							message: `Source asset ${source.sourceResourceId} must exist as a single-frame PNG no larger than 2048 × 2048 pixels.`,
+						}),
+					);
+				const image = yield* Effect.acquireUseRelease(
+					Effect.sync(() =>
+						URL.createObjectURL(
+							new Blob(
+								[
+									resource.bytes.slice().buffer,
+								],
+								{
+									type: resource.mime,
+								},
+							),
+						),
+					),
+					(url) => loadImageFx(source, url),
+					(url) => Effect.sync(() => URL.revokeObjectURL(url)),
+				);
+				return [
+					source.id,
+					image,
+				] as const;
+			}),
 		{
 			concurrency: 8,
 		},

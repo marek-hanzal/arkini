@@ -1,3 +1,5 @@
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { useTilePaintingImageUrls } from "~/tile-painting/ui/useTilePaintingImageUrls";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCanvasSize";
 import { useEffect, useState } from "react";
@@ -15,7 +17,9 @@ import type { TilePaintingDocumentSchema } from "~/tile-painting/schema/TilePain
 
 /** Compares seam-adjacent tiles at source resolution; preview arrangement never enters the baked asset. */
 export const TilePaintingPreview = () => {
+	const { resources } = useEditorProject();
 	const session = useTilePaintingSession();
+	const imageUrls = useTilePaintingImageUrls(session.document.images);
 	const painting = session.document;
 	const [png, setPngFn] = useState<string>();
 	const [renderError, setRenderErrorFn] = useState<string>();
@@ -30,7 +34,7 @@ export const TilePaintingPreview = () => {
 		const abort = new AbortController();
 		setPngFn(undefined);
 		setRenderErrorFn(undefined);
-		void RendererRuntime.runPromise(renderTilePaintingPngFx(painting), {
+		void RendererRuntime.runPromise(renderTilePaintingPngFx(painting, resources), {
 			signal: abort.signal,
 		})
 			.then((value) => {
@@ -42,6 +46,7 @@ export const TilePaintingPreview = () => {
 			});
 		return () => abort.abort();
 	}, [
+		resources,
 		painting.images,
 		painting.layers,
 		painting.scatter,
@@ -247,7 +252,7 @@ export const TilePaintingPreview = () => {
 							>
 								<img
 									className="size-7 object-contain"
-									src={image.png}
+									src={imageUrls.get(image.id)}
 								/>
 							</LinkButton>
 						</Tooltip>
@@ -309,8 +314,7 @@ export const TilePaintingPreview = () => {
 							cell?.kind === "painting"
 								? png
 								: cell?.kind === "image"
-									? painting.images.find((image) => image.id === cell.imageId)
-											?.png
+									? imageUrls.get(cell.imageId)
 									: undefined;
 						return (
 							<button

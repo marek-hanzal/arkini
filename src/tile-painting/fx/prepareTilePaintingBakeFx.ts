@@ -1,9 +1,7 @@
-import { readTilePaintingReferencedImageIdsFn } from "~/tile-painting/fn/readTilePaintingReferencedImageIdsFn";
 import { Effect } from "effect";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 import { planTilePaintingBakeFn } from "~/tile-painting/fn/planTilePaintingBakeFn";
-import { refreshTilePaintingSourcesFx } from "~/tile-painting/fx/refreshTilePaintingSourcesFx";
 import { renderTilePaintingPngFx } from "~/tile-painting/fx/renderTilePaintingPngFx";
 import type { TilePaintingDocumentSchema } from "~/tile-painting/schema/TilePaintingDocumentSchema";
 
@@ -12,7 +10,7 @@ export namespace prepareTilePaintingBakeFx {
 		readonly document: TilePaintingDocumentSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly outputResourceId: string;
-		/** Bake-all resolves guide-only references to later outputs in its final snapshot pass. */
+		/** Bake-all may refer to guide-only outputs that will be produced later in the batch. */
 		readonly deferredResourceIds?: ReadonlySet<string>;
 	}
 	export interface Output {
@@ -21,7 +19,7 @@ export namespace prepareTilePaintingBakeFx {
 	}
 }
 
-/** Refresh inputs, render once, then capture the new output when it is used only as an editor guide. */
+/** Render canonical Assets after validating output dependencies; guides do not enter the PNG. */
 export const prepareTilePaintingBakeFx = Effect.fn("prepareTilePaintingBakeFx")(function* ({
 	document,
 	resources,
@@ -48,32 +46,8 @@ export const prepareTilePaintingBakeFx = Effect.fn("prepareTilePaintingBakeFx")(
 				message: plan.message,
 			}),
 		);
-	const rendered = new Set(plan.steps[0].renderedSourceIds);
-	const guides = new Set(
-		[
-			...(deferredResourceIds ?? []),
-			outputResourceId,
-		].filter((id) => !rendered.has(id)),
-	);
-	const refreshed = yield* refreshTilePaintingSourcesFx({
-		document,
-		resources,
-		deferredResourceIds: guides,
-	});
-	const bakedPng = yield* renderTilePaintingPngFx(refreshed);
-	const referenced = readTilePaintingReferencedImageIdsFn(refreshed);
 	return {
-		document: {
-			...refreshed,
-			images: refreshed.images.map((image) =>
-				referenced.has(image.id) && image.sourceResourceId === outputResourceId
-					? {
-							...image,
-							png: bakedPng,
-						}
-					: image,
-			),
-		},
-		bakedPng,
+		document,
+		bakedPng: yield* renderTilePaintingPngFx(document, resources),
 	} satisfies prepareTilePaintingBakeFx.Output;
 });

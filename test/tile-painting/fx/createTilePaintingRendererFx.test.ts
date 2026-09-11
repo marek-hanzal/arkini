@@ -1,3 +1,5 @@
+import { renderTilePaintingPngFx } from "~/tile-painting/fx/renderTilePaintingPngFx";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
@@ -71,6 +73,10 @@ const sourceImage = {
 };
 
 beforeEach(() => {
+	vi.stubGlobal("URL", {
+		createObjectURL: vi.fn(() => "blob:test"),
+		revokeObjectURL: vi.fn(),
+	});
 	dabCount = 0;
 	shadowCount = 0;
 	stampAlphas.length = 0;
@@ -95,6 +101,7 @@ beforeEach(() => {
 				operation: string;
 			}[] = [];
 			const projection = {
+				createPattern: () => null,
 				filter: "none",
 				globalAlpha: 1,
 				globalCompositeOperation: "source-over",
@@ -168,8 +175,104 @@ afterEach(() => {
 });
 
 describe("painting gesture projections", () => {
+	it("decodes current Asset bytes for the same recipe and releases temporary URLs", async () => {
+		const sources = [
+			{
+				id: "dirt",
+				label: "Dirt",
+				sourceResourceId: "dirt",
+			},
+		];
+		const bytes = createTestPngBytes();
+		const replacement = new Uint8Array([
+			...bytes,
+			0,
+		]);
+		await Effect.runPromise(
+			createTilePaintingRendererFx(sources, [
+				{
+					id: "dirt",
+					mime: "image/png",
+					bytes,
+				},
+			]),
+		);
+		await Effect.runPromise(
+			createTilePaintingRendererFx(sources, [
+				{
+					id: "dirt",
+					mime: "image/png",
+					bytes: replacement,
+				},
+			]),
+		);
+		const readBlobFn = (blob: Blob) =>
+			new Promise<Uint8Array>((resolve) => {
+				const reader = new FileReader();
+				reader.onload = () => resolve(new Uint8Array(reader.result as ArrayBuffer));
+				reader.readAsArrayBuffer(blob);
+			});
+		const blobs = vi.mocked(URL.createObjectURL).mock.calls.map(([blob]) => blob as Blob);
+		expect(await readBlobFn(blobs[0])).toEqual(bytes);
+		expect(await readBlobFn(blobs[1])).toEqual(replacement);
+		expect(URL.revokeObjectURL).toHaveBeenCalledTimes(2);
+	});
+
+	it("bakes visible terrain without requiring hidden layers or editor-only guide Assets", async () => {
+		vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(
+			"data:image/png;base64,result",
+		);
+		const document = {
+			...painting,
+			images: [
+				{
+					id: "dirt",
+					label: "Dirt",
+					sourceResourceId: "dirt",
+				},
+				{
+					id: "later",
+					label: "Later output",
+					sourceResourceId: "later",
+				},
+			],
+			layers: [
+				painting.layers[0],
+				{
+					...painting.layers[0],
+					id: "hidden",
+					imageId: "later",
+					visible: false,
+				},
+				{
+					...painting.layers[0],
+					id: "transparent",
+					imageId: "later",
+					opacity: 0,
+				},
+			],
+			reference: {
+				imageId: "later",
+				opacity: 1,
+				visible: true,
+			},
+		};
+		expect(
+			await Effect.runPromise(
+				renderTilePaintingPngFx(document, [
+					{
+						id: "dirt",
+						mime: "image/png",
+						bytes: createTestPngBytes(),
+					},
+				]),
+			),
+		).toBe("data:image/png;base64,result");
+		expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+	});
+
 	it("paints only appended dabs and adopts the completed mask including an unrendered final point", async () => {
-		const renderer = await Effect.runPromise(createTilePaintingRendererFx([]));
+		const renderer = await Effect.runPromise(createTilePaintingRendererFx([], []));
 		const canvas = document.createElement("canvas");
 		const stroke = strokeFn();
 		const pending = {
@@ -256,7 +359,7 @@ describe("painting gesture projections", () => {
 	});
 
 	it("discards a cancelled draft even when the next gesture starts at the same point", async () => {
-		const renderer = await Effect.runPromise(createTilePaintingRendererFx([]));
+		const renderer = await Effect.runPromise(createTilePaintingRendererFx([], []));
 		const canvas = document.createElement("canvas");
 		const abandoned = strokeFn();
 		await Effect.runPromise(
@@ -319,14 +422,22 @@ describe("painting gesture projections", () => {
 	});
 	it("rasterizes only new pending scatter stamps and applies preview opacity to their composite", async () => {
 		const renderer = await Effect.runPromise(
-			createTilePaintingRendererFx([
-				{
-					id: "dirt",
-					sourceResourceId: "dirt",
-					label: "Dirt",
-					png: "data:image/png;base64,YQ==",
-				},
-			]),
+			createTilePaintingRendererFx(
+				[
+					{
+						id: "dirt",
+						sourceResourceId: "dirt",
+						label: "Dirt",
+					},
+				],
+				[
+					{
+						id: "dirt",
+						mime: "image/png",
+						bytes: createTestPngBytes(),
+					},
+				],
+			),
 		);
 		const canvas = document.createElement("canvas");
 		const emptyPainting = {
@@ -395,7 +506,7 @@ describe("painting gesture projections", () => {
 		]);
 	});
 	it("limits scene writes to new dabs, skips unchanged frames, and fully clears cancelled projections", async () => {
-		const renderer = await Effect.runPromise(createTilePaintingRendererFx([]));
+		const renderer = await Effect.runPromise(createTilePaintingRendererFx([], []));
 		const canvas = document.createElement("canvas");
 		await Effect.runPromise(
 			renderer.renderFx({
@@ -448,7 +559,7 @@ describe("painting gesture projections", () => {
 	});
 
 	it("accumulates separated committed strokes until the deferred shadow settles", async () => {
-		const renderer = await Effect.runPromise(createTilePaintingRendererFx([]));
+		const renderer = await Effect.runPromise(createTilePaintingRendererFx([], []));
 		const canvas = document.createElement("canvas");
 		await Effect.runPromise(
 			renderer.renderFx({

@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { validateTilePaintingDocumentFx } from "~/project-authoring/filesystem/fx/validateTilePaintingDocumentFx";
 import { Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTilePaintingImageFx } from "~/tile-painting/fx/createTilePaintingImageFx";
@@ -28,7 +27,7 @@ describe("Painting image admission", () => {
 		);
 		expect(Exit.isFailure(result)).toBe(true);
 	});
-	it("rejects animated PNGs at browser and native admission even when the native decoder accepts their first frame", async () => {
+	it("rejects animated PNGs before referencing an Asset even when the decoder accepts their first frame", async () => {
 		// Synthetic 1×1 APNG: red then green, with valid animation control and frame CRCs.
 		const encoded =
 			"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAACAAAAAPONk3AAAAAaZmNUTAAAAAAAAAABAAAAAQAAAAAAAAAAAAEACgAAWn8w0AAAAA1JREFUeJxj+M/A8B8ABQAB/4mZPR0AAAAaZmNUTAAAAAEAAAABAAAAAQAAAAAAAAAAAAEACgAAwQzaBAAAABFmZEFUAAAAAnicY2D4z/AfAAQBAf9i5+mcAAAAAElFTkSuQmCC";
@@ -47,34 +46,6 @@ describe("Painting image admission", () => {
 					id: "animated",
 					mime: "image/png",
 					bytes,
-				}),
-			),
-		).rejects.toThrow("single-frame");
-		await expect(
-			Effect.runPromise(
-				validateTilePaintingDocumentFx({
-					name: "Animated source",
-					images: [
-						{
-							id: "animated",
-							label: "Animated source",
-							sourceResourceId: "item-water",
-							png: `data:image/png;base64,${encoded}`,
-						},
-					],
-					layers: [],
-					catalog: [],
-					scatter: [],
-					reference: null,
-					preview: {
-						columns: 1,
-						rows: 1,
-						cells: [
-							{
-								kind: "painting",
-							},
-						],
-					},
 				}),
 			),
 		).rejects.toThrow("single-frame");

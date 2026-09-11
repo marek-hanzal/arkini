@@ -9,11 +9,6 @@ const point = z
 		y: z.number().min(-4096).max(8192),
 	})
 	.strict();
-const png = z
-	.string()
-	.max(24 * 1024 * 1024)
-	.regex(/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/);
-
 /** Portable, non-destructive painting recipe. Points are spaced brush dabs in canvas pixels. */
 export const TilePaintingDocumentSchema = z
 	.object({
@@ -25,7 +20,6 @@ export const TilePaintingDocumentSchema = z
 						id: IdSchema,
 						label: z.string().max(240),
 						sourceResourceId: IdSchema,
-						png,
 					})
 					.strict(),
 			)

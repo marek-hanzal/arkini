@@ -1,3 +1,4 @@
+import { useTilePaintingImageUrls } from "~/tile-painting/ui/useTilePaintingImageUrls";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { createId } from "@paralleldrive/cuid2";
@@ -9,6 +10,7 @@ import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 
 export const TilePaintingScattering = () => {
 	const session = useTilePaintingSession();
+	const imageUrls = useTilePaintingImageUrls(session.document.images);
 	const painting = session.document;
 	return (
 		<fieldset
@@ -66,7 +68,7 @@ export const TilePaintingScattering = () => {
 							<div className="flex items-center gap-4">
 								<img
 									className="size-16 object-contain"
-									src={image?.png}
+									src={image === undefined ? undefined : imageUrls.get(image.id)}
 								/>
 								<span className="min-w-0 flex-1 truncate font-semibold">
 									{image?.label}

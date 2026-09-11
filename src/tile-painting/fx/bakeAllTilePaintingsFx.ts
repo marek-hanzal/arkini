@@ -6,7 +6,6 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import type { Project } from "~/project-authoring/type/Project";
 import { planTilePaintingBakeFn } from "~/tile-painting/fn/planTilePaintingBakeFn";
 import { prepareTilePaintingBakeFx } from "~/tile-painting/fx/prepareTilePaintingBakeFx";
-import { refreshTilePaintingSourcesFx } from "~/tile-painting/fx/refreshTilePaintingSourcesFx";
 import type { TilePaintingSchema } from "~/tile-painting/schema/TilePaintingSchema";
 
 export namespace bakeAllTilePaintingsFx {
@@ -98,31 +97,18 @@ export const bakeAllTilePaintingsFx = Effect.fn("bakeAllTilePaintingsFx")(functi
 		});
 		yield* Effect.sync(() => onProgressFn?.(prepared.length, plan.steps.length));
 	}
-	const finalPaintings = yield* Effect.forEach(prepared, (painting) =>
-		Effect.map(
-			refreshTilePaintingSourcesFx({
-				document: painting.document,
-				resources: [
-					...resources.values(),
-				],
-			}),
-			(document) => ({
-				...painting,
-				document,
-			}),
-		),
-	);
+
 	const result = yield* repository.bakeTilePaintingsFx({
 		projectId,
 		expectedRevision: project.revision,
-		paintings: finalPaintings,
+		paintings: prepared,
 	});
 	yield* publishEditorProjectFx(projectId, {
 		project: result.project,
 	});
 	return {
 		...result,
-		bakedCount: finalPaintings.length,
+		bakedCount: prepared.length,
 		skippedCount: plan.skippedCount,
 	} satisfies bakeAllTilePaintingsFx.Output;
 });

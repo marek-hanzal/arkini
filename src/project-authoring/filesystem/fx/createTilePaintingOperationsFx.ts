@@ -4,7 +4,6 @@ import type { ProjectRepository } from "~/project-authoring/service/ProjectRepos
 import { readTilePaintingPngSupportFn } from "~/tile-painting/fn/readTilePaintingPngSupportFn";
 import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCanvasSize";
 import { TilePaintingFileSchema } from "~/tile-painting/schema/TilePaintingFileSchema";
-import { validateTilePaintingDocumentFx } from "./validateTilePaintingDocumentFx";
 import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
 import { Clock, Effect, FileSystem, type Semaphore } from "effect";
 import sharp from "sharp";
@@ -117,7 +116,7 @@ export const createTilePaintingOperationsFx = Effect.fn("createTilePaintingOpera
 				return yield* Effect.fail(new Error("Painting changed after it was read."));
 			if (previous === undefined && state.tilePaintings.length >= 256)
 				return yield* Effect.fail(new Error("A project supports at most 256 paintings."));
-			yield* validateTilePaintingDocumentFx(request.document);
+			yield* Effect.try(() => TilePaintingDocumentSchema.parse(request.document));
 			const outputResourceId = request.outputResourceId ?? previous?.outputResourceId ?? null;
 			if (request.bakedPng !== undefined && outputResourceId === null)
 				return yield* Effect.fail(
@@ -228,27 +227,16 @@ export const createTilePaintingOperationsFx = Effect.fn("createTilePaintingOpera
 				]),
 			);
 			for (const output of outputs) effectiveResources.set(output.id, output);
-			// A batch may include upstream outputs. Every baked snapshot must use the final exact source bytes.
+			// Source references must resolve in the final project, including outputs produced by this batch.
 			for (const entry of prepared) {
-				if (entry.output === null) continue;
 				const referenced = readTilePaintingReferencedImageIdsFn(entry.painting.document);
 				for (const image of entry.painting.document.images) {
 					if (!referenced.has(image.id)) continue;
 					const source = effectiveResources.get(image.sourceResourceId);
-					if (source === undefined)
+					if (source === undefined || !readTilePaintingPngSupportFn(source.bytes))
 						return yield* Effect.fail(
 							new Error(
-								`Painting source ${image.sourceResourceId} is missing from the project.`,
-							),
-						);
-					const snapshot = Buffer.from(
-						image.png.slice("data:image/png;base64,".length),
-						"base64",
-					);
-					if (!snapshot.equals(Buffer.from(source.bytes)))
-						return yield* Effect.fail(
-							new Error(
-								`Painting source ${image.sourceResourceId} changed. Refresh its snapshot before baking.`,
+								`Painting source ${image.sourceResourceId} must exist as a supported PNG in the project.`,
 							),
 						);
 				}

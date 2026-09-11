@@ -28,17 +28,13 @@ const png = async (color: string) =>
 			.toBuffer(),
 	);
 const url = (bytes: Uint8Array) => `data:image/png;base64,${Buffer.from(bytes).toString("base64")}`;
-const document = (
-	sourceResourceId: string,
-	bytes: Uint8Array,
-): TilePaintingDocumentSchema.Type => ({
+const document = (sourceResourceId: string): TilePaintingDocumentSchema.Type => ({
 	name: "Ground",
 	images: [
 		{
 			id: "image",
 			label: "Ground source",
 			sourceResourceId,
-			png: url(bytes),
 		},
 	],
 	layers: [
@@ -67,7 +63,7 @@ const document = (
 });
 
 describe("painting source rebuild transactions", () => {
-	it("guards every freshness token, validates final source bytes, and atomically rebuilds dependent outputs", async () => {
+	it("guards every freshness token, validates final source references, and atomically rebuilds dependent outputs", async () => {
 		const repository = await harness.openRepository();
 		let project = await harness.createProject(repository);
 		const old = await png("#503020");
@@ -90,7 +86,7 @@ describe("painting source rebuild transactions", () => {
 				paintingId: "first",
 				expectedRevision: project.revision,
 				expectedUpdatedAtMs: null,
-				document: document("dirt", old),
+				document: document("dirt"),
 				outputResourceId: "ground-one",
 				bakedPng: url(old),
 			}),
@@ -101,7 +97,7 @@ describe("painting source rebuild transactions", () => {
 				paintingId: "second",
 				expectedRevision: first.project.revision,
 				expectedUpdatedAtMs: null,
-				document: document("ground-one", old),
+				document: document("ground-one"),
 				outputResourceId: "ground-two",
 				bakedPng: url(old),
 			}),
@@ -122,13 +118,13 @@ describe("painting source rebuild transactions", () => {
 			{
 				paintingId: "second",
 				expectedUpdatedAtMs: second.painting.updatedAtMs,
-				document: document("ground-one", fresh),
+				document: document("ground-one"),
 				bakedPng: url(fresh),
 			},
 			{
 				paintingId: "first",
 				expectedUpdatedAtMs: first.painting.updatedAtMs,
-				document: document("dirt", fresh),
+				document: document("dirt"),
 				bakedPng: url(fresh),
 			},
 		];
@@ -155,13 +151,13 @@ describe("painting source rebuild transactions", () => {
 					paintings: [
 						{
 							...paintings[0],
-							document: document("ground-one", old),
+							document: document("missing-source"),
 						},
 						paintings[1],
 					],
 				}),
 			),
-		).rejects.toThrow("changed");
+		).rejects.toThrow("must exist");
 		expect(
 			await Effect.runPromise(
 				repository.readTilePaintingFx({
@@ -194,7 +190,7 @@ describe("painting source rebuild transactions", () => {
 				fresh,
 			);
 		for (const painting of baked.paintings)
-			expect(painting.document.images[0].png).toBe(url(fresh));
+			expect(painting.document.images[0]).not.toHaveProperty("png");
 	});
 	it("rolls back every recipe and output when a later batch publication fails", async () => {
 		const nodeFs = await Effect.runPromise(
@@ -240,7 +236,7 @@ describe("painting source rebuild transactions", () => {
 				paintingId: "first",
 				expectedRevision: project.revision,
 				expectedUpdatedAtMs: null,
-				document: document("dirt", old),
+				document: document("dirt"),
 				outputResourceId: "ground-one",
 				bakedPng: url(old),
 			}),
@@ -251,7 +247,7 @@ describe("painting source rebuild transactions", () => {
 				paintingId: "second",
 				expectedRevision: first.project.revision,
 				expectedUpdatedAtMs: null,
-				document: document("dirt", old),
+				document: document("dirt"),
 				outputResourceId: "ground-two",
 				bakedPng: url(old),
 			}),
@@ -280,7 +276,7 @@ describe("painting source rebuild transactions", () => {
 					].map((painting) => ({
 						paintingId: painting.paintingId,
 						expectedUpdatedAtMs: painting.updatedAtMs,
-						document: document("dirt", fresh),
+						document: document("dirt"),
 						bakedPng: url(fresh),
 					})),
 				}),
@@ -328,7 +324,7 @@ describe("painting source rebuild transactions", () => {
 				paintingId: "first",
 				expectedRevision: project.revision,
 				expectedUpdatedAtMs: null,
-				document: document("dirt", bytes),
+				document: document("dirt"),
 				outputResourceId: "ground-one",
 				bakedPng: url(bytes),
 			}),
@@ -339,7 +335,7 @@ describe("painting source rebuild transactions", () => {
 				paintingId: "second",
 				expectedRevision: first.project.revision,
 				expectedUpdatedAtMs: null,
-				document: document("ground-one", bytes),
+				document: document("ground-one"),
 			}),
 		);
 		const renamed = await Effect.runPromise(
@@ -369,7 +365,7 @@ describe("painting source rebuild transactions", () => {
 		);
 		expect(producer?.outputResourceId).toBe("ground-renamed");
 		expect(consumer?.document.images[0].sourceResourceId).toBe("ground-renamed");
-		expect(consumer?.document.images[0].png).toBe(url(bytes));
+		expect(consumer?.document.images[0]).not.toHaveProperty("png");
 		expect(producer?.updatedAtMs).toBeGreaterThan(first.painting.updatedAtMs);
 		expect(consumer?.updatedAtMs).toBeGreaterThan(second.painting.updatedAtMs);
 		await expect(

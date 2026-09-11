@@ -111,6 +111,7 @@ export const EditorBuildStatus = ({
 			description={description}
 			icon={icon}
 			title={title}
+			variant="flat"
 		/>
 	);
 };

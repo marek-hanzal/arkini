@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -211,7 +211,11 @@ describe("repository note item relationships", () => {
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
 			rename: (from, to) => {
-				if (fail && String(to).includes("/notes/") && String(to).endsWith(".json")) {
+				if (
+					fail &&
+					basename(dirname(String(to))) === "notes" &&
+					String(to).endsWith(".json")
+				) {
 					publishedNotes += 1;
 					if (publishedNotes === 2) {
 						fail = false;

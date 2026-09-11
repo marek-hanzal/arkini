@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -185,7 +185,7 @@ describe("filesystem build version metadata", () => {
 				if (
 					fail &&
 					String(from) === `${String(to)}.arkini-replace` &&
-					String(to).endsWith("/game.json")
+					basename(String(to)) === "game.json"
 				) {
 					fail = false;
 					return Effect.fail(

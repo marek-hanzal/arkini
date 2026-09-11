@@ -63,7 +63,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 				>
 					<fieldset
 						disabled={controller.buildPending}
-						className="grid shrink-0 grid-cols-[minmax(0,7rem)_auto_minmax(0,7rem)_auto_minmax(8rem,14rem)] items-end gap-2"
+						className="grid shrink-0 grid-cols-[minmax(0,7rem)_auto_minmax(0,7rem)_auto_minmax(8rem,14rem)] items-end justify-start gap-2"
 						data-ui="EditorBuildVersion"
 					>
 						<EditorNumberControl

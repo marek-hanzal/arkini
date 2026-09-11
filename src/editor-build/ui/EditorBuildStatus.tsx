@@ -40,14 +40,11 @@ export const EditorBuildStatus = ({
 		? `The previous Build is out of date. Build v${requestedVersion} to replace it.`
 		: "Validate the saved project and create an Arkpack ready to install or save.";
 	let icon = PackageCheck;
-	if (pending) {
-		title = `Building v${requestedVersion}`;
-		description = "Validating the saved project and creating its Arkpack.";
-	} else if (buildFailure?.type === "validation") {
+	if (!pending && buildFailure?.type === "validation") {
 		title = "Build blocked by validation";
 		description = `Fix the blocking findings below, then build v${requestedVersion} again.`;
 		icon = TriangleAlert;
-	} else if (buildFailure?.type === "operational") {
+	} else if (!pending && buildFailure?.type === "operational") {
 		title = "Build failed";
 		description =
 			buildFailure.detail ??

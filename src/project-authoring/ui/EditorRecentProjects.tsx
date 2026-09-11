@@ -1,4 +1,5 @@
-import { ChevronRight, FolderKanban, FolderX, Trash2 } from "lucide-react";
+import { useMatchRoute } from "@tanstack/react-router";
+import { ChevronRight, FolderKanban, FolderX, LoaderCircle, Trash2 } from "lucide-react";
 
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
@@ -28,6 +29,13 @@ export const EditorRecentProjects = ({
 	onOpenProjectFolderFn,
 	projects,
 }: EditorRecentProjectsProps) => {
+	const matchRouteFn = useMatchRoute();
+	const openingProject = matchRouteFn({
+		to: "/editor/$projectId",
+		pending: true,
+		fuzzy: true,
+		includeSearch: false,
+	});
 	if (projects.length === 0) return null;
 	return (
 		<section
@@ -84,7 +92,12 @@ export const EditorRecentProjects = ({
 								cursorIntent={blocked ? "progress" : undefined}
 								className="min-h-0 min-w-0 flex-1 justify-start gap-3 rounded-none border-0 bg-transparent px-4 py-3 text-left shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent"
 							>
-								<FolderKanban className="size-5 shrink-0 text-accent" />
+								{openingProject &&
+								openingProject.projectId === candidate.project.projectId ? (
+									<LoaderCircle className="size-5 shrink-0 animate-spin text-accent" />
+								) : (
+									<FolderKanban className="size-5 shrink-0 text-accent" />
+								)}
 								<span className="min-w-0 flex-1">
 									<span className="flex min-w-0 items-center gap-2">
 										<span className="truncate text-sm font-semibold">

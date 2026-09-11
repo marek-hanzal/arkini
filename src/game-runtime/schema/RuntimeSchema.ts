@@ -24,7 +24,7 @@ export const RuntimeSchema = z
 			.describe("Every active product-line run currently owned by the runtime."),
 		jobQueue: z
 			.array(JobQueueRequestSchema)
-			.describe("FIFO line-start requests not started yet."),
+			.describe("Pending line-start requests in accepted intent order."),
 		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.describe(
 			"Save-backed default product line selected for exact live owner identities.",
 		),

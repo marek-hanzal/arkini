@@ -79,13 +79,78 @@ describe("readItemDetailQueue", () => {
 					requestId: "job:queued",
 					lineId: "line:workshop:build",
 					title: "Build",
-					status: "blocked-earlier",
+					status: "blocked-active",
 				},
 			],
 		});
 	});
 
-	it("keeps an already queued ready head ready at capacity one and rejects unavailable owners", () => {
+	it("projects each idle request independently without changing accepted order or input state", () => {
+		const config = structuredClone(lineRunTestConfig);
+		const workshop = config.items.workshop;
+		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
+		workshop.lines.push({
+			...workshop.lines[0],
+			id: "line:workshop:ready",
+			title: "Ready work",
+			input: [
+				{
+					type: "simple",
+				},
+			],
+		});
+		const base = queuedRuntime(
+			lineRunRuntime({
+				permit: true,
+				water: [
+					1,
+				],
+			}),
+		);
+		const runtime = {
+			...base,
+			items: base.items.map((item) => ({
+				...item,
+				item: config.items[item.item.id],
+			})),
+			jobQueue: [
+				...base.jobQueue,
+				{
+					id: "job:later",
+					ownerItemId: "runtime:workshop",
+					lineId: "line:workshop:ready",
+				},
+			],
+		} satisfies RuntimeSchema.Type;
+		const before = structuredClone(runtime);
+
+		expect(
+			readQueue(
+				{
+					itemId: "runtime:workshop",
+					runtime,
+				},
+				config,
+			),
+		).toMatchObject({
+			request: [
+				{
+					requestId: "job:queued",
+					lineId: "line:workshop:build",
+					status: "waiting-inputs",
+					missingQuantity: 2,
+				},
+				{
+					requestId: "job:later",
+					lineId: "line:workshop:ready",
+					status: "inputs-ready",
+				},
+			],
+		});
+		expect(runtime).toEqual(before);
+	});
+
+	it("keeps an already queued ready request ready at capacity one and rejects unavailable owners", () => {
 		const runtime = lineRunRuntime({
 			permit: true,
 			water: [
@@ -203,7 +268,7 @@ describe("readItemDetailQueue", () => {
 		});
 	});
 
-	it("blocks a material-ready head at the output cap without reporting missing inputs", () => {
+	it("blocks a material-ready request at the output cap without reporting missing inputs", () => {
 		const config = structuredClone(lineRunTestConfig);
 		config.items.permit.maxCount = 1;
 		const workshop = config.items.workshop;

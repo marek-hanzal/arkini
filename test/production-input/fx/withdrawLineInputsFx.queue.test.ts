@@ -41,7 +41,7 @@ const assertPreservedBlockedQueue = ({
 			},
 			{
 				requestId: secondRequestId,
-				status: "blocked-earlier",
+				status: "waiting-inputs",
 			},
 		],
 	});

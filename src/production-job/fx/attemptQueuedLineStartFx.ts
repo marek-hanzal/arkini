@@ -48,7 +48,7 @@ export namespace attemptQueuedLineStartFx {
 }
 
 /**
- * Starts one exact live FIFO head or classifies a transient block.
+ * Attempts one exact live request or classifies a transient block.
  *
  * The request is removed only from the immutable start candidate. Any rejected start returns the
  * original runtime with the exact row intact.
@@ -63,16 +63,6 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 			type: "empty",
 			runtime,
 		} satisfies attemptQueuedLineStartFx.Result;
-	const ownerHead = runtime.jobQueue.find(
-		(candidate) => candidate.ownerItemId === request.ownerItemId,
-	);
-	if (ownerHead?.id !== request.id) {
-		return {
-			type: "empty",
-			runtime,
-		} satisfies attemptQueuedLineStartFx.Result;
-	}
-
 	return yield* Effect.gen(function* () {
 		const result = yield* startQueuedLineRuntimeFx({
 			ownerItemId: request.ownerItemId,

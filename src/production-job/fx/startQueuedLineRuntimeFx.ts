@@ -4,6 +4,8 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
+import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
+import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -25,7 +27,7 @@ export namespace startQueuedLineRuntimeFx {
 		  }
 		| {
 				readonly type: "queue-request-unavailable";
-				readonly reason: "missing" | "not-head" | "wrong-line";
+				readonly reason: "missing" | "wrong-line";
 				readonly runtime: RuntimeSchema.Type;
 		  }
 		| {
@@ -39,9 +41,9 @@ export namespace startQueuedLineRuntimeFx {
 /**
  * Starts only from canonical input truth after every physical delivery has settled.
  *
- * A queue caller supplies the exact FIFO head identity. That request is removed only inside the
- * successful start transition. Grid autofill coverage is reported to the caller but never applied
- * here, so every item still travels through the shared delivery pipeline before becoming startable.
+ * Tick probes requests in intent order and supplies each exact identity. The request is removed
+ * only inside the successful start transition. Grid autofill coverage is reported to the caller
+ * but never applied here; material travels through Delivery before becoming startable.
  */
 export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(function* ({
 	lineId,
@@ -63,16 +65,6 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 		return {
 			type: "queue-request-unavailable",
 			reason: "wrong-line",
-			runtime,
-		} satisfies startQueuedLineRuntimeFx.Result;
-	}
-	const ownerHead = runtime.jobQueue.find((candidate) => {
-		return candidate.ownerItemId === ownerItemId;
-	});
-	if (ownerHead?.id !== queueRequestId) {
-		return {
-			type: "queue-request-unavailable",
-			reason: "not-head",
 			runtime,
 		} satisfies startQueuedLineRuntimeFx.Result;
 	}
@@ -98,6 +90,18 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 		runtime,
 	});
 	if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
+		// Missing material permits delivery only while the line's other admission
+		// conditions still hold. A blocked probe must not lease shared supply.
+		const resolution = yield* resolveLineStartFx({
+			ownerItemId,
+			lineId,
+			runtime,
+		});
+		yield* assertLineEnqueueConditionsFx({
+			candidateId: queueRequestId,
+			resolution,
+			runtime,
+		});
 		return {
 			type: "incomplete",
 			missingQuantity: coverage.type === "incomplete" ? coverage.missingQuantity : 0,

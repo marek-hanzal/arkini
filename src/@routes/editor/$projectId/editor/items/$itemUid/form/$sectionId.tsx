@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { NeighborhoodArtworkRules } from "~/item-authoring/ui/NeighborhoodArtworkRules";
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { ChargesSection } from "~/item-authoring/ui/ChargesSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -48,8 +47,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				return <IdentitySection />;
 			case "artwork":
 				return <ArtworkSection />;
-			case "neighbors":
-				return <NeighborhoodArtworkRules />;
 			case "charges":
 				return <ChargesSection />;
 			case "merges":

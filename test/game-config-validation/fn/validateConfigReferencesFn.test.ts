@@ -48,56 +48,6 @@ const depositInput = (itemId: string) => ({
 });
 
 describe("completed config reference validation", () => {
-	it("blocks missing neighborhood item references at their exact authored cell", async () => {
-		const ignore = {
-			type: "ignore",
-		};
-		const result = await compileItems({
-			road: {
-				...createSimpleItem("road"),
-				asset: {
-					scale: 1,
-					default: [
-						"road",
-					],
-					neighbors: [
-						{
-							sourceId: "joined-road",
-							neighbors: {
-								nw: ignore,
-								n: ignore,
-								ne: {
-									type: "item",
-									itemId: "missing-road",
-								},
-								w: ignore,
-								e: ignore,
-								sw: ignore,
-								s: ignore,
-								se: ignore,
-							},
-						},
-					],
-				},
-			},
-		});
-		expect(result.diagnostics).toContainEqual(
-			expect.objectContaining({
-				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-				referenceId: "missing-road",
-				path: [
-					"items",
-					"road",
-					"asset",
-					"neighbors",
-					0,
-					"neighbors",
-					"ne",
-					"itemId",
-				],
-			}),
-		);
-	});
 	it("reports canonical record key and embedded ID mismatches", async () => {
 		const result = await compileItems({
 			"item:key": createSimpleItem("item:embedded"),

@@ -12,10 +12,6 @@ const Sections = [
 		label: "Artwork",
 	},
 	{
-		id: "neighbors",
-		label: "Neighbors",
-	},
-	{
 		id: "charges",
 		label: "Charges",
 	},

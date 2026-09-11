@@ -6,8 +6,6 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
-import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import { createMainActorStoreFx } from "~/tile-rendering/fx/createMainActorStoreFx";
 import { createParticleTexturesFx } from "~/tile-rendering/fx/createParticleTexturesFx";
 import { createAnimationDriverFx } from "~/tile-rendering/fx/createAnimationDriverFx";
@@ -139,20 +137,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		registerRollbackFn(cursorGrab.closeFx);
 		const dropPresentation = yield* createDropPresentationFx();
 		registerRollbackFn(dropPresentation.closeFx);
-		const refreshActorFx = Effect.fn("MainRuntime.refreshActorFx")(function* (
-			actor: PixiTileActor,
-		) {
-			if (actor.container.destroyed) return;
-			yield* updateTileActorFx({
-				actor,
-				animator,
-				frames: application.frames,
-				item: actor.item,
-				palette: paletteState.current,
-				size: actor.size,
-				textures,
-			});
-		});
 		let replayCurrentTransitionFn: () => void = () => undefined;
 		const dropSubmission = yield* createDropSubmissionFx({
 			actorStore,
@@ -164,7 +148,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			motion,
 			onAcceptedDropFn: () => replayCurrentTransitionFn(),
 			onDropFn,
-			refreshActorFx,
 			surface,
 		});
 		registerRollbackFn(dropSubmission.closeFx);
@@ -180,7 +163,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			motion,
 			onActivateFn,
 			readAckTintFn: () => paletteState.current.success,
-			refreshActorFx,
 			surface,
 		});
 		registerRollbackFn(drag.closeFx);

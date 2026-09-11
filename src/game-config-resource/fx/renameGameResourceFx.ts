@@ -28,10 +28,6 @@ export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* 
 					...item.asset,
 					default: item.asset.default.map(renameFn),
 					sources: item.asset.sources?.map(renameFn),
-					neighbors: item.asset.neighbors?.map((rule) => ({
-						...rule,
-						sourceId: renameFn(rule.sourceId),
-					})),
 				},
 			},
 		]),

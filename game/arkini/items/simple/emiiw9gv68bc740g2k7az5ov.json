@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "emiiw9gv68bc740g2k7az5ov",
+		"id": "stone-path-vertical",
+		"title": "Stone Path Vertical",
+		"draft": true,
+		"asset": {
+			"default": [
+				"stone-path-vertical"
+			]
+		},
+		"scope": "any",
+		"layer": "ground",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "krlb5mr56uunrt3hpvapqrkq",
+		"id": "grass-tile",
+		"title": "Grass Tile",
+		"draft": true,
+		"asset": {
+			"default": [
+				"grass-tile"
+			]
+		},
+		"scope": "any",
+		"layer": "ground",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

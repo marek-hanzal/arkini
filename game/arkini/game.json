@@ -291,6 +291,20 @@
 				"space": 0,
 				"itemId": "foundation-chest",
 				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 0,
+				"space": 0,
+				"itemId": "stone-path-vertical",
+				"quantity": 1
+			},
+			{
+				"x": 4,
+				"y": 3,
+				"space": 0,
+				"itemId": "grass-tile",
+				"quantity": 1
 			}
 		],
 		"inventory": [],

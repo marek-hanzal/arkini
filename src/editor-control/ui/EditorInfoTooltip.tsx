@@ -9,10 +9,7 @@ interface EditorInfoTooltipProps {
 
 /** Renders the canonical contextual-help affordance used by editor forms. */
 export const EditorInfoTooltip = ({ content }: EditorInfoTooltipProps) => (
-	<Tooltip
-		content={content}
-		contentClassName="z-50"
-	>
+	<Tooltip content={content}>
 		<button
 			type="button"
 			data-ui="EditorInfoTooltip"

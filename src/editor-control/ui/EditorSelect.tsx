@@ -12,39 +12,31 @@ import {
 	useFloating,
 	useInteractions,
 } from "@floating-ui/react";
-import { type ReactNode, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { useState } from "react";
 
-import { LinkButton } from "~/ui/ui/LinkButton";
 import { Button } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export interface EditorSelectOption<Value extends string> {
 	readonly disabled?: boolean;
 	readonly label: string;
-	readonly leading?: ReactNode;
 	readonly value: Value;
 }
 
 /** Replaces visually inconsistent native selects with the editor's Floating UI menu. */
 export const EditorSelect = <Value extends string>({
 	label,
-	className,
 	onChangeFn,
 	options,
 	size = "large",
-	variant = "default",
 	value,
 }: {
 	readonly label: string;
-	readonly className?: string;
 	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<EditorSelectOption<Value>>;
 	readonly size?: "control" | "large";
-	readonly variant?: "default" | "link";
 	readonly value: Value;
 }) => {
-	const Trigger = variant === "link" ? LinkButton : Button;
 	const [open, setOpenFn] = useState(false);
 	const selected = options.find((option) => option.value === value);
 	const { context, floatingStyles, refs } = useFloating({
@@ -74,28 +66,21 @@ export const EditorSelect = <Value extends string>({
 
 	return (
 		<>
-			<Trigger
+			<Button
 				ref={refs.setReference}
-				className={twMerge(
-					"h-[var(--ak-control-min-height)] min-h-[var(--ak-control-min-height)] min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none data-[ui-size=large]:h-12 data-[ui-size=large]:min-h-12 data-[ui-variant=link]:inline-flex data-[ui-variant=link]:h-9 data-[ui-variant=link]:min-h-9 data-[ui-variant=link]:min-w-0 data-[ui-variant=link]:items-center data-[ui-variant=link]:border-0 data-[ui-variant=link]:bg-transparent data-[ui-variant=link]:px-2 data-[ui-variant=link]:no-underline",
-					className,
-				)}
+				className="h-[var(--ak-control-min-height)] min-h-[var(--ak-control-min-height)] min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none data-[ui-size=large]:h-12 data-[ui-size=large]:min-h-12"
 				title={label}
 				{...getReferencePropsFn()}
 				{...readDataUiFn({
 					dataUi: "EditorSelectTrigger",
 					state: {
 						size,
-						variant,
 					},
 				})}
 			>
-				<span className="flex min-w-0 items-center gap-3">
-					{selected?.leading}
-					<span>{selected?.label ?? value}</span>
-				</span>
+				<span>{selected?.label ?? value}</span>
 				<ChevronDown className="size-4 shrink-0 text-muted" />
-			</Trigger>
+			</Button>
 			{open ? (
 				<FloatingPortal>
 					<div
@@ -122,10 +107,7 @@ export const EditorSelect = <Value extends string>({
 									},
 								})}
 							>
-								<span className="flex min-w-0 items-center gap-3">
-									{option.leading}
-									<span>{option.label}</span>
-								</span>
+								{option.label}
 								{option.value === value ? (
 									<Check className="size-4 shrink-0" />
 								) : null}

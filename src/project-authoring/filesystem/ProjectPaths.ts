@@ -15,8 +15,6 @@ export interface ProjectPaths {
 	readonly assets: string;
 	readonly resources: string;
 	readonly notes: string;
-	readonly tilePaintings: string;
-	readonly tilePaintingFileFx: (paintingId: string) => Effect.Effect<string, never, never>;
 	readonly itemFileFx: (props: {
 		readonly type: TypeSchema.Type;
 		readonly uid: string;

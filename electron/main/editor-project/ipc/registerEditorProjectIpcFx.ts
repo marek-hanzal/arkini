@@ -1,4 +1,3 @@
-import { registerEditorTilePaintingIpcFx } from "./registerEditorTilePaintingIpcFx";
 import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect, Semaphore } from "effect";
 
@@ -58,11 +57,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 			});
 			if (!shouldRegister) return;
 			const noteChannels = yield* registerEditorNoteIpcFx({
-				diagnostics,
-				ownership,
-				trustedRenderer,
-			});
-			const paintingChannels = yield* registerEditorTilePaintingIpcFx({
 				diagnostics,
 				ownership,
 				trustedRenderer,
@@ -377,7 +371,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectUpsertItem,
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					...noteChannels,
-					...paintingChannels,
 				];
 				app.once("will-quit", () => {
 					for (const channel of channels) ipcMain.removeHandler(channel);

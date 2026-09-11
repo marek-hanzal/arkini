@@ -1,4 +1,3 @@
-import { readProjectTilePaintingsFx } from "./readProjectTilePaintingsFx";
 import { createId } from "@paralleldrive/cuid2";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
@@ -121,10 +120,6 @@ const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
 			});
 			return {
 				catalog,
-				tilePaintings: yield* readProjectTilePaintingsFx({
-					paths,
-					projectId,
-				}),
 				notes,
 				paths,
 				project: {

@@ -40,7 +40,6 @@ export const AssetAutocompleteField = ({
 };
 
 interface EditorAssetReferenceControlProps extends AssetAutocompleteFieldProps {
-	readonly labelVisible?: boolean;
 	readonly value: string;
 	readonly error?: string;
 	readonly includeResourceFn?: (resource: Project.Resource) => boolean;
@@ -51,7 +50,6 @@ interface EditorAssetReferenceControlProps extends AssetAutocompleteFieldProps {
 /** Reuses the canonical asset autocomplete outside direct form field bindings. */
 export const EditorAssetReferenceControl = ({
 	label,
-	labelVisible = true,
 	description,
 	optional = true,
 	value,
@@ -85,7 +83,6 @@ export const EditorAssetReferenceControl = ({
 	return (
 		<EditorSearchCombobox
 			label={label}
-			labelVisible={labelVisible}
 			description={description}
 			emptyLabel="No known asset matches this search."
 			error={error}

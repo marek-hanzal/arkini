@@ -23,7 +23,6 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 		"assets",
 		"resources",
 		"notes",
-		"paintings",
 		"items",
 	]) {
 		const sourceDirectory = path.join(canonicalSource, directory);
@@ -38,7 +37,7 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 				}
 			}
 		} else {
-			const extension = directory === "notes" || directory === "paintings" ? ".json" : ".png";
+			const extension = directory === "notes" ? ".json" : ".png";
 			files.push(
 				...entries
 					.filter((file) => file.endsWith(extension))

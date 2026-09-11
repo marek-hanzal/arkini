@@ -1,4 +1,3 @@
-import { readTilePaintingReferencedImageIdsFn } from "~/tile-painting/fn/readTilePaintingReferencedImageIdsFn";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
@@ -110,22 +109,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		};
 		readonly nowMs: number;
 	}) {
-		if (
-			resourceDelete !== undefined &&
-			state.tilePaintings.some((painting) => {
-				const referenced = readTilePaintingReferencedImageIdsFn(painting.document);
-				return painting.document.images.some(
-					(image) =>
-						referenced.has(image.id) && image.sourceResourceId === resourceDelete,
-				);
-			})
-		)
-			return yield* Effect.fail(
-				errorFn(
-					"delete-resource",
-					`Resource ${resourceDelete} is a saved painting source. Remove its painting references before deleting it.`,
-				),
-			);
 		const canonicalConfig = GameConfigSchema.parse({
 			...config,
 			$schema: GameProjectGameSchemaReference,
@@ -195,33 +178,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						updatedAtMs: noteUpdatedAtMs,
 					};
 		});
-		const tilePaintings = state.tilePaintings.map((painting) => {
-			if (resourceRename === undefined) return painting;
-			const sourceChanged = painting.document.images.some(
-				(image) => image.sourceResourceId === resourceRename.from,
-			);
-			const outputChanged = painting.outputResourceId === resourceRename.from;
-			if (!sourceChanged && !outputChanged) return painting;
-			return {
-				...painting,
-				updatedAtMs: Math.max(nowMs, painting.updatedAtMs + 1),
-				outputResourceId: outputChanged ? resourceRename.to : painting.outputResourceId,
-				document: {
-					...painting.document,
-					images: painting.document.images.map((image) =>
-						image.sourceResourceId === resourceRename.from
-							? {
-									...image,
-									sourceResourceId: resourceRename.to,
-								}
-							: image,
-					),
-				},
-			};
-		});
-		const tilePaintingUpdates = tilePaintings.filter(
-			(painting, index) => painting !== state.tilePaintings[index],
-		);
 		const noteUpdates = notes.filter((note, index) => note !== state.notes[index]);
 		yield* writeProjectFx({
 			root: state.paths.root,
@@ -241,7 +197,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				resources,
 			},
 			noteUpdates,
-			tilePaintingUpdates,
 		});
 		const nextState: ProjectState = {
 			...state,
@@ -262,10 +217,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						right.noteId.localeCompare(left.noteId),
 				),
 			project: nextProject,
-			tilePaintings: tilePaintings.map((painting) => ({
-				...painting,
-				projectId: nextProjectId,
-			})),
 		};
 		if (projectIdChanged) states.delete(previousProjectId);
 		states.set(nextProjectId, nextState);

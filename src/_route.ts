@@ -34,7 +34,6 @@ import { Route as EditorProjectIdEstimateRouteImport } from "./@routes/editor/$p
 import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
 import { Route as EditorProjectIdMcpRouteImport } from "./@routes/editor/$projectId/mcp"
 import { Route as EditorProjectIdNotesRouteImport } from "./@routes/editor/$projectId/notes"
-import { Route as EditorProjectIdPainterRouteImport } from "./@routes/editor/$projectId/painter"
 import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
 import { Route as GamePackageIdSceneRouteImport } from "./@routes/game/$packageId/_scene"
 import { Route as GamePackageIdCheatsRouteImport } from "./@routes/game/$packageId/cheats"
@@ -46,8 +45,6 @@ import { Route as EditorProjectIdEditorIndexRouteImport } from "./@routes/editor
 import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
 import { Route as EditorProjectIdMcpIndexRouteImport } from "./@routes/editor/$projectId/mcp/index"
 import { Route as EditorProjectIdMcpSectionIdRouteImport } from "./@routes/editor/$projectId/mcp/$sectionId"
-import { Route as EditorProjectIdPainterIndexRouteImport } from "./@routes/editor/$projectId/painter/index"
-import { Route as EditorProjectIdPainterPaintingIdRouteImport } from "./@routes/editor/$projectId/painter/$paintingId"
 import { Route as EditorProjectIdProjectIndexRouteImport } from "./@routes/editor/$projectId/project/index"
 import { Route as EditorProjectIdProjectSectionIdRouteImport } from "./@routes/editor/$projectId/project/$sectionId"
 import { Route as EditorProjectIdProjectDetailRouteImport } from "./@routes/editor/$projectId/project/detail"
@@ -62,11 +59,6 @@ import { Route as EditorProjectIdAssetsResourceIdEditRouteImport } from "./@rout
 import { Route as EditorProjectIdEditorItemsItemUidRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid"
 import { Route as EditorProjectIdEditorItemsListRouteImport } from "./@routes/editor/$projectId/editor/items/list"
 import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
-import { Route as EditorProjectIdPainterPaintingIdIndexRouteImport } from "./@routes/editor/$projectId/painter/$paintingId/index"
-import { Route as EditorProjectIdPainterPaintingIdCanvasRouteImport } from "./@routes/editor/$projectId/painter/$paintingId/canvas"
-import { Route as EditorProjectIdPainterPaintingIdLayersRouteImport } from "./@routes/editor/$projectId/painter/$paintingId/layers"
-import { Route as EditorProjectIdPainterPaintingIdPreviewRouteImport } from "./@routes/editor/$projectId/painter/$paintingId/preview"
-import { Route as EditorProjectIdPainterPaintingIdScatteringRouteImport } from "./@routes/editor/$projectId/painter/$paintingId/scattering"
 import { Route as EditorProjectIdProjectDetailIndexRouteImport } from "./@routes/editor/$projectId/project/detail/index"
 import { Route as EditorProjectIdProjectDetailSectionIdRouteImport } from "./@routes/editor/$projectId/project/detail/$sectionId"
 import { Route as EditorProjectIdProjectFormIndexRouteImport } from "./@routes/editor/$projectId/project/form/index"
@@ -207,11 +199,6 @@ const EditorProjectIdNotesRoute = EditorProjectIdNotesRouteImport.update({
   path: "/notes",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
-const EditorProjectIdPainterRoute = EditorProjectIdPainterRouteImport.update({
-  id: "/painter",
-  path: "/painter",
-  getParentRoute: () => EditorProjectIdRoute,
-} as any)
 const EditorProjectIdProjectRoute = EditorProjectIdProjectRouteImport.update({
   id: "/project",
   path: "/project",
@@ -272,18 +259,6 @@ const EditorProjectIdMcpSectionIdRoute =
     id: "/$sectionId",
     path: "/$sectionId",
     getParentRoute: () => EditorProjectIdMcpRoute,
-  } as any)
-const EditorProjectIdPainterIndexRoute =
-  EditorProjectIdPainterIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => EditorProjectIdPainterRoute,
-  } as any)
-const EditorProjectIdPainterPaintingIdRoute =
-  EditorProjectIdPainterPaintingIdRouteImport.update({
-    id: "/$paintingId",
-    path: "/$paintingId",
-    getParentRoute: () => EditorProjectIdPainterRoute,
   } as any)
 const EditorProjectIdProjectIndexRoute =
   EditorProjectIdProjectIndexRouteImport.update({
@@ -366,36 +341,6 @@ const EditorProjectIdEditorItemsNewRoute =
     id: "/new",
     path: "/new",
     getParentRoute: () => EditorProjectIdEditorItemsRoute,
-  } as any)
-const EditorProjectIdPainterPaintingIdIndexRoute =
-  EditorProjectIdPainterPaintingIdIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => EditorProjectIdPainterPaintingIdRoute,
-  } as any)
-const EditorProjectIdPainterPaintingIdCanvasRoute =
-  EditorProjectIdPainterPaintingIdCanvasRouteImport.update({
-    id: "/canvas",
-    path: "/canvas",
-    getParentRoute: () => EditorProjectIdPainterPaintingIdRoute,
-  } as any)
-const EditorProjectIdPainterPaintingIdLayersRoute =
-  EditorProjectIdPainterPaintingIdLayersRouteImport.update({
-    id: "/layers",
-    path: "/layers",
-    getParentRoute: () => EditorProjectIdPainterPaintingIdRoute,
-  } as any)
-const EditorProjectIdPainterPaintingIdPreviewRoute =
-  EditorProjectIdPainterPaintingIdPreviewRouteImport.update({
-    id: "/preview",
-    path: "/preview",
-    getParentRoute: () => EditorProjectIdPainterPaintingIdRoute,
-  } as any)
-const EditorProjectIdPainterPaintingIdScatteringRoute =
-  EditorProjectIdPainterPaintingIdScatteringRouteImport.update({
-    id: "/scattering",
-    path: "/scattering",
-    getParentRoute: () => EditorProjectIdPainterPaintingIdRoute,
   } as any)
 const EditorProjectIdProjectDetailIndexRoute =
   EditorProjectIdProjectDetailIndexRouteImport.update({
@@ -512,7 +457,6 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/mcp": typeof EditorProjectIdMcpRouteWithChildren
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
-  "/editor/$projectId/painter": typeof EditorProjectIdPainterRouteWithChildren
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/settings/": typeof LauncherSettingsIndexRoute
@@ -520,7 +464,6 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/mcp/$sectionId": typeof EditorProjectIdMcpSectionIdRoute
-  "/editor/$projectId/painter/$paintingId": typeof EditorProjectIdPainterPaintingIdRouteWithChildren
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
   "/editor/$projectId/project/detail": typeof EditorProjectIdProjectDetailRouteWithChildren
   "/editor/$projectId/project/form": typeof EditorProjectIdProjectFormRouteWithChildren
@@ -533,20 +476,14 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/mcp/": typeof EditorProjectIdMcpIndexRoute
-  "/editor/$projectId/painter/": typeof EditorProjectIdPainterIndexRoute
   "/editor/$projectId/project/": typeof EditorProjectIdProjectIndexRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailRouteWithChildren
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRoute
-  "/editor/$projectId/painter/$paintingId/canvas": typeof EditorProjectIdPainterPaintingIdCanvasRoute
-  "/editor/$projectId/painter/$paintingId/layers": typeof EditorProjectIdPainterPaintingIdLayersRoute
-  "/editor/$projectId/painter/$paintingId/preview": typeof EditorProjectIdPainterPaintingIdPreviewRoute
-  "/editor/$projectId/painter/$paintingId/scattering": typeof EditorProjectIdPainterPaintingIdScatteringRoute
   "/editor/$projectId/project/detail/$sectionId": typeof EditorProjectIdProjectDetailSectionIdRoute
   "/editor/$projectId/project/form/$sectionId": typeof EditorProjectIdProjectFormSectionIdRoute
-  "/editor/$projectId/painter/$paintingId/": typeof EditorProjectIdPainterPaintingIdIndexRoute
   "/editor/$projectId/project/detail/": typeof EditorProjectIdProjectDetailIndexRoute
   "/editor/$projectId/project/form/": typeof EditorProjectIdProjectFormIndexRoute
   "/editor/$projectId/assets/$resourceId/detail/delete": typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
@@ -596,19 +533,13 @@ export interface FileRoutesByTo {
   "/editor/$projectId/board": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/mcp": typeof EditorProjectIdMcpIndexRoute
-  "/editor/$projectId/painter": typeof EditorProjectIdPainterIndexRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectIndexRoute
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRoute
-  "/editor/$projectId/painter/$paintingId/canvas": typeof EditorProjectIdPainterPaintingIdCanvasRoute
-  "/editor/$projectId/painter/$paintingId/layers": typeof EditorProjectIdPainterPaintingIdLayersRoute
-  "/editor/$projectId/painter/$paintingId/preview": typeof EditorProjectIdPainterPaintingIdPreviewRoute
-  "/editor/$projectId/painter/$paintingId/scattering": typeof EditorProjectIdPainterPaintingIdScatteringRoute
   "/editor/$projectId/project/detail/$sectionId": typeof EditorProjectIdProjectDetailSectionIdRoute
   "/editor/$projectId/project/form/$sectionId": typeof EditorProjectIdProjectFormSectionIdRoute
-  "/editor/$projectId/painter/$paintingId": typeof EditorProjectIdPainterPaintingIdIndexRoute
   "/editor/$projectId/project/detail": typeof EditorProjectIdProjectDetailIndexRoute
   "/editor/$projectId/project/form": typeof EditorProjectIdProjectFormIndexRoute
   "/editor/$projectId/assets/$resourceId/detail/delete": typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
@@ -648,7 +579,6 @@ export interface FileRoutesById {
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/mcp": typeof EditorProjectIdMcpRouteWithChildren
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
-  "/editor/$projectId/painter": typeof EditorProjectIdPainterRouteWithChildren
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
   "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
@@ -657,7 +587,6 @@ export interface FileRoutesById {
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/mcp/$sectionId": typeof EditorProjectIdMcpSectionIdRoute
-  "/editor/$projectId/painter/$paintingId": typeof EditorProjectIdPainterPaintingIdRouteWithChildren
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
   "/editor/$projectId/project/detail": typeof EditorProjectIdProjectDetailRouteWithChildren
   "/editor/$projectId/project/form": typeof EditorProjectIdProjectFormRouteWithChildren
@@ -670,20 +599,14 @@ export interface FileRoutesById {
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/mcp/": typeof EditorProjectIdMcpIndexRoute
-  "/editor/$projectId/painter/": typeof EditorProjectIdPainterIndexRoute
   "/editor/$projectId/project/": typeof EditorProjectIdProjectIndexRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailRouteWithChildren
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRoute
-  "/editor/$projectId/painter/$paintingId/canvas": typeof EditorProjectIdPainterPaintingIdCanvasRoute
-  "/editor/$projectId/painter/$paintingId/layers": typeof EditorProjectIdPainterPaintingIdLayersRoute
-  "/editor/$projectId/painter/$paintingId/preview": typeof EditorProjectIdPainterPaintingIdPreviewRoute
-  "/editor/$projectId/painter/$paintingId/scattering": typeof EditorProjectIdPainterPaintingIdScatteringRoute
   "/editor/$projectId/project/detail/$sectionId": typeof EditorProjectIdProjectDetailSectionIdRoute
   "/editor/$projectId/project/form/$sectionId": typeof EditorProjectIdProjectFormSectionIdRoute
-  "/editor/$projectId/painter/$paintingId/": typeof EditorProjectIdPainterPaintingIdIndexRoute
   "/editor/$projectId/project/detail/": typeof EditorProjectIdProjectDetailIndexRoute
   "/editor/$projectId/project/form/": typeof EditorProjectIdProjectFormIndexRoute
   "/editor/$projectId/assets/$resourceId/detail/delete": typeof EditorProjectIdAssetsResourceIdDetailDeleteRoute
@@ -724,7 +647,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/flow"
     | "/editor/$projectId/mcp"
     | "/editor/$projectId/notes"
-    | "/editor/$projectId/painter"
     | "/editor/$projectId/project"
     | "/game/$packageId/cheats"
     | "/settings/"
@@ -732,7 +654,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
     | "/editor/$projectId/mcp/$sectionId"
-    | "/editor/$projectId/painter/$paintingId"
     | "/editor/$projectId/project/$sectionId"
     | "/editor/$projectId/project/detail"
     | "/editor/$projectId/project/form"
@@ -745,20 +666,14 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/"
     | "/editor/$projectId/editor/"
     | "/editor/$projectId/mcp/"
-    | "/editor/$projectId/painter/"
     | "/editor/$projectId/project/"
     | "/editor/$projectId/assets/$resourceId/detail"
     | "/editor/$projectId/assets/$resourceId/edit"
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/list"
     | "/editor/$projectId/editor/items/new"
-    | "/editor/$projectId/painter/$paintingId/canvas"
-    | "/editor/$projectId/painter/$paintingId/layers"
-    | "/editor/$projectId/painter/$paintingId/preview"
-    | "/editor/$projectId/painter/$paintingId/scattering"
     | "/editor/$projectId/project/detail/$sectionId"
     | "/editor/$projectId/project/form/$sectionId"
-    | "/editor/$projectId/painter/$paintingId/"
     | "/editor/$projectId/project/detail/"
     | "/editor/$projectId/project/form/"
     | "/editor/$projectId/assets/$resourceId/detail/delete"
@@ -808,19 +723,13 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board"
     | "/editor/$projectId/editor"
     | "/editor/$projectId/mcp"
-    | "/editor/$projectId/painter"
     | "/editor/$projectId/project"
     | "/editor/$projectId/assets/$resourceId/edit"
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/list"
     | "/editor/$projectId/editor/items/new"
-    | "/editor/$projectId/painter/$paintingId/canvas"
-    | "/editor/$projectId/painter/$paintingId/layers"
-    | "/editor/$projectId/painter/$paintingId/preview"
-    | "/editor/$projectId/painter/$paintingId/scattering"
     | "/editor/$projectId/project/detail/$sectionId"
     | "/editor/$projectId/project/form/$sectionId"
-    | "/editor/$projectId/painter/$paintingId"
     | "/editor/$projectId/project/detail"
     | "/editor/$projectId/project/form"
     | "/editor/$projectId/assets/$resourceId/detail/delete"
@@ -859,7 +768,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/flow"
     | "/editor/$projectId/mcp"
     | "/editor/$projectId/notes"
-    | "/editor/$projectId/painter"
     | "/editor/$projectId/project"
     | "/game/$packageId/_scene"
     | "/game/$packageId/cheats"
@@ -868,7 +776,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
     | "/editor/$projectId/mcp/$sectionId"
-    | "/editor/$projectId/painter/$paintingId"
     | "/editor/$projectId/project/$sectionId"
     | "/editor/$projectId/project/detail"
     | "/editor/$projectId/project/form"
@@ -881,20 +788,14 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/"
     | "/editor/$projectId/editor/"
     | "/editor/$projectId/mcp/"
-    | "/editor/$projectId/painter/"
     | "/editor/$projectId/project/"
     | "/editor/$projectId/assets/$resourceId/detail"
     | "/editor/$projectId/assets/$resourceId/edit"
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/list"
     | "/editor/$projectId/editor/items/new"
-    | "/editor/$projectId/painter/$paintingId/canvas"
-    | "/editor/$projectId/painter/$paintingId/layers"
-    | "/editor/$projectId/painter/$paintingId/preview"
-    | "/editor/$projectId/painter/$paintingId/scattering"
     | "/editor/$projectId/project/detail/$sectionId"
     | "/editor/$projectId/project/form/$sectionId"
-    | "/editor/$projectId/painter/$paintingId/"
     | "/editor/$projectId/project/detail/"
     | "/editor/$projectId/project/form/"
     | "/editor/$projectId/assets/$resourceId/detail/delete"
@@ -1097,13 +998,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdNotesRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
-    "/editor/$projectId/painter": {
-      id: "/editor/$projectId/painter"
-      path: "/painter"
-      fullPath: "/editor/$projectId/painter"
-      preLoaderRoute: typeof EditorProjectIdPainterRouteImport
-      parentRoute: typeof EditorProjectIdRoute
-    }
     "/editor/$projectId/project": {
       id: "/editor/$projectId/project"
       path: "/project"
@@ -1180,20 +1074,6 @@ declare module "@tanstack/react-router" {
       fullPath: "/editor/$projectId/mcp/$sectionId"
       preLoaderRoute: typeof EditorProjectIdMcpSectionIdRouteImport
       parentRoute: typeof EditorProjectIdMcpRoute
-    }
-    "/editor/$projectId/painter/": {
-      id: "/editor/$projectId/painter/"
-      path: "/"
-      fullPath: "/editor/$projectId/painter/"
-      preLoaderRoute: typeof EditorProjectIdPainterIndexRouteImport
-      parentRoute: typeof EditorProjectIdPainterRoute
-    }
-    "/editor/$projectId/painter/$paintingId": {
-      id: "/editor/$projectId/painter/$paintingId"
-      path: "/$paintingId"
-      fullPath: "/editor/$projectId/painter/$paintingId"
-      preLoaderRoute: typeof EditorProjectIdPainterPaintingIdRouteImport
-      parentRoute: typeof EditorProjectIdPainterRoute
     }
     "/editor/$projectId/project/": {
       id: "/editor/$projectId/project/"
@@ -1292,41 +1172,6 @@ declare module "@tanstack/react-router" {
       fullPath: "/editor/$projectId/editor/items/new"
       preLoaderRoute: typeof EditorProjectIdEditorItemsNewRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsRoute
-    }
-    "/editor/$projectId/painter/$paintingId/": {
-      id: "/editor/$projectId/painter/$paintingId/"
-      path: "/"
-      fullPath: "/editor/$projectId/painter/$paintingId/"
-      preLoaderRoute: typeof EditorProjectIdPainterPaintingIdIndexRouteImport
-      parentRoute: typeof EditorProjectIdPainterPaintingIdRoute
-    }
-    "/editor/$projectId/painter/$paintingId/canvas": {
-      id: "/editor/$projectId/painter/$paintingId/canvas"
-      path: "/canvas"
-      fullPath: "/editor/$projectId/painter/$paintingId/canvas"
-      preLoaderRoute: typeof EditorProjectIdPainterPaintingIdCanvasRouteImport
-      parentRoute: typeof EditorProjectIdPainterPaintingIdRoute
-    }
-    "/editor/$projectId/painter/$paintingId/layers": {
-      id: "/editor/$projectId/painter/$paintingId/layers"
-      path: "/layers"
-      fullPath: "/editor/$projectId/painter/$paintingId/layers"
-      preLoaderRoute: typeof EditorProjectIdPainterPaintingIdLayersRouteImport
-      parentRoute: typeof EditorProjectIdPainterPaintingIdRoute
-    }
-    "/editor/$projectId/painter/$paintingId/preview": {
-      id: "/editor/$projectId/painter/$paintingId/preview"
-      path: "/preview"
-      fullPath: "/editor/$projectId/painter/$paintingId/preview"
-      preLoaderRoute: typeof EditorProjectIdPainterPaintingIdPreviewRouteImport
-      parentRoute: typeof EditorProjectIdPainterPaintingIdRoute
-    }
-    "/editor/$projectId/painter/$paintingId/scattering": {
-      id: "/editor/$projectId/painter/$paintingId/scattering"
-      path: "/scattering"
-      fullPath: "/editor/$projectId/painter/$paintingId/scattering"
-      preLoaderRoute: typeof EditorProjectIdPainterPaintingIdScatteringRouteImport
-      parentRoute: typeof EditorProjectIdPainterPaintingIdRoute
     }
     "/editor/$projectId/project/detail/": {
       id: "/editor/$projectId/project/detail/"
@@ -1646,50 +1491,6 @@ const EditorProjectIdMcpRouteChildren: EditorProjectIdMcpRouteChildren = {
 const EditorProjectIdMcpRouteWithChildren =
   EditorProjectIdMcpRoute._addFileChildren(EditorProjectIdMcpRouteChildren)
 
-interface EditorProjectIdPainterPaintingIdRouteChildren {
-  EditorProjectIdPainterPaintingIdCanvasRoute: typeof EditorProjectIdPainterPaintingIdCanvasRoute
-  EditorProjectIdPainterPaintingIdLayersRoute: typeof EditorProjectIdPainterPaintingIdLayersRoute
-  EditorProjectIdPainterPaintingIdPreviewRoute: typeof EditorProjectIdPainterPaintingIdPreviewRoute
-  EditorProjectIdPainterPaintingIdScatteringRoute: typeof EditorProjectIdPainterPaintingIdScatteringRoute
-  EditorProjectIdPainterPaintingIdIndexRoute: typeof EditorProjectIdPainterPaintingIdIndexRoute
-}
-
-const EditorProjectIdPainterPaintingIdRouteChildren: EditorProjectIdPainterPaintingIdRouteChildren =
-  {
-    EditorProjectIdPainterPaintingIdCanvasRoute:
-      EditorProjectIdPainterPaintingIdCanvasRoute,
-    EditorProjectIdPainterPaintingIdLayersRoute:
-      EditorProjectIdPainterPaintingIdLayersRoute,
-    EditorProjectIdPainterPaintingIdPreviewRoute:
-      EditorProjectIdPainterPaintingIdPreviewRoute,
-    EditorProjectIdPainterPaintingIdScatteringRoute:
-      EditorProjectIdPainterPaintingIdScatteringRoute,
-    EditorProjectIdPainterPaintingIdIndexRoute:
-      EditorProjectIdPainterPaintingIdIndexRoute,
-  }
-
-const EditorProjectIdPainterPaintingIdRouteWithChildren =
-  EditorProjectIdPainterPaintingIdRoute._addFileChildren(
-    EditorProjectIdPainterPaintingIdRouteChildren,
-  )
-
-interface EditorProjectIdPainterRouteChildren {
-  EditorProjectIdPainterPaintingIdRoute: typeof EditorProjectIdPainterPaintingIdRouteWithChildren
-  EditorProjectIdPainterIndexRoute: typeof EditorProjectIdPainterIndexRoute
-}
-
-const EditorProjectIdPainterRouteChildren: EditorProjectIdPainterRouteChildren =
-  {
-    EditorProjectIdPainterPaintingIdRoute:
-      EditorProjectIdPainterPaintingIdRouteWithChildren,
-    EditorProjectIdPainterIndexRoute: EditorProjectIdPainterIndexRoute,
-  }
-
-const EditorProjectIdPainterRouteWithChildren =
-  EditorProjectIdPainterRoute._addFileChildren(
-    EditorProjectIdPainterRouteChildren,
-  )
-
 interface EditorProjectIdProjectDetailRouteChildren {
   EditorProjectIdProjectDetailSectionIdRoute: typeof EditorProjectIdProjectDetailSectionIdRoute
   EditorProjectIdProjectDetailIndexRoute: typeof EditorProjectIdProjectDetailIndexRoute
@@ -1756,7 +1557,6 @@ interface EditorProjectIdRouteChildren {
   EditorProjectIdFlowRoute: typeof EditorProjectIdFlowRoute
   EditorProjectIdMcpRoute: typeof EditorProjectIdMcpRouteWithChildren
   EditorProjectIdNotesRoute: typeof EditorProjectIdNotesRoute
-  EditorProjectIdPainterRoute: typeof EditorProjectIdPainterRouteWithChildren
   EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRouteWithChildren
 }
 
@@ -1769,7 +1569,6 @@ const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
   EditorProjectIdFlowRoute: EditorProjectIdFlowRoute,
   EditorProjectIdMcpRoute: EditorProjectIdMcpRouteWithChildren,
   EditorProjectIdNotesRoute: EditorProjectIdNotesRoute,
-  EditorProjectIdPainterRoute: EditorProjectIdPainterRouteWithChildren,
   EditorProjectIdProjectRoute: EditorProjectIdProjectRouteWithChildren,
 }
 

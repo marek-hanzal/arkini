@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
-import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
+import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";

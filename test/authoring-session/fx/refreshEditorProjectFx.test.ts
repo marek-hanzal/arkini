@@ -14,8 +14,8 @@ import {
 	type ProjectWriteAdmissionService,
 } from "~/project-authoring/service/ProjectWriteAdmission";
 import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";

@@ -4,10 +4,10 @@ import { expect } from "vitest";
 import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
-import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
+import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import { restoreBoardScenarioFx } from "~/board-scenario/fx/restoreBoardScenarioFx";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";

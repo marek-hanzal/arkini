@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { Project } from "~/project-authoring/type/Project";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 
 /** Claims and synchronizes the project currently owned by the editor route. */
 export const syncEditorBoardGameFx = Effect.fn("syncEditorBoardGameFx")((project: Project) =>

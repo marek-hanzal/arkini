@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 
 /** Joins disposal of whichever editor game currently owns the process boundary. */
 export const releaseCurrentEditorBoardGameFx = Atom.get(EditorBoardGameResourceOwnerAtom).pipe(

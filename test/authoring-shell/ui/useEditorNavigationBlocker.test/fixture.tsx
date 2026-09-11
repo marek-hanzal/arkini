@@ -17,8 +17,8 @@ import { afterEach, vi } from "vitest";
 import { bootstrapEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/bootstrapEditorMcpVersionCheckoutFx";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { useEditorNavigationBlocker } from "~/authoring-shell/ui/useEditorNavigationBlocker";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import {
 	ProjectWriteAdmission,

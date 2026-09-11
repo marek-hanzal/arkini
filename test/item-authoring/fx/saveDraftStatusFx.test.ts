@@ -6,8 +6,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import {
 	ProjectRepository,
 	type ProjectRepositoryService,

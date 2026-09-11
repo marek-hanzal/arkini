@@ -2,7 +2,7 @@ import { useAtomSet } from "@effect/atom-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { Project } from "~/project-authoring/type/Project";
-import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
 import { BoardScenarioCommandAtoms } from "~/board-scenario/atom/BoardScenarioCommandAtoms";
 import type { BoardScenarioDescriptorSchema } from "~/board-scenario/schema/BoardScenarioSchema";
 

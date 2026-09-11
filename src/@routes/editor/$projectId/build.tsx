@@ -15,13 +15,11 @@ import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
-import { EditorNumberControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {
 		const controller = useEditorBuildController();
-		const requestedVersion = controller.canBuild ? formatVersionFn(controller.version) : "…";
 		const outputVersion =
 			controller.artifact?.version ?? formatVersionFn(controller.project.version);
 		const InstallIcon = controller.installAction === "update" ? PackageCheck : PackagePlus;
@@ -61,38 +59,6 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 					className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-3"
 					data-ui="EditorBuild"
 				>
-					<fieldset
-						disabled={controller.buildPending}
-						className="grid shrink-0 grid-cols-[minmax(0,7rem)_auto_minmax(0,7rem)_auto_minmax(8rem,14rem)] items-end justify-start gap-2"
-						data-ui="EditorBuildVersion"
-					>
-						<EditorNumberControl
-							label="Major"
-							min={0}
-							max={Number.MAX_SAFE_INTEGER}
-							value={controller.version.major}
-							onChangeFn={controller.setMajorFn}
-						/>
-						<span className="pb-2">.</span>
-						<EditorNumberControl
-							label="Minor"
-							min={0}
-							max={Number.MAX_SAFE_INTEGER}
-							value={controller.version.minor}
-							onChangeFn={controller.setMinorFn}
-						/>
-						<span className="pb-2">-</span>
-						<EditorTextControl
-							label="Suffix"
-							required={false}
-							placeholder="optional"
-							value={controller.version.suffix ?? ""}
-							onChangeFn={controller.setSuffixFn}
-						/>
-					</fieldset>
-					{controller.versionError === undefined ? null : (
-						<p className="text-sm text-danger">{controller.versionError}</p>
-					)}
 					{artifactSummary === undefined ? null : (
 						<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 							<h2 className="text-lg font-semibold">Build output</h2>
@@ -144,7 +110,11 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								canBuild={controller.canBuild}
 								pending={controller.buildPending}
 								stale={controller.buildStatus === "stale"}
-								version={requestedVersion}
+								version={controller.version}
+								versionError={controller.versionError}
+								onMajorChangeFn={controller.setMajorFn}
+								onMinorChangeFn={controller.setMinorFn}
+								onSuffixChangeFn={controller.setSuffixFn}
 								onBuildFn={controller.buildFn}
 							/>
 						</div>

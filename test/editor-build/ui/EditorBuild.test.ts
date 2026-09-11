@@ -221,20 +221,11 @@ const testTranslator = createTranslatorFn({
 		"Build help": {
 			value: "Build help",
 		},
-		"Build dirty description": {
-			value: "Build uses the committed Version HEAD. Review the saved changes and create a Version commit; Arkini will bring you back here to build the resulting Arkpack.",
-		},
-		"Build dirty title": {
-			value: "Commit the working copy first",
-		},
 		Close: {
 			value: "Close",
 		},
 		"Page help": {
 			value: "Page help",
-		},
-		"Review and commit": {
-			value: "Review & commit",
 		},
 	},
 });

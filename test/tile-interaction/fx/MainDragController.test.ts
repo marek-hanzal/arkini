@@ -10,6 +10,31 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: pointer", () => {
+	it("routes a hit through the outgoing content during the fade and freezes ground priority in the drop", async () => {
+		const ground = {
+			...item,
+			id: "runtime:ground",
+			layer: "ground" as const,
+		};
+		const mounted = mountController({
+			interactionLayer: "ground",
+			targetItems: [
+				ground,
+			],
+		});
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+		mounted.flushFrame();
+		mounted.stage.emit("pointerup", pointer(70, 20));
+		await Promise.resolve();
+		expect(mounted.onDrop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				sourceItemId: ground.id,
+				interactionLayer: "ground",
+			}),
+		);
+		expect(mounted.actor.dragging).toBe(false);
+	});
 	it("blocks direct gestures on covered ground and immediately admits it when uncovered", async () => {
 		const mounted = mountController();
 		const ground = {

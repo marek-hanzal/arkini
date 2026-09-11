@@ -494,6 +494,7 @@ export const createReconcilerHarness = ({
 	const layer = new Container();
 	const transientActorLayer = new Container();
 	const surface = {
+		readInteractionLayerFx: Effect.succeed("content" as const),
 		readActorPoseFx: () =>
 			Effect.succeed(
 				readPose

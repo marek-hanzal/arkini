@@ -118,8 +118,10 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 		}
 		if (
 			canonical.location.scope === "board" &&
-			canonical.layer === "ground" &&
-			(yield* actorStore.readCanonicalOccupantFx(canonical.location))?.id !== canonical.id
+			(yield* actorStore.readCanonicalOccupantFx(
+				canonical.location,
+				yield* surface.readInteractionLayerFx,
+			))?.id !== canonical.id
 		)
 			return null;
 		return {
@@ -137,13 +139,16 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 			readonly sourceItem: TileActorItem;
 			readonly targetFacts: TargetFacts;
 		}) =>
-			readTileDropPreviewFx({
-				game,
-				sourceItemId: sourceItem.id,
-				sourceLocation: sourceItem.location,
-				sourceRevision: sourceItem.revision,
-				target: targetFacts.commandTarget,
-			}).pipe(Effect.map(({ kind }) => kind)),
+			Effect.gen(function* () {
+				return (yield* readTileDropPreviewFx({
+					game,
+					interactionLayer: yield* surface.readInteractionLayerFx,
+					sourceItemId: sourceItem.id,
+					sourceLocation: sourceItem.location,
+					sourceRevision: sourceItem.revision,
+					target: targetFacts.commandTarget,
+				})).kind;
+			}),
 	);
 
 	const refreshAttractionEligibilityFx = Effect.fn(
@@ -173,9 +178,10 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 				actor === undefined ||
 				actor.container.destroyed ||
 				(canonical?.location.scope === "board" &&
-					canonical.layer === "ground" &&
-					(yield* actorStore.readCanonicalOccupantFx(canonical.location))?.id !==
-						canonical.id)
+					(yield* actorStore.readCanonicalOccupantFx(
+						canonical.location,
+						yield* surface.readInteractionLayerFx,
+					))?.id !== canonical.id)
 			) {
 				drag.attractionEligibilityByActorId.delete(actorId);
 				continue;
@@ -205,6 +211,7 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 					? drag.previewKind
 					: (yield* readTileDropPreviewFx({
 							game,
+							interactionLayer: yield* surface.readInteractionLayerFx,
 							sourceItemId: sourceItem.id,
 							sourceLocation: sourceItem.location,
 							sourceRevision: sourceItem.revision,

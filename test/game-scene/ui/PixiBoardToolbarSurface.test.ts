@@ -91,6 +91,9 @@ vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 
 vi.mock("~/game-scene/ui/PixiGameRuntime", () => ({
 	usePixiGameRuntime: () => ({
+		boardLayer: {
+			setGroundHeldFx: () => Effect.void,
+		},
 		interaction: {
 			registerFx: (cancel: () => void) =>
 				Effect.sync(() => {

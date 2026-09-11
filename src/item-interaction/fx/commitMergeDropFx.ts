@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
@@ -13,6 +14,7 @@ import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
 export namespace commitMergeDropFx {
 	export interface Props {
+		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly targetItemId: IdSchema.Type;
@@ -22,6 +24,7 @@ export namespace commitMergeDropFx {
 
 /** Commits one exact authored merge and normalizes both actor identities. */
 export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
+	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	targetItemId,
@@ -36,6 +39,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 			}),
 		);
 	return yield* mergeItemsFx({
+		interactionLayer,
 		sourceItemId,
 		sourceRevision,
 		targetItemId,

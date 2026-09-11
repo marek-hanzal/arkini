@@ -374,6 +374,8 @@ export const createSurface = ({
 	) => ActorPose | null;
 	readonly transientActorLayer?: Container;
 } = {}): MainSurface => ({
+	readInteractionLayerFx: Effect.succeed("content"),
+	setInteractionLayerFx: () => Effect.void,
 	closeFx: Effect.void,
 	readActorPoseFx: (item) =>
 		Effect.succeed(readActorPose?.(item) ?? readLocationPose(item.location, item.layer)),

@@ -123,6 +123,7 @@ const readMovePreviewFx = Effect.fnUntraced(function* ({
 
 /** Reads the current authoritative semantic kind of one prospective item drop without mutating runtime. */
 export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
+	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -161,6 +162,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	}
 	if (
 		readGridLocationOccupantFn({
+			interactionLayer,
 			runtime,
 			location: source.location,
 		})?.id !== source.id
@@ -170,6 +172,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (target.occupant === null) {
 		if (
 			readGridLocationOccupantFn({
+				interactionLayer,
 				runtime,
 				location: target.location,
 			}) !== undefined
@@ -202,6 +205,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	}
 	if (
 		readGridLocationOccupantFn({
+			interactionLayer,
 			runtime,
 			location: targetItem.location,
 		})?.id !== targetItem.id

@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import type { AnimationDriver, AnimationControl } from "~/tile-rendering/service/AnimationDriver";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -26,6 +28,7 @@ interface PixiSceneDropTarget {
 }
 
 interface CreateMainSurfaceProps {
+	readonly animationDriver: AnimationDriver;
 	readonly actorStore: MainActorStore;
 	readonly application: PixiApplicationOwner;
 	readonly dropFeedback: DropFeedback;
@@ -36,6 +39,7 @@ interface CreateMainSurfaceProps {
 /** Owns main-scene geometry, layers, masks, hit testing and drop feedback paint. */
 export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 	({
+		animationDriver,
 		actorStore,
 		application,
 		dropFeedback,
@@ -110,6 +114,26 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			);
 			application.stage.eventMode = "static";
 			let closed = false;
+			let interactionLayer: TileActorItem["layer"] = "content";
+			let layerAnimation: AnimationControl | null = null;
+			const restoreLayerOpacityFx = Effect.fn("MainSurface.restoreLayerOpacityFx")(() =>
+				Effect.gen(function* () {
+					const groundAlpha = groundActorLayer.alpha;
+					const contentAlpha = boardActorLayer.alpha;
+					layerAnimation = yield* animationDriver.startTweenFx({
+						durationMs: 110,
+						from: 0,
+						to: 1,
+						onUpdateFn: (progress) => {
+							groundActorLayer.alpha = groundAlpha + (1 - groundAlpha) * progress;
+							boardActorLayer.alpha = contentAlpha + (1 - contentAlpha) * progress;
+						},
+						onCompleteFn: () => {
+							layerAnimation = null;
+						},
+					});
+				}),
+			);
 
 			const readLocationPoseFn = (
 				location: TileActorItem["location"],
@@ -178,7 +202,10 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						};
 					}
 					const location = readTargetLocationFn(target);
-					const occupant = yield* actorStore.readCanonicalOccupantFx(location);
+					const occupant = yield* actorStore.readCanonicalOccupantFx(
+						location,
+						interactionLayer,
+					);
 					return {
 						commandTarget: {
 							kind: "slot" as const,
@@ -193,6 +220,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						},
 						occupant,
 						stableKey: JSON.stringify([
+							interactionLayer,
 							layoutRevision,
 							location.scope,
 							location.scope === LocationScopeEnumSchema.enum.Board
@@ -311,10 +339,44 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			};
 
 			return {
+				readInteractionLayerFx: Effect.sync(() => interactionLayer),
+				setInteractionLayerFx: Effect.fn("MainSurface.setInteractionLayerFx")((nextLayer) =>
+					Effect.gen(function* () {
+						if (closed || interactionLayer === nextLayer) return;
+						interactionLayer = nextLayer;
+						if (layerAnimation !== null) yield* layerAnimation.stopFx;
+						const front = nextLayer === "ground" ? groundActorLayer : boardActorLayer;
+						const back = nextLayer === "ground" ? boardActorLayer : groundActorLayer;
+						if (
+							application.stage.getChildIndex(front) >
+							application.stage.getChildIndex(back)
+						) {
+							yield* restoreLayerOpacityFx();
+							return;
+						}
+						const fromAlpha = back.alpha;
+						const frontAlpha = front.alpha;
+						// Change painter order only after the outgoing front is transparent.
+						layerAnimation = yield* animationDriver.startTweenFx({
+							durationMs: 110,
+							from: 0,
+							to: 1,
+							onUpdateFn: (progress) => {
+								back.alpha = fromAlpha * (1 - progress);
+								front.alpha = frontAlpha + (1 - frontAlpha) * progress;
+							},
+							onCompleteFn: () => {
+								application.stage.swapChildren(front, back);
+								RendererRuntime.runSync(restoreLayerOpacityFx());
+							},
+						});
+					}),
+				),
 				transientActorLayer,
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
+					if (layerAnimation !== null) RendererRuntime.runSync(layerAnimation.stopFx);
 					for (const displayObject of [
 						transientActorLayer,
 						toolbarActorLayer,
@@ -344,7 +406,10 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						const locations: TileActorItem["location"][] = [];
 						appendIntersectingLocationsFn(locations, layout.board, bounds);
 						appendIntersectingLocationsFn(locations, layout.toolbar, bounds);
-						const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
+						const occupants = yield* actorStore.readCanonicalOccupantsFx(
+							locations,
+							interactionLayer,
+						);
 						return occupants
 							.filter(({ id }) => id !== bounds.excludeActorId)
 							.map(({ id }) => id);

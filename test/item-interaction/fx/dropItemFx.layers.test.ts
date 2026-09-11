@@ -63,6 +63,80 @@ const groundConfig = GameConfigSchema.parse({
 });
 
 describe("Board layer drop semantics", () => {
+	it("uses captured ground priority for covered source movement and target merge without moving content", () => {
+		run(
+			Effect.gen(function* () {
+				const ground = yield* spawnItemFx({
+					id: "ground",
+					itemId: "stone",
+					location: sourceLocation,
+					quantity: 1,
+				});
+				const cover = yield* spawnItemFx({
+					id: "cover",
+					itemId: "cover",
+					location: sourceLocation,
+					quantity: 1,
+				});
+				const targetCover = yield* spawnItemFx({
+					id: "target-cover",
+					itemId: "cover",
+					location: occupiedLocation,
+					quantity: 1,
+				});
+				const tool = yield* spawnItemFx({
+					id: "tool",
+					itemId: "water",
+					location: emptyLocation,
+					quantity: 1,
+				});
+				const moveCommand = {
+					...command(ground, targetCover),
+					interactionLayer: "ground" as const,
+				};
+				expect(yield* readDropItemPreviewFx(command(ground, targetCover))).toMatchObject({
+					kind: "reject",
+					reason: "invalid-source",
+				});
+				expect(yield* readDropItemPreviewFx(moveCommand)).toEqual({
+					kind: "move",
+				});
+				const moved = yield* dropItemFx(moveCommand);
+				expect(moved.kind).toBe("move");
+				if (moved.kind !== "move") throw new Error("Expected ground movement");
+				const currentGround = {
+					...ground,
+					location: moved.location,
+					revision: moved.revision,
+				};
+				const hiddenContentCommand = {
+					...command(targetCover, cover),
+					interactionLayer: "ground" as const,
+				};
+				expect(yield* dropItemFx(hiddenContentCommand)).toMatchObject({
+					kind: "reject",
+					reason: "invalid-source",
+				});
+				const mergeCommand = {
+					...command(tool, currentGround),
+					interactionLayer: "ground" as const,
+				};
+				expect(yield* readDropItemPreviewFx(mergeCommand)).toEqual({
+					kind: "merge",
+				});
+				expect(yield* dropItemFx(mergeCommand)).toMatchObject({
+					kind: "merge",
+					effect: "remove",
+				});
+				expect((yield* readRuntimeFx()).items).toEqual([
+					cover,
+					targetCover,
+				]);
+			}),
+			groundConfig,
+		);
+	});
+
 	it("places content over ground, prevents covered targeting, and exposes the same ground identity for destruction", () => {
 		run(
 			Effect.gen(function* () {

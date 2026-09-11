@@ -17,6 +17,7 @@ import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import { updateActorProgressFx } from "~/tile-rendering/fx/updateActorProgressFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { animateRetargetablePoseFx } from "~/tile-rendering/fx/animateRetargetablePoseFx";
+import { settleActorLayerFx } from "~/tile-rendering/fx/settleActorLayerFx";
 import { flashConsumedSourceFx } from "~/tile-rendering/fx/flashConsumedSourceFx";
 import { feedbackDurationMs } from "~/tile-rendering/fx/runActivityParticlesFx";
 import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
@@ -521,7 +522,14 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					if (actor.container.destroyed) return;
 					const latest =
 						RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
-					latest.layer.addChild(actor.container);
+					RendererRuntime.runSync(
+						settleActorLayerFx({
+							actor,
+							animator,
+							layer: latest.layer,
+							renderer: application.app.renderer,
+						}),
+					);
 				};
 				yield* animateRetargetablePoseFx({
 					actor,

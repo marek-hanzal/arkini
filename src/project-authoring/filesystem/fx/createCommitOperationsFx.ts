@@ -29,7 +29,6 @@ type Operations = Pick<
 	| "replaceConfigFx"
 	| "optimizeResourcesFx"
 	| "replaceResourceFx"
-	| "saveResourceFx"
 	| "upsertItemFx"
 	| "upsertResourcesFx"
 >;
@@ -435,47 +434,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			);
 		});
 
-	const saveResourceFx: Operations["saveResourceFx"] = ({
-		expectedRevision,
-		overwrite,
-		projectId,
-		resource: candidate,
-	}) =>
-		Effect.gen(function* () {
-			const resource = yield* Effect.try({
-				try: () => ResourceSchema.parse(candidate),
-				catch: (cause) =>
-					errorFn("save-resource", "The Editor resource is invalid.", cause),
-			});
-			return yield* commitResourcesFx(
-				"save-resource",
-				projectId,
-				expectedRevision,
-				(state) => {
-					const exists = state.project.resources.some(({ id }) => id === resource.id);
-					if (exists && !overwrite)
-						return Effect.fail(
-							errorFn("save-resource", `Resource ID ${resource.id} already exists.`),
-						);
-					return Effect.succeed({
-						config: state.project.config,
-						resources: [
-							...state.project.resources.filter(({ id }) => id !== resource.id),
-							resource,
-						],
-					});
-				},
-			);
-		}).pipe(
-			Effect.mapError((cause) =>
-				errorFn(
-					"save-resource",
-					`Resource ${candidate.id} could not be saved in project ${projectId}.`,
-					cause,
-				),
-			),
-		);
-
 	const upsertResourcesFx: Operations["upsertResourcesFx"] = ({
 		projectId,
 		resources: candidates,
@@ -744,7 +702,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		optimizeResourcesFx,
 		replaceConfigFx,
 		replaceResourceFx,
-		saveResourceFx,
 		upsertItemFx,
 		upsertResourcesFx,
 	} satisfies Operations;

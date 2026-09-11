@@ -32,46 +32,64 @@ const config = GameConfigSchema.parse({
 });
 
 describe("drop commit exposure", () => {
-	it.each([
-		[
-			"move",
-			"source",
-		],
-		[
-			"swap",
-			"source",
-		],
-		[
-			"swap",
-			"target",
-		],
-		[
-			"stack",
-			"source",
-		],
-		[
-			"stack",
-			"target",
-		],
-		[
-			"inventory",
-			"source",
-		],
-		[
-			"inventory",
-			"target",
-		],
-		[
-			"input",
-			"source",
-		],
-		[
-			"input",
-			"target",
-		],
-	] as const)(
-		"rejects %s when %s becomes covered without changing its revision",
-		(command, covered) => {
+	it.each(
+		(
+			[
+				[
+					"move",
+					"source",
+				],
+				[
+					"swap",
+					"source",
+				],
+				[
+					"swap",
+					"target",
+				],
+				[
+					"stack",
+					"source",
+				],
+				[
+					"stack",
+					"target",
+				],
+				[
+					"inventory",
+					"source",
+				],
+				[
+					"inventory",
+					"target",
+				],
+				[
+					"input",
+					"source",
+				],
+				[
+					"input",
+					"target",
+				],
+			] as const
+		).flatMap(
+			([command, covered]) =>
+				[
+					[
+						command,
+						covered,
+						undefined,
+					],
+					[
+						command,
+						covered,
+						"ground",
+					],
+				] as const,
+		),
+	)(
+		"rechecks %s when %s gains a content peer with interaction layer %s",
+		(command, covered, interactionLayer) => {
 			const result = run(
 				Effect.gen(function* () {
 					const source = yield* spawnItemFx({
@@ -100,6 +118,7 @@ describe("drop commit exposure", () => {
 					});
 					const before = yield* readRuntimeFx();
 					const props = {
+						interactionLayer,
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
 						sourceLocation,
@@ -142,11 +161,24 @@ describe("drop commit exposure", () => {
 				}),
 				config,
 			);
-			expect(result.outcome).toMatchObject({
-				kind: "reject",
-				reason: covered === "source" ? "invalid-source" : "invalid-target",
-			});
-			expect(result.after).toEqual(result.before);
+			if (interactionLayer === undefined) {
+				expect(result.outcome).toMatchObject({
+					kind: "reject",
+					reason: covered === "source" ? "invalid-source" : "invalid-target",
+				});
+				expect(result.after).toEqual(result.before);
+			} else {
+				expect(result.outcome.kind).toBe(
+					command === "inventory"
+						? "store-inventory"
+						: command === "input"
+							? "store-input"
+							: command,
+				);
+				expect(result.after.items.find((item) => item.id === "cover")).toEqual(
+					result.before.items.find((item) => item.id === "cover"),
+				);
+			}
 		},
 	);
 

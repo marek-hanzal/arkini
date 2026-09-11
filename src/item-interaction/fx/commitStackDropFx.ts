@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -47,10 +48,12 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 			}
 
 			yield* assertGridItemExposedFx({
+				interactionLayer: props.interactionLayer,
 				item: resolution.source,
 				runtime,
 			});
 			yield* assertGridItemExposedFx({
+				interactionLayer: props.interactionLayer,
 				item: resolution.target,
 				runtime,
 			});
@@ -108,6 +111,7 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 
 export namespace commitStackDropFx {
 	export interface Props {
+		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -119,6 +123,7 @@ export namespace commitStackDropFx {
 
 /** Commits one exact pure-stack transfer and normalizes both actor identities. */
 export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
+	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -127,6 +132,7 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 	targetLocation,
 }: commitStackDropFx.Props) {
 	return yield* stackItemsFx({
+		interactionLayer,
 		sourceItemId,
 		sourceRevision,
 		sourceLocation,

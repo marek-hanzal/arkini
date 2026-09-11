@@ -14,6 +14,7 @@ import type { MainActivationIntent } from "~/tile-interaction/type/MainActivatio
 import { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
+import { bindBoardLayerKeyboardFx } from "~/game-scene/fx/bindBoardLayerKeyboardFx";
 
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
@@ -30,7 +31,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 	const game = useGameEngine();
 	const { runSpaceActivationFn, runDropFn, runSplitFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
-	const { textures } = usePixiGameRuntime();
+	const { textures, boardLayer } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
 	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
 	const controlsRef = useRef({
@@ -123,6 +124,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 	const createRuntimeFx = useCallback(
 		(host: HTMLElement) =>
 			createMainRuntimeFx({
+				boardLayer,
 				dragThreshold: PointerDragThreshold,
 				game,
 				host,
@@ -132,6 +134,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 			}),
 		[
 			activateFn,
+			boardLayer,
 			game,
 			runDropFn,
 			textures,
@@ -141,6 +144,20 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 		createRuntimeFx,
 		game,
 	});
+	useEffect(() => {
+		if (interactionBlocked) return;
+		const keyboard = RendererRuntime.runSync(
+			bindBoardLayerKeyboardFx({
+				control: boardLayer,
+				window,
+				document,
+			}),
+		);
+		return () => RendererRuntime.runSync(keyboard.closeFx);
+	}, [
+		boardLayer,
+		interactionBlocked,
+	]);
 
 	useEffect(() => {
 		if (enqueueLineState.kind !== "error") return;

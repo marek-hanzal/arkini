@@ -7,6 +7,9 @@ import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 export interface MainSurface extends MainInteractionSurface {
+	readonly setInteractionLayerFx: (
+		layer: TileActorItem["layer"],
+	) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly readLocationPoseFx: (
 		location: TileActorItem["location"],

@@ -140,12 +140,14 @@ const readTargetRedirectFn = (result: DropItemResult): MotionRedirect | null =>
 		.exhaustive();
 
 const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
+	interactionLayer,
 	commandTarget,
 	dropPresentation,
 	previewKind,
 	sourceItem,
 	targetItem,
 }: {
+	readonly interactionLayer: TileActorItem["layer"];
 	readonly commandTarget: DropItemCommand["target"];
 	readonly dropPresentation: DropPresentation;
 	readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
@@ -168,6 +170,7 @@ const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 				}
 			: null;
 	const command = {
+		interactionLayer,
 		sourceItemId: sourceItem.id,
 		sourceLocation: sourceItem.location,
 		sourceRevision: sourceItem.revision,
@@ -259,6 +262,9 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 					});
 					const drop = RendererRuntime.runSync(
 						beginDropFx({
+							interactionLayer: RendererRuntime.runSync(
+								surface.readInteractionLayerFx,
+							),
 							commandTarget,
 							dropPresentation,
 							previewKind,

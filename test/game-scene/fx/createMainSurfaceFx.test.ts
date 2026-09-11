@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { Container } from "pixi.js";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -19,6 +20,18 @@ interface FakeDisplayObject {
 
 vi.mock("pixi.js", () => {
 	class Container {
+		alpha = 1;
+		getChildIndex(child: Container) {
+			return this.children.indexOf(child);
+		}
+		swapChildren(left: Container, right: Container) {
+			const a = this.getChildIndex(left);
+			const b = this.getChildIndex(right);
+			[this.children[a], this.children[b]] = [
+				right,
+				left,
+			];
+		}
 		readonly children: Container[] = [];
 		destroyCalls = 0;
 		destroyed = false;
@@ -77,6 +90,27 @@ vi.mock("pixi.js", () => {
 		Graphics,
 		Rectangle,
 	};
+});
+
+const tweens: {
+	props: Parameters<AnimationDriver["startTweenFx"]>[0];
+	stop: ReturnType<typeof vi.fn>;
+}[] = [];
+const animationDriver = {
+	startTweenFx: (props: Parameters<AnimationDriver["startTweenFx"]>[0]) =>
+		Effect.sync(() => {
+			const stop = vi.fn();
+			tweens.push({
+				props,
+				stop,
+			});
+			return {
+				stopFx: Effect.sync(stop),
+			};
+		}),
+} as AnimationDriver;
+beforeEach(() => {
+	tweens.length = 0;
 });
 
 const palette = {
@@ -201,6 +235,7 @@ describe("main surface", () => {
 		} as unknown as PixiApplicationOwner;
 		const surface = Effect.runSync(
 			createMainSurfaceFx({
+				animationDriver,
 				actorStore,
 				application,
 				dropFeedback: {
@@ -245,6 +280,49 @@ describe("main surface", () => {
 				y: 0,
 			},
 		});
+
+		Effect.runSync(surface.setInteractionLayerFx("ground"));
+		expect(
+			Effect.runSync(surface.readTargetFactsFx(firstPose.x + 1, firstPose.y + 1)).occupant,
+		).toBe(ground);
+		expect(
+			Effect.runSync(
+				surface.readLocalActorIdsFx({
+					x: firstPose.x,
+					y: firstPose.y,
+					width: firstPose.size,
+					height: firstPose.size,
+				}),
+			),
+		).toEqual([
+			ground.id,
+		]);
+		tweens[0]!.props.onUpdateFn(1);
+		expect(firstPose.layer.alpha).toBe(0);
+		tweens[0]!.props.onCompleteFn?.();
+		expect(stage.children.indexOf(groundPose.layer)).toBeGreaterThan(
+			stage.children.indexOf(firstPose.layer),
+		);
+		tweens[1]!.props.onUpdateFn(0.5);
+		Effect.runSync(surface.setInteractionLayerFx("content"));
+		expect(tweens[1]!.stop).toHaveBeenCalledOnce();
+		tweens[2]!.props.onUpdateFn(1);
+		tweens[2]!.props.onCompleteFn?.();
+		tweens[3]!.props.onUpdateFn(1);
+		tweens[3]!.props.onCompleteFn?.();
+		expect(
+			Effect.runSync(surface.readTargetFactsFx(firstPose.x + 1, firstPose.y + 1)).occupant,
+		).toBe(boardFirst);
+		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
+			stage.children.indexOf(firstPose.layer),
+		);
+		expect([
+			groundPose.layer.alpha,
+			firstPose.layer.alpha,
+		]).toEqual([
+			1,
+			1,
+		]);
 
 		const revisedFirst = {
 			...boardFirst,
@@ -436,6 +514,7 @@ describe("main surface", () => {
 		} as unknown as PixiApplicationOwner;
 		const surface = Effect.runSync(
 			createMainSurfaceFx({
+				animationDriver,
 				actorStore: Effect.runSync(createMainActorStoreFx()),
 				application,
 				dropFeedback,

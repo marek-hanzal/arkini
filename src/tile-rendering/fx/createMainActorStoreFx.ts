@@ -21,13 +21,17 @@ const readCanonicalSlotKeyFn = (
 const readVisibleOccupantFn = (
 	occupants: ReadonlyMap<string, PixiTileActor["item"]>,
 	location: PixiTileActor["item"]["location"],
+	interactionLayer: PixiTileActor["item"]["layer"],
 ) => {
-	const contentKey = readCanonicalSlotKeyFn(location, "content");
-	if (contentKey === null) return null;
-	const content = occupants.get(contentKey);
-	if (content !== undefined || location.scope !== "board") return content ?? null;
-	const groundKey = readCanonicalSlotKeyFn(location, "ground");
-	return groundKey === null ? null : (occupants.get(groundKey) ?? null);
+	const preferredKey = readCanonicalSlotKeyFn(location, interactionLayer);
+	if (preferredKey === null) return null;
+	const preferred = occupants.get(preferredKey);
+	if (preferred !== undefined || location.scope !== "board") return preferred ?? null;
+	const backgroundKey = readCanonicalSlotKeyFn(
+		location,
+		interactionLayer === "content" ? "ground" : "content",
+	);
+	return backgroundKey === null ? null : (occupants.get(backgroundKey) ?? null);
 };
 
 /** Owns canonical item projections and retained actor identity for the main Pixi scene. */
@@ -62,16 +66,22 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 				Effect.sync(() => canonicalItems.get(actorId) ?? null),
 			),
 			readCanonicalOccupantFx: Effect.fn("MainActorStore.readCanonicalOccupantFx")(
-				(location) =>
-					Effect.sync(() => readVisibleOccupantFn(canonicalOccupants, location)),
+				(location, interactionLayer = "content") =>
+					Effect.sync(() =>
+						readVisibleOccupantFn(canonicalOccupants, location, interactionLayer),
+					),
 			),
 			readCanonicalOccupantsFx: Effect.fn("MainActorStore.readCanonicalOccupantsFx")(
-				(locations) =>
+				(locations, interactionLayer = "content") =>
 					Effect.sync(() => {
 						const seen = new Set<string>();
 						const occupants: PixiTileActor["item"][] = [];
 						for (const location of locations) {
-							const occupant = readVisibleOccupantFn(canonicalOccupants, location);
+							const occupant = readVisibleOccupantFn(
+								canonicalOccupants,
+								location,
+								interactionLayer,
+							);
 							if (occupant === null || seen.has(occupant.id)) continue;
 							seen.add(occupant.id);
 							occupants.push(occupant);

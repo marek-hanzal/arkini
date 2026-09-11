@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
 import { Application, Container } from "pixi.js";
 import { vi } from "vitest";
 
@@ -156,10 +157,12 @@ export const pointer = (x: number, y: number, button = 0): FakePointerEvent => (
 export const mountController = ({
 	cheatsEnabled = false,
 	interactionClaimByActorId = new Map(),
+	interactionLayer = "content",
 	targetItems = [],
 }: {
 	readonly cheatsEnabled?: boolean;
 	readonly interactionClaimByActorId?: ReadonlyMap<string, "activation-only" | "handoff">;
+	readonly interactionLayer?: TileActorItem["layer"];
 	readonly targetItems?: ReadonlyArray<TileActorItem>;
 } = {}) => {
 	previewState.kind = "move";
@@ -271,7 +274,15 @@ export const mountController = ({
 			}),
 		readActorFx: (actorId) => Effect.sync(() => actors.get(actorId) ?? null),
 		readCanonicalItemFx: (actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
-		readCanonicalOccupantFx: () => Effect.succeed(null),
+		readCanonicalOccupantFx: (location, layer = "content") =>
+			Effect.sync(() => {
+				const occupants = [
+					...canonicalItems.values(),
+				].filter((candidate) => isSameTileActorLocationFn(candidate.location, location));
+				return (
+					occupants.find((candidate) => candidate.layer === layer) ?? occupants[0] ?? null
+				);
+			}),
 		readCanonicalOccupantsFx: () => Effect.succeed([]),
 		releaseActorFx: (actorId) =>
 			Effect.sync(() => {
@@ -375,6 +386,7 @@ export const mountController = ({
 		syncPresentationFx: Effect.void,
 	} satisfies MotionRuntime;
 	const surface = {
+		readInteractionLayerFx: Effect.succeed(interactionLayer),
 		readActorPoseFx: (actorItem: TileActorItem) =>
 			Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
 		readLocalActorIdsFx: (

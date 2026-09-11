@@ -1,5 +1,6 @@
 import { Effect, Option, Random } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -67,6 +68,7 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 });
 
 interface MergeItemsProps {
+	readonly interactionLayer?: BaseSchema.Type["layer"];
 	readonly sourceItemId: IdSchema.Type;
 	readonly sourceRevision: RevisionSchema.Type;
 	readonly targetItemId: IdSchema.Type;
@@ -90,6 +92,7 @@ interface MergeItemsResult {
 
 /** Commits one directional merge and returns exact before/after actor identities. */
 export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
+	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	targetItemId,
@@ -152,10 +155,12 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 			}
 
 			yield* assertGridItemExposedFx({
+				interactionLayer,
 				item: source,
 				runtime,
 			});
 			yield* assertGridItemExposedFx({
+				interactionLayer,
 				item: target,
 				runtime,
 			});

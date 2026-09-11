@@ -526,6 +526,9 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 						settleActorLayerFx({
 							actor,
 							animator,
+							interactionLayer: RendererRuntime.runSync(
+								surface.readInteractionLayerFx,
+							),
 							layer: latest.layer,
 							renderer: application.app.renderer,
 						}),

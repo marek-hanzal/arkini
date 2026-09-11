@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
 	createItem,
@@ -20,8 +20,6 @@ describe("main drag controller: preview", () => {
 				ground,
 			],
 		});
-		const visible = vi.spyOn(mounted.actorStore, "readCanonicalOccupantFx");
-		visible.mockReturnValue(Effect.succeed(ground));
 		previewState.actorKinds.set(ground.id, "merge");
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
@@ -30,12 +28,11 @@ describe("main drag controller: preview", () => {
 			true,
 		);
 		const previewReads = previewState.readsByActorId.get(ground.id);
-		visible.mockReturnValue(
-			Effect.succeed({
-				...item,
-				id: "runtime:cover",
-			}),
-		);
+		mounted.canonicalItems.set("runtime:cover", {
+			...item,
+			id: "runtime:cover",
+			location: ground.location,
+		});
 		mounted.setLocalActorIds([]);
 		mounted.setActiveMagneticSourceActorIds([
 			ground.id,

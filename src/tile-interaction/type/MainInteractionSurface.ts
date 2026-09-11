@@ -21,6 +21,7 @@ export interface MainInteractionTargetFacts {
 }
 
 export interface MainInteractionSurface {
+	readonly readInteractionLayerFx: Effect.Effect<TileActorItem["layer"], never, never>;
 	readonly transientActorLayer: Container;
 	readonly readActorPoseFx: (item: TileActorItem) => Effect.Effect<
 		{

@@ -1,5 +1,6 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -32,6 +33,7 @@ class SwapSameItemError extends Data.TaggedError("SwapSameItemError")<{
 }> {}
 
 interface SwapItemsProps {
+	readonly interactionLayer?: BaseSchema.Type["layer"];
 	readonly firstItemId: IdSchema.Type;
 	readonly firstItemRevision: RevisionSchema.Type;
 	readonly secondItemId: IdSchema.Type;
@@ -44,6 +46,7 @@ interface SwapItemsResult {
 }
 
 const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
+	interactionLayer,
 	firstItemId,
 	firstItemRevision,
 	secondItemId,
@@ -141,10 +144,12 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				);
 			}
 			yield* assertGridItemExposedFx({
+				interactionLayer,
 				item: first,
 				runtime,
 			});
 			yield* assertGridItemExposedFx({
+				interactionLayer,
 				item: second,
 				runtime,
 			});
@@ -197,6 +202,7 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 
 export namespace commitSwapDropFx {
 	export interface Props {
+		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -208,6 +214,7 @@ export namespace commitSwapDropFx {
 
 /** Commits one exact grid swap and normalizes both actor identities. */
 export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
+	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -216,6 +223,7 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 	targetLocation,
 }: commitSwapDropFx.Props) {
 	return yield* swapItemsFx({
+		interactionLayer,
 		firstItemId: sourceItemId,
 		firstItemRevision: sourceRevision,
 		secondItemId: targetItemId,

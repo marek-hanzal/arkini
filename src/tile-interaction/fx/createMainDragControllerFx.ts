@@ -704,15 +704,29 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					previewKind: null,
 					running: actor.item.running,
 				});
+				const boundActor = actor;
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
-					if (
-						actor.item.location.scope === "board" &&
-						actor.item.layer === "ground" &&
-						RendererRuntime.runSync(
-							actorStore.readCanonicalOccupantFx(actor.item.location),
-						)?.id !== actor.item.id
-					)
-						return;
+					// Painter order can lag the layer intent during its fade. Route the hit to
+					// the canonical foreground occupant instead of swallowing a fast Alt+click.
+					const location =
+						actorStore.canonicalItems.get(boundActor.item.id)?.location ??
+						boundActor.item.location;
+					const occupant =
+						location.scope === "board"
+							? RendererRuntime.runSync(
+									actorStore.readCanonicalOccupantFx(
+										location,
+										RendererRuntime.runSync(surface.readInteractionLayerFx),
+									),
+								)
+							: null;
+					const actor =
+						location.scope === "board"
+							? occupant === null
+								? undefined
+								: actorStore.actors.get(occupant.id)
+							: boundActor;
+					if (actor === undefined) return;
 					const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
 					const motionClaim = motionSnapshot.interactionClaimByActorId.get(actor.item.id);
 					const needsMotionHandoff = motionClaim === "handoff";

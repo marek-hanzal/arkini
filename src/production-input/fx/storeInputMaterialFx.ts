@@ -1,5 +1,6 @@
 import { Effect, Option } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -33,6 +34,7 @@ import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExpose
 
 export namespace storeInputMaterialFx {
 	export interface Props {
+		readonly interactionLayer?: BaseSchema.Type["layer"];
 		ownerItemId: IdSchema.Type;
 		ownerItemRevision?: RevisionSchema.Type;
 		expectedOwnerLocation?: GridLocationSchema.Type;
@@ -62,6 +64,7 @@ export namespace storeInputMaterialFx {
  * its pure remainder is delivered through canonical placement in the same commit.
  */
 export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* ({
+	interactionLayer,
 	ownerItemId,
 	ownerItemRevision,
 	expectedOwnerLocation,
@@ -146,11 +149,13 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 			}
 			if (interaction === "drop") {
 				yield* assertGridItemExposedFx({
+					interactionLayer,
 					item: source,
 					runtime,
 				});
 				if (gridOwner !== undefined) {
 					yield* assertGridItemExposedFx({
+						interactionLayer,
 						item: gridOwner,
 						runtime,
 					});

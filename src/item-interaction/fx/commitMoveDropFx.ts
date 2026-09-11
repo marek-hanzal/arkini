@@ -1,5 +1,6 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -28,6 +29,7 @@ class LocationOccupiedError extends Data.TaggedError("LocationOccupiedError")<{
 }> {}
 
 interface MoveItemProps {
+	readonly interactionLayer?: BaseSchema.Type["layer"];
 	readonly itemId: IdSchema.Type;
 	readonly location: GridLocationSchema.Type;
 	readonly revision: RevisionSchema.Type;
@@ -40,6 +42,7 @@ interface MoveItemResult {
 }
 
 const moveItemFx = Effect.fn("moveItemFx")(function* ({
+	interactionLayer,
 	itemId,
 	location,
 	revision,
@@ -89,6 +92,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			yield* assertGridItemExposedFx({
+				interactionLayer,
 				item,
 				runtime,
 			});
@@ -170,6 +174,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 
 export namespace commitMoveDropFx {
 	export interface Props {
+		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -179,12 +184,14 @@ export namespace commitMoveDropFx {
 
 /** Commits one exact empty-slot drop and normalizes its public result. */
 export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
+	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
 	targetLocation,
 }: commitMoveDropFx.Props) {
 	return yield* moveItemFx({
+		interactionLayer,
 		itemId: sourceItemId,
 		revision: sourceRevision,
 		expectedLocation: sourceLocation,

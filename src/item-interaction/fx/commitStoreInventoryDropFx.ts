@@ -1,5 +1,6 @@
 import { Data, Effect, Option } from "effect";
 
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
@@ -156,10 +157,12 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 				);
 			}
 			yield* assertGridItemExposedFx({
+				interactionLayer: props.interactionLayer,
 				item: source,
 				runtime,
 			});
 			yield* assertGridItemExposedFx({
+				interactionLayer: props.interactionLayer,
 				item: inventory,
 				runtime,
 			});
@@ -190,6 +193,7 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 
 export namespace commitStoreInventoryDropFx {
 	export interface Props {
+		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;

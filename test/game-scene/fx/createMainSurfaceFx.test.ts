@@ -21,17 +21,6 @@ interface FakeDisplayObject {
 vi.mock("pixi.js", () => {
 	class Container {
 		alpha = 1;
-		getChildIndex(child: Container) {
-			return this.children.indexOf(child);
-		}
-		swapChildren(left: Container, right: Container) {
-			const a = this.getChildIndex(left);
-			const b = this.getChildIndex(right);
-			[this.children[a], this.children[b]] = [
-				right,
-				left,
-			];
-		}
 		readonly children: Container[] = [];
 		destroyCalls = 0;
 		destroyed = false;
@@ -92,25 +81,29 @@ vi.mock("pixi.js", () => {
 	};
 });
 
-const tweens: {
-	props: Parameters<AnimationDriver["startTweenFx"]>[0];
-	stop: ReturnType<typeof vi.fn>;
+const springs: {
+	props: Parameters<AnimationDriver["createSpringFx"]>[0];
+	setTarget: ReturnType<typeof vi.fn>;
+	close: ReturnType<typeof vi.fn>;
 }[] = [];
 const animationDriver = {
-	startTweenFx: (props: Parameters<AnimationDriver["startTweenFx"]>[0]) =>
+	createSpringFx: (props: Parameters<AnimationDriver["createSpringFx"]>[0]) =>
 		Effect.sync(() => {
-			const stop = vi.fn();
-			tweens.push({
+			const setTarget = vi.fn();
+			const close = vi.fn();
+			springs.push({
 				props,
-				stop,
+				setTarget,
+				close,
 			});
 			return {
-				stopFx: Effect.sync(stop),
+				setTargetFx: (value: number) => Effect.sync(() => setTarget(value)),
+				closeFx: Effect.sync(close),
 			};
 		}),
 } as AnimationDriver;
 beforeEach(() => {
-	tweens.length = 0;
+	springs.length = 0;
 });
 
 const palette = {
@@ -297,32 +290,35 @@ describe("main surface", () => {
 		).toEqual([
 			ground.id,
 		]);
-		tweens[0]!.props.onUpdateFn(1);
-		expect(firstPose.layer.alpha).toBe(0);
-		tweens[0]!.props.onCompleteFn?.();
-		expect(stage.children.indexOf(groundPose.layer)).toBeGreaterThan(
-			stage.children.indexOf(firstPose.layer),
-		);
-		tweens[1]!.props.onUpdateFn(0.5);
-		Effect.runSync(surface.setInteractionLayerFx("content"));
-		expect(tweens[1]!.stop).toHaveBeenCalledOnce();
-		tweens[2]!.props.onUpdateFn(1);
-		tweens[2]!.props.onCompleteFn?.();
-		tweens[3]!.props.onUpdateFn(1);
-		tweens[3]!.props.onCompleteFn?.();
-		expect(
-			Effect.runSync(surface.readTargetFactsFx(firstPose.x + 1, firstPose.y + 1)).occupant,
-		).toBe(boardFirst);
+		const opacity = springs[0]!;
+		const dimmedOpacity = opacity.setTarget.mock.calls[0]![0] as number;
+		expect(dimmedOpacity).toBeGreaterThan(0);
+		expect(dimmedOpacity).toBeLessThan(1);
+		opacity.props.onUpdateFn(dimmedOpacity);
+		expect(groundPose.layer.alpha).toBe(1);
 		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
 			stage.children.indexOf(firstPose.layer),
 		);
-		expect([
-			groundPose.layer.alpha,
-			firstPose.layer.alpha,
-		]).toEqual([
-			1,
-			1,
-		]);
+		Effect.runSync(surface.setInteractionLayerFx("content"));
+		expect(opacity.setTarget).toHaveBeenLastCalledWith(1);
+		expect(firstPose.layer.alpha).toBe(dimmedOpacity);
+		opacity.props.onUpdateFn(0.5);
+		Effect.runSync(surface.setInteractionLayerFx("ground"));
+		expect(opacity.setTarget).toHaveBeenLastCalledWith(dimmedOpacity);
+		expect(firstPose.layer.alpha).toBe(0.5);
+		Effect.runSync(surface.setInteractionLayerFx("content"));
+		expect(firstPose.layer.alpha).toBe(0.5);
+		expect(springs).toHaveLength(1);
+		expect(opacity.close).not.toHaveBeenCalled();
+		expect(groundPose.layer.alpha).toBe(1);
+		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
+			stage.children.indexOf(firstPose.layer),
+		);
+		expect(
+			Effect.runSync(surface.readTargetFactsFx(firstPose.x + 1, firstPose.y + 1)).occupant,
+		).toBe(boardFirst);
+		opacity.props.onUpdateFn(1);
+		expect(firstPose.layer.alpha).toBe(1);
 
 		const revisedFirst = {
 			...boardFirst,
@@ -526,6 +522,9 @@ describe("main surface", () => {
 
 		Effect.runSync(surface.closeFx);
 		Effect.runSync(surface.closeFx);
+		expect(springs[0]!.close).toHaveBeenCalledOnce();
+		Effect.runSync(surface.setInteractionLayerFx("ground"));
+		expect(springs[0]!.setTarget).not.toHaveBeenCalled();
 
 		expect(owned).toHaveLength(10);
 		for (const displayObject of owned) {

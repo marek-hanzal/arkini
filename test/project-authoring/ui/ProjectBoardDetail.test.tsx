@@ -53,7 +53,7 @@ vi.mock("~/editor-control/ui/EditorSearchCombobox", () => ({
 
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectBoardDetail } from "~/project-authoring/ui/ProjectBoardDetail";
-import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
+import { layeredBoardSpaceProject as boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
 
 (
 	globalThis as {
@@ -99,6 +99,13 @@ describe("project Board detail", () => {
 			"0",
 			"4",
 		]);
+		expect(preview()?.dataset.items).toBe("water:1");
+		const ground = container.querySelector<HTMLButtonElement>('[data-ui-value="ground"]');
+		const content = container.querySelector<HTMLButtonElement>('[data-ui-value="content"]');
+		if (ground === null || content === null) throw new Error("Missing Board layer selector.");
+		await act(async () => ground.click());
+		expect(preview()?.dataset.items).toBe("path:1");
+		await act(async () => content.click());
 		expect(preview()?.dataset.items).toBe("water:1");
 
 		await act(async () => {

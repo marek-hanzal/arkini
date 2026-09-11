@@ -18,7 +18,13 @@ vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", async () => {
 	const { startTestConfig } = await import("~test/game-start/support/startTestConfig");
 	return {
 		useEditorItemSearchOptions: () => ({
-			items: startTestConfig.items,
+			items: {
+				...startTestConfig.items,
+				tree: {
+					...startTestConfig.items.tree,
+					layer: "ground",
+				},
+			},
 			options: Object.values(startTestConfig.items).map((item) => ({
 				id: item.id,
 				label: item.title,
@@ -53,10 +59,12 @@ afterEach(async () => {
 
 const PickerHarness = ({
 	onSelect,
+	layer,
 	scope = "inventory",
 	start = startTestConfig.start,
 }: {
 	readonly onSelect: (itemId: string) => void;
+	readonly layer?: "content" | "ground";
 	readonly scope?: "board" | "inventory" | "toolbar";
 	readonly start?: typeof startTestConfig.start;
 }) => {
@@ -72,6 +80,7 @@ const PickerHarness = ({
 			</button>
 			{open ? (
 				<ProjectStartItemPicker
+					layer={layer}
 					onCloseFn={() => setOpen(false)}
 					onSelectFn={onSelect}
 					scope={scope}
@@ -113,6 +122,19 @@ const renderPicker = async (
 };
 
 describe("ProjectStartItemPicker", () => {
+	it("admits only items from the selected Board layer", async () => {
+		const onSelect = vi.fn();
+		const { container } = await renderPicker(onSelect, {
+			scope: "board",
+			layer: "ground",
+		});
+		const options = container.querySelectorAll<HTMLButtonElement>("button[data-item-id]");
+		expect(Array.from(options, (option) => option.dataset.itemId)).toEqual([
+			"tree",
+		]);
+		await act(async () => options[0]?.click());
+		expect(onSelect).toHaveBeenCalledExactlyOnceWith("tree");
+	});
 	it("admits only the requested scope and restores focus after exact selection", async () => {
 		const onSelect = vi.fn();
 		const { container, opener } = await renderPicker(onSelect);

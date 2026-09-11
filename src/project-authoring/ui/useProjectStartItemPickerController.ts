@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ProjectStartScope } from "~/project-authoring/type/ProjectStartScope";
 import { readProjectStartItemIdsFn } from "~/project-authoring/fn/readProjectStartItemIdsFn";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
@@ -26,6 +27,7 @@ const readStartItemQuantitiesFn = (start: StartSchema.Type) => {
 
 export namespace useProjectStartItemPickerController {
 	export interface Props {
+		readonly layer?: ItemSchema.Type["layer"];
 		readonly onCloseFn: () => void;
 		readonly onSelectFn: (itemId: string) => void;
 		readonly scope: ProjectStartScope;
@@ -41,6 +43,7 @@ export namespace useProjectStartItemPickerController {
 
 /** Owns allowed-item admission and selection for one initial grid scope. */
 export const useProjectStartItemPickerController = ({
+	layer,
 	onCloseFn,
 	onSelectFn,
 	scope,
@@ -57,10 +60,12 @@ export const useProjectStartItemPickerController = ({
 		() =>
 			readProjectStartItemIdsFn({
 				items,
+				layer,
 				scope,
 			}),
 		[
 			items,
+			layer,
 			scope,
 		],
 	);
@@ -90,7 +95,8 @@ export const useProjectStartItemPickerController = ({
 		],
 	);
 	const selectItemFn = (itemId: string) => {
-		if (allowedOptions.some((option) => option.id === itemId && option.maxCountReached)) return;
+		const option = allowedOptions.find((option) => option.id === itemId);
+		if (option === undefined || option.maxCountReached) return;
 		onSelectFn(itemId);
 		onCloseFn();
 	};

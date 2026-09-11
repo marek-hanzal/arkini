@@ -140,8 +140,9 @@ describe("actor animator", () => {
 		"complete",
 		"move",
 		"retire",
+		"dimmed-content",
 	] as const)(
-		"releases a ground landing snapshot on %s without hiding or duplicating the live actor",
+		"releases a Board landing snapshot on %s without hiding or duplicating the live actor",
 		(ending) => {
 			const { animator, tweens } = createAnimator();
 			const actor = {
@@ -150,7 +151,7 @@ describe("actor animator", () => {
 			};
 			actor.item = {
 				...actor.item,
-				layer: "ground",
+				layer: ending === "dimmed-content" ? "content" : "ground",
 				location: {
 					scope: "board",
 					position: {
@@ -166,6 +167,7 @@ describe("actor animator", () => {
 			actor.container.pivot.set(4, 8);
 			const transient = new Container();
 			const ground = new Container();
+			ground.alpha = ending === "dimmed-content" ? 0.5 : 1;
 			transient.addChild(actor.container);
 			const texture = RenderTexture.create({
 				width: 1,
@@ -200,7 +202,7 @@ describe("actor animator", () => {
 			tweens[0]!.update(0.5);
 			expect(outgoing.alpha).toBe(0.5);
 			expect(actor.container.alpha).toBe(1);
-			if (ending === "complete") tweens[0]!.complete();
+			if (ending === "complete" || ending === "dimmed-content") tweens[0]!.complete();
 			else if (ending === "move")
 				Effect.runSync(
 					animator.setFx({

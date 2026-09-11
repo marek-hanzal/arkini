@@ -4,17 +4,15 @@ import { Container, Sprite, type Renderer } from "pixi.js";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
-/** Fades a non-interactive tail while an item resumes the Board layer behind the active layer. */
+/** Fades a non-interactive tail while an item resumes Ground coverage or dimmed Content. */
 export const settleActorLayerFx = Effect.fn("settleActorLayerFx")(function* ({
 	actor,
 	animator,
-	interactionLayer = "content",
 	layer,
 	renderer,
 }: {
 	readonly actor: PixiTileActor;
 	readonly animator: ActorAnimator;
-	readonly interactionLayer?: PixiTileActor["item"]["layer"];
 	readonly layer: Container;
 	readonly renderer: Renderer;
 }) {
@@ -22,7 +20,7 @@ export const settleActorLayerFx = Effect.fn("settleActorLayerFx")(function* ({
 	yield* animator.cancelChannelFx(actor, "layer-release");
 	const previousLayer = actor.container.parent;
 	if (
-		actor.item.layer === interactionLayer ||
+		(actor.item.layer === "content" && layer.alpha === 1) ||
 		actor.item.location.scope !== "board" ||
 		previousLayer === null
 	) {

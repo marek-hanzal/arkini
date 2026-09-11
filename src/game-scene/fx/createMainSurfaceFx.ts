@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { AnimationDriver, AnimationControl } from "~/tile-rendering/service/AnimationDriver";
+import type { AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -46,7 +46,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 		game,
 		palette: initialPalette,
 	}: CreateMainSurfaceProps) =>
-		Effect.sync((): MainSurface => {
+		Effect.gen(function* () {
 			let palette = initialPalette;
 			let latestTransition = game.getTransitionSnapshotFn();
 			let layoutRevision = 0;
@@ -115,25 +115,20 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			application.stage.eventMode = "static";
 			let closed = false;
 			let interactionLayer: TileActorItem["layer"] = "content";
-			let layerAnimation: AnimationControl | null = null;
-			const restoreLayerOpacityFx = Effect.fn("MainSurface.restoreLayerOpacityFx")(() =>
-				Effect.gen(function* () {
-					const groundAlpha = groundActorLayer.alpha;
-					const contentAlpha = boardActorLayer.alpha;
-					layerAnimation = yield* animationDriver.startTweenFx({
-						durationMs: 110,
-						from: 0,
-						to: 1,
-						onUpdateFn: (progress) => {
-							groundActorLayer.alpha = groundAlpha + (1 - groundAlpha) * progress;
-							boardActorLayer.alpha = contentAlpha + (1 - contentAlpha) * progress;
-						},
-						onCompleteFn: () => {
-							layerAnimation = null;
-						},
-					});
-				}),
-			);
+			// Keep painter order and Ground coverage stable; only Content recedes into a ghost.
+			const contentOpacity = yield* animationDriver.createSpringFx({
+				initialValue: 1,
+				onUpdateFn: (opacity) => {
+					boardActorLayer.alpha = opacity;
+				},
+				options: {
+					damping: 44,
+					mass: 1,
+					restDelta: 0.001,
+					restSpeed: 0.01,
+					stiffness: 480,
+				},
+			});
 
 			const readLocationPoseFn = (
 				location: TileActorItem["location"],
@@ -344,39 +339,14 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					Effect.gen(function* () {
 						if (closed || interactionLayer === nextLayer) return;
 						interactionLayer = nextLayer;
-						if (layerAnimation !== null) yield* layerAnimation.stopFx;
-						const front = nextLayer === "ground" ? groundActorLayer : boardActorLayer;
-						const back = nextLayer === "ground" ? boardActorLayer : groundActorLayer;
-						if (
-							application.stage.getChildIndex(front) >
-							application.stage.getChildIndex(back)
-						) {
-							yield* restoreLayerOpacityFx();
-							return;
-						}
-						const fromAlpha = back.alpha;
-						const frontAlpha = front.alpha;
-						// Change painter order only after the outgoing front is transparent.
-						layerAnimation = yield* animationDriver.startTweenFx({
-							durationMs: 110,
-							from: 0,
-							to: 1,
-							onUpdateFn: (progress) => {
-								back.alpha = fromAlpha * (1 - progress);
-								front.alpha = frontAlpha + (1 - frontAlpha) * progress;
-							},
-							onCompleteFn: () => {
-								application.stage.swapChildren(front, back);
-								RendererRuntime.runSync(restoreLayerOpacityFx());
-							},
-						});
+						yield* contentOpacity.setTargetFx(nextLayer === "ground" ? 0.16 : 1);
 					}),
 				),
 				transientActorLayer,
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
-					if (layerAnimation !== null) RendererRuntime.runSync(layerAnimation.stopFx);
+					RendererRuntime.runSync(contentOpacity.closeFx);
 					for (const displayObject of [
 						transientActorLayer,
 						toolbarActorLayer,
@@ -484,6 +454,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						latestTransition = transition;
 					}),
 				),
-			};
+			} satisfies MainSurface;
 		}),
 );

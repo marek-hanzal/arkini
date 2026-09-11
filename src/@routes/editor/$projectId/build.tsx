@@ -59,6 +59,20 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 					className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-3"
 					data-ui="EditorBuild"
 				>
+					<div className="shrink-0">
+						<EditorBuildStatus
+							buildFailure={controller.buildFailure}
+							canBuild={controller.canBuild}
+							pending={controller.buildPending}
+							stale={controller.buildStatus === "stale"}
+							version={controller.version}
+							versionError={controller.versionError}
+							onMajorChangeFn={controller.setMajorFn}
+							onMinorChangeFn={controller.setMinorFn}
+							onSuffixChangeFn={controller.setSuffixFn}
+							onBuildFn={controller.buildFn}
+						/>
+					</div>
 					{artifactSummary === undefined ? null : (
 						<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 							<h2 className="text-lg font-semibold">Build output</h2>
@@ -103,22 +117,6 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							)}
 						</article>
 					)}
-					{
-						<div className="shrink-0">
-							<EditorBuildStatus
-								buildFailure={controller.buildFailure}
-								canBuild={controller.canBuild}
-								pending={controller.buildPending}
-								stale={controller.buildStatus === "stale"}
-								version={controller.version}
-								versionError={controller.versionError}
-								onMajorChangeFn={controller.setMajorFn}
-								onMinorChangeFn={controller.setMinorFn}
-								onSuffixChangeFn={controller.setSuffixFn}
-								onBuildFn={controller.buildFn}
-							/>
-						</div>
-					}
 					{controller.validationVisible && controller.diagnostics.length > 0 ? (
 						<EditorBuildValidation
 							diagnostics={controller.diagnostics}

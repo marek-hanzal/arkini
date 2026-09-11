@@ -16,7 +16,7 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { type FormValues, readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
 
 const defaultArtwork: FormValues["asset"] = {
-	scale: 0.8,
+	scale: 1,
 	default: [
 		"",
 		"",
@@ -113,7 +113,7 @@ const ArtworkFields = withFieldGroupFn({
 					{(field) => (
 						<EditorNumberControl
 							label="Base tile scale"
-							description="Ratio from 0.25 to 1. 0.8 is 80%; 1 fills the tile at 100%."
+							description="Ratio from 0.25 to 1. The default 1 fills the tile at 100%."
 							error={readEditorFieldErrorFn(field.state.meta.errors)}
 							min={0.25}
 							max={1}

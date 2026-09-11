@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { NeighborhoodArtworkRuleSchema } from "~/item-definition/schema/NeighborhoodArtworkRuleSchema";
 import type { InputSchema } from "~/production-action/schema/InputSchema";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
@@ -19,6 +20,7 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 			string,
 		];
 		readonly sources: string[];
+		readonly neighbors?: NeighborhoodArtworkRuleSchema.Type[];
 	};
 	readonly description: string;
 	readonly type: TypeSchema.Type;
@@ -42,6 +44,11 @@ export const readCanonicalItemArtworkFn = (
 	const sources = asset.sources.filter((resourceId) => resourceId !== "");
 	return {
 		scale: asset.scale,
+		...((asset.neighbors?.length ?? 0) === 0
+			? {}
+			: {
+					neighbors: asset.neighbors,
+				}),
 		default:
 			overlay === ""
 				? [

@@ -79,6 +79,49 @@ const renderUsage = async (usage: readGameResourceUsagesFn.Usage) => {
 };
 
 describe("EditorAssetUsageRow", () => {
+	it("routes item usages to the tab that owns their authored resource reference", async () => {
+		for (const [path, sectionId] of [
+			[
+				[
+					"items",
+					"road",
+					"asset",
+					"default",
+					0,
+				],
+				"artwork",
+			],
+			[
+				[
+					"items",
+					"road",
+					"asset",
+					"neighbors",
+					1,
+					"sourceId",
+				],
+				"neighbors",
+			],
+		] as const) {
+			const link = await renderUsage({
+				owner: "item",
+				ownerId: "road",
+				ownerUid: "road-uid",
+				ownerLabel: "Road",
+				roleLabel: "Artwork",
+				resourceId: "road.png",
+				path: [
+					...path,
+				],
+			});
+			expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
+				projectId: project.projectId,
+				itemUid: "road-uid",
+				sectionId,
+			});
+		}
+	});
+
 	it("opens project hero and avatar usages in their exact Artwork destination", async () => {
 		const hero = await renderUsage({
 			owner: "project",

@@ -1,4 +1,5 @@
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import { readActorVisualItemFn } from "~/tile-rendering/fn/readActorVisualItemFn";
 import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
 import { readCrowdAlphaFn } from "~/tile-rendering/fn/readCrowdAlphaFn";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -81,7 +82,14 @@ export const classifyActorUpdateFn = ({
 	preserveVisual,
 }: ClassifyActorUpdateProps): ActorUpdatePlan => {
 	const moved = !isSameTileActorLocationFn(actor.item.location, displayItem.location);
-	const visualChanged = !isSameMainSceneVisualFn(actor.currentVisual.item, displayItem);
+	// The pending face owns the destination: returning to the visible face must supersede it.
+	const visualChanged = !isSameMainSceneVisualFn(
+		(actor.pendingVisual ?? actor.currentVisual).item,
+		readActorVisualItemFn({
+			dragging: actor.dragging,
+			item: displayItem,
+		}),
+	);
 	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 	const sizeChanged = actor.size !== pose.size;
 	const poseOwned = actor.dragging || deliveryRetained || motionClaimed || poseChannelActive;

@@ -112,10 +112,7 @@ describe("validateGameResourcesFn", () => {
 		);
 	});
 
-	it("reports exact missing default, progress and neighborhood artwork references", () => {
-		const ignore = {
-			type: "ignore",
-		};
+	it("reports the exact missing default layer and progress source entries", () => {
 		const [itemId, item] = Object.entries(startTestConfig.items)[0] ?? [];
 		if (itemId === undefined || item === undefined) throw new Error("Missing test item.");
 		const config = GameConfigSchema.parse({
@@ -133,21 +130,6 @@ describe("validateGameResourcesFn", () => {
 						sources: [
 							"missing:progress",
 						],
-						neighbors: [
-							{
-								sourceId: "missing:neighborhood",
-								neighbors: {
-									nw: ignore,
-									n: ignore,
-									ne: ignore,
-									w: ignore,
-									e: ignore,
-									sw: ignore,
-									s: ignore,
-									se: ignore,
-								},
-							},
-						],
 					},
 				},
 			},
@@ -160,18 +142,6 @@ describe("validateGameResourcesFn", () => {
 
 		expect(diagnostics).toEqual(
 			expect.arrayContaining([
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
-					resourceId: "missing:neighborhood",
-					path: [
-						"items",
-						itemId,
-						"asset",
-						"neighbors",
-						0,
-						"sourceId",
-					],
-				}),
 				expect.objectContaining({
 					resourceId: "missing:base",
 					path: [

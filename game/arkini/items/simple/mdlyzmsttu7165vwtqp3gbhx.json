@@ -6,7 +6,7 @@
 		"title": "Glass Pitcher",
 		"description": "Be careful",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"glass-pitcher"
 			]

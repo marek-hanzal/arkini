@@ -6,7 +6,7 @@
 		"title": "Toxic Filter",
 		"description": "Your waste, my business",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"toxic-filter"
 			]

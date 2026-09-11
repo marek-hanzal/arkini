@@ -6,7 +6,7 @@
 		"title": "Book - Tier 2",
 		"description": "A better book. Maybe Hobbit",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"book-t2"
 			]

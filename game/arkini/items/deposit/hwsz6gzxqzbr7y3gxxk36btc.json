@@ -6,7 +6,7 @@
 		"title": "Sand Deposit",
 		"description": "Sandman.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"sand-source"
 			]

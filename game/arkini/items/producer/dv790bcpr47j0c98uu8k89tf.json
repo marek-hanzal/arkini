@@ -6,7 +6,7 @@
 		"title": "Stoneworks",
 		"description": "Even this one is good to advance - stone would be better stone. Everybody likes better stones!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"stoneworks"
 			]

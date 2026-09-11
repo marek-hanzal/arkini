@@ -6,7 +6,7 @@
 		"title": "Spoiled Fruit Crate",
 		"description": "Ugly thing",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-fruit-crate"
 			]

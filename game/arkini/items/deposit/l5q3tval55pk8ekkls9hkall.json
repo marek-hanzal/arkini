@@ -6,7 +6,7 @@
 		"title": "Well With Milk",
 		"description": "Cows are on vacation",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"well-with-milk"
 			]

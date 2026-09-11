@@ -6,7 +6,7 @@
 		"title": "Well Fed Sarka",
 		"description": "Fully belly",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"well-fed-sarka"
 			]

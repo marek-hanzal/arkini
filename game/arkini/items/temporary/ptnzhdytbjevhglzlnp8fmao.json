@@ -6,7 +6,7 @@
 		"title": "Pralines",
 		"description": "So tasty",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pralines"
 			]

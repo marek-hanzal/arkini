@@ -6,7 +6,7 @@
 		"title": "Copper Bathtub With Water",
 		"description": "Water. In a bathtub",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"copper-bathtub-with-water"
 			]

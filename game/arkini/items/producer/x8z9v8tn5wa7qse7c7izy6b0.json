@@ -6,7 +6,7 @@
 		"title": "Base Camp",
 		"description": "This is the start of your journey. Here you can build more stuff as you progress!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"base-camp"
 			]

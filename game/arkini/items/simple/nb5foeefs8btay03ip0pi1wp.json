@@ -6,7 +6,7 @@
 		"title": "Sack With Wine",
 		"description": "True blood, oh, true wine",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"sack-with-wine"
 			]

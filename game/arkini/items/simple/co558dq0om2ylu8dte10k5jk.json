@@ -6,7 +6,7 @@
 		"title": "Sugar Beet Seed",
 		"description": "Put into field to get some sugar stuff",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"seed",
 				"sugar-beet"

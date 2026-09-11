@@ -6,7 +6,7 @@
 		"title": "Empty Mine",
 		"description": "You need some new resources?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"mine-depleted"
 			]

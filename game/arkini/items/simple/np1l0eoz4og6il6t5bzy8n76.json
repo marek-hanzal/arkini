@@ -6,7 +6,7 @@
 		"title": "Spoiled Rum Barrel",
 		"description": "Ages ago, it was a nice barrel",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-rum-barrel"
 			]

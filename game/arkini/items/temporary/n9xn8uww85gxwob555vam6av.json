@@ -6,7 +6,7 @@
 		"title": "Coffee Tankard",
 		"description": "Americano",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"coffee-tankard"
 			]

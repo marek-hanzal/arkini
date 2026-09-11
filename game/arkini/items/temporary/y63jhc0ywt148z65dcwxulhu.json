@@ -6,7 +6,7 @@
 		"title": "Toilet Golem",
 		"description": "This is real danger",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"toilet-golem"
 			]

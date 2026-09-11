@@ -6,7 +6,7 @@
 		"title": "Fruit Garden",
 		"description": "I see an apple there, Adam",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fruit-garden"
 			]

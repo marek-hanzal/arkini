@@ -6,7 +6,7 @@
 		"title": "Spoiled Copper Bathtub",
 		"description": "You're welcome to bath. Not really",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-copper-bathtub"
 			]

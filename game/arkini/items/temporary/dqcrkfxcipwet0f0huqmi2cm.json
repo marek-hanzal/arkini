@@ -6,7 +6,7 @@
 		"title": "Bubble",
 		"description": "Bubble. No use for it",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"bubble"
 			]

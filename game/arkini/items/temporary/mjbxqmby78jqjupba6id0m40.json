@@ -6,7 +6,7 @@
 		"title": "Fertilized Field",
 		"description": "Now you can put seed on it",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fertilized-field"
 			]

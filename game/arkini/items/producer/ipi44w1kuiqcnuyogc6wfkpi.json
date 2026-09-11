@@ -6,7 +6,7 @@
 		"title": "Pig Farm",
 		"description": "Pig generator",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pig-farm"
 			]

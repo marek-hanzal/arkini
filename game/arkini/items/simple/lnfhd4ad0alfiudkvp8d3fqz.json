@@ -6,7 +6,7 @@
 		"title": "Treasure Chest",
 		"description": "You're rich now!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"treasure-chest"
 			]

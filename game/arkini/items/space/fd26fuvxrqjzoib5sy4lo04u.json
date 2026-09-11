@@ -6,7 +6,7 @@
 		"title": "Mining Portal",
 		"description": "Transfer you to the mining-land",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"mining-portal"
 			]

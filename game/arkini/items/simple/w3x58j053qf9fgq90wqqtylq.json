@@ -6,7 +6,7 @@
 		"title": "Empty Jar",
 		"description": "Ready to be filled",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-jar"
 			]

@@ -6,7 +6,7 @@
 		"title": "Spoiled Eggs",
 		"description": "No more Easter",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-eggs"
 			]

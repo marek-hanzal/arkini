@@ -6,7 +6,7 @@
 		"title": "Clay Vase With Flowers",
 		"description": "It's nice. For a while",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"clay-vase-with-flowers"
 			]

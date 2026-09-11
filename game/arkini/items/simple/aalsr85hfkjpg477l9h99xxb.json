@@ -6,7 +6,7 @@
 		"title": "Fawn",
 		"description": "It's cute, isn't it?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fawn"
 			]

@@ -6,7 +6,7 @@
 		"title": "Harmless Air Pollution",
 		"description": "It does nothing. It's innocent",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"harmless-air-pollution"
 			]

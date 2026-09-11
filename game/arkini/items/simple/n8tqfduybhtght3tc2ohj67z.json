@@ -6,7 +6,7 @@
 		"title": "Spoiled Herbs",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-herbs"
 			]

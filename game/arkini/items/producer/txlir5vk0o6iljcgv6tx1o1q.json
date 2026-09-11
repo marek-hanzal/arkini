@@ -6,7 +6,7 @@
 		"title": "Vegetable Garden",
 		"description": "Grows some vegetables",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"vegetable-garden"
 			]

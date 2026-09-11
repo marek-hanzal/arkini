@@ -6,7 +6,7 @@
 		"title": "Cutting Board With Vegetables",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"cutting-board-with-vegetables"
 			]

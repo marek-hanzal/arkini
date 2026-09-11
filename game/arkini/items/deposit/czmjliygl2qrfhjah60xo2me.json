@@ -6,7 +6,7 @@
 		"title": "Tree",
 		"description": "This is a tree. You can use it to get logs. Whole civilization is based on the wood!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"tree"
 			]

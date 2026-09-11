@@ -6,7 +6,7 @@
 		"title": "Glassworks",
 		"description": "Be careful, it's a bit britle",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"glassworks"
 			]

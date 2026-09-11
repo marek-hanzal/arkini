@@ -6,7 +6,7 @@
 		"title": "Scissors",
 		"description": "Sharp. Keep children away",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"scissors"
 			]

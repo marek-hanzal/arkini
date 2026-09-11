@@ -6,7 +6,7 @@
 		"title": "Paper Boat Wine Bath",
 		"description": "Even those with wine can float a boat",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"paper-boat-wine-bath"
 			]

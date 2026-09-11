@@ -6,7 +6,7 @@
 		"title": "Townhall I",
 		"description": "Better village management, really.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"townhall-t1"
 			]

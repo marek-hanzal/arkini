@@ -6,7 +6,7 @@
 		"title": "Dairy",
 		"description": "What is the smell here...? Ah, tasty cheese!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dairy"
 			]

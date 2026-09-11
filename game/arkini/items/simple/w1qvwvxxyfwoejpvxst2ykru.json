@@ -6,7 +6,7 @@
 		"title": "Tomášek",
 		"description": "The older son",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"avatar-04"
 			]

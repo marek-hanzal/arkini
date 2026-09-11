@@ -5,7 +5,7 @@
 		"id": "pillow-with-coins",
 		"title": "Pillow With Coins",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pillow-with-coins"
 			]

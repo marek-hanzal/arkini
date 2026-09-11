@@ -6,7 +6,7 @@
 		"title": "Once upon a time, here was stone",
 		"description": "Stone is no longer here, but you can use some tools to find a new deposit!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"stone-source-depleted"
 			]

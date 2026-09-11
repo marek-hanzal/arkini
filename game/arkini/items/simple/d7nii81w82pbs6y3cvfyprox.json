@@ -6,7 +6,7 @@
 		"title": "Unlit Candle",
 		"description": "Just a candle. It does not emit any light.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"unlit-candle"
 			]

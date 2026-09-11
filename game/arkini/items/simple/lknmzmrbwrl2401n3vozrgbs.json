@@ -6,7 +6,7 @@
 		"title": "Shield",
 		"description": "It may protect you",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"shield"
 			]

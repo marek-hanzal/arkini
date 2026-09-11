@@ -6,7 +6,7 @@
 		"title": "Raw Ruby",
 		"description": "Baby ruby",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"raw-ruby"
 			]

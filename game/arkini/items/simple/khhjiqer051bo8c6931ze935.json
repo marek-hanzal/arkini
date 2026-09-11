@@ -6,7 +6,7 @@
 		"title": "Spoiled Wine",
 		"description": "You've forgot it in the corner month ago?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-wine"
 			]

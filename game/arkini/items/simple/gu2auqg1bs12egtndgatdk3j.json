@@ -6,7 +6,7 @@
 		"title": "Faith Paper Scriptorium",
 		"description": "Somebody bless papers and books!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"faith-paper-scriptorium"
 			]

@@ -5,7 +5,7 @@
 		"id": "empty-sugar-beet-field",
 		"title": "Empty Sugar Beet Field",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-sugar-beet-field"
 			]

@@ -6,7 +6,7 @@
 		"title": "Labor - Tier 1",
 		"description": "Work needs labor tokens, here you go",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"labor-t1"
 			]

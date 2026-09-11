@@ -6,7 +6,7 @@
 		"title": "Gem Mine",
 		"description": "If you wanna be rich, go into the depths",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"gem-mine"
 			]

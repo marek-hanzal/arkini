@@ -6,7 +6,7 @@
 		"title": "Empty Bubble Reservoir",
 		"description": "No more bubbles, you need refill.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-bubble-reservoir"
 			]

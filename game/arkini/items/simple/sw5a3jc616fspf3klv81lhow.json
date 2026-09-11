@@ -6,7 +6,7 @@
 		"title": "Marble",
 		"description": "Just a marble thing",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"marble"
 			]

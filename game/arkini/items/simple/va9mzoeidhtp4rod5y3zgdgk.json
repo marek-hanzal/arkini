@@ -6,7 +6,7 @@
 		"title": "Blasting Machine",
 		"description": "This will make kaboom if connected properly",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"blasting-machine"
 			]

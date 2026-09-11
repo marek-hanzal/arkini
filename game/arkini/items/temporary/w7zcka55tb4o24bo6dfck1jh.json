@@ -6,7 +6,7 @@
 		"title": "Mouse Full Belly",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"mouse-full-belly"
 			]

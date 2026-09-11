@@ -6,7 +6,7 @@
 		"title": "Fertilized Grain Field",
 		"description": "Ready for grain seed.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fertilized-grain-field"
 			]

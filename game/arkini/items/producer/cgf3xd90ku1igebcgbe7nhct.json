@@ -6,7 +6,7 @@
 		"title": "Grain Farm",
 		"description": "Some food? Basic stuff here!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"grain-farm"
 			]

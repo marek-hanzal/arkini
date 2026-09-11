@@ -6,7 +6,7 @@
 		"title": "Honey",
 		"description": "So sweet",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"honey"
 			]

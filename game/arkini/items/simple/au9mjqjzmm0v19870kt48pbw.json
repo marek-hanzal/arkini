@@ -6,7 +6,7 @@
 		"title": "Empty Cacao Grove",
 		"description": "No more cocoa stuff",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-cacao-grove"
 			]

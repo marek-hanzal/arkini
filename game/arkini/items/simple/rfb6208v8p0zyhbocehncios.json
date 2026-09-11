@@ -6,7 +6,7 @@
 		"title": "Bio Waste Bucket",
 		"description": "Grose",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"bio-waste-bucket"
 			]

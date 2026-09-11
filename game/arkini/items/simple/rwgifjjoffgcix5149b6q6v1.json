@@ -6,7 +6,7 @@
 		"title": "Firewood",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"firewood"
 			]

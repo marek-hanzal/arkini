@@ -6,7 +6,7 @@
 		"title": "Oven With Ash",
 		"description": "It's done",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"oven-with-ash"
 			]

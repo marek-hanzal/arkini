@@ -6,7 +6,7 @@
 		"title": "Brewery Blueprint",
 		"description": "We want beer! We want beer!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"blueprint",
 				"brewery"

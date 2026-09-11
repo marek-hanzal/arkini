@@ -6,7 +6,7 @@
 		"title": "Clay Mug With Water",
 		"description": "Drinkable",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"clay-mug-with-water"
 			]

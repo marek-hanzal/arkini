@@ -6,7 +6,7 @@
 		"title": "Lumber Camp Blueprint",
 		"description": "If you need a new one, here we go.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"blueprint",
 				"lumber-camp"

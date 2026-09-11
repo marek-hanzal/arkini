@@ -6,7 +6,7 @@
 		"title": "Honeycomb",
 		"description": "Sweet stuff",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"honeycomb"
 			]

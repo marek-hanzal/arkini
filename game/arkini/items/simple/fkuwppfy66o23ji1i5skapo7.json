@@ -6,7 +6,7 @@
 		"title": "Rum Bottle",
 		"description": "It has one special ability",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"rum-bottle"
 			]

@@ -6,7 +6,7 @@
 		"title": "Roasted Coffee Bag",
 		"description": "Now you can open your coffee shop!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"roasted-coffee-bag"
 			]

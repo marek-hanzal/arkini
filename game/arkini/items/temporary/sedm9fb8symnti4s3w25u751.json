@@ -6,7 +6,7 @@
 		"title": "Candle",
 		"description": "Warm, nice light source; be careful, it will fade over time.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"candle"
 			]

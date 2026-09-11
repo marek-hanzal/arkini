@@ -6,7 +6,7 @@
 		"title": "Cauldron With Vegetables And Meat",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"cauldron-with-vegetables-and-meat"
 			]

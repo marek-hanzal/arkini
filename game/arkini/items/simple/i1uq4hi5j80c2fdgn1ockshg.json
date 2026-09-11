@@ -6,7 +6,7 @@
 		"title": "Sword",
 		"description": "Just a sword. You can cut a bread using it",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"sword"
 			]

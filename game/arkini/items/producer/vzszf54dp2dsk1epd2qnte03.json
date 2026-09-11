@@ -6,7 +6,7 @@
 		"title": "Sawmill",
 		"description": "You want to advance in your journey? Sawmill is your friend!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"sawmill"
 			]

@@ -6,7 +6,7 @@
 		"title": "Bow And Arrows",
 		"description": "You can hunt stuff yourself",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"bow-and-arrows"
 			]

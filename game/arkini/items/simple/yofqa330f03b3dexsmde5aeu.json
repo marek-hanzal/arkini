@@ -6,7 +6,7 @@
 		"title": "Oven With Wood",
 		"description": "Ready to be fired!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"oven-with-wood"
 			]

@@ -6,7 +6,7 @@
 		"title": "Wolf",
 		"description": "He is dangerous. But he may walk away",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"wolf"
 			]

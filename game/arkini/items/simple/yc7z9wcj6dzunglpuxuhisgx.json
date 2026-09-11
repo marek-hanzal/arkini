@@ -5,7 +5,7 @@
 		"id": "dirty-cutting-board",
 		"title": "Dirty Cutting Board",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dirty-cutting-board"
 			]

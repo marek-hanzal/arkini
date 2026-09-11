@@ -6,7 +6,7 @@
 		"title": "Empty Basket",
 		"description": "Just basket",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-basket"
 			]

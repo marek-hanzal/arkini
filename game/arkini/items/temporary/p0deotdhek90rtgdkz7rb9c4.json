@@ -6,7 +6,7 @@
 		"title": "Bread Basket",
 		"description": "Some fresh bread and stuff",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"bread-basket"
 			]

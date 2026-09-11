@@ -6,7 +6,7 @@
 		"title": "Spoiled Flax",
 		"description": "Offline threads",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-flax"
 			]

@@ -6,7 +6,7 @@
 		"title": "Cauldron With Beeswax",
 		"description": "Try to make it warm",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"cauldron-with-beeswax"
 			]

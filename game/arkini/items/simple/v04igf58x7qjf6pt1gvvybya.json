@@ -6,7 +6,7 @@
 		"title": "Book - Tier 3",
 		"description": "Quite a good book",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"book-t3"
 			]

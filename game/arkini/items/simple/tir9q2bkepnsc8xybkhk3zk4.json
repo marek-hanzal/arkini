@@ -6,7 +6,7 @@
 		"title": "Spoiled Vegetable Crate",
 		"description": "Not so healthy anymore",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-vegetable-crate"
 			]

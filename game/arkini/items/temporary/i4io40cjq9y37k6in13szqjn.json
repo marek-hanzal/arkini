@@ -6,7 +6,7 @@
 		"title": "Flax",
 		"description": "Clothes, ropes and other stuff starts with a flower.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"flax"
 			]

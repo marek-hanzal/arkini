@@ -5,7 +5,7 @@
 		"id": "fertilized-dye-field",
 		"title": "Fertilized Dye Field",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fertilized-dye-field"
 			]

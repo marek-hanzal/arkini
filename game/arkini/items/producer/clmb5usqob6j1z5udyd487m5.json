@@ -6,7 +6,7 @@
 		"title": "Stonemason Camp",
 		"description": "So, I heard you need a stone?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"stonemason-camp"
 			]

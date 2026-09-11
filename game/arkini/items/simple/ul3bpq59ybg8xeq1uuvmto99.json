@@ -6,7 +6,7 @@
 		"title": "Water Mug",
 		"description": "A mug. With a water. Really?!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"water-mug"
 			]

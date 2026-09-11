@@ -6,7 +6,7 @@
 		"title": "Dye Workshop",
 		"description": "Produces colors",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dye-workshop"
 			]

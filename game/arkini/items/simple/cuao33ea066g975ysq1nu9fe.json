@@ -6,7 +6,7 @@
 		"title": "Flower Field",
 		"description": "Floweers",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"flower-field"
 			]

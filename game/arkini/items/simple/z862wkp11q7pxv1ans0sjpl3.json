@@ -6,7 +6,7 @@
 		"title": "Wine Mug",
 		"description": "You're a barbar!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"wine-mug"
 			]

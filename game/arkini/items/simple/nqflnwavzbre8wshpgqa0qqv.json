@@ -6,7 +6,7 @@
 		"title": "Clay Bowl With Lye",
 		"description": "Don't drink it.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"clay-bowl-with-lye"
 			]

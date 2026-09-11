@@ -6,7 +6,7 @@
 		"title": "Hide",
 		"description": "Raw stuff to make a nice leather",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"hide"
 			]

@@ -6,7 +6,7 @@
 		"title": "Bed Biowaste",
 		"description": "You monster!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"bed-biowaste"
 			]

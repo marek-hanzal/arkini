@@ -5,7 +5,7 @@
 		"id": "spoiled-sugar-cane",
 		"title": "Spoiled Sugar Cane",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-sugar-cane"
 			]

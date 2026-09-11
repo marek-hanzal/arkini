@@ -6,7 +6,7 @@
 		"title": "Coin Bag",
 		"description": "Small fortune",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"coin-bag"
 			]

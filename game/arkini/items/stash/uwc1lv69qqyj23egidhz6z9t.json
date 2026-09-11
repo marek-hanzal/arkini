@@ -6,7 +6,7 @@
 		"title": "Treasure Chest - Tier 2",
 		"description": "Surprise lurks inside",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"treasure-chest-t2"
 			]

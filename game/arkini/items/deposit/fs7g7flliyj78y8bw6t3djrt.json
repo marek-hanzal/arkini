@@ -6,7 +6,7 @@
 		"title": "Well",
 		"description": "Source of water. This one is full.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"well"
 			]

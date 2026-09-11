@@ -6,7 +6,7 @@
 		"title": "Wool Cloth",
 		"description": "It's warm",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"wool-cloth"
 			]

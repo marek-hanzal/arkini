@@ -6,7 +6,7 @@
 		"title": "Sack With Milk",
 		"description": "It cannot hold it. Oops",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"sack-with-milk"
 			]

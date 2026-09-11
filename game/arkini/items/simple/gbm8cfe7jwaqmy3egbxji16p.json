@@ -6,7 +6,7 @@
 		"title": "Flint And Steel",
 		"description": "Can make a fire. Be carefull. Don't use it next to the flammable objects. You've been warned.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"flint-and-steel"
 			]

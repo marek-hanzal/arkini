@@ -6,7 +6,7 @@
 		"title": "Pig",
 		"description": "Have some spare mug?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pig"
 			]

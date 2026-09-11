@@ -6,7 +6,7 @@
 		"title": "Badly Trimmed Beagle",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"badly-trimmed-beagle"
 			]

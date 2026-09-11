@@ -6,7 +6,7 @@
 		"title": "Clay Mug",
 		"description": "Wanna some coffee?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"clay-mug"
 			]

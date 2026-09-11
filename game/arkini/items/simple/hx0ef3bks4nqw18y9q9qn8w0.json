@@ -6,7 +6,7 @@
 		"title": "Clay Bowl With Beer",
 		"description": "Beer inside (tm)",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"clay-bowl-with-beer"
 			]

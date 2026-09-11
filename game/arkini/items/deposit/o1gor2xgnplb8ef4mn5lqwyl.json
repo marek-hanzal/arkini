@@ -6,7 +6,7 @@
 		"title": "Grape Field",
 		"description": "Grape field",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"grape-field"
 			]

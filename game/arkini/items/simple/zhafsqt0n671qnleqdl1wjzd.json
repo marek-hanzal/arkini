@@ -6,7 +6,7 @@
 		"title": "Construction Set - Tier 2",
 		"description": "Quite better construction stuff",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"construction-material-box-t2"
 			]

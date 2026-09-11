@@ -6,7 +6,7 @@
 		"title": "Well With Coffee",
 		"description": "Source of coffee. Try it out",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"well-with-coffee"
 			]

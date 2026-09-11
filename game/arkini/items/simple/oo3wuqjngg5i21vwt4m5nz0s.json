@@ -6,7 +6,7 @@
 		"title": "Toilet Biowaste",
 		"description": "Disgusting",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"toilet-biowaste"
 			]

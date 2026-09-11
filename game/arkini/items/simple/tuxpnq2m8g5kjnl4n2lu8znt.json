@@ -5,7 +5,7 @@
 		"id": "dirty-kitchen-knife",
 		"title": "Dirty Kitchen Knife",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dirty-kitchen-knife"
 			]

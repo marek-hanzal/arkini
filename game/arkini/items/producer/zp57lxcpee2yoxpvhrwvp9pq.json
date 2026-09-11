@@ -6,7 +6,7 @@
 		"title": "Air Purifier",
 		"description": "Fresh air",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"air-purifier"
 			]

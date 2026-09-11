@@ -6,7 +6,7 @@
 		"title": "Battle Axe",
 		"description": "Slice through things",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"battle-axe"
 			]

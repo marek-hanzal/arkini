@@ -6,7 +6,7 @@
 		"title": "Wine With Milk",
 		"description": "Somebody may tell you a wine belongs there",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"wine-with-milk"
 			]

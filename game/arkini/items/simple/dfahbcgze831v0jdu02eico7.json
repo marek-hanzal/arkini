@@ -6,7 +6,7 @@
 		"title": "Spoiled Coffee Plant",
 		"description": "Bleh-Coffee",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-coffee-plant"
 			]

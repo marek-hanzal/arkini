@@ -5,7 +5,7 @@
 		"id": "pot-with-coins",
 		"title": "Pot With Coins",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pot-with-coins"
 			]

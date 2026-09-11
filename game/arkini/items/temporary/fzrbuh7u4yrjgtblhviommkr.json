@@ -6,7 +6,7 @@
 		"title": "Rum Barrel",
 		"description": "A lot of fun inside",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"rum-barrel"
 			]

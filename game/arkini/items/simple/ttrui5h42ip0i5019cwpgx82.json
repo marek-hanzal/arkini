@@ -6,7 +6,7 @@
 		"title": "Duvet",
 		"description": "Wanna something warm over you?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"duvet"
 			]

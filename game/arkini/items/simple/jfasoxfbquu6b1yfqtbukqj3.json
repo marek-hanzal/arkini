@@ -6,7 +6,7 @@
 		"title": "Pottery",
 		"description": "Tavern may need this",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pottery"
 			]

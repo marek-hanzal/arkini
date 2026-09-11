@@ -6,7 +6,7 @@
 		"title": "Cauldron With Wine",
 		"description": "A lot of wine",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"cauldron-with-wine"
 			]

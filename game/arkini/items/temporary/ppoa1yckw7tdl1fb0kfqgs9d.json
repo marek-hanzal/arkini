@@ -6,7 +6,7 @@
 		"title": "Burned Sack With Corn Kernels",
 		"draft": false,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"burned-sack-with-corn-kernels"
 			]

@@ -6,7 +6,7 @@
 		"title": "Feast",
 		"description": "Bigger yummi ever. Maybe The Last Dinner.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"feast"
 			]

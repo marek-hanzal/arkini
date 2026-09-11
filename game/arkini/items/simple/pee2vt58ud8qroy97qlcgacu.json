@@ -6,7 +6,7 @@
 		"title": "Dirty Clay Mug",
 		"description": "I suppose you won't put nothing inside",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dirty-clay-mug"
 			]

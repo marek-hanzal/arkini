@@ -6,7 +6,7 @@
 		"title": "Pillow",
 		"description": "Your neck may thank you",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"pillow"
 			]

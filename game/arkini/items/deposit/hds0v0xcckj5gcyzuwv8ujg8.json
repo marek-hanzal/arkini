@@ -6,7 +6,7 @@
 		"title": "Stone deposit",
 		"description": "So, next to the wood, we also need some stone to build the prospering civilization. Here you go, you're welcome!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"stone-source"
 			]

@@ -6,7 +6,7 @@
 		"title": "Empty Bed T1",
 		"description": "You can sleep, not so comfortably",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-bed-t1"
 			]

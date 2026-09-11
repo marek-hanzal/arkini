@@ -6,7 +6,7 @@
 		"title": "Poison Jar",
 		"draft": true,
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"poison-jar"
 			]

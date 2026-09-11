@@ -6,7 +6,7 @@
 		"title": "Raw Diamond",
 		"description": "It's raw",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"raw-diamond"
 			]

@@ -6,7 +6,7 @@
 		"title": "Treasure Chest - Tier 6",
 		"description": "Best quality chest ever",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"treasure-chest-t6"
 			]

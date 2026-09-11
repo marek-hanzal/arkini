@@ -6,7 +6,7 @@
 		"title": "Water",
 		"description": "Everybody needs to drink.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"water-bucket"
 			]

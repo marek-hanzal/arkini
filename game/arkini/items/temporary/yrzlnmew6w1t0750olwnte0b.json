@@ -6,7 +6,7 @@
 		"title": "Fruits",
 		"description": "Yammy",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fruit-crate"
 			]

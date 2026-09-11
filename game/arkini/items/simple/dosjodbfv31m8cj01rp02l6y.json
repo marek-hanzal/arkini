@@ -6,7 +6,7 @@
 		"title": "Grapes",
 		"description": "Yummy",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"grapes"
 			]

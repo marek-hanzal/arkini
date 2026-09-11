@@ -6,7 +6,7 @@
 		"title": "Dye Workshop Milk",
 		"description": "Milky-way",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dye-workshop-milk"
 			]

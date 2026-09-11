@@ -6,7 +6,7 @@
 		"title": "Grape Seed",
 		"description": "Wine Time!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"seed",
 				"grapes"

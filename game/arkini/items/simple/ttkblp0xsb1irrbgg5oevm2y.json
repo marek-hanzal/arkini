@@ -6,7 +6,7 @@
 		"title": "Paper",
 		"description": "If you want to persist your knowledge or get better stuff, paper is the way to go!",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"paper"
 			]

@@ -6,7 +6,7 @@
 		"title": "Vegetable Garden Blueprint",
 		"description": "Good stuff to eat",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"blueprint",
 				"vegetable-garden"

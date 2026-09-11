@@ -6,7 +6,7 @@
 		"title": "Dye Workshop Washed",
 		"description": "You washed it out",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"dye-workshop-washed"
 			]

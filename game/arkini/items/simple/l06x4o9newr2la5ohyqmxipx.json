@@ -6,7 +6,7 @@
 		"title": "Furniture",
 		"description": "Some furniture to the house",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"furniture"
 			]

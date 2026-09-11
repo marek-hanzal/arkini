@@ -6,7 +6,7 @@
 		"title": "Feather",
 		"description": "Piece of arrow. Or piece of writing tool",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"feather"
 			]

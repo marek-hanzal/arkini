@@ -6,7 +6,7 @@
 		"title": "Fertilized Grape Field",
 		"description": "Ready for grape seed.",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"fertilized-grape-field"
 			]

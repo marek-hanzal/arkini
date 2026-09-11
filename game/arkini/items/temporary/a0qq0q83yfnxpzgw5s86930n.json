@@ -6,7 +6,7 @@
 		"title": "Paper Boat Beer Bath",
 		"description": "It floats in beer too",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"paper-boat-beer-bath"
 			]

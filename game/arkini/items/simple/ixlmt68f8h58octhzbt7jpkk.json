@@ -5,7 +5,7 @@
 		"id": "empty-sugar-cane-field",
 		"title": "Empty Sugar Cane Field",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"empty-sugar-cane-field"
 			]

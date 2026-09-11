@@ -6,7 +6,7 @@
 		"title": "Milk Mug",
 		"description": "Innocent mug of milk. Or foam on top of beer you can mask",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"milk-mug"
 			]

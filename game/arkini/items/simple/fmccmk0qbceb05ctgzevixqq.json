@@ -6,7 +6,7 @@
 		"title": "Spoiled Pralines",
 		"description": "You didn't like them?",
 		"asset": {
-			"scale": 0.8,
+			"scale": 1,
 			"default": [
 				"spoiled-pralines"
 			]

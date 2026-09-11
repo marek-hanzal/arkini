@@ -20,7 +20,7 @@ const calls = vi.hoisted(() => ({
 	publishFn: vi.fn(),
 }));
 vi.mock("~/tile-painting/fx/renderTilePaintingPngFx", () => ({
-	renderTilePaintingPngFx: (document: unknown) => calls.renderFn(document),
+	renderTilePaintingPngFx: (...args: unknown[]) => calls.renderFn(...args),
 }));
 vi.mock("~/authoring-session/fx/publishEditorProjectFx", () => ({
 	publishEditorProjectFx: (...args: unknown[]) => calls.publishFn(...args),
@@ -30,7 +30,6 @@ import { prepareTilePaintingBakeFx } from "~/tile-painting/fx/prepareTilePaintin
 
 const original = createTestPngBytes();
 const replacement = createAlternateTestPngBytes();
-const originalPng = `data:image/png;base64,${Encoding.encodeBase64(original)}`;
 const replacementPng = `data:image/png;base64,${Encoding.encodeBase64(replacement)}`;
 const paintingFn = (
 	paintingId: string,
@@ -48,13 +47,11 @@ const paintingFn = (
 				id: "material",
 				label: source,
 				sourceResourceId: source,
-				png: originalPng,
 			},
 			{
 				id: "guide",
 				label: guide,
 				sourceResourceId: guide,
-				png: originalPng,
 			},
 		],
 		layers: [
@@ -144,7 +141,7 @@ beforeEach(() => {
 });
 
 describe("painting bake orchestration", () => {
-	it("refreshes source bytes for rendering and captures its own output only as a guide without making a render cycle", async () => {
+	it("renders current Assets without persisting source bytes or making a self-guide render cycle", async () => {
 		const painting = paintingFn("output", "texture", "output");
 		const result = await Effect.runPromise(
 			prepareTilePaintingBakeFx({
@@ -159,12 +156,16 @@ describe("painting bake orchestration", () => {
 				],
 			}),
 		);
-		expect(calls.renderFn.mock.calls[0][0].images[0].png).toBe(replacementPng);
-		expect(result.document.images[1].png).toBe(replacementPng);
-		expect(painting.document.images[0].png).toBe(originalPng);
+		expect(calls.renderFn.mock.calls[0][1][0].bytes).toEqual(replacement);
+		expect(result.document).toBe(painting.document);
+		expect(result.document.images[0]).toEqual({
+			id: "material",
+			label: "texture",
+			sourceResourceId: "texture",
+		});
 	});
 
-	it("feeds freshly rendered parent bytes into its child and submits all final guide snapshots in one commit", async () => {
+	it("feeds freshly rendered parent bytes into its child and commits reference-only recipes in one batch", async () => {
 		const fixture = fixtureFn();
 		const progressFn = vi.fn();
 		const result = await Effect.runPromise(
@@ -180,14 +181,16 @@ describe("painting bake orchestration", () => {
 			"parent",
 			"child",
 		]);
-		expect(calls.renderFn.mock.calls[1][0].images[0].png).toBe(replacementPng);
+		expect(
+			calls.renderFn.mock.calls[1][1].find(
+				(resource: Project.Resource) => resource.id === "parent",
+			).bytes,
+		).toEqual(replacement);
 		expect(fixture.batchFn).toHaveBeenCalledOnce();
 		const committed = fixture.batchFn.mock.calls[0][0];
 		expect(committed.expectedRevision).toBe(100);
-		expect(committed.paintings[0].document.images[1].png).toBe(replacementPng);
-		expect(
-			committed.paintings[1].document.images.every((image) => image.png === replacementPng),
-		).toBe(true);
+		expect(committed.paintings[0].document).toEqual(fixture.records[1].document);
+		expect(committed.paintings[1].document).toEqual(fixture.records[0].document);
 		expect(calls.publishFn).toHaveBeenCalledOnce();
 		expect(result.bakedCount).toBe(2);
 		expect(progressFn.mock.calls).toEqual([
@@ -232,13 +235,12 @@ describe("painting bake orchestration", () => {
 		expect(calls.publishFn).not.toHaveBeenCalled();
 	});
 
-	it("preserves an unused captured brush snapshot even if its former source was deleted", async () => {
+	it("does not render an unused image entry whose source was deleted", async () => {
 		const painting = paintingFn("output", "texture", "output");
 		painting.document.images.push({
 			id: "unused",
 			label: "Deleted brush",
 			sourceResourceId: "deleted",
-			png: originalPng,
 		});
 		const result = await Effect.runPromise(
 			prepareTilePaintingBakeFx({

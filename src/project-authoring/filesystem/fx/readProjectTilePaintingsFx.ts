@@ -1,6 +1,5 @@
 import { decodeGameProjectFileStemFn } from "~/game-config-source/fn/decodeGameProjectFileStemFn";
 import { TilePaintingFileSchema } from "~/tile-painting/schema/TilePaintingFileSchema";
-import { validateTilePaintingDocumentFx } from "./validateTilePaintingDocumentFx";
 import { Effect, FileSystem, Path } from "effect";
 import type { ProjectPaths } from "../ProjectPaths";
 
@@ -45,7 +44,6 @@ export const readProjectTilePaintingsFx = Effect.fn("readProjectTilePaintingsFx"
 			});
 			if ((yield* paths.tilePaintingFileFx(paintingId)) !== target)
 				return yield* Effect.fail(new Error(`Painting ${file} has an invalid identity.`));
-			yield* validateTilePaintingDocumentFx(painting.document);
 			return {
 				...painting,
 				paintingId,

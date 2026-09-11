@@ -5,7 +5,7 @@ import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchem
 import type { TilePaintingDocumentSchema } from "~/tile-painting/schema/TilePaintingDocumentSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 
-/** Copies admitted PNG bytes into the painting so asset replacement cannot change its recipe. */
+/** Admits a canonical Asset reference without retaining its bytes in the recipe. */
 export const createTilePaintingImageFx = Effect.fn("createTilePaintingImageFx")(function* (
 	resource: ResourceSchema.Type,
 ) {
@@ -19,15 +19,10 @@ export const createTilePaintingImageFx = Effect.fn("createTilePaintingImageFx")(
 			}),
 		);
 	return yield* Effect.sync((): TilePaintingDocumentSchema.Type["images"][number] => {
-		let binary = "";
-		for (let offset = 0; offset < resource.bytes.length; offset += 8192) {
-			binary += String.fromCharCode(...resource.bytes.subarray(offset, offset + 8192));
-		}
 		return {
 			id: createId(),
 			label: resource.id,
 			sourceResourceId: resource.id,
-			png: `data:image/png;base64,${btoa(binary)}`,
 		};
 	});
 });

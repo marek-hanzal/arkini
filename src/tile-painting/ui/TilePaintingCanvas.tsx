@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react";
 import { memo } from "react";
 import { useTilePaintingCanvasController } from "~/tile-painting/ui/useTilePaintingCanvasController";
 
@@ -49,7 +50,7 @@ export const TilePaintingCanvas = memo(function TilePaintingCanvas(
 				data-ui="TilePaintingCanvasLoading"
 				className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground"
 			>
-				Loading painting…
+				<LoaderCircle className="size-5 animate-spin" />
 			</div>
 		</div>
 	);

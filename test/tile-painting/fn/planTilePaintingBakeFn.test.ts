@@ -9,7 +9,6 @@ const documentFn = (sourceResourceId: string): TilePaintingDocumentSchema.Type =
 			id: "image",
 			label: sourceResourceId,
 			sourceResourceId,
-			png: "data:image/png;base64,YQ==",
 		},
 	],
 	layers: [
@@ -62,7 +61,6 @@ describe("planTilePaintingBakeFn", () => {
 						id: "guide",
 						label: "Guide",
 						sourceResourceId,
-						png: "data:image/png;base64,YQ==",
 					},
 				],
 				reference: {
@@ -132,7 +130,6 @@ describe("planTilePaintingBakeFn", () => {
 			id: "self",
 			label: "Self",
 			sourceResourceId: "output",
-			png: "data:image/png;base64,YQ==",
 		};
 		const document = {
 			...painting.document,
@@ -221,13 +218,12 @@ describe("planTilePaintingBakeFn", () => {
 		});
 	});
 
-	it("does not block a build on a deleted image left only in the unused snapshot registry", () => {
+	it("does not block a build on a deleted image left only in the unused image registry", () => {
 		const painting = paintingFn("output", "texture");
 		painting.document.images.push({
 			id: "unused",
 			label: "Unused",
 			sourceResourceId: "deleted",
-			png: "data:image/png;base64,YQ==",
 		});
 		expect(
 			planTilePaintingBakeFn({

@@ -1,3 +1,4 @@
+import { useTilePaintingImageUrls } from "~/tile-painting/ui/useTilePaintingImageUrls";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useState } from "react";
@@ -26,14 +27,14 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const tools = [
 	{
-		id: "reveal",
-		label: "Reveal · B — Paint the texture into the mask.",
-		icon: Brush,
-	},
-	{
 		id: "hide",
 		label: "Erase · E — Remove opacity from the mask, down to full transparency.",
 		icon: Eraser,
+	},
+	{
+		id: "reveal",
+		label: "Reveal · B — Restore erased parts of the texture.",
+		icon: Brush,
 	},
 	{
 		id: "smooth",
@@ -49,6 +50,7 @@ const tools = [
 
 export const TilePaintingCanvasPage = () => {
 	const session = useTilePaintingSession();
+	const imageUrls = useTilePaintingImageUrls(session.document.images);
 	const runtime = useTilePaintingSessionRuntime();
 	const [settingsOpen, setSettingsOpenFn] = useState(false);
 	const selectedLayerId = session.document.layers.some(
@@ -269,7 +271,11 @@ export const TilePaintingCanvasPage = () => {
 												/>
 												<img
 													className="size-10 object-contain"
-													src={image?.png}
+													src={
+														image === undefined
+															? undefined
+															: imageUrls.get(image.id)
+													}
 												/>
 												<span className="min-w-0 flex-1 truncate text-sm">
 													{image?.label}
@@ -370,12 +376,7 @@ export const TilePaintingCanvasPage = () => {
 									{session.brush.brushImageId !== null ? (
 										<img
 											className="mx-auto size-20 object-contain"
-											src={
-												session.document.images.find(
-													(image) =>
-														image.id === session.brush.brushImageId,
-												)?.png
-											}
+											src={imageUrls.get(session.brush.brushImageId)}
 										/>
 									) : null}
 									<TilePaintingImagePicker

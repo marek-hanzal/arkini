@@ -21,7 +21,6 @@ const loaded: TilePaintingSchema.Type = {
 				id: "texture",
 				sourceResourceId: "source",
 				label: "Source",
-				png: "data:image/png;base64,YQ==",
 			},
 		],
 		layers: [

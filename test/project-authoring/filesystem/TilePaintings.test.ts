@@ -57,10 +57,9 @@ const png = async () =>
 	).toString("base64")}`;
 
 describe("portable tile painting persistence", () => {
-	it("rejects stale recipe writes and preserves embedded sources through portable export and reopen", async () => {
+	it("rejects stale recipe writes and persists only source references through portable export and reopen", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
-		const image = await png();
 		const document = {
 			...blank(),
 			images: [
@@ -68,7 +67,6 @@ describe("portable tile painting persistence", () => {
 					id: "source",
 					label: "Dirt",
 					sourceResourceId: "item-water",
-					png: image,
 				},
 			],
 			layers: [
@@ -139,7 +137,11 @@ describe("portable tile painting persistence", () => {
 		const portable = JSON.parse(
 			await readFile(join(exported.root, "paintings", "road.json"), "utf8"),
 		);
-		expect(portable.document.images[0].png).toBe(image);
+		expect(portable.document.images[0]).toEqual({
+			id: "source",
+			label: "Dirt",
+			sourceResourceId: "item-water",
+		});
 		expect(portable.document.layers).toEqual(document.layers);
 		expect(portable).not.toHaveProperty("projectId");
 		expect(portable).not.toHaveProperty("paintingId");
@@ -207,7 +209,7 @@ describe("portable tile painting persistence", () => {
 			),
 		).toBe(true);
 	});
-	it("rejects undecodable embedded sources before any recipe or output is written", async () => {
+	it("rejects missing source references before any recipe or output is written", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		await expect(
@@ -219,12 +221,22 @@ describe("portable tile painting persistence", () => {
 					expectedUpdatedAtMs: null,
 					document: {
 						...blank(),
+						layers: [
+							{
+								id: "layer",
+								name: "Layer",
+								imageId: "bad",
+								visible: true,
+								opacity: 1,
+								tileSize: 64,
+								strokes: [],
+							},
+						],
 						images: [
 							{
 								id: "bad",
 								label: "Broken",
-								sourceResourceId: "item-water",
-								png: "data:image/png;base64,AAAA",
+								sourceResourceId: "missing",
 							},
 						],
 					},

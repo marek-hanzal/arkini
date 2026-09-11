@@ -1,4 +1,6 @@
-import { useLayoutEffect, useRef, type RefObject } from "react";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
+import { useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import { Effect, Exit, Scope } from "effect";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { attachTilePaintingCanvasFx } from "~/tile-painting/fx/attachTilePaintingCanvasFx";
@@ -22,6 +24,15 @@ export const useTilePaintingCanvasController = ({
 	session,
 	suspended = false,
 }: useTilePaintingCanvasController.Props): useTilePaintingCanvasController.Output => {
+	const { resources } = useEditorProject();
+	const brushResourceId = useSyncExternalStore(session.subscribeFn, () => {
+		const current = session.readFn();
+		return current.document.images.find((image) => image.id === current.brush.brushImageId)
+			?.sourceResourceId;
+	});
+	const brushImageUrl = useResourceUrl(brushResourceId);
+	const resourcesRef = useRef(resources);
+	resourcesRef.current = resources;
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const cursorRef = useRef<HTMLDivElement>(null);
@@ -43,6 +54,7 @@ export const useTilePaintingCanvasController = ({
 		ownerRef.current = RendererRuntime.runSync(
 			attachTilePaintingCanvasFx({
 				session,
+				resources: resourcesRef.current,
 				viewportElement,
 				canvas,
 				cursorElement,
@@ -55,6 +67,20 @@ export const useTilePaintingCanvasController = ({
 		};
 	}, [
 		session,
+	]);
+	useLayoutEffect(() => {
+		if (ownerRef.current !== undefined)
+			RendererRuntime.runSync(ownerRef.current.setResourcesFx(resources));
+	}, [
+		session,
+		resources,
+	]);
+	useLayoutEffect(() => {
+		if (ownerRef.current !== undefined)
+			RendererRuntime.runSync(ownerRef.current.setBrushImageUrlFx(brushImageUrl));
+	}, [
+		session,
+		brushImageUrl,
 	]);
 	useLayoutEffect(() => {
 		if (ownerRef.current !== undefined)

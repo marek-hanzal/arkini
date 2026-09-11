@@ -3,7 +3,7 @@ import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCan
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 import { useEffect, useEffectEvent, useState, type PropsWithChildren } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { Save, Undo2, Redo2, ImagePlus, Check, X } from "lucide-react";
+import { Save, Undo2, Redo2, ImagePlus, Check, X, LoaderCircle } from "lucide-react";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
@@ -43,13 +43,14 @@ const TilePaintingHelp = () => (
 			<>
 				<p>
 					The canvas is {TilePaintingCanvasSize} × {TilePaintingCanvasSize} px. Layers are
-					listed from top to bottom and new layers start hidden by their masks. Layers
-					hold repeating textures. Reveal or erase their masks; the original images stay
-					intact. Strength gradually adds or removes visibility; Smooth softens existing
-					mask transitions. Higher layers cover lower layers. Scatter decorations are
-					placed above the texture layers. Each layer’s Shadow controls tune shading on
-					lower terrain; transparent areas stay clear. Canvas shadows refresh shortly
-					after you finish drawing.
+					listed from top to bottom. New layers start fully revealed above existing
+					layers. Erase is the default tool: cut away the repeating texture to expose
+					lower layers. Reveal restores erased areas; the original images stay intact.
+					Strength gradually adds or removes visibility; Smooth softens existing mask
+					transitions. Higher layers cover lower layers. Scatter decorations are placed
+					above the texture layers. Each layer’s Shadow controls tune shading on lower
+					terrain; transparent areas stay clear. Canvas shadows refresh shortly after you
+					finish drawing.
 				</p>
 				<p>
 					Erase at 100% strength clears the solid brush core completely. Soft edges keep
@@ -63,8 +64,8 @@ const TilePaintingHelp = () => (
 				<dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
 					<dt className="font-mono text-foreground">Drag</dt>
 					<dd>Paint one stroke. One stroke = one undo step.</dd>
-					<dt className="font-mono text-foreground">B / E / M / S</dt>
-					<dd>Reveal / erase / smooth mask / scatter.</dd>
+					<dt className="font-mono text-foreground">E / B / M / S</dt>
+					<dd>Erase / reveal / smooth mask / scatter.</dd>
 					<dt className="font-mono text-foreground">A</dt>
 					<dd>
 						Toggle active/all layers. All includes hidden layers; one stroke is one
@@ -261,7 +262,11 @@ export const TilePaintingWorkspace = ({ children }: PropsWithChildren) => {
 									disabled={session.busy}
 									onClick={() => void session.saveFn()}
 								>
-									<Save className="size-4" />
+									{session.busy ? (
+										<LoaderCircle className="size-4 animate-spin" />
+									) : (
+										<Save className="size-4" />
+									)}
 								</LinkButton>
 							</Tooltip>
 							<Tooltip
@@ -327,7 +332,7 @@ export const TilePaintingWorkspace = ({ children }: PropsWithChildren) => {
 							: "Choose a new asset ID. Existing unrelated assets are protected."}
 					</p>
 					<Tooltip
-						content={session.busy ? "Saving…" : "Save and bake"}
+						content="Save and bake"
 						contentClassName="z-50"
 					>
 						<LinkButton
@@ -339,7 +344,11 @@ export const TilePaintingWorkspace = ({ children }: PropsWithChildren) => {
 								})
 							}
 						>
-							<Check className="size-5" />
+							{session.busy ? (
+								<LoaderCircle className="size-5 animate-spin" />
+							) : (
+								<Check className="size-5" />
+							)}
 						</LinkButton>
 					</Tooltip>
 				</TilePaintingDialog>

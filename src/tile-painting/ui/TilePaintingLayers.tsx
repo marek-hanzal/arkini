@@ -1,7 +1,9 @@
+import { useTilePaintingImageUrls } from "~/tile-painting/ui/useTilePaintingImageUrls";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useState } from "react";
 import type { TilePaintingDocumentSchema } from "~/tile-painting/schema/TilePaintingDocumentSchema";
+import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCanvasSize";
 import { TilePaintingDefaultShadow } from "~/tile-painting/constant/TilePaintingDefaultShadow";
 import { TilePaintingDialog } from "~/tile-painting/ui/TilePaintingDialog";
 import { createId } from "@paralleldrive/cuid2";
@@ -14,6 +16,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export const TilePaintingLayers = () => {
 	const session = useTilePaintingSession();
+	const imageUrls = useTilePaintingImageUrls(session.document.images);
 	const painting = session.document;
 	return (
 		<fieldset
@@ -48,11 +51,7 @@ export const TilePaintingLayers = () => {
 						<>
 							<img
 								className="max-h-44 w-full object-contain"
-								src={
-									painting.images.find(
-										(image) => image.id === painting.reference?.imageId,
-									)?.png
-								}
+								src={imageUrls.get(painting.reference?.imageId)}
 							/>
 							<EditorNumberControl
 								label="Reference opacity (%)"
@@ -142,7 +141,23 @@ export const TilePaintingLayers = () => {
 										opacity: 1,
 										tileSize: 256,
 										shadow: TilePaintingDefaultShadow,
-										strokes: [],
+										// Seed coverage belongs to layer creation, so undoing a brush stroke keeps the layer filled.
+										strokes: [
+											{
+												mode: "reveal",
+												size: TilePaintingCanvasSize,
+												opacity: 1,
+												hardness: 1,
+												shape: "square",
+												brushImageId: null,
+												points: [
+													{
+														x: TilePaintingCanvasSize / 2,
+														y: TilePaintingCanvasSize / 2,
+													},
+												],
+											},
+										],
 									},
 								],
 							};
@@ -201,10 +216,7 @@ export const TilePaintingLayers = () => {
 							<div className="flex items-center gap-3">
 								<img
 									className="size-14 rounded-lg object-cover"
-									src={
-										painting.images.find((image) => image.id === layer.imageId)
-											?.png
-									}
+									src={imageUrls.get(layer.imageId)}
 								/>
 								<LinkButton
 									className="inline-flex items-center justify-center mr-auto min-h-9"

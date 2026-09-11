@@ -1,12 +1,21 @@
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
-import { PrimaryButton } from "~/ui/ui/Button";
+import { DangerButton, PrimaryButton } from "~/ui/ui/Button";
 import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCanvasSize";
 import { createId } from "@paralleldrive/cuid2";
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { Paintbrush, Plus, Trash2, RefreshCw, ChevronRight, Check } from "lucide-react";
+import {
+	Paintbrush,
+	Plus,
+	Trash2,
+	RefreshCw,
+	ChevronRight,
+	Check,
+	X,
+	LoaderCircle,
+} from "lucide-react";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { TilePaintingBakeAtom } from "~/tile-painting/atom/TilePaintingBakeAtom";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -174,7 +183,7 @@ export const TilePaintingLibrary = () => {
 						<div className="relative flex items-center gap-1">
 							{bakePending ? (
 								<span className="pointer-events-none absolute right-full mr-2 whitespace-nowrap text-xs tabular-nums text-muted">
-									{bakePercent === 100 ? "Saving…" : `Baking ${bakePercent}%`}
+									{bakePercent}%
 								</span>
 							) : null}
 							<Tooltip
@@ -204,7 +213,11 @@ export const TilePaintingLibrary = () => {
 										/>
 									) : null}
 									<span className="relative z-10 inline-flex items-center gap-2">
-										<RefreshCw className="size-4" />
+										{bakePending ? (
+											<LoaderCircle className="size-4 animate-spin" />
+										) : (
+											<RefreshCw className="size-4" />
+										)}
 									</span>
 								</LinkButton>
 							</Tooltip>
@@ -258,7 +271,7 @@ export const TilePaintingLibrary = () => {
 					</p>
 				) : null}
 				{loading && paintings.length === 0 ? (
-					<p className="text-sm text-muted">Loading paintings…</p>
+					<LoaderCircle className="size-5 animate-spin text-muted" />
 				) : paintings.length === 0 ? (
 					<Status
 						dataUi="TilePaintingLibraryEmpty"
@@ -354,19 +367,18 @@ export const TilePaintingLibrary = () => {
 						value={name}
 						onChangeFn={setNameFn}
 					/>
-
-					<p className="text-xs text-muted">
-						Fixed 1254 × 1254 px canvas viewed from above, matching our generated
-						artwork.
-					</p>
 					{error !== null ? <p className="text-sm text-danger">{error}</p> : null}
 					<PrimaryButton
 						className="min-h-9 justify-self-end gap-2 px-3 py-1.5 text-sm"
 						disabled={busy || name.trim() === ""}
 						onClick={() => void createFn()}
 					>
-						<Check className="size-4" />
-						{busy ? "Creating…" : "Create painting"}
+						{localBusy ? (
+							<LoaderCircle className="size-4 animate-spin" />
+						) : (
+							<Check className="size-4" />
+						)}
+						Create painting
 					</PrimaryButton>
 				</TilePaintingDialog>
 			) : null}
@@ -382,18 +394,28 @@ export const TilePaintingLibrary = () => {
 						asset stays in Assets. This cannot be undone in the painter.
 					</p>
 					{error !== null ? <p className="text-sm text-danger">{error}</p> : null}
-					<Tooltip
-						content="Delete painting"
-						contentClassName="z-50"
-					>
+					<div className="flex items-center justify-between gap-3">
 						<LinkButton
-							className="inline-flex size-9 items-center justify-center justify-self-end no-underline hover:no-underline"
+							className="inline-flex items-center gap-2"
+							disabled={busy}
+							onClick={() => setDeleteCandidateFn(null)}
+						>
+							<X className="size-4" />
+							Cancel
+						</LinkButton>
+						<DangerButton
+							className="gap-2"
 							disabled={busy}
 							onClick={() => void deleteFn()}
 						>
-							<Trash2 className="size-5" />
-						</LinkButton>
-					</Tooltip>
+							{localBusy ? (
+								<LoaderCircle className="size-4 animate-spin" />
+							) : (
+								<Trash2 className="size-4" />
+							)}
+							Delete
+						</DangerButton>
+					</div>
 				</TilePaintingDialog>
 			) : null}
 		</EditorSectionPage>

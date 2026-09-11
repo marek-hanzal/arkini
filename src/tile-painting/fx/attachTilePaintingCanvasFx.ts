@@ -1,3 +1,5 @@
+import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import { readTilePaintingReferencedImageIdsFn } from "~/tile-painting/fn/readTilePaintingReferencedImageIdsFn";
 import { Effect } from "effect";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { TilePaintingCanvasSize } from "~/tile-painting/constant/TilePaintingCanvasSize";
@@ -31,15 +33,27 @@ interface PanGesture {
 export namespace attachTilePaintingCanvasFx {
 	export interface Props {
 		readonly session: makeTilePaintingSessionFx.Output;
+		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly viewportElement: HTMLDivElement;
 		readonly canvas: HTMLCanvasElement;
 		readonly cursorElement: HTMLDivElement;
 		readonly loadingElement: HTMLDivElement;
 	}
 	export interface Output {
+		readonly setResourcesFx: (
+			resources: ReadonlyArray<ResourceSchema.Type>,
+		) => Effect.Effect<void>;
+		readonly setBrushImageUrlFx: (url: string | undefined) => Effect.Effect<void>;
 		readonly setSuspendedFx: (suspended: boolean) => Effect.Effect<void>;
 	}
 }
+
+const readCanvasImageIdsFn = (current: makeTilePaintingSessionFx.Snapshot): ReadonlySet<string> => {
+	const ids = new Set(readTilePaintingReferencedImageIdsFn(current.document));
+	if (current.brush.shape === "image" && current.brush.brushImageId !== null)
+		ids.add(current.brush.brushImageId);
+	return ids;
+};
 
 /** Native input and disposable render resources read the session directly; React only attaches the surface. */
 export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Props) =>
@@ -47,6 +61,10 @@ export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Pro
 		Effect.sync(() => {
 			const { session, viewportElement, canvas, cursorElement, loadingElement } = props;
 			let renderer: createTilePaintingRendererFx.Output | undefined;
+			let resources = props.resources;
+			let brushImageUrl: string | undefined;
+			let loadedImageIds: ReadonlySet<string> = new Set();
+			let decodeError: string | undefined;
 			let activeGesture: PaintGesture | PanGesture | undefined;
 			let cursorPosition:
 				| {
@@ -89,7 +107,7 @@ export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Pro
 					current.brush.shape !== "circle" && current.tool !== "scatter" ? "0" : "50%";
 				element.style.backgroundImage =
 					current.brush.shape === "image" && current.tool !== "scatter"
-						? `url(${current.document.images.find((image) => image.id === current.brush.brushImageId)?.png ?? ""})`
+						? `url(${brushImageUrl ?? ""})`
 						: "none";
 				element.style.opacity =
 					current.brush.shape === "image" && current.tool !== "scatter" ? "0.65" : "1";
@@ -502,25 +520,31 @@ export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Pro
 				renderer = undefined;
 				loadingElement.style.display = "";
 				cancelFn();
-				void RendererRuntime.runPromise(
-					createTilePaintingRendererFx(session.readFn().document.images),
-					{
-						signal: controller.signal,
-					},
-				)
+				const current = session.readFn();
+				loadedImageIds = readCanvasImageIdsFn(current);
+				const sources = current.document.images.filter((image) =>
+					loadedImageIds.has(image.id),
+				);
+				void RendererRuntime.runPromise(createTilePaintingRendererFx(sources, resources), {
+					signal: controller.signal,
+				})
 					.then((result) => {
 						if (disposed || controller.signal.aborted) return;
 						renderer = result;
+						if (decodeError !== undefined && session.readFn().error === decodeError)
+							RendererRuntime.runSync(session.setErrorFx(null));
+						decodeError = undefined;
 						loadingElement.style.display = "none";
 						redrawFn();
 					})
 					.catch((error: unknown) => {
-						if (!disposed && !controller.signal.aborted)
-							reportErrorFn(
+						if (!disposed && !controller.signal.aborted) {
+							decodeError =
 								error instanceof Error
 									? error.message
-									: "Could not load painting images.",
-							);
+									: "Could not load painting images.";
+							reportErrorFn(decodeError);
+						}
 					});
 			};
 			let previous = session.readFn();
@@ -543,7 +567,18 @@ export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Pro
 						updateBrushAppearanceFn();
 					updateCursorFn();
 				}
-				if (before.document.images !== current.document.images) loadImagesFn();
+				const requiredImageIds =
+					before.document !== current.document || before.brush !== current.brush
+						? readCanvasImageIdsFn(current)
+						: loadedImageIds;
+				if (
+					before.document.images !== current.document.images ||
+					requiredImageIds.size !== loadedImageIds.size ||
+					[
+						...requiredImageIds,
+					].some((id) => !loadedImageIds.has(id))
+				)
+					loadImagesFn();
 				else if (
 					before.document !== current.document ||
 					before.referenceOnly !== current.referenceOnly ||
@@ -570,6 +605,17 @@ export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Pro
 			updateGeometryFn();
 			loadImagesFn();
 			return {
+				setResourcesFx: (next: ReadonlyArray<ResourceSchema.Type>) =>
+					Effect.sync(() => {
+						if (resources === next) return;
+						resources = next;
+						loadImagesFn();
+					}),
+				setBrushImageUrlFx: (url: string | undefined) =>
+					Effect.sync(() => {
+						brushImageUrl = url;
+						updateBrushAppearanceFn();
+					}),
 				setSuspendedFx: (next: boolean) =>
 					Effect.sync(() => {
 						suspended = next;
@@ -607,6 +653,8 @@ export const attachTilePaintingCanvasFx = (props: attachTilePaintingCanvasFx.Pro
 		Effect.map(
 			(owner): attachTilePaintingCanvasFx.Output => ({
 				setSuspendedFx: owner.setSuspendedFx,
+				setResourcesFx: owner.setResourcesFx,
+				setBrushImageUrlFx: owner.setBrushImageUrlFx,
 			}),
 		),
 	);

@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { useEffect, useState } from "react";
 import { Outlet } from "@tanstack/react-router";
@@ -55,7 +56,12 @@ export const TilePaintingDocumentPage = ({ paintingId }: { readonly paintingId: 
 				</LinkButtonLink>
 			</div>
 		);
-	if (loaded === undefined) return <p className="p-5 text-sm text-muted">Loading painting…</p>;
+	if (loaded === undefined)
+		return (
+			<div className="p-5 text-muted">
+				<LoaderCircle className="size-5 animate-spin" />
+			</div>
+		);
 	return (
 		<TilePaintingSessionProvider
 			key={`${loaded.projectId}:${loaded.paintingId}`}

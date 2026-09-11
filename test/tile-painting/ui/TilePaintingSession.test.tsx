@@ -207,7 +207,6 @@ describe("Painting document session boundaries", () => {
 				id,
 				sourceResourceId,
 				label: sourceResourceId,
-				png: "data:image/png;base64,YQ==",
 			});
 			await act(async () =>
 				session.addImageFn(
@@ -234,7 +233,6 @@ describe("Painting document session boundaries", () => {
 					id: "flower",
 					label: "Flower",
 					sourceResourceId: "item-water",
-					png: "data:image/png;base64,YQ==",
 				},
 			],
 			layers: [
@@ -309,7 +307,6 @@ describe("Painting document session boundaries", () => {
 						id: "stamp",
 						label: "Stamp",
 						sourceResourceId: "item-water",
-						png: "data:image/png;base64,YQ==",
 					},
 				],
 			});

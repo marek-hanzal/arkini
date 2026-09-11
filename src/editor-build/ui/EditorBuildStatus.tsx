@@ -10,7 +10,6 @@ interface EditorBuildStatusProps {
 	readonly pending: boolean;
 	readonly stale: boolean;
 	readonly version: string;
-	readonly versionStatusError: string | undefined;
 	readonly onBuildFn: () => void;
 }
 
@@ -21,28 +20,16 @@ export const EditorBuildStatus = ({
 	pending,
 	stale,
 	version,
-	versionStatusError,
 	onBuildFn,
 }: EditorBuildStatusProps) => {
-	if (versionStatusError !== undefined) {
-		return (
-			<Status
-				dataUi="EditorBuildActionStatus"
-				description={versionStatusError}
-				icon={TriangleAlert}
-				title="Build unavailable"
-			/>
-		);
-	}
-
 	if (pending) {
 		return (
 			<Status
 				dataUi="EditorBuildActionStatus"
-				description="Validating the committed project and creating its Arkpack."
+				description="Validating the saved project and creating its Arkpack."
 				icon={LoaderCircle}
 				iconSpin
-				title={`Building Version v${version}`}
+				title={`Building v${version}`}
 			/>
 		);
 	}
@@ -61,7 +48,7 @@ export const EditorBuildStatus = ({
 					</PrimaryButton>
 				}
 				dataUi="EditorBuildActionStatus"
-				description={`Fix the blocking findings below, commit the project, then build Version v${version} again.`}
+				description={`Fix the blocking findings below, then build v${version} again.`}
 				icon={TriangleAlert}
 				title="Build blocked by validation"
 			/>
@@ -107,11 +94,11 @@ export const EditorBuildStatus = ({
 			dataUi="EditorBuildActionStatus"
 			description={
 				stale
-					? `The previous Build is out of date. Build Version v${version} to replace it.`
-					: `Validate Version v${version} and create an Arkpack ready to install or save.`
+					? `The previous Build is out of date. Build v${version} to replace it.`
+					: `Validate the saved project and build v${version} and create an Arkpack ready to install or save.`
 			}
 			icon={PackageCheck}
-			title={stale ? `Build current Version v${version}` : `Build Version v${version}`}
+			title={stale ? `Build current project v${version}` : `Build v${version}`}
 		/>
 	);
 };

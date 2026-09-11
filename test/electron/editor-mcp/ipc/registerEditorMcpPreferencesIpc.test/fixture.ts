@@ -11,7 +11,6 @@ export const createEvent = () => {
 	const sender = new EventEmitter() as WebContents;
 	Object.assign(sender, {
 		isDestroyed: vi.fn(() => false),
-		postMessage: vi.fn(),
 	});
 	return {
 		event: {

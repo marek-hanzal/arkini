@@ -9,7 +9,8 @@ import {
 } from "./useEditorBuildArtifactController";
 import { useEditorBuildInstallController } from "./useEditorBuildInstallController";
 import { useEditorBuildSaveController } from "./useEditorBuildSaveController";
-import { useProjectVersionStatus } from "~/project-version/ui/useProjectVersionStatus";
+import { useState } from "react";
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 
 type EditorBuildStatus = "building" | "not-built" | "stale" | "valid";
 
@@ -21,7 +22,6 @@ export namespace useEditorBuildController {
 		readonly buildPending: boolean;
 		readonly buildStatus: EditorBuildStatus;
 		readonly canBuild: boolean;
-		readonly commitRequired?: boolean;
 		readonly cancelInstallFn: () => void;
 		readonly confirmInstallFn: () => void;
 		readonly dismissValidationFn: () => void;
@@ -34,7 +34,11 @@ export namespace useEditorBuildController {
 		readonly installPending: boolean;
 		readonly installedPackageId?: string;
 		readonly project: Project;
-		readonly versionStatusError?: string;
+		readonly version: VersionPartsSchema.Type;
+		readonly versionError?: string;
+		readonly setMajorFn: (value: number) => void;
+		readonly setMinorFn: (value: number) => void;
+		readonly setSuffixFn: (value: string) => void;
 		readonly saveArtifactFn: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;
@@ -45,12 +49,21 @@ export namespace useEditorBuildController {
 /** Composes build, external save, and installation without duplicating artifact truth. */
 export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const project = useEditorProject();
-	const versionState = useProjectVersionStatus(project.projectId);
-	const versionStatus = versionState.status === "ready" ? versionState.versionStatus : undefined;
-	const canBuild =
-		versionStatus?.currentBaseVersionId !== undefined && versionStatus.dirty === false;
+	const [draft, setDraftFn] = useState({
+		projectId: project.projectId,
+		version: project.version,
+	});
+	const version = draft.projectId === project.projectId ? draft.version : project.version;
+	if (draft.projectId !== project.projectId)
+		setDraftFn({
+			projectId: project.projectId,
+			version: project.version,
+		});
+	const validated = VersionPartsSchema.safeParse(version);
+	const canBuild = validated.success;
 	const artifactController = useEditorBuildArtifactController({
 		canBuild,
+		version,
 		project,
 	});
 	const saveController = useEditorBuildSaveController({
@@ -58,7 +71,6 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	});
 	const installController = useEditorBuildInstallController({
 		artifact: artifactController.artifact,
-		targetVersion: project.version,
 	});
 
 	return {
@@ -79,21 +91,44 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		installError: installController.installError,
 		installPending: installController.installPending,
 		installedPackageId: installController.installedPackageId,
-		...(versionStatus === undefined
-			? {}
-			: {
-					commitRequired:
-						versionStatus.currentBaseVersionId === undefined || versionStatus.dirty,
-				}),
+
 		project,
 		saveArtifactFn: saveController.saveArtifactFn,
 		saveError: saveController.saveError,
 		savePending: saveController.savePending,
 		validationVisible: artifactController.validationVisible,
-		...(versionState.status === "error"
-			? {
-					versionStatusError: versionState.message,
-				}
-			: {}),
+		version,
+		versionError: validated.success
+			? undefined
+			: "Use non-negative whole numbers and an optional suffix containing letters, digits, dots or hyphens.",
+		setMajorFn: (major) =>
+			setDraftFn({
+				projectId: project.projectId,
+				version: {
+					...version,
+					major,
+				},
+			}),
+		setMinorFn: (minor) =>
+			setDraftFn({
+				projectId: project.projectId,
+				version: {
+					...version,
+					minor,
+				},
+			}),
+		setSuffixFn: (suffix) =>
+			setDraftFn({
+				projectId: project.projectId,
+				version: {
+					major: version.major,
+					minor: version.minor,
+					...(suffix === ""
+						? {}
+						: {
+								suffix,
+							}),
+				},
+			}),
 	};
 };

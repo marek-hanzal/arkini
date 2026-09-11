@@ -48,19 +48,7 @@ const runEditorMcpFx = Effect.fn("runEditorMcpFx")(function* ({
 				}),
 				(ownership) => ownership.closeFx.pipe(Effect.ignore),
 			);
-			yield* Effect.sync(() =>
-				ownership.setProjectContextFn(projectId, (versionId) =>
-					Effect.gen(function* () {
-						yield* repository.awaitIdleFx;
-						const status = yield* repository.readVersionStatusFx(projectId);
-						yield* repository.checkoutVersionFx({
-							expectedFingerprint: status.currentFingerprint,
-							projectId,
-							versionId,
-						});
-					}),
-				),
-			);
+			yield* Effect.sync(() => ownership.setProjectContextFn(projectId));
 			const local = yield* ownership.startLocalFx;
 			if (local.overview.local.type !== "ready")
 				return yield* Effect.fail(

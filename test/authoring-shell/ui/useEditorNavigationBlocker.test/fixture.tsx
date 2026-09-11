@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 // @vitest-environment jsdom
 
 import { RegistryContext } from "@effect/atom-react";
@@ -14,12 +15,10 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 
-import { bootstrapEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/bootstrapEditorMcpVersionCheckoutFx";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { useEditorNavigationBlocker } from "~/authoring-shell/ui/useEditorNavigationBlocker";
 import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
-import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import {
 	ProjectWriteAdmission,
 	type ProjectWriteAdmissionService,
@@ -54,7 +53,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 	const project = {
 		projectId: "project-one",
 		title: editorTestPayload.config.meta.title,
-		version: editorTestPayload.version,
+		version: parseVersionFn(editorTestPayload.version),
 		createdAtMs: 1,
 		updatedAtMs: 2,
 		revision: 2,
@@ -68,7 +67,6 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 	const writeFx = Deferred.succeed(writeStarted, undefined).pipe(
 		Effect.andThen(Deferred.await(writeGate)),
 	);
-	const checkoutVersionFx = vi.fn(() => writeFx);
 	const { rendererRuntime, atomRegistry } = createTestRendererRuntime({
 		createResourceFx: () => Effect.never,
 		editorProjectRepository: {
@@ -81,15 +79,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 			replaceResourceFx: () => Effect.die("Unexpected resource write."),
 			upsertItemFx: () => Effect.die("Unexpected item write."),
 			upsertResourcesFx: () => Effect.die("Unexpected resource write."),
-			checkoutVersionFx,
 			readProjectFx: () => Effect.succeed(project),
-			readVersionStatusFx: () =>
-				Effect.succeed({
-					canCommit: true,
-					currentFingerprint: "a".repeat(64),
-					dirty: true,
-					versionCount: 1,
-				}),
 		},
 	});
 	const refreshProjectFn = vi.fn(async () => {
@@ -120,7 +110,6 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 		syncFx,
 		publishFx: () => Effect.void,
 		advanceNoopFx: () => Effect.void,
-		replaceFx: () => Effect.void,
 		shutdownFx: Effect.void,
 		releaseCurrentFx: Deferred.succeed(releaseStarted, undefined).pipe(
 			Effect.andThen(Deferred.await(releaseGate)),
@@ -139,7 +128,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 		loader: ({ params }) =>
 			params.projectId === "project-two" ? navigationLoader?.() : undefined,
 	});
-	const leaf = (path: "draft" | "versions/history") =>
+	const leaf = (path: "draft") =>
 		createRoute({
 			getParentRoute: () => editor,
 			path,
@@ -149,7 +138,6 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 		routeTree: rootRoute.addChildren([
 			editor.addChildren([
 				leaf("draft"),
-				leaf("versions/history"),
 			]),
 		]),
 		history: createMemoryHistory({
@@ -184,26 +172,8 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 			),
 		),
 	);
-	let checkout:
-		| ((request: { projectId: string; versionId: string }) => Promise<void>)
-		| undefined;
-	rendererRuntime.runSync(
-		bootstrapEditorMcpVersionCheckoutFx({
-			editorMcp: {
-				onVersionCheckoutRequestedFn: (listener) => {
-					checkout = listener;
-					return () => undefined;
-				},
-			},
-			rendererRuntime,
-			router: router as unknown as Pick<ArkiniRouter, "navigate" | "state">,
-		}),
-	);
-	if (checkout === undefined) throw new Error("Expected checkout handler.");
 	return {
-		checkout,
 		admission,
-		checkoutVersionFx,
 		project,
 		refreshProjectFn,
 		releaseGate,

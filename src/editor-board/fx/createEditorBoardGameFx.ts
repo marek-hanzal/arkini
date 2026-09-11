@@ -10,28 +10,20 @@ import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { startFx } from "~/game-start/fx/startFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
-import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 
 export namespace createEditorBoardGameFx {
 	export interface Props {
 		readonly project: Project;
-		readonly state?: StateSchema.Type;
 	}
 }
 
 /** Creates one fresh canonical game session without any durable save capability. */
 export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(function* ({
 	project,
-	state,
 }: createEditorBoardGameFx.Props) {
 	const session = yield* createGameSessionFx({
 		config: project.config,
-		...(state === undefined
-			? {}
-			: {
-					state,
-				}),
 	});
 	let resourceUrls: GameResourceUrls | undefined;
 	const discardFailedBootstrapFx = discardGameBootstrapFx(
@@ -44,7 +36,7 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			owner: "Editor game",
 			resources: project.resources,
 		});
-		if (state === undefined) yield* session.runFx(startFx());
+		yield* session.runFx(startFx());
 		yield* session.runFx(
 			setCheatEnabledFx({
 				enabled: true,
@@ -56,7 +48,7 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			projectId: project.projectId,
 			projectRevision: project.revision,
 			config: project.config,
-			restored: state !== undefined,
+			restored: false,
 			runRendererEffectFn: Effect.runSync,
 			session,
 		});

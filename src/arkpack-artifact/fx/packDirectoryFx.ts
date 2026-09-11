@@ -1,10 +1,11 @@
-import { randomUUID } from "node:crypto";
-import { promisify } from "node:util";
+import { createHash, randomUUID } from "node:crypto";
+import { isDeepStrictEqual, promisify } from "node:util";
 import { gzip } from "node:zlib";
 import { FileSystem, Path } from "effect";
 import { Effect, Exit } from "effect";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
 import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
@@ -41,6 +42,28 @@ const writeSyncedFileFx = Effect.fn("packDirectoryFx.writeSyncedFileFx")(functio
 	);
 });
 
+const readSourceSnapshotFx = Effect.fn("packDirectoryFx.readSourceSnapshotFx")(function* (
+	input: string,
+) {
+	const fileSystem = yield* FileSystem.FileSystem;
+	const files = yield* collectSourceFilesFx({
+		input,
+	});
+	return yield* Effect.forEach(
+		[
+			...files.json,
+			...files.png,
+		],
+		(source) =>
+			fileSystem.readFile(source).pipe(
+				Effect.map((bytes) => ({
+					source,
+					hash: createHash("sha256").update(bytes).digest("hex"),
+				})),
+			),
+	);
+});
+
 /** Compiles, validates, and atomically publishes one canonical project build directory. */
 const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* ({
 	assertCurrentFx,
@@ -48,6 +71,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 }: packDirectoryFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
+	const sourceSnapshot = yield* readSourceSnapshotFx(input);
 	const compilation = yield* compileGameDirectoryFx({
 		input,
 	});
@@ -84,6 +108,11 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 
 	yield* Effect.gen(function* () {
 		if (assertCurrentFx !== undefined) yield* assertCurrentFx;
+		const currentSources = yield* readSourceSnapshotFx(input);
+		if (!isDeepStrictEqual(sourceSnapshot, currentSources))
+			return yield* Effect.fail(
+				new Error("The saved project sources changed while the build was prepared."),
+			);
 		yield* fileSystem.makeDirectory(pending);
 		const stagedArkpack = path.join(pending, filename);
 		yield* writeSyncedFileFx(stagedArkpack, arkpack);

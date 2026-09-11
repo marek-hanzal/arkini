@@ -21,8 +21,9 @@ import { readProjectFilesFx } from "./readProjectFilesFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
-import { createVersionReaderFx } from "./createVersionReaderFx";
-import { readVersionSnapshotFx } from "~/project-version/fx/readVersionSnapshotFx";
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
+import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
+import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
 
 class EditorProjectBuildOperationError extends Data.TaggedError(
 	"EditorProjectBuildOperationError",
@@ -63,7 +64,7 @@ const relativeDiagnosticProvenanceFn = (
 };
 
 const filesystemFailureMessageFn = (
-	operation: "build-project" | "read-project-build",
+	operation: "build-project" | "read-project-build" | "save-build-version",
 	cause: FilesystemWriteError,
 ) => {
 	const action = operation === "build-project" ? "published" : "read";
@@ -73,7 +74,7 @@ const filesystemFailureMessageFn = (
 };
 
 const createBuildErrorFn = (
-	operation: "build-project" | "read-project-build",
+	operation: "build-project" | "read-project-build" | "save-build-version",
 	message: string,
 	cause?: unknown,
 ) =>
@@ -98,7 +99,7 @@ const createBuildErrorFn = (
 const assertRevisionFx = (
 	state: ProjectState,
 	expectedRevision: number,
-	operation: "build-project" | "read-project-build",
+	operation: "build-project" | "read-project-build" | "save-build-version",
 ) =>
 	state.project.revision === expectedRevision
 		? Effect.void
@@ -113,6 +114,7 @@ export namespace createBuildOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
+		readonly states: Map<string, ProjectState>;
 		readonly readStateFx: (
 			projectId: string,
 		) => Effect.Effect<ProjectState, ProjectRepositoryError, never>;
@@ -124,6 +126,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 	filesystemWrite,
 	operations,
 	readStateFx,
+	states,
 }: createBuildOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
@@ -134,86 +137,116 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
-	const { readCurrentSnapshotFx, readHeadFx, readPublishedVersionFx } =
-		yield* createVersionReaderFx({
-			readStateFx,
-		});
-	const assertCommittedHeadFx = Effect.fn("assertProjectCommittedHeadFx")(function* (
-		state: ProjectState,
-	) {
-		const head = yield* readHeadFx(state);
-		if (head === undefined)
-			return yield* Effect.fail(
-				new EditorProjectBuildOperationError({
-					message: "Commit the initial project version before building.",
-				}),
-			);
-		const current = yield* readCurrentSnapshotFx(state.project.projectId);
-		const published = yield* readPublishedVersionFx(state, head.current);
-		if (published.descriptor.contentFingerprint !== current.contentFingerprint)
-			return yield* Effect.fail(
-				new EditorProjectBuildOperationError({
-					message: "Commit the saved project changes before building.",
-				}),
-			);
-		return published;
-	});
+	const assertCurrentFx = (state: ProjectState) =>
+		readProjectFilesFx(state.paths.root).pipe(
+			Effect.mapError(projectChangedBeforeBuildFn),
+			Effect.filterOrFail(
+				(files) =>
+					files.marker.revision === state.project.revision &&
+					isDeepStrictEqual(files.arkpack, state.project.version) &&
+					isDeepStrictEqual(files.config, state.project.config) &&
+					isDeepStrictEqual(files.resources, state.project.resources),
+				projectChangedBeforeBuildFn,
+			),
+			Effect.asVoid,
+		);
+
+	const saveBuildVersionFx: EditorBuildRepositoryService["saveBuildVersionFx"] = ({
+		projectId,
+		expectedRevision,
+		version: candidateVersion,
+	}) =>
+		operations.withPermits(1)(
+			Effect.gen(function* () {
+				const version = yield* Effect.try(() => VersionPartsSchema.parse(candidateVersion));
+				const state = yield* readStateFx(projectId);
+				yield* assertRevisionFx(state, expectedRevision, "save-build-version");
+				return yield* providePlatformFx(
+					withProjectLockFx(
+						filesystemWrite,
+						state.paths.root,
+						Effect.gen(function* () {
+							const source = yield* fileSystem.readFileString(state.paths.gameFile);
+							yield* assertCurrentFx(state);
+							if (isDeepStrictEqual(version, state.project.version))
+								return VersionPartsSchema.parse(version);
+							const game = yield* Effect.try(() =>
+								GameFileSchema.parse(JSON.parse(source)),
+							);
+							// Version metadata and its in-memory projection settle together without a gameplay revision.
+							return yield* Effect.uninterruptible(
+								Effect.gen(function* () {
+									yield* writeProjectFileSetFx({
+										filesystemWrite,
+										root: state.paths.root,
+										planFx: Effect.succeed({
+											writes: [
+												{
+													target: state.paths.gameFile,
+													bytes: new TextEncoder().encode(
+														`${JSON.stringify(
+															{
+																...game,
+																version,
+															},
+															undefined,
+															"\t",
+														)}\n`,
+													),
+												},
+											],
+										}),
+									});
+									states.set(projectId, {
+										...state,
+										project: {
+											...state.project,
+											version,
+										},
+									});
+									return VersionPartsSchema.parse(version);
+								}),
+							);
+						}),
+					),
+				);
+			}).pipe(
+				Effect.mapError((cause) =>
+					createBuildErrorFn(
+						"save-build-version",
+						`Build version for Editor project ${projectId} could not be saved.`,
+						cause,
+					),
+				),
+			),
+		);
 
 	const buildProjectFx: EditorBuildRepositoryService["buildProjectFx"] = ({
 		expectedRevision,
+		expectedVersion,
 		projectId,
 	}) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const state = yield* readStateFx(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
-				const publishedHead = yield* assertCommittedHeadFx(state);
+				if (!isDeepStrictEqual(state.project.version, expectedVersion))
+					return yield* Effect.fail(
+						new EditorProjectBuildOperationError({
+							message:
+								"The selected build version changed before the build started. Build again with the current version.",
+						}),
+					);
 				const build = yield* providePlatformFx(
 					withProjectLockFx(
 						filesystemWrite,
 						state.paths.root,
 						Effect.gen(function* () {
-							const headSnapshot = yield* readVersionSnapshotFx({
-								manifest: publishedHead.manifest,
-								root: state.paths.root,
-							}).pipe(
-								Effect.filterOrFail(
-									(snapshot) =>
-										snapshot.contentFingerprint ===
-											publishedHead.descriptor.contentFingerprint &&
-										snapshot.arkpack === publishedHead.descriptor.version,
-									() => new Error("The published Version HEAD is inconsistent."),
-								),
-								Effect.mapError(
-									() =>
-										new EditorProjectBuildOperationError({
-											message: "The published Version HEAD is invalid.",
-										}),
-								),
-							);
-							if (headSnapshot.config.meta.id !== projectId)
-								return yield* Effect.fail(
-									new EditorProjectBuildOperationError({
-										message: "The published Version HEAD is invalid.",
-									}),
-								);
 							yield* ensureProjectGitignoreFx(state.paths);
-							const assertCurrentFx = readProjectFilesFx(state.paths.root).pipe(
-								Effect.mapError(projectChangedBeforeBuildFn),
-								Effect.filterOrFail(
-									(files) =>
-										files.marker.revision === state.project.revision &&
-										files.arkpack === state.project.version &&
-										isDeepStrictEqual(files.config, state.project.config) &&
-										isDeepStrictEqual(files.resources, state.project.resources),
-									projectChangedBeforeBuildFn,
-								),
-								Effect.asVoid,
-							);
-							yield* assertCurrentFx;
+							yield* assertCurrentFx(state);
 							return yield* packDirectoryFx({
 								input: state.paths.root,
-								assertCurrentFx,
+								assertCurrentFx: assertCurrentFx(state),
 							}).pipe(
 								Effect.mapError((cause) =>
 									cause instanceof GameValidationError
@@ -243,6 +276,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 					projectId,
 					revision: state.project.revision,
 					contentHash: build.contentHash,
+					version: build.version,
 					size: build.bytes,
 					diagnostics: GameDiagnosticsSchema.parse(
 						build.diagnostics.map((diagnostic) =>
@@ -309,6 +343,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 		);
 
 	return {
+		saveBuildVersionFx,
 		buildProjectFx,
 		readProjectBuildFx,
 	};

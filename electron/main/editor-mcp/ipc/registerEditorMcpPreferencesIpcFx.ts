@@ -9,7 +9,6 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import type { ServerOwnership } from "~/authoring-mcp/http/createEditorMcpOwnershipFx";
-import { requestVersionCheckoutFx } from "./requestVersionCheckoutFx";
 
 let registered = false;
 
@@ -86,12 +85,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 							Effect.tap((projectId) =>
 								Effect.sync(() => {
 									watchProjectContextSenderFn(event.sender);
-									ownership.setProjectContextFn(projectId, (versionId) =>
-										requestVersionCheckoutFx(event.sender, {
-											projectId,
-											versionId,
-										}),
-									);
+									ownership.setProjectContextFn(projectId);
 								}),
 							),
 							Effect.asVoid,

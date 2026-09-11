@@ -23,7 +23,10 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 const project = {
 	projectId: "project-one",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 9,
 	revision: 9,
@@ -49,7 +52,6 @@ const runRefresh = async (
 		publishFx: (nextProject) =>
 			Effect.sync(() => events.push(`board-publish-${nextProject.revision}`)),
 		advanceNoopFx: () => Effect.void,
-		replaceFx: () => Effect.void,
 		releaseCurrentFx: Effect.sync(() => events.push("board-release")),
 		shutdownFx: Effect.void,
 	} satisfies EditorBoardGameResource;
@@ -189,7 +191,7 @@ describe("refreshEditorProjectFx", () => {
 	it("reports replacement ownership collisions without touching mounted state", async () => {
 		const writeAdmission = Effect.runSync(createProjectWriteAdmissionFx);
 		const releaseFx = Effect.runSync(
-			writeAdmission.acquireReplacementFx("checkout-version", () => false),
+			writeAdmission.acquireReplacementFx("rename-project", () => false),
 		);
 		try {
 			const result = await runRefresh("same", writeAdmission);

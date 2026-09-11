@@ -32,7 +32,10 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 const project = {
 	projectId: "project-one",
 	title: "Project one",
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 3,

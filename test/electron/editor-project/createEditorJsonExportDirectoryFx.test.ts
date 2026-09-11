@@ -48,6 +48,10 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			);
 			for (const excluded of [
 				"build",
+				"versions",
+				"objects",
+				"scenarios",
+				".git",
 				"game.json.tmp",
 				"unrelated.json",
 				".gitignore",

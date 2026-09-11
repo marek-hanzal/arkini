@@ -37,10 +37,7 @@ export namespace createHttpListenerOwnershipFx {
 		readonly notifyProjectChangedFn: (projectId: string) => void;
 		readonly storage: Pick<McpStorage, "readPortFx">;
 		readonly readProjectContextFn: () => string | undefined;
-		readonly requestVersionCheckoutFx: (
-			projectId: string,
-			versionId: string,
-		) => Effect.Effect<void, unknown, never>;
+
 		readonly runPromiseFn: <Value, Error>(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
@@ -67,7 +64,6 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 	notifyProjectChangedFn,
 	storage,
 	readProjectContextFn,
-	requestVersionCheckoutFx,
 	runPromiseFn,
 }: createHttpListenerOwnershipFx.Props) {
 	let localEnabled = false;
@@ -112,7 +108,6 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 			notifyProjectChangedFn,
 			readProjectContextFn,
 			repository: editor.repository,
-			requestVersionCheckoutFx,
 			runPromiseFn,
 		});
 		const handler = createMcpHandler(factory.create);

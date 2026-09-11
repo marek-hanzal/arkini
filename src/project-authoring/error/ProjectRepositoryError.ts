@@ -5,29 +5,21 @@ import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/Game
 export type ProjectRepositoryOperation =
 	| "await-idle"
 	| "build-project"
-	| "checkout-version"
-	| "create-version"
+	| "save-build-version"
 	| "create-project"
 	| "create-note"
 	| "delete-project"
 	| "delete-item"
 	| "delete-resource"
 	| "delete-note"
-	| "delete-board-scenario"
-	| "diff-versions"
 	| "export-json-directory"
 	| "import-json-directory"
-	| "list-board-scenarios"
 	| "list-notes"
 	| "list-projects"
-	| "list-versions"
 	| "open-project-directory"
 	| "optimize-resources"
-	| "preview-version-commit"
 	| "read-project"
 	| "read-project-build"
-	| "read-version-status"
-	| "read-board-scenario"
 	| "replace-config"
 	| "replace-resource"
 	| "refresh-project"
@@ -35,9 +27,7 @@ export type ProjectRepositoryOperation =
 	| "save-project-build"
 	| "upsert-item"
 	| "upsert-resource"
-	| "update-version-tag"
-	| "update-note"
-	| "write-board-scenario";
+	| "update-note";
 
 /** One canonical editor-project repository operation failed. */
 export class ProjectRepositoryError extends Data.TaggedError("EditorProjectRepositoryError")<{

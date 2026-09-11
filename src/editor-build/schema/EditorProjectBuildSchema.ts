@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VersionSchema } from "~/game-version/schema/VersionSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
@@ -6,6 +7,7 @@ import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagn
 export const EditorProjectBuildSchema = z
 	.object({
 		projectId: IdSchema,
+		version: VersionSchema,
 		revision: z.number().int().nonnegative(),
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
 		size: z.number().int().nonnegative(),

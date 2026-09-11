@@ -81,29 +81,6 @@ const reportChatGptState = (state: { readonly type: "loading" | "ready" }) => {
 	handler(undefined, state);
 };
 
-const requestEditorMcpVersionCheckout = async (request: {
-	readonly projectId: string;
-	readonly versionId: string;
-}) => {
-	const handler = electron.handlers.get(
-		ArkiniElectronContract.channels.editorMcpVersionCheckoutRequest,
-	);
-	if (handler === undefined) throw new Error("Expected MCP version checkout listener.");
-	const port = {
-		close: vi.fn(),
-		postMessage: vi.fn(),
-	};
-	await handler(
-		{
-			ports: [
-				port,
-			],
-		},
-		request,
-	);
-	return port;
-};
-
 describe("Electron preload lifecycle", () => {
 	beforeEach(() => {
 		electron.reset();
@@ -227,25 +204,6 @@ describe("Electron preload lifecycle", () => {
 		});
 
 		expect(listener).toHaveBeenCalledExactlyOnceWith(progress);
-	});
-
-	it("returns renderer MCP version checkout completion through its private port", async () => {
-		const api = await loadPreload();
-		const listener = vi.fn(() => Promise.resolve());
-		const unsubscribe = api.editorMcp.onVersionCheckoutRequestedFn(listener);
-		const request = {
-			projectId: "project-one",
-			versionId: "version-one",
-		};
-
-		const port = await requestEditorMcpVersionCheckout(request);
-
-		expect(listener).toHaveBeenCalledExactlyOnceWith(request);
-		expect(port.postMessage).toHaveBeenCalledWith({
-			type: "success",
-		});
-		expect(port.close).toHaveBeenCalledOnce();
-		unsubscribe();
 	});
 
 	it("shares one pending native close request", async () => {

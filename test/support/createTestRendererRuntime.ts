@@ -60,6 +60,7 @@ const UnavailableEditorProjectRepository: ProjectRepositoryService = {
 const UnavailableEditorBuildRepository: EditorBuildRepositoryService = {
 	buildProjectFx: () => Effect.die("This test did not provide an Editor Build repository."),
 	readProjectBuildFx: () => Effect.die("This test did not provide an Editor Build repository."),
+	saveBuildVersionFx: () => Effect.die("This test did not provide an Editor Build repository."),
 };
 
 /** Creates one isolated renderer runtime with fresh Atom and Game lifecycle authorities. */

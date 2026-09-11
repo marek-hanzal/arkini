@@ -1,14 +1,15 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { Effect } from "effect";
 import { vi } from "vitest";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const editorProjectIpcDescriptor = {
 	projectId: "project-one",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: parseVersionFn(editorTestPayload.version),
 	createdAtMs: 1,
 	updatedAtMs: 2,
 };
@@ -28,21 +29,12 @@ export const editorProjectIpcProject = {
 };
 
 export const editorProjectIpcBuild = {
+	version: formatVersionFn(editorProjectIpcProject.version),
 	projectId: editorProjectIpcProject.projectId,
 	revision: editorProjectIpcProject.revision,
 	contentHash: "a".repeat(64),
 	size: 3,
 	diagnostics: [],
-};
-
-export const editorProjectIpcVersion = {
-	arkini: ArkiniAppVersion,
-	arkpackVersion: editorProjectIpcProject.version,
-	createdAtMs: 3,
-	projectId: editorProjectIpcProject.projectId,
-	sourceRevision: editorProjectIpcProject.revision,
-	subject: "Initial version",
-	versionId: "version-one",
 };
 
 export const editorProjectIpcNote = {
@@ -58,10 +50,9 @@ export const editorProjectIpcNote = {
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
 export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
+	saveBuildVersionFx: vi.fn(({ version }) => Effect.succeed(version)),
 	buildProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcBuild)),
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	createVersionFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
-	checkoutVersionFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
 	createNoteFx: vi.fn(({ projectId, content, itemUids, resourceIds }) =>
 		Effect.succeed({
@@ -96,17 +87,6 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 			}),
 		),
 	),
-	diffVersionsFx: vi.fn(({ from, to }) =>
-		Effect.succeed({
-			from,
-			to,
-			hasChanges: false,
-			project: [],
-			items: [],
-			resources: [],
-			scenarios: [],
-		}),
-	),
 	listProjectsFx: Effect.succeed([
 		{
 			type: "valid" as const,
@@ -117,11 +97,6 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	listNotesFx: vi.fn(() =>
 		Effect.succeed([
 			editorProjectIpcNote,
-		]),
-	),
-	listVersionsFx: vi.fn(() =>
-		Effect.succeed([
-			editorProjectIpcVersion,
 		]),
 	),
 	openProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
@@ -137,30 +112,11 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	),
 	readProjectRootFx: vi.fn(() => Effect.succeed("/editor/project-one")),
 	refreshProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	readVersionStatusFx: vi.fn(() =>
-		Effect.succeed({
-			canCommit: true,
-			currentFingerprint: "fingerprint",
-			dirty: true,
-			versionCount: 0,
-		}),
-	),
-	previewVersionCommitFx: vi.fn(() =>
-		Effect.succeed({
-			bump: "noop" as const,
-			canCommit: true,
-			currentFingerprint: "fingerprint",
-			initial: true,
-			nextArkpackVersion: "1.0",
-			scenariosToDelete: [],
-		}),
-	),
 	replaceConfigFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	saveResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	updateVersionTagFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
 	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids, resourceIds }) =>
 		Effect.succeed({
 			...editorProjectIpcNote,
@@ -176,19 +132,5 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 			updatedAtMs: 5,
 		}),
 	),
-	listBoardScenariosFx: vi.fn(() => Effect.succeed([])),
-	readBoardScenarioFx: vi.fn(() => Effect.succeed(null)),
-	writeBoardScenarioFx: vi.fn(({ projectId, name, bytes }) =>
-		Effect.succeed({
-			projectId,
-			name,
-			projectRevision: editorProjectIpcProject.revision,
-			version: editorProjectIpcProject.version,
-			bytes,
-			createdAtMs: 3,
-			updatedAtMs: 3,
-		}),
-	),
-	deleteBoardScenarioFx: vi.fn(() => Effect.void),
 	closeFx: Effect.void,
 });

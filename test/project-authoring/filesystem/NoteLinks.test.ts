@@ -21,10 +21,9 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("repository note item relationships", () => {
-	it("persists UID links across authored-ID rename and freshness-guarded unlink without changing Versions", async () => {
+	it("persists UID links across authored-ID rename and freshness-guarded unlink without changing authoring revision", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
-		const status = await Effect.runPromise(repository.readVersionStatusFx(project.projectId));
 		const created = await Effect.runPromise(
 			repository.createNoteFx({
 				projectId: project.projectId,
@@ -34,9 +33,6 @@ describe("repository note item relationships", () => {
 				],
 				resourceIds: [],
 			}),
-		);
-		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(
-			status,
 		);
 		expect(
 			(await Effect.runPromise(repository.readProjectFx(project.projectId)))?.revision,

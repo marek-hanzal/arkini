@@ -4,7 +4,10 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 export const boardSpaceProject = {
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 0,

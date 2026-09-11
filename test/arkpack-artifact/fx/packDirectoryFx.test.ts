@@ -212,6 +212,46 @@ describe("packDirectoryFx game-project contract", () => {
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
+	for (const change of [
+		"JSON bytes",
+		"PNG bytes",
+		"source membership",
+	] as const) {
+		it.effect(`preserves the previous artifact when ${change} changes during packing`, () =>
+			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
+				const path = yield* Path.Path;
+				const input = yield* writeGameProjectFixtureFx();
+				const previous = yield* packDirectoryFx({
+					input,
+				});
+				const previousBytes = yield* fileSystem.readFile(previous.arkpack);
+				const mutation =
+					change === "JSON bytes"
+						? fileSystem.writeFileString(path.join(input, "game.json"), "{}")
+						: change === "PNG bytes"
+							? fileSystem.writeFile(
+									path.join(input, "assets", "item-water.png"),
+									png,
+								)
+							: fileSystem.writeFile(path.join(input, "assets", "extra.png"), png);
+				const result = yield* Effect.result(
+					packDirectoryFx({
+						input,
+						assertCurrentFx: mutation,
+					}),
+				);
+				expect(result).toMatchObject({
+					_tag: "Failure",
+					failure: {
+						message: "The saved project sources changed while the build was prepared.",
+					},
+				});
+				expect(yield* fileSystem.readFile(previous.arkpack)).toEqual(previousBytes);
+			}).pipe(Effect.provide(NodeServices.layer)),
+		);
+	}
+
 	it.effect("serializes concurrent project builds before the freshness assertion", () =>
 		Effect.gen(function* () {
 			const input = yield* writeGameProjectFixtureFx();

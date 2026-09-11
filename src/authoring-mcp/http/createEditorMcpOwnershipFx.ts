@@ -27,10 +27,7 @@ export interface ServerOwnership {
 	readonly stopRemoteFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
 	readonly resetRemoteAuthFx: Effect.Effect<EditorMcpCommandResultSchema.Type, unknown, never>;
 	readonly readProjectContextFn: () => string | undefined;
-	readonly setProjectContextFn: (
-		projectId: string,
-		requestVersionCheckoutFx?: (versionId: string) => Effect.Effect<void, unknown, never>,
-	) => void;
+	readonly setProjectContextFn: (projectId: string) => void;
 	readonly clearProjectContextFn: (projectId: string) => void;
 	readonly resetProjectContextFn: () => void;
 	readonly closeFx: Effect.Effect<void, unknown, never>;
@@ -78,22 +75,12 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	};
 	let tunnelSession: McpTunnelSession | undefined;
 	let projectContext: string | undefined;
-	let versionCheckoutRequestFx:
-		| ((versionId: string) => Effect.Effect<void, unknown, never>)
-		| undefined;
 	const commandLock = yield* Semaphore.make(1);
 	const httpListener = yield* createHttpListenerOwnershipFx({
 		editor,
 		notifyProjectChangedFn,
 		storage,
 		readProjectContextFn: () => projectContext,
-		requestVersionCheckoutFx: (projectId, versionId) => {
-			if (projectContext !== projectId || versionCheckoutRequestFx === undefined)
-				return Effect.fail(
-					new Error("The open editor renderer is unavailable for version checkout."),
-				);
-			return versionCheckoutRequestFx(versionId);
-		},
 		runPromiseFn,
 	});
 
@@ -344,18 +331,15 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 		stopRemoteFx,
 		resetRemoteAuthFx,
 		readProjectContextFn: () => projectContext,
-		setProjectContextFn: (projectId, requestVersionCheckoutFx) => {
+		setProjectContextFn: (projectId) => {
 			projectContext = projectId;
-			versionCheckoutRequestFx = requestVersionCheckoutFx;
 		},
 		clearProjectContextFn: (projectId) => {
 			if (projectContext !== projectId) return;
 			projectContext = undefined;
-			versionCheckoutRequestFx = undefined;
 		},
 		resetProjectContextFn: () => {
 			projectContext = undefined;
-			versionCheckoutRequestFx = undefined;
 		},
 		closeFx,
 		closeSyncFn: () => {

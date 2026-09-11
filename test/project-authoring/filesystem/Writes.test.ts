@@ -19,17 +19,11 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project writes", () => {
-	it("rekeys a renamed package and starts its next Version history at a new root", async () => {
+	it("rekeys a renamed package while preserving its version and Notes", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository);
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		if (root === null) throw new Error("Managed project root missing.");
-		await Effect.runPromise(
-			repository.createVersionFx({
-				projectId: created.projectId,
-				subject: "Initial",
-			}),
-		);
 		await Effect.runPromise(
 			repository.createNoteFx({
 				itemUids: [],
@@ -59,7 +53,6 @@ describe("filesystem Editor project writes", () => {
 		expect(await Effect.runPromise(repository.readProjectFx(created.projectId))).toBeNull();
 		expect(await Effect.runPromise(repository.readProjectRootFx(created.projectId))).toBeNull();
 		expect(await Effect.runPromise(repository.readProjectRootFx("project-renamed"))).toBe(root);
-		expect(await Effect.runPromise(repository.listVersionsFx("project-renamed"))).toEqual([]);
 		expect(await Effect.runPromise(repository.listNotesFx("project-renamed"))).toEqual([
 			expect.objectContaining({
 				content: "Keep this note",
@@ -70,7 +63,6 @@ describe("filesystem Editor project writes", () => {
 
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
-		expect(await Effect.runPromise(reopened.listVersionsFx("project-renamed"))).toEqual([]);
 		expect(await Effect.runPromise(reopened.readProjectFx("project-renamed"))).toMatchObject({
 			projectId: "project-renamed",
 			version: created.version,
@@ -147,7 +139,7 @@ describe("filesystem Editor project writes", () => {
 		);
 	});
 
-	it("pins config, item, and resource writes while preserving the committed version", async () => {
+	it("pins config, item, and resource writes while preserving the selected build version", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository);
 		const compatible = await Effect.runPromise(
@@ -164,7 +156,10 @@ describe("filesystem Editor project writes", () => {
 				},
 			}),
 		);
-		expect(compatible.version).toBe("1.0");
+		expect(compatible.version).toEqual({
+			major: 1,
+			minor: 0,
+		});
 		expect(compatible.config.$schema).toBe(GameProjectGameSchemaReference);
 
 		const water = editorTestPayload.config.items.water;
@@ -178,7 +173,10 @@ describe("filesystem Editor project writes", () => {
 				},
 			}),
 		);
-		expect(itemCommit.version).toBe("1.0");
+		expect(itemCommit.version).toEqual({
+			major: 1,
+			minor: 0,
+		});
 		await expect(
 			Effect.runPromise(
 				repository.upsertItemFx({
@@ -206,7 +204,10 @@ describe("filesystem Editor project writes", () => {
 			}),
 		);
 		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual(resource);
-		expect(resourceCommit.version).toBe("1.0");
+		expect(resourceCommit.version).toEqual({
+			major: 1,
+			minor: 0,
+		});
 		await expect(
 			Effect.runPromise(
 				repository.saveResourceFx({

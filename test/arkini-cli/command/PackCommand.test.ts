@@ -12,7 +12,7 @@ const execFileAsync = promisify(execFile);
 let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-cli-pack-head-");
+	harness = await createProjectTestHarness("arkini-cli-pack-current-");
 });
 
 afterEach(async () => harness.close());
@@ -48,7 +48,7 @@ const runValidate = (root: string) =>
 	);
 
 describe("game pack CLI", () => {
-	it("builds the exact clean Version HEAD and rejects later saved changes", async () => {
+	it("builds the current project directly before and after saved changes", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "cli-pack-head");
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -56,19 +56,9 @@ describe("game pack CLI", () => {
 		await expect(runValidate(root)).resolves.toMatchObject({
 			stdout: expect.stringContaining("Validated"),
 		});
-		const status = await Effect.runPromise(repository.readVersionStatusFx(project.projectId));
-		const version = await Effect.runPromise(
-			repository.createVersionFx({
-				expectedFingerprint: status.currentFingerprint,
-				projectId: project.projectId,
-				subject: "Initial",
-			}),
-		);
 
 		const built = await runPack(root);
-		expect(built.stdout).toContain(
-			`Building Version HEAD ${version.versionId} (Arkpack v1.0).`,
-		);
+		expect(built.stdout).toContain("Building Arkpack v1.0.");
 
 		await Effect.runPromise(
 			repository.replaceConfigFx({
@@ -83,15 +73,6 @@ describe("game pack CLI", () => {
 				projectId: project.projectId,
 			}),
 		);
-		const rejected = await runPack(root).catch(
-			(cause: unknown) =>
-				cause as {
-					readonly stderr: string;
-					readonly stdout: string;
-				},
-		);
-		expect(`${rejected.stdout}${rejected.stderr}`).toContain(
-			"Commit the saved project changes before building.",
-		);
+		expect((await runPack(root)).stdout).toContain("Building Arkpack v1.0.");
 	}, 30_000);
 });

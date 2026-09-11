@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -25,7 +26,12 @@ describe("editor MCP note asset links", () => {
 			Effect.runPromise,
 			notifyProjectChangedFn,
 		);
-		const project = await Effect.runPromise(repository.createProjectFx(editorTestPayload));
+		const project = await Effect.runPromise(
+			repository.createProjectFx({
+				...editorTestPayload,
+				version: parseVersionFn(editorTestPayload.version),
+			}),
+		);
 		ownership.setProjectContextFn(project.projectId);
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);

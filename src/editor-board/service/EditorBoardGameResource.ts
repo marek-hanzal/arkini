@@ -3,7 +3,6 @@ import type { Effect, SubscriptionRef } from "effect";
 import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
-import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 export namespace EditorBoardGameResource {
 	export type Resource = GameEngineResource<EditorBoardGame>;
@@ -35,17 +34,11 @@ export interface EditorBoardGameResource {
 	readonly syncFx: (project: Project) => Effect.Effect<void, never, never>;
 	/** Synchronizes a committed revision only while its project still owns the route. */
 	readonly publishFx: (project: Project) => Effect.Effect<void, never, never>;
-	/** Advances a version-noop authoring revision without replacing its game session. */
+	/** Advances a non-gameplay authoring revision without replacing its game session. */
 	readonly advanceNoopFx: (
 		project: Project,
 		expectedPreviousRevision: number,
 	) => Effect.Effect<void, never, never>;
-	/** Replaces only the exact lifecycle snapshot that originated the scenario read. */
-	readonly replaceFx: (
-		project: Project,
-		expected: EditorBoardGameResource.State,
-		state?: StateSchema.Type,
-	) => Effect.Effect<void, unknown, never>;
 	readonly releaseCurrentFx: Effect.Effect<void, unknown, never>;
 	readonly shutdownFx: Effect.Effect<void, never, never>;
 }

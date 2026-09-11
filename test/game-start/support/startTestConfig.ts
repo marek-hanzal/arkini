@@ -19,6 +19,7 @@ const simpleItem = ({
 				`asset:${id}`,
 			],
 		},
+		layer: "content",
 		scope,
 		maxStackSize,
 		type: "simple",
@@ -94,6 +95,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			type: "inventory",
 			title: "Backpack",
 			description: "Backpack",
+			layer: "content",
 			asset: {
 				default: [
 					"asset:backpack",

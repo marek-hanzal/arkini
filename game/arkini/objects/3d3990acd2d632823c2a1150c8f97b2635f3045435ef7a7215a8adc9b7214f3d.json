@@ -1,0 +1,26 @@
+{
+	"uid": "bamumldgmvb0bhq8bkq0koxj",
+	"id": "british-shorthair-kitten",
+	"title": "British Shorthair Kitten",
+	"draft": true,
+	"asset": {
+		"default": [
+			"british-shorthair-kitten"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "mouse"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "british-shorthair-kitten-with-mouse"
+		}
+	],
+	"type": "simple"
+}

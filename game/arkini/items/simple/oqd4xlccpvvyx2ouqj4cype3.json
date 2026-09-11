@@ -12,6 +12,7 @@
 			]
 		},
 		"scope": "any",
+		"layer": "content",
 		"maxStackSize": 12,
 		"merge": [
 			{

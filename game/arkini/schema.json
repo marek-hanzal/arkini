@@ -360,6 +360,14 @@
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
 				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
+				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
@@ -402,6 +410,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"type",
 				"line"
@@ -1754,6 +1763,14 @@
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
 				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
+				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
@@ -1810,6 +1827,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"maxQueueSize",
 				"type"
@@ -1847,6 +1865,14 @@
 				"scope": {
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
+				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
 				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
@@ -1886,6 +1912,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"type"
 			],
@@ -1922,6 +1949,14 @@
 				"scope": {
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
+				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
 				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
@@ -1983,6 +2018,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"type",
 				"space",
@@ -2046,6 +2082,14 @@
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
 				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
+				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
@@ -2102,6 +2146,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"maxQueueSize",
 				"type",
@@ -2140,6 +2185,14 @@
 				"scope": {
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
+				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
 				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
@@ -2183,6 +2236,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"type",
 				"line"
@@ -2220,6 +2274,14 @@
 				"scope": {
 					"description": "The part of game state in which this item may be stored.",
 					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
+				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
 				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
@@ -2263,6 +2325,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"type",
 				"line"
@@ -2304,6 +2367,14 @@
 					"enum": [
 						"board"
 					]
+				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
 				},
 				"maxCount": {
 					"description": "The optional maximum number of this item allowed across the game state.",
@@ -2357,6 +2428,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxStackSize",
 				"type",
 				"durationMs"
@@ -2398,6 +2470,14 @@
 					"enum": [
 						"board"
 					]
+				},
+				"layer": {
+					"type": "string",
+					"enum": [
+						"content",
+						"ground"
+					],
+					"description": "The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage."
 				},
 				"maxCount": {
 					"default": 1,
@@ -2442,6 +2522,7 @@
 				"title",
 				"asset",
 				"scope",
+				"layer",
 				"maxCount",
 				"maxStackSize",
 				"type"

@@ -1,0 +1,48 @@
+{
+	"uid": "szc460rahffy43pnkp44drw7",
+	"id": "honeyed-fruit-pancake-with-cream-and-sugar",
+	"title": "Honeyed Fruit Pancake With Cream And Sugar",
+	"description": "Very nammy",
+	"asset": {
+		"default": [
+			"honeyed-fruit-pancake-with-cream-and-sugar"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "clay-plate",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							},
+							{
+								"itemId": "bio-waste",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

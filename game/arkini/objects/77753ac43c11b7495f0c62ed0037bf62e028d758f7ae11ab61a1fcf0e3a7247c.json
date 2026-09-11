@@ -1,0 +1,39 @@
+{
+	"uid": "fzkyszns4hv8l7fh68o62q00",
+	"id": "feast",
+	"title": "Feast",
+	"description": "Bigger yummi ever. Maybe The Last Dinner.",
+	"asset": {
+		"default": [
+			"feast"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "bio-waste",
+								"quantity": {
+									"min": 1,
+									"max": 2
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

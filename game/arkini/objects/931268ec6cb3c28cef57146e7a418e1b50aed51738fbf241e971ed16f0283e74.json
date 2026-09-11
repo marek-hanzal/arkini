@@ -1,0 +1,15 @@
+{
+	"uid": "atcdihdj87zfj52oagbqxcri",
+	"id": "empty-herb-garden",
+	"title": "Empty Herb Garden",
+	"draft": true,
+	"asset": {
+		"default": [
+			"empty-herb-garden"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

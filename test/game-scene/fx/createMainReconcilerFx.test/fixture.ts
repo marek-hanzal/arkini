@@ -160,6 +160,7 @@ export const createItem = (
 	id,
 	itemId: "water",
 	itemType: "simple",
+	layer: "content" as const,
 	location,
 	primaryAction: {
 		kind: "none",

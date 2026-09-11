@@ -1,0 +1,18 @@
+{
+	"uid": "qxhf92qz2l33xrlpcnfe4tyi",
+	"id": "corrupted-british-shorthair-kitten",
+	"title": "Corrupted British Shorthair Kitten",
+	"draft": true,
+	"asset": {
+		"default": [
+			"corrupted-british-shorthair-kitten"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 6
+	},
+	"type": "simple"
+}

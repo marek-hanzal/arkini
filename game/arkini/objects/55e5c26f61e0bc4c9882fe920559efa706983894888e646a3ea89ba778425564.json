@@ -1,0 +1,15 @@
+{
+	"uid": "qxqafymuxw7keyketjpn9cye",
+	"id": "feather",
+	"title": "Feather",
+	"description": "Piece of arrow. Or piece of writing tool",
+	"asset": {
+		"default": [
+			"feather"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 12,
+	"type": "simple"
+}

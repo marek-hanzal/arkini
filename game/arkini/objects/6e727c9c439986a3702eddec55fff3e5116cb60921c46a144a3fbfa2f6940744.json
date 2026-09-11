@@ -1,0 +1,15 @@
+{
+	"uid": "dail5cu4taoh8pnt293uie0i",
+	"id": "spoiled-chopped-vegetables",
+	"title": "Spoiled Chopped Vegetables",
+	"draft": true,
+	"asset": {
+		"default": [
+			"spoiled-chopped-vegetables"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

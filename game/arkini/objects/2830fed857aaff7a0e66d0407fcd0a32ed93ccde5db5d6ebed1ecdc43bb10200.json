@@ -1,0 +1,15 @@
+{
+	"uid": "w9gzjc42tmdkah3i2v1a4vwl",
+	"id": "empty-rum-barrel",
+	"title": "Empty Rum Barrel",
+	"description": "Waiting for an another round",
+	"asset": {
+		"default": [
+			"empty-rum-barrel"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

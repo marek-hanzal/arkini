@@ -1,0 +1,14 @@
+{
+	"uid": "ilfa6qy345vmj82d0lfgi0fo",
+	"id": "empty-dye-field",
+	"title": "Empty Dye Field",
+	"asset": {
+		"default": [
+			"empty-dye-field"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

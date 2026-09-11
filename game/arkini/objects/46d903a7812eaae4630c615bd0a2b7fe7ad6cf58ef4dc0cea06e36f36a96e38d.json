@@ -1,0 +1,16 @@
+{
+	"uid": "gsowtc0rzpubbqkaam67fz85",
+	"id": "mage-lodge",
+	"title": "Mage Lodge",
+	"description": "Your way of magic starts here",
+	"asset": {
+		"default": [
+			"mage-lodge"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxCount": 1,
+	"maxStackSize": 1,
+	"type": "simple"
+}

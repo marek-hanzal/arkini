@@ -11,6 +11,7 @@
 			]
 		},
 		"scope": "any",
+		"layer": "content",
 		"maxStackSize": 1,
 		"charges": {
 			"amount": 12

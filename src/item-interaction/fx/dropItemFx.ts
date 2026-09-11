@@ -58,18 +58,18 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		);
 	}
 
-	if (target.occupant === null) {
-		if (preflight.kind !== DropItemResultKind.Move) {
-			return yield* Effect.die(
-				new Error(`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`),
-			);
-		}
+	if (preflight.kind === DropItemResultKind.Move) {
 		return yield* commitMoveDropFx({
 			sourceItemId,
 			sourceRevision,
 			sourceLocation,
 			targetLocation: target.location,
 		});
+	}
+	if (target.occupant === null) {
+		return yield* Effect.die(
+			new Error(`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`),
+		);
 	}
 
 	const targetItemId = target.occupant.itemId;
@@ -151,12 +151,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			{
 				kind: DropItemResultKind.Move,
 			},
-			(unexpected) =>
-				Effect.die(
-					new Error(
-						`Occupied drop preview unexpectedly resolved as "${unexpected.kind}".`,
-					),
-				),
+			() => Effect.die(new Error("Move preview was already dispatched.")),
 		)
 		.exhaustive();
 });

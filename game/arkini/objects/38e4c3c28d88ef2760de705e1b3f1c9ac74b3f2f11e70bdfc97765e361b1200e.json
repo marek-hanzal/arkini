@@ -1,0 +1,14 @@
+{
+	"uid": "czq5ciz94u4pfhdoot7vd05e",
+	"id": "faith-chest",
+	"title": "Faith Chest",
+	"asset": {
+		"default": [
+			"faith-chest"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

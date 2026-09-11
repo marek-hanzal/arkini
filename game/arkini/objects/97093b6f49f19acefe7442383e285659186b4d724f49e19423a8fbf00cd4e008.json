@@ -1,0 +1,15 @@
+{
+	"uid": "inkvbfkqv4zu96xz2eiiu4dw",
+	"id": "knowledge-t1",
+	"title": "Knowledge - Tier 1",
+	"description": "Some knowledge",
+	"asset": {
+		"default": [
+			"knowledge-t1"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

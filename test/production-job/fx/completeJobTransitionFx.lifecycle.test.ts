@@ -47,6 +47,7 @@ const base = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
+	layer: "content" as const,
 	scope: "board" as const,
 	maxStackSize: 1,
 });

@@ -47,6 +47,7 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		);
 	return yield* Effect.gen(function* () {
 		const stored = yield* storeInputMaterialFx({
+			interaction: "drop",
 			ownerItemId: targetItemId,
 			ownerItemRevision: targetRevision,
 			expectedOwnerLocation: targetLocation,
@@ -76,6 +77,15 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		} satisfies DropItemResult;
 	}).pipe(
 		Effect.catchTags({
+			ItemCoveredError: (error) =>
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "invalid-location",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropActorRejectedResultFn({

@@ -1,0 +1,15 @@
+{
+	"uid": "a9ntvac0bvpmj3npntiyy3wh",
+	"id": "flax-fiber",
+	"title": "Flax Fiber",
+	"description": "Fibers everywhre",
+	"asset": {
+		"default": [
+			"flax-fiber"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

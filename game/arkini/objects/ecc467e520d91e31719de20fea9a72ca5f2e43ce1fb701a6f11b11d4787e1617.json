@@ -1,0 +1,50 @@
+{
+	"uid": "g8oi8iw4hidud9t24h8lv0p4",
+	"id": "animal-fat",
+	"title": "Animal Fat",
+	"description": "Fat",
+	"asset": {
+		"default": [
+			"animal-fat"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "cauldron-with-lye"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "cauldron-with-soap"
+		}
+	],
+	"type": "temporary",
+	"durationMs": 600000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-animal-fat",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

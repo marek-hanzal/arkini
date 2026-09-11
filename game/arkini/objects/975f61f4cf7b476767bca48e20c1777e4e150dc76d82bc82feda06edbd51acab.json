@@ -1,0 +1,15 @@
+{
+	"uid": "lphz3b889r4j02iyh4c5zv0w",
+	"id": "linen",
+	"title": "Linen",
+	"description": "Some linen over here",
+	"asset": {
+		"default": [
+			"linen"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

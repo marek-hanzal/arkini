@@ -1,0 +1,15 @@
+{
+	"uid": "xnhzgd7zmbzlpxipmxnfhe9c",
+	"id": "spoiled-flax",
+	"title": "Spoiled Flax",
+	"description": "Offline threads",
+	"asset": {
+		"default": [
+			"spoiled-flax"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

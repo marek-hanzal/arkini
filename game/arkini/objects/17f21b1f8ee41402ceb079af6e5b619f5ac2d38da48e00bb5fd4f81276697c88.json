@@ -1,0 +1,39 @@
+{
+	"uid": "bi89dksa0k5at0g2z2277own",
+	"id": "dye-workshop-washed",
+	"title": "Dye Workshop Washed",
+	"description": "You washed it out",
+	"asset": {
+		"default": [
+			"dye-workshop-washed"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 30000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "dye-workshop",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "bwa5v4j1546dw6utogyygd4x",
+	"id": "sugar-cane-field",
+	"title": "Sugar Cane Field",
+	"asset": {
+		"default": [
+			"sugar-cane-field"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

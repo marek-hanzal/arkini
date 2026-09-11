@@ -1,0 +1,15 @@
+{
+	"uid": "unndmc4319g50sb7uqh48yrb",
+	"id": "key-t3",
+	"title": "Key - Tier 3",
+	"description": "Quite a good key, but not good enough",
+	"asset": {
+		"default": [
+			"key-t3"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 6,
+	"type": "simple"
+}

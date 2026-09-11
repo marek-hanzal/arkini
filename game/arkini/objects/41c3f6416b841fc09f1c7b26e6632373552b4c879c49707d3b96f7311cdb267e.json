@@ -1,0 +1,39 @@
+{
+	"uid": "dxmdzdy9wuj7wv0cwt6gkrjh",
+	"id": "cutting-board-with-vegetables",
+	"title": "Cutting Board With Vegetables",
+	"draft": true,
+	"asset": {
+		"default": [
+			"cutting-board-with-vegetables"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-cutting-board-with-vegetables",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

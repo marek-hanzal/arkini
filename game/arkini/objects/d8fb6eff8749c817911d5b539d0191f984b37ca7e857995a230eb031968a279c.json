@@ -1,0 +1,30 @@
+{
+	"uid": "wna37dq208sf06fj9yfdyg6l",
+	"id": "treasure-chest-t6",
+	"title": "Treasure Chest - Tier 6",
+	"description": "Best quality chest ever",
+	"asset": {
+		"default": [
+			"treasure-chest-t6"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "stash",
+	"line": {
+		"id": "line:treasure-chest-t6:default",
+		"title": "New stash line",
+		"description": "Describe what this stash line consumes and produces.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 0,
+		"input": [
+			{
+				"type": "simple"
+			}
+		],
+		"rules": []
+	}
+}

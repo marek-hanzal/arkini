@@ -1,0 +1,14 @@
+{
+	"uid": "lg61am0b6qg38836uz6hoswa",
+	"id": "dirty-clay-vase",
+	"title": "Dirty Clay Vase",
+	"asset": {
+		"default": [
+			"dirty-clay-vase"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

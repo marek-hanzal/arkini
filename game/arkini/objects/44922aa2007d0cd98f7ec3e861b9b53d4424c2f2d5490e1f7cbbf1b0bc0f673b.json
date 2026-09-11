@@ -1,0 +1,15 @@
+{
+	"uid": "txeu4cnpp7fqele4z2i1jzzz",
+	"id": "leather-satchel",
+	"title": "Leather Satchel",
+	"draft": true,
+	"asset": {
+		"default": [
+			"leather-satchel"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

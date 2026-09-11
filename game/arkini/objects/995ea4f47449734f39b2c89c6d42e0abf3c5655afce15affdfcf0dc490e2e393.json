@@ -1,0 +1,29 @@
+{
+	"uid": "z5ag5z87p47q90osssbnz596",
+	"id": "linen-sewing-kit",
+	"title": "Linen Sewing Kit",
+	"draft": true,
+	"asset": {
+		"default": [
+			"linen-sewing-kit"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 8
+	},
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "leather"
+			},
+			"action": "deposit",
+			"effect": "replace",
+			"result": "leather-satchel"
+		}
+	],
+	"type": "simple"
+}

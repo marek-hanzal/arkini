@@ -1,0 +1,73 @@
+{
+	"uid": "kgxsxcqbi8ylj89t2og2cv7s",
+	"id": "copper-pan-with-raw-steak",
+	"title": "Copper Pan With Raw Steak",
+	"description": "Wanna eat this",
+	"asset": {
+		"default": [
+			"copper-pan-with-raw-steak"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "campfire-burning"
+			},
+			"action": "consume",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "copper-pan-with-cooked-steak",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "campfire-extinguished"
+		}
+	],
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-copper-pan",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

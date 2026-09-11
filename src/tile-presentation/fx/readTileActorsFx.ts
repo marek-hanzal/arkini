@@ -171,6 +171,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 						}),
 				id: item.id,
 				itemType: item.item.type,
+				layer: item.item.layer,
 				revision: item.revision,
 				quantity: item.quantity,
 				location: item.location,

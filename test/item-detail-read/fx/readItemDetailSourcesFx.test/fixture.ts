@@ -20,6 +20,7 @@ const item = (id: string, title = id) => ({
 			`asset:${id}`,
 		],
 	},
+	layer: "content" as const,
 	scope: "any" as const,
 	maxStackSize: 10,
 });

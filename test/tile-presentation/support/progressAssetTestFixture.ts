@@ -7,6 +7,7 @@ const itemBase = (id: string, scope: "any" | "board" = "any") => ({
 	title: id,
 	description: id,
 	scope,
+	layer: "content",
 });
 
 const materialInput = (quantity: number, capacity?: number) => ({

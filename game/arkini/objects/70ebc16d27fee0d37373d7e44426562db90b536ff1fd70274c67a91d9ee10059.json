@@ -1,0 +1,15 @@
+{
+	"uid": "n8tqfduybhtght3tc2ohj67z",
+	"id": "spoiled-herbs",
+	"title": "Spoiled Herbs",
+	"draft": true,
+	"asset": {
+		"default": [
+			"spoiled-herbs"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

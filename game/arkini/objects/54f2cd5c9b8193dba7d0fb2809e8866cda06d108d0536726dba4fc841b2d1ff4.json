@@ -1,0 +1,15 @@
+{
+	"uid": "whgs98b1abnac63cfsm022z8",
+	"id": "corrupted-beagle",
+	"title": "Corrupted Beagle",
+	"draft": true,
+	"asset": {
+		"default": [
+			"corrupted-beagle"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -1,0 +1,15 @@
+{
+	"uid": "vwq92k7xdri5r6cety12sj8b",
+	"id": "wine-with-beer",
+	"title": "Wine With Beer",
+	"description": "Disgusting",
+	"asset": {
+		"default": [
+			"wine-with-beer"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -1,0 +1,15 @@
+{
+	"uid": "l5bda2bzpvcb2c6tonsukrw1",
+	"id": "spoiled-fruit-crate",
+	"title": "Spoiled Fruit Crate",
+	"description": "Ugly thing",
+	"asset": {
+		"default": [
+			"spoiled-fruit-crate"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

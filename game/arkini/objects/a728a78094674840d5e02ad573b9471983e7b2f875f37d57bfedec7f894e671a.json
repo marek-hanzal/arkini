@@ -1,0 +1,26 @@
+{
+	"uid": "mroh4s4rsygi6qlncjqbqu2k",
+	"id": "empty-sack",
+	"title": "Empty Sack",
+	"description": "You can put things inside",
+	"asset": {
+		"default": [
+			"empty-sack"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 12,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "loose-ash"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "ash"
+		}
+	],
+	"type": "simple"
+}

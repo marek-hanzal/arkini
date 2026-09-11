@@ -1,0 +1,39 @@
+{
+	"uid": "ox33wyn4q7imp03kaibxrxi5",
+	"id": "clay-bowl-with-coffee",
+	"title": "Clay Bowl With Coffee",
+	"description": "Flateticano",
+	"asset": {
+		"default": [
+			"clay-bowl-with-coffee"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-clay-bowl",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

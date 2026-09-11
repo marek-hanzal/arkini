@@ -1,0 +1,15 @@
+{
+	"uid": "yoody7n37wf3xnufn46i2xne",
+	"id": "empty-bed-t1",
+	"title": "Empty Bed T1",
+	"description": "You can sleep, not so comfortably",
+	"asset": {
+		"default": [
+			"empty-bed-t1"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

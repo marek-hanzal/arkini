@@ -1,0 +1,15 @@
+{
+	"uid": "isr1iw451e8km1lo7pejzjht",
+	"id": "building-ruins",
+	"title": "Building Ruins",
+	"description": "If you destroy a building - here you go",
+	"asset": {
+		"default": [
+			"building-ruins"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

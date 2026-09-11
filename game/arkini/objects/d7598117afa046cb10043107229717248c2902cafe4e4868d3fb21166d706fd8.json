@@ -1,0 +1,15 @@
+{
+	"uid": "oo3wuqjngg5i21vwt4m5nz0s",
+	"id": "toilet-biowaste",
+	"title": "Toilet Biowaste",
+	"description": "Disgusting",
+	"asset": {
+		"default": [
+			"toilet-biowaste"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

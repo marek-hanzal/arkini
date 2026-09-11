@@ -12,6 +12,7 @@ const simpleItem = ({ id }: { id: string }) => {
 				`asset:${id}`,
 			],
 		},
+		layer: "content",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

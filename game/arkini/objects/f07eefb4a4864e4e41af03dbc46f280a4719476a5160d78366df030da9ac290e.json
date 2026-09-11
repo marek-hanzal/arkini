@@ -1,0 +1,40 @@
+{
+	"uid": "kbq806ubyrorojtlc7o9afki",
+	"id": "flour",
+	"title": "Flour",
+	"description": "Bread?",
+	"asset": {
+		"default": [
+			"flour"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 720000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "chance",
+						"chance": 0.5,
+						"drop": [
+							{
+								"itemId": "bio-waste",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

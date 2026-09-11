@@ -11,6 +11,7 @@
 			]
 		},
 		"scope": "any",
+		"layer": "content",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"type": "producer",

@@ -1,0 +1,15 @@
+{
+	"uid": "xf44x3an4an91b5xqmxevd11",
+	"id": "spoiled-raw-game-meat",
+	"title": "Spoiled Raw Game Meat",
+	"description": "Not good anymore",
+	"asset": {
+		"default": [
+			"spoiled-raw-game-meat"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

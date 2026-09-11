@@ -1,0 +1,39 @@
+{
+	"uid": "rvrxgi8ol0hdiwa93d9zzes4",
+	"id": "cheese",
+	"title": "Cheese",
+	"description": "Cheese you want to chew in!",
+	"asset": {
+		"default": [
+			"cheese"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-cheese",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

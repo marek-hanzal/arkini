@@ -11,6 +11,7 @@
 			]
 		},
 		"scope": "any",
+		"layer": "content",
 		"maxCount": 1,
 		"maxStackSize": 1,
 		"merge": [

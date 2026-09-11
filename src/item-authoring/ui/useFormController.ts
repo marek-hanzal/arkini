@@ -94,6 +94,7 @@ const FormPathLabelBySegment = {
 	from: "Paid by",
 	hint: "Hint",
 	id: "ID",
+	layer: "Board layer",
 	max: "Maximum",
 	maxCount: "Maximum global count",
 	maxQueueSize: "Maximum parallel jobs",

@@ -1,0 +1,38 @@
+{
+	"uid": "b8rjy59wi12w74pr2oo57far",
+	"id": "fertilized-sugar-cane-field",
+	"title": "Fertilized Sugar Cane Field",
+	"asset": {
+		"default": [
+			"fertilized-sugar-cane-field"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 120000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "empty-sugar-cane-field",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

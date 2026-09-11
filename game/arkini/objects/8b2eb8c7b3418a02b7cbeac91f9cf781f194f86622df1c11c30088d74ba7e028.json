@@ -1,0 +1,111 @@
+{
+	"uid": "ii0uj0xllpdlv6prfeu29q2k",
+	"id": "magic-sawmill-blueprint",
+	"title": "Magic Sawmill Blueprint",
+	"description": "Can you smell fresh wood... and magic?",
+	"asset": {
+		"default": [
+			"blueprint",
+			"magic-sawmill"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"charges": {
+		"amount": 1
+	},
+	"type": "blueprint",
+	"line": {
+		"id": "magic-sawmill",
+		"title": "Magic Sawmill",
+		"description": "Better sawmill-jack",
+		"default": true,
+		"show": true,
+		"enable": false,
+		"runtimeMs": 60000,
+		"input": [
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "lumer-camp"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"type": "materials",
+				"selector": {
+					"type": "item",
+					"itemId": "sawmill"
+				},
+				"mode": "consume",
+				"quantity": {
+					"min": 1,
+					"max": 1
+				},
+				"capacity": 0
+			},
+			{
+				"charges": {
+					"cost": 1,
+					"from": "self"
+				},
+				"type": "deposit",
+				"query": {
+					"selector": {
+						"type": "item",
+						"itemId": "magic-sawmill-blueprint"
+					},
+					"scope": "board",
+					"distance": "self"
+				}
+			}
+		],
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "magic-sawmill",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"rules": [
+			{
+				"when": [
+					{
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "mage-lodge"
+							},
+							"scope": "universe"
+						},
+						"type": "exists"
+					}
+				],
+				"type": "enable"
+			}
+		]
+	}
+}

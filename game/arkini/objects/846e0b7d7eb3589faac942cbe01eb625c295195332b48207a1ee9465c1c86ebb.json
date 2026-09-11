@@ -1,0 +1,50 @@
+{
+	"uid": "wsseeyoomcb3j46h58plhr5p",
+	"id": "vegetables",
+	"title": "Vegetables",
+	"description": "Fresh vegetables you want to eat",
+	"asset": {
+		"default": [
+			"vegetable-crate"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "cutting-board"
+			},
+			"action": "consume",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-crate",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "cutting-board-with-vegetables"
+		}
+	],
+	"type": "temporary",
+	"durationMs": 600000
+}

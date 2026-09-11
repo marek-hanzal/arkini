@@ -1,0 +1,181 @@
+{
+	"uid": "cpmdnqi63m2cql44na50d7vq",
+	"id": "scissors",
+	"title": "Scissors",
+	"description": "Sharp. Keep children away",
+	"asset": {
+		"default": [
+			"scissors"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 4,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "paper"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "paper-boat"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "sheep"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "shorn-sheep"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "pillow-with-coins"
+			},
+			"action": "use",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "clutter",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "coin-stack"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "british-shorthair"
+			},
+			"action": "use",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "british-shorthair-shorn"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "mouse"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "mouse-with-cut-tail"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "beagle"
+			},
+			"action": "use",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "badly-trimmed-beagle"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "wild-boar"
+			},
+			"action": "use",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "boar-bristles",
+										"quantity": {
+											"min": 2,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "replace",
+			"result": "shorn-wild-boar"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "sewn-pillow-with-coins"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "pillow-with-coins"
+		}
+	],
+	"type": "simple"
+}

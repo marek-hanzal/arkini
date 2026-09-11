@@ -1,0 +1,39 @@
+{
+	"uid": "zfyzc3defzvpdhz1fn0fsk95",
+	"id": "sick-british-shorthair",
+	"title": "Sick British Shorthair",
+	"draft": true,
+	"asset": {
+		"default": [
+			"sick-british-shorthair"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-raw-game-meat",
+								"quantity": {
+									"min": 2,
+									"max": 3
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

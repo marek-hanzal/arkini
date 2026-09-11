@@ -1,0 +1,15 @@
+{
+	"uid": "yjpg011j6ltn534wgnbidtvj",
+	"id": "knowledge-t2",
+	"title": "Knowledge - Tier 2",
+	"description": "A bit better knowledge of something... interesting",
+	"asset": {
+		"default": [
+			"knowledge-t2"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

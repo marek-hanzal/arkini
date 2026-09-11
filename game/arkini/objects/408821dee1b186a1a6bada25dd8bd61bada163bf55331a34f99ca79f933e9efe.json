@@ -1,0 +1,15 @@
+{
+	"uid": "mdlyzmsttu7165vwtqp3gbhx",
+	"id": "glass-pitcher",
+	"title": "Glass Pitcher",
+	"description": "Be careful",
+	"asset": {
+		"default": [
+			"glass-pitcher"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

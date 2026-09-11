@@ -1,0 +1,15 @@
+{
+	"uid": "qs93ro2wex61c7emcew4s9ek",
+	"id": "herb-garden",
+	"title": "Herb Garden",
+	"draft": true,
+	"asset": {
+		"default": [
+			"herb-garden"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

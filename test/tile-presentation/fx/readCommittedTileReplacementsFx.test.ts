@@ -39,6 +39,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
+			layer: "content",
 		},
 		mud: {
 			uid: "mud",
@@ -53,6 +54,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
+			layer: "content",
 		},
 	},
 });

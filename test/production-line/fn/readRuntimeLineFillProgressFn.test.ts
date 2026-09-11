@@ -16,6 +16,7 @@ const materialItem = {
 			"asset:material",
 		],
 	},
+	layer: "content",
 	scope: "any",
 	maxStackSize: 10,
 } satisfies ItemSchema.Type;

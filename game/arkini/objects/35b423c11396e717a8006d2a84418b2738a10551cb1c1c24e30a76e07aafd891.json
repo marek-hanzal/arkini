@@ -1,0 +1,15 @@
+{
+	"uid": "k5c77w0nkqa2gik8nxj2mrb2",
+	"id": "bed-with-teddy-bear",
+	"title": "Bed With Teddy Bear",
+	"draft": true,
+	"asset": {
+		"default": [
+			"bed-with-teddy-bear"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

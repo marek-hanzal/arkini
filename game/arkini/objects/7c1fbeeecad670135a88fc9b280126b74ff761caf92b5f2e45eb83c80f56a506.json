@@ -1,0 +1,15 @@
+{
+	"uid": "i767otw53htcjcc2y9zrw6it",
+	"id": "chicken",
+	"title": "Chicken",
+	"description": "Kwooo... kwo, kwo!",
+	"asset": {
+		"default": [
+			"chicken"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

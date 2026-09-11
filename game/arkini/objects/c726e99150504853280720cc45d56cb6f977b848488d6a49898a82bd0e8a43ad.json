@@ -1,0 +1,15 @@
+{
+	"uid": "oi2iydyb9hhf1nt7wdra2hg9",
+	"id": "empty-crate",
+	"title": "Empty Crate",
+	"description": "Just a crate",
+	"asset": {
+		"default": [
+			"empty-crate"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

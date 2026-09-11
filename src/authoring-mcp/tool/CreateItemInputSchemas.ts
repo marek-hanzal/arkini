@@ -3,6 +3,7 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
+import { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";
 import { DepositSchema } from "~/item-definition/schema/DepositSchema";
@@ -14,6 +15,9 @@ import { StashSchema } from "~/item-definition/schema/StashSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
+const draftLayer = BaseSchema.shape.layer
+	.optional()
+	.describe("Optional Board layer; defaults to content, matching a new Editor form.");
 const draftAsset = AssetSchema.optional().describe(
 	"Optional visual asset definition; defaults to the first asset in the open project.",
 );
@@ -50,6 +54,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 		})
@@ -72,6 +77,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			enable: SpaceSchema.shape.enable.removeDefault().optional(),
 			input: SpaceSchema.shape.input.removeDefault().optional(),
 			rules: SpaceSchema.shape.rules.removeDefault().optional(),
@@ -96,6 +102,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			maxQueueSize: draftMaxQueueSize,
@@ -122,6 +129,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			line: CraftSchema.shape.line
@@ -145,6 +153,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			line: BlueprintSchema.shape.line
@@ -171,6 +180,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			maxQueueSize: draftMaxQueueSize,
@@ -193,6 +203,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			line: StashSchema.shape.line
@@ -216,6 +227,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 			durationMs: TimeSchema.min(500)
 				.optional()
 				.describe("Optional lifetime in milliseconds; defaults to 500."),
@@ -237,6 +249,7 @@ export const CreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
+			layer: draftLayer,
 		})
 		.strict()
 		.meta({

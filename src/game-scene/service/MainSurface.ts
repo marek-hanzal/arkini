@@ -10,6 +10,7 @@ export interface MainSurface extends MainInteractionSurface {
 	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly readLocationPoseFx: (
 		location: TileActorItem["location"],
+		layer?: TileActorItem["layer"],
 	) => Effect.Effect<ActorPose | null, never, never>;
 	readonly redrawFx: Effect.Effect<void, never, never>;
 	readonly setPaletteFx: (palette: PixiScenePalette) => Effect.Effect<void, never, never>;

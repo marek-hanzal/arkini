@@ -60,6 +60,7 @@ const item = {
 	id: "runtime:water",
 	itemId: "water",
 	itemType: "simple" as const,
+	layer: "content" as const,
 	title: "Water",
 	sourceUrl: "resource:water",
 	revision: "revision:delivery",

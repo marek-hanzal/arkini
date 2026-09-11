@@ -10,6 +10,7 @@ const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number
 			`asset:${id}`,
 		],
 	},
+	layer: "content" as const,
 	scope: "any" as const,
 	maxStackSize,
 });

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
+import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
@@ -8,6 +9,9 @@ import { finalizeMotionActorsFx } from "~/tile-motion/fx/finalizeMotionActorsFx"
 
 import {
 	createActorMap,
+	createMotionHarness,
+	readPoseAnimation,
+	secondBoardLocation,
 	createActorStore,
 	createApplication,
 	createSurface,
@@ -20,7 +24,63 @@ import {
 	type ActorAnimation,
 } from "./createMotionRuntimeFx.test/fixture";
 
+vi.mock("~/tile-rendering/fx/updateActorVisualFx", () => ({
+	updateActorVisualFx: () => Effect.void,
+}));
+
 describe("spawn lifecycle", () => {
+	it("settles a spawned ground identity in its own band", () => {
+		const groundLayer = new Container();
+		const contentLayer = new Container();
+		const spawned = createActor("runtime:ground-spawn");
+		spawned.item = {
+			...spawned.item,
+			layer: "ground",
+			location: secondBoardLocation,
+		};
+		const { runtime, animations } = createMotionHarness({
+			actors: createActorMap(spawned),
+			canonicalItems: new Map([
+				[
+					spawned.item.id,
+					spawned.item,
+				],
+			]),
+			readPose: (location, layer) => ({
+				layer: layer === "ground" ? groundLayer : contentLayer,
+				size: 80,
+				x: location.position.x * 100,
+				y: 40,
+			}),
+		});
+		Effect.runSync(
+			runtime.enqueueFx([
+				{
+					kind: "spawn",
+					sequence: 1,
+					eventIndex: 0,
+					staggerIndex: 0,
+					actorId: spawned.item.id,
+					originActorId: "runtime:source",
+					originLocation: {
+						...secondBoardLocation,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					targetLocation: secondBoardLocation,
+				},
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const travel = readPoseAnimation(animations, spawned);
+		samplePoseAnimation(travel, 1);
+		travel.onCompleteFn?.();
+		expect(spawned.container.parent).toBe(groundLayer);
+		Effect.runSync(runtime.closeFx);
+	});
+
 	it.each([
 		{
 			acquired: false,

@@ -57,6 +57,7 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
+			layer: "content",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -87,6 +88,7 @@ const config = GameConfigSchema.parse({
 					"asset:resource",
 				],
 			},
+			layer: "content",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -96,6 +98,7 @@ const config = GameConfigSchema.parse({
 			type: "inventory",
 			title: "Satchel",
 			description: "Opens the shared inventory.",
+			layer: "content",
 			asset: {
 				default: [
 					"asset:satchel",

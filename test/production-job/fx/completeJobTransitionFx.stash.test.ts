@@ -68,6 +68,7 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
 			`asset:${id}`,
 		],
 	},
+	layer: "content",
 	scope,
 	maxStackSize: 1,
 });
@@ -94,6 +95,7 @@ const stashItem = ({
 			`asset:${id}`,
 		],
 	},
+	layer: "content" as const,
 	scope: "board" as const,
 	maxStackSize: 1,
 	line: {

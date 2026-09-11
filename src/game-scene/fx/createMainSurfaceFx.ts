@@ -59,6 +59,10 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				eventMode: "none",
 				label: "GridLayer",
 			});
+			const groundActorLayer = new Container({
+				eventMode: "passive",
+				label: "GroundActorLayer",
+			});
 			const boardActorLayer = new Container({
 				eventMode: "passive",
 				label: "BoardActorLayer",
@@ -91,6 +95,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			gridLayer.addChild(boardGrid, toolbarGrid);
 			boardGrid.mask = boardMask;
 			toolbarGrid.mask = toolbarMask;
+			groundActorLayer.mask = boardMask;
 			boardActorLayer.mask = boardMask;
 			toolbarActorLayer.mask = toolbarMask;
 			application.stage.addChild(
@@ -98,6 +103,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				dropFeedback.container,
 				boardMask,
 				toolbarMask,
+				groundActorLayer,
 				boardActorLayer,
 				toolbarActorLayer,
 				transientActorLayer,
@@ -105,13 +111,16 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			application.stage.eventMode = "static";
 			let closed = false;
 
-			const readLocationPoseFn = (location: TileActorItem["location"]) => {
+			const readLocationPoseFn = (
+				location: TileActorItem["location"],
+				layer: TileActorItem["layer"] = "content",
+			) => {
 				if (
 					location.scope === LocationScopeEnumSchema.enum.Board &&
 					location.space === latestTransition.runtime.currentSpace
 				) {
 					return {
-						layer: boardActorLayer,
+						layer: layer === "ground" ? groundActorLayer : boardActorLayer,
 						size: layout.board.cellSize,
 						x: layout.board.x + location.position.x * layout.board.cellSize,
 						y: layout.board.y + location.position.y * layout.board.cellSize,
@@ -310,6 +319,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						transientActorLayer,
 						toolbarActorLayer,
 						boardActorLayer,
+						groundActorLayer,
 						toolbarMask,
 						boardMask,
 						gridLayer,
@@ -321,13 +331,13 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					}
 				}),
 				readActorPoseFx: Effect.fn("MainSurface.readActorPoseFx")((item) =>
-					Effect.sync(() => readLocationPoseFn(item.location)),
+					Effect.sync(() => readLocationPoseFn(item.location, item.layer)),
 				),
 				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
 					readTargetFactsFromTargetFx(readDropTargetFn(x, y)),
 				),
-				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
-					Effect.sync(() => readLocationPoseFn(location)),
+				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location, layer) =>
+					Effect.sync(() => readLocationPoseFn(location, layer)),
 				),
 				readLocalActorIdsFx: Effect.fn("MainSurface.readLocalActorIdsFx")((bounds) =>
 					Effect.gen(function* () {

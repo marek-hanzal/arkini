@@ -32,6 +32,7 @@ const item = (
 	id,
 	itemId: id,
 	itemType: "simple",
+	layer: "content",
 	location,
 	primaryAction: {
 		kind: "none",
@@ -73,6 +74,51 @@ describe("main canonical occupancy", () => {
 		expect(Effect.runSync(store.readCanonicalOccupantFx(board(2, 3)))).toBe(revised);
 		expect(Effect.runSync(store.readCanonicalOccupantFx(toolbar(1)))).toBeNull();
 		expect(store.canonicalItems.get(boardItem.id)).toBe(revised);
+	});
+
+	it("retains both Board layers while exposing content first regardless of projection order", () => {
+		const store = Effect.runSync(createMainActorStoreFx());
+		const content = item("runtime:content", board(0, 0));
+		const ground = {
+			...item("runtime:ground", content.location),
+			layer: "ground" as const,
+		};
+		for (const items of [
+			[
+				content,
+				ground,
+			],
+			[
+				ground,
+				content,
+			],
+		]) {
+			Effect.runSync(store.replaceCanonicalItemsFx(items));
+			expect(Effect.runSync(store.readCanonicalItemFx(ground.id))).toBe(ground);
+			expect(Effect.runSync(store.readCanonicalOccupantFx(content.location))).toBe(content);
+		}
+		Effect.runSync(
+			store.replaceCanonicalItemsFx([
+				ground,
+			]),
+		);
+		expect(Effect.runSync(store.readCanonicalOccupantFx(content.location))).toBe(ground);
+
+		const duplicateToolbar = Effect.runSync(
+			Effect.exit(
+				store.replaceCanonicalItemsFx([
+					{
+						...content,
+						location: toolbar(0),
+					},
+					{
+						...ground,
+						location: toolbar(0),
+					},
+				]),
+			),
+		);
+		expect(Exit.isFailure(duplicateToolbar)).toBe(true);
 	});
 
 	it("returns unique occupants in deterministic caller slot order", () => {

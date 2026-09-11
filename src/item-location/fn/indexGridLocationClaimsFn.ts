@@ -5,7 +5,7 @@ import { readGridLocationKeyFn } from "./readGridLocationKeyFn";
 export const indexGridLocationClaimsFn = (claims: ReadonlyArray<GridLocationClaim>) => {
 	const claimsByLocation = new Map<string, GridLocationClaim[]>();
 	for (const claim of claims) {
-		const key = readGridLocationKeyFn(claim.location);
+		const key = readGridLocationKeyFn(claim.location, claim.layer);
 		const existing = claimsByLocation.get(key);
 		if (existing === undefined) {
 			claimsByLocation.set(key, [

@@ -19,6 +19,7 @@ const baseItem = ({
 				`asset:${id}`,
 			],
 		},
+		layer: "content",
 		scope,
 		maxStackSize,
 	} as const;

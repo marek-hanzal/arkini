@@ -1,9 +1,11 @@
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface GridLocationClaim {
 	readonly itemId: string;
+	readonly layer: ItemSchema.Type["layer"];
 	readonly kind: "delivery-origin" | "occupant";
 	readonly location: GridLocationSchema.Type;
 }
@@ -24,6 +26,7 @@ export const readGridLocationClaimsFn = ({ runtime }: { readonly runtime: Runtim
 		) {
 			claims.push({
 				itemId: item.id,
+				layer: item.item.layer,
 				kind: "occupant",
 				location: item.location,
 			});
@@ -32,6 +35,7 @@ export const readGridLocationClaimsFn = ({ runtime }: { readonly runtime: Runtim
 		if (item.location.scope === LocationScopeEnumSchema.enum.Delivery) {
 			claims.push({
 				itemId: item.id,
+				layer: item.item.layer,
 				kind: "delivery-origin",
 				location: item.location.origin,
 			});

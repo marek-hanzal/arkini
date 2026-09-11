@@ -24,6 +24,8 @@ import { projectDropTransferActorFn } from "~/item-interaction/fn/projectDropTra
 import type { InventoryStoragePlan } from "~/item-interaction/fx/planInventoryStorageFx";
 import { planInventoryStorageFx } from "~/item-interaction/fx/planInventoryStorageFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
+import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
+import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 
 /** One canonical item cannot own a passive Inventory location. */
 class ItemInventoryStorageUnavailableError extends Data.TaggedError(
@@ -153,6 +155,14 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 					}),
 				);
 			}
+			yield* assertGridItemExposedFx({
+				item: source,
+				runtime,
+			});
+			yield* assertGridItemExposedFx({
+				item: inventory,
+				runtime,
+			});
 			const plan = yield* planInventoryStorageFx({
 				item: source,
 				runtime,
@@ -210,6 +220,15 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 			};
 		}),
 		Effect.catchTags({
+			ItemCoveredError: (error) =>
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "invalid-location",
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

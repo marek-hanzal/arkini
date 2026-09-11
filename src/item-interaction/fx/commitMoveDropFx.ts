@@ -15,6 +15,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
+import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
@@ -87,6 +88,10 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					}),
 				);
 			}
+			yield* assertGridItemExposedFx({
+				item,
+				runtime,
+			});
 			if (
 				isSameGridLocationFn({
 					left: item.location,
@@ -127,6 +132,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			const claim = readGridLocationClaimAtFn({
+				layer: item.item.layer,
 				claims: readGridLocationClaimsFn({
 					runtime,
 				}).filter((candidate) => candidate.itemId !== itemId),
@@ -194,6 +200,12 @@ export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
 			}),
 		),
 		Effect.catchTags({
+			ItemCoveredError: () =>
+				Effect.succeed({
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.InvalidSource,
+					itemId: sourceItemId,
+				}),
 			LocationOccupiedError: (error) =>
 				Effect.succeed({
 					kind: DropItemResultKind.Reject,

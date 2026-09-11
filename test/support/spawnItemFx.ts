@@ -64,6 +64,7 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 			}
 
 			const claim = readGridLocationClaimAtFn({
+				layer: item.layer,
 				claims: readGridLocationClaimsFn({
 					runtime,
 				}),

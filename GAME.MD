@@ -6,6 +6,10 @@ This document owns implemented gameplay meaning. [`CONFIG.md`](CONFIG.md) owns a
 
 Arkini runs multiple isolated Board spaces plus global Inventory and optional Toolbar storage. A Board cell is `space + x + y`; equal coordinates in different spaces never interact. `currentSpace` selects presentation and the Board destination for an Inventory release; that release uses the item's authored scope, tries the current Board before Toolbar for `any`, and never returns to Inventory. All spaces keep simulating.
 
+Every Item defines `layer: content | ground`. Board occupancy and delivery-origin leases are exclusive per layer; one ground and one content item may share a cell. Inventory and Toolbar remain single-slot grids. Birth, output, return and merge replacement use the resulting definition's layer; replacement rejects an occupied destination layer atomically. A layer is derived from the definition, never duplicated in the saved location.
+
+Content has priority for direct selection, dragging, drops and magnetism. Covered ground becomes interactive immediately when content leaves; a delivery lease alone does not cover it. Ground retains ordinary production, queries, charges, lifetime and removal even while covered. An exposed ground item accepts authored cross-layer merges and input interactions. Without a matching interaction, dropping an item over the other layer moves into its own free layer instead of swapping layers; same-layer drops retain ordinary behavior.
+
 A new game applies authored start entries in Board → Inventory → Toolbar order against one evolving candidate Runtime. Board space and coordinates plus Inventory/Toolbar slots are exact; every entry uses canonical placement, and `currentSpace` plus the complete initial state commit atomically or not at all.
 
 Spatial mechanics—distance, placement, merge, charge targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:

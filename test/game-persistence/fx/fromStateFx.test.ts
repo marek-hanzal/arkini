@@ -38,6 +38,7 @@ const config = GameConfigSchema.parse({
 					"asset:tree",
 				],
 			},
+			layer: "content",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

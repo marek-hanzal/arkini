@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { useGameFx } from "~test/support/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
@@ -82,6 +83,42 @@ const spawnBlockerFx = Effect.fn("spawnBlockerFx")(function* (id: string, x: num
 });
 
 describe("temporary item lifetime", () => {
+	it("expires covered ground through ordinary Tick while preserving its content occupant", () => {
+		const groundConfig = GameConfigSchema.parse({
+			...config,
+			items: {
+				...config.items,
+				temporaryPlain: {
+					...config.items.temporaryPlain,
+					layer: "ground",
+					durationMs: 500,
+				},
+			},
+		});
+		Effect.runSync(
+			Effect.gen(function* () {
+				const ground = yield* spawnTemporaryFx({});
+				const cover = yield* spawnBlockerFx("cover", 0);
+				let step = yield* advanceRuntimeStepFx(yield* readRuntimeFx());
+				for (let index = 1; index < 5; index++)
+					step = yield* advanceRuntimeStepFx(step.runtime);
+				expect(step.runtime.items.map((item) => item.id)).toEqual([
+					cover.id,
+				]);
+				expect(step.events).toContainEqual(
+					expect.objectContaining({
+						type: GameEventEnumSchema.enum.ItemExpired,
+						itemId: ground.id,
+					}),
+				);
+			}).pipe(
+				useGameFx({
+					config: groundConfig,
+				}),
+			),
+		);
+	});
+
 	it("starts at authored duration and expires exactly on its fixed-step boundary", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

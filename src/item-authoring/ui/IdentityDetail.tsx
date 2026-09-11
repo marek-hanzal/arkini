@@ -31,6 +31,10 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							}
 						/>
 						<Fact
+							label="Board layer"
+							value={item.layer === "content" ? "Content" : "Ground"}
+						/>
+						<Fact
 							label={translator.textFn("Stack capacity")}
 							value={
 								item.maxStackSize === 1

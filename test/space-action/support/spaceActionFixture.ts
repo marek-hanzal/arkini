@@ -20,6 +20,7 @@ const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => (
 			string,
 		],
 	},
+	layer: "content",
 	scope,
 	maxStackSize: 4,
 });

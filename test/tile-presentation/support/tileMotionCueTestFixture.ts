@@ -53,6 +53,7 @@ const config = GameConfigSchema.parse({
 			uid: "water",
 			id: "water",
 			type: "simple",
+			layer: "content",
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -67,6 +68,7 @@ const config = GameConfigSchema.parse({
 			uid: "inventory",
 			id: "inventory",
 			type: "inventory",
+			layer: "content",
 			title: "Inventory",
 			description: "Inventory",
 			asset: {

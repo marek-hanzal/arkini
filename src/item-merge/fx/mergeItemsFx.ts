@@ -10,6 +10,7 @@ import { applyMergeRuntimeFx } from "~/item-merge/fx/applyMergeRuntimeFx";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
@@ -150,6 +151,14 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				);
 			}
 
+			yield* assertGridItemExposedFx({
+				item: source,
+				runtime,
+			});
+			yield* assertGridItemExposedFx({
+				item: target,
+				runtime,
+			});
 			const resolved = yield* resolveMergeRuleFx({
 				source,
 				target,

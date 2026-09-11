@@ -63,6 +63,7 @@ export const writeSigningGame = async (root: string) => {
 						"item",
 					],
 				},
+				layer: "content",
 				scope: "any",
 				maxStackSize: 1,
 			},

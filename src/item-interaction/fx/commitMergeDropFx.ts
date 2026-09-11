@@ -64,6 +64,17 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 			};
 		}),
 		Effect.catchTags({
+			ItemCoveredError: (error) =>
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason:
+							error.itemId === sourceItemId
+								? DropItemRejectedReason.InvalidSource
+								: DropItemRejectedReason.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropActorRejectedResultFn({

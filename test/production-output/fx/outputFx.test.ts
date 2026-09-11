@@ -40,6 +40,7 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
+			layer: "content",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",

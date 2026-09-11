@@ -199,6 +199,7 @@ describe("validateGameResourcesFn", () => {
 					targetAsset,
 				] as const,
 			},
+			layer: "content" as const,
 			scope: "any" as const,
 			maxStackSize: 1,
 			line: {

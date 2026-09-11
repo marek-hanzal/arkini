@@ -45,6 +45,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 					"item-water",
 				],
 			},
+			layer: "content",
 			scope: "any",
 			maxStackSize: 10,
 		},

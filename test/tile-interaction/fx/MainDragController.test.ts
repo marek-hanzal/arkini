@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import {
@@ -10,6 +10,100 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: pointer", () => {
+	it("blocks direct gestures on covered ground and immediately admits it when uncovered", async () => {
+		const mounted = mountController();
+		const ground = {
+			...mounted.actor.item,
+			layer: "ground" as const,
+		};
+		mounted.actor.item = ground;
+		mounted.canonicalItems.set(ground.id, ground);
+		const visible = vi.spyOn(mounted.actorStore, "readCanonicalOccupantFx");
+		visible.mockReturnValue(
+			Effect.succeed({
+				...item,
+				id: "runtime:cover",
+			}),
+		);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+		mounted.flushFrame();
+		mounted.stage.emit("pointerup", pointer(70, 20));
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+
+		visible.mockReturnValue(Effect.succeed(ground));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20, 2));
+		mounted.stage.emit("pointerup", pointer(10, 20, 2));
+		await Promise.resolve();
+		expect(mounted.onActivate).toHaveBeenCalledOnce();
+	});
+
+	it.each([
+		"before release",
+		"before activation",
+	])("cancels ground activation when content appears %s", async (timing) => {
+		const mounted = mountController();
+		const ground = {
+			...mounted.actor.item,
+			layer: "ground" as const,
+		};
+		mounted.actor.item = ground;
+		mounted.canonicalItems.set(ground.id, ground);
+		const visible = vi.spyOn(mounted.actorStore, "readCanonicalOccupantFx");
+		visible.mockReturnValue(Effect.succeed(ground));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		if (timing === "before release") {
+			visible.mockReturnValue(
+				Effect.succeed({
+					...item,
+					id: "runtime:cover",
+				}),
+			);
+		}
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		visible.mockReturnValue(
+			Effect.succeed({
+				...item,
+				id: "runtime:cover",
+			}),
+		);
+		await Promise.resolve();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+	});
+
+	it("cancels a held ground drag when content covers its canonical slot", () => {
+		const mounted = mountController();
+		const ground = {
+			...mounted.actor.item,
+			layer: "ground" as const,
+		};
+		mounted.actor.item = ground;
+		mounted.canonicalItems.set(ground.id, ground);
+		const visible = vi.spyOn(mounted.actorStore, "readCanonicalOccupantFx");
+		visible.mockReturnValue(Effect.succeed(ground));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+		mounted.flushFrame();
+		expect(mounted.actor.dragging).toBe(true);
+		const updates = mounted.magneticUpdates.length;
+		visible.mockReturnValue(
+			Effect.succeed({
+				...item,
+				id: "runtime:cover",
+			}),
+		);
+		Effect.runSync(mounted.controller.requestRefreshFx);
+		mounted.flushFrame();
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.finishCursorGrab).toHaveBeenCalledOnce();
+		expect(mounted.magneticUpdates).toHaveLength(updates);
+		mounted.stage.emit("pointerup", pointer(70, 20));
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+	});
+
 	it("does not activate a right release exactly at the screen threshold after fractional zoom", async () => {
 		const mounted = mountController();
 		const scale = 800 / 2432;

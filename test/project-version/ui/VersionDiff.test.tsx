@@ -9,6 +9,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		config: {
 			items: {
 				academy: {
+					layer: "content",
 					asset: {
 						default: [],
 					},

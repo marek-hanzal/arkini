@@ -64,6 +64,7 @@ const createItem = ({
 		id: "runtime:spawn",
 		itemId: "water",
 		itemType: "simple",
+		layer: "content" as const,
 		location: {
 			scope: "board",
 			space: 0,

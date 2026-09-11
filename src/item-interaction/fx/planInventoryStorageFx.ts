@@ -81,6 +81,7 @@ export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(functi
 		size: config.meta.inventory,
 	});
 	const [location] = readEmptyLocationsFn({
+		layer: item.item.layer,
 		locations,
 		runtime,
 	});

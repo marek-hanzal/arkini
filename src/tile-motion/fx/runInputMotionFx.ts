@@ -213,7 +213,10 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					const latestHome =
-						(yield* surface.readLocationPoseFx(cue.originLocation)) ?? sourceHome;
+						(yield* surface.readLocationPoseFx(
+							cue.originLocation,
+							source?.item.layer,
+						)) ?? sourceHome;
 					if (source === null) {
 						yield* exitAndDestroyInputTransientFx({
 							animator,
@@ -341,7 +344,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		});
 	}
 
-	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
+	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation, deliveryItem.layer);
 
 	const readLiveTargetFn = () => {
 		return readLiveContactPoseFn({

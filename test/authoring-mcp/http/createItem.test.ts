@@ -101,6 +101,7 @@ describe("editor MCP item creation", () => {
 			},
 			description: "Created through the editor MCP.",
 			draft: false,
+			layer: "content",
 			id: "item:mcp-simple",
 			title: "MCP Simple",
 			type: "simple",
@@ -202,6 +203,11 @@ describe("editor MCP item creation", () => {
 					id,
 					title: `MCP ${type}`,
 					description: `Created ${type} item.`,
+					...(type === "producer"
+						? {
+								layer: "ground",
+							}
+						: {}),
 					...(type === "simple"
 						? {
 								draft: true,
@@ -228,6 +234,7 @@ describe("editor MCP item creation", () => {
 		const has = (type: string) => types.some((candidate) => candidate === type);
 		for (const type of types) {
 			expect(read(type), type).toMatchObject({
+				layer: type === "producer" ? "ground" : "content",
 				asset: {
 					default: [
 						editorTestPayload.resources[0]?.id,

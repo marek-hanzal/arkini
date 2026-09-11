@@ -166,6 +166,7 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 				}),
 		id: source.id,
 		itemType: source.item.type,
+		layer: source.item.layer,
 		location: source.location,
 		primaryAction: {
 			kind: "none",

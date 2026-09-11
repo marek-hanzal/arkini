@@ -6,6 +6,7 @@
 		"title": "Sack With Coffee",
 		"description": "You'd better drink it yourself",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"sack-with-coffee"
 			]

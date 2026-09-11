@@ -6,6 +6,7 @@
 		"title": "Spoiled Steak",
 		"description": "Piece of cow, maybe?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-steak"
 			]

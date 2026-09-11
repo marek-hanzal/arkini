@@ -5,6 +5,7 @@
 		"id": "corruption",
 		"title": "Corruption",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"corruption"
 			]

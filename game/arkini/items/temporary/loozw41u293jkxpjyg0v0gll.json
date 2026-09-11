@@ -6,6 +6,7 @@
 		"title": "Dye Workshop Beer",
 		"description": "Why you did this?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dye-workshop-beer"
 			]

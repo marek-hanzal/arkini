@@ -6,6 +6,7 @@
 		"title": "Window",
 		"description": "Just a window(s)",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"window"
 			]

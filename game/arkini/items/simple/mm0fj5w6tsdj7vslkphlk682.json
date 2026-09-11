@@ -6,6 +6,7 @@
 		"title": "Filter Bank Depleted",
 		"description": "Job is done. Now throw it away or recycle it.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"filter-bank-depleted"
 			]

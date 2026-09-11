@@ -6,6 +6,7 @@
 		"title": "Cauldron With Milk",
 		"description": "A lot of milk",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cauldron-with-milk"
 			]

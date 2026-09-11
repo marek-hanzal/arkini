@@ -6,6 +6,7 @@
 		"title": "Cauldron With Corn",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cauldron-with-corn"
 			]

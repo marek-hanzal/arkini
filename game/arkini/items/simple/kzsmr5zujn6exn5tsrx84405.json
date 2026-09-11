@@ -6,6 +6,7 @@
 		"title": "Sapphire",
 		"description": "You're rich now!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"sapphire"
 			]

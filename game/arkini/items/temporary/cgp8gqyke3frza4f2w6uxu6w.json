@@ -6,6 +6,7 @@
 		"title": "Sweet Pastry",
 		"description": "You should brush your teeth after this",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"sweet-pastry"
 			]

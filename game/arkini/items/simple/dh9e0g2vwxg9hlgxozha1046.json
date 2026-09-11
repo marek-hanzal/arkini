@@ -6,6 +6,7 @@
 		"title": "Marek Smelly",
 		"description": "I should take some wash",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"marek-smelly"
 			]

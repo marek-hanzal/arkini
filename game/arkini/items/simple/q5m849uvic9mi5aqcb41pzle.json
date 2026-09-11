@@ -6,6 +6,7 @@
 		"title": "Bedding",
 		"description": "Sleep well",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"bedding"
 			]

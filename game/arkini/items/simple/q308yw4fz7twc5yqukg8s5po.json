@@ -6,6 +6,7 @@
 		"title": "Clay Jug With Water",
 		"description": "Another day, another water",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-jug-with-water"
 			]

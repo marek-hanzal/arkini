@@ -6,6 +6,7 @@
 		"title": "Cotton Seed",
 		"description": "Cotton. Want. To. Grow",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"seed",
 				"cotton"

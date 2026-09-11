@@ -6,6 +6,7 @@
 		"title": "Bed - Tier 1",
 		"description": "Simple, but comfortable bed",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"bed-t1"
 			]

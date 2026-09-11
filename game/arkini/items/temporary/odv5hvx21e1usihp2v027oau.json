@@ -5,6 +5,7 @@
 		"id": "holy-shit",
 		"title": "Holy Shit",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"holy-shit"
 			]

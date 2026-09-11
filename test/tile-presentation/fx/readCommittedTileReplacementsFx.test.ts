@@ -33,6 +33,7 @@ const config = GameConfigSchema.parse({
 			title: "Stone",
 			description: "Stone",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:stone",
 				],
@@ -48,6 +49,7 @@ const config = GameConfigSchema.parse({
 			title: "Mud",
 			description: "Mud",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:mud",
 				],
@@ -126,6 +128,7 @@ describe("readCommittedTileReplacementsFx", () => {
 				actorId: "runtime:target",
 				key: "7:0:replacement",
 				previous: {
+					artworkScale: 0.8,
 					itemId: "stone",
 					title: "Stone",
 					sourceUrl: "resource:asset:stone",

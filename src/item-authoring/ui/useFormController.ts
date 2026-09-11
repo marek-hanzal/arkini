@@ -55,6 +55,7 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	description: item.description ?? "",
 	asset: {
+		scale: item.asset.scale,
 		default: [
 			item.asset.default[0],
 			item.asset.default[1] ?? "",
@@ -107,6 +108,7 @@ const FormPathLabelBySegment = {
 	quantity: "Quantity",
 	result: "Replacement item",
 	runtimeMs: "Runtime",
+	scale: "Base tile scale",
 	selector: "Selected item",
 	show: "Visible",
 	space: "Space",

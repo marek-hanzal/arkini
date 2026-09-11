@@ -6,6 +6,7 @@
 		"title": "Brewery",
 		"description": "Wanna some cold beer?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"brewery"
 			]

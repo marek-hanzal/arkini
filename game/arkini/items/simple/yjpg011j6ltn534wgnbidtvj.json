@@ -6,6 +6,7 @@
 		"title": "Knowledge - Tier 2",
 		"description": "A bit better knowledge of something... interesting",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"knowledge-t2"
 			]

@@ -6,6 +6,7 @@
 		"title": "Empty Mug",
 		"description": "You can put something in there",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-mug"
 			]

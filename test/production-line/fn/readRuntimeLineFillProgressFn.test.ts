@@ -12,6 +12,7 @@ const materialItem = {
 	title: "Material",
 	description: "Material",
 	asset: {
+		scale: 0.8,
 		default: [
 			"asset:material",
 		],

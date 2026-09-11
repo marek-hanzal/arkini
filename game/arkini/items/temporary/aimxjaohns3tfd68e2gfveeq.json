@@ -6,6 +6,7 @@
 		"title": "Mouse With Cut Tail",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"mouse-with-cut-tail"
 			]

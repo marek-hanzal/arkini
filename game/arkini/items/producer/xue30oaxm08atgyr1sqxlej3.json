@@ -6,6 +6,7 @@
 		"title": "Clay Camp",
 		"description": "Gives you a clay",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-camp"
 			]

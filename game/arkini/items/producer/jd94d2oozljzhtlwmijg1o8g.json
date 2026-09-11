@@ -6,6 +6,7 @@
 		"title": "Cow Farm",
 		"description": "Something related to milk? Come here!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cow-farm"
 			]

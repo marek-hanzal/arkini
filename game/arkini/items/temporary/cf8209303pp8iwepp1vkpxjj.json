@@ -6,6 +6,7 @@
 		"title": "Clay Mug With Milk",
 		"description": "A mini-milk",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-mug-with-milk"
 			]

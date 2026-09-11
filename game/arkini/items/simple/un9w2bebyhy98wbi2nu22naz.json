@@ -6,6 +6,7 @@
 		"title": "Dynamite",
 		"description": "Kaboom. You should be extremely careful as this may literally destroy your progress.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dynamite"
 			]

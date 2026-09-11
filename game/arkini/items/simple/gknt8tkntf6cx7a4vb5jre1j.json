@@ -6,6 +6,7 @@
 		"title": "Dirty Cauldron",
 		"description": "You should clean it up",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-cauldron"
 			]

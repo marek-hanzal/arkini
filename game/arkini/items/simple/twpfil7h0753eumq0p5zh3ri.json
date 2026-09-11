@@ -6,6 +6,7 @@
 		"title": "Colored Glass",
 		"description": "Rainbooow!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"colored-glass"
 			]

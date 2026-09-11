@@ -6,6 +6,7 @@
 		"title": "Chicken",
 		"description": "Kwooo... kwo, kwo!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"chicken"
 			]

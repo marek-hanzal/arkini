@@ -7,12 +7,16 @@ import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSe
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
+import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { ArtworkTimeline } from "~/item-authoring/ui/ArtworkTimeline";
+import { ArtworkTilePreview } from "~/item-authoring/ui/ArtworkTilePreview";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { type FormValues, readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
 
 const defaultArtwork: FormValues["asset"] = {
+	scale: 0.8,
 	default: [
 		"",
 		"",
@@ -104,6 +108,28 @@ const ArtworkFields = withFieldGroupFn({
 					);
 				}}
 			</group.AppField>
+			<div className="max-w-48">
+				<group.AppField name="scale">
+					{(field) => (
+						<EditorNumberControl
+							label="Base tile scale"
+							description="Ratio from 0.25 to 1. 0.8 is 80%; 1 fills the tile at 100%."
+							error={readEditorFieldErrorFn(field.state.meta.errors)}
+							min={0.25}
+							max={1}
+							step={0.01}
+							name={field.name}
+							value={field.state.value}
+							onBlurFn={field.handleBlur}
+							onChangeFn={field.handleChange}
+						/>
+					)}
+				</group.AppField>
+			</div>
+			<p className="text-sm text-muted">
+				Scale changes artwork only. Occupied cells, storage, interaction reach and image
+				resolution stay the same. Transparent padding inside the PNG remains visible.
+			</p>
 		</>
 	),
 });
@@ -152,14 +178,28 @@ export const ArtworkSection = () => {
 			<form.Subscribe selector={(state) => state.values.asset}>
 				{(asset) => {
 					const canonicalAsset = readCanonicalItemArtworkFn(asset);
-					if (canonicalAsset.sources === undefined) return null;
 					return (
-						<ArtworkPreview
-							asset={canonicalAsset}
-							itemType={form.state.values.type}
-							onSelectProgressFn={setSelectedProgressIndexFn}
-							selectedProgressIndex={selectedProgressIndex}
-						/>
+						<>
+							<EditorFormCard>
+								<h2 className="text-base font-semibold">Tile preview</h2>
+								<ArtworkTilePreview
+									resourceIds={canonicalAsset.default}
+									scale={canonicalAsset.scale}
+								/>
+								<p className="text-sm text-muted">
+									The frame marks the complete tile. Scale 1 fills it with the
+									artwork canvas.
+								</p>
+							</EditorFormCard>
+							{canonicalAsset.sources === undefined ? null : (
+								<ArtworkPreview
+									asset={canonicalAsset}
+									itemType={form.state.values.type}
+									onSelectProgressFn={setSelectedProgressIndexFn}
+									selectedProgressIndex={selectedProgressIndex}
+								/>
+							)}
+						</>
 					);
 				}}
 			</form.Subscribe>

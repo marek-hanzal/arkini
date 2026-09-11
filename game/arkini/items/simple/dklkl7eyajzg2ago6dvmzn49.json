@@ -6,6 +6,7 @@
 		"title": "Spoiled Cauldron",
 		"description": "Bada-fuj",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-cauldron"
 			]

@@ -6,6 +6,7 @@
 		"title": "Kitchen Knife",
 		"description": "Sharp.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"kitchen-knife"
 			]

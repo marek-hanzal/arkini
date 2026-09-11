@@ -6,6 +6,7 @@
 		"title": "Roasted Coffee Beans",
 		"description": "Time for a good cup of coffee",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"roasted-coffee-beans"
 			]

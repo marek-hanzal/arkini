@@ -6,6 +6,7 @@
 		"title": "Wine With Beer",
 		"description": "Disgusting",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"wine-with-beer"
 			]

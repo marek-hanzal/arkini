@@ -6,6 +6,7 @@
 		"title": "Boar Bristles",
 		"description": "Core item for making other things clean",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"boar-bristles"
 			]

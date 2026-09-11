@@ -6,6 +6,7 @@
 		"title": "Bed Wine",
 		"description": "Don't lick it",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"bed-wine"
 			]

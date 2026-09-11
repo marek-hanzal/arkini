@@ -6,6 +6,7 @@
 		"title": "Beer Barrel",
 		"description": "Beer source",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"beer-barrel"
 			]

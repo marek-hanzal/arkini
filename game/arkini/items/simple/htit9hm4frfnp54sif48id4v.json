@@ -6,6 +6,7 @@
 		"title": "Key - Tier 6",
 		"description": "Master key of Life and Death. Just kidding, it's a key, just nicer.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"key-t6"
 			]

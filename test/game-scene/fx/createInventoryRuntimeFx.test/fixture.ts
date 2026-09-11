@@ -531,6 +531,7 @@ export const inventoryItem = {
 	revision: "revision:water",
 	running: false,
 	activityEffect: false,
+	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	title: "Water",
 } satisfies TileActorItem;
@@ -547,6 +548,7 @@ export const inventoryTargetItem = {
 		},
 	},
 	revision: "revision:stone",
+	artworkScale: 0.8,
 	sourceUrl: "resource:stone",
 	title: "Stone",
 } satisfies TileActorItem;

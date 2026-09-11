@@ -6,6 +6,7 @@
 		"title": "Mage Lodge",
 		"description": "Your way of magic starts here",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"mage-lodge"
 			]

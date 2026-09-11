@@ -6,6 +6,7 @@
 		"title": "Gear - Tier 1",
 		"description": "Simple gear for simple machines",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"gear-t1"
 			]

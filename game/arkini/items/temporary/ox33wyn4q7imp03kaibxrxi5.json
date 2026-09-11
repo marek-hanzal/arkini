@@ -6,6 +6,7 @@
 		"title": "Clay Bowl With Coffee",
 		"description": "Flateticano",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-bowl-with-coffee"
 			]

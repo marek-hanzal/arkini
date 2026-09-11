@@ -6,6 +6,7 @@
 		"title": "Gear - Tier 2",
 		"description": "Better gears",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"gear-t2"
 			]

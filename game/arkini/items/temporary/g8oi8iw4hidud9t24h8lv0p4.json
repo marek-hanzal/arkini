@@ -6,6 +6,7 @@
 		"title": "Animal Fat",
 		"description": "Fat",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"animal-fat"
 			]

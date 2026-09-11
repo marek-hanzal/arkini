@@ -6,6 +6,7 @@
 		"title": "Cutting Board With Bread",
 		"description": "Bread",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cutting-board-with-bread"
 			]

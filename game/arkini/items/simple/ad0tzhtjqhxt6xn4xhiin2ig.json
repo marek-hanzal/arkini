@@ -6,6 +6,7 @@
 		"title": "Planks",
 		"description": "Really complex piece of wood. Just planks, I'm kidding.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"planks"
 			]

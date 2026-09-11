@@ -6,6 +6,7 @@
 		"title": "Pancake",
 		"description": "You can make it better",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"pancake"
 			]

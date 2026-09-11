@@ -6,6 +6,7 @@
 		"title": "Campfire Extinguished",
 		"description": "No more light here",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"campfire-extinguished"
 			]

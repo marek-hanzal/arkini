@@ -123,6 +123,10 @@ describe("filesystem Editor project writes", () => {
 				item: {
 					...water,
 					title: "Fresh Water",
+					asset: {
+						...water.asset,
+						scale: 0.65,
+					},
 				},
 			}),
 		);
@@ -137,6 +141,16 @@ describe("filesystem Editor project writes", () => {
 				join(root, "project.json"),
 			].sort(),
 		);
+		const savedItem = JSON.parse(
+			await Effect.runPromise(
+				nodeFileSystem.readFileString(join(root, "items", "simple", `${water.uid}.json`)),
+			),
+		);
+		expect(savedItem.item.asset.scale).toBe(0.65);
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		const project = await Effect.runPromise(reopened.readProjectFx(created.projectId));
+		expect(project?.config.items.water?.asset.scale).toBe(0.65);
 	});
 
 	it("pins config, item, and resource writes while preserving the selected build version", async () => {

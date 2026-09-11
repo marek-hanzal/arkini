@@ -6,6 +6,7 @@
 		"title": "Wooden Hot Chocolate",
 		"description": "Wooden chocolate",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"wooden-hot-chocolate"
 			]

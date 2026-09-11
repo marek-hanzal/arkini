@@ -6,6 +6,7 @@
 		"title": "Cocoa Powder",
 		"description": "Can you smell it?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cocoa-powder"
 			]

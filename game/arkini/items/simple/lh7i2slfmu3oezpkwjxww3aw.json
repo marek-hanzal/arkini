@@ -6,6 +6,7 @@
 		"title": "Copper Wire",
 		"description": "Another variant of copper ore",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-wire"
 			]

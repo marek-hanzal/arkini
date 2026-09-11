@@ -6,6 +6,7 @@
 		"title": "Colored Window",
 		"description": "Colors, hehehe",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"colored-window"
 			]

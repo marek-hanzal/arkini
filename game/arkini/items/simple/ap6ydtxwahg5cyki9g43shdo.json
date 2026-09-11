@@ -6,6 +6,7 @@
 		"title": "Copper Pan",
 		"description": "Wanna cook something?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-pan"
 			]

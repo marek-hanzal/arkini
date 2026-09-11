@@ -6,6 +6,7 @@
 		"title": "Eggs",
 		"description": "Some eggs you may cook.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"eggs"
 			]

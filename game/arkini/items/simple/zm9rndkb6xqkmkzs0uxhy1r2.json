@@ -5,6 +5,7 @@
 		"id": "dirty-wine",
 		"title": "Dirty Wine",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-wine"
 			]

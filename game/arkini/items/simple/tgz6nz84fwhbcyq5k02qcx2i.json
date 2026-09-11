@@ -6,6 +6,7 @@
 		"title": "Goose",
 		"description": "Beloved lifestock",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"goose"
 			]

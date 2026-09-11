@@ -6,6 +6,7 @@
 		"title": "Empty Grain Field",
 		"description": "Ready for another grain cycle.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-grain-field"
 			]

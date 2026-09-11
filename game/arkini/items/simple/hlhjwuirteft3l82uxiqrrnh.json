@@ -5,6 +5,7 @@
 		"id": "empty-corn-field",
 		"title": "Empty Corn Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-corn-field"
 			]

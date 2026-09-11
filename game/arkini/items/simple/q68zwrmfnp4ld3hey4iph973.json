@@ -6,6 +6,7 @@
 		"title": "Copper Ingot",
 		"description": "Quite shiny piece of metal",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-ingot"
 			]

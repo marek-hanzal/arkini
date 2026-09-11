@@ -6,6 +6,7 @@
 		"title": "Spoiled Clay Jug",
 		"description": "Next time a bit more care",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-clay-jug"
 			]

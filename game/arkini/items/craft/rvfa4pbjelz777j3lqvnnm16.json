@@ -6,6 +6,7 @@
 		"title": "Confectionery",
 		"description": "Yummies are available here",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"confectionery"
 			]

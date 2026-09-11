@@ -6,6 +6,7 @@
 		"title": "Coal Deposit",
 		"description": "Industrial times starts here",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"coal-source"
 			]

@@ -5,6 +5,7 @@
 		"id": "dirty-copper-bathtub",
 		"title": "Dirty Copper Bathtub",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-copper-bathtub"
 			]

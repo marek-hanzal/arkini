@@ -6,6 +6,7 @@
 		"title": "Compost",
 		"description": "Nice thing, flowers would like it.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"compost"
 			]

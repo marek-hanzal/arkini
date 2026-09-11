@@ -6,6 +6,7 @@
 		"title": "Amethyst",
 		"description": "A colorful stone",
 		"asset": {
+			"scale": 1,
 			"default": [
 				"amethyst"
 			]

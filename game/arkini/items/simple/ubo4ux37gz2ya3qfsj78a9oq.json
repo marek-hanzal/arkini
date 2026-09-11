@@ -6,6 +6,7 @@
 		"title": "Clutter",
 		"description": "Just broken stuff. You should take care of you clutter.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clutter"
 			]

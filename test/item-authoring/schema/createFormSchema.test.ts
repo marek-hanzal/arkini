@@ -29,6 +29,7 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	description: item.description ?? "",
 	asset: {
+		scale: item.asset.scale,
 		default: [
 			item.asset.default[0],
 			"",

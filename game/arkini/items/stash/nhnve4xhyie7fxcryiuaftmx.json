@@ -6,6 +6,7 @@
 		"title": "Treasure Chest - Tier 5",
 		"description": "Quite luxury stuff",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"treasure-chest-t5"
 			]

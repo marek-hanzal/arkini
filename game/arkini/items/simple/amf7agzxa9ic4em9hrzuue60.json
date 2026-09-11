@@ -6,6 +6,7 @@
 		"title": "Empty Wine Barrel",
 		"description": "Wanna more",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-wine-barrel"
 			]

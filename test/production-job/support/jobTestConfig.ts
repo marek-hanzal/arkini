@@ -10,6 +10,7 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 	title: id,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],

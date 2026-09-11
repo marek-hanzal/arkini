@@ -6,6 +6,7 @@
 		"title": "Cauldron With Beer",
 		"description": "Beer. In cauldron. A lot of beer",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cauldron-with-beer"
 			]

@@ -6,6 +6,7 @@
 		"title": "Fertilized Cotton Field",
 		"description": "Ready for cotton seed.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"fertilized-cotton-field"
 			]

@@ -5,6 +5,7 @@
 		"id": "faith-chest",
 		"title": "Faith Chest",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"faith-chest"
 			]

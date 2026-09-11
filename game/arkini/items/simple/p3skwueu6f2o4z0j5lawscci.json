@@ -6,6 +6,7 @@
 		"title": "Rope",
 		"description": "Just a rope if you want hang something",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"rope"
 			]

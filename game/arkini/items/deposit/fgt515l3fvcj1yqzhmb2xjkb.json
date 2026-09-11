@@ -6,6 +6,7 @@
 		"title": "Clay Deposit",
 		"description": "You can get some clay from here. Brick-mood?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-source"
 			]

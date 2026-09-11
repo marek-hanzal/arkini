@@ -6,6 +6,7 @@
 		"title": "Clay Bowl",
 		"description": "Just a bowl",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-bowl"
 			]

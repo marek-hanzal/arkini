@@ -6,6 +6,7 @@
 		"title": "Wine Barrel",
 		"description": "Over age of 18",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"wine-barrel"
 			]

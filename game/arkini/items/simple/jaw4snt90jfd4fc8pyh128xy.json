@@ -5,6 +5,7 @@
 		"id": "mana-reservoir",
 		"title": "Mana Reservoir",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"mana-reservoir"
 			]

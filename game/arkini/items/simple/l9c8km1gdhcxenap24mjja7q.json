@@ -6,6 +6,7 @@
 		"title": "Spoiled Animal Fat",
 		"description": "I don't like it",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-animal-fat"
 			]

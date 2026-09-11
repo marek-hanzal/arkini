@@ -6,6 +6,7 @@
 		"title": "Cotton Field",
 		"description": "Grows cotton",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cotton-field"
 			]

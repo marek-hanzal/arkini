@@ -6,6 +6,7 @@
 		"title": "Flour",
 		"description": "Bread?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"flour"
 			]

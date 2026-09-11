@@ -6,6 +6,7 @@
 		"title": "Lumber camp",
 		"description": "That place you get wood from. You need this one.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"lumber-camp"
 			]

@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { ArtworkTilePreview } from "~/item-authoring/ui/ArtworkTilePreview";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { readProgressArtworkThresholdsFn } from "~/tile-presentation/fn/readProgressArtworkThresholdsFn";
@@ -55,9 +55,10 @@ export const ArtworkTimeline = ({
 	return (
 		<>
 			<div className="flex items-center gap-4">
-				<EditorItemThumbnail
+				<ArtworkTilePreview
 					className="size-24"
 					resourceIds={asset.default}
+					scale={asset.scale}
 				/>
 				<div className="grid gap-1">
 					<h3 className="text-sm font-semibold">Default composition</h3>
@@ -95,20 +96,22 @@ export const ArtworkTimeline = ({
 								0%
 							</span>
 							<span className="relative z-10 size-3 rounded-full bg-secondary-selected" />
-							<EditorItemThumbnail
+							<ArtworkTilePreview
 								resourceIds={asset.default}
-								size="md"
+								className="size-12"
+								scale={asset.scale}
 							/>
 							<span className="max-w-32 truncate text-xs font-medium">Default</span>
 						</li>
 						{sources.map((resourceId, index) => {
 							const threshold = (thresholds[index] ?? 0) * 100;
 							const thumbnail = (
-								<EditorItemThumbnail
+								<ArtworkTilePreview
 									resourceIds={[
 										resourceId,
 									]}
-									size="md"
+									className="size-12"
+									scale={asset.scale}
 								/>
 							);
 							return (

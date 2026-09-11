@@ -62,6 +62,7 @@ export const writeSigningGame = async (root: string) => {
 				title: "Item",
 				description: "Signing fixture item.",
 				asset: {
+					scale: 0.8,
 					default: [
 						"item",
 					],

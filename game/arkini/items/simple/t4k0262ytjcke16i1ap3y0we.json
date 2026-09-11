@@ -6,6 +6,7 @@
 		"title": "Spoiled Popcorn",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-popcorn"
 			]

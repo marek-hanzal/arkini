@@ -6,6 +6,7 @@
 		"title": "Linen Sewing Kit",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"linen-sewing-kit"
 			]

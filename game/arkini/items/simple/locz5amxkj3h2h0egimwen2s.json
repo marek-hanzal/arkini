@@ -6,6 +6,7 @@
 		"title": "Work Clothes",
 		"description": "You should go the the work",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"work-clothes"
 			]

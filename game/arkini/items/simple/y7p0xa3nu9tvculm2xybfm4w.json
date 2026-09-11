@@ -6,6 +6,7 @@
 		"title": "Explosive Compound",
 		"description": "Kaboom in the bottle",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"explosive-compound"
 			]

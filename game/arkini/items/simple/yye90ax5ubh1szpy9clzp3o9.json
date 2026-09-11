@@ -6,6 +6,7 @@
 		"title": "Stone Block",
 		"description": "It's squarish.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"stone-block"
 			]

@@ -6,6 +6,7 @@
 		"title": "Yarn",
 		"description": "Tangled.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"yarn"
 			]

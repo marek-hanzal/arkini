@@ -6,6 +6,7 @@
 		"title": "Forest Portal",
 		"description": "Gives you an access to the Forest Land",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"forest-portal"
 			]

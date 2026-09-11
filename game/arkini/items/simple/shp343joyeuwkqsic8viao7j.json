@@ -6,6 +6,7 @@
 		"title": "Copper Bathtub With Bio Waste",
 		"description": "You cannot help yourself?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-bathtub-with-bio-waste"
 			]

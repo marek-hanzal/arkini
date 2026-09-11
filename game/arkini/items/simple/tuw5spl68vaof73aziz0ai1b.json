@@ -6,6 +6,7 @@
 		"title": "Empty Quiver",
 		"description": "Put arrows inside",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-quiver"
 			]

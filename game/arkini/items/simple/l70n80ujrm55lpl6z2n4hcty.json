@@ -6,6 +6,7 @@
 		"title": "Bio-Waste",
 		"description": "Stuff produced by life. From the other side.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"bio-waste"
 			]

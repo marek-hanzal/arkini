@@ -16,6 +16,7 @@ const item = (id: string, title = id) => ({
 	title,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],

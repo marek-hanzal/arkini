@@ -79,6 +79,7 @@ describe("Form", () => {
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
 			asset: {
+				scale: 0.8,
 				default: [
 					project.resources[0]?.id,
 				],
@@ -112,6 +113,7 @@ describe("Form", () => {
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
 			asset: {
+				scale: 0.8,
 				default: [
 					"selected_asset-name",
 				],

@@ -6,6 +6,7 @@
 		"title": "Cow Farm Blueprint",
 		"description": "It's time for some boos!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"blueprint",
 				"cow-farm"

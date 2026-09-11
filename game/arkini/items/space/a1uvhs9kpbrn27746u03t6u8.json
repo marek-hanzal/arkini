@@ -6,6 +6,7 @@
 		"title": "Workshop Portal",
 		"description": "Workshops",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"workshop-portal"
 			]

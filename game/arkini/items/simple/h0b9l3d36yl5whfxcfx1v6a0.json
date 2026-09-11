@@ -6,6 +6,7 @@
 		"title": "Piggy Bank",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"piggy-bank"
 			]

@@ -6,6 +6,7 @@
 		"title": "Roof Tiles",
 		"description": "This thing should be put on top of buildings.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"roof-tiles"
 			]

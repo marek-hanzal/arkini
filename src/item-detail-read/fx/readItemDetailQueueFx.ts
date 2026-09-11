@@ -17,7 +17,7 @@ interface ItemDetailQueueRequest {
 	readonly lineId: IdSchema.Type;
 	readonly title: string;
 	readonly outputItemId?: IdSchema.Type;
-	readonly status: "inputs-ready" | "waiting-inputs" | "blocked-earlier" | "blocked-condition";
+	readonly status: "inputs-ready" | "waiting-inputs" | "blocked-active" | "blocked-condition";
 	readonly missingQuantity?: number;
 }
 
@@ -106,14 +106,13 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 			),
 	);
 	const requests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
-	const projectedRequests = yield* Effect.forEach(requests, (request, index) =>
+	const projectedRequests = yield* Effect.forEach(requests, (request) =>
 		Effect.gen(function* () {
 			let status: ItemDetailQueueRequest["status"] =
-				active.length > 0 || index > 0 ? "blocked-earlier" : "blocked-condition";
+				active.length > 0 ? "blocked-active" : "blocked-condition";
 			let missingQuantity: number | undefined;
 			if (
 				active.length === 0 &&
-				index === 0 &&
 				owner.location.scope === LocationScopeEnumSchema.enum.Board
 			) {
 				const start = yield* resolveLineStartFx({
@@ -144,7 +143,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 								coverage.selectedQuantity +
 								(coverage.type === "incomplete" ? coverage.missingQuantity : 0);
 						} else {
-							// Capacity is already checked; coverage only reads this same snapshot.
+							// Each row reads the same snapshot; readiness does not predict dispatch order.
 							status = start.run.ready ? "inputs-ready" : "blocked-condition";
 						}
 					}

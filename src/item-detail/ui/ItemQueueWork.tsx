@@ -207,8 +207,8 @@ const QueueRequestRow = ({
 							? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
 									request.missingQuantity === 1 ? "unit" : "units"
 								} missing`
-							: request.status === "blocked-earlier"
-								? "Blocked by earlier work"
+							: request.status === "blocked-active"
+								? "Waiting for active job"
 								: "Waiting for runtime conditions"}
 				</motion.p>
 			</AnimatePresence>

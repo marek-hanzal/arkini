@@ -45,7 +45,7 @@ const runAttempt = (runtime: RuntimeSchema.Type, requestId = request.id) =>
 	);
 
 describe("attemptQueuedLineStartFx", () => {
-	it("returns empty when the exact request is not a live FIFO head", () => {
+	it("returns empty when the exact request is no longer queued", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
@@ -63,41 +63,6 @@ describe("attemptQueuedLineStartFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		const result = runAttempt(runtime);
-
-		expect(result).toMatchObject({
-			_tag: "Success",
-			success: {
-				type: "empty",
-			},
-		});
-		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
-	});
-
-	it("does not start a later request from the same owner", () => {
-		const later = {
-			...request,
-			id: "job:request:later",
-		} satisfies JobQueueRequestSchema.Type;
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				instantGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				owner,
-			],
-			jobs: [],
-			jobQueue: [
-				request,
-				later,
-			],
-
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-
-		const result = runAttempt(runtime, later.id);
 
 		expect(result).toMatchObject({
 			_tag: "Success",
@@ -209,7 +174,7 @@ describe("attemptQueuedLineStartFx", () => {
 		});
 	});
 
-	it("propagates a missing line from the live FIFO head", () => {
+	it("propagates a missing line from a live request", () => {
 		const missingLineRequest = {
 			...request,
 			lineId: "line:missing",
@@ -240,7 +205,7 @@ describe("attemptQueuedLineStartFx", () => {
 		});
 	});
 
-	it("starts only the owner's live FIFO head through the canonical pipeline", () => {
+	it("starts the exact selected later request through the canonical pipeline", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
@@ -257,7 +222,7 @@ describe("attemptQueuedLineStartFx", () => {
 					],
 				} satisfies RuntimeSchema.Type;
 				return yield* attemptQueuedLineStartFx({
-					requestId: request.id,
+					requestId: secondRequest.id,
 					runtime,
 				});
 			}).pipe(
@@ -268,11 +233,11 @@ describe("attemptQueuedLineStartFx", () => {
 		);
 
 		expect(result.type).toBe("started");
-		if (result.type !== "started") throw new Error("Expected the FIFO request to start.");
+		if (result.type !== "started") throw new Error("Expected the selected request to start.");
 		expect(result.job.lineId).toBe(request.lineId);
 		expect(result.runtime.jobQueue).toEqual([
 			expect.objectContaining({
-				id: "job:request:second",
+				id: request.id,
 			}),
 		]);
 	});

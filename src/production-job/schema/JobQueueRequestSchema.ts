@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 
-/** One FIFO request to start a line later through the canonical start pipeline. */
+/** One ordered intent to start a line later through the canonical start pipeline. */
 export const JobQueueRequestSchema = z
 	.object({
 		id: IdSchema,

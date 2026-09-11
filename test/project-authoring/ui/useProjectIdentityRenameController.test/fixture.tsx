@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { RegistryContext } from "@effect/atom-react";
 import {
 	createMemoryHistory,
@@ -13,7 +14,6 @@ import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { bootstrapEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/bootstrapEditorMcpVersionCheckoutFx";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { useEditorNavigationBlocker } from "~/authoring-shell/ui/useEditorNavigationBlocker";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -25,7 +25,7 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 const project: Project = {
 	projectId: "project-one",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: parseVersionFn(editorTestPayload.version),
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 2,
@@ -76,13 +76,6 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 		type: "success",
 		value: undefined,
 	}));
-	const readVersionStatusFn = vi.fn(async () => ({
-		type: "failure",
-		error: {
-			operation: "read-version-status",
-			message: "Old project no longer exists.",
-		},
-	}));
 	const originalArkini = Object.getOwnPropertyDescriptor(window, "arkini");
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
@@ -90,7 +83,6 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 			editor: {
 				replaceConfigFn,
 				awaitIdleFn,
-				readVersionStatusFn,
 			},
 		},
 	});
@@ -113,15 +105,9 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 			await Effect.runPromise(Deferred.await(routeGate));
 		},
 	});
-	const historyRoute = createRoute({
-		getParentRoute: () => rootRoute,
-		path: "/editor/$projectId/versions/history",
-		component: () => createElement("p", null, "History"),
-	});
 	const router = createRouter({
 		routeTree: rootRoute.addChildren([
 			editorRoute,
-			historyRoute,
 		]),
 		history: createMemoryHistory({
 			initialEntries: [
@@ -133,19 +119,6 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 	const host = document.createElement("div");
 	document.body.append(host);
 	const root = createRoot(host);
-	let checkoutFn!: (request: { projectId: string; versionId: string }) => Promise<void>;
-	const unsubscribeFn = RendererRuntime.runSync(
-		bootstrapEditorMcpVersionCheckoutFx({
-			editorMcp: {
-				onVersionCheckoutRequestedFn: (listenerFn) => {
-					checkoutFn = listenerFn;
-					return () => undefined;
-				},
-			},
-			rendererRuntime: RendererRuntime,
-			router: router as never,
-		}),
-	);
 	await act(async () =>
 		root.render(
 			createElement(
@@ -164,8 +137,6 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 		admission: RendererRuntime.runSync(ProjectWriteAdmission),
 		owner: RendererRuntime.runSync(EditorUnsavedChanges),
 		awaitIdleFn,
-		checkoutFn,
-		readVersionStatusFn,
 		replaceConfigFn,
 		router,
 		readControllerFn: () => controller,
@@ -176,7 +147,6 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 		unmountFn: async () => {
 			Effect.runSync(Deferred.succeed(commitGate, undefined));
 			Effect.runSync(Deferred.succeed(routeGate, undefined));
-			unsubscribeFn();
 			await act(async () => root.unmount());
 			host.remove();
 			if (originalArkini === undefined) Reflect.deleteProperty(window, "arkini");

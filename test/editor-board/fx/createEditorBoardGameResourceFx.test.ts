@@ -13,7 +13,10 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 const createProject = (revision: number): Project => ({
 	projectId: "editor-board",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,

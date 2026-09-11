@@ -2,14 +2,14 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 
 /** Canonical project row persisted without duplicated display metadata. */
 export const ProjectRecordSchema = z
 	.object({
 		projectId: IdSchema,
 		config: GameConfigSchema,
-		version: GameVersionSchema,
+		version: VersionPartsSchema,
 		revision: z.number().int().nonnegative(),
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),

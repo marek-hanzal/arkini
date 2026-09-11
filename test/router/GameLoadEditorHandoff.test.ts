@@ -33,7 +33,10 @@ describe("game load editor handoff", () => {
 		const project: Project = {
 			projectId: "delayed-editor-project",
 			title: editorTestPayload.config.meta.title,
-			version: editorTestPayload.version,
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			createdAtMs: 1,
 			updatedAtMs: 1,
 			revision: 1,

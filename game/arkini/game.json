@@ -367,5 +367,8 @@
 			}
 		]
 	},
-	"version": "3.0"
+	"version": {
+		"major": 3,
+		"minor": 0
+	}
 }

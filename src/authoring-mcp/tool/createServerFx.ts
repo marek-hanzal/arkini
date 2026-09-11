@@ -1,3 +1,4 @@
+import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import { McpServer } from "@modelcontextprotocol/server";
 import { Effect, Order } from "effect";
 import { z } from "zod";
@@ -24,7 +25,6 @@ import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerNoteToolsFn } from "./registerNoteTools";
-import { registerVersionToolsFn } from "./registerVersionTools";
 import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
@@ -130,7 +130,7 @@ const readProjectTextFn = (project: Project) => {
 		`Title: ${project.title}`,
 		`Project ID: ${project.projectId}`,
 		`Game ID: ${project.config.meta.id}`,
-		`Arkpack version: ${project.version}`,
+		`Arkpack version: ${formatVersionFn(project.version)}`,
 		`Revision: ${project.revision}`,
 		`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
 		`Toolbar: ${project.config.meta.toolbarSize === undefined || project.config.meta.toolbarSize === 0 ? "disabled" : `${project.config.meta.toolbarSize} slots`}`,
@@ -236,10 +236,7 @@ const createServerFn = (
 	notifyProjectChangedFn: (projectId: string) => void,
 	repository: ProjectRepositoryService,
 	readProjectContextFn: () => string | undefined,
-	requestVersionCheckoutFx: (
-		projectId: string,
-		versionId: string,
-	) => Effect.Effect<void, unknown, never>,
+
 	runPromiseFn: <Value, Error>(effect: Effect.Effect<Value, Error, never>) => Promise<Value>,
 ) => {
 	const runToolFn = async (effect: Effect.Effect<string, unknown, never>) => {
@@ -271,7 +268,7 @@ const createServerFn = (
 		},
 		{
 			instructions:
-				"Every project tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail and resolve each returned $ref through schema_detail again. Create, edit, and version tools persist canonical saved editor state; version_checkout performs an explicit destructive hard reset.",
+				"Every project tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail and resolve each returned $ref through schema_detail again. Create and edit tools persist canonical saved editor state.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
@@ -481,14 +478,6 @@ const createServerFn = (
 				),
 			),
 	);
-	registerVersionToolsFn({
-		notifyProjectChangedFn,
-		readProjectFx,
-		repository,
-		requestVersionCheckoutFx,
-		runToolFn,
-		server,
-	});
 	return server;
 };
 
@@ -498,16 +487,12 @@ export const createServerFx = Effect.fn("createServerFx")(
 		notifyProjectChangedFn,
 		readProjectContextFn,
 		repository,
-		requestVersionCheckoutFx,
 		runPromiseFn,
 	}: {
 		readonly notifyProjectChangedFn: (projectId: string) => void;
 		readonly readProjectContextFn: () => string | undefined;
 		readonly repository: ProjectRepositoryService;
-		readonly requestVersionCheckoutFx: (
-			projectId: string,
-			versionId: string,
-		) => Effect.Effect<void, unknown, never>;
+
 		readonly runPromiseFn: <Value, Error>(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
@@ -518,7 +503,6 @@ export const createServerFx = Effect.fn("createServerFx")(
 					notifyProjectChangedFn,
 					repository,
 					readProjectContextFn,
-					requestVersionCheckoutFx,
 					runPromiseFn,
 				),
 		} as const),

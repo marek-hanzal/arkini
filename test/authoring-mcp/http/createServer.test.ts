@@ -73,13 +73,6 @@ describe("editor MCP server", () => {
 			"item_input",
 			"item_output",
 			"item_estimate",
-			"version_status",
-			"version_commit_preview",
-			"version_list",
-			"version_diff",
-			"version_commit",
-			"version_checkout",
-			"version_tag",
 		]);
 		const collectionProperties = tools.tools.find(({ name }) => name === "item_collection")
 			?.inputSchema.properties;
@@ -236,7 +229,10 @@ describe("editor MCP server", () => {
 		const { ownership, port, repository } = await createMcpHarness(runPromiseFn);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...editorTestPayload.config,
 					meta: {
@@ -308,7 +304,10 @@ describe("editor MCP server", () => {
 		const { ownership, port, repository } = await createMcpHarness();
 		await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...createJobTestConfig(),
 					meta: {
@@ -379,209 +378,5 @@ describe("editor MCP server", () => {
 				},
 			],
 		});
-	});
-
-	it("commits, inspects, tags, and renderer-checks out full project versions", async () => {
-		const notifications: string[] = [];
-		const { ownership, port, repository } = await createMcpHarness(
-			Effect.runPromise,
-			(projectId) => notifications.push(projectId),
-		);
-		const created = await Effect.runPromise(
-			repository.createProjectFx({
-				version: "1.0",
-				config: {
-					...editorTestPayload.config,
-					meta: {
-						...editorTestPayload.config.meta,
-						id: "version-project",
-					},
-				},
-				resources: editorTestPayload.resources,
-			}),
-		);
-		const checkoutRequests: string[] = [];
-		ownership.setProjectContextFn("version-project", (versionId) =>
-			Effect.gen(function* () {
-				checkoutRequests.push(versionId);
-				const status = yield* repository.readVersionStatusFx("version-project");
-				yield* repository.checkoutVersionFx({
-					projectId: "version-project",
-					versionId,
-					expectedFingerprint: status.currentFingerprint,
-				});
-			}),
-		);
-		await Effect.runPromise(ownership.startLocalFx);
-		const client = await connectMcpClient(port);
-
-		const initialStatus = await client.callTool({
-			name: "version_status",
-			arguments: {},
-		});
-		expect(initialStatus.content).toMatchObject([
-			{
-				text: expect.stringContaining("Versions: 0\nWorking copy: dirty"),
-			},
-		]);
-		const initialPreview = await client.callTool({
-			name: "version_commit_preview",
-			arguments: {},
-		});
-		expect(initialPreview.content).toMatchObject([
-			{
-				text: expect.stringContaining("Resulting Arkpack: v1.0\nCompatibility bump: noop"),
-			},
-		]);
-		const initialPreviewText = initialPreview.content.find(({ type }) => type === "text");
-		if (initialPreviewText?.type !== "text") throw new Error("Expected text preview.");
-		const initialFingerprint = /Commit fingerprint: ([a-f0-9]{64})/.exec(
-			initialPreviewText.text,
-		)?.[1];
-		if (initialFingerprint === undefined) throw new Error("Expected commit fingerprint.");
-		const committed = await client.callTool({
-			name: "version_commit",
-			arguments: {
-				message: "Initial snapshot",
-				previewFingerprint: initialFingerprint,
-				tag: "baseline",
-			},
-		});
-		expect(committed.isError).not.toBe(true);
-		const [version] = await Effect.runPromise(repository.listVersionsFx("version-project"));
-		if (version === undefined) throw new Error("Expected MCP-created version.");
-		expect(committed.content).toMatchObject([
-			{
-				text: expect.stringContaining(version.versionId),
-			},
-		]);
-
-		await Effect.runPromise(
-			repository.replaceConfigFx({
-				projectId: "version-project",
-				expectedRevision: created.revision,
-				config: {
-					...created.config,
-					meta: {
-						...created.config.meta,
-						title: "Changed after snapshot",
-					},
-				},
-			}),
-		);
-		const diff = await client.callTool({
-			name: "version_diff",
-			arguments: {
-				from: version.versionId,
-				to: "current",
-			},
-		});
-		expect(diff.content).toMatchObject([
-			{
-				text: expect.stringContaining("config.meta.title · minor bump"),
-			},
-		]);
-		const minorProject = await Effect.runPromise(repository.readProjectFx("version-project"));
-		if (minorProject === null) throw new Error("Expected current project.");
-		await Effect.runPromise(
-			repository.writeBoardScenarioFx({
-				bytes: Uint8Array.of(1, 2, 3),
-				expectedRevision: minorProject.revision,
-				name: "Opening",
-				projectId: "version-project",
-			}),
-		);
-		const minorPreview = await client.callTool({
-			name: "version_commit_preview",
-			arguments: {},
-		});
-		const minorPreviewText = minorPreview.content.find(({ type }) => type === "text");
-		if (minorPreviewText?.type !== "text") throw new Error("Expected text preview.");
-		expect(minorPreviewText.text).toContain(
-			"Compatibility bump: minor\nBoard scenarios deleted by commit: 0",
-		);
-		const minorFingerprint = /Commit fingerprint: ([a-f0-9]{64})/.exec(
-			minorPreviewText.text,
-		)?.[1];
-		if (minorFingerprint === undefined) throw new Error("Expected commit fingerprint.");
-		await Effect.runPromise(
-			repository.replaceConfigFx({
-				projectId: "version-project",
-				expectedRevision: minorProject.revision,
-				config: {
-					...minorProject.config,
-					meta: {
-						...minorProject.config.meta,
-						board: {
-							...minorProject.config.meta.board,
-							width: minorProject.config.meta.board.width + 1,
-						},
-					},
-				},
-			}),
-		);
-		const staleCommit = await client.callTool({
-			name: "version_commit",
-			arguments: {
-				message: "Stale preview must fail",
-				previewFingerprint: minorFingerprint,
-			},
-		});
-		expect(staleCommit.isError).toBe(true);
-		expect(staleCommit.content).toMatchObject([
-			{
-				text: expect.stringContaining("changed after version_commit_preview"),
-			},
-		]);
-		expect(
-			await Effect.runPromise(repository.listBoardScenariosFx("version-project")),
-		).toHaveLength(1);
-		expect(await Effect.runPromise(repository.listVersionsFx("version-project"))).toHaveLength(
-			1,
-		);
-		const tagged = await client.callTool({
-			name: "version_tag",
-			arguments: {
-				versionId: version.versionId,
-				tag: "restore-point",
-			},
-		});
-		expect(tagged.content).toMatchObject([
-			{
-				text: expect.stringContaining("Tag: restore-point"),
-			},
-		]);
-		const list = await client.callTool({
-			name: "version_list",
-			arguments: {},
-		});
-		expect(list.content).toMatchObject([
-			{
-				text: expect.stringContaining("Total: 1"),
-			},
-		]);
-		const checkedOut = await client.callTool({
-			name: "version_checkout",
-			arguments: {
-				versionId: version.versionId,
-				confirmDiscardCurrentChanges: true,
-			},
-		});
-		expect(checkedOut.content).toMatchObject([
-			{
-				text: expect.stringContaining("The selected project's saved state was replaced."),
-			},
-		]);
-		expect(checkoutRequests).toEqual([
-			version.versionId,
-		]);
-		expect(
-			(await Effect.runPromise(repository.readProjectFx("version-project")))?.config.meta
-				.title,
-		).toBe(editorTestPayload.config.meta.title);
-		expect(notifications).toEqual([
-			"version-project",
-			"version-project",
-		]);
 	});
 });

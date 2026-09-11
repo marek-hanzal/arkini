@@ -10,7 +10,10 @@ import type { DiagnosticRecord } from "~electron/contract/diagnostics/Diagnostic
 const project: Project = {
 	projectId: "editor-board",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 7,
@@ -23,7 +26,7 @@ afterEach(() => {
 	vi.unstubAllGlobals();
 });
 
-describe("Board Scenario createEditorBoardGameFx", () => {
+describe("Editor Board createEditorBoardGameFx", () => {
 	it("owns one fresh revision-pinned game and discards it without package persistence", async () => {
 		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>(() => Promise.resolve());
 		const writeIncident = vi.fn(() => Promise.resolve());

@@ -4,7 +4,7 @@
   <img src="game/arkini/resources/hero.png" alt="Arkini logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Flow, Estimate, Versions, Notes, and Assets.
+Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Flow, Estimate, Notes, and Assets.
 
 ## Start here
 
@@ -28,8 +28,7 @@ Read the smallest entry point needed for the task:
 | Retained gameplay presentation | Tile projection/rendering/motion/interaction and concrete scenes | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored source | Foundational values, completed Config, source files, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Artifacts and compatibility | Arkpack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |
-| Editor persistence | Portable repository, renderer project session, IPC, Scenarios, Notes and Build | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
-| Versions | Immutable project snapshots, commit compatibility, saved-HEAD proof and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
+| Editor persistence | Portable repository, renderer project session, IPC, Notes and Build | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 | Flow and Estimate | Authored acquisition graph, layout, Canvas and static optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
 | Application and platform | Launcher, renderer runtime/shell/settings, routes and Electron | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 

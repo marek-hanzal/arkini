@@ -1,5 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { readFile } from "node:fs/promises";
+import { readFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -30,16 +30,6 @@ describe("repository note asset relationships", () => {
 					...hero,
 					id: "spare",
 				},
-			}),
-		);
-		const initialStatus = await Effect.runPromise(
-			repository.readVersionStatusFx(project.projectId),
-		);
-		const initialVersion = await Effect.runPromise(
-			repository.createVersionFx({
-				expectedFingerprint: initialStatus.currentFingerprint,
-				projectId: project.projectId,
-				subject: "Initial resources",
 			}),
 		);
 		const withCover = await Effect.runPromise(
@@ -118,14 +108,11 @@ describe("repository note asset relationships", () => {
 				}),
 			),
 		).rejects.toBeDefined();
-		await Effect.runPromise(
-			repository.checkoutVersionFx({
-				projectId: project.projectId,
-				versionId: initialVersion.versionId,
-			}),
-		);
-		const restored = await Effect.runPromise(repository.readProjectFx(project.projectId));
-		if (restored === null) throw new Error("Expected the checked-out project.");
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Expected the project root.");
+		await unlink(join(root, "assets", "cover.png"));
+		await unlink(join(root, "assets", "future.png"));
+		const restored = await Effect.runPromise(repository.refreshProjectFx(project.projectId));
 
 		const renamed = await Effect.runPromise(
 			repository.replaceResourceFx({

@@ -40,7 +40,10 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const project: Project = {
 	projectId: "editor-test",
 	title: "Editor test",
-	version: "1.0",
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 0,

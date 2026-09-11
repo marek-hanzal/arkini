@@ -31,7 +31,10 @@ describe("ProjectIdentityRenameDialog", () => {
 		const project = {
 			projectId: "project-old",
 			title: "Old project",
-			version: editorTestPayload.version,
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			createdAtMs: 1,
 			updatedAtMs: 2,
 			revision: 3,

@@ -16,9 +16,6 @@ const editorProjectChangedListeners = new Set<
 const editorResourceOptimizationProgressListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editor"]["onOptimizeResourcesProgressFn"]>[0]
 >();
-const editorMcpVersionCheckoutListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editorMcp"]["onVersionCheckoutRequestedFn"]>[0]
->();
 const editorMcpOverviewListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editorMcp"]["onOverviewChangedFn"]>[0]
 >();
@@ -72,31 +69,6 @@ ipcRenderer.on(ArkiniElectronApi.channels.chatGptStateChanged, (_event, state) =
 ipcRenderer.on(ArkiniElectronApi.channels.chatGptAssetCandidate, (_event, candidate) => {
 	for (const listenerFn of Array.from(chatGptAssetCandidateListeners)) listenerFn(candidate);
 });
-
-ipcRenderer.on(
-	ArkiniElectronApi.channels.editorMcpVersionCheckoutRequest,
-	async (event, request) => {
-		const port = event.ports[0];
-		if (port === undefined) return;
-		let response: ArkiniElectronApi.EditorMcpVersionCheckoutResponse;
-		try {
-			const listeners = Array.from(editorMcpVersionCheckoutListeners);
-			if (listeners.length !== 1)
-				throw new Error("The editor version checkout handler is unavailable.");
-			await listeners[0](request);
-			response = {
-				type: "success",
-			};
-		} catch (cause) {
-			response = {
-				type: "failure",
-				message: cause instanceof Error ? cause.message : String(cause),
-			};
-		}
-		port.postMessage(response);
-		port.close();
-	},
-);
 
 ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
@@ -169,6 +141,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.localizationPreferredLanguagesRead),
 	},
 	editor: {
+		saveBuildVersionFn: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, request),
 		buildProjectFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuild, request),
 		readProjectBuildFn: (request) =>
@@ -227,28 +201,6 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteUpdate, request),
 		deleteNoteFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteDelete, request),
-		listBoardScenariosFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioList, projectId),
-		readBoardScenarioFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioRead, request),
-		writeBoardScenarioFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioWrite, request),
-		deleteBoardScenarioFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioDelete, request),
-		readVersionStatusFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionStatus, projectId),
-		previewVersionCommitFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCommitPreview, projectId),
-		listVersionsFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionList, projectId),
-		diffVersionsFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionDiff, request),
-		createVersionFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCommit, request),
-		checkoutVersionFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCheckout, request),
-		updateVersionTagFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionTag, request),
 	},
 	editorMcp: {
 		readOverviewFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpOverviewRead),
@@ -264,10 +216,6 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextSet, projectId),
 		clearProjectContextFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextClear, projectId),
-		onVersionCheckoutRequestedFn: (listenerFn) => {
-			editorMcpVersionCheckoutListeners.add(listenerFn);
-			return () => editorMcpVersionCheckoutListeners.delete(listenerFn);
-		},
 	},
 	arkpack: {
 		listFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),

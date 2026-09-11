@@ -15,7 +15,10 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 const createProject = (revision: number): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,
@@ -60,7 +63,6 @@ describe("publishEditorProjectFx", () => {
 			syncFx: () => Effect.void,
 			publishFx,
 			advanceNoopFx,
-			replaceFx: () => Effect.void,
 			releaseCurrentFx: Effect.void,
 			shutdownFx: Effect.void,
 		};

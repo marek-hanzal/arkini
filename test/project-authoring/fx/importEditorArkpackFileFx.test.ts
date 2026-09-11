@@ -97,14 +97,19 @@ describe("importEditorArkpackFileFx", () => {
 		expect(descriptor).toMatchObject({
 			projectId: editorTestPayload.config.meta.id,
 			title: "Editor test",
-			version: "4.2",
+			version: {
+				major: 4,
+				minor: 2,
+			},
 			revision: 0,
 		});
 		expect(createProjectFx).toHaveBeenCalledOnce();
 		expect(createProjectFx).toHaveBeenCalledWith({
-			version: "4.2",
+			version: {
+				major: 4,
+				minor: 2,
+			},
 			config: editorTestPayload.config,
-			initialVersionSubject: "Imported Arkpack v4.2",
 			resources: validPayload.resources,
 		});
 	});

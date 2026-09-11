@@ -5,7 +5,10 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 export const failedCreationProject: Project = {
 	projectId: "failed-editor-board",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 1,

@@ -21,7 +21,6 @@ The densest islands have local maps:
 | Retained scene | Game Scene, Tile Presentation, Rendering, Motion and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Flow and Estimate | Acquisition graph, layout, Canvas and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
-| Versions | Immutable logical snapshots, commit compatibility and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
 | Editor persistence | Project Authoring filesystem repository, transactions, renderer projection, MCP and Electron IPC | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 
 ## Change impact
@@ -137,10 +136,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `chatgpt-asset-authoring` | Project-scoped ChatGPT view and confirmed Asset insertion | [`src/chatgpt-asset-authoring/ui/useEditorChatGptController.ts`](src/chatgpt-asset-authoring/ui/useEditorChatGptController.ts) |
 | `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |
-| `board-scenario` | Named persisted Board snapshots and restore | [`src/board-scenario/fx/restoreBoardScenarioFx.ts`](src/board-scenario/fx/restoreBoardScenarioFx.ts) |
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |
-| `project-note` | Ordered Notes outside Version snapshots | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
-| `project-version` | Immutable snapshots, commit compatibility, saved-HEAD proof and checkout | [`src/project-version/README.md`](src/project-version/README.md) |
+| `project-note` | Ordered portable project Notes | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
 | `authoring-mcp` | MCP schemas, storage, HTTP/tools/tunnel lifecycle and Editor presentation | [`src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts`](src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts) |
 | `flow` | Authored acquisition graph and relation semantics | [`src/flow/fn/createAcquisitionGraphFn.ts`](src/flow/fn/createAcquisitionGraphFn.ts) |
 | `flow-layout` | Deterministic graph layout and worker lifecycle | [`src/flow-layout/fx/layoutInWorkerFx.ts`](src/flow-layout/fx/layoutInWorkerFx.ts) |

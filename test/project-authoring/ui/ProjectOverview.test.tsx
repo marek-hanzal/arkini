@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 // @vitest-environment jsdom
 
 import { act, createElement, type ReactNode } from "react";
@@ -12,24 +13,10 @@ const state = vi.hoisted(() => ({
 		rows: [] as ItemEstimateIndexRow[],
 		status: "loading" as "loading" | "ready",
 	},
-	versionStatus: {
-		canCommit: true,
-		currentBaseVersionId: "version-one" as string | undefined,
-		currentFingerprint: "fingerprint",
-		dirty: true,
-		versionCount: 2,
-	},
 }));
 
 vi.mock("~/estimate/ui/useItemEstimateIndex", () => ({
 	useItemEstimateIndex: () => state.estimate,
-}));
-
-vi.mock("~/project-version/ui/useProjectVersionStatus", () => ({
-	useProjectVersionStatus: () => ({
-		status: "ready",
-		versionStatus: state.versionStatus,
-	}),
 }));
 
 vi.mock("~/project-note/ui/ProjectNotesOverview", () => ({
@@ -69,7 +56,7 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 const project = {
 	projectId: "project-one",
 	title: "Project one",
-	version: editorTestPayload.version,
+	version: parseVersionFn(editorTestPayload.version),
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 3,
@@ -89,13 +76,6 @@ afterEach(async () => {
 		rows: [],
 		status: "loading",
 	};
-	state.versionStatus = {
-		canCommit: true,
-		currentBaseVersionId: "version-one",
-		currentFingerprint: "fingerprint",
-		dirty: true,
-		versionCount: 2,
-	};
 });
 
 describe("ProjectOverview", () => {
@@ -111,19 +91,11 @@ describe("ProjectOverview", () => {
 			container.querySelectorAll<HTMLAnchorElement>('[data-ui="EditorProjectOverviewLink"]'),
 		);
 		expect(links.map((link) => link.dataset.overviewId)).toEqual([
-			"arkpack-version",
-			"versions-commit",
-			"versions-history",
-			"versions",
 			"items-type-simple",
 			"items",
 			"assets",
 		]);
 		expect(links.map((link) => link.dataset.to)).toEqual([
-			"/editor/$projectId/build",
-			"/editor/$projectId/versions/commit",
-			"/editor/$projectId/versions/history",
-			"/editor/$projectId/versions/commit",
 			"/editor/$projectId/editor/items/list",
 			"/editor/$projectId/editor/items/list",
 			"/editor/$projectId/assets",
@@ -132,7 +104,7 @@ describe("ProjectOverview", () => {
 			expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
 				projectId: project.projectId,
 			});
-		expect(JSON.parse(links[4]?.dataset.search ?? "null")).toEqual({
+		expect(JSON.parse(links[0]?.dataset.search ?? "null")).toEqual({
 			itemType: "simple",
 		});
 		expect(container.textContent).toContain("Calculating…");
@@ -178,26 +150,5 @@ describe("ProjectOverview", () => {
 		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
 			view: "incomplete",
 		});
-	});
-
-	it("keeps Commit unavailable when the working copy has no changes", async () => {
-		state.versionStatus = {
-			...state.versionStatus,
-			canCommit: false,
-			dirty: false,
-		};
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () => root.render(<ProjectOverview project={project} />));
-
-		expect(
-			container.querySelector<HTMLButtonElement>(
-				'[data-ui="EditorProjectOverviewCommitUnavailable"]',
-			)?.disabled,
-		).toBe(true);
-		expect(container.querySelector('[data-overview-id="versions-commit"]')).toBeNull();
 	});
 });

@@ -1,9 +1,9 @@
-import { GitCommitHorizontal, Trash2, X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import type { Project } from "~/project-authoring/type/Project";
-import { Button, PrimaryButtonLink } from "~/ui/ui/Button";
+import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 const DeleteError = ({ error }: { readonly error: unknown }) =>
@@ -117,10 +117,8 @@ export const DeleteDialog = ({
 			</p>
 			<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 				<p>
-					Deleting an item only changes the saved working copy. Its next Version commit
-					will apply a major bump and delete every current Board scenario after showing
-					that consequence in the commit preview. Existing published game saves remain
-					stored, but cannot load the resulting major Arkpack.
+					This removes the item from the saved project. This cannot be undone in the
+					Editor.
 				</p>
 				{force ? (
 					<p>
@@ -152,21 +150,6 @@ export const DeleteDialog = ({
 						<Trash2 className="size-4" />
 						{force ? "Force delete" : "Delete"}
 					</Button>
-					<PrimaryButtonLink
-						className="gap-1.5"
-						disabled={pending}
-						data-ui="EditorItemDeleteCreateVersion"
-						to="/editor/$projectId/versions/commit"
-						params={{
-							projectId: project.projectId,
-						}}
-						search={{
-							returnTo: `/editor/${encodeURIComponent(project.projectId)}/editor/items/${encodeURIComponent(item.uid)}/detail/delete`,
-						}}
-					>
-						<GitCommitHorizontal className="size-4" />
-						Commit
-					</PrimaryButtonLink>
 				</div>
 			</div>
 		</div>

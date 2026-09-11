@@ -11,7 +11,6 @@ import {
 import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
-import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 
 let harness: ProjectTestHarness;
 
@@ -21,39 +20,28 @@ beforeEach(async () => {
 
 afterEach(async () => harness.close());
 
-const commitCurrent = async (repository: OwnedEditorProjectRepository, projectId: string) => {
-	const status = await Effect.runPromise(repository.readVersionStatusFx(projectId));
-	await Effect.runPromise(
-		repository.createVersionFx({
-			expectedFingerprint: status.currentFingerprint,
-			projectId,
-			subject: "Initial",
-		}),
-	);
-};
-
 describe("filesystem Editor project build", () => {
-	it("requires a committed Version HEAD", async () => {
+	it("builds a fresh project directly", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project-unversioned");
 
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
+					expectedVersion: project.version,
 					projectId: project.projectId,
 					expectedRevision: project.revision,
 				}),
 			),
-		).rejects.toMatchObject({
-			operation: "build-project",
-			message: "Commit the initial project version before building.",
+		).resolves.toMatchObject({
+			version: "1.0",
+			revision: project.revision,
 		});
 	});
 
-	it("rejects saved working-copy changes until they are committed", async () => {
+	it("builds saved project edits directly", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project-dirty");
-		await commitCurrent(repository, project.projectId);
 		const dirty = await Effect.runPromise(
 			repository.replaceConfigFx({
 				projectId: project.projectId,
@@ -71,53 +59,25 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
+					expectedVersion: project.version,
 					projectId: project.projectId,
 					expectedRevision: dirty.revision,
 				}),
 			),
-		).rejects.toMatchObject({
-			operation: "build-project",
-			message: "Commit the saved project changes before building.",
-		});
-	});
-
-	it("rejects a corrupted published Version HEAD object", async () => {
-		const repository = await harness.openRepository();
-		const project = await harness.createProject(repository, "project-corrupt-head");
-		await commitCurrent(repository, project.projectId);
-		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
-		if (root === null) throw new Error("Project root is missing.");
-		const head = JSON.parse(await readFile(join(root, "versions", "head.json"), "utf8")) as {
-			readonly current: string;
-		};
-		const manifest = JSON.parse(
-			await readFile(join(root, "versions", head.current, "manifest.json"), "utf8"),
-		) as {
-			readonly game: string;
-		};
-		await writeFile(join(root, "objects", `${manifest.game}.json`), "corrupt\n");
-
-		await expect(
-			Effect.runPromise(
-				repository.buildProjectFx({
-					projectId: project.projectId,
-					expectedRevision: project.revision,
-				}),
-			),
-		).rejects.toMatchObject({
-			operation: "build-project",
-			message: "The published Version HEAD is invalid.",
+		).resolves.toMatchObject({
+			version: "1.0",
+			revision: dirty.revision,
 		});
 	});
 
 	it("publishes and reads the one canonical artifact while ignoring build output", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.build");
-		await commitCurrent(repository, project.projectId);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
+				expectedVersion: project.version,
 				projectId: project.projectId,
 				expectedRevision: project.revision,
 			}),
@@ -139,7 +99,6 @@ describe("filesystem Editor project build", () => {
 			}),
 		);
 		expect(content.bytes.byteLength).toBe(artifact.size);
-		const status = await Effect.runPromise(repository.readVersionStatusFx(project.projectId));
 		await Effect.runPromise(
 			repository.createNoteFx({
 				projectId: project.projectId,
@@ -150,11 +109,9 @@ describe("filesystem Editor project build", () => {
 				resourceIds: [],
 			}),
 		);
-		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(
-			status,
-		);
 		const rebuilt = await Effect.runPromise(
 			repository.buildProjectFx({
+				expectedVersion: project.version,
 				projectId: project.projectId,
 				expectedRevision: project.revision,
 			}),
@@ -174,9 +131,9 @@ describe("filesystem Editor project build", () => {
 				root,
 			}),
 		);
-		await commitCurrent(repository, project.projectId);
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
+				expectedVersion: project.version,
 				projectId: project.projectId,
 				expectedRevision: project.revision,
 			}),
@@ -225,11 +182,11 @@ describe("filesystem Editor project build", () => {
 				root,
 			}),
 		);
-		await commitCurrent(repository, project.projectId);
 
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
+					expectedVersion: project.version,
 					projectId: project.projectId,
 					expectedRevision: project.revision,
 				}),
@@ -254,10 +211,10 @@ describe("filesystem Editor project build", () => {
 				root,
 			}),
 		);
-		await commitCurrent(repository, project.projectId);
 
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
+				expectedVersion: project.version,
 				projectId: project.projectId,
 				expectedRevision: project.revision,
 			}),
@@ -274,7 +231,6 @@ describe("filesystem Editor project build", () => {
 	it("rejects unrefreshed external source changes before publishing", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.external-change");
-		await commitCurrent(repository, project.projectId);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		const gamePath = join(root, "game.json");
@@ -285,6 +241,7 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
+					expectedVersion: project.version,
 					projectId: project.projectId,
 					expectedRevision: project.revision,
 				}),
@@ -300,7 +257,6 @@ describe("filesystem Editor project build", () => {
 	it("classifies structurally invalid external edits as requiring Refresh", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.invalid-external-change");
-		await commitCurrent(repository, project.projectId);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		await writeFile(join(root, "game.json"), "{ invalid json");
@@ -308,6 +264,7 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
+					expectedVersion: project.version,
 					projectId: project.projectId,
 					expectedRevision: project.revision,
 				}),

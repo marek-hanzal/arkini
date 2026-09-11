@@ -1,3 +1,4 @@
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import { Effect } from "effect";
 
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
@@ -12,6 +13,17 @@ import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTr
 export const createElectronEditorBuildRepositoryFx = Effect.gen(function* () {
 	const admission = yield* ProjectWriteAdmission;
 	return {
+		saveBuildVersionFx: (request) =>
+			admission.admitWriteFx(
+				"save-build-version",
+				invokeProjectTransportFx({
+					callFn: () => window.arkini.editor.saveBuildVersionFn(request),
+					operation: "save-build-version",
+					parseFn: (value) => VersionPartsSchema.parse(value),
+					requestMessage: "The editor IPC request failed.",
+					responseMessage: "The editor IPC response is invalid.",
+				}),
+			),
 		buildProjectFx: (request) =>
 			admission.admitWriteFx(
 				"build-project",

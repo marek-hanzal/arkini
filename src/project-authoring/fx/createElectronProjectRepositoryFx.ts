@@ -8,131 +8,14 @@ import {
 	ProjectRepositoryError,
 	type ProjectRepositoryOperation,
 } from "~/project-authoring/error/ProjectRepositoryError";
-import {
-	BoardScenarioDescriptorSchema,
-	BoardScenarioSchema,
-} from "~/board-scenario/schema/BoardScenarioSchema";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import {
 	ProjectCommitPayloadSchema,
 	ProjectPayloadSchema,
 } from "~/project-authoring/schema/ProjectPayloadSchema";
-import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
-
-const versionReferenceSchema = z.discriminatedUnion("type", [
-	z
-		.object({
-			type: z.literal("current"),
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("version"),
-			versionId: z.string().min(1),
-		})
-		.strict(),
-]);
-const versionDescriptorSchema = z
-	.object({
-		arkini: ArkiniVersionSchema,
-		arkpackVersion: GameVersionSchema,
-		body: z.string().optional(),
-		createdAtMs: z.number().int().nonnegative(),
-		parentVersionId: z.string().min(1).optional(),
-		projectId: z.string().min(1),
-		sourceRevision: z.number().int().nonnegative(),
-		subject: z.string().min(1),
-		tag: z.string().optional(),
-		versionId: z.string().min(1),
-	})
-	.strict();
-const versionValueChangeSchema = z
-	.object({
-		path: z.string(),
-		before: z.unknown().optional(),
-		after: z.unknown().optional(),
-		bump: z
-			.enum([
-				"minor",
-				"major",
-			])
-			.optional(),
-	})
-	.strict();
-const versionBinaryDiffSchema = z
-	.object({
-		change: z.enum([
-			"added",
-			"changed",
-			"deleted",
-		]),
-		bump: z
-			.enum([
-				"minor",
-				"major",
-			])
-			.optional(),
-		id: z.string(),
-	})
-	.strict();
-const versionDiffSchema = z
-	.object({
-		from: versionReferenceSchema,
-		to: versionReferenceSchema,
-		hasChanges: z.boolean(),
-		project: versionValueChangeSchema.array(),
-		items: z
-			.object({
-				change: z.enum([
-					"added",
-					"changed",
-					"deleted",
-				]),
-				uid: z.string(),
-				values: versionValueChangeSchema.array(),
-			})
-			.strict()
-			.array(),
-		resources: versionBinaryDiffSchema.array(),
-		scenarios: versionBinaryDiffSchema.array(),
-	})
-	.strict();
-const versionCommitPreviewSchema = z
-	.object({
-		bump: z.enum([
-			"noop",
-			"minor",
-			"major",
-		]),
-		canCommit: z.boolean(),
-		currentFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-		diff: versionDiffSchema.optional(),
-		initial: z.boolean(),
-		nextArkpackVersion: GameVersionSchema,
-		scenariosToDelete: z.string().array(),
-	})
-	.strict();
-const versionStatusSchema = z
-	.object({
-		canCommit: z.boolean(),
-		currentBaseVersionId: z.string().min(1).optional(),
-		currentFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-		dirty: z.boolean(),
-		versionCount: z.number().int().nonnegative(),
-	})
-	.strict();
-
-const parseBoardScenarioFn = (candidate: unknown) => {
-	const scenario = BoardScenarioSchema.parse(candidate);
-	return {
-		...scenario,
-		bytes: new Uint8Array(scenario.bytes),
-	};
-};
 
 const parseCommitFn = (candidate: unknown) => ProjectCommitPayloadSchema.parse(candidate);
 const parseProjectFn = (candidate: unknown) => ProjectPayloadSchema.parse(candidate);
@@ -227,21 +110,6 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					() => undefined,
 				),
 			),
-		createVersionFx: (request) =>
-			writeFx(
-				"create-version",
-				callFx(
-					"create-version",
-					() => window.arkini.editor.createVersionFn(request),
-					(value) => versionDescriptorSchema.parse(value),
-				),
-			),
-		checkoutVersionFx: (request) =>
-			callFx(
-				"checkout-version",
-				() => window.arkini.editor.checkoutVersionFn(request),
-				() => undefined,
-			),
 		deleteItemFx: (request) =>
 			writeFx(
 				"delete-item",
@@ -259,12 +127,6 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					() => window.arkini.editor.deleteResourceFn(request),
 					parseProjectFn,
 				),
-			),
-		diffVersionsFx: (request) =>
-			callFx(
-				"diff-versions",
-				() => window.arkini.editor.diffVersionsFn(request),
-				(value) => versionDiffSchema.parse(value),
 			),
 		listProjectsFx: callFx(
 			"list-projects",
@@ -314,41 +176,11 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					return notes;
 				},
 			),
-		listVersionsFx: (projectId) =>
-			callFx(
-				"list-versions",
-				() => window.arkini.editor.listVersionsFn(projectId),
-				(value) => versionDescriptorSchema.array().parse(value),
-			),
-		previewVersionCommitFx: (projectId) =>
-			callFx(
-				"preview-version-commit",
-				() => window.arkini.editor.previewVersionCommitFn(projectId),
-				(value) => versionCommitPreviewSchema.parse(value),
-			),
-		listBoardScenariosFx: (projectId) =>
-			callFx(
-				"list-board-scenarios",
-				() => window.arkini.editor.listBoardScenariosFn(projectId),
-				(value) => BoardScenarioDescriptorSchema.array().parse(value),
-			),
-		readBoardScenarioFx: (request) =>
-			callFx(
-				"read-board-scenario",
-				() => window.arkini.editor.readBoardScenarioFn(request),
-				(value) => (value === null ? null : parseBoardScenarioFn(value)),
-			),
 		readProjectFx: (projectId) =>
 			callFx(
 				"read-project",
 				() => window.arkini.editor.readProjectFn(projectId),
 				(value) => (value === null ? null : parseProjectFn(value)),
-			),
-		readVersionStatusFx: (projectId) =>
-			callFx(
-				"read-version-status",
-				() => window.arkini.editor.readVersionStatusFn(projectId),
-				(value) => versionStatusSchema.parse(value),
 			),
 		replaceConfigFx: (request) =>
 			writeFx(
@@ -395,15 +227,6 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					parseProjectFn,
 				),
 			),
-		updateVersionTagFx: (request) =>
-			writeFx(
-				"update-version-tag",
-				callFx(
-					"update-version-tag",
-					() => window.arkini.editor.updateVersionTagFn(request),
-					(value) => versionDescriptorSchema.parse(value),
-				),
-			),
 		updateNoteFx: (request) =>
 			writeFx(
 				"update-note",
@@ -416,24 +239,6 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 							throw new Error("Editor note identity does not match the request.");
 						return note;
 					},
-				),
-			),
-		writeBoardScenarioFx: (request) =>
-			writeFx(
-				"write-board-scenario",
-				callFx(
-					"write-board-scenario",
-					() => window.arkini.editor.writeBoardScenarioFn(request),
-					parseBoardScenarioFn,
-				),
-			),
-		deleteBoardScenarioFx: (request) =>
-			writeFx(
-				"delete-board-scenario",
-				callFx(
-					"delete-board-scenario",
-					() => window.arkini.editor.deleteBoardScenarioFn(request),
-					() => undefined,
 				),
 			),
 	} satisfies ProjectRepositoryService;

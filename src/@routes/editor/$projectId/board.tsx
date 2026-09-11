@@ -10,7 +10,7 @@ import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
 import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
 import { EditorBoardItemDetailLink } from "~/editor-board/ui/EditorBoardItemDetailLink";
 import { EditorBoardProductionLineLink } from "~/editor-board/ui/EditorBoardProductionLineLink";
-import { BoardScenarioToolbar } from "~/board-scenario/ui/BoardScenarioToolbar";
+import { EditorBoardToolbar } from "~/editor-board/ui/EditorBoardToolbar";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 
@@ -75,9 +75,9 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 			<EditorSectionPage
 				contentMode="viewport"
 				header={
-					<BoardScenarioToolbar
+					<EditorBoardToolbar
 						game={ready ? state.resource.game : undefined}
-						project={project}
+						projectId={project.projectId}
 					/>
 				}
 			>

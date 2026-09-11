@@ -1,3 +1,4 @@
+import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -60,6 +61,7 @@ const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefine
 export namespace useEditorBuildArtifactController {
 	export interface Props {
 		readonly canBuild: boolean;
+		readonly version: VersionPartsSchema.Type;
 		readonly project: Project;
 	}
 
@@ -78,6 +80,7 @@ export namespace useEditorBuildArtifactController {
 /** Owns one project's build command and admission of its exact current-revision artifact. */
 export const useEditorBuildArtifactController = ({
 	canBuild,
+	version,
 	project,
 }: useEditorBuildArtifactController.Props): useEditorBuildArtifactController.Output => {
 	const buildAtom = BuildCommandAtoms.build(project.projectId);
@@ -126,6 +129,7 @@ export const useEditorBuildArtifactController = ({
 			if (!canBuild) return;
 			runBuildFn({
 				expectedRevision: project.revision,
+				version,
 			});
 		},
 		buildFailure,

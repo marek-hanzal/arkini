@@ -58,7 +58,10 @@ beforeEach(() => {
 	state.project = {
 		projectId: "draft-project",
 		title: editorTestPayload.config.meta.title,
-		version: "1.0",
+		version: {
+			major: 1,
+			minor: 0,
+		},
 		createdAtMs: 1,
 		updatedAtMs: 2,
 		revision: 7,

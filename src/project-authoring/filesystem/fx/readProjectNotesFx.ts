@@ -1,10 +1,7 @@
-import { Buffer } from "node:buffer";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { BoardScenarioSchema } from "~/board-scenario/schema/BoardScenarioSchema";
-import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
 import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
 import { NoteSchema } from "~/project-note/schema/NoteSchema";
 
@@ -26,7 +23,7 @@ const decodeNoteFileStemFn = (stem: string) => {
 	}
 };
 
-const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (directory: string) {
+const readJsonFilesFx = Effect.fn("readNoteJsonFilesFx")(function* (directory: string) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	if (!(yield* fileSystem.exists(directory))) return [];
@@ -44,7 +41,7 @@ const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (directory
 							value: JSON.parse(source) as unknown,
 						}),
 						catch: (cause) =>
-							new Error(`Editor sidecar ${target} is invalid.`, {
+							new Error(`Editor Note ${target} is invalid.`, {
 								cause,
 							}),
 					}),
@@ -54,8 +51,8 @@ const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (directory
 	});
 });
 
-/** Loads the portable note and named Board-scenario state captured by open/Refresh. */
-export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
+/** Loads the portable Notes captured by open/Refresh. */
+export const readProjectNotesFx = Effect.fn("readProjectNotesFx")(function* ({
 	paths,
 	projectId,
 }: {
@@ -97,50 +94,8 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 			});
 		}),
 	);
-	const scenarios = yield* Effect.forEach(
-		yield* readJsonFilesFx(paths.scenarios),
-		({ file, value }) =>
-			Effect.gen(function* () {
-				const scenario = yield* Effect.try({
-					try: () => BoardScenarioFileSchema.parse(value),
-					catch: (cause) =>
-						new Error(`Editor Board scenario ${file} is invalid.`, {
-							cause,
-						}),
-				});
-				const expected = yield* paths.scenarioFileFx(scenario.name);
-				if (path.resolve(file) !== expected)
-					return yield* Effect.fail(
-						new Error(
-							`Editor Board scenario ${scenario.name} has an invalid filename.`,
-						),
-					);
-				return yield* Effect.try({
-					try: () =>
-						BoardScenarioSchema.parse({
-							projectId,
-							name: scenario.name,
-							projectRevision: scenario.revision,
-							version: scenario.version,
-							bytes: Uint8Array.from(Buffer.from(scenario.save, "base64")),
-							createdAtMs: scenario.createdAtMs,
-							updatedAtMs: scenario.updatedAtMs,
-						}),
-					catch: (cause) =>
-						new Error(`Editor Board scenario ${scenario.name} is invalid.`, {
-							cause,
-						}),
-				});
-			}),
+	return notes.sort(
+		(left, right) =>
+			right.updatedAtMs - left.updatedAtMs || right.noteId.localeCompare(left.noteId),
 	);
-	return {
-		notes: notes.sort(
-			(left, right) =>
-				right.updatedAtMs - left.updatedAtMs || right.noteId.localeCompare(left.noteId),
-		),
-		scenarios: scenarios.sort(
-			(left, right) =>
-				right.updatedAtMs - left.updatedAtMs || left.name.localeCompare(right.name),
-		),
-	};
 });

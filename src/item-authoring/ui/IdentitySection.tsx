@@ -40,7 +40,7 @@ export const IdentitySection = () => {
 					{(field) => (
 						<field.TextField
 							label="Item ID"
-							description="Renaming updates exact project references and requires a major gameplay version commit."
+							description="Renaming updates exact project references."
 							placeholder="item:example"
 						/>
 					)}

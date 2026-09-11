@@ -14,7 +14,7 @@ import { mountIdentityRenameFn } from "./useProjectIdentityRenameController.test
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe("useProjectIdentityRenameController", () => {
-	it("excludes MCP checkout and unrelated navigation until the committed identity reaches its new route", async () => {
+	it("excludes project refresh and unrelated navigation until the committed identity reaches its new route", async () => {
 		const fixture = await mountIdentityRenameFn();
 		let rename: Promise<void> | undefined;
 		try {
@@ -32,13 +32,11 @@ describe("useProjectIdentityRenameController", () => {
 				"/editor/project-one/project/detail/general",
 			);
 			await expect(
-				fixture.checkoutFn({
-					projectId: "project-one",
-					versionId: "version-one",
-				}),
+				Effect.runPromise(
+					fixture.admission.acquireReplacementFx("refresh-project", () => false),
+				),
 			).rejects.toBeInstanceOf(ProjectRepositoryError);
 			expect(fixture.awaitIdleFn).not.toHaveBeenCalled();
-			expect(fixture.readVersionStatusFn).not.toHaveBeenCalled();
 
 			await act(async () => {
 				fixture.releaseCommitFn();
@@ -131,7 +129,7 @@ describe("useProjectIdentityRenameController", () => {
 				rename = fixture.readControllerFn().renameFn("project-two");
 			});
 			releaseFx = Effect.runSync(
-				fixture.admission.acquireReplacementFx("checkout-version", () => false),
+				fixture.admission.acquireReplacementFx("refresh-project", () => false),
 			);
 			await act(async () => {
 				await fixture.owner.decideFn("discard");

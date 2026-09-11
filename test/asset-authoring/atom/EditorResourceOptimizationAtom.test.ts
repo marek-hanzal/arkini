@@ -56,7 +56,10 @@ const project = {
 	revision: 4,
 	title: editorTestPayload.config.meta.title,
 	updatedAtMs: 2,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	config: editorTestPayload.config,
 	resources: editorTestPayload.resources,
 };

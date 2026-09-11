@@ -3,11 +3,6 @@ import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { InstallationStatus } from "./cli/InstallationStatus";
 import type { CompletionStatus } from "./cli/CompletionStatus";
-import type {
-	ChatGptAssetCandidateSchema,
-	ChatGptSurfaceSchema,
-	ChatGptViewStateSchema,
-} from "./chatgpt/ChatGptSurfaceSchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { readPreferredLanguagesFn } from "./localization/readPreferredLanguagesFn";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
@@ -37,9 +32,6 @@ export namespace ArkiniElectronApi {
 		appearanceAccentWrite: "arkini:appearance:accent:write",
 		cheatAvailabilityRead: "arkini:cheats:available:read",
 		cheatAvailabilityWrite: "arkini:cheats:available:write",
-		chatGptSurfaceSet: "arkini:chatgpt:surface:set",
-		chatGptStateChanged: "arkini:chatgpt:state:changed",
-		chatGptAssetCandidate: "arkini:chatgpt:asset:candidate",
 		clipboardWriteText: "arkini:clipboard:write-text",
 		cliStatus: "arkini:cli:status",
 		cliInstall: "arkini:cli:install",
@@ -143,15 +135,6 @@ export namespace ArkiniElectronApi {
 		readonly cheats: {
 			readonly readAvailableFn: () => Promise<CheatAvailabilitySchema.Type>;
 			readonly writeAvailableFn: (available: CheatAvailabilitySchema.Type) => Promise<void>;
-		};
-		readonly chatGpt: {
-			readonly setSurfaceFn: (surface: ChatGptSurfaceSchema.Type | null) => Promise<void>;
-			readonly onStateChangedFn: (
-				listenerFn: (state: ChatGptViewStateSchema.Type) => void,
-			) => () => void;
-			readonly onAssetCandidateFn: (
-				listenerFn: (candidate: ChatGptAssetCandidateSchema.Type) => void,
-			) => () => void;
 		};
 		readonly clipboard: {
 			readonly writeTextFn: (text: string) => Promise<void>;

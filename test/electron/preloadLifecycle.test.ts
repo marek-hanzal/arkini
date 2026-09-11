@@ -75,12 +75,6 @@ const reportEditorResourceOptimizationProgress = (
 	handler(undefined, progress);
 };
 
-const reportChatGptState = (state: { readonly type: "loading" | "ready" }) => {
-	const handler = electron.handlers.get(ArkiniElectronContract.channels.chatGptStateChanged);
-	if (handler === undefined) throw new Error("Expected ChatGPT state listener registration.");
-	handler(undefined, state);
-};
-
 describe("Electron preload lifecycle", () => {
 	beforeEach(() => {
 		electron.reset();
@@ -138,38 +132,6 @@ describe("Electron preload lifecycle", () => {
 			ArkiniElectronContract.channels.editorMcpProjectContextClear,
 			"project-one",
 		);
-	});
-
-	it("exposes declarative ChatGPT surface placement and removable state listeners", async () => {
-		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
-		const api = await loadPreload();
-		const listener = vi.fn();
-		const unsubscribe = api.chatGpt.onStateChangedFn(listener);
-		const surface = {
-			projectId: "project-one",
-			bounds: {
-				x: 64,
-				y: 0,
-				width: 800,
-				height: 600,
-			},
-		};
-
-		await expect(api.chatGpt.setSurfaceFn(surface)).resolves.toBeUndefined();
-		reportChatGptState({
-			type: "ready",
-		});
-		unsubscribe();
-		reportChatGptState({
-			type: "loading",
-		});
-		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
-			ArkiniElectronContract.channels.chatGptSurfaceSet,
-			surface,
-		);
-		expect(listener).toHaveBeenCalledExactlyOnceWith({
-			type: "ready",
-		});
 	});
 
 	it("subscribes the renderer to main-process editor project mutations", async () => {

@@ -49,11 +49,6 @@ export const editorProjectIpcNote = {
 
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
 export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository => ({
-	bakeTilePaintingsFx: vi.fn(() => Effect.die("Unexpected painting batch.")),
-	listTilePaintingsFx: vi.fn(() => Effect.succeed([])),
-	readTilePaintingFx: vi.fn(() => Effect.succeed(null)),
-	saveTilePaintingFx: vi.fn(() => Effect.die("Unexpected painting save.")),
-	deleteTilePaintingFx: vi.fn(() => Effect.void),
 	awaitIdleFx: Effect.void,
 	saveBuildVersionFx: vi.fn(({ version }) => Effect.succeed(version)),
 	buildProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcBuild)),

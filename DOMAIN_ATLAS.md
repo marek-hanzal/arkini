@@ -133,7 +133,6 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `authoring-form` | Shared form registry and reference controls | [`src/authoring-form/ui/EditorForm.tsx`](src/authoring-form/ui/EditorForm.tsx) |
 | `editor-control` | Reusable Editor fields, sections, selection and search | [`src/editor-control/ui/EditorFormSection.tsx`](src/editor-control/ui/EditorFormSection.tsx) |
 | `asset-authoring` | Asset catalog, validation, edit/import/delete and UI | [`src/asset-authoring/ui/EditorAssetManager.tsx`](src/asset-authoring/ui/EditorAssetManager.tsx) |
-| `tile-painting` | Non-destructive terrain recipes, synchronous document/history sessions, native canvas input and baked Assets | [`makeTilePaintingSessionFx`](src/tile-painting/fx/makeTilePaintingSessionFx.ts), [`attachTilePaintingCanvasFx`](src/tile-painting/fx/attachTilePaintingCanvasFx.ts), [`TilePaintingWorkspace`](src/tile-painting/ui/TilePaintingWorkspace.tsx) |
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |

@@ -1,32 +1,5 @@
 /** Serializable editor transport contracts. Domain payloads stay unknown until each process validates them. */
 export namespace EditorProjectTransport {
-	export interface BakeTilePaintingsRequest {
-		readonly projectId: string;
-		readonly expectedRevision: number;
-		readonly paintings: ReadonlyArray<{
-			readonly paintingId: string;
-			readonly expectedUpdatedAtMs: number;
-			readonly document: unknown;
-			readonly bakedPng: string;
-		}>;
-	}
-
-	export interface TilePaintingKey {
-		readonly projectId: string;
-		readonly paintingId: string;
-	}
-	export interface SaveTilePaintingRequest extends TilePaintingKey {
-		readonly expectedRevision: number;
-		readonly expectedUpdatedAtMs: number | null;
-		readonly document: unknown;
-		readonly bakedPng?: string;
-		readonly outputResourceId?: string;
-	}
-	export interface DeleteTilePaintingRequest extends TilePaintingKey {
-		readonly expectedRevision: number;
-		readonly expectedUpdatedAtMs: number;
-	}
-
 	export interface BuildVersion {
 		readonly major: number;
 		readonly minor: number;
@@ -34,11 +7,6 @@ export namespace EditorProjectTransport {
 	}
 
 	export type Operation =
-		| "bake-tile-paintings"
-		| "list-tile-paintings"
-		| "read-tile-painting"
-		| "save-tile-painting"
-		| "delete-tile-painting"
 		| "await-idle"
 		| "build-project"
 		| "save-build-version"

@@ -165,16 +165,6 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
 		upsertResourcesFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertResources, request),
-		bakeTilePaintingsFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorTilePaintingBake, request),
-		listTilePaintingsFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorTilePaintingList, projectId),
-		readTilePaintingFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorTilePaintingRead, request),
-		saveTilePaintingFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorTilePaintingSave, request),
-		deleteTilePaintingFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorTilePaintingDelete, request),
 		listNotesFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteList, projectId),
 		createNoteFn: (request) =>

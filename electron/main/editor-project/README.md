@@ -14,7 +14,6 @@ One GUI Electron main or Node CLI process owns the physical Editor project repos
 | Filesystem repository composition | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Discovery, create/open/refresh/delete | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts) |
 | Config, Item and Resource commits | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts) |
-| Tile Painter recipes and atomic PNG baking | `src/tile-painting` schemas plus Project Authoring filesystem operations | [`../../../src/project-authoring/filesystem/fx/createTilePaintingOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createTilePaintingOperationsFx.ts) |
 | Notes and Build | Their `src/*` contracts plus Project Authoring filesystem operations | `src/project-authoring/filesystem/fx/create*OperationsFx.ts` |
 | Current-tree lock, journal and recovery | `src/project-authoring/filesystem` + mechanical `filesystem-write` | [`../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts), [`../../../src/project-authoring/filesystem/fx/recoverProjectFileTransactionFx.ts`](../../../src/project-authoring/filesystem/fx/recoverProjectFileTransactionFx.ts) |
 | IPC authorization and dispatch | `electron/main/editor-project` | [`ipc/registerEditorProjectIpcFx.ts`](ipc/registerEditorProjectIpcFx.ts) |
@@ -45,7 +44,7 @@ One process-lifetime repository owns:
 - A serialized operation semaphore.
 - The catalog of managed/external roots and discovery metadata.
 - One in-memory `ProjectState` per opened project, derived from disk.
-- Current Project, Note, Tile Painting and Build operations.
+- Current Project, Note and Build operations.
 
 The catalog never copies canonical project identity or mutable project fields. `game.json.meta.id` remains project/package identity. Invalid catalog entries stay independently visible with their concrete error.
 
@@ -68,7 +67,7 @@ recover any prior journal
 → recover/clean the exact journal
 ```
 
-Unowned, ambiguous, escaped or missing durable artifacts fail closed. Recovery restores an old-or-new complete portable tree; it never guesses a partial state. Item/config commits reconcile Note links against the final item UIDs; resource rename/delete rewrites Note resource IDs. Each operation includes affected Note files in the same transaction, and a failed Note rewrite rolls back the project tree plus every earlier Note rewrite before repository state is published. Tile Painter saves embed source PNGs and persist separate alpha-mask recipes; an explicit bake includes the output asset and project revision in that same transaction. Recipe freshness is independent of gameplay-source revision, and open/Refresh validates portable recipes before exposing them to the renderer. Single-file mechanics belong to `src/filesystem-write`; the multi-file journal belongs here.
+Unowned, ambiguous, escaped or missing durable artifacts fail closed. Recovery restores an old-or-new complete portable tree; it never guesses a partial state. Item/config commits reconcile Note links against the final item UIDs; resource rename/delete rewrites Note resource IDs. Each operation includes affected Note files in the same transaction, and a failed Note rewrite rolls back the project tree plus every earlier Note rewrite before repository state is published. Single-file mechanics belong to `src/filesystem-write`; the multi-file journal belongs here.
 
 ## Renderer replacement flow
 

@@ -67,11 +67,6 @@ export namespace ArkiniElectronApi {
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
 		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
-		editorTilePaintingBake: "arkini:editor:painting:bake",
-		editorTilePaintingList: "arkini:editor:painting:list",
-		editorTilePaintingRead: "arkini:editor:painting:read",
-		editorTilePaintingSave: "arkini:editor:painting:save",
-		editorTilePaintingDelete: "arkini:editor:painting:delete",
 		editorNoteList: "arkini:editor:note:list",
 		editorNoteCreate: "arkini:editor:note:create",
 		editorNoteUpdate: "arkini:editor:note:update",
@@ -230,21 +225,6 @@ export namespace ArkiniElectronApi {
 			readonly upsertResourcesFn: (
 				request: EditorProjectTransport.UpsertResourcesRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly bakeTilePaintingsFn: (
-				request: EditorProjectTransport.BakeTilePaintingsRequest,
-			) => Promise<EditorProjectTransport.Result<unknown>>;
-			readonly listTilePaintingsFn: (
-				projectId: string,
-			) => Promise<EditorProjectTransport.Result<unknown>>;
-			readonly readTilePaintingFn: (
-				request: EditorProjectTransport.TilePaintingKey,
-			) => Promise<EditorProjectTransport.Result<unknown>>;
-			readonly saveTilePaintingFn: (
-				request: EditorProjectTransport.SaveTilePaintingRequest,
-			) => Promise<EditorProjectTransport.Result<unknown>>;
-			readonly deleteTilePaintingFn: (
-				request: EditorProjectTransport.DeleteTilePaintingRequest,
-			) => Promise<EditorProjectTransport.Result<void>>;
 			readonly listNotesFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.Note>>>;

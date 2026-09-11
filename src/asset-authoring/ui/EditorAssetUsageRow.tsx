@@ -1,3 +1,4 @@
+import { readSectionForPathFn } from "~/item-authoring/fn/readSectionForPathFn";
 import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -48,7 +49,7 @@ export const EditorAssetUsageRow = ({
 				params={{
 					itemUid: usage.ownerUid,
 					projectId: project.projectId,
-					sectionId: "artwork",
+					sectionId: readSectionForPathFn(usage.path.slice(2)),
 				}}
 				className={className}
 				data-ui={dataUi}

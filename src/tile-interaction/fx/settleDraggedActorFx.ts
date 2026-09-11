@@ -20,10 +20,10 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 	animator,
 	surface,
 }: Props) {
+	actor.dragging = false;
 	const pose = yield* surface.readActorPoseFx(actor.item);
 	if (pose === null || actor.container.destroyed) return;
 	surface.transientActorLayer.addChild(actor.container);
-	actor.dragging = false;
 	actor.container.zIndex = 0;
 	actor.container.cursor = readActorCursorFn({
 		phase: "idle",

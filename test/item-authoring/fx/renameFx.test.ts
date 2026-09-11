@@ -13,6 +13,9 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 describe("renameFx", () => {
 	it("rewrites exact references across start, selectors, inputs, and outputs", () => {
+		const ignore = {
+			type: "ignore",
+		};
 		const output = createOutput([
 			{
 				itemId: "water",
@@ -24,6 +27,30 @@ describe("renameFx", () => {
 				water: editorTestConfig.items.water,
 				oil: {
 					...createSimpleItem("oil"),
+					asset: {
+						scale: 1,
+						default: [
+							"oil",
+						],
+						neighbors: [
+							{
+								sourceId: "joined-oil",
+								neighbors: {
+									nw: ignore,
+									n: {
+										type: "item",
+										itemId: "water",
+									},
+									ne: ignore,
+									w: ignore,
+									e: ignore,
+									sw: ignore,
+									s: ignore,
+									se: ignore,
+								},
+							},
+						],
+					},
 					merge: [
 						{
 							action: "use",
@@ -81,7 +108,11 @@ describe("renameFx", () => {
 		expect(result.config.start.board[0]?.itemId).toBe("fresh-water");
 		expect(JSON.stringify(result.config.items.oil)).not.toContain('"water"');
 		expect(JSON.stringify(result.config.items.producer)).not.toContain('"water"');
-		expect(result.updatedReferencePaths).toHaveLength(5);
+		expect(result.updatedReferencePaths).toHaveLength(6);
+		expect(result.config.items.oil.asset.neighbors?.[0]?.neighbors.n).toEqual({
+			type: "item",
+			itemId: "fresh-water",
+		});
 		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 	});
 });

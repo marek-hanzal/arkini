@@ -12,6 +12,8 @@ Content has default priority for direct selection, dragging, drops and magnetism
 
 A new game applies authored start entries in Board → Inventory → Toolbar order against one evolving candidate Runtime. Board space and coordinates plus Inventory/Toolbar slots are exact; every entry uses canonical placement, and `currentSpace` plus the complete initial state commit atomically or not at all.
 
+Optional neighborhood artwork reads eight adjacent actual occupants in the same Board space and layer. The first matching authored rule overrides ordinary default/progress artwork without changing gameplay identity or state. Artwork changes crossfade after replacement textures are ready. During dragging, only the held actor crossfades to its ordinary default/progress artwork; neighbors continue reading its committed origin until the drop commits. Drop, rejection and cancellation restore artwork from the latest committed neighborhood. There is no hover-time neighborhood preview or saved visual selection.
+
 Spatial mechanics—distance, placement, merge, charge targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:
 
 - active/ready jobs pause and queued work does not dispatch there;

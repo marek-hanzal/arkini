@@ -80,6 +80,7 @@ const createItem = ({
 		revision,
 		running: false,
 		activityEffect: false,
+		artworkScale: 0.8,
 		sourceUrl,
 		title: "Water",
 	}) satisfies TileActorItem;

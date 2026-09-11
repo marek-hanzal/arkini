@@ -41,6 +41,7 @@ describe("main reconciliation / replacement visuals", () => {
 				actorId: current.id,
 				key: "2:0:replacement",
 				previous: {
+					artworkScale: 0.8,
 					compositeUrl: previous.compositeUrl,
 					itemId: previous.itemId,
 					sourceUrl: previous.sourceUrl,
@@ -135,6 +136,7 @@ describe("main reconciliation / replacement visuals", () => {
 				actorId: first.id,
 				key: "2:0:replacement",
 				previous: {
+					artworkScale: 0.8,
 					itemId: first.itemId,
 					sourceUrl: first.sourceUrl,
 					title: first.title,
@@ -153,6 +155,7 @@ describe("main reconciliation / replacement visuals", () => {
 				actorId: first.id,
 				key: "3:0:replacement",
 				previous: {
+					artworkScale: 0.8,
 					itemId: second.itemId,
 					sourceUrl: second.sourceUrl,
 					title: second.title,

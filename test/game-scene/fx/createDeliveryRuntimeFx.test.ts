@@ -62,6 +62,7 @@ const item = {
 	itemType: "simple" as const,
 	layer: "content" as const,
 	title: "Water",
+	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	revision: "revision:delivery",
 	quantity: 7,

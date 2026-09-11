@@ -14,6 +14,7 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 
 export const item = {
+	artworkScale: 0.8,
 	id: "runtime:log",
 	itemId: "log",
 	itemType: "simple",

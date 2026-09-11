@@ -10,6 +10,7 @@ const chargedItem = {
 	title: "Tree",
 	description: "A charged source",
 	asset: {
+		scale: 0.8,
 		default: [
 			"asset:tree",
 		],

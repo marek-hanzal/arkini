@@ -169,6 +169,7 @@ export const createItem = (
 	revision: `revision:${id}`,
 	running: false,
 	activityEffect: false,
+	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	title: "Water",
 	...overrides,

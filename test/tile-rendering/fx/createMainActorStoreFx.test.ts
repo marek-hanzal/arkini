@@ -40,6 +40,7 @@ const item = (
 	quantity: 1,
 	revision,
 	running: false,
+	artworkScale: 0.8,
 	sourceUrl: `resource:${id}`,
 	title: id,
 });

@@ -7,21 +7,48 @@ import { useCallback, useMemo, useState } from "react";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
-import { deleteFx } from "~/item-authoring/fx/deleteFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import type { Project } from "~/project-authoring/type/Project";
+
+interface DeleteCommandProps {
+	readonly expectedRevision: number;
+	readonly force: boolean;
+	readonly itemUid: string;
+	readonly onDeletedFn: () => Promise<void>;
+}
 
 const deleteCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<deleteFx.Props, "projectId">) =>
-				deleteFx({
-					...props,
-					projectId,
-				}).pipe(Effect.provideService(ProjectRepository, repository)),
+			Atom.fn(({ onDeletedFn, ...props }: DeleteCommandProps) =>
+				Effect.gen(function* () {
+					yield* Effect.yieldNow;
+					return yield* Effect.uninterruptible(
+						Effect.gen(function* () {
+							const commit = yield* repository.deleteItemFx({
+								...props,
+								projectId,
+							});
+							// Leave the item route before its mounted readers can observe the deletion.
+							// Publication must survive both route unmount and navigation failure.
+							yield* Effect.tryPromise({
+								try: onDeletedFn,
+								catch: (cause) => cause,
+							}).pipe(
+								Effect.ensuring(
+									publishEditorProjectFx(projectId, {
+										commit,
+									}),
+								),
+							);
+							return commit;
+						}),
+					);
+				}),
 			).pipe(Atom.setIdleTTL(0)),
 		),
 	),
@@ -104,13 +131,14 @@ export const useDeleteController = ({
 				expectedRevision: project.revision,
 				force: confirming === "force",
 				itemUid: item.uid,
-			});
-			await navigateFn({
-				to: "/editor/$projectId/editor/items/list",
-				params: {
-					projectId: project.projectId,
-				},
-				replace: true,
+				onDeletedFn: () =>
+					navigateFn({
+						to: "/editor/$projectId/editor/items/list",
+						params: {
+							projectId: project.projectId,
+						},
+						replace: true,
+					}),
 			});
 		} catch {
 			// The settled command error remains visible in the confirmation dialog.

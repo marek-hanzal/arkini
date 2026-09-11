@@ -33,6 +33,11 @@ vi.mock("~/project-authoring/ui/useEditorWelcomeActions", () => ({
 	useEditorWelcomeActions: () => actions,
 }));
 
+vi.mock("@tanstack/react-router", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@tanstack/react-router")>()),
+	useMatchRoute: () => () => false,
+}));
+
 vi.mock("~/ui/ui/Button", async (importOriginal) => {
 	const original = await importOriginal<typeof import("~/ui/ui/Button")>();
 	return {

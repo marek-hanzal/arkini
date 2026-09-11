@@ -104,7 +104,8 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								</Button>
 								{controller.installedPackageId === undefined ? null : (
 									<p className="ml-auto min-w-0 truncate text-right text-sm text-success">
-										Installed as <strong>{controller.installedPackageId}</strong>.
+										Installed as{" "}
+										<strong>{controller.installedPackageId}</strong>.
 									</p>
 								)}
 							</div>

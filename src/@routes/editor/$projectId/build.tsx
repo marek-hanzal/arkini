@@ -77,8 +77,9 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 							<h2 className="text-lg font-semibold">Build output</h2>
 							<p className="mt-2 break-all text-sm text-muted">{artifactSummary}</p>
-							<div className="mt-4 flex flex-wrap gap-3">
+							<div className="mt-4 flex items-center gap-3">
 								<PrimaryButton
+									className="shrink-0 whitespace-nowrap"
 									data-ui="EditorBuildInstall"
 									disabled={
 										controller.installPending || !controller.installAvailable
@@ -92,7 +93,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 									{controller.installAction === "update" ? "Update" : "Install"}
 								</PrimaryButton>
 								<Button
-									className="border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
+									className="shrink-0 whitespace-nowrap border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
 									data-ui="EditorBuildSave"
 									disabled={controller.savePending}
 									cursorIntent={controller.savePending ? "progress" : undefined}
@@ -101,6 +102,12 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 									<Download className="mr-2 size-4" />
 									Save as…
 								</Button>
+								{controller.installedPackageId === undefined ? null : (
+									<p className="ml-auto min-w-0 truncate text-right text-sm text-success">
+										Installed as{" "}
+										<strong>{controller.installedPackageId}</strong>.
+									</p>
+								)}
 							</div>
 							{controller.saveError === undefined ? null : (
 								<p className="mt-3 text-sm text-danger">{controller.saveError}</p>
@@ -108,11 +115,6 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							{controller.installError === undefined ? null : (
 								<p className="mt-3 text-sm text-danger">
 									{controller.installError}
-								</p>
-							)}
-							{controller.installedPackageId === undefined ? null : (
-								<p className="mt-3 text-sm text-success">
-									Installed as {controller.installedPackageId}.
 								</p>
 							)}
 						</article>

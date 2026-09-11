@@ -672,7 +672,7 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 					cached.shadowDirty = undefined;
 				}
 				let composite = cached.composite;
-				let shadow = deferShadows && cached.shadowDirty ? undefined : cached.shadow;
+				let shadow = cached.shadow;
 				if (pending?.layerIds.includes(layer.id) && pending.stroke !== undefined) {
 					let draft = drafts.get(layer.id);
 					if (
@@ -718,10 +718,9 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 						draft.shadowDirty = undefined;
 					}
 					composite = draft.composite;
-					shadow = deferShadows && draft.shadowDirty ? undefined : draft.shadow;
+					shadow = draft.shadow ?? cached.shadow;
 				}
-				// A stale shadow still covers freshly erased holes. Hide that layer's shadow
-				// until settlement, invalidating its previous coverage once (not every dab).
+				// Keep the last computed shadow during input; settlement replaces its coverage.
 				if (cached.displayedShadow !== shadow) sceneDirty = "full";
 				cached.displayedShadow = shadow;
 				visibleLayers.push({

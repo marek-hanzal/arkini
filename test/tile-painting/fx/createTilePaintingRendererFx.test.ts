@@ -178,7 +178,7 @@ afterEach(() => {
 });
 
 describe("painting gesture projections", () => {
-	it("removes stale shadow coverage during a gesture and restores it on cancel or settlement", async () => {
+	it("retains the computed shadow through a gesture and commit until deferred settlement", async () => {
 		const renderer = await Effect.runPromise(createTilePaintingRendererFx([], []));
 		const canvas = document.createElement("canvas");
 		Effect.runSync(
@@ -208,13 +208,9 @@ describe("painting gesture projections", () => {
 				deferShadows: true,
 			}),
 		);
-		expect(shadowDrawCount).toBe(0);
-		expect(clears.find((entry) => entry.canvas === canvas)?.bounds).toEqual([
-			0,
-			0,
-			1254,
-			1254,
-		]);
+		expect(shadowDrawCount).toBe(1);
+		expect(shadowCount).toBe(1);
+		expect(clears.find((entry) => entry.canvas === canvas)?.bounds[2]).toBeLessThan(32);
 		clears.length = 0;
 		stroke.points.push({
 			x: 24,
@@ -229,7 +225,8 @@ describe("painting gesture projections", () => {
 			}),
 		);
 		expect(clears.find((entry) => entry.canvas === canvas)?.bounds[2]).toBeLessThan(32);
-		// Cancelling restores the unchanged cached shadow without filtering it again.
+		// Cancelling keeps the unchanged cached shadow without filtering it again.
+		shadowDrawCount = 0;
 		Effect.runSync(
 			renderer.renderFx({
 				document: painting,
@@ -271,7 +268,9 @@ describe("painting gesture projections", () => {
 				deferShadows: true,
 			}),
 		);
-		expect(shadowDrawCount).toBe(0);
+		expect(shadowDrawCount).toBe(1);
+		expect(shadowCount).toBe(1);
+		shadowDrawCount = 0;
 		Effect.runSync(
 			renderer.renderFx({
 				document: committed,

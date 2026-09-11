@@ -297,17 +297,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, request) => repository.replaceResourceFx(request),
 						),
 				);
-				handleFn(
-					ArkiniElectronApi.channels.editorProjectSaveResource,
-					(_event, candidate) =>
-						executeEditorProjectRepositoryFx(
-							"save-resource",
-							ownership,
-							diagnostics,
-							requestParser.parseSaveResourceFx(candidate),
-							(repository, request) => repository.saveResourceFx(request),
-						),
-				);
 				handleFn(ArkiniElectronApi.channels.editorProjectUpsertItem, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"upsert-item",
@@ -379,7 +368,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectRefresh,
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,
 					ArkiniElectronApi.channels.editorProjectReplaceResource,
-					ArkiniElectronApi.channels.editorProjectSaveResource,
 					ArkiniElectronApi.channels.editorProjectUpsertItem,
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					...noteChannels,

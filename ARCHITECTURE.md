@@ -133,8 +133,6 @@ Electron main owns native windows, protocols, privileged IPC and GUI-side filesy
 
 Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
-The Editor ChatGPT page is the one foreign surface. Electron owns its separate sandboxed, Node-free `WebContentsView` with no preload or Arkini IPC authority. Generated PNG bytes remain temporary until canonical validation and explicit revision-pinned insertion.
-
 ## Persistence and Editor
 
 Arkini-owned data is resolved independently from Electron below the effective system user's home:

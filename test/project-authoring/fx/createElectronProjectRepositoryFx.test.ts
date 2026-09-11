@@ -101,7 +101,6 @@ const installEditorApi = () => {
 		onOptimizeResourcesProgressFn: vi.fn(() => () => undefined),
 		replaceConfigFn: vi.fn(async () => success(commit)),
 		replaceResourceFn: vi.fn(async () => success(project)),
-		saveResourceFn: vi.fn(async () => success(project)),
 		upsertItemFn: vi.fn(async () => success(commit)),
 		upsertResourcesFn: vi.fn(async () => success(project)),
 		updateNoteFn: vi.fn(async ({ projectId, noteId, content, itemUids, resourceIds }) =>
@@ -378,7 +377,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		expect(unsubscribeFn).toHaveBeenCalledOnce();
 	});
 
-	it("blocks save-resource IPC while a hard project replacement owns writes", async () => {
+	it("blocks resource import IPC while a hard project replacement owns writes", async () => {
 		const editor = installEditorApi();
 		const { admission, repository } = createRepository();
 		const releaseFx = Effect.runSync(
@@ -386,15 +385,15 @@ describe("createElectronProjectRepositoryFx", () => {
 		);
 		try {
 			const failure = await readTypedFailure(
-				repository.saveResourceFx({
+				repository.upsertResourcesFx({
 					projectId: "project-one",
-					expectedRevision: project.revision,
-					overwrite: false,
-					resource: editorTestPayload.resources[0]!,
+					resources: [
+						editorTestPayload.resources[0]!,
+					],
 				}),
 			);
-			expect(failure.operation).toBe("save-resource");
-			expect(editor.saveResourceFn).not.toHaveBeenCalled();
+			expect(failure.operation).toBe("upsert-resource");
+			expect(editor.upsertResourcesFn).not.toHaveBeenCalled();
 		} finally {
 			Effect.runSync(releaseFx);
 		}

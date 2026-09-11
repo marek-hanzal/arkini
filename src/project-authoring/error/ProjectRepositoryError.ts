@@ -23,7 +23,6 @@ export type ProjectRepositoryOperation =
 	| "replace-config"
 	| "replace-resource"
 	| "refresh-project"
-	| "save-resource"
 	| "save-project-build"
 	| "upsert-item"
 	| "upsert-resource"

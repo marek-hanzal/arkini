@@ -21,37 +21,17 @@ describe("repository note asset relationships", () => {
 		const project = await harness.createProject(repository);
 		const hero = project.resources.find((resource) => resource.id === "hero");
 		if (hero === undefined) throw new Error("Expected the hero fixture resource.");
-		const prepared = await Effect.runPromise(
-			repository.saveResourceFx({
-				expectedRevision: project.revision,
-				overwrite: false,
-				projectId: project.projectId,
-				resource: {
-					...hero,
-					id: "spare",
-				},
-			}),
-		);
-		const withCover = await Effect.runPromise(
-			repository.saveResourceFx({
-				expectedRevision: prepared.revision,
-				overwrite: false,
-				projectId: project.projectId,
-				resource: {
-					...hero,
-					id: "cover",
-				},
-			}),
-		);
 		await Effect.runPromise(
-			repository.saveResourceFx({
-				expectedRevision: withCover.revision,
-				overwrite: false,
+			repository.upsertResourcesFx({
 				projectId: project.projectId,
-				resource: {
+				resources: [
+					"spare",
+					"cover",
+					"future",
+				].map((id) => ({
 					...hero,
-					id: "future",
-				},
+					id,
+				})),
 			}),
 		);
 		for (const resourceIds of [
@@ -214,14 +194,14 @@ describe("repository note asset relationships", () => {
 			operation === "rename"
 				? project
 				: await Effect.runPromise(
-						repository.saveResourceFx({
-							expectedRevision: project.revision,
-							overwrite: false,
+						repository.upsertResourcesFx({
 							projectId: project.projectId,
-							resource: {
-								...hero,
-								id: "spare",
-							},
+							resources: [
+								{
+									...hero,
+									id: "spare",
+								},
+							],
 						}),
 					);
 		const linkedResourceId = operation === "rename" ? "hero" : "spare";

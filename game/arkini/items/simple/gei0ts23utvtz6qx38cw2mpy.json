@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gei0ts23utvtz6qx38cw2mpy",
+		"id": "medicine-jar",
+		"title": "Medicine Jar",
+		"draft": true,
+		"asset": {
+			"default": [
+				"medicine-jar"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "t9b6dl6c7h3ob49clqys3uit",
+		"id": "corrupted-mouse",
+		"title": "Corrupted Mouse",
+		"draft": true,
+		"asset": {
+			"default": [
+				"corrupted-mouse"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

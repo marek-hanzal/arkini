@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fawn"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "corrupted-beagle-puppy-with-fawn"
+			}
+		],
 		"type": "simple"
 	}
 }

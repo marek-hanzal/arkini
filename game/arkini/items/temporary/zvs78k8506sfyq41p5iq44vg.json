@@ -1,0 +1,41 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "zvs78k8506sfyq41p5iq44vg",
+		"id": "sick-beagle-puppy",
+		"title": "Sick Beagle Puppy",
+		"draft": true,
+		"asset": {
+			"default": [
+				"sick-beagle-puppy"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "spoiled-raw-game-meat",
+									"quantity": {
+										"min": 2,
+										"max": 3
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

@@ -20,6 +20,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "corrupted-faith-bear"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "british-shorthair-kitten"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "corrupted-british-shorthair-kitten"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "medicine-jar"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "poison-jar"
 			}
 		],
 		"type": "simple"

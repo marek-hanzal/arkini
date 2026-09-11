@@ -47,6 +47,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "beagle-puppy"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "faith-cow"
 			}
 		],
 		"type": "simple"

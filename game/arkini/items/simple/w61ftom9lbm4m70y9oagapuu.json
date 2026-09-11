@@ -53,6 +53,15 @@
 				},
 				"effect": "replace",
 				"result": "bio-waste-bucket"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cutting-board"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "dirty-cutting-board"
 			}
 		],
 		"type": "simple"

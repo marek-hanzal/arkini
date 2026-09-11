@@ -21,6 +21,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "beagle"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fawn"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-puppy-with-fawn"
 			}
 		],
 		"type": "simple"

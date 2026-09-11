@@ -1,0 +1,28 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "di926lypctzw8e6a4twmyeme",
+		"id": "cotton-fabric",
+		"title": "Cotton Fabric",
+		"draft": true,
+		"asset": {
+			"default": [
+				"cotton-fabric"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "mouse-with-cut-tail"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "mouse-with-bandaged-tail"
+			}
+		],
+		"type": "simple"
+	}
+}

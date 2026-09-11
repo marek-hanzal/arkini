@@ -45,6 +45,24 @@
 				},
 				"effect": "replace",
 				"result": "raw-game-meat"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "raw-game-meat"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "well-fed-beagle"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "spoiled-sausage"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sick-beagle"
 			}
 		],
 		"type": "simple"

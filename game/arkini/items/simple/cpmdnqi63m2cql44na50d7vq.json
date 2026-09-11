@@ -62,6 +62,111 @@
 				},
 				"effect": "replace",
 				"result": "coin-stack"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "british-shorthair"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "british-shorthair-shorn"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "mouse"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "mouse-with-cut-tail"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "badly-trimmed-beagle"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wild-boar"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "boar-bristles",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "shorn-wild-boar"
 			}
 		],
 		"type": "simple"

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "qpohoerto0n3r136mz1wvksg",
+		"id": "spoiled-cheese",
+		"title": "Spoiled Cheese",
+		"draft": true,
+		"asset": {
+			"default": [
+				"spoiled-cheese"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

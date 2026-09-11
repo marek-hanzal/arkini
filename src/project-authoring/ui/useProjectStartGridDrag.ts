@@ -2,6 +2,7 @@ import {
 	type PointerEvent as ReactPointerEvent,
 	type RefObject,
 	useEffect,
+	useEffectEvent,
 	useRef,
 	useState,
 } from "react";
@@ -40,8 +41,7 @@ export const useProjectStartGridDrag = ({
 }) => {
 	const dragRef = useRef<ProjectStartGridDrag | undefined>(undefined);
 	const dragPreviewRef = useRef<HTMLDivElement>(null);
-	const onMoveRef = useRef(onMoveFn);
-	onMoveRef.current = onMoveFn;
+	const moveFn = useEffectEvent(onMoveFn);
 	const suppressClickRef = useRef(false);
 	const [dragVisual, setDragVisualFn] = useState<ProjectStartGridDragVisual>();
 
@@ -116,7 +116,7 @@ export const useProjectStartGridDrag = ({
 					target !== undefined &&
 					(target.x !== drag.source.x || target.y !== drag.source.y)
 				)
-					onMoveRef.current(drag.source, target);
+					moveFn(drag.source, target);
 			}
 			suppressNextClickFn();
 			resetFn();

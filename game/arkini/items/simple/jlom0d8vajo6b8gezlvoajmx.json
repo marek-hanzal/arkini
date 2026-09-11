@@ -35,6 +35,24 @@
 				"action": "deposit",
 				"effect": "replace",
 				"result": "recovering-cow"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-pig"
+				},
+				"action": "deposit",
+				"effect": "replace",
+				"result": "recovering-pig"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-sheep"
+				},
+				"action": "deposit",
+				"effect": "replace",
+				"result": "recovering-sheep"
 			}
 		],
 		"type": "simple"

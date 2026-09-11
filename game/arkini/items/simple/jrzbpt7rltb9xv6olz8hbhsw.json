@@ -1,19 +1,19 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "ppyp6pjf6uqnjegb6q5l9d9o",
-		"id": "cotton",
-		"title": "Cotton",
-		"description": "Fluffy",
+		"uid": "jrzbpt7rltb9xv6olz8hbhsw",
+		"id": "spoiled-cotton",
+		"title": "Spoiled Cotton",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"cotton"
+				"spoiled-cotton"
 			]
 		},
 		"scope": "any",
 		"layer": "content",
-		"maxStackSize": 10,
+		"maxStackSize": 1,
 		"type": "simple"
 	}
 }

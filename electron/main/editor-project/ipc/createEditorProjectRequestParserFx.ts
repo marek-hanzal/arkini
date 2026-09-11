@@ -88,14 +88,6 @@ const replaceResourceSchema = z
 		resource: ResourceSchema,
 	})
 	.strict();
-const saveResourceSchema = z
-	.object({
-		expectedRevision: z.number().int().nonnegative(),
-		overwrite: z.boolean(),
-		projectId: IdSchema,
-		resource: ResourceSchema,
-	})
-	.strict();
 const upsertResourcesSchema = z
 	.object({
 		projectId: IdSchema,
@@ -173,10 +165,6 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 					replaceResourceSchema,
 					candidate,
 				),
-			parseSaveResourceFx: (
-				candidate: unknown,
-			): Effect.Effect<ProjectRepository.SaveResourceProps, ProjectRepositoryError, never> =>
-				parseEditorProjectIpcRequestFx("save-resource", saveResourceSchema, candidate),
 			parseUpsertItemFx: (
 				candidate: unknown,
 			): Effect.Effect<ProjectRepository.UpsertItemProps, ProjectRepositoryError, never> =>

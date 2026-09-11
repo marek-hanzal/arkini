@@ -196,11 +196,11 @@ describe("filesystem Editor project writes", () => {
 			bytes: Uint8Array.of(7, 8, 9),
 		};
 		const resourceCommit = await Effect.runPromise(
-			repository.saveResourceFx({
+			repository.upsertResourcesFx({
 				projectId: created.projectId,
-				expectedRevision: itemCommit.revision,
-				overwrite: false,
-				resource,
+				resources: [
+					resource,
+				],
 			}),
 		);
 		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual(resource);
@@ -210,10 +210,11 @@ describe("filesystem Editor project writes", () => {
 		});
 		await expect(
 			Effect.runPromise(
-				repository.saveResourceFx({
+				repository.replaceResourceFx({
 					projectId: created.projectId,
 					expectedRevision: itemCommit.revision,
-					overwrite: true,
+					currentId: resource.id,
+					config: resourceCommit.config,
 					resource: {
 						...resource,
 						bytes: Uint8Array.of(1),
@@ -223,6 +224,21 @@ describe("filesystem Editor project writes", () => {
 		).rejects.toThrow(
 			`changed from revision ${itemCommit.revision} to ${resourceCommit.revision}`,
 		);
+
+		await expect(
+			Effect.runPromise(
+				repository.replaceResourceFx({
+					projectId: created.projectId,
+					expectedRevision: resourceCommit.revision,
+					currentId: resource.id,
+					config: resourceCommit.config,
+					resource: {
+						...resource,
+						id: "hero",
+					},
+				}),
+			),
+		).rejects.toThrow("Resource ID hero already exists.");
 
 		const canonical = await Effect.runPromise(repository.readProjectFx(created.projectId));
 		expect(canonical?.config.items.water?.title).toBe("Fresh Water");

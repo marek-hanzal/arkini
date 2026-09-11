@@ -161,8 +161,6 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
 		replaceResourceFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceResource, request),
-		saveResourceFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectSaveResource, request),
 		upsertItemFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
 		upsertResourcesFn: (request) =>

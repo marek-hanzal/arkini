@@ -65,7 +65,6 @@ export namespace ArkiniElectronApi {
 		editorProjectChanged: "arkini:editor:project:changed",
 		editorProjectReplaceConfig: "arkini:editor:project:replace-config",
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
-		editorProjectSaveResource: "arkini:editor:project:save-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
 		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
 		editorNoteList: "arkini:editor:note:list",
@@ -219,9 +218,6 @@ export namespace ArkiniElectronApi {
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
 			readonly replaceResourceFn: (
 				request: EditorProjectTransport.ReplaceResourceRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
-			readonly saveResourceFn: (
-				request: EditorProjectTransport.SaveResourceRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly upsertItemFn: (
 				request: EditorProjectTransport.UpsertItemRequest,

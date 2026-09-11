@@ -47,7 +47,6 @@ const fitSingleLineTextFx = Effect.fn("fitSingleLineTextFx")(
 		}),
 );
 
-const tileToSlotRatio = 0.8;
 const layeredArtworkToFaceRatio = 0.75;
 const formatTileBadgeLabelFn = (count: number, kind?: "charges" | "queue") =>
 	`${kind === "queue" ? "x" : ""}${count > 99 ? "99+" : String(count)}`;
@@ -59,7 +58,7 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	size,
 	visual,
 }: updateActorVisualFx.Props) {
-	const inset = (size * (1 - tileToSlotRatio)) / 2;
+	const inset = (size * (1 - item.artworkScale)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
 	const titlePaddingX = faceSize * 0.06;
 	const titlePaddingY = Math.max(2, faceSize * 0.025);

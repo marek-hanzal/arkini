@@ -63,6 +63,7 @@ Before delivery takes an existing actor's pose, reconciliation retires its activ
 - One reconciler owns actor allocation, visual generations, store mutation, and presentation-claim settlement.
 - One animator owns each typed presentation channel; ownership keys may cancel work but cannot create a competing writer. Motion is the only interpolation clock, and the Pixi ticker is not a second loop.
 - Root pose, grab offset, lifecycle, crowd, particles, and visual revision remain independent channels. Tuning belongs in implementation, not this contract.
+- `TileActorVisual.artworkScale` projects the required authored `asset.scale` once. Retained faces, layers, badges, progress and activity geometry use it on Board, Inventory and Toolbar, including Editor Board. Every crossfade slot keeps its own revision's ratio. The slot anchor, hit area and placement geometry remain full-size; transient actor/container motion still settles to its own neutral scale.
 - Actor stores follow exact runtime identities within their canvas. Pure canonical placement may normalize identity; presentation never assumes continuity from intent.
 - Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
 - Async texture completion is generation-guarded. A complete current visual remains until a complete replacement is ready; superseded work cannot publish or destroy the surviving generation.

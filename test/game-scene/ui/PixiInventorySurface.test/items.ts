@@ -19,6 +19,7 @@ export const item = {
 	revision: "revision:water",
 	running: false,
 	activityEffect: false,
+	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	title: "Water",
 } satisfies TileActorItem;

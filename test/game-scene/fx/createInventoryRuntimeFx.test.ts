@@ -16,6 +16,24 @@ import {
 import type { GameTransition } from "./createInventoryRuntimeFx.test/fixture";
 
 describe("Inventory runtime / feedback and hydration", () => {
+	it("refreshes an authored scale change without a new runtime revision or slot move", async () => {
+		const { actor, runtime } = await mountScene();
+		const position = {
+			x: actor.container.x,
+			y: actor.container.y,
+		};
+		publishItems([
+			{
+				...inventoryItem,
+				artworkScale: 1,
+			},
+		]);
+		expect(actor.currentVisual.item.artworkScale).toBe(1);
+		expect(actor.container.x).toBe(position.x);
+		expect(actor.container.y).toBe(position.y);
+		expect(actor.container.scale.x).toBe(1);
+		await Effect.runPromise(runtime.closeFx);
+	});
 	it("keeps Inventory travel running through unrelated committed transitions", async () => {
 		const { actor, runtime } = await mountScene();
 		const initialX = actor.container.x;

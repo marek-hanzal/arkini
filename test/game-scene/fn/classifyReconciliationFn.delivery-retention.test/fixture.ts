@@ -27,6 +27,7 @@ export const createDeliveryActorItem = (
 	quantity: 1,
 	revision: `revision:${id}`,
 	running: false,
+	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	title: "Water",
 	...overrides,

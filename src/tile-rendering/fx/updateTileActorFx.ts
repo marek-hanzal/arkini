@@ -30,11 +30,10 @@ export namespace updateTileActorFx {
 	}
 }
 
-const tileToSlotRatio = 0.8;
-
 const sameVisualRevisionFn = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
 	left.title === right.title &&
+	left.artworkScale === right.artworkScale &&
 	left.badgeCount === right.badgeCount &&
 	left.badgeKind === right.badgeKind &&
 	left.quantity === right.quantity &&
@@ -84,7 +83,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 		contains: (x: number, y: number) => x >= 0 && x <= size && y >= 0 && y <= size,
 	};
 
-	const inset = (size * (1 - tileToSlotRatio)) / 2;
+	const inset = (size * (1 - item.artworkScale)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
 	const activityParticles = actor.activityParticles;
 	const largestParticleSize = faceSize * 0.18;

@@ -1,3 +1,4 @@
+import { readProjectTilePaintingsFx } from "~/project-authoring/filesystem/fx/readProjectTilePaintingsFx";
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
@@ -11,6 +12,10 @@ export const readEditorJsonExportFx = Effect.fn("readEditorJsonExportFx")(functi
 	const paths = yield* createProjectPathsFx(root);
 	const project = yield* readProjectFilesFx(root);
 	yield* readProjectNotesFx({
+		paths,
+		projectId: project.config.meta.id,
+	});
+	yield* readProjectTilePaintingsFx({
 		paths,
 		projectId: project.config.meta.id,
 	});

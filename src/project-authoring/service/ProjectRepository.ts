@@ -1,3 +1,5 @@
+import type { TilePaintingSchema } from "~/tile-painting/schema/TilePaintingSchema";
+import type { TilePaintingDocumentSchema } from "~/tile-painting/schema/TilePaintingDocumentSchema";
 import { Context, type Effect } from "effect";
 
 import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
@@ -11,6 +13,41 @@ import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchem
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 export namespace ProjectRepository {
+	export interface BakeTilePaintingsProps {
+		readonly projectId: string;
+		readonly expectedRevision: number;
+		readonly paintings: ReadonlyArray<{
+			readonly paintingId: string;
+			readonly expectedUpdatedAtMs: number;
+			readonly document: TilePaintingDocumentSchema.Type;
+			readonly bakedPng: string;
+		}>;
+	}
+	export interface BakeTilePaintingsResult {
+		readonly project: Project;
+		readonly paintings: ReadonlyArray<TilePaintingSchema.Type>;
+	}
+
+	export interface TilePaintingKey {
+		readonly projectId: string;
+		readonly paintingId: string;
+	}
+	export interface SaveTilePaintingProps extends TilePaintingKey {
+		readonly expectedRevision: number;
+		readonly expectedUpdatedAtMs: number | null;
+		readonly document: TilePaintingDocumentSchema.Type;
+		readonly bakedPng?: string;
+		readonly outputResourceId?: string;
+	}
+	export interface DeleteTilePaintingProps extends TilePaintingKey {
+		readonly expectedRevision: number;
+		readonly expectedUpdatedAtMs: number;
+	}
+	export interface SaveTilePaintingResult {
+		readonly painting: TilePaintingSchema.Type;
+		readonly project: Project;
+	}
+
 	export interface CreateProjectProps {
 		readonly version: VersionPartsSchema.Type;
 		readonly config: GameConfigSchema.Type;
@@ -105,6 +142,23 @@ export namespace ProjectRepository {
 }
 
 export interface ProjectRepositoryService {
+	readonly bakeTilePaintingsFx: (
+		props: ProjectRepository.BakeTilePaintingsProps,
+	) => Effect.Effect<ProjectRepository.BakeTilePaintingsResult, ProjectRepositoryError>;
+
+	readonly listTilePaintingsFx: (
+		projectId: string,
+	) => Effect.Effect<ReadonlyArray<TilePaintingSchema.Type>, ProjectRepositoryError>;
+	readonly readTilePaintingFx: (
+		key: ProjectRepository.TilePaintingKey,
+	) => Effect.Effect<TilePaintingSchema.Type | null, ProjectRepositoryError>;
+	readonly saveTilePaintingFx: (
+		props: ProjectRepository.SaveTilePaintingProps,
+	) => Effect.Effect<ProjectRepository.SaveTilePaintingResult, ProjectRepositoryError>;
+	readonly deleteTilePaintingFx: (
+		props: ProjectRepository.DeleteTilePaintingProps,
+	) => Effect.Effect<void, ProjectRepositoryError>;
+
 	/** Joins every repository write admitted before this Effect acquires the write boundary. */
 	readonly awaitIdleFx: Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly createProjectFx: (

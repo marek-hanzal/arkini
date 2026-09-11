@@ -1,3 +1,4 @@
+import { TilePaintingSchema } from "~/tile-painting/schema/TilePaintingSchema";
 import { Effect } from "effect";
 import { z } from "zod";
 
@@ -163,6 +164,98 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 							(value) => optimizeResourcesResultSchema.parse(value),
 						),
 					(unsubscribeFn) => Effect.sync(() => unsubscribeFn?.()),
+				),
+			),
+		bakeTilePaintingsFx: (request) =>
+			writeFx(
+				"bake-tile-paintings",
+				callFx(
+					"bake-tile-paintings",
+					() => window.arkini.editor.bakeTilePaintingsFn(request),
+					(value) => {
+						const result = z
+							.object({
+								project: ProjectPayloadSchema,
+								paintings: TilePaintingSchema.array(),
+							})
+							.strict()
+							.parse(value);
+						const ids = new Set(
+							request.paintings.map((painting) => painting.paintingId),
+						);
+						if (
+							result.project.projectId !== request.projectId ||
+							result.paintings.length !== ids.size ||
+							new Set(result.paintings.map((painting) => painting.paintingId))
+								.size !== ids.size ||
+							result.paintings.some(
+								(painting) =>
+									painting.projectId !== request.projectId ||
+									!ids.has(painting.paintingId),
+							)
+						)
+							throw new Error("Baked painting batch identity does not match.");
+						return result;
+					},
+				),
+			),
+		listTilePaintingsFx: (projectId) =>
+			callFx(
+				"list-tile-paintings",
+				() => window.arkini.editor.listTilePaintingsFn(projectId),
+				(value) => {
+					const paintings = TilePaintingSchema.array().parse(value);
+					if (paintings.some((painting) => painting.projectId !== projectId))
+						throw new Error("Painting project identity does not match.");
+					return paintings;
+				},
+			),
+		readTilePaintingFx: (request) =>
+			callFx(
+				"read-tile-painting",
+				() => window.arkini.editor.readTilePaintingFn(request),
+				(value) => {
+					const painting = TilePaintingSchema.nullable().parse(value);
+					if (
+						painting !== null &&
+						(painting.projectId !== request.projectId ||
+							painting.paintingId !== request.paintingId)
+					)
+						throw new Error("Painting identity does not match.");
+					return painting;
+				},
+			),
+		saveTilePaintingFx: (request) =>
+			writeFx(
+				"save-tile-painting",
+				callFx(
+					"save-tile-painting",
+					() => window.arkini.editor.saveTilePaintingFn(request),
+					(value) => {
+						const result = z
+							.object({
+								painting: TilePaintingSchema,
+								project: ProjectPayloadSchema,
+							})
+							.strict()
+							.parse(value);
+						if (
+							result.painting.projectId !== request.projectId ||
+							result.painting.paintingId !== request.paintingId ||
+							result.project.projectId !== request.projectId
+						)
+							throw new Error("Saved painting identity does not match.");
+						return result;
+					},
+				),
+			),
+		deleteTilePaintingFx: (request) =>
+			writeFx(
+				"delete-tile-painting",
+				callFx(
+					"delete-tile-painting",
+					() => window.arkini.editor.deleteTilePaintingFn(request),
+					() => undefined,
 				),
 			),
 		listNotesFx: (projectId) =>

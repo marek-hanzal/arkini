@@ -16,6 +16,7 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 	const items = path.join(root, "items");
 	const assets = path.join(root, "assets");
 	const resources = path.join(root, "resources");
+	const tilePaintings = path.join(root, "paintings");
 	const notes = path.join(root, "notes");
 
 	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
@@ -50,6 +51,11 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		assets,
 		resources,
 		notes,
+		tilePaintings,
+		tilePaintingFileFx: (paintingId) =>
+			Effect.succeed(
+				path.join(tilePaintings, `${encodeGameProjectFileStemFn(paintingId)}.json`),
+			),
 		itemFileFx: ({ type, uid }) =>
 			Effect.succeed(path.join(items, type, `${encodeGameProjectFileStemFn(uid)}.json`)),
 		assetFileFx: (resourceId) => readResourceFileFx(assets, resourceId),

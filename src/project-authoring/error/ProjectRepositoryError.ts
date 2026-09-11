@@ -3,6 +3,11 @@ import { Data } from "effect";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 
 export type ProjectRepositoryOperation =
+	| "bake-tile-paintings"
+	| "list-tile-paintings"
+	| "read-tile-painting"
+	| "save-tile-painting"
+	| "delete-tile-painting"
 	| "await-idle"
 	| "build-project"
 	| "save-build-version"

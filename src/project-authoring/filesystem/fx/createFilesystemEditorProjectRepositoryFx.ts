@@ -1,3 +1,4 @@
+import { createTilePaintingOperationsFx } from "./createTilePaintingOperationsFx";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, Path, Semaphore } from "effect";
 
@@ -67,7 +68,14 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		readStateFx,
 		states,
 	});
+	const paintings = yield* createTilePaintingOperationsFx({
+		filesystemWrite,
+		operations,
+		readStateFx,
+		states,
+	});
 	const repository = {
+		...paintings,
 		awaitIdleFx: operations.withPermits(1)(Effect.void),
 		...projects,
 		...builds,
@@ -83,6 +91,11 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 
 	return {
 		awaitIdleFx: provideFx(repository.awaitIdleFx),
+		bakeTilePaintingsFx: (props) => provideFx(repository.bakeTilePaintingsFx(props)),
+		listTilePaintingsFx: (projectId) => provideFx(repository.listTilePaintingsFx(projectId)),
+		readTilePaintingFx: (key) => provideFx(repository.readTilePaintingFx(key)),
+		saveTilePaintingFx: (props) => provideFx(repository.saveTilePaintingFx(props)),
+		deleteTilePaintingFx: (props) => provideFx(repository.deleteTilePaintingFx(props)),
 		saveBuildVersionFx: (props) => provideFx(repository.saveBuildVersionFx(props)),
 		buildProjectFx: (props) => provideFx(repository.buildProjectFx(props)),
 		createProjectFx: (props) => provideFx(repository.createProjectFx(props)),

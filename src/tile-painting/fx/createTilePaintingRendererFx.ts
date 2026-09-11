@@ -23,7 +23,21 @@ export namespace createTilePaintingRendererFx {
 			readonly includeReference?: boolean;
 			readonly pending?: Pending;
 			readonly deferShadows?: boolean;
-		}) => Effect.Effect<void>;
+		}) => Effect.Effect<Frame>;
+	}
+	/** What reached the output surface, including cache decisions needed to diagnose lost projections. */
+	export interface Frame {
+		readonly changed:
+			| "full"
+			| "none"
+			| {
+					readonly left: number;
+					readonly top: number;
+					readonly right: number;
+					readonly bottom: number;
+			  };
+		readonly adoptedLayerIds: ReadonlyArray<string>;
+		readonly replayedLayerIds: ReadonlyArray<string>;
 	}
 }
 
@@ -225,6 +239,7 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 			mask: HTMLCanvasElement;
 			composite: HTMLCanvasElement;
 			shadow?: HTMLCanvasElement;
+			displayedShadow?: HTMLCanvasElement;
 			shadowDirty: DirtyRegion;
 		}
 	>();
@@ -515,6 +530,8 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 			pending,
 			deferShadows = false,
 		}) {
+			const adoptedLayerIds: string[] = [];
+			const replayedLayerIds: string[] = [];
 			const resized =
 				canvas.width !== TilePaintingCanvasSize || canvas.height !== TilePaintingCanvasSize;
 			if (canvas.width !== TilePaintingCanvasSize) canvas.width = TilePaintingCanvasSize;
@@ -540,7 +557,11 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 				if (includeReference) yield* drawReferenceFx(painting, canvas, outputContext);
 				outputContext.globalAlpha = 1;
 				scene = undefined;
-				return;
+				return {
+					changed: "full" as const,
+					adoptedLayerIds,
+					replayedLayerIds,
+				};
 			}
 			const context = yield* readContextFx(terrain);
 			const visibleLayers: {
@@ -555,6 +576,7 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 				if (!layer.visible || layer.opacity === 0) continue;
 				let cached = layers.get(layer.id);
 				if (cached === undefined) {
+					replayedLayerIds.push(layer.id);
 					cached = {
 						layer,
 						mask: yield* createCanvasFx(canvas.width, canvas.height),
@@ -597,6 +619,7 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 								.slice(0, draft.painted)
 								.every((point, index) => point === finalStroke.points[index]);
 						if (adopt) {
+							adoptedLayerIds.push(layer.id);
 							cached.mask = draft.mask;
 							cached.composite = draft.composite;
 							if (draft.painted < finalStroke.points.length) {
@@ -604,6 +627,7 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 								compositeDirty = true;
 							}
 						} else {
+							replayedLayerIds.push(layer.id);
 							const start = append ? cached.layer.strokes.length : 0;
 							if (!append)
 								(yield* readContextFx(cached.mask)).clearRect(
@@ -648,7 +672,7 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 					cached.shadowDirty = undefined;
 				}
 				let composite = cached.composite;
-				let shadow = cached.shadow;
+				let shadow = deferShadows && cached.shadowDirty ? undefined : cached.shadow;
 				if (pending?.layerIds.includes(layer.id) && pending.stroke !== undefined) {
 					let draft = drafts.get(layer.id);
 					if (
@@ -694,8 +718,12 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 						draft.shadowDirty = undefined;
 					}
 					composite = draft.composite;
-					shadow = draft.shadow ?? cached.shadow;
+					shadow = deferShadows && draft.shadowDirty ? undefined : draft.shadow;
 				}
+				// A stale shadow still covers freshly erased holes. Hide that layer's shadow
+				// until settlement, invalidating its previous coverage once (not every dab).
+				if (cached.displayedShadow !== shadow) sceneDirty = "full";
+				cached.displayedShadow = shadow;
 				visibleLayers.push({
 					layer,
 					composite,
@@ -796,6 +824,11 @@ export const createTilePaintingRendererFx = Effect.fn("createTilePaintingRendere
 				stroke: pending?.stroke,
 				scatter: pending?.scatter,
 				layerIds: pending?.layerIds ?? [],
+			};
+			return {
+				changed: sceneDirty ?? "none",
+				adoptedLayerIds,
+				replayedLayerIds,
 			};
 		}),
 	};

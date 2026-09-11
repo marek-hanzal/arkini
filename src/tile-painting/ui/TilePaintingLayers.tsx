@@ -467,10 +467,6 @@ const LayerShadowControl = ({
 								/>
 							</label>
 						</fieldset>
-						<p className="text-xs text-muted">
-							Changes apply immediately and support undo. Transparent areas stay
-							clear.
-						</p>
 					</fieldset>
 				</TilePaintingDialog>
 			) : null}

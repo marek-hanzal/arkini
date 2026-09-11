@@ -50,6 +50,7 @@ const strokeFn = (): TilePaintingDocumentSchema.Stroke => ({
 });
 let dabCount = 0;
 let shadowCount = 0;
+let shadowDrawCount = 0;
 const stampAlphas: number[] = [];
 type Rect = readonly [
 	number,
@@ -79,6 +80,7 @@ beforeEach(() => {
 	});
 	dabCount = 0;
 	shadowCount = 0;
+	shadowDrawCount = 0;
 	stampAlphas.length = 0;
 	clears.length = 0;
 	blurred.length = 0;
@@ -133,6 +135,7 @@ beforeEach(() => {
 					if (width === 8) dabCount += 1;
 				},
 				drawImage: (source: unknown) => {
+					if (projection.globalCompositeOperation === "source-atop") shadowDrawCount += 1;
 					if (source === sourceImage) stampAlphas.push(projection.globalAlpha);
 					if (projection.filter.startsWith("blur(")) {
 						shadowCount += 1;
@@ -175,6 +178,110 @@ afterEach(() => {
 });
 
 describe("painting gesture projections", () => {
+	it("removes stale shadow coverage during a gesture and restores it on cancel or settlement", async () => {
+		const renderer = await Effect.runPromise(createTilePaintingRendererFx([], []));
+		const canvas = document.createElement("canvas");
+		Effect.runSync(
+			renderer.renderFx({
+				document: painting,
+				canvas,
+			}),
+		);
+		expect(shadowDrawCount).toBe(1);
+		const stroke = {
+			...strokeFn(),
+			mode: "hide" as const,
+		};
+		const pending = {
+			layerIds: [
+				"ground",
+			],
+			stroke,
+		};
+		shadowDrawCount = 0;
+		clears.length = 0;
+		Effect.runSync(
+			renderer.renderFx({
+				document: painting,
+				canvas,
+				pending,
+				deferShadows: true,
+			}),
+		);
+		expect(shadowDrawCount).toBe(0);
+		expect(clears.find((entry) => entry.canvas === canvas)?.bounds).toEqual([
+			0,
+			0,
+			1254,
+			1254,
+		]);
+		clears.length = 0;
+		stroke.points.push({
+			x: 24,
+			y: 20,
+		});
+		Effect.runSync(
+			renderer.renderFx({
+				document: painting,
+				canvas,
+				pending,
+				deferShadows: true,
+			}),
+		);
+		expect(clears.find((entry) => entry.canvas === canvas)?.bounds[2]).toBeLessThan(32);
+		// Cancelling restores the unchanged cached shadow without filtering it again.
+		Effect.runSync(
+			renderer.renderFx({
+				document: painting,
+				canvas,
+				deferShadows: true,
+			}),
+		);
+		expect(shadowDrawCount).toBe(1);
+		expect(shadowCount).toBe(1);
+		Effect.runSync(
+			renderer.renderFx({
+				document: painting,
+				canvas,
+				pending,
+				deferShadows: true,
+			}),
+		);
+		const committed = {
+			...painting,
+			layers: [
+				{
+					...painting.layers[0],
+					strokes: [
+						{
+							...stroke,
+							points: [
+								...stroke.points,
+							],
+						},
+					],
+				},
+			],
+		};
+		shadowDrawCount = 0;
+		Effect.runSync(
+			renderer.renderFx({
+				document: committed,
+				canvas,
+				deferShadows: true,
+			}),
+		);
+		expect(shadowDrawCount).toBe(0);
+		Effect.runSync(
+			renderer.renderFx({
+				document: committed,
+				canvas,
+			}),
+		);
+		expect(shadowDrawCount).toBe(1);
+		expect(shadowCount).toBe(2);
+	});
+
 	it("decodes current Asset bytes for the same recipe and releases temporary URLs", async () => {
 		const sources = [
 			{
@@ -512,6 +619,7 @@ describe("painting gesture projections", () => {
 			renderer.renderFx({
 				document: painting,
 				canvas,
+				deferShadows: true,
 			}),
 		);
 		clears.length = 0;

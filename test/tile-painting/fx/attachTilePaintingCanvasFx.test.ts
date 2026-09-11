@@ -8,6 +8,10 @@ import { editorTestConfig } from "~test/project-authoring/support/editorTestPayl
 
 const renders = vi.hoisted(() => vi.fn());
 const decoders = vi.hoisted(() => vi.fn());
+const traceRecords = vi.hoisted(() => vi.fn());
+vi.mock("~/application-diagnostics/fx/writeDiagnosticRecordFx", () => ({
+	writeDiagnosticRecordFx: (record: unknown) => Effect.sync(() => traceRecords(record)),
+}));
 vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	return {
@@ -75,7 +79,7 @@ const painting: TilePaintingDocumentSchema.Type = {
 	reference: null,
 };
 
-const pointerFn = (type: string, x = 320, y = 240, button = 0) => {
+const pointerFn = (type: string, x = 320, y = 240, button = 0, target: EventTarget = surface) => {
 	const event = new MouseEvent(type, {
 		bubbles: true,
 		clientX: x,
@@ -85,7 +89,7 @@ const pointerFn = (type: string, x = 320, y = 240, button = 0) => {
 	Object.defineProperty(event, "pointerId", {
 		value: 1,
 	});
-	surface.dispatchEvent(event);
+	target.dispatchEvent(event);
 };
 const mountFn = async () => {
 	scope = Effect.runSync(Scope.make());
@@ -113,6 +117,7 @@ beforeEach(async () => {
 		}),
 	);
 	renders.mockClear();
+	traceRecords.mockClear();
 	changes.mockClear();
 	vi.stubGlobal(
 		"ResizeObserver",
@@ -206,6 +211,94 @@ afterEach(() => {
 });
 
 describe("native painting gesture settlement", () => {
+	it.each([
+		"reveal",
+		"hide",
+		"scatter",
+	] as const)(
+		"retains %s through capture loss before release and commits exactly once",
+		async (tool) => {
+			Effect.runSync(session.setToolFx(tool));
+			for (let index = 0; index < 12; index++) {
+				pointerFn("pointerdown", 300);
+				pointerFn("pointermove", 330);
+				await vi.advanceTimersByTimeAsync(16);
+				pointerFn("lostpointercapture", 330);
+				// Match the user's log: a render may happen between lost capture and release.
+				await vi.advanceTimersByTimeAsync(16);
+				expect(renders.mock.calls.at(-1)?.[0].pending).toBeDefined();
+				// Once capture is lost the release and remaining motion can target another element.
+				pointerFn("pointermove", 360, 240, 0, document.body);
+				pointerFn("pointerup", 390, 240, 0, document.body);
+				pointerFn("pointerup", 390);
+			}
+			const result = session.readFn().document;
+			const strokes = tool === "scatter" ? result.scatter : result.layers[0].strokes;
+			expect(strokes).toHaveLength(12);
+			expect(changes).toHaveBeenCalledTimes(12);
+			if (tool !== "scatter") {
+				const points = result.layers[0].strokes[0].points;
+				expect(points.at(-1)!.x).toBeGreaterThan(820);
+				// Captured moves bubble through the viewport too; each sample is consumed once.
+				expect(points).toHaveLength(69);
+			}
+			Effect.runSync(session.undoFx);
+			expect(
+				tool === "scatter"
+					? session.readFn().document.scatter
+					: session.readFn().document.layers[0].strokes,
+			).toHaveLength(11);
+		},
+	);
+
+	it("still cancels explicitly after capture loss and removes window gesture listeners on detach", () => {
+		pointerFn("pointerdown");
+		pointerFn("lostpointercapture");
+		pointerFn("pointercancel", 340, 240, 0, document.body);
+		pointerFn("pointerup", 360, 240, 0, document.body);
+		expect(changes).not.toHaveBeenCalled();
+		pointerFn("pointerdown");
+		pointerFn("lostpointercapture");
+		Effect.runSync(Scope.close(scope, Exit.void));
+		pointerFn("pointermove", 380, 240, 0, document.body);
+		pointerFn("pointerup", 400, 240, 0, document.body);
+		expect(changes).not.toHaveBeenCalled();
+	});
+
+	it("correlates committed and cancelled gestures with document revisions and rendered frames", async () => {
+		pointerFn("pointerdown");
+		pointerFn("pointermove", 360);
+		await vi.advanceTimersByTimeAsync(16);
+		pointerFn("pointerup", 380);
+		pointerFn("pointerdown");
+		pointerFn("pointermove", 360);
+		pointerFn("pointercancel");
+		await vi.advanceTimersByTimeAsync(400);
+		const events = traceRecords.mock.calls.flatMap(([record]) => record.data.entries);
+		expect(
+			events
+				.filter((entry) => entry.event === "gesture-started")
+				.map((entry) => entry.data.gestureId),
+		).toEqual([
+			1,
+			2,
+		]);
+		expect(events.find((entry) => entry.event === "gesture-finished")?.data).toMatchObject({
+			gestureId: 1,
+			committed: true,
+			documentRevision: 1,
+		});
+		expect(events.find((entry) => entry.event === "gesture-cancelled")?.data).toMatchObject({
+			gestureId: 2,
+			reason: "pointercancel",
+			documentRevision: 1,
+		});
+		expect(events.filter((entry) => entry.event === "rendered").at(-1)?.data).toMatchObject({
+			gestureId: null,
+			documentRevision: 1,
+			deferShadows: false,
+		});
+	});
 	it.each([
 		"reveal",
 		"scatter",
@@ -494,7 +587,6 @@ describe("native painting gesture settlement", () => {
 		"escape",
 		"blur",
 		"pointercancel",
-		"lostpointercapture",
 		"document-replaced",
 		"suspended",
 	])("discards a pending gesture on %s", (reason) => {

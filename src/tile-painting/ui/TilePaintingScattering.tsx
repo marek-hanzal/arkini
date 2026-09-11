@@ -44,7 +44,7 @@ export const TilePaintingScattering = () => {
 					/>
 				</div>
 			</EditorRootCard>
-			<div className="grid gap-3 lg:grid-cols-2">
+			<div className="ak-list grid gap-2">
 				{painting.catalog.map((entry) => {
 					const image = painting.images.find((image) => image.id === entry.imageId);
 					const changeFn = (minSize: number, maxSize: number) =>
@@ -61,38 +61,21 @@ export const TilePaintingScattering = () => {
 							),
 						});
 					return (
-						<EditorRootCard
+						<article
 							key={entry.id}
-							dataUi="TilePaintingScatterEntry"
+							data-ui="TilePaintingScatterEntry"
+							className="ak-list-row grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 rounded-xl px-4 py-3 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,36rem)_auto]"
 						>
-							<div className="flex items-center gap-4">
+							<div className="flex min-w-0 items-center gap-3">
 								<img
-									className="size-16 object-contain"
+									className="size-12 shrink-0 object-contain"
 									src={image === undefined ? undefined : imageUrls.get(image.id)}
 								/>
 								<span className="min-w-0 flex-1 truncate font-semibold">
 									{image?.label}
 								</span>
-								<Tooltip
-									content="Remove from catalog (existing stamps stay)"
-									contentClassName="z-50"
-								>
-									<LinkButton
-										className="inline-flex size-9 shrink-0 items-center justify-center no-underline hover:no-underline"
-										onClick={() =>
-											session.editFn({
-												...painting,
-												catalog: painting.catalog.filter(
-													(candidate) => candidate.id !== entry.id,
-												),
-											})
-										}
-									>
-										<Trash2 className="size-4" />
-									</LinkButton>
-								</Tooltip>
 							</div>
-							<div className="grid grid-cols-3 gap-3">
+							<div className="col-span-2 row-start-2 grid min-w-0 grid-cols-3 gap-3 lg:col-span-1 lg:col-start-2 lg:row-start-1">
 								<EditorNumberControl
 									label="Minimum size (px)"
 									min={1}
@@ -142,7 +125,25 @@ export const TilePaintingScattering = () => {
 									}}
 								/>
 							</div>
-						</EditorRootCard>
+							<Tooltip
+								content="Remove from catalog (existing stamps stay)"
+								contentClassName="z-50"
+							>
+								<LinkButton
+									className="col-start-2 row-start-1 inline-flex size-9 shrink-0 items-center justify-center no-underline hover:no-underline lg:col-start-3"
+									onClick={() =>
+										session.editFn({
+											...painting,
+											catalog: painting.catalog.filter(
+												(candidate) => candidate.id !== entry.id,
+											),
+										})
+									}
+								>
+									<Trash2 className="size-4" />
+								</LinkButton>
+							</Tooltip>
+						</article>
 					);
 				})}
 			</div>

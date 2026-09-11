@@ -111,7 +111,7 @@ export const TilePaintingCanvasPage = () => {
 				</Tooltip>
 				<EditorSelect
 					label="Active layer"
-					className="w-80 shrink-0"
+					className="w-80 shrink-0 data-[ui-variant=link]:h-12 data-[ui-variant=link]:min-h-12"
 					size="control"
 					variant="link"
 					value={selectedLayerId ?? ""}
@@ -130,6 +130,13 @@ export const TilePaintingCanvasPage = () => {
 									.map((layer) => ({
 										value: layer.id,
 										label: `${layer.name}${layer.visible ? "" : " (hidden)"}`,
+										leading: (
+											<img
+												className="size-10 shrink-0 rounded object-contain"
+												src={imageUrls.get(layer.imageId)}
+												draggable={false}
+											/>
+										),
 									}))
 					}
 					onChangeFn={session.setActiveLayerIdFn}

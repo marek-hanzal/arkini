@@ -12,7 +12,7 @@ import {
 	useFloating,
 	useInteractions,
 } from "@floating-ui/react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -22,6 +22,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 export interface EditorSelectOption<Value extends string> {
 	readonly disabled?: boolean;
 	readonly label: string;
+	readonly leading?: ReactNode;
 	readonly value: Value;
 }
 
@@ -89,7 +90,10 @@ export const EditorSelect = <Value extends string>({
 					},
 				})}
 			>
-				<span>{selected?.label ?? value}</span>
+				<span className="flex min-w-0 items-center gap-3">
+					{selected?.leading}
+					<span>{selected?.label ?? value}</span>
+				</span>
 				<ChevronDown className="size-4 shrink-0 text-muted" />
 			</Trigger>
 			{open ? (
@@ -118,7 +122,10 @@ export const EditorSelect = <Value extends string>({
 									},
 								})}
 							>
-								{option.label}
+								<span className="flex min-w-0 items-center gap-3">
+									{option.leading}
+									<span>{option.label}</span>
+								</span>
 								{option.value === value ? (
 									<Check className="size-4 shrink-0" />
 								) : null}

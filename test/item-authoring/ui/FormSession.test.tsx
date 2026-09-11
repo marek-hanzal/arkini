@@ -129,6 +129,7 @@ const item: ItemSchema.Type = {
 	title: "Water",
 	description: "Fresh water.",
 	asset: {
+		scale: 0.8,
 		default: [
 			"asset:water",
 		],
@@ -323,6 +324,31 @@ describe("item section form session", () => {
 		const { container } = await render(<ArtworkSection />);
 
 		expect(container.querySelector('[data-ui="EditorItemArtworkProgression"]')).toBeNull();
+	});
+
+	it("keeps the persisted artwork scale in the form and saves the edited ratio", async () => {
+		const scaledItem = {
+			...item,
+			asset: {
+				...item.asset,
+				scale: 0.65,
+			},
+		};
+		state.persisted = scaledItem;
+		const { container } = await render(<ArtworkSection />);
+		const scale = container.querySelector<HTMLInputElement>('input[name="asset.scale"]');
+		if (scale === null) throw new Error("Missing artwork scale control.");
+		expect(scale.value).toBe("0.65");
+		await changeInput(scale, "0.9");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenCalledOnce();
+		expect(state.saveItem.mock.calls[0]?.[0].item.asset).toEqual({
+			...item.asset,
+			scale: 0.9,
+		});
+		expect(scaledItem.asset.scale).toBe(0.65);
 	});
 
 	it("picks both bounds of the reserved random space range into the local draft", async () => {

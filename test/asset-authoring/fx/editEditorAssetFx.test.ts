@@ -19,7 +19,10 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 const createProject = (revision = 3): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,

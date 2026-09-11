@@ -59,7 +59,7 @@ export const createProjectWriteAdmissionFx = Effect.sync(() => {
 							new ProjectRepositoryError({
 								operation,
 								message:
-									"The editor project is being replaced by a checked-out or refreshed version.",
+									"The editor project is being refreshed from its saved state.",
 							}),
 						)
 					: effect,

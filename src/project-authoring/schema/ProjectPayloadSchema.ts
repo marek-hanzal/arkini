@@ -34,12 +34,19 @@ const materializeProjectRecordFn = (transport: z.infer<typeof projectTransportSc
 		createdAtMs: transport.createdAtMs,
 		updatedAtMs: transport.updatedAtMs,
 	});
-	if (transport.title !== record.config.meta.title || transport.version !== record.version)
-		throw new Error("Editor IPC metadata does not match the canonical project config.");
+	if (
+		transport.title !== record.config.meta.title ||
+		transport.version.major !== record.version.major ||
+		transport.version.minor !== record.version.minor ||
+		transport.version.suffix !== record.version.suffix
+	)
+		throw new Error("Editor IPC metadata does not match the canonical project record.");
 	return {
 		projectId: record.projectId,
 		title: record.config.meta.title,
-		version: record.version,
+		version: {
+			...record.version,
+		},
 		createdAtMs: record.createdAtMs,
 		updatedAtMs: record.updatedAtMs,
 		revision: record.revision,

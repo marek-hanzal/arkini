@@ -1,0 +1,44 @@
+import type { Effect, SubscriptionRef } from "effect";
+
+import type { Project } from "~/project-authoring/type/Project";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
+import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
+
+export namespace EditorBoardGameResource {
+	export type Resource = GameEngineResource<EditorBoardGame>;
+	export type State =
+		| {
+				readonly type: "idle";
+		  }
+		| {
+				readonly type: "loading";
+				readonly projectId: string;
+				readonly projectRevision: number;
+		  }
+		| {
+				readonly type: "ready";
+				readonly resource: Resource;
+		  }
+		| {
+				readonly type: "failed";
+				readonly error: unknown;
+				readonly projectId: string;
+				readonly projectRevision: number;
+		  };
+}
+
+/** Process-owned, serialized lifecycle for the revision-pinned editor game. */
+export interface EditorBoardGameResource {
+	readonly state: SubscriptionRef.SubscriptionRef<EditorBoardGameResource.State>;
+	/** Claims the routed project before synchronizing its latest loaded revision. */
+	readonly syncFx: (project: Project) => Effect.Effect<void, never, never>;
+	/** Synchronizes a committed revision only while its project still owns the route. */
+	readonly publishFx: (project: Project) => Effect.Effect<void, never, never>;
+	/** Advances a non-gameplay authoring revision without replacing its game session. */
+	readonly advanceNoopFx: (
+		project: Project,
+		expectedPreviousRevision: number,
+	) => Effect.Effect<void, never, never>;
+	readonly releaseCurrentFx: Effect.Effect<void, unknown, never>;
+	readonly shutdownFx: Effect.Effect<void, never, never>;
+}

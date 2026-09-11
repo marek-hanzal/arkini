@@ -7,35 +7,31 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import type {
-	ProjectVersionCheckoutInput,
-	ProjectVersionCommitInput,
-	ProjectVersionDiffInput,
-	ProjectVersionTagInput,
-} from "~/project-version/type/ProjectVersion";
-import {
-	ProjectVersionBodySchema,
-	ProjectVersionSubjectSchema,
-	ProjectVersionTagSchema,
-} from "~/project-version/schema/ProjectVersionMetadataSchema";
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 
 const createProjectSchema = z
 	.object({
-		version: GameVersionSchema,
+		version: VersionPartsSchema,
 		config: GameConfigSchema,
-		initialVersionSubject: ProjectVersionSubjectSchema.optional(),
 		resources: ResourceSchema.array(),
 	})
 	.strict();
-const buildProjectSchema = z
+const saveBuildVersionSchema = z
 	.object({
+		version: VersionPartsSchema,
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
 	})
 	.strict();
+const buildProjectSchema = saveBuildVersionSchema
+	.omit({
+		version: true,
+	})
+	.extend({
+		expectedVersion: VersionPartsSchema,
+	});
 const readProjectBuildSchema = z
 	.object({
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
@@ -106,55 +102,16 @@ const upsertResourcesSchema = z
 		resources: ResourceSchema.array().min(1),
 	})
 	.strict();
-const fingerprintSchema = z.string().regex(/^[a-f0-9]{64}$/);
-const versionReferenceSchema = z.discriminatedUnion("type", [
-	z
-		.object({
-			type: z.literal("current"),
-		})
-		.strict(),
-	z
-		.object({
-			type: z.literal("version"),
-			versionId: IdSchema,
-		})
-		.strict(),
-]);
-const versionCommitSchema = z
-	.object({
-		body: ProjectVersionBodySchema.optional(),
-		expectedFingerprint: fingerprintSchema.optional(),
-		projectId: IdSchema,
-		subject: ProjectVersionSubjectSchema,
-		tag: ProjectVersionTagSchema.optional(),
-	})
-	.strict();
-const versionCheckoutSchema = z
-	.object({
-		expectedFingerprint: fingerprintSchema.optional(),
-		projectId: IdSchema,
-		versionId: IdSchema,
-	})
-	.strict();
-const versionTagSchema = z
-	.object({
-		projectId: IdSchema,
-		tag: ProjectVersionTagSchema.optional(),
-		versionId: IdSchema,
-	})
-	.strict();
-const versionDiffSchema = z
-	.object({
-		projectId: IdSchema,
-		from: versionReferenceSchema,
-		to: versionReferenceSchema,
-	})
-	.strict();
-
 /** Creates the feature-owned validator capability used by the Electron IPC adapter. */
 export const createEditorProjectRequestParserFx = Effect.fn("createEditorProjectRequestParserFx")(
 	() =>
 		Effect.succeed({
+			parseSaveBuildVersionFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx(
+					"save-build-version",
+					saveBuildVersionSchema,
+					candidate,
+				),
 			parseBuildProjectFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("build-project", buildProjectSchema, candidate),
 			parseReadProjectBuildFx: (candidate: unknown) =>
@@ -232,31 +189,5 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				never
 			> =>
 				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
-			parseVersionStatusProjectIdFx: (candidate: unknown) =>
-				parseEditorProjectIpcRequestFx("read-version-status", IdSchema, candidate),
-			parseVersionCommitPreviewProjectIdFx: (candidate: unknown) =>
-				parseEditorProjectIpcRequestFx("preview-version-commit", IdSchema, candidate),
-			parseVersionListProjectIdFx: (candidate: unknown) =>
-				parseEditorProjectIpcRequestFx("list-versions", IdSchema, candidate),
-			parseVersionCommitFx: (
-				candidate: unknown,
-			): Effect.Effect<ProjectVersionCommitInput, ProjectRepositoryError, never> =>
-				parseEditorProjectIpcRequestFx("create-version", versionCommitSchema, candidate),
-			parseVersionCheckoutFx: (
-				candidate: unknown,
-			): Effect.Effect<ProjectVersionCheckoutInput, ProjectRepositoryError, never> =>
-				parseEditorProjectIpcRequestFx(
-					"checkout-version",
-					versionCheckoutSchema,
-					candidate,
-				),
-			parseVersionTagFx: (
-				candidate: unknown,
-			): Effect.Effect<ProjectVersionTagInput, ProjectRepositoryError, never> =>
-				parseEditorProjectIpcRequestFx("update-version-tag", versionTagSchema, candidate),
-			parseVersionDiffFx: (
-				candidate: unknown,
-			): Effect.Effect<ProjectVersionDiffInput, ProjectRepositoryError, never> =>
-				parseEditorProjectIpcRequestFx("diff-versions", versionDiffSchema, candidate),
 		} as const),
 );

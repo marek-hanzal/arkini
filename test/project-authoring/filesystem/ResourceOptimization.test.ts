@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -39,7 +40,7 @@ describe("filesystem Editor PNG optimization", () => {
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				version: editorTestPayload.version,
+				version: parseVersionFn(editorTestPayload.version),
 				config: editorTestPayload.config,
 				resources: editorTestPayload.resources.map((resource) => ({
 					...resource,
@@ -138,7 +139,7 @@ describe("filesystem Editor PNG optimization", () => {
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				version: editorTestPayload.version,
+				version: parseVersionFn(editorTestPayload.version),
 				config: editorTestPayload.config,
 				resources: editorTestPayload.resources.map((resource) => ({
 					...resource,

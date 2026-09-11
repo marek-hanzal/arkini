@@ -41,7 +41,10 @@ describe("createFreshProjectFx", () => {
 				Effect.succeed<Project>({
 					projectId: config.meta.id,
 					title: config.meta.title,
-					version: "1.0",
+					version: {
+						major: 1,
+						minor: 0,
+					},
 					createdAtMs: 100,
 					updatedAtMs: 100,
 					revision: 0,
@@ -59,7 +62,10 @@ describe("createFreshProjectFx", () => {
 		expect(project.projectId).toBe("game:chosen");
 		expect(project).toMatchObject({
 			title: "Untitled project",
-			version: "1.0",
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			revision: 0,
 			config: {
 				meta: {
@@ -89,7 +95,10 @@ describe("createFreshProjectFx", () => {
 		expect(project.resources).toHaveLength(1);
 		expect(createProjectFx).toHaveBeenCalledWith(
 			expect.objectContaining({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 			}),
 		);
 		expect(project.resources[0]).toMatchObject({

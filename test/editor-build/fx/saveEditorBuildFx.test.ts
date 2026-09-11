@@ -25,6 +25,7 @@ describe("Editor Build saveEditorBuildFx", () => {
 		await Effect.runPromise(
 			saveEditorBuildFx({
 				projectId: "project",
+				version: "1.0",
 				size: 2,
 				contentHash: "a".repeat(64),
 				diagnostics: [],

@@ -12,6 +12,7 @@ const createArtifact = (
 	diagnostics: GameDiagnosticsSchema.Type = [],
 ) => ({
 	projectId: "editor-test",
+	version: "1.0",
 	contentHash,
 	diagnostics,
 	revision,
@@ -37,7 +38,6 @@ const state = vi.hoisted(() => ({
 	exportResults: new Map<string, unknown>(),
 	installResults: new Map<string, unknown>(),
 	project: undefined as unknown,
-	versionDirty: false,
 }));
 
 type MockButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -87,17 +87,8 @@ vi.mock("~/editor-build/service/EditorBuildRepository", async () => {
 	};
 });
 
-vi.mock("~/project-version/ui/useProjectVersionStatus", () => ({
-	useProjectVersionStatus: () => ({
-		status: "ready",
-		versionStatus: {
-			canCommit: state.versionDirty,
-			currentBaseVersionId: "version-one",
-			currentFingerprint: "a".repeat(64),
-			dirty: state.versionDirty,
-			versionCount: 1,
-		},
-	}),
+vi.mock("~/authoring-session/atom/EditorProjectAtom", () => ({
+	EditorProjectAtom: () => ({}),
 }));
 
 vi.mock("@effect/atom-react", () => ({
@@ -230,20 +221,11 @@ const testTranslator = createTranslatorFn({
 		"Build help": {
 			value: "Build help",
 		},
-		"Build dirty description": {
-			value: "Build uses the committed Version HEAD. Review the saved changes and create a Version commit; Arkini will bring you back here to build the resulting Arkpack.",
-		},
-		"Build dirty title": {
-			value: "Commit the working copy first",
-		},
 		Close: {
 			value: "Close",
 		},
 		"Page help": {
 			value: "Page help",
-		},
-		"Review and commit": {
-			value: "Review & commit",
 		},
 	},
 });
@@ -258,9 +240,11 @@ beforeEach(() => {
 		},
 		resources: [],
 		revision: 0,
-		version: "1.0",
+		version: {
+			major: 1,
+			minor: 0,
+		},
 	};
-	state.versionDirty = false;
 	state.buildResult = AsyncResult.initial();
 	state.catalogState = {
 		type: "ready",
@@ -321,41 +305,6 @@ const renderController = async () => {
 };
 
 describe("EditorBuild", () => {
-	it("routes a dirty working copy to Version commit instead of admitting Build", async () => {
-		state.versionDirty = true;
-		const { container } = await renderBuild();
-
-		const status = container.querySelector('[data-ui="EditorBuildCommitRequired"]');
-		expect(status?.textContent).toContain("Commit the working copy first");
-		expect(status?.textContent).toContain("Review & commit");
-		expect(
-			status?.querySelector(
-				'a[href="/editor/editor-test/versions/commit?returnTo=%2Feditor%2Feditor-test%2Fbuild"]',
-			),
-		).not.toBeNull();
-		expect(
-			Array.from(container.querySelectorAll("button")).some(
-				(button) => button.textContent?.trim() === "Build",
-			),
-		).toBe(false);
-	});
-
-	it("presents a committed unbuilt Version as the next Build status", async () => {
-		const { container } = await renderBuild();
-
-		const status = container.querySelector('[data-ui="EditorBuildActionStatus"]');
-		expect(status?.textContent).toContain("Build Version v1.0");
-		expect(status?.textContent).toContain(
-			"Validate Version v1.0 and create an Arkpack ready to install or save.",
-		);
-		expect(
-			Array.from(status?.querySelectorAll("button") ?? []).some(
-				(button) => button.textContent?.trim() === "Build",
-			),
-		).toBe(true);
-		expect(container.querySelector('[data-ui="EditorBuildValidation"]')).toBeNull();
-	});
-
 	it("keeps structured validation diagnostics distinct from operational failures", async () => {
 		const diagnostics = [
 			{
@@ -492,17 +441,21 @@ describe("EditorBuild", () => {
 		expect(controller?.artifact).toBeUndefined();
 	});
 
-	it("presents the committed Arkpack version instead of the internal project revision", async () => {
+	it("presents the artifact version independently of saved output settings", async () => {
 		state.project = {
 			...(state.project as Record<string, unknown>),
 			revision: 1_788_449_167_035,
-			version: "4.2",
+			version: {
+				major: 9,
+				minor: 2,
+			},
 		};
-		state.buildResult = AsyncResult.success(
-			createArtifact("a".repeat(64), 1_788_449_167_035, [
+		state.buildResult = AsyncResult.success({
+			...createArtifact("a".repeat(64), 1_788_449_167_035, [
 				unusedResourceDiagnostic,
 			]),
-		);
+			version: "4.2",
+		});
 
 		const { container } = await renderBuild();
 		const validation = container.querySelector('[data-ui="EditorBuildValidation"]');
@@ -573,7 +526,6 @@ describe("EditorBuild", () => {
 		);
 		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith({
 			artifact,
-			targetVersion: "1.0",
 		});
 	});
 
@@ -611,11 +563,52 @@ describe("EditorBuild", () => {
 		).toContain("Install storage is unavailable.");
 	});
 
+	it("keeps install compatibility bound to built bytes while a different major is drafted", async () => {
+		const artifact = createArtifact("b".repeat(64), 0);
+		state.buildResult = AsyncResult.success(artifact);
+		state.catalogState = {
+			type: "ready",
+			arkpacks: [
+				{
+					packageId: artifact.projectId,
+					contentHash: "a".repeat(64),
+					version: "1.8",
+					title: "Installed",
+					arkini: "0.5.0",
+					provenance: {
+						type: "community",
+					},
+					source: "user",
+				},
+			],
+		};
+		await renderController();
+		await act(async () => controller?.setMajorFn(2));
+		expect(controller?.version.major).toBe(2);
+		await act(async () => controller?.installArtifactFn());
+		expect(controller?.installConfirmation).toBeUndefined();
+		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith({
+			artifact,
+		});
+		controller?.buildFn();
+		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
+			expectedRevision: 0,
+			version: {
+				major: 2,
+				minor: 0,
+			},
+		});
+	});
+
 	it("builds the current local revision without signing input", async () => {
 		await renderController();
 		controller?.buildFn();
 		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
 			expectedRevision: 0,
+			version: {
+				major: 1,
+				minor: 0,
+			},
 		});
 	});
 
@@ -656,7 +649,6 @@ describe("EditorBuild", () => {
 		expect(install).toHaveBeenCalledWith({
 			artifact,
 			confirmation,
-			targetVersion: "1.0",
 		});
 	});
 
@@ -686,7 +678,6 @@ describe("EditorBuild", () => {
 		expect(controller?.installConfirmation).toBeUndefined();
 		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith({
 			artifact,
-			targetVersion: "1.0",
 		});
 	});
 });

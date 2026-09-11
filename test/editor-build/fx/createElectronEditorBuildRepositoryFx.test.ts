@@ -81,6 +81,10 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 			repository.buildProjectFx({
 				projectId: "project-one",
 				expectedRevision: 2,
+				expectedVersion: {
+					major: 1,
+					minor: 0,
+				},
 			}),
 		);
 
@@ -107,6 +111,10 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 			repository.buildProjectFx({
 				projectId: "project-one",
 				expectedRevision: 2,
+				expectedVersion: {
+					major: 1,
+					minor: 0,
+				},
 			}),
 		);
 

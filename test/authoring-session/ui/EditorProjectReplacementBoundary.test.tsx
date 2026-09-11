@@ -50,7 +50,10 @@ afterEach(async () => {
 const createProject = (revision: number): Project => ({
 	projectId: "project",
 	title: `Project ${revision}`,
-	version: "1.0",
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision,

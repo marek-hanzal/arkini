@@ -10,11 +10,9 @@ import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProje
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
-import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { BoardScenarioFileSchema } from "~/board-scenario/schema/BoardScenarioFileSchema";
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
 import { NoteSchema } from "~/project-note/schema/NoteSchema";
-import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
@@ -85,7 +83,7 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 			}),
 	});
 	const arkpack = yield* Effect.try({
-		try: () => GameVersionSchema.parse(files.arkpack),
+		try: () => VersionPartsSchema.parse(files.arkpack),
 		catch: (cause) =>
 			new Error("The Editor Arkpack version is invalid.", {
 				cause,
@@ -187,11 +185,7 @@ export namespace writeProjectFilesFx {
 		readonly root: string;
 		readonly previous?: ProjectFiles;
 		readonly next: ProjectFiles;
-		readonly previousScenarioNames?: ReadonlyArray<string>;
-		readonly removeVersionHead?: boolean;
 		readonly noteUpdates?: ReadonlyArray<NoteSchema.Type>;
-		readonly scenarios?: ReadonlyArray<BoardScenarioFileSchema.Type>;
-		readonly versionHead?: VersionHeadFileSchema.Type;
 	}
 }
 
@@ -212,26 +206,6 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				props.previous === undefined
 					? undefined
 					: yield* createSnapshotFx(paths, props.previous);
-			const scenarioFiles =
-				props.scenarios === undefined
-					? undefined
-					: yield* Effect.try({
-							try: () => BoardScenarioFileSchema.array().parse(props.scenarios),
-							catch: (cause) =>
-								new Error("The Editor Board scenarios are invalid.", {
-									cause,
-								}),
-						});
-			const versionHead =
-				props.versionHead === undefined
-					? undefined
-					: yield* Effect.try({
-							try: () => VersionHeadFileSchema.parse(props.versionHead),
-							catch: (cause) =>
-								new Error("The Editor version head is invalid.", {
-									cause,
-								}),
-						});
 			yield* fileSystem.makeDirectory(paths.items, {
 				recursive: true,
 			});
@@ -268,25 +242,6 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				...(previousSnapshot?.resources.keys() ?? []),
 			].filter((target) => !keep.has(target));
 
-			if (scenarioFiles !== undefined) {
-				const scenarioTargets = new Set<string>();
-				for (const scenario of scenarioFiles) {
-					const target = yield* paths.scenarioFileFx(scenario.name);
-					if (scenarioTargets.has(target))
-						return yield* Effect.fail(
-							new Error(`Editor Board scenario ${scenario.name} is duplicated.`),
-						);
-					scenarioTargets.add(target);
-					candidateWrites.push({
-						target,
-						bytes: encodeJsonFn(scenario),
-					});
-				}
-				for (const name of props.previousScenarioNames ?? []) {
-					const target = yield* paths.scenarioFileFx(name);
-					if (!scenarioTargets.has(target)) deletes.push(target);
-				}
-			}
 			for (const note of props.noteUpdates ?? []) {
 				const target = yield* paths.noteFileFx(note.noteId);
 				const body = yield* Effect.try(() =>
@@ -303,12 +258,6 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					bytes: encodeJsonFn(body),
 				});
 			}
-			if (versionHead !== undefined)
-				candidateWrites.push({
-					target: paths.versionHeadFile,
-					bytes: encodeJsonFn(versionHead),
-				});
-			if (props.removeVersionHead === true) deletes.push(paths.versionHeadFile);
 			candidateWrites.push({
 				target: paths.projectFile,
 				bytes: encodeJsonFn(nextSnapshot.marker),

@@ -8,7 +8,6 @@ import {
 	readEditorBuildInstallPlanFn,
 } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
@@ -19,7 +18,6 @@ const readErrorMessageFn = (error: unknown) =>
 export namespace useEditorBuildInstallController {
 	export interface Props {
 		readonly artifact?: EditorProjectBuildSchema.Type;
-		readonly targetVersion: GameVersionSchema.Type;
 	}
 
 	export interface Output {
@@ -38,7 +36,6 @@ export namespace useEditorBuildInstallController {
 /** Owns catalog-aware installation and confirmation for one exact admitted build artifact. */
 export const useEditorBuildInstallController = ({
 	artifact,
-	targetVersion,
 }: useEditorBuildInstallController.Props): useEditorBuildInstallController.Output => {
 	const catalogState = useAtomValue(CatalogAtom);
 	const installPlan =
@@ -46,7 +43,6 @@ export const useEditorBuildInstallController = ({
 			? readEditorBuildInstallPlanFn({
 					arkpacks: catalogState.arkpacks,
 					artifact,
-					targetVersion,
 				})
 			: undefined;
 	const installAtom = BuildCommandAtoms.install(artifact?.contentHash ?? "unbuilt");
@@ -76,7 +72,6 @@ export const useEditorBuildInstallController = ({
 					: {
 							confirmation,
 						}),
-				targetVersion,
 			});
 			if (confirmation !== undefined)
 				setRequestedConfirmationFn((current) =>

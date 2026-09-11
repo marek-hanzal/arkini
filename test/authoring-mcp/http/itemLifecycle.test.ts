@@ -19,7 +19,10 @@ describe("editor MCP item lifecycle", () => {
 		);
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...editorTestPayload.config,
 					meta: {

@@ -11,15 +11,11 @@ Board editing help:
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
 Build:
   value: Build
-Build dirty description:
-  value: Build uses the committed Version HEAD. Review the saved changes and create a Version commit; Arkini will bring you back here to build the resulting Arkpack.
-Build dirty title:
-  value: Commit the working copy first
 Build help:
   value: |
-    Build turns the project's committed Version HEAD into a portable Arkpack. Before producing the file, it runs the complete project and resource validation used by the game.
+    Build turns the project's current saved content into a portable Arkpack. Before producing the file, it runs the complete project and resource validation used by the game.
 
-    Only committed project state can be built. If the saved working copy changed after its current Version, open **Commit** first and create a new restore point. Blocking diagnostics link back to the exact Editor surface that needs fixing; non-blocking diagnostics remain attached to the finished artifact.
+    Choose the output **Major**, **Minor** and optional **Suffix**. Build remembers valid settings even if compilation fails; these settings do not change the live Editor Board. You decide when a major change makes older saves incompatible. Blocking diagnostics link back to the exact Editor surface that needs fixing; non-blocking diagnostics remain attached to the finished artifact.
 
     After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
 Cancel:
@@ -36,8 +32,6 @@ Choose a different Project ID.:
   value: Choose a different Project ID.
 Close:
   value: Close
-Commit version:
-  value: Commit version
 Connection search empty:
   value: No connection matches this search.
 Connection search placeholder:
@@ -67,21 +61,12 @@ Editor Board help:
 
     Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Instant** removes waiting time while preserving normal requirements, placement, charges, and lifecycle rules.
 
-    ### Scenarios
-
-    Scenarios are named snapshots of the current live game state. They are useful for instantly returning to different test setups and checking that specific configurations behave correctly—for example when reproducing an edge case, comparing production setups, or tuning runtimes and pacing without rebuilding the Board by hand.
-
-    - Choose a saved Scenario to restore it immediately.
-    - Use **+** to prepare a new name, then press **Save** to capture the current Board state.
-    - Press **Save** on a selected Scenario to update its snapshot.
-    - Deleting a Scenario removes only the saved snapshot; the current live Board stays unchanged.
-
-    Nothing is saved automatically. The live Board session itself is disposable.
+    The live Board session is disposable. It has no saved scenarios and does not change authored project data.
 Editor MCP:
   value: Editor MCP
 Editor MCP help:
   value: |
-    MCP lets AI tools work with the project currently open in Arkini. A connected client can inspect and edit project data and Notes, run validation, explore item relationships, and work with Versions.
+    MCP lets AI tools work with the project currently open in Arkini. A connected client can inspect and edit project data and Notes, run validation, and explore item relationships.
 
     > **Treat every connection as full project access.** Only connect clients you trust, and keep the intended project open in Arkini while they work.
 
@@ -140,8 +125,6 @@ Global estimate help:
     Use **Fastest first** and **Slowest first** to find pacing outliers, **Highest demand first** to spot heavily reused ingredients or prerequisites, and **Incomplete only** to find broken or unusually complex paths.
 
     Open an item to see its selected route and the quantities and time behind the estimate.
-Initial Version commit consequence:
-  value: The first Version commit records the complete project without changing its starting version.
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
@@ -257,16 +240,8 @@ Loading notes…:
   value: Loading notes…
 Location:
   value: Location
-Major Version commit consequence:
-  value: Major versions are incompatible with existing saves. Players must start a new game.
 Max count reached:
   value: Max count reached
-Minor Version commit consequence:
-  value: Existing saves remain compatible with this minor version.
-New game required:
-  value: New game required
-No-op Version commit consequence:
-  value: Only Editor-only content changed. The Arkpack version and save compatibility stay unchanged.
 Notes:
   value: Notes
 Notes empty description:
@@ -298,13 +273,9 @@ Rename project ID help:
   value: |
     The new ID makes this a different game to existing saves.
 
-    > **Version history starts fresh.**
-    >
-    > Existing Version commits become unreachable from this project. Gameplay version stays the same; the next Version commit becomes a new history root.
+    The current project content and its last output version settings stay unchanged.
 Retry loading notes:
   value: Retry loading notes
-Review and commit:
-  value: Review & commit
 Save:
   value: Save
 Search assets…:
@@ -332,28 +303,5 @@ Type:
   value: Type
 UID:
   value: UID
-Version commit help:
-  value: |
-    A version deliberately freezes the saved working copy as a named restore point. Ordinary saves do not change the Arkpack gameplay version; Commit evaluates all saved changes against the current parent and applies at most one compatibility bump.
-
-    The first commit captures the complete project at its starting version. Later commits apply one major bump if any gameplay change is breaking, otherwise one minor bump if any compatible gameplay or asset change exists. Scenario-only changes keep the version unchanged. A major preview lists the current Board scenarios that the commit will delete. Unsaved form drafts and the current unsaved Board session are never included.
-
-    Give the version a short **Message** so you can recognize it in History. **Details** and **Tag** are optional context for what changed, why the state matters, or what you want to try next.
-
-    After committing, open **History** to compare versions or restore the complete saved state.
-Version history:
-  value: Version history
-Version history help:
-  value: |
-    History is the project's **map of saved restore points**. The working copy sits at the top, and the connecting lines show which saved version each later version came from.
-
-    - **Working copy** is the project currently saved in the Editor. **Dirty** means it has changed since its current base; **Clean** means it still matches.
-    - **Current base** marks the saved version the working copy continues from.
-    - Select a saved version to see its message, details, tag, and parent. The comparison starts with what changed from that version's parent.
-    - Use **Before** and **After** to compare any saved version with another version or the working copy. Changes are grouped into project settings, items, assets, and Board scenarios.
-    - **Major bump** flags a breaking gameplay change. **Minor bump** marks a save-compatible change.
-    - Arkpack version badges describe compatibility, not node identity. Sibling commits and scenario-only parent/child commits may share the same version.
-
-    **Restore version** replaces the complete saved project with that snapshot. If the working copy or an Editor tool has an unsaved draft, Arkini lets you Commit first or restore and discard it.
 Write a note…:
   value: Write a note…

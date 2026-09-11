@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
-import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
+import { releaseCurrentEditorBoardGameFx } from "~/editor-board/fx/releaseCurrentEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/editor-board/fx/syncEditorBoardGameFx";
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectProvider } from "~/authoring-session/ui/useEditorProject";
 import { readProjectFx } from "~/project-authoring/fx/readProjectFx";
@@ -10,7 +10,6 @@ import { ButtonLink } from "~/ui/ui/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/ui/EditorShell";
 import { ProjectResourceUrlProvider } from "~/authoring-session/ui/ResourceUrlSession";
-import { VersionRestoreAction } from "~/project-version/ui/VersionRestoreAction";
 import { ItemEstimateWarmup } from "~/estimate/ui/ItemEstimateWarmup";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
@@ -68,7 +67,6 @@ export const Route = createFileRoute("/editor/$projectId")({
 		return (
 			<EditorProjectProvider loaded={project}>
 				<ItemEstimateWarmup project={project} />
-				<VersionRestoreAction projectId={project.projectId} />
 				<EditorProjectReplacementBoundary>
 					<ProjectResourceUrlProvider>
 						<EditorShell>

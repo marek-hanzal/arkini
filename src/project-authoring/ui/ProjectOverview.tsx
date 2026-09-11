@@ -1,4 +1,4 @@
-import { ArrowRight, Boxes, GitBranch, Images, LoaderCircle, TriangleAlert } from "lucide-react";
+import { ArrowRight, Boxes, Images, LoaderCircle, TriangleAlert } from "lucide-react";
 import { Fragment } from "react";
 
 import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
@@ -6,41 +6,14 @@ import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectNotesOverview } from "~/project-note/ui/ProjectNotesOverview";
-import { useProjectVersionStatus } from "~/project-version/ui/useProjectVersionStatus";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 /** Presents project-wide repository, content, Estimate, and asset summaries. */
 export const ProjectOverview = ({ project }: { readonly project: Project }) => {
-	const versionState = useProjectVersionStatus(project.projectId);
 	const estimateState = useItemEstimateIndex(project, {
 		query: "",
 		view: "incomplete",
 	});
-	const versionStatus = versionState.status === "ready" ? versionState.versionStatus : undefined;
-	const versionCountSummary =
-		versionStatus === undefined
-			? versionState.status === "loading"
-				? "Loading…"
-				: "Unavailable"
-			: `${versionStatus.versionCount} saved ${versionStatus.versionCount === 1 ? "version" : "versions"}`;
-	const workingCopyStatus =
-		versionStatus === undefined
-			? versionState.status === "loading"
-				? "loading"
-				: "unavailable"
-			: versionStatus.currentBaseVersionId === undefined
-				? "unversioned"
-				: versionStatus.dirty
-					? "dirty"
-					: "clean";
-	const workingCopySummary = {
-		clean: "Clean",
-		dirty: "Dirty",
-		loading: "Loading…",
-		unavailable: "Unavailable",
-		unversioned: "Unversioned",
-	}[workingCopyStatus];
 	const unreachableCount = estimateState.rows.filter(
 		({ estimate }) => estimate.status === "unreachable",
 	).length;
@@ -90,87 +63,6 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 			data-ui="EditorProjectOverview"
 		>
 			<ProjectNotesOverview projectId={project.projectId} />
-			<EditorOverviewCard
-				body={
-					<div className="flex flex-wrap items-center gap-3">
-						<span>{versionCountSummary}</span>
-						<span className="h-5 w-px bg-line" />
-						<span>v{project.version}</span>
-						<span className="text-subtle">·</span>
-						<LinkButtonLink
-							data-overview-id="arkpack-version"
-							data-ui="EditorProjectOverviewLink"
-							params={{
-								projectId: project.projectId,
-							}}
-							to="/editor/$projectId/build"
-						>
-							Build
-						</LinkButtonLink>
-					</div>
-				}
-				footerLeft={
-					<div
-						className="group flex items-center gap-3"
-						{...readDataUiFn({
-							dataUi: "EditorProjectOverviewVersionStatus",
-							state: {
-								status: workingCopyStatus,
-							},
-						})}
-					>
-						<span className="size-2 shrink-0 rounded-full bg-muted group-data-[ui-status=clean]:bg-success group-data-[ui-status=dirty]:bg-warning" />
-						<span>{workingCopySummary}</span>
-						<span className="text-subtle">·</span>
-						{versionStatus?.canCommit === true ? (
-							<LinkButtonLink
-								data-overview-id="versions-commit"
-								data-ui="EditorProjectOverviewLink"
-								params={{
-									projectId: project.projectId,
-								}}
-								to="/editor/$projectId/versions/commit"
-							>
-								Commit
-							</LinkButtonLink>
-						) : (
-							<LinkButton
-								data-ui="EditorProjectOverviewCommitUnavailable"
-								disabled
-							>
-								Commit
-							</LinkButton>
-						)}
-						<span className="h-5 w-px bg-line" />
-						<LinkButtonLink
-							data-overview-id="versions-history"
-							data-ui="EditorProjectOverviewLink"
-							params={{
-								projectId: project.projectId,
-							}}
-							to="/editor/$projectId/versions/history"
-						>
-							History
-						</LinkButtonLink>
-					</div>
-				}
-				footerRight={
-					<LinkButtonLink
-						className="inline-flex items-center gap-1.5"
-						data-overview-id="versions"
-						data-ui="EditorProjectOverviewLink"
-						params={{
-							projectId: project.projectId,
-						}}
-						to="/editor/$projectId/versions/commit"
-					>
-						Versions
-						<ArrowRight className="size-4" />
-					</LinkButtonLink>
-				}
-				icon={GitBranch}
-				title="Versions"
-			/>
 			<EditorOverviewCard
 				body={
 					<div className="flex flex-wrap items-center gap-x-3 gap-y-2">

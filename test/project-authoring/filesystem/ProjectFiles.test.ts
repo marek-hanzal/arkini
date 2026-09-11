@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -22,7 +23,7 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		const initial = {
-			arkpack: editorTestPayload.version,
+			arkpack: parseVersionFn(editorTestPayload.version),
 			marker: {
 				arkini: ArkiniAppVersion,
 				revision: 1,
@@ -58,7 +59,7 @@ describe("filesystem Editor project current tree", () => {
 				GameFileSchema: {
 					properties: {
 						version: {
-							$ref: "urn:arkini:schema:project#/$defs/ArkpackVersionSchema",
+							$ref: "urn:arkini:schema:project#/$defs/VersionPartsSchema",
 						},
 					},
 					type: "object",
@@ -75,7 +76,7 @@ describe("filesystem Editor project current tree", () => {
 		});
 		const game = JSON.parse(await readFile(join(harness.root, "game.json"), "utf8"));
 		expect(game.$schema).toBe(GameProjectGameSchemaReference);
-		expect(game.version).toBe(editorTestPayload.version);
+		expect(game.version).toEqual(parseVersionFn(editorTestPayload.version));
 		expect(game).not.toHaveProperty("items");
 		const waterPath = join(harness.root, "items", "simple", "water.json");
 		expect(JSON.parse(await readFile(waterPath, "utf8")).$schema).toBe(
@@ -156,7 +157,7 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
-			arkpack: editorTestPayload.version,
+			arkpack: parseVersionFn(editorTestPayload.version),
 			marker: {
 				arkini: ArkiniAppVersion,
 				revision: 1,
@@ -173,7 +174,7 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
-			arkpack: editorTestPayload.version,
+			arkpack: parseVersionFn(editorTestPayload.version),
 			marker: {
 				arkini: ArkiniAppVersion,
 				revision: 1,

@@ -5,7 +5,7 @@ import type {
 	ProjectRepositoryOperation,
 } from "~/project-authoring/error/ProjectRepositoryError";
 
-export type ProjectReplacementOperation = "checkout-version" | "refresh-project";
+export type ProjectReplacementOperation = "refresh-project";
 
 export interface ProjectWriteAdmissionService {
 	readonly isNavigationBlockedFn: () => boolean;

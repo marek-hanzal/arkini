@@ -1,3 +1,4 @@
+import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import { Context, type Effect } from "effect";
 
 import type {
@@ -18,8 +19,15 @@ interface ReadEditorBuildProps {
 }
 
 export interface EditorBuildRepositoryService {
+	readonly saveBuildVersionFx: (
+		props: EditorBuildProps & {
+			readonly version: VersionPartsSchema.Type;
+		},
+	) => Effect.Effect<VersionPartsSchema.Type, ProjectRepositoryError, never>;
 	readonly buildProjectFx: (
-		props: EditorBuildProps,
+		props: EditorBuildProps & {
+			readonly expectedVersion: VersionPartsSchema.Type;
+		},
 	) => Effect.Effect<EditorProjectBuildSchema.Type, ProjectRepositoryError, never>;
 	readonly readProjectBuildFx: (
 		props: ReadEditorBuildProps,

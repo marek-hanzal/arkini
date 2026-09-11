@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { createId } from "@paralleldrive/cuid2";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
@@ -17,20 +16,13 @@ import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProje
 import { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
-import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import { VersionDescriptorFileSchema } from "~/project-version/schema/VersionDescriptorFileSchema";
-import { VersionHeadFileSchema } from "~/project-version/schema/VersionHeadFileSchema";
-import { ProjectVersionSubjectSchema } from "~/project-version/schema/ProjectVersionMetadataSchema";
+import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { readProjectFilesFx } from "./readProjectFilesFx";
-import { readSidecarsFx } from "./readSidecarsFx";
-import { readVersionHistoryFx } from "./readVersionHistoryFx";
+import { readProjectNotesFx } from "./readProjectNotesFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
-import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
-
-const encoder = new TextEncoder();
 
 interface LifecycleOperations {
 	readonly createProjectFx: (
@@ -60,6 +52,9 @@ interface LifecycleOperations {
 
 const cloneProjectFn = (project: Project): Project => ({
 	...project,
+	version: {
+		...project.version,
+	},
 	config: GameConfigSchema.parse(project.config),
 	resources: project.resources.map((resource) => ({
 		...resource,
@@ -76,7 +71,9 @@ const materializeDescriptorFn = ({
 }: Project): ProjectDescriptor => ({
 	projectId,
 	title,
-	version,
+	version: {
+		...version,
+	},
 	createdAtMs,
 	updatedAtMs,
 });
@@ -117,16 +114,14 @@ const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
 			const paths = yield* createProjectPathsFx(catalog.root);
 			const files = yield* readProjectFilesFx(paths.root);
 			const projectId = files.config.meta.id;
-			const sidecars = yield* readSidecarsFx({
+			const notes = yield* readProjectNotesFx({
 				paths,
 				projectId,
 			});
-			const versionHistory = yield* readVersionHistoryFx(paths);
 			return {
 				catalog,
-				...sidecars,
+				notes,
 				paths,
-				versionHistory,
 				project: {
 					projectId,
 					title: files.config.meta.title,
@@ -206,79 +201,6 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 		);
 	const writeProjectFx = (props: Parameters<typeof writeProjectFilesFx>[0]) =>
 		providePlatformFx(writeProjectFilesFx(props));
-	const writeInitialVersionProjectFx = Effect.fn("writeInitialVersionProjectFx")(function* ({
-		config,
-		marker,
-		resources,
-		root,
-		subject,
-		version,
-	}: {
-		readonly config: GameConfigSchema.Type;
-		readonly marker: GameProjectManifestSchema.Type;
-		readonly resources: ReadonlyArray<ResourceSchema.Type>;
-		readonly root: string;
-		readonly subject: string;
-		readonly version: GameVersionSchema.Type;
-	}) {
-		const paths = yield* createProjectPathsFx(root);
-		const snapshot = yield* providePlatformFx(
-			createVersionSnapshotFx({
-				arkpack: version,
-				config,
-				filesystemWrite,
-				resources,
-				scenarios: [],
-				paths,
-			}),
-		);
-		const versionId = `v-${createHash("sha256")
-			.update(
-				JSON.stringify({
-					contentFingerprint: snapshot.contentFingerprint,
-					subject,
-				}),
-			)
-			.digest("hex")}`;
-		const descriptor = VersionDescriptorFileSchema.parse({
-			arkini: ArkiniAppVersion,
-			version,
-			sourceRevision: marker.revision,
-			contentFingerprint: snapshot.contentFingerprint,
-			createdAtMs: marker.revision,
-			subject,
-		});
-		const head = VersionHeadFileSchema.parse({
-			current: versionId,
-			versions: [
-				versionId,
-			],
-		});
-		yield* fileSystem.makeDirectory(paths.versions, {
-			recursive: true,
-		});
-		yield* fileSystem.makeDirectory(yield* paths.versionDirectoryFx(versionId), {
-			recursive: true,
-		});
-		const writeJsonFx = (target: string, value: unknown) =>
-			filesystemWrite.replaceFileFx({
-				lock: paths.lockFile,
-				target,
-				bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
-			});
-		yield* writeJsonFx(yield* paths.versionManifestFileFx(versionId), snapshot.manifest);
-		yield* writeJsonFx(yield* paths.versionDescriptorFileFx(versionId), descriptor);
-		yield* writeProjectFx({
-			root,
-			next: {
-				arkpack: version,
-				marker,
-				config,
-				resources,
-			},
-			versionHead: head,
-		});
-	});
 	const readCandidatesFx = Effect.gen(function* () {
 		const candidates: Array<ProjectCandidate> = [];
 		const listedRoots = new Set<string>();
@@ -395,30 +317,22 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 	const createProjectFx: LifecycleOperations["createProjectFx"] = ({
 		version: candidateVersion,
 		config: candidateConfig,
-		initialVersionSubject: candidateInitialVersionSubject,
 		resources: candidateResources,
 	}) =>
 		Effect.gen(function* () {
-			const { projectId, version, config, initialVersionSubject, resources } =
-				yield* Effect.try({
-					try: () => {
-						const config = GameConfigSchema.parse(candidateConfig);
-						return {
-							projectId: config.meta.id,
-							version: GameVersionSchema.parse(candidateVersion),
-							config,
-							initialVersionSubject:
-								candidateInitialVersionSubject === undefined
-									? undefined
-									: ProjectVersionSubjectSchema.parse(
-											candidateInitialVersionSubject,
-										),
-							resources: ResourceSchema.array().parse(candidateResources),
-						};
-					},
-					catch: (cause) =>
-						errorFn("create-project", "The Editor project is invalid.", cause),
-				});
+			const { projectId, version, config, resources } = yield* Effect.try({
+				try: () => {
+					const config = GameConfigSchema.parse(candidateConfig);
+					return {
+						projectId: config.meta.id,
+						version: VersionPartsSchema.parse(candidateVersion),
+						config,
+						resources: ResourceSchema.array().parse(candidateResources),
+					};
+				},
+				catch: (cause) =>
+					errorFn("create-project", "The Editor project is invalid.", cause),
+			});
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations.withPermits(1)(
 				Effect.gen(function* () {
@@ -447,25 +361,15 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 										arkini: ArkiniAppVersion,
 										revision: nowMs,
 									});
-									if (initialVersionSubject === undefined)
-										yield* writeProjectFx({
-											root: pendingRoot,
-											next: {
-												arkpack: version,
-												marker,
-												config,
-												resources,
-											},
-										});
-									else
-										yield* writeInitialVersionProjectFx({
-											config,
+									yield* writeProjectFx({
+										root: pendingRoot,
+										next: {
+											arkpack: version,
 											marker,
+											config,
 											resources,
-											root: pendingRoot,
-											subject: initialVersionSubject,
-											version,
-										});
+										},
+									});
 									yield* fileSystem.rename(pendingRoot, root);
 									const entry = ProjectCatalogEntrySchema.parse({
 										root: yield* fileSystem.realPath(root),

@@ -23,11 +23,9 @@ interface EditorBuildInstallPlan {
 export const readEditorBuildInstallPlanFn = ({
 	arkpacks,
 	artifact,
-	targetVersion,
 }: {
 	readonly arkpacks: ReadonlyArray<ArkpackDescriptor>;
 	readonly artifact: EditorProjectBuildSchema.Type;
-	readonly targetVersion: GameVersionSchema.Type;
 }): EditorBuildInstallPlan => {
 	const installed = arkpacks.find(({ packageId }) => packageId === artifact.projectId);
 	if (installed === undefined) {
@@ -38,7 +36,7 @@ export const readEditorBuildInstallPlanFn = ({
 		} satisfies EditorBuildInstallPlan;
 	}
 	const installedVersion = readGameVersionMajorFn(installed.version);
-	const nextVersion = readGameVersionMajorFn(targetVersion);
+	const nextVersion = readGameVersionMajorFn(artifact.version);
 	return {
 		action: "update",
 		expectedCurrent: {
@@ -53,7 +51,7 @@ export const readEditorBuildInstallPlanFn = ({
 						installedContentHash: installed.contentHash,
 						installedVersion: installed.version,
 						targetContentHash: artifact.contentHash,
-						targetVersion,
+						targetVersion: artifact.version,
 					},
 				}),
 	};

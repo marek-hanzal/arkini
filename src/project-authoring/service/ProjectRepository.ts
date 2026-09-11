@@ -4,22 +4,16 @@ import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { NoteSchema } from "~/project-note/schema/NoteSchema";
-import type {
-	BoardScenarioDescriptorSchema,
-	BoardScenarioSchema,
-} from "~/board-scenario/schema/BoardScenarioSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
-import type { ProjectVersionRepositoryService } from "~/project-version/type/ProjectVersion";
+import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 
 export namespace ProjectRepository {
 	export interface CreateProjectProps {
-		readonly version: GameVersionSchema.Type;
+		readonly version: VersionPartsSchema.Type;
 		readonly config: GameConfigSchema.Type;
-		readonly initialVersionSubject?: string;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}
 
@@ -93,16 +87,6 @@ export namespace ProjectRepository {
 		readonly project: Project;
 	}
 
-	export interface BoardScenarioKey {
-		readonly projectId: string;
-		readonly name: string;
-	}
-
-	export interface WriteBoardScenarioProps extends BoardScenarioKey {
-		readonly expectedRevision: number;
-		readonly bytes: Uint8Array;
-	}
-
 	export interface NoteKey {
 		readonly projectId: string;
 		readonly noteId: string;
@@ -127,7 +111,7 @@ export namespace ProjectRepository {
 	}
 }
 
-export interface ProjectRepositoryService extends ProjectVersionRepositoryService {
+export interface ProjectRepositoryService {
 	/** Joins every repository write admitted before this Effect acquires the write boundary. */
 	readonly awaitIdleFx: Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly createProjectFx: (
@@ -159,16 +143,6 @@ export interface ProjectRepositoryService extends ProjectVersionRepositoryServic
 	readonly listNotesFx: (
 		projectId: string,
 	) => Effect.Effect<ReadonlyArray<NoteSchema.Type>, ProjectRepositoryError, never>;
-	readonly listBoardScenariosFx: (
-		projectId: string,
-	) => Effect.Effect<
-		ReadonlyArray<BoardScenarioDescriptorSchema.Type>,
-		ProjectRepositoryError,
-		never
-	>;
-	readonly readBoardScenarioFx: (
-		key: ProjectRepository.BoardScenarioKey,
-	) => Effect.Effect<BoardScenarioSchema.Type | null, ProjectRepositoryError, never>;
 	readonly readProjectFx: (
 		projectId: string,
 	) => Effect.Effect<Project | null, ProjectRepositoryError, never>;
@@ -190,12 +164,6 @@ export interface ProjectRepositoryService extends ProjectVersionRepositoryServic
 	readonly updateNoteFx: (
 		props: ProjectRepository.UpdateNoteProps,
 	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError, never>;
-	readonly writeBoardScenarioFx: (
-		props: ProjectRepository.WriteBoardScenarioProps,
-	) => Effect.Effect<BoardScenarioSchema.Type, ProjectRepositoryError, never>;
-	readonly deleteBoardScenarioFx: (
-		key: ProjectRepository.BoardScenarioKey,
-	) => Effect.Effect<void, ProjectRepositoryError, never>;
 }
 
 /** Sole canonical persistence authority for editor projects. */

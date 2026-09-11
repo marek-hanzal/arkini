@@ -2,7 +2,7 @@ import { ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
-import { Button, ButtonLink, DangerButton } from "~/ui/ui/Button";
+import { Button, DangerButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";
@@ -18,19 +18,13 @@ const EditorAssetDeleteError = ({ error }: { readonly error: unknown }) =>
 
 const EditorAssetDeleteDialog = ({
 	error,
-	filter,
 	pending,
-	project,
-	query,
 	resourceId,
 	onCancelFn,
 	onConfirmFn,
 }: {
 	readonly error: unknown;
-	readonly filter: "all" | "unused";
 	readonly pending: boolean;
-	readonly project: Project;
-	readonly query: string;
 	readonly resourceId: string;
 	readonly onCancelFn: () => void;
 	readonly onConfirmFn: () => void;
@@ -45,30 +39,12 @@ const EditorAssetDeleteDialog = ({
 				Delete <strong className="text-foreground">{resourceId}</strong> from the project.
 			</p>
 			<div className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
-				Its image bytes will be removed from the current project. A full saved version can
-				restore them; otherwise this cannot be undone.
+				Its image bytes will be removed from the current project. This cannot be undone in
+				the Editor.
 			</div>
 			<p className="mt-2 text-xs text-subtle">Asset ID: {resourceId}</p>
 			<EditorAssetDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
-				<ButtonLink
-					disabled={pending}
-					data-ui="EditorAssetDeleteCreateVersion"
-					to="/editor/$projectId/versions/commit"
-					params={{
-						projectId: project.projectId,
-					}}
-					search={{
-						returnTo: `/editor/${encodeURIComponent(project.projectId)}/assets/${encodeURIComponent(resourceId)}/detail/delete?${new URLSearchParams(
-							{
-								filter,
-								query,
-							},
-						)}`,
-					}}
-				>
-					Create version first…
-				</ButtonLink>
 				<Button
 					disabled={pending}
 					onClick={onCancelFn}
@@ -200,10 +176,7 @@ export const EditorAssetDeleteSection = ({
 			{controller.confirming ? (
 				<EditorAssetDeleteDialog
 					error={controller.error}
-					filter={filter}
 					pending={controller.deleting}
-					project={controller.project}
-					query={query}
 					resourceId={resourceId}
 					onCancelFn={controller.cancelFn}
 					onConfirmFn={() => void controller.confirmFn()}

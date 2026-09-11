@@ -5,7 +5,10 @@ import { createJobTestConfig } from "~test/production-job/support/jobTestConfig"
 export const createToolProject = (config: GameConfigSchema.Type): Project => ({
 	config,
 	createdAtMs: 0,
-	version: "1.0",
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	projectId: "mcp-tool-test",
 	resources: [],
 	revision: 0,

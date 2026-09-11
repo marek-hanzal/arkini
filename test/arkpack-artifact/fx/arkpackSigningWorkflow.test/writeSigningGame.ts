@@ -27,7 +27,10 @@ export const writeSigningGame = async (root: string) => {
 		join(gameDirectory, "game.json"),
 		`${JSON.stringify({
 			$schema: "./schema.json",
-			version: "1.0",
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			meta: {
 				id: "game:signing-workflow",
 				title: "Signing workflow",

@@ -19,7 +19,10 @@ vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 const project: Project = {
 	projectId: editorTestPayload.config.meta.id,
 	title: editorTestPayload.config.meta.title,
-	version: "4.2",
+	version: {
+		major: 4,
+		minor: 2,
+	},
 	createdAtMs: 100,
 	updatedAtMs: 100,
 	revision: 0,
@@ -75,7 +78,7 @@ describe("openEditorArkpackFx", () => {
 					packageId: project.projectId,
 					contentHash: "a".repeat(64),
 					title: project.title,
-					version: project.version,
+					version: "4.2",
 					arkini: ArkiniAppVersion,
 					provenance: {
 						type: "community",
@@ -84,7 +87,7 @@ describe("openEditorArkpackFx", () => {
 					overridesBundled: false,
 				},
 				payload: {
-					version: project.version,
+					version: "4.2",
 					arkini: ArkiniAppVersion,
 					config: project.config,
 					resources: [
@@ -103,7 +106,6 @@ describe("openEditorArkpackFx", () => {
 		expect(createProjectFx).toHaveBeenCalledWith({
 			version: project.version,
 			config: project.config,
-			initialVersionSubject: "Imported Arkpack v4.2",
 			resources: project.resources,
 		});
 	});

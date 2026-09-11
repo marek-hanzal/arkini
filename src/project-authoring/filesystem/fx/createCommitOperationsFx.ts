@@ -197,7 +197,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				config: canonicalConfig,
 				resources,
 			},
-			removeVersionHead: projectIdChanged,
 			noteUpdates,
 		});
 		const nextState: ProjectState = {
@@ -219,17 +218,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						right.noteId.localeCompare(left.noteId),
 				),
 			project: nextProject,
-			scenarios: projectIdChanged
-				? state.scenarios.map((scenario) => ({
-						...scenario,
-						projectId: nextProjectId,
-					}))
-				: state.scenarios,
-			versionHistory: projectIdChanged
-				? {
-						versions: new Map(),
-					}
-				: state.versionHistory,
 		};
 		if (projectIdChanged) states.delete(previousProjectId);
 		states.set(nextProjectId, nextState);

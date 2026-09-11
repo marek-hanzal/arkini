@@ -271,7 +271,10 @@ describe("project section form session", () => {
 		state.project = {
 			projectId: "project",
 			title: editorTestPayload.config.meta.title,
-			version: editorTestPayload.version,
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			createdAtMs: 1,
 			updatedAtMs: 2,
 			revision: 0,
@@ -300,7 +303,10 @@ describe("project section form session", () => {
 		state.project = {
 			projectId: "project",
 			title: editorTestPayload.config.meta.title,
-			version: editorTestPayload.version,
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			createdAtMs: 1,
 			updatedAtMs: 2,
 			revision: 0,

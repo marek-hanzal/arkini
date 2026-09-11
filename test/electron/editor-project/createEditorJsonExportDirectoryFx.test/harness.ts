@@ -1,9 +1,9 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { Effect, FileSystem, PlatformError } from "effect";
 
 import { createProjectPathsFx } from "~/project-authoring/filesystem/createProjectPathsFx";
 import { readProjectFilesFx } from "~/project-authoring/filesystem/fx/readProjectFilesFx";
-import { readSidecarsFx } from "~/project-authoring/filesystem/fx/readSidecarsFx";
-import { readVersionHistoryFx } from "~/project-authoring/filesystem/fx/readVersionHistoryFx";
+import { readProjectNotesFx } from "~/project-authoring/filesystem/fx/readProjectNotesFx";
 import { writeProjectFilesFx } from "~/project-authoring/filesystem/fx/writeProjectFilesFx";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
@@ -21,7 +21,7 @@ export const writeReimportableProjectFx = (root: string, revision: number) =>
 	writeProjectFilesFx({
 		root,
 		next: {
-			arkpack: editorTestPayload.version,
+			arkpack: parseVersionFn(editorTestPayload.version),
 			config: editorTestPayload.config,
 			marker: GameProjectManifestSchema.parse({
 				arkini: ArkiniAppVersion,
@@ -44,6 +44,15 @@ export const writeExportSourceExtrasFx = Effect.fn("writeExportSourceExtrasFx")(
 			discard: true,
 		},
 	);
+	for (const directory of [
+		"versions",
+		"objects",
+		"scenarios",
+		".git",
+	]) {
+		yield* fileSystem.makeDirectory(`${source}/${directory}`);
+		yield* fileSystem.writeFileString(`${source}/${directory}/ignored.json`, "unrelated bytes");
+	}
 	yield* Effect.all(
 		[
 			fileSystem.writeFileString(
@@ -67,11 +76,10 @@ export const readReimportableProjectFx = Effect.fn("readReimportableProjectFx")(
 ) {
 	const paths = yield* createProjectPathsFx(root);
 	const project = yield* readProjectFilesFx(root);
-	yield* readSidecarsFx({
+	yield* readProjectNotesFx({
 		paths,
 		projectId: project.config.meta.id,
 	});
-	yield* readVersionHistoryFx(paths);
 	return project;
 });
 

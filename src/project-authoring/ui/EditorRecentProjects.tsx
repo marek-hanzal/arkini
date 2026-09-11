@@ -1,5 +1,6 @@
 import { ChevronRight, FolderKanban, FolderX, Trash2 } from "lucide-react";
 
+import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
@@ -96,7 +97,8 @@ export const EditorRecentProjects = ({
 										</span>
 									</span>
 									<span className="mt-1 block truncate text-xs text-subtle">
-										{candidate.project.projectId} · v{candidate.project.version}
+										{candidate.project.projectId} · v
+										{formatVersionFn(candidate.project.version)}
 									</span>
 								</span>
 							</ButtonLink>

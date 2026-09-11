@@ -171,7 +171,10 @@ beforeEach(() => {
 	state.project = {
 		projectId: "editor-test",
 		revision: "revision-1",
-		version: "1.0",
+		version: {
+			major: 1,
+			minor: 0,
+		},
 		resources: [],
 		config: (
 			state.canonical as {

@@ -10,6 +10,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 			items: {
 				consumer: {
 					asset: {
+						scale: 0.8,
 						default: [],
 					},
 					id: "consumer",
@@ -20,6 +21,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 				},
 				peer: {
 					asset: {
+						scale: 0.8,
 						default: [],
 					},
 					description: "Also consumes the selected item.",
@@ -30,6 +32,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 				},
 				unrelated: {
 					asset: {
+						scale: 0.8,
 						default: [],
 					},
 					description: "Not connected.",
@@ -54,6 +57,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 	readItemConnectionsFn: () => [
 		{
 			asset: {
+				scale: 0.8,
 				default: [],
 			},
 			description: "Consumes the selected item.",
@@ -64,6 +68,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 		},
 		{
 			asset: {
+				scale: 0.8,
 				default: [],
 			},
 			description: "Also consumes the selected item.",

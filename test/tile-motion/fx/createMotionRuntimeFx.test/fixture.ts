@@ -168,6 +168,7 @@ export const createItem = (
 	id: string,
 	location: TileActorItem["location"] = firstBoardLocation,
 ): TileActorItem => ({
+	artworkScale: 0.8,
 	id,
 	itemId: id,
 	itemType: "simple",

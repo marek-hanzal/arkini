@@ -31,10 +31,11 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
-	it("preserves the complete default composition and ordered progress sources", async () => {
+	it("preserves authored scale, default composition, and ordered progress sources", async () => {
 		const item = {
 			...createSimpleItem("item:layered"),
 			asset: {
+				scale: 0.65,
 				default: [
 					"asset:base",
 					"asset:overlay",

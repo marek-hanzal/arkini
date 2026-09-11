@@ -33,6 +33,7 @@ const config = GameConfigSchema.parse({
 			title: "Source",
 			description: "A drop origin.",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:source",
 				],

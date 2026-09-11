@@ -39,6 +39,7 @@ const createInventoryProject = () =>
 					title: "Backpack",
 					description: "Backpack",
 					asset: {
+						scale: 0.8,
 						default: [
 							"item-water",
 						],

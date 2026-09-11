@@ -23,11 +23,13 @@ describe("readTileActorsFx", () => {
 		const empty = readMainActor(
 			createProgressAssetRuntime({
 				owner: "blueprint",
+				artworkScale: 0.625,
 			}),
 		);
 		const filled = readMainActor(
 			createProgressAssetRuntime({
 				owner: "blueprint",
+				artworkScale: 0.625,
 				storedQuantities: [
 					3,
 					3,
@@ -36,10 +38,12 @@ describe("readTileActorsFx", () => {
 		);
 
 		expect(empty).toMatchObject({
+			artworkScale: 0.625,
 			sourceUrl: "resource:asset:blueprint-empty",
 			compositeUrl: "resource:asset:blueprint-complete",
 		});
 		expect(filled).toMatchObject({
+			artworkScale: 0.625,
 			sourceUrl: "resource:asset:blueprint-complete",
 		});
 		expect(filled).not.toHaveProperty("compositeUrl");

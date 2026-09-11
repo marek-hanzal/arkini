@@ -198,6 +198,7 @@ describe("PixiBoardToolbarSurface", () => {
 			revision: "revision:producer",
 			running: false,
 			activityEffect: false,
+			artworkScale: 0.8,
 			sourceUrl: "resource:producer",
 			title: "Producer",
 		} satisfies TileActorItem;
@@ -260,6 +261,7 @@ describe("PixiBoardToolbarSurface", () => {
 			revision: "revision:stack",
 			running: false,
 			activityEffect: false,
+			artworkScale: 0.8,
 			sourceUrl: "resource:material",
 			title: "Material",
 		} satisfies TileActorItem;
@@ -305,6 +307,7 @@ describe("PixiBoardToolbarSurface", () => {
 			revision: "revision:producer:running",
 			running: true,
 			activityEffect: true,
+			artworkScale: 0.8,
 			sourceUrl: "resource:producer",
 			title: "Producer",
 		} satisfies TileActorItem;
@@ -368,6 +371,7 @@ describe("PixiBoardToolbarSurface", () => {
 			revision: "revision:inventory",
 			running: false,
 			activityEffect: false,
+			artworkScale: 0.8,
 			sourceUrl: "resource:inventory",
 			title: "Inventory",
 		} satisfies TileActorItem;

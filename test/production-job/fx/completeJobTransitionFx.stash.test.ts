@@ -64,6 +64,7 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
 	title: id,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],
@@ -91,6 +92,7 @@ const stashItem = ({
 	title: id,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],

@@ -58,6 +58,7 @@ const isSameMainSceneVisualFn = (left: TileActorItem, right: TileActorItem) => {
 		return false;
 	return (
 		left.activityEffect === right.activityEffect &&
+		left.artworkScale === right.artworkScale &&
 		left.badgeCount === right.badgeCount &&
 		left.badgeKind === right.badgeKind &&
 		left.compositeUrl === right.compositeUrl &&

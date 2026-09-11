@@ -41,6 +41,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 			title: "Water",
 			description: "Water",
 			asset: {
+				scale: 0.8,
 				default: [
 					"item-water",
 				],

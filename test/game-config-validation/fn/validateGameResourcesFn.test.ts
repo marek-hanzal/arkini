@@ -122,6 +122,7 @@ describe("validateGameResourcesFn", () => {
 				[itemId]: {
 					...item,
 					asset: {
+						scale: 0.8,
 						default: [
 							"missing:base",
 							"missing:overlay",
@@ -194,6 +195,7 @@ describe("validateGameResourcesFn", () => {
 			title: id,
 			description: id,
 			asset: {
+				scale: 0.8,
 				default: [
 					"blueprint",
 					targetAsset,

@@ -34,6 +34,7 @@ const config = GameConfigSchema.parse({
 			title: "Craft",
 			description: "A stackable craft.",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:craft",
 				],

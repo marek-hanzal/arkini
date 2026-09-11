@@ -57,6 +57,7 @@ const config = GameConfigSchema.parse({
 			title: "Water",
 			description: "Water",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:water",
 				],
@@ -72,6 +73,7 @@ const config = GameConfigSchema.parse({
 			title: "Inventory",
 			description: "Inventory",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:inventory",
 				],

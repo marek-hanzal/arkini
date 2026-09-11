@@ -98,6 +98,7 @@ describe("editor MCP item creation", () => {
 		const item = project.config.items["item:mcp-simple"];
 		expect(item).toMatchObject({
 			asset: {
+				scale: 0.8,
 				default: [
 					editorTestPayload.resources[0]?.id,
 				],
@@ -242,6 +243,7 @@ describe("editor MCP item creation", () => {
 			expect(read(type), type).toMatchObject({
 				layer: type === "producer" ? "ground" : "content",
 				asset: {
+					scale: 0.8,
 					default: [
 						editorTestPayload.resources[0]?.id,
 					],

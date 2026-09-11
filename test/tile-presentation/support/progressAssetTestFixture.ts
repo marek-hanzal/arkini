@@ -60,6 +60,7 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			...itemBase("material"),
 			type: "simple",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:material-primary",
 					"asset:material-unused-stage",
@@ -71,6 +72,7 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			...itemBase("craft"),
 			type: "craft",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:stage-0",
 				],
@@ -92,6 +94,7 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			...itemBase("blueprint"),
 			type: "blueprint",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:blueprint-empty",
 					"asset:blueprint-complete",
@@ -113,6 +116,7 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			...itemBase("temporary", "board"),
 			type: "temporary",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:temporary-stage-0",
 				],
@@ -144,12 +148,14 @@ const boardLocation = {
 
 export const createProgressAssetRuntime = ({
 	active = false,
+	artworkScale = 0.8,
 	owner = "craft",
 	queued = 0,
 	storedQuantity = 0,
 	storedQuantities,
 }: {
 	readonly active?: boolean;
+	readonly artworkScale?: number;
 	readonly owner?: "blueprint" | "craft";
 	readonly queued?: number;
 	readonly storedQuantity?: number;
@@ -170,7 +176,13 @@ export const createProgressAssetRuntime = ({
 			{
 				id: "runtime:owner",
 				revision: "revision:owner",
-				item: ownerItem,
+				item: {
+					...ownerItem,
+					asset: {
+						...ownerItem.asset,
+						scale: artworkScale,
+					},
+				},
 				location: boardLocation,
 				quantity: 1,
 			},

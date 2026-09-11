@@ -48,6 +48,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					title: "Workshop",
 					description: "Produces grouped output.",
 					asset: {
+						scale: 0.8,
 						default: [
 							"asset:workshop",
 						],
@@ -140,6 +141,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					title: "Wood",
 					description: "Wood.",
 					asset: {
+						scale: 0.8,
 						default: [
 							"asset:wood",
 						],
@@ -155,6 +157,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					title: "Gem",
 					description: "Gem.",
 					asset: {
+						scale: 0.8,
 						default: [
 							"asset:gem",
 						],

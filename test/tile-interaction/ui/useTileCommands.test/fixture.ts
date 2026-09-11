@@ -16,6 +16,7 @@ const base = (id: string) => ({
 	maxStackSize: 1,
 	layer: "content",
 	asset: {
+		scale: 0.8,
 		default: [
 			"hero",
 		],

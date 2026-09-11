@@ -9,6 +9,7 @@ const item = {
 	title: "Tree",
 	description: "A living tree.",
 	asset: {
+		scale: 0.8,
 		default: [
 			"asset:tree",
 		],

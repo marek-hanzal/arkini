@@ -15,6 +15,7 @@ const simpleItem = ({
 		title: id,
 		description: id,
 		asset: {
+			scale: 0.8,
 			default: [
 				`asset:${id}`,
 			],
@@ -97,6 +98,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			description: "Backpack",
 			layer: "content",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:backpack",
 				],

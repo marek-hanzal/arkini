@@ -291,69 +291,6 @@
 				"space": 0,
 				"itemId": "foundation-chest",
 				"quantity": 1
-			},
-			{
-				"x": 4,
-				"y": 3,
-				"space": 0,
-				"itemId": "grass-tile",
-				"quantity": 1
-			},
-			{
-				"x": 4,
-				"y": 2,
-				"space": 0,
-				"itemId": "grass-tile-n",
-				"quantity": 1
-			},
-			{
-				"x": 3,
-				"y": 2,
-				"space": 0,
-				"itemId": "grass-tile-nw",
-				"quantity": 1
-			},
-			{
-				"x": 5,
-				"y": 3,
-				"space": 0,
-				"itemId": "grass-tile-e",
-				"quantity": 1
-			},
-			{
-				"x": 4,
-				"y": 4,
-				"space": 0,
-				"itemId": "grass-tile-s",
-				"quantity": 1
-			},
-			{
-				"x": 3,
-				"y": 3,
-				"space": 0,
-				"itemId": "grass-tile-w",
-				"quantity": 1
-			},
-			{
-				"x": 3,
-				"y": 4,
-				"space": 0,
-				"itemId": "grass-tile-sw",
-				"quantity": 1
-			},
-			{
-				"x": 5,
-				"y": 2,
-				"space": 0,
-				"itemId": "grass-tile-ne",
-				"quantity": 1
-			},
-			{
-				"x": 5,
-				"y": 4,
-				"space": 0,
-				"itemId": "grass-tile-se",
-				"quantity": 1
 			}
 		],
 		"inventory": [],

@@ -43,7 +43,6 @@ export const EditorBuildStatus = ({
 	if (pending) {
 		title = `Building v${requestedVersion}`;
 		description = "Validating the saved project and creating its Arkpack.";
-		icon = LoaderCircle;
 	} else if (buildFailure?.type === "validation") {
 		title = "Build blocked by validation";
 		description = `Fix the blocking findings below, then build v${requestedVersion} again.`;
@@ -99,7 +98,11 @@ export const EditorBuildStatus = ({
 						disabled={pending || !canBuild}
 						onClick={onBuildFn}
 					>
-						<PackageCheck className="size-4" />
+						{pending ? (
+							<LoaderCircle className="size-4 animate-spin" />
+						) : (
+							<PackageCheck className="size-4" />
+						)}
 						{buildFailure === undefined || pending ? "Build" : "Try again"}
 					</PrimaryButton>
 				</div>
@@ -107,7 +110,6 @@ export const EditorBuildStatus = ({
 			dataUi="EditorBuildActionStatus"
 			description={description}
 			icon={icon}
-			iconSpin={pending}
 			title={title}
 		/>
 	);

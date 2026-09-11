@@ -476,6 +476,12 @@
 		"AssetSchema": {
 			"type": "object",
 			"properties": {
+				"scale": {
+					"type": "number",
+					"minimum": 0.25,
+					"maximum": 1,
+					"description": "The artwork canvas scale within its full tile, from 0.25 through 1."
+				},
 				"default": {
 					"description": "The default one- or two-layer visual composition in back-to-front order.",
 					"$ref": "urn:arkini:schema:project#/$defs/item.CompositionSchema"
@@ -490,6 +496,7 @@
 				}
 			},
 			"required": [
+				"scale",
 				"default"
 			],
 			"additionalProperties": false,

@@ -6,6 +6,7 @@
 		"title": "Deplated Earth Deposit",
 		"description": "You can find a new one to mine!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"earth-source-depleted"
 			]

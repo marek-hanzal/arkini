@@ -6,6 +6,7 @@
 		"title": "Clay Vase",
 		"description": "Something could be put inside.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-vase"
 			]

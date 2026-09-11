@@ -6,6 +6,7 @@
 		"title": "Spoiled Clay Mug",
 		"description": "It's spoiled",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-clay-mug"
 			]

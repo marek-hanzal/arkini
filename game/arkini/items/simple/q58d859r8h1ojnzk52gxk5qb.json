@@ -6,6 +6,7 @@
 		"title": "Spoiled Clay Plate",
 		"description": "A dinner for your enemy",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-clay-plate"
 			]

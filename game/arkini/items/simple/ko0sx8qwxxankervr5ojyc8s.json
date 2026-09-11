@@ -6,6 +6,7 @@
 		"title": "Arrowheads",
 		"description": "Arrow. Oh, just a tip",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"arrowheads"
 			]

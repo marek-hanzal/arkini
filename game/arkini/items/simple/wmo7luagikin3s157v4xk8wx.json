@@ -5,6 +5,7 @@
 		"id": "empty-hop-field",
 		"title": "Empty Hop Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-hop-field"
 			]

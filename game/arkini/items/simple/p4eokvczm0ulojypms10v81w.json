@@ -6,6 +6,7 @@
 		"title": "Empty Beer Barrel",
 		"description": "Nothing inside.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-beer-barrel"
 			]

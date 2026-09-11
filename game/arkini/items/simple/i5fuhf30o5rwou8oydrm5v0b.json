@@ -5,6 +5,7 @@
 		"id": "dirty-bucket",
 		"title": "Dirty Bucket",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-bucket"
 			]

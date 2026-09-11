@@ -6,6 +6,7 @@
 		"title": "Steel Armor",
 		"description": "You may be a bit better protected",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"steel-armor"
 			]

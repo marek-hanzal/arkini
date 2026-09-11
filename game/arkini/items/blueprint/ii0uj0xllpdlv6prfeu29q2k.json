@@ -6,6 +6,7 @@
 		"title": "Magic Sawmill Blueprint",
 		"description": "Can you smell fresh wood... and magic?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"blueprint",
 				"magic-sawmill"

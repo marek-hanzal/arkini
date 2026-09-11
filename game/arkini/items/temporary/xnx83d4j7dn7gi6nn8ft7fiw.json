@@ -6,6 +6,7 @@
 		"title": "Raw Game Meat",
 		"description": "Needs more processing",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"raw-game-meat"
 			]

@@ -6,6 +6,7 @@
 		"title": "Bobík",
 		"description": "The less older son",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"avatar-05"
 			]

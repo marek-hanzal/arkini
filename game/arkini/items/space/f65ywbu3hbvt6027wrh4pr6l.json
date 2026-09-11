@@ -6,6 +6,7 @@
 		"title": "Industrial Portal",
 		"description": "Dark, heavy",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"industrial-portal"
 			]

@@ -6,6 +6,7 @@
 		"title": "Resource research",
 		"description": "A magical item, which may find new resources!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"resource-search"
 			]

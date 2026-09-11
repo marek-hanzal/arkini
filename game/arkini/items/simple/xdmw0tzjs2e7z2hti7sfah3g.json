@@ -6,6 +6,7 @@
 		"title": "Paper Boat",
 		"description": "Just a boat",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"paper-boat"
 			]

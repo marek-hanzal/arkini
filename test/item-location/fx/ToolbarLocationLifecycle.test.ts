@@ -49,6 +49,7 @@ const configInput = {
 			title: "Water",
 			description: "Water",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:water",
 				],
@@ -64,6 +65,7 @@ const configInput = {
 			title: "Stone",
 			description: "Stone",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:stone",
 				],
@@ -79,6 +81,7 @@ const configInput = {
 			title: "Board only",
 			description: "Board only",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:board-only",
 				],
@@ -94,6 +97,7 @@ const configInput = {
 			title: "Inventory only",
 			description: "Inventory only",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:inventory-only",
 				],
@@ -110,6 +114,7 @@ const configInput = {
 			description: "Backpack",
 			layer: "content",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:backpack",
 				],

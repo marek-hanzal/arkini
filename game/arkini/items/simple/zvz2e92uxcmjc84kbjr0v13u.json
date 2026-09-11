@@ -5,6 +5,7 @@
 		"id": "dirty-clay-plate",
 		"title": "Dirty Clay Plate",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-clay-plate"
 			]

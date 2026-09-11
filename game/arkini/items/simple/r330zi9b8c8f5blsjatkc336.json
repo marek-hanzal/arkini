@@ -5,6 +5,7 @@
 		"id": "dirty-mug",
 		"title": "Dirty Mug",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-mug"
 			]

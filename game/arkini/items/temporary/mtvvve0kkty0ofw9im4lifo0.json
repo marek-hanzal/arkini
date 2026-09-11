@@ -6,6 +6,7 @@
 		"title": "Sausage",
 		"description": "Suasage",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"sausage"
 			]

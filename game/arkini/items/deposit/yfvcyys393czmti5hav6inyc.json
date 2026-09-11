@@ -6,6 +6,7 @@
 		"title": "Iron Mine",
 		"description": "We need raw ore, dudes",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"iron-mine"
 			]

@@ -6,6 +6,7 @@
 		"title": "Hops",
 		"description": "Core ingredient for a beer.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"hops"
 			]

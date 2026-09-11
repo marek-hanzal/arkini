@@ -6,6 +6,7 @@
 		"title": "Empty Rum Bottle",
 		"description": "A bottle",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-rum-bottle"
 			]

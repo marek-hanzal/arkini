@@ -6,6 +6,7 @@
 		"title": "Knowledge - Tier 4",
 		"description": "Master knowledge of the topic",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"knowledge-t4"
 			]

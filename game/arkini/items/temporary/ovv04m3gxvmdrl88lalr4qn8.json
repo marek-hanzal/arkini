@@ -6,6 +6,7 @@
 		"title": "Marek",
 		"description": "The Author",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"avatar-02"
 			]

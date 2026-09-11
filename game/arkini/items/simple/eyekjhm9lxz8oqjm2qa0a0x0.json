@@ -6,6 +6,7 @@
 		"title": "Clay Jug",
 		"description": "A lot of stuff you can put stuff into",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-jug"
 			]

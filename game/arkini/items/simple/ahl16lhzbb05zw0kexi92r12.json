@@ -6,6 +6,7 @@
 		"title": "Copper Ore",
 		"description": "It wanna became a Copper Ingot!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-ore"
 			]

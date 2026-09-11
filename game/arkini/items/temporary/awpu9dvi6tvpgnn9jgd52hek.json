@@ -6,6 +6,7 @@
 		"title": "Copper Pan With Popcorn",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-pan-with-popcorn"
 			]

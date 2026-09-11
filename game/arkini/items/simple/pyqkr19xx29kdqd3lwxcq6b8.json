@@ -6,6 +6,7 @@
 		"title": "House Of Engineers",
 		"description": "Your mechanical journey starts here",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"house-of-engineers"
 			]

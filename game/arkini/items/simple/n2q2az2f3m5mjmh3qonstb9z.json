@@ -5,6 +5,7 @@
 		"id": "dirty-clay-jug",
 		"title": "Dirty Clay Jug",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-clay-jug"
 			]

@@ -6,6 +6,7 @@
 		"title": "Clay Bowl With Wine",
 		"description": "God may like this",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-bowl-with-wine"
 			]

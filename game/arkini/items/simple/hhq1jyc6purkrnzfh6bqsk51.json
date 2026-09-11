@@ -6,6 +6,7 @@
 		"title": "Ash",
 		"description": "Fire was once there",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"ash"
 			]

@@ -6,6 +6,7 @@
 		"title": "Dye",
 		"description": "Wanna color something?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dye"
 			]

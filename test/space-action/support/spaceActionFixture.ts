@@ -14,6 +14,7 @@ const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => (
 	title: id,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			"hero",
 		] as [

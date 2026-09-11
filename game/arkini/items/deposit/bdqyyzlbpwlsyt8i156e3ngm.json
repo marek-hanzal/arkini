@@ -6,6 +6,7 @@
 		"title": "Well With Beer",
 		"description": "Source of beer, if you want",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"well-with-beer"
 			]

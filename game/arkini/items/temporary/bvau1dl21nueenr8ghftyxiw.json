@@ -6,6 +6,7 @@
 		"title": "Copper Pan With Roasted Coffee Beans",
 		"description": "Now you can grind it",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"copper-pan-with-roasted-coffee-beans"
 			]

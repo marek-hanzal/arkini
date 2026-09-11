@@ -6,6 +6,7 @@
 		"title": "Clay Mug With Beer",
 		"description": "Beer in quite a strange form",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-mug-with-beer"
 			]

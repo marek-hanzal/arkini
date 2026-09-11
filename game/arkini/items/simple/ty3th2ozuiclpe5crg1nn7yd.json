@@ -6,6 +6,7 @@
 		"title": "Toilet Milk",
 		"description": "Milk included",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"toilet-milk"
 			]

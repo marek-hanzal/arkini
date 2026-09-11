@@ -6,6 +6,7 @@
 		"title": "Butter",
 		"description": "Fresh nice butter",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"butter"
 			]

@@ -6,6 +6,7 @@
 		"title": "Foundation Chest",
 		"description": "Initial stuff",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"foundation-chest"
 			]

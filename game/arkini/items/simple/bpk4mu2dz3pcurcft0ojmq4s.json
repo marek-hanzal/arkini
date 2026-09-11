@@ -5,6 +5,7 @@
 		"id": "dirty-rum-bottle",
 		"title": "Dirty Rum Bottle",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-rum-bottle"
 			]

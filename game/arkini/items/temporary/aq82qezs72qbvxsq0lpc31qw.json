@@ -5,6 +5,7 @@
 		"id": "fertilized-coffee-field",
 		"title": "Fertilized Coffee Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"fertilized-coffee-field"
 			]

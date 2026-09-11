@@ -6,6 +6,7 @@
 		"title": "Toilet",
 		"description": "Universal bio remover",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"toilet"
 			]

@@ -6,6 +6,7 @@
 		"title": "Vegetables",
 		"description": "Fresh vegetables you want to eat",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"vegetable-crate"
 			]

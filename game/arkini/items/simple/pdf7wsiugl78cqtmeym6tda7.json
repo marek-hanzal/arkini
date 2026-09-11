@@ -6,6 +6,7 @@
 		"title": "Silenced Bow",
 		"description": "It makes less noise",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"silenced-bow"
 			]

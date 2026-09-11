@@ -6,6 +6,7 @@
 		"title": "Spoiled Butter",
 		"description": "You don't want this on your bread",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-butter"
 			]

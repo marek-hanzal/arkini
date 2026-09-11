@@ -6,6 +6,7 @@
 		"title": "Toxic Waste Purifier",
 		"description": "Throw those ugly chemicals into the river... oh, filter it out in pure nature way",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"toxic-waste-purifier"
 			]

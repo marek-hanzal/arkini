@@ -6,6 +6,7 @@
 		"title": "Wood",
 		"description": "Raw wood, so you can be creative with it to make new nice things.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"wood"
 			]

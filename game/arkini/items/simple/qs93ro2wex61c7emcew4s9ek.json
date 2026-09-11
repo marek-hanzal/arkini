@@ -6,6 +6,7 @@
 		"title": "Herb Garden",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"herb-garden"
 			]

@@ -6,6 +6,7 @@
 		"title": "Spoiled Mug",
 		"description": "Bleh",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-mug"
 			]

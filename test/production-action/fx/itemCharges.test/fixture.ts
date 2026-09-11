@@ -114,6 +114,7 @@ export const base = ({
 	title: id,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],

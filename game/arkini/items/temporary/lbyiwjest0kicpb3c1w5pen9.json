@@ -6,6 +6,7 @@
 		"title": "Bear",
 		"description": "A bit scary, but he will eventually go to otehr business",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"bear"
 			]

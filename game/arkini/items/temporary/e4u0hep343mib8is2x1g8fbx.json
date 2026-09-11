@@ -6,6 +6,7 @@
 		"title": "Coffee Plant",
 		"description": "You need caffeine",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"coffee-plant"
 			]

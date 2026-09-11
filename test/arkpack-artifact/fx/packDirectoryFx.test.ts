@@ -67,6 +67,8 @@ describe("packDirectoryFx game-project contract", () => {
 			});
 			expect(normalized.data[3]).toBe(128);
 			expect(payload.config).not.toHaveProperty("arkpack");
+			expect(payload.config.items.water?.asset.scale).toBe(0.65);
+			expect(payload.config.items.portal?.asset.scale).toBe(1);
 			expect(payload.config.items.portal).toMatchObject({
 				type: "space",
 				space: 9,

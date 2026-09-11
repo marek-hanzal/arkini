@@ -6,6 +6,7 @@
 		"title": "Stone",
 		"description": "Finally, you've found a stone. Now you can use it for various interesting things!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"stone"
 			]

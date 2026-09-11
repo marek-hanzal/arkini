@@ -6,6 +6,7 @@
 		"title": "Waste",
 		"description": "Not a useful stuff. You should get rid of it.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"waste"
 			]

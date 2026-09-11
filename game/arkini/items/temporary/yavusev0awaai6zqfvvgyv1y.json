@@ -6,6 +6,7 @@
 		"title": "Chocolate",
 		"description": "Good chocolate",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"chocolate"
 			]

@@ -6,6 +6,7 @@
 		"title": "Inkwell",
 		"description": "Write something nice",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"inkwell"
 			]

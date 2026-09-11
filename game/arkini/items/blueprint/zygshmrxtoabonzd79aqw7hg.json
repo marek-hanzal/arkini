@@ -6,6 +6,7 @@
 		"title": "Dairy Blueprint",
 		"description": "Cheese!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"blueprint",
 				"dairy"

@@ -5,6 +5,7 @@
 		"id": "fertilized-flower-field",
 		"title": "Fertilized Flower Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"fertilized-flower-field"
 			]

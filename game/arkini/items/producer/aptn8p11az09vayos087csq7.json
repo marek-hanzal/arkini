@@ -6,6 +6,7 @@
 		"title": "Brickworks",
 		"description": "Do bricks",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"brickworks"
 			]

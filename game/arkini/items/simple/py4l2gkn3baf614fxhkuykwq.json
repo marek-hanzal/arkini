@@ -6,6 +6,7 @@
 		"title": "Steam Dye Workshop",
 		"description": "Dye",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"steam-dye-workshop"
 			]

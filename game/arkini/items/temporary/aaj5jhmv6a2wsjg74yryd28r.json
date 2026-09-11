@@ -6,6 +6,7 @@
 		"title": "Cauldron With Boiling Water",
 		"description": "Keep it hot",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cauldron-with-boiling-water"
 			]

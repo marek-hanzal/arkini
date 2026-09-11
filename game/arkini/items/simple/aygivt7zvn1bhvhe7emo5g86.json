@@ -5,6 +5,7 @@
 		"id": "faith-toilet",
 		"title": "Faith Toilet",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"faith-toilet"
 			]

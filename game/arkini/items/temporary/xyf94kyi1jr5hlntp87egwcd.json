@@ -5,6 +5,7 @@
 		"id": "fertilized-corn-field",
 		"title": "Fertilized Corn Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"fertilized-corn-field"
 			]

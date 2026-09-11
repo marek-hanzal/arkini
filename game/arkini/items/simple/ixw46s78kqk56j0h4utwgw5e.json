@@ -6,6 +6,7 @@
 		"title": "Pickaxe",
 		"description": "Miners, go deep!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"pickaxe"
 			]

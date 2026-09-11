@@ -12,6 +12,11 @@ import { CompositionSchema } from "./CompositionSchema";
  */
 export const AssetSchema = z
 	.object({
+		scale: z
+			.number()
+			.min(0.25)
+			.max(1)
+			.describe("The artwork canvas scale within its full tile, from 0.25 through 1."),
 		/**
 		 * Complete default composition in authoritative back-to-front order.
 		 */

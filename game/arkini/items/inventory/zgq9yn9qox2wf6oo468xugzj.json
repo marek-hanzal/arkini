@@ -6,6 +6,7 @@
 		"title": "Inventory",
 		"description": "Here you have all the clutter you don't want on the board. Yaay!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"inventory"
 			]

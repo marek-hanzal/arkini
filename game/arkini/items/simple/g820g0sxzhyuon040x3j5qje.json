@@ -6,6 +6,7 @@
 		"title": "Grain",
 		"description": "All you can eat!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"grain"
 			]

@@ -6,6 +6,7 @@
 		"title": "Well Fed Beagle",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"well-fed-beagle"
 			]

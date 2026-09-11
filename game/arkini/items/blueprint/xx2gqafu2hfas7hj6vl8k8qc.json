@@ -6,6 +6,7 @@
 		"title": "Well Blueprint",
 		"description": "Wanna some well?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"blueprint",
 				"well"

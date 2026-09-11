@@ -6,6 +6,7 @@
 		"title": "Bed Milk",
 		"description": "Milk everywhere.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"bed-milk"
 			]

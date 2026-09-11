@@ -6,6 +6,7 @@
 		"title": "Cauldron With Boiling Beeswax",
 		"description": "Boiling beeswax. It could be useful, but keep it warm",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cauldron-with-boiling-beeswax"
 			]

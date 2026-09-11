@@ -6,6 +6,7 @@
 		"title": "Dirty Scrubbing Brush",
 		"description": "No longer is able to clean up things",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"dirty-scrubbing-brush"
 			]

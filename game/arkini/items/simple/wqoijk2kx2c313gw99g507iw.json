@@ -6,6 +6,7 @@
 		"title": "Forest",
 		"description": "Just forest. Cute and nice",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"forest"
 			]

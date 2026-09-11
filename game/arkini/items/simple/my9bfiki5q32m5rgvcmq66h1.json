@@ -6,6 +6,7 @@
 		"title": "Soapy Scrubbing Brush",
 		"description": "Make things clean again",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"soapy-scrubbing-brush"
 			]

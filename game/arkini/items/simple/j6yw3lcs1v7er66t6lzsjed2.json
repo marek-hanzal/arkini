@@ -6,6 +6,7 @@
 		"title": "Water Jar",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"water-jar"
 			]

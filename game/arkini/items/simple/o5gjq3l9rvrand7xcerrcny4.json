@@ -6,6 +6,7 @@
 		"title": "Construction Set - Tier 3",
 		"description": "Coolest and most complex stuff for constructing stuff",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"construction-material-box-t3"
 			]

@@ -5,6 +5,7 @@
 		"id": "empty-coffee-field",
 		"title": "Empty Coffee Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-coffee-field"
 			]

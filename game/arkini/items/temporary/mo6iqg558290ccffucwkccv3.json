@@ -6,6 +6,7 @@
 		"title": "Green Coffee Beans",
 		"description": "Still needs some care before it will be a coffee you know",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"green-coffee-beans"
 			]

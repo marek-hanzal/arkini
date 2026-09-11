@@ -6,6 +6,7 @@
 		"title": "Injured Fawn",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"injured-fawn"
 			]

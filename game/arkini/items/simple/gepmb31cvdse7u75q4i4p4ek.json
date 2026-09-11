@@ -6,6 +6,7 @@
 		"title": "Empty Lantern",
 		"description": "Just an unlit lanter. Needs something to make it work",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-lantern"
 			]

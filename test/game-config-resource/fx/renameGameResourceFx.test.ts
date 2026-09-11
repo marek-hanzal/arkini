@@ -13,6 +13,7 @@ describe("renameGameResourceFx", () => {
 				water: {
 					...editorTestPayload.config.items.water,
 					asset: {
+						scale: 0.8,
 						default: [
 							"hero",
 						] as [

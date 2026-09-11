@@ -6,6 +6,7 @@
 		"title": "Stone Path Vertical",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"stone-path-vertical"
 			]

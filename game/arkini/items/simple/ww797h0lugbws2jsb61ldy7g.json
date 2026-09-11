@@ -6,6 +6,7 @@
 		"title": "Empty Bucket",
 		"description": "I suppose you would be creative with this one",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-bucket"
 			]

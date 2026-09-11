@@ -6,6 +6,7 @@
 		"title": "Cauldron With Coffee",
 		"description": "A lot of coffee",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cauldron-with-coffee"
 			]

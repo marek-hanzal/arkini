@@ -6,6 +6,7 @@
 		"title": "Fertilized Herb Garden",
 		"draft": true,
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"fertilized-herb-garden"
 			]

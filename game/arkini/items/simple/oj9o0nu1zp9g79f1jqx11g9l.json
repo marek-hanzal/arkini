@@ -6,6 +6,7 @@
 		"title": "Empty Cauldron",
 		"description": "This is a good friend used for brew stuff.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-cauldron"
 			]

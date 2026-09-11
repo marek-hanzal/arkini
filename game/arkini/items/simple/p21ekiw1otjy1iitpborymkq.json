@@ -5,6 +5,7 @@
 		"id": "empty-flower-field",
 		"title": "Empty Flower Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"empty-flower-field"
 			]

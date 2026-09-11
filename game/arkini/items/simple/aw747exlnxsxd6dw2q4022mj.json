@@ -6,6 +6,7 @@
 		"title": "Toxic Filter Depleted",
 		"description": "Ugly and toxic. You should burn it down",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"toxic-filter-depleted"
 			]

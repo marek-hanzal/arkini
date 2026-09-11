@@ -6,6 +6,7 @@
 		"title": "Magic Sawmill",
 		"description": "Magical wood",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"magic-sawmill"
 			]

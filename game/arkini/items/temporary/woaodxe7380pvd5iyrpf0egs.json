@@ -5,6 +5,7 @@
 		"id": "fertilized-flax-field",
 		"title": "Fertilized Flax Field",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"fertilized-flax-field"
 			]

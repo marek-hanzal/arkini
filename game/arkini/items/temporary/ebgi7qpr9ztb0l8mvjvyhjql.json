@@ -6,6 +6,7 @@
 		"title": "Wine",
 		"description": "Get drunk. Don't tell mom.",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"wine"
 			]

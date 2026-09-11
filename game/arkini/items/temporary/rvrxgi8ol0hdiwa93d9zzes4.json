@@ -6,6 +6,7 @@
 		"title": "Cheese",
 		"description": "Cheese you want to chew in!",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"cheese"
 			]

@@ -6,6 +6,7 @@
 		"title": "Apiary Blueprint",
 		"description": "Bees",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"blueprint",
 				"apiary"

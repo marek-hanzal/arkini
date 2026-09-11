@@ -6,6 +6,7 @@
 		"title": "Spoiled Chocolate",
 		"description": "...",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"spoiled-chocolate"
 			]

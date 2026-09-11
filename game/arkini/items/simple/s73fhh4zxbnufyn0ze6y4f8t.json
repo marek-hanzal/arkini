@@ -6,6 +6,7 @@
 		"title": "Raw Amethyst",
 		"description": "Purple",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"raw-amethyst"
 			]

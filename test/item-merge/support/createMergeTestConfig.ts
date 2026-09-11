@@ -27,6 +27,7 @@ const simpleItem = ({
 	description: id,
 	charges,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],

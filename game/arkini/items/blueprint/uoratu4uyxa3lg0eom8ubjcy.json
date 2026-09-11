@@ -6,6 +6,7 @@
 		"title": "Sawmill Blueprint",
 		"description": "What about some stuff sawing other stuff?",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"blueprint",
 				"sawmill"

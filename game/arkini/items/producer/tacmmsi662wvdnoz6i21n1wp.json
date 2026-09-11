@@ -6,6 +6,7 @@
 		"title": "Waste Incinerator",
 		"description": "De-waste-izator",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"waste-incinerator"
 			]

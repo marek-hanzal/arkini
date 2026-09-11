@@ -6,6 +6,7 @@
 		"title": "Clay Jug With Beer",
 		"description": "Fresh beer",
 		"asset": {
+			"scale": 0.8,
 			"default": [
 				"clay-jug-with-beer"
 			]

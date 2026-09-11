@@ -12,6 +12,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 12,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "loose-ash"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "ash"
+			}
+		],
 		"type": "simple"
 	}
 }

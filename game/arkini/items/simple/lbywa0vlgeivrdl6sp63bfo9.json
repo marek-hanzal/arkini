@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "lbywa0vlgeivrdl6sp63bfo9",
+		"id": "needle",
+		"title": "Needle",
+		"draft": true,
+		"asset": {
+			"default": [
+				"needle"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -16,11 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse-with-cut-tail"
+					"itemId": "leather-satchel"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "mouse-with-bandaged-tail"
+				"result": "bandage-satchel"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "medicine-satchel"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "healing-kit"
 			}
 		],
 		"type": "simple"

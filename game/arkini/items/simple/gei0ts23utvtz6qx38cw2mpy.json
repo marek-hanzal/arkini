@@ -12,6 +12,26 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "leather-satchel"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "medicine-satchel"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bandage-satchel"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "healing-kit"
+			}
+		],
 		"type": "simple"
 	}
 }

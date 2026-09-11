@@ -167,6 +167,15 @@
 				},
 				"effect": "replace",
 				"result": "shorn-wild-boar"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sewn-pillow-with-coins"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "pillow-with-coins"
 			}
 		],
 		"type": "simple"

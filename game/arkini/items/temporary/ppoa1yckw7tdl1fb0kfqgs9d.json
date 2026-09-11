@@ -4,7 +4,7 @@
 		"uid": "ppoa1yckw7tdl1fb0kfqgs9d",
 		"id": "burned-sack-with-corn-kernels",
 		"title": "Burned Sack With Corn Kernels",
-		"draft": true,
+		"draft": false,
 		"asset": {
 			"default": [
 				"burned-sack-with-corn-kernels"

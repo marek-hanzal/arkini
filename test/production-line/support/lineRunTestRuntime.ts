@@ -13,6 +13,7 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 				`asset:${id}`,
 			],
 		},
+		layer: "content",
 		scope,
 		maxStackSize: 10,
 	} as const;

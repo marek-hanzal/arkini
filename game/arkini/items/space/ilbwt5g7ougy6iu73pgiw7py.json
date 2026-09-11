@@ -11,6 +11,7 @@
 			]
 		},
 		"scope": "toolbar",
+		"layer": "content",
 		"maxCount": 1,
 		"maxStackSize": 1,
 		"type": "space",

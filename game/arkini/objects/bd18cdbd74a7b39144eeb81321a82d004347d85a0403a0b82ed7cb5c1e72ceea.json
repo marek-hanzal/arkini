@@ -1,0 +1,15 @@
+{
+	"uid": "a1m6qc2zrjjuwunmaojue424",
+	"id": "sewn-pillow-with-coins",
+	"title": "Sewn Pillow With Coins",
+	"draft": true,
+	"asset": {
+		"default": [
+			"sewn-pillow-with-coins"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

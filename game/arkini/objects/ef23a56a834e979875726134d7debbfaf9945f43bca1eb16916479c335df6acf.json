@@ -1,0 +1,39 @@
+{
+	"uid": "ot27atkde11q2qwas9p7gujj",
+	"id": "badly-trimmed-beagle",
+	"title": "Badly Trimmed Beagle",
+	"draft": true,
+	"asset": {
+		"default": [
+			"badly-trimmed-beagle"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 120000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "beagle",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

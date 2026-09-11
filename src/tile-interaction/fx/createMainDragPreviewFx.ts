@@ -116,6 +116,12 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 		) {
 			return null;
 		}
+		if (
+			canonical.location.scope === "board" &&
+			canonical.layer === "ground" &&
+			(yield* actorStore.readCanonicalOccupantFx(canonical.location))?.id !== canonical.id
+		)
+			return null;
 		return {
 			...drag.actor.item,
 			location: canonical.location,
@@ -163,7 +169,14 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 			if (actorId === sourceItem.id) continue;
 			const actor = actorStore.actors.get(actorId);
 			const canonical = actorStore.canonicalItems.get(actorId);
-			if (actor === undefined || actor.container.destroyed) {
+			if (
+				actor === undefined ||
+				actor.container.destroyed ||
+				(canonical?.location.scope === "board" &&
+					canonical.layer === "ground" &&
+					(yield* actorStore.readCanonicalOccupantFx(canonical.location))?.id !==
+						canonical.id)
+			) {
 				drag.attractionEligibilityByActorId.delete(actorId);
 				continue;
 			}

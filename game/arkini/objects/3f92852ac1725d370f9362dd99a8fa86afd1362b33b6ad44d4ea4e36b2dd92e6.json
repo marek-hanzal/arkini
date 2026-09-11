@@ -1,0 +1,39 @@
+{
+	"uid": "h408uew16iniwj9h93gz1h1o",
+	"id": "injured-fawn",
+	"title": "Injured Fawn",
+	"draft": true,
+	"asset": {
+		"default": [
+			"injured-fawn"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-raw-game-meat",
+								"quantity": {
+									"min": 3,
+									"max": 5
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

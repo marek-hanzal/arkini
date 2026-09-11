@@ -1,0 +1,15 @@
+{
+	"uid": "j9ni85pox4gjt7uu3ud04kkj",
+	"id": "bow",
+	"title": "Bow",
+	"description": "Bow. Hunt something",
+	"asset": {
+		"default": [
+			"bow"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

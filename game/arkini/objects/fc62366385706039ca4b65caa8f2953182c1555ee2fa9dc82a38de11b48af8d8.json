@@ -1,0 +1,15 @@
+{
+	"uid": "wnz92z3wagysspwsyffvuo59",
+	"id": "dirty-jar",
+	"title": "Dirty Jar",
+	"description": "Bleh",
+	"asset": {
+		"default": [
+			"dirty-jar"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

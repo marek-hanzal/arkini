@@ -1,0 +1,15 @@
+{
+	"uid": "w1icsk6chjx802whummot9pd",
+	"id": "labor-t3",
+	"title": "Labor T3",
+	"description": "Expensive ones",
+	"asset": {
+		"default": [
+			"labor-t3"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

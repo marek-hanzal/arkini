@@ -19,6 +19,12 @@ import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/item-interaction/fn/makeDropRejectedResultFn";
+import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
+import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
+
+/** A swap cannot overwrite a third occupant or delivery lease in either destination layer. */
+class SwapLocationOccupiedError extends Data.TaggedError("SwapLocationOccupiedError") {}
 
 /** A two-item swap requires two distinct runtime identities. */
 class SwapSameItemError extends Data.TaggedError("SwapSameItemError")<{
@@ -134,6 +140,31 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
+			yield* assertGridItemExposedFx({
+				item: first,
+				runtime,
+			});
+			yield* assertGridItemExposedFx({
+				item: second,
+				runtime,
+			});
+			const claims = readGridLocationClaimsFn({
+				runtime,
+			}).filter((claim) => claim.itemId !== first.id && claim.itemId !== second.id);
+			if (
+				readGridLocationClaimAtFn({
+					claims,
+					location: second.location,
+					layer: first.item.layer,
+				}) !== undefined ||
+				readGridLocationClaimAtFn({
+					claims,
+					location: first.location,
+					layer: second.item.layer,
+				}) !== undefined
+			) {
+				return yield* Effect.fail(new SwapLocationOccupiedError());
+			}
 			const swappedFirst = yield* reviseRuntimeItemFx({
 				item: {
 					...first,
@@ -208,6 +239,23 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 			}),
 		),
 		Effect.catchTags({
+			ItemCoveredError: (error) =>
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "invalid-location",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
+			SwapLocationOccupiedError: () =>
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.Occupied,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropActorRejectedResultFn({

@@ -1,0 +1,15 @@
+{
+	"uid": "xog8fv3y6so0rcfemho9hs80",
+	"id": "spoiled-clay-vase-with-flowers",
+	"title": "Spoiled Clay Vase With Flowers",
+	"description": "Once nice flowers",
+	"asset": {
+		"default": [
+			"spoiled-clay-vase-with-flowers"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

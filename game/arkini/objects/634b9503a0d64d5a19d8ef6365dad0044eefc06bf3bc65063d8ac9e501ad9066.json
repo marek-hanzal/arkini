@@ -1,0 +1,15 @@
+{
+	"uid": "hhq1jyc6purkrnzfh6bqsk51",
+	"id": "ash",
+	"title": "Ash",
+	"description": "Fire was once there",
+	"asset": {
+		"default": [
+			"ash"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

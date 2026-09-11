@@ -29,6 +29,7 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
+import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
 
 export namespace storeInputMaterialFx {
 	export interface Props {
@@ -41,6 +42,7 @@ export namespace storeInputMaterialFx {
 		sourceItemRevision: RevisionSchema.Type;
 		expectedSourceLocation?: GridLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
+		interaction?: "drop";
 	}
 
 	export interface Result {
@@ -69,6 +71,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 	sourceItemRevision,
 	expectedSourceLocation,
 	quantity,
+	interaction,
 }: storeInputMaterialFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
@@ -140,6 +143,18 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 						actualLocation: source.location,
 					}),
 				);
+			}
+			if (interaction === "drop") {
+				yield* assertGridItemExposedFx({
+					item: source,
+					runtime,
+				});
+				if (gridOwner !== undefined) {
+					yield* assertGridItemExposedFx({
+						item: gridOwner,
+						runtime,
+					});
+				}
 			}
 			const boardOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));
 			const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));

@@ -1,0 +1,39 @@
+{
+	"uid": "xaijv8bc7ljbonqgp1vzcxcc",
+	"id": "hunted-game",
+	"title": "Hunted Game",
+	"description": "Some raw hunted stuff you shall process",
+	"asset": {
+		"default": [
+			"hunted-game"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 600000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "bio-waste",
+								"quantity": {
+									"min": 1,
+									"max": 2
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

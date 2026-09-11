@@ -1,0 +1,14 @@
+{
+	"uid": "zvz2e92uxcmjc84kbjr0v13u",
+	"id": "dirty-clay-plate",
+	"title": "Dirty Clay Plate",
+	"asset": {
+		"default": [
+			"dirty-clay-plate"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

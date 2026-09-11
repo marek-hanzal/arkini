@@ -19,6 +19,7 @@ export const createDeliveryActorItem = (
 	id,
 	itemId: "water",
 	itemType: "simple",
+	layer: "content" as const,
 	location: boardLocation(0),
 	primaryAction: {
 		kind: "none",

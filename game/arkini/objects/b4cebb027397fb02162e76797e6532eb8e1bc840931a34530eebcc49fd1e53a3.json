@@ -1,0 +1,39 @@
+{
+	"uid": "iz7g7a4t9cusl70zjj99xq89",
+	"id": "fertilized-grain-field",
+	"title": "Fertilized Grain Field",
+	"description": "Ready for grain seed.",
+	"asset": {
+		"default": [
+			"fertilized-grain-field"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "empty-grain-field",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

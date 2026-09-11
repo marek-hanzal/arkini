@@ -39,6 +39,7 @@ const createInventoryProject = () =>
 							"item-water",
 						],
 					},
+					layer: "content",
 					scope: "board",
 					maxCount: 1,
 					maxStackSize: 1,

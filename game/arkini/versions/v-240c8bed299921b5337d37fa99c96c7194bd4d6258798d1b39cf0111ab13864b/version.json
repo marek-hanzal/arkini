@@ -1,0 +1,9 @@
+{
+	"subject": "Establish explicit item layer baseline",
+	"body": "All current item definitions explicitly use the content layer. Earlier immutable snapshots are retained outside the new published history.",
+	"arkini": "0.5.0",
+	"version": "3.0",
+	"sourceRevision": 1789121876349,
+	"contentFingerprint": "79120fff0a29a73ff43b39deafaa2c83f62ba71b8a2c573f18b42e6fe54c48d5",
+	"createdAtMs": 1789122542534
+}

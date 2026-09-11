@@ -125,6 +125,7 @@ const item = (
 	id,
 	itemId: id,
 	itemType: "simple",
+	layer: "content",
 	location,
 	primaryAction: {
 		kind: "none",
@@ -147,6 +148,10 @@ describe("main surface", () => {
 				y: 0,
 			},
 		});
+		const ground = {
+			...item("runtime:ground", boardFirst.location),
+			layer: "ground" as const,
+		};
 		const boardSecond = item("runtime:board-second", {
 			scope: "board",
 			space: 0,
@@ -176,6 +181,7 @@ describe("main surface", () => {
 				boardFar,
 				toolbarItem,
 				boardFirst,
+				ground,
 			]),
 		);
 		const stage = new Container();
@@ -208,6 +214,16 @@ describe("main surface", () => {
 		);
 		const firstPose = Effect.runSync(surface.readActorPoseFx(boardFirst));
 		if (firstPose === null) throw new Error("Expected Board pose.");
+		const groundPose = Effect.runSync(surface.readActorPoseFx(ground));
+		if (groundPose === null) throw new Error("Expected ground pose.");
+		expect(groundPose).toMatchObject({
+			x: firstPose.x,
+			y: firstPose.y,
+			size: firstPose.size,
+		});
+		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
+			stage.children.indexOf(firstPose.layer),
+		);
 
 		const firstFacts = Effect.runSync(
 			surface.readTargetFactsFx(
@@ -241,6 +257,7 @@ describe("main surface", () => {
 				boardFar,
 				toolbarItem,
 				revisedFirst,
+				ground,
 			]),
 		);
 		const revisedFacts = Effect.runSync(
@@ -338,6 +355,33 @@ describe("main surface", () => {
 		expect(resizedFacts.occupant).toBe(revisedFirst);
 		expect(resizedFacts.stableKey).not.toBe(revisedFacts.stableKey);
 
+		Effect.runSync(
+			actorStore.replaceCanonicalItemsFx([
+				ground,
+				boardSecond,
+			]),
+		);
+		const uncoveredFacts = Effect.runSync(
+			surface.readTargetFactsFx(
+				resizedPose.x + resizedPose.size / 2,
+				resizedPose.y + resizedPose.size / 2,
+			),
+		);
+		expect(uncoveredFacts.occupant).toBe(ground);
+		expect(uncoveredFacts.stableKey).not.toBe(resizedFacts.stableKey);
+		expect(
+			Effect.runSync(
+				surface.readLocalActorIdsFx({
+					height: resizedPose.size,
+					width: resizedPose.size,
+					x: resizedPose.x,
+					y: resizedPose.y,
+				}),
+			),
+		).toEqual([
+			ground.id,
+		]);
+
 		const nextSpaceItem = item("runtime:next-space", {
 			scope: "board",
 			space: 1,
@@ -404,7 +448,7 @@ describe("main surface", () => {
 		Effect.runSync(surface.closeFx);
 		Effect.runSync(surface.closeFx);
 
-		expect(owned).toHaveLength(9);
+		expect(owned).toHaveLength(10);
 		for (const displayObject of owned) {
 			if (displayObject === dropFeedbackDisplayObject) {
 				expect(displayObject.destroyed).toBe(false);

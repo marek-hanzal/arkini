@@ -1,0 +1,14 @@
+{
+	"uid": "g5xkc3f2hw5xr6iipq2wf9lj",
+	"id": "dirty-copper-pan",
+	"title": "Dirty Copper Pan",
+	"asset": {
+		"default": [
+			"dirty-copper-pan"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

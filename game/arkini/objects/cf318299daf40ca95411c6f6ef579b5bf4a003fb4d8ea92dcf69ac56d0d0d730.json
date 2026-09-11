@@ -1,0 +1,15 @@
+{
+	"uid": "lu1hzxcer0v2bm8tptfix07j",
+	"id": "bathhouse",
+	"title": "Bathhouse",
+	"description": "Luxury bathing.",
+	"asset": {
+		"default": [
+			"bathhouse"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

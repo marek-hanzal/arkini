@@ -78,12 +78,12 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 			const claims = readGridLocationClaimsFn({
 				runtime,
 			});
-			const originKey = readGridLocationKeyFn(current.location.origin);
+			const originKey = readGridLocationKeyFn(current.location.origin, current.item.layer);
 			let conflictingClaim: (typeof claims)[number] | undefined;
 			for (const claim of claims) {
 				if (
 					claim.itemId !== current.id &&
-					readGridLocationKeyFn(claim.location) === originKey
+					readGridLocationKeyFn(claim.location, claim.layer) === originKey
 				) {
 					conflictingClaim = claim;
 					break;

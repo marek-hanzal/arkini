@@ -1,0 +1,15 @@
+{
+	"uid": "mctcyxqkk2gv0x6mflu1ssya",
+	"id": "empty-grape-field",
+	"title": "Empty Grape Field",
+	"description": "Ready for another grape cycle.",
+	"asset": {
+		"default": [
+			"empty-grape-field"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

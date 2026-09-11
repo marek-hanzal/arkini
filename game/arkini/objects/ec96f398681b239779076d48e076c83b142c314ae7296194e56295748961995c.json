@@ -1,0 +1,15 @@
+{
+	"uid": "sag14rytoixz9t1i2fy33v3m",
+	"id": "emerald",
+	"title": "Emerald",
+	"description": "Esm...emerald",
+	"asset": {
+		"default": [
+			"emerald"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

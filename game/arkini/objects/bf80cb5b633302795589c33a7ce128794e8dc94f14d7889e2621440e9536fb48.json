@@ -1,0 +1,15 @@
+{
+	"uid": "axd4j8rxprm3w1lyj7ndu3dl",
+	"id": "jam",
+	"title": "Jam",
+	"description": "Yummi",
+	"asset": {
+		"default": [
+			"jam"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

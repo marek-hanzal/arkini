@@ -1,0 +1,57 @@
+{
+	"uid": "qvjicvykpbmp1bdxxrscxnul",
+	"id": "axe",
+	"title": "Axe",
+	"description": "Chop something down?",
+	"asset": {
+		"default": [
+			"axe"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "tree"
+			},
+			"action": "use",
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "wood",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"effect": "deposit"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "wood"
+			},
+			"action": "use",
+			"effect": "replace",
+			"result": "firewood"
+		}
+	],
+	"type": "simple"
+}

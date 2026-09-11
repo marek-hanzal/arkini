@@ -1,0 +1,15 @@
+{
+	"uid": "c6evvzu0ea2xj1e7se8kgxqi",
+	"id": "labor-t4",
+	"title": "Labor - Tier 4",
+	"description": "Masters of the Masters",
+	"asset": {
+		"default": [
+			"labor-t4"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

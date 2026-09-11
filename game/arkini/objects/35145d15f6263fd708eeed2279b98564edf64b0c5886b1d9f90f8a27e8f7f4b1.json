@@ -1,0 +1,30 @@
+{
+	"uid": "k0yejygdsoyq8ttrky01olv5",
+	"id": "treasure-chest-t1",
+	"title": "Treasure Chest - Tier 1",
+	"description": "It may give you some basic loot",
+	"asset": {
+		"default": [
+			"treasure-chest-t1"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 4,
+	"type": "stash",
+	"line": {
+		"id": "line:treasure-chest-t1:default",
+		"title": "New stash line",
+		"description": "Describe what this stash line consumes and produces.",
+		"default": true,
+		"show": true,
+		"enable": true,
+		"runtimeMs": 0,
+		"input": [
+			{
+				"type": "simple"
+			}
+		],
+		"rules": []
+	}
+}

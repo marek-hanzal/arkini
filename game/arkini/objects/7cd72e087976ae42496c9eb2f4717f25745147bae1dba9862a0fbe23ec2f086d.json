@@ -1,0 +1,15 @@
+{
+	"uid": "wqoijk2kx2c313gw99g507iw",
+	"id": "forest",
+	"title": "Forest",
+	"description": "Just forest. Cute and nice",
+	"asset": {
+		"default": [
+			"forest"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

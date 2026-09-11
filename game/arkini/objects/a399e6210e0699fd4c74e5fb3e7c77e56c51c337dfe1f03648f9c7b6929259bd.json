@@ -1,0 +1,15 @@
+{
+	"uid": "drj72ef3yia0euytyg2e1jal",
+	"id": "oven-with-ash",
+	"title": "Oven With Ash",
+	"description": "It's done",
+	"asset": {
+		"default": [
+			"oven-with-ash"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

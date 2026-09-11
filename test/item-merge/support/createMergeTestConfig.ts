@@ -31,6 +31,7 @@ const simpleItem = ({
 			`asset:${id}`,
 		],
 	},
+	layer: "content",
 	scope,
 	maxCount,
 	maxStackSize,

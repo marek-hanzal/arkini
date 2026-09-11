@@ -490,6 +490,7 @@ export const mountController = ({
 	return {
 		actor,
 		actorEvents,
+		actorStore: actorStore as MainActorStore,
 		actors,
 		animations,
 		animateActor,

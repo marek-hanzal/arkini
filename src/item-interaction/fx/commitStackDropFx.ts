@@ -18,6 +18,8 @@ import { projectDropTransferActorFn } from "~/item-interaction/fn/projectDropTra
 import { StackItemsUnavailableError } from "~/item-interaction/error/StackItemsUnavailableError";
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
+import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
+import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 
 interface StackItemsResult {
 	readonly transferredQuantity: PositiveIntegerSchema.Type;
@@ -44,6 +46,14 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 				);
 			}
 
+			yield* assertGridItemExposedFx({
+				item: resolution.source,
+				runtime,
+			});
+			yield* assertGridItemExposedFx({
+				item: resolution.target,
+				runtime,
+			});
 			const sourceRemainingQuantity =
 				resolution.source.quantity - resolution.transferredQuantity;
 			const sourceAfter =
@@ -161,6 +171,15 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			),
 		),
 		Effect.catchTags({
+			ItemCoveredError: (error) =>
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "invalid-location",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

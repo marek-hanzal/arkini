@@ -1,0 +1,39 @@
+{
+	"uid": "ejznmbmbn7inrmbk1iwyd2ao",
+	"id": "sick-beagle",
+	"title": "Sick Beagle",
+	"draft": true,
+	"asset": {
+		"default": [
+			"sick-beagle"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-raw-game-meat",
+								"quantity": {
+									"min": 3,
+									"max": 5
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"uid": "vtwdcl5ne53d9tyy5ijk76dg",
+	"id": "cafe",
+	"title": "Cafe",
+	"description": "Coffee",
+	"asset": {
+		"default": [
+			"cafe"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

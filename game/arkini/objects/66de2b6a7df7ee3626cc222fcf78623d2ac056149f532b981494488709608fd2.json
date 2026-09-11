@@ -1,0 +1,14 @@
+{
+	"uid": "qcg5xzpysvkh34ph5p4tckkx",
+	"id": "pillow-with-coins",
+	"title": "Pillow With Coins",
+	"asset": {
+		"default": [
+			"pillow-with-coins"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

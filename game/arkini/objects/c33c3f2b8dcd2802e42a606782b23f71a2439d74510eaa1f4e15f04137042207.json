@@ -1,0 +1,15 @@
+{
+	"uid": "l06x4o9newr2la5ohyqmxipx",
+	"id": "furniture",
+	"title": "Furniture",
+	"description": "Some furniture to the house",
+	"asset": {
+		"default": [
+			"furniture"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

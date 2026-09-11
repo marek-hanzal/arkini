@@ -1,0 +1,15 @@
+{
+	"uid": "lq5ztb3oa3a55c8j0hapkv5t",
+	"id": "clay-mug-with-wine",
+	"title": "Clay Mug With Wine",
+	"description": "Another way to drink it",
+	"asset": {
+		"default": [
+			"clay-mug-with-wine"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

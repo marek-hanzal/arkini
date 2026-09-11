@@ -1,0 +1,15 @@
+{
+	"uid": "k36yguaozfwge6mst4p46h7s",
+	"id": "steel",
+	"title": "Steel",
+	"description": "Steel stuff.",
+	"asset": {
+		"default": [
+			"steel"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 6,
+	"type": "simple"
+}

@@ -1,0 +1,15 @@
+{
+	"uid": "o119fbjvkgci3q5bylh0mr4b",
+	"id": "sand",
+	"title": "Sand",
+	"description": "Sand",
+	"asset": {
+		"default": [
+			"sand"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 4,
+	"type": "simple"
+}

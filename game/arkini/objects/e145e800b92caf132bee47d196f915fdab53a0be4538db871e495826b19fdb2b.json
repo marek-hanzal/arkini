@@ -1,0 +1,15 @@
+{
+	"uid": "axpgheijxv8sypvu52ux6sxy",
+	"id": "gear-t1",
+	"title": "Gear - Tier 1",
+	"description": "Simple gear for simple machines",
+	"asset": {
+		"default": [
+			"gear-t1"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

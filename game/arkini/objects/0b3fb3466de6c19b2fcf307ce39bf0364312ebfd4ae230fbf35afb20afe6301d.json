@@ -1,0 +1,15 @@
+{
+	"uid": "ppyp6pjf6uqnjegb6q5l9d9o",
+	"id": "cotton",
+	"title": "Cotton",
+	"description": "Fluffy",
+	"asset": {
+		"default": [
+			"cotton"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 10,
+	"type": "simple"
+}

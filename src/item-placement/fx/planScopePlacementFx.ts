@@ -25,22 +25,24 @@ interface PlanScopePlacementProps {
 }
 
 const readAvailableStackItemsFn = ({
-	itemId,
+	item: definition,
 	locations,
 	origin,
 	runtime,
 }: {
-	readonly itemId: string;
+	readonly item: ItemSchema.Type;
 	readonly locations: ReadonlyArray<GridLocationSchema.Type>;
 	readonly origin?: PositionSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) => {
-	const locationKeys = new Set(locations.map(readGridLocationKeyFn));
+	const locationKeys = new Set(
+		locations.map((location) => readGridLocationKeyFn(location, definition.layer)),
+	);
 	return Array.getSomes(runtime.items.map(narrowGridRuntimeItemFn))
 		.filter(
 			(item) =>
-				locationKeys.has(readGridLocationKeyFn(item.location)) &&
-				item.item.id === itemId &&
+				locationKeys.has(readGridLocationKeyFn(item.location, item.item.layer)) &&
+				item.item.id === definition.id &&
 				item.quantity < item.item.maxStackSize &&
 				isItemPureFn({
 					item,
@@ -113,7 +115,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		if (!excluded) eligibleLocations.push(location);
 	}
 	const availableStacks = readAvailableStackItemsFn({
-		itemId: item.id,
+		item,
 		locations: eligibleLocations,
 		origin,
 		runtime,
@@ -136,6 +138,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 	}
 
 	const emptyLocations = readEmptyLocationsFn({
+		layer: item.layer,
 		locations: eligibleLocations,
 		runtime,
 	});

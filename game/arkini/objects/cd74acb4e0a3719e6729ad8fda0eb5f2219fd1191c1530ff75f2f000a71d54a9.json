@@ -1,0 +1,39 @@
+{
+	"uid": "m0quqq3gbmugylp39ced2zco",
+	"id": "corn",
+	"title": "Corn",
+	"draft": true,
+	"asset": {
+		"default": [
+			"corn"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-corn",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

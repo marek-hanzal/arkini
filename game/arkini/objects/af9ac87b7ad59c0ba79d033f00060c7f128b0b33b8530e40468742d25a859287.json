@@ -1,0 +1,15 @@
+{
+	"uid": "lknmzmrbwrl2401n3vozrgbs",
+	"id": "shield",
+	"title": "Shield",
+	"description": "It may protect you",
+	"asset": {
+		"default": [
+			"shield"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -83,6 +83,7 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 	});
 	const orderedBoard = orderGridLocationsFn({
 		locations: readEmptyLocationsFn({
+			layer: item.item.layer,
 			locations: board,
 			runtime,
 		}),
@@ -95,6 +96,7 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 		}),
 	});
 	const emptyInventory = readEmptyLocationsFn({
+		layer: item.item.layer,
 		locations: inventory,
 		runtime,
 	});
@@ -105,6 +107,7 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 		}),
 	});
 	const emptyToolbar = readEmptyLocationsFn({
+		layer: item.item.layer,
 		locations: toolbar,
 		runtime,
 	});

@@ -1,0 +1,15 @@
+{
+	"uid": "jx4fawgqrdrwvt7d5afims1l",
+	"id": "dynamite-sticks",
+	"title": "Dynamite Sticks",
+	"description": "Boom",
+	"asset": {
+		"default": [
+			"dynamite-sticks"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

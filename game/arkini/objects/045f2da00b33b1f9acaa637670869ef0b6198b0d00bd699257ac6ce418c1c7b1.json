@@ -1,0 +1,140 @@
+{
+	"uid": "m3vmxky6ih04sumyrmlja6jz",
+	"id": "herbalist",
+	"title": "Herbalist",
+	"draft": true,
+	"asset": {
+		"default": [
+			"herbalist"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"maxQueueSize": 4,
+	"type": "producer",
+	"lines": [
+		{
+			"id": "medicine",
+			"title": "Medicine",
+			"description": "You can heal something",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 42000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "herbs"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "empty-jar"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "medicine-jar",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		},
+		{
+			"id": "poison",
+			"title": "Poison",
+			"description": "Be careful, it may kill something",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 60000,
+			"input": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "herbs"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "empty-jar"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "poison-jar",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	]
+}

@@ -118,6 +118,7 @@ export const base = ({
 			`asset:${id}`,
 		],
 	},
+	layer: "content",
 	scope,
 	maxStackSize,
 });

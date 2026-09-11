@@ -1,4 +1,5 @@
 import type { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -10,6 +11,7 @@ export interface TileActorItem extends TileActorVisual {
 	readonly badgeKind?: "charges" | "queue";
 	readonly id: string;
 	readonly itemType: TypeSchema.Type;
+	readonly layer: ItemSchema.Type["layer"];
 	readonly revision: string;
 	readonly quantity: number;
 	readonly location: GridLocationSchema.Type;

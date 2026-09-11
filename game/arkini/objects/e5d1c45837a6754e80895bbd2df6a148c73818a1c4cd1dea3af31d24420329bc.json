@@ -1,0 +1,15 @@
+{
+	"uid": "h4jtpd5yoilq7pi0h7xm89yg",
+	"id": "goose-quill",
+	"title": "Goose Quill",
+	"description": "Time for school",
+	"asset": {
+		"default": [
+			"goose-quill"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

@@ -1,0 +1,14 @@
+{
+	"uid": "r330zi9b8c8f5blsjatkc336",
+	"id": "dirty-mug",
+	"title": "Dirty Mug",
+	"asset": {
+		"default": [
+			"dirty-mug"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

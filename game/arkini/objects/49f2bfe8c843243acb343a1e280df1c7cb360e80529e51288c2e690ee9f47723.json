@@ -1,0 +1,15 @@
+{
+	"uid": "mnuieh8uswt3b0atf6qi1xrn",
+	"id": "nails",
+	"title": "Nails",
+	"description": "Put some things together",
+	"asset": {
+		"default": [
+			"nails"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

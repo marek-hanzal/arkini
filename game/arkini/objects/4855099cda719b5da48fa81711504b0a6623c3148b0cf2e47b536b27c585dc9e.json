@@ -1,0 +1,39 @@
+{
+	"uid": "e4u0hep343mib8is2x1g8fbx",
+	"id": "coffee-plant",
+	"title": "Coffee Plant",
+	"description": "You need caffeine",
+	"asset": {
+		"default": [
+			"coffee-plant"
+		]
+	},
+	"scope": "board",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "temporary",
+	"durationMs": 300000,
+	"output": {
+		"set": [
+			{
+				"weight": 1,
+				"roll": [
+					{
+						"type": "guaranteed",
+						"drop": [
+							{
+								"itemId": "spoiled-coffee-plant",
+								"quantity": {
+									"min": 1,
+									"max": 1
+								},
+								"placement": "drop",
+								"rules": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

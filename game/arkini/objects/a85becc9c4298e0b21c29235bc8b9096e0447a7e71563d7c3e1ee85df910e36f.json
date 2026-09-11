@@ -1,0 +1,14 @@
+{
+	"uid": "hap8h04cn4l4c60avf2b7il2",
+	"id": "empty-sugar-beet-field",
+	"title": "Empty Sugar Beet Field",
+	"asset": {
+		"default": [
+			"empty-sugar-beet-field"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

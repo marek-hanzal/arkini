@@ -1,0 +1,15 @@
+{
+	"uid": "oryldez7t6fhoaa0hgxhd27l",
+	"id": "magic-sawmill",
+	"title": "Magic Sawmill",
+	"description": "Magical wood",
+	"asset": {
+		"default": [
+			"magic-sawmill"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

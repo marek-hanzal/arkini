@@ -1,0 +1,26 @@
+{
+	"uid": "ld5rduazg59ttnnlf2npoe9v",
+	"id": "corrupted-beagle-puppy",
+	"title": "Corrupted Beagle Puppy",
+	"draft": true,
+	"asset": {
+		"default": [
+			"corrupted-beagle-puppy"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "fawn"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "corrupted-beagle-puppy-with-fawn"
+		}
+	],
+	"type": "simple"
+}

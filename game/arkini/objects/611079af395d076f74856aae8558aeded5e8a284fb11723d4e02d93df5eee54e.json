@@ -1,0 +1,15 @@
+{
+	"uid": "np1l0eoz4og6il6t5bzy8n76",
+	"id": "spoiled-rum-barrel",
+	"title": "Spoiled Rum Barrel",
+	"description": "Ages ago, it was a nice barrel",
+	"asset": {
+		"default": [
+			"spoiled-rum-barrel"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

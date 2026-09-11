@@ -1,0 +1,14 @@
+{
+	"uid": "y8a926c064v74l7gncur9clj",
+	"id": "empty-flax-field",
+	"title": "Empty Flax Field",
+	"asset": {
+		"default": [
+			"empty-flax-field"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

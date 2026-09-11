@@ -1,0 +1,15 @@
+{
+	"uid": "dt5oypzf7djravictevjgqhr",
+	"id": "colored-glassware",
+	"title": "Colored Glassware",
+	"description": "Glass. And colors",
+	"asset": {
+		"default": [
+			"colored-glassware"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

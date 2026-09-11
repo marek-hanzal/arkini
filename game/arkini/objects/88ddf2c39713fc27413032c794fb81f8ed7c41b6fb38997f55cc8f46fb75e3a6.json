@@ -1,0 +1,15 @@
+{
+	"uid": "y9cwptcb1jtevcufgotv1kqs",
+	"id": "cotton-thread",
+	"title": "Cotton Thread",
+	"description": "Cotton thread",
+	"asset": {
+		"default": [
+			"cotton-thread"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 8,
+	"type": "simple"
+}

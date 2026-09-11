@@ -1,0 +1,15 @@
+{
+	"uid": "mp2maik3tk3jwvt78hwfjw9x",
+	"id": "flax-field",
+	"title": "Flax Field",
+	"description": "Flax field",
+	"asset": {
+		"default": [
+			"flax-field"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

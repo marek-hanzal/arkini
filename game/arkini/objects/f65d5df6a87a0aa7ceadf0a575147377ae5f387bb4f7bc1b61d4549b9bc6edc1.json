@@ -1,0 +1,15 @@
+{
+	"uid": "xrdeluarbzrl0z2uimh88olz",
+	"id": "bandage-satchel",
+	"title": "Bandage Satchel",
+	"draft": true,
+	"asset": {
+		"default": [
+			"bandage-satchel"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

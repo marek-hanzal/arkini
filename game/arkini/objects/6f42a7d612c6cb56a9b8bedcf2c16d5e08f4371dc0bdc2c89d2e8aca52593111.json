@@ -1,0 +1,15 @@
+{
+	"uid": "osmpflow443kpnve1hfl6x3e",
+	"id": "copper-bathtub-with-water",
+	"title": "Copper Bathtub With Water",
+	"description": "Water. In a bathtub",
+	"asset": {
+		"default": [
+			"copper-bathtub-with-water"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

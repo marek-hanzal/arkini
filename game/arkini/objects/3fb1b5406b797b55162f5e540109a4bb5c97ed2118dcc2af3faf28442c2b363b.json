@@ -1,0 +1,44 @@
+{
+	"uid": "l70n80ujrm55lpl6z2n4hcty",
+	"id": "bio-waste",
+	"title": "Bio-Waste",
+	"description": "Stuff produced by life. From the other side.",
+	"asset": {
+		"default": [
+			"bio-waste"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 6,
+	"merge": [
+		{
+			"target": {
+				"type": "item",
+				"itemId": "toilet"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "toilet-biowaste"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "bed-t1"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "bed-biowaste"
+		},
+		{
+			"target": {
+				"type": "item",
+				"itemId": "copper-bathtub"
+			},
+			"action": "consume",
+			"effect": "replace",
+			"result": "copper-bathtub-with-bio-waste"
+		}
+	],
+	"type": "simple"
+}

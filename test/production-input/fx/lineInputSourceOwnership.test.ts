@@ -23,6 +23,7 @@ const baseItem = (id: string) =>
 				`asset:${id}`,
 			],
 		},
+		layer: "content",
 		scope: "any",
 		maxStackSize: 1,
 	}) as const;

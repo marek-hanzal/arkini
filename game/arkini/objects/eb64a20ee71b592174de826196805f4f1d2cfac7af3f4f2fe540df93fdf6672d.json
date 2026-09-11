@@ -1,0 +1,15 @@
+{
+	"uid": "ks3q0os5blwii5qaa299wlek",
+	"id": "coal",
+	"title": "Coal",
+	"description": "Coal",
+	"asset": {
+		"default": [
+			"coal"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 4,
+	"type": "simple"
+}

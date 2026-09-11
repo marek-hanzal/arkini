@@ -514,7 +514,11 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (drag.phase === "pressed") {
 			activeDrag = null;
 			const currentActor = actorStore.actors.get(drag.sourceItem.id);
-			if (currentActor === undefined || currentActor.container.destroyed) return;
+			if (
+				currentActor === undefined ||
+				RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag)) === null
+			)
+				return;
 			try {
 				RendererRuntime.runSync(
 					burstFeedbackParticlesFx({
@@ -529,9 +533,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
-					const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
-					if (currentItem === undefined) return;
-					return onActivateFn(currentItem, drag.activationIntent, application.app.canvas);
+					if (RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag)) === null)
+						return;
+					return onActivateFn(
+						drag.actor.item,
+						drag.activationIntent,
+						application.app.canvas,
+					);
 				})
 				.catch((cause) => {
 					if (closed) return;
@@ -697,6 +705,14 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					running: actor.item.running,
 				});
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
+					if (
+						actor.item.location.scope === "board" &&
+						actor.item.layer === "ground" &&
+						RendererRuntime.runSync(
+							actorStore.readCanonicalOccupantFx(actor.item.location),
+						)?.id !== actor.item.id
+					)
+						return;
 					const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
 					const motionClaim = motionSnapshot.interactionClaimByActorId.get(actor.item.id);
 					const needsMotionHandoff = motionClaim === "handoff";

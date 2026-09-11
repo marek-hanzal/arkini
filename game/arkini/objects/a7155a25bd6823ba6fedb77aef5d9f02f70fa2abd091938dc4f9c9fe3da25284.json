@@ -1,0 +1,15 @@
+{
+	"uid": "u1mdrqt6xl58jbtesw7qride",
+	"id": "spoiled-cutting-board-with-vegetables",
+	"title": "Spoiled Cutting Board With Vegetables",
+	"draft": true,
+	"asset": {
+		"default": [
+			"spoiled-cutting-board-with-vegetables"
+		]
+	},
+	"scope": "any",
+	"layer": "content",
+	"maxStackSize": 1,
+	"type": "simple"
+}

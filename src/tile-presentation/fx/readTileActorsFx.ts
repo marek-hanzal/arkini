@@ -7,6 +7,7 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
+import { readNeighborhoodArtworkFn } from "~/tile-presentation/fn/readNeighborhoodArtworkFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
@@ -113,6 +114,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			job,
 		]),
 	);
+	const neighborhoodArtwork = readNeighborhoodArtworkFn(runtime.items);
 	const gridItems = Array.getSomes(runtime.items.map(narrowGridRuntimeItemFn)).filter((item) =>
 		surface === "inventory"
 			? item.location.scope === LocationScopeEnumSchema.enum.Inventory
@@ -131,7 +133,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 							job: activeJob,
 							runtime,
 						});
-			const visual = yield* readTileActorVisualFx({
+			const nativeVisual = yield* readTileActorVisualFx({
 				game,
 				item: item.item,
 				sourceIds: readTileActorAssetSourceIdsFn({
@@ -139,6 +141,17 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					runtime,
 				}),
 			});
+			const sourceId = neighborhoodArtwork.get(item.id);
+			const visual =
+				sourceId === undefined
+					? nativeVisual
+					: yield* readTileActorVisualFx({
+							game,
+							item: item.item,
+							sourceIds: [
+								sourceId,
+							],
+						});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
 			const queueBadgeCount = readQueueBadgeCountFn({
 				ownerItemId: item.id,
@@ -159,6 +172,19 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 
 			return {
 				...visual,
+				...(visual.sourceUrl === nativeVisual.sourceUrl &&
+				visual.compositeUrl === nativeVisual.compositeUrl
+					? {}
+					: {
+							nativeArtwork: {
+								sourceUrl: nativeVisual.sourceUrl,
+								...(nativeVisual.compositeUrl === undefined
+									? {}
+									: {
+											compositeUrl: nativeVisual.compositeUrl,
+										}),
+							},
+						}),
 				...(badgeCount === undefined
 					? {}
 					: {

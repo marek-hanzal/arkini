@@ -4,7 +4,7 @@ import type { SectionId } from "~/item-authoring/type/Section";
 export const readSectionForPathFn = (path: ReadonlyArray<PropertyKey>): SectionId => {
 	switch (path[0]) {
 		case "asset":
-			return "artwork";
+			return path[1] === "neighbors" ? "neighbors" : "artwork";
 		case "maxCount":
 		case "maxStackSize":
 			return "identity";

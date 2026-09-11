@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
+import { classifyActorUpdateFn } from "~/game-scene/fn/classifyActorUpdateFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
@@ -280,6 +281,137 @@ describe("texture readiness", () => {
 		oldTexture.destroy();
 		nextTexture.destroy();
 	});
+
+	it.each([
+		"fading",
+		"loading",
+	] as const)(
+		"reconciles a reversal to the current artwork while the superseded face is %s",
+		async (fallbackState) => {
+			const { resolves, textures } = createControlledTextures();
+			const canonical = {
+				...createItem(),
+				nativeArtwork: {
+					sourceUrl: "resource:native",
+				},
+			};
+			const { actor, frames } = createActor({
+				item: canonical,
+				textures,
+			});
+			const { animations, animator } = createAnimator();
+			const refreshFn = (item: TileActorItem) => {
+				const plan = classifyActorUpdateFn({
+					actor,
+					deliveryRetained: false,
+					directLanding: false,
+					displayItem: item,
+					motionClaimed: false,
+					pose: {
+						layer: actor.container,
+						size: 80,
+						x: 0,
+						y: 0,
+					},
+					poseChannelActive: false,
+					preserveVisual: false,
+				});
+				if (plan.item.kind === "visual") {
+					Effect.runSync(
+						updateTileActorFx({
+							actor,
+							animator,
+							frames,
+							item,
+							palette,
+							size: 80,
+							textures,
+						}),
+					);
+				} else {
+					actor.item = item;
+				}
+				return plan.item.kind;
+			};
+			await vi.waitFor(() => expect(resolves.has("resource:old")).toBe(true));
+			const originalResolveFn = resolves.get("resource:old");
+			originalResolveFn?.(Texture.WHITE);
+			await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
+			const original = actor.currentVisual;
+			actor.dragging = true;
+			refreshFn(canonical);
+			const fallback = actor.pendingVisual;
+			expect(fallback?.item.sourceUrl).toBe("resource:native");
+			expect(fallback?.container.alpha).toBe(0);
+			expect(actor.currentVisual).toBe(original);
+			expect(actor.item).toBe(canonical);
+			await vi.waitFor(() => expect(resolves.has("resource:native")).toBe(true));
+			if (fallbackState === "fading") {
+				resolves.get("resource:native")?.(Texture.WHITE);
+				await vi.waitFor(() =>
+					expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true),
+				);
+				const fade = animations.find(({ channel }) => channel === "visual-mix");
+				expect(fade?.durationMs).toBe(950);
+				if (fade?.channel !== "visual-mix") throw new Error("Expected a visual crossfade");
+				fade.incoming.alpha = 0.4;
+				fade.outgoing.alpha = 0.6;
+				expect(actor.currentVisual).toBe(original);
+			}
+			const latest = {
+				...canonical,
+				sourceUrl: "resource:latest",
+			};
+			refreshFn(latest);
+			expect(actor.item).toBe(latest);
+			expect(actor.pendingVisual ?? actor.currentVisual).toBe(fallback);
+			expect(resolves.has("resource:latest")).toBe(false);
+			const previousFadeCount = animations.filter(
+				({ channel }) => channel === "visual-mix",
+			).length;
+			actor.dragging = false;
+			// The desired rule has reverted to the still-current A while B is pending.
+			expect(refreshFn(canonical)).toBe("visual");
+			const restored = actor.pendingVisual;
+			expect(restored?.item.sourceUrl).toBe("resource:old");
+			expect(actor.item).toBe(canonical);
+			if (fallbackState === "fading") {
+				expect(original.container.alpha).toBe(0.6);
+				expect(fallback?.container.alpha).toBe(0.4);
+				animations.find(({ channel }) => channel === "visual-mix")?.onCompleteFn?.();
+				expect(actor.pendingVisual).toBe(restored);
+			}
+			expect(restored?.container.alpha).toBe(0);
+			if (fallbackState === "loading") {
+				resolves.get("resource:native")?.(Texture.WHITE);
+				await vi.waitFor(() => expect(fallback?.textureState).toBe("ready"));
+				expect(animations.filter(({ channel }) => channel === "visual-mix")).toHaveLength(
+					previousFadeCount,
+				);
+				expect(actor.pendingVisual).toBe(restored);
+			}
+			await vi.waitFor(() =>
+				expect(resolves.get("resource:old")).not.toBe(originalResolveFn),
+			);
+			resolves.get("resource:old")?.(Texture.WHITE);
+			await vi.waitFor(() =>
+				expect(animations.filter(({ channel }) => channel === "visual-mix")).toHaveLength(
+					previousFadeCount + 1,
+				),
+			);
+			const restoredFade = animations
+				.filter(({ channel }) => channel === "visual-mix")
+				.at(-1);
+			expect(restoredFade?.durationMs).toBe(950);
+			expect(actor.currentVisual).not.toBe(restored);
+			restoredFade?.onCompleteFn?.();
+			expect(actor.currentVisual).toBe(restored);
+			expect(fallback?.container.destroyed).toBe(true);
+			actor.container.destroy({
+				children: true,
+			});
+		},
+	);
 
 	it("keeps a spawn fade intent durable when its original visual is superseded", async () => {
 		const { resolves, textures } = createControlledTextures();

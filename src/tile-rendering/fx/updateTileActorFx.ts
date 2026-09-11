@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { Rectangle } from "pixi.js";
 import { match } from "ts-pattern";
 
+import { readActorVisualItemFn } from "~/tile-rendering/fn/readActorVisualItemFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import { readParticleLightSurfaceFn } from "~/tile-rendering/fn/readParticleLightSurfaceFn";
@@ -51,12 +52,16 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	actor,
 	animator,
 	frames,
-	item,
+	item: canonicalItem,
 	palette,
 	preserveVisual = false,
 	size,
 	textures,
 }: updateTileActorFx.Props) {
+	const item = readActorVisualItemFn({
+		dragging: actor.dragging,
+		item: canonicalItem,
+	});
 	const pendingMatches =
 		actor.pendingVisual !== null && sameVisualRevisionFn(actor.pendingVisual.item, item);
 	const texturesChanged =
@@ -68,7 +73,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 		!pendingMatches &&
 		(actor.pendingVisual !== null || !sameVisualRevisionFn(actor.currentVisual.item, item));
 
-	actor.item = item;
+	actor.item = canonicalItem;
 	if (!actor.dragging) {
 		actor.container.cursor = readActorCursorFn({
 			phase: "idle",
@@ -184,7 +189,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	yield* updateActorProgressFx({
 		actor,
 		frames,
-		item,
+		item: canonicalItem,
 		palette,
 		size,
 	});

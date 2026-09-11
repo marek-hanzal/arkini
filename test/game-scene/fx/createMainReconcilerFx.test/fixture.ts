@@ -522,6 +522,9 @@ export const createReconcilerHarness = ({
 			actorStore: store,
 			animator: animatorHarness.animator,
 			application: {
+				app: {
+					renderer: {},
+				},
 				frames: {
 					invalidateFx: Effect.sync(invalidate),
 				},

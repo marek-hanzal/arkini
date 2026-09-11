@@ -112,6 +112,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const ownerKey =
 						animation.ownerKey ?? `${actor.instanceId ?? actor.item.id}:${channel}`;
 					cancelChannelFn(actor, channel);
+					if (channel === "pose") cancelChannelFn(actor, "layer-release");
 					cancelFn(animationsByOwner.get(ownerKey));
 					// Cancellation callbacks are allowed to retire the actor synchronously. Pixi
 					// destroys its transform internals at that point, so even reading the old pose
@@ -127,7 +128,9 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const fromIncomingAlpha =
 						animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
 					const fromOutgoingAlpha =
-						animation.channel === "visual-mix" ? animation.outgoing.alpha : 0;
+						animation.channel === "visual-mix" || animation.channel === "layer-release"
+							? animation.outgoing.alpha
+							: 0;
 					const active: ActiveAnimation = {
 						actor,
 						channel,
@@ -188,6 +191,10 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 												(animation.toCrowdAlpha - fromCrowdAlpha) *
 													progress;
 											break;
+										case "layer-release":
+											animation.outgoing.alpha =
+												fromOutgoingAlpha * (1 - progress);
+											break;
 										case "visual-mix":
 											animation.incoming.alpha =
 												fromIncomingAlpha +
@@ -241,6 +248,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 				setFx: Effect.fn("ActorAnimator.setFx")((write) =>
 					Effect.gen(function* () {
 						cancelChannelFn(write.actor, write.channel);
+						if (write.channel === "pose") cancelChannelFn(write.actor, "layer-release");
 						applyWriteFn(write);
 						yield* frames.invalidateFx;
 					}),

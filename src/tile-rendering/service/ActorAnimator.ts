@@ -8,6 +8,7 @@ export type AnimationChannel =
 	| "activity-particles"
 	| "crowd-opacity"
 	| "grab-offset"
+	| "layer-release"
 	| "lifecycle-opacity"
 	| "lifecycle-scale"
 	| "pose"
@@ -31,6 +32,10 @@ export interface PresentedPose {
 }
 
 export type ActorAnimation =
+	| (AnimationBase & {
+			readonly channel: "layer-release";
+			readonly outgoing: Container;
+	  })
 	| (AnimationBase & {
 			readonly channel: "pose";
 			readonly readPoseFn?: (progress: number) => PresentedPose;

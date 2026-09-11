@@ -48,12 +48,15 @@ enqueueLineFx
 → validate charges, output capacity and queue capacity
 → append intent only
 
-Tick: FIFO head of idle owner
+Tick: persisted global queue order, earliest actionable request per idle owner
+→ skip blocked requests without changing state or intent order
+→ recheck rules, non-material requirements, charges and output limits
 → autofill useful material through Delivery when possible
 → retry from fresh Runtime facts
 → resolveLineRunFx from one pinned snapshot
 → reserve inputs + charges + worst-case output
 → start one Job atomically
+→ only start or scheduled delivery handles this owner for the queue pass
 
 Tick: ready Job in stable ID order
 → remove Job and consumed roots from one candidate
@@ -66,7 +69,7 @@ Tick: ready temporary material after completion settlement
 → remove the temporary identity and place expiry output from the visible owner origin
 → keep the Job when every material minimum still holds
 → otherwise remove the Job and consumed roots, then relocate reservations
-→ retry idle FIFO queue heads
+→ retry idle owners' queued requests in global intent order
 → commit all or nothing
 
 clear pending owner queue
@@ -80,7 +83,9 @@ A queued request owns no time, material, charges or output reservation. Input fi
 
 ## Important invariants
 
-- The FIFO head retries from fresh Runtime state and cannot be overtaken or silently removed.
+- Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.
+- A skipped request keeps its identity, line and valid buffered inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
+- One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; active Jobs remain non-preemptive and stored owners stay blocked.
 - Clearing pending work returns its unused line-input material without cancelling active work.
 - Start re-resolves all live facts and atomically applies input ownership, charge spending, stack isolation, reservation and Job creation.
 - Active Jobs reserve the worst possible output quantity; queued requests reserve nothing.

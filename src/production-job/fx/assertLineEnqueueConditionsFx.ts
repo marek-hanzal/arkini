@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
 import type { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
@@ -21,8 +20,8 @@ export namespace assertLineEnqueueConditionsFx {
 /**
  * Validates hard queue conditions while allowing only missing concrete material to wait.
  *
- * This is shared by queue admission and queue projection so charges, rules, non-material inputs,
- * and output limits cannot be interpreted differently from the actual enqueue command.
+ * Queue admission, queued Autofill and queue projection share these checks so charges, rules,
+ * non-material inputs and output limits cannot diverge while material is missing.
  */
 export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditionsFx")(function* ({
 	candidateId,
@@ -42,37 +41,34 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 			missingConcreteInputsOnly = false;
 			break;
 		}
-		const chargePlan = runInput.plan?.charges;
-		if (chargePlan !== undefined) {
-			reservedCharges.set(
-				chargePlan.itemId,
-				(reservedCharges.get(chargePlan.itemId) ?? 0) + chargePlan.cost,
-			);
-		}
-		if (runInput.resolution.ready) continue;
 		if (
-			runInput.resolution.type !== TypeSchema.enum.Materials ||
-			configuredInput.type !== TypeSchema.enum.Materials ||
-			runInput.resolution.missingQuantity === 0
+			!runInput.resolution.ready &&
+			(runInput.resolution.type !== TypeSchema.enum.Materials ||
+				configuredInput.type !== TypeSchema.enum.Materials ||
+				runInput.resolution.missingQuantity === 0)
 		) {
 			missingConcreteInputsOnly = false;
 			break;
 		}
-		if (configuredInput.charges?.from !== ChargeSourceSchema.enum.Self) continue;
+		// Run plans omit missing materials. Recheck every cost against one budget,
+		// including ready plans that did not account for those earlier missing inputs.
 		const charges = yield* resolveActionChargeFx({
 			charges: configuredInput.charges,
 			ownerItemId: resolution.ownerItemId,
 			reservedCharges,
+			targetItemId: runInput.plan?.charges?.itemId,
 			runtime,
 		});
-		if (!charges.ready || charges.plan === undefined) {
+		if (!charges.ready) {
 			missingConcreteInputsOnly = false;
 			break;
 		}
-		reservedCharges.set(
-			charges.plan.itemId,
-			(reservedCharges.get(charges.plan.itemId) ?? 0) + charges.plan.cost,
-		);
+		if (charges.plan !== undefined) {
+			reservedCharges.set(
+				charges.plan.itemId,
+				(reservedCharges.get(charges.plan.itemId) ?? 0) + charges.plan.cost,
+			);
+		}
 	}
 	if (!missingConcreteInputsOnly) {
 		return yield* Effect.fail(

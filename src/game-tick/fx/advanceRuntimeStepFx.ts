@@ -79,29 +79,22 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 	} as const;
 });
 
-const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function* (
+/** Retains intent order; only a start or useful delivery claims an idle owner for this pass. */
+const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
-	const activeOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
-	const visitedOwnerItemIds = new Set<IdSchema.Type>();
+	const handledOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
 	const queueSnapshot = runtime.jobQueue;
 
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
 	for (const request of queueSnapshot) {
-		if (visitedOwnerItemIds.has(request.ownerItemId)) continue;
-		visitedOwnerItemIds.add(request.ownerItemId);
-		if (activeOwnerItemIds.has(request.ownerItemId)) continue;
+		if (handledOwnerItemIds.has(request.ownerItemId)) continue;
 
 		const dispatched = yield* dispatchQueueRequestFx(request.id, draft);
-		if (dispatched.type === "delivery-scheduled") {
-			draft = dispatched.runtime;
-			events.push(...dispatched.events);
-			continue;
-		}
-		if (dispatched.type !== "started") continue;
+		if (dispatched.type !== "started" && dispatched.type !== "delivery-scheduled") continue;
+		handledOwnerItemIds.add(request.ownerItemId);
 		draft = dispatched.runtime;
-		activeOwnerItemIds.add(request.ownerItemId);
 		events.push(...dispatched.events);
 	}
 
@@ -126,7 +119,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	// Queue admission may emit external charge-depletion output. New temporary
 	// identities earn time only from the next boundary, regardless of that output path.
 	const temporaryItems = sortTemporaryItemsFn(stepStart);
-	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
+	const boundaryStart = yield* dispatchIdleQueueRequestsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesRuntimeFx(boundaryStart.runtime);
 	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime: deliveryStart.runtime,
@@ -192,7 +185,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	}
 
 	if (completedOwnerItemIds.length > 0) {
-		const dispatched = yield* dispatchIdleQueueHeadsFx(draft);
+		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);
 	}
@@ -212,7 +205,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		didExpireTemporaryItem = true;
 	}
 	if (didExpireTemporaryItem) {
-		const dispatched = yield* dispatchIdleQueueHeadsFx(draft);
+		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);
 	}

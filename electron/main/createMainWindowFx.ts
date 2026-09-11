@@ -11,18 +11,9 @@ import { calculateInitialWindowBoundsFn } from "./window/fn/calculateInitialWind
 import type { WindowModeControllerOwnership } from "./window/createWindowModeControllerOwnershipFx";
 import type { WindowPreferences } from "./window/createFilesystemWindowPreferencesFx";
 import type { WindowModeSchema } from "../contract/window/WindowModeSchema";
-import { createChatGptViewControllerFx } from "./chatgpt/createChatGptViewControllerFx";
-import type { ChatGptViewControllerOwnership } from "./chatgpt/createChatGptViewControllerOwnershipFx";
-import type { EditorMcpNgrokDomainSchema } from "~/authoring-mcp/schema/EditorMcpNgrokDomainSchema";
 
 export namespace createMainWindowFx {
 	export interface Props {
-		readonly chatGptViewControllerOwnership: ChatGptViewControllerOwnership;
-		readonly readMcpNgrokDomainFx: Effect.Effect<
-			EditorMcpNgrokDomainSchema.Type | undefined,
-			unknown,
-			never
-		>;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly windowMode: WindowModeSchema.Type;
 		readonly windowModeControllerOwnership: WindowModeControllerOwnership;
@@ -32,8 +23,6 @@ export namespace createMainWindowFx {
 
 export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 	({
-		chatGptViewControllerOwnership,
-		readMcpNgrokDomainFx,
 		trustedRenderer,
 		windowMode,
 		windowModeControllerOwnership,
@@ -66,14 +55,6 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 
 			return yield* Effect.gen(function* () {
 				yield* trustedRenderer.registerWindowFx(window);
-				const chatGptViewController = yield* createChatGptViewControllerFx({
-					readMcpNgrokDomainFx,
-					window,
-				});
-				yield* chatGptViewControllerOwnership.attachControllerFx(
-					window,
-					chatGptViewController,
-				);
 				if (windowMode === "bordered") {
 					yield* Effect.sync(() => window.maximize());
 				}

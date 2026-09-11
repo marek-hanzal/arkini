@@ -7,7 +7,6 @@ import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { createMainWindowFx } from "~electron/main/createMainWindowFx";
 import { ElectronMainError } from "~electron/main/ElectronMainError";
-import { createChatGptViewControllerOwnershipFx } from "~electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { createWindowModeControllerOwnershipFx } from "~electron/main/window/createWindowModeControllerOwnershipFx";
 import type { WindowPreferences } from "~electron/main/window/createFilesystemWindowPreferencesFx";
@@ -118,21 +117,11 @@ beforeEach(() => {
 });
 
 const createTestMainWindowFx = Effect.fn("createTestMainWindowFx")(
-	(
-		props: Omit<
-			createMainWindowFx.Props,
-			| "chatGptViewControllerOwnership"
-			| "readMcpNgrokDomainFx"
-			| "windowModeControllerOwnership"
-		>,
-	) =>
+	(props: Omit<createMainWindowFx.Props, "windowModeControllerOwnership">) =>
 		Effect.gen(function* () {
-			const chatGptViewControllerOwnership = yield* createChatGptViewControllerOwnershipFx();
 			const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
 			return yield* createMainWindowFx({
 				...props,
-				chatGptViewControllerOwnership,
-				readMcpNgrokDomainFx: Effect.succeed(undefined),
 				windowModeControllerOwnership,
 			});
 		}),

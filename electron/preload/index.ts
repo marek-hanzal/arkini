@@ -4,12 +4,6 @@ import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 const closeFailedListeners = new Set<(error: unknown) => void>();
-const chatGptStateListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["chatGpt"]["onStateChangedFn"]>[0]
->();
-const chatGptAssetCandidateListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["chatGpt"]["onAssetCandidateFn"]>[0]
->();
 const editorProjectChangedListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChangedFn"]>[0]
 >();
@@ -62,14 +56,6 @@ ipcRenderer.on(ArkiniElectronApi.channels.editorMcpOverviewChanged, (_event, ove
 	for (const listenerFn of Array.from(editorMcpOverviewListeners)) listenerFn(overview);
 });
 
-ipcRenderer.on(ArkiniElectronApi.channels.chatGptStateChanged, (_event, state) => {
-	for (const listenerFn of Array.from(chatGptStateListeners)) listenerFn(state);
-});
-
-ipcRenderer.on(ArkiniElectronApi.channels.chatGptAssetCandidate, (_event, candidate) => {
-	for (const listenerFn of Array.from(chatGptAssetCandidateListeners)) listenerFn(candidate);
-});
-
 ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
 	closing = true;
@@ -100,18 +86,6 @@ const api: ArkiniElectronApi.Api = {
 		readAvailableFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityRead),
 		writeAvailableFn: (available) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
-	},
-	chatGpt: {
-		setSurfaceFn: (surface) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.chatGptSurfaceSet, surface),
-		onStateChangedFn: (listenerFn) => {
-			chatGptStateListeners.add(listenerFn);
-			return () => chatGptStateListeners.delete(listenerFn);
-		},
-		onAssetCandidateFn: (listenerFn) => {
-			chatGptAssetCandidateListeners.add(listenerFn);
-			return () => chatGptAssetCandidateListeners.delete(listenerFn);
-		},
 	},
 	clipboard: {
 		writeTextFn: (text) =>

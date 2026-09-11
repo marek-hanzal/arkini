@@ -5,8 +5,8 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
-import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
-import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
+import { releaseCurrentEditorBoardGameFx } from "~/editor-board/fx/releaseCurrentEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/editor-board/fx/syncEditorBoardGameFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { readProjectFx } from "~/project-authoring/fx/readProjectFx";
 import { ProjectVersionCheckoutConfirmationRequired } from "~/project-version/error/ProjectVersionCheckoutConfirmationRequired";

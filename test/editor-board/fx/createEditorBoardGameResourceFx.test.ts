@@ -3,9 +3,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
-import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
-import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
+import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";

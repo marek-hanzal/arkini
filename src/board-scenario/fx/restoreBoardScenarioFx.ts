@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { Project } from "~/project-authoring/type/Project";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 
 export namespace publishEditorProjectFx {

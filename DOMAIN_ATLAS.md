@@ -136,7 +136,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `asset-authoring` | Asset catalog, validation, edit/import/delete and UI | [`src/asset-authoring/ui/EditorAssetManager.tsx`](src/asset-authoring/ui/EditorAssetManager.tsx) |
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `chatgpt-asset-authoring` | Project-scoped ChatGPT view and confirmed Asset insertion | [`src/chatgpt-asset-authoring/ui/useEditorChatGptController.ts`](src/chatgpt-asset-authoring/ui/useEditorChatGptController.ts) |
-| `board-scenario` | Scenario snapshots and Editor Board Game lifecycle | [`src/board-scenario/fx/createEditorBoardGameResourceFx.ts`](src/board-scenario/fx/createEditorBoardGameResourceFx.ts) |
+| `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |
+| `board-scenario` | Named persisted Board snapshots and restore | [`src/board-scenario/fx/restoreBoardScenarioFx.ts`](src/board-scenario/fx/restoreBoardScenarioFx.ts) |
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |
 | `project-note` | Ordered Notes outside Version snapshots | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
 | `project-version` | Immutable snapshots, commit compatibility, saved-HEAD proof and checkout | [`src/project-version/README.md`](src/project-version/README.md) |

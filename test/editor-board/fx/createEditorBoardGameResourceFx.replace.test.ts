@@ -3,8 +3,8 @@ import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
-import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
+import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";

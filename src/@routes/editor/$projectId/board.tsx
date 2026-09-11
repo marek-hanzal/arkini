@@ -2,14 +2,14 @@ import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useSyncExternalStore } from "react";
 
-import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
-import { EditorBoardGameAtom } from "~/board-scenario/atom/EditorBoardGameAtom";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
+import { EditorBoardGameAtom } from "~/editor-board/atom/EditorBoardGameAtom";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
 import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
-import { EditorBoardItemDetailLink } from "~/board-scenario/ui/EditorBoardItemDetailLink";
-import { EditorBoardProductionLineLink } from "~/board-scenario/ui/EditorBoardProductionLineLink";
+import { EditorBoardItemDetailLink } from "~/editor-board/ui/EditorBoardItemDetailLink";
+import { EditorBoardProductionLineLink } from "~/editor-board/ui/EditorBoardProductionLineLink";
 import { BoardScenarioToolbar } from "~/board-scenario/ui/BoardScenarioToolbar";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";

@@ -8,7 +8,7 @@ import {
 	setUpEditorProjectRouteTest,
 	tearDownEditorProjectRouteTest,
 } from "~test/router/EditorProjectRouteLifecycle.test/createEditorProjectRouteHarness";
-import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/editor-board/fx/syncEditorBoardGameFx";
 
 beforeEach(setUpEditorProjectRouteTest);
 afterEach(tearDownEditorProjectRouteTest);

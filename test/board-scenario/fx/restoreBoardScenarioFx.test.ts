@@ -9,8 +9,8 @@ import {
 	ProjectRepository,
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import { restoreBoardScenarioFx } from "~/board-scenario/fx/restoreBoardScenarioFx";
 import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";

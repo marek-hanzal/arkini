@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/fx/releaseCurrentEditorBoardGameFx";
-import { syncEditorBoardGameFx } from "~/board-scenario/fx/syncEditorBoardGameFx";
+import { releaseCurrentEditorBoardGameFx } from "~/editor-board/fx/releaseCurrentEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/editor-board/fx/syncEditorBoardGameFx";
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectProvider } from "~/authoring-session/ui/useEditorProject";
 import { readProjectFx } from "~/project-authoring/fx/readProjectFx";

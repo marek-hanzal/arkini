@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 

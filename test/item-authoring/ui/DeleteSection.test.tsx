@@ -143,7 +143,11 @@ describe("DeleteSection", () => {
 		});
 	});
 
-	it("confirms an eligible delete and replaces a direct deep-link fallback", async () => {
+	it.each([
+		false,
+		true,
+	])("replaces the deleted item URL with the list when history back is %s", async (canGoBack) => {
+		state.historyBack.mockReturnValue(canGoBack);
 		makeItemEligible();
 		const container = await render();
 		const open = container.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteOpen"]');
@@ -161,7 +165,7 @@ describe("DeleteSection", () => {
 			force: false,
 			itemUid: "water",
 		});
-		expect(state.historyBack).toHaveBeenCalledOnce();
+		expect(state.historyBack).not.toHaveBeenCalled();
 		expect(state.navigate).toHaveBeenCalledWith({
 			to: "/editor/$projectId/editor/items/list",
 			params: {
@@ -169,5 +173,21 @@ describe("DeleteSection", () => {
 			},
 			replace: true,
 		});
+	});
+
+	it("stays on the item when deletion fails", async () => {
+		makeItemEligible();
+		state.remove.mockRejectedValueOnce(new Error("Delete failed."));
+		const container = await render();
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteOpen"]')?.click(),
+		);
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteConfirm"]')?.click(),
+		);
+
+		expect(state.remove).toHaveBeenCalledOnce();
+		expect(state.navigate).not.toHaveBeenCalled();
+		expect(state.historyBack).not.toHaveBeenCalled();
 	});
 });

@@ -3,7 +3,6 @@ import {
 	Boxes,
 	Calculator,
 	FolderCog,
-	GitBranch,
 	GitFork,
 	Images,
 	LayoutGrid,
@@ -89,15 +88,6 @@ export const EditorWorkspaceRoutes = [
 		separatorAfter: true,
 		shortcut: "Mod+Shift+B",
 		to: "/editor/$projectId/board",
-	},
-	{
-		id: "versions",
-		icon: GitBranch,
-		label: "Versions",
-		matchTo: "/editor/$projectId/versions",
-		separatorAfter: true,
-		shortcut: "Mod+Shift+V",
-		to: "/editor/$projectId/versions/commit",
 	},
 	{
 		id: "build",

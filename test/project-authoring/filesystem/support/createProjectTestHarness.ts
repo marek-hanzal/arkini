@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -48,7 +49,7 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 		createProject: (repository: OwnedEditorProjectRepository, projectId = "project-one") =>
 			Effect.runPromise(
 				repository.createProjectFx({
-					version: editorTestPayload.version,
+					version: parseVersionFn(editorTestPayload.version),
 					config: {
 						...editorTestPayload.config,
 						meta: {
@@ -66,7 +67,7 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 				writeProjectFilesFx({
 					root,
 					next: {
-						arkpack: editorTestPayload.version,
+						arkpack: parseVersionFn(editorTestPayload.version),
 						marker: GameProjectManifestSchema.parse({
 							arkini: ArkiniAppVersion,
 							revision: 1,

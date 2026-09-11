@@ -14,17 +14,13 @@ items/<type>/<uid>.json
 assets/<id>.png
 resources/<id>.png
 notes/<noteId>.json
-scenarios/<hash>.json
-versions/head.json
-versions/<versionId>/{version.json,manifest.json}
-objects/<sha256>.{json,png}
 ```
 
-Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, notes, scenarios, version history, objects, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` nevertheless require this working source tree to match its published Version HEAD exactly; validation may still inspect an uncommitted working tree.
+Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, Notes, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` validate and build the current saved sources directly.
 
 - `project.json` is the root marker and contains Arkini writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
-- `game.json` is the strict complete non-item root and owns `$schema`, package metadata/ID, gameplay version, resources, and start state.
+- `game.json` is the strict complete non-item root and owns `$schema`, package metadata/ID, structured output version, resources, and start state.
 - Each item file is a strict `{ $schema, item }` document. Its path owns canonical type and immutable encoded UID; its item owns the human-authored ID.
 - `resources/` contains package-shell resources and `assets/` item artwork. The current source contract accepts PNG bytes; schema support does not imply another runtime resource type. The explicit Editor Assets **Optimize** action losslessly re-encodes every 8-bit PNG in both directories at its original dimensions, normalizes it to RGBA, and clears RGB below fully transparent pixels. This source-maintenance write is separate from Build and Arkpack artwork baking.
 
@@ -69,11 +65,11 @@ The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. 
 
 All exact IDs use [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/IdSchema.ts); prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
 
-Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export, Versions, and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item type/UID and its path.
+Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item type/UID and its path.
 
 The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests, and artifacts derive or verify it rather than copying a competing identity.
 
-Renaming `meta.id` creates a different game namespace: existing installed saves remain associated with the old package ID. The Editor preserves the gameplay version, current source, scenarios and Notes, removes the published Version HEAD, and makes any older immutable Version files unreachable. The next explicit Version commit is a new root and does not bump gameplay compatibility merely because the package identity changed.
+Renaming `meta.id` creates a different game namespace: existing installed saves remain associated with the old package ID. The Editor preserves output version settings, current source and Notes.
 
 ## Authoring semantics
 
@@ -86,7 +82,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - initial Board editing and preview select `Content` or `Ground` (default `Content`); editing preserves the other layer and the item picker admits only the selected Board layer;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
-- item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics; its Version diff is `noop`;
+- item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
 - positive extra material capacity is supported only for producer-owned lines;
@@ -107,9 +103,9 @@ The compiler must reject an invalid project without producing a usable artifact.
 
 Notes are stored once in `notes/<noteId>.json` with Markdown content, ordering/freshness timestamps, and optional unique `itemUids` and `resourceIds` arrays. Missing link arrays normalize to `[]`; a note is globally unlinked only when both arrays are empty. Item links use immutable UIDs, while asset links use the current canonical resource IDs. The global Notes route and every Item or Asset detail Notes tab share one composer/list; authoring forms do not expose Notes. Create/edit validates both relationship sets against the open project and guards updates by `expectedUpdatedAtMs`. Item deletion strips absent UIDs, and resource rename/delete rewrites affected resource IDs, in the same recoverable current-tree transaction while preserving the note and advancing its freshness.
 
-Notes are portable but do not change authoring revision and do not enter Versions, Build, or Arkpack output. Scenarios are explicit portable gameplay-State snapshots included in Versions; the live Editor Board is not persisted. Versions are complete immutable logical snapshots published through `versions/head.json`, not property deltas.
+Notes are portable but do not change authoring revision and do not enter Build or Arkpack output. The live Editor Board is ephemeral: named scenarios and internal project history are not supported. Use Git to version the portable project.
 
-Ordinary non-identity Project, Item, and resource saves never change the Arkpack gameplay version. A package-ID rename also preserves that version but removes Version HEAD because the renamed package is a new game; its next explicit Version commit records a new root. Otherwise, the first explicit Version commit records the complete starting snapshot at its existing version (`1.0` for a fresh project); Arkpack import creates this root commit automatically while preserving the imported version. Each later commit compares the working tree with the current parent snapshot and applies exactly one strongest compatibility result: any major-classified gameplay field produces one major bump, otherwise any minor-classified field or resource change produces one minor bump, and scenario-only changes produce no bump. A major commit deletes every current Board scenario after presenting that consequence in the commit preview. Branch identity is the Version ID, so sibling commits may legitimately carry the same gameplay version and no-op parent/child commits may share one version.
+The project stores `game.json.version` as `{ major, minor, suffix? }`, the last manually chosen Arkpack output version. Major and minor are nonnegative safe integers; the optional suffix starts with an ASCII letter or digit and then permits ASCII letters, digits, dots and hyphens. Fresh projects start at `{ major: 1, minor: 0 }`. Build saves valid version settings before compilation, retaining them on failure without changing authoring revision or the live Board. Ordinary authoring and package-ID rename preserve these settings. CLI uses the same saved fields; compilation formats them as `major.minor[-suffix]`. Arkpack import parses that external string once. Authors decide compatibility; no content diff or automatic bump exists.
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
 

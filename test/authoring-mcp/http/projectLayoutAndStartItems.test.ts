@@ -30,7 +30,10 @@ describe("editor MCP project layout and start items", () => {
 		);
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...editorTestPayload.config,
 					meta: {
@@ -136,7 +139,10 @@ describe("editor MCP project layout and start items", () => {
 		);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...editorTestPayload.config,
 					meta: {

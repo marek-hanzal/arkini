@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 
 /** Opens an existing matching Editor project or creates it from the installed Arkpack. */
 export const openEditorArkpackFx = Effect.fn("openEditorArkpackFx")(function* (packageId: string) {
@@ -14,9 +15,8 @@ export const openEditorArkpackFx = Effect.fn("openEditorArkpackFx")(function* (p
 		packageId,
 	});
 	const project = yield* repository.createProjectFx({
-		version: payload.version,
+		version: parseVersionFn(payload.version),
 		config: payload.config,
-		initialVersionSubject: `Imported Arkpack v${payload.version}`,
 		resources: payload.resources,
 	});
 	return project satisfies ProjectDescriptor;

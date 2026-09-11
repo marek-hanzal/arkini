@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import { access, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as NodeServices from "@effect/platform-node/NodeServices";
@@ -32,7 +33,7 @@ describe("filesystem Editor project lifecycle", () => {
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				version: editorTestPayload.version,
+				version: parseVersionFn(editorTestPayload.version),
 				config: {
 					...editorTestPayload.config,
 					meta: {
@@ -57,37 +58,24 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
 	});
 
-	it("publishes an imported project with its preserved version as the initial HEAD", async () => {
+	it("reopens an imported project's selected build version", async () => {
 		const repository = await harness.openRepository();
+		const version = {
+			major: 4,
+			minor: 2,
+			suffix: "test",
+		};
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				version: "4.2",
+				version,
 				config: editorTestPayload.config,
-				initialVersionSubject: "Imported Arkpack v4.2",
 				resources: editorTestPayload.resources,
 			}),
 		);
-		expect(
-			await Effect.runPromise(repository.readVersionStatusFx(created.projectId)),
-		).toMatchObject({
-			canCommit: false,
-			dirty: false,
-			versionCount: 1,
-		});
-		expect(await Effect.runPromise(repository.listVersionsFx(created.projectId))).toEqual([
-			expect.objectContaining({
-				arkpackVersion: "4.2",
-				subject: "Imported Arkpack v4.2",
-			}),
-		]);
-
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
-		expect(
-			await Effect.runPromise(reopened.readVersionStatusFx(created.projectId)),
-		).toMatchObject({
-			dirty: false,
-			versionCount: 1,
+		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toMatchObject({
+			version,
 		});
 	});
 
@@ -114,9 +102,11 @@ describe("filesystem Editor project lifecycle", () => {
 		await expect(
 			Effect.runPromise(
 				repository.createProjectFx({
-					version: "4.2",
+					version: {
+						major: 4,
+						minor: 2,
+					},
 					config: editorTestPayload.config,
-					initialVersionSubject: "Imported Arkpack v4.2",
 					resources: editorTestPayload.resources,
 				}),
 			),
@@ -138,7 +128,10 @@ describe("filesystem Editor project lifecycle", () => {
 			revision: expect.any(Number),
 		});
 		expect(JSON.parse(await readFile(join(root ?? "", "game.json"), "utf8"))).toMatchObject({
-			version: "1.0",
+			version: {
+				major: 1,
+				minor: 0,
+			},
 		});
 		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
 			projects: [
@@ -352,12 +345,6 @@ describe("filesystem Editor project lifecycle", () => {
 				root,
 			}),
 		);
-		const version = await Effect.runPromise(
-			repository.createVersionFx({
-				projectId: opened.projectId,
-				subject: "Before rename",
-			}),
-		);
 		const gamePath = join(root, "game.json");
 		const game = JSON.parse(await readFile(gamePath, "utf8")) as {
 			meta: {
@@ -392,14 +379,6 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(repository.readProjectRootFx(refreshed.projectId))).toBe(
 			await realPath(root),
 		);
-		await expect(
-			Effect.runPromise(
-				repository.checkoutVersionFx({
-					projectId: refreshed.projectId,
-					versionId: version.versionId,
-				}),
-			),
-		).rejects.toThrow(`belongs to Editor project ${opened.projectId}`);
 		expect(
 			(await Effect.runPromise(repository.readProjectFx(refreshed.projectId)))?.projectId,
 		).toBe(refreshed.projectId);
@@ -424,69 +403,5 @@ describe("filesystem Editor project lifecycle", () => {
 		).rejects.toThrow("already open from another folder");
 		expect(first.projectId).toBe("shared-project");
 		expect(await Effect.runPromise(repository.listProjectsFx)).toHaveLength(1);
-	});
-
-	it("keeps external version-head edits hidden until the explicit hard refresh", async () => {
-		const repository = await harness.openRepository();
-		const created = await harness.createProject(repository);
-		const initialStatus = await Effect.runPromise(
-			repository.readVersionStatusFx(created.projectId),
-		);
-		const first = await Effect.runPromise(
-			repository.createVersionFx({
-				projectId: created.projectId,
-				expectedFingerprint: initialStatus.currentFingerprint,
-				subject: "Initial",
-			}),
-		);
-		const changed = await Effect.runPromise(
-			repository.replaceConfigFx({
-				projectId: created.projectId,
-				expectedRevision: created.revision,
-				config: {
-					...created.config,
-					meta: {
-						...created.config.meta,
-						title: "Changed",
-					},
-				},
-			}),
-		);
-		const second = await Effect.runPromise(
-			repository.createVersionFx({
-				projectId: created.projectId,
-				subject: "Changed",
-			}),
-		);
-		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
-		if (root === null) throw new Error("Managed project root missing.");
-		await writeFile(
-			join(root, "versions", "head.json"),
-			JSON.stringify({
-				current: first.versionId,
-				versions: [
-					first.versionId,
-				],
-			}),
-		);
-
-		expect(
-			(await Effect.runPromise(repository.listVersionsFx(created.projectId))).map(
-				({ versionId }) => versionId,
-			),
-		).toEqual([
-			second.versionId,
-			first.versionId,
-		]);
-		expect(changed.previousRevision).toBe(created.revision);
-
-		await Effect.runPromise(repository.refreshProjectFx(created.projectId));
-		expect(
-			(await Effect.runPromise(repository.listVersionsFx(created.projectId))).map(
-				({ versionId }) => versionId,
-			),
-		).toEqual([
-			first.versionId,
-		]);
 	});
 });

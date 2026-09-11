@@ -9,7 +9,7 @@ An Arkini release is `<major>.<minor>.<patch>[-prerelease]`. The table is the du
 | Change | Contract |
 | --- | --- |
 | Major | May break any earlier Arkini-owned data. Migration is an explicit product decision, never an implied promise. |
-| Minor | Must preserve every supported Arkpack, save, Editor project, scenario, version history, and other external contract from the previous release. A migration may implement compatibility, but is optional and must be proven safe. |
+| Minor | Must preserve every supported Arkpack, save, Editor project and other external contract from the previous release. A migration may implement compatibility, but is optional and must be proven safe. |
 | Patch | Contains fixes without material gameplay, architecture, or data-contract impact and inherits the minor guarantee. |
 
 Every persisted Arkini writer stamp records the complete release version, including prerelease provenance. Reader admission uses only its major:
@@ -21,7 +21,7 @@ Every persisted Arkini writer stamp records the complete release version, includ
 
 Reader compatibility and release provenance are independent. Reader admission compares only the major. Official provenance instead binds the signed payload to the distribution channel configured in the reading application; the writer's full version or release tag never changes trust and never selects a parser or rejects otherwise valid Community gameplay.
 
-Project-owned gameplay version uses `<major>.<minor>` and is a separate authority. A save/scenario and its Arkpack are compatible when their gameplay majors match; minor ordering cannot reject data or choose another reader. Writers always stamp current complete provenance.
+Project-owned gameplay version uses `<major>.<minor>[-suffix]` and is a separate authority chosen by the author at Build. A save and its Arkpack are compatible when their gameplay majors match; minor and suffix cannot reject data or choose another reader. Writers stamp the complete string. The Editor stores the major, minor and optional suffix as output settings, with no effect on its live Board or authoring revision.
 
 ## Pre-stable policy
 
@@ -48,14 +48,10 @@ Use the smallest non-derivable payload:
 | --- | --- |
 | `project.json` | `{ arkini, revision }`: writer provenance and current project revision. |
 | `schema.json` | Current project JSON Schema with stable `$id` and explicit definitions. |
-| `game.json` | `$schema`, gameplay `version`, and complete non-item config; `meta.id` is package identity. |
+| `game.json` | `$schema`, structured output `version`, and complete non-item config; `meta.id` is package identity. |
 | `items/<type>/<uid>.json` | `$schema` plus direct `item`; path owns type/UID, item owns gameplay ID. |
 | `assets/<id>.png`, `resources/<id>.png` | Path owns ID/kind; extension owns current MIME. |
 | `notes/<noteId>.json` | Markdown content, optional unique immutable `itemUids` and canonical `resourceIds`, and ordering/freshness timestamps; path owns note ID. |
-| `scenarios/<hash>.json` | Human name, revision, gameplay version, State bytes, and timestamps; hash path is content-safe identity. |
-| `versions/head.json` | Published current/list order. |
-| `versions/<versionId>/version.json` | Parent, subject/body/tag, writer/gameplay provenance, source revision, fingerprint, time; directory owns ID. |
-| `versions/<versionId>/manifest.json` | Hashes of the complete versioned project/scenario set. |
 
 The Editor installation catalog stores discovery roots, managed/external ownership, and timestamps only. It never copies canonical project identity or mutable project fields.
 
@@ -63,8 +59,8 @@ The Editor installation catalog stores discovery roots, managed/external ownersh
 
 | Artifact | Contract |
 | --- | --- |
-| `.arkpack` | Self-contained magic/length envelope around one gzip-compressed MessagePack gameplay payload and optional Sigstore proof through EOF. The proof signs only the exact compressed payload. Manifest owns gameplay `version`, Arkini writer, config byte length, and resource IDs/lengths needed to slice the stream. Package ID comes only from `config.meta.id`. |
-| Editor build descriptor | `{ projectId, revision, contentHash, size, diagnostics }`; disposable proof of one Community build, invalidated by later project mutation. `contentHash` covers only the inner gameplay payload. |
+| `.arkpack` | Self-contained magic/length envelope around one gzip-compressed MessagePack gameplay payload and optional Sigstore proof through EOF. The proof signs only the exact compressed payload. Manifest owns the formatted output `version` string, Arkini writer, config byte length, and resource IDs/lengths needed to slice the stream. Package ID comes only from `config.meta.id`. |
+| Editor build descriptor | `{ projectId, revision, version, contentHash, size, diagnostics }`; disposable proof of one Community build with the exact output version, invalidated by later authored-content changes. `contentHash` covers only the inner gameplay payload. |
 | `.arksave` | MessagePack `{ version, arkini, state }` below the collision-safe encoded package directory. Path owns package identity; payload owns gameplay compatibility, writer provenance, and complete State. |
 | Latest incident environment | Disposable fixed directory `game/incidents/latest/` containing exact `game.arkpack` and `save.arksave` replay inputs plus linked `incident.md`, `failure.md`, `history.md`, and `runtime-state.md` text reports. A later fatal failure hard-overwrites these files; modification time identifies freshness. The report is a debugging projection, not a versioned interchange format; each Arkpack/save retains its own normal compatibility contract. |
 

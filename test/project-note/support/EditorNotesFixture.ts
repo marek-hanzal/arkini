@@ -5,7 +5,10 @@ import type { Project } from "~/project-authoring/type/Project";
 export const editorNotesTestProject: Project = {
 	projectId: "project-one",
 	title: "Notes test",
-	version: "1.0",
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 1,

@@ -132,7 +132,10 @@ describe("EditorWelcome project rows", () => {
 								project: {
 									projectId: "project-one",
 									title: "Arkini",
-									version: "1.0",
+									version: {
+										major: 1,
+										minor: 0,
+									},
 									createdAtMs: 1,
 									updatedAtMs: 2,
 								},
@@ -143,7 +146,10 @@ describe("EditorWelcome project rows", () => {
 								project: {
 									projectId: "project-two",
 									title: "Custom folder",
-									version: "1.0",
+									version: {
+										major: 1,
+										minor: 0,
+									},
 									createdAtMs: 1,
 									updatedAtMs: 1,
 								},

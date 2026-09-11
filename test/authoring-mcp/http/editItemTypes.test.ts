@@ -151,7 +151,10 @@ beforeAll(async () => {
 	repository = harness.repository;
 	const created = await Effect.runPromise(
 		repository.createProjectFx({
-			version: "1.0",
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			config: seededConfig,
 			resources: editorTestPayload.resources,
 		}),

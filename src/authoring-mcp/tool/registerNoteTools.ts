@@ -242,7 +242,7 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and asset links. Linked items include their current authored IDs and human titles; linked assets include resource IDs, image type and MIME. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Versions or Arkpacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and asset links. Linked items include their current authored IDs and human titles; linked assets include resource IDs, image type and MIME. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Arkpacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
@@ -292,7 +292,7 @@ export const registerNoteToolsFn = ({
 		"create_note",
 		{
 			description:
-				"Create and persist one Markdown note in the open project. Notes remain outside project Versions and Arkpacks.",
+				"Create and persist one Markdown note in the open project. Notes remain outside Arkpacks.",
 			inputSchema: CreateNoteInputSchema,
 		},
 		async ({ content, itemUids, resourceIds }) =>

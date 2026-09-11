@@ -5,7 +5,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/atom/EditorUnsavedChangesOwnerAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 
 afterAll(async () => {
 	await RendererRuntime.dispose();

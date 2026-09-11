@@ -10,7 +10,10 @@ import { editorTestPayload } from "~test/project-authoring/support/editorTestPay
 const createProject = (overrides?: Partial<Project>): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 0,

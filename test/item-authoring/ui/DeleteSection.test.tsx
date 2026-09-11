@@ -77,7 +77,10 @@ beforeEach(() => {
 	state.project = {
 		projectId: "project-one",
 		title: editorTestPayload.config.meta.title,
-		version: "1.0",
+		version: {
+			major: 1,
+			minor: 0,
+		},
 		createdAtMs: 1,
 		updatedAtMs: 1,
 		revision: 0,
@@ -128,20 +131,11 @@ describe("DeleteSection", () => {
 				.querySelector<HTMLButtonElement>('[data-ui="EditorItemForceDeleteOpen"]')
 				?.click(),
 		);
-		const commitLink = container.querySelector<HTMLAnchorElement>(
-			'[data-ui="EditorItemDeleteCreateVersion"]',
-		);
-		expect(commitLink?.dataset.to).toBe("/editor/$projectId/versions/commit");
-		expect(JSON.parse(commitLink?.dataset.params ?? "null")).toEqual({
-			projectId: "project-one",
-		});
-
 		await act(async () =>
 			container
 				.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteConfirm"]')
 				?.click(),
 		);
-
 		expect(state.remove).toHaveBeenCalledWith({
 			expectedRevision: 0,
 			force: true,

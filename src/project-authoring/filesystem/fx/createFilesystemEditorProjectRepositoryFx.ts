@@ -5,13 +5,11 @@ import type { OwnedEditorProjectRepository } from "~/project-authoring/service/E
 import type { ProjectState } from "../ProjectState";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
-import { createBoardScenarioOperationsFx } from "./createBoardScenarioOperationsFx";
 import { createNoteOperationsFx } from "./createNoteOperationsFx";
 import { createProjectCatalogFx } from "./createProjectCatalogFx";
 import { createBuildOperationsFx } from "./createBuildOperationsFx";
 import { createCommitOperationsFx } from "./createCommitOperationsFx";
 import { createLifecycleOperationsFx } from "./createLifecycleOperationsFx";
-import { createVersionOperationsFx } from "./createVersionOperationsFx";
 
 export namespace createFilesystemEditorProjectRepositoryFx {
 	export interface Props {
@@ -58,23 +56,12 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		states,
 	});
 	const builds = yield* createBuildOperationsFx({
-		filesystemWrite,
-		operations,
-		readStateFx,
-	});
-	const boardScenarios = yield* createBoardScenarioOperationsFx({
-		filesystemWrite,
-		operations,
-		readStateFx,
 		states,
+		filesystemWrite,
+		operations,
+		readStateFx,
 	});
 	const notes = yield* createNoteOperationsFx({
-		filesystemWrite,
-		operations,
-		readStateFx,
-		states,
-	});
-	const versions = yield* createVersionOperationsFx({
 		filesystemWrite,
 		operations,
 		readStateFx,
@@ -85,9 +72,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		...projects,
 		...builds,
 		...commits,
-		...boardScenarios,
 		...notes,
-		...versions,
 		closeFx: operations.withPermits(1)(Effect.void),
 	} satisfies OwnedEditorProjectRepository;
 	const provideFx = <Value, Failure>(effect: Effect.Effect<Value, Failure, never>) =>
@@ -98,6 +83,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 
 	return {
 		awaitIdleFx: provideFx(repository.awaitIdleFx),
+		saveBuildVersionFx: (props) => provideFx(repository.saveBuildVersionFx(props)),
 		buildProjectFx: (props) => provideFx(repository.buildProjectFx(props)),
 		createProjectFx: (props) => provideFx(repository.createProjectFx(props)),
 		deleteProjectFx: (projectId) => provideFx(repository.deleteProjectFx(projectId)),
@@ -115,22 +101,10 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		saveResourceFx: (props) => provideFx(repository.saveResourceFx(props)),
 		upsertItemFx: (props) => provideFx(repository.upsertItemFx(props)),
 		upsertResourcesFx: (props) => provideFx(repository.upsertResourcesFx(props)),
-		listBoardScenariosFx: (projectId) => provideFx(repository.listBoardScenariosFx(projectId)),
-		readBoardScenarioFx: (key) => provideFx(repository.readBoardScenarioFx(key)),
-		writeBoardScenarioFx: (props) => provideFx(repository.writeBoardScenarioFx(props)),
-		deleteBoardScenarioFx: (key) => provideFx(repository.deleteBoardScenarioFx(key)),
 		listNotesFx: (projectId) => provideFx(repository.listNotesFx(projectId)),
 		createNoteFx: (props) => provideFx(repository.createNoteFx(props)),
 		updateNoteFx: (props) => provideFx(repository.updateNoteFx(props)),
 		deleteNoteFx: (key) => provideFx(repository.deleteNoteFx(key)),
-		checkoutVersionFx: (props) => provideFx(repository.checkoutVersionFx(props)),
-		createVersionFx: (props) => provideFx(repository.createVersionFx(props)),
-		diffVersionsFx: (props) => provideFx(repository.diffVersionsFx(props)),
-		listVersionsFx: (projectId) => provideFx(repository.listVersionsFx(projectId)),
-		previewVersionCommitFx: (projectId) =>
-			provideFx(repository.previewVersionCommitFx(projectId)),
-		readVersionStatusFx: (projectId) => provideFx(repository.readVersionStatusFx(projectId)),
-		updateVersionTagFx: (props) => provideFx(repository.updateVersionTagFx(props)),
 		closeFx: provideFx(repository.closeFx),
 	} satisfies OwnedEditorProjectRepository;
 });

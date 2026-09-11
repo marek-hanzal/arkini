@@ -6,8 +6,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import {
 	ProjectRepository,
 	type ProjectRepositoryService,
@@ -21,7 +21,10 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 const createProject = (revision: number): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,
@@ -80,7 +83,6 @@ describe("saveDraftStatusFx", () => {
 			syncFx: () => Effect.void,
 			publishFx,
 			advanceNoopFx,
-			replaceFx: () => Effect.void,
 			releaseCurrentFx: Effect.void,
 			shutdownFx: Effect.void,
 		};

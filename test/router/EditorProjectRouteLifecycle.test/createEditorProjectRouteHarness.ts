@@ -5,11 +5,11 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { routeTree } from "~/_route";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
-import type { EditorBoardGame } from "~/board-scenario/type/EditorBoardGame";
-import type { EditorBoardGameResource } from "~/board-scenario/service/EditorBoardGameResource";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
+import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -47,7 +47,10 @@ export const tearDownEditorProjectRouteTest = async () => {
 const createProject = (projectId: string, revision = 1): Project => ({
 	projectId,
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: revision,
 	revision,

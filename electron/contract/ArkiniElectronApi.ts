@@ -54,6 +54,7 @@ export namespace ArkiniElectronApi {
 		localizationPreferredLanguagesRead: "arkini:localization:preferred-languages:read",
 		editorStatus: "arkini:editor:status",
 		editorAwaitIdle: "arkini:editor:await-idle",
+		editorProjectBuildVersionSave: "arkini:editor:build:version:save",
 		editorProjectBuild: "arkini:editor:project:build",
 		editorProjectBuildRead: "arkini:editor:project:build:read",
 		editorProjectBuildSave: "arkini:editor:project:build:save",
@@ -79,24 +80,12 @@ export namespace ArkiniElectronApi {
 		editorNoteCreate: "arkini:editor:note:create",
 		editorNoteUpdate: "arkini:editor:note:update",
 		editorNoteDelete: "arkini:editor:note:delete",
-		editorVersionStatus: "arkini:editor:version:status",
-		editorVersionCommitPreview: "arkini:editor:version:commit-preview",
-		editorVersionList: "arkini:editor:version:list",
-		editorVersionDiff: "arkini:editor:version:diff",
-		editorVersionCommit: "arkini:editor:version:commit",
-		editorVersionCheckout: "arkini:editor:version:checkout",
-		editorVersionTag: "arkini:editor:version:tag",
-		editorBoardScenarioList: "arkini:editor:board-scenario:list",
-		editorBoardScenarioRead: "arkini:editor:board-scenario:read",
-		editorBoardScenarioWrite: "arkini:editor:board-scenario:write",
-		editorBoardScenarioDelete: "arkini:editor:board-scenario:delete",
 		editorMcpOverviewRead: "arkini:editor:mcp:overview:read",
 		editorMcpConfigure: "arkini:editor:mcp:configure",
 		editorMcpCommand: "arkini:editor:mcp:command",
 		editorMcpOverviewChanged: "arkini:editor:mcp:overview:changed",
 		editorMcpProjectContextSet: "arkini:editor:mcp:project-context:set",
 		editorMcpProjectContextClear: "arkini:editor:mcp:project-context:clear",
-		editorMcpVersionCheckoutRequest: "arkini:editor:mcp:version-checkout:request",
 		diagnosticsWrite: "arkini:diagnostics:write",
 		diagnosticsWriteApplication: "arkini:diagnostics:write-application",
 		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
@@ -132,20 +121,6 @@ export namespace ArkiniElectronApi {
 		readonly packageId: string;
 		readonly bytes: Uint8Array;
 	}
-
-	export interface EditorMcpVersionCheckoutRequest {
-		readonly projectId: string;
-		readonly versionId: string;
-	}
-
-	export type EditorMcpVersionCheckoutResponse =
-		| {
-				readonly type: "success";
-		  }
-		| {
-				readonly type: "failure";
-				readonly message: string;
-		  };
 
 	export interface SaveKey {
 		readonly packageId: string;
@@ -203,6 +178,9 @@ export namespace ArkiniElectronApi {
 		readonly editor: {
 			readonly statusFn: () => Promise<EditorProjectTransport.ServiceStatus>;
 			readonly awaitIdleFn: () => Promise<EditorProjectTransport.Result<void>>;
+			readonly saveBuildVersionFn: (
+				request: EditorProjectTransport.SaveBuildVersionRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BuildVersion>>;
 			readonly buildProjectFn: (
 				request: EditorProjectTransport.BuildRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Build>>;
@@ -280,51 +258,6 @@ export namespace ArkiniElectronApi {
 			readonly deleteNoteFn: (
 				request: EditorProjectTransport.DeleteNoteRequest,
 			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly listBoardScenariosFn: (
-				projectId: string,
-			) => Promise<
-				EditorProjectTransport.Result<
-					ReadonlyArray<EditorProjectTransport.BoardScenarioDescriptor>
-				>
-			>;
-			readonly readBoardScenarioFn: (
-				request: EditorProjectTransport.BoardScenarioKeyRequest,
-			) => Promise<
-				EditorProjectTransport.Result<EditorProjectTransport.BoardScenario | null>
-			>;
-			readonly writeBoardScenarioFn: (
-				request: EditorProjectTransport.WriteBoardScenarioRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BoardScenario>>;
-			readonly deleteBoardScenarioFn: (
-				request: EditorProjectTransport.BoardScenarioKeyRequest,
-			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly readVersionStatusFn: (
-				projectId: string,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionStatus>>;
-			readonly previewVersionCommitFn: (
-				projectId: string,
-			) => Promise<
-				EditorProjectTransport.Result<EditorProjectTransport.VersionCommitPreview>
-			>;
-			readonly listVersionsFn: (
-				projectId: string,
-			) => Promise<
-				EditorProjectTransport.Result<
-					ReadonlyArray<EditorProjectTransport.VersionDescriptor>
-				>
-			>;
-			readonly diffVersionsFn: (
-				request: EditorProjectTransport.VersionDiffRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDiff>>;
-			readonly createVersionFn: (
-				request: EditorProjectTransport.VersionCommitRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
-			readonly checkoutVersionFn: (
-				request: EditorProjectTransport.VersionCheckoutRequest,
-			) => Promise<EditorProjectTransport.Result<void>>;
-			readonly updateVersionTagFn: (
-				request: EditorProjectTransport.VersionTagRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
 		};
 		readonly editorMcp: {
 			readonly readOverviewFn: () => Promise<EditorMcpOverviewSchema.Type>;
@@ -339,9 +272,6 @@ export namespace ArkiniElectronApi {
 			) => () => void;
 			readonly setProjectContextFn: (projectId: string) => Promise<void>;
 			readonly clearProjectContextFn: (projectId: string) => Promise<void>;
-			readonly onVersionCheckoutRequestedFn: (
-				listenerFn: (request: EditorMcpVersionCheckoutRequest) => Promise<void>,
-			) => () => void;
 		};
 		readonly save: {
 			readonly readFn: (key: SaveKey) => Promise<Uint8Array | null>;

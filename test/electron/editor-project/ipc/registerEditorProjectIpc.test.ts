@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -16,7 +17,6 @@ import {
 	editorProjectIpcBuild,
 	editorProjectIpcDescriptor,
 	editorProjectIpcProject,
-	editorProjectIpcVersion,
 } from "./support/createEditorProjectIpcRepository";
 
 const sourceExport = vi.hoisted(() => ({
@@ -131,6 +131,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorStatus,
 	ArkiniElectronApi.channels.editorAwaitIdle,
 	ArkiniElectronApi.channels.editorProjectBuild,
+	ArkiniElectronApi.channels.editorProjectBuildVersionSave,
 	ArkiniElectronApi.channels.editorProjectBuildRead,
 	ArkiniElectronApi.channels.editorProjectBuildSave,
 	ArkiniElectronApi.channels.editorProjectCreate,
@@ -149,13 +150,6 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectSaveResource,
 	ArkiniElectronApi.channels.editorProjectUpsertItem,
 	ArkiniElectronApi.channels.editorProjectUpsertResources,
-	ArkiniElectronApi.channels.editorVersionStatus,
-	ArkiniElectronApi.channels.editorVersionCommitPreview,
-	ArkiniElectronApi.channels.editorVersionList,
-	ArkiniElectronApi.channels.editorVersionDiff,
-	ArkiniElectronApi.channels.editorVersionCommit,
-	ArkiniElectronApi.channels.editorVersionCheckout,
-	ArkiniElectronApi.channels.editorVersionTag,
 ];
 
 beforeEach(async () => {
@@ -196,7 +190,7 @@ describe("registerEditorProjectIpcFx", () => {
 			repository,
 		});
 		const createRequest = {
-			version: editorTestPayload.version,
+			version: parseVersionFn(editorTestPayload.version),
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
 		};
@@ -253,8 +247,37 @@ describe("registerEditorProjectIpcFx", () => {
 		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toMatchObject({
 			type: "success",
 		});
+		const saveVersionRequest = {
+			projectId: "project-one",
+			expectedRevision: 1,
+			version: {
+				major: 2,
+				minor: 3,
+				suffix: "preview",
+			},
+		};
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, saveVersionRequest),
+		).resolves.toEqual({
+			type: "success",
+			value: saveVersionRequest.version,
+		});
+		expect(repository.saveBuildVersionFx).toHaveBeenCalledExactlyOnceWith(saveVersionRequest);
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, {
+				...saveVersionRequest,
+				version: "2.3-preview",
+			}),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				operation: "save-build-version",
+			},
+		});
+		expect(repository.saveBuildVersionFx).toHaveBeenCalledOnce();
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectBuild, {
+				expectedVersion: parseVersionFn(editorTestPayload.version),
 				projectId: "project-one",
 				expectedRevision: 1,
 			}),
@@ -263,6 +286,7 @@ describe("registerEditorProjectIpcFx", () => {
 			value: editorProjectIpcBuild,
 		});
 		expect(repository.buildProjectFx).toHaveBeenCalledWith({
+			expectedVersion: parseVersionFn(editorTestPayload.version),
 			projectId: "project-one",
 			expectedRevision: 1,
 		});
@@ -354,80 +378,6 @@ describe("registerEditorProjectIpcFx", () => {
 			ArkiniElectronApi.channels.editorProjectOptimizeResources,
 			optimizeResourcesRequest,
 		);
-		const versionReference = {
-			type: "version" as const,
-			versionId: editorProjectIpcVersion.versionId,
-		};
-		const versionDiffRequest = {
-			projectId: "project-one",
-			from: versionReference,
-			to: {
-				type: "current" as const,
-			},
-		};
-		const versionCommitRequest = {
-			projectId: "project-one",
-			subject: "Initial state",
-		};
-		const versionCheckoutRequest = {
-			projectId: "project-one",
-			versionId: editorProjectIpcVersion.versionId,
-		};
-		const versionTagRequest = {
-			...versionCheckoutRequest,
-			tag: "safe",
-		};
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionStatus, "project-one"),
-		).resolves.toMatchObject({
-			type: "success",
-			value: {
-				dirty: true,
-			},
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionCommitPreview, "project-one"),
-		).resolves.toMatchObject({
-			type: "success",
-			value: {
-				bump: "noop",
-			},
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionList, "project-one"),
-		).resolves.toEqual({
-			type: "success",
-			value: [
-				editorProjectIpcVersion,
-			],
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionDiff, versionDiffRequest),
-		).resolves.toMatchObject({
-			type: "success",
-			value: {
-				hasChanges: false,
-			},
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionCommit, versionCommitRequest),
-		).resolves.toEqual({
-			type: "success",
-			value: editorProjectIpcVersion,
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionCheckout, versionCheckoutRequest),
-		).resolves.toEqual({
-			type: "success",
-			value: undefined,
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorVersionTag, versionTagRequest),
-		).resolves.toEqual({
-			type: "success",
-			value: editorProjectIpcVersion,
-		});
-
 		expect(repository.createProjectFx).toHaveBeenCalledWith(createRequest);
 		expect(repository.deleteProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.readProjectFx).toHaveBeenCalledWith("project-one");
@@ -452,13 +402,6 @@ describe("registerEditorProjectIpcFx", () => {
 				totalResourceCount: 2,
 			},
 		);
-		expect(repository.readVersionStatusFx).toHaveBeenCalledWith("project-one");
-		expect(repository.previewVersionCommitFx).toHaveBeenCalledWith("project-one");
-		expect(repository.listVersionsFx).toHaveBeenCalledWith("project-one");
-		expect(repository.diffVersionsFx).toHaveBeenCalledWith(versionDiffRequest);
-		expect(repository.createVersionFx).toHaveBeenCalledWith(versionCommitRequest);
-		expect(repository.checkoutVersionFx).toHaveBeenCalledWith(versionCheckoutRequest);
-		expect(repository.updateVersionTagFx).toHaveBeenCalledWith(versionTagRequest);
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectCreate, {
 				...createRequest,

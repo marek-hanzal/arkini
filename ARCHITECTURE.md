@@ -155,9 +155,9 @@ External changes are ignored while mounted. Explicit Refresh settles writes, dis
 
 The GUI Editor and `arkini-cli editor mcp` are alternative owners of that repository. Running them concurrently is unsupported by contract and is neither detected nor prevented.
 
-Ordinary authoring writes keep the gameplay version frozen. A Version commit derives one strongest major/minor/noop result from its parent diff, applies that version to the current source tree and publishes the immutable snapshot with HEAD. The first commit preserves the starting version; major commits remove current scenarios atomically, while scenario-only commits do not bump the gameplay version. Version IDs, not gameplay version strings, own graph identity.
+Gameplay version is output metadata stored as `{ major, minor, suffix? }` in `game.json`. Build remembers valid settings before compilation without advancing authoring revision or publishing a Board change; failed compilation retains those settings. The produced artifact owns the formatted version used by install compatibility. Ordinary content writes preserve output metadata and retain their normal revision boundary.
 
-Editor Build and CLI pack require the saved current tree to match its published Version HEAD. Versions are immutable complete logical snapshots; Notes stay outside them and Scenarios are included. See [`src/project-version/README.md`](src/project-version/README.md) and [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
+Editor Build and CLI pack compile the current saved source tree and verify actual source-file identity and bytes before publication. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Arkpack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 
 ## Hosted validation and delivery
 

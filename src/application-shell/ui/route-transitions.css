@@ -379,7 +379,7 @@
 	opacity: 0;
 }
 
-/* Board scenarios stay fixed while only the routed Board/Inventory gameplay leaf moves. */
+/* The Editor Board toolbar stays fixed while only the routed Board/Inventory gameplay leaf moves. */
 :root:active-view-transition-type(editor-board-leaf)::view-transition-old(
 	arkini-editor-game-board
 ) {

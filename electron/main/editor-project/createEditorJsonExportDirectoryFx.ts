@@ -1,62 +1,7 @@
 import { Exit, FileSystem, Path } from "effect";
 import { Effect } from "effect";
-import { match, P } from "ts-pattern";
 
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
-
-const isPortableEditorProjectFileFn = (path: Path.Path, relative: string) =>
-	match(relative.split(path.sep))
-		.with(
-			[
-				P.union("schema.json", "project.json", "game.json"),
-			],
-			() => true,
-		)
-		.with(
-			[
-				P.union("assets", "resources"),
-				P.string.endsWith(".png"),
-			],
-			() => true,
-		)
-		.with(
-			[
-				P.union("notes", "scenarios"),
-				P.string.endsWith(".json"),
-			],
-			() => true,
-		)
-		.with(
-			[
-				"objects",
-				P.union(P.string.endsWith(".json"), P.string.endsWith(".png")),
-			],
-			() => true,
-		)
-		.with(
-			[
-				"versions",
-				"head.json",
-			],
-			() => true,
-		)
-		.with(
-			[
-				"items",
-				P.string,
-				P.string.endsWith(".json"),
-			],
-			() => true,
-		)
-		.with(
-			[
-				"versions",
-				P.string,
-				P.union("version.json", "manifest.json"),
-			],
-			() => true,
-		)
-		.otherwise(() => false);
 
 const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(function* ({
 	source,
@@ -69,11 +14,38 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 	const path = yield* Path.Path;
 	const canonicalSource = yield* fileSystem.realPath(source);
 	yield* fileSystem.makeDirectory(path.join(target, "items"));
-	const files = (yield* fileSystem.readDirectory(canonicalSource, {
-		recursive: true,
-	}))
-		.filter((relative) => isPortableEditorProjectFileFn(path, relative))
-		.sort();
+	const files = [
+		"schema.json",
+		"project.json",
+		"game.json",
+	];
+	for (const directory of [
+		"assets",
+		"resources",
+		"notes",
+		"items",
+	]) {
+		const sourceDirectory = path.join(canonicalSource, directory);
+		if (!(yield* fileSystem.exists(sourceDirectory))) continue;
+		const entries = yield* fileSystem.readDirectory(sourceDirectory);
+		if (directory === "items") {
+			for (const type of entries.sort()) {
+				const typeDirectory = path.join(sourceDirectory, type);
+				if ((yield* fileSystem.stat(typeDirectory)).type !== "Directory") continue;
+				for (const file of yield* fileSystem.readDirectory(typeDirectory)) {
+					if (file.endsWith(".json")) files.push(path.join(directory, type, file));
+				}
+			}
+		} else {
+			const extension = directory === "notes" ? ".json" : ".png";
+			files.push(
+				...entries
+					.filter((file) => file.endsWith(extension))
+					.map((file) => path.join(directory, file)),
+			);
+		}
+	}
+	files.sort();
 	for (const relative of files) {
 		const sourceFile = path.join(canonicalSource, relative);
 		const targetFile = path.join(target, relative);

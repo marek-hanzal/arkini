@@ -6,7 +6,6 @@ import { createRoot } from "react-dom/client";
 
 import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
 import { bootstrapArkpackCatalogFx } from "~/arkpack-catalog/fx/bootstrapArkpackCatalogFx";
-import { bootstrapEditorMcpVersionCheckoutFx } from "~/authoring-mcp/fx/bootstrapEditorMcpVersionCheckoutFx";
 import { bootstrapRendererLifecycleFx } from "~/application-runtime/fx/bootstrapRendererLifecycleFx";
 import { bootstrapRendererControlledCloseFx } from "~/application-runtime/fx/bootstrapRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
@@ -68,11 +67,6 @@ export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(() =>
 
 				const router = yield* createArkiniRouterFx({
 					rendererRuntime: RendererRuntime,
-				});
-				yield* bootstrapEditorMcpVersionCheckoutFx({
-					editorMcp: window.arkini.editorMcp,
-					rendererRuntime: RendererRuntime,
-					router,
 				});
 				yield* bootstrapRendererControlledCloseFx({
 					lifecycle: window.arkini.lifecycle,

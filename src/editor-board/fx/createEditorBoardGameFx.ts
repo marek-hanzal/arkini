@@ -1,0 +1,71 @@
+import { Effect } from "effect";
+
+import type { Project } from "~/project-authoring/type/Project";
+import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
+import {
+	createGameResourceUrlsFx,
+	type GameResourceUrls,
+} from "~/playable-game/fx/createGameResourceUrlsFx";
+import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
+import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
+import { startFx } from "~/game-start/fx/startFx";
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
+
+export namespace createEditorBoardGameFx {
+	export interface Props {
+		readonly project: Project;
+	}
+}
+
+/** Creates one fresh canonical game session without any durable save capability. */
+export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(function* ({
+	project,
+}: createEditorBoardGameFx.Props) {
+	const session = yield* createGameSessionFx({
+		config: project.config,
+	});
+	let resourceUrls: GameResourceUrls | undefined;
+	const discardFailedBootstrapFx = discardGameBootstrapFx(
+		session,
+		Effect.suspend(() => resourceUrls?.releaseFx ?? Effect.void),
+	);
+
+	return yield* Effect.gen(function* () {
+		resourceUrls = yield* createGameResourceUrlsFx({
+			owner: "Editor game",
+			resources: project.resources,
+		});
+		yield* session.runFx(startFx());
+		yield* session.runFx(
+			setCheatEnabledFx({
+				enabled: true,
+			}),
+		);
+
+		const liveResourceUrls = resourceUrls;
+		const diagnostics = yield* installGameDiagnosticsFx({
+			projectId: project.projectId,
+			projectRevision: project.revision,
+			config: project.config,
+			restored: false,
+			runRendererEffectFn: Effect.runSync,
+			session,
+		});
+		const disposeFx = session.disposeWithoutSaveFx.pipe(
+			Effect.tap(() => Effect.sync(() => diagnostics.close("discarded"))),
+			Effect.andThen(liveResourceUrls.releaseFx),
+		);
+		const game: EditorBoardGame = {
+			...session,
+			config: project.config,
+			diagnosticSessionId: diagnostics.sessionId,
+			disposeFx,
+			disposeWithoutSaveFx: disposeFx,
+			projectId: project.projectId,
+			projectRevision: project.revision,
+			getResourceUrlFn: liveResourceUrls.getFn,
+		};
+		return game;
+	}).pipe(Effect.onError(() => discardFailedBootstrapFx));
+});

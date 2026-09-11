@@ -23,7 +23,10 @@ const createPng = () =>
 const createProject = (revision = 0): Project => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,

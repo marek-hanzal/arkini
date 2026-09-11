@@ -7,9 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/atom/EditorBoardGameResourceOwnerAtom";
-import { createEditorBoardGameFx } from "~/board-scenario/fx/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/board-scenario/fx/createEditorBoardGameResourceFx";
+import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
@@ -33,7 +33,10 @@ describe("game load editor handoff", () => {
 		const project: Project = {
 			projectId: "delayed-editor-project",
 			title: editorTestPayload.config.meta.title,
-			version: editorTestPayload.version,
+			version: {
+				major: 1,
+				minor: 0,
+			},
 			createdAtMs: 1,
 			updatedAtMs: 1,
 			revision: 1,

@@ -23,7 +23,10 @@ describe("editor MCP project notes", () => {
 		const { ownership, port, repository } = await createMcpHarness();
 		await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...editorTestPayload.config,
 					meta: {
@@ -105,7 +108,10 @@ describe("editor MCP project notes", () => {
 		);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				version: "1.0",
+				version: {
+					major: 1,
+					minor: 0,
+				},
 				config: {
 					...editorTestPayload.config,
 					meta: {

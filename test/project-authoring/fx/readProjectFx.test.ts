@@ -13,7 +13,10 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 const project: Project = {
 	projectId: "editor-test",
 	title: "Editor test",
-	version: "1.0",
+	version: {
+		major: 1,
+		minor: 0,
+	},
 	createdAtMs: 123,
 	updatedAtMs: 124,
 	revision: 2,

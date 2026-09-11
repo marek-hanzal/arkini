@@ -32,7 +32,7 @@
 					"$ref": "urn:arkini:schema:project#/$defs/StartSchema"
 				},
 				"version": {
-					"$ref": "urn:arkini:schema:project#/$defs/ArkpackVersionSchema"
+					"$ref": "urn:arkini:schema:project#/$defs/VersionPartsSchema"
 				}
 			},
 			"required": [
@@ -303,10 +303,30 @@
 			"additionalProperties": false,
 			"description": "The initial board placements, inventory contents, and toolbar placements for a new game."
 		},
-		"ArkpackVersionSchema": {
-			"type": "string",
-			"pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
-			"description": "The arkpack gameplay compatibility version."
+		"VersionPartsSchema": {
+			"type": "object",
+			"properties": {
+				"major": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 9007199254740991
+				},
+				"minor": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 9007199254740991
+				},
+				"suffix": {
+					"type": "string",
+					"pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+				}
+			},
+			"required": [
+				"major",
+				"minor"
+			],
+			"additionalProperties": false,
+			"description": "The structured project-owned gameplay version."
 		},
 		"ItemFileSchema": {
 			"type": "object",

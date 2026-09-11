@@ -113,7 +113,10 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		path.join(input, "game.json"),
 		JSON.stringify({
 			$schema: "./schema.json",
-			version: "2.3",
+			version: {
+				major: 2,
+				minor: 3,
+			},
 			...root,
 		}),
 	);

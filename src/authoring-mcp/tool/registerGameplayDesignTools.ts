@@ -1,3 +1,4 @@
+import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
@@ -146,7 +147,7 @@ const readProjectConfigTextFn = (project: Project) =>
 		{
 			projectId: project.projectId,
 			revision: project.revision,
-			version: project.version,
+			version: formatVersionFn(project.version),
 			config: {
 				meta: project.config.meta,
 				resources: project.config.resources,

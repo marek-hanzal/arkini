@@ -1,3 +1,4 @@
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 // @vitest-environment jsdom
 
 import { Cause, Effect, Exit, Option } from "effect";
@@ -9,7 +10,6 @@ import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProj
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => ({
 	type: "success",
@@ -19,7 +19,7 @@ const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => (
 const descriptor: EditorProjectTransport.Descriptor = {
 	projectId: "project-one",
 	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
+	version: parseVersionFn(editorTestPayload.version),
 	createdAtMs: 10,
 	updatedAtMs: 11,
 };
@@ -41,18 +41,9 @@ const project: EditorProjectTransport.Project = {
 	})),
 };
 
-const version: EditorProjectTransport.VersionDescriptor = {
-	arkini: ArkiniAppVersion,
-	arkpackVersion: "1.0",
-	createdAtMs: 12,
-	projectId: "project-one",
-	sourceRevision: 2,
-	subject: "Initial state",
-	versionId: "version-one",
-};
-
 const installEditorApi = () => {
 	const editor: Window["arkini"]["editor"] = {
+		saveBuildVersionFn: vi.fn(async ({ version }) => success(version)),
 		buildProjectFn: vi.fn(async () => {
 			throw new Error("Unexpected build.");
 		}),
@@ -113,60 +104,6 @@ const installEditorApi = () => {
 		saveResourceFn: vi.fn(async () => success(project)),
 		upsertItemFn: vi.fn(async () => success(commit)),
 		upsertResourcesFn: vi.fn(async () => success(project)),
-		listBoardScenariosFn: vi.fn(async () => success([])),
-		readBoardScenarioFn: vi.fn(async () => success(null)),
-		writeBoardScenarioFn: vi.fn(async () =>
-			success({
-				projectId: "project-one",
-				name: "Scenario 1",
-				projectRevision: 2,
-				version: editorTestPayload.version,
-				bytes: new Uint8Array([
-					1,
-				]),
-				createdAtMs: 12,
-				updatedAtMs: 12,
-			}),
-		),
-		deleteBoardScenarioFn: vi.fn(async () => success(undefined)),
-		readVersionStatusFn: vi.fn(async () =>
-			success({
-				canCommit: false,
-				currentBaseVersionId: version.versionId,
-				currentFingerprint: "a".repeat(64),
-				dirty: false,
-				versionCount: 1,
-			}),
-		),
-		previewVersionCommitFn: vi.fn(async () =>
-			success({
-				bump: "noop" as const,
-				canCommit: false,
-				currentFingerprint: "a".repeat(64),
-				initial: false,
-				nextArkpackVersion: editorTestPayload.version,
-				scenariosToDelete: [],
-			}),
-		),
-		listVersionsFn: vi.fn(async () =>
-			success([
-				version,
-			]),
-		),
-		diffVersionsFn: vi.fn(async (request) =>
-			success({
-				from: request.from,
-				to: request.to,
-				hasChanges: false,
-				project: [],
-				items: [],
-				resources: [],
-				scenarios: [],
-			}),
-		),
-		createVersionFn: vi.fn(async () => success(version)),
-		checkoutVersionFn: vi.fn(async () => success(undefined)),
-		updateVersionTagFn: vi.fn(async () => success(version)),
 		updateNoteFn: vi.fn(async ({ projectId, noteId, content, itemUids, resourceIds }) =>
 			success({
 				noteId,
@@ -271,7 +208,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		expect(editor.readProjectFn).toHaveBeenCalledWith("");
 	});
 
-	it("rejects invalid project and version responses at the renderer boundary", async () => {
+	it("rejects invalid project responses at the renderer boundary", async () => {
 		const editor = installEditorApi();
 		vi.mocked(editor.readProjectFn).mockResolvedValueOnce(
 			success({
@@ -279,24 +216,11 @@ describe("createElectronProjectRepositoryFx", () => {
 				title: "Metadata drift",
 			}),
 		);
-		vi.mocked(editor.listVersionsFn).mockResolvedValueOnce(
-			success([
-				{
-					...version,
-					sourceRevision: -1,
-				},
-			]),
-		);
 		const { repository } = createRepository();
 
 		const projectFailure = await readTypedFailure(repository.readProjectFx("project-one"));
-		const versionFailure = await readTypedFailure(repository.listVersionsFx("project-one"));
 
 		expect(projectFailure.message).toBe("The editor IPC response is invalid.");
-		expect(versionFailure).toMatchObject({
-			operation: "list-versions",
-			message: "The editor IPC response is invalid.",
-		});
 	});
 
 	it("rejects note responses that escape the requested project or note identity", async () => {
@@ -458,7 +382,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		const editor = installEditorApi();
 		const { admission, repository } = createRepository();
 		const releaseFx = Effect.runSync(
-			admission.acquireReplacementFx("checkout-version", () => false),
+			admission.acquireReplacementFx("refresh-project", () => false),
 		);
 		try {
 			const failure = await readTypedFailure(

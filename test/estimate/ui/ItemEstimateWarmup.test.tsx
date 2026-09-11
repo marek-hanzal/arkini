@@ -35,7 +35,10 @@ const project = (projectId: string, revision: number): Project => ({
 	revision,
 	title: projectId,
 	updatedAtMs: 1,
-	version: "1.0",
+	version: {
+		major: 1,
+		minor: 0,
+	},
 });
 const roots: Array<ReturnType<typeof createRoot>> = [];
 

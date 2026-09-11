@@ -10,6 +10,7 @@ import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProje
 
 const artifact: EditorProjectBuildSchema.Type = {
 	projectId: "project:build",
+	version: "1.0",
 	revision: 7,
 	contentHash: "b".repeat(64),
 	size: 1,
@@ -40,9 +41,9 @@ describe("Editor Build install admission", () => {
 			],
 			artifact: {
 				...artifact,
+				version: "1.0",
 				projectId: "project:other",
 			},
-			targetVersion: "1.0",
 		});
 		expect(initial.action).toBe("install");
 
@@ -50,8 +51,10 @@ describe("Editor Build install admission", () => {
 			arkpacks: [
 				descriptor("1.4", "bundled"),
 			],
-			artifact,
-			targetVersion: "1.9",
+			artifact: {
+				...artifact,
+				version: "1.9",
+			},
 		});
 		expect(bundledUpdate).toMatchObject({
 			action: "update",
@@ -77,8 +80,10 @@ describe("Editor Build install admission", () => {
 			arkpacks: [
 				descriptor(from),
 			],
-			artifact,
-			targetVersion: to,
+			artifact: {
+				...artifact,
+				version: to,
+			},
 		});
 		expect(plan.confirmation).toEqual({
 			installedContentHash: "a".repeat(64),
@@ -113,12 +118,14 @@ describe("Editor Build install admission", () => {
 		await expect(
 			Effect.runPromise(
 				installBuiltEditorArkpackFx({
-					artifact,
+					artifact: {
+						...artifact,
+						version: "2.0",
+					},
 					catalog,
 					repository: {
 						readProjectBuildFx,
 					},
-					targetVersion: "2.0",
 				}),
 			),
 		).rejects.toThrow("requires confirmation");
@@ -129,19 +136,23 @@ describe("Editor Build install admission", () => {
 			arkpacks: [
 				installed,
 			],
-			artifact,
-			targetVersion: "2.0",
+			artifact: {
+				...artifact,
+				version: "2.0",
+			},
 		});
 		await expect(
 			Effect.runPromise(
 				installBuiltEditorArkpackFx({
-					artifact,
+					artifact: {
+						...artifact,
+						version: "2.0",
+					},
 					catalog,
 					confirmation: plan.confirmation,
 					repository: {
 						readProjectBuildFx,
 					},
-					targetVersion: "2.0",
 				}),
 			),
 		).resolves.toMatchObject({
@@ -175,7 +186,10 @@ describe("Editor Build install admission", () => {
 
 		await Effect.runPromise(
 			installBuiltEditorArkpackFx({
-				artifact,
+				artifact: {
+					...artifact,
+					version: "1.9",
+				},
 				catalog,
 				repository: {
 					readProjectBuildFx: () =>
@@ -185,7 +199,6 @@ describe("Editor Build install admission", () => {
 							]),
 						}),
 				},
-				targetVersion: "1.9",
 			}),
 		);
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({

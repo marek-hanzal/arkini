@@ -1,3 +1,5 @@
+import type { TilePaintingSchema } from "~/tile-painting/schema/TilePaintingSchema";
+import { TilePaintingFileSchema } from "~/tile-painting/schema/TilePaintingFileSchema";
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
@@ -185,6 +187,7 @@ export namespace writeProjectFilesFx {
 		readonly root: string;
 		readonly previous?: ProjectFiles;
 		readonly next: ProjectFiles;
+		readonly tilePaintingUpdates?: ReadonlyArray<TilePaintingSchema.Type>;
 		readonly noteUpdates?: ReadonlyArray<NoteSchema.Type>;
 	}
 }
@@ -242,6 +245,13 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				...(previousSnapshot?.resources.keys() ?? []),
 			].filter((target) => !keep.has(target));
 
+			for (const painting of props.tilePaintingUpdates ?? []) {
+				const { projectId: _projectId, paintingId, ...file } = painting;
+				candidateWrites.push({
+					target: yield* paths.tilePaintingFileFx(paintingId),
+					bytes: encodeJsonFn(TilePaintingFileSchema.parse(file)),
+				});
+			}
 			for (const note of props.noteUpdates ?? []) {
 				const target = yield* paths.noteFileFx(note.noteId);
 				const body = yield* Effect.try(() =>

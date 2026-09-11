@@ -43,6 +43,15 @@ const project: EditorProjectTransport.Project = {
 
 const installEditorApi = () => {
 	const editor: Window["arkini"]["editor"] = {
+		bakeTilePaintingsFn: vi.fn(async () => {
+			throw new Error("Unexpected painting batch.");
+		}),
+		listTilePaintingsFn: vi.fn(async () => success([])),
+		readTilePaintingFn: vi.fn(async () => success(null)),
+		saveTilePaintingFn: vi.fn(async () => {
+			throw new Error("Unexpected painting save.");
+		}),
+		deleteTilePaintingFn: vi.fn(async () => success(undefined)),
 		saveBuildVersionFn: vi.fn(async ({ version }) => success(version)),
 		buildProjectFn: vi.fn(async () => {
 			throw new Error("Unexpected build.");

@@ -1,27 +1,10 @@
+import { decodeGameProjectFileStemFn } from "~/game-config-source/fn/decodeGameProjectFileStemFn";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
 import { NoteFileSchema } from "~/project-note/schema/NoteFileSchema";
 import { NoteSchema } from "~/project-note/schema/NoteSchema";
-
-const decodeNoteFileStemFn = (stem: string) => {
-	// URI decoding rejects the lone-surrogate triplets emitted by the total writer.
-	const withLoneSurrogates = stem.replace(
-		/%ED%([AB][0-9A-F])%([89AB][0-9A-F])/gu,
-		(_match, secondByte: string, thirdByte: string) =>
-			String.fromCharCode(
-				0xd000 |
-					((Number.parseInt(secondByte, 16) & 0x3f) << 6) |
-					(Number.parseInt(thirdByte, 16) & 0x3f),
-			),
-	);
-	try {
-		return decodeURIComponent(withLoneSurrogates);
-	} catch {
-		return undefined;
-	}
-};
 
 const readJsonFilesFx = Effect.fn("readNoteJsonFilesFx")(function* (directory: string) {
 	const fileSystem = yield* FileSystem.FileSystem;
@@ -63,7 +46,9 @@ export const readProjectNotesFx = Effect.fn("readProjectNotesFx")(function* ({
 	const noteFiles = yield* readJsonFilesFx(paths.notes);
 	const notes = yield* Effect.forEach(noteFiles, ({ file, value }) =>
 		Effect.gen(function* () {
-			const noteId = decodeNoteFileStemFn(path.basename(file).slice(0, -".json".length));
+			const noteId = decodeGameProjectFileStemFn(
+				path.basename(file).slice(0, -".json".length),
+			);
 			if (noteId === undefined)
 				return yield* Effect.fail(
 					new Error(`Editor note ${file} has an invalid filename.`),

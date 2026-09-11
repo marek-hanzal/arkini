@@ -7,6 +7,7 @@ import {
 	Images,
 	LayoutGrid,
 	NotebookPen,
+	Paintbrush,
 	PackageCheck,
 	RadioTower,
 } from "lucide-react";
@@ -35,6 +36,14 @@ export const EditorWorkspaceRoutes = [
 		matchTo: "/editor/$projectId/assets",
 		shortcut: "Mod+Shift+A",
 		to: "/editor/$projectId/assets",
+	},
+	{
+		id: "painter",
+		icon: Paintbrush,
+		label: "Tile painter",
+		matchTo: "/editor/$projectId/painter",
+		shortcut: "Mod+Shift+T",
+		to: "/editor/$projectId/painter",
 	},
 	{
 		id: "notes",

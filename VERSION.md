@@ -52,6 +52,7 @@ Use the smallest non-derivable payload:
 | `items/<type>/<uid>.json` | `$schema` plus direct `item`; path owns type/UID, item owns gameplay ID. |
 | `assets/<id>.png`, `resources/<id>.png` | Path owns ID/kind; extension owns current MIME. |
 | `notes/<noteId>.json` | Markdown content, optional unique immutable `itemUids` and canonical `resourceIds`, and ordering/freshness timestamps; path owns note ID. |
+| `paintings/<paintingId>.json` | Non-destructive recipe, canonical source resource IDs with embedded PNG working snapshots, freshness and optional baked output ID. Explicit bake refreshes referenced snapshots; ordinary read/save retains them. The encoded path owns painting ID; project identity comes from its root. Current project major admission covers this sidecar. |
 
 The Editor installation catalog stores discovery roots, managed/external ownership, and timestamps only. It never copies canonical project identity or mutable project fields.
 

@@ -13,6 +13,7 @@ import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 /** Local presentation values owned only by one mounted item form. */
 export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"> & {
 	readonly asset: {
+		readonly scale: number;
 		readonly default: [
 			string,
 			string,
@@ -40,6 +41,7 @@ export const readCanonicalItemArtworkFn = (
 	const overlay = asset.default[1];
 	const sources = asset.sources.filter((resourceId) => resourceId !== "");
 	return {
+		scale: asset.scale,
 		default:
 			overlay === ""
 				? [

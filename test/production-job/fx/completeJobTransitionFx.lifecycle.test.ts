@@ -43,6 +43,7 @@ const base = (id: string) => ({
 	title: id,
 	description: id,
 	asset: {
+		scale: 0.8,
 		default: [
 			`asset:${id}`,
 		],

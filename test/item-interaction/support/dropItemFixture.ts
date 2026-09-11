@@ -35,6 +35,7 @@ export const configInput = {
 			title: "Water",
 			description: "Water",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:water",
 				],
@@ -50,6 +51,7 @@ export const configInput = {
 			title: "Stone",
 			description: "Stone",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:stone",
 				],
@@ -66,6 +68,7 @@ export const configInput = {
 			description: "Backpack",
 			layer: "content",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:backpack",
 				],
@@ -154,6 +157,7 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 			description: "Mud",
 			layer: "content",
 			asset: {
+				scale: 0.8,
 				default: [
 					"asset:mud",
 				],

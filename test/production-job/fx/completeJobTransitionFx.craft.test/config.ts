@@ -59,6 +59,7 @@ const craftItem = ({
 }) =>
 	({
 		asset: {
+			scale: 0.8,
 			default: [
 				`asset:${id}`,
 			],
@@ -116,6 +117,7 @@ const craftItem = ({
 const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 	({
 		asset: {
+			scale: 0.8,
 			default: [
 				`asset:${id}`,
 			],

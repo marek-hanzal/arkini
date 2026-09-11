@@ -6,7 +6,7 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { NeighborhoodArtworkRuleSchema } from "~/item-definition/schema/NeighborhoodArtworkRuleSchema";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { Button } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 const positions = [
 	"nw",
@@ -68,7 +68,7 @@ export const NeighborhoodArtworkBoard = ({
 						? (item?.title ?? condition.itemId)
 						: (
 								{
-									ignore: "Ignore",
+									ignore: "Any",
 									empty: "Empty",
 									filled: "Filled",
 								} as const
@@ -136,13 +136,13 @@ export const NeighborhoodArtworkBoard = ({
 					{condition?.type === "item" &&
 					position !== "center" &&
 					onChooseItemFn !== undefined ? (
-						<Button
-							className="absolute right-0.5 bottom-0.5 min-h-0 rounded p-1 shadow-none"
+						<LinkButton
+							className="absolute right-0.5 bottom-0.5 inline-flex items-center justify-center p-1"
 							title={`Change ${positionLabels[position].toLowerCase()} item`}
 							onClick={() => onChooseItemFn(position)}
 						>
 							<Pencil className="size-3" />
-						</Button>
+						</LinkButton>
 					) : null}
 				</div>
 			);

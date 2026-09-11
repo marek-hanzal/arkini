@@ -8,7 +8,7 @@ import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { NeighborhoodArtworkBoard } from "~/item-authoring/ui/NeighborhoodArtworkBoard";
 import { useNeighborhoodArtworkRulesController } from "~/item-authoring/ui/useNeighborhoodArtworkRulesController";
-import { Button } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
 
 /** Authors ordered local artwork overrides without creating runtime item instances. */
@@ -81,12 +81,13 @@ export const NeighborhoodArtworkRules = () => {
 							onChangeFn={(value) => controller.selectRuleFn(Number(value))}
 						/>
 					</div>
-					<Button
+					<LinkButton
+						className="inline-flex h-[var(--ak-control-min-height)] w-8 shrink-0 items-center justify-center"
 						title="Add neighborhood rule"
 						onClick={controller.addFn}
 					>
 						<Plus className="size-4" />
-					</Button>
+					</LinkButton>
 				</div>
 				{controller.activeRule === undefined ? (
 					<p className="text-sm text-muted">
@@ -95,33 +96,36 @@ export const NeighborhoodArtworkRules = () => {
 				) : (
 					<>
 						<div className="flex flex-wrap gap-2">
-							<Button
+							<LinkButton
+								className="inline-flex size-8 items-center justify-center"
 								title="Clone neighborhood rule"
 								onClick={controller.cloneFn}
 							>
-								<Copy className="mr-1 size-4" />
-								Clone
-							</Button>
-							<Button
+								<Copy className="size-4" />
+							</LinkButton>
+							<LinkButton
+								className="inline-flex size-8 items-center justify-center"
 								title="Move neighborhood rule up"
 								disabled={controller.activeIndex === 0}
 								onClick={() => controller.moveFn(-1)}
 							>
 								<ArrowUp className="size-4" />
-							</Button>
-							<Button
+							</LinkButton>
+							<LinkButton
+								className="inline-flex size-8 items-center justify-center"
 								title="Move neighborhood rule down"
 								disabled={controller.activeIndex === rules.length - 1}
 								onClick={() => controller.moveFn(1)}
 							>
 								<ArrowDown className="size-4" />
-							</Button>
-							<Button
+							</LinkButton>
+							<LinkButton
+								className="inline-flex size-8 items-center justify-center"
 								title="Remove neighborhood rule"
 								onClick={controller.removeFn}
 							>
 								<Trash2 className="size-4" />
-							</Button>
+							</LinkButton>
 						</div>
 						<div className="flex flex-wrap items-start gap-4">
 							<NeighborhoodArtworkBoard
@@ -138,11 +142,11 @@ export const NeighborhoodArtworkRules = () => {
 									{(field) => <field.AssetField label="Result asset" />}
 								</form.AppField>
 								<p className="text-sm text-muted">
-									Click a neighbor to cycle: Ignore → Empty → Filled → choose an
-									item → Ignore. Use the pencil to change a selected item.
+									Click a neighbor to cycle: Any → Empty → Filled → choose an item
+									→ Any. Use the pencil to change a selected item.
 								</p>
 								<p className="text-sm text-muted">
-									Every specified cell must match. Ignore accepts anything; Empty
+									Every specified cell must match. Any accepts anything; Empty
 									requires an unoccupied cell. The center shows this rule’s
 									result.
 								</p>

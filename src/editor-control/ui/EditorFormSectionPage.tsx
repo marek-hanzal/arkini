@@ -103,7 +103,7 @@ export const EditorFormSectionPage = ({
 		}
 	>
 		<div
-			className="grid gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
+			className="mx-auto grid w-4/5 min-w-0 gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
 			{...readDataUiFn({
 				dataUi: "EditorFormViewport",
 				state: {

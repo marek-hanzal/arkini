@@ -19,7 +19,7 @@ describe("readSectionsFn", () => {
 		}
 
 		const simpleSections = readSectionsFn({
-			type: "simple",
+			type: "common",
 		});
 		expect(simpleSections.some(({ id }) => id === "units")).toBe(true);
 		expect(simpleSections.some(({ id }) => id === "merges")).toBe(true);

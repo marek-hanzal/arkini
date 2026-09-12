@@ -31,22 +31,16 @@ describe("editor MCP server", () => {
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
 			"schema_detail",
-			"create_simple_item",
+			"create_common_item",
 			"create_space_item",
-			"create_producer_item",
 			"create_clock_item",
-			"create_craft_item",
 			"create_blueprint_item",
-			"create_stash_item",
 			"create_temporary_item",
 			"create_inventory_item",
-			"edit_simple_item",
+			"edit_common_item",
 			"edit_space_item",
-			"edit_producer_item",
 			"edit_clock_item",
-			"edit_craft_item",
 			"edit_blueprint_item",
-			"edit_stash_item",
 			"edit_temporary_item",
 			"edit_inventory_item",
 			"project_config",
@@ -126,13 +120,10 @@ describe("editor MCP server", () => {
 		});
 		const jsonInputToolNames = new Set([
 			...[
-				"simple",
 				"space",
-				"producer",
+				"common",
 				"clock",
-				"craft",
 				"blueprint",
-				"stash",
 				"temporary",
 				"inventory",
 			].flatMap((type) => [

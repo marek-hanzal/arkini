@@ -6,12 +6,9 @@ import { z } from "zod";
 export const TypeSchema = z
 	.enum({
 		Blueprint: "blueprint",
-		Simple: "simple",
+		Common: "common",
 		Space: "space",
-		Producer: "producer",
 		Clock: "clock",
-		Craft: "craft",
-		Stash: "stash",
 		Temporary: "temporary",
 		Inventory: "inventory",
 	})

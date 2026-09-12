@@ -2,11 +2,8 @@ import { z } from "zod";
 
 import { BlueprintSchema } from "./BlueprintSchema";
 import { ClockSchema } from "./ClockSchema";
-import { CraftSchema } from "./CraftSchema";
 import { InventorySchema } from "./InventorySchema";
-import { ProducerSchema } from "./ProducerSchema";
-import { SimpleSchema } from "./SimpleSchema";
-import { StashSchema } from "./StashSchema";
+import { CommonSchema } from "./CommonSchema";
 import { TemporarySchema } from "./TemporarySchema";
 import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 
@@ -19,12 +16,9 @@ import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 export const ItemSchema = z
 	.discriminatedUnion("type", [
 		BlueprintSchema,
-		SimpleSchema,
+		CommonSchema,
 		SpaceSchema,
-		ProducerSchema,
 		ClockSchema,
-		CraftSchema,
-		StashSchema,
 		TemporarySchema,
 		InventorySchema,
 	])

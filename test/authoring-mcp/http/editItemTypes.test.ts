@@ -15,54 +15,42 @@ import {
 const projectId = "edit-item-types-project";
 const groups = [
 	{
-		name: "edits simple, space, and craft items through their dedicated tools",
+		name: "edits Common and Space items through their dedicated tools",
 		cases: [
 			[
-				"simple",
+				"common",
 				{
-					maxStackSize: 3,
+					title: "Edited Common",
 				},
 			],
 			[
 				"space",
 				{
-					title: "Edited space",
-				},
-			],
-			[
-				"craft",
-				{
-					title: "Edited craft",
+					title: "Edited Space",
 				},
 			],
 		],
 	},
 	{
-		name: "edits blueprint and inventory items through their dedicated tools",
+		name: "edits Blueprint and Inventory items through their dedicated tools",
 		cases: [
 			[
 				"blueprint",
 				{
-					title: "Edited blueprint",
+					title: "Edited Blueprint",
 				},
 			],
 			[
 				"inventory",
 				{
-					title: "Edited inventory",
+					title: "Edited Inventory",
 				},
 			],
 		],
 	},
 	{
-		name: "edits producer and clock items through their dedicated tools",
+		name: "edits Clock and Temporary items through their dedicated tools",
 		cases: [
-			[
-				"producer",
-				{
-					title: "Edited producer",
-				},
-			],
 			[
 				"clock",
 				{
@@ -72,30 +60,25 @@ const groups = [
 					onExpire: null,
 				},
 			],
-		],
-	},
-	{
-		name: "edits stash and temporary items through their dedicated tools",
-		cases: [
-			[
-				"stash",
-				{
-					title: "Edited stash",
-				},
-			],
 			[
 				"temporary",
 				{
-					durationMs: 1_000,
+					durationMs: 1000,
 				},
 			],
 		],
 	},
 ] as const;
 
-const itemId = (type: TypeSchema.Type) =>
-	`${type === "producer" ? "producer" : "item"}:edit-${type}`;
+const itemId = (type: TypeSchema.Type) => `${type === "common" ? "common" : "item"}:edit-${type}`;
 const resourceId = editorTestPayload.resources[0]?.id ?? "missing-asset";
+const clockDraft = createDraftFn({
+	resourceId,
+	type: "clock",
+	uid: "uid:line-template",
+});
+if (clockDraft.type !== "clock") throw new Error("Expected Clock draft.");
+const productionLines = clockDraft.lines;
 const types = groups.flatMap(({ cases }) => cases.map(([type]) => type));
 const seededConfig = GameConfigSchema.parse({
 	...editorTestPayload.config,
@@ -119,9 +102,10 @@ const seededConfig = GameConfigSchema.parse({
 						description: `Existing ${type} item.`,
 						id,
 						title: `Original ${type}`,
-						...(type === "producer"
+						...(type === "common"
 							? {
 									maxQueueSize: 4,
+									lines: productionLines,
 								}
 							: {}),
 					},
@@ -192,9 +176,10 @@ describe.sequential("editor MCP typed item editing", () => {
 				if (value === null) expect(item, `${type}.${field}`).not.toHaveProperty(field);
 			}
 		}
-		if (cases.some(([type]) => type === "producer"))
-			expect(project.config.items[itemId("producer")]).toMatchObject({
+		if (cases.some(([type]) => type === "common"))
+			expect(project.config.items[itemId("common")]).toMatchObject({
 				maxQueueSize: 4,
+				lines: productionLines,
 			});
 		expect(project.revision).toBeGreaterThan(revisionBefore);
 		revision = project.revision;
@@ -202,7 +187,7 @@ describe.sequential("editor MCP typed item editing", () => {
 
 		const rejectedTypes = cases
 			.map(([type]) => type)
-			.filter((type): type is "producer" => type === "producer");
+			.filter((type): type is "common" => type === "common");
 		for (const type of rejectedTypes) {
 			const rejected = await client.callTool({
 				name: `edit_${type}_item`,
@@ -219,5 +204,22 @@ describe.sequential("editor MCP typed item editing", () => {
 			);
 			expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length);
 		}
+	});
+	it("clears Common production only through an explicit empty lines replacement", async () => {
+		const edited = await client.callTool({
+			name: "edit_common_item",
+			arguments: jsonToolInputFn({
+				itemId: itemId("common"),
+				patch: {
+					lines: [],
+				},
+			}),
+		});
+		expect(edited.isError).not.toBe(true);
+		const project = await Effect.runPromise(repository.readProjectFx(projectId));
+		expect(project?.config.items[itemId("common")]).toMatchObject({
+			lines: [],
+			maxQueueSize: 4,
+		});
 	});
 });

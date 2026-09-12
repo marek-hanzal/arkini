@@ -36,7 +36,7 @@ const item = (
 	],
 	starterScopes: [],
 	title: itemId,
-	type: "simple",
+	type: "common",
 });
 
 export const producerFlow: ItemOriginFlow = {

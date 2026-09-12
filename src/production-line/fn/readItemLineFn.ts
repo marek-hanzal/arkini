@@ -17,18 +17,14 @@ export const readItemLineFn = ({ item, lineId }: readItemLineFn.Props) =>
 	match(item)
 		.with(
 			{
-				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
+				type: P.union(TypeSchema.enum.Common, TypeSchema.enum.Clock),
 			},
 			({ lines }) => lines.find((line) => line.id === lineId),
 		)
 
 		.with(
 			{
-				type: P.union(
-					TypeSchema.enum.Blueprint,
-					TypeSchema.enum.Craft,
-					TypeSchema.enum.Stash,
-				),
+				type: TypeSchema.enum.Blueprint,
 			},
 			({ line }) => (line.id === lineId ? line : undefined),
 		)

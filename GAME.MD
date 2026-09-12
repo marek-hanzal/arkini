@@ -25,7 +25,7 @@ When a Board operation first attaches state to a stacked identity, the original 
 
 ## Lines, intent, and delivery
 
-Producer, craft, blueprint, and stash items share one line lifecycle. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units, output capacity, and queue capacity. Missing concrete material may wait.
+Common items with production lines, Clock, and Blueprint share one line lifecycle. Common owns zero or more `lines`; an empty collection is passive. Production uses `maxQueueSize` (default `1`) and ordinary optional material buffers. A default line selects the click action; it does not schedule work automatically. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units, output capacity, and queue capacity. Missing concrete material may wait.
 
 A queued request is not a job. It owns no time, material, unit, or reservation. The persisted global queue retains accepted intent order. Each queue pass traverses that array in order against the latest Runtime draft and selects the earliest actionable request for each idle Board owner. A request makes progress by starting a Job or scheduling useful canonical Autofill delivery while its rules, non-material requirements, units and output limits hold. Only progress marks its owner as handled for that pass; blocked requests may be overtaken. Other owners compete for shared resources in the same global traversal order.
 
@@ -58,7 +58,7 @@ Ready temporaries expire after job completion in stable runtime-ID order, so a j
 
 ## Scheduled production
 
-Clock is a Board-authored, non-stackable production owner with ordinary Producer lines, material buffers, queue capacity, and authored/save-backed default-line selection. Its periodic schedule uses the same line admission, job, Autofill, unit, delivery, and output operations as manual production. Each pulse attempts one current effective default line; an admitted request retains that exact line even if the default changes later. No default, unavailable admission, or a full queue consumes the pulse without accumulating hidden debt or selecting another line. Queue capacity counts the active job plus pending requests.
+Clock is a Board-authored, non-stackable production owner with ordinary Common production lines, material buffers, queue capacity, and authored/save-backed default-line selection. Its periodic schedule uses the same line admission, job, Autofill, unit, delivery, and output operations as manual production. Each pulse attempts one current effective default line; an admitted request retains that exact line even if the default changes later. No default, unavailable admission, or a full queue consumes the pulse without accumulating hidden debt or selecting another line. Queue capacity counts the active job plus pending requests.
 
 `intervalMs` is at least 100 ms; optional `durationMs` limits active schedule time. Missing duration means unlimited lifetime. Both timers pause while the canonical enable/disable rules do not allow the schedule, with disable retaining veto precedence. The schedule keeps its sub-step phase remainder, so intervals that are not multiples of 100 ms do not accumulate rounding drift. It continues aging while its ordinary production is blocked. Only Board schedule identities present at step start earn the step; identities in material/delivery ownership retain their state but do not run their schedule. Instant gameplay accelerates ordinary jobs and deliveries, while periodic admission retains simulation-time cadence.
 
@@ -83,7 +83,7 @@ Removing an authored idle Board owner releases its buffered roots through canoni
 
 ## Units and completion
 
-Units are an item capability independent of its type: a passive resource uses Simple, a resource with manually selected lines uses Producer, and scheduled production uses Clock. A units input selects a Board item with a unit supply; it does not require a special item type.
+Units are an item capability independent of its type: passive and manually operated resources use Common, and scheduled production uses Clock. A units input selects a Board item with a unit supply; it does not require a special item type.
 
 `quantity` counts item instances in a stack; `units` is the finite supply inside each instance and can represent health, resource stock, or uses.
 
@@ -138,3 +138,5 @@ Serializable State contains items, deliveries, jobs, queues, current space, and 
 Presentation may trail canonical Runtime and may redirect, shorten, collapse, or skip choreography. It never determines readiness, validity, placement, queue/job state, Tick progress, save, or event publication; a new subscriber never receives old events merely because another surface is still animating them.
 
 Do not add player-driven job cancellation or queue reordering, wall-clock job timestamps, reverse reservation history, partial output, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.
+
+Production artwork uses the same activity effect for every running job owner. Every owner with an active job uses the same occupied opacity, including jobs waiting for completion placement; passive items retain their normal opacity.

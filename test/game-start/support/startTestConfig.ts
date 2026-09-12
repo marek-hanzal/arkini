@@ -10,6 +10,9 @@ const simpleItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		maxQueueSize: 1,
+		lines: [],
+
 		uid: id,
 		id,
 		title: id,
@@ -22,7 +25,7 @@ const simpleItem = ({
 		},
 		scope,
 		maxStackSize,
-		type: "simple",
+		type: "common",
 	} as const;
 };
 

@@ -14,7 +14,7 @@ describe("readGameSourceFilesFx", () => {
 			const fileSystem = yield* FileSystem.FileSystem;
 			const path = yield* Path.Path;
 			const input = yield* fileSystem.makeTempDirectoryScoped();
-			yield* fileSystem.makeDirectory(path.join(input, "items", "simple"), {
+			yield* fileSystem.makeDirectory(path.join(input, "items", "common"), {
 				recursive: true,
 			});
 			yield* fileSystem.writeFileString(
@@ -29,11 +29,11 @@ describe("readGameSourceFilesFx", () => {
 				JSON.stringify(GameProjectJsonSchema),
 			);
 			yield* fileSystem.writeFileString(
-				path.join(input, "items", "simple", "broken.json"),
+				path.join(input, "items", "common", "broken.json"),
 				"{ nope",
 			);
 			yield* fileSystem.writeFileString(
-				path.join(input, "items", "simple", "invalid.json"),
+				path.join(input, "items", "common", "invalid.json"),
 				JSON.stringify({
 					item: [],
 				}),

@@ -67,7 +67,7 @@ export const BaseSchema = z
 		/**
 		 * Maximum number of this item that one stack can hold.
 		 *
-		 * Runtime keeps an item with mutable state, such as craft progress, in an
+		 * Runtime keeps an item with mutable state, such as production progress, in an
 		 * individual stack even when this configured limit is greater than one.
 		 */
 		maxStackSize: PositiveIntegerSchema.describe(

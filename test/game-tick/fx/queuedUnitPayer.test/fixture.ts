@@ -35,7 +35,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				...base({
 					id: "payer",
 				}),
-				type: "producer",
+				type: "common",
 				units: {
 					amount,
 				},
@@ -76,7 +76,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				...base({
 					id: "consumer",
 				}),
-				type: "producer",
+				type: "common",
 				maxQueueSize: 1,
 				lines: [
 					line(
@@ -94,7 +94,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				...base({
 					id: "independent",
 				}),
-				type: "producer",
+				type: "common",
 				maxQueueSize: 1,
 				lines: [
 					line("free", [
@@ -105,10 +105,13 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				],
 			},
 			absent: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...base({
 					id: "absent",
 				}),
-				type: "simple",
+				type: "common",
 			},
 		},
 	});

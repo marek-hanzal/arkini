@@ -64,7 +64,7 @@ const config = GameConfigSchema.parse({
 		[workerItemId]: {
 			...baseItem(workerItemId),
 			maxQueueSize: 2,
-			type: "producer",
+			type: "common",
 			lines: [
 				{
 					id: workerRunLineId,
@@ -125,8 +125,11 @@ const config = GameConfigSchema.parse({
 			},
 		},
 		[fuelItemId]: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem(fuelItemId),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

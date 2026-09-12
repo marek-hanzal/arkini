@@ -5,12 +5,9 @@ import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
-import { CraftSchema } from "~/item-definition/schema/CraftSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
-import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
-import { StashSchema } from "~/item-definition/schema/StashSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
@@ -24,42 +21,20 @@ const draftMaxStackSize = PositiveIntegerSchema.optional().describe(
 	"Optional maximum stack size; defaults to one.",
 );
 const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
-	"Optional maximum parallel queue size; defaults to one.",
+	"Optional accepted job count, including the active job and queued requests; defaults to one.",
 );
 
 const createItemInputSchemaIds = {
-	simple: "urn:arkini:schema:mcp:create-simple-item-input",
 	space: "urn:arkini:schema:mcp:create-space-item-input",
-	producer: "urn:arkini:schema:mcp:create-producer-item-input",
+	common: "urn:arkini:schema:mcp:create-common-item-input",
 	clock: "urn:arkini:schema:mcp:create-clock-item-input",
-	craft: "urn:arkini:schema:mcp:create-craft-item-input",
 	blueprint: "urn:arkini:schema:mcp:create-blueprint-item-input",
-	stash: "urn:arkini:schema:mcp:create-stash-item-input",
 	temporary: "urn:arkini:schema:mcp:create-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:create-inventory-item-input",
 } as const;
 
 /** Human-facing create inputs; omitted fields use the matching Editor form's draft values. */
 export const CreateItemInputSchemas = {
-	simple: SimpleSchema.omit({
-		asset: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			scope: draftScope,
-			maxStackSize: draftMaxStackSize,
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.simple,
-			$id: createItemInputSchemaIds.simple,
-			title: "Create simple item tool input",
-			description: "Authoring fields accepted when creating one simple item.",
-		}),
 	space: SpaceSchema.omit({
 		asset: true,
 		enable: true,
@@ -85,7 +60,7 @@ export const CreateItemInputSchemas = {
 			title: "Create space item tool input",
 			description: "Authoring fields accepted when creating one space item.",
 		}),
-	producer: ProducerSchema.omit({
+	common: CommonSchema.omit({
 		asset: true,
 		lines: true,
 		maxQueueSize: true,
@@ -99,18 +74,19 @@ export const CreateItemInputSchemas = {
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			maxQueueSize: draftMaxQueueSize,
-			lines: ProducerSchema.shape.lines
+			lines: CommonSchema.shape.lines
+				.removeDefault()
 				.optional()
 				.describe(
-					"Optional non-empty product lines; defaults to the Editor's initial producer line.",
+					"Optional production lines; omitted or empty lines create a passive item.",
 				),
 		})
 		.strict()
 		.meta({
-			id: createItemInputSchemaIds.producer,
-			$id: createItemInputSchemaIds.producer,
-			title: "Create producer item tool input",
-			description: "Authoring fields accepted when creating one producer item.",
+			id: createItemInputSchemaIds.common,
+			$id: createItemInputSchemaIds.common,
+			title: "Create common item tool input",
+			description: "Authoring fields accepted when creating one common item.",
 		}),
 	clock: ClockSchema.omit({
 		asset: true,
@@ -144,29 +120,6 @@ export const CreateItemInputSchemas = {
 			description: "Authoring fields accepted when creating one clock item.",
 		}),
 
-	craft: CraftSchema.omit({
-		asset: true,
-		line: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			scope: draftScope,
-			maxStackSize: draftMaxStackSize,
-			line: CraftSchema.shape.line
-				.optional()
-				.describe("Optional product line; defaults to the Editor's initial craft line."),
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.craft,
-			$id: createItemInputSchemaIds.craft,
-			title: "Create craft item tool input",
-			description: "Authoring fields accepted when creating one craft item.",
-		}),
 	blueprint: BlueprintSchema.omit({
 		asset: true,
 		line: true,
@@ -191,29 +144,6 @@ export const CreateItemInputSchemas = {
 			$id: createItemInputSchemaIds.blueprint,
 			title: "Create blueprint item tool input",
 			description: "Authoring fields accepted when creating one blueprint item.",
-		}),
-	stash: StashSchema.omit({
-		asset: true,
-		line: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			scope: draftScope,
-			maxStackSize: draftMaxStackSize,
-			line: StashSchema.shape.line
-				.optional()
-				.describe("Optional product line; defaults to the Editor's initial stash line."),
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.stash,
-			$id: createItemInputSchemaIds.stash,
-			title: "Create stash item tool input",
-			description: "Authoring fields accepted when creating one stash item.",
 		}),
 	temporary: TemporarySchema.omit({
 		asset: true,

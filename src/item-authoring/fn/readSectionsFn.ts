@@ -47,10 +47,8 @@ const Sections = [
 
 const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
 	"blueprint",
-	"craft",
-	"producer",
+	"common",
 	"clock",
-	"stash",
 	"temporary",
 ]);
 

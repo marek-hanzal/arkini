@@ -25,14 +25,16 @@ const sourceProjection = {
 
 describe("resolveItemDetailTargetFn", () => {
 	it("exposes Queue for every runtime line-owner variant", () => {
+		const craft = purityTestConfig.items.craft;
+		if (craft.type !== "common") throw new Error("Expected Common fixture.");
+		const { lines, maxQueueSize: _maxQueueSize, ...base } = craft;
 		const lineOwners = [
 			lineRunTestConfig.items.workshop,
 			{
-				...purityTestConfig.items.craft,
+				...base,
+				line: lines[0],
 				type: "blueprint" as const,
 			},
-			purityTestConfig.items.craft,
-			purityTestConfig.items.stash,
 		];
 		for (const [index, item] of lineOwners.entries()) {
 			const runtimeItem = RuntimeItemSchema.parse({

@@ -27,16 +27,23 @@ const bufferedInput = (capacity: number): ReadonlyArray<InputSchema.Type> => [
 	},
 ];
 
-const lineOwner = (type: "blueprint" | "craft" | "stash", capacity: number) => ({
-	...createSimpleItem(`item:${type}`),
-	type,
-	units: {
-		amount: 1,
-	},
-	line: createLine({
-		input: bufferedInput(capacity),
-	}),
-});
+const blueprint = (capacity: number) => {
+	const {
+		lines: _lines,
+		maxQueueSize: _maxQueueSize,
+		...base
+	} = createSimpleItem("item:blueprint");
+	return {
+		...base,
+		type: "blueprint",
+		units: {
+			amount: 1,
+		},
+		line: createLine({
+			input: bufferedInput(capacity),
+		}),
+	};
+};
 
 const diagnostics = async (items: Record<string, unknown>) =>
 	(
@@ -55,7 +62,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 	);
 
 describe("validateLineInputCapacityFn", () => {
-	it("allows positive material capacity on producer lines", async () => {
+	it("allows positive material capacity on Common lines", async () => {
 		const producer = createProducerItem({
 			id: "item:producer",
 			input: bufferedInput(2),
@@ -92,12 +99,8 @@ describe("validateLineInputCapacityFn", () => {
 		expect(result.diagnostics.filter(({ severity }) => severity === "error")).toEqual([]);
 	});
 
-	it.each([
-		"blueprint",
-		"craft",
-		"stash",
-	] as const)("rejects positive material capacity on %s lines", async (type) => {
-		const owner = lineOwner(type, 2);
+	it("rejects positive material capacity on Blueprint lines", async () => {
+		const owner = blueprint(2);
 
 		expect(
 			await diagnostics({
@@ -113,12 +116,12 @@ describe("validateLineInputCapacityFn", () => {
 		]);
 	});
 
-	it("accepts zero material capacity on non-producer lines", async () => {
-		const craft = lineOwner("craft", 0);
+	it("accepts zero material capacity on Blueprint lines", async () => {
+		const owner = blueprint(0);
 
 		expect(
 			await diagnostics({
-				[craft.id]: craft,
+				[owner.id]: owner,
 			}),
 		).toEqual([]);
 	});

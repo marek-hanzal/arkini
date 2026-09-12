@@ -50,9 +50,12 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "water",
 			id: "water",
-			type: "simple",
+			type: "common",
 			title: "Water",
 			description: "Water",
 			asset: {

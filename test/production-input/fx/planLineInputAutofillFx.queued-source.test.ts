@@ -16,7 +16,7 @@ import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 
 it("keeps queued material identities intact, uses idle alternatives, and retries after clearing their queue", () => {
 	const workshop = inputRuntimeTestConfig.items.workshop;
-	if (workshop.type !== "producer") throw new Error("Expected workshop Producer.");
+	if (workshop.type !== "common") throw new Error("Expected workshop Producer.");
 	const config = GameConfigSchema.parse({
 		...inputRuntimeTestConfig,
 		items: {

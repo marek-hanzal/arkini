@@ -97,7 +97,7 @@ const config = GameConfigSchema.parse({
 	items: {
 		"producer:converter": {
 			...base("producer:converter"),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				line("line:converter:run", "producer:inner", "item:product"),
@@ -106,7 +106,7 @@ const config = GameConfigSchema.parse({
 		},
 		"producer:inner": {
 			...base("producer:inner"),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				line("line:inner:load", "producer:middle"),
@@ -114,19 +114,25 @@ const config = GameConfigSchema.parse({
 		},
 		"producer:middle": {
 			...base("producer:middle"),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				line("line:middle:load", "item:payload"),
 			],
 		},
 		"item:payload": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:payload"),
-			type: "simple",
+			type: "common",
 		},
 		"item:product": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:product"),
-			type: "simple",
+			type: "common",
 			maxCount: 1,
 		},
 	},

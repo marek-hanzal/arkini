@@ -30,6 +30,9 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		any: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "any",
 			id: "any",
 			title: "Any item",
@@ -42,9 +45,12 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "simple",
+			type: "common",
 		},
 		limited: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "limited",
 			id: "limited",
 			title: "Limited item",
@@ -58,9 +64,12 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxCount: 3,
 			maxStackSize: 2,
-			type: "simple",
+			type: "common",
 		},
 		board: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "board",
 			id: "board",
 			title: "Board item",
@@ -73,7 +82,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 	},
 });

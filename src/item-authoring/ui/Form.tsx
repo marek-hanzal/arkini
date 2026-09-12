@@ -103,7 +103,7 @@ export const Form = ({
 		defaultDraft,
 		defaultItemId,
 		defaultTitle,
-		itemType ?? persistedItem?.type ?? "simple",
+		itemType ?? persistedItem?.type ?? "common",
 		uid,
 		resourceId,
 	);

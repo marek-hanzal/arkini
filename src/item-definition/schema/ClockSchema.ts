@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProducerSchema } from "./ProducerSchema";
+import { CommonSchema } from "./CommonSchema";
 import { TypeSchema } from "./TypeSchema";
 import { StorageSchema } from "./StorageSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -8,7 +8,11 @@ import { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 /** A non-stackable Board producer whose schedule enqueues its effective default line. */
 export const ClockSchema = z
 	.object({
-		...ProducerSchema.shape,
+		...CommonSchema.shape,
+		lines: CommonSchema.shape.lines
+			.removeDefault()
+			.min(1)
+			.describe("One or more production lines available to the schedule."),
 		...ItemScheduleSchema.shape,
 		type: TypeSchema.extract([
 			"Clock",

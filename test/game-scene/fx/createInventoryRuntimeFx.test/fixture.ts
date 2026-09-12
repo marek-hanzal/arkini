@@ -515,7 +515,7 @@ export const inventoryItem = {
 	compositeUrl: undefined,
 	id: "runtime:water",
 	itemId: "water",
-	itemType: "simple",
+	itemType: "common",
 	location: {
 		scope: "inventory",
 		position: {

@@ -23,8 +23,8 @@ describe("editor MCP item editing", () => {
 		const producer = {
 			...createDraftFn({
 				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
-				type: "producer",
-				uid: "producer-uid",
+				type: "clock",
+				uid: "clock-uid",
 			}),
 			id: "producer:test",
 			title: "Test Producer",
@@ -83,7 +83,7 @@ describe("editor MCP item editing", () => {
 		});
 
 		const edited = await client.callTool({
-			name: "edit_simple_item",
+			name: "edit_common_item",
 			arguments: jsonToolInputFn({
 				itemId: "water",
 				revision: waterConfig.revision,
@@ -100,7 +100,7 @@ describe("editor MCP item editing", () => {
 			content: [
 				{
 					text: [
-						"Edited simple item.",
+						"Edited common item.",
 						"ID: water",
 						"UID: water",
 						`Revision: ${project.revision}`,
@@ -116,7 +116,7 @@ describe("editor MCP item editing", () => {
 		});
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("edit-simple-project");
 		const stale = await client.callTool({
-			name: "edit_simple_item",
+			name: "edit_common_item",
 			arguments: jsonToolInputFn({
 				itemId: "water",
 				revision: waterConfig.revision,
@@ -142,14 +142,14 @@ describe("editor MCP item editing", () => {
 				id: "renamed-water",
 			},
 			{
-				type: "producer",
+				type: "common",
 			},
 			{
 				uid: "forced-water",
 			},
 		]) {
 			const rejected = await client.callTool({
-				name: "edit_simple_item",
+				name: "edit_common_item",
 				arguments: jsonToolInputFn({
 					itemId: "water",
 					patch,
@@ -158,7 +158,7 @@ describe("editor MCP item editing", () => {
 			expect(rejected.isError, JSON.stringify(patch)).toBe(true);
 		}
 		const wrongType = await client.callTool({
-			name: "edit_simple_item",
+			name: "edit_common_item",
 			arguments: jsonToolInputFn({
 				itemId: producer.id,
 				patch: {
@@ -170,7 +170,7 @@ describe("editor MCP item editing", () => {
 			isError: true,
 			content: [
 				{
-					text: expect.stringContaining(`Item ${producer.id} is producer, not simple.`),
+					text: expect.stringContaining(`Item ${producer.id} is clock, not common.`),
 				},
 			],
 		});

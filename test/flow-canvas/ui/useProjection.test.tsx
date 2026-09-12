@@ -24,7 +24,7 @@ const itemNode = (itemId: string): ItemOriginItemNode => ({
 	],
 	starterScopes: [],
 	title: itemId,
-	type: "simple",
+	type: "common",
 });
 const position = (flowOrder: number, x: number, y: number): LayoutNode => ({
 	flowOrder,

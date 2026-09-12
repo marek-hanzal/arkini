@@ -159,7 +159,7 @@ export const createItem = (
 	compositeUrl: undefined,
 	id,
 	itemId: "water",
-	itemType: "simple",
+	itemType: "common",
 	location,
 	primaryAction: {
 		kind: "none",

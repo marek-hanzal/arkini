@@ -31,6 +31,9 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		source: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "source",
 			id: "source",
 			title: "Source",
@@ -43,7 +46,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 	},
 });

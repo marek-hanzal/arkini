@@ -17,7 +17,7 @@ const readRanks = (
 				height: 1,
 				id,
 				ports: [],
-				type: "simple",
+				type: "common",
 				width: 1,
 			})),
 		} satisfies LayoutInput,

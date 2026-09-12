@@ -41,7 +41,7 @@ describe("readItemOriginSourcesFn", () => {
 	it("uses canonical route IDs, conditions, and positive-probability outputs", () => {
 		const config = structuredClone(createJobTestConfig());
 		const forge = config.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		for (const itemId of [
 			"dust",
 			"ingot",
@@ -163,7 +163,7 @@ describe("readItemOriginSourcesFn", () => {
 	it("keeps output-specific requirement clauses on their own occurrence", () => {
 		const config = structuredClone(createJobTestConfig());
 		const forge = config.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		for (const itemId of [
 			"permit-a",
 			"permit-b",

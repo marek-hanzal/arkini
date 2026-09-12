@@ -7,12 +7,12 @@ const itemFn = ({
 	draft,
 	id,
 	title,
-	type = "simple",
+	type = "common",
 }: {
 	readonly draft: boolean;
 	readonly id: string;
 	readonly title: string;
-	readonly type?: "producer" | "simple";
+	readonly type?: "common" | "clock";
 }) => ({
 	...createDraftFn({
 		draft,
@@ -41,8 +41,8 @@ describe("filterFn", () => {
 			itemFn({
 				draft: true,
 				id: "producer:draft-herb",
-				title: "Draft Herb Producer",
-				type: "producer",
+				title: "Draft Herb Clock",
+				type: "clock",
 			}),
 			itemFn({
 				draft: true,
@@ -54,7 +54,7 @@ describe("filterFn", () => {
 		expect(
 			filterFn(items, {
 				draft: true,
-				itemType: "simple",
+				itemType: "common",
 				query: "herb",
 			}),
 		).toEqual([

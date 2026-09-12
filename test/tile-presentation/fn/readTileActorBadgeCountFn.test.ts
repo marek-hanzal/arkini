@@ -26,12 +26,12 @@ describe("tile actor overlay projection", () => {
 	it("shows stack quantity only above one and projects units for every item type", () => {
 		const single = runtimeItem({
 			item: {
-				type: TypeSchema.enum.Simple,
+				type: TypeSchema.enum.Common,
 			},
 		});
 		const stack = runtimeItem({
 			item: {
-				type: TypeSchema.enum.Simple,
+				type: TypeSchema.enum.Common,
 			},
 			quantity: 120,
 		});
@@ -40,7 +40,7 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 12,
 				},
-				type: TypeSchema.enum.Producer,
+				type: TypeSchema.enum.Common,
 			},
 		});
 		const usedProducer = runtimeItem({
@@ -48,7 +48,7 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 12,
 				},
-				type: TypeSchema.enum.Producer,
+				type: TypeSchema.enum.Common,
 			},
 			remainingUnits: 4,
 		});
@@ -57,7 +57,7 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 8,
 				},
-				type: TypeSchema.enum.Simple,
+				type: TypeSchema.enum.Common,
 			},
 		});
 		const usedFiniteItem = runtimeItem({
@@ -65,7 +65,7 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 8,
 				},
-				type: TypeSchema.enum.Simple,
+				type: TypeSchema.enum.Common,
 			},
 			remainingUnits: 3,
 		});

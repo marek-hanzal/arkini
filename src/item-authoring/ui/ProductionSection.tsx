@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { CircleCheck, CircleX, PackagePlus } from "lucide-react";
 import { match } from "ts-pattern";
 
@@ -26,108 +27,116 @@ const ProductionFields = withFieldGroupFn({
 	defaultValues: defaultProductionFieldValues,
 	props: {
 		invalidLineIndex: undefined as number | undefined,
-		kind: "producer" as "producer" | "clock",
+		kind: "common" as "common" | "clock",
 		ownerId: "",
 		selectedLineId: undefined as string | undefined,
 	},
-	render: ({ group, invalidLineIndex, kind, ownerId, selectedLineId }) => (
-		<div className="grid gap-[var(--ak-viewport-gap)]">
-			<EditorFormCard>
-				<group.AppField name="maxQueueSize">
-					{(field) => (
-						<field.NumberField
-							label="Maximum parallel jobs"
-							description="Maximum accepted work count across this item’s production lines: one active job plus queued requests."
-							min={1}
-						/>
+	render: ({ group, invalidLineIndex, kind, ownerId, selectedLineId }) => {
+		const translator = useTranslator();
+		return (
+			<div className="grid gap-[var(--ak-viewport-gap)]">
+				<EditorFormCard>
+					<group.AppField name="maxQueueSize">
+						{(field) => (
+							<field.NumberField
+								label={translator.textFn("Queue capacity")}
+								description={translator.textFn(
+									"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
+								)}
+								min={1}
+							/>
+						)}
+					</group.AppField>
+				</EditorFormCard>
+				<EditorFormSectionDivider
+					description={translator.textFn(
+						"Add lines to enable production. An item without lines is passive. Each line has its own inputs, output, runtime and rules.",
 					)}
-				</group.AppField>
-			</EditorFormCard>
-			<EditorFormSectionDivider
-				description="Each product line is an independent job contract owned by this item, with its own inputs, output, runtime and rules."
-				title="Product lines"
-			/>
-			<group.AppField
-				name="lines"
-				mode="array"
-			>
-				{(linesField) => {
-					const lines = linesField.state.value ?? [];
-					const addLineFn = () => {
-						const lineOwnerId =
-							ownerId.replace(/^(?:item|producer):/, "") || "new-item";
-						const lineIdPrefix = `line:${lineOwnerId}`;
-						const existingIds = new Set(lines.map((line) => line.id));
-						let id = `${lineIdPrefix}:default`;
-						if (lines.length > 0 || existingIds.has(id)) {
-							let suffix = 2;
-							while (existingIds.has(`${lineIdPrefix}:${suffix}`)) suffix += 1;
-							id = `${lineIdPrefix}:${suffix}`;
-						}
-						const line: LineSchema.Type = {
-							id,
-							title: `New ${kind} line`,
-							description: `Describe what this ${kind} line consumes and produces.`,
-							default: lines.length === 0,
-							show: true,
-							enable: true,
-							runtimeMs: 0,
-							input: [
-								{
-									type: "simple",
-								},
-							],
-							rules: [],
-						};
-						if (linesField.state.value === undefined) {
-							group.setFieldValue("lines", [
-								line,
-							]);
-							return;
-						}
-						linesField.pushValue(line);
-					};
-					return (
-						<EditorCollectionSelector
-							addLabel="Add line"
-							count={lines.length}
-							itemLabelFn={(index) => {
-								const line = lines[index];
-								return line.title.length === 0
-									? `Production line ${index + 1}`
-									: line.title;
-							}}
-							itemSearchTermsFn={(index) => [
-								lines[index].id,
-							]}
-							initialSelectedIndex={Math.max(
-								0,
-								lines.findIndex((line) => line.id === selectedLineId),
-							)}
-							selectedIndex={invalidLineIndex}
-							label="Product lines"
-							navigationCard
-							onAddFn={addLineFn}
-							onRemoveFn={
-								lines.length === 1
-									? undefined
-									: (index) => linesField.removeValue(index)
+					title={translator.textFn("Product lines")}
+				/>
+				<group.AppField
+					name="lines"
+					mode="array"
+				>
+					{(linesField) => {
+						const lines = linesField.state.value ?? [];
+						const addLineFn = () => {
+							const lineOwnerId = ownerId.replace(/^item:/, "") || "new-item";
+							const lineIdPrefix = `line:${lineOwnerId}`;
+							const existingIds = new Set(lines.map((line) => line.id));
+							let id = `${lineIdPrefix}:default`;
+							if (lines.length > 0 || existingIds.has(id)) {
+								let suffix = 2;
+								while (existingIds.has(`${lineIdPrefix}:${suffix}`)) suffix += 1;
+								id = `${lineIdPrefix}:${suffix}`;
 							}
-							removeLabel="Remove line"
-						>
-							{(index) => (
-								<LineFields
-									form={group}
-									fields={`lines[${index}]`}
-									label={null}
-								/>
-							)}
-						</EditorCollectionSelector>
-					);
-				}}
-			</group.AppField>
-		</div>
-	),
+							const line: LineSchema.Type = {
+								id,
+								title: translator.textFn("New production line"),
+								description: translator.textFn(
+									"Describe what this line consumes and produces.",
+								),
+								default: lines.length === 0,
+								show: true,
+								enable: true,
+								runtimeMs: 0,
+								input: [
+									{
+										type: "simple",
+									},
+								],
+								rules: [],
+							};
+							if (linesField.state.value === undefined) {
+								group.setFieldValue("lines", [
+									line,
+								]);
+								return;
+							}
+							linesField.pushValue(line);
+						};
+						return (
+							<EditorCollectionSelector
+								addLabel={translator.textFn("Add line")}
+								count={lines.length}
+								itemLabelFn={(index) => {
+									const line = lines[index];
+									return line.title.length === 0
+										? `${translator.textFn("Production line")} ${index + 1}`
+										: line.title;
+								}}
+								itemSearchTermsFn={(index) => [
+									lines[index].id,
+								]}
+								initialSelectedIndex={Math.max(
+									0,
+									lines.findIndex((line) => line.id === selectedLineId),
+								)}
+								selectedIndex={invalidLineIndex}
+								label={translator.textFn("Product lines")}
+								navigationCard
+								onAddFn={addLineFn}
+								onRemoveFn={
+									kind === "clock" && lines.length === 1
+										? undefined
+										: (index) => linesField.removeValue(index)
+								}
+								removeLabel={translator.textFn("Remove line")}
+							>
+								{(index) => (
+									<LineFields
+										form={group}
+										fields={`lines[${index}]`}
+										label={null}
+									/>
+								)}
+							</EditorCollectionSelector>
+						);
+					}}
+				</group.AppField>
+			</div>
+		);
+	},
 });
 
 /** Composes shared time, rule, and output controls for the authored schedule. */
@@ -241,7 +250,7 @@ export const ProductionSection = () => {
 	const content = match(canonicalItem)
 		.with(
 			{
-				type: "producer",
+				type: "common",
 			},
 			() => (
 				<ProductionFields
@@ -250,7 +259,7 @@ export const ProductionSection = () => {
 						maxQueueSize: "maxQueueSize",
 						lines: "lines",
 					}}
-					kind="producer"
+					kind="common"
 					invalidLineIndex={invalidLineIndex}
 					ownerId={itemId}
 					selectedLineId={productionLineId}
@@ -323,12 +332,6 @@ export const ProductionSection = () => {
 			{
 				type: "blueprint",
 			},
-			{
-				type: "craft",
-			},
-			{
-				type: "stash",
-			},
 			() => (
 				<LineFields
 					form={form}
@@ -340,9 +343,6 @@ export const ProductionSection = () => {
 		.with(
 			{
 				type: "inventory",
-			},
-			{
-				type: "simple",
 			},
 			{
 				type: "space",

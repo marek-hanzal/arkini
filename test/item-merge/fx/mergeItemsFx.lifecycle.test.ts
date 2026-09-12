@@ -41,7 +41,7 @@ const producerItem = ({
 	...baseItem({
 		id,
 	}),
-	type: "producer" as const,
+	type: "common" as const,
 	maxQueueSize: 2,
 	merge,
 	lines: [
@@ -119,10 +119,13 @@ const createLifecycleConfig = ({
 				selectorItemId: sourceInputItemId,
 			})
 		: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "source",
 				}),
-				type: "simple" as const,
+				type: "common" as const,
 				merge: [
 					merge,
 				],
@@ -133,6 +136,9 @@ const createLifecycleConfig = ({
 			})
 		: targetDurationMs === undefined
 			? {
+					maxQueueSize: 1,
+					lines: [],
+
 					...baseItem({
 						id: "target",
 					}),
@@ -142,7 +148,7 @@ const createLifecycleConfig = ({
 							: {
 									amount: targetUnits,
 								},
-					type: "simple" as const,
+					type: "common" as const,
 				}
 			: {
 					...baseItem({
@@ -182,6 +188,9 @@ const createLifecycleConfig = ({
 			result:
 				resultDurationMs === undefined
 					? {
+							maxQueueSize: 1,
+							lines: [],
+
 							...baseItem({
 								id: "result",
 							}),
@@ -191,7 +200,7 @@ const createLifecycleConfig = ({
 									: {
 											amount: resultUnits,
 										},
-							type: "simple",
+							type: "common",
 						}
 					: {
 							...baseItem({
@@ -203,13 +212,16 @@ const createLifecycleConfig = ({
 							type: "temporary",
 						},
 			material: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "material",
 				}),
 				units: {
 					amount: 2,
 				},
-				type: "simple",
+				type: "common",
 			},
 			owner: producerItem({
 				id: "owner",

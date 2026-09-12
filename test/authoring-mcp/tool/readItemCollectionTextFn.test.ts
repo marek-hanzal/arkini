@@ -8,7 +8,7 @@ describe("readItemCollectionTextFn", () => {
 		const project = createGraphProject();
 		const producers = readItemCollectionTextFn(project, {
 			itemTypes: [
-				"producer",
+				"common",
 			],
 			page: 1,
 			limit: 25,
@@ -19,9 +19,9 @@ describe("readItemCollectionTextFn", () => {
 			limit: 2,
 		});
 
-		expect(producers).toContain("Item type filter (OR): producer");
-		expect(producers).toContain("Type-filtered items: 1");
-		expect(producers).toContain("- forge\n  ID: forge\n  Type: producer");
+		expect(producers).toContain("Item type filter (OR): common");
+		expect(producers).toContain("Type-filtered items: 5");
+		expect(producers).toContain("- forge\n  ID: forge\n  Type: common");
 		expect(producers).toContain("Draft: false");
 		expect(lastPage).toContain("Page: 3\nTotal pages: 3");
 		expect(lastPage).toContain("Previous page: 2");

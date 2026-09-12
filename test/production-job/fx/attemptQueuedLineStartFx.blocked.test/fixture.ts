@@ -15,7 +15,7 @@ export type Blocker =
 export const createBlockedQueueFixture = (blocker: Blocker) => {
 	const base = createJobTestConfig(2, "any");
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	const material = {
 		type: "materials",
 		selector: {

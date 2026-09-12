@@ -1,33 +1,7 @@
-import { match, P } from "ts-pattern";
-
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { LineSchema } from "~/production-line/schema/LineSchema";
+import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemPurityIndex } from "./readItemPurityIndexFn";
-
-const readOwnedLinesFn = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[] =>
-	match(item.item)
-		.with(
-			{
-				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
-			},
-			({ lines }) => lines,
-		)
-
-		.with(
-			{
-				type: P.union(
-					TypeSchema.enum.Blueprint,
-					TypeSchema.enum.Craft,
-					TypeSchema.enum.Stash,
-				),
-			},
-			({ line }) => [
-				line,
-			],
-		)
-		.otherwise(() => []);
 
 /** Reads item purity from one pre-indexed immutable runtime snapshot. */
 export const isItemPureWithIndexFn = ({
@@ -50,7 +24,7 @@ export const isItemPureWithIndexFn = ({
 	const inputLineIds = index.inputLineIdsByOwnerId.get(item.id);
 	const jobLineIds = index.jobLineIdsByOwnerId.get(item.id);
 	const queueLineIds = index.queueLineIdsByOwnerId.get(item.id);
-	return readOwnedLinesFn(item).every(
+	return readAuthoredItemLinesFn(item.item).every(
 		(line) =>
 			inputLineIds?.has(line.id) !== true &&
 			jobLineIds?.has(line.id) !== true &&

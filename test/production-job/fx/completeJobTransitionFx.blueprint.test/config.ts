@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -17,10 +17,13 @@ const simpleItem = ({
 	scope?: "any" | "board";
 	maxStackSize?: number;
 }) =>
-	SimpleSchema.parse({
+	CommonSchema.parse({
+		maxQueueSize: 1,
+		lines: [],
+
 		uid: id,
 		id,
-		type: "simple" as const,
+		type: "common" as const,
 		title: id,
 		description: id,
 		asset: {
@@ -369,7 +372,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:limited": {
 			uid: "producer:limited",
 			id: "producer:limited",
-			type: "producer",
+			type: "common",
 			title: "Limited producer",
 			description: "Produces one singleton output.",
 			asset: {
@@ -408,7 +411,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:blueprint-source": {
 			uid: "producer:blueprint-source",
 			id: "producer:blueprint-source",
-			type: "producer",
+			type: "common",
 			title: "Blueprint source",
 			description: "Produces one purpose-bound blueprint.",
 			asset: {
@@ -618,7 +621,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:shared-source": {
 			uid: "producer:shared-source",
 			id: "producer:shared-source",
-			type: "producer",
+			type: "common",
 			title: "Shared source",
 			description: "Produces the shared capped item.",
 			asset: {
@@ -649,7 +652,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:shared-consumer": {
 			uid: "producer:shared-consumer",
 			id: "producer:shared-consumer",
-			type: "producer",
+			type: "common",
 			title: "Shared consumer",
 			description: "Consumes the shared capped item without producing it.",
 			asset: {
@@ -687,7 +690,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:recycler": {
 			uid: "producer:recycler",
 			id: "producer:recycler",
-			type: "producer",
+			type: "common",
 			title: "Recycler",
 			description: "Replaces one capped item with one capped item.",
 			asset: {
@@ -726,7 +729,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:spent-stack": {
 			uid: "producer:spent-stack",
 			id: "producer:spent-stack",
-			type: "producer",
+			type: "common",
 			title: "Finite stack",
 			description: "Replaces exactly one depleted stacked owner.",
 			asset: {

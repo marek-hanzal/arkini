@@ -59,9 +59,12 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "water",
 			id: "water",
-			type: "simple",
+			type: "common",
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -80,7 +83,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const input = yield* fileSystem.makeTempDirectoryScoped();
-	const simpleItems = path.join(input, "items", "simple");
+	const simpleItems = path.join(input, "items", "common");
 	const spaceItems = path.join(input, "items", "space");
 	const assets = path.join(input, "assets");
 	const resources = path.join(input, "resources");

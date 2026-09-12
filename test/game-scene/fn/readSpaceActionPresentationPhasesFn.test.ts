@@ -5,6 +5,9 @@ import { readSpaceActionPresentationPhasesFn } from "~/game-scene/fn/readSpaceAc
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const unitOwnerItem = {
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: "uid:tree",
 	id: "tree",
 	title: "Tree",
@@ -20,7 +23,7 @@ const unitOwnerItem = {
 	units: {
 		amount: 2,
 	},
-	type: "simple",
+	type: "common",
 };
 
 const payerLocation = {

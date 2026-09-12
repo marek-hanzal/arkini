@@ -59,7 +59,7 @@ const Flow: ItemOriginFlow = {
 			],
 			starterScopes: [],
 			title: "Tool",
-			type: "producer",
+			type: "common",
 		},
 	],
 };

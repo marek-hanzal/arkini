@@ -82,10 +82,11 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
+- Common has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Empty Common items expose no runtime production controls; adding lines enables the ordinary production contract. Clock requires at least one line. Blueprint retains its singular construction `line`;
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
-- positive extra material capacity is supported for Producer and Clock lines;
-- `units` defines a finite supply inside each item instance (health, resource stock, or uses), independently of item type and separately from stack `quantity`: passive resources use Simple and resources with production lines use Producer or Clock;
+- positive extra material capacity is supported for Common and Clock lines;
+- `units` defines a finite supply inside each item instance (health, resource stock, or uses), independently of item type and separately from stack `quantity`: passive and manually operated resources use Common; scheduled production uses Clock;
 - `self` unit costs use the line owner, while `target` is valid only for a units input and its deterministic Board payer (including an owner with units selected at self distance);
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode;
 - directional merge rules belong to the source item and never imply a reverse rule;

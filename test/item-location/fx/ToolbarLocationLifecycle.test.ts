@@ -43,9 +43,12 @@ const configInput = {
 	},
 	items: {
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "water",
 			id: "water",
-			type: "simple",
+			type: "common",
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -58,9 +61,12 @@ const configInput = {
 			maxStackSize: 10,
 		},
 		stone: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "stone",
 			id: "stone",
-			type: "simple",
+			type: "common",
 			title: "Stone",
 			description: "Stone",
 			asset: {
@@ -73,9 +79,12 @@ const configInput = {
 			maxStackSize: 10,
 		},
 		boardOnly: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "boardOnly",
 			id: "boardOnly",
-			type: "simple",
+			type: "common",
 			title: "Board only",
 			description: "Board only",
 			asset: {
@@ -88,9 +97,12 @@ const configInput = {
 			maxStackSize: 1,
 		},
 		inventoryOnly: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "inventoryOnly",
 			id: "inventoryOnly",
-			type: "simple",
+			type: "common",
 			title: "Inventory only",
 			description: "Inventory only",
 			asset: {

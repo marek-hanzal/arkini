@@ -3,7 +3,7 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 export const item = {
 	id: "runtime:water",
 	itemId: "water",
-	itemType: "simple",
+	itemType: "common",
 	location: {
 		scope: "inventory",
 		position: {

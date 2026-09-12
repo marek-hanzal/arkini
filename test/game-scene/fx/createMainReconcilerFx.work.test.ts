@@ -15,10 +15,10 @@ import {
 describe("main reconciliation / work and consumption", () => {
 	it("dims a craft as soon as its active job starts collecting inputs", () => {
 		const idle = createItem("runtime:craft", boardLocation, {
-			itemType: TypeSchema.enum.Craft,
+			itemType: TypeSchema.enum.Common,
 		});
 		const collecting = createItem(idle.id, boardLocation, {
-			itemType: TypeSchema.enum.Craft,
+			itemType: TypeSchema.enum.Common,
 			jobStatus: JobStatusEnumSchema.enum.Paused,
 		});
 		const actor = createActor(idle);

@@ -1,3 +1,4 @@
+import { createItemBase } from "~test/game-config-validation/support/gameValidationTestSource";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -17,14 +18,14 @@ const lineId = "line:forge:run";
 const createConfig = (scope: "any" | "universe") => {
 	const base = createJobTestConfig(2, "any");
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 
 	return GameConfigSchema.parse({
 		...base,
 		items: {
 			...base.items,
 			portal: {
-				...base.items.tool,
+				...createItemBase("portal"),
 				uid: "portal",
 				id: "portal",
 				title: "Portal",

@@ -4,6 +4,9 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 
 const item = {
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: "tree",
 	id: "tree",
 	title: "Tree",
@@ -16,7 +19,7 @@ const item = {
 	},
 	scope: "board",
 	maxStackSize: 1,
-	type: "simple",
+	type: "common",
 } satisfies ItemSchema.Type;
 
 const stone = {

@@ -189,8 +189,13 @@ describe("forceDeleteFx", () => {
 	});
 
 	it("removes only Space action entries that reference the deleted item", () => {
+		const {
+			lines: _lines,
+			maxQueueSize: _queueSize,
+			...portalBase
+		} = createSimpleItem("portal");
 		const portal = {
-			...createSimpleItem("portal"),
+			...portalBase,
 			type: "space" as const,
 			space: 1,
 			input: [
@@ -264,12 +269,19 @@ describe("forceDeleteFx", () => {
 		]);
 	});
 
-	it("deletes an owner whose required production structure references the item", () => {
+	it("retains a passive Common owner after its last dependent line is removed", () => {
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
 			start: {
 				...editorTestConfig.start,
-				board: [],
+				board: [
+					{
+						itemId: "producer",
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
 			},
 			items: {
 				...editorTestConfig.items,
@@ -287,9 +299,12 @@ describe("forceDeleteFx", () => {
 			}),
 		);
 
-		expect(result.config.items).toEqual({});
-		expect(result.impact.deletedOwnerItemIds).toEqual([
-			"producer",
-		]);
+		expect(result.config.items.producer).toMatchObject({
+			type: "common",
+			lines: [],
+		});
+		expect(result.impact.deletedOwnerItemIds).toEqual([]);
+		expect(result.config.start.board).toEqual(config.start.board);
+		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 	});
 });

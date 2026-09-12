@@ -69,7 +69,7 @@ describe("Form", () => {
 		await act(async () => {
 			root.render(
 				createElement(Form, {
-					itemType: "simple",
+					itemType: "common",
 					uid,
 				}),
 			);
@@ -78,6 +78,9 @@ describe("Form", () => {
 			container.querySelector("output")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
+			maxQueueSize: 1,
+			lines: [],
+
 			asset: {
 				scale: 1,
 				default: [
@@ -85,7 +88,7 @@ describe("Form", () => {
 				],
 			},
 			draft: false,
-			type: "simple",
+			type: "common",
 			uid,
 		});
 	});

@@ -62,7 +62,7 @@ const config = GameConfigSchema.parse({
 	items: {
 		"producer:employer": {
 			...base("producer:employer"),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -79,7 +79,7 @@ const config = GameConfigSchema.parse({
 		},
 		"producer:tool-user": {
 			...base("producer:tool-user"),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -96,7 +96,7 @@ const config = GameConfigSchema.parse({
 		},
 		"producer:worker": {
 			...base("producer:worker", "any"),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 2,
 			},
@@ -134,17 +134,26 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		"item:payload": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:payload", "any"),
-			type: "simple",
+			type: "common",
 		},
 		"item:tool": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:tool", "any"),
 			maxStackSize: 10,
-			type: "simple",
+			type: "common",
 		},
 		"item:blocker": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:blocker", "any"),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

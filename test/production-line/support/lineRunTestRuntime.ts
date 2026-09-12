@@ -58,7 +58,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				scope: "board",
 			}),
 			maxStackSize: 1,
-			type: "producer",
+			type: "common",
 			maxQueueSize: 2,
 			lines: [
 				{
@@ -137,46 +137,64 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 			],
 		},
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "water",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		permit: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "permit",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		booster: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "booster",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		adjuster: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "adjuster",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		floor: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "floor",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		blocker: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "blocker",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

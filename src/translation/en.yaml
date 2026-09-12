@@ -1,3 +1,7 @@
+Add line:
+  value: Add line
+Add lines to enable production. An item without lines is passive. Each line has its own inputs, output, runtime and rules.:
+  value: Add lines to enable production. An item without lines is passive. Each line has its own inputs, output, runtime and rules.
 Adds no item or units requirement. The action may start without delivering or targeting another item.:
   value: Adds no item or units requirement. The action may start without delivering or targeting another item.
 Asset notes empty description:
@@ -57,6 +61,8 @@ Delete:
   value: Delete
 Depletion output:
   value: Depletion output
+Describe what this line consumes and produces.:
+  value: Describe what this line consumes and produces.
 Description:
   value: Description
 Disable units:
@@ -219,8 +225,8 @@ Item type - blueprint:
 Item type - clock:
   value: Clock
   dynamic: true
-Item type - craft:
-  value: Craft owner
+Item type - common:
+  value: Common item
   dynamic: true
 Item type - inventory:
   value: Inventory control
@@ -228,17 +234,8 @@ Item type - inventory:
 Item type - missing:
   value: Missing item
   dynamic: true
-Item type - producer:
-  value: Producer
-  dynamic: true
-Item type - simple:
-  value: Simple item
-  dynamic: true
 Item type - space:
   value: Space item
-  dynamic: true
-Item type - stash:
-  value: Stash
   dynamic: true
 Item type - temporary:
   value: Temporary item
@@ -249,23 +246,14 @@ Item type description - blueprint:
 Item type description - clock:
   value: A board item that periodically starts its default production line, with an optional lifetime.
   dynamic: true
-Item type description - craft:
-  value: A consumable or quest-like item with one product line.
+Item type description - common:
+  value: An item with optional production lines, finite units, and merge rules.
   dynamic: true
 Item type description - inventory:
   value: The singleton item that opens the shared inventory.
   dynamic: true
-Item type description - producer:
-  value: A building or actor with one or more selectable product lines.
-  dynamic: true
-Item type description - simple:
-  value: A regular stackable item without specialized behavior.
-  dynamic: true
 Item type description - space:
   value: An immediately activated item that moves play to an authored space.
-  dynamic: true
-Item type description - stash:
-  value: A chest or reward container with one opening line.
   dynamic: true
 Item type description - temporary:
   value: A board-only effect that expires after an authored duration.
@@ -286,8 +274,12 @@ Materials:
   value: Materials
 Max count reached:
   value: Max count reached
+"Maximum accepted work count across this item’s production lines: one active job plus queued requests.":
+  value: "Maximum accepted work count across this item’s production lines: one active job plus queued requests."
 Merge output:
   value: Merge output
+New production line:
+  value: New production line
 Next pulse:
   value: Next pulse
 No depletion output:
@@ -335,14 +327,22 @@ Paused:
   value: "Permanently removes one source quantity instead of returning it. This consumes the item itself, not one unit. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears."
 "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action.":
   value: "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action."
+Product lines:
+  value: Product lines
+Production line:
+  value: Production line
 Project ID:
   value: Project ID
 Project ID example:
   value: project:example
 Project ID is required.:
   value: Project ID is required.
+Queue capacity:
+  value: Queue capacity
 Remove:
   value: Remove
+Remove line:
+  value: Remove line
 Rename project:
   value: Rename project
 Rename project ID:

@@ -7,7 +7,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { inputRuntimeTestConfig } from "~test/production-input/support/inputRuntimeTestConfig";
 
 const workshop = inputRuntimeTestConfig.items.workshop;
-if (workshop.type !== "producer") {
+if (workshop.type !== "common") {
 	throw new Error("Input runtime test workshop must remain a producer.");
 }
 const workshopLine = workshop.lines[0];

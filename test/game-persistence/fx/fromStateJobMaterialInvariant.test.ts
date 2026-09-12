@@ -75,7 +75,7 @@ describe("fromStateFx job material invariants", () => {
 	it("hydrates one stateful reserved instance with its passive owned subtree intact", () => {
 		const spentConfig = createJobTestConfig();
 		const worker = spentConfig.items.forge;
-		if (worker.type !== "producer") throw new Error("Expected producer fixture.");
+		if (worker.type !== "common") throw new Error("Expected producer fixture.");
 		const reservedInput = worker.lines[0].input[1];
 		if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
 		reservedInput.selector = {

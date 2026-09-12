@@ -148,7 +148,7 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "producer:shrine",
 				maxStackSize: 3,
 			}),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 2,
 				output: output("item:dust"),
@@ -178,7 +178,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:double-target",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -210,7 +210,7 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "producer:mixed-unit",
 				maxStackSize: 2,
 			}),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 2,
 			},
@@ -253,7 +253,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:overdrawn",
 			}),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 1,
 			},
@@ -288,7 +288,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:lumberjack",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -330,7 +330,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:capped-shrine",
 			}),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 1,
 				output: output("item:capped-gift"),
@@ -360,7 +360,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:capped-lumberjack",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -393,7 +393,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "units:self-well",
 			}),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 2,
 			},
@@ -427,105 +427,144 @@ export const unitsConfig = GameConfigSchema.parse({
 			],
 		},
 		"units:tree": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "units:tree",
 				maxStackSize: 3,
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 2,
 			},
 		},
 		"units:sapling": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "units:sapling",
 				maxStackSize: 3,
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 1,
 				output: output("item:seed"),
 			},
 		},
 		"units:capped-sapling": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "units:capped-sapling",
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 1,
 				output: output("item:capped-seed"),
 			},
 		},
 		"units:empty": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "units:empty",
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 1,
 			},
 		},
 		"units:messy": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "units:messy",
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 1,
 				output: output("item:seed", "item:trash"),
 			},
 		},
 		"item:gift": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:gift",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		"item:dust": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:dust",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		"item:log": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:log",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		"item:seed": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:seed",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		"item:trash": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:trash",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		"item:capped-gift": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:capped-gift",
 			}),
-			type: "simple",
+			type: "common",
 			maxCount: 1,
 		},
 		"item:capped-seed": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:capped-seed",
 			}),
-			type: "simple",
+			type: "common",
 			maxCount: 1,
 		},
 		"item:blocker": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base({
 				id: "item:blocker",
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

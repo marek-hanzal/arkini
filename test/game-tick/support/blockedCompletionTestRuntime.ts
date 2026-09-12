@@ -12,7 +12,7 @@ export const freeCompletionOwnerId = "runtime:free-forge";
 export const createBlockedCompletionTestConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	const line = forge.lines[0];
 	if (line === undefined) throw new Error("Expected producer line fixture.");
 

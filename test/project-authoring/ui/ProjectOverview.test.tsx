@@ -91,7 +91,7 @@ describe("ProjectOverview", () => {
 			container.querySelectorAll<HTMLAnchorElement>('[data-ui="EditorProjectOverviewLink"]'),
 		);
 		expect(links.map((link) => link.dataset.overviewId)).toEqual([
-			"items-type-simple",
+			"items-type-common",
 			"items",
 			"assets",
 		]);
@@ -105,7 +105,7 @@ describe("ProjectOverview", () => {
 				projectId: project.projectId,
 			});
 		expect(JSON.parse(links[0]?.dataset.search ?? "null")).toEqual({
-			itemType: "simple",
+			itemType: "common",
 		});
 		expect(container.textContent).toContain("Calculating…");
 		expect(container.querySelector(".animate-spin")).not.toBeNull();

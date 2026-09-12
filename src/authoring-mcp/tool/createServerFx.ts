@@ -29,13 +29,10 @@ import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
 const itemTypes = [
-	"simple",
+	"common",
 	"space",
-	"producer",
 	"clock",
-	"craft",
 	"blueprint",
-	"stash",
 	"temporary",
 	"inventory",
 ] as const;

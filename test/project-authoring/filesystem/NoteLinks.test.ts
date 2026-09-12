@@ -202,7 +202,7 @@ describe("repository note item relationships", () => {
 		expect(await Effect.runPromise(reopened.listNotesFx(project.projectId))).toEqual(notes);
 	});
 
-	it("rolls back a partially rewritten Notes set and item deletion, then strips every force-deleted owner on retry", async () => {
+	it("rolls back a partially rewritten Notes set and item deletion, then removes only deleted item links on retry", async () => {
 		const nodeFileSystem = await Effect.runPromise(
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
 		);
@@ -266,7 +266,7 @@ describe("repository note item relationships", () => {
 				producer.uid,
 			],
 			[
-				producer.uid,
+				"water",
 			],
 		]) {
 			await Effect.runPromise(
@@ -310,14 +310,19 @@ describe("repository note item relationships", () => {
 		).toEqual(prepared.config);
 		expect(await Effect.runPromise(reopened.listNotesFx(project.projectId))).toEqual(before);
 		const deleted = await Effect.runPromise(reopened.deleteItemFx(request));
-		expect(deleted.config.items).toEqual({});
+		expect(deleted.config.items).toEqual({
+			[producer.id]: {
+				...producer,
+				lines: [],
+			},
+		});
 		const after = await Effect.runPromise(reopened.listNotesFx(project.projectId));
 		expect(after).toHaveLength(2);
 		for (const note of after) {
 			const original = before.find((candidate) => candidate.noteId === note.noteId)!;
 			expect(note).toEqual({
 				...original,
-				itemUids: [],
+				itemUids: original.itemUids.filter((uid) => uid !== "water"),
 				updatedAtMs: expect.any(Number),
 			});
 			expect(note.updatedAtMs).toBeGreaterThan(before[0]!.updatedAtMs);

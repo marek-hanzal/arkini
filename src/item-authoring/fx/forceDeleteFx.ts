@@ -159,8 +159,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		if (owner === undefined) continue;
 		const mustDeleteOwner =
 			cleanup.removeLine ||
-			((owner.type === "producer" || owner.type === "clock") &&
-				cleanup.lineIndexes.size === owner.lines.length);
+			(owner.type === "clock" && cleanup.lineIndexes.size === owner.lines.length);
 		if (mustDeleteOwner) {
 			delete items[ownerItemId];
 			deletedOwnerItemIds.push(ownerItemId);

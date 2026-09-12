@@ -15,6 +15,7 @@ import { importEditorArkpackFileFx } from "~/project-authoring/fx/importEditorAr
 export namespace EditorWelcomeCommandAtom {
 	export type Action =
 		| "create"
+		| "dismiss-invalid-project"
 		| "delete-project"
 		| "exit"
 		| "import-arkpack"
@@ -41,7 +42,7 @@ export namespace EditorWelcomeCommandAtom {
 				readonly action: "import-json";
 		  }
 		| {
-				readonly action: "open-project-folder";
+				readonly action: "open-project-folder" | "dismiss-invalid-project";
 				readonly root: string;
 		  };
 
@@ -60,6 +61,11 @@ export namespace EditorWelcomeCommandAtom {
 	export type Input = Command | NavigationEvent;
 
 	export type ReadyState =
+		| {
+				readonly kind: "ready";
+				readonly action: "dismiss-invalid-project";
+				readonly root: string;
+		  }
 		| {
 				readonly kind: "ready";
 				readonly action: "create" | "import-arkpack" | "import-json";
@@ -127,6 +133,25 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 					kind: "ready",
 					action: "delete-project",
 					projectId: command.projectId,
+				});
+				return;
+			}
+			if (command.action === "dismiss-invalid-project") {
+				const result = yield* Effect.exit(
+					invokeProjectTransportFx({
+						callFn: () => window.arkini.editor.dismissInvalidProjectFn(command.root),
+						operation: "dismiss-invalid-project",
+						parseFn: () => undefined,
+						requestMessage:
+							"The blocked Editor project could not be removed from Recent.",
+						responseMessage: "The Editor project dismissal response is invalid.",
+					}),
+				);
+				if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
+				yield* Atom.set(EditorWelcomeCommandStateAtom, {
+					kind: "ready",
+					action: "dismiss-invalid-project",
+					root: command.root,
 				});
 				return;
 			}

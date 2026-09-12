@@ -188,6 +188,17 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.createProjectFx(request),
 					),
 				);
+				handleFn(
+					ArkiniElectronApi.channels.editorProjectDismissInvalid,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"dismiss-invalid-project",
+							ownership,
+							diagnostics,
+							requestParser.parseDismissInvalidProjectRootFx(candidate),
+							(repository, root) => repository.dismissInvalidProjectFx(root),
+						),
+				);
 				handleFn(ArkiniElectronApi.channels.editorProjectDelete, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"delete-project",
@@ -356,6 +367,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectBuildRead,
 					ArkiniElectronApi.channels.editorProjectBuildSave,
 					ArkiniElectronApi.channels.editorProjectCreate,
+					ArkiniElectronApi.channels.editorProjectDismissInvalid,
 					ArkiniElectronApi.channels.editorProjectDelete,
 					ArkiniElectronApi.channels.editorProjectDeleteItem,
 					ArkiniElectronApi.channels.editorProjectDeleteResource,

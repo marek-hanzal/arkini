@@ -13,6 +13,7 @@ export interface ProjectCatalog {
 	readonly addFx: (
 		entry: ProjectCatalogEntrySchema.Type,
 	) => Effect.Effect<void, ProjectRepositoryError, never>;
+	readonly dismissFx: (root: string) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly listFn: () => ReadonlyArray<ProjectCatalogEntrySchema.Type>;
 	readonly removeFx: (root: string) => Effect.Effect<void, ProjectRepositoryError, never>;
 }
@@ -71,7 +72,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 					(entry) =>
 						[
 							entry.root,
-							entry.createdAtMs,
+							entry,
 						] as const,
 				),
 		);
@@ -84,7 +85,8 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 				ProjectCatalogEntrySchema.parse({
 					root,
 					ownership: "managed",
-					createdAtMs: previousManaged.get(root) ?? 0,
+					createdAtMs: previousManaged.get(root)?.createdAtMs ?? 0,
+					dismissed: previousManaged.get(root)?.dismissed,
 				}),
 			);
 		}
@@ -132,6 +134,18 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 				...projects.filter((candidate) => candidate.root !== entry.root),
 				entry,
 			]),
+		// Keep dismissal in the catalog so managed-directory discovery cannot resurrect it.
+		dismissFx: (root) =>
+			updateFx((projects) =>
+				projects.map((entry) =>
+					entry.root === root
+						? {
+								...entry,
+								dismissed: true,
+							}
+						: entry,
+				),
+			),
 		listFn: () => catalog.projects,
 		removeFx: (root) => updateFx((projects) => projects.filter((entry) => entry.root !== root)),
 	} satisfies ProjectCatalog;

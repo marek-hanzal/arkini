@@ -1,4 +1,4 @@
-import { ArrowRight, TriangleAlert } from "lucide-react";
+import { ArrowRight, TriangleAlert, Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -56,7 +56,13 @@ const ItemEstimateResult = ({
 	readonly estimate: ItemEstimate;
 	readonly limit?: number;
 }) =>
-	estimate.obtainable ? (
+	estimate.status === "unreachable" ? (
+		<Status
+			dataUi="EditorItemEstimateUnreachable"
+			icon={Unlink}
+			title="This item is unreachable."
+		/>
+	) : estimate.obtainable ? (
 		<ItemEstimateRouteGraph
 			config={config}
 			header={<ItemEstimateSummary estimate={estimate} />}
@@ -71,9 +77,8 @@ const ItemEstimateResult = ({
 			<ItemEstimateSummary estimate={estimate} />
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
-					{estimate.status === "partial"
-						? "The bounded static analysis could not produce stable totals; see the diagnostic for the exact limit."
-						: "The authored dependency graph contains no complete route from the configured starting facts."}
+					The bounded static analysis could not produce stable totals; see the diagnostic
+					for the exact limit.
 				</p>
 				<ul className="grid gap-2">
 					{estimate.diagnostics.slice(0, limit).map((diagnostic, index) => (
@@ -149,6 +154,7 @@ export const ItemEstimateSection = ({
 			) : null}
 			{previewItemUid !== undefined &&
 			state.status === "ready" &&
+			state.estimate.status !== "unreachable" &&
 			(state.estimate.obtainable
 				? state.estimate.routeSteps.length
 				: state.estimate.diagnostics.length) > 2 ? (

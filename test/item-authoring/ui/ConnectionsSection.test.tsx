@@ -19,7 +19,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 					id: "consumer",
 					description: "Consumes the selected item.",
 					title: "Consumer",
-					type: "common",
+
 					uid: "consumer-uid",
 				},
 				peer: {
@@ -33,7 +33,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 					description: "Also consumes the selected item.",
 					id: "peer",
 					title: "Peer",
-					type: "common",
+
 					uid: "peer-uid",
 				},
 				unrelated: {
@@ -47,7 +47,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 					description: "Not connected.",
 					id: "unrelated",
 					title: "Unrelated",
-					type: "common",
+
 					uid: "unrelated-uid",
 				},
 			},
@@ -75,7 +75,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 			description: "Consumes the selected item.",
 			id: "consumer",
 			title: "Consumer",
-			type: "common",
+
 			uid: "consumer-uid",
 		},
 		{
@@ -89,7 +89,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 			description: "Also consumes the selected item.",
 			id: "peer",
 			title: "Peer",
-			type: "common",
+
 			uid: "peer-uid",
 		},
 	],

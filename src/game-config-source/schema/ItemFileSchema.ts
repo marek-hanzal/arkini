@@ -14,7 +14,7 @@ export const ItemFileSchema = z
 		id: "ItemFileSchema",
 		$id: "urn:arkini:schema:item-file",
 		title: "Arkini item source file",
-		description: "One item stored at items/<type>/<encoded uid>.json.",
+		description: "One item stored at items/<encoded uid>.json.",
 	});
 
 export type ItemFileSchema = typeof ItemFileSchema;

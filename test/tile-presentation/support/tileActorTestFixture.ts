@@ -60,7 +60,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			lines: [],
 
 			...itemBase("material"),
-			type: "common",
+
 			asset: {
 				scale: 0.8,
 				default: [
@@ -73,7 +73,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 
 			...itemBase("craft"),
-			type: "common",
+
 			asset: {
 				scale: 0.8,
 				default: [
@@ -92,7 +92,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		},
 		blueprint: {
 			...itemBase("blueprint"),
-			type: "common",
+
 			asset: {
 				scale: 0.8,
 				default: [
@@ -117,7 +117,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		temporary: {
 			...itemBase("temporary", "board"),
 			maxStackSize: 1,
-			type: "common",
+
 			lines: [],
 			maxQueueSize: 1,
 			asset: {
@@ -135,7 +135,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 
 const craftItem = tileActorTestConfig.items.craft;
 const blueprintItem = tileActorTestConfig.items.blueprint;
-if (craftItem.type !== "common" || blueprintItem.type !== "common") {
+if (craftItem === undefined || blueprintItem === undefined) {
 	throw new Error("Invalid tile actor test config.");
 }
 

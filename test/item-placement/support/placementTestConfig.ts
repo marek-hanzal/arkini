@@ -30,7 +30,6 @@ const simpleItem = ({
 		scope,
 		maxCount,
 		maxStackSize,
-		type: "common",
 	} as const;
 };
 

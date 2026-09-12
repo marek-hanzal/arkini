@@ -70,7 +70,6 @@ describe("packDirectoryFx game-project contract", () => {
 			expect(payload.config.items.water?.asset.scale).toBe(0.65);
 			expect(payload.config.items.portal?.asset.scale).toBe(1);
 			expect(payload.config.items.portal).toMatchObject({
-				type: "common",
 				action: {
 					type: "space" as const,
 					space: 9,
@@ -191,7 +190,7 @@ describe("packDirectoryFx game-project contract", () => {
 			const fileSystem = yield* FileSystem.FileSystem;
 			const path = yield* Path.Path;
 			const input = yield* writeGameProjectFixtureFx();
-			const itemDirectory = path.join(input, "items", "common");
+			const itemDirectory = path.join(input, "items");
 			yield* fileSystem.rename(
 				path.join(itemDirectory, "water.json"),
 				path.join(itemDirectory, "wrong.json"),

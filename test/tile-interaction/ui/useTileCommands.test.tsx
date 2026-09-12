@@ -122,14 +122,16 @@ it("keeps rejected and committed overlapping Space activations distinct", async 
 	const { session, commands, hold, release, close } = await createSessionFixture();
 	try {
 		const firstLocation = {
-			scope: "inventory",
+			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
 			},
 		} as const;
 		const secondLocation = {
-			scope: "inventory",
+			scope: "board",
+			space: 0,
 			position: {
 				x: 1,
 				y: 0,
@@ -152,13 +154,13 @@ it("keeps rejected and committed overlapping Space activations distinct", async 
 			}),
 		);
 		await hold();
-		const first = commands.runSpaceActivationFn({
+		const first = commands.runItemActionFn({
 			currentSpace: 0,
 			itemId: a.id,
 			location: firstLocation,
 			revision: a.revision,
 		});
-		const second = commands.runSpaceActivationFn({
+		const second = commands.runItemActionFn({
 			currentSpace: 0,
 			itemId: b.id,
 			location: secondLocation,
@@ -259,8 +261,8 @@ it("keeps command rejections recoverable without swallowing defects", async () =
 		},
 	} as const;
 	try {
-		expect(await mounted.getCommands().runSpaceActivationFn(command)).toBeNull();
-		await expect(mounted.getCommands().runSpaceActivationFn(command)).rejects.toBe(defect);
+		expect(await mounted.getCommands().runItemActionFn(command)).toBeNull();
+		await expect(mounted.getCommands().runItemActionFn(command)).rejects.toBe(defect);
 		await expect(
 			mounted.getCommands().runDropFn({
 				sourceItemId: "item",

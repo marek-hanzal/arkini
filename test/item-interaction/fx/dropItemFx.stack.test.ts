@@ -49,7 +49,7 @@ const mergeBeforeStackConfig = GameConfigSchema.parse({
 });
 
 const producerItem = purityTestConfig.items.producer;
-if (producerItem.type !== "common") {
+if (producerItem === undefined) {
 	throw new Error("Expected the purity producer fixture.");
 }
 

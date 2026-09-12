@@ -17,17 +17,6 @@ import {
 import type { LayoutNode } from "~/flow-layout/type/Layout";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["type"]) => {
-	switch (type) {
-		case "common":
-			return palette.warning;
-		case "inventory":
-			return palette.info;
-		case "missing":
-			return palette.danger;
-	}
-};
-
 const readSourceKindColorFn = (palette: CanvasPalette, kind: ItemOriginOperationKind) => {
 	switch (kind) {
 		case "line":
@@ -90,27 +79,27 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 			position,
 			resourceUrls,
 		}: DrawCanvasItemNodeProps) => {
-			const typeColor = readItemTypeColorFn(palette, node.type);
+			const itemColor = node.missing ? palette.danger : palette.warning;
+			const itemSurface = node.missing ? palette.missingItemSurface : palette.itemSurface;
 			context.save();
 			context.globalAlpha = opacity;
 			context.beginPath();
 			context.rect(position.x, position.y, position.width, position.height);
-			context.fillStyle = palette.itemSurfaces[node.type];
+			context.fillStyle = itemSurface;
 			context.fill();
 			context.lineWidth = highlight === "selected" ? 4 : highlight === "active" ? 2.5 : 2;
-			context.strokeStyle = highlight === "idle" ? typeColor : palette.accent;
+			context.strokeStyle = highlight === "idle" ? itemColor : palette.accent;
 			context.stroke();
 
 			if (connectedPortIds?.has(ItemOriginItemInputPortId) === true) {
 				context.beginPath();
 				context.arc(position.x, position.y + metrics.itemPortY, 6, 0, Math.PI * 2);
 				context.fillStyle =
-					highlightedPortColors?.get(ItemOriginItemInputPortId) ??
-					palette.itemSurfaces[node.type];
+					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? itemSurface;
 				context.fill();
 				context.lineWidth = 2.5;
 				context.strokeStyle =
-					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? typeColor;
+					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? itemColor;
 				context.stroke();
 			}
 			if (connectedPortIds?.has(ItemOriginItemOutputPortId) === true) {
@@ -123,12 +112,11 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 					Math.PI * 2,
 				);
 				context.fillStyle =
-					highlightedPortColors?.get(ItemOriginItemOutputPortId) ??
-					palette.itemSurfaces[node.type];
+					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? itemSurface;
 				context.fill();
 				context.lineWidth = 2.5;
 				context.strokeStyle =
-					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? typeColor;
+					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? itemColor;
 				context.stroke();
 			}
 
@@ -179,9 +167,9 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 			const label =
 				node.starterScopes.length > 0
 					? `Starter: ${node.starterScopes.join(", ")}`
-					: node.type === "missing"
-						? translator.textFn("Item type - missing")
-						: translator.textFn(`Item type - ${node.type}`);
+					: node.missing
+						? translator.textFn("Missing item")
+						: "";
 			context.fillText(
 				textPainter.fitTextFn(context, label.toUpperCase(), maxTextWidth),
 				textX,
@@ -270,8 +258,7 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 					if (connectedPortIds?.has(input.id) === true) {
 						context.beginPath();
 						context.arc(position.x, worldY, 6, 0, Math.PI * 2);
-						context.fillStyle =
-							highlightedPortColors?.get(input.id) ?? palette.itemSurfaces[node.type];
+						context.fillStyle = highlightedPortColors?.get(input.id) ?? itemSurface;
 						context.fill();
 						context.lineWidth = 2.5;
 						context.strokeStyle = highlightedPortColors?.get(input.id) ?? kindColor;
@@ -293,9 +280,7 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 					if (connectedPortIds?.has(output.id) === true) {
 						context.beginPath();
 						context.arc(position.x + position.width, worldY, 6, 0, Math.PI * 2);
-						context.fillStyle =
-							highlightedPortColors?.get(output.id) ??
-							palette.itemSurfaces[node.type];
+						context.fillStyle = highlightedPortColors?.get(output.id) ?? itemSurface;
 						context.fill();
 						context.lineWidth = 2.5;
 						context.strokeStyle = highlightedPortColors?.get(output.id) ?? kindColor;

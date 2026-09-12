@@ -41,7 +41,7 @@ const producerItem = ({
 	...baseItem({
 		id,
 	}),
-	type: "common" as const,
+
 	maxQueueSize: 2,
 	merge,
 	lines: [
@@ -125,7 +125,7 @@ const createLifecycleConfig = ({
 				...baseItem({
 					id: "source",
 				}),
-				type: "common" as const,
+
 				merge: [
 					merge,
 				],
@@ -148,7 +148,6 @@ const createLifecycleConfig = ({
 							: {
 									amount: targetUnits,
 								},
-					type: "common" as const,
 				}
 			: {
 					...baseItem({
@@ -159,7 +158,6 @@ const createLifecycleConfig = ({
 					},
 					maxStackSize: 1,
 					scope: "board" as const,
-					type: "common" as const,
 				};
 
 	return GameConfigSchema.parse({
@@ -202,7 +200,6 @@ const createLifecycleConfig = ({
 									: {
 											amount: resultUnits,
 										},
-							type: "common",
 						}
 					: {
 							...baseItem({
@@ -213,7 +210,6 @@ const createLifecycleConfig = ({
 							},
 							maxStackSize: 1,
 							scope: "board",
-							type: "common",
 						},
 			material: {
 				maxQueueSize: 1,
@@ -225,7 +221,6 @@ const createLifecycleConfig = ({
 				units: {
 					amount: 2,
 				},
-				type: "common",
 			},
 			owner: producerItem({
 				id: "owner",

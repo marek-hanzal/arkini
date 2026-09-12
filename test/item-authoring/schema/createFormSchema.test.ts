@@ -408,8 +408,7 @@ describe("createFormSchema", () => {
 		};
 		const accepted = schema.safeParse(form);
 		expect(accepted.success).toBe(true);
-		if (!accepted.success || accepted.data.type !== "common")
-			throw new Error("Expected Common action.");
+		if (!accepted.success) throw new Error("Expected Common action.");
 		expect(accepted.data.action?.input[0]).toMatchObject({
 			query: {
 				distance: "self",

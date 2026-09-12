@@ -231,13 +231,15 @@ Interval (seconds):
   value: Interval (seconds)
 Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.:
   value: Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.
+Inventory:
+  value: Inventory
+Inventory action:
+  value: Inventory action
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
   value: |
     Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
-Inventory item storage scope form:
-  value: Board & Toolbar — fixed by the Inventory item contract
 Item:
   value: Item
 Item ID:
@@ -280,25 +282,8 @@ Item storage scope - board:
 Item storage scope - inventory:
   value: Inventory only
   dynamic: true
-Item storage scope - inventory-control:
-  value: Board & Toolbar
 Item storage scope - toolbar:
   value: Toolbar only
-  dynamic: true
-Item type - common:
-  value: Common item
-  dynamic: true
-Item type - inventory:
-  value: Inventory control
-  dynamic: true
-Item type - missing:
-  value: Missing item
-  dynamic: true
-Item type description - common:
-  value: An item with optional production or an immediate action, finite units, and merge rules.
-  dynamic: true
-Item type description - inventory:
-  value: The singleton item that opens the shared inventory.
   dynamic: true
 Keep:
   value: Keep
@@ -326,6 +311,10 @@ Max count reached:
   value: "Maximum accepted work count across this item’s production lines: one active job plus queued requests."
 Merge output:
   value: Merge output
+Missing item:
+  value: Missing item
+New item:
+  value: New item
 New production line:
   value: New production line
 Next pulse:
@@ -367,6 +356,8 @@ Once requires a lifetime. When it ends, accepted production settles before the e
   value: Once requires a lifetime. When it ends, accepted production settles before the expiry output is emitted.
 Only items with Units enabled are shown because the target pays the unit cost.:
   value: Only items with Units enabled are shown because the target pays the unit cost.
+Open the inventory after all requirements and rules pass.:
+  value: Open the inventory after all requirements and rules pass.
 Optional items emitted after this merge resolves.:
   value: Optional items emitted after this merge resolves.
 Optional items emitted when the final unit is spent.:
@@ -448,8 +439,8 @@ Schedule:
   value: Schedule
 Search assets…:
   value: Search assets…
-Search item title, ID or type…:
-  value: Search item title, ID or type…
+Search item title or ID…:
+  value: Search item title or ID…
 Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.:
   value: Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.
 Select an item with Units enabled.:
@@ -523,8 +514,6 @@ Toolbar editing:
 Toolbar editing help:
   value: |
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
-Type:
-  value: Type
 UID:
   value: UID
 Unit cost:
@@ -563,6 +552,8 @@ Without an output, the item simply disappears when its last unit is spent. Enabl
   value: Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.
 Write a note…:
   value: Write a note…
+space:
+  value: space
 unit available:
   value: unit available
 unit from owner:

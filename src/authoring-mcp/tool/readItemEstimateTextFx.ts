@@ -11,7 +11,7 @@ const formatNumberFn = (value: number) =>
 
 const itemReferenceFn = (project: Project, itemId: string) => {
 	const item = project.config.items[itemId];
-	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
+	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}]`;
 };
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {

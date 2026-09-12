@@ -45,7 +45,7 @@ export interface ItemOriginItemNode {
 	readonly resourceIds: ItemSchema.Type["asset"]["default"];
 	readonly starterScopes: ReadonlyArray<"Board" | "Inventory" | "Toolbar">;
 	readonly title: string;
-	readonly type: ItemSchema.Type["type"] | "missing";
+	readonly missing: boolean;
 }
 
 export interface ItemOriginEdge {

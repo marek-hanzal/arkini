@@ -234,7 +234,6 @@ describe("Clock lifetime boundaries", () => {
 	it("ages expiring buffers before redispatch can spend units on the next accepted request", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const owner = base.items.owner;
-		if (owner.type !== "common") throw new Error("Expected Common owner.");
 		const config = GameConfigSchema.parse({
 			...base,
 			items: {

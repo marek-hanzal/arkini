@@ -26,6 +26,7 @@ describe("readProjectStartItemIdsFn", () => {
 			new Set([
 				"log",
 				"lens",
+				"backpack",
 			]),
 		);
 		expect(

@@ -1,21 +1,8 @@
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-
-type JobCompletionItem = Extract<
-	ItemSchema.Type,
-	{
-		readonly type: typeof TypeSchema.enum.Common;
-	}
->;
-
-export type JobCompletionOwner = Omit<BoardRuntimeItemSchema.Type, "item"> & {
-	readonly item: JobCompletionItem;
-};
 
 /**
  * Shared live facts resolved once before completing one line job.
@@ -26,7 +13,7 @@ export type JobCompletionOwner = Omit<BoardRuntimeItemSchema.Type, "item"> & {
 export interface JobCompletionContext {
 	readonly job: JobSchema.Type;
 	readonly line: LineSchema.Type;
-	readonly owner: JobCompletionOwner;
+	readonly owner: BoardRuntimeItemSchema.Type;
 	readonly reservations: readonly ReservedRuntimeItemSchema.Type[];
 	readonly runtime: RuntimeSchema.Type;
 }

@@ -1,3 +1,4 @@
+import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -11,11 +12,9 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
-import { animateRetargetablePoseFx } from "~/tile-rendering/fx/animateRetargetablePoseFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
-import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
@@ -28,16 +27,12 @@ export interface DropSubmission {
 	readonly isPendingActorFx: (actorId: string) => Effect.Effect<boolean, never, never>;
 	readonly submitFx: (request: {
 		readonly actor: PixiTileActor;
-		readonly commandTarget: DropItemCommand["target"];
+		readonly commandTarget:
+			| DropItemCommand["target"]
+			| {
+					readonly kind: "inventory";
+			  };
 		readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
-		readonly shortcutReceiver?: {
-			readonly actor: PixiTileActor;
-			readonly pose: {
-				readonly size: number;
-				readonly x: number;
-				readonly y: number;
-			};
-		};
 		readonly sourceItem: TileActorItem;
 		readonly targetItem: TileActorItem | null;
 	}) => Effect.Effect<void, never, never>;
@@ -57,22 +52,13 @@ interface Props {
 	readonly surface: MainInteractionSurface;
 }
 
-const inventoryShortcutTravelOwnerPrefix = "inventory-shortcut-travel";
-
 const readTargetRedirectFn = (result: DropItemResult): MotionRedirect | null =>
 	match(result)
 		.with(
 			{
 				kind: DropItemResultKind.StoreInventory,
 			},
-			(store) =>
-				store.source.current === null
-					? {
-							sourceActorId: store.source.itemId,
-							targetActorId: store.inventory.itemId,
-							targetLocation: store.inventory.location,
-						}
-					: null,
+			() => null,
 		)
 		.with(
 			{
@@ -146,7 +132,11 @@ const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 	sourceItem,
 	targetItem,
 }: {
-	readonly commandTarget: DropItemCommand["target"];
+	readonly commandTarget:
+		| DropItemCommand["target"]
+		| {
+				readonly kind: "inventory";
+		  };
 	readonly dropPresentation: DropPresentation;
 	readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 	readonly sourceItem: TileActorItem;
@@ -167,12 +157,21 @@ const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 					},
 				}
 			: null;
-	const command = {
+	const source = {
 		sourceItemId: sourceItem.id,
 		sourceLocation: sourceItem.location,
 		sourceRevision: sourceItem.revision,
-		target: commandTarget,
-	} satisfies DropItemCommand;
+	};
+	const command =
+		commandTarget.kind === "inventory"
+			? {
+					...source,
+					kind: "inventory" as const,
+				}
+			: ({
+					...source,
+					target: commandTarget,
+				} satisfies DropItemCommand);
 	const generation = yield* dropPresentation.beginFx({
 		sourceActorId: sourceItem.id,
 		swapCandidate,
@@ -246,7 +245,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 			),
 		),
 		submitFx: Effect.fn("DropSubmission.submitFx")(
-			({ actor, commandTarget, previewKind, shortcutReceiver, sourceItem, targetItem }) =>
+			({ actor, commandTarget, previewKind, sourceItem, targetItem }) =>
 				Effect.sync(() => {
 					if (closed) return;
 					RendererRuntime.runSync(cursorGrab.finishFx(actor));
@@ -267,7 +266,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						}),
 					);
 					const optimisticRemoval =
-						previewKind === DropItemResultKind.StoreInventory ||
+						commandTarget.kind === "inventory" ||
 						(previewKind === DropItemResultKind.Stack && sourceItem.quantity === 1)
 							? {
 									actor,
@@ -275,13 +274,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 									sourceActorId: sourceItem.id,
 								}
 							: null;
-					const optimisticInventoryReceiver =
-						previewKind === DropItemResultKind.StoreInventory && targetItem !== null
-							? (actorStore.actors.get(targetItem.id) ?? null)
-							: null;
 					let removalStarted = false;
-					let shortcutVisualComplete = shortcutReceiver === undefined;
-					let queuedResult: DropItemResult | null = null;
 					let finalized = false;
 					let targetRedirected = false;
 
@@ -291,24 +284,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						RendererRuntime.runSync(
 							startActorExitFx({
 								actor: optimisticRemoval.actor,
-								animator,
-								onCancelFn: () => {
-									shortcutVisualComplete = true;
-									if (queuedResult !== null) finalizeResultFn(queuedResult);
-								},
-								onCompleteFn: () => {
-									shortcutVisualComplete = true;
-									if (queuedResult !== null) finalizeResultFn(queuedResult);
-								},
-							}),
-						);
-					};
-
-					const flashInventoryReceiverFn = () => {
-						if (optimisticInventoryReceiver === null) return;
-						RendererRuntime.runSync(
-							burstFeedbackParticlesFx({
-								actor: optimisticInventoryReceiver,
 								animator,
 							}),
 						);
@@ -330,14 +305,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							game.reportCriticalFailureFn("game-presentation", cause);
 							return;
 						}
-						if (
-							shortcutReceiver !== undefined &&
-							result.kind === DropItemResultKind.StoreInventory &&
-							!shortcutVisualComplete
-						) {
-							queuedResult = result;
-							return;
-						}
 						finalized = true;
 						try {
 							RendererRuntime.runSync(
@@ -346,19 +313,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 									result,
 								}),
 							);
-							if (
-								result.kind === DropItemResultKind.StoreInventory &&
-								optimisticInventoryReceiver !== null &&
-								result.inventory.itemId === optimisticInventoryReceiver.item.id &&
-								actorStore.actors.get(result.inventory.itemId) ===
-									optimisticInventoryReceiver
-							) {
-								// The exact surviving receiver already flashed. A replaced receiver keeps
-								// the canonical cue and receives feedback during reconcile.
-								RendererRuntime.runSync(
-									dropPresentation.clearFeedbackFx(drop.generation),
-								);
-							}
 							const retainedSource =
 								actorStore.actors.get(sourceItem.id) === actor ? actor : null;
 							if (retainedSource !== null) {
@@ -413,44 +367,16 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						game.reportCriticalFailureFn("game-presentation", cause);
 					};
 
-					if (shortcutReceiver === undefined) {
-						startRemovalFn();
-						flashInventoryReceiverFn();
-					} else {
-						const finishTravelFn = () => {
-							if (closed || finalized) return;
-							flashInventoryReceiverFn();
-							startRemovalFn();
-						};
-						RendererRuntime.runSync(
-							animateRetargetablePoseFx({
-								actor,
-								animator,
-								onCancelFn: finishTravelFn,
-								onCompleteFn: finishTravelFn,
-								ownerKey: `${inventoryShortcutTravelOwnerPrefix}:${actor.instanceId}`,
-								readSizeFn: () =>
-									RendererRuntime.runSync(
-										surface.readActorPoseFx(shortcutReceiver.actor.item),
-									)?.size ?? shortcutReceiver.pose.size,
-								readTargetFn: () => {
-									const pose = RendererRuntime.runSync(
-										surface.readActorPoseFx(shortcutReceiver.actor.item),
-									);
-									return pose === null
-										? null
-										: {
-												x: pose.x,
-												y: pose.y,
-											};
-								},
-								target: shortcutReceiver.pose,
-							}),
-						);
-					}
+					startRemovalFn();
 					let submittedDrop: PromiseLike<DropItemResult | null>;
 					try {
-						submittedDrop = closed ? Promise.resolve(null) : onDropFn(drop.command);
+						submittedDrop = closed
+							? Promise.resolve(null)
+							: "kind" in drop.command
+								? RendererRuntime.runPromise(
+										game.runFx(storeInventoryItemFx(drop.command)),
+									)
+								: onDropFn(drop.command);
 					} catch (cause) {
 						submittedDrop = Promise.reject(cause);
 					}

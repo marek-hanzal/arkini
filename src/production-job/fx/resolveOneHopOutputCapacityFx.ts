@@ -5,7 +5,6 @@ import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readOutputConditionalMaximumQuantitiesFn } from "~/production-output/fn/readOutputConditionalMaximumQuantitiesFn";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
@@ -89,7 +88,7 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 		});
 		const owner = Option.getOrUndefined(narrowLineOwnerItemFn(intermediate));
 		if (owner === undefined) continue;
-		const applicable = readLineOwnerLinesFn(owner).filter(
+		const applicable = owner.lines.filter(
 			(candidate) => candidate.ahead === true && candidate.show && candidate.enable,
 		);
 		if (applicable.length === 0) continue;

@@ -16,7 +16,6 @@ import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema
 import type { LineRun } from "~/production-line/type/LineRun";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 
@@ -276,7 +275,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 	if (ownerItem === undefined) return unavailable;
 
-	const lines = readLineOwnerLinesFn(ownerItem);
+	const lines = ownerItem.lines;
 	const defaultLineId = readEffectiveLineFn({
 		selection: "default",
 		ownerItemId: owner.id,

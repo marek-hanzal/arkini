@@ -148,7 +148,7 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "producer:shrine",
 				maxStackSize: 3,
 			}),
-			type: "common",
+
 			units: {
 				amount: 2,
 				output: output("item:dust"),
@@ -178,7 +178,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:double-target",
 			}),
-			type: "common",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -210,7 +210,7 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "producer:mixed-unit",
 				maxStackSize: 2,
 			}),
-			type: "common",
+
 			units: {
 				amount: 2,
 			},
@@ -253,7 +253,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:overdrawn",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 			},
@@ -288,7 +288,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:lumberjack",
 			}),
-			type: "common",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -330,7 +330,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:capped-shrine",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 				output: output("item:capped-gift"),
@@ -360,7 +360,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "producer:capped-lumberjack",
 			}),
-			type: "common",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -393,7 +393,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "units:self-well",
 			}),
-			type: "common",
+
 			units: {
 				amount: 2,
 			},
@@ -434,7 +434,7 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "units:tree",
 				maxStackSize: 3,
 			}),
-			type: "common",
+
 			units: {
 				amount: 2,
 			},
@@ -447,7 +447,7 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "units:sapling",
 				maxStackSize: 3,
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 				output: output("item:seed"),
@@ -460,7 +460,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "units:capped-sapling",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 				output: output("item:capped-seed"),
@@ -473,7 +473,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "units:empty",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 			},
@@ -485,7 +485,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "units:messy",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 				output: output("item:seed", "item:trash"),
@@ -498,7 +498,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:gift",
 			}),
-			type: "common",
 		},
 		"item:dust": {
 			maxQueueSize: 1,
@@ -507,7 +506,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:dust",
 			}),
-			type: "common",
 		},
 		"item:log": {
 			maxQueueSize: 1,
@@ -516,7 +514,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:log",
 			}),
-			type: "common",
 		},
 		"item:seed": {
 			maxQueueSize: 1,
@@ -525,7 +522,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:seed",
 			}),
-			type: "common",
 		},
 		"item:trash": {
 			maxQueueSize: 1,
@@ -534,7 +530,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:trash",
 			}),
-			type: "common",
 		},
 		"item:capped-gift": {
 			maxQueueSize: 1,
@@ -543,7 +538,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:capped-gift",
 			}),
-			type: "common",
+
 			maxCount: 1,
 		},
 		"item:capped-seed": {
@@ -553,7 +548,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:capped-seed",
 			}),
-			type: "common",
+
 			maxCount: 1,
 		},
 		"item:blocker": {
@@ -564,7 +559,6 @@ export const unitsConfig = GameConfigSchema.parse({
 				id: "item:blocker",
 				scope: "any",
 			}),
-			type: "common",
 		},
 	},
 });

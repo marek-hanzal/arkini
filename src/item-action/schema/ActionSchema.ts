@@ -1,3 +1,4 @@
+import { InventoryActionSchema } from "./InventoryActionSchema";
 import { z } from "zod";
 import { SpaceActionSchema } from "~/space-action/schema/SpaceActionSchema";
 
@@ -5,6 +6,7 @@ import { SpaceActionSchema } from "~/space-action/schema/SpaceActionSchema";
 export const ActionSchema = z
 	.discriminatedUnion("type", [
 		SpaceActionSchema,
+		InventoryActionSchema,
 	])
 	.meta({
 		id: "itemAction.ActionSchema",

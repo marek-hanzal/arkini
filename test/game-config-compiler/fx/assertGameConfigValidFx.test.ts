@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
 import {
 	createRootSource,
@@ -13,9 +13,9 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 
 describe("assertGameConfigValidFx", () => {
 	it("returns a completed config when diagnostics contain only warnings", async () => {
-		const units = CommonSchema.parse({
+		const units = ItemSchema.parse({
 			...createSimpleItem("item:units"),
-			type: "common",
+
 			units: {
 				amount: 1,
 			},

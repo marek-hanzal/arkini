@@ -123,7 +123,7 @@ describe("readItemDetailLinesFx / active work", () => {
 		const runtime = {
 			...base,
 			items: base.items.map((item) =>
-				item.id === "runtime:workshop" && item.item.type === "common"
+				item.id === "runtime:workshop"
 					? {
 							...item,
 							item: {

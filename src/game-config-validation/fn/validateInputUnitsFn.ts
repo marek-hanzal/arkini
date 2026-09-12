@@ -1,6 +1,5 @@
 import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
-import { TypeSchema as ItemTypeSchema } from "~/item-definition/schema/TypeSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
@@ -41,7 +40,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 			input: line.input,
 			path,
 		}));
-		if (item.type === ItemTypeSchema.enum.Common && item.action !== undefined) {
+		if (item.action !== undefined) {
 			actions.push({
 				id: item.id,
 				input: item.action.input,

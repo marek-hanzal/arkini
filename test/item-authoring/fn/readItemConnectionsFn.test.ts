@@ -35,7 +35,6 @@ describe("readItemConnectionsFn", () => {
 	it("keeps inputs from disabled outputless authored lines", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
-		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		const config = GameConfigSchema.parse({
 			...base,
 			items: {
@@ -88,10 +87,8 @@ describe("readItemConnectionsFn", () => {
 	it("reads line, merge, unit-depletion, and temporary-expiry outputs", () => {
 		const base = createTemporaryLifetimeTestConfig();
 		const common = base.items.blocker;
-		if (common.type !== "common") throw new Error("Expected Common fixture.");
 		const { lines: _lines, maxQueueSize: _queueSize, ...baseItem } = common;
 		const producer = base.items.producer;
-		if (producer.type !== "common") throw new Error("Expected producer fixture.");
 		const output = guaranteedMergeOutput({
 			itemId: "result",
 		});
@@ -114,7 +111,7 @@ describe("readItemConnectionsFn", () => {
 					id: "blueprint",
 					uid: "blueprint",
 					title: "blueprint",
-					type: "common",
+
 					lines: [
 						{
 							...line,
@@ -127,7 +124,7 @@ describe("readItemConnectionsFn", () => {
 					id: "craft",
 					uid: "craft",
 					title: "craft",
-					type: "common",
+
 					lines: [
 						line,
 					],
@@ -137,7 +134,7 @@ describe("readItemConnectionsFn", () => {
 					id: "stash",
 					uid: "stash",
 					title: "stash",
-					type: "common",
+
 					lines: [
 						line,
 					],
@@ -147,7 +144,7 @@ describe("readItemConnectionsFn", () => {
 					id: "spent",
 					uid: "spent",
 					title: "spent",
-					type: "common",
+
 					units: {
 						amount: 1,
 						output,
@@ -158,7 +155,7 @@ describe("readItemConnectionsFn", () => {
 					id: "mergeSource",
 					uid: "mergeSource",
 					title: "mergeSource",
-					type: "common",
+
 					merge: [
 						{
 							action: "consume",
@@ -196,9 +193,7 @@ describe("readItemConnectionsFn", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		const common = base.items.tool;
-		if (common.type !== "common") throw new Error("Expected Common fixture.");
 		const { lines: _lines, maxQueueSize: _queueSize, ...baseItem } = common;
-		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		const config = GameConfigSchema.parse({
 			...base,
 			items: {
@@ -241,7 +236,7 @@ describe("readItemConnectionsFn", () => {
 					id: "portal",
 					uid: "portal",
 					title: "portal",
-					type: "common",
+
 					action: {
 						type: "space" as const,
 						space: 1,

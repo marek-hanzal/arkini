@@ -89,7 +89,6 @@ describe("readItemDetailQueue", () => {
 	it("projects each idle request independently without changing accepted order or input state", () => {
 		const config = structuredClone(lineRunTestConfig);
 		const workshop = config.items.workshop;
-		if (workshop.type !== "common") throw new Error("Expected producer fixture.");
 		workshop.lines.push({
 			...workshop.lines[0],
 			id: "line:workshop:ready",
@@ -161,7 +160,7 @@ describe("readItemDetailQueue", () => {
 		const singleSlotRuntime = {
 			...queuedRuntime(runtime),
 			items: runtime.items.map((item) =>
-				item.id === "runtime:workshop" && item.item.type === "common"
+				item.id === "runtime:workshop"
 					? {
 							...item,
 							item: {
@@ -233,7 +232,6 @@ describe("readItemDetailQueue", () => {
 
 		const spentConfig = structuredClone(lineRunTestConfig);
 		const workshop = spentConfig.items.workshop;
-		if (workshop.type !== "common") throw new Error("Expected producer fixture.");
 		workshop.units = {
 			amount: 1,
 		};
@@ -274,7 +272,6 @@ describe("readItemDetailQueue", () => {
 		const config = structuredClone(lineRunTestConfig);
 		config.items.permit.maxCount = 1;
 		const workshop = config.items.workshop;
-		if (workshop.type !== "common") throw new Error("Expected producer fixture.");
 		workshop.lines[0].output = createOutput([
 			{
 				itemId: "permit",

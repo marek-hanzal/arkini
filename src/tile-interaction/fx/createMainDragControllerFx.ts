@@ -4,7 +4,6 @@ import type { FederatedPointerEvent } from "pixi.js";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { removeCheatItemFx as removeEngineCheatItemFx } from "~/game-cheat/fx/removeCheatItemFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -82,58 +81,6 @@ interface MovableGesture extends ActiveDragBase {
 }
 
 type ActiveDrag = ActivationOnlyGesture | MotionHandoffGesture | MovableGesture;
-const readInventoryShortcutFx = Effect.fn("createMainDragControllerFx.readInventoryShortcutFx")(
-	function* ({
-		actorStore,
-		drag,
-		preview,
-		surface,
-	}: {
-		readonly actorStore: MainActorStore;
-		readonly drag: ActiveDrag;
-		readonly preview: createMainDragPreviewFx.Output;
-		readonly surface: MainInteractionSurface;
-	}) {
-		const inventoryActor = Array.from(actorStore.actors.values()).find(
-			(actor) =>
-				actor !== drag.actor &&
-				!actor.container.destroyed &&
-				actor.item.itemType === "inventory",
-		);
-		if (inventoryActor === undefined) return null;
-		const pose = yield* surface.readActorPoseFx(inventoryActor.item);
-		if (pose === null) return null;
-		const targetFacts = yield* surface.readTargetFactsFx(
-			pose.x + pose.size / 2,
-			pose.y + pose.size / 2,
-		);
-		if (targetFacts.target === null) return null;
-		const sourceItem = yield* preview.readCurrentSourceFx(drag);
-		if (sourceItem === null) return null;
-		const kind = yield* preview.readPreviewKindFx({
-			sourceItem,
-			targetFacts,
-		});
-		if (
-			kind !== DropItemResultKind.StoreInventory ||
-			targetFacts.occupant?.id !== inventoryActor.item.id
-		) {
-			return null;
-		}
-		return {
-			actor: drag.actor,
-			commandTarget: targetFacts.commandTarget,
-			previewKind: kind,
-			shortcutReceiver: {
-				actor: inventoryActor,
-				pose,
-			},
-			sourceItem,
-			targetItem: targetFacts.occupant,
-		} satisfies Parameters<DropSubmission["submitFx"]>[0];
-	},
-);
-
 const updateMagneticFieldFx = Effect.fn("createMainDragControllerFx.updateMagneticFieldFx")(
 	function* ({
 		actor,
@@ -597,21 +544,17 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		}
 		event.preventDefault();
 		event.stopImmediatePropagation();
-		let submission: Parameters<DropSubmission["submitFx"]>[0] | null;
-		try {
-			submission = RendererRuntime.runSync(
-				readInventoryShortcutFx({
-					actorStore,
-					drag,
-					preview: dragPreview,
-					surface,
-				}),
-			);
-		} catch (cause) {
-			recoverPointerFailureFn(cause);
-			return;
-		}
-		if (submission === null) return;
+		const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
+		if (sourceItem === null) return;
+		const submission = {
+			actor: drag.actor,
+			sourceItem,
+			commandTarget: {
+				kind: "inventory" as const,
+			},
+			previewKind: null,
+			targetItem: null,
+		};
 		releaseDragPointerFn(drag.pointerId);
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;

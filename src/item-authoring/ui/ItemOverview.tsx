@@ -25,7 +25,6 @@ import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import type { SectionDescriptor, SectionId } from "~/item-authoring/type/Section";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 const OverviewIconBySection = {
@@ -118,9 +117,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 			project.config,
 		],
 	);
-	const enabledProductionLineCount = readAuthoredItemLinesFn(item).filter(
-		(line) => line.enable,
-	).length;
+	const enabledProductionLineCount = item.lines.filter((line) => line.enable).length;
 	const estimateSummary =
 		estimate.status === "ready"
 			? formatItemEstimateResultFn(estimate.estimate)
@@ -129,11 +126,9 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				: "Unavailable";
 	const summaries = {
 		action:
-			item.type === "common"
-				? item.action === undefined
-					? translator.textFn("Disabled")
-					: translator.textFn("Space")
-				: null,
+			item.action === undefined
+				? translator.textFn("Disabled")
+				: translator.textFn(item.action.type === "space" ? "Space" : "Inventory"),
 		artwork: (
 			<div className="flex items-center gap-3">
 				<EditorItemThumbnail
@@ -149,7 +144,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				</div>
 			</div>
 		),
-		clock: item.type === "common" && item.clock !== undefined ? "Enabled" : "Disabled",
+		clock: item.clock !== undefined ? "Enabled" : "Disabled",
 		notes: "Ideas and decisions linked to this item",
 		units: item.units === undefined ? "Disabled" : "Enabled",
 		delete:
@@ -170,7 +165,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 			className="flex flex-col gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorItemOverview"
 		>
-			{readSectionsFn(item).map((section) =>
+			{readSectionsFn().map((section) =>
 				section.id === "identity" ? null : (
 					<ItemOverviewCard
 						icon={

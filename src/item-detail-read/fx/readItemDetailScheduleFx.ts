@@ -26,8 +26,7 @@ export const readItemDetailScheduleFx = Effect.fn("readItemDetailScheduleFx")(fu
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const owner = runtime.items.find((item) => item.id === itemId);
-	if (owner === undefined || owner.item.type !== "common" || owner.item.clock === undefined)
-		return undefined;
+	if (owner === undefined || owner.item.clock === undefined) return undefined;
 	const clock = owner.item.clock;
 	const enabled = yield* resolveItemScheduleEnabledFx({
 		item: owner,

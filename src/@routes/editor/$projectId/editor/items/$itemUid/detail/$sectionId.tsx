@@ -63,7 +63,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		const item = useItemByUid(itemUid);
 		if (item === undefined) return <NotFound uid={itemUid} />;
 		const section = sectionId as SectionId;
-		const available = readSectionsFn(item).some((candidate) => candidate.id === section);
+		const available = readSectionsFn().some((candidate) => candidate.id === section);
 		if (!available)
 			return (
 				<section

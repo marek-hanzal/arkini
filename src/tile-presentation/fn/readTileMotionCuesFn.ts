@@ -1,9 +1,3 @@
-import { Effect, Option } from "effect";
-
-import type { GameEngine } from "~/playable-game/type/GameEngine";
-import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
-import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeItemFn";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -11,8 +5,6 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { readRuntimeInventoryOpenerFx } from "~/item-interaction/fx/readRuntimeInventoryOpenerFx";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -133,54 +125,15 @@ const readSpawnCueFn = ({
 	} satisfies UnstaggeredTileMotionCue;
 };
 
-const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx")(function* ({
-	game,
-	source,
-}: {
-	readonly game: Pick<GameEngine, "getResourceUrlFn">;
-	readonly source: GridRuntimeItemSchema.Type;
-}) {
-	const visual = yield* readTileActorVisualFx({
-		game,
-		item: source.item,
-	});
-	const badgeCount = readTileActorBadgeCountFn(source);
-	return {
-		...visual,
-		...(badgeCount === undefined
-			? {}
-			: {
-					badgeCount,
-				}),
-		...(source.item.units === undefined
-			? {}
-			: {
-					badgeKind: "units" as const,
-				}),
-		id: source.id,
-		itemType: source.item.type,
-		location: source.location,
-		primaryAction: {
-			kind: "none",
-		},
-		quantity: source.quantity,
-		revision: source.revision,
-		running: false,
-		activityEffect: false,
-	} satisfies TileActorItem;
-});
-
-const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
+const readEventCueFn = ({
 	event,
 	eventIndex,
-	game,
 	transition,
 }: {
 	readonly event: GameEventSchema.Type;
 	readonly eventIndex: number;
-	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly transition: CommittedTransitionSchema.Type;
-}) {
+}) => {
 	if (event.type === GameEventEnumSchema.enum.ItemSpawned) {
 		return readSpawnCueFn({
 			event,
@@ -237,53 +190,6 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 		} satisfies UnstaggeredTileMotionCue;
 	}
 	if (
-		event.type === GameEventEnumSchema.enum.ItemInputStored &&
-		event.previousSourceLocation.scope === LocationScopeEnumSchema.enum.Inventory
-	) {
-		if (transition.previousRuntime === null) return null;
-		const source = readGridRuntimeItemFn({
-			itemId: event.sourceItemId,
-			runtime: transition.previousRuntime,
-		});
-		if (
-			source === null ||
-			source.item.id !== event.canonicalItemId ||
-			!isSameGridLocationFn({
-				left: source.location,
-				right: event.previousSourceLocation,
-			})
-		) {
-			return null;
-		}
-		const inventoryOpener = yield* readRuntimeInventoryOpenerFx({
-			itemId: source.id,
-			runtime: transition.previousRuntime,
-		}).pipe(Effect.option);
-		const target = readGridRuntimeItemFn({
-			itemId: event.ownerItemId,
-			runtime: transition.runtime,
-		});
-		if (Option.isNone(inventoryOpener) || target === null) return null;
-		return {
-			kind: "input",
-			sequence: transition.sequence,
-			eventIndex,
-			sourceActorId: event.sourceItemId,
-			sourceItem: yield* readInventoryInputSourceItemFx({
-				game,
-				source,
-			}),
-			targetActorId: event.ownerItemId,
-			canonicalItemId: event.canonicalItemId,
-			previousQuantity: event.previousQuantity,
-			storedQuantity: event.storedQuantity,
-			resultingQuantity: event.resultingQuantity,
-			originActorId: inventoryOpener.value.id,
-			originLocation: inventoryOpener.value.location,
-			targetLocation: target.location,
-		} satisfies UnstaggeredTileMotionCue;
-	}
-	if (
 		event.type === GameEventEnumSchema.enum.ItemPlaced &&
 		event.previousLocation.scope === LocationScopeEnumSchema.enum.Inventory
 	) {
@@ -294,7 +200,7 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 		});
 	}
 	return null;
-});
+};
 
 /**
  * Compiles ordered engine facts into semantic tile motion intents.
@@ -302,18 +208,15 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
  * Missing or stale visual identities intentionally degrade to no cue; gameplay has already
  * committed and renderer choreography must never weaken that authority.
  */
-export const readTileMotionCuesFx = Effect.fn("readTileMotionCuesFx")(function* ({
-	game,
+export const readTileMotionCuesFn = ({
 	transition,
 }: {
-	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly transition: CommittedTransitionSchema.Type;
-}) {
-	const cues = yield* Effect.forEach(transition.events, (event, eventIndex) =>
-		readEventCueFx({
+}) => {
+	const cues = transition.events.map((event, eventIndex) =>
+		readEventCueFn({
 			event,
 			eventIndex,
-			game,
 			transition,
 		}),
 	);
@@ -328,4 +231,4 @@ export const readTileMotionCuesFx = Effect.fn("readTileMotionCuesFx")(function* 
 			staggerIndex,
 		};
 	});
-});
+};

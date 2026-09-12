@@ -8,7 +8,7 @@ const node = (id: string): LayoutInput["nodes"][number] => ({
 	height: 120,
 	id,
 	ports: [],
-	type: "common",
+
 	width: 240,
 });
 

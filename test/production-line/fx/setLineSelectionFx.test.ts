@@ -63,7 +63,7 @@ const config = GameConfigSchema.parse({
 		producer: {
 			uid: "producer",
 			id: "producer",
-			type: "common",
+
 			title: "Producer",
 			description: "Owns two lines.",
 			asset: {
@@ -106,7 +106,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 			producer: {
 				uid: "producer",
 				id: "producer",
-				type: "common",
+
 				title: "Producer",
 				description: "Owns one line.",
 				asset: {
@@ -128,7 +128,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 
 				uid: "blocker",
 				id: "blocker",
-				type: "common",
+
 				title: "Blocker",
 				description: "Blocks placement.",
 				asset: {

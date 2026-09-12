@@ -2,4 +2,4 @@
 export const GameProjectManifestFileName = "project.json";
 export const GameProjectSchemaFileName = "schema.json";
 export const GameProjectGameSchemaReference = "./schema.json";
-export const GameProjectItemSchemaReference = "../../schema.json";
+export const GameProjectItemSchemaReference = "../schema.json";

@@ -16,7 +16,7 @@ const item = (id: string, title = id) => ({
 
 	uid: id,
 	id,
-	type: "common" as const,
+
 	title,
 	description: id,
 	asset: {
@@ -132,7 +132,7 @@ const targetLine = ({
 
 const producer = (id: string, title: string, lines: readonly object[]) => ({
 	...item(id, title),
-	type: "common" as const,
+
 	scope: "board" as const,
 	maxStackSize: 1,
 	maxQueueSize: 1,
@@ -202,7 +202,7 @@ export const config = GameConfigSchema.parse({
 			...createItemBase("blueprint"),
 			title: "Blueprint",
 			maxQueueSize: 1,
-			type: "common",
+
 			units: {
 				amount: 1,
 			},

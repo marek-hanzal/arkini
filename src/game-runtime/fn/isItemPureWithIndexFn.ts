@@ -1,4 +1,3 @@
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemPurityIndex } from "./readItemPurityIndexFn";
@@ -23,7 +22,7 @@ export const isItemPureWithIndexFn = ({
 	const inputLineIds = index.inputLineIdsByOwnerId.get(item.id);
 	const jobLineIds = index.jobLineIdsByOwnerId.get(item.id);
 	const queueLineIds = index.queueLineIdsByOwnerId.get(item.id);
-	return readAuthoredItemLinesFn(item.item).every(
+	return item.item.lines.every(
 		(line) =>
 			inputLineIds?.has(line.id) !== true &&
 			jobLineIds?.has(line.id) !== true &&

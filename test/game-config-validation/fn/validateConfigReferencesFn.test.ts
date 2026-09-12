@@ -135,7 +135,7 @@ describe("completed config reference validation", () => {
 	it("reports selectors authored by Space requirements and availability rules", async () => {
 		const portal = {
 			...createItemBase("item:portal"),
-			type: "common" as const,
+
 			action: {
 				type: "space" as const,
 				space: 1,

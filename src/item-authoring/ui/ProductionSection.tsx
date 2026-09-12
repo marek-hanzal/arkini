@@ -1,7 +1,6 @@
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { match } from "ts-pattern";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -125,35 +124,21 @@ const ProductionFields = withFieldGroupFn({
 
 export const ProductionSection = () => {
 	const translator = useTranslator();
-	const { canonicalItem, form, productionLineId, validationIssues } = useFormSession();
+	const { form, productionLineId, validationIssues } = useFormSession();
 	const invalidLineIndex = validationIssues.find(
 		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
-	const content = match(canonicalItem)
-		.with(
-			{
-				type: "common",
-			},
-			() => (
-				<ProductionFields
-					form={form}
-					fields={{
-						maxQueueSize: "maxQueueSize",
-						lines: "lines",
-					}}
-					invalidLineIndex={invalidLineIndex}
-					selectedLineId={productionLineId}
-				/>
-			),
-		)
-		.with(
-			{
-				type: "inventory",
-			},
-			() => null,
-		)
-		.exhaustive();
-	if (content === null) return null;
+	const content = (
+		<ProductionFields
+			form={form}
+			fields={{
+				maxQueueSize: "maxQueueSize",
+				lines: "lines",
+			}}
+			invalidLineIndex={invalidLineIndex}
+			selectedLineId={productionLineId}
+		/>
+	);
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormSectionDivider

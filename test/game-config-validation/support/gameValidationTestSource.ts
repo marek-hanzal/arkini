@@ -1,5 +1,5 @@
 import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
@@ -21,9 +21,8 @@ export const createItemBase = (id: string) => ({
 });
 
 export const createSimpleItem = (id: string) =>
-	CommonSchema.parse({
+	ItemSchema.parse({
 		...createItemBase(id),
-		type: "common",
 	});
 
 export const createLine = ({
@@ -66,9 +65,9 @@ export const createProducerItem = ({
 	output?: OutputSchema.Type;
 	lines?: ReadonlyArray<LineSchema.Type>;
 }) =>
-	CommonSchema.parse({
+	ItemSchema.parse({
 		...createSimpleItem(id),
-		type: "common",
+
 		lines: lines ?? [
 			createLine({
 				input,
@@ -121,7 +120,7 @@ export const createRootSource = ({
 	GameSourceFileSchema.parse({
 		path,
 		value: {
-			$schema: "../schema.json",
+			$schema: "schema.json",
 			resources: {
 				hero: "hero",
 			},

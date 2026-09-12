@@ -375,8 +375,8 @@ export const validateConfigReferencesFn = ({
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		const action = item.type === "common" ? item.action : undefined;
-		const clock = item.type === "common" ? item.clock : undefined;
+		const action = item.action;
+		const clock = item.clock;
 		if (action !== undefined || clock !== undefined) {
 			const rules = action?.rules ?? clock?.rules ?? [];
 			diagnostics.push(

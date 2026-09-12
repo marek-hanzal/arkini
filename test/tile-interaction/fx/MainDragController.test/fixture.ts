@@ -41,6 +41,13 @@ const previewState = vi.hoisted(() => ({
 
 export const previewTestState = previewState;
 
+const storageState = vi.hoisted(() => ({
+	store: vi.fn(),
+}));
+vi.mock("~/item-interaction/fx/storeInventoryItemFx", () => ({
+	storeInventoryItemFx: (props: unknown) => Effect.sync(() => storageState.store(props)),
+}));
+
 const removalState = vi.hoisted(() => ({
 	remove: vi.fn(),
 }));
@@ -168,6 +175,17 @@ export const mountController = ({
 	previewState.reads = 0;
 	previewState.readsByActorId.clear();
 	removalState.remove.mockClear();
+	storageState.store.mockReset().mockReturnValue({
+		kind: "store-inventory",
+		source: {
+			itemId: item.id,
+			canonicalItemId: item.itemId,
+			previousQuantity: item.quantity,
+			previousRevision: item.revision,
+			previousLocation: item.location,
+			current: null,
+		},
+	});
 	const stageContainer = new Container();
 	const stage = new FakeEmitter(stageContainer);
 	const animateActor = vi.fn();
@@ -514,6 +532,7 @@ export const mountController = ({
 		releasePointerCapture,
 		reportCriticalFailureFn,
 		removeDraggedItem: removalState.remove,
+		storeInventory: storageState.store,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
 		},
@@ -558,7 +577,7 @@ export const setOrdinaryInventoryTarget = (
 	mounted: ReturnType<typeof mountController>,
 	inventory: TileActorItem,
 ) => {
-	previewState.actorKinds.set(inventory.id, "store-inventory");
+	previewState.actorKinds.set(inventory.id, "stack");
 	mounted.setOccupant(inventory);
 	mounted.setCommandTarget({
 		kind: "slot",

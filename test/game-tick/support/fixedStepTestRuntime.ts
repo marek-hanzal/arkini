@@ -12,7 +12,6 @@ import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 export const createFixedStepTestConfig = () => {
 	const base = createJobTestConfig();
 	const forge = base.items.forge;
-	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {

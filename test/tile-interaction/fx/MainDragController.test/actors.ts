@@ -17,7 +17,7 @@ export const item = {
 	artworkScale: 0.8,
 	id: "runtime:log",
 	itemId: "log",
-	itemType: "common",
+
 	location: {
 		scope: "board",
 		space: 0,

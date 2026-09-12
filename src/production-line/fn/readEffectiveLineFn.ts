@@ -1,13 +1,12 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readEffectiveLineFn {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly ownerItem: narrowLineOwnerItemFn.Result;
+		readonly ownerItem: ItemSchema.Type;
 		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId" | "items">;
 		readonly selection: "default" | "clock";
 	}
@@ -27,7 +26,7 @@ export const readEffectiveLineFn = ({
 	runtime,
 	selection,
 }: readEffectiveLineFn.Props) => {
-	const lines = readLineOwnerLinesFn(ownerItem);
+	const lines = ownerItem.lines;
 	const override =
 		selection === "default"
 			? Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)

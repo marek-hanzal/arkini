@@ -12,7 +12,6 @@ import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItem
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -32,15 +31,9 @@ class ItemInventoryStorageUnavailableError extends Data.TaggedError(
 	readonly itemId: IdSchema.Type;
 }> {}
 
-/** A requested inventory-storage target is not the live Inventory opener. */
-class ItemInventoryTargetInvalidError extends Data.TaggedError("ItemInventoryTargetInvalidError")<{
-	readonly itemId: IdSchema.Type;
-}> {}
-
 interface StoreItemInInventoryResult {
 	readonly sourceBefore: GridRuntimeItemSchema.Type;
 	readonly sourceAfter?: GridRuntimeItemSchema.Type;
-	readonly inventoryItem: GridRuntimeItemSchema.Type;
 }
 
 const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(function* ({
@@ -80,7 +73,7 @@ const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(fun
 });
 
 const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
-	props: commitStoreInventoryDropFx.Props,
+	props: storeInventoryItemFx.Props,
 ) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
@@ -88,22 +81,12 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 				itemId: props.sourceItemId,
 				runtime,
 			});
-			const runtimeInventory = yield* readRuntimeItemByIdFx({
-				itemId: props.inventoryItemId,
-				runtime,
-			});
 			yield* assertRevisionFx({
 				actualRevision: runtimeSource.revision,
 				entityId: runtimeSource.id,
 				expectedRevision: props.sourceRevision,
 			});
-			yield* assertRevisionFx({
-				actualRevision: runtimeInventory.revision,
-				entityId: runtimeInventory.id,
-				expectedRevision: props.inventoryRevision,
-			});
 			const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
-			const inventory = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeInventory));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -127,21 +110,9 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 				);
 			}
 			if (
-				inventory === undefined ||
-				inventory.item.type !== TypeSchema.enum.Inventory ||
-				!isSameGridLocationFn({
-					left: inventory.location,
-					right: props.inventoryLocation,
-				})
-			) {
-				return yield* Effect.fail(
-					new ItemInventoryTargetInvalidError({
-						itemId: props.inventoryItemId,
-					}),
-				);
-			}
-			if (
 				source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+				(source.location.scope === "board" &&
+					source.location.space !== runtime.currentSpace) ||
 				!isItemLocationScopeAllowedFn({
 					item: source.item,
 					locationScope: LocationScopeEnumSchema.enum.Inventory,
@@ -170,7 +141,6 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 						: {
 								sourceAfter: stored.current,
 							}),
-					inventoryItem: inventory,
 				} satisfies StoreItemInInventoryResult,
 				stored.runtime,
 			] as const;
@@ -178,20 +148,17 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 	);
 });
 
-export namespace commitStoreInventoryDropFx {
+export namespace storeInventoryItemFx {
 	export interface Props {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
-		readonly inventoryItemId: IdSchema.Type;
-		readonly inventoryRevision: RevisionSchema.Type;
-		readonly inventoryLocation: GridLocationSchema.Type;
 	}
 }
 
-/** Commits one exact whole-item transfer through the Inventory opener. */
-export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx")(function* (
-	props: commitStoreInventoryDropFx.Props,
+/** Stores one exact whole tile through canonical Inventory placement, without a target item. */
+export const storeInventoryItemFx = Effect.fn("storeInventoryItemFx")(function* (
+	props: storeInventoryItemFx.Props,
 ) {
 	return yield* storeItemInInventoryFx(props).pipe(
 		Effect.map((result): DropItemResult => {
@@ -202,34 +169,21 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 			return {
 				kind: DropItemResultKind.StoreInventory,
 				source,
-				inventory: {
-					itemId: result.inventoryItem.id,
-					revision: result.inventoryItem.revision,
-					location: result.inventoryItem.location,
-				},
 			};
 		}),
 		Effect.catchTags({
-			ItemNotFoundError: (error) =>
+			ItemNotFoundError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({
-						reason:
-							error.itemId === props.inventoryItemId
-								? DropItemRejectedReason.StaleTarget
-								: DropItemRejectedReason.StaleSource,
+						reason: DropItemRejectedReason.StaleSource,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
-			RevisionConflictError: (error) =>
+			RevisionConflictError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({
-						reason:
-							error.entityId === props.inventoryItemId
-								? DropItemRejectedReason.StaleTarget
-								: DropItemRejectedReason.StaleSource,
+						reason: DropItemRejectedReason.StaleSource,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
 			ItemLocationConflictError: () =>
@@ -237,7 +191,6 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 					makeDropRejectedResultFn({
 						reason: DropItemRejectedReason.StaleSource,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
 			ItemNotOnGridError: () =>
@@ -245,7 +198,6 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 					makeDropRejectedResultFn({
 						reason: DropItemRejectedReason.InvalidSource,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
 			ItemInventoryStorageUnavailableError: () =>
@@ -253,15 +205,6 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 					makeDropRejectedResultFn({
 						reason: DropItemRejectedReason.InvalidTarget,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
-			ItemInventoryTargetInvalidError: () =>
-				Effect.succeed(
-					makeDropRejectedResultFn({
-						reason: DropItemRejectedReason.InvalidTarget,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
 			ItemStatefulError: () =>
@@ -269,7 +212,6 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 					makeDropRejectedResultFn({
 						reason: DropItemRejectedReason.Blocked,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
 			PlacementUnavailableError: () =>
@@ -277,7 +219,6 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 					makeDropRejectedResultFn({
 						reason: DropItemRejectedReason.Blocked,
 						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
 					}),
 				),
 		}),

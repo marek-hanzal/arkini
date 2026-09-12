@@ -2,9 +2,9 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { board, inventory, run, spawnAndActivate } from "../support/spaceActionFixture";
+import { board, inventory, toolbar, run, spawnAndActivate } from "../support/spaceActionFixture";
 
 describe("Space item activation admission", () => {
 	it("evaluates proximity-gated availability from the Space item's Board origin", () => {
@@ -23,7 +23,7 @@ describe("Space item activation admission", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				yield* activateSpaceItemFx({
+				yield* activateItemActionFx({
 					currentSpace: before.currentSpace,
 					itemId: portal.id,
 					location: portal.location,
@@ -50,7 +50,7 @@ describe("Space item activation admission", () => {
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: before.currentSpace,
 						itemId: portal.id,
 						location: portal.location,
@@ -74,12 +74,12 @@ describe("Space item activation admission", () => {
 				const portal = yield* spawnItemFx({
 					id: "runtime:passive-zero-rule-portal",
 					itemId: "passiveZeroBoardRulePortal",
-					location: inventory(0),
+					location: toolbar(0),
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: before.currentSpace,
 						itemId: portal.id,
 						location: portal.location,
@@ -97,7 +97,7 @@ describe("Space item activation admission", () => {
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "BoardQueryOriginUnavailableError",
-				origin: inventory(0),
+				origin: toolbar(0),
 			});
 		}
 		expect(result.after).toEqual(result.before);
@@ -114,7 +114,7 @@ describe("Space item activation admission", () => {
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: before.currentSpace,
 						itemId: item.id,
 						location: item.location,
@@ -152,11 +152,11 @@ describe("Space item activation admission", () => {
 				yield* spawnAndActivate({
 					id: "runtime:navigator",
 					itemId: "portal",
-					location: inventory(0),
+					location: toolbar(0),
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: observed.currentSpace,
 						itemId: item.id,
 						location: item.location,

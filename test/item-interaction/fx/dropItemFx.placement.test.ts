@@ -1,3 +1,4 @@
+import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { useGameFx } from "~test/support/useGameFx";
@@ -128,7 +129,7 @@ describe("dropItemFx / move storage and swap", () => {
 		).toHaveLength(1);
 	});
 
-	it("stores the whole source stack through the Inventory opener atomically", () => {
+	it("stores the whole source stack without an opener atomically", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -149,24 +150,10 @@ describe("dropItemFx / move storage and swap", () => {
 					},
 					quantity: 8,
 				});
-				const inventory = yield* spawnItemFx({
-					id: "runtime:backpack",
-					itemId: "backpack",
-					location: occupiedLocation,
-					quantity: 1,
-				});
-				const outcome = yield* dropItemFx({
+				const outcome = yield* storeInventoryItemFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,
 					sourceLocation,
-					target: {
-						kind: "slot",
-						location: occupiedLocation,
-						occupant: {
-							itemId: inventory.id,
-							revision: inventory.revision,
-						},
-					},
 				});
 				return {
 					outcome,
@@ -181,10 +168,6 @@ describe("dropItemFx / move storage and swap", () => {
 				itemId: "runtime:water-source",
 				previousQuantity: 3,
 				current: null,
-			},
-			inventory: {
-				itemId: "runtime:backpack",
-				location: occupiedLocation,
 			},
 		});
 		expect(

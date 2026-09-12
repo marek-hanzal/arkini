@@ -18,7 +18,7 @@ const item = (id: string, title: string): ItemSchema.Type => ({
 	description: `${title} description`,
 	id,
 	title,
-	type: "common",
+
 	uid: id,
 });
 

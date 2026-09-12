@@ -19,7 +19,7 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 					index,
 				],
 			});
-	if (item.type === "common" && item.action !== undefined)
+	if (item.action !== undefined)
 		collections.push({
 			input: item.action.input,
 			path: [

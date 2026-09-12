@@ -146,9 +146,8 @@ const ClockFields = () => {
 
 /** Authors an optional schedule independently of the item's manual production controls. */
 export const ClockSection = () => {
-	const { canonicalItem, form } = useFormSession();
+	const { form } = useFormSession();
 	const translator = useTranslator();
-	if (canonicalItem.type !== "common") return null;
 	return (
 		<form.Subscribe selector={(state) => state.values.clock}>
 			{(clock) =>

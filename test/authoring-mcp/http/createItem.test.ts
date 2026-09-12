@@ -11,25 +11,8 @@ import {
 
 afterEach(cleanupMcpHarnesses);
 
-const typeGroups = [
-	{
-		name: "creates Common items through its dedicated tool",
-		projectId: "common-space-clock-types-project",
-		types: [
-			"common",
-		],
-	},
-	{
-		name: "creates Inventory items through its dedicated tool",
-		projectId: "special-item-types-project",
-		types: [
-			"inventory",
-		],
-	},
-] as const;
-
 describe("editor MCP item creation", () => {
-	it("creates a passive Common item from the Editor draft defaults and rejects an ID collision", async () => {
+	it("creates a passive item from the Editor draft defaults and rejects an ID collision", async () => {
 		const notifyProjectChanged = vi.fn();
 		const { ownership, port, repository } = await createMcpHarness(
 			Effect.runPromise,
@@ -56,7 +39,7 @@ describe("editor MCP item creation", () => {
 		const client = await connectMcpClient(port);
 
 		const created = await client.callTool({
-			name: "create_common_item",
+			name: "create_item",
 			arguments: jsonToolInputFn({
 				id: "item:mcp-simple",
 				title: "MCP Simple",
@@ -70,7 +53,7 @@ describe("editor MCP item creation", () => {
 				{
 					text: expect.stringMatching(
 						new RegExp(
-							`^Created common item\\.\\nID: item:mcp-simple\\nUID: .+\\nRevision: ${project.revision}$`,
+							`^Created item\\.\\nID: item:mcp-simple\\nUID: .+\\nRevision: ${project.revision}$`,
 						),
 					),
 				},
@@ -88,7 +71,7 @@ describe("editor MCP item creation", () => {
 			draft: false,
 			id: "item:mcp-simple",
 			title: "MCP Simple",
-			type: "common",
+
 			lines: [],
 			maxQueueSize: 1,
 		});
@@ -112,12 +95,12 @@ describe("editor MCP item creation", () => {
 		});
 		expect(collection.content).toMatchObject([
 			{
-				text: expect.stringMatching(/ID: item:mcp-simple\n  Type: common\n  Draft: false/),
+				text: expect.stringMatching(/ID: item:mcp-simple\n  Draft: false/),
 			},
 		]);
 
 		const rejectedStructuredInput = await client.callTool({
-			name: "create_common_item",
+			name: "create_item",
 			arguments: {
 				id: "item:legacy-structured-input",
 				title: "Legacy structured input",
@@ -126,7 +109,7 @@ describe("editor MCP item creation", () => {
 		});
 		expect(rejectedStructuredInput.isError).toBe(true);
 		const rejectedInvalidJson = await client.callTool({
-			name: "create_common_item",
+			name: "create_item",
 			arguments: {
 				input: "{",
 			},
@@ -134,7 +117,7 @@ describe("editor MCP item creation", () => {
 		expect(rejectedInvalidJson.isError).toBe(true);
 
 		const collision = await client.callTool({
-			name: "create_common_item",
+			name: "create_item",
 			arguments: jsonToolInputFn({
 				id: "item:mcp-simple",
 				title: "Duplicate",
@@ -158,14 +141,12 @@ describe("editor MCP item creation", () => {
 		).toBeUndefined();
 	});
 
-	it.each(typeGroups)("$name", async ({ projectId, types }) => {
-		const notifyProjectChanged = vi.fn();
-		const { ownership, port, repository } = await createMcpHarness(
-			Effect.runPromise,
-			notifyProjectChanged,
-		);
+	it("creates an inventory action through the generic tool and rejects an incompatible clock", async () => {
+		const { ownership, port, repository } = await createMcpHarness();
+		const projectId = "inventory-action-project";
 		await Effect.runPromise(
 			repository.createProjectFx({
+				...editorTestPayload,
 				version: {
 					major: 1,
 					minor: 0,
@@ -177,72 +158,48 @@ describe("editor MCP item creation", () => {
 						id: projectId,
 					},
 				},
-				resources: editorTestPayload.resources,
 			}),
 		);
 		ownership.setProjectContextFn(projectId);
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
-
-		for (const type of types) {
-			const id = `${type === "common" ? "common" : "item"}:mcp-${type}`;
-			const result = await client.callTool({
-				name: `create_${type}_item`,
-				arguments: jsonToolInputFn({
-					id,
-					title: `MCP ${type}`,
-					description: `Created ${type} item.`,
-					...(type === "common"
-						? {
-								draft: true,
-							}
-						: {}),
-				}),
-			});
-			expect(result.isError, type).not.toBe(true);
-			expect(result.content, type).toMatchObject([
-				{
-					text: expect.stringContaining(`Created ${type} item.`),
+		const created = await client.callTool({
+			name: "create_item",
+			arguments: jsonToolInputFn({
+				id: "bag",
+				title: "Bag",
+				action: {
+					type: "inventory",
 				},
-			]);
-		}
-
+			}),
+		});
+		expect(created.isError).not.toBe(true);
 		const project = await Effect.runPromise(repository.readProjectFx(projectId));
-		const read = (type: (typeof types)[number]) =>
-			project?.config.items[`${type === "common" ? "common" : "item"}:mcp-${type}`];
-		const has = (type: string) => types.some((candidate) => candidate === type);
-		for (const type of types) {
-			expect(read(type), type).toMatchObject({
-				asset: {
-					scale: 1,
-					default: [
-						editorTestPayload.resources[0]?.id,
-					],
+		expect(project?.config.items.bag).toMatchObject({
+			scope: "any",
+			lines: [],
+			action: {
+				type: "inventory",
+				input: [],
+				rules: [],
+			},
+		});
+		const rejected = await client.callTool({
+			name: "edit_item",
+			arguments: jsonToolInputFn({
+				itemId: "bag",
+				patch: {
+					clock: {
+						durationMs: 1000,
+					},
+					scope: "board",
 				},
-				draft: type === "common",
-				type,
-			});
-		}
-		expect(notifyProjectChanged).toHaveBeenCalledTimes(types.length);
-
-		if (has("common")) {
-			const discriminatorOverride = await client.callTool({
-				name: "create_common_item",
-				arguments: jsonToolInputFn({
-					id: "item:invalid-override",
-					title: "Invalid override",
-					description: "Must remain a Common item.",
-					type: "common",
-					uid: "forced-uid",
-				}),
-			});
-			expect(discriminatorOverride.isError).toBe(true);
-			expect(
-				(await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
-					"item:invalid-override"
-				],
-			).toBeUndefined();
-		}
+			}),
+		});
+		expect(rejected.isError).toBe(true);
+		expect((await Effect.runPromise(repository.readProjectFx(projectId)))?.revision).toBe(
+			project?.revision,
+		);
 	});
 
 	it("acknowledges a committed item when renderer notification fails", async () => {
@@ -272,7 +229,7 @@ describe("editor MCP item creation", () => {
 		const client = await connectMcpClient(port);
 
 		const created = await client.callTool({
-			name: "create_common_item",
+			name: "create_item",
 			arguments: jsonToolInputFn({
 				id: "item:committed",
 				title: "Committed",
@@ -282,7 +239,7 @@ describe("editor MCP item creation", () => {
 		expect(created.isError).not.toBe(true);
 		expect(created.content).toMatchObject([
 			{
-				text: expect.stringContaining("Created common item."),
+				text: expect.stringContaining("Created item."),
 			},
 		]);
 		expect(

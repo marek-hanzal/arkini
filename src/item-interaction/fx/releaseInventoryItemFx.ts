@@ -7,9 +7,12 @@ import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
+import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocationsFn";
+import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
-import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
@@ -17,7 +20,6 @@ import { ItemLocationConflictError } from "~/item-location/error/ItemLocationCon
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import { readRuntimeInventoryOpenerFx } from "~/item-interaction/fx/readRuntimeInventoryOpenerFx";
 
 export namespace releaseInventoryItemFx {
 	export interface Props {
@@ -68,58 +70,58 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 					}),
 				);
 			}
-			const inventoryOpener = yield* readRuntimeInventoryOpenerFx({
-				itemId,
-				runtime,
-			});
 			const config = yield* GameConfigFx;
-			const boardLocations = readBoardLocationsFn({
-				size: config.meta.board,
-				space: runtime.currentSpace,
-			});
-			const [origin] = boardLocations;
-			if (origin === undefined) {
-				return yield* Effect.fail(
-					new PlacementUnavailableError({
-						itemId: item.item.id,
-						placement: PlacementSchema.enum.Drop,
-						quantity: item.quantity,
-						reason: PlacementUnavailableError.Reason.BoardOriginUnavailable,
-						remainingQuantity: item.quantity,
+			const target = readEmptyLocationsFn({
+				locations: [
+					...readBoardLocationsFn({
+						size: config.meta.board,
+						space: runtime.currentSpace,
 					}),
-				);
-			}
-			const placed = yield* placeRuntimeItemFx({
-				excludedLocations: readInventoryLocationsFn({
-					size: config.meta.inventory,
-				}),
-				itemId,
-				origin,
-				originItemId: inventoryOpener.id,
+					...readToolbarLocationsFn({
+						size: config.meta.toolbarSize ?? 0,
+					}),
+				].filter((candidate) =>
+					isItemLocationScopeAllowedFn({
+						item: item.item,
+						locationScope: candidate.scope,
+					}),
+				),
 				runtime,
-			});
-			if (
-				placed.events.some(
-					(event) =>
-						!("location" in event) ||
-						(event.location.scope !== LocationScopeEnumSchema.enum.Board &&
-							event.location.scope !== LocationScopeEnumSchema.enum.Toolbar),
-				)
-			) {
+			})[0];
+			if (target === undefined) {
 				return yield* Effect.fail(
 					new PlacementUnavailableError({
 						itemId: item.item.id,
 						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
-						reason: PlacementUnavailableError.Reason.ToolbarFull,
+						reason:
+							item.item.scope === "toolbar"
+								? PlacementUnavailableError.Reason.ToolbarFull
+								: PlacementUnavailableError.Reason.BoardFull,
 						remainingQuantity: item.quantity,
 					}),
 				);
 			}
+			const released = yield* reviseRuntimeItemFx({
+				item: {
+					...item,
+					location: target,
+				},
+			});
+			const nextRuntime = {
+				...runtime,
+				items: runtime.items.map((candidate) =>
+					candidate.id === itemId ? released : candidate,
+				),
+			};
+			const events: GameEventSchema.Type[] = [];
 			return [
-				placed,
-				placed.runtime,
-				placed.events,
+				{
+					runtime: nextRuntime,
+					events,
+				},
+				nextRuntime,
+				events,
 			] as const;
 		}),
 	);

@@ -66,8 +66,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-merge` | Directional merge admission and atomic lifecycle | [`src/item-merge/fx/mergeItemsFx.ts`](src/item-merge/fx/mergeItemsFx.ts) |
 | `item-state-isolation` | Identity-bound owner isolation and remainder placement | [`src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts`](src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts) |
 | `item-interaction` | Drop preview/commit, release, split, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
-| `item-action` | Discriminated immediate-action value contract and shared requirements | [`src/item-action/schema/ActionSchema.ts`](src/item-action/schema/ActionSchema.ts) |
-| `space-action` | Common space-action activation, unit settlement and navigation | [`src/space-action/fx/activateSpaceItemFx.ts`](src/space-action/fx/activateSpaceItemFx.ts) |
+| `item-action` | Immediate inventory/space action admission and unit settlement | [`src/item-action/fx/activateItemActionFx.ts`](src/item-action/fx/activateItemActionFx.ts) |
 
 [`GAME.MD`](GAME.MD) owns gameplay meaning. The Runtime map owns state and lifecycle navigation.
 

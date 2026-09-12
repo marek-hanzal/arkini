@@ -113,17 +113,12 @@ const readFeedbackCuesFn = (
 			{
 				kind: DropItemResultKind.StoreInventory,
 			},
-			({ inventory, source }) =>
+			({ source }) =>
 				[
 					{
 						actorId: source.itemId,
 						key: `drop:${generation}:consume-source`,
 						kind: "consume-source",
-					},
-					{
-						actorId: inventory.itemId,
-						key: `drop:${generation}:consume`,
-						kind: "consume",
 					},
 				] satisfies TileActorFeedbackCue[],
 		)

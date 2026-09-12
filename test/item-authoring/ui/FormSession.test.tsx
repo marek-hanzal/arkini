@@ -130,7 +130,7 @@ const item: ItemSchema.Type = {
 
 	uid: "q12cmsx5ussy30wyjiea8yaw",
 	id: "item:water",
-	type: "common",
+
 	title: "Water",
 	description: "Fresh water.",
 	asset: {
@@ -213,7 +213,7 @@ const render = async (children: ReactNode, newItem = false, defaultDraft?: boole
 								defaultDraft,
 								defaultItemId: "dirty-bucket",
 								defaultTitle: "Dirty Bucket",
-								itemType: "common" as const,
+								create: true as const,
 							}
 						: {})}
 					sectionId={sectionId}
@@ -257,7 +257,7 @@ describe("item section form session", () => {
 			defaultDraft: true,
 			defaultItemId: "dirty-bucket",
 			defaultTitle: "Dirty Bucket",
-			itemType: "common",
+			create: true,
 		});
 	});
 
@@ -352,7 +352,7 @@ describe("item section form session", () => {
 	it("picks both bounds of the reserved random space range into the local draft", async () => {
 		const spaceItem = {
 			...item,
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 0,
@@ -668,10 +668,80 @@ describe("item section form session", () => {
 			}),
 		);
 	});
+	it("switches the action payload without losing shared requirements or rules", async () => {
+		const rule = {
+			type: "enable" as const,
+			when: [
+				{
+					type: "exists" as const,
+					query: {
+						scope: "universe" as const,
+						selector: {
+							type: "item" as const,
+							itemId: item.id,
+						},
+					},
+				},
+			] as [
+				{
+					type: "exists";
+					query: {
+						scope: "universe";
+						selector: {
+							type: "item";
+							itemId: string;
+						};
+					};
+				},
+			],
+		};
+		const input = {
+			type: "simple" as const,
+		};
+		const portal = {
+			...item,
+			action: {
+				type: "space" as const,
+				space: 7,
+				input: [
+					input,
+				],
+				rules: [
+					rule,
+				],
+			},
+		};
+		state.persisted = portal;
+		(state.project as Project).config.items[item.id] = portal;
+		const { container } = await render(<ActionSection />);
+		const inventory = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Inventory");
+		if (inventory === undefined) throw new Error("Missing Inventory action choice.");
+		await act(async () => inventory.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					action: {
+						type: "inventory",
+						input: [
+							input,
+						],
+						rules: [
+							rule,
+						],
+					},
+				}),
+			}),
+		);
+	});
 	it("replaces a configured action when the first production line is added", async () => {
 		const common = {
 			...item,
-			type: "common" as const,
+
 			action: {
 				type: "space" as const,
 				space: 7,
@@ -704,7 +774,7 @@ describe("item section form session", () => {
 	it("disables a configured action without changing the item identity", async () => {
 		const common = {
 			...item,
-			type: "common" as const,
+
 			action: {
 				type: "space" as const,
 				space: 7,
@@ -745,7 +815,6 @@ describe("item section form session", () => {
 		expect(state.saveItem).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					type: "common",
 					lines: [
 						expect.objectContaining({
 							default: true,
@@ -776,7 +845,6 @@ describe("item section form session", () => {
 		expect(state.saveItem).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					type: "common",
 					lines: [],
 				}),
 			}),
@@ -866,7 +934,7 @@ describe("item section form session", () => {
 	it("enables a clock on an action item as one valid saved Common", async () => {
 		const common = {
 			...item,
-			type: "common" as const,
+
 			scope: "inventory" as const,
 			maxStackSize: 9,
 			action: {
@@ -888,7 +956,6 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
-			type: "common",
 			scope: "board",
 			maxStackSize: 1,
 			action: undefined,
@@ -905,7 +972,7 @@ describe("item section form session", () => {
 				id: item.id,
 			}),
 			uid: item.uid,
-			type: "common",
+
 			scope: "board",
 			maxStackSize: 1,
 			clock: {
@@ -921,7 +988,6 @@ describe("item section form session", () => {
 				};
 			}
 		).config.items[item.id] = clock;
-		if (clock.type !== "common") throw new Error("Expected Common clock fixture.");
 		const { container } = await render(<ClockSection />);
 		const duration = container.querySelector<HTMLInputElement>(
 			'input[name="clock.durationMs"]',
@@ -1001,7 +1067,7 @@ describe("item section form session", () => {
 	it("names and focuses the invalid Once lifetime", async () => {
 		const once: ItemSchema.Type = {
 			...item,
-			type: "common",
+
 			scope: "board",
 			clock: {
 				durationMs: 2000,

@@ -1,7 +1,6 @@
 import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
@@ -19,6 +18,7 @@ export namespace readRuntimeItemPrimaryActionFx {
 		  }
 		| {
 				readonly kind: "open-inventory";
+				readonly currentSpace: number;
 		  }
 		| {
 				readonly kind: "enqueue-default-line";
@@ -39,7 +39,11 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click interaction of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
-		if (item.item.type === TypeSchema.enum.Common && item.item.action !== undefined) {
+		if (item.location.scope === "inventory")
+			return {
+				kind: "none" as const,
+			};
+		if (item.item.action !== undefined) {
 			return match(item.item.action)
 				.with(
 					{
@@ -50,12 +54,16 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 						kind: "activate-space" as const,
 					}),
 				)
+				.with(
+					{
+						type: "inventory",
+					},
+					() => ({
+						kind: "open-inventory" as const,
+						currentSpace: runtime.currentSpace,
+					}),
+				)
 				.exhaustive();
-		}
-		if (item.item.type === TypeSchema.enum.Inventory) {
-			return {
-				kind: "open-inventory" as const,
-			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
 		const lineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(item.item));
 		if (lineOwnerItem === undefined) {

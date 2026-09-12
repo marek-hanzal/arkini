@@ -35,8 +35,8 @@ const item = (
 		"missing",
 	],
 	starterScopes: [],
+	missing: false,
 	title: itemId,
-	type: "common",
 });
 
 export const producerFlow: ItemOriginFlow = {

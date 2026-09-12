@@ -12,7 +12,6 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 
 const workshop = lineRunTestConfig.items.workshop;
-if (workshop.type !== "common") throw new Error("Expected a Common workshop.");
 const config = GameConfigSchema.parse({
 	...lineRunTestConfig,
 	items: {
@@ -59,7 +58,6 @@ describe("independent Clock line selection", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnOwnerFx;
-				if (owner.item.type !== "common") throw new Error("Expected Common owner.");
 				const before = yield* readRuntimeFx();
 				const authored = {
 					default: readEffectiveLineFn({

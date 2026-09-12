@@ -43,7 +43,7 @@ export const testArkpackConfig = GameConfigSchema.parse({
 
 			uid: "water",
 			id: "water",
-			type: "common",
+
 			title: "Water",
 			description: "Water",
 			asset: {

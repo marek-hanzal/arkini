@@ -4,16 +4,8 @@ import { describe, expect, it } from "vitest";
 import { tileMotionCueTestFixture } from "~test/tile-presentation/support/tileMotionCueTestFixture";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
-const {
-	committedRuntime,
-	inventoryOpener,
-	readCues,
-	runtime,
-	source,
-	sourceLocation,
-	target,
-	targetLocation,
-} = tileMotionCueTestFixture;
+const { committedRuntime, readCues, runtime, source, sourceLocation, target, targetLocation } =
+	tileMotionCueTestFixture;
 
 describe("readTileMotionCuesFx", () => {
 	it("compiles ordered spawn and stack facts from the complete committed transition", () => {
@@ -112,91 +104,6 @@ describe("readTileMotionCuesFx", () => {
 		]);
 	});
 
-	it.each([
-		{
-			label: "Board",
-			openerLocation: {
-				scope: "board" as const,
-				space: 0,
-				position: {
-					x: 1,
-					y: 0,
-				},
-			},
-		},
-		{
-			label: "Toolbar",
-			openerLocation: inventoryOpener.location,
-		},
-	])("compiles one exact Inventory release from its live $label opener", ({ openerLocation }) => {
-		const inventoryLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const previousRuntime = {
-			...runtime,
-			items: runtime.items.map((item) =>
-				item.id === source.id
-					? {
-							...item,
-							location: inventoryLocation,
-						}
-					: item.id === inventoryOpener.id
-						? {
-								...item,
-								location: openerLocation,
-							}
-						: item,
-			),
-		};
-		const currentRuntime = {
-			...runtime,
-			items: runtime.items.map((item) =>
-				item.id === inventoryOpener.id
-					? {
-							...item,
-							location: openerLocation,
-						}
-					: item,
-			),
-		};
-
-		expect(
-			Effect.runSync(
-				readCues({
-					sequence: 9,
-					previousRuntime,
-					runtime: currentRuntime,
-					events: [
-						{
-							type: GameEventEnumSchema.enum.ItemPlaced,
-							itemId: source.id,
-							canonicalItemId: source.item.id,
-							originItemId: inventoryOpener.id,
-							previousLocation: inventoryLocation,
-							location: sourceLocation,
-							quantity: source.quantity,
-						},
-					],
-				}),
-			),
-		).toEqual([
-			{
-				kind: "spawn",
-				sequence: 9,
-				eventIndex: 0,
-				staggerIndex: 0,
-				actorId: source.id,
-				originActorId: inventoryOpener.id,
-				originLocation: openerLocation,
-				targetLocation: sourceLocation,
-			},
-		]);
-	});
-
 	it("compiles a board input store as whole-source delivery to its live owner", () => {
 		expect(
 			Effect.runSync(
@@ -239,7 +146,7 @@ describe("readTileMotionCuesFx", () => {
 		]);
 	});
 
-	it("anchors an Inventory input store to the physical toolbar opener", () => {
+	it("does not invent a main-canvas origin for an Inventory input transfer", () => {
 		const inventorySourceLocation = {
 			scope: "inventory" as const,
 			position: {
@@ -294,34 +201,8 @@ describe("readTileMotionCuesFx", () => {
 					],
 				}),
 			),
-		).toMatchObject([
-			{
-				kind: "input",
-				sequence: 11,
-				eventIndex: 0,
-				staggerIndex: 0,
-				sourceActorId: source.id,
-				sourceItem: {
-					badgeCount: 2,
-					id: source.id,
-					itemId: source.item.id,
-					itemType: "common",
-					location: inventorySourceLocation,
-					quantity: 2,
-					sourceUrl: "asset:water",
-				},
-				targetActorId: target.id,
-				canonicalItemId: source.item.id,
-				previousQuantity: 2,
-				storedQuantity: 1,
-				resultingQuantity: 1,
-				originActorId: inventoryOpener.id,
-				originLocation: inventoryOpener.location,
-				targetLocation,
-			},
-		]);
+		).toEqual([]);
 	});
-
 	it("degrades stale or missing visual identities to no choreography", () => {
 		const cues = Effect.runSync(
 			readCues({

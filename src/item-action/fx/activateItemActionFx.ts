@@ -9,7 +9,7 @@ import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIn
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import type { ActionSchema } from "~/item-action/schema/ActionSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InputRun } from "~/production-input/type/InputRun";
@@ -23,9 +23,9 @@ import { readRuntimeCommandTargetFx } from "~/game-runtime/fx/readRuntimeCommand
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { CurrentSpaceConflictError } from "~/space-action/error/CurrentSpaceConflictError";
-import { SpaceActionUnavailableError } from "~/space-action/error/SpaceActionUnavailableError";
+import { ItemActionUnavailableError } from "~/item-action/error/ItemActionUnavailableError";
 
-export namespace activateSpaceItemFx {
+export namespace activateItemActionFx {
 	export interface Props {
 		currentSpace: NonNegativeIntegerSchema.Type;
 		itemId: IdSchema.Type;
@@ -34,9 +34,9 @@ export namespace activateSpaceItemFx {
 	}
 }
 
-interface SpaceActionPlan {
+interface ItemActionPlan {
 	readonly ownerItemId: IdSchema.Type;
-	readonly space: number;
+	readonly action: ActionSchema.Type;
 	readonly units: ReadonlyArray<InputRun.UnitPlan>;
 }
 
@@ -47,7 +47,7 @@ type CurrentSpaceChangedGameEvent = Extract<
 	}
 >;
 
-const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
+const resolveItemActionFx = Effect.fn("resolveItemActionFx")(function* ({
 	itemId,
 	runtime,
 }: {
@@ -61,11 +61,11 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
 	if (
 		owner === undefined ||
-		owner.item.type !== TypeSchema.enum.Common ||
-		owner.item.action?.type !== "space"
+		owner.location.scope === "inventory" ||
+		owner.item.action === undefined
 	) {
 		return yield* Effect.fail(
-			new SpaceActionUnavailableError({
+			new ItemActionUnavailableError({
 				itemId,
 			}),
 		);
@@ -91,7 +91,7 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 	});
 	if (!enabled) {
 		return yield* Effect.fail(
-			new SpaceActionUnavailableError({
+			new ItemActionUnavailableError({
 				itemId,
 			}),
 		);
@@ -108,7 +108,7 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 		});
 		if (!resolution.resolution.ready || resolution.plan === undefined) {
 			return yield* Effect.fail(
-				new SpaceActionUnavailableError({
+				new ItemActionUnavailableError({
 					itemId,
 				}),
 			);
@@ -124,9 +124,9 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 
 	return {
 		ownerItemId: owner.id,
-		space: owner.item.action.space,
+		action: owner.item.action,
 		units,
-	} satisfies SpaceActionPlan;
+	} satisfies ItemActionPlan;
 });
 
 const setCurrentSpaceFn = ({
@@ -157,13 +157,13 @@ const setCurrentSpaceFn = ({
 	};
 };
 
-const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(function* ({
+const applyItemActionFx = Effect.fn("applyItemActionFx")(function* ({
 	runtime,
 	currentSpace,
 	itemId,
 	location,
 	revision,
-}: activateSpaceItemFx.Props & {
+}: activateItemActionFx.Props & {
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	if (runtime.currentSpace !== currentSpace) {
@@ -203,7 +203,7 @@ const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(funct
 		);
 	}
 
-	const plan = yield* resolveSpaceActionFx({
+	const plan = yield* resolveItemActionFx({
 		itemId,
 		runtime,
 	});
@@ -215,10 +215,10 @@ const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(funct
 	});
 	const navigation = setCurrentSpaceFn({
 		runtime: settlement.runtime,
-		space: plan.space,
+		space: plan.action.type === "space" ? plan.action.space : settlement.runtime.currentSpace,
 	});
 	return [
-		plan.space,
+		plan.action,
 		navigation.runtime,
 		[
 			...settlement.events,
@@ -227,22 +227,22 @@ const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(funct
 	] as const;
 });
 
-/** Settles one fresh Space action plan and navigation in one engine transaction. */
-export const activateSpaceItemFx = Effect.fn("activateSpaceItemFx")(
-	(props: activateSpaceItemFx.Props) =>
+/** Settles one immediate action plan and its result in one engine transaction. */
+export const activateItemActionFx = Effect.fn("activateItemActionFx")(
+	(props: activateItemActionFx.Props) =>
 		modifyRuntimeFx((runtime) =>
-			applySpaceItemActivationFx({
+			applyItemActionFx({
 				...props,
 				runtime,
 			}),
 		),
 );
 
-/** Returns the exact transition causally committed by this accepted Space action. */
-export const activateSpaceItemWithTransitionFx = Effect.fn("activateSpaceItemWithTransitionFx")(
-	(props: activateSpaceItemFx.Props) =>
+/** Returns the exact transition causally committed by this accepted item action. */
+export const activateItemActionWithTransitionFx = Effect.fn("activateItemActionWithTransitionFx")(
+	(props: activateItemActionFx.Props) =>
 		modifyRuntimeWithTransitionFx((runtime) =>
-			applySpaceItemActivationFx({
+			applyItemActionFx({
 				...props,
 				runtime,
 			}),

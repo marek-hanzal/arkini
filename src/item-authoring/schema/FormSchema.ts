@@ -2,15 +2,16 @@ import { z } from "zod";
 
 import type { ActionSchema } from "~/item-action/schema/ActionSchema";
 import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
-export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"> & {
+export type FormValues = Omit<
+	ItemSchema.Type,
+	"asset" | "description" | "merge" | "lines" | "maxQueueSize"
+> & {
 	readonly asset: {
 		readonly scale: number;
 		readonly default: [
@@ -19,7 +20,6 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 		];
 	};
 	readonly description: string;
-	readonly type: TypeSchema.Type;
 	readonly clock?: ItemScheduleSchema.Type;
 	readonly control?: "automatic-only" | "interactive";
 	readonly action?: ActionSchema.Type;

@@ -7,7 +7,6 @@ import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
@@ -222,7 +221,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 			owner.location.scope === LocationScopeEnumSchema.enum.Board
 				? owner.location
 				: undefined;
-		const lines = readLineOwnerLinesFn(ownerItem);
+		const lines = ownerItem.lines;
 		const matchingLines: readItemDetailSourcesFx.Line[] = [];
 		for (const line of lines) {
 			const output = readMatchingFactsFn({
@@ -322,7 +321,7 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 		for (const candidate of Object.values(config.items)) {
 			const owner = Option.getOrUndefined(narrowLineOwnerItemFn(candidate));
 			if (owner === undefined || owner.id === targetDefinitionItemId) continue;
-			const lines = readLineOwnerLinesFn(owner);
+			const lines = owner.lines;
 			if (
 				!lines.some(
 					(line) =>

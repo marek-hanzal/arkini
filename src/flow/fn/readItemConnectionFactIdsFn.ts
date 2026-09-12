@@ -4,7 +4,6 @@ import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisi
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { InputSchema as ActionInputSchema } from "~/production-action/schema/InputSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
@@ -70,7 +69,7 @@ const readItemConnectionFactsFn = (item: ItemSchema.Type): ItemConnectionFacts =
 		inputs: new Set<string>(),
 		outputs: new Set<string>(),
 	};
-	for (const line of readAuthoredItemLinesFn(item)) {
+	for (const line of item.lines) {
 		for (const input of line.input) {
 			const inputItemId = readInputItemIdFn(input);
 			if (inputItemId !== undefined) facts.inputs.add(inputItemId);
@@ -79,7 +78,7 @@ const readItemConnectionFactsFn = (item: ItemSchema.Type): ItemConnectionFacts =
 			facts.inputs.add(conditionFactId);
 		addOutputFactsFn(facts, line.output);
 	}
-	if (item.type === "common" && item.action !== undefined) {
+	if (item.action !== undefined) {
 		for (const input of item.action.input) {
 			const inputItemId = readInputItemIdFn(input);
 			if (inputItemId !== undefined) facts.inputs.add(inputItemId);
@@ -93,7 +92,7 @@ const readItemConnectionFactsFn = (item: ItemSchema.Type): ItemConnectionFacts =
 		addOutputFactsFn(facts, merge.output);
 	}
 	addOutputFactsFn(facts, item.units?.output);
-	if (item.type === "common" && item.clock !== undefined) {
+	if (item.clock !== undefined) {
 		addOutputFactsFn(facts, item.clock.onExpire);
 		for (const factId of readAvailabilityFactIdsFn(item.clock.rules)) facts.inputs.add(factId);
 	}

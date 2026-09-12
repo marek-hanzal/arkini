@@ -6,7 +6,6 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 /** Presents an optional immediate action and its requirements. */
 export const ActionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
-	if (item.type !== "common") return null;
 	const action = item.action;
 	if (action === undefined)
 		return (
@@ -23,15 +22,21 @@ export const ActionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 		<div className="grid gap-6">
 			<DetailSection
 				description={translator.textFn(
-					"Activation settles every requirement before entering the target.",
+					action.type === "space"
+						? "Activation settles every requirement before entering the target."
+						: "Open the inventory after all requirements and rules pass.",
 				)}
-				title={translator.textFn("Space action")}
+				title={translator.textFn(
+					action.type === "space" ? "Space action" : "Inventory action",
+				)}
 			>
 				<DetailFacts>
-					<DetailFact
-						label={translator.textFn("Target space")}
-						value={action.space}
-					/>
+					{action.type === "space" ? (
+						<DetailFact
+							label={translator.textFn("Target space")}
+							value={action.space}
+						/>
+					) : null}
 					<DetailFact
 						label={translator.textFn("Rules")}
 						value={action.rules.length}

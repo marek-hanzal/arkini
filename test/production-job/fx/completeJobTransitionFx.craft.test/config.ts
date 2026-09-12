@@ -1,6 +1,6 @@
 import type { z } from "zod";
 
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
@@ -112,9 +112,9 @@ const craftItem = ({
 		maxStackSize,
 		scope: "any",
 		title: id,
-		type: "common",
+
 		uid: id,
-	}) satisfies z.input<typeof CommonSchema>;
+	}) satisfies z.input<typeof ItemSchema>;
 
 const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 	({
@@ -132,9 +132,9 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 		maxStackSize: 1,
 		scope,
 		title: id,
-		type: "common",
+
 		uid: id,
-	}) satisfies z.input<typeof CommonSchema>;
+	}) satisfies z.input<typeof ItemSchema>;
 
 /** One canonical parse owns every compact authored fixture builder above. */
 export const craftCompletionConfig = GameConfigSchema.parse({

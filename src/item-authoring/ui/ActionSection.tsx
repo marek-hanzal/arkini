@@ -20,8 +20,7 @@ const RandomSpaceMaximum = 1_024;
 /** Authors the optional immediate action; production and action never coexist. */
 export const ActionSection = () => {
 	const translator = useTranslator();
-	const { canonicalItem, form } = useFormSession();
-	if (canonicalItem.type !== "common") return null;
+	const { form } = useFormSession();
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
@@ -60,6 +59,13 @@ export const ActionSection = () => {
 										value={action.type}
 										options={[
 											{
+												value: "inventory",
+												label: translator.textFn("Inventory"),
+												description: translator.textFn(
+													"Open the inventory after all requirements and rules pass.",
+												),
+											},
+											{
 												value: "space",
 												label: translator.textFn("Space"),
 												description: translator.textFn(
@@ -68,10 +74,21 @@ export const ActionSection = () => {
 											},
 										]}
 										onChangeFn={(type) =>
-											form.setFieldValue("action", {
-												...action,
-												type,
-											})
+											form.setFieldValue(
+												"action",
+												type === "inventory"
+													? {
+															type,
+															input: action.input,
+															rules: action.rules,
+														}
+													: {
+															type,
+															space: 0,
+															input: action.input,
+															rules: action.rules,
+														},
+											)
 										}
 									/>
 									<Button
@@ -128,6 +145,12 @@ export const ActionSection = () => {
 											</form.AppField>
 										</EditorFormCard>
 									),
+								)
+								.with(
+									{
+										type: "inventory",
+									},
+									() => null,
 								)
 								.exhaustive()}
 							<EditorFormCard>

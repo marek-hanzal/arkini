@@ -1,8 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useMemo, type PropsWithChildren } from "react";
 import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
-import { convertFn } from "~/item-authoring/fn/convertFn";
 import { FormSession } from "~/item-authoring/ui/FormSession";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
@@ -13,7 +11,6 @@ const useDraft = (
 	defaultDraft: boolean | undefined,
 	defaultItemId: string | undefined,
 	defaultTitle: string | undefined,
-	type: TypeSchema.Type,
 	uid: string,
 	resourceId?: string,
 ): ItemSchema.Type => {
@@ -23,7 +20,6 @@ const useDraft = (
 			draft: defaultDraft,
 			itemId: defaultItemId,
 			resourceId: resourceId ?? project.resources[0]?.id ?? "missing-asset",
-			type,
 			uid,
 		});
 		const namedDraft =
@@ -40,7 +36,6 @@ const useDraft = (
 		defaultTitle,
 		project.resources,
 		resourceId,
-		type,
 		uid,
 	]);
 };
@@ -50,7 +45,7 @@ interface FormProps extends PropsWithChildren {
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
-	readonly itemType?: TypeSchema.Type;
+	readonly create?: boolean;
 	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
@@ -58,14 +53,14 @@ interface FormProps extends PropsWithChildren {
 	readonly uid: string;
 }
 
-/** Resolves a canonical item by UID or seeds its first local form from itemType. */
+/** Resolves a canonical item by UID or seeds its first local form from create. */
 export const Form = ({
 	children,
 	defaultDraft,
 	defaultItemId,
 	defaultTitle,
 	enableCapability,
-	itemType,
+	create,
 	mergeIndex,
 	productionLineId,
 	resourceId,
@@ -73,32 +68,20 @@ export const Form = ({
 	uid,
 }: FormProps) => {
 	const persistedItem = useItemByUid(uid);
-	const draft = useDraft(
-		defaultDraft,
-		defaultItemId,
-		defaultTitle,
-		itemType ?? persistedItem?.type ?? "common",
-		uid,
-		resourceId,
-	);
-	if (persistedItem === undefined && itemType === undefined) return <NotFound uid={uid} />;
-	const initialItem =
-		persistedItem === undefined
-			? draft
-			: itemType === undefined
-				? persistedItem
-				: convertFn(persistedItem, itemType);
+	const draft = useDraft(defaultDraft, defaultItemId, defaultTitle, uid, resourceId);
+	if (persistedItem === undefined && create !== true) return <NotFound uid={uid} />;
+	const initialItem = persistedItem ?? draft;
 	const isNew = persistedItem === undefined;
 	return (
 		<FormSession
-			key={`${initialItem.uid}:${initialItem.type}`}
+			key={initialItem.uid}
 			defaultDraft={defaultDraft}
 			defaultItemId={defaultItemId}
 			defaultTitle={defaultTitle}
 			enableCapability={enableCapability}
 			initialItem={initialItem}
 			isNew={isNew}
-			itemType={itemType}
+			create={create}
 			mergeIndex={mergeIndex}
 			productionLineId={productionLineId}
 			resourceId={resourceId}

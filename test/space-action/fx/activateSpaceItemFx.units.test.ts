@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
-import { activateSpaceItemWithTransitionFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
+import { activateItemActionWithTransitionFx } from "~/item-action/fx/activateItemActionFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { board, inventory, run, spawnAndActivate } from "../support/spaceActionFixture";
+import { board, inventory, toolbar, run, spawnAndActivate } from "../support/spaceActionFixture";
 
 describe("Space item unit settlement", () => {
 	it("treats activation of the current space as an event-free same-runtime no-op", () => {
@@ -15,11 +15,11 @@ describe("Space item unit settlement", () => {
 				const portal = yield* spawnItemFx({
 					id: "runtime:same-space",
 					itemId: "sameSpacePortal",
-					location: inventory(0),
+					location: toolbar(0),
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const activation = yield* activateSpaceItemWithTransitionFx({
+				const activation = yield* activateItemActionWithTransitionFx({
 					currentSpace: before.currentSpace,
 					itemId: portal.id,
 					location: portal.location,
@@ -33,8 +33,11 @@ describe("Space item unit settlement", () => {
 			}),
 		);
 
-		expect(result.activation).toEqual({
-			result: 0,
+		expect(result.activation).toMatchObject({
+			result: {
+				type: "space",
+				space: 0,
+			},
 			transition: null,
 		});
 		expect(result.after).toBe(result.before);
@@ -46,7 +49,7 @@ describe("Space item unit settlement", () => {
 				yield* spawnAndActivate({
 					id: "runtime:space-four-navigator",
 					itemId: "spentPortal",
-					location: inventory(0),
+					location: toolbar(0),
 				});
 				return yield* spawnAndActivate({
 					id: "runtime:spent",
@@ -63,7 +66,7 @@ describe("Space item unit settlement", () => {
 			spawnAndActivate({
 				id: "runtime:spent-stack",
 				itemId: "spentPortal",
-				location: inventory(2),
+				location: toolbar(2),
 				quantity: 2,
 			}),
 		);
@@ -73,7 +76,7 @@ describe("Space item unit settlement", () => {
 		expect(stackItems).toEqual([
 			expect.objectContaining({
 				id: passiveStack.item.id,
-				location: inventory(2),
+				location: toolbar(2),
 				quantity: 2,
 				remainingUnits: undefined,
 			}),
@@ -82,7 +85,7 @@ describe("Space item unit settlement", () => {
 			spawnAndActivate({
 				id: "runtime:spent-passive-stack",
 				itemId: "passiveFinitePortal",
-				location: inventory(2),
+				location: toolbar(2),
 				quantity: 2,
 			}),
 		);
@@ -98,7 +101,7 @@ describe("Space item unit settlement", () => {
 		);
 		expect(spentStackItems.find((item) => item.id !== spentPassiveStack.item.id)).toMatchObject(
 			{
-				location: inventory(1),
+				location: toolbar(1),
 				quantity: 1,
 				remainingUnits: undefined,
 			},
@@ -114,7 +117,7 @@ describe("Space item unit settlement", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const activation = yield* activateSpaceItemWithTransitionFx({
+				const activation = yield* activateItemActionWithTransitionFx({
 					currentSpace: before.currentSpace,
 					itemId: portal.id,
 					location: portal.location,
@@ -167,12 +170,12 @@ describe("Space item unit settlement", () => {
 				const portal = yield* spawnItemFx({
 					id: "runtime:passive-failure",
 					itemId: "passiveFailurePortal",
-					location: inventory(0),
+					location: toolbar(0),
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: before.currentSpace,
 						itemId: portal.id,
 						location: portal.location,

@@ -69,7 +69,7 @@ describe("Form", () => {
 		await act(async () => {
 			root.render(
 				createElement(Form, {
-					itemType: "common",
+					create: true,
 					uid,
 				}),
 			);
@@ -88,7 +88,7 @@ describe("Form", () => {
 				],
 			},
 			draft: false,
-			type: "common",
+
 			uid,
 		});
 	});
@@ -105,7 +105,7 @@ describe("Form", () => {
 					defaultDraft: true,
 					defaultItemId: "selected_asset-name",
 					defaultTitle: "Selected Asset Name",
-					itemType: "common",
+					create: true,
 					resourceId: "selected_asset-name",
 					uid: "draft-with-selected-asset",
 				}),
@@ -125,7 +125,6 @@ describe("Form", () => {
 			id: "selected_asset-name",
 			lines: [],
 			title: "Selected Asset Name",
-			type: "common",
 		});
 	});
 });

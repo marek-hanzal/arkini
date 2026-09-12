@@ -102,11 +102,6 @@ interface DropStoredInputResult {
 interface DropStoredInventoryResult {
 	readonly kind: typeof DropItemResultKind.StoreInventory;
 	readonly source: DropTransferredActor;
-	readonly inventory: {
-		readonly itemId: IdSchema.Type;
-		readonly revision: RevisionSchema.Type;
-		readonly location: GridLocationSchema.Type;
-	};
 }
 
 interface DropStackedResult {

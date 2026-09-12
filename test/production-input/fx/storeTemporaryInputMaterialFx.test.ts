@@ -46,7 +46,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 
 			...baseItem("owner"),
-			type: "common",
+
 			lines: [
 				{
 					id: "line:owner",
@@ -74,7 +74,7 @@ const config = GameConfigSchema.parse({
 		},
 		temporary: {
 			...baseItem("temporary"),
-			type: "common",
+
 			lines: [],
 			maxQueueSize: 1,
 			clock: {

@@ -7,8 +7,9 @@
 
 @media (forced-colors: none) {
 	* {
-		scrollbar-color: var(--ak-scrollbar-thumb) var(--ak-scrollbar-track);
-		scrollbar-width: thin;
+		/* Native overlay styling overrides the persistent WebKit scrollbar below. */
+		scrollbar-color: auto;
+		scrollbar-width: auto;
 	}
 
 	*::-webkit-scrollbar {
@@ -41,6 +42,19 @@
 	*::-webkit-scrollbar-corner {
 		background: var(--ak-scrollbar-corner);
 	}
+}
+
+/* Reserve each scroll surface's track even before its content overflows. */
+@utility overflow-auto {
+	overflow: scroll;
+}
+
+@utility overflow-y-auto {
+	overflow-y: scroll;
+}
+
+@utility overflow-x-auto {
+	overflow-x: scroll;
 }
 
 html,

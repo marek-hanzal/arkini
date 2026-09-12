@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { detectPlatform } from "@tanstack/react-hotkeys";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -97,7 +98,18 @@ describe("ProjectIdentityRenameDialog", () => {
 				}),
 			);
 		});
-		await act(async () => submit.click());
+		await act(async () => {
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "s",
+					code: "KeyS",
+					bubbles: true,
+					cancelable: true,
+					metaKey: detectPlatform() === "mac",
+					ctrlKey: detectPlatform() !== "mac",
+				}),
+			);
+		});
 
 		expect(renameFn).toHaveBeenCalledWith("project-new");
 

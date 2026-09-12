@@ -1,3 +1,5 @@
+import { useImperativeHandle, useRef, type PropsWithChildren, type Ref } from "react";
+import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { ArrowLeft, NotebookPen, Pencil, Save, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -49,6 +51,37 @@ const noteMotion = {
 	},
 } as const;
 
+/** Keeps the save shortcut attached to one stable card as its editor opens and closes. */
+const ProjectNoteCard = ({
+	children,
+	ref,
+	saveEnabled,
+	saveFn,
+}: PropsWithChildren<{
+	readonly ref?: Ref<HTMLElement>;
+	readonly saveEnabled: boolean;
+	readonly saveFn: () => void;
+}>) => {
+	const cardRef = useRef<HTMLElement>(null);
+	useImperativeHandle(ref, () => cardRef.current!, []);
+	useEditorSaveShortcut({
+		target: cardRef,
+		saveEnabled,
+		saveFn,
+	});
+	return (
+		<motion.article
+			ref={cardRef}
+			layout="position"
+			className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5"
+			data-ui="EditorNote"
+			{...noteMotion}
+		>
+			{children}
+		</motion.article>
+	);
+};
+
 interface ProjectNotesProps extends useNotesController.Props {
 	readonly assetFilter?: AssetCollectionFilterSchema.Type;
 	readonly assetQuery?: string;
@@ -58,12 +91,21 @@ interface ProjectNotesProps extends useNotesController.Props {
 export const ProjectNotes = (props: ProjectNotesProps) => {
 	const controller = useNotesController(props);
 	const translator = useTranslator();
+	const composerRef = useRef<HTMLElement>(null);
+	useEditorSaveShortcut({
+		target: composerRef,
+		saveEnabled: controller.canCreate,
+		saveFn: controller.createFn,
+	});
 	return (
 		<div
 			className="mx-auto grid w-full max-w-3xl gap-6"
 			data-ui="EditorNotes"
 		>
-			<section className="grid gap-3 rounded-2xl border border-line bg-surface-raised/60 p-5">
+			<section
+				ref={composerRef}
+				className="grid gap-3 rounded-2xl border border-line bg-surface-raised/60 p-5"
+			>
 				<EditorTextarea
 					maxLength={NoteContentMaxLength}
 					maxRows={12}
@@ -149,12 +191,10 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 							controller.notes.map((note) => {
 								const editing = controller.editingNoteId === note.noteId;
 								return (
-									<motion.article
+									<ProjectNoteCard
+										saveEnabled={editing && controller.canSaveEdit}
+										saveFn={controller.saveEditFn}
 										key={note.noteId}
-										layout="position"
-										className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5"
-										data-ui="EditorNote"
-										{...noteMotion}
 									>
 										<header className="flex items-center gap-3">
 											<time className="text-xs text-subtle">
@@ -313,7 +353,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 												/>
 											</div>
 										) : null}
-									</motion.article>
+									</ProjectNoteCard>
 								);
 							})
 						)}

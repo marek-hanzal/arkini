@@ -1,3 +1,4 @@
+import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tx } from "~/translation/ui/Tx";
 import { Save, Trash2 } from "lucide-react";
@@ -75,57 +76,63 @@ export const EditorFormSectionPage = ({
 	readonly saving: boolean;
 	readonly tabs: ReactNode;
 	readonly title?: ReactNode;
-}>) => (
-	<EditorSectionPage
-		contentMode={contentMode}
-		header={
-			<EditorSectionNavigation
-				leading={leading}
-				title={title}
-				tabs={tabs}
-				action={
-					<div className="flex items-center gap-3">
-						{help === undefined ? null : (
-							<>
-								<EditorPageHelp {...help} />
-								<EditorSectionNavigationSeparator />
-							</>
-						)}
-						<EditorFormActions
-							discardFn={discardFn}
-							saveEnabled={saveEnabled}
-							saving={saving}
-							saveFn={saveFn}
-						/>
-					</div>
-				}
-			/>
-		}
-	>
-		<div
-			className="mx-auto grid w-3/4 min-w-0 gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
-			{...readDataUiFn({
-				dataUi: "EditorFormViewport",
-				state: {
-					contentMode,
-				},
-			})}
+}>) => {
+	useEditorSaveShortcut({
+		saveEnabled: saveEnabled && !saving,
+		saveFn,
+	});
+	return (
+		<EditorSectionPage
+			contentMode={contentMode}
+			header={
+				<EditorSectionNavigation
+					leading={leading}
+					title={title}
+					tabs={tabs}
+					action={
+						<div className="flex items-center gap-3">
+							{help === undefined ? null : (
+								<>
+									<EditorPageHelp {...help} />
+									<EditorSectionNavigationSeparator />
+								</>
+							)}
+							<EditorFormActions
+								discardFn={discardFn}
+								saveEnabled={saveEnabled}
+								saving={saving}
+								saveFn={saveFn}
+							/>
+						</div>
+					}
+				/>
+			}
 		>
-			{notice}
-			<EditorFormContent
-				error={error}
-				fill={contentMode === "viewport"}
-				rootCard={rootCard}
-				saveFn={saveFn}
+			<div
+				className="mx-auto grid w-3/4 min-w-0 gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
+				{...readDataUiFn({
+					dataUi: "EditorFormViewport",
+					state: {
+						contentMode,
+					},
+				})}
 			>
-				<fieldset
-					className="contents"
-					disabled={saving}
-					inert={saving}
+				{notice}
+				<EditorFormContent
+					error={error}
+					fill={contentMode === "viewport"}
+					rootCard={rootCard}
+					saveFn={saveFn}
 				>
-					{children}
-				</fieldset>
-			</EditorFormContent>
-		</div>
-	</EditorSectionPage>
-);
+					<fieldset
+						className="contents"
+						disabled={saving}
+						inert={saving}
+					>
+						{children}
+					</fieldset>
+				</EditorFormContent>
+			</div>
+		</EditorSectionPage>
+	);
+};

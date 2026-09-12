@@ -2,12 +2,12 @@
 	"$schema": "../../schema.json",
 	"item": {
 		"uid": "bpk4mu2dz3pcurcft0ojmq4s",
-		"id": "dirty-rum-bottle",
-		"title": "Dirty Rum Bottle",
+		"id": "dirty-bottle",
+		"title": "Dirty Bottle",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"dirty-rum-bottle"
+				"dirty-bottle"
 			]
 		},
 		"scope": "any",

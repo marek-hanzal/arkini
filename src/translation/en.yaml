@@ -533,6 +533,8 @@ Item storage scope help:
     Controls where this item can be placed: **Board**, **Toolbar**, **Inventory**, or **Any** of these locations. Normal placement rules still need a compatible free cell or stack.
 
     A configured **Clock** requires Board scope and a stack size of one.
+Item units empty title:
+  value: Give this item health, resources, or another finite supply.
 Item units help:
   value: |
     Units are a finite amount inside one item, such as health, resource stock, or uses. **Quantity** counts separate items in a stack.
@@ -996,10 +998,6 @@ Unit cost:
 Units:
   value: Units
   dynamic: true
-Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.:
-  value: Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.
-Units are disabled:
-  value: Units are disabled
 Units are the supply inside each item, independently of how many items are stacked.:
   value: Units are the supply inside each item, independently of how many items are stacked.
 Units configured:

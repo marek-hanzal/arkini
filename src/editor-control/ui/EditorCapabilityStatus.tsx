@@ -7,7 +7,7 @@ import { Status } from "~/ui/ui/Status";
 interface EditorCapabilityStatusProps {
 	readonly actionLabel: string;
 	readonly dataUi?: string;
-	readonly description: string;
+	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly onEnableFn: () => void;
 	readonly title: string;
@@ -29,7 +29,7 @@ export const EditorCapabilityStatus = ({
 		title={
 			<span className="inline-flex items-center gap-1.5">
 				{title}
-				<EditorInfoTooltip content={description} />
+				{description === undefined ? null : <EditorInfoTooltip content={description} />}
 			</span>
 		}
 		variant="flat"

@@ -20,16 +20,13 @@ export const UnitsSection = () => {
 							<EditorCapabilityStatus
 								actionLabel={translator.textFn("Enable units")}
 								dataUi="EditorUnitsDisabled"
-								description={translator.textFn(
-									"Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.",
-								)}
 								icon={BatteryCharging}
 								onEnableFn={() =>
 									form.setFieldValue("units", {
 										amount: 1,
 									})
 								}
-								title={translator.textFn("Units are disabled")}
+								title={translator.textFn("Item units empty title")}
 							/>
 						</EditorFormCard>
 					) : (

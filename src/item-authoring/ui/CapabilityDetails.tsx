@@ -21,12 +21,9 @@ export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 			<DisabledCapabilityDetail
 				actionLabel={translator.textFn("Enable units")}
 				capability="units"
-				description={translator.textFn(
-					"Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.",
-				)}
 				icon={BatteryCharging}
 				itemUid={item.uid}
-				title={translator.textFn("Units are disabled")}
+				title={translator.textFn("Item units empty title")}
 			/>
 		</EditorRootCard>
 	) : (

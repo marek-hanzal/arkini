@@ -16,7 +16,7 @@ export const DisabledCapabilityDetail = ({
 }: {
 	readonly actionLabel: string;
 	readonly capability: OptionalCapability;
-	readonly description: string;
+	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly itemUid: string;
 	readonly title: string;
@@ -43,7 +43,7 @@ export const DisabledCapabilityDetail = ({
 			title={
 				<span className="inline-flex items-center gap-1.5">
 					{title}
-					<EditorInfoTooltip content={description} />
+					{description === undefined ? null : <EditorInfoTooltip content={description} />}
 				</span>
 			}
 			variant="flat"

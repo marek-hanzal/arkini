@@ -38,7 +38,7 @@ interface CompleteJobTransitionProps {
 }
 
 /**
- * Resolves one ready job once and applies line output plus charge depletion lifecycle.
+ * Resolves one ready job once and applies line output plus unit depletion lifecycle.
  * Output conditions share this completion's input snapshot, including earlier Tick
  * transitions but excluding this completion's partial candidate.
  */

@@ -75,7 +75,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"producer:trader": {
 			...base("producer:trader"),
 			type: "producer",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			maxQueueSize: 1,
@@ -88,7 +88,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -111,7 +111,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"producer:phoenix": {
 			...base("producer:phoenix"),
 			type: "producer",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			maxCount: 1,
@@ -125,7 +125,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -160,7 +160,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"producer:finite-queue": {
 			...base("producer:finite-queue"),
 			type: "producer",
-			charges: {
+			units: {
 				amount: 2,
 			},
 			maxQueueSize: 3,
@@ -168,12 +168,12 @@ const lifecycleConfig = GameConfigSchema.parse({
 				{
 					id: "line:finite-queue:work",
 					title: "Finite queue work",
-					description: "Runs only while the owner has charges.",
+					description: "Runs only while the owner has units.",
 					runtimeMs: 200,
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -186,7 +186,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"blueprint:empty": {
 			...base("blueprint:empty"),
 			type: "blueprint",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: {
@@ -197,7 +197,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "simple",
-						charges: {
+						units: {
 							from: "self",
 							cost: 1,
 						},
@@ -226,7 +226,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"item:material": {
 			...base("item:material"),
 			type: "simple",
-			charges: {
+			units: {
 				amount: 2,
 			},
 			maxStackSize: 2,
@@ -247,7 +247,7 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 		),
 	);
 
-describe("job completion charge lifecycle", () => {
+describe("job completion unit lifecycle", () => {
 	it("removes a depleted producer and its remaining queue", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -401,7 +401,7 @@ describe("job completion charge lifecycle", () => {
 							y: 0,
 						},
 					},
-					remainingCharges: 0,
+					remainingUnits: 0,
 					quantity: 1,
 				},
 				{
@@ -423,7 +423,7 @@ describe("job completion charge lifecycle", () => {
 						lineId: "line:trader:trade",
 						inputIndex: 0,
 					},
-					remainingCharges: 1,
+					remainingUnits: 1,
 					quantity: 1,
 				},
 			],
@@ -465,7 +465,7 @@ describe("job completion charge lifecycle", () => {
 		});
 		expect(runtime.items.find((item) => item.id === "runtime:buffered-material")).toMatchObject(
 			{
-				remainingCharges: 1,
+				remainingUnits: 1,
 				location: {
 					scope: "board",
 					space: 0,

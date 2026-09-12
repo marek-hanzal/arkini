@@ -29,10 +29,10 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					maxCount: item.maxCount,
 				}),
 		maxStackSize: item.maxStackSize,
-		...(item.charges === undefined
+		...(item.units === undefined
 			? {}
 			: {
-					charges: item.charges,
+					units: item.units,
 				}),
 		...(item.merge === undefined
 			? {}

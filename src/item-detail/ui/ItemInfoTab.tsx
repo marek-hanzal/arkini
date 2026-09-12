@@ -23,8 +23,8 @@ export namespace ItemInfoTab {
 		readonly maxStackSize: number;
 		readonly ownedQuantity?: number;
 		readonly maxCount?: number;
-		readonly charges?: {
-			readonly label: "Charges" | "Charges per item";
+		readonly units?: {
+			readonly label: "Units" | "Units per item";
 			readonly value: string;
 		};
 	}
@@ -140,50 +140,55 @@ export const ItemInfoTab = ({
 			label: translator.textFn("Game limit"),
 			value: readGameLimitLabelFn(detail.maxCount),
 		},
-		...(detail.charges === undefined
+		...(detail.units === undefined
 			? []
 			: [
 					{
-						...detail.charges,
-						label: translator.textFn(detail.charges.label),
+						...detail.units,
+						label:
+							detail.units.label === "Units"
+								? translator.textFn("Units")
+								: translator.textFn("Units per item"),
 					},
 				]),
 		...(schedule === undefined
 			? []
 			: [
 					{
-						label: "Interval",
+						label: translator.textFn("Interval"),
 						value: formatDurationFn(schedule.intervalMs),
 					},
 					{
-						label: "Lifetime",
+						label: translator.textFn("Lifetime"),
 						value:
 							schedule.durationMs === undefined
-								? "Unlimited"
+								? translator.textFn("Unlimited")
 								: formatDurationFn(schedule.durationMs),
 					},
 					{
-						label: "Control",
+						label: translator.textFn("Control"),
 						value:
-							schedule.control === "interactive" ? "Interactive" : "Automatic only",
+							schedule.control === "interactive"
+								? translator.textFn("Interactive")
+								: translator.textFn("Automatic only"),
 					},
 					...(schedule.runtime === undefined
 						? []
 						: [
 								{
-									label: "Schedule",
+									label: translator.textFn("Schedule"),
 									value:
 										schedule.runtime.status === "draining"
-											? "Finishing accepted work"
+											? translator.textFn("Finishing accepted work")
 											: schedule.runtime.status === "running"
-												? "Running"
-												: "Paused",
+												? translator.textFn("Running")
+												: translator.textFn("Paused"),
 								},
 								...(schedule.runtime.status === "draining"
 									? []
 									: [
 											{
-												label: "Next pulse",
+												label: translator.textFn("Next pulse"),
 												value: formatDurationFn(
 													schedule.runtime.remainingIntervalMs,
 												),
@@ -192,7 +197,9 @@ export const ItemInfoTab = ({
 												? []
 												: [
 														{
-															label: "Lifetime remaining",
+															label: translator.textFn(
+																"Lifetime remaining",
+															),
 															value: formatDurationFn(
 																schedule.runtime
 																	.remainingDurationMs,
@@ -241,7 +248,7 @@ export const ItemInfoTab = ({
 					scheduleRuntime !== undefined &&
 					scheduleControl !== undefined ? (
 						<Fact
-							label="Timer control"
+							label={translator.textFn("Timer control")}
 							value={
 								<div className="flex flex-col items-start gap-2">
 									<Button
@@ -257,7 +264,9 @@ export const ItemInfoTab = ({
 											scheduleControl.setRunningFn(!scheduleRuntime.running)
 										}
 									>
-										{scheduleRuntime.running ? "Turn off" : "Turn on"}
+										{scheduleRuntime.running
+											? translator.textFn("Turn off")
+											: translator.textFn("Turn on")}
 									</Button>
 									{scheduleControl.error === null ? null : (
 										<p className="text-sm text-danger">

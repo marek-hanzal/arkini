@@ -2,7 +2,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemDetailReference } from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
-import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
+import type { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
@@ -11,9 +11,9 @@ import type { ItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";
 
 /** Renderer-owned contract for one live Item Detail lines projection. */
 export namespace ItemDetailLinesProjection {
-	export interface ChargeCost {
+	export interface UnitCost {
 		readonly cost: number;
-		readonly from: ChargeSourceSchema.Type;
+		readonly from: UnitSourceSchema.Type;
 	}
 
 	export interface Selector {
@@ -37,26 +37,26 @@ export namespace ItemDetailLinesProjection {
 				readonly availableCapacity: number;
 				readonly ready: boolean;
 				readonly canWithdraw: boolean;
-				readonly charges?: ChargeCost;
+				readonly units?: UnitCost;
 				readonly detail?: ItemDetailReference;
 		  }
 		| {
-				readonly kind: "deposit";
+				readonly kind: "units";
 				readonly selector: Selector;
 				readonly distance: DistanceSchema.Type;
-				readonly requiredCharges: number;
-				readonly availableCharges: number;
-				readonly availableChargesLabel: string;
+				readonly requiredUnits: number;
+				readonly availableUnits: number;
+				readonly availableUnitsLabel: string;
 				readonly targetTitles: readonly string[];
 				readonly ready: boolean;
-				readonly charges?: ChargeCost;
+				readonly units?: UnitCost;
 				readonly detail?: ItemDetailReference;
 		  }
 		| {
 				readonly kind: "simple";
 				readonly count: number;
 				readonly ready: boolean;
-				readonly charges: ChargeCost;
+				readonly units: UnitCost;
 		  };
 
 	export interface OutputItem extends OutputProjection.Item {
@@ -76,7 +76,7 @@ export namespace ItemDetailLinesProjection {
 				readonly message: string;
 		  }
 		| {
-				readonly kind: "deposit-target-missing";
+				readonly kind: "units-target-missing";
 				readonly selector: Selector;
 				readonly distance: DistanceSchema.Type;
 				readonly detail?: ItemDetailReference;

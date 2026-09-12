@@ -19,7 +19,7 @@ const CanvasColorToken = {
 	line: "--ak-line",
 	lineStrong: "--ak-line-strong",
 	muted: "--ak-muted",
-	sourceCharges: "--ak-flow-source-charges-surface",
+	sourceUnits: "--ak-flow-source-units-surface",
 	sourceExpiry: "--ak-flow-source-expiry-surface",
 	sourceLine: "--ak-flow-source-line-surface",
 	sourceMerge: "--ak-flow-source-merge-surface",
@@ -101,7 +101,7 @@ export const useCanvasPalette = (scheduleDrawRef: RefObject<() => void>) => {
 				lineStrong: colors.lineStrong,
 				muted: colors.muted,
 				sourceSurfaces: {
-					charges: colors.sourceCharges,
+					units: colors.sourceUnits,
 					expiry: colors.sourceExpiry,
 					line: colors.sourceLine,
 					merge: colors.sourceMerge,

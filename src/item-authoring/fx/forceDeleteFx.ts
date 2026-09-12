@@ -11,7 +11,7 @@ interface ItemCleanup {
 	readonly actionRuleIndexes: Set<number>;
 	readonly mergeIndexes: Set<number>;
 	readonly lineIndexes: Set<number>;
-	removeChargesOutput: boolean;
+	removeUnitsOutput: boolean;
 	removeExpiryOutput: boolean;
 	removeLine: boolean;
 }
@@ -27,7 +27,7 @@ export namespace forceDeleteFx {
 			readonly ownerItemId: string;
 			readonly ruleNumber: number;
 		}>;
-		readonly removedChargeOutputOwnerIds: ReadonlyArray<string>;
+		readonly removedUnitOutputOwnerIds: ReadonlyArray<string>;
 		readonly removedExpiryOutputOwnerIds: ReadonlyArray<string>;
 		readonly removedLines: ReadonlyArray<{
 			readonly ownerItemId: string;
@@ -57,7 +57,7 @@ const createItemCleanupFn = (): ItemCleanup => ({
 	actionRuleIndexes: new Set(),
 	mergeIndexes: new Set(),
 	lineIndexes: new Set(),
-	removeChargesOutput: false,
+	removeUnitsOutput: false,
 	removeExpiryOutput: false,
 	removeLine: false,
 });
@@ -115,8 +115,8 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			case "line":
 				cleanup.removeLine = true;
 				break;
-			case "charges":
-				cleanup.removeChargesOutput = true;
+			case "units":
+				cleanup.removeUnitsOutput = true;
 				break;
 			case "onExpire":
 			case "output":
@@ -138,7 +138,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		ownerItemId: string;
 		ruleNumber: number;
 	}> = [];
-	const removedChargeOutputOwnerIds: string[] = [];
+	const removedUnitOutputOwnerIds: string[] = [];
 	const removedExpiryOutputOwnerIds: string[] = [];
 	const removedLines: Array<{
 		ownerItemId: string;
@@ -219,12 +219,12 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					});
 			}
 		}
-		if (cleanup.removeChargesOutput && owner.charges !== undefined) {
-			candidate.charges = {
-				...owner.charges,
+		if (cleanup.removeUnitsOutput && owner.units !== undefined) {
+			candidate.units = {
+				...owner.units,
 				output: undefined,
 			};
-			removedChargeOutputOwnerIds.push(ownerItemId);
+			removedUnitOutputOwnerIds.push(ownerItemId);
 		}
 		if (cleanup.removeExpiryOutput) {
 			candidate[owner.type === "clock" ? "onExpire" : "output"] = undefined;
@@ -252,7 +252,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			deletedOwnerItemIds,
 			removedActionInputs,
 			removedActionRules,
-			removedChargeOutputOwnerIds,
+			removedUnitOutputOwnerIds,
 			removedExpiryOutputOwnerIds,
 			removedLines,
 			removedMergeRules,

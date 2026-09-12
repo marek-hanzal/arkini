@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { ChargeSchema } from "./ChargeSchema";
+import { UnitCostSchema } from "./UnitCostSchema";
 
 /** Fields shared by immediate-action and product-line requirements. */
 export const BaseSchema = z
 	.object({
-		/** Optional charge cost paid when the enclosing action commits. */
-		charges: ChargeSchema.optional().describe(
-			"The optional charge cost paid by the action owner or this requirement's resolved target.",
+		/** Optional unit cost paid when the enclosing action commits. */
+		units: UnitCostSchema.optional().describe(
+			"The optional unit cost paid by the action owner or this requirement's resolved target.",
 		),
 	})
 	.strict()

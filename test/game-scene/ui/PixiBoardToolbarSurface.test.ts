@@ -159,7 +159,7 @@ describe("PixiBoardToolbarSurface", () => {
 		boardState.enqueueLineState = {
 			kind: "error",
 			error: {
-				_tag: "DepositUnavailable",
+				_tag: "UnitsUnavailable",
 			},
 			ownerItemId: "runtime:producer",
 		};

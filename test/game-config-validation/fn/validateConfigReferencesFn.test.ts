@@ -31,8 +31,8 @@ const compileItems = (
 		]),
 	);
 
-const depositInput = (itemId: string) => ({
-	type: "deposit" as const,
+const unitsInput = (itemId: string) => ({
+	type: "units" as const,
 	query: {
 		scope: "board" as const,
 		distance: "close" as const,
@@ -41,7 +41,7 @@ const depositInput = (itemId: string) => ({
 			itemId,
 		},
 	},
-	charges: {
+	units: {
 		from: "target" as const,
 		cost: 1,
 	},
@@ -137,7 +137,7 @@ describe("completed config reference validation", () => {
 			type: "space" as const,
 			space: 1,
 			input: [
-				depositInput("item:missing-deposit"),
+				unitsInput("item:missing-units"),
 			],
 			rules: [
 				{
@@ -166,7 +166,7 @@ describe("completed config reference validation", () => {
 		expect(missing).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					referenceId: "item:missing-deposit",
+					referenceId: "item:missing-units",
 				}),
 				expect.objectContaining({
 					referenceId: "item:missing-rule",

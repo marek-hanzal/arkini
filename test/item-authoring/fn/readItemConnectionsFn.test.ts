@@ -85,7 +85,7 @@ describe("readItemConnectionsFn", () => {
 		expect(readIdsFn(config, "source", "produces")).toEqual([]);
 	});
 
-	it("reads line, merge, charge-depletion, and temporary-expiry outputs", () => {
+	it("reads line, merge, unit-depletion, and temporary-expiry outputs", () => {
 		const base = createTemporaryLifetimeTestConfig();
 		const common = base.items.blocker;
 		const producer = base.items.producer;
@@ -131,13 +131,13 @@ describe("readItemConnectionsFn", () => {
 					type: "stash",
 					line,
 				},
-				charged: {
+				spent: {
 					...common,
-					id: "charged",
-					uid: "charged",
-					title: "charged",
+					id: "spent",
+					uid: "spent",
+					title: "spent",
 					type: "simple",
-					charges: {
+					units: {
 						amount: 1,
 						output,
 					},
@@ -169,7 +169,7 @@ describe("readItemConnectionsFn", () => {
 			"blueprint",
 			"craft",
 			"stash",
-			"charged",
+			"spent",
 			"temporaryOutput",
 		])
 			expect(readIdsFn(config, ownerItemId, "produces")).toEqual([
@@ -233,7 +233,7 @@ describe("readItemConnectionsFn", () => {
 					enable: false,
 					input: [
 						{
-							type: "deposit",
+							type: "units",
 							query: {
 								distance: "far",
 								scope: "board",

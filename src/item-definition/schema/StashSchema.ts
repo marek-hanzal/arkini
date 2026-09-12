@@ -8,7 +8,7 @@ import { TypeSchema } from "./TypeSchema";
 /**
  * An item configuration that owns one ordinary product line.
  *
- * Output and placement use the shared line contract. Item lifetime is expressed independently through optional charges.
+ * Output and placement use the shared line contract. Item lifetime is expressed independently through optional units.
  */
 export const StashSchema = z
 	.object({

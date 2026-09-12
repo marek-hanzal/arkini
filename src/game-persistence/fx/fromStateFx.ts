@@ -22,7 +22,7 @@ const fromStateItemFx = Effect.fn("fromStateItemFx")(function* (state: StateItem
 		item,
 		location: state.location,
 		quantity: state.quantity,
-		remainingCharges: state.remainingCharges,
+		remainingUnits: state.remainingUnits,
 		schedule: state.schedule,
 		remainingDurationMs:
 			state.remainingDurationMs ??

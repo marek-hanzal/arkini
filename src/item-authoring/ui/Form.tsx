@@ -36,15 +36,15 @@ const useDraft = (
 		if (namedDraft.type !== "blueprint") return namedDraft;
 		return {
 			...namedDraft,
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: {
 				...namedDraft.line,
 				input: [
 					{
-						type: "deposit",
-						charges: {
+						type: "units",
+						units: {
 							cost: 1,
 							from: "self",
 						},

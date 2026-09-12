@@ -85,7 +85,7 @@ const stashItem = ({
 	uid: id,
 	id,
 	type: "stash" as const,
-	charges: {
+	units: {
 		amount: 1,
 	},
 	title: id,
@@ -106,7 +106,7 @@ const stashItem = ({
 		input: [
 			{
 				type: "materials" as const,
-				charges: {
+				units: {
 					from: "self" as const,
 					cost: 1,
 				},

@@ -118,7 +118,7 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {
-	// Queue admission may emit external charge-depletion output. New temporary
+	// Queue admission may emit external unit-depletion output. New temporary
 	// identities earn time only from the next boundary, regardless of that output path.
 	const temporaryItems = sortTemporaryItemsFn(stepStart);
 	const boundaryStart = yield* dispatchIdleQueueRequestsFx(stepStart);

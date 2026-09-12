@@ -6,7 +6,7 @@ import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
 /** Internal readiness and exact mutation plans for one configured line input. */
 export namespace InputRun {
-	export interface ChargePlan {
+	export interface UnitPlan {
 		readonly itemId: IdSchema.Type;
 		readonly cost: PositiveIntegerSchema.Type;
 	}
@@ -18,26 +18,26 @@ export namespace InputRun {
 
 	export interface SimplePlan {
 		readonly type: "simple";
-		readonly charges?: ChargePlan;
+		readonly units?: UnitPlan;
 	}
 
 	export interface MaterialPlan {
 		readonly type: "materials";
 		readonly mode: ModeSchema.Type;
 		readonly quantity: PositiveIntegerSchema.Type;
-		readonly charges?: ChargePlan;
+		readonly units?: UnitPlan;
 		readonly item: readonly [
 			ItemPlan,
 			...ItemPlan[],
 		];
 	}
 
-	export interface DepositPlan {
-		readonly type: "deposit";
-		readonly charges: ChargePlan;
+	export interface UnitsPlan {
+		readonly type: "units";
+		readonly units: UnitPlan;
 	}
 
-	export type Plan = SimplePlan | MaterialPlan | DepositPlan;
+	export type Plan = SimplePlan | MaterialPlan | UnitsPlan;
 
 	export interface SimpleResolution {
 		readonly type: "simple";
@@ -56,13 +56,13 @@ export namespace InputRun {
 		readonly ready: boolean;
 	}
 
-	export interface DepositResolution {
-		readonly type: "deposit";
+	export interface UnitsResolution {
+		readonly type: "units";
 		readonly ready: boolean;
 		readonly targetItemId?: IdSchema.Type;
 	}
 
-	export type InputResolution = SimpleResolution | MaterialResolution | DepositResolution;
+	export type InputResolution = SimpleResolution | MaterialResolution | UnitsResolution;
 
 	export interface Resolution {
 		readonly resolution: InputResolution;

@@ -110,7 +110,7 @@ describe("forceDeleteFx", () => {
 							},
 						},
 					],
-					charges: {
+					units: {
 						amount: 1,
 						output: waterOutput,
 					},
@@ -147,7 +147,7 @@ describe("forceDeleteFx", () => {
 		expect(result.config.start.board).toEqual([]);
 		expect(result.config.start.inventory).toEqual([]);
 		expect(result.config.items.oil).toMatchObject({
-			charges: {
+			units: {
 				amount: 1,
 			},
 		});
@@ -163,7 +163,7 @@ describe("forceDeleteFx", () => {
 			deletedOwnerItemIds: [],
 			removedActionInputs: [],
 			removedActionRules: [],
-			removedChargeOutputOwnerIds: [
+			removedUnitOutputOwnerIds: [
 				"oil",
 			],
 			removedExpiryOutputOwnerIds: [],
@@ -195,7 +195,7 @@ describe("forceDeleteFx", () => {
 			space: 1,
 			input: [
 				{
-					type: "deposit" as const,
+					type: "units" as const,
 					query: {
 						scope: "board" as const,
 						distance: "close" as const,
@@ -204,7 +204,7 @@ describe("forceDeleteFx", () => {
 							itemId: "water",
 						},
 					},
-					charges: {
+					units: {
 						from: "target" as const,
 						cost: 1,
 					},

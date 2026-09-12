@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -23,9 +24,10 @@ export const InputsControl = ({
 	onChangeFn,
 	value,
 }: InputsControlProps) => {
+	const translator = useTranslator();
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const { form, itemId } = useFormSession();
-	const selfChargesEnabled = useStore(form.store, (state) => state.values.charges !== undefined);
+	const selfUnitsEnabled = useStore(form.store, (state) => state.values.units !== undefined);
 	const validationIssues = useFormValidationIssues(value);
 	const issuesByInput = value.map((_input, index) =>
 		readEditorFormValidationIssuesFn(validationIssues, [
@@ -45,7 +47,9 @@ export const InputsControl = ({
 				description={
 					allowMaterials
 						? "Inputs belong only to this production line. At least one explicit input contract is required, and every configured contract must be satisfiable before a job can start. A Simple input explicitly requires no material."
-						: "Optional requirements settled when this action activates. Simple adds no external item requirement, while Deposit targets a matching board item and may spend its charges."
+						: translator.textFn(
+								"Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.",
+							)
 				}
 				title="Inputs"
 				variant="secondary"
@@ -60,10 +64,10 @@ export const InputsControl = ({
 							input.selector.itemId,
 							"No item selected",
 						)}`;
-					if (input.type === "deposit" && input.charges?.from === "self")
-						return `Self-paid Deposit input ${index + 1}`;
-					if (input.type === "deposit")
-						return `Deposit input ${index + 1} — ${readItemLabelFn(
+					if (input.type === "units" && input.units?.from === "self")
+						return `${translator.textFn("Self-paid units input")} ${index + 1}`;
+					if (input.type === "units")
+						return `${translator.textFn("Units input")} ${index + 1} — ${readItemLabelFn(
 							input.query.selector.itemId,
 							"No item selected",
 						)}`;
@@ -75,7 +79,7 @@ export const InputsControl = ({
 						return [
 							input.selector.itemId,
 						];
-					if (input.type === "deposit")
+					if (input.type === "units")
 						return [
 							input.query.selector.itemId,
 						];
@@ -107,7 +111,7 @@ export const InputsControl = ({
 						input={value[index]}
 						issues={issuesByInput[index]}
 						ownerItemId={itemId}
-						selfChargesEnabled={selfChargesEnabled}
+						selfUnitsEnabled={selfUnitsEnabled}
 						onChangeFn={(next) => replaceAtFn(index, next)}
 					/>
 				)}

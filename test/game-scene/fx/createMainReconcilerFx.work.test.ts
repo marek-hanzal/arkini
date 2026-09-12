@@ -89,7 +89,7 @@ describe("main reconciliation / work and consumption", () => {
 			}),
 		);
 	});
-	it("starts terminal deposit feedback before its longer fade-off releases the actor", () => {
+	it("starts terminal units feedback before its longer fade-off releases the actor", () => {
 		const item = createItem("runtime:depleted-tree", boardLocation);
 		const actor = createActor(item);
 		const harness = createReconcilerHarness({

@@ -19,7 +19,7 @@ import { InputSelectorMismatchIssueSchema } from "~/production-input/schema/Inpu
 import { InputSlotInvalidIssueSchema } from "~/production-input/schema/InputSlotInvalidIssueSchema";
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
-import { ItemChargesIssueSchema } from "./ItemChargesIssueSchema";
+import { ItemUnitsIssueSchema } from "./ItemUnitsIssueSchema";
 import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { ItemTemporaryDurationIssueSchema } from "./ItemTemporaryDurationIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
@@ -45,7 +45,7 @@ export const RuntimeCheckIssueSchema = z
 		JobConsumedMaterialStateIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,
-		ItemChargesIssueSchema,
+		ItemUnitsIssueSchema,
 		ItemStackSizeIssueSchema,
 		ItemTemporaryDurationIssueSchema,
 		ItemScheduleIssueSchema,

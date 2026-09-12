@@ -64,7 +64,7 @@ const craftItem = ({
 				`asset:${id}`,
 			],
 		},
-		charges: {
+		units: {
 			amount: 1,
 		},
 		description: id,
@@ -76,7 +76,7 @@ const craftItem = ({
 				inputItemId === undefined
 					? [
 							{
-								charges: {
+								units: {
 									cost: 1,
 									from: "self",
 								},
@@ -85,7 +85,7 @@ const craftItem = ({
 						]
 					: [
 							{
-								charges: {
+								units: {
 									cost: 1,
 									from: "self",
 								},

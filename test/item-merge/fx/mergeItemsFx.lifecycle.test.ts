@@ -75,20 +75,20 @@ const createLifecycleConfig = ({
 	effect = "keep",
 	sourceProducer = false,
 	targetProducer = false,
-	resultCharges,
+	resultUnits,
 	resultDurationMs,
 	sourceInputItemId = "material",
-	targetCharges,
+	targetUnits,
 	targetDurationMs,
 	ownerInputItemId = "material",
 }: {
 	action?: "consume" | "use";
 	effect?: "keep" | "remove" | "replace";
-	resultCharges?: number;
+	resultUnits?: number;
 	resultDurationMs?: number;
 	sourceInputItemId?: string;
 	sourceProducer?: boolean;
-	targetCharges?: number;
+	targetUnits?: number;
 	targetDurationMs?: number;
 	targetProducer?: boolean;
 	ownerInputItemId?: string;
@@ -136,11 +136,11 @@ const createLifecycleConfig = ({
 					...baseItem({
 						id: "target",
 					}),
-					charges:
-						targetCharges === undefined
+					units:
+						targetUnits === undefined
 							? undefined
 							: {
-									amount: targetCharges,
+									amount: targetUnits,
 								},
 					type: "simple" as const,
 				}
@@ -185,11 +185,11 @@ const createLifecycleConfig = ({
 							...baseItem({
 								id: "result",
 							}),
-							charges:
-								resultCharges === undefined
+							units:
+								resultUnits === undefined
 									? undefined
 									: {
-											amount: resultCharges,
+											amount: resultUnits,
 										},
 							type: "simple",
 						}
@@ -206,7 +206,7 @@ const createLifecycleConfig = ({
 				...baseItem({
 					id: "material",
 				}),
-				charges: {
+				units: {
 					amount: 2,
 				},
 				type: "simple",
@@ -626,7 +626,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 	it("initializes replacement state through the canonical runtime-item constructor", () => {
 		const config = createLifecycleConfig({
 			effect: "replace",
-			resultCharges: 2,
+			resultUnits: 2,
 		});
 		const state = {
 			cheats: {
@@ -658,13 +658,13 @@ describe("mergeItemsFx participant lifecycle", () => {
 			id: "runtime:target",
 			item: {
 				id: "result",
-				charges: {
+				units: {
 					amount: 2,
 				},
 			},
 			location: beforeTarget?.location,
 			quantity: 1,
-			remainingCharges: undefined,
+			remainingUnits: undefined,
 		});
 		expect(replaced?.revision).not.toBe(beforeTarget?.revision);
 	});
@@ -710,11 +710,11 @@ describe("mergeItemsFx participant lifecycle", () => {
 		});
 	});
 
-	it("preserves spent charges through a compatible replacement", () => {
+	it("preserves spent units through a compatible replacement", () => {
 		const config = createLifecycleConfig({
 			effect: "replace",
-			resultCharges: 36,
-			targetCharges: 18,
+			resultUnits: 36,
+			targetUnits: 18,
 		});
 		const state = {
 			cheats: {
@@ -727,7 +727,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				boardItem("source", 0),
 				{
 					...boardItem("target", 1),
-					remainingCharges: 5,
+					remainingUnits: 5,
 				},
 			],
 			jobQueue: [],
@@ -746,18 +746,18 @@ describe("mergeItemsFx participant lifecycle", () => {
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
 				id: "result",
-				charges: {
+				units: {
 					amount: 36,
 				},
 			},
-			remainingCharges: 23,
+			remainingUnits: 23,
 		});
 	});
 
-	it("rejects a charged replacement when the result cannot carry its wear", () => {
+	it("rejects a replacement with units when the result cannot carry its wear", () => {
 		const config = createLifecycleConfig({
 			effect: "replace",
-			targetCharges: 18,
+			targetUnits: 18,
 		});
 		const state = {
 			cheats: {
@@ -770,7 +770,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				boardItem("source", 0),
 				{
 					...boardItem("target", 1),
-					remainingCharges: 5,
+					remainingUnits: 5,
 				},
 			],
 			jobQueue: [],
@@ -821,7 +821,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 							inputIndex: 0,
 						},
 						quantity: 1,
-						remainingCharges: 1,
+						remainingUnits: 1,
 					},
 				],
 				jobQueue: [],
@@ -849,7 +849,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					(item) => item.id === "runtime:target:material",
 				);
 				expect(released).toMatchObject({
-					remainingCharges: 1,
+					remainingUnits: 1,
 					location: {
 						scope: "board",
 					},

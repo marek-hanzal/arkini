@@ -60,7 +60,7 @@ describe("blueprint depletion projection", () => {
 		});
 	});
 
-	it("includes final-charge output and owner depletion in input-starved fallback", () => {
+	it("includes final-unit output and owner depletion in input-starved fallback", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {
 				yield* spawnItemFx({

@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { Form } from "~/item-authoring/ui/Form";
 import type { SectionId } from "~/item-authoring/type/Section";
 
-type OptionalCapability = "charges" | "merges";
+type OptionalCapability = "units" | "merges";
 
 interface EditorItemFormSearch {
 	readonly defaultDraft?: boolean;
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						defaultTitle: search.defaultTitle,
 					}
 				: {}),
-			...(search.enable === "charges" || search.enable === "merges"
+			...(search.enable === "units" || search.enable === "merges"
 				? {
 						enable: search.enable,
 					}

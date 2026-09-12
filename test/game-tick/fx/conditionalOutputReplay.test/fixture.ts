@@ -68,7 +68,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 				...base.items.blocker,
 				uid: "payer",
 				id: "payer",
-				charges: {
+				units: {
 					amount: 1,
 					output: output("result", true),
 				},
@@ -76,7 +76,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			producer: {
 				...producer,
 				maxQueueSize: 2,
-				charges:
+				units:
 					path === "deferred-depletion"
 						? {
 								amount: 1,
@@ -90,7 +90,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 						input: [
 							{
 								type: "simple",
-								charges:
+								units:
 									path === "deferred-depletion"
 										? {
 												from: "self",
@@ -107,7 +107,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 						output: undefined,
 						input: [
 							{
-								type: "deposit",
+								type: "units",
 								query: {
 									scope: "board",
 									distance: "close",
@@ -116,7 +116,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 										itemId: "payer",
 									},
 								},
-								charges: {
+								units: {
 									from: "target",
 									cost: 1,
 								},

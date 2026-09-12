@@ -12,7 +12,7 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
-import { spendActionChargesFx } from "~/production-action/fx/spendActionChargesFx";
+import { spendActionUnitsFx } from "~/production-action/fx/spendActionUnitsFx";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
@@ -43,8 +43,8 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 		ownerItemId: source.id,
 		runtime,
 	});
-	if (action === SourceActionSchema.enum.Deposit) {
-		const spent = yield* spendActionChargesFx({
+	if (action === SourceActionSchema.enum.Spend) {
+		const spent = yield* spendActionUnitsFx({
 			actionId,
 			cost: 1,
 			itemId: source.id,
@@ -119,7 +119,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	};
 });
 
-const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementChargesFx")(function* ({
+const resolveMergeReplacementUnitsFx = Effect.fn("resolveMergeReplacementUnitsFx")(function* ({
 	resultItem,
 	runtime,
 	target,
@@ -131,7 +131,7 @@ const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementCharg
 	const otherwisePure = isItemPureFn({
 		item: {
 			...target,
-			remainingCharges: undefined,
+			remainingUnits: undefined,
 			remainingDurationMs: undefined,
 		},
 		runtime,
@@ -143,10 +143,10 @@ const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementCharg
 			}),
 		);
 	}
-	if (target.remainingCharges === undefined) return {};
+	if (target.remainingUnits === undefined) return {};
 
-	const targetCapacity = target.item.charges?.amount;
-	const resultCapacity = resultItem.charges?.amount;
+	const targetCapacity = target.item.units?.amount;
+	const resultCapacity = resultItem.units?.amount;
 	if (targetCapacity === undefined || resultCapacity === undefined || target.quantity !== 1) {
 		return yield* Effect.fail(
 			new ItemStatefulError({
@@ -154,8 +154,8 @@ const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementCharg
 			}),
 		);
 	}
-	const remainingCharges = resultCapacity - (targetCapacity - target.remainingCharges);
-	if (remainingCharges <= 0) {
+	const remainingUnits = resultCapacity - (targetCapacity - target.remainingUnits);
+	if (remainingUnits <= 0) {
 		return yield* Effect.fail(
 			new ItemStatefulError({
 				itemId: target.id,
@@ -163,10 +163,10 @@ const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementCharg
 		);
 	}
 
-	return remainingCharges === resultCapacity
+	return remainingUnits === resultCapacity
 		? {}
 		: {
-				remainingCharges,
+				remainingUnits,
 			};
 });
 
@@ -186,10 +186,10 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 	return yield* match(rule)
 		.with(
 			{
-				effect: TargetEffectSchema.enum.Deposit,
+				effect: TargetEffectSchema.enum.Spend,
 			},
 			() =>
-				spendActionChargesFx({
+				spendActionUnitsFx({
 					actionId,
 					cost: 1,
 					itemId: target.id,
@@ -254,7 +254,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 					const resultItem = yield* resolveItemFx({
 						itemId: result,
 					});
-					const replacementCharges = yield* resolveMergeReplacementChargesFx({
+					const replacementUnits = yield* resolveMergeReplacementUnitsFx({
 						resultItem,
 						runtime,
 						target,
@@ -264,7 +264,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						item: resultItem,
 						location: target.location,
 						quantity: 1,
-						...replacementCharges,
+						...replacementUnits,
 					});
 					const replacedRuntime = {
 						...runtime,

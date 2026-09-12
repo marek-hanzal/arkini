@@ -15,12 +15,12 @@ const readOwnerItemIdFn = (route: AcquisitionRoute) => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return route.metadata.ownerItemId;
-		case "line-charge-depletion":
-			return route.metadata.chargedItemId;
+		case "line-unit-depletion":
+			return route.metadata.unitOwnerItemId;
 		case "merge-output":
 			return route.metadata.sourceItemId;
-		case "merge-charge-depletion":
-			return route.metadata.chargedItemId;
+		case "merge-unit-depletion":
+			return route.metadata.unitOwnerItemId;
 		case "temporary-expiry":
 		case "clock-expiry":
 			return route.metadata.itemId;
@@ -34,18 +34,18 @@ const readReferenceFn = (route: AcquisitionRoute): ItemOriginSourceReference => 
 				lineId: route.metadata.lineId,
 				type: "line",
 			};
-		case "line-charge-depletion":
+		case "line-unit-depletion":
 			return {
-				type: "charges",
+				type: "units",
 			};
 		case "merge-output":
 			return {
 				ruleNumber: route.metadata.mergeIndex + 1,
 				type: "merge",
 			};
-		case "merge-charge-depletion":
+		case "merge-unit-depletion":
 			return {
-				type: "charges",
+				type: "units",
 			};
 		case "temporary-expiry":
 		case "clock-expiry":
@@ -109,11 +109,11 @@ const readLabelFn = (route: AcquisitionRoute) => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return route.metadata.lineTitle;
-		case "line-charge-depletion":
+		case "line-unit-depletion":
 			return "Depletion";
 		case "merge-output":
 			return "Merge";
-		case "merge-charge-depletion":
+		case "merge-unit-depletion":
 			return "Depletion";
 		case "temporary-expiry":
 		case "clock-expiry":
@@ -125,12 +125,12 @@ const readKindFn = (route: AcquisitionRoute): ItemOriginSource["kind"] => {
 	switch (route.metadata.kind) {
 		case "line-output":
 			return "line";
-		case "line-charge-depletion":
-			return "charges";
+		case "line-unit-depletion":
+			return "units";
 		case "merge-output":
 			return "merge";
-		case "merge-charge-depletion":
-			return "charges";
+		case "merge-unit-depletion":
+			return "units";
 		case "temporary-expiry":
 		case "clock-expiry":
 			return "expiry";
@@ -139,8 +139,8 @@ const readKindFn = (route: AcquisitionRoute): ItemOriginSource["kind"] => {
 
 const readRuntimeMsFn = (route: AcquisitionRoute) =>
 	route.metadata.kind === "merge-output" ||
-	route.metadata.kind === "merge-charge-depletion" ||
-	route.metadata.kind === "line-charge-depletion"
+	route.metadata.kind === "merge-unit-depletion" ||
+	route.metadata.kind === "line-unit-depletion"
 		? undefined
 		: route.durationMs;
 
@@ -148,9 +148,7 @@ const readRequirementItemIdsFn = (ownerItemId: string, routes: ReadonlyArray<Acq
 	uniqueFn([
 		ownerItemId,
 		...routes.flatMap((route) => route.operation?.inputs.map(({ factId }) => factId) ?? []),
-		...routes.flatMap((route) =>
-			(route.chargeUses ?? []).map(({ payerFactId }) => payerFactId),
-		),
+		...routes.flatMap((route) => (route.unitUses ?? []).map(({ payerFactId }) => payerFactId)),
 		...routes.flatMap((route) => route.requirements.allOf.map(({ factId }) => factId)),
 		...routes.flatMap((route) =>
 			route.requirements.anyOf.flatMap((clause) => clause.map(({ factId }) => factId)),

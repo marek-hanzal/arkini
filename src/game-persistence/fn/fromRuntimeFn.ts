@@ -14,10 +14,10 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 					...item.schedule,
 				},
 			}),
-	...(item.remainingCharges === undefined
+	...(item.remainingUnits === undefined
 		? {}
 		: {
-				remainingCharges: item.remainingCharges,
+				remainingUnits: item.remainingUnits,
 			}),
 	...(item.remainingDurationMs === undefined
 		? {}

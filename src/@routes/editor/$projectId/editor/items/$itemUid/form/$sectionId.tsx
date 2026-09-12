@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
-import { ChargesSection } from "~/item-authoring/ui/ChargesSection";
+import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
@@ -47,8 +47,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				return <IdentitySection />;
 			case "artwork":
 				return <ArtworkSection />;
-			case "charges":
-				return <ChargesSection />;
+			case "units":
+				return <UnitsSection />;
 			case "merges":
 				return <MergesSection />;
 			case "action":

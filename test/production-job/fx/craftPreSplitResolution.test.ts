@@ -42,7 +42,7 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 10,
 			type: "craft",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: {

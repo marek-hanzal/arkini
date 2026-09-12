@@ -7,6 +7,7 @@ import { afterEach, beforeEach, vi } from "vitest";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import type { ItemDetailPendingAction } from "~/item-detail-frame/type/ItemDetailControl";
+import { TranslationContext } from "~/translation/ui/TranslationContext";
 import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
 
 (
@@ -182,10 +183,18 @@ export const renderLines = async (lines: AvailableProjection) => {
 	const rerender = async (nextLines: AvailableProjection) => {
 		await act(async () => {
 			root.render(
-				createElement(ItemLinesTab, {
-					disabled: false,
-					lines: nextLines,
-				}),
+				createElement(
+					TranslationContext,
+					{
+						value: {
+							textFn: (key) => key,
+						},
+					},
+					createElement(ItemLinesTab, {
+						disabled: false,
+						lines: nextLines,
+					}),
+				),
 			);
 		});
 	};

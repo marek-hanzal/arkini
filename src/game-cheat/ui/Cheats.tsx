@@ -83,7 +83,7 @@ export const Cheats = ({
 							<span className="text-sm font-semibold">Instant gameplay</span>
 							<span className="text-sm leading-5 text-muted">
 								Removes waiting time while preserving normal requirements,
-								placement, charges and lifecycle rules.
+								placement, units and lifecycle rules.
 							</span>
 						</span>
 						<input

@@ -175,7 +175,7 @@ describe("validateGameResourcesFn", () => {
 			uid: id,
 			id,
 			type: "blueprint" as const,
-			charges: {
+			units: {
 				amount: 1,
 			},
 			title: id,

@@ -17,7 +17,7 @@ const MergeFields = ({
 	initialSelectedIndex,
 	invalidMergeIndex,
 	onChangeFn,
-	sourceChargesEnabled,
+	sourceUnitsEnabled,
 	targetItems,
 	value,
 }: {
@@ -25,7 +25,7 @@ const MergeFields = ({
 	readonly initialSelectedIndex: number;
 	readonly invalidMergeIndex?: number;
 	readonly onChangeFn: (value: MergeSchema.Type[] | undefined) => void;
-	readonly sourceChargesEnabled: boolean;
+	readonly sourceUnitsEnabled: boolean;
 	readonly targetItems: GameConfigSchema.Type["items"];
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
@@ -94,11 +94,11 @@ const MergeFields = ({
 							<MergeField
 								merge={merges[index]}
 								onChangeFn={(merge) => updateFn(index, merge)}
-								sourceChargesEnabled={sourceChargesEnabled}
-								targetChargesEnabled={
+								sourceUnitsEnabled={sourceUnitsEnabled}
+								targetUnitsEnabled={
 									targetItems[merges[index].target.itemId]?.uid === currentItemUid
-										? sourceChargesEnabled
-										: targetItems[merges[index].target.itemId]?.charges !==
+										? sourceUnitsEnabled
+										: targetItems[merges[index].target.itemId]?.units !==
 											undefined
 								}
 							/>
@@ -112,10 +112,7 @@ const MergeFields = ({
 
 export const MergesSection = () => {
 	const { canonicalItem, form, mergeIndex, project, validationIssues } = useFormSession();
-	const sourceChargesEnabled = useStore(
-		form.store,
-		(state) => state.values.charges !== undefined,
-	);
+	const sourceUnitsEnabled = useStore(form.store, (state) => state.values.units !== undefined);
 	const invalidMergeIndex = validationIssues.find(
 		(issue) => issue.path[0] === "merge" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
@@ -126,7 +123,7 @@ export const MergesSection = () => {
 					currentItemUid={canonicalItem.uid}
 					initialSelectedIndex={mergeIndex ?? 0}
 					invalidMergeIndex={invalidMergeIndex}
-					sourceChargesEnabled={sourceChargesEnabled}
+					sourceUnitsEnabled={sourceUnitsEnabled}
 					targetItems={project.config.items}
 					value={merge}
 					onChangeFn={(next) => form.setFieldValue("merge", next)}

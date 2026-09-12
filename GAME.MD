@@ -10,32 +10,32 @@ Each Board cell holds one item stack or one delivery-origin lease. Inventory and
 
 A new game applies authored start entries in Board → Inventory → Toolbar order against one evolving candidate Runtime. Board space and coordinates plus Inventory/Toolbar slots are exact; every entry uses canonical placement, and `currentSpace` plus the complete initial state commit atomically or not at all.
 
-Spatial mechanics—distance, placement, merge, charge targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:
+Spatial mechanics—distance, placement, merge, unit targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:
 
 - active/ready jobs pause and queued work does not dispatch there;
 - new line input, job, or queue state cannot attach there;
-- moving an already stateful owner there preserves its identity, inputs, job, queue, charges, and remaining time;
+- moving an already stateful owner there preserves its identity, inputs, job, queue, units, and remaining time;
 - returning it to a Board resumes evaluation against the destination space.
 
 Configured storage scope is `board | inventory | toolbar | any`. Query reach is separate: `board` is the origin-space Board, `inventory` and `toolbar` are their global surfaces, `any` is the origin-space Board plus both passive surfaces, and `universe` is every Board plus both passive surfaces. `universe` is not a storage scope.
 
-Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial charge count. An impure item has effective stack size `1`.
+Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial unit count. An impure item has effective stack size `1`.
 
 When a Board operation first attaches state to a stacked identity, the original identity becomes quantity `1` and the pure remainder uses standard placement in the same atomic transition. Failure to place the remainder changes nothing. Generic stack/quantity operations accept only pure items.
 
 ## Lines, intent, and delivery
 
-Producer, craft, blueprint, and stash items share one line lifecycle. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, charges, output capacity, and queue capacity. Missing concrete material may wait.
+Producer, craft, blueprint, and stash items share one line lifecycle. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units, output capacity, and queue capacity. Missing concrete material may wait.
 
-A queued request is not a job. It owns no time, material, charge, or reservation. The persisted global queue retains accepted intent order. Each queue pass traverses that array in order against the latest Runtime draft and selects the earliest actionable request for each idle Board owner. A request makes progress by starting a Job or scheduling useful canonical Autofill delivery while its rules, non-material requirements, charges and output limits hold. Only progress marks its owner as handled for that pass; blocked requests may be overtaken. Other owners compete for shared resources in the same global traversal order.
+A queued request is not a job. It owns no time, material, unit, or reservation. The persisted global queue retains accepted intent order. Each queue pass traverses that array in order against the latest Runtime draft and selects the earliest actionable request for each idle Board owner. A request makes progress by starting a Job or scheduling useful canonical Autofill delivery while its rules, non-material requirements, units and output limits hold. Only progress marks its owner as handled for that pass; blocked requests may be overtaken. Other owners compete for shared resources in the same global traversal order.
 
-A blocked probe changes no Runtime state, buffered inputs, charges, reservations, deliveries, events or gameplay randomness. Skipping preserves the request's identity, line, relative array position and valid line-input ownership. Once actionable again, an older request wins over later requests for that owner. An already travelling delivery alone is not new progress. Active Jobs remain non-preemptive; stored owners cannot dispatch. Each dispatch pass admits at most one progress-producing request per owner, including the separate passes after completion or temporary expiry within the same fixed step. Item Detail retains accepted queue order and reports per-row facts without promising execution order.
+A blocked probe changes no Runtime state, buffered inputs, units, reservations, deliveries, events or gameplay randomness. Skipping preserves the request's identity, line, relative array position and valid line-input ownership. Once actionable again, an older request wins over later requests for that owner. An already travelling delivery alone is not new progress. Active Jobs remain non-preemptive; stored owners cannot dispatch. Each dispatch pass admits at most one progress-producing request per owner, including the separate passes after completion or temporary expiry within the same fixed step. Item Detail retains accepted queue order and reports per-row facts without promising execution order.
 
-The player may clear all pending requests for one owner without affecting its active job, charges, consumed material, or reservations. Clearing atomically returns unused buffered roots for the removed request lines and reverses their outbound deliveries through canonical placement; if a buffered root cannot be returned, nothing is cleared.
+The player may clear all pending requests for one owner without affecting its active job, units, consumed material, or reservations. Clearing atomically returns unused buffered roots for the removed request lines and reverses their outbound deliveries through canonical placement; if a buffered root cannot be returned, nothing is cleared.
 
 At a fixed-step boundary, queue playback may Autofill useful concrete material through canonical deliveries while retaining the request. Delivery travel is persisted engine state with fixed-step remaining duration. The material becomes available only when Tick settles delivery into input storage. Renderer geometry/contact never admits material or starts work. A missing or invalid soft target returns the same leased actor, including a partial remainder, to its persisted origin.
 
-Only after required material has settled may a later queue pass create the job and remove its request. Start re-resolves every live fact and commits input ownership, charge spending, stateful-stack isolation, output reservations, and the job atomically.
+Only after required material has settled may a later queue pass create the job and remove its request. Start re-resolves every live fact and commits input ownership, unit spending, stateful-stack isolation, output reservations, and the job atomically.
 
 ## Tick, jobs, and temporary items
 
@@ -58,7 +58,7 @@ Ready temporaries expire after job completion in stable runtime-ID order, so a j
 
 ## Scheduled production
 
-Clock is a Board-authored, non-stackable production owner with ordinary Producer lines, material buffers, queue capacity, and authored/save-backed default-line selection. Its periodic schedule uses the same line admission, job, Autofill, charge, delivery, and output operations as manual production. Each pulse attempts one current effective default line; an admitted request retains that exact line even if the default changes later. No default, unavailable admission, or a full queue consumes the pulse without accumulating hidden debt or selecting another line. Queue capacity counts the active job plus pending requests.
+Clock is a Board-authored, non-stackable production owner with ordinary Producer lines, material buffers, queue capacity, and authored/save-backed default-line selection. Its periodic schedule uses the same line admission, job, Autofill, unit, delivery, and output operations as manual production. Each pulse attempts one current effective default line; an admitted request retains that exact line even if the default changes later. No default, unavailable admission, or a full queue consumes the pulse without accumulating hidden debt or selecting another line. Queue capacity counts the active job plus pending requests.
 
 `intervalMs` is at least 100 ms; optional `durationMs` limits active schedule time. Missing duration means unlimited lifetime. Both timers pause while the canonical enable/disable rules do not allow the schedule, with disable retaining veto precedence. The schedule keeps its sub-step phase remainder, so intervals that are not multiples of 100 ms do not accumulate rounding drift. It continues aging while its ordinary production is blocked. Only Board schedule identities present at step start earn the step; identities in material/delivery ownership retain their state but do not run their schedule. Instant gameplay accelerates ordinary jobs and deliveries, while periodic admission retains simulation-time cadence.
 
@@ -72,22 +72,24 @@ At a boundary, existing production earns its step before schedule pulses are adm
 
 Material input uses one exact canonical item selector and one of two modes:
 
-- `consume`: the material stays intact while buffered; start discards its passive owned subtree, moves only the inaccessible root into `job` scope, and completion destroys it permanently. Conversion is not charge depletion and emits no depletion output.
+- `consume`: the material stays intact while buffered; start discards its passive owned subtree, moves only the inaccessible root into `job` scope, and completion destroys it permanently. Conversion is not unit depletion and emits no depletion output.
 - `reserve`: start moves the same live instance into `reserved` scope. Completion relocates it from the owner's current Board origin. Pure material may normalize into ordinary stacks/identities; impure material preserves exact identity and needs one exclusive cell.
 
 Neither mode remembers historical stack, slot, or position. Each committed root retains its material input index so live requirements remain attributable. Job-owned material is inaccessible to generic mutations. A zero-capacity material input closes while its line runs; positive capacity remains open as storage. Temporary items may enter material input and keep aging through buffering and active work.
 
-When committed temporary material expires, the job rechecks every material input against its required minimum. Enough remaining committed quantity lets the job continue. Otherwise the engine removes the job and its remaining consumed roots, returns every reservation through canonical placement, preserves queued intent, and produces no line output. Charges spent at start are not refunded. A successful expiry immediately retries idle owners' queued requests in global intent order against the resulting Runtime.
+When committed temporary material expires, the job rechecks every material input against its required minimum. Enough remaining committed quantity lets the job continue. Otherwise the engine removes the job and its remaining consumed roots, returns every reservation through canonical placement, preserves queued intent, and produces no line output. Units spent at start are not refunded. A successful expiry immediately retries idle owners' queued requests in global intent order against the resulting Runtime.
 
 Removing an authored idle Board owner releases its buffered roots through canonical existing-item placement in the same transition. A loaded passive owner must return to a Board first because no passive coordinate is reinterpreted as a Board origin. Any blocked release rolls the removal back.
 
-## Charges and completion
+## Units and completion
 
-Charges are an item capability independent of its type: a passive resource uses Simple, a resource with manually selected lines uses Producer, and scheduled production uses Clock. A deposit input selects a charged Board item; it does not require a special item type.
+Units are an item capability independent of its type: a passive resource uses Simple, a resource with manually selected lines uses Producer, and scheduled production uses Clock. A units input selects a Board item with a unit supply; it does not require a special item type.
 
-An item may author finite `charges.amount` and optional depletion output. Missing live `remainingCharges` means the fresh full amount and remains pure. Input costs charge either the line owner (`self`) or the deterministic Board target of a deposit input (`target`). Queueing pays nothing.
+`quantity` counts item instances in a stack; `units` is the finite supply inside each instance and can represent health, resource stock, or uses.
 
-Start reserves charge budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound charge state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers with queued work are skipped when the aggregated cost would fully deplete them. Eligible idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes.
+An item may author finite `units.amount` and optional depletion output. Missing live `remainingUnits` means the fresh full amount and remains pure. Input costs spend units from either the line owner (`self`) or the deterministic Board target of a units input (`target`). Queueing pays nothing.
+
+Start reserves unit budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound unit state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers with queued work are skipped when the aggregated cost would fully deplete them. Eligible idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes.
 
 Completion removes the ready job and consumed roots in one candidate, keeps reserved roots live, then applies this order:
 
@@ -99,7 +101,7 @@ remove a depleted owner and its queue
 → relocate reserved instances
 ```
 
-A non-depleted owner, its buffered storage, and pending queue remain. Any charge, placement, capacity, or return failure preserves the pre-completion state for retry. One blocked owner does not prevent independent owners from advancing.
+A non-depleted owner, its buffered storage, and pending queue remain. Any unit, placement, capacity, or return failure preserves the pre-completion state for retry. One blocked owner does not prevent independent owners from advancing.
 
 ## Output capacity and randomness
 
@@ -123,7 +125,7 @@ validate live + reserved maxCount
 
 `drop` starts from the supplied origin; `random` chooses a fresh Board origin for every resolved quantity unit, including occupied cells, then places each unit stack-first and nearest-first against the evolving draft. An `any` item may fall back Board → Inventory → Toolbar, never another Board. Existing pure items may normalize; impure items keep exact identity and require one empty cell. Partial placement is forbidden and rolls back the owning mutation.
 
-Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed, used, or charged through source `deposit`; one Board target is kept, removed, replaced, or charged through target `deposit`; and optional output uses ordinary placement. Replacing a temporary target discards its remaining lifetime and initializes the replacement through its own canonical item state. `use` returns the source through ordinary placement without spending charges. Each `deposit` spends one real charge from its respective participant and runs that item's standard depletion output when the last charge is spent. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
+Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed, used, or has a unit spent through source `spend`; one Board target is kept, removed, replaced, or has a unit spent through target `spend`; and optional output uses ordinary placement. Replacing a temporary target discards its remaining lifetime and initializes the replacement through its own canonical item state. `use` returns the source through ordinary placement without spending units. Each `spend` spends one real unit from its respective participant and runs that item's standard depletion output when the last unit is spent. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
 
 ## Cheats, save, and presentation
 

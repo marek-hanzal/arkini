@@ -31,6 +31,12 @@ import { InputControl } from "~/production-authoring/ui/InputControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (key: string) => key,
+	}),
+}));
+
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 beforeEach(() => {
@@ -59,28 +65,28 @@ const renderInput = async (
 	root: ReturnType<typeof createRoot>,
 	input: InputSchema.Type,
 	onChangeFn: (input: InputSchema.Type) => void = () => undefined,
-	selfChargesEnabled = true,
+	selfUnitsEnabled = true,
 ) => {
 	await act(async () => {
 		root.render(
 			<InputControl
 				input={input}
 				ownerItemId="owner"
-				selfChargesEnabled={selfChargesEnabled}
+				selfUnitsEnabled={selfUnitsEnabled}
 				onChangeFn={onChangeFn}
 			/>,
 		);
 	});
 };
 
-const unchargedDepositInput = {
-	type: "deposit",
+const withoutUnitsUnitsInput = {
+	type: "units",
 	query: {
 		scope: "board",
 		distance: "close",
 		selector: {
 			type: "item",
-			itemId: "stone-deposit",
+			itemId: "stone-units",
 		},
 	},
 } as const satisfies InputSchema.Type;
@@ -98,7 +104,7 @@ const findChoiceControl = (container: Element, label: string) => {
 	return control;
 };
 
-const createSearchItem = (id: string, charged: boolean) =>
+const createSearchItem = (id: string, spent: boolean) =>
 	({
 		uid: `uid:${id}`,
 		id,
@@ -113,9 +119,9 @@ const createSearchItem = (id: string, charged: boolean) =>
 		},
 		scope: "any",
 		maxStackSize: 1,
-		...(charged
+		...(spent
 			? {
-					charges: {
+					units: {
 						amount: 1,
 					},
 				}
@@ -123,22 +129,22 @@ const createSearchItem = (id: string, charged: boolean) =>
 	}) satisfies ItemSchema.Type;
 
 describe("InputControl", () => {
-	it("shows charge authoring only for Deposit inputs", async () => {
+	it("shows unit authoring only for Units inputs", async () => {
 		const { container, root } = createContainer();
 
 		await renderInput(root, {
 			type: "simple",
-			charges: {
+			units: {
 				cost: 1,
 				from: "self",
 			},
 		});
-		expect(container.querySelector('[data-ui="EditorInputChargeCost"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).toBeNull();
 
 		await renderInput(root, {
 			type: "materials",
 			capacity: 0,
-			charges: {
+			units: {
 				cost: 1,
 				from: "self",
 			},
@@ -152,24 +158,24 @@ describe("InputControl", () => {
 				itemId: "stone",
 			},
 		});
-		expect(container.querySelector('[data-ui="EditorInputChargeCost"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).toBeNull();
 
-		await renderInput(root, unchargedDepositInput);
-		expect(container.querySelector('[data-ui="EditorInputChargeCost"]')).not.toBeNull();
+		await renderInput(root, withoutUnitsUnitsInput);
+		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).not.toBeNull();
 	});
 
-	it("renders Deposit charge controls with Target as the direct default", async () => {
+	it("renders Units unit controls with Target as the direct default", async () => {
 		const { container, root } = createContainer();
-		await renderInput(root, unchargedDepositInput);
+		await renderInput(root, withoutUnitsUnitsInput);
 
-		const chargeCost = container.querySelector('[data-ui="EditorInputChargeCost"]');
-		if (chargeCost === null) throw new Error("Expected Deposit charge cost controls.");
+		const unitCost = container.querySelector('[data-ui="EditorInputUnitCost"]');
+		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
 		const inputType = findChoiceControl(container, "Input type");
 		const paidBy = findChoiceControl(container, "Paid by");
-		const boardDistance = findChoiceControl(chargeCost, "Board distance");
+		const boardDistance = findChoiceControl(unitCost, "Board distance");
 
 		expect(inputType.parentElement).toBe(paidBy.parentElement);
-		expect(chargeCost.contains(paidBy)).toBe(false);
+		expect(unitCost.contains(paidBy)).toBe(false);
 		expect(readChoiceValues(paidBy)).toEqual([
 			"target",
 			"self",
@@ -183,47 +189,47 @@ describe("InputControl", () => {
 		expect(
 			paidBy.querySelector('[data-ui-value="target"]')?.getAttribute("data-ui-selected"),
 		).toBe("true");
-		expect(chargeCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).not.toBeNull();
-		expect(chargeCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("1");
+		expect(unitCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).not.toBeNull();
+		expect(unitCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("1");
 	});
 
-	it("renders only Cost for a self-paid Deposit", async () => {
+	it("renders only Cost for a self-paid Units", async () => {
 		const { container, root } = createContainer();
 		await renderInput(root, {
-			...unchargedDepositInput,
-			charges: {
+			...withoutUnitsUnitsInput,
+			units: {
 				cost: 2,
 				from: "self",
 			},
 		});
 
-		const chargeCost = container.querySelector('[data-ui="EditorInputChargeCost"]');
-		if (chargeCost === null) throw new Error("Expected Deposit charge cost controls.");
+		const unitCost = container.querySelector('[data-ui="EditorInputUnitCost"]');
+		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
 		const paidBy = findChoiceControl(container, "Paid by");
 		const self = paidBy.querySelector<HTMLButtonElement>('[data-ui-value="self"]');
-		if (self === null) throw new Error("Expected Self charge source option.");
+		if (self === null) throw new Error("Expected Self unit source option.");
 
 		expect(self.disabled).toBe(false);
 		expect(self.getAttribute("data-ui-selected")).toBe("true");
-		expect(chargeCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).toBeNull();
-		expect(chargeCost.querySelector('[data-ui="EditorChoiceControl"]')).toBeNull();
-		expect(chargeCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("2");
+		expect(unitCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).toBeNull();
+		expect(unitCost.querySelector('[data-ui="EditorChoiceControl"]')).toBeNull();
+		expect(unitCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("2");
 	});
 
-	it("binds a self-paid Deposit to the owning item instead of a hidden empty target", async () => {
+	it("binds a self-paid Units to the owning item instead of a hidden empty target", async () => {
 		const { container, root } = createContainer();
 		const onChangeFn = vi.fn();
-		await renderInput(root, unchargedDepositInput, onChangeFn);
+		await renderInput(root, withoutUnitsUnitsInput, onChangeFn);
 
 		const self = findChoiceControl(container, "Paid by").querySelector<HTMLButtonElement>(
 			'[data-ui-value="self"]',
 		);
-		if (self === null) throw new Error("Expected Self charge source option.");
+		if (self === null) throw new Error("Expected Self unit source option.");
 		await act(async () => self.click());
 
 		expect(onChangeFn).toHaveBeenCalledWith({
-			...unchargedDepositInput,
-			charges: {
+			...withoutUnitsUnitsInput,
+			units: {
 				cost: 1,
 				from: "self",
 			},
@@ -238,15 +244,15 @@ describe("InputControl", () => {
 		});
 	});
 
-	it("marks the exact invalid Deposit control and shows its local error", async () => {
+	it("marks the exact invalid Units control and shows its local error", async () => {
 		const { container, root } = createContainer();
 		await act(async () => {
 			root.render(
 				<InputControl
-					input={unchargedDepositInput}
+					input={withoutUnitsUnitsInput}
 					issues={[
 						{
-							message: "Choose a charged target.",
+							message: "Choose a target with units.",
 							path: [
 								"query",
 								"selector",
@@ -256,7 +262,7 @@ describe("InputControl", () => {
 					]}
 					onChangeFn={() => undefined}
 					ownerItemId="owner"
-					selfChargesEnabled
+					selfUnitsEnabled
 				/>,
 			);
 		});
@@ -265,25 +271,25 @@ describe("InputControl", () => {
 			'[data-ui="EditorSearchComboboxInput"]',
 		);
 		expect(selectedItem?.dataset.uiInvalid).toBe("true");
-		expect(container.textContent).toContain("Choose a charged target.");
+		expect(container.textContent).toContain("Choose a target with units.");
 		expect(findChoiceControl(container, "Paid by").getAttribute("data-ui-invalid")).toBe(
 			"false",
 		);
 	});
 
-	it("disables Self when the owning item has no Charges", async () => {
+	it("disables Self when the owning item has no Units", async () => {
 		const { container, root } = createContainer();
-		await renderInput(root, unchargedDepositInput, () => undefined, false);
+		await renderInput(root, withoutUnitsUnitsInput, () => undefined, false);
 
 		const paidBy = findChoiceControl(container, "Paid by");
 		const self = paidBy.querySelector<HTMLButtonElement>('[data-ui-value="self"]');
-		if (self === null) throw new Error("Expected Self charge source option.");
+		if (self === null) throw new Error("Expected Self unit source option.");
 
 		expect(self.disabled).toBe(true);
 		expect(self.dataset.uiDisabled).toBe("true");
 	});
 
-	it("creates a new Deposit input with a Target charge cost", async () => {
+	it("creates a new Units input with a Target unit cost", async () => {
 		const { container, root } = createContainer();
 		const onChangeFn = vi.fn();
 		await renderInput(
@@ -294,15 +300,15 @@ describe("InputControl", () => {
 			onChangeFn,
 		);
 
-		const depositButton = container.querySelector<HTMLButtonElement>(
-			'button[data-ui-value="deposit"]',
+		const unitsButton = container.querySelector<HTMLButtonElement>(
+			'button[data-ui-value="units"]',
 		);
-		if (depositButton === null) throw new Error("Expected Deposit input type option.");
-		await act(async () => depositButton.click());
+		if (unitsButton === null) throw new Error("Expected Units input type option.");
+		await act(async () => unitsButton.click());
 
 		expect(onChangeFn).toHaveBeenCalledWith({
-			type: "deposit",
-			charges: {
+			type: "units",
+			units: {
 				cost: 1,
 				from: "target",
 			},
@@ -317,42 +323,42 @@ describe("InputControl", () => {
 		});
 	});
 
-	it("offers only charged items to a target-paid Deposit and flags an existing invalid target", async () => {
-		const charged = createSearchItem("battery-target", true);
-		const uncharged = createSearchItem("plain-target", false);
+	it("offers only items with units to a target-paid Units and flags an existing invalid target", async () => {
+		const spent = createSearchItem("battery-target", true);
+		const withoutUnits = createSearchItem("plain-target", false);
 		state.items = {
-			[charged.id]: charged,
-			[uncharged.id]: uncharged,
+			[spent.id]: spent,
+			[withoutUnits.id]: withoutUnits,
 		};
 		const { container, root } = createContainer();
 		await renderInput(root, {
-			...unchargedDepositInput,
-			charges: {
+			...withoutUnitsUnitsInput,
+			units: {
 				cost: 1,
 				from: "target",
 			},
 			query: {
-				...unchargedDepositInput.query,
+				...withoutUnitsUnitsInput.query,
 				selector: {
 					type: "item",
-					itemId: uncharged.id,
+					itemId: withoutUnits.id,
 				},
 			},
 		});
 
 		expect(container.querySelector('[data-ui="EditorInfoTooltip"]')).not.toBeNull();
-		expect(container.textContent).toContain("Selected target must have Charges enabled.");
+		expect(container.textContent).toContain("Selected target must have Units enabled.");
 		const search = container.querySelector<HTMLInputElement>(
 			'[data-ui="EditorSearchComboboxInput"]',
 		);
-		if (search === null) throw new Error("Expected Deposit target search.");
+		if (search === null) throw new Error("Expected Units target search.");
 		await act(async () => search.click());
 		const options = Array.from(
 			document.querySelectorAll('[data-ui="EditorSearchComboboxOption"]'),
 		).map((option) => option.textContent);
 
 		expect(options).toHaveLength(1);
-		expect(options[0]).toContain(charged.title);
-		expect(options[0]).not.toContain(uncharged.title);
+		expect(options[0]).toContain(spent.title);
+		expect(options[0]).not.toContain(withoutUnits.title);
 	});
 });

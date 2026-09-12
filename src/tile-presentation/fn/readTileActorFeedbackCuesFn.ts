@@ -27,7 +27,7 @@ export const readTileActorFeedbackCuesFn = (
 			.with(
 				{
 					type: P.union(
-						GameEventEnumSchema.enum.ItemChargeSpent,
+						GameEventEnumSchema.enum.ItemUnitSpent,
 						GameEventEnumSchema.enum.ItemDepleted,
 					),
 				},
@@ -119,10 +119,10 @@ export const readTileActorFeedbackCuesFn = (
 							{
 								action: P.union(
 									SourceActionSchema.enum.Use,
-									SourceActionSchema.enum.Deposit,
+									SourceActionSchema.enum.Spend,
 								),
 								effect: P.union(
-									TargetEffectSchema.enum.Deposit,
+									TargetEffectSchema.enum.Spend,
 									TargetEffectSchema.enum.Keep,
 									TargetEffectSchema.enum.Remove,
 								),

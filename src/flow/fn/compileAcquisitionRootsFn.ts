@@ -28,7 +28,7 @@ const requiresAbsentFactFn = (when: WhenSchema.Type) => {
 const readItemOutputsFn = (item: ItemSchema.Type) => {
 	return [
 		...readAuthoredItemLinesFn(item).map(({ output }) => output),
-		item.charges?.output,
+		item.units?.output,
 		...(item.merge ?? []).map(({ output }) => output),
 		item.type === "temporary" ? item.output : item.type === "clock" ? item.onExpire : undefined,
 	];
@@ -51,7 +51,7 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 			)
 				limitations.add("conditional-runtime-adjustments-ignored");
 			if (
-				line.input.some(({ type }) => type === "deposit") ||
+				line.input.some(({ type }) => type === "units") ||
 				line.rules.some(({ when }) => when.length > 0)
 			)
 				limitations.add("spatial-requirements-approximated");

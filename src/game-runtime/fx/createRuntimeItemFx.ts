@@ -14,7 +14,7 @@ interface CreateRuntimeItemProps<Location extends LocationSchema.Type> {
 	item: ItemSchema.Type;
 	location: Location;
 	quantity: PositiveIntegerSchema.Type;
-	remainingCharges?: number;
+	remainingUnits?: number;
 	remainingDurationMs?: number;
 }
 
@@ -35,7 +35,7 @@ export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 	item,
 	location,
 	quantity,
-	remainingCharges,
+	remainingUnits,
 	remainingDurationMs,
 }: CreateRuntimeItemProps<Location>) {
 	const revision = yield* createRevisionFx();
@@ -53,7 +53,7 @@ export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 						remainingIntervalMs: schedule.intervalMs,
 						remainingDurationMs: schedule.durationMs,
 					},
-		remainingCharges,
+		remainingUnits,
 		remainingDurationMs:
 			remainingDurationMs ??
 			(item.type === TypeSchema.enum.Temporary ? item.durationMs : undefined),

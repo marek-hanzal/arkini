@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
+import { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -12,7 +12,7 @@ import { readOutputConditionalMaximumQuantitiesFn } from "~/production-output/fn
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readOutputReservationFn } from "~/production-job/fn/readOutputReservationFn";
-import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
+import { applyFinalUnitReservationFx } from "./applyFinalUnitReservationFx";
 import { clampOutputReservationFx } from "./clampOutputReservationFx";
 import type { resolveOutputCapacityFx } from "./resolveOutputCapacityFx";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
@@ -27,17 +27,15 @@ const readDefinitionOutputReservationFx = Effect.fn("readDefinitionOutputReserva
 		readonly owner: ItemSchema.Type;
 	}) {
 		const quantities = new Map(readOutputReservationFn(line));
-		const selfChargeCost = line.input.reduce(
+		const selfUnitCost = line.input.reduce(
 			(total, input) =>
-				input.charges?.from === ChargeSourceSchema.enum.Self
-					? total + input.charges.cost
-					: total,
+				input.units?.from === UnitSourceSchema.enum.Self ? total + input.units.cost : total,
 			0,
 		);
-		if (selfChargeCost <= 0 || owner.charges?.amount !== selfChargeCost) {
+		if (selfUnitCost <= 0 || owner.units?.amount !== selfUnitCost) {
 			return yield* clampOutputReservationFx(quantities);
 		}
-		yield* applyFinalChargeReservationFx({
+		yield* applyFinalUnitReservationFx({
 			payer: owner,
 			quantities,
 		});

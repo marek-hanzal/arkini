@@ -4,11 +4,11 @@ import type { GameTransition } from "~/game-session/type/GameSession";
 import { readSpaceActionPresentationPhasesFn } from "~/game-scene/fn/readSpaceActionPresentationPhasesFn";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-const chargedItem = {
+const unitOwnerItem = {
 	uid: "uid:tree",
 	id: "tree",
 	title: "Tree",
-	description: "A charged source",
+	description: "A spent source",
 	asset: {
 		scale: 0.8,
 		default: [
@@ -17,7 +17,7 @@ const chargedItem = {
 	},
 	scope: "board",
 	maxStackSize: 1,
-	charges: {
+	units: {
 		amount: 2,
 	},
 	type: "simple",
@@ -32,7 +32,7 @@ const payerLocation = {
 	},
 };
 
-const runtime = (currentSpace: number, remainingCharges?: number) =>
+const runtime = (currentSpace: number, remainingUnits?: number) =>
 	RuntimeSchema.parse({
 		cheats: {
 			enabled: false,
@@ -43,11 +43,11 @@ const runtime = (currentSpace: number, remainingCharges?: number) =>
 		items: [
 			{
 				id: "runtime:tree",
-				item: chargedItem,
+				item: unitOwnerItem,
 				location: payerLocation,
 				quantity: 1,
-				remainingCharges,
-				revision: `revision:${remainingCharges ?? 2}`,
+				remainingUnits,
+				revision: `revision:${remainingUnits ?? 2}`,
 			},
 		],
 		jobs: [],
@@ -65,12 +65,12 @@ describe("readSpaceActionPresentationPhasesFn", () => {
 			runtime: finalRuntime,
 			events: [
 				{
-					type: "item:charge-spent",
+					type: "item:unit-spent",
 					itemId: "runtime:tree",
 					canonicalItemId: "tree",
 					location: payerLocation,
-					previousCharges: 2,
-					resultingCharges: 1,
+					previousUnits: 2,
+					resultingUnits: 1,
 				},
 				{
 					type: "current-space:changed",
@@ -88,14 +88,14 @@ describe("readSpaceActionPresentationPhasesFn", () => {
 			transition: {
 				events: [
 					{
-						type: "item:charge-spent",
+						type: "item:unit-spent",
 					},
 				],
 				runtime: {
 					currentSpace: 0,
 					items: [
 						{
-							remainingCharges: 1,
+							remainingUnits: 1,
 						},
 					],
 				},
@@ -113,7 +113,7 @@ describe("readSpaceActionPresentationPhasesFn", () => {
 					currentSpace: 0,
 					items: [
 						{
-							remainingCharges: 1,
+							remainingUnits: 1,
 						},
 					],
 				},

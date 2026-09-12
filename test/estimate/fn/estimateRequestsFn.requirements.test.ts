@@ -55,7 +55,7 @@ describe("estimateRequestsFn", () => {
 		});
 	});
 
-	it("charges shared one-time prerequisites once across selected siblings", () => {
+	it("units shared one-time prerequisites once across selected siblings", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -112,31 +112,31 @@ describe("estimateRequestsFn", () => {
 		});
 	});
 
-	it("acquires a deposit once and reuses it across every output run", () => {
-		const depositRequirement: AcquisitionRequirement = {
-			factId: "deposit",
+	it("acquires a unit source once and reuses it across every output run", () => {
+		const unitsRequirement: AcquisitionRequirement = {
+			factId: "units",
 			quantity: 1,
-			source: "deposit-input",
+			source: "units-input",
 			usage: "one-time",
 		};
 		const dependencyGraph = graph({
 			facts: [
-				"deposit",
+				"units",
 				"target",
 			],
 			roots: [],
 			routes: [
 				route({
 					durationMs: 50,
-					id: "acquire-deposit",
-					output: "deposit",
+					id: "acquire-units",
+					output: "units",
 				}),
 				route({
 					allOf: [
-						depositRequirement,
+						unitsRequirement,
 					],
 					durationMs: 2,
-					id: "use-deposit",
+					id: "use-units",
 					output: "target",
 				}),
 			],
@@ -147,14 +147,14 @@ describe("estimateRequestsFn", () => {
 			durationMs: 70,
 			obtainable: true,
 		});
-		if (!result.obtainable) throw new Error("Expected reusable deposit route.");
-		expect(result.routeSteps.find(({ factId }) => factId === "deposit")?.quantity).toBe(1);
+		if (!result.obtainable) throw new Error("Expected reusable units route.");
+		expect(result.routeSteps.find(({ factId }) => factId === "units")?.quantity).toBe(1);
 		expect(
 			estimate(
 				{
 					...dependencyGraph,
 					routes: dependencyGraph.routes.filter(
-						({ output }) => output.factId !== "deposit",
+						({ output }) => output.factId !== "units",
 					),
 				},
 				"target",

@@ -1,6 +1,6 @@
 import { Array, Effect } from "effect";
 
-import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
+import { resolveActionUnitFx } from "~/production-action/fx/resolveActionUnitFx";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
@@ -13,7 +13,7 @@ export namespace resolveInputMaterialRunFx {
 		input: MaterialSchema.Type;
 		items: InputRuntimeItemSchema.Type[];
 		ownerItemId: IdSchema.Type;
-		reservedCharges: ReadonlyMap<IdSchema.Type, number>;
+		reservedUnits: ReadonlyMap<IdSchema.Type, number>;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -21,11 +21,11 @@ export namespace resolveInputMaterialRunFx {
 const planInputMaterialRunFn = ({
 	items,
 	resolution,
-	charges,
+	units,
 }: {
 	readonly items: InputRuntimeItemSchema.Type[];
 	readonly resolution: InputRun.MaterialResolution;
-	readonly charges?: InputRun.ChargePlan;
+	readonly units?: InputRun.UnitPlan;
 }) => {
 	if (!resolution.ready) return undefined;
 
@@ -52,7 +52,7 @@ const planInputMaterialRunFn = ({
 		type: resolution.type,
 		mode: resolution.mode,
 		quantity: resolution.runQuantity,
-		charges,
+		units,
 		item: [
 			firstItem,
 			...remainingItems,
@@ -67,7 +67,7 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 	input,
 	items,
 	ownerItemId,
-	reservedCharges,
+	reservedUnits,
 	runtime,
 }: resolveInputMaterialRunFx.Props) {
 	const storedQuantity = items.reduce((quantity, item) => {
@@ -77,20 +77,20 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 		input,
 		storedQuantity,
 	});
-	const charges = yield* resolveActionChargeFx({
-		charges: input.charges,
+	const units = yield* resolveActionUnitFx({
+		units: input.units,
 		ownerItemId,
-		reservedCharges,
+		reservedUnits,
 		runtime,
 	});
 	const resolution = {
 		...materialResolution,
-		ready: materialResolution.ready && charges.ready,
+		ready: materialResolution.ready && units.ready,
 	};
 	const plan = planInputMaterialRunFn({
 		items,
 		resolution,
-		charges: charges.plan,
+		units: units.plan,
 	});
 
 	return {

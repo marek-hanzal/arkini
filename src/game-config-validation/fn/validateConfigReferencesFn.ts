@@ -414,7 +414,7 @@ export const validateConfigReferencesFn = ({
 			match(merge)
 				.with(
 					{
-						effect: TargetEffectSchema.enum.Deposit,
+						effect: TargetEffectSchema.enum.Spend,
 					},
 					() => undefined,
 				)

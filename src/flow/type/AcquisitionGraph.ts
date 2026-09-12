@@ -17,8 +17,8 @@ export interface AcquisitionRequirement {
 	readonly identity?: "distinct";
 	readonly quantity: number;
 	readonly source:
-		| "charged-item"
-		| "deposit-input"
+		| "unit-owner"
+		| "units-input"
 		| "line-condition"
 		| "material-input"
 		| "merge-source"
@@ -72,8 +72,8 @@ export type AcquisitionRouteMetadata =
 			readonly ownerItemId: string;
 	  }
 	| {
-			readonly chargedItemId: string;
-			readonly kind: "line-charge-depletion";
+			readonly unitOwnerItemId: string;
+			readonly kind: "line-unit-depletion";
 			readonly lineId: string;
 			readonly lineTitle: string;
 			readonly ownerItemId: string;
@@ -85,8 +85,8 @@ export type AcquisitionRouteMetadata =
 			readonly targetItemId: string;
 	  }
 	| {
-			readonly chargedItemId: string;
-			readonly kind: "merge-charge-depletion";
+			readonly unitOwnerItemId: string;
+			readonly kind: "merge-unit-depletion";
 			readonly mergeIndex: number;
 			readonly sourceItemId: string;
 			readonly targetItemId: string;
@@ -101,7 +101,7 @@ export interface AcquisitionRoute {
 	readonly executionConstraint?: "unavailable" | "finite-owner-lifetime";
 	/** Optimistic action cadence; owner startup and runtime queue delays remain outside the model. */
 	readonly minimumActionIntervalMs?: number;
-	readonly chargeUses?: ReadonlyArray<{
+	readonly unitUses?: ReadonlyArray<{
 		/** Signals when concrete payer-identity packing cannot be summarized statically. */
 		readonly accounting?: "multi-payer-unsupported" | "single-payer-exact";
 		readonly payerFactId: string;

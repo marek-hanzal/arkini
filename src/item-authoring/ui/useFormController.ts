@@ -76,7 +76,7 @@ const FormPathLabelBySegment = {
 	asset: "Artwork",
 	capacity: "Buffer",
 	chance: "Chance",
-	charges: "Charges",
+	units: "Units",
 	cost: "Cost",
 	default: "Default",
 	description: "Description",
@@ -230,9 +230,9 @@ export const useFormController = ({
 		if (initializedCapability.current || enableCapability === undefined) return;
 		initializedCapability.current = true;
 		switch (enableCapability) {
-			case "charges":
-				if (form.state.values.charges === undefined) {
-					form.setFieldValue("charges", {
+			case "units":
+				if (form.state.values.units === undefined) {
+					form.setFieldValue("units", {
 						amount: 1,
 					});
 				}

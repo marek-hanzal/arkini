@@ -1,6 +1,6 @@
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineInputFrame } from "~/item-line-detail/ui/ItemLineInputFrame";
-import { ChargeCostValue } from "~/production-input/ui/ChargeCostValue";
+import { UnitCostValue } from "~/production-input/ui/UnitCostValue";
 
 type SimpleInput = Extract<
 	ItemDetailLinesProjection.Input,
@@ -9,7 +9,7 @@ type SimpleInput = Extract<
 	}
 >;
 
-/** Owns the fixed owner-charge presentation of a simple line input. */
+/** Owns the fixed owner-unit presentation of a simple line input. */
 export const SimpleItemLineInput = ({
 	input,
 	suppressSurface,
@@ -22,9 +22,9 @@ export const SimpleItemLineInput = ({
 		state="empty"
 		suppressSurface={suppressSurface}
 	>
-		<p className="font-medium text-foreground">Owner charge</p>
+		<p className="font-medium text-foreground">Owner unit</p>
 		<p className="text-right text-sm text-muted">
-			<ChargeCostValue charge={input.charges} />
+			<UnitCostValue unit={input.units} />
 		</p>
 	</ItemLineInputFrame>
 );

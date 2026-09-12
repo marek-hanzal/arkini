@@ -6,9 +6,9 @@ import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 export type Blocker =
 	| "missing-input"
 	| "rule"
-	| "self-charge"
-	| "aggregate-self-charge"
-	| "target-charge"
+	| "self-unit"
+	| "aggregate-self-unit"
+	| "target-unit"
 	| "output-capacity"
 	| "placement";
 
@@ -28,18 +28,12 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 		},
 		capacity: 2,
 		mode: "consume",
-		...(blocker === "self-charge" ||
-		blocker === "aggregate-self-charge" ||
-		blocker === "placement"
+		...(blocker === "self-unit" || blocker === "aggregate-self-unit" || blocker === "placement"
 			? {
-					charges: {
+					units: {
 						from: "self",
 						cost:
-							blocker === "self-charge"
-								? 4
-								: blocker === "aggregate-self-charge"
-									? 2
-									: 1,
+							blocker === "self-unit" ? 4 : blocker === "aggregate-self-unit" ? 2 : 1,
 					},
 				}
 			: {}),
@@ -101,14 +95,14 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				...base.items.tool,
 				id: "payer",
 				uid: "payer",
-				charges: {
+				units: {
 					amount: 1,
 					output: output("debris", 2, "random"),
 				},
 			},
 			forge: {
 				...forge,
-				charges: {
+				units: {
 					amount: 3,
 				},
 				lines: [
@@ -119,7 +113,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 						runtimeMs: 1_000,
 						input: [
 							material,
-							...(blocker === "placement" || blocker === "aggregate-self-charge"
+							...(blocker === "placement" || blocker === "aggregate-self-unit"
 								? [
 										{
 											type: "materials",
@@ -133,9 +127,9 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 											},
 											capacity: 1,
 											mode: "reserve",
-											...(blocker === "aggregate-self-charge"
+											...(blocker === "aggregate-self-unit"
 												? {
-														charges: {
+														units: {
 															from: "self",
 															cost: 2,
 														},
@@ -144,10 +138,10 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 										},
 									]
 								: []),
-							...(blocker === "placement" || blocker === "target-charge"
+							...(blocker === "placement" || blocker === "target-unit"
 								? [
 										{
-											type: "deposit",
+											type: "units",
 											query: {
 												scope: "board",
 												selector: {
@@ -156,7 +150,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 												},
 												distance: "close",
 											},
-											charges: {
+											units: {
 												from: "target",
 												cost: 1,
 											},
@@ -256,7 +250,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			},
 		],
 	};
-	if (blocker === "placement" || blocker === "aggregate-self-charge") {
+	if (blocker === "placement" || blocker === "aggregate-self-unit") {
 		runtime.items.push({
 			id: "tool",
 			revision: "revision:tool",

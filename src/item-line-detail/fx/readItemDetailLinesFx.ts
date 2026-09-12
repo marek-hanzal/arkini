@@ -102,8 +102,8 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 		resolved: resolution.input,
 		runtime,
 	});
-	const missingDepositTarget = input.find(
-		(candidate) => candidate.kind === "deposit" && candidate.targetItemIds.length === 0,
+	const missingUnitsTarget = input.find(
+		(candidate) => candidate.kind === "units" && candidate.targetItemIds.length === 0,
 	);
 	const availability: ItemDetailLines.Line["availability"] = !resolution.enable
 		? {
@@ -136,13 +136,13 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 							maxCount: downstreamOutputBlock.maxCount,
 						},
 					}
-				: missingDepositTarget?.kind === "deposit"
+				: missingUnitsTarget?.kind === "units"
 					? {
 							kind: "unavailable",
 							reason: {
-								kind: "deposit-target-missing",
-								selector: missingDepositTarget.selector,
-								distance: missingDepositTarget.distance,
+								kind: "units-target-missing",
+								selector: missingUnitsTarget.selector,
+								distance: missingUnitsTarget.distance,
 							},
 						}
 					: {

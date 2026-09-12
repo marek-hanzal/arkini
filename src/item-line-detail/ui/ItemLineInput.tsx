@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import { DepositItemLineInput } from "~/item-line-detail/ui/DepositItemLineInput";
+import { UnitsItemLineInput } from "~/item-line-detail/ui/UnitsItemLineInput";
 import { MaterialItemLineInput } from "~/item-line-detail/ui/MaterialItemLineInput";
 import { SimpleItemLineInput } from "~/item-line-detail/ui/SimpleItemLineInput";
 
@@ -39,12 +39,12 @@ export const ItemLineInput = ({
 		)
 		.with(
 			{
-				kind: "deposit",
+				kind: "units",
 			},
-			(deposit) => (
-				<DepositItemLineInput
+			(units) => (
+				<UnitsItemLineInput
 					disabled={disabled}
-					input={deposit}
+					input={units}
 					stale={stale}
 					suppressSurface={suppressSurface}
 				/>

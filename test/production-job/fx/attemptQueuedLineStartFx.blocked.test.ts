@@ -13,13 +13,13 @@ describe("queued blocked probes", () => {
 	it.each<Blocker>([
 		"missing-input",
 		"rule",
-		"self-charge",
-		"aggregate-self-charge",
-		"target-charge",
+		"self-unit",
+		"aggregate-self-unit",
+		"target-unit",
 		"output-capacity",
 		"placement",
 	])(
-		"preserves input, charges, reservations, deliveries and randomness on %s rejection",
+		"preserves input, units, reservations, deliveries and randomness on %s rejection",
 		(blocker) => {
 			const { config, runtime, request } = createBlockedQueueFixture(blocker);
 			const snapshot = structuredClone(runtime);
@@ -86,8 +86,8 @@ describe("queued blocked probes", () => {
 		},
 	);
 
-	it("does not let mixed missing and buffered input costs claim Autofill priority beyond the shared charge budget", () => {
-		const { config, runtime, request } = createBlockedQueueFixture("aggregate-self-charge");
+	it("does not let mixed missing and buffered input costs claim Autofill priority beyond the shared unit budget", () => {
+		const { config, runtime, request } = createBlockedQueueFixture("aggregate-self-unit");
 		const result = Effect.runSync(
 			advanceRuntimeStepFx(runtime).pipe(
 				useGameFx({
@@ -147,7 +147,7 @@ describe("queued blocked probes", () => {
 			result.started.runtime.items.filter((item) => item.item.id === "debris"),
 		).toHaveLength(2);
 		expect(
-			result.started.runtime.items.find((item) => item.id === "owner")?.remainingCharges,
+			result.started.runtime.items.find((item) => item.id === "owner")?.remainingUnits,
 		).toBe(2);
 		expect(
 			result.started.runtime.items.find((item) => item.id === "buffer")?.location.scope,

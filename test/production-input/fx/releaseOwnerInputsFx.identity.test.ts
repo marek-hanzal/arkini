@@ -91,7 +91,7 @@ const config = GameConfigSchema.parse({
 				id: "worker",
 			}),
 			type: "producer",
-			charges: {
+			units: {
 				amount: 2,
 			},
 			maxQueueSize: 1,
@@ -149,13 +149,13 @@ const inputItem = ({
 	inputIndex,
 	itemId,
 	ownerItemId = boardOwner.id,
-	remainingCharges,
+	remainingUnits,
 }: {
 	id: string;
 	inputIndex: number;
 	itemId: string;
 	ownerItemId?: string;
-	remainingCharges?: number;
+	remainingUnits?: number;
 }) => ({
 	id,
 	itemId,
@@ -166,7 +166,7 @@ const inputItem = ({
 		inputIndex,
 	},
 	quantity: 1,
-	remainingCharges,
+	remainingUnits,
 });
 
 const runRemoveFx = (state: StateSchema.Type) =>
@@ -212,7 +212,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					id: "runtime:worker",
 					inputIndex: 0,
 					itemId: "worker",
-					remainingCharges: 1,
+					remainingUnits: 1,
 				}),
 				inputItem({
 					id: "runtime:payload",
@@ -229,7 +229,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		expect(Result.isSuccess(result.attempt)).toBe(true);
 		const worker = result.after.items.find((item) => item.id === "runtime:worker");
 		expect(worker).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 			location: {
 				scope: "board",
 				space: 2,
@@ -364,13 +364,13 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					id: "runtime:worker:a",
 					inputIndex: 0,
 					itemId: "worker",
-					remainingCharges: 1,
+					remainingUnits: 1,
 				}),
 				inputItem({
 					id: "runtime:worker:b",
 					inputIndex: 1,
 					itemId: "worker",
-					remainingCharges: 1,
+					remainingUnits: 1,
 				}),
 				{
 					id: "runtime:blocker",
@@ -393,7 +393,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 		expect(Result.isSuccess(result.attempt)).toBe(true);
 		expect(result.after.items.find((item) => item.id === "runtime:worker:a")).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 			location: {
 				scope: "board",
 				space: 2,
@@ -404,7 +404,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			},
 		});
 		expect(result.after.items.find((item) => item.id === "runtime:worker:b")).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 			location: {
 				scope: "inventory",
 				position: {
@@ -429,13 +429,13 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					id: "runtime:worker:a",
 					inputIndex: 0,
 					itemId: "worker",
-					remainingCharges: 1,
+					remainingUnits: 1,
 				}),
 				inputItem({
 					id: "runtime:worker:b",
 					inputIndex: 1,
 					itemId: "worker",
-					remainingCharges: 1,
+					remainingUnits: 1,
 				}),
 				{
 					id: "runtime:board-blocker",

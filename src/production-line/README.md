@@ -10,7 +10,7 @@ This README maps the peer `production-*` roots. It lives beside Production Line 
 | --- | --- | --- |
 | `production-condition` | Authored runtime condition evaluation | [`whenFx.ts`](../production-condition/fx/whenFx.ts) |
 | `production-output` | Output, drop and roll schemas; deterministic resolution | [`outputFx.ts`](../production-output/fx/outputFx.ts), [`readOutputMaximumQuantitiesFn.ts`](../production-output/fn/readOutputMaximumQuantitiesFn.ts) |
-| `production-action` | Immediate action admission, action inputs and charge settlement | [`resolveActionRuleFx.ts`](../production-action/fx/resolveActionRuleFx.ts), [`settleActionChargesFx.ts`](../production-action/fx/settleActionChargesFx.ts) |
+| `production-action` | Immediate action admission, action inputs and unit settlement | [`resolveActionRuleFx.ts`](../production-action/fx/resolveActionRuleFx.ts), [`settleActionUnitsFx.ts`](../production-action/fx/settleActionUnitsFx.ts) |
 | `production-input` | Material resolution, buffers, autofill, withdrawal and storage mutation | [`resolveInputRunFx.ts`](../production-input/fx/resolveInputRunFx.ts), [`applyInputRunPlanFx.ts`](../production-input/fx/applyInputRunPlanFx.ts) |
 | `production-line` | Line definitions, rules, reads and one pinned-snapshot run plan | [`fx/resolveLineRunFx.ts`](fx/resolveLineRunFx.ts) |
 | `production-job` | Queue admission, reservation, start, completion and cancellation cleanup | [`../production-job/fx/enqueueLineFx.ts`](../production-job/fx/enqueueLineFx.ts), [`../production-job/fx/attemptQueuedLineStartFx.ts`](../production-job/fx/attemptQueuedLineStartFx.ts), [`../production-job/fx/attemptJobCompletionFx.ts`](../production-job/fx/attemptJobCompletionFx.ts) |
@@ -45,16 +45,16 @@ Do not call one side globally upstream or downstream. State the exact layer: for
 ```text
 enqueueLineFx
 → resolve owner + line + rules + non-material requirements
-→ validate charges, output capacity and queue capacity
+→ validate units, output capacity and queue capacity
 → append intent only
 
 Tick: persisted global queue order, earliest actionable request per idle owner
 → skip blocked requests without changing state or intent order
-→ recheck rules, non-material requirements, charges and output limits
+→ recheck rules, non-material requirements, units and output limits
 → autofill useful material through Delivery when possible
 → retry from fresh Runtime facts
 → resolveLineRunFx from one pinned snapshot
-→ reserve inputs + charges + worst-case output
+→ reserve inputs + units + worst-case output
 → start one Job atomically
 → only start or scheduled delivery handles this owner for the queue pass
 
@@ -79,7 +79,7 @@ clear pending owner queue
 → commit all or nothing
 ```
 
-A queued request owns no time, material, charges or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
+A queued request owns no time, material, units or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
 Scheduled owners use the same line/default readers and one-intent admission. `item-schedule` owns phase and lifetime, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally. Player-control admission is separate from autonomous work and shared by production commands and their projections.
 
@@ -89,7 +89,7 @@ Scheduled owners use the same line/default readers and one-intent admission. `it
 - A skipped request keeps its identity, line and valid buffered inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; active Jobs remain non-preemptive and stored owners stay blocked.
 - Clearing pending work returns its unused line-input material without cancelling active work.
-- Start re-resolves all live facts and atomically applies input ownership, charge spending, stack isolation, reservation and Job creation.
+- Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.
 - Active Jobs reserve the worst possible output quantity; queued requests reserve nothing.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.

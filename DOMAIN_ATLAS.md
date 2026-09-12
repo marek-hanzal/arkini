@@ -67,7 +67,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-merge` | Directional merge admission and atomic lifecycle | [`src/item-merge/fx/mergeItemsFx.ts`](src/item-merge/fx/mergeItemsFx.ts) |
 | `item-state-isolation` | Identity-bound owner isolation and remainder placement | [`src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts`](src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts) |
 | `item-interaction` | Drop preview/commit, release, split, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
-| `space-action` | Space activation, charge settlement and navigation | [`src/space-action/fx/activateSpaceItemFx.ts`](src/space-action/fx/activateSpaceItemFx.ts) |
+| `space-action` | Space activation, unit settlement and navigation | [`src/space-action/fx/activateSpaceItemFx.ts`](src/space-action/fx/activateSpaceItemFx.ts) |
 
 [`GAME.MD`](GAME.MD) owns gameplay meaning. The Runtime map owns state and lifecycle navigation.
 
@@ -77,7 +77,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | --- | --- | --- |
 | `production-condition` | Authored runtime condition evaluation | [`src/production-condition/fx/whenFx.ts`](src/production-condition/fx/whenFx.ts) |
 | `production-output` | Output/drop/roll contracts and resolution | [`src/production-output/fx/outputFx.ts`](src/production-output/fx/outputFx.ts) |
-| `production-action` | Immediate action admission, inputs and charge settlement | [`src/production-action/fx/resolveActionRuleFx.ts`](src/production-action/fx/resolveActionRuleFx.ts) |
+| `production-action` | Immediate action admission, inputs and unit settlement | [`src/production-action/fx/resolveActionRuleFx.ts`](src/production-action/fx/resolveActionRuleFx.ts) |
 | `production-input` | Material planning, buffers, autofill and withdrawal | [`src/production-input/fx/resolveInputRunFx.ts`](src/production-input/fx/resolveInputRunFx.ts) |
 | `production-line` | Line definitions, rules, reads and run planning | [`src/production-line/README.md`](src/production-line/README.md) |
 | `production-job` | Queue, reservation, start, completion and cancellation | [`src/production-job/fx/enqueueLineFx.ts`](src/production-job/fx/enqueueLineFx.ts) |

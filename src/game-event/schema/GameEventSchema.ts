@@ -176,20 +176,20 @@ const itemInputStoredEventSchema = z
 	})
 	.strict();
 
-const itemChargeSpentEventSchema = z
+const itemUnitSpentEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
-			"ItemChargeSpent",
+			"ItemUnitSpent",
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: GridLocationSchema,
-		previousCharges: z.number().int().positive(),
-		resultingCharges: z.number().int().positive(),
+		previousUnits: z.number().int().positive(),
+		resultingUnits: z.number().int().positive(),
 	})
 	.strict()
-	.refine((event) => event.resultingCharges < event.previousCharges, {
-		message: "resultingCharges must be less than previousCharges",
+	.refine((event) => event.resultingUnits < event.previousUnits, {
+		message: "resultingUnits must be less than previousUnits",
 	});
 
 const itemDepletedEventSchema = z
@@ -236,7 +236,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	itemSplitEventSchema,
 	itemConsumedEventSchema,
 	itemInputStoredEventSchema,
-	itemChargeSpentEventSchema,
+	itemUnitSpentEventSchema,
 	itemDepletedEventSchema,
 	itemExplicitlyRemovedEventSchema,
 ]);

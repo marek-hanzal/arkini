@@ -19,8 +19,8 @@ export const readSectionForPathFn = (
 		case "maxCount":
 		case "maxStackSize":
 			return "identity";
-		case "charges":
-			return "charges";
+		case "units":
+			return "units";
 		case "merge":
 			return "merges";
 		case "intervalMs":

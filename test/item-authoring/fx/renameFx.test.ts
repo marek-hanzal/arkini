@@ -117,7 +117,7 @@ describe("renameFx", () => {
 							},
 						},
 					],
-					charges: {
+					units: {
 						amount: 1,
 						output,
 					},

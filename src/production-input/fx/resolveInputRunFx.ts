@@ -18,7 +18,7 @@ export namespace resolveInputRunFx {
 		inputIndex: NonNegativeIntegerSchema.Type;
 		lineId: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
-		reservedCharges: ReadonlyMap<IdSchema.Type, number>;
+		reservedUnits: ReadonlyMap<IdSchema.Type, number>;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -31,7 +31,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	inputIndex,
 	lineId,
 	ownerItemId,
-	reservedCharges,
+	reservedUnits,
 	runtime,
 }: resolveInputRunFx.Props) {
 	return yield* match(input)
@@ -43,7 +43,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 				return resolveActionInputFx({
 					input,
 					ownerItemId,
-					reservedCharges,
+					reservedUnits,
 					runtime,
 				});
 			},
@@ -64,7 +64,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 				return resolveInputMaterialRunFx({
 					input,
 					ownerItemId,
-					reservedCharges,
+					reservedUnits,
 					runtime,
 					items: materialItems,
 				});
@@ -72,13 +72,13 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Deposit,
+				type: TypeSchema.enum.Units,
 			},
 			(input) => {
 				return resolveActionInputFx({
 					input,
 					ownerItemId,
-					reservedCharges,
+					reservedUnits,
 					runtime,
 				});
 			},

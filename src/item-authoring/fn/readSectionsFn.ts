@@ -12,8 +12,8 @@ const Sections = [
 		label: "Artwork",
 	},
 	{
-		id: "charges",
-		label: "Charges",
+		id: "units",
+		label: "Units",
 	},
 	{
 		id: "merges",
@@ -69,7 +69,7 @@ export const readSectionsFn = (
 		)
 			return false;
 		switch (section.id) {
-			case "charges":
+			case "units":
 			case "merges":
 				return item.type !== "inventory";
 			case "production":

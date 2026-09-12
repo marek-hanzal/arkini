@@ -25,7 +25,7 @@ const immutableItemFields = {
 	uid: true,
 } as const;
 const nullableBaseItemFields = {
-	charges: BaseSchema.shape.charges.nullable(),
+	units: BaseSchema.shape.units.nullable(),
 	description: BaseSchema.shape.description.nullable(),
 	maxCount: BaseSchema.shape.maxCount.nullable(),
 	merge: BaseSchema.shape.merge.nullable(),
@@ -131,7 +131,7 @@ const inventoryPatch = requireReplacementFn(
 	})
 		.partial()
 		.extend({
-			charges: nullableBaseItemFields.charges,
+			units: nullableBaseItemFields.units,
 			description: nullableBaseItemFields.description,
 			merge: nullableBaseItemFields.merge,
 		})

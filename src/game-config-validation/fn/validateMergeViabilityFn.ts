@@ -25,7 +25,7 @@ export const validateMergeViabilityFn = ({
 
 	for (const [ownerItemId, owner] of Object.entries(config.items)) {
 		for (const [mergeIndex, merge] of (owner.merge ?? []).entries()) {
-			if (merge.action === SourceActionSchema.enum.Deposit && owner.charges === undefined) {
+			if (merge.action === SourceActionSchema.enum.Spend && owner.units === undefined) {
 				diagnostics.push({
 					code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
 					severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -37,17 +37,17 @@ export const validateMergeViabilityFn = ({
 						"action",
 					],
 					source: provenance.items[ownerItemId],
-					message: `Merge ${mergeIndex} of item ${ownerItemId} deposits a source charge, but the item has no charges.`,
+					message: `Merge ${mergeIndex} of item ${ownerItemId} spends a source unit, but the item has no units.`,
 					ownerItemId,
 					mergeIndex,
-					reason: InvalidMergeReasonEnumSchema.enum.SourceChargesDisabled,
+					reason: InvalidMergeReasonEnumSchema.enum.SourceUnitsDisabled,
 				});
 			}
 			const exactTarget = config.items[merge.target.itemId];
 			if (
-				merge.effect === TargetEffectSchema.enum.Deposit &&
+				merge.effect === TargetEffectSchema.enum.Spend &&
 				exactTarget !== undefined &&
-				exactTarget.charges === undefined
+				exactTarget.units === undefined
 			) {
 				diagnostics.push({
 					code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
@@ -60,10 +60,10 @@ export const validateMergeViabilityFn = ({
 						"effect",
 					],
 					source: provenance.items[ownerItemId],
-					message: `Merge ${mergeIndex} of item ${ownerItemId} deposits a target charge, but selected target ${merge.target.itemId} has no charges.`,
+					message: `Merge ${mergeIndex} of item ${ownerItemId} spends a target unit, but selected target ${merge.target.itemId} has no units.`,
 					ownerItemId,
 					mergeIndex,
-					reason: InvalidMergeReasonEnumSchema.enum.TargetChargesDisabled,
+					reason: InvalidMergeReasonEnumSchema.enum.TargetUnitsDisabled,
 				});
 			}
 			const missingExactTarget = config.items[merge.target.itemId] === undefined;

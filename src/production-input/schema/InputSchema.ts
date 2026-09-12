@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { DepositSchema } from "./DepositSchema";
+import { UnitsSchema } from "./UnitsSchema";
 import { MaterialSchema } from "./MaterialSchema";
 import { SimpleSchema } from "./SimpleSchema";
 
@@ -8,20 +8,19 @@ import { SimpleSchema } from "./SimpleSchema";
  * A discriminated resource requirement for one product line.
  *
  * Simple inputs carry no resource operation. Material inputs are directly
- * delivered items. Deposit inputs describe intended capacity spending from a
- * matching board source; active runtime resolution rejects them until deposit
- * capacity state exists.
+ * delivered items. Units inputs resolve a matching Board item and spend its
+ * units in place through the shared action settlement.
  */
 export const InputSchema = z
 	.discriminatedUnion("type", [
 		SimpleSchema,
 		MaterialSchema,
-		DepositSchema,
+		UnitsSchema,
 	])
 	.meta({
 		id: "InputSchema",
 		description:
-			"A simple, material-item, or authored board-deposit input requirement for a product line.",
+			"A simple, material-item, or Board unit-cost input requirement for a product line.",
 	});
 
 export type InputSchema = typeof InputSchema;

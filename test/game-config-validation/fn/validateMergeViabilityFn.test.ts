@@ -22,17 +22,17 @@ const compileDiagnostics = async (items: Record<string, unknown>) =>
 
 const mergeSource = ({
 	action = "consume",
-	charges,
+	units,
 	effect = "keep",
 	maxCount,
 	result,
 	target,
 }: {
-	action?: "consume" | "deposit";
-	charges?: {
+	action?: "consume" | "spend";
+	units?: {
 		amount: number;
 	};
-	effect?: "deposit" | "keep" | "replace";
+	effect?: "spend" | "keep" | "replace";
 	maxCount?: number;
 	result?: string;
 	target: {
@@ -41,7 +41,7 @@ const mergeSource = ({
 	};
 }) => ({
 	...createSimpleItem("source"),
-	charges,
+	units,
 	maxCount,
 	merge: [
 		effect === "replace"
@@ -65,9 +65,9 @@ const mergeDiagnostics = async (items: Record<string, unknown>) =>
 	);
 
 describe("validateMergeViabilityFn", () => {
-	it("requires Charges on a source that uses the Deposit action", async () => {
+	it("requires Units on a source that uses the Spend action", async () => {
 		const source = mergeSource({
-			action: "deposit",
+			action: "spend",
 			target: {
 				type: "item",
 				itemId: "target",
@@ -89,15 +89,15 @@ describe("validateMergeViabilityFn", () => {
 					0,
 					"action",
 				],
-				reason: InvalidMergeReasonEnumSchema.enum.SourceChargesDisabled,
+				reason: InvalidMergeReasonEnumSchema.enum.SourceUnitsDisabled,
 			}),
 		]);
 	});
 
-	it("accepts Deposit when the merge source has Charges", async () => {
+	it("accepts Units when the merge source has Units", async () => {
 		const source = mergeSource({
-			action: "deposit",
-			charges: {
+			action: "spend",
+			units: {
 				amount: 2,
 			},
 			target: {
@@ -115,9 +115,9 @@ describe("validateMergeViabilityFn", () => {
 		).toEqual([]);
 	});
 
-	it("requires Charges on the selected target of a Deposit effect", async () => {
+	it("requires Units on the selected target of a Spend effect", async () => {
 		const source = mergeSource({
-			effect: "deposit",
+			effect: "spend",
 			target: {
 				type: "item",
 				itemId: "target",
@@ -139,14 +139,14 @@ describe("validateMergeViabilityFn", () => {
 					0,
 					"effect",
 				],
-				reason: InvalidMergeReasonEnumSchema.enum.TargetChargesDisabled,
+				reason: InvalidMergeReasonEnumSchema.enum.TargetUnitsDisabled,
 			}),
 		]);
 	});
 
-	it("accepts a Deposit effect when the selected target has Charges", async () => {
+	it("accepts a Spend effect when the selected target has Units", async () => {
 		const source = mergeSource({
-			effect: "deposit",
+			effect: "spend",
 			target: {
 				type: "item",
 				itemId: "target",
@@ -154,7 +154,7 @@ describe("validateMergeViabilityFn", () => {
 		});
 		const target = {
 			...createSimpleItem("target"),
-			charges: {
+			units: {
 				amount: 2,
 			},
 		};

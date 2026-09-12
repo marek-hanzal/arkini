@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { ArrowUpRight, BatteryCharging, Combine, type LucideIcon } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -54,38 +55,42 @@ const DisabledCapabilityDetail = ({
 	);
 };
 
-/** Presents the optional charge capability or its explicit disabled state. */
-export const ChargesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
-	item.charges === undefined ? (
-		<EditorRootCard dataUi="EditorItemChargesDisabledCard">
+/** Presents the optional unit capability or its explicit disabled state. */
+export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+	const translator = useTranslator();
+	return item.units === undefined ? (
+		<EditorRootCard dataUi="EditorItemUnitsDisabledCard">
 			<DisabledCapabilityDetail
-				actionLabel="Enable charges"
-				capability="charges"
-				description="Charges give this item a finite number of uses. Spending the last charge depletes it and may emit a configured output."
+				actionLabel={translator.textFn("Enable units")}
+				capability="units"
+				description={translator.textFn(
+					"Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.",
+				)}
 				icon={BatteryCharging}
 				itemUid={item.uid}
-				title="Charges are disabled"
+				title={translator.textFn("Units are disabled")}
 			/>
 		</EditorRootCard>
 	) : (
 		<div className="grid gap-3">
-			<EditorRootCard dataUi="EditorItemChargesCard">
-				<DetailSection title="Charges">
+			<EditorRootCard dataUi="EditorItemUnitsCard">
+				<DetailSection title={translator.textFn("Units")}>
 					<DetailFact
-						label="Initial charges"
-						value={item.charges.amount}
+						label={translator.textFn("Initial units")}
+						value={item.units.amount}
 					/>
 				</DetailSection>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorItemDepletionOutputCard">
 				<OutputDetail
-					emptyLabel="No depletion output configured."
-					output={item.charges.output}
-					title="Depletion output"
+					emptyLabel={translator.textFn("No depletion output configured.")}
+					output={item.units.output}
+					title={translator.textFn("Depletion output")}
 				/>
 			</EditorRootCard>
 		</div>
 	);
+};
 
 const MergeDetail = ({
 	index,
@@ -96,6 +101,7 @@ const MergeDetail = ({
 	readonly itemUid: string;
 	readonly merge: MergeSchema.Type;
 }) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	return (
 		<EditorRootCard dataUi="EditorItemMergeDetailCard">
@@ -124,11 +130,11 @@ const MergeDetail = ({
 				/>
 				<DetailFact
 					label="Source action"
-					value={merge.action}
+					value={merge.action === "spend" ? translator.textFn("Spend") : merge.action}
 				/>
 				<DetailFact
 					label="Target effect"
-					value={merge.effect}
+					value={merge.effect === "spend" ? translator.textFn("Spend") : merge.effect}
 				/>
 				{"result" in merge ? (
 					<DetailFact

@@ -415,7 +415,7 @@ Item artwork help:
 
     **Base tile scale** changes the artwork size within its tile. A value of 1 fills the tile with the artwork canvas; transparent PNG padding remains visible. Scale does not change occupied cells, storage, interaction reach, or image resolution.
 
-    The preview frame marks the complete tile.
+    The artwork preview in Item detail marks the complete tile.
 Item clock help:
   value: |
     A Clock adds periodic production, a finite lifetime, or both.
@@ -947,8 +947,6 @@ The board space entered after successful activation. One-way navigation is allow
   value: The board space entered after successful activation. One-way navigation is allowed.
 The finite supply held by each new item, independently of its stack quantity.:
   value: The finite supply held by each new item, independently of its stack quantity.
-The frame marks the complete tile. Scale 1 fills it with the artwork canvas.:
-  value: The frame marks the complete tile. Scale 1 fills it with the artwork canvas.
 The item that owns this action pays the unit cost. It must define enough available units.:
   value: The item that owns this action pays the unit cost. It must define enough available units.
 The line selected by default for manual production. Selecting this line clears Default on sibling lines.:
@@ -977,8 +975,6 @@ This line can complete without producing an item. Configured output is resolved 
   value: This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.
 This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.:
   value: This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.
-Tile preview:
-  value: Tile preview
 Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.:
   value: Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.
 Time for one production cycle before runtime rules. Zero completes immediately.:

@@ -118,7 +118,7 @@ describe("readItemConnectionsFn", () => {
 					lines: [
 						{
 							...line,
-							checkAhead: true,
+							ahead: true,
 						},
 					],
 				},

@@ -55,7 +55,7 @@ export const ProductionLineDetail = ({
 							Default
 						</span>
 					) : null}
-					{line.checkAhead === true ? (
+					{line.ahead === true ? (
 						<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
 							<Tx label="Check ahead" />
 						</span>

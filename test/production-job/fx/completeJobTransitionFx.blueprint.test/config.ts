@@ -66,7 +66,7 @@ const blueprintItem = ({
 		maxStackSize: 1,
 		lines: [
 			{
-				checkAhead: true,
+				ahead: true,
 				id: lineId,
 				title: lineId,
 				description: lineId,

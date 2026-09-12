@@ -29,7 +29,7 @@ export const LineSchema = z
 		description: DescriptionSchema.describe(
 			"The human-readable explanation of this product line's purpose.",
 		),
-		checkAhead: z
+		ahead: z
 			.boolean()
 			.optional()
 			.describe(

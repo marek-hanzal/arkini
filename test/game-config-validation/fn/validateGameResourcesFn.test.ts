@@ -192,7 +192,7 @@ describe("validateGameResourcesFn", () => {
 			maxStackSize: 1,
 			lines: [
 				{
-					checkAhead: true,
+					ahead: true,
 					id: `line:${id}:construct`,
 					title: id,
 					description: id,

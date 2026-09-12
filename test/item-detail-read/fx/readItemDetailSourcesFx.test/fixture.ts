@@ -209,7 +209,7 @@ export const config = GameConfigSchema.parse({
 			maxStackSize: 1,
 			lines: [
 				{
-					checkAhead: true,
+					ahead: true,
 					...acquisitionLine("line:blueprint", "product"),
 					input: [
 						{

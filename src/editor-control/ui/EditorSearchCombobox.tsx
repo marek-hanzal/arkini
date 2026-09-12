@@ -51,7 +51,7 @@ interface EditorSearchComboboxProps {
 	readonly optionContentLayout?: "inline" | "stacked";
 	readonly renderOptionContentFn?: (option: EditorSearchOption) => ReactNode;
 	readonly renderPreviewFn: (option: EditorSearchOption) => ReactNode;
-	readonly renderSelectedPreviewFn?: (option: EditorSearchOption) => ReactNode;
+	readonly renderSelectedPreviewFn?: (option: EditorSearchOption | undefined) => ReactNode;
 }
 
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
@@ -75,8 +75,7 @@ export const EditorSearchCombobox = ({
 	value,
 }: EditorSearchComboboxProps) => {
 	const selectedOption = options.find((option) => option.id === value);
-	const selectedPreview =
-		selectedOption === undefined ? undefined : renderSelectedPreviewFn?.(selectedOption);
+	const selectedPreview = renderSelectedPreviewFn?.(selectedOption);
 	const selectedLabel = displaySelectedLabel
 		? (options.find((option) => option.id === value)?.label ?? value)
 		: value;

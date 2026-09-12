@@ -23,27 +23,10 @@ const ArtworkFields = withFieldGroupFn({
 		const translator = useTranslator();
 		return (
 			<>
-				<group.AppField name="default[0]">
-					{(field) => <field.AssetField label={translator.textFn("Base asset")} />}
-				</group.AppField>
-				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
-					<group.AppField name="default[1]">
-						{(field) => (
-							<field.AssetField
-								label={translator.textFn("Overlay asset")}
-								optional
-							/>
-						)}
+				<div className="grid grid-cols-[minmax(0,1fr)_12rem] items-start gap-4">
+					<group.AppField name="default[0]">
+						{(field) => <field.AssetField label={translator.textFn("Base asset")} />}
 					</group.AppField>
-					<LinkButton
-						className="flex h-[var(--ak-control-min-height)] shrink-0 items-center"
-						title={translator.textFn("Clear overlay asset")}
-						onClick={() => group.setFieldValue("default[1]", "")}
-					>
-						<Trash2 className="size-4" />
-					</LinkButton>
-				</div>
-				<div className="max-w-48">
 					<group.AppField name="scale">
 						{(field) => (
 							<EditorNumberControl
@@ -62,6 +45,23 @@ const ArtworkFields = withFieldGroupFn({
 							/>
 						)}
 					</group.AppField>
+				</div>
+				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
+					<group.AppField name="default[1]">
+						{(field) => (
+							<field.AssetField
+								label={translator.textFn("Overlay asset")}
+								optional
+							/>
+						)}
+					</group.AppField>
+					<LinkButton
+						className="flex h-[var(--ak-control-min-height)] shrink-0 items-center"
+						title={translator.textFn("Clear overlay asset")}
+						onClick={() => group.setFieldValue("default[1]", "")}
+					>
+						<Trash2 className="size-4" />
+					</LinkButton>
 				</div>
 			</>
 		);

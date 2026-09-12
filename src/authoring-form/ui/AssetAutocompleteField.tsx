@@ -99,7 +99,7 @@ export const EditorAssetReferenceControl = ({
 			)}
 			renderSelectedPreviewFn={(option) => (
 				<EditorAssetThumbnail
-					resourceId={option.id}
+					resourceId={option?.id}
 					size="sm"
 				/>
 			)}

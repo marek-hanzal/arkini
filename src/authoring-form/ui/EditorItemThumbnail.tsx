@@ -36,9 +36,15 @@ export const EditorItemSearchThumbnail = ({
 	readonly item: ItemSchema.Type | undefined;
 	readonly selected?: boolean;
 }) =>
-	item === undefined ? null : selected ? (
-		<EditorItemSelectedThumbnail resourceIds={item.asset.default} />
-	) : (
+	selected ? (
+		<EditorItemSelectedThumbnail
+			resourceIds={
+				item?.asset.default ?? [
+					"",
+				]
+			}
+		/>
+	) : item === undefined ? null : (
 		<EditorItemThumbnail
 			resourceIds={item.asset.default}
 			size="lg"
@@ -80,7 +86,9 @@ export const EditorItemThumbnail = ({
 			)}
 			data-ui="EditorItemThumbnail"
 		>
-			<span className="text-xl font-semibold text-subtle">?</span>
+			{resourceIds[0] === "" ? null : (
+				<span className="text-xl font-semibold text-subtle">?</span>
+			)}
 		</div>
 	);
 };

@@ -10,24 +10,24 @@ const FormSections = [
 		label: "Artwork",
 	},
 	{
-		id: "units",
-		label: "Units",
+		id: "production",
+		label: "Production",
 	},
 	{
 		id: "merges",
 		label: "Merges",
 	},
 	{
-		id: "action",
-		label: "Action",
+		id: "units",
+		label: "Units",
 	},
 	{
 		id: "clock",
 		label: "Clock",
 	},
 	{
-		id: "production",
-		label: "Production",
+		id: "action",
+		label: "Action",
 	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 

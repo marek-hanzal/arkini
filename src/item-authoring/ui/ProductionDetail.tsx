@@ -1,3 +1,4 @@
+import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
@@ -31,6 +32,12 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 					key={item.uid}
 					count={item.lines.length}
 					itemLabelFn={(index) => item.lines[index].title}
+					renderItemContentFn={(index, label) => (
+						<ProductionLineOption
+							line={item.lines[index]}
+							label={label}
+						/>
+					)}
 					itemSearchTermsFn={(index) => [
 						item.lines[index].id,
 						item.lines[index].description,

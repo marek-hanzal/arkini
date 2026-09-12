@@ -1,3 +1,4 @@
+import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
@@ -96,6 +97,12 @@ const ProductionFields = withFieldGroupFn({
 										? `${translator.textFn("Production line")} ${index + 1}`
 										: line.title;
 								}}
+								renderItemContentFn={(index, label) => (
+									<ProductionLineOption
+										line={lines[index]}
+										label={label}
+									/>
+								)}
 								itemSearchTermsFn={(index) => [
 									lines[index].id,
 									lines[index].description,

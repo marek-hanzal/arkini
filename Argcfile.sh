@@ -33,10 +33,20 @@ arkpack-fingerprint() {
 		find src shared electron scripts -type f ! -name _route.ts -print0 || return $?
 		find game/arkini/items -type f -name '*.json' -print0 || return $?
 		find game/arkini/assets game/arkini/resources -type f -name '*.png' -print0 || return $?
-		printf '%s\0' game/arkini/game.json game/arkini/project.json game/arkini/schema.json \
+		printf '%s\0' game/arkini/game.json game/arkini/schema.json \
 			Argcfile.sh mise.toml package.json package-lock.json electron.vite.config.ts tsconfig*.json
 	} | LC_ALL=C coreutils sort -z | xargs -0 coreutils sha256sum --binary --zero |
-		{ printf '%s\0' "$OSTYPE" "$HOSTTYPE"; cat; } |
+		{
+			printf '%s\0' "$OSTYPE" "$HOSTTYPE"
+			cat
+			# The Editor revision is not build content; preserve every other manifest field.
+			node --input-type=module -e '
+				import { readFileSync } from "node:fs";
+				const marker = JSON.parse(readFileSync("game/arkini/project.json", "utf8"));
+				if (Number.isSafeInteger(marker.revision) && marker.revision >= 0) marker.revision = 0;
+				process.stdout.write(JSON.stringify(marker));
+			' || return $?
+		} |
 		coreutils sha256sum | coreutils cut -d ' ' -f 1
 }
 

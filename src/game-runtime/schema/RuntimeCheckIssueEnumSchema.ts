@@ -15,7 +15,7 @@ export const RuntimeCheckIssueEnumSchema = z
 		JobConsumedMaterialState: "job:consumed-material-state",
 		DuplicateItemId: "item:id:duplicate",
 		ItemMaxCount: "item:max-count",
-		ItemCharges: "item:charges",
+		ItemUnits: "item:units",
 		ItemStackSize: "item:stack-size",
 		ItemSchedule: "item:schedule",
 		ItemTemporaryDuration: "item:temporary-duration",

@@ -49,7 +49,7 @@ export namespace readItemDetailInfoFn {
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
 				readonly maxCount?: number;
-				readonly charges?: {
+				readonly units?: {
 					readonly remaining: number;
 					readonly total: number;
 				};
@@ -131,7 +131,7 @@ export const readItemDetailInfoFn = ({
 }: readItemDetailInfoFn.Props): readItemDetailInfoFn.Result => {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined) return unavailable;
-	const totalCharges = item.item.charges?.amount;
+	const totalUnits = item.item.units?.amount;
 	return {
 		kind: "available",
 		itemId: item.id,
@@ -151,12 +151,12 @@ export const readItemDetailInfoFn = ({
 			: {
 					maxCount: item.item.maxCount,
 				}),
-		...(totalCharges === undefined
+		...(totalUnits === undefined
 			? {}
 			: {
-					charges: {
-						remaining: item.remainingCharges ?? totalCharges,
-						total: totalCharges,
+					units: {
+						remaining: item.remainingUnits ?? totalUnits,
+						total: totalUnits,
 					},
 				}),
 	};

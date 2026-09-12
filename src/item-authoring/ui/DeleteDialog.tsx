@@ -52,9 +52,9 @@ const ForceDeleteImpactList = ({
 		entries.push(
 			`Remove production line “${title}” from ${readItemTitleFn(project, ownerItemId)}`,
 		);
-	for (const ownerItemId of impact.removedChargeOutputOwnerIds)
+	for (const ownerItemId of impact.removedUnitOutputOwnerIds)
 		entries.push(
-			`Remove the charge depletion output from ${readItemTitleFn(project, ownerItemId)}`,
+			`Remove the unit depletion output from ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const ownerItemId of impact.removedExpiryOutputOwnerIds)
 		entries.push(`Remove the expiry output from ${readItemTitleFn(project, ownerItemId)}`);

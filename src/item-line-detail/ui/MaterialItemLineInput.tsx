@@ -14,7 +14,7 @@ import {
 } from "~/item-line-detail/ui/ItemLineInputFrame";
 import { MaterialInputWithdraw } from "~/item-line-detail/ui/ItemLineInputWithdrawal";
 import { QuantityValue } from "~/item-definition/ui/QuantityValue";
-import { ChargeCostValue } from "~/production-input/ui/ChargeCostValue";
+import { UnitCostValue } from "~/production-input/ui/UnitCostValue";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -126,10 +126,10 @@ export const MaterialItemLineInput = ({
 				/>
 				<p className="mt-0.5 text-xs text-muted">
 					{input.mode === "consume" ? "Consumed" : "Reserved"}
-					{input.charges === undefined ? null : (
+					{input.units === undefined ? null : (
 						<>
 							{" · "}
-							<ChargeCostValue charge={input.charges} />
+							<UnitCostValue unit={input.units} />
 						</>
 					)}
 				</p>

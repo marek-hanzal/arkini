@@ -62,7 +62,7 @@
 						}
 					]
 				},
-				"effect": "deposit"
+				"effect": "spend"
 			}
 		],
 		"type": "simple"

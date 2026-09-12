@@ -13,7 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 4,
-		"charges": {
+		"units": {
 			"amount": 24
 		},
 		"merge": [
@@ -22,7 +22,7 @@
 					"type": "item",
 					"itemId": "unlit-candle"
 				},
-				"action": "deposit",
+				"action": "spend",
 				"effect": "replace",
 				"result": "candle"
 			},
@@ -31,7 +31,7 @@
 					"type": "item",
 					"itemId": "campfire"
 				},
-				"action": "deposit",
+				"action": "spend",
 				"effect": "replace",
 				"result": "campfire-burning"
 			},
@@ -40,7 +40,7 @@
 					"type": "item",
 					"itemId": "foundry-extinguished"
 				},
-				"action": "deposit",
+				"action": "spend",
 				"effect": "replace",
 				"result": "foundry"
 			},
@@ -49,7 +49,7 @@
 					"type": "item",
 					"itemId": "oven-with-wood"
 				},
-				"action": "deposit",
+				"action": "spend",
 				"effect": "replace",
 				"result": "burning-oven"
 			}

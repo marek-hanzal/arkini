@@ -23,7 +23,7 @@ export interface EstimateTopology {
 }
 
 const projectRequirementFn = (requirement: AcquisitionRequirement): AcquisitionRequirement =>
-	requirement.source === "charged-item"
+	requirement.source === "unit-owner"
 		? {
 				...requirement,
 				quantity: 1,

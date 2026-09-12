@@ -19,7 +19,7 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 			...base.items,
 			blocker: {
 				...base.items.blocker,
-				charges: {
+				units: {
 					amount: 1,
 					output: producer.lines[0].output,
 				},
@@ -32,8 +32,8 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 						output: undefined,
 						input: [
 							{
-								type: "deposit",
-								charges: {
+								type: "units",
+								units: {
 									from: "target",
 									cost: 1,
 								},

@@ -22,7 +22,7 @@ const readInputItemIdFn = (input: LineInputSchema.Type | ActionInputSchema.Type)
 			return undefined;
 		case "materials":
 			return input.selector.itemId;
-		case "deposit":
+		case "units":
 			return input.query.selector.itemId;
 	}
 };
@@ -92,7 +92,7 @@ const readItemConnectionFactsFn = (item: ItemSchema.Type): ItemConnectionFacts =
 		if (merge.effect === "replace") facts.outputs.add(merge.result);
 		addOutputFactsFn(facts, merge.output);
 	}
-	addOutputFactsFn(facts, item.charges?.output);
+	addOutputFactsFn(facts, item.units?.output);
 	if (item.type === "temporary") addOutputFactsFn(facts, item.output);
 	return facts;
 };

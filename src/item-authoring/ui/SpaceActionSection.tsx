@@ -20,7 +20,7 @@ export const SpaceActionSection = () => {
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormCard>
 				<EditorFormSectionDivider
-					description="Activating this item settles its configured requirements and charge costs, then enters the authored target space in the same engine transaction."
+					description="Activating this item settles its configured requirements and unit costs, then enters the authored target space in the same engine transaction."
 					title="Space action"
 					variant="secondary"
 				/>

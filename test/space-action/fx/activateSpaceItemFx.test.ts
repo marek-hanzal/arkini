@@ -92,7 +92,7 @@ describe("Space item activation", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("settles external or owner-paid Board deposits and never invents a passive origin", () => {
+	it("settles external or owner-paid Board units and never invents a passive origin", () => {
 		const boardResult = run(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
@@ -108,8 +108,8 @@ describe("Space item activation", () => {
 					quantity: 1,
 				});
 				return yield* spawnAndActivate({
-					id: "runtime:deposit-portal",
-					itemId: "depositPortal",
+					id: "runtime:units-portal",
+					itemId: "unitsPortal",
 					location: board(1, 1),
 				});
 			}),
@@ -118,12 +118,12 @@ describe("Space item activation", () => {
 		expect(
 			boardResult.runtime.items.find((item) => item.id === "runtime:payer:near"),
 		).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 		});
 		expect(
 			boardResult.runtime.items.find((item) => item.id === "runtime:payer:far"),
 		).toMatchObject({
-			remainingCharges: undefined,
+			remainingUnits: undefined,
 		});
 
 		const ownerPaid = run(
@@ -136,7 +136,7 @@ describe("Space item activation", () => {
 				});
 				const activated = yield* spawnAndActivate({
 					id: "runtime:owner-paid-portal",
-					itemId: "ownerDepositPortal",
+					itemId: "ownerUnitsPortal",
 					location: board(0),
 				});
 				return {
@@ -151,12 +151,12 @@ describe("Space item activation", () => {
 				(item) => item.id === ownerPaid.activated.item.id,
 			),
 		).toMatchObject({
-			remainingCharges: 2,
+			remainingUnits: 2,
 		});
 		expect(
 			ownerPaid.activated.runtime.items.find((item) => item.id === ownerPaid.payer.id),
 		).toMatchObject({
-			remainingCharges: undefined,
+			remainingUnits: undefined,
 		});
 
 		const passiveResult = run(
@@ -168,8 +168,8 @@ describe("Space item activation", () => {
 					quantity: 1,
 				});
 				const portal = yield* spawnItemFx({
-					id: "runtime:passive-deposit-portal",
-					itemId: "depositPortal",
+					id: "runtime:passive-units-portal",
+					itemId: "unitsPortal",
 					location: inventory(0),
 					quantity: 1,
 				});

@@ -150,23 +150,23 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		rules,
 	});
 	const resolvedInputs: InputRun.Resolution[] = [];
-	const reservedCharges = new Map<IdSchema.Type, number>();
+	const reservedUnits = new Map<IdSchema.Type, number>();
 	for (const [inputIndex, configuredInput] of line.input.entries()) {
 		const resolvedInput = yield* resolveInputRunFx({
 			input: configuredInput,
 			inputIndex,
 			lineId,
 			ownerItemId,
-			reservedCharges,
+			reservedUnits,
 			runtime,
 		});
 		resolvedInputs.push(resolvedInput);
 
-		const chargePlan = resolvedInput.plan?.charges;
-		if (chargePlan !== undefined) {
-			reservedCharges.set(
-				chargePlan.itemId,
-				(reservedCharges.get(chargePlan.itemId) ?? 0) + chargePlan.cost,
+		const unitPlan = resolvedInput.plan?.units;
+		if (unitPlan !== undefined) {
+			reservedUnits.set(
+				unitPlan.itemId,
+				(reservedUnits.get(unitPlan.itemId) ?? 0) + unitPlan.cost,
 			);
 		}
 	}

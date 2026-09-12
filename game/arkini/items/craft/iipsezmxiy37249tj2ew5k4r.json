@@ -14,7 +14,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 12,
-		"charges": {
+		"units": {
 			"amount": 1
 		},
 		"type": "craft",
@@ -41,11 +41,11 @@
 					"capacity": 0
 				},
 				{
-					"charges": {
+					"units": {
 						"cost": 1,
 						"from": "self"
 					},
-					"type": "deposit",
+					"type": "units",
 					"query": {
 						"selector": {
 							"type": "item",

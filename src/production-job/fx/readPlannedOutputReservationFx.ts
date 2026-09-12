@@ -3,13 +3,13 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ModeSchema } from "~/production-input/schema/ModeSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
+import { applyFinalUnitReservationFx } from "./applyFinalUnitReservationFx";
 import { adjustOutputReservationFx } from "./adjustOutputReservationFx";
 import { clampOutputReservationFx } from "./clampOutputReservationFx";
 
@@ -23,7 +23,7 @@ export namespace readPlannedOutputReservationFx {
 
 /**
  * Computes one exact candidate plan's future quantity delta without applying
- * input moves, charge spends, lifecycle output, placement, or identity changes.
+ * input moves, unit spends, lifecycle output, placement, or identity changes.
  */
 export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReservationFx")(
 	function* ({ line, plan, runtime }: readPlannedOutputReservationFx.Props) {
@@ -54,20 +54,17 @@ export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReserv
 
 		const costs = new Map<IdSchema.Type, number>();
 		for (const input of plan.input) {
-			if (input.charges === undefined) continue;
-			costs.set(
-				input.charges.itemId,
-				(costs.get(input.charges.itemId) ?? 0) + input.charges.cost,
-			);
+			if (input.units === undefined) continue;
+			costs.set(input.units.itemId, (costs.get(input.units.itemId) ?? 0) + input.units.cost);
 		}
 		for (const [payerId, cost] of costs) {
 			const payer = yield* readRuntimeItemByIdFx({
 				itemId: payerId,
 				runtime,
 			});
-			const remainingCharges = readItemRemainingChargesFn(payer);
-			if (remainingCharges !== cost) continue;
-			yield* applyFinalChargeReservationFx({
+			const remainingUnits = readItemRemainingUnitsFn(payer);
+			if (remainingUnits !== cost) continue;
+			yield* applyFinalUnitReservationFx({
 				payer: payer.item,
 				quantities,
 			});

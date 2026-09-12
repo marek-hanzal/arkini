@@ -13,7 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 1
 		},
 		"maxQueueSize": 1,
@@ -29,11 +29,11 @@
 				"runtimeMs": 30000,
 				"input": [
 					{
-						"charges": {
+						"units": {
 							"cost": 1,
 							"from": "self"
 						},
-						"type": "deposit",
+						"type": "units",
 						"query": {
 							"selector": {
 								"type": "item",
@@ -92,11 +92,11 @@
 				"runtimeMs": 30000,
 				"input": [
 					{
-						"charges": {
+						"units": {
 							"cost": 1,
 							"from": "self"
 						},
-						"type": "deposit",
+						"type": "units",
 						"query": {
 							"selector": {
 								"type": "item",

@@ -16,7 +16,7 @@ export namespace readGameAudioCuesFn {
 		| "split"
 		| "consume"
 		| "store"
-		| "charge"
+		| "unit"
 		| "deplete"
 		| "remove";
 
@@ -42,7 +42,7 @@ const cuePriority: Record<readGameAudioCuesFn.Kind, number> = {
 	split: 2,
 	consume: 2,
 	store: 2,
-	charge: 2,
+	unit: 2,
 	deplete: 3,
 	remove: 3,
 };
@@ -129,9 +129,9 @@ const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
 		)
 		.with(
 			{
-				type: GameEventEnumSchema.enum.ItemChargeSpent,
+				type: GameEventEnumSchema.enum.ItemUnitSpent,
 			},
-			(event) => cueFn("charge", event.previousCharges - event.resultingCharges),
+			(event) => cueFn("unit", event.previousUnits - event.resultingUnits),
 		)
 		.with(
 			{

@@ -26,7 +26,7 @@ export type JobCompletionOwner = Omit<BoardRuntimeItemSchema.Type, "item"> & {
  * Shared live facts resolved once before completing one line job.
  *
  * `runtime` already excludes the completed job and consumed job material, while reserved items remain live until identity-aware placement returns them.
- * Item lifetime is determined only by its live charge state.
+ * Item lifetime is determined only by its live unit state.
  */
 export interface JobCompletionContext {
 	readonly job: JobSchema.Type;

@@ -231,13 +231,13 @@ describe("readItemDetailQueue", () => {
 			],
 		});
 
-		const chargedConfig = structuredClone(lineRunTestConfig);
-		const workshop = chargedConfig.items.workshop;
+		const spentConfig = structuredClone(lineRunTestConfig);
+		const workshop = spentConfig.items.workshop;
 		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
-		workshop.charges = {
+		workshop.units = {
 			amount: 1,
 		};
-		workshop.lines[0].input[0].charges = {
+		workshop.lines[0].input[0].units = {
 			cost: 2,
 			from: "self",
 		};
@@ -247,7 +247,7 @@ describe("readItemDetailQueue", () => {
 				item.id === "runtime:workshop"
 					? {
 							...item,
-							item: chargedConfig.items.workshop,
+							item: spentConfig.items.workshop,
 						}
 					: item,
 			),
@@ -258,7 +258,7 @@ describe("readItemDetailQueue", () => {
 					itemId: "runtime:workshop",
 					runtime: blocked,
 				},
-				chargedConfig,
+				spentConfig,
 			),
 		).toMatchObject({
 			request: [

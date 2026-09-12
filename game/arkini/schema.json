@@ -388,9 +388,9 @@
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -495,11 +495,11 @@
 			],
 			"description": "Where one canonical item may physically exist in grid state."
 		},
-		"ChargeSchema": {
+		"UnitsSchema": {
 			"type": "object",
 			"properties": {
 				"amount": {
-					"description": "The positive number of charges owned by every fresh item instance.",
+					"description": "The positive number of units owned by every fresh item instance.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
 				"output": {
@@ -511,7 +511,7 @@
 				"amount"
 			],
 			"additionalProperties": false,
-			"description": "A finite item lifetime and optional output emitted on depletion."
+			"description": "A finite unit supply and optional output emitted on depletion."
 		},
 		"OutputSchema": {
 			"type": "object",
@@ -1124,7 +1124,7 @@
 		"MergeSchema": {
 			"oneOf": [
 				{
-					"$ref": "urn:arkini:schema:project#/$defs/merge.DepositSchema"
+					"$ref": "urn:arkini:schema:project#/$defs/merge.SpendSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/merge.KeepSchema"
@@ -1138,7 +1138,7 @@
 			],
 			"description": "A discriminated target-specific directional item merge."
 		},
-		"merge.DepositSchema": {
+		"merge.SpendSchema": {
 			"type": "object",
 			"properties": {
 				"target": {
@@ -1156,9 +1156,9 @@
 				"effect": {
 					"type": "string",
 					"enum": [
-						"deposit"
+						"spend"
 					],
-					"description": "Identifies this merge as one that spends a charge from its selected target."
+					"description": "Identifies this merge as one that spends a unit from its selected target."
 				}
 			},
 			"required": [
@@ -1167,14 +1167,14 @@
 				"effect"
 			],
 			"additionalProperties": false,
-			"description": "A merge that spends one charge from its selected receiving item."
+			"description": "A merge that spends one unit from its selected receiving item."
 		},
 		"merge.SourceActionSchema": {
 			"type": "string",
 			"enum": [
 				"use",
 				"consume",
-				"deposit"
+				"spend"
 			],
 			"description": "The action applied to a source item after it initiates a merge."
 		},
@@ -1291,17 +1291,17 @@
 					"$ref": "urn:arkini:schema:project#/$defs/input.MaterialSchema"
 				},
 				{
-					"$ref": "urn:arkini:schema:project#/$defs/input.DepositSchema"
+					"$ref": "urn:arkini:schema:project#/$defs/input.UnitsSchema"
 				}
 			],
-			"description": "A simple, material-item, or authored board-deposit input requirement for a product line."
+			"description": "A simple, material-item, or Board unit-cost input requirement for a product line."
 		},
 		"input.SimpleSchema": {
 			"type": "object",
 			"properties": {
-				"charges": {
-					"description": "The optional charge cost paid by the action owner or this requirement's resolved target.",
-					"$ref": "urn:arkini:schema:project#/$defs/input.ChargeSchema"
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:arkini:schema:project#/$defs/input.UnitCostSchema"
 				},
 				"type": {
 					"type": "string",
@@ -1317,16 +1317,16 @@
 			"additionalProperties": false,
 			"description": "An explicit action requirement with no consumable resource requirement."
 		},
-		"input.ChargeSchema": {
+		"input.UnitCostSchema": {
 			"type": "object",
 			"properties": {
 				"cost": {
-					"description": "The positive number of charges paid when the enclosing action commits.",
+					"description": "The positive number of units paid when the enclosing action commits.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
 				"from": {
 					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
-					"$ref": "urn:arkini:schema:project#/$defs/input.ChargeSourceSchema"
+					"$ref": "urn:arkini:schema:project#/$defs/input.UnitSourceSchema"
 				}
 			},
 			"required": [
@@ -1334,9 +1334,9 @@
 				"from"
 			],
 			"additionalProperties": false,
-			"description": "One action-requirement charge cost and the runtime item that pays it."
+			"description": "One action-requirement unit cost and the runtime item that pays it."
 		},
-		"input.ChargeSourceSchema": {
+		"input.UnitSourceSchema": {
 			"type": "string",
 			"enum": [
 				"self",
@@ -1347,9 +1347,9 @@
 		"input.MaterialSchema": {
 			"type": "object",
 			"properties": {
-				"charges": {
-					"description": "The optional charge cost paid by the action owner or this requirement's resolved target.",
-					"$ref": "urn:arkini:schema:project#/$defs/input.ChargeSchema"
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:arkini:schema:project#/$defs/input.UnitCostSchema"
 				},
 				"type": {
 					"type": "string",
@@ -1395,22 +1395,22 @@
 			],
 			"description": "How an input item participates in a product line."
 		},
-		"input.DepositSchema": {
+		"input.UnitsSchema": {
 			"type": "object",
 			"properties": {
-				"charges": {
-					"description": "The optional charge cost paid by the action owner or this requirement's resolved target.",
-					"$ref": "urn:arkini:schema:project#/$defs/input.ChargeSchema"
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:arkini:schema:project#/$defs/input.UnitCostSchema"
 				},
 				"type": {
 					"type": "string",
 					"enum": [
-						"deposit"
+						"units"
 					],
-					"description": "Identifies this input as one external charged-item target on the board."
+					"description": "Identifies this input as one item on the Board that can pay units."
 				},
 				"query": {
-					"description": "The board query used to select one charged target for this input.",
+					"description": "The board query used to select one target with units for this input.",
 					"$ref": "urn:arkini:schema:project#/$defs/query.BoardSchema"
 				}
 			},
@@ -1419,7 +1419,7 @@
 				"query"
 			],
 			"additionalProperties": false,
-			"description": "A board query that resolves one external charged-item target."
+			"description": "A board query that resolves one Board item that can pay units."
 		},
 		"line.RuleSchema": {
 			"oneOf": [
@@ -1781,9 +1781,9 @@
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -1856,9 +1856,9 @@
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -1924,10 +1924,10 @@
 					"$ref": "urn:arkini:schema:project#/$defs/input.SimpleSchema"
 				},
 				{
-					"$ref": "urn:arkini:schema:project#/$defs/input.DepositSchema"
+					"$ref": "urn:arkini:schema:project#/$defs/input.UnitsSchema"
 				}
 			],
-			"description": "A simple or board-deposit requirement resolved by an immediate item action."
+			"description": "A simple or board-units requirement resolved by an immediate item action."
 		},
 		"action.RuleSchema": {
 			"oneOf": [
@@ -1979,9 +1979,9 @@
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -2078,9 +2078,9 @@
 					"maximum": 1,
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -2213,9 +2213,9 @@
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -2293,9 +2293,9 @@
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -2379,9 +2379,9 @@
 					"maximum": 1,
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
@@ -2475,9 +2475,9 @@
 					"maximum": 1,
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"charges": {
-					"description": "The optional finite lifetime and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
 					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",

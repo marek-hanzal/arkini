@@ -13,7 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 8,
 			"output": {
 				"set": [

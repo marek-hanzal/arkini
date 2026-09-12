@@ -90,7 +90,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Deposit,
+				type: TypeSchema.enum.Units,
 			},
 			() =>
 				Effect.succeed({

@@ -43,15 +43,15 @@ const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): Readonl
 	switch (diagnostic.code) {
 		case "input:capacity-unsupported":
 		case "input:material-ineligible":
-		case "input:charges-invalid":
+		case "input:units-invalid":
 		case "merge:invalid":
 		case "line:duplicate-id":
 		case "line:multiple-defaults":
 			return [
 				diagnostic.ownerItemId,
 			];
-		case "charges:stochastic-renewal":
-		case "charges:missing-renewal":
+		case "units:stochastic-renewal":
+		case "units:missing-renewal":
 			return [
 				diagnostic.itemId,
 			];
@@ -79,14 +79,14 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 			return "merges";
 		case "input:capacity-unsupported":
 		case "input:material-ineligible":
-		case "input:charges-invalid":
+		case "input:units-invalid":
 		case "input:acceptance-cycle":
 		case "line:duplicate-id":
 		case "line:multiple-defaults":
 			return "production";
-		case "charges:stochastic-renewal":
-		case "charges:missing-renewal":
-			return "charges";
+		case "units:stochastic-renewal":
+		case "units:missing-renewal":
+			return "units";
 		case "resource:missing":
 			return "artwork";
 		default:

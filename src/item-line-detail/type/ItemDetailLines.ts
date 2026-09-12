@@ -1,7 +1,7 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { TimeSchema } from "~/game-value/schema/TimeSchema";
 import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
-import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
+import type { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
@@ -10,9 +10,9 @@ import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 
-interface ItemDetailLineChargeCost {
+interface ItemDetailLineUnitCost {
 	readonly cost: number;
-	readonly from: ChargeSourceSchema.Type;
+	readonly from: UnitSourceSchema.Type;
 }
 
 /** Framework-neutral contract for the Item Line Detail read projection. */
@@ -42,28 +42,28 @@ export namespace ItemDetailLines {
 		readonly availableCapacity: number;
 		readonly ready: boolean;
 		readonly canWithdraw: boolean;
-		readonly charges?: ItemDetailLineChargeCost;
+		readonly units?: ItemDetailLineUnitCost;
 	}
 
-	export interface DepositInput {
-		readonly kind: "deposit";
+	export interface UnitsInput {
+		readonly kind: "units";
 		readonly selector: SelectorSchema.Type;
 		readonly distance: DistanceSchema.Type;
-		readonly requiredCharges: number;
-		readonly availableCharges: number;
+		readonly requiredUnits: number;
+		readonly availableUnits: number;
 		readonly targetItemIds: readonly IdSchema.Type[];
 		readonly ready: boolean;
-		readonly charges?: ItemDetailLineChargeCost;
+		readonly units?: ItemDetailLineUnitCost;
 	}
 
 	export interface SimpleInput {
 		readonly kind: "simple";
 		readonly count: number;
 		readonly ready: boolean;
-		readonly charges: ItemDetailLineChargeCost;
+		readonly units: ItemDetailLineUnitCost;
 	}
 
-	export type Input = MaterialInput | DepositInput | SimpleInput;
+	export type Input = MaterialInput | UnitsInput | SimpleInput;
 
 	export interface OutputItem {
 		readonly itemId: IdSchema.Type;
@@ -80,7 +80,7 @@ export namespace ItemDetailLines {
 				readonly kind: "owner-stored";
 		  }
 		| {
-				readonly kind: "deposit-target-missing";
+				readonly kind: "units-target-missing";
 				readonly selector: SelectorSchema.Type;
 				readonly distance: DistanceSchema.Type;
 		  }

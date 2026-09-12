@@ -97,7 +97,7 @@ const config = GameConfigSchema.parse({
 		"producer:worker": {
 			...base("producer:worker", "any"),
 			type: "producer",
-			charges: {
+			units: {
 				amount: 2,
 			},
 			maxQueueSize: 1,
@@ -105,12 +105,12 @@ const config = GameConfigSchema.parse({
 				{
 					id: "line:worker:spend",
 					title: "Spend",
-					description: "Spend one worker charge.",
+					description: "Spend one worker unit.",
 					runtimeMs: 200,
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -195,7 +195,7 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 });
 
 describe("reserved material lifecycle", () => {
-	it("returns one partially charged impure item with the same identity and charge state", () => {
+	it("returns one partially spent impure item with the same identity and unit state", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const employer = yield* spawnItemFx({
@@ -241,7 +241,7 @@ describe("reserved material lifecycle", () => {
 		);
 
 		expect(result.reserved.items.find((item) => item.id === "runtime:worker")).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 			location: {
 				scope: "reserved",
 				jobId: result.job.id,
@@ -249,7 +249,7 @@ describe("reserved material lifecycle", () => {
 			},
 		});
 		expect(result.completed.items.find((item) => item.id === "runtime:worker")).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 			location: expect.objectContaining({
 				scope: "board",
 			}),

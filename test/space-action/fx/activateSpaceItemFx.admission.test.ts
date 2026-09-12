@@ -144,7 +144,7 @@ describe("Space item activation admission", () => {
 			Effect.gen(function* () {
 				const item = yield* spawnItemFx({
 					id: "runtime:stale-passive-portal",
-					itemId: "chargedPortal",
+					itemId: "spentPortal",
 					location: inventory(1),
 					quantity: 1,
 				});

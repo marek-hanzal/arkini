@@ -15,7 +15,7 @@
 		"scope": "any",
 		"maxCount": 1,
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 1
 		},
 		"type": "blueprint",
@@ -42,11 +42,11 @@
 					"capacity": 0
 				},
 				{
-					"charges": {
+					"units": {
 						"cost": 1,
 						"from": "self"
 					},
-					"type": "deposit",
+					"type": "units",
 					"query": {
 						"selector": {
 							"type": "item",

@@ -41,7 +41,7 @@ const readSourceKindColorFn = (palette: CanvasPalette, kind: ItemOriginOperation
 	switch (kind) {
 		case "line":
 			return palette.accent;
-		case "charges":
+		case "units":
 			return palette.warning;
 		case "merge":
 			return palette.success;
@@ -52,8 +52,7 @@ const readSourceKindColorFn = (palette: CanvasPalette, kind: ItemOriginOperation
 
 const SourceKindIconPath: Record<ItemOriginOperationKind, string> = {
 	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
-	charges:
-		"m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
+	units: "m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
 	merge: "M14 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1m5-7a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1M7 15l3 3m-3 3 3-3H5a2 2 0 0 1-2-2v-2",
 	expiry: "M10 2h4m-2 12 3-3",
 };

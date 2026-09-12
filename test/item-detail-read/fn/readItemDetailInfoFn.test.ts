@@ -14,7 +14,7 @@ describe("tile identity and Info projections", () => {
 		const item = {
 			...owner.item,
 			maxCount: 2,
-			charges: {
+			units: {
 				amount: 4,
 			},
 		};
@@ -24,7 +24,7 @@ describe("tile identity and Info projections", () => {
 				{
 					...owner,
 					item,
-					remainingCharges: 3,
+					remainingUnits: 3,
 				},
 				{
 					...owner,
@@ -77,7 +77,7 @@ describe("tile identity and Info projections", () => {
 			maxStackSize: 1,
 			ownedQuantity: 2,
 			maxCount: 2,
-			charges: {
+			units: {
 				remaining: 3,
 				total: 4,
 			},

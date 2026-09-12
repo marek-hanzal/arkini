@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import { resolveActionEnableFn } from "~/production-action/fn/resolveActionEnableFn";
 import { resolveActionInputFx } from "~/production-action/fx/resolveActionInputFx";
 import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx";
-import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
+import { settleActionUnitsFx } from "~/production-action/fx/settleActionUnitsFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -37,7 +37,7 @@ export namespace activateSpaceItemFx {
 interface SpaceActionPlan {
 	readonly ownerItemId: IdSchema.Type;
 	readonly space: number;
-	readonly charges: ReadonlyArray<InputRun.ChargePlan>;
+	readonly units: ReadonlyArray<InputRun.UnitPlan>;
 }
 
 type CurrentSpaceChangedGameEvent = Extract<
@@ -93,13 +93,13 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 		);
 	}
 
-	const reservedCharges = new Map<IdSchema.Type, number>();
-	const charges: InputRun.ChargePlan[] = [];
+	const reservedUnits = new Map<IdSchema.Type, number>();
+	const units: InputRun.UnitPlan[] = [];
 	for (const input of owner.item.input) {
 		const resolution = yield* resolveActionInputFx({
 			input,
 			ownerItemId: owner.id,
-			reservedCharges,
+			reservedUnits,
 			runtime,
 		});
 		if (!resolution.resolution.ready || resolution.plan === undefined) {
@@ -109,12 +109,11 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 				}),
 			);
 		}
-		if (resolution.plan.charges !== undefined) {
-			charges.push(resolution.plan.charges);
-			reservedCharges.set(
-				resolution.plan.charges.itemId,
-				(reservedCharges.get(resolution.plan.charges.itemId) ?? 0) +
-					resolution.plan.charges.cost,
+		if (resolution.plan.units !== undefined) {
+			units.push(resolution.plan.units);
+			reservedUnits.set(
+				resolution.plan.units.itemId,
+				(reservedUnits.get(resolution.plan.units.itemId) ?? 0) + resolution.plan.units.cost,
 			);
 		}
 	}
@@ -122,7 +121,7 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 	return {
 		ownerItemId: owner.id,
 		space: owner.item.space,
-		charges,
+		units,
 	} satisfies SpaceActionPlan;
 });
 
@@ -204,9 +203,9 @@ const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(funct
 		itemId,
 		runtime,
 	});
-	const settlement = yield* settleActionChargesFx({
+	const settlement = yield* settleActionUnitsFx({
 		actionId: item.item.id,
-		charges: plan.charges,
+		units: plan.units,
 		ownerItemId: plan.ownerItemId,
 		runtime,
 	});

@@ -13,7 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 8,
 			"output": {
 				"set": [
@@ -45,7 +45,7 @@
 					"type": "item",
 					"itemId": "bear"
 				},
-				"action": "deposit",
+				"action": "spend",
 				"effect": "replace",
 				"result": "hunted-game"
 			}

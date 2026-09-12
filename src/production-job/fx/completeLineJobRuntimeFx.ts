@@ -5,7 +5,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { JobCompletionContext } from "~/production-job/type/JobCompletionContext";
-import { makeChargeDepletionRandomFx } from "~/production-job/fx/makeChargeDepletionRandomFx";
+import { makeUnitDepletionRandomFx } from "~/production-job/fx/makeUnitDepletionRandomFx";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
@@ -27,15 +27,14 @@ export namespace completeLineJobRuntimeFx {
  *
  * A depleted owner is detached before output placement so its board cell becomes
  * available while its last location remains the placement origin. Line output is
- * delivered before charge-depletion output, then owned inputs and job reservations
+ * delivered before unit-depletion output, then owned inputs and job reservations
  * are released through canonical placement. The caller publishes the resulting
  * draft and this event order atomically.
  */
 export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(function* (
 	context: JobCompletionContext,
 ) {
-	const depleted =
-		context.owner.item.charges !== undefined && context.owner.remainingCharges === 0;
+	const depleted = context.owner.item.units !== undefined && context.owner.remainingUnits === 0;
 	let draft = context.runtime;
 	const events: GameEventSchema.Type[] = [];
 
@@ -80,13 +79,13 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 		draft = withLineOutput;
 	}
 
-	if (depleted && context.owner.item.charges?.output !== undefined) {
-		const depletionOutput = yield* makeChargeDepletionRandomFx({
+	if (depleted && context.owner.item.units?.output !== undefined) {
+		const depletionOutput = yield* makeUnitDepletionRandomFx({
 			itemId: context.owner.id,
 			job: context.job,
 			program: outputFx({
 				origin: context.owner.location,
-				output: context.owner.item.charges.output,
+				output: context.owner.item.units.output,
 			}),
 		});
 		if (depletionOutput.drop.length > 0) {

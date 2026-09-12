@@ -13,7 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 8
 		},
 		"merge": [
@@ -22,7 +22,7 @@
 					"type": "item",
 					"itemId": "pillow-with-coins"
 				},
-				"action": "deposit",
+				"action": "spend",
 				"effect": "replace",
 				"result": "sewn-pillow-with-coins"
 			}

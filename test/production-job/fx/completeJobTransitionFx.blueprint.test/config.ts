@@ -49,7 +49,7 @@ const blueprintItem = ({
 		uid: id,
 		id,
 		type: "blueprint" as const,
-		charges: {
+		units: {
 			amount: 1,
 		},
 		title: id,
@@ -71,7 +71,7 @@ const blueprintItem = ({
 				? [
 						{
 							type: "materials" as const,
-							charges: {
+							units: {
 								from: "self" as const,
 								cost: 1,
 							},
@@ -89,7 +89,7 @@ const blueprintItem = ({
 				: [
 						{
 							type: "simple" as const,
-							charges: {
+							units: {
 								from: "self" as const,
 								cost: 1,
 							},
@@ -224,7 +224,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
-			charges: {
+			units: {
 				amount: 1,
 				output: blueprintOutput("item:depletion-product"),
 			},
@@ -236,7 +236,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
-			charges: {
+			units: {
 				amount: 1,
 				output: blueprintOutput("blueprint:depletion-self"),
 			},
@@ -249,7 +249,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
-			charges: {
+			units: {
 				amount: 1,
 				output: {
 					set: [
@@ -603,7 +603,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				{
 					id: "line:producer:lifecycle-blueprint",
 					title: "Produce lifecycle blueprint",
-					description: "Produces a blueprint whose final charge has a capped branch.",
+					description: "Produces a blueprint whose final unit has a capped branch.",
 					runtimeMs: 200,
 					input: [
 						{
@@ -723,41 +723,41 @@ export const blueprintConfig = GameConfigSchema.parse({
 				},
 			],
 		},
-		"producer:charged-stack": {
-			uid: "producer:charged-stack",
-			id: "producer:charged-stack",
+		"producer:spent-stack": {
+			uid: "producer:spent-stack",
+			id: "producer:spent-stack",
 			type: "producer",
-			title: "Charged stack",
+			title: "Finite stack",
 			description: "Replaces exactly one depleted stacked owner.",
 			asset: {
 				scale: 0.8,
 				default: [
-					"asset:producer:charged-stack",
+					"asset:producer:spent-stack",
 				],
 			},
 			scope: "board",
 			maxStackSize: 3,
 			maxCount: 3,
 			maxQueueSize: 1,
-			charges: {
+			units: {
 				amount: 1,
 			},
 			lines: [
 				{
-					id: "line:producer:charged-stack",
+					id: "line:producer:spent-stack",
 					title: "Renew one",
-					description: "Spend the final owner charge and replace one owner.",
+					description: "Spend the final owner unit and replace one owner.",
 					runtimeMs: 200,
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
 						},
 					],
-					output: blueprintOutput("producer:charged-stack"),
+					output: blueprintOutput("producer:spent-stack"),
 					rules: [],
 				},
 			],

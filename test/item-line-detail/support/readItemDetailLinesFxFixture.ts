@@ -96,23 +96,23 @@ export const focusRuntime = ({
 	} satisfies RuntimeSchema.Type;
 };
 
-const depositWorkshop = lineRunTestConfig.items.workshop;
-if (depositWorkshop.type !== "producer") throw new Error("Expected a producer fixture.");
+const unitsWorkshop = lineRunTestConfig.items.workshop;
+if (unitsWorkshop.type !== "producer") throw new Error("Expected a producer fixture.");
 
-export const createDepositConfig = (inputCount: number) =>
+export const createUnitsConfig = (inputCount: number) =>
 	GameConfigSchema.parse({
 		...lineRunTestConfig,
 		items: {
 			...lineRunTestConfig.items,
 			workshop: {
-				...depositWorkshop,
+				...unitsWorkshop,
 				scope: "any",
 				lines: [
 					{
-						...depositWorkshop.lines[0],
-						id: "line:deposit",
-						title: "Deposit",
-						description: "Consumes nearby charges.",
+						...unitsWorkshop.lines[0],
+						id: "line:units",
+						title: "Units",
+						description: "Consumes nearby units.",
 						show: true,
 						enable: true,
 						input: Array.from(
@@ -120,7 +120,7 @@ export const createDepositConfig = (inputCount: number) =>
 								length: inputCount,
 							},
 							() => ({
-								charges: {
+								units: {
 									cost: 1,
 									from: "target" as const,
 								},
@@ -132,7 +132,7 @@ export const createDepositConfig = (inputCount: number) =>
 										type: "item" as const,
 									},
 								},
-								type: "deposit" as const,
+								type: "units" as const,
 							}),
 						),
 						rules: [],
@@ -144,21 +144,21 @@ export const createDepositConfig = (inputCount: number) =>
 				uid: "tree",
 				id: "tree",
 				title: "Tree",
-				description: "Charged deposit.",
-				charges: {
+				description: "Finite units.",
+				units: {
 					amount: 18,
 				},
 			},
 		},
 	});
 
-export const createDepositRuntime = (
+export const createUnitsRuntime = (
 	config: GameConfigSchema.Type,
 	trees: ReadonlyArray<{
 		readonly id: string;
 		readonly x: number;
 		readonly y: number;
-		readonly remainingCharges?: number;
+		readonly remainingUnits?: number;
 	}>,
 ): RuntimeSchema.Type => ({
 	cheats: {
@@ -182,7 +182,7 @@ export const createDepositRuntime = (
 			quantity: 1,
 			revision: "revision:workshop",
 		},
-		...trees.map(({ id, remainingCharges, x, y }) => ({
+		...trees.map(({ id, remainingUnits, x, y }) => ({
 			id,
 			item: config.items.tree!,
 			location: {
@@ -194,10 +194,10 @@ export const createDepositRuntime = (
 				},
 			},
 			quantity: 1,
-			...(remainingCharges === undefined
+			...(remainingUnits === undefined
 				? {}
 				: {
-						remainingCharges,
+						remainingUnits,
 					}),
 			revision: `revision:${id}`,
 		})),

@@ -14,7 +14,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 1
 		},
 		"type": "blueprint",

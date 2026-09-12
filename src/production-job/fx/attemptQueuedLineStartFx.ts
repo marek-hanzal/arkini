@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { ItemChargesUnavailableError } from "~/production-action/error/ItemChargesUnavailableError";
+import type { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import type { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
@@ -28,7 +28,7 @@ export namespace attemptQueuedLineStartFx {
 		| {
 				type: "blocked";
 				error:
-					| ItemChargesUnavailableError
+					| ItemUnitsUnavailableError
 					| ItemNotOnBoardError
 					| OutputCapacityError
 					| LineRunUnavailableError
@@ -117,7 +117,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		} satisfies attemptQueuedLineStartFx.Result;
 	}).pipe(
 		Effect.catchTags({
-			ItemChargesUnavailableError: (error) =>
+			ItemUnitsUnavailableError: (error) =>
 				Effect.succeed({
 					type: "blocked",
 					error,

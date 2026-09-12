@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
-import { ChargesDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { UnitsDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
 import { DeleteSection } from "~/item-authoring/ui/DeleteSection";
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
@@ -80,8 +80,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <IdentityDetail item={item} />;
 			case "artwork":
 				return <ArtworkDetail item={item} />;
-			case "charges":
-				return <ChargesDetail item={item} />;
+			case "units":
+				return <UnitsDetail item={item} />;
 			case "merges":
 				return <MergesDetail item={item} />;
 			case "action":

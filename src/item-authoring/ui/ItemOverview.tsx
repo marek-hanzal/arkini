@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import {
 	ArrowRight,
 	BatteryCharging,
@@ -30,7 +31,7 @@ import { LinkButtonLink } from "~/ui/ui/LinkButton";
 const OverviewIconBySection = {
 	action: MapPinned,
 	artwork: ImageIcon,
-	charges: BatteryCharging,
+	units: BatteryCharging,
 	delete: ShieldCheck,
 	estimate: Clock3,
 	merges: Combine,
@@ -52,7 +53,9 @@ const ItemOverviewCard = ({
 	readonly projectId: string;
 	readonly section: SectionDescriptor;
 }) => {
+	const translator = useTranslator();
 	if (section.id === "identity") return null;
+	const label = section.id === "units" ? translator.textFn("Units") : section.label;
 	return (
 		<EditorOverviewCard
 			body={children}
@@ -76,12 +79,12 @@ const ItemOverviewCard = ({
 					}
 					to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 				>
-					{section.label}
+					{label}
 					<ArrowRight className="size-4" />
 				</LinkButtonLink>
 			}
 			icon={Icon}
-			title={section.label}
+			title={label}
 		/>
 	);
 };
@@ -135,7 +138,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 			</div>
 		),
 		notes: "Ideas and decisions linked to this item",
-		charges: item.charges === undefined ? "Disabled" : "Enabled",
+		units: item.units === undefined ? "Disabled" : "Enabled",
 		delete:
 			deleteBlockers.length === 0
 				? "Can be deleted"

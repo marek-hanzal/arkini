@@ -94,7 +94,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 				scope: "any",
 			}),
 			type: "simple",
-			charges: {
+			units: {
 				amount: 2,
 			},
 		},

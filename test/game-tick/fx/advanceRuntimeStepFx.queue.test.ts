@@ -204,7 +204,7 @@ describe("Tick queue progress priority", () => {
 	});
 
 	it.each([
-		"charges",
+		"units",
 		"output",
 	] as const)("re-evaluates A2 after B1 spends the shared %s budget", (budget) => {
 		const config = createContendedQueueConfigFn(budget);
@@ -250,9 +250,9 @@ describe("Tick queue progress priority", () => {
 			queue[2],
 		]);
 		expect(result.events.filter((event) => event.type === "job:started")).toHaveLength(1);
-		if (budget === "charges") {
+		if (budget === "units") {
 			expect(result.runtime.items.find((item) => item.id === "payer")).toMatchObject({
-				remainingCharges: 1,
+				remainingUnits: 1,
 			});
 		} else {
 			expect(

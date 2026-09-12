@@ -86,7 +86,7 @@ describe("ItemOverview", () => {
 		);
 		expect(links.map((link) => link.dataset.sectionId)).toEqual([
 			"artwork",
-			"charges",
+			"units",
 			"merges",
 			"estimate",
 			"connections",
@@ -109,3 +109,9 @@ describe("ItemOverview", () => {
 		});
 	});
 });
+
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (key: string) => key,
+	}),
+}));

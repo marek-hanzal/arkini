@@ -141,12 +141,12 @@ describe("multi-space spatial isolation", () => {
 		]);
 	});
 
-	it("keeps external charge targets inside the owner space", () => {
+	it("keeps external unit targets inside the owner space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
-					id: "runtime:deposit-owner",
-					itemId: "depositProducer",
+					id: "runtime:units-owner",
+					itemId: "unitsProducer",
 					location: boardLocation(1, 0),
 					quantity: 1,
 				});
@@ -158,7 +158,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				const remoteOnly = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:deposit:run",
+					lineId: "line:units:run",
 					runtime: yield* readRuntimeFx(),
 				});
 				yield* spawnItemFx({
@@ -169,7 +169,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				const local = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:deposit:run",
+					lineId: "line:units:run",
 					runtime: yield* readRuntimeFx(),
 				});
 

@@ -211,9 +211,9 @@ describe("estimateRequestsFn", () => {
 		);
 	});
 
-	it("ignores charge capacity while sharing co-product work", () => {
+	it("ignores unit capacity while sharing co-product work", () => {
 		const operation = {
-			id: "charged-a-and-b",
+			id: "spent-a-and-b",
 			inputs: [],
 			outputDistribution: [
 				{
@@ -249,7 +249,7 @@ describe("estimateRequestsFn", () => {
 				allOf: [
 					requirement("fuel"),
 				],
-				chargeUses: [
+				unitUses: [
 					{
 						accounting: "single-payer-exact",
 						payerFactId: "payer",

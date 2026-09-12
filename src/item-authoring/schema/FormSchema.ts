@@ -61,7 +61,7 @@ const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchem
 	ownerItemId: string,
 ): Inputs =>
 	inputs.map((input) =>
-		input.type === "deposit" && input.charges?.from === "self"
+		input.type === "units" && input.units?.from === "self"
 			? {
 					...input,
 					query: {
@@ -76,7 +76,7 @@ const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchem
 			: input,
 	) as unknown as Inputs;
 
-const bindSelfPaidDepositsToOwnerFn = (candidate: FormValues): FormValues => ({
+const bindSelfPaidUnitsInputsToOwnerFn = (candidate: FormValues): FormValues => ({
 	...candidate,
 	...(candidate.input === undefined
 		? {}
@@ -108,7 +108,7 @@ const bindSelfPaidDepositsToOwnerFn = (candidate: FormValues): FormValues => ({
  * at their exact field path instead of silently coercing them to zero.
  */
 export const FormSchema = z.custom<FormValues>().transform((candidate, context) => {
-	const normalized = bindSelfPaidDepositsToOwnerFn(candidate);
+	const normalized = bindSelfPaidUnitsInputsToOwnerFn(candidate);
 	const { description, ...item } = normalized;
 	const result = ItemSchema.safeParse({
 		...item,

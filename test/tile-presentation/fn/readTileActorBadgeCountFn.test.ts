@@ -6,14 +6,14 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 
 const runtimeItem = (overrides: {
 	readonly item: {
-		readonly charges?: {
+		readonly units?: {
 			readonly amount: number;
 		};
 		readonly durationMs?: number;
 		readonly type: RuntimeItemSchema.Type["item"]["type"];
 	};
 	readonly quantity?: number;
-	readonly remainingCharges?: number;
+	readonly remainingUnits?: number;
 	readonly remainingDurationMs?: number;
 }) =>
 	({
@@ -23,7 +23,7 @@ const runtimeItem = (overrides: {
 	}) as unknown as RuntimeItemSchema.Type;
 
 describe("tile actor overlay projection", () => {
-	it("shows stack quantity only above one and projects charges for every item type", () => {
+	it("shows stack quantity only above one and projects units for every item type", () => {
 		const single = runtimeItem({
 			item: {
 				type: TypeSchema.enum.Simple,
@@ -37,7 +37,7 @@ describe("tile actor overlay projection", () => {
 		});
 		const freshProducer = runtimeItem({
 			item: {
-				charges: {
+				units: {
 					amount: 12,
 				},
 				type: TypeSchema.enum.Producer,
@@ -45,36 +45,36 @@ describe("tile actor overlay projection", () => {
 		});
 		const usedProducer = runtimeItem({
 			item: {
-				charges: {
+				units: {
 					amount: 12,
 				},
 				type: TypeSchema.enum.Producer,
 			},
-			remainingCharges: 4,
+			remainingUnits: 4,
 		});
-		const freshChargedItem = runtimeItem({
+		const freshFiniteItem = runtimeItem({
 			item: {
-				charges: {
+				units: {
 					amount: 8,
 				},
 				type: TypeSchema.enum.Simple,
 			},
 		});
-		const usedChargedItem = runtimeItem({
+		const usedFiniteItem = runtimeItem({
 			item: {
-				charges: {
+				units: {
 					amount: 8,
 				},
 				type: TypeSchema.enum.Simple,
 			},
-			remainingCharges: 3,
+			remainingUnits: 3,
 		});
 
 		expect(readTileActorBadgeCountFn(single)).toBeUndefined();
 		expect(readTileActorBadgeCountFn(stack)).toBe(120);
 		expect(readTileActorBadgeCountFn(freshProducer)).toBe(12);
 		expect(readTileActorBadgeCountFn(usedProducer)).toBe(4);
-		expect(readTileActorBadgeCountFn(freshChargedItem)).toBe(8);
-		expect(readTileActorBadgeCountFn(usedChargedItem)).toBe(3);
+		expect(readTileActorBadgeCountFn(freshFiniteItem)).toBe(8);
+		expect(readTileActorBadgeCountFn(usedFiniteItem)).toBe(3);
 	});
 });

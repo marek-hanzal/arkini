@@ -13,7 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 50,
 			"output": {
 				"set": [
@@ -52,11 +52,11 @@
 				"runtimeMs": 6000,
 				"input": [
 					{
-						"charges": {
+						"units": {
 							"cost": 1,
 							"from": "self"
 						},
-						"type": "deposit",
+						"type": "units",
 						"query": {
 							"selector": {
 								"type": "item",

@@ -14,7 +14,7 @@ export const GameEventEnumSchema = z
 		ItemSplit: "item:split",
 		ItemConsumed: "item:consumed",
 		ItemInputStored: "item:input-stored",
-		ItemChargeSpent: "item:charge-spent",
+		ItemUnitSpent: "item:unit-spent",
 		ItemDepleted: "item:depleted",
 		ItemExplicitlyRemoved: "item:explicitly-removed",
 	})

@@ -175,7 +175,7 @@ export const FormSession = ({
 					rootCard={
 						sectionId !== "action" &&
 						sectionId !== "artwork" &&
-						sectionId !== "charges" &&
+						sectionId !== "units" &&
 						sectionId !== "merges" &&
 						sectionId !== "production"
 					}

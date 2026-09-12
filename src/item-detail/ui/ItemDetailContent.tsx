@@ -113,12 +113,12 @@ const ItemInfoContent = ({
 								location: info.location,
 								currentStack: info.quantity,
 								ownedQuantity: info.ownedQuantity,
-								...(info.charges === undefined
+								...(info.units === undefined
 									? {}
 									: {
-											charges: {
-												label: "Charges" as const,
-												value: `${info.charges.remaining} / ${info.charges.total}`,
+											units: {
+												label: "Units" as const,
+												value: `${info.units.remaining} / ${info.units.total}`,
 											},
 										}),
 							}),
@@ -322,12 +322,12 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 						: {
 								maxCount: props.definition.maxCount,
 							}),
-					...(props.definition.totalCharges === undefined
+					...(props.definition.totalUnits === undefined
 						? {}
 						: {
-								charges: {
-									label: "Charges per item",
-									value: `${props.definition.totalCharges}`,
+								units: {
+									label: "Units per item",
+									value: `${props.definition.totalUnits}`,
 								},
 							}),
 				}}

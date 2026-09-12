@@ -23,7 +23,7 @@ const spaceTransition = (sequence: number, previousSpace: number, currentSpace: 
 	runtime: runtime(currentSpace),
 	events: [
 		{
-			type: "item:charge-spent" as const,
+			type: "item:unit-spent" as const,
 			itemId: `runtime:payer:${sequence}`,
 			canonicalItemId: "payer",
 			location: {
@@ -34,8 +34,8 @@ const spaceTransition = (sequence: number, previousSpace: number, currentSpace: 
 					y: 0,
 				},
 			},
-			previousCharges: 2,
-			resultingCharges: 1,
+			previousUnits: 2,
+			resultingUnits: 1,
 		},
 		{
 			type: "current-space:changed" as const,
@@ -95,16 +95,16 @@ describe("Space Action presenter", () => {
 		presenter.presentFn(spaceTransition(3, 1, 2), "present");
 
 		expect(applied).toEqual([
-			"1:0:item:charge-spent",
+			"1:0:item:unit-spent",
 		]);
 		expect(interactionBlocks.at(-1)).toBe(true);
 
 		runFrame(0);
 		expect(applied).toEqual([
-			"1:0:item:charge-spent",
+			"1:0:item:unit-spent",
 			"1:1:current-space:changed",
 			"2:1:",
-			"3:1:item:charge-spent",
+			"3:1:item:unit-spent",
 		]);
 
 		Effect.runSync(presenter.setInteractionBlockedFx(false));
@@ -144,7 +144,7 @@ describe("Space Action presenter", () => {
 		presenter.presentFn(overtakingSpace, "present");
 		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
 			[
-				"item:charge-spent",
+				"item:unit-spent",
 			],
 		]);
 
@@ -153,7 +153,7 @@ describe("Space Action presenter", () => {
 
 		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
 			[
-				"item:charge-spent",
+				"item:unit-spent",
 			],
 			[
 				"current-space:changed",
@@ -187,13 +187,13 @@ describe("Space Action presenter", () => {
 		presenter.presentFn(ordinaryTransition(2, 1), "present");
 
 		expect(applied).toEqual([
-			"1:0:item:charge-spent",
+			"1:0:item:unit-spent",
 		]);
 
 		renderAcknowledgment();
 
 		expect(applied).toEqual([
-			"1:0:item:charge-spent",
+			"1:0:item:unit-spent",
 			"1:1:current-space:changed",
 			"2:1:",
 		]);

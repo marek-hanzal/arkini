@@ -50,10 +50,10 @@ describe("readTileActorsFx", () => {
 		});
 	});
 
-	it("projects remaining uses for an idle charged non-deposit item", () => {
+	it("projects remaining uses for an idle spent non-units item", () => {
 		expect(readMainActor(createTileActorRuntime())).toMatchObject({
 			badgeCount: 1,
-			badgeKind: "charges",
+			badgeKind: "units",
 		});
 	});
 

@@ -40,10 +40,10 @@ const formatRuntimeFn = (report: GameIncidentReport) => {
 			`### ${formatGameDiagnosticItemReferenceTextFn(item.item)}`,
 			"",
 			`- Quantity: ${item.quantity}`,
-			...(item.remainingCharges === undefined
+			...(item.remainingUnits === undefined
 				? []
 				: [
-						`- Remaining charges: ${item.remainingCharges}`,
+						`- Remaining units: ${item.remainingUnits}`,
 					]),
 			...(item.remainingDurationMs === undefined
 				? []

@@ -128,18 +128,18 @@ describe("createEstimateTopologyFn", () => {
 		}
 	});
 
-	it("excludes ignored disable-condition and charge edges from component membership", () => {
+	it("excludes ignored disable-condition and unit edges from component membership", () => {
 		const topology = createEstimateTopologyFn(
 			graph({
 				facts: [
 					"condition-root",
 					"condition-dependent",
-					"charge-root",
-					"charge-dependent",
+					"unit-root",
+					"unit-dependent",
 				],
 				roots: [
 					"condition-root",
-					"charge-root",
+					"unit-root",
 				],
 				routes: [
 					route({
@@ -166,32 +166,32 @@ describe("createEstimateTopologyFn", () => {
 						output: "condition-dependent",
 					}),
 					route({
-						chargeUses: [
+						unitUses: [
 							{
 								accounting: "single-payer-exact",
-								payerFactId: "charge-dependent",
+								payerFactId: "unit-dependent",
 								usableActionRuns: 1,
 							},
 						],
 						durationMs: 1,
-						id: "charge-edge",
-						output: "charge-root",
+						id: "unit-edge",
+						output: "unit-root",
 					}),
 					route({
 						allOf: [
-							requirement("charge-root"),
+							requirement("unit-root"),
 						],
 						durationMs: 1,
-						id: "charge-back-edge",
-						output: "charge-dependent",
+						id: "unit-back-edge",
+						output: "unit-dependent",
 					}),
 				],
 			}),
 		);
 
 		expect(topology.seededComponentByFact.get("condition-root")).toBeDefined();
-		expect(topology.seededComponentByFact.get("charge-root")).toBeDefined();
+		expect(topology.seededComponentByFact.get("unit-root")).toBeDefined();
 		expect(topology.seededComponentByFact.get("condition-dependent")).toBeUndefined();
-		expect(topology.seededComponentByFact.get("charge-dependent")).toBeUndefined();
+		expect(topology.seededComponentByFact.get("unit-dependent")).toBeUndefined();
 	});
 });

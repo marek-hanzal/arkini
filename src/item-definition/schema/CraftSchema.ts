@@ -9,7 +9,7 @@ import { TypeSchema } from "./TypeSchema";
  * An item configuration that provides one craft product line.
  *
  * A craft owns one product line instead of a producer's multiple selectable
- * product lines. Runtime start isolates one craft quantity from any stack. Output placement is authored by the line, while item lifetime is expressed by optional charges.
+ * product lines. Runtime start isolates one craft quantity from any stack. Output placement is authored by the line, while item lifetime is expressed by optional units.
  */
 export const CraftSchema = z
 	.object({

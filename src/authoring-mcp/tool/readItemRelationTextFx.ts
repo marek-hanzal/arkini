@@ -167,9 +167,9 @@ const sourceReferenceLinesFn = (project: Project, source: ItemOriginSource) => [
 				return [
 					`  Line ID: ${source.reference.lineId}`,
 				];
-			case "charges":
+			case "units":
 				return [
-					"  Relationship: charge depletion",
+					"  Relationship: unit depletion",
 				];
 			case "expiry":
 				return [

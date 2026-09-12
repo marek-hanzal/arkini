@@ -14,9 +14,9 @@ export const DiagnosticCodeEnumSchema = z
 		ConfigMissingReference: "config:missing-reference",
 		InputMaterialIneligible: "input:material-ineligible",
 		SourceSchemaInvalid: "source:schema-invalid",
-		InputChargesInvalid: "input:charges-invalid",
+		InputUnitsInvalid: "input:units-invalid",
 		MergeInvalid: "merge:invalid",
-		ChargeRenewalStochastic: "charges:stochastic-renewal",
+		UnitRenewalStochastic: "units:stochastic-renewal",
 		InputAcceptanceCycle: "input:acceptance-cycle",
 		SourceSchemaReferenceConflict: "source:schema-reference-conflict",
 		ConfigSchema: "config:schema",
@@ -24,7 +24,7 @@ export const DiagnosticCodeEnumSchema = z
 		LineDuplicateId: "line:duplicate-id",
 		LineMultipleDefaults: "line:multiple-defaults",
 		ConfigKeyIdMismatch: "config:key-id-mismatch",
-		ChargeRenewalMissing: "charges:missing-renewal",
+		UnitRenewalMissing: "units:missing-renewal",
 	})
 	.meta({
 		id: "DiagnosticCodeEnumSchema",

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
+import { resolveActionUnitFx } from "~/production-action/fx/resolveActionUnitFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
@@ -20,7 +20,7 @@ export namespace assertLineEnqueueConditionsFx {
 /**
  * Validates hard queue conditions while allowing only missing concrete material to wait.
  *
- * Queue admission, queued Autofill and queue projection share these checks so charges, rules,
+ * Queue admission, queued Autofill and queue projection share these checks so units, rules,
  * non-material inputs and output limits cannot diverge while material is missing.
  */
 export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditionsFx")(function* ({
@@ -33,7 +33,7 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 		lineId: resolution.lineId,
 		runtime,
 	});
-	const reservedCharges = new Map<IdSchema.Type, number>();
+	const reservedUnits = new Map<IdSchema.Type, number>();
 	let missingConcreteInputsOnly = resolution.run.enable;
 	for (const [inputIndex, runInput] of resolution.run.input.entries()) {
 		const configuredInput = line.input[inputIndex];
@@ -52,21 +52,21 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 		}
 		// Run plans omit missing materials. Recheck every cost against one budget,
 		// including ready plans that did not account for those earlier missing inputs.
-		const charges = yield* resolveActionChargeFx({
-			charges: configuredInput.charges,
+		const units = yield* resolveActionUnitFx({
+			units: configuredInput.units,
 			ownerItemId: resolution.ownerItemId,
-			reservedCharges,
-			targetItemId: runInput.plan?.charges?.itemId,
+			reservedUnits,
+			targetItemId: runInput.plan?.units?.itemId,
 			runtime,
 		});
-		if (!charges.ready) {
+		if (!units.ready) {
 			missingConcreteInputsOnly = false;
 			break;
 		}
-		if (charges.plan !== undefined) {
-			reservedCharges.set(
-				charges.plan.itemId,
-				(reservedCharges.get(charges.plan.itemId) ?? 0) + charges.plan.cost,
+		if (units.plan !== undefined) {
+			reservedUnits.set(
+				units.plan.itemId,
+				(reservedUnits.get(units.plan.itemId) ?? 0) + units.plan.cost,
 			);
 		}
 	}

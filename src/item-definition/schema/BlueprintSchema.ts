@@ -10,7 +10,7 @@ import { TypeSchema } from "./TypeSchema";
  *
  * The blueprint visual is authored explicitly through the standard item asset. Its
  * line may emit any configured output and every resolved drop keeps its authored
- * placement strategy. Item lifetime is expressed independently through optional charges.
+ * placement strategy. Item lifetime is expressed independently through optional units.
  */
 export const BlueprintSchema = z
 	.object({

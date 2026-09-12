@@ -13,7 +13,7 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"charges": {
+		"units": {
 			"amount": 24,
 			"output": {
 				"set": [

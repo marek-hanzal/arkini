@@ -124,7 +124,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				scope: "board",
 			}),
 			type: "simple",
-			charges: {
+			units: {
 				amount: 1,
 			},
 		},
@@ -160,22 +160,22 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				},
 			],
 		},
-		depositProducer: {
+		unitsProducer: {
 			...baseItem({
-				id: "depositProducer",
+				id: "unitsProducer",
 				scope: "board",
 			}),
 			type: "producer",
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:deposit:run",
-					title: "Deposit",
-					description: "Uses one nearby payer charge.",
+					id: "line:units:run",
+					title: "Units",
+					description: "Uses one nearby payer unit.",
 					runtimeMs: 200,
 					input: [
 						{
-							type: "deposit",
+							type: "units",
 							query: {
 								scope: "board",
 								distance: "far",
@@ -184,7 +184,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 									itemId: "payer",
 								},
 							},
-							charges: {
+							units: {
 								from: "target",
 								cost: 1,
 							},

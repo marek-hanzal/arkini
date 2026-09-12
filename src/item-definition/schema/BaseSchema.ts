@@ -7,7 +7,7 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { AssetSchema } from "./AssetSchema";
-import { ChargeSchema } from "./ChargeSchema";
+import { UnitsSchema } from "./UnitsSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -74,10 +74,10 @@ export const BaseSchema = z
 			"The maximum number of this item that one stack can hold before it has mutable state.",
 		),
 		/**
-		 * Optional finite lifetime shared by every fresh instance of this item.
+		 * Optional finite unit supply initialized separately for each fresh item instance.
 		 */
-		charges: ChargeSchema.optional().describe(
-			"The optional finite lifetime and depletion output of each item instance.",
+		units: UnitsSchema.optional().describe(
+			"The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
 		),
 		/**
 		 * Optional target-specific merges initiated when this item is dropped onto another item.

@@ -13,10 +13,10 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 
 describe("assertGameConfigValidFx", () => {
 	it("returns a completed config when diagnostics contain only warnings", async () => {
-		const deposit = SimpleSchema.parse({
-			...createSimpleItem("item:deposit"),
+		const units = SimpleSchema.parse({
+			...createSimpleItem("item:units"),
 			type: "simple",
-			charges: {
+			units: {
 				amount: 1,
 			},
 		});
@@ -24,7 +24,7 @@ describe("assertGameConfigValidFx", () => {
 			compileGameSourcesFx([
 				createRootSource({
 					items: {
-						[deposit.id]: deposit,
+						[units.id]: units,
 					},
 				}),
 			]),
@@ -34,11 +34,11 @@ describe("assertGameConfigValidFx", () => {
 		expect(compilation.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ChargeRenewalMissing,
+					code: DiagnosticCodeEnumSchema.enum.UnitRenewalMissing,
 					severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				}),
 			]),
 		);
-		expect(config.items[deposit.id]).toEqual(deposit);
+		expect(config.items[units.id]).toEqual(units);
 	});
 });

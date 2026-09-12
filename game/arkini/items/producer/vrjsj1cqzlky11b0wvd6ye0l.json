@@ -26,11 +26,11 @@
 				"runtimeMs": 6000,
 				"input": [
 					{
-						"charges": {
+						"units": {
 							"cost": 1,
 							"from": "target"
 						},
-						"type": "deposit",
+						"type": "units",
 						"query": {
 							"selector": {
 								"type": "item",

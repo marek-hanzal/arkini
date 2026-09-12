@@ -11,12 +11,12 @@ import { MultipleDefaultLinesDiagnosticSchema } from "./MultipleDefaultLinesDiag
 import { DuplicateResourceDiagnosticSchema } from "./DuplicateResourceDiagnosticSchema";
 import { DuplicateRecordDiagnosticSchema } from "./DuplicateRecordDiagnosticSchema";
 import { InputAcceptanceCycleDiagnosticSchema } from "./InputAcceptanceCycleDiagnosticSchema";
-import { InvalidInputChargesDiagnosticSchema } from "./InvalidInputChargesDiagnosticSchema";
+import { InvalidInputUnitsDiagnosticSchema } from "./InvalidInputUnitsDiagnosticSchema";
 import { IneligibleMaterialInputDiagnosticSchema } from "./IneligibleMaterialInputDiagnosticSchema";
 import { InvalidMergeDiagnosticSchema } from "./InvalidMergeDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./KeyIdMismatchDiagnosticSchema";
-import { MissingChargeRenewalWarningDiagnosticSchema } from "./MissingChargeRenewalWarningDiagnosticSchema";
-import { StochasticChargeRenewalWarningDiagnosticSchema } from "./StochasticChargeRenewalWarningDiagnosticSchema";
+import { MissingUnitRenewalWarningDiagnosticSchema } from "./MissingUnitRenewalWarningDiagnosticSchema";
+import { StochasticUnitRenewalWarningDiagnosticSchema } from "./StochasticUnitRenewalWarningDiagnosticSchema";
 import { MissingReferenceDiagnosticSchema } from "./MissingReferenceDiagnosticSchema";
 import { SchemaReferenceConflictDiagnosticSchema } from "./SchemaReferenceConflictDiagnosticSchema";
 import { StartInvalidDiagnosticSchema } from "./StartInvalidDiagnosticSchema";
@@ -35,12 +35,12 @@ export const GameDiagnosticSchema = z
 		KeyIdMismatchDiagnosticSchema,
 		MissingReferenceDiagnosticSchema,
 		InputAcceptanceCycleDiagnosticSchema,
-		InvalidInputChargesDiagnosticSchema,
+		InvalidInputUnitsDiagnosticSchema,
 		IneligibleMaterialInputDiagnosticSchema,
 		InvalidMergeDiagnosticSchema,
 		UnsupportedInputCapacityDiagnosticSchema,
-		MissingChargeRenewalWarningDiagnosticSchema,
-		StochasticChargeRenewalWarningDiagnosticSchema,
+		MissingUnitRenewalWarningDiagnosticSchema,
+		StochasticUnitRenewalWarningDiagnosticSchema,
 		StartInvalidDiagnosticSchema,
 		SourceJsonDiagnosticSchema,
 		SourceSchemaDiagnosticSchema,

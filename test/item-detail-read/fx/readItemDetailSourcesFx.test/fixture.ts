@@ -197,7 +197,7 @@ export const config = GameConfigSchema.parse({
 		blueprint: {
 			...item("blueprint", "Blueprint"),
 			type: "blueprint",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			maxStackSize: 1,
@@ -206,7 +206,7 @@ export const config = GameConfigSchema.parse({
 				input: [
 					{
 						type: "simple",
-						charges: {
+						units: {
 							from: "self",
 							cost: 1,
 						},

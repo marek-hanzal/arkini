@@ -12,7 +12,7 @@ export namespace readItemOutputEntriesFn {
 	}
 }
 
-/** Reads line, charge-depletion, lifetime-expiry, and merge outputs owned by one canonical item. */
+/** Reads line, unit-depletion, lifetime-expiry, and merge outputs owned by one canonical item. */
 export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesFn.Props) => {
 	const lines = readItemLineEntriesFn({
 		itemId,
@@ -32,13 +32,13 @@ export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesF
 				],
 	);
 
-	if (item.charges?.output !== undefined) {
+	if (item.units?.output !== undefined) {
 		entries.push({
-			output: item.charges.output,
+			output: item.units.output,
 			path: [
 				"items",
 				itemId,
-				"charges",
+				"units",
 				"output",
 			],
 		});

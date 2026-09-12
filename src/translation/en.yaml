@@ -1,7 +1,13 @@
+Adds no item or units requirement. The action may start without delivering or targeting another item.:
+  value: Adds no item or units requirement. The action may start without delivering or targeting another item.
 Asset notes empty description:
   value: Create a note here to keep art direction and decisions linked to this asset.
 Asset notes empty title:
   value: No notes for this asset yet
+Automatic only:
+  value: Automatic only
+Board:
+  value: Board
 Board editing:
   value: Board editing
 Board editing help:
@@ -22,12 +28,6 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
-Charges:
-  value: Charges
-  dynamic: true
-Charges per item:
-  value: Charges per item
-  dynamic: true
 Choose a different Project ID.:
   value: Choose a different Project ID.
 Close:
@@ -38,6 +38,12 @@ Connection search placeholder:
   value: Search connections…
 Connections:
   value: Connections
+Consume:
+  value: Consume
+Control:
+  value: Control
+Cost:
+  value: Cost
 Create note:
   value: Create note
 Create project:
@@ -49,17 +55,21 @@ Current stack:
   value: Current stack
 Delete:
   value: Delete
+Depletion output:
+  value: Depletion output
 Description:
   value: Description
+Disable units:
+  value: Disable units
 Edit:
   value: Edit
 Editor Board:
   value: Editor Board
 Editor Board help:
   value: |
-    Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, charges, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
+    Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, units, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
 
-    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Instant** removes waiting time while preserving normal requirements, placement, charges, and lifecycle rules.
+    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Instant** removes waiting time while preserving normal requirements, placement, units, and lifecycle rules.
 
     The live Board session is disposable. It has no saved scenarios and does not change authored project data.
 Editor MCP:
@@ -85,8 +95,24 @@ Editor MCP help:
     Open **Settings**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
 
     On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
+Enable Units on this item before selecting Self to pay the unit cost.:
+  value: Enable Units on this item before selecting Self to pay the unit cost.
+Enable Units on this item before selecting Self.:
+  value: Enable Units on this item before selecting Self.
+Enable Units on this item before selecting Spend.:
+  value: Enable Units on this item before selecting Spend.
+Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.:
+  value: Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.
+Enable depletion output:
+  value: Enable depletion output
+Enable merge output:
+  value: Enable merge output
+Enable units:
+  value: Enable units
 Estimate:
   value: Estimate
+Finishing accepted work:
+  value: Finishing accepted work
 Flow:
   value: Flow
 Flow help:
@@ -125,6 +151,14 @@ Global estimate help:
     Use **Fastest first** and **Slowest first** to find pacing outliers, **Highest demand first** to spot heavily reused ingredients or prerequisites, and **Incomplete only** to find broken or unusually complex paths.
 
     Open an item to see its selected route and the quantities and time behind the estimate.
+Initial units:
+  value: Initial units
+Input type:
+  value: Input type
+Interactive:
+  value: Interactive
+Interval:
+  value: Interval
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
@@ -188,9 +222,6 @@ Item type - clock:
 Item type - craft:
   value: Craft owner
   dynamic: true
-Item type - deposit:
-  value: Resource deposit
-  dynamic: true
 Item type - inventory:
   value: Inventory control
   dynamic: true
@@ -221,9 +252,6 @@ Item type description - clock:
 Item type description - craft:
   value: A consumable or quest-like item with one product line.
   dynamic: true
-Item type description - deposit:
-  value: A board resource source with optional finite production lines.
-  dynamic: true
 Item type description - inventory:
   value: The singleton item that opens the shared inventory.
   dynamic: true
@@ -242,12 +270,36 @@ Item type description - stash:
 Item type description - temporary:
   value: A board-only effect that expires after an authored duration.
   dynamic: true
+Keep:
+  value: Keep
+"Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged.":
+  value: "Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged."
+Lifetime:
+  value: Lifetime
+Lifetime remaining:
+  value: Lifetime remaining
 Loading notes…:
   value: Loading notes…
 Location:
   value: Location
+Materials:
+  value: Materials
 Max count reached:
   value: Max count reached
+Merge output:
+  value: Merge output
+Next pulse:
+  value: Next pulse
+No depletion output:
+  value: No depletion output
+No depletion output configured.:
+  value: No depletion output configured.
+No item with Units enabled matches this search.:
+  value: No item with Units enabled matches this search.
+No merge output:
+  value: No merge output
+None available:
+  value: None available
 Notes:
   value: Notes
 Notes empty description:
@@ -261,16 +313,36 @@ Notes help:
     Write them in **Markdown**. Notes stay with the Editor project, but **they are not versioned with it**: creating or restoring a Version does not capture or roll back your notes. They are also excluded from the built Arkpack, so they never affect the game.
 Notes unavailable:
   value: Notes are unavailable.
+Only items with Units enabled are shown because the target pays the unit cost.:
+  value: Only items with Units enabled are shown because the target pays the unit cost.
+Optional items emitted after this merge resolves.:
+  value: Optional items emitted after this merge resolves.
+Optional items emitted when the final unit is spent.:
+  value: Optional items emitted when the final unit is spent.
+Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.:
+  value: Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.
 Owned:
   value: Owned
+Owner units:
+  value: Owner units
 Page help:
   value: Page help
+Paid by:
+  value: Paid by
+Paused:
+  value: Paused
+"Permanently removes one source quantity instead of returning it. This consumes the item itself, not one unit. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears.":
+  value: "Permanently removes one source quantity instead of returning it. This consumes the item itself, not one unit. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears."
+"Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action.":
+  value: "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action."
 Project ID:
   value: Project ID
 Project ID example:
   value: project:example
 Project ID is required.:
   value: Project ID is required.
+Remove:
+  value: Remove
 Rename project:
   value: Rename project
 Rename project ID:
@@ -280,14 +352,62 @@ Rename project ID help:
     The new ID makes this a different game to existing saves.
 
     The current project content and its last output version settings stay unchanged.
+Replace:
+  value: Replace
+Replacement item:
+  value: Replacement item
+"Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent units carry over only to a compatible replacement with units; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle.":
+  value: "Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent units carry over only to a compatible replacement with units; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle."
+Required:
+  value: Required
+Required units:
+  value: Required units
+Requires:
+  value: Requires
+Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.:
+  value: Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.
 Retry loading notes:
   value: Retry loading notes
+"Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged.":
+  value: "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged."
+Running:
+  value: Running
 Save:
   value: Save
+Schedule:
+  value: Schedule
 Search assets…:
   value: Search assets…
 Search item title, ID or type…:
   value: Search item title, ID or type…
+Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.:
+  value: Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.
+Select an item with Units enabled.:
+  value: Select an item with Units enabled.
+Selected target must have Units enabled before choosing Spend.:
+  value: Selected target must have Units enabled before choosing Spend.
+Selected target must have Units enabled.:
+  value: Selected target must have Units enabled.
+Self:
+  value: Self
+Self-paid units input:
+  value: Self-paid units input
+Simple:
+  value: Simple
+Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.:
+  value: Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.
+Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.:
+  value: Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.
+Source action:
+  value: Source action
+Spend:
+  value: Spend
+"Spends one unit from the selected target. Spending its last unit depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill.":
+  value: "Spends one unit from the selected target. Spending its last unit depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill."
+"Spends one unit from the source item. Spending the last unit depletes one source item and emits its configured depletion output. Example: Flint And Steel + Unlit Candle → Candle; Flint And Steel loses one use.":
+  value: "Spends one unit from the source item. Spending the last unit depletes one source item and emits its configured depletion output. Example: Flint And Steel + Unlit Candle → Candle; Flint And Steel loses one use."
+Spends units from this item or a matching board item when the action starts. The paying item stays in place.:
+  value: Spends units from this item or a matching board item when the action starts. The paying item stays in place.
 Stack capacity:
   value: Stack capacity
 Starting layout controls help:
@@ -300,14 +420,70 @@ Starting layout controls help:
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
 Storage:
   value: Storage
+Target:
+  value: Target
+Target effect:
+  value: Target effect
+The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.:
+  value: The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.
+The item that owns this action pays the unit cost. It must define enough available units.:
+  value: The item that owns this action pays the unit cost. It must define enough available units.
+The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.:
+  value: The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.
+Timer control:
+  value: Timer control
 Toolbar editing:
   value: Toolbar editing
 Toolbar editing help:
   value: |
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
+Turn off:
+  value: Turn off
+Turn on:
+  value: Turn on
 Type:
   value: Type
 UID:
   value: UID
+Unit cost:
+  value: Unit cost
+Unit settings:
+  value: Unit settings
+Units:
+  value: Units
+  dynamic: true
+Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.:
+  value: Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.
+Units are disabled:
+  value: Units are disabled
+"Units belong to one item: health, resources, or uses. Quantity counts separate items in a stack.":
+  value: "Units belong to one item: health, resources, or uses. Quantity counts separate items in a stack."
+Units input:
+  value: Units input
+Units per item:
+  value: Units per item
+  dynamic: true
+Units spent by the item that owns this action when it starts.:
+  value: Units spent by the item that owns this action when it starts.
+Units spent by the selected target when the action starts.:
+  value: Units spent by the selected target when the action starts.
+Unlimited:
+  value: Unlimited
+Use:
+  value: Use
+Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.:
+  value: Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.
 Write a note…:
   value: Write a note…
+unit available:
+  value: unit available
+unit from owner:
+  value: unit from owner
+unit from target:
+  value: unit from target
+units available:
+  value: units available
+units from owner:
+  value: units from owner
+units from target:
+  value: units from target

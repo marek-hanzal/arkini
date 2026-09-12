@@ -76,7 +76,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 				],
 			},
 			maxStackSize: 1,
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: productionLine("craft", [
@@ -94,7 +94,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 				],
 			},
 			maxStackSize: 1,
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: productionLine("blueprint", [

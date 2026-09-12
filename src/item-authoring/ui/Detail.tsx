@@ -146,7 +146,7 @@ export const Detail = ({
 			}
 		>
 			{sectionId === "identity" ||
-			sectionId === "charges" ||
+			sectionId === "units" ||
 			sectionId === "delete" ||
 			sectionId === "notes" ||
 			sectionId === "estimate" ||

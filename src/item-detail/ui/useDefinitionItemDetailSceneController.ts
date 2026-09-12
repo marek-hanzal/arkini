@@ -39,7 +39,7 @@ export namespace useDefinitionItemDetailSceneController {
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
 				readonly maxCount?: number;
-				readonly totalCharges?: number;
+				readonly totalUnits?: number;
 		  }
 		| {
 				readonly kind: "unavailable";
@@ -98,10 +98,10 @@ const useItemDefinitionDetail = (
 					: {
 							maxCount: item.maxCount,
 						}),
-				...(item.charges === undefined
+				...(item.units === undefined
 					? {}
 					: {
-							totalCharges: item.charges.amount,
+							totalUnits: item.units.amount,
 						}),
 			};
 		},

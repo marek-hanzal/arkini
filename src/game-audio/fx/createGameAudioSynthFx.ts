@@ -65,7 +65,7 @@ const readGameAudioTonePlanFn = (cue: readGameAudioCuesFn.Result): ReadonlyArray
 		.with("store", () => [
 			toneFn("sine", 300, 420, 0.1, 0.09),
 		])
-		.with("charge", () => [
+		.with("unit", () => [
 			toneFn("square", 160, 120, 0.06, 0.07),
 		])
 		.with("deplete", () => [

@@ -7,7 +7,7 @@ export const TypeSchema = z
 	.enum({
 		Simple: "simple",
 		Materials: "materials",
-		Deposit: "deposit",
+		Units: "units",
 	})
 	.meta({
 		id: "input.TypeSchema",

@@ -798,3 +798,9 @@ describe("item section form session", () => {
 		},
 	);
 });
+
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (key: string) => key,
+	}),
+}));

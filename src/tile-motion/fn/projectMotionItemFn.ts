@@ -4,7 +4,7 @@ import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentati
 /**
  * Applies the one narrow piece of canonical truth that motion may delay.
  *
- * Charged items use their badge for remaining charges and queue owners preserve canonical work
+ * Finite items use their badge for remaining units and queue owners preserve canonical work
  * count; every other badge mirrors the presented stack quantity. Keeping both fields here prevents
  * the reconciler and animation code from disagreeing.
  */
@@ -20,7 +20,7 @@ export const projectMotionItemFn = (
 	return {
 		...item,
 		badgeCount:
-			item.badgeKind === "charges" || item.badgeKind === "queue"
+			item.badgeKind === "units" || item.badgeKind === "queue"
 				? item.badgeCount
 				: quantity > 1
 					? quantity

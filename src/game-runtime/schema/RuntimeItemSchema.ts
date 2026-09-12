@@ -29,12 +29,12 @@ export const RuntimeItemSchema = z
 		 */
 		location: LocationSchema.describe("The current concrete location owned by this item."),
 		/**
-		 * Remaining charges of this concrete item instance after its first use.
+		 * Remaining units of this concrete item instance after its first use.
 		 *
-		 * Undefined means the instance still owns its authored full charge amount.
+		 * Undefined means the instance still owns its authored full unit amount.
 		 */
-		remainingCharges: NonNegativeIntegerSchema.optional().describe(
-			"The optional remaining charges of this concrete item instance; undefined means the authored full amount.",
+		remainingUnits: NonNegativeIntegerSchema.optional().describe(
+			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
 		/**
 		 * Remaining fixed-step lifetime of one temporary item instance.

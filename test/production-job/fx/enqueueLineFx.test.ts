@@ -49,7 +49,7 @@ const createDisabledJobConfig = () => {
 	});
 };
 
-const createExhaustedChargeJobConfig = () => {
+const createExhaustedUnitJobConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
 	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -59,7 +59,7 @@ const createExhaustedChargeJobConfig = () => {
 			...base.items,
 			forge: {
 				...forge,
-				charges: {
+				units: {
 					amount: 1,
 				},
 				lines: forge.lines.map((line) => ({
@@ -68,7 +68,7 @@ const createExhaustedChargeJobConfig = () => {
 						index === 0
 							? {
 									...input,
-									charges: {
+									units: {
 										cost: 2,
 										from: "self",
 									},
@@ -360,7 +360,7 @@ describe("enqueueLineFx", () => {
 		expect(result.runtime.jobQueue).toEqual([]);
 	});
 
-	it("rejects exhausted self charges even while concrete material is missing", () => {
+	it("rejects exhausted self units even while concrete material is missing", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
@@ -379,7 +379,7 @@ describe("enqueueLineFx", () => {
 				return yield* Effect.result(enqueueLineFx(props));
 			}).pipe(
 				useGameFx({
-					config: createExhaustedChargeJobConfig(),
+					config: createExhaustedUnitJobConfig(),
 				}),
 			),
 		);

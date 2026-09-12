@@ -95,7 +95,7 @@ export const purityTestConfig = GameConfigSchema.parse({
 				id: "craft",
 			}),
 			type: "craft",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: {
@@ -124,7 +124,7 @@ export const purityTestConfig = GameConfigSchema.parse({
 				id: "stash",
 			}),
 			type: "stash",
-			charges: {
+			units: {
 				amount: 1,
 			},
 			line: {

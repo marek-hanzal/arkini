@@ -1,18 +1,18 @@
 import { describe } from "vitest";
 import {
-	createDepositConfig,
-	createDepositRuntime,
+	createUnitsConfig,
+	createUnitsRuntime,
 	expect,
 	it,
 	readLines,
 	type RuntimeSchema,
 } from "../support/readItemDetailLinesFxFixture";
 
-describe("readItemDetailLinesFx / deposits", () => {
-	it("sums charges of eligible nearby deposits", () => {
-		const config = createDepositConfig(1);
+describe("readItemDetailLinesFx / unit sources", () => {
+	it("sums units of eligible nearby unit sources", () => {
+		const config = createUnitsConfig(1);
 		const lines = readLines(
-			createDepositRuntime(config, [
+			createUnitsRuntime(config, [
 				{
 					id: "runtime:tree:full",
 					x: 1,
@@ -22,19 +22,19 @@ describe("readItemDetailLinesFx / deposits", () => {
 					id: "runtime:tree:five",
 					x: 0,
 					y: 1,
-					remainingCharges: 5,
+					remainingUnits: 5,
 				},
 				{
 					id: "runtime:tree:ten",
 					x: 2,
 					y: 1,
-					remainingCharges: 10,
+					remainingUnits: 10,
 				},
 				{
 					id: "runtime:tree:far",
 					x: 4,
 					y: 0,
-					remainingCharges: 7,
+					remainingUnits: 7,
 				},
 			]),
 			"runtime:workshop",
@@ -44,44 +44,44 @@ describe("readItemDetailLinesFx / deposits", () => {
 		expect(lines.kind).toBe("available");
 		if (lines.kind !== "available") throw new Error("Expected available lines.");
 		expect(lines.line[0]?.input[0]).toMatchObject({
-			kind: "deposit",
-			requiredCharges: 1,
-			availableCharges: 33,
+			kind: "units",
+			requiredUnits: 1,
+			availableUnits: 33,
 			ready: true,
 		});
 	});
 
-	it("distinguishes a missing target from insufficient charges", () => {
-		const config = createDepositConfig(2);
-		const missing = readLines(createDepositRuntime(config, []), "runtime:workshop", config);
+	it("distinguishes a missing target from insufficient units", () => {
+		const config = createUnitsConfig(2);
+		const missing = readLines(createUnitsRuntime(config, []), "runtime:workshop", config);
 		const depleted = readLines(
-			createDepositRuntime(config, [
+			createUnitsRuntime(config, [
 				{
 					id: "runtime:tree",
 					x: 1,
 					y: 0,
-					remainingCharges: 1,
+					remainingUnits: 1,
 				},
 			]),
 			"runtime:workshop",
 			config,
 		);
 		if (missing.kind !== "available" || depleted.kind !== "available") {
-			throw new Error("Expected deposit lines.");
+			throw new Error("Expected units lines.");
 		}
 
 		expect(missing.line[0]).toMatchObject({
 			availability: {
 				kind: "unavailable",
 				reason: {
-					kind: "deposit-target-missing",
+					kind: "units-target-missing",
 				},
 			},
 			input: [
 				{
-					kind: "deposit",
-					availableCharges: 0,
-					requiredCharges: 2,
+					kind: "units",
+					availableUnits: 0,
+					requiredUnits: 2,
 					targetItemIds: [],
 					ready: false,
 				},
@@ -94,9 +94,9 @@ describe("readItemDetailLinesFx / deposits", () => {
 			},
 			input: [
 				{
-					kind: "deposit",
-					availableCharges: 1,
-					requiredCharges: 2,
+					kind: "units",
+					availableUnits: 1,
+					requiredUnits: 2,
 					targetItemIds: [
 						"runtime:tree",
 					],
@@ -106,9 +106,9 @@ describe("readItemDetailLinesFx / deposits", () => {
 		});
 	});
 
-	it("projects stored deposit owners without inventing a board origin", () => {
-		const config = createDepositConfig(1);
-		const boardRuntime = createDepositRuntime(config, [
+	it("projects stored units owners without inventing a board origin", () => {
+		const config = createUnitsConfig(1);
+		const boardRuntime = createUnitsRuntime(config, [
 			{
 				id: "runtime:tree",
 				x: 1,
@@ -146,8 +146,8 @@ describe("readItemDetailLinesFx / deposits", () => {
 					},
 					input: [
 						{
-							kind: "deposit",
-							availableCharges: 0,
+							kind: "units",
+							availableUnits: 0,
 							targetItemIds: [],
 						},
 					],

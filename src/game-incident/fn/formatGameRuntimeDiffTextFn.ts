@@ -95,9 +95,9 @@ export const formatGameRuntimeDiffTextFn = ({
 				previous.quantity === item.quantity
 					? null
 					: `quantity ${previous.quantity} → ${item.quantity}`,
-				previous.remainingCharges === item.remainingCharges
+				previous.remainingUnits === item.remainingUnits
 					? null
-					: `charges ${previous.remainingCharges ?? "none"} → ${item.remainingCharges ?? "none"}`,
+					: `units ${previous.remainingUnits ?? "none"} → ${item.remainingUnits ?? "none"}`,
 				previous.remainingDurationMs === item.remainingDurationMs
 					? null
 					: `remaining duration ${previous.remainingDurationMs ?? "none"} → ${item.remainingDurationMs ?? "none"} ms`,

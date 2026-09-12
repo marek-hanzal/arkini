@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ScheduleStateSchema } from "~/item-schedule/schema/ScheduleStateSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -6,7 +7,6 @@ import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeInteger
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { TimeSchema } from "~/game-value/schema/TimeSchema";
 
 /**
  * A hydrated live item or item stack that owns its current location.
@@ -28,21 +28,14 @@ export const RuntimeItemSchema = z
 		 */
 		location: LocationSchema.describe("The current concrete location owned by this item."),
 		/**
-		 * Remaining charges of this concrete item instance after its first use.
+		 * Remaining units of this concrete item instance after its first use.
 		 *
-		 * Undefined means the instance still owns its authored full charge amount.
+		 * Undefined means the instance still owns its authored full unit amount.
 		 */
-		remainingCharges: NonNegativeIntegerSchema.optional().describe(
-			"The optional remaining charges of this concrete item instance; undefined means the authored full amount.",
+		remainingUnits: NonNegativeIntegerSchema.optional().describe(
+			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
-		/**
-		 * Remaining fixed-step lifetime of one temporary item instance.
-		 *
-		 * Undefined is canonical for every non-temporary item.
-		 */
-		remainingDurationMs: TimeSchema.optional().describe(
-			"The optional remaining fixed-step lifetime of this temporary item instance.",
-		),
+		schedule: ScheduleStateSchema.optional(),
 		/**
 		 * Number of canonical items represented by this live runtime entry.
 		 */
@@ -52,7 +45,7 @@ export const RuntimeItemSchema = z
 		/**
 		 * Opaque optimistic-concurrency token replaced after command-relevant mutations.
 		 *
-		 * Passive temporary lifetime aging preserves the token so a pointer gesture does not become
+		 * Passive lifetime aging preserves the token so a pointer gesture does not become
 		 * stale every fixed tick. Expiry still removes the exact identity atomically.
 		 */
 		revision: RevisionSchema.describe(

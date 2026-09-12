@@ -184,19 +184,19 @@ const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(function*
 		)
 		.with(
 			{
-				kind: "deposit",
+				kind: "units",
 			},
-			(deposit) =>
+			(units) =>
 				Effect.gen(function* () {
 					const selector = projectItemDetailSelectorFn({
 						items: game.config.items,
-						selector: deposit.selector,
+						selector: units.selector,
 					});
 					const exactTargetId =
-						deposit.targetItemIds.length === 1 ? deposit.targetItemIds[0] : undefined;
+						units.targetItemIds.length === 1 ? units.targetItemIds[0] : undefined;
 					const detail = yield* projectItemDetailReferenceFx({
 						game,
-						itemId: deposit.selector.itemId,
+						itemId: units.selector.itemId,
 						preferredRuntimeItemIds:
 							exactTargetId === undefined
 								? []
@@ -206,25 +206,25 @@ const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(function*
 						runtime,
 					});
 					return {
-						kind: deposit.kind,
+						kind: units.kind,
 						selector,
-						distance: deposit.distance,
-						requiredCharges: deposit.requiredCharges,
-						availableCharges: deposit.availableCharges,
-						availableChargesLabel:
-							deposit.targetItemIds.length === 0
+						distance: units.distance,
+						requiredUnits: units.requiredUnits,
+						availableUnits: units.availableUnits,
+						availableUnitsLabel:
+							units.targetItemIds.length === 0
 								? "None"
-								: String(deposit.availableCharges),
-						targetTitles: deposit.targetItemIds.map(
+								: String(units.availableUnits),
+						targetTitles: units.targetItemIds.map(
 							(itemId) =>
 								runtime.items.find((item) => item.id === itemId)?.item.title ??
 								itemId,
 						),
-						ready: deposit.ready,
-						...(deposit.charges === undefined
+						ready: units.ready,
+						...(units.units === undefined
 							? {}
 							: {
-									charges: deposit.charges,
+									units: units.units,
 								}),
 						...(detail === undefined
 							? {}
@@ -284,7 +284,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 			{
 				kind: "unavailable",
 				reason: {
-					kind: "deposit-target-missing",
+					kind: "units-target-missing",
 				},
 			},
 			({ reason }) =>

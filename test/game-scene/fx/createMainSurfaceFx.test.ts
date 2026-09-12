@@ -124,7 +124,7 @@ const item = (
 	activityEffect: false,
 	id,
 	itemId: id,
-	itemType: "simple",
+
 	location,
 	primaryAction: {
 		kind: "none",

@@ -8,12 +8,10 @@ import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schem
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { validateConfigReferencesFn } from "../fn/validateConfigReferencesFn";
 import { validateInputAcceptanceCyclesFn } from "../fn/validateInputAcceptanceCyclesFn";
-import { validateInputChargesFn } from "../fn/validateInputChargesFn";
+import { validateInputUnitsFn } from "../fn/validateInputUnitsFn";
 import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
 import { validateItemUidsFn } from "../fn/validateItemUidsFn";
-import { validateMaterialInputEligibilityFn } from "../fn/validateMaterialInputEligibilityFn";
-import { validateLimitedDepositsFn } from "../fn/validateLimitedDepositsFn";
-import { validateLineInputCapacityFn } from "../fn/validateLineInputCapacityFn";
+import { validateUnitRenewalFn } from "../fn/validateUnitRenewalFn";
 import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "./validateStartStateFx";
 
@@ -80,15 +78,7 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			config,
 			provenance,
 		}),
-		validateMaterialInputEligibilityFn({
-			config,
-			provenance,
-		}),
-		validateLineInputCapacityFn({
-			config,
-			provenance,
-		}),
-		validateInputChargesFn({
+		validateInputUnitsFn({
 			config,
 			provenance,
 		}),
@@ -96,7 +86,7 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			config,
 			provenance,
 		}),
-		validateLimitedDepositsFn({
+		validateUnitRenewalFn({
 			config,
 			provenance,
 		}),

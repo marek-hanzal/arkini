@@ -64,6 +64,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 2,
+			canClearQueue: true,
 			active: [
 				{
 					jobId: "job:active",
@@ -88,7 +89,6 @@ describe("readItemDetailQueue", () => {
 	it("projects each idle request independently without changing accepted order or input state", () => {
 		const config = structuredClone(lineRunTestConfig);
 		const workshop = config.items.workshop;
-		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
 		workshop.lines.push({
 			...workshop.lines[0],
 			id: "line:workshop:ready",
@@ -160,7 +160,7 @@ describe("readItemDetailQueue", () => {
 		const singleSlotRuntime = {
 			...queuedRuntime(runtime),
 			items: runtime.items.map((item) =>
-				item.id === "runtime:workshop" && item.item.type === "producer"
+				item.id === "runtime:workshop"
 					? {
 							...item,
 							item: {
@@ -180,6 +180,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 1,
+			canClearQueue: true,
 			active: [],
 			request: [
 				{
@@ -229,13 +230,12 @@ describe("readItemDetailQueue", () => {
 			],
 		});
 
-		const chargedConfig = structuredClone(lineRunTestConfig);
-		const workshop = chargedConfig.items.workshop;
-		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
-		workshop.charges = {
+		const spentConfig = structuredClone(lineRunTestConfig);
+		const workshop = spentConfig.items.workshop;
+		workshop.units = {
 			amount: 1,
 		};
-		workshop.lines[0].input[0].charges = {
+		workshop.lines[0].input[0].units = {
 			cost: 2,
 			from: "self",
 		};
@@ -245,7 +245,7 @@ describe("readItemDetailQueue", () => {
 				item.id === "runtime:workshop"
 					? {
 							...item,
-							item: chargedConfig.items.workshop,
+							item: spentConfig.items.workshop,
 						}
 					: item,
 			),
@@ -256,7 +256,7 @@ describe("readItemDetailQueue", () => {
 					itemId: "runtime:workshop",
 					runtime: blocked,
 				},
-				chargedConfig,
+				spentConfig,
 			),
 		).toMatchObject({
 			request: [
@@ -272,7 +272,6 @@ describe("readItemDetailQueue", () => {
 		const config = structuredClone(lineRunTestConfig);
 		config.items.permit.maxCount = 1;
 		const workshop = config.items.workshop;
-		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
 		workshop.lines[0].output = createOutput([
 			{
 				itemId: "permit",

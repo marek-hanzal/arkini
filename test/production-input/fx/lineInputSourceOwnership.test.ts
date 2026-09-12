@@ -64,7 +64,7 @@ const config = GameConfigSchema.parse({
 		[workerItemId]: {
 			...baseItem(workerItemId),
 			maxQueueSize: 2,
-			type: "producer",
+
 			lines: [
 				{
 					id: workerRunLineId,
@@ -102,31 +102,37 @@ const config = GameConfigSchema.parse({
 		},
 		[upgradeItemId]: {
 			...baseItem(upgradeItemId),
-			type: "blueprint",
-			line: {
-				id: upgradeLineId,
-				title: "Construct",
-				description: "Consume one idle worker.",
-				runtimeMs: 1_000,
-				input: [
-					{
-						type: "materials",
-						selector: {
-							type: "item",
-							itemId: workerItemId,
+			maxQueueSize: 1,
+
+			lines: [
+				{
+					ahead: true,
+					id: upgradeLineId,
+					title: "Construct",
+					description: "Consume one idle worker.",
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "materials",
+							selector: {
+								type: "item",
+								itemId: workerItemId,
+							},
+							quantity: {
+								min: 1,
+								max: 1,
+							},
 						},
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-					},
-				],
-				rules: [],
-			},
+					],
+					rules: [],
+				},
+			],
 		},
 		[fuelItemId]: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem(fuelItemId),
-			type: "simple",
 		},
 	},
 });

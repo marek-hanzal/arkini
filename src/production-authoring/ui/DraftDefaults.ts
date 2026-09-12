@@ -93,9 +93,9 @@ export const DraftDefaults = {
 			},
 			capacity: 0,
 		},
-		deposit: {
-			type: "deposit",
-			charges: {
+		units: {
+			type: "units",
+			units: {
 				cost: 1,
 				from: "target",
 			},

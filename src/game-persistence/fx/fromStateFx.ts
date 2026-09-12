@@ -6,7 +6,6 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import type { StateItemSchema } from "~/game-persistence/schema/StateItemSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 interface FromStateProps {
 	state: StateSchema.Type;
@@ -22,10 +21,8 @@ const fromStateItemFx = Effect.fn("fromStateItemFx")(function* (state: StateItem
 		item,
 		location: state.location,
 		quantity: state.quantity,
-		remainingCharges: state.remainingCharges,
-		remainingDurationMs:
-			state.remainingDurationMs ??
-			(item.type === TypeSchema.enum.Temporary ? item.durationMs : undefined),
+		remainingUnits: state.remainingUnits,
+		schedule: state.schedule,
 		revision: yield* createRevisionFx(),
 	} satisfies RuntimeItemSchema.Type;
 });

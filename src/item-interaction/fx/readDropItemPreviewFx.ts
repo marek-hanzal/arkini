@@ -2,7 +2,6 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputStoreFn";
@@ -16,7 +15,6 @@ import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItem
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { planInventoryStorageFx } from "~/item-interaction/fx/planInventoryStorageFx";
 import { DropItemIgnoredReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
@@ -28,7 +26,6 @@ export namespace readDropItemPreviewFx {
 					| typeof DropItemResultKind.Move
 					| typeof DropItemResultKind.Swap
 					| typeof DropItemResultKind.Merge
-					| typeof DropItemResultKind.StoreInventory
 					| typeof DropItemResultKind.Stack;
 		  }
 		| {
@@ -189,26 +186,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return inputStore === undefined
 			? rejectedFn(DropItemRejectedReason.Blocked)
 			: storeInputPreviewFn(inputStore);
-	}
-	if (targetItem.item.type === TypeSchema.enum.Inventory) {
-		if (
-			source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			!isItemLocationScopeAllowedFn({
-				item: source.item,
-				locationScope: LocationScopeEnumSchema.enum.Inventory,
-			})
-		) {
-			return rejectedFn(DropItemRejectedReason.InvalidTarget);
-		}
-		const storagePlan = yield* planInventoryStorageFx({
-			item: source,
-			runtime,
-		}).pipe(Effect.option);
-		return Option.isSome(storagePlan)
-			? {
-					kind: DropItemResultKind.StoreInventory,
-				}
-			: rejectedFn(DropItemRejectedReason.Blocked);
 	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({

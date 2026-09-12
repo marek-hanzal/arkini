@@ -7,7 +7,7 @@ export const SourceActionSchema = z
 	.enum({
 		Use: "use",
 		Consume: "consume",
-		Deposit: "deposit",
+		Spend: "spend",
 	})
 	.meta({
 		id: "merge.SourceActionSchema",

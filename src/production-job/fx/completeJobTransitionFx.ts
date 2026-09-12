@@ -1,8 +1,6 @@
 import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { JobCompletionOwner } from "~/production-job/type/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/production-job/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
@@ -38,7 +36,7 @@ interface CompleteJobTransitionProps {
 }
 
 /**
- * Resolves one ready job once and applies line output plus charge depletion lifecycle.
+ * Resolves one ready job once and applies line output plus unit depletion lifecycle.
  * Output conditions share this completion's input snapshot, including earlier Tick
  * transitions but excluding this completion's partial candidate.
  */
@@ -78,27 +76,13 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	});
 	if (line === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
-	if (
-		owner.item.type !== TypeSchema.enum.Blueprint &&
-		owner.item.type !== TypeSchema.enum.Craft &&
-		owner.item.type !== TypeSchema.enum.Deposit &&
-		owner.item.type !== TypeSchema.enum.Producer &&
-		owner.item.type !== TypeSchema.enum.Stash
-	) {
-		return yield* Effect.die(
-			new Error(`Job ${job.id} owner ${owner.id} does not expose a product line.`),
-		);
-	}
 	const consumedItems = Array.getSomes(runtime.items.map(isJobRuntimeItemFn)).filter(
 		(item) => item.location.jobId === job.id,
 	);
 	const reservations = Array.getSomes(runtime.items.map(isReservedRuntimeItemFn)).filter(
 		(item) => item.location.jobId === job.id,
 	);
-	const completionOwner = {
-		...owner,
-		item: owner.item,
-	} satisfies JobCompletionOwner;
+	const completionOwner = owner;
 	let completionRuntime = {
 		...runtime,
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),

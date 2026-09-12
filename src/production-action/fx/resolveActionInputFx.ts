@@ -1,24 +1,24 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
-import { resolveActionDepositInputFx } from "~/production-action/fx/resolveActionDepositInputFx";
+import { resolveActionUnitFx } from "~/production-action/fx/resolveActionUnitFx";
+import { resolveActionUnitsInputFx } from "~/production-action/fx/resolveActionUnitsInputFx";
 import type { InputSchema } from "~/production-action/schema/InputSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { InputRun } from "~/production-input/type/InputRun";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-/** Resolves one immediate Simple or Deposit requirement without mutating runtime. */
+/** Resolves one immediate Simple or Units requirement without mutating runtime. */
 export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* ({
 	input,
 	ownerItemId,
-	reservedCharges,
+	reservedUnits,
 	runtime,
 }: {
 	readonly input: InputSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
-	readonly reservedCharges: ReadonlyMap<IdSchema.Type, number>;
+	readonly reservedUnits: ReadonlyMap<IdSchema.Type, number>;
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	return yield* match(input)
@@ -28,21 +28,21 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 			},
 			(input) =>
 				Effect.gen(function* () {
-					const charges = yield* resolveActionChargeFx({
-						charges: input.charges,
+					const units = yield* resolveActionUnitFx({
+						units: input.units,
 						ownerItemId,
-						reservedCharges,
+						reservedUnits,
 						runtime,
 					});
 					return {
 						resolution: {
 							type: input.type,
-							ready: charges.ready,
+							ready: units.ready,
 						},
-						plan: charges.ready
+						plan: units.ready
 							? {
 									type: input.type,
-									charges: charges.plan,
+									units: units.plan,
 								}
 							: undefined,
 					} satisfies InputRun.Resolution;
@@ -50,13 +50,13 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Deposit,
+				type: TypeSchema.enum.Units,
 			},
 			(input) =>
-				resolveActionDepositInputFx({
+				resolveActionUnitsInputFx({
 					input,
 					ownerItemId,
-					reservedCharges,
+					reservedUnits,
 					runtime,
 				}),
 		)

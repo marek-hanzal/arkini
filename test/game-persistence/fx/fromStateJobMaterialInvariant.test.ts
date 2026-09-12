@@ -73,16 +73,15 @@ describe("fromStateFx job material invariants", () => {
 	});
 
 	it("hydrates one stateful reserved instance with its passive owned subtree intact", () => {
-		const chargedConfig = createJobTestConfig();
-		const worker = chargedConfig.items.forge;
-		if (worker.type !== "producer") throw new Error("Expected producer fixture.");
+		const spentConfig = createJobTestConfig();
+		const worker = spentConfig.items.forge;
 		const reservedInput = worker.lines[0].input[1];
 		if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
 		reservedInput.selector = {
 			type: "item",
 			itemId: "forge",
 		};
-		worker.charges = {
+		worker.units = {
 			amount: 2,
 		};
 		const state = {
@@ -102,7 +101,7 @@ describe("fromStateFx job material invariants", () => {
 						jobId: job.id,
 						inputIndex: 1,
 					},
-					remainingCharges: 1,
+					remainingUnits: 1,
 					quantity: 1,
 				},
 				{
@@ -127,13 +126,13 @@ describe("fromStateFx job material invariants", () => {
 				state,
 			}).pipe(
 				useGameFx({
-					config: chargedConfig,
+					config: spentConfig,
 				}),
 			),
 		);
 
 		expect(runtime.items.find((item) => item.id === "runtime:reserved-worker")).toMatchObject({
-			remainingCharges: 1,
+			remainingUnits: 1,
 			location: {
 				scope: "reserved",
 				jobId: job.id,

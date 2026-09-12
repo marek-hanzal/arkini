@@ -22,9 +22,6 @@ import {
 const ownerItemId = "runtime:workshop";
 const lineId = "line:workshop:build";
 const inputTestWorkshop = inputRuntimeTestConfig.items.workshop;
-if (inputTestWorkshop.type !== "producer") {
-	throw new Error("Expected the input runtime test workshop to be a producer.");
-}
 
 const twoInputTestConfig = GameConfigSchema.parse({
 	...inputRuntimeTestConfig,

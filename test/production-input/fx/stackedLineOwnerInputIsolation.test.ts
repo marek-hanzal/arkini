@@ -9,16 +9,9 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 describe("stacked line owner input isolation", () => {
-	it.each([
-		{
-			itemId: "craft" as const,
-			lineId: "line:craft",
-		},
-		{
-			itemId: "stash" as const,
-			lineId: "line:stash",
-		},
-	])("isolates one $itemId before attaching its first input", ({ itemId, lineId }) => {
+	it("isolates one Common line owner before attaching its first input", () => {
+		const itemId = "craft";
+		const lineId = "line:craft";
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({

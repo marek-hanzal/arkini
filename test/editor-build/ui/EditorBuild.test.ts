@@ -308,9 +308,9 @@ describe("EditorBuild", () => {
 	it("keeps structured validation diagnostics distinct from operational failures", async () => {
 		const diagnostics = [
 			{
-				code: "input:capacity-unsupported" as const,
+				code: "input:units-invalid" as const,
 				severity: "error" as const,
-				message: "This input buffer is only supported by producer lines.",
+				message: "The item has no units to pay its own input cost.",
 				path: [
 					"items",
 					"producer:academy",
@@ -322,7 +322,7 @@ describe("EditorBuild", () => {
 				ownerItemId: "producer:academy",
 				lineId: "line:academy:knowledge",
 				inputIndex: 0,
-				capacity: 2,
+				reason: "self-missing-units" as const,
 			},
 			{
 				code: "resource:unused" as const,
@@ -394,7 +394,7 @@ describe("EditorBuild", () => {
 
 		expect(container.textContent).toContain("Build blocked by validation");
 		expect(container.textContent).toContain("2 blocking errors · 1 warning");
-		expect(container.textContent).toContain("Unsupported input capacity");
+		expect(container.textContent).toContain("Invalid input unit contract");
 		expect(
 			container.querySelector(
 				'a[href="/editor/editor-test/editor/items/academy-uid/form/production"]',

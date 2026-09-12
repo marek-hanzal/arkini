@@ -9,31 +9,24 @@ interface InputCollection {
 }
 
 const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputCollection> => {
+	const collections: InputCollection[] = [];
 	if ("lines" in item)
-		return (item.lines ?? []).map((line, index) => ({
-			input: line.input,
-			path: [
-				"lines",
-				index,
-			],
-		}));
-	if ("line" in item)
-		return [
-			{
-				input: item.line.input,
+		for (const [index, line] of item.lines.entries())
+			collections.push({
+				input: line.input,
 				path: [
-					"line",
+					"lines",
+					index,
 				],
-			},
-		];
-	if (item.type === "space")
-		return [
-			{
-				input: item.input,
-				path: [],
-			},
-		];
-	return [];
+			});
+	if (item.action !== undefined)
+		collections.push({
+			input: item.action.input,
+			path: [
+				"action",
+			],
+		});
+	return collections;
 };
 
 /** Adds project-local identity and selected-target validation to the canonical item form schema. */
@@ -50,23 +43,23 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 			});
 		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
-			if (merge.action === "deposit" && item.charges === undefined)
+			if (merge.action === "spend" && item.units === undefined)
 				context.addIssue({
 					code: "custom",
-					message: "Enable Charges on this item before selecting Deposit.",
+					message: "Enable Units on this item before selecting Spend.",
 					path: [
 						"merge",
 						mergeIndex,
 						"action",
 					],
 				});
-			if (merge.effect !== "deposit") continue;
+			if (merge.effect !== "spend") continue;
 			const selectedItem = project.config.items[merge.target.itemId];
 			const target = selectedItem?.uid === item.uid ? item : selectedItem;
-			if (target === undefined || target.charges !== undefined) continue;
+			if (target === undefined || target.units !== undefined) continue;
 			context.addIssue({
 				code: "custom",
-				message: "Selected target must have Charges enabled before choosing Deposit.",
+				message: "Selected target must have Units enabled before choosing Spend.",
 				path: [
 					"merge",
 					mergeIndex,
@@ -76,29 +69,29 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 		}
 		for (const collection of readInputCollectionsFn(item)) {
 			for (const [inputIndex, input] of collection.input.entries()) {
-				if (input.type !== "deposit") continue;
-				if (input.charges?.from === "self") {
-					if (item.charges !== undefined) continue;
+				if (input.type !== "units") continue;
+				if (input.units?.from === "self") {
+					if (item.units !== undefined) continue;
 					context.addIssue({
 						code: "custom",
-						message: "Enable Charges on this item before selecting Self.",
+						message: "Enable Units on this item before selecting Self.",
 						path: [
 							...collection.path,
 							"input",
 							inputIndex,
-							"charges",
+							"units",
 							"from",
 						],
 					});
 					continue;
 				}
-				if (input.charges?.from !== "target") continue;
+				if (input.units?.from !== "target") continue;
 				const selectedItem = project.config.items[input.query.selector.itemId];
 				const target = selectedItem?.uid === item.uid ? item : selectedItem;
-				if (target === undefined || target.charges !== undefined) continue;
+				if (target === undefined || target.units !== undefined) continue;
 				context.addIssue({
 					code: "custom",
-					message: `Selected target ${target.id} must have Charges enabled.`,
+					message: `Selected target ${target.id} must have Units enabled.`,
 					path: [
 						...collection.path,
 						"input",

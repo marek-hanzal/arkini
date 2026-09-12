@@ -241,7 +241,7 @@ const readItemNodeFn = (
 			...(index.starters.get(itemId) ?? []),
 		],
 		title: item?.title || itemId,
-		type: item?.type ?? "missing",
+		missing: item === undefined,
 	};
 };
 

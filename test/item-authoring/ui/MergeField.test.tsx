@@ -30,6 +30,12 @@ import { MergeField } from "~/item-authoring/ui/MergeField";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (key: string) => key,
+	}),
+}));
+
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 afterEach(async () => {
@@ -49,81 +55,77 @@ const merge = {
 } satisfies MergeSchema.Type;
 
 describe("MergeField", () => {
-	it("enables Deposit only when the source item has Charges", async () => {
+	it("enables Spend only when the source item has Units", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
 		const onChangeFn = vi.fn();
-		const renderField = async (sourceChargesEnabled: boolean) => {
+		const renderField = async (sourceUnitsEnabled: boolean) => {
 			await act(async () => {
 				root.render(
 					<MergeField
 						merge={merge}
 						onChangeFn={onChangeFn}
-						sourceChargesEnabled={sourceChargesEnabled}
-						targetChargesEnabled={false}
+						sourceUnitsEnabled={sourceUnitsEnabled}
+						targetUnitsEnabled={false}
 					/>,
 				);
 			});
 		};
 
 		await renderField(false);
-		let deposit = container.querySelectorAll<HTMLButtonElement>(
-			'button[data-ui-value="deposit"]',
+		let units = container.querySelectorAll<HTMLButtonElement>(
+			'button[data-ui-value="spend"]',
 		)[0];
-		if (deposit === null) throw new Error("Expected Deposit source action.");
-		expect(deposit.disabled).toBe(true);
+		if (units === null) throw new Error("Expected Units source action.");
+		expect(units.disabled).toBe(true);
 
 		await renderField(true);
-		deposit = container.querySelectorAll<HTMLButtonElement>(
-			'button[data-ui-value="deposit"]',
-		)[0];
-		if (deposit === null) throw new Error("Expected Deposit source action.");
-		expect(deposit.disabled).toBe(false);
-		await act(async () => deposit.click());
+		units = container.querySelectorAll<HTMLButtonElement>('button[data-ui-value="spend"]')[0];
+		if (units === null) throw new Error("Expected Units source action.");
+		expect(units.disabled).toBe(false);
+		await act(async () => units.click());
 		expect(onChangeFn).toHaveBeenCalledWith({
 			...merge,
-			action: "deposit",
+			action: "spend",
 		});
 	});
 
-	it("enables Deposit only when the selected target item has Charges", async () => {
+	it("enables Spend only when the selected target item has Units", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
 		const onChangeFn = vi.fn();
-		const renderField = async (targetChargesEnabled: boolean) => {
+		const renderField = async (targetUnitsEnabled: boolean) => {
 			await act(async () => {
 				root.render(
 					<MergeField
 						merge={merge}
 						onChangeFn={onChangeFn}
-						sourceChargesEnabled={false}
-						targetChargesEnabled={targetChargesEnabled}
+						sourceUnitsEnabled={false}
+						targetUnitsEnabled={targetUnitsEnabled}
 					/>,
 				);
 			});
 		};
 
 		await renderField(false);
-		let deposit = container.querySelectorAll<HTMLButtonElement>(
-			'button[data-ui-value="deposit"]',
+		let units = container.querySelectorAll<HTMLButtonElement>(
+			'button[data-ui-value="spend"]',
 		)[1];
-		if (deposit === undefined) throw new Error("Expected Deposit target effect.");
-		expect(deposit.disabled).toBe(true);
+		if (units === undefined) throw new Error("Expected Units target effect.");
+		expect(units.disabled).toBe(true);
 
 		await renderField(true);
-		deposit = container.querySelectorAll<HTMLButtonElement>(
-			'button[data-ui-value="deposit"]',
-		)[1];
-		if (deposit === undefined) throw new Error("Expected Deposit target effect.");
-		expect(deposit.disabled).toBe(false);
-		await act(async () => deposit.click());
+		units = container.querySelectorAll<HTMLButtonElement>('button[data-ui-value="spend"]')[1];
+		if (units === undefined) throw new Error("Expected Units target effect.");
+		expect(units.disabled).toBe(false);
+		await act(async () => units.click());
 		expect(onChangeFn).toHaveBeenCalledWith({
 			...merge,
-			effect: "deposit",
+			effect: "spend",
 		});
 	});
 });

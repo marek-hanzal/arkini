@@ -13,7 +13,6 @@ import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 const ownerKinds = [
 	"producer",
 	"craft",
-	"blueprint",
 ] as const;
 
 const baseItem = (id: string) => ({
@@ -73,13 +72,16 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		material: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("material"),
-			type: "simple",
+
 			maxStackSize: 10,
 		},
 		producer: {
 			...baseItem("producer"),
-			type: "producer",
+
 			maxQueueSize: 2,
 			lines: [
 				makeLine("line:producer"),
@@ -98,14 +100,13 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		craft: {
+			maxQueueSize: 1,
+
 			...baseItem("craft"),
-			type: "craft",
-			line: makeLine("line:craft"),
-		},
-		blueprint: {
-			...baseItem("blueprint"),
-			type: "blueprint",
-			line: makeLine("line:blueprint"),
+
+			lines: [
+				makeLine("line:craft"),
+			],
 		},
 	},
 });

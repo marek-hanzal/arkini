@@ -1,6 +1,6 @@
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import { McpServer } from "@modelcontextprotocol/server";
-import { Effect, Order } from "effect";
+import { Effect } from "effect";
 import { z } from "zod";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
@@ -10,8 +10,8 @@ import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuanti
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { AssetCollectionInputSchema } from "./AssetCollectionInputSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
-import { CreateItemInputSchemas } from "./CreateItemInputSchemas";
-import { EditItemInputSchemas } from "./EditItemInputSchemas";
+import { CreateItemInputSchema } from "./CreateItemInputSchema";
+import { EditItemInputSchema } from "./EditItemInputSchema";
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
@@ -27,18 +27,6 @@ import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerNoteToolsFn } from "./registerNoteTools";
 import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
-
-const itemTypes = [
-	"simple",
-	"space",
-	"producer",
-	"craft",
-	"blueprint",
-	"deposit",
-	"stash",
-	"temporary",
-	"inventory",
-] as const;
 
 const ProjectInputSchema = z.object({}).strict().meta({
 	$id: "urn:arkini:schema:mcp:project-input",
@@ -146,19 +134,8 @@ const readProjectTextFn = (project: Project) => {
 	].join("\n");
 };
 
-const readItemMetaTextFn = (project: Project) => {
-	const counts = new Map<string, number>();
-	for (const item of Object.values(project.config.items))
-		counts.set(item.type, (counts.get(item.type) ?? 0) + 1);
-	return [
-		`Total: ${Object.keys(project.config.items).length}`,
-		...[
-			...counts.entries(),
-		]
-			.sort(([left], [right]) => Order.String(left, right))
-			.map(([type, count]) => `${type}: ${count}`),
-	].join("\n");
-};
+const readItemMetaTextFn = (project: Project) =>
+	`Total: ${Object.keys(project.config.items).length}`;
 
 const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project, itemId: string) =>
 	Effect.gen(function* () {
@@ -171,7 +148,6 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 			`Item: ${item.title}`,
 			`ID: ${item.id}`,
 			`UID: ${item.uid}`,
-			`Type: ${item.type}`,
 			`Draft: ${readDraftFn(item)}`,
 			...(item.description === undefined
 				? []
@@ -281,17 +257,17 @@ const createServerFn = (
 		},
 		async ({ id }) => runToolFn(readSchemaDetailTextFx(id)),
 	);
-	for (const type of itemTypes) {
-		const schemaId = resolveSchemaId(CreateItemInputSchemas[type]);
+	{
+		const schemaId = resolveSchemaId(CreateItemInputSchema);
 		server.registerTool(
-			`create_${type}_item`,
+			"create_item",
 			{
-				description: `Create and persist one ${type} item in the open project. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Omitted fields use the same defaults as a new ${type}-item form in the Editor UI.`,
+				description: `Create and persist one item in the open project. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Omitted fields use the same defaults as a new item form in the Editor UI.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
 				runToolFn(
-					parseToolInputJsonFx(input, CreateItemInputSchemas[type]).pipe(
+					parseToolInputJsonFx(input, CreateItemInputSchema).pipe(
 						Effect.flatMap((decodedInput) =>
 							readProjectFx().pipe(
 								Effect.flatMap((project) =>
@@ -300,7 +276,6 @@ const createServerFn = (
 										notifyProjectChangedFn,
 										project,
 										repository,
-										type,
 									}),
 								),
 							),
@@ -309,17 +284,17 @@ const createServerFn = (
 				),
 		);
 	}
-	for (const type of itemTypes) {
-		const schemaId = resolveSchemaId(EditItemInputSchemas[type]);
+	{
+		const schemaId = resolveSchemaId(EditItemInputSchema);
 		server.registerTool(
-			`edit_${type}_item`,
+			"edit_item",
 			{
-				description: `Patch one existing ${type} item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, charges, merge, line, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
+				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, units, merge, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
 				runToolFn(
-					parseToolInputJsonFx(input, EditItemInputSchemas[type]).pipe(
+					parseToolInputJsonFx(input, EditItemInputSchema).pipe(
 						Effect.flatMap((decodedInput) =>
 							readProjectFx().pipe(
 								Effect.flatMap((project) =>
@@ -328,7 +303,6 @@ const createServerFn = (
 										notifyProjectChangedFn,
 										project,
 										repository,
-										type,
 									}),
 								),
 							),
@@ -356,7 +330,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_meta",
 		{
-			description: "Count items in the open project by their canonical item type.",
+			description: "Count items in the open project.",
 			inputSchema: ItemMetaInputSchema,
 		},
 		async () => runToolFn(readProjectFx().pipe(Effect.map(readItemMetaTextFn))),
@@ -377,7 +351,7 @@ const createServerFn = (
 		"item_collection",
 		{
 			description:
-				"List one page of items with collection metadata, title, ID, optional description, type, and Editor draft status, optionally filtered by item types and the editor's fuzzy search.",
+				"List one page of items with collection metadata, title, ID, optional description, and Editor draft status, optionally filtered by the editor's fuzzy search.",
 			inputSchema: ItemCollectionInputSchema,
 		},
 		async (input) =>
@@ -426,7 +400,7 @@ const createServerFn = (
 		"item_config",
 		{
 			description:
-				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_<type>_item, preserve every unchanged nested value, and copy revision into the edit request.",
+				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the edit request.",
 			inputSchema: ItemConfigInputSchema,
 		},
 		async ({ itemId }) =>

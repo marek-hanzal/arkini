@@ -74,8 +74,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 	items: {
 		"producer:trader": {
 			...base("producer:trader"),
-			type: "producer",
-			charges: {
+
+			units: {
 				amount: 1,
 			},
 			maxQueueSize: 1,
@@ -88,7 +88,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -110,8 +110,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 		},
 		"producer:phoenix": {
 			...base("producer:phoenix"),
-			type: "producer",
-			charges: {
+
+			units: {
 				amount: 1,
 			},
 			maxCount: 1,
@@ -125,7 +125,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -159,8 +159,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 		},
 		"producer:finite-queue": {
 			...base("producer:finite-queue"),
-			type: "producer",
-			charges: {
+
+			units: {
 				amount: 2,
 			},
 			maxQueueSize: 3,
@@ -168,12 +168,12 @@ const lifecycleConfig = GameConfigSchema.parse({
 				{
 					id: "line:finite-queue:work",
 					title: "Finite queue work",
-					description: "Runs only while the owner has charges.",
+					description: "Runs only while the owner has units.",
 					runtimeMs: 200,
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
@@ -185,55 +185,68 @@ const lifecycleConfig = GameConfigSchema.parse({
 		},
 		"blueprint:empty": {
 			...base("blueprint:empty"),
-			type: "blueprint",
-			charges: {
+			maxQueueSize: 1,
+
+			units: {
 				amount: 1,
 			},
-			line: {
-				id: "line:blueprint:empty",
-				title: "Build nothing",
-				description: "Completes without output.",
-				runtimeMs: 200,
-				input: [
-					{
-						type: "simple",
-						charges: {
-							from: "self",
-							cost: 1,
+			lines: [
+				{
+					ahead: true,
+					id: "line:blueprint:empty",
+					title: "Build nothing",
+					description: "Completes without output.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
 						},
-					},
-				],
-				rules: [],
-			},
+					],
+					rules: [],
+				},
+			],
 		},
 		"craft:repeatable": {
+			maxQueueSize: 1,
+
 			...base("craft:repeatable"),
-			type: "craft",
-			line: {
-				id: "line:craft:repeatable",
-				title: "Repeat",
-				description: "Repeat without consuming the owner.",
-				runtimeMs: 200,
-				input: [
-					{
-						type: "simple",
-					},
-				],
-				output,
-				rules: [],
-			},
+
+			lines: [
+				{
+					id: "line:craft:repeatable",
+					title: "Repeat",
+					description: "Repeat without consuming the owner.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					output,
+					rules: [],
+				},
+			],
 		},
 		"item:material": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:material"),
-			type: "simple",
-			charges: {
+
+			units: {
 				amount: 2,
 			},
 			maxStackSize: 2,
 		},
 		"item:gift": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:gift"),
-			type: "simple",
 		},
 	},
 });
@@ -247,7 +260,7 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 		),
 	);
 
-describe("job completion charge lifecycle", () => {
+describe("job completion unit lifecycle", () => {
 	it("removes a depleted producer and its remaining queue", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -401,7 +414,7 @@ describe("job completion charge lifecycle", () => {
 							y: 0,
 						},
 					},
-					remainingCharges: 0,
+					remainingUnits: 0,
 					quantity: 1,
 				},
 				{
@@ -423,7 +436,7 @@ describe("job completion charge lifecycle", () => {
 						lineId: "line:trader:trade",
 						inputIndex: 0,
 					},
-					remainingCharges: 1,
+					remainingUnits: 1,
 					quantity: 1,
 				},
 			],
@@ -465,7 +478,7 @@ describe("job completion charge lifecycle", () => {
 		});
 		expect(runtime.items.find((item) => item.id === "runtime:buffered-material")).toMatchObject(
 			{
-				remainingCharges: 1,
+				remainingUnits: 1,
 				location: {
 					scope: "board",
 					space: 0,

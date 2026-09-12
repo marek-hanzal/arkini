@@ -65,6 +65,7 @@ describe("ItemQueueTab command boundary", () => {
 					queue: {
 						active: [],
 						capacity: 2,
+						canClearQueue: true,
 						itemId: "runtime:owner",
 						kind: "available",
 						request: [

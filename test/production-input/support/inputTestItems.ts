@@ -1,8 +1,11 @@
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 const simpleItem = ({ id }: { id: string }) => {
-	return SimpleSchema.parse({
+	return ItemSchema.parse({
+		maxQueueSize: 1,
+		lines: [],
+
 		uid: id,
 		id,
 		title: id,
@@ -15,7 +18,6 @@ const simpleItem = ({ id }: { id: string }) => {
 		},
 		scope: "any",
 		maxStackSize: 10,
-		type: "simple",
 	});
 };
 

@@ -1,7 +1,6 @@
 import type { z } from "zod";
 
-import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -17,10 +16,13 @@ const simpleItem = ({
 	scope?: "any" | "board";
 	maxStackSize?: number;
 }) =>
-	SimpleSchema.parse({
+	ItemSchema.parse({
+		maxQueueSize: 1,
+		lines: [],
+
 		uid: id,
 		id,
-		type: "simple" as const,
+
 		title: id,
 		description: id,
 		asset: {
@@ -45,11 +47,11 @@ const blueprintItem = ({
 	output?: z.input<typeof OutputSchema>;
 	reserveTool?: boolean;
 }) =>
-	BlueprintSchema.parse({
+	ItemSchema.parse({
 		uid: id,
 		id,
-		type: "blueprint" as const,
-		charges: {
+
+		units: {
 			amount: 1,
 		},
 		title: id,
@@ -62,42 +64,45 @@ const blueprintItem = ({
 		},
 		scope: "board" as const,
 		maxStackSize: 1,
-		line: {
-			id: lineId,
-			title: lineId,
-			description: lineId,
-			runtimeMs: 200,
-			input: reserveTool
-				? [
-						{
-							type: "materials" as const,
-							charges: {
-								from: "self" as const,
-								cost: 1,
+		lines: [
+			{
+				ahead: true,
+				id: lineId,
+				title: lineId,
+				description: lineId,
+				runtimeMs: 200,
+				input: reserveTool
+					? [
+							{
+								type: "materials" as const,
+								units: {
+									from: "self" as const,
+									cost: 1,
+								},
+								selector: {
+									type: "item" as const,
+									itemId: "item:tool",
+								},
+								mode: "reserve" as const,
+								quantity: {
+									min: 1,
+									max: 1,
+								},
 							},
-							selector: {
-								type: "item" as const,
-								itemId: "item:tool",
+						]
+					: [
+							{
+								type: "simple" as const,
+								units: {
+									from: "self" as const,
+									cost: 1,
+								},
 							},
-							mode: "reserve" as const,
-							quantity: {
-								min: 1,
-								max: 1,
-							},
-						},
-					]
-				: [
-						{
-							type: "simple" as const,
-							charges: {
-								from: "self" as const,
-								cost: 1,
-							},
-						},
-					],
-			output,
-			rules: [],
-		},
+						],
+				output,
+				rules: [],
+			},
+		],
 	});
 
 const guaranteedOutput = (
@@ -224,7 +229,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
-			charges: {
+			units: {
 				amount: 1,
 				output: blueprintOutput("item:depletion-product"),
 			},
@@ -236,7 +241,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
-			charges: {
+			units: {
 				amount: 1,
 				output: blueprintOutput("blueprint:depletion-self"),
 			},
@@ -249,7 +254,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
-			charges: {
+			units: {
 				amount: 1,
 				output: {
 					set: [
@@ -369,7 +374,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:limited": {
 			uid: "producer:limited",
 			id: "producer:limited",
-			type: "producer",
+
 			title: "Limited producer",
 			description: "Produces one singleton output.",
 			asset: {
@@ -408,7 +413,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:blueprint-source": {
 			uid: "producer:blueprint-source",
 			id: "producer:blueprint-source",
-			type: "producer",
+
 			title: "Blueprint source",
 			description: "Produces one purpose-bound blueprint.",
 			asset: {
@@ -603,7 +608,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 				{
 					id: "line:producer:lifecycle-blueprint",
 					title: "Produce lifecycle blueprint",
-					description: "Produces a blueprint whose final charge has a capped branch.",
+					description: "Produces a blueprint whose final unit has a capped branch.",
 					runtimeMs: 200,
 					input: [
 						{
@@ -618,7 +623,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:shared-source": {
 			uid: "producer:shared-source",
 			id: "producer:shared-source",
-			type: "producer",
+
 			title: "Shared source",
 			description: "Produces the shared capped item.",
 			asset: {
@@ -649,7 +654,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:shared-consumer": {
 			uid: "producer:shared-consumer",
 			id: "producer:shared-consumer",
-			type: "producer",
+
 			title: "Shared consumer",
 			description: "Consumes the shared capped item without producing it.",
 			asset: {
@@ -687,7 +692,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"producer:recycler": {
 			uid: "producer:recycler",
 			id: "producer:recycler",
-			type: "producer",
+
 			title: "Recycler",
 			description: "Replaces one capped item with one capped item.",
 			asset: {
@@ -723,41 +728,41 @@ export const blueprintConfig = GameConfigSchema.parse({
 				},
 			],
 		},
-		"producer:charged-stack": {
-			uid: "producer:charged-stack",
-			id: "producer:charged-stack",
-			type: "producer",
-			title: "Charged stack",
+		"producer:spent-stack": {
+			uid: "producer:spent-stack",
+			id: "producer:spent-stack",
+
+			title: "Finite stack",
 			description: "Replaces exactly one depleted stacked owner.",
 			asset: {
 				scale: 0.8,
 				default: [
-					"asset:producer:charged-stack",
+					"asset:producer:spent-stack",
 				],
 			},
 			scope: "board",
 			maxStackSize: 3,
 			maxCount: 3,
 			maxQueueSize: 1,
-			charges: {
+			units: {
 				amount: 1,
 			},
 			lines: [
 				{
-					id: "line:producer:charged-stack",
+					id: "line:producer:spent-stack",
 					title: "Renew one",
-					description: "Spend the final owner charge and replace one owner.",
+					description: "Spend the final owner unit and replace one owner.",
 					runtimeMs: 200,
 					input: [
 						{
 							type: "simple",
-							charges: {
+							units: {
 								from: "self",
 								cost: 1,
 							},
 						},
 					],
-					output: blueprintOutput("producer:charged-stack"),
+					output: blueprintOutput("producer:spent-stack"),
 					rules: [],
 				},
 			],

@@ -2,17 +2,15 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
+import { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readOutputConditionalMaximumQuantitiesFn } from "~/production-output/fn/readOutputConditionalMaximumQuantitiesFn";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readOutputReservationFn } from "~/production-job/fn/readOutputReservationFn";
-import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
+import { applyFinalUnitReservationFx } from "./applyFinalUnitReservationFx";
 import { clampOutputReservationFx } from "./clampOutputReservationFx";
 import type { resolveOutputCapacityFx } from "./resolveOutputCapacityFx";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
@@ -27,17 +25,15 @@ const readDefinitionOutputReservationFx = Effect.fn("readDefinitionOutputReserva
 		readonly owner: ItemSchema.Type;
 	}) {
 		const quantities = new Map(readOutputReservationFn(line));
-		const selfChargeCost = line.input.reduce(
+		const selfUnitCost = line.input.reduce(
 			(total, input) =>
-				input.charges?.from === ChargeSourceSchema.enum.Self
-					? total + input.charges.cost
-					: total,
+				input.units?.from === UnitSourceSchema.enum.Self ? total + input.units.cost : total,
 			0,
 		);
-		if (selfChargeCost <= 0 || owner.charges?.amount !== selfChargeCost) {
+		if (selfUnitCost <= 0 || owner.units?.amount !== selfUnitCost) {
 			return yield* clampOutputReservationFx(quantities);
 		}
-		yield* applyFinalChargeReservationFx({
+		yield* applyFinalUnitReservationFx({
 			payer: owner,
 			quantities,
 		});
@@ -58,10 +54,8 @@ export namespace resolveOneHopOutputCapacityFx {
 }
 
 /**
- * Checks exactly one blueprint intermediate hop.
- *
- * Blueprint is the authored purpose-bound intermediate contract. Ordinary
- * materials and other multi-purpose line owners are deliberately not traversed.
+ * Checks exactly one intermediate hop through explicitly marked future lines.
+ * Unmarked lines neither participate in the check nor promise a usable alternative.
  */
 export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapacityFx")(function* ({
 	line,
@@ -92,11 +86,10 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 		const intermediate = yield* resolveItemFx({
 			itemId: intermediateItemId,
 		});
-		if (intermediate.type !== TypeSchema.enum.Blueprint) continue;
 		const owner = Option.getOrUndefined(narrowLineOwnerItemFn(intermediate));
 		if (owner === undefined) continue;
-		const applicable = readLineOwnerLinesFn(owner).filter(
-			(candidate) => candidate.show && candidate.enable,
+		const applicable = owner.lines.filter(
+			(candidate) => candidate.ahead === true && candidate.show && candidate.enable,
 		);
 		if (applicable.length === 0) continue;
 		const branchReserved = readOutputConditionalMaximumQuantitiesFn({
@@ -110,18 +103,18 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 			else branchReserved.set(itemId, quantity);
 		}
 		/*
-		 * Every idle Blueprint and every pending Blueprint output is one future
-		 * execution of its purpose-bound line. Active Blueprint owners are
+		 * Every idle intermediate and every pending intermediate output is one future
+		 * execution of its purpose-bound line. Active intermediate owners are
 		 * represented by their job output reservation instead of being counted
-		 * twice as both a live Blueprint and a future target.
+		 * twice as both a live intermediate and a future target.
 		 */
-		const activeJobCountByBlueprintOwnerId = new Map<IdSchema.Type, number>();
+		const activeJobCountByOwnerId = new Map<IdSchema.Type, number>();
 		for (const job of runtime.jobs) {
 			const jobOwner = runtime.items.find((item) => item.id === job.ownerItemId);
 			if (jobOwner?.item.id !== intermediateItemId) continue;
-			activeJobCountByBlueprintOwnerId.set(
+			activeJobCountByOwnerId.set(
 				job.ownerItemId,
-				(activeJobCountByBlueprintOwnerId.get(job.ownerItemId) ?? 0) + 1,
+				(activeJobCountByOwnerId.get(job.ownerItemId) ?? 0) + 1,
 			);
 		}
 		const liveIdleQuantity = runtime.items.reduce(
@@ -130,8 +123,7 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 					? quantity +
 						Math.max(
 							0,
-							candidate.quantity -
-								(activeJobCountByBlueprintOwnerId.get(candidate.id) ?? 0),
+							candidate.quantity - (activeJobCountByOwnerId.get(candidate.id) ?? 0),
 						)
 					: quantity,
 			0,

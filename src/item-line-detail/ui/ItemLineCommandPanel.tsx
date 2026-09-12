@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
@@ -7,19 +8,18 @@ export const ItemLineCommandPanel = ({
 	disabled,
 	enqueueFn,
 	line,
-	pendingDefault,
+	pendingSelection,
 	pendingEnqueue,
-	setDefaultFn,
-	unsetDefaultFn,
+	selectFn,
 }: {
 	readonly disabled: boolean;
 	readonly enqueueFn: () => void;
 	readonly line: ItemDetailLinesProjection.Line;
-	readonly pendingDefault: boolean;
+	readonly pendingSelection: boolean;
 	readonly pendingEnqueue: boolean;
-	readonly setDefaultFn: () => void;
-	readonly unsetDefaultFn: () => void;
+	readonly selectFn: (selection: "default" | "clock", selected: boolean) => void;
 }) => {
+	const translator = useTranslator();
 	const activeJob = line.activeJob;
 	const unavailable = line.availability.kind === "unavailable";
 
@@ -28,27 +28,37 @@ export const ItemLineCommandPanel = ({
 			<div className="flex flex-wrap justify-end gap-2">
 				<Button
 					className="min-h-8 px-3 py-1 text-xs"
-					cursorIntent={pendingDefault ? "progress" : undefined}
+					cursorIntent={pendingSelection ? "progress" : undefined}
 					data-ui="TileLineSetDefaultButton"
 					data-default={line.isDefault ? "true" : "false"}
-					disabled={disabled || pendingDefault || unavailable}
-					onClick={() => {
-						if (line.isDefault) {
-							unsetDefaultFn();
-							return;
-						}
-						setDefaultFn();
-					}}
+					disabled={
+						disabled ||
+						pendingSelection ||
+						unavailable ||
+						!line.actions.canChangeDefault
+					}
+					onClick={() => selectFn("default", !line.isDefault)}
 				>
-					{line.isDefault ? "Unset default" : "Set default"}
+					{translator.textFn(line.isDefault ? "Unset default" : "Set default")}
 				</Button>
+				{line.clock === undefined ? null : (
+					<Button
+						className="min-h-8 px-3 py-1 text-xs"
+						cursorIntent={pendingSelection ? "progress" : undefined}
+						data-ui="TileLineSetClockButton"
+						disabled={disabled || pendingSelection || !line.clock.canChange}
+						onClick={() => selectFn("clock", !line.clock?.selected)}
+					>
+						{translator.textFn(line.clock.selected ? "Unset clock" : "Set clock")}
+					</Button>
+				)}
 				<PrimaryButton
 					cursorIntent={pendingEnqueue ? "progress" : undefined}
 					data-ui="TileLineEnqueueButton"
 					disabled={disabled || pendingEnqueue || !line.actions.enqueue.enabled}
 					onClick={enqueueFn}
 				>
-					Enqueue
+					{translator.textFn("Enqueue")}
 				</PrimaryButton>
 			</div>
 			<ProductionJobRuntime

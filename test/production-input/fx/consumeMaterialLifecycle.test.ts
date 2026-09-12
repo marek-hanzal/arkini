@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -97,7 +97,7 @@ const config = GameConfigSchema.parse({
 	items: {
 		"producer:converter": {
 			...base("producer:converter"),
-			type: "producer",
+
 			maxQueueSize: 1,
 			lines: [
 				line("line:converter:run", "producer:inner", "item:product"),
@@ -106,7 +106,7 @@ const config = GameConfigSchema.parse({
 		},
 		"producer:inner": {
 			...base("producer:inner"),
-			type: "producer",
+
 			maxQueueSize: 1,
 			lines: [
 				line("line:inner:load", "producer:middle"),
@@ -114,19 +114,24 @@ const config = GameConfigSchema.parse({
 		},
 		"producer:middle": {
 			...base("producer:middle"),
-			type: "producer",
+
 			maxQueueSize: 1,
 			lines: [
 				line("line:middle:load", "item:payload"),
 			],
 		},
 		"item:payload": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:payload"),
-			type: "simple",
 		},
 		"item:product": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:product"),
-			type: "simple",
+
 			maxCount: 1,
 		},
 	},
@@ -167,7 +172,8 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		quantity: 1,
 	});
 
-	yield* setDefaultLineFx({
+	yield* setLineSelectionFx({
+		selection: "default",
 		ownerItemId: inner.id,
 		lineId: "line:inner:load",
 	});

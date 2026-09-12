@@ -1,0 +1,152 @@
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
+import { match } from "ts-pattern";
+import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
+
+import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
+
+type OutputRecreationCertainty = "guaranteed" | "stochastic" | "none";
+
+export namespace validateUnitRenewalFn {
+	export interface Props {
+		config: GameConfigSchema.Type;
+		provenance: GameSourceProvenanceSchema.Type;
+	}
+}
+
+const readDropCertaintyFn = (
+	drops: ReadonlyArray<DropSchema.Type>,
+	itemId: IdSchema.Type,
+): OutputRecreationCertainty => {
+	const matching = drops.filter((drop) => drop.itemId === itemId);
+	if (matching.length === 0) return "none";
+	return matching.some((drop) => drop.rules.length === 0) ? "guaranteed" : "stochastic";
+};
+
+const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSchema.Type) => {
+	const sets = output.set.map((set) => {
+		const rolls = set.roll.map(
+			(roll): OutputRecreationCertainty =>
+				match(roll)
+					.with(
+						{
+							type: RollTypeSchema.enum.Guaranteed,
+						},
+						(guaranteed) => readDropCertaintyFn(guaranteed.drop, itemId),
+					)
+					.with(
+						{
+							type: RollTypeSchema.enum.Chance,
+						},
+						(chance) => {
+							if (chance.chance === 0) return "none";
+							const drop = readDropCertaintyFn(chance.drop, itemId);
+							if (drop === "none") return "none";
+							return chance.chance === 1 && drop === "guaranteed"
+								? "guaranteed"
+								: "stochastic";
+						},
+					)
+					.with(
+						{
+							type: RollTypeSchema.enum.Weight,
+						},
+						(weight) => {
+							const candidates = weight.drop.map((candidate) =>
+								readDropCertaintyFn(candidate.drop, itemId),
+							);
+							if (candidates.every((candidate) => candidate === "guaranteed"))
+								return "guaranteed";
+							return candidates.some((candidate) => candidate !== "none")
+								? "stochastic"
+								: "none";
+						},
+					)
+					.exhaustive(),
+		);
+
+		if (rolls.some((roll) => roll === "guaranteed")) return "guaranteed" as const;
+		if (rolls.some((roll) => roll === "stochastic")) return "stochastic" as const;
+		return "none" as const;
+	});
+
+	if (sets.every((set) => set === "guaranteed")) return "guaranteed";
+	if (sets.some((set) => set !== "none")) return "stochastic";
+	return "none";
+};
+
+const strongerCertaintyFn = (
+	current: OutputRecreationCertainty,
+	candidate: OutputRecreationCertainty,
+): OutputRecreationCertainty => {
+	if (current === "guaranteed" || candidate === "guaranteed") return "guaranteed";
+	if (current === "stochastic" || candidate === "stochastic") return "stochastic";
+	return "none";
+};
+
+/** Warns when a item with units lacks a deterministic configured recreation path. */
+export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewalFn.Props) => {
+	const certainty = new Map<IdSchema.Type, OutputRecreationCertainty>();
+	for (const [itemId, item] of Object.entries(config.items)) {
+		for (const merge of item.merge ?? []) {
+			if (merge.effect === TargetEffectSchema.enum.Replace) {
+				certainty.set(merge.result, "guaranteed");
+			}
+		}
+		const outputs = readItemOutputEntriesFn({
+			itemId,
+			item,
+		});
+		for (const { output } of outputs) {
+			for (const unitOwnerItemId of Object.keys(config.items)) {
+				if (config.items[unitOwnerItemId]?.units === undefined) continue;
+				const outputCertainty = readOutputRecreationCertaintyFn(output, unitOwnerItemId);
+				certainty.set(
+					unitOwnerItemId,
+					strongerCertaintyFn(certainty.get(unitOwnerItemId) ?? "none", outputCertainty),
+				);
+			}
+		}
+	}
+
+	const diagnostics: GameDiagnosticsSchema.Type = [];
+	for (const [itemId, item] of Object.entries(config.items)) {
+		if (item.units === undefined) continue;
+		const itemCertainty = certainty.get(itemId) ?? "none";
+		if (itemCertainty === "guaranteed") continue;
+		if (itemCertainty === "stochastic") {
+			diagnostics.push({
+				code: DiagnosticCodeEnumSchema.enum.UnitRenewalStochastic,
+				severity: DiagnosticSeverityEnumSchema.enum.Warning,
+				path: [
+					"items",
+					itemId,
+				],
+				source: provenance.items[itemId],
+				message: `Finite item ${itemId} is recreated only through probabilistic, weighted, or conditional output paths.`,
+				itemId,
+			});
+			continue;
+		}
+		diagnostics.push({
+			code: DiagnosticCodeEnumSchema.enum.UnitRenewalMissing,
+			severity: DiagnosticSeverityEnumSchema.enum.Warning,
+			path: [
+				"items",
+				itemId,
+			],
+			source: provenance.items[itemId],
+			message: `Finite item ${itemId} has no configured output or merge path that recreates it.`,
+			itemId,
+		});
+	}
+
+	return diagnostics;
+};

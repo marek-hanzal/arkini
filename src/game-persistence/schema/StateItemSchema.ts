@@ -1,9 +1,9 @@
 import { z } from "zod";
+import { ScheduleStateSchema } from "~/item-schedule/schema/ScheduleStateSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /**
@@ -11,6 +11,7 @@ import { LocationSchema } from "~/item-location/schema/LocationSchema";
  */
 export const StateItemSchema = z
 	.object({
+		schedule: ScheduleStateSchema.optional(),
 		/**
 		 * Stable identity of this live item or stack.
 		 */
@@ -28,18 +29,12 @@ export const StateItemSchema = z
 			"The current concrete location owned by this persisted item.",
 		),
 		/**
-		 * Remaining charges of this concrete item instance after its first use.
+		 * Remaining units of this concrete item instance after its first use.
 		 *
-		 * Undefined means the instance still owns its authored full charge amount.
+		 * Undefined means the instance still owns its authored full unit amount.
 		 */
-		remainingCharges: NonNegativeIntegerSchema.optional().describe(
-			"The optional remaining charges of this concrete item instance; undefined means the authored full amount.",
-		),
-		/**
-		 * Remaining fixed-step lifetime of one persisted temporary item instance.
-		 */
-		remainingDurationMs: TimeSchema.optional().describe(
-			"The optional remaining fixed-step lifetime of this persisted temporary item instance.",
+		remainingUnits: NonNegativeIntegerSchema.optional().describe(
+			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
 		/**
 		 * Number of canonical items represented by this live state entry.

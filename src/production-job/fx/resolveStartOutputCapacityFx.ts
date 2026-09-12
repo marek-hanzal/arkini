@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
-import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
+import { UnitSourceSchema } from "~/production-input/schema/UnitSourceSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -10,7 +10,7 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readOutputReservationFn } from "~/production-job/fn/readOutputReservationFn";
-import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
+import { applyFinalUnitReservationFx } from "./applyFinalUnitReservationFx";
 import { clampOutputReservationFx } from "./clampOutputReservationFx";
 import { readPlannedOutputReservationFx } from "./readPlannedOutputReservationFx";
 import { resolveDirectOutputCapacityFx } from "./resolveDirectOutputCapacityFx";
@@ -24,19 +24,17 @@ const readPendingOutputReservationFx = Effect.fn("readPendingOutputReservationFx
 	readonly owner: RuntimeItemSchema.Type;
 }) {
 	const quantities = new Map(readOutputReservationFn(line));
-	const selfChargeCost = line.input.reduce(
+	const selfUnitCost = line.input.reduce(
 		(total, input) =>
-			input.charges?.from === ChargeSourceSchema.enum.Self
-				? total + input.charges.cost
-				: total,
+			input.units?.from === UnitSourceSchema.enum.Self ? total + input.units.cost : total,
 		0,
 	);
-	const remainingCharges = readItemRemainingChargesFn(owner);
-	if (selfChargeCost <= 0 || remainingCharges !== selfChargeCost) {
+	const remainingUnits = readItemRemainingUnitsFn(owner);
+	if (selfUnitCost <= 0 || remainingUnits !== selfUnitCost) {
 		return yield* clampOutputReservationFx(quantities);
 	}
 
-	yield* applyFinalChargeReservationFx({
+	yield* applyFinalUnitReservationFx({
 		payer: owner.item,
 		quantities,
 	});
@@ -100,8 +98,8 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 				});
 	/*
 	 * Prefer the purpose-bound target violation over an intermediate
-	 * Blueprint's own cap so the player sees the limit that actually makes
-	 * another Blueprint useless.
+	 * item's own cap so the player sees the limit that actually makes
+	 * another intermediate useless.
 	 */
 	const downstream = yield* resolveOneHopOutputCapacityFx({
 		line,

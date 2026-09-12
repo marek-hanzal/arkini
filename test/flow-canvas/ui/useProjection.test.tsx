@@ -23,8 +23,8 @@ const itemNode = (itemId: string): ItemOriginItemNode => ({
 		itemId,
 	],
 	starterScopes: [],
+	missing: false,
 	title: itemId,
-	type: "simple",
 });
 const position = (flowOrder: number, x: number, y: number): LayoutNode => ({
 	flowOrder,

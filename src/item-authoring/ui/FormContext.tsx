@@ -1,10 +1,9 @@
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createContext, useContext, type PropsWithChildren } from "react";
 import type { useFormController } from "~/item-authoring/ui/useFormController";
 
 type FormSession = useFormController.Output & {
 	readonly isNew: boolean;
-	readonly itemType?: TypeSchema.Type;
+	readonly create?: boolean;
 	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
 };

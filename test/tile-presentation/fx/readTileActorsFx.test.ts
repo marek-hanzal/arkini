@@ -2,57 +2,42 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
-	createProgressAssetRuntime,
-	createTemporaryProgressRuntime,
-	progressAssetGame,
-} from "~test/tile-presentation/support/progressAssetTestFixture";
+	createTileActorRuntime,
+	createTemporaryTileActorRuntime,
+	tileActorGame,
+} from "~test/tile-presentation/support/tileActorTestFixture";
 import { readTileActorsFx } from "~/tile-presentation/fx/readTileActorsFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const readMainActor = (runtime: RuntimeSchema.Type) =>
 	Effect.runSync(
 		readTileActorsFx({
-			game: progressAssetGame,
+			game: tileActorGame,
 			runtime,
 			surface: "main",
 		}),
 	)[0];
 
 describe("readTileActorsFx", () => {
-	it("projects both default layers and drops the overlay for a progress source", () => {
+	it("projects the complete default artwork composition with its authored scale", () => {
 		const empty = readMainActor(
-			createProgressAssetRuntime({
+			createTileActorRuntime({
 				owner: "blueprint",
 				artworkScale: 0.625,
-			}),
-		);
-		const filled = readMainActor(
-			createProgressAssetRuntime({
-				owner: "blueprint",
-				artworkScale: 0.625,
-				storedQuantities: [
-					3,
-					3,
-				],
 			}),
 		);
 
 		expect(empty).toMatchObject({
 			artworkScale: 0.625,
-			sourceUrl: "resource:asset:blueprint-empty",
-			compositeUrl: "resource:asset:blueprint-complete",
+			sourceUrl: "resource:asset:blueprint-base",
+			compositeUrl: "resource:asset:blueprint-overlay",
 		});
-		expect(filled).toMatchObject({
-			artworkScale: 0.625,
-			sourceUrl: "resource:asset:blueprint-complete",
-		});
-		expect(filled).not.toHaveProperty("compositeUrl");
 	});
 
 	it("projects active work progress, activity, and queue count", () => {
 		expect(
 			readMainActor(
-				createProgressAssetRuntime({
+				createTileActorRuntime({
 					active: true,
 					queued: 2,
 				}),
@@ -65,15 +50,15 @@ describe("readTileActorsFx", () => {
 		});
 	});
 
-	it("projects remaining uses for an idle charged non-deposit item", () => {
-		expect(readMainActor(createProgressAssetRuntime())).toMatchObject({
+	it("projects remaining units for an idle finite item", () => {
+		expect(readMainActor(createTileActorRuntime())).toMatchObject({
 			badgeCount: 1,
-			badgeKind: "charges",
+			badgeKind: "units",
 		});
 	});
 
 	it("projects temporary lifetime without an activity effect", () => {
-		expect(readMainActor(createTemporaryProgressRuntime())).toMatchObject({
+		expect(readMainActor(createTemporaryTileActorRuntime())).toMatchObject({
 			activityEffect: false,
 			progressRatio: 0.6,
 		});

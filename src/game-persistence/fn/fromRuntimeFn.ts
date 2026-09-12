@@ -7,15 +7,17 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 	itemId: item.item.id,
 	location: item.location,
 	quantity: item.quantity,
-	...(item.remainingCharges === undefined
+	...(item.schedule === undefined
 		? {}
 		: {
-				remainingCharges: item.remainingCharges,
+				schedule: {
+					...item.schedule,
+				},
 			}),
-	...(item.remainingDurationMs === undefined
+	...(item.remainingUnits === undefined
 		? {}
 		: {
-				remainingDurationMs: item.remainingDurationMs,
+				remainingUnits: item.remainingUnits,
 			}),
 });
 interface Props {

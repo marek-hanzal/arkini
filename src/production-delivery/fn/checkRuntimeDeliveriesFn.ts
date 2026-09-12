@@ -3,7 +3,6 @@ import { Option } from "effect";
 import type { DeliveryTargetIssueSchema } from "~/production-delivery/schema/DeliveryTargetIssueSchema";
 import { DeliveryTargetIssueReasonEnumSchema } from "~/production-delivery/schema/DeliveryTargetIssueReasonEnumSchema";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
-import { isMaterialInputEligibleFn } from "~/production-input/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
@@ -87,7 +86,6 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 				continue;
 			}
 			if (
-				!isMaterialInputEligibleFn(current.item) ||
 				!matchesItemSelectorFn({
 					item: current.item,
 					selector: input.selector,

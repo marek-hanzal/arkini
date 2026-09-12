@@ -21,23 +21,21 @@ const useItemLineSearchCandidates = (
 	>,
 ) =>
 	useMemo(() => {
-		const readChargeSearchTermsFn = (
-			charges: ItemDetailLinesProjection.ChargeCost | undefined,
-		) =>
-			charges === undefined
+		const readUnitSearchTermsFn = (units: ItemDetailLinesProjection.UnitCost | undefined) =>
+			units === undefined
 				? []
-				: charges.from === "self"
+				: units.from === "self"
 					? [
-							"charge",
-							"charges",
-							"owner charge",
-							"self charge",
+							"unit",
+							"units",
+							"owner unit",
+							"self unit",
 						]
 					: [
-							"charge",
-							"charges",
-							"target charge",
-							"deposit charge",
+							"unit",
+							"units",
+							"target unit",
+							"board units",
 						];
 		const readInputSearchTermsFn = (
 			input: ItemDetailLinesProjection.Input,
@@ -62,29 +60,29 @@ const useItemLineSearchCandidates = (
 									materials.detail.itemId,
 									materials.detail.title,
 								]),
-						...readChargeSearchTermsFn(materials.charges),
+						...readUnitSearchTermsFn(materials.units),
 					],
 				)
 				.with(
 					{
-						kind: "deposit",
+						kind: "units",
 					},
-					(deposit) => [
+					(units) => [
 						"input",
-						"deposit",
+						"units",
 						"board",
-						deposit.selector.kind,
-						deposit.selector.label,
-						deposit.distance,
-						deposit.ready ? "ready" : "missing inputs",
-						...deposit.targetTitles,
-						...(deposit.detail === undefined
+						units.selector.kind,
+						units.selector.label,
+						units.distance,
+						units.ready ? "ready" : "missing inputs",
+						...units.targetTitles,
+						...(units.detail === undefined
 							? []
 							: [
-									deposit.detail.itemId,
-									deposit.detail.title,
+									units.detail.itemId,
+									units.detail.title,
 								]),
-						...readChargeSearchTermsFn(deposit.charges),
+						...readUnitSearchTermsFn(units.units),
 					],
 				)
 				.with(
@@ -93,9 +91,9 @@ const useItemLineSearchCandidates = (
 					},
 					(simple) => [
 						"input",
-						"owner charge",
+						"owner unit",
 						simple.ready ? "ready" : "missing inputs",
-						...readChargeSearchTermsFn(simple.charges),
+						...readUnitSearchTermsFn(simple.units),
 					],
 				)
 				.exhaustive();

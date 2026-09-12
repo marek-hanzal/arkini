@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
@@ -42,14 +41,13 @@ export namespace readItemDetailInfoFn {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly description?: string;
-				readonly itemType: TypeSchema.Type;
 				readonly storageScope: StorageSchema.Type;
 				readonly location: Location;
 				readonly quantity: number;
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
 				readonly maxCount?: number;
-				readonly charges?: {
+				readonly units?: {
 					readonly remaining: number;
 					readonly total: number;
 				};
@@ -131,12 +129,11 @@ export const readItemDetailInfoFn = ({
 }: readItemDetailInfoFn.Props): readItemDetailInfoFn.Result => {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined) return unavailable;
-	const totalCharges = item.item.charges?.amount;
+	const totalUnits = item.item.units?.amount;
 	return {
 		kind: "available",
 		itemId: item.id,
 		description: item.item.description,
-		itemType: item.item.type,
 		storageScope: item.item.scope,
 		location: readLocationFn(item.location),
 		quantity: item.quantity,
@@ -151,12 +148,12 @@ export const readItemDetailInfoFn = ({
 			: {
 					maxCount: item.item.maxCount,
 				}),
-		...(totalCharges === undefined
+		...(totalUnits === undefined
 			? {}
 			: {
-					charges: {
-						remaining: item.remainingCharges ?? totalCharges,
-						total: totalCharges,
+					units: {
+						remaining: item.remainingUnits ?? totalUnits,
+						total: totalUnits,
 					},
 				}),
 	};

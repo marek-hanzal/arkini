@@ -5,18 +5,16 @@ import { DuplicateItemUidDiagnosticSchema } from "./DuplicateItemUidDiagnosticSc
 import { DuplicateLineIdDiagnosticSchema } from "./DuplicateLineIdDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./DuplicateProviderDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./UnusedResourceDiagnosticSchema";
-import { UnsupportedInputCapacityDiagnosticSchema } from "./UnsupportedInputCapacityDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./MissingResourceDiagnosticSchema";
-import { MultipleDefaultLinesDiagnosticSchema } from "./MultipleDefaultLinesDiagnosticSchema";
+import { MultipleLineSelectionsDiagnosticSchema } from "./MultipleLineSelectionsDiagnosticSchema";
 import { DuplicateResourceDiagnosticSchema } from "./DuplicateResourceDiagnosticSchema";
 import { DuplicateRecordDiagnosticSchema } from "./DuplicateRecordDiagnosticSchema";
 import { InputAcceptanceCycleDiagnosticSchema } from "./InputAcceptanceCycleDiagnosticSchema";
-import { InvalidInputChargesDiagnosticSchema } from "./InvalidInputChargesDiagnosticSchema";
-import { IneligibleMaterialInputDiagnosticSchema } from "./IneligibleMaterialInputDiagnosticSchema";
+import { InvalidInputUnitsDiagnosticSchema } from "./InvalidInputUnitsDiagnosticSchema";
 import { InvalidMergeDiagnosticSchema } from "./InvalidMergeDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./KeyIdMismatchDiagnosticSchema";
-import { LimitedDepositWarningDiagnosticSchema } from "./LimitedDepositWarningDiagnosticSchema";
-import { StochasticLimitedDepositWarningDiagnosticSchema } from "./StochasticLimitedDepositWarningDiagnosticSchema";
+import { MissingUnitRenewalWarningDiagnosticSchema } from "./MissingUnitRenewalWarningDiagnosticSchema";
+import { StochasticUnitRenewalWarningDiagnosticSchema } from "./StochasticUnitRenewalWarningDiagnosticSchema";
 import { MissingReferenceDiagnosticSchema } from "./MissingReferenceDiagnosticSchema";
 import { SchemaReferenceConflictDiagnosticSchema } from "./SchemaReferenceConflictDiagnosticSchema";
 import { StartInvalidDiagnosticSchema } from "./StartInvalidDiagnosticSchema";
@@ -35,18 +33,16 @@ export const GameDiagnosticSchema = z
 		KeyIdMismatchDiagnosticSchema,
 		MissingReferenceDiagnosticSchema,
 		InputAcceptanceCycleDiagnosticSchema,
-		InvalidInputChargesDiagnosticSchema,
-		IneligibleMaterialInputDiagnosticSchema,
+		InvalidInputUnitsDiagnosticSchema,
 		InvalidMergeDiagnosticSchema,
-		UnsupportedInputCapacityDiagnosticSchema,
-		LimitedDepositWarningDiagnosticSchema,
-		StochasticLimitedDepositWarningDiagnosticSchema,
+		MissingUnitRenewalWarningDiagnosticSchema,
+		StochasticUnitRenewalWarningDiagnosticSchema,
 		StartInvalidDiagnosticSchema,
 		SourceJsonDiagnosticSchema,
 		SourceSchemaDiagnosticSchema,
 		DuplicateItemUidDiagnosticSchema,
 		DuplicateLineIdDiagnosticSchema,
-		MultipleDefaultLinesDiagnosticSchema,
+		MultipleLineSelectionsDiagnosticSchema,
 	])
 	.meta({
 		id: "GameDiagnosticSchema",

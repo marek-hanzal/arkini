@@ -7,7 +7,7 @@ import { TypeSchema } from "./TypeSchema";
  * An explicit action requirement with no consumable resource requirement.
  *
  * This marker keeps a line's input contract explicit without inventing a
- * material, quantity, reservation, or deposit-capacity operation.
+ * material, quantity, reservation, or units-capacity operation.
  */
 export const SimpleSchema = z
 	.object({

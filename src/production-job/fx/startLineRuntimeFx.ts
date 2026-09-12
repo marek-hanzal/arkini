@@ -6,7 +6,7 @@ import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerS
 import type { TimeSchema } from "~/game-value/schema/TimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
-import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
+import { settleActionUnitsFx } from "~/production-action/fx/settleActionUnitsFx";
 import type { applyInputMaterialConsumeRunPlanFx } from "~/production-input/fx/applyInputMaterialConsumeRunPlanFx";
 import { applyInputRunPlanFx } from "~/production-input/fx/applyInputRunPlanFx";
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
@@ -112,7 +112,7 @@ const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 	);
 });
 
-const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(function* ({
+const applyLineUnitPlansFx = Effect.fn("applyLineUnitPlansFx")(function* ({
 	job,
 	plan,
 	runtime,
@@ -121,13 +121,13 @@ const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(function* ({
 	readonly plan: LineRun.Plan;
 	readonly runtime: RuntimeSchema.Type;
 }) {
-	return yield* settleActionChargesFx({
+	return yield* settleActionUnitsFx({
 		actionId: job.lineId,
-		charges: plan.input.flatMap(({ charges }) =>
-			charges === undefined
+		units: plan.input.flatMap(({ units }) =>
+			units === undefined
 				? []
 				: [
-						charges,
+						units,
 					],
 		),
 		ownerItemId: job.ownerItemId,
@@ -188,7 +188,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		plan,
 		runtime: jobRuntime,
 	});
-	const charged = yield* applyLineChargePlansFx({
+	const spent = yield* applyLineUnitPlansFx({
 		job,
 		plan,
 		runtime: inputTransition.runtime,
@@ -199,7 +199,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	);
 	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
 		ownerItemId,
-		runtime: charged.runtime,
+		runtime: spent.runtime,
 	});
 	const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 		runtime: isolation.runtime,
@@ -209,7 +209,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		reconciledRuntime,
 		[
 			...inputTransition.events,
-			...charged.events,
+			...spent.events,
 			...isolation.events,
 		],
 	] as const;

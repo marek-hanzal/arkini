@@ -1,5 +1,6 @@
 import { Order } from "effect";
 
+import { readEstimateRouteDurationFn } from "~/estimate/fn/readEstimateRouteDurationFn";
 import type {
 	EstimateAmount,
 	EstimateProjection,
@@ -74,7 +75,7 @@ const projectRouteStepsFn = (witness: EstimateWitness): ReadonlyArray<EstimateRo
 			}
 			stepsByFact.set(factId, {
 				actionRuns: selected.actionRuns,
-				durationMs: selected.route.durationMs * selected.actionRuns,
+				durationMs: readEstimateRouteDurationFn(selected.route, selected.actionRuns),
 				factId,
 				metadata: selected.route.metadata,
 				outputRuns: selected.outputRuns,
@@ -134,7 +135,7 @@ const readParallelDurationFn = (witness: EstimateWitness): number => {
 			unitId,
 			Math.max(
 				durationByUnitId.get(unitId) ?? 0,
-				selected.route.durationMs * selected.actionRuns,
+				readEstimateRouteDurationFn(selected.route, selected.actionRuns),
 			),
 		);
 	}

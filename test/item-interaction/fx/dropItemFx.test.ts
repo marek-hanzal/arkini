@@ -117,7 +117,7 @@ describe("readDropItemPreviewFx / preview", () => {
 			reason: DropItemRejectedReason.StaleSource,
 		});
 	});
-	it("advertises whole-item storage instead of swapping with the Inventory opener", () => {
+	it("uses ordinary swap semantics when the target has an Inventory click action", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -149,7 +149,7 @@ describe("readDropItemPreviewFx / preview", () => {
 		);
 
 		expect(result).toEqual({
-			kind: DropItemResultKind.StoreInventory,
+			kind: DropItemResultKind.Swap,
 		});
 	});
 	it("surfaces authored merge invariant failures instead of reporting a product rejection", () => {

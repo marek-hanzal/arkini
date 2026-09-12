@@ -16,12 +16,10 @@ describe("renameGameResourceFx", () => {
 						scale: 0.8,
 						default: [
 							"hero",
+							"item-water",
 						] as [
 							string,
-						],
-						sources: [
-							"hero",
-							"item-water",
+							string,
 						],
 					},
 				},
@@ -37,9 +35,6 @@ describe("renameGameResourceFx", () => {
 
 		expect(renamed.resources.hero).toBe("cover");
 		expect(renamed.items.water?.asset.default).toEqual([
-			"cover",
-		]);
-		expect(renamed.items.water?.asset.sources).toEqual([
 			"cover",
 			"item-water",
 		]);

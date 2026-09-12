@@ -104,7 +104,7 @@ describe("Game fatal-state diagnostics", () => {
 						},
 						quantity: 1,
 						revision: "revision:depleted-owner",
-						remainingCharges: 0,
+						remainingUnits: 0,
 					},
 				],
 				jobs: [
@@ -197,7 +197,7 @@ describe("Game fatal-state diagnostics", () => {
 										itemUid: "uid:producer:finite",
 									},
 								},
-								remainingCharges: 0,
+								remainingUnits: 0,
 							},
 						],
 						jobs: [
@@ -245,7 +245,7 @@ describe("Game fatal-state diagnostics", () => {
 				items: [
 					expect.objectContaining({
 						id: ownerItemId,
-						remainingCharges: 0,
+						remainingUnits: 0,
 					}),
 				],
 			},

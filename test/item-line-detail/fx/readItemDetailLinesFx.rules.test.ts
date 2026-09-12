@@ -51,7 +51,6 @@ describe("readItemDetailLinesFx / rule projection", () => {
 	});
 	it("keeps active hints and lets the first disable veto own disclosure even without a hint", () => {
 		const workshop = lineRunTestConfig.items.workshop;
-		if (workshop.type !== "producer") throw new Error("Expected producer workshop.");
 		const readHintedLines = (runtime: RuntimeSchema.Type, disableHint: string | undefined) => {
 			const hintedConfig = GameConfigSchema.parse({
 				...lineRunTestConfig,

@@ -1,7 +1,8 @@
 import { Effect } from "effect";
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { ItemChargesUnavailableError } from "~/production-action/error/ItemChargesUnavailableError";
+import type { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import type { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
@@ -27,7 +28,7 @@ export namespace attemptQueuedLineStartFx {
 		| {
 				type: "blocked";
 				error:
-					| ItemChargesUnavailableError
+					| ItemUnitsUnavailableError
 					| ItemNotOnBoardError
 					| OutputCapacityError
 					| LineRunUnavailableError
@@ -77,6 +78,16 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 			} satisfies attemptQueuedLineStartFx.Result;
 		}
 		if (result.type === "incomplete") {
+			const owner = runtime.items.find((item) => item.id === request.ownerItemId);
+			if (owner !== undefined && !isItemProductionAdmissionOpenFn(owner))
+				return {
+					type: "blocked",
+					runtime,
+					error: new LineRunUnavailableError({
+						ownerItemId: request.ownerItemId,
+						lineId: request.lineId,
+					}),
+				} as const;
 			const autofill = yield* autofillLineInputsRuntimeFx({
 				ownerItemId: request.ownerItemId,
 				lineId: request.lineId,
@@ -106,7 +117,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		} satisfies attemptQueuedLineStartFx.Result;
 	}).pipe(
 		Effect.catchTags({
-			ItemChargesUnavailableError: (error) =>
+			ItemUnitsUnavailableError: (error) =>
 				Effect.succeed({
 					type: "blocked",
 					error,

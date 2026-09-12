@@ -96,26 +96,13 @@ describe("readTileDeliveriesFx", () => {
 		]);
 	});
 
-	it("projects an Inventory delivery through the live Toolbar opener", () => {
-		const openerLocation = {
-			scope: "toolbar" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
+	it("keeps Inventory delivery leases off the main canvas without an opener", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: workshopLocation,
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:inventory-opener",
-					itemId: "inventory",
-					location: openerLocation,
 					quantity: 1,
 				});
 				yield* spawnItemFx({
@@ -145,19 +132,6 @@ describe("readTileDeliveriesFx", () => {
 			),
 		);
 
-		expect(result).toMatchObject([
-			{
-				from: openerLocation,
-				remainingDurationMs: 500,
-				item: {
-					id: "runtime:inventory-water",
-					location: openerLocation,
-					quantity: 3,
-				},
-				phase: "outbound",
-				targetActorId: "runtime:workshop",
-				to: workshopLocation,
-			},
-		]);
+		expect(result).toEqual([]);
 	});
 });

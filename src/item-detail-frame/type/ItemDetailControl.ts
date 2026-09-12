@@ -6,7 +6,7 @@ import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDeta
 export type ItemDetailPendingAction =
 	| "autofill"
 	| "clear-queue"
-	| "default"
+	| "selection"
 	| "enqueue"
 	| "withdraw";
 

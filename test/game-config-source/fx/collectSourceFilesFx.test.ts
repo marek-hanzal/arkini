@@ -24,8 +24,8 @@ describe("collectSourceFilesFx", () => {
 			yield* writeFiles(project, [
 				"project.json",
 				"game.json",
-				"items/producer/kept.json",
-				"items/producer/nested/ignored.json",
+				"items/kept.json",
+				"items/nested/ignored.json",
 				"assets/kept.png",
 				"resources/nested/ignored.png",
 				"notes/ignored.json",
@@ -55,7 +55,7 @@ describe("collectSourceFilesFx", () => {
 			expect(result).toEqual({
 				json: [
 					"game.json",
-					"items/producer/kept.json",
+					"items/kept.json",
 				],
 				png: [
 					"assets/kept.png",

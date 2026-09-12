@@ -7,14 +7,14 @@ import { itemEstimateTestFixture } from "~test/estimate/fn/itemEstimateTestFixtu
 const { estimate, graph, requirement, route } = itemEstimateTestFixture;
 
 describe("estimateRequestsFn", () => {
-	it("keeps charge-depletion output work while acquiring its payer once", () => {
+	it("keeps unit-depletion output work while acquiring its payer once", () => {
 		const depletionRoute: AcquisitionRoute = {
 			...route({
 				allOf: [
 					{
 						factId: "payer",
 						quantity: 1,
-						source: "charged-item",
+						source: "unit-owner",
 						usage: "consume",
 					},
 					requirement("material"),
@@ -24,8 +24,8 @@ describe("estimateRequestsFn", () => {
 				output: "target",
 			}),
 			metadata: {
-				chargedItemId: "payer",
-				kind: "line-charge-depletion",
+				unitOwnerItemId: "payer",
+				kind: "line-unit-depletion",
 				lineId: "line",
 				lineTitle: "Line",
 				ownerItemId: "owner",

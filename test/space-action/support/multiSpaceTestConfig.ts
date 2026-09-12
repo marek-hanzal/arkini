@@ -71,35 +71,47 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "portal",
 				scope: "board",
 			}),
-			type: "space",
-			space: 1,
+
+			action: {
+				type: "space" as const,
+				space: 1,
+			},
 		},
 		origin: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "origin",
 				scope: "board",
 			}),
-			type: "simple",
 		},
 		log: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "log",
 				maxStackSize: 3,
 			}),
-			type: "simple",
 		},
 		blocker: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "blocker",
 				scope: "board",
 			}),
-			type: "simple",
 		},
 		mergeSource: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "mergeSource",
 			}),
-			type: "simple",
+
 			merge: [
 				{
 					target: {
@@ -112,19 +124,24 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			],
 		},
 		mergeTarget: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "mergeTarget",
 				scope: "board",
 			}),
-			type: "simple",
 		},
 		payer: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "payer",
 				scope: "board",
 			}),
-			type: "simple",
-			charges: {
+
+			units: {
 				amount: 1,
 			},
 		},
@@ -133,7 +150,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "workshop",
 				scope: "board",
 			}),
-			type: "producer",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -160,22 +177,22 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				},
 			],
 		},
-		depositProducer: {
+		unitsProducer: {
 			...baseItem({
-				id: "depositProducer",
+				id: "unitsProducer",
 				scope: "board",
 			}),
-			type: "producer",
+
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:deposit:run",
-					title: "Deposit",
-					description: "Uses one nearby payer charge.",
+					id: "line:units:run",
+					title: "Units",
+					description: "Uses one nearby payer unit.",
 					runtimeMs: 200,
 					input: [
 						{
-							type: "deposit",
+							type: "units",
 							query: {
 								scope: "board",
 								distance: "far",
@@ -184,7 +201,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 									itemId: "payer",
 								},
 							},
-							charges: {
+							units: {
 								from: "target",
 								cost: 1,
 							},
@@ -199,7 +216,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "worker",
 				scope: "board",
 			}),
-			type: "producer",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -222,9 +239,15 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "temporary",
 				scope: "board",
 			}),
-			type: "temporary",
-			durationMs: 600,
-			output: guaranteedOutput("log"),
+
+			lines: [],
+			maxQueueSize: 1,
+			clock: {
+				durationMs: 600,
+				enable: true,
+				rules: [],
+				onExpire: guaranteedOutput("log"),
+			},
 		},
 	},
 });

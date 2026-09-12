@@ -47,12 +47,12 @@ const readJobMaximumOutputQuantitiesFn = ({
 		);
 	}
 
-	const depleted = owner.item.charges !== undefined && owner.remainingCharges === 0;
-	if (depleted && owner.item.charges?.output !== undefined) {
+	const depleted = owner.item.units !== undefined && owner.remainingUnits === 0;
+	if (depleted && owner.item.units?.output !== undefined) {
 		addQuantitiesFn(
 			quantities,
 			readOutputMaximumQuantitiesFn({
-				output: owner.item.charges.output,
+				output: owner.item.units.output,
 			}),
 		);
 	}

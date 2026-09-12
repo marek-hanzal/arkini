@@ -1,5 +1,4 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
@@ -19,16 +18,8 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					/>
 					<FactList>
 						<Fact
-							label={translator.textFn("Type")}
-							value={<TypePresentation type={item.type} />}
-						/>
-						<Fact
 							label={translator.textFn("Storage")}
-							value={
-								item.type === "inventory"
-									? translator.textFn("Item storage scope - inventory-control")
-									: translator.textFn(`Item storage scope - ${item.scope}`)
-							}
+							value={translator.textFn(`Item storage scope - ${item.scope}`)}
 						/>
 						<Fact
 							label={translator.textFn("Stack capacity")}

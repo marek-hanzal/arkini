@@ -25,7 +25,7 @@ const requirement = (
 const route = ({
 	allOf = [],
 	anyOf = [],
-	chargeUses,
+	unitUses,
 	durationMs,
 	id,
 	operation,
@@ -37,7 +37,7 @@ const route = ({
 }: {
 	readonly allOf?: ReadonlyArray<AcquisitionRequirement>;
 	readonly anyOf?: ReadonlyArray<ReadonlyArray<AcquisitionRequirement>>;
-	readonly chargeUses?: AcquisitionRoute["chargeUses"];
+	readonly unitUses?: AcquisitionRoute["unitUses"];
 	readonly durationMs: number;
 	readonly id: string;
 	readonly operation?: AcquisitionRoute["operation"];
@@ -47,10 +47,10 @@ const route = ({
 	readonly quantityDistribution?: AcquisitionRoute["output"]["quantityDistribution"];
 	readonly runMultiplier?: number;
 }): AcquisitionRoute => ({
-	...(chargeUses === undefined
+	...(unitUses === undefined
 		? {}
 		: {
-				chargeUses,
+				unitUses,
 			}),
 	durationMs,
 	id,

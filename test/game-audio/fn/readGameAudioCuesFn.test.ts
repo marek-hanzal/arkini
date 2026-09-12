@@ -140,8 +140,8 @@ describe("readGameAudioCuesFn", () => {
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemDepleted,
-					itemId: "runtime:charged",
-					canonicalItemId: "item:charged",
+					itemId: "runtime:spent",
+					canonicalItemId: "item:spent",
 					location: boardLocation,
 					previousQuantity: 1,
 					resultingQuantity: 0,

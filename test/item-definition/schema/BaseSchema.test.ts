@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 
 describe("BaseSchema draft status", () => {
 	it("accepts an omitted persisted draft status and resolves it as false", () => {
-		const item = SimpleSchema.parse({
+		const item = ItemSchema.parse({
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "legacy-item",
 			id: "legacy-item",
 			title: "Legacy item",
@@ -17,7 +20,6 @@ describe("BaseSchema draft status", () => {
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "simple",
 		});
 
 		expect(item.draft).toBeUndefined();

@@ -34,7 +34,11 @@ const createInventoryProject = () =>
 				backpack: {
 					uid: "backpack",
 					id: "backpack",
-					type: "inventory",
+					action: {
+						type: "inventory",
+						input: [],
+						rules: [],
+					},
 					title: "Backpack",
 					description: "Backpack",
 					asset: {
@@ -43,7 +47,7 @@ const createInventoryProject = () =>
 							"item-water",
 						],
 					},
-					scope: "board",
+					scope: "any",
 					maxCount: 1,
 					maxStackSize: 1,
 				},

@@ -1,8 +1,9 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
@@ -12,21 +13,19 @@ import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import type { InputRun } from "~/production-input/type/InputRun";
-import type { DepositSchema } from "~/production-input/schema/DepositSchema";
+import type { UnitsSchema } from "~/production-input/schema/UnitsSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
-const readItemDetailChargeKeyFn = (charges: InputSchema.Type["charges"]) =>
-	charges === undefined ? "none" : `${charges.from}:${charges.cost}`;
+const readItemDetailUnitKeyFn = (units: InputSchema.Type["units"]) =>
+	units === undefined ? "none" : `${units.from}:${units.cost}`;
 
-const readItemDetailDepositAvailableChargesFx = Effect.fn(
-	"readItemDetailDepositAvailableChargesFx",
-)(function* ({
+const readItemDetailAvailableUnitsFx = Effect.fn("readItemDetailAvailableUnitsFx")(function* ({
 	input,
 	ownerItemId,
 	runtime,
 }: {
-	readonly input: DepositSchema.Type;
+	readonly input: UnitsSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
@@ -36,7 +35,7 @@ const readItemDetailDepositAvailableChargesFx = Effect.fn(
 		configuredOwner.location.scope !== LocationScopeEnumSchema.enum.Board
 	) {
 		return {
-			availableCharges: 0,
+			availableUnits: 0,
 			candidateItemIds: [],
 		};
 	}
@@ -53,13 +52,13 @@ const readItemDetailDepositAvailableChargesFx = Effect.fn(
 		}),
 	);
 
-	let availableCharges = 0;
+	let availableUnits = 0;
 	for (const candidate of candidates) {
-		const remainingCharges = readItemRemainingChargesFn(candidate);
-		availableCharges += (remainingCharges ?? 0) * candidate.quantity;
+		const remainingUnits = readItemRemainingUnitsFn(candidate);
+		availableUnits += (remainingUnits ?? 0) * candidate.quantity;
 	}
 	return {
-		availableCharges,
+		availableUnits,
 		candidateItemIds: candidates.map((candidate) => candidate.id),
 	};
 });
@@ -78,8 +77,10 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 	readonly resolved?: readonly InputRun.Resolution[];
 	readonly runtime: RuntimeSchema.Type;
 }) {
+	const owner = runtime.items.find((item) => item.id === ownerItemId);
+	const canControl = owner !== undefined && canControlItemProductionFn(owner.item);
 	const materials = new Map<string, ItemDetailLines.MaterialInput>();
-	const deposits = new Map<string, ItemDetailLines.DepositInput>();
+	const unitInputs = new Map<string, ItemDetailLines.UnitsInput>();
 	const simple = new Map<string, ItemDetailLines.SimpleInput>();
 
 	for (const [inputIndex, input] of configured.entries()) {
@@ -122,8 +123,8 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 								selector: materialInput.selector,
 							});
 						const selectorKey = `item:${materialInput.selector.itemId}`;
-						const chargeKey = readItemDetailChargeKeyFn(materialInput.charges);
-						const key = `${inputIndex}:${selectorKey}:${materialInput.mode}:${chargeKey}`;
+						const unitKey = readItemDetailUnitKeyFn(materialInput.units);
+						const key = `${inputIndex}:${selectorKey}:${materialInput.mode}:${unitKey}`;
 						materials.set(key, {
 							kind: "materials",
 							inputIndex,
@@ -142,49 +143,48 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							missingQuantity,
 							availableCapacity,
 							ready: resolution?.ready ?? storedQuantity >= required.min,
-							canWithdraw: storedItems.length > 0,
-							...(materialInput.charges === undefined
+							canWithdraw: canControl && storedItems.length > 0,
+							...(materialInput.units === undefined
 								? {}
 								: {
-										charges: materialInput.charges,
+										units: materialInput.units,
 									}),
 						});
 					}),
 			)
 			.with(
 				{
-					type: TypeSchema.enum.Deposit,
+					type: TypeSchema.enum.Units,
 				},
-				(depositInput) =>
+				(unitsInput) =>
 					Effect.gen(function* () {
-						const selectorKey = `item:${depositInput.query.selector.itemId}`;
-						const chargeKey = readItemDetailChargeKeyFn(depositInput.charges);
-						const key = `${selectorKey}:${depositInput.query.distance}:${chargeKey}`;
-						const previous = deposits.get(key);
+						const selectorKey = `item:${unitsInput.query.selector.itemId}`;
+						const unitKey = readItemDetailUnitKeyFn(unitsInput.units);
+						const key = `${selectorKey}:${unitsInput.query.distance}:${unitKey}`;
+						const previous = unitInputs.get(key);
 						const availability =
 							previous === undefined
-								? yield* readItemDetailDepositAvailableChargesFx({
-										input: depositInput,
+								? yield* readItemDetailAvailableUnitsFx({
+										input: unitsInput,
 										ownerItemId,
 										runtime,
 									})
 								: undefined;
-						deposits.set(key, {
-							kind: "deposit",
-							selector: depositInput.query.selector,
-							distance: depositInput.query.distance,
-							requiredCharges:
-								(previous?.requiredCharges ?? 0) +
-								(depositInput.charges?.cost ?? 0),
-							availableCharges:
-								previous?.availableCharges ?? availability?.availableCharges ?? 0,
+						unitInputs.set(key, {
+							kind: "units",
+							selector: unitsInput.query.selector,
+							distance: unitsInput.query.distance,
+							requiredUnits:
+								(previous?.requiredUnits ?? 0) + (unitsInput.units?.cost ?? 0),
+							availableUnits:
+								previous?.availableUnits ?? availability?.availableUnits ?? 0,
 							targetItemIds:
 								previous?.targetItemIds ?? availability?.candidateItemIds ?? [],
 							ready: (previous?.ready ?? true) && (resolution?.ready ?? false),
-							...(depositInput.charges === undefined
+							...(unitsInput.units === undefined
 								? {}
 								: {
-										charges: depositInput.charges,
+										units: unitsInput.units,
 									}),
 						});
 					}),
@@ -195,14 +195,14 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 				},
 				(simpleInput) =>
 					Effect.gen(function* () {
-						if (simpleInput.charges === undefined) return;
-						const key = readItemDetailChargeKeyFn(simpleInput.charges);
+						if (simpleInput.units === undefined) return;
+						const key = readItemDetailUnitKeyFn(simpleInput.units);
 						const previous = simple.get(key);
 						simple.set(key, {
 							kind: "simple",
 							count: (previous?.count ?? 0) + 1,
 							ready: (previous?.ready ?? true) && (resolution?.ready ?? false),
-							charges: simpleInput.charges,
+							units: simpleInput.units,
 						});
 					}),
 			)
@@ -211,7 +211,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 
 	return [
 		...materials.values(),
-		...deposits.values(),
+		...unitInputs.values(),
 		...simple.values(),
 	] satisfies readonly ItemDetailLines.Input[];
 });

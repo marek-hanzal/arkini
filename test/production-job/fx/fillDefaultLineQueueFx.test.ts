@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { fillDefaultLineQueueFx } from "~/production-job/fx/fillDefaultLineQueueFx";
-import { unsetDefaultLineFx } from "~/production-line/fx/unsetDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -18,7 +18,6 @@ const lineId = "line:forge:run";
 const createDefaultLineConfig = (capacity: number) => {
 	const base = createJobTestConfig(capacity);
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {
@@ -169,7 +168,9 @@ describe("fillDefaultLineQueueFx", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx;
-				yield* unsetDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "default",
+					lineId: null,
 					ownerItemId,
 				});
 				const before = yield* (yield* CommittedTransitionsFx).read;

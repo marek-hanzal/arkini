@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type { Project } from "~/project-authoring/type/Project";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -107,10 +107,12 @@ import { Form } from "~/item-authoring/ui/Form";
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
+import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
-import { SpaceActionSection } from "~/item-authoring/ui/SpaceActionSection";
+import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import type { SectionId } from "~/item-authoring/type/Section";
 import {
+	createLine,
 	createOutput,
 	createProducerItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
@@ -123,9 +125,12 @@ import {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const item: ItemSchema.Type = {
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: "q12cmsx5ussy30wyjiea8yaw",
 	id: "item:water",
-	type: "simple",
+
 	title: "Water",
 	description: "Fresh water.",
 	asset: {
@@ -194,7 +199,12 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (children: ReactNode, newItem = false, defaultDraft?: boolean) => {
+const render = async (
+	children: ReactNode,
+	newItem = false,
+	defaultDraft?: boolean,
+	enableClock = false,
+) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -208,10 +218,11 @@ const render = async (children: ReactNode, newItem = false, defaultDraft?: boole
 								defaultDraft,
 								defaultItemId: "dirty-bucket",
 								defaultTitle: "Dirty Bucket",
-								itemType: "simple" as const,
+								create: true as const,
 							}
 						: {})}
 					sectionId={sectionId}
+					enableCapability={enableClock ? "clock" : undefined}
 					uid={item.uid}
 				>
 					{section}
@@ -252,7 +263,7 @@ describe("item section form session", () => {
 			defaultDraft: true,
 			defaultItemId: "dirty-bucket",
 			defaultTitle: "Dirty Bucket",
-			itemType: "simple",
+			create: true,
 		});
 	});
 
@@ -319,12 +330,6 @@ describe("item section form session", () => {
 		expect(title.matches(":disabled")).toBe(false);
 	});
 
-	it("omits the artwork progression preview until a progress asset is selected", async () => {
-		const { container } = await render(<ArtworkSection />);
-
-		expect(container.querySelector('[data-ui="EditorItemArtworkProgression"]')).toBeNull();
-	});
-
 	it("keeps the persisted artwork scale in the form and saves the edited ratio", async () => {
 		const scaledItem = {
 			...item,
@@ -353,11 +358,13 @@ describe("item section form session", () => {
 	it("picks both bounds of the reserved random space range into the local draft", async () => {
 		const spaceItem = {
 			...item,
-			type: "space",
-			space: 0,
-			enable: true,
-			input: [],
-			rules: [],
+
+			action: {
+				type: "space" as const,
+				space: 0,
+				input: [],
+				rules: [],
+			},
 		} satisfies ItemSchema.Type;
 		state.persisted = spaceItem;
 		(
@@ -372,8 +379,8 @@ describe("item section form session", () => {
 			.mockReturnValueOnce(0)
 			.mockReturnValueOnce(1 - Number.EPSILON);
 		try {
-			const { container } = await render(<SpaceActionSection />);
-			const input = container.querySelector<HTMLInputElement>('input[name="space"]');
+			const { container } = await render(<ActionSection />);
+			const input = container.querySelector<HTMLInputElement>('input[name="action.space"]');
 			const pickRandomSpaceButton = [
 				...container.querySelectorAll("button"),
 			].find((button) => button.textContent === "Pick random space");
@@ -634,28 +641,461 @@ describe("item section form session", () => {
 		expect(document.activeElement).toBe(invalid);
 	});
 
-	it("names and focuses the invalid temporary duration", async () => {
-		const temporary: ItemSchema.Type = {
-			...item,
-			type: "temporary",
-			scope: "board",
-			durationMs: 2_000,
+	it("replaces production with an action in the canonical saved item", async () => {
+		const common = {
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
 		};
-		state.persisted = temporary;
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ActionSection />);
+		const enable = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable action");
+		if (enable === undefined) throw new Error("Missing enable action control.");
+		await act(async () => enable.click());
+		// Persist the action and empty lines as one canonical item.
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					lines: [],
+					action: {
+						type: "space",
+						space: 0,
+						input: [],
+						rules: [],
+					},
+				}),
+			}),
+		);
+	});
+	it("switches the action payload without losing shared requirements or rules", async () => {
+		const rule = {
+			type: "enable" as const,
+			when: [
+				{
+					type: "exists" as const,
+					query: {
+						scope: "universe" as const,
+						selector: {
+							type: "item" as const,
+							itemId: item.id,
+						},
+					},
+				},
+			] as [
+				{
+					type: "exists";
+					query: {
+						scope: "universe";
+						selector: {
+							type: "item";
+							itemId: string;
+						};
+					};
+				},
+			],
+		};
+		const input = {
+			type: "simple" as const,
+		};
+		const portal = {
+			...item,
+			action: {
+				type: "space" as const,
+				space: 7,
+				input: [
+					input,
+				],
+				rules: [
+					rule,
+				],
+			},
+		};
+		state.persisted = portal;
+		(state.project as Project).config.items[item.id] = portal;
+		const { container } = await render(<ActionSection />);
+		const inventory = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Inventory");
+		if (inventory === undefined) throw new Error("Missing Inventory action choice.");
+		await act(async () => inventory.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					action: {
+						type: "inventory",
+						input: [
+							input,
+						],
+						rules: [
+							rule,
+						],
+					},
+				}),
+			}),
+		);
+	});
+	it("replaces a configured action when the first production line is added", async () => {
+		const common = {
+			...item,
+
+			action: {
+				type: "space" as const,
+				space: 7,
+				input: [],
+				rules: [],
+			},
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ProductionSection />);
+		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		if (add === null) throw new Error("Missing add line control.");
+		await act(async () => add.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					action: undefined,
+					lines: [
+						expect.objectContaining({
+							default: true,
+						}),
+					],
+				}),
+			}),
+		);
+	});
+	it("disables a configured action without changing the item identity", async () => {
+		const common = {
+			...item,
+
+			action: {
+				type: "space" as const,
+				space: 7,
+				input: [],
+				rules: [],
+			},
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ActionSection />);
+		const disable = container.querySelector<HTMLButtonElement>(
+			'button[title="Disable action"]',
+		);
+		if (disable === null) throw new Error("Missing disable action control.");
+		await act(async () => disable.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					id: item.id,
+					action: undefined,
+					lines: [],
+				}),
+			}),
+		);
+	});
+
+	it("adds production to a passive Common through the ordinary line editor", async () => {
+		const { container } = await render(<ProductionSection />);
+		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		if (addLine === null) throw new Error("Missing add line control.");
+		await act(async () => addLine.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					lines: [
+						expect.objectContaining({
+							default: true,
+						}),
+					],
+				}),
+			}),
+		);
+	});
+	it("saves a passive Common after removing its last production line", async () => {
+		const common = {
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ProductionSection />);
+		const removeLine = container.querySelector<HTMLButtonElement>(
+			'button[title="Remove line"]',
+		);
+		if (removeLine === null) throw new Error("Missing remove line control.");
+		await act(async () => removeLine.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					lines: [],
+				}),
+			}),
+		);
+	});
+
+	it("selects Default and Clock exclusively across sibling lines through the saved form", async () => {
+		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
+			state.persisted = item;
+			(state.project as Project).config.items[item.id] = item;
+			return item;
+		});
+		const common = {
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+			lines: [
+				createLine({
+					id: "line:first",
+					default: false,
+				}),
+				createLine({
+					id: "line:second",
+					default: true,
+					clock: true,
+				}),
+			],
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container, renderSection } = await render(<ProductionSection />);
+		const toggle = async (label: string) => {
+			const button = [
+				...container.querySelectorAll("button"),
+			].find((candidate) => candidate.textContent === label);
+			if (button === undefined) throw new Error(`Missing ${label} toggle.`);
+			await act(async () => button.click());
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			// The repository hook mock needs an explicit render to publish the saved canonical item.
+			await renderSection(<ProductionSection />);
+			return state.saveItem.mock.lastCall?.[0].item.lines;
+		};
+		expect(await toggle("Default")).toMatchObject([
+			{
+				default: true,
+			},
+			{
+				default: false,
+				clock: true,
+			},
+		]);
+		expect(await toggle("Clock")).toMatchObject([
+			{
+				default: true,
+				clock: true,
+			},
+			{
+				default: false,
+				clock: false,
+			},
+		]);
+		expect(await toggle("Default")).toMatchObject([
+			{
+				default: false,
+				clock: true,
+			},
+			{
+				default: false,
+				clock: false,
+			},
+		]);
+		expect(await toggle("Clock")).toMatchObject([
+			{
+				default: false,
+				clock: false,
+			},
+			{
+				default: false,
+				clock: false,
+			},
+		]);
+	});
+
+	it.each([
+		"form",
+		"detail",
+	] as const)("enables a clock through the %s entry as one valid saved item", async (entry) => {
+		const common = {
+			...item,
+
+			scope: "inventory" as const,
+			maxStackSize: 9,
+			action: {
+				type: "space" as const,
+				space: 2,
+				input: [],
+				rules: [],
+			},
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ClockSection />, false, undefined, entry === "detail");
+		if (entry === "form") {
+			const enable = [
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === "Enable clock");
+			if (enable === undefined) throw new Error("Missing clock enable control.");
+			await act(async () => enable.click());
+		}
+		expect(state.saveItem).not.toHaveBeenCalled();
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
+			scope: "board",
+			maxStackSize: 1,
+			action: undefined,
+			clock: {
+				intervalMs: 300_000,
+				durationMs: 3_600_000,
+			},
+			lines: [],
+		});
+	});
+
+	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
+		const clock = ItemSchema.parse({
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+
+			scope: "board",
+			maxStackSize: 1,
+			clock: {
+				intervalMs: 1500,
+				durationMs: 2000,
+			},
+		});
+		state.persisted = clock;
 		(
 			state.project as {
 				config: {
 					items: Record<string, ItemSchema.Type>;
 				};
 			}
-		).config.items[item.id] = temporary;
-		const { container } = await render(<ProductionSection />);
-		const duration = container.querySelector<HTMLInputElement>('input[name="durationMs"]');
+		).config.items[item.id] = clock;
+		const { container } = await render(<ClockSection />);
+		const duration = container.querySelector<HTMLInputElement>(
+			'input[name="clock.durationMs"]',
+		);
+		if (duration === null) throw new Error("Missing clock lifetime field.");
+		await changeInput(duration, "");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					clock: expect.objectContaining({
+						intervalMs: 1500,
+						durationMs: undefined,
+					}),
+					lines: clock.lines,
+				}),
+			}),
+		);
+	});
+
+	it("clears the Clock interval while preserving the edited lifetime and expiry output", async () => {
+		const onExpire = createOutput([
+			{
+				itemId: item.id,
+			},
+		]);
+		const scheduled = ItemSchema.parse({
+			...item,
+			scope: "board",
+			clock: {
+				intervalMs: 1500,
+				onExpire,
+			},
+		});
+		state.persisted = scheduled;
+		(state.project as Project).config.items[item.id] = scheduled;
+		const { container } = await render(<ClockSection />);
+		const interval = container.querySelector<HTMLInputElement>(
+			'input[name="clock.intervalMs"]',
+		);
+		const duration = container.querySelector<HTMLInputElement>(
+			'input[name="clock.durationMs"]',
+		);
+		if (interval === null || duration === null) throw new Error("Missing Clock timer fields.");
+		await changeInput(duration, "5");
+		await changeInput(interval, "");
+		await changeInput(interval, "2");
+		await changeInput(interval, "");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		const saved = state.saveItem.mock.lastCall?.[0].item;
+		expect(saved).toMatchObject({
+			lines: [],
+			clock: {
+				durationMs: 5000,
+				onExpire,
+			},
+		});
+		expect(saved.clock.intervalMs).toBeUndefined();
+	});
+
+	it("marks both missing Clock timers invalid and focuses the first field", async () => {
+		const once: ItemSchema.Type = {
+			...item,
+
+			scope: "board",
+			clock: {
+				durationMs: 2000,
+				enable: true,
+				rules: [],
+			},
+		};
+		state.persisted = once;
+		(
+			state.project as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config.items[item.id] = once;
+		const { container } = await render(<ClockSection />);
+		const duration = container.querySelector<HTMLInputElement>(
+			'input[name="clock.durationMs"]',
+		);
+		const interval = container.querySelector<HTMLInputElement>(
+			'input[name="clock.intervalMs"]',
+		);
 		const saveButton = [
 			...container.querySelectorAll("button"),
 		].find((button) => button.textContent === "Save");
-		if (duration === null || saveButton === undefined)
-			throw new Error("Missing temporary duration form.");
+		if (interval === null || duration === null || saveButton === undefined)
+			throw new Error("Missing Once lifetime form.");
 
 		await changeInput(duration, "");
 		await act(async () => {
@@ -663,15 +1103,25 @@ describe("item section form session", () => {
 			await Promise.resolve();
 		});
 
-		expect(container.textContent).toContain("Duration: Enter a valid number.");
+		expect(state.saveItem).not.toHaveBeenCalled();
 		expect(duration.dataset.uiInvalid).toBe("true");
+		expect(interval.dataset.uiInvalid).toBe("true");
 		await act(
 			() =>
 				new Promise<void>((resolve) => {
 					requestAnimationFrame(() => resolve());
 				}),
 		);
-		expect(document.activeElement).toBe(duration);
+		expect(document.activeElement).toBe(interval);
+		await changeInput(interval, "1");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.clock).toMatchObject({
+			intervalMs: 1000,
+		});
+		expect(duration.dataset.uiInvalid).not.toBe("true");
+		expect(interval.dataset.uiInvalid).not.toBe("true");
 	});
 
 	it.each([
@@ -765,3 +1215,9 @@ describe("item section form session", () => {
 		},
 	);
 });
+
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (key: string) => key,
+	}),
+}));

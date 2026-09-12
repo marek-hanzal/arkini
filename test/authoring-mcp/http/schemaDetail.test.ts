@@ -1,4 +1,6 @@
+import Ajv2020 from "ajv/dist/2020";
 import { Effect } from "effect";
+import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -32,9 +34,9 @@ describe("editor MCP authoring schema registry", () => {
 			return schema;
 		};
 
-		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-producer-item-input");
+		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-item-input");
 		expect(producer).toMatchObject({
-			$id: "urn:arkini:schema:mcp:create-producer-item-input",
+			$id: "urn:arkini:schema:mcp:create-item-input",
 			properties: {
 				asset: {
 					$ref: "AssetSchema",
@@ -52,16 +54,14 @@ describe("editor MCP authoring schema registry", () => {
 			},
 			type: "object",
 		});
-		expect(
-			await readSchemaDetail("urn:arkini:schema:mcp:edit-producer-item-input"),
-		).toMatchObject({
+		expect(await readSchemaDetail("urn:arkini:schema:mcp:edit-item-input")).toMatchObject({
 			properties: {
 				patch: {
-					$ref: "ProducerItemPatchSchema",
+					$ref: "ItemPatchSchema",
 				},
 			},
 		});
-		expect(await readSchemaDetail("ProducerItemPatchSchema")).toMatchObject({
+		expect(await readSchemaDetail("ItemPatchSchema")).toMatchObject({
 			minProperties: 1,
 			type: "object",
 		});
@@ -159,22 +159,9 @@ describe("editor MCP authoring schema registry", () => {
 				type: "object",
 			});
 		}
-		const itemTypes = [
-			"simple",
-			"space",
-			"producer",
-			"craft",
-			"blueprint",
-			"deposit",
-			"stash",
-			"temporary",
-			"inventory",
-		];
 		const pending = [
-			...itemTypes.flatMap((type) => [
-				`urn:arkini:schema:mcp:create-${type}-item-input`,
-				`urn:arkini:schema:mcp:edit-${type}-item-input`,
-			]),
+			"urn:arkini:schema:mcp:create-item-input",
+			"urn:arkini:schema:mcp:edit-item-input",
 			"urn:arkini:schema:mcp:edit-project-input",
 		];
 		const visited = new Set<string>();
@@ -200,7 +187,6 @@ describe("editor MCP authoring schema registry", () => {
 				}
 			}
 		}
-		expect(visited.size).toBeGreaterThan(70);
 		expect([
 			...visited,
 		]).toEqual(
@@ -219,6 +205,148 @@ describe("editor MCP authoring schema registry", () => {
 				"start.ToolbarItemSchema",
 			]),
 		);
+
+		// MCP clients validate this exported graph before sending canonical authoring writes.
+		const ajv = new Ajv2020({
+			strict: false,
+		});
+		const schemaUri = (id: string) => `https://schema.arkini.test/${encodeURIComponent(id)}`;
+		// MCP refs are exact registry IDs; give Ajv absolute addresses for that same graph.
+		for (const [id, schema] of schemasById)
+			ajv.addSchema(
+				JSON.parse(
+					JSON.stringify(schema, (key, value) =>
+						(key === "$id" || key === "$ref") && typeof value === "string"
+							? schemaUri(value)
+							: value,
+					),
+				),
+				schemaUri(id),
+			);
+		const validateCreate = ajv.getSchema(schemaUri("urn:arkini:schema:mcp:create-item-input"));
+		const validatePatch = ajv.getSchema(schemaUri("ItemPatchSchema"));
+		if (validateCreate === undefined || validatePatch === undefined)
+			throw new Error("Missing public item schema.");
+		const action = {
+			type: "space",
+			space: 1,
+		};
+		const input = {
+			id: "item:portal",
+			title: "Portal",
+			action,
+		};
+		expect(validateCreate(input), JSON.stringify(validateCreate.errors)).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				action: {
+					type: "inventory",
+				},
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				action: {
+					type: "inventory",
+					space: 1,
+				},
+			}),
+		).toBe(false);
+		expect(
+			validateCreate({
+				...input,
+				lines: [],
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				lines: [
+					createLine({}),
+				],
+			}),
+		).toBe(false);
+		expect(
+			validateCreate({
+				id: "item:workshop",
+				title: "Workshop",
+				lines: [
+					createLine({}),
+				],
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		// Patches may clear an action and replace lines together; the complete candidate enforces exclusivity.
+		expect(
+			validatePatch({
+				action: null,
+				lines: [
+					createLine({}),
+				],
+			}),
+			JSON.stringify(validatePatch.errors),
+		).toBe(true);
+
+		// The advertised Common graph must reject schedules that canonical saves reject.
+		const scheduled = {
+			id: "item:timer",
+			title: "Timer",
+			clock: {
+				intervalMs: 1000,
+			},
+			scope: "board",
+			maxStackSize: 1,
+			lines: [
+				createLine({}),
+			],
+		};
+		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);
+		for (const replacement of [
+			{
+				scope: "inventory",
+			},
+			{
+				maxStackSize: 2,
+			},
+			{
+				action,
+			},
+		])
+			expect(
+				validateCreate({
+					...scheduled,
+					...replacement,
+				}),
+			).toBe(false);
+		expect(
+			validatePatch({
+				clock: null,
+				lines: [],
+			}),
+			JSON.stringify(validatePatch.errors),
+		).toBe(true);
+
+		expect(
+			validateCreate({
+				...scheduled,
+				clock: {
+					durationMs: 2000,
+				},
+				lines: [],
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		expect(
+			validateCreate({
+				...scheduled,
+				clock: {},
+				lines: [],
+			}),
+		).toBe(false);
 
 		const wrongCase = await client.callTool({
 			name: "schema_detail",

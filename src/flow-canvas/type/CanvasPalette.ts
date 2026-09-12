@@ -1,4 +1,4 @@
-import type { ItemOriginItemNode, ItemOriginOperationKind } from "~/flow/type/ItemOriginFlow";
+import type { ItemOriginOperationKind } from "~/flow/type/ItemOriginFlow";
 
 export interface CanvasPalette {
 	readonly accent: string;
@@ -6,7 +6,8 @@ export interface CanvasPalette {
 	readonly danger: string;
 	readonly foreground: string;
 	readonly info: string;
-	readonly itemSurfaces: Readonly<Record<ItemOriginItemNode["type"], string>>;
+	readonly itemSurface: string;
+	readonly missingItemSurface: string;
 	readonly line: string;
 	readonly lineStrong: string;
 	readonly muted: string;

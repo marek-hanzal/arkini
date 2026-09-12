@@ -1,5 +1,4 @@
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
 interface TileMotionCueBase {
 	readonly sequence: number;
@@ -24,7 +23,6 @@ export interface TileStackMotionCue extends TileMotionCueBase {
 
 export interface TileInputMotionCue extends TileMotionCueBase {
 	readonly kind: "input";
-	readonly sourceItem?: TileActorItem;
 	readonly sourceActorId: string;
 	readonly targetActorId: string;
 	readonly canonicalItemId: string;

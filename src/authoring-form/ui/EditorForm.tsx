@@ -131,21 +131,38 @@ const EditorNumberField = ({
 interface EditorSecondsFieldProps {
 	readonly description?: string;
 	readonly label: string;
+	readonly min?: number;
+	readonly optional?: boolean;
+	readonly step?: number;
 }
 
-const EditorSecondsField = ({ description, label }: EditorSecondsFieldProps) => {
-	const field = useFieldContext<number>();
+const EditorSecondsField = ({
+	description,
+	label,
+	min = 0,
+	optional = false,
+	step,
+}: EditorSecondsFieldProps) => {
+	const field = useFieldContext<number | undefined>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
-	const seconds = field.state.value / 1_000;
+	const seconds = (field.state.value ?? Number.NaN) / 1_000;
 	return (
 		<EditorSecondsControl
 			description={description}
 			error={error}
 			label={label}
-			min={0}
+			min={min}
 			name={field.name}
 			onBlurFn={field.handleBlur}
-			onChangeFn={(nextSeconds) => field.handleChange(Math.round(nextSeconds * 1_000))}
+			onChangeFn={(nextSeconds) =>
+				field.handleChange(
+					optional && Number.isNaN(nextSeconds)
+						? undefined
+						: Math.round(nextSeconds * 1_000),
+				)
+			}
+			step={step}
+			required={!optional}
 			value={seconds}
 		/>
 	);

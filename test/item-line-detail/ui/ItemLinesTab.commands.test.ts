@@ -12,34 +12,57 @@ import {
 } from "../support/ItemLinesTabFixture";
 
 describe("ItemLinesTab command boundary", () => {
-	it("wires save-backed default set and unset to the exact owner and line", async () => {
-		const { rerender } = await renderLines(projection);
-		const defaultButton = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineSetDefaultButton"]',
-		);
-		await act(async () => defaultButton?.click());
-		expect(commands.setDefault).toHaveBeenCalledWith({
-			ownerItemId: projection.itemId,
-			lineId: projection.line[0]?.lineId,
-		});
-
-		await rerender({
-			...projection,
-			line: [
-				{
-					...projection.line[0],
-					isDefault: true,
+	it.each([
+		"default",
+		"clock",
+	] as const)(
+		"wires the %s role to its exact owner, line, and clearing command",
+		async (selection) => {
+			const line = {
+				...projection.line[0],
+				clock: {
+					selected: false,
+					canChange: true,
 				},
-			],
-		});
-		const unsetButton = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineSetDefaultButton"]',
-		);
-		await act(async () => unsetButton?.click());
-		expect(commands.unsetDefault).toHaveBeenCalledWith({
-			ownerItemId: projection.itemId,
-		});
-	});
+			};
+			const { rerender } = await renderLines({
+				...projection,
+				line: [
+					line,
+				],
+			});
+			const selector =
+				selection === "default"
+					? '[data-ui="TileLineSetDefaultButton"]'
+					: '[data-ui="TileLineSetClockButton"]';
+			await act(async () => document.querySelector<HTMLButtonElement>(selector)?.click());
+			expect(commands.select).toHaveBeenCalledWith({
+				selection,
+				ownerItemId: projection.itemId,
+				lineId: line.lineId,
+			});
+
+			await rerender({
+				...projection,
+				line: [
+					{
+						...line,
+						isDefault: selection === "default",
+						clock: {
+							selected: selection === "clock",
+							canChange: true,
+						},
+					},
+				],
+			});
+			await act(async () => document.querySelector<HTMLButtonElement>(selector)?.click());
+			expect(commands.select).toHaveBeenCalledWith({
+				selection,
+				ownerItemId: projection.itemId,
+				lineId: null,
+			});
+		},
+	);
 
 	it("wires enqueue to the exact owner and line", async () => {
 		await renderLines(projection);
@@ -93,6 +116,7 @@ describe("ItemLinesTab command boundary", () => {
 				{
 					...projection.line[0],
 					actions: {
+						canChangeDefault: false,
 						canWithdraw: true,
 						enqueue: {
 							enabled: false,

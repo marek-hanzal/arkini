@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { readTileMotionCuesFx } from "~/tile-presentation/fx/readTileMotionCuesFx";
+import { readTileMotionCuesFn } from "~/tile-presentation/fn/readTileMotionCuesFn";
 import { useGameFx } from "~test/support/useGameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { startFx } from "~/game-start/fx/startFx";
@@ -50,9 +50,12 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "water",
 			id: "water",
-			type: "simple",
+
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -67,7 +70,11 @@ const config = GameConfigSchema.parse({
 		inventory: {
 			uid: "inventory",
 			id: "inventory",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Inventory",
 			description: "Inventory",
 			asset: {
@@ -87,9 +94,7 @@ const runtime = Effect.runSync(
 		}),
 	),
 );
-const game = {
-	getResourceUrlFn: (resourceId: string) => resourceId,
-};
+
 const source = runtime.items.find(
 	(item) => item.location.scope === "board" && item.location.position.x === 0,
 );
@@ -142,11 +147,12 @@ const swappedRuntime = {
 export const tileMotionCueTestFixture = {
 	committedRuntime,
 	inventoryOpener,
-	readCues: (transition: Parameters<typeof readTileMotionCuesFx>[0]["transition"]) =>
-		readTileMotionCuesFx({
-			game,
-			transition,
-		}),
+	readCues: (transition: Parameters<typeof readTileMotionCuesFn>[0]["transition"]) =>
+		Effect.succeed(
+			readTileMotionCuesFn({
+				transition,
+			}),
+		),
 	runtime,
 	source,
 	sourceLocation,

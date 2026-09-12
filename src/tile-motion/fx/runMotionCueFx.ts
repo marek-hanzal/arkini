@@ -172,8 +172,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									magneticField,
 									onCompleteFn,
 									onRemainderRevealedFn: onInputRemainderRevealedFn,
-									onPayloadCreatedFn,
-									origin,
+
 									readPaletteFn,
 									readSourceSurvivesFn,
 									surface,

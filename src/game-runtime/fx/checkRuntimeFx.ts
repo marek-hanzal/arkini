@@ -1,3 +1,4 @@
+import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItemSchedulesFn";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -10,12 +11,10 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/game-runtime/schema/DuplicateItemIdIssueSchema";
-import { ItemChargesIssueReasonEnumSchema } from "~/game-runtime/schema/ItemChargesIssueReasonEnumSchema";
-import type { ItemChargesIssueSchema } from "~/game-runtime/schema/ItemChargesIssueSchema";
+import { ItemUnitsIssueReasonEnumSchema } from "~/game-runtime/schema/ItemUnitsIssueReasonEnumSchema";
+import type { ItemUnitsIssueSchema } from "~/game-runtime/schema/ItemUnitsIssueSchema";
 import type { ItemMaxCountIssueSchema } from "~/game-runtime/schema/ItemMaxCountIssueSchema";
 import type { ItemStackSizeIssueSchema } from "~/game-runtime/schema/ItemStackSizeIssueSchema";
-import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/game-runtime/schema/ItemTemporaryDurationIssueReasonEnumSchema";
-import type { ItemTemporaryDurationIssueSchema } from "~/game-runtime/schema/ItemTemporaryDurationIssueSchema";
 import type { LocationOccupiedIssueSchema } from "~/game-runtime/schema/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/game-runtime/schema/LocationOutOfBoundsIssueSchema";
 import type { LocationScopeIssueSchema } from "~/game-runtime/schema/LocationScopeIssueSchema";
@@ -26,7 +25,6 @@ import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationS
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
 import { checkRuntimeInputLocationsFn } from "~/production-input/fn/checkRuntimeInputLocationsFn";
 import { checkRuntimeJobsFn } from "~/production-job/fn/checkRuntimeJobsFn";
@@ -37,51 +35,48 @@ interface CheckRuntimeProps {
 	runtime: RuntimeSchema.Type;
 }
 
-const checkRuntimeItemChargesFn = (runtime: RuntimeSchema.Type) => {
-	const issues: ItemChargesIssueSchema.Type[] = [];
+const checkRuntimeItemUnitsFn = (runtime: RuntimeSchema.Type) => {
+	const issues: ItemUnitsIssueSchema.Type[] = [];
 
 	for (const item of runtime.items) {
-		if (item.remainingCharges === undefined) continue;
-		const amount = item.item.charges?.amount;
+		if (item.remainingUnits === undefined) continue;
+		const amount = item.item.units?.amount;
 		if (amount === undefined) {
 			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
+				type: RuntimeCheckIssueEnumSchema.enum.ItemUnits,
 				itemId: item.id,
-				remainingCharges: item.remainingCharges,
-				reason: ItemChargesIssueReasonEnumSchema.enum.MissingConfig,
+				remainingUnits: item.remainingUnits,
+				reason: ItemUnitsIssueReasonEnumSchema.enum.MissingConfig,
 			});
 			continue;
 		}
-		if (item.remainingCharges > amount) {
+		if (item.remainingUnits > amount) {
 			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
+				type: RuntimeCheckIssueEnumSchema.enum.ItemUnits,
 				itemId: item.id,
 				amount,
-				remainingCharges: item.remainingCharges,
-				reason: ItemChargesIssueReasonEnumSchema.enum.ExceedsAmount,
+				remainingUnits: item.remainingUnits,
+				reason: ItemUnitsIssueReasonEnumSchema.enum.ExceedsAmount,
 			});
 			continue;
 		}
-		if (item.remainingCharges === amount) {
+		if (item.remainingUnits === amount) {
 			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
+				type: RuntimeCheckIssueEnumSchema.enum.ItemUnits,
 				itemId: item.id,
 				amount,
-				remainingCharges: item.remainingCharges,
-				reason: ItemChargesIssueReasonEnumSchema.enum.FullState,
+				remainingUnits: item.remainingUnits,
+				reason: ItemUnitsIssueReasonEnumSchema.enum.FullState,
 			});
 			continue;
 		}
-		if (
-			item.remainingCharges === 0 &&
-			!runtime.jobs.some((job) => job.ownerItemId === item.id)
-		) {
+		if (item.remainingUnits === 0 && !runtime.jobs.some((job) => job.ownerItemId === item.id)) {
 			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
+				type: RuntimeCheckIssueEnumSchema.enum.ItemUnits,
 				itemId: item.id,
 				amount,
-				remainingCharges: item.remainingCharges,
-				reason: ItemChargesIssueReasonEnumSchema.enum.DepletedIdle,
+				remainingUnits: item.remainingUnits,
+				reason: ItemUnitsIssueReasonEnumSchema.enum.DepletedIdle,
 			});
 		}
 	}
@@ -192,61 +187,6 @@ const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitiesFx")(f
 	];
 });
 
-const checkRuntimeItemTemporaryDurationsFn = (runtime: RuntimeSchema.Type) => {
-	const issues: ItemTemporaryDurationIssueSchema.Type[] = [];
-
-	for (const item of runtime.items) {
-		if (item.item.type !== TypeSchema.enum.Temporary) {
-			if (item.remainingDurationMs !== undefined) {
-				issues.push({
-					type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-					itemId: item.id,
-					remainingDurationMs: item.remainingDurationMs,
-					location: item.location,
-					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnexpectedState,
-				});
-			}
-			continue;
-		}
-
-		if (
-			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
-		) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-				itemId: item.id,
-				durationMs: item.item.durationMs,
-				remainingDurationMs: item.remainingDurationMs,
-				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnsupportedLocation,
-			});
-		}
-		if (item.remainingDurationMs === undefined) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-				itemId: item.id,
-				durationMs: item.item.durationMs,
-				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.MissingState,
-			});
-			continue;
-		}
-		if (item.remainingDurationMs > item.item.durationMs) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-				itemId: item.id,
-				durationMs: item.item.durationMs,
-				remainingDurationMs: item.remainingDurationMs,
-				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.ExceedsDuration,
-			});
-		}
-	}
-
-	return issues;
-};
-
 const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: RuntimeSchema.Type) => {
 	const items: {
 		readonly item: RuntimeItemSchema.Type;
@@ -334,10 +274,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	runtime,
 }: CheckRuntimeProps) {
 	const config = yield* GameConfigFx;
-	const itemChargeIssues = checkRuntimeItemChargesFn(runtime);
+	const itemUnitIssues = checkRuntimeItemUnitsFn(runtime);
 	const itemIdIssues = checkRuntimeItemIdsFn(runtime);
 	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx(runtime);
-	const itemTemporaryDurationIssues = checkRuntimeItemTemporaryDurationsFn(runtime);
 	const defaultLineIssues = checkRuntimeDefaultLinesFn({
 		runtime,
 	});
@@ -354,10 +293,10 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 
 	return {
 		issues: [
-			...itemChargeIssues,
+			...itemUnitIssues,
 			...itemIdIssues,
 			...itemQuantityIssues,
-			...itemTemporaryDurationIssues,
+			...checkRuntimeItemSchedulesFn(runtime),
 			...defaultLineIssues,
 			...inputLocationIssues,
 			...deliveryIssues,

@@ -28,22 +28,12 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 		const sourceDirectory = path.join(canonicalSource, directory);
 		if (!(yield* fileSystem.exists(sourceDirectory))) continue;
 		const entries = yield* fileSystem.readDirectory(sourceDirectory);
-		if (directory === "items") {
-			for (const type of entries.sort()) {
-				const typeDirectory = path.join(sourceDirectory, type);
-				if ((yield* fileSystem.stat(typeDirectory)).type !== "Directory") continue;
-				for (const file of yield* fileSystem.readDirectory(typeDirectory)) {
-					if (file.endsWith(".json")) files.push(path.join(directory, type, file));
-				}
-			}
-		} else {
-			const extension = directory === "notes" ? ".json" : ".png";
-			files.push(
-				...entries
-					.filter((file) => file.endsWith(extension))
-					.map((file) => path.join(directory, file)),
-			);
-		}
+		const extension = directory === "notes" || directory === "items" ? ".json" : ".png";
+		files.push(
+			...entries
+				.filter((file) => file.endsWith(extension))
+				.map((file) => path.join(directory, file)),
+		);
 	}
 	files.sort();
 	for (const relative of files) {

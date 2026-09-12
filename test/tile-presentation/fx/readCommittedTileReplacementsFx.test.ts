@@ -27,9 +27,12 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		stone: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "stone",
 			id: "stone",
-			type: "simple",
+
 			title: "Stone",
 			description: "Stone",
 			asset: {
@@ -42,9 +45,12 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 		},
 		mud: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "mud",
 			id: "mud",
-			type: "simple",
+
 			title: "Mud",
 			description: "Mud",
 			asset: {

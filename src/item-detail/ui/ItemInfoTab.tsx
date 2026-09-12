@@ -1,8 +1,9 @@
+import type { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { match } from "ts-pattern";
 
 import type { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { Scrollable } from "~/ui/ui/Scrollable";
@@ -11,15 +12,15 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 export namespace ItemInfoTab {
 	export interface Detail {
 		readonly description?: string;
-		readonly itemType: TypeSchema.Type;
+		readonly schedule?: readItemDetailScheduleFx.Schedule;
 		readonly storageScope: StorageSchema.Type;
 		readonly location?: readItemDetailInfoFn.Location;
 		readonly currentStack?: number;
 		readonly maxStackSize: number;
 		readonly ownedQuantity?: number;
 		readonly maxCount?: number;
-		readonly charges?: {
-			readonly label: "Charges" | "Charges per item";
+		readonly units?: {
+			readonly label: "Units" | "Units per item";
 			readonly value: string;
 		};
 	}
@@ -83,11 +84,8 @@ const readLocationLabelFn = (location: readItemDetailInfoFn.Location) =>
 /** Renders the canonical description-and-facts presentation for configured and live items. */
 export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail }) => {
 	const translator = useTranslator();
+	const schedule = detail.schedule;
 	const fact = [
-		{
-			label: translator.textFn("Type"),
-			value: translator.textFn(`Item type - ${detail.itemType}`),
-		},
 		...(detail.location === undefined
 			? []
 			: [
@@ -98,10 +96,7 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 				]),
 		{
 			label: translator.textFn("Storage"),
-			value:
-				detail.itemType === "inventory"
-					? translator.textFn("Item storage scope - inventory-control")
-					: translator.textFn(`Item storage scope - ${detail.storageScope}`),
+			value: translator.textFn(`Item storage scope - ${detail.storageScope}`),
 		},
 		...(detail.currentStack === undefined
 			? []
@@ -127,13 +122,78 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 			label: translator.textFn("Game limit"),
 			value: readGameLimitLabelFn(detail.maxCount),
 		},
-		...(detail.charges === undefined
+		...(detail.units === undefined
 			? []
 			: [
 					{
-						...detail.charges,
-						label: translator.textFn(detail.charges.label),
+						...detail.units,
+						label:
+							detail.units.label === "Units"
+								? translator.textFn("Units")
+								: translator.textFn("Units per item"),
 					},
+				]),
+		...(schedule === undefined
+			? []
+			: [
+					{
+						label: translator.textFn("Interval"),
+						value:
+							schedule.intervalMs === undefined
+								? translator.textFn("Once")
+								: formatDurationFn(schedule.intervalMs),
+					},
+					{
+						label: translator.textFn("Lifetime"),
+						value:
+							schedule.durationMs === undefined
+								? translator.textFn("Unlimited")
+								: formatDurationFn(schedule.durationMs),
+					},
+					{
+						label: translator.textFn("Control"),
+						value:
+							schedule.control === "interactive"
+								? translator.textFn("Interactive")
+								: translator.textFn("Automatic only"),
+					},
+					...(schedule.runtime === undefined
+						? []
+						: [
+								{
+									label: translator.textFn("Schedule"),
+									value:
+										schedule.runtime.status === "draining"
+											? translator.textFn("Finishing accepted work")
+											: schedule.runtime.status === "running"
+												? translator.textFn("Running")
+												: translator.textFn("Paused"),
+								},
+								...(schedule.runtime.remainingIntervalMs === undefined ||
+								schedule.runtime.status === "draining"
+									? []
+									: [
+											{
+												label: translator.textFn("Next pulse"),
+												value: formatDurationFn(
+													schedule.runtime.remainingIntervalMs,
+												),
+											},
+											...(schedule.runtime.remainingDurationMs === undefined
+												? []
+												: [
+														{
+															label: translator.textFn(
+																"Lifetime remaining",
+															),
+															value: formatDurationFn(
+																schedule.runtime
+																	.remainingDurationMs,
+															),
+														},
+													]),
+										]),
+							]),
 				]),
 	];
 	return (

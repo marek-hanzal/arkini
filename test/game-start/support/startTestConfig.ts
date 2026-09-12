@@ -10,6 +10,9 @@ const simpleItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		maxQueueSize: 1,
+		lines: [],
+
 		uid: id,
 		id,
 		title: id,
@@ -22,7 +25,6 @@ const simpleItem = ({
 		},
 		scope,
 		maxStackSize,
-		type: "simple",
 	} as const;
 };
 
@@ -92,7 +94,11 @@ export const startTestConfig = GameConfigSchema.parse({
 		backpack: {
 			uid: "backpack",
 			id: "backpack",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
 			asset: {

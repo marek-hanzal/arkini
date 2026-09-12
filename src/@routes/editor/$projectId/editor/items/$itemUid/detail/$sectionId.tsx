@@ -1,7 +1,8 @@
+import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
-import { ChargesDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { UnitsDetail, MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
 import { DeleteSection } from "~/item-authoring/ui/DeleteSection";
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
@@ -10,7 +11,7 @@ import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 import { type ItemConnectionFilter, ItemConnectionFilters } from "~/flow/type/ItemConnectionFilter";
 import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
-import { SpaceActionDetail } from "~/item-authoring/ui/SpaceActionDetail";
+import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
@@ -62,7 +63,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		const item = useItemByUid(itemUid);
 		if (item === undefined) return <NotFound uid={itemUid} />;
 		const section = sectionId as SectionId;
-		const available = readSectionsFn(item).some((candidate) => candidate.id === section);
+		const available = readSectionsFn().some((candidate) => candidate.id === section);
 		if (!available)
 			return (
 				<section
@@ -80,12 +81,14 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <IdentityDetail item={item} />;
 			case "artwork":
 				return <ArtworkDetail item={item} />;
-			case "charges":
-				return <ChargesDetail item={item} />;
+			case "units":
+				return <UnitsDetail item={item} />;
 			case "merges":
 				return <MergesDetail item={item} />;
 			case "action":
-				return <SpaceActionDetail item={item} />;
+				return <ActionDetail item={item} />;
+			case "clock":
+				return <ClockDetail item={item} />;
 			case "production":
 				return <ProductionDetail item={item} />;
 			case "estimate":

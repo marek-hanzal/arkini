@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { match } from "ts-pattern";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
@@ -11,35 +12,10 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { EditorFormValidationIssue } from "~/editor-control/type/EditorFormValidationIssue";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 
-const inputTypeOptions = [
-	{
-		description:
-			"Adds no item or deposit requirement. The action may start without delivering or targeting another item.",
-		label: "Simple",
-		value: "simple",
-	},
-	{
-		description:
-			"Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.",
-		label: "Materials",
-		value: "materials",
-	},
-	{
-		description:
-			"Targets one matching board item in place. It is not delivered; its configured charge cost is paid when the action starts.",
-		label: "Deposit",
-		value: "deposit",
-	},
-] as const satisfies ReadonlyArray<{
-	readonly description: string;
-	readonly label: string;
-	readonly value: LineInputSchema.Type["type"];
-}>;
-
-type DepositInput = Extract<
+type UnitsInput = Extract<
 	LineInputSchema.Type,
 	{
-		readonly type: "deposit";
+		readonly type: "units";
 	}
 >;
 
@@ -50,49 +26,59 @@ type MaterialInput = Extract<
 	}
 >;
 
-const hasChargesFn = (item: ItemSchema.Type) => item.charges !== undefined;
+const hasUnitsFn = (item: ItemSchema.Type) => item.units !== undefined;
 
-const DepositPaidByControl = ({
+const UnitsPaidByControl = ({
 	error,
 	input,
 	onChangeFn,
 	ownerItemId,
-	selfChargesEnabled,
+	selfUnitsEnabled,
 }: {
 	readonly error?: string;
-	readonly input: DepositInput;
-	readonly onChangeFn: (input: DepositInput) => void;
+	readonly input: UnitsInput;
+	readonly onChangeFn: (input: UnitsInput) => void;
 	readonly ownerItemId: string;
-	readonly selfChargesEnabled: boolean;
+	readonly selfUnitsEnabled: boolean;
 }) => {
-	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
+	const translator = useTranslator();
+	const units = input.units ?? DraftDefaults.inputs.units.units;
 	return (
 		<EditorChoiceControl
-			error={error}
-			label="Paid by"
-			value={charges.from}
+			error={
+				error !== undefined && units.from === "self" && !selfUnitsEnabled
+					? translator.textFn("Enable Units on this item before selecting Self.")
+					: error
+			}
+			label={translator.textFn("Paid by")}
+			value={units.from}
 			options={[
 				{
-					description:
-						"The board item resolved by a Deposit input pays the charge cost in place. Only Deposit inputs may charge their target.",
-					label: "Target",
+					description: translator.textFn(
+						"The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.",
+					),
+					label: translator.textFn("Target"),
 					value: "target",
 				},
 				{
-					description: selfChargesEnabled
-						? "The item that owns this action pays the charge cost. It must define enough available charges."
-						: "Enable Charges on this item before selecting Self to pay its Deposit charge cost.",
-					disabled: !selfChargesEnabled,
-					label: "Self",
+					description: selfUnitsEnabled
+						? translator.textFn(
+								"The item that owns this action pays the unit cost. It must define enough available units.",
+							)
+						: translator.textFn(
+								"Enable Units on this item before selecting Self to pay the unit cost.",
+							),
+					disabled: !selfUnitsEnabled,
+					label: translator.textFn("Self"),
 					value: "self",
 				},
 			]}
 			onChangeFn={(from) => {
-				const switchingBackToTarget = from === "target" && charges.from === "self";
+				const switchingBackToTarget = from === "target" && units.from === "self";
 				onChangeFn({
 					...input,
-					charges: {
-						...charges,
+					units: {
+						...units,
 						from,
 					},
 					query:
@@ -106,7 +92,7 @@ const DepositPaidByControl = ({
 									},
 								}
 							: switchingBackToTarget
-								? structuredClone(DraftDefaults.inputs.deposit.query)
+								? structuredClone(DraftDefaults.inputs.units.query)
 								: input.query,
 				});
 			}}
@@ -114,36 +100,39 @@ const DepositPaidByControl = ({
 	);
 };
 
-const DepositSelfChargeCostControl = ({
+const UnitsSelfUnitCostControl = ({
 	error,
 	input,
 	onChangeFn,
 }: {
 	readonly error?: string;
-	readonly input: DepositInput;
-	readonly onChangeFn: (input: DepositInput) => void;
+	readonly input: UnitsInput;
+	readonly onChangeFn: (input: UnitsInput) => void;
 }) => {
-	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
+	const translator = useTranslator();
+	const units = input.units ?? DraftDefaults.inputs.units.units;
 	return (
 		<div
 			className="grid gap-3"
-			data-ui="EditorInputChargeCost"
+			data-ui="EditorInputUnitCost"
 		>
 			<EditorFormSectionDivider
-				description="Charge payment made by the item that owns this action when the Deposit input settles."
-				title="Charge cost"
+				description={translator.textFn(
+					"Units spent by the item that owns this action when it starts.",
+				)}
+				title={translator.textFn("Unit cost")}
 				variant="secondary"
 			/>
 			<EditorNumberControl
 				error={error}
-				label="Cost"
-				value={charges.cost}
+				label={translator.textFn("Cost")}
+				value={units.cost}
 				min={1}
 				onChangeFn={(cost) =>
 					onChangeFn({
 						...input,
-						charges: {
-							...charges,
+						units: {
+							...units,
 							cost,
 						},
 					})
@@ -240,46 +229,51 @@ const MaterialInputControl = ({
 	</div>
 );
 
-const DepositTargetChargeCostControl = ({
+const UnitsTargetUnitCostControl = ({
 	input,
 	issues,
 	onChangeFn,
 }: {
-	readonly input: DepositInput;
+	readonly input: UnitsInput;
 	readonly issues: ReadonlyArray<EditorFormValidationIssue>;
-	readonly onChangeFn: (input: DepositInput) => void;
+	readonly onChangeFn: (input: UnitsInput) => void;
 }) => {
 	const project = useEditorProject();
-	const charges = input.charges ?? DraftDefaults.inputs.deposit.charges;
+	const translator = useTranslator();
+	const units = input.units ?? DraftDefaults.inputs.units.units;
 	const selectedItem = project.config.items[input.query.selector.itemId];
-	const targetMissingCharges = selectedItem !== undefined && selectedItem.charges === undefined;
+	const targetMissingUnits = selectedItem !== undefined && selectedItem.units === undefined;
 	const selectedItemError = readEditorFormValidationErrorFn(issues, "query", "selector");
 	return (
 		<div
 			className="grid gap-3"
-			data-ui="EditorInputChargeCost"
+			data-ui="EditorInputUnitCost"
 		>
 			<EditorFormSectionDivider
-				description="Charge payment made by the selected Deposit target when this input settles."
-				title="Charge cost"
+				description={translator.textFn(
+					"Units spent by the selected target when the action starts.",
+				)}
+				title={translator.textFn("Unit cost")}
 				variant="secondary"
 			/>
 			<SelectorControl
-				description="Only items with Charges enabled are shown because the selected target pays this Deposit charge cost."
-				emptyLabel="No item with Charges enabled matches this search."
+				description={translator.textFn(
+					"Only items with Units enabled are shown because the target pays the unit cost.",
+				)}
+				emptyLabel={translator.textFn("No item with Units enabled matches this search.")}
 				error={
-					targetMissingCharges
-						? "Selected target must have Charges enabled."
+					targetMissingUnits
+						? translator.textFn("Selected target must have Units enabled.")
 						: input.query.selector.itemId === "" && selectedItemError !== undefined
-							? "Select an item with Charges enabled."
+							? translator.textFn("Select an item with Units enabled.")
 							: selectedItemError
 				}
-				includeItemFn={hasChargesFn}
+				includeItemFn={hasUnitsFn}
 				value={input.query.selector}
 				onChangeFn={(selector) =>
 					onChangeFn({
 						...input,
-						charges,
+						units,
 						query: {
 							...input.query,
 							selector,
@@ -295,21 +289,21 @@ const DepositTargetChargeCostControl = ({
 						if (query.scope === "board")
 							onChangeFn({
 								...input,
-								charges,
+								units,
 								query,
 							});
 					}}
 				/>
 				<EditorNumberControl
-					error={readEditorFormValidationErrorFn(issues, "charges", "cost")}
-					label="Cost"
-					value={charges.cost}
+					error={readEditorFormValidationErrorFn(issues, "units", "cost")}
+					label={translator.textFn("Cost")}
+					value={units.cost}
 					min={1}
 					onChangeFn={(cost) =>
 						onChangeFn({
 							...input,
-							charges: {
-								...charges,
+							units: {
+								...units,
 								cost,
 							},
 						})
@@ -326,87 +320,122 @@ export const InputControl = ({
 	issues = [],
 	onChangeFn,
 	ownerItemId,
-	selfChargesEnabled,
+	selfUnitsEnabled,
 }: {
 	readonly allowMaterials?: boolean;
 	readonly input: LineInputSchema.Type;
 	readonly issues?: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: LineInputSchema.Type) => void;
 	readonly ownerItemId: string;
-	readonly selfChargesEnabled: boolean;
-}) => (
-	<article className="grid gap-4">
-		<div className="flex flex-wrap items-start justify-between gap-4">
-			<EditorChoiceControl
-				error={readEditorFormValidationErrorFn(issues, "type")}
-				label="Input type"
-				description={
-					allowMaterials
-						? "Simple explicitly requires no consumable resource. Materials consume or reserve an item, while Deposit targets a matching board deposit."
-						: "Simple adds no external item requirement. Deposit targets a matching item on the current board."
-				}
-				value={input.type}
-				options={inputTypeOptions.filter(
-					(option) => allowMaterials || option.value !== "materials",
-				)}
-				onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.inputs[type]))}
-			/>
-			{input.type === "materials" ? (
-				<MaterialModeControl
-					error={readEditorFormValidationErrorFn(issues, "mode")}
-					input={input}
-					onChangeFn={onChangeFn}
+	readonly selfUnitsEnabled: boolean;
+}) => {
+	const translator = useTranslator();
+	const inputTypeOptions = [
+		{
+			description: translator.textFn(
+				"Adds no item or units requirement. The action may start without delivering or targeting another item.",
+			),
+			label: translator.textFn("Simple"),
+			value: "simple",
+		},
+		{
+			description: translator.textFn(
+				"Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.",
+			),
+			label: translator.textFn("Materials"),
+			value: "materials",
+		},
+		{
+			description: translator.textFn(
+				"Spends units from this item or a matching board item when the action starts. The paying item stays in place.",
+			),
+			label: translator.textFn("Units"),
+			value: "units",
+		},
+	] as const satisfies ReadonlyArray<{
+		readonly description: string;
+		readonly label: string;
+		readonly value: LineInputSchema.Type["type"];
+	}>;
+
+	return (
+		<article className="grid gap-4">
+			<div className="flex flex-wrap items-start justify-between gap-4">
+				<EditorChoiceControl
+					error={readEditorFormValidationErrorFn(issues, "type")}
+					label={translator.textFn("Input type")}
+					description={
+						allowMaterials
+							? translator.textFn(
+									"Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.",
+								)
+							: translator.textFn(
+									"Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.",
+								)
+					}
+					value={input.type}
+					options={inputTypeOptions.filter(
+						(option) => allowMaterials || option.value !== "materials",
+					)}
+					onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.inputs[type]))}
 				/>
-			) : input.type === "deposit" ? (
-				<DepositPaidByControl
-					error={readEditorFormValidationErrorFn(issues, "charges", "from")}
-					input={input}
-					ownerItemId={ownerItemId}
-					selfChargesEnabled={selfChargesEnabled}
-					onChangeFn={onChangeFn}
-				/>
-			) : null}
-		</div>
-		{match(input)
-			.with(
-				{
-					type: "simple",
-				},
-				() => null,
-			)
-			.with(
-				{
-					type: "materials",
-				},
-				(material) => (
-					<MaterialInputControl
-						input={material}
-						issues={issues}
+				{input.type === "materials" ? (
+					<MaterialModeControl
+						error={readEditorFormValidationErrorFn(issues, "mode")}
+						input={input}
 						onChangeFn={onChangeFn}
 					/>
-				),
-			)
-			.with(
-				{
-					type: "deposit",
-				},
-				(deposit) => {
-					const charges = deposit.charges ?? DraftDefaults.inputs.deposit.charges;
-					return charges.from === "target" ? (
-						<DepositTargetChargeCostControl
-							input={deposit}
+				) : input.type === "units" ? (
+					<UnitsPaidByControl
+						error={readEditorFormValidationErrorFn(issues, "units", "from")}
+						input={input}
+						ownerItemId={ownerItemId}
+						selfUnitsEnabled={selfUnitsEnabled}
+						onChangeFn={onChangeFn}
+					/>
+				) : null}
+			</div>
+			{match(input)
+				.with(
+					{
+						type: "simple",
+					},
+					() => null,
+				)
+				.with(
+					{
+						type: "materials",
+					},
+					(material) => (
+						<MaterialInputControl
+							input={material}
 							issues={issues}
 							onChangeFn={onChangeFn}
 						/>
-					) : (
-						<DepositSelfChargeCostControl
-							error={readEditorFormValidationErrorFn(issues, "charges", "cost")}
-							input={deposit}
-							onChangeFn={onChangeFn}
-						/>
-					);
-				},
-			)
-			.exhaustive()}
-	</article>
-);
+					),
+				)
+				.with(
+					{
+						type: "units",
+					},
+					(unitsInput) => {
+						const units = unitsInput.units ?? DraftDefaults.inputs.units.units;
+						return units.from === "target" ? (
+							<UnitsTargetUnitCostControl
+								input={unitsInput}
+								issues={issues}
+								onChangeFn={onChangeFn}
+							/>
+						) : (
+							<UnitsSelfUnitCostControl
+								error={readEditorFormValidationErrorFn(issues, "units", "cost")}
+								input={unitsInput}
+								onChangeFn={onChangeFn}
+							/>
+						);
+					},
+				)
+				.exhaustive()}
+		</article>
+	);
+};

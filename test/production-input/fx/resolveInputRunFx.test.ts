@@ -7,9 +7,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { inputRuntimeTestConfig } from "~test/production-input/support/inputRuntimeTestConfig";
 
 const workshop = inputRuntimeTestConfig.items.workshop;
-if (workshop.type !== "producer") {
-	throw new Error("Input runtime test workshop must remain a producer.");
-}
 const workshopLine = workshop.lines[0];
 
 const owner = {
@@ -58,7 +55,7 @@ describe("resolveInputRunFx", () => {
 				inputIndex: 1,
 				lineId: "line:workshop:build",
 				ownerItemId: owner.id,
-				reservedCharges: new Map(),
+				reservedUnits: new Map(),
 				runtime: {
 					cheats: {
 						enabled: false,
@@ -125,7 +122,7 @@ describe("resolveInputRunFx", () => {
 				inputIndex: 0,
 				lineId: "line:workshop:build",
 				ownerItemId: owner.id,
-				reservedCharges: new Map(),
+				reservedUnits: new Map(),
 				runtime,
 			}),
 		);
@@ -150,7 +147,7 @@ describe("resolveInputRunFx", () => {
 		});
 	});
 
-	it("resolves one charged deposit target into a charge run plan", () => {
+	it("resolves one spent units target into a unit run plan", () => {
 		const target = {
 			id: "runtime:stone",
 			item: inputRuntimeTestConfig.items.stone,
@@ -168,7 +165,7 @@ describe("resolveInputRunFx", () => {
 		const result = Effect.runSync(
 			resolveInputRunFx({
 				input: {
-					type: "deposit",
+					type: "units",
 					query: {
 						scope: "board",
 						selector: {
@@ -177,7 +174,7 @@ describe("resolveInputRunFx", () => {
 						},
 						distance: "close",
 					},
-					charges: {
+					units: {
 						from: "target",
 						cost: 1,
 					},
@@ -185,7 +182,7 @@ describe("resolveInputRunFx", () => {
 				inputIndex: 0,
 				lineId: "line:workshop:build",
 				ownerItemId: owner.id,
-				reservedCharges: new Map(),
+				reservedUnits: new Map(),
 				runtime: {
 					cheats: {
 						enabled: false,
@@ -207,13 +204,13 @@ describe("resolveInputRunFx", () => {
 
 		expect(result).toEqual({
 			resolution: {
-				type: "deposit",
+				type: "units",
 				ready: true,
 				targetItemId: target.id,
 			},
 			plan: {
-				type: "deposit",
-				charges: {
+				type: "units",
+				units: {
 					itemId: target.id,
 					cost: 1,
 				},

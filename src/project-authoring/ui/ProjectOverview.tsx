@@ -1,9 +1,7 @@
 import { ArrowRight, Boxes, Images, LoaderCircle, TriangleAlert } from "lucide-react";
-import { Fragment } from "react";
 
 import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectNotesOverview } from "~/project-note/ui/ProjectNotesOverview";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
@@ -19,17 +17,6 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 	).length;
 	const items = Object.values(project.config.items);
 	const itemCount = items.length;
-	const itemTypeCounts = TypeSchema.options.flatMap((type) => {
-		const count = items.filter((item) => item.type === type).length;
-		return count === 0
-			? []
-			: [
-					{
-						count,
-						type,
-					},
-				];
-	});
 	const unreachableSummary =
 		estimateState.status === "loading" ? (
 			<span
@@ -72,31 +59,6 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						{unreachableSummary === null ? null : <span className="h-5 w-px bg-line" />}
 						{unreachableSummary}
 					</div>
-				}
-				footerLeft={
-					itemTypeCounts.length === 0 ? undefined : (
-						<div className="flex flex-wrap items-center gap-2">
-							{itemTypeCounts.map(({ count, type }, index) => (
-								<Fragment key={type}>
-									{index === 0 ? null : <span className="text-subtle">·</span>}
-									<LinkButtonLink
-										className="capitalize"
-										data-overview-id={`items-type-${type}`}
-										data-ui="EditorProjectOverviewLink"
-										params={{
-											projectId: project.projectId,
-										}}
-										search={{
-											itemType: type,
-										}}
-										to="/editor/$projectId/editor/items/list"
-									>
-										{type} ({count})
-									</LinkButtonLink>
-								</Fragment>
-							))}
-						</div>
-					)
 				}
 				footerRight={
 					<LinkButtonLink

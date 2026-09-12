@@ -91,12 +91,10 @@ describe("ProjectOverview", () => {
 			container.querySelectorAll<HTMLAnchorElement>('[data-ui="EditorProjectOverviewLink"]'),
 		);
 		expect(links.map((link) => link.dataset.overviewId)).toEqual([
-			"items-type-simple",
 			"items",
 			"assets",
 		]);
 		expect(links.map((link) => link.dataset.to)).toEqual([
-			"/editor/$projectId/editor/items/list",
 			"/editor/$projectId/editor/items/list",
 			"/editor/$projectId/assets",
 		]);
@@ -104,9 +102,6 @@ describe("ProjectOverview", () => {
 			expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
 				projectId: project.projectId,
 			});
-		expect(JSON.parse(links[0]?.dataset.search ?? "null")).toEqual({
-			itemType: "simple",
-		});
 		expect(container.textContent).toContain("Calculating…");
 		expect(container.querySelector(".animate-spin")).not.toBeNull();
 		expect(container.querySelector('[data-overview-id="unreachable-items"]')).toBeNull();

@@ -1,13 +1,13 @@
+import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
-import { ChargesSection } from "~/item-authoring/ui/ChargesSection";
-import { useFormSession } from "~/item-authoring/ui/FormContext";
+import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
-import { SpaceActionSection } from "~/item-authoring/ui/SpaceActionSection";
+import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
@@ -26,10 +26,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const section = sectionId as SectionId;
-		const session = useFormSession();
-		const available = readSectionsFn(session.initialItem, "form").some(
-			(candidate) => candidate.id === section,
-		);
+		const available = readSectionsFn("form").some((candidate) => candidate.id === section);
 		if (!available)
 			return (
 				<section
@@ -47,12 +44,14 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				return <IdentitySection />;
 			case "artwork":
 				return <ArtworkSection />;
-			case "charges":
-				return <ChargesSection />;
+			case "units":
+				return <UnitsSection />;
 			case "merges":
 				return <MergesSection />;
 			case "action":
-				return <SpaceActionSection />;
+				return <ActionSection />;
+			case "clock":
+				return <ClockSection />;
 			case "production":
 				return <ProductionSection />;
 		}

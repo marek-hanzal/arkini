@@ -137,13 +137,13 @@ describe("filesystem Editor project writes", () => {
 			].sort(),
 		).toEqual(
 			[
-				join(root, "items", "simple", `${water.uid}.json`),
+				join(root, "items", `${water.uid}.json`),
 				join(root, "project.json"),
 			].sort(),
 		);
 		const savedItem = JSON.parse(
 			await Effect.runPromise(
-				nodeFileSystem.readFileString(join(root, "items", "simple", `${water.uid}.json`)),
+				nodeFileSystem.readFileString(join(root, "items", `${water.uid}.json`)),
 			),
 		);
 		expect(savedItem.item.asset.scale).toBe(0.65);

@@ -58,9 +58,12 @@ const output = (
 });
 
 const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: id,
 	id,
-	type: "simple" as const,
+
 	title: id,
 	description: id,
 	asset: {
@@ -82,10 +85,12 @@ const stashItem = ({
 	lineId: string;
 	lineOutput: ReturnType<typeof output>;
 }) => ({
+	maxQueueSize: 1,
+
 	uid: id,
 	id,
-	type: "stash" as const,
-	charges: {
+
+	units: {
 		amount: 1,
 	},
 	title: id,
@@ -98,28 +103,30 @@ const stashItem = ({
 	},
 	scope: "board" as const,
 	maxStackSize: 1,
-	line: {
-		id: lineId,
-		title: lineId,
-		description: lineId,
-		runtimeMs: 200,
-		input: [
-			{
-				type: "materials" as const,
-				charges: {
-					from: "self" as const,
-					cost: 1,
+	lines: [
+		{
+			id: lineId,
+			title: lineId,
+			description: lineId,
+			runtimeMs: 200,
+			input: [
+				{
+					type: "materials" as const,
+					units: {
+						from: "self" as const,
+						cost: 1,
+					},
+					selector: {
+						type: "item" as const,
+						itemId: "item:key",
+					},
+					quantity: value(1),
 				},
-				selector: {
-					type: "item" as const,
-					itemId: "item:key",
-				},
-				quantity: value(1),
-			},
-		],
-		output: lineOutput,
-		rules: [],
-	},
+			],
+			output: lineOutput,
+			rules: [],
+		},
+	],
 });
 
 const stashConfig = GameConfigSchema.parse({

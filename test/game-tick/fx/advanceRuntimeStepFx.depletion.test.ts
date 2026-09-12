@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
@@ -12,14 +12,13 @@ import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 it("preserves the full lifetime of temporary depletion output created by queue dispatch", () => {
 	const base = createTemporaryLifetimeTestConfig();
 	const producer = base.items.producer;
-	if (producer?.type !== "producer") throw new Error("Expected producer fixture.");
 	const config = GameConfigSchema.parse({
 		...base,
 		items: {
 			...base.items,
 			blocker: {
 				...base.items.blocker,
-				charges: {
+				units: {
 					amount: 1,
 					output: producer.lines[0].output,
 				},
@@ -32,8 +31,8 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 						output: undefined,
 						input: [
 							{
-								type: "deposit",
-								charges: {
+								type: "units",
+								units: {
 									from: "target",
 									cost: 1,
 								},
@@ -97,11 +96,11 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 
 	expect(result.first.runtime.items.some((item) => item.item.id === "blocker")).toBe(false);
 	expect(
-		result.first.runtime.items.find((item) => item.item.id === "temporaryPlain")
+		result.first.runtime.items.find((item) => item.item.id === "temporaryPlain")?.schedule
 			?.remainingDurationMs,
 	).toBe(600);
 	expect(
-		result.second.runtime.items.find((item) => item.item.id === "temporaryPlain")
+		result.second.runtime.items.find((item) => item.item.id === "temporaryPlain")?.schedule
 			?.remainingDurationMs,
 	).toBe(500);
 });

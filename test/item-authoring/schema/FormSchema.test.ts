@@ -12,7 +12,7 @@ describe("FormSchema", () => {
 	])("rejects an invalid authored scale %s at its form field", (scale) => {
 		const item = createDraftFn({
 			resourceId: "base",
-			type: "simple",
+
 			uid: "item-form-scale",
 		});
 		const result = FormSchema.safeParse({
@@ -25,7 +25,6 @@ describe("FormSchema", () => {
 					"base",
 					"",
 				],
-				sources: [],
 			},
 		});
 		expect(result.success).toBe(false);
@@ -43,7 +42,7 @@ describe("FormSchema", () => {
 	it("omits a blank optional item description", () => {
 		const item = createDraftFn({
 			resourceId: "base",
-			type: "simple",
+
 			uid: "item-form-description",
 		});
 
@@ -58,7 +57,6 @@ describe("FormSchema", () => {
 						"base",
 						"",
 					],
-					sources: [],
 				},
 			}),
 		).not.toHaveProperty("description");
@@ -67,7 +65,7 @@ describe("FormSchema", () => {
 	it("preserves authored scale while omitting empty optional artwork slots", () => {
 		const item = createDraftFn({
 			resourceId: "base",
-			type: "simple",
+
 			uid: "item-form-artwork",
 		});
 
@@ -82,20 +80,12 @@ describe("FormSchema", () => {
 						"base",
 						"",
 					],
-					sources: [
-						"",
-						"progress",
-						"",
-					],
 				},
 			}).asset,
 		).toEqual({
 			scale: 0.65,
 			default: [
 				"base",
-			],
-			sources: [
-				"progress",
 			],
 		});
 	});

@@ -5,8 +5,8 @@ import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetai
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
-import { unsetDefaultLineFx } from "~/production-line/fx/unsetDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 export namespace useItemLineCommandController {
 	export interface Props {
@@ -18,12 +18,11 @@ export namespace useItemLineCommandController {
 		readonly enqueueFn: () => void;
 		readonly error: string | null;
 		readonly pending: {
-			readonly default: boolean;
+			readonly selection: boolean;
 			readonly enqueue: boolean;
 			readonly withdraw: boolean;
 		};
-		readonly setDefaultFn: () => void;
-		readonly unsetDefaultFn: () => void;
+		readonly selectFn: (selection: "default" | "clock", selected: boolean) => void;
 		readonly withdrawFn: () => void;
 	}
 }
@@ -33,12 +32,12 @@ export const useItemLineCommandController = ({
 	line,
 	ownerItemId,
 }: useItemLineCommandController.Props): useItemLineCommandController.Output => {
+	const translator = useTranslator();
 	const pendingKeys = {
-		default: JSON.stringify([
+		selection: JSON.stringify([
 			"line",
 			ownerItemId,
-			line.lineId,
-			"default",
+			"selection",
 		]),
 		enqueue: JSON.stringify([
 			"line",
@@ -53,23 +52,17 @@ export const useItemLineCommandController = ({
 			"withdraw",
 		]),
 	} as const;
-	const setDefaultLine = useItemDetailPendingCommand({
-		action: "default",
-		failureMessage: "Default line could not be changed.",
-		pendingKey: pendingKeys.default,
-		runFx: (game, command: setDefaultLineFx.Props) => game.runFx(setDefaultLineFx(command)),
+	const selectLine = useItemDetailPendingCommand({
+		action: "selection",
+		failureMessage: translator.textFn("Line selection could not be changed."),
+		pendingKey: pendingKeys.selection,
+		runFx: (game, command: setLineSelectionFx.Props) => game.runFx(setLineSelectionFx(command)),
 	});
 	const enqueueLine = useItemDetailPendingCommand({
 		action: "enqueue",
 		failureMessage: "Work could not be queued.",
 		pendingKey: pendingKeys.enqueue,
 		runFx: (game, command: enqueueLineFx.Props) => game.runFx(enqueueLineFx(command)),
-	});
-	const unsetDefaultLine = useItemDetailPendingCommand({
-		action: "default",
-		failureMessage: "Default line could not be changed.",
-		pendingKey: pendingKeys.default,
-		runFx: (game, command: unsetDefaultLineFx.Props) => game.runFx(unsetDefaultLineFx(command)),
 	});
 	const withdrawLine = useItemDetailPendingCommand({
 		action: "withdraw",
@@ -94,23 +87,19 @@ export const useItemLineCommandController = ({
 		error:
 			[
 				enqueueLine.error,
-				setDefaultLine.error,
-				unsetDefaultLine.error,
+				selectLine.error,
 				withdrawLine.error,
 			].find((message) => message !== null) ?? null,
 		pending: {
-			default: setDefaultLine.pending || unsetDefaultLine.pending,
+			selection: selectLine.pending,
 			enqueue: enqueueLine.pending,
 			withdraw: withdrawLine.pending,
 		},
-		setDefaultFn: () =>
-			setDefaultLine.runFn({
+		selectFn: (selection, selected) =>
+			selectLine.runFn({
 				ownerItemId,
-				lineId: line.lineId,
-			}),
-		unsetDefaultFn: () =>
-			unsetDefaultLine.runFn({
-				ownerItemId,
+				selection,
+				lineId: selected ? line.lineId : null,
 			}),
 		withdrawFn: () =>
 			withdrawLine.runFn({

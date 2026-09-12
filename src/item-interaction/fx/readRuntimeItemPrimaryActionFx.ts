@@ -1,9 +1,9 @@
 import { Effect, Option } from "effect";
+import { match } from "ts-pattern";
 
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -18,6 +18,7 @@ export namespace readRuntimeItemPrimaryActionFx {
 		  }
 		| {
 				readonly kind: "open-inventory";
+				readonly currentSpace: number;
 		  }
 		| {
 				readonly kind: "enqueue-default-line";
@@ -38,16 +39,31 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click interaction of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
-		if (item.item.type === TypeSchema.enum.Space) {
+		if (item.location.scope === "inventory")
 			return {
-				currentSpace: runtime.currentSpace,
-				kind: "activate-space" as const,
-			} satisfies readRuntimeItemPrimaryActionFx.Result;
-		}
-		if (item.item.type === TypeSchema.enum.Inventory) {
-			return {
-				kind: "open-inventory" as const,
-			} satisfies readRuntimeItemPrimaryActionFx.Result;
+				kind: "none" as const,
+			};
+		if (item.item.action !== undefined) {
+			return match(item.item.action)
+				.with(
+					{
+						type: "space",
+					},
+					() => ({
+						currentSpace: runtime.currentSpace,
+						kind: "activate-space" as const,
+					}),
+				)
+				.with(
+					{
+						type: "inventory",
+					},
+					() => ({
+						kind: "open-inventory" as const,
+						currentSpace: runtime.currentSpace,
+					}),
+				)
+				.exhaustive();
 		}
 		const lineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(item.item));
 		if (lineOwnerItem === undefined) {
@@ -55,7 +71,8 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 				kind: "none" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		const defaultLine = readEffectiveDefaultLineFn({
+		const defaultLine = readEffectiveLineFn({
+			selection: "default",
 			ownerItemId: item.id,
 			ownerItem: lineOwnerItem,
 			runtime,

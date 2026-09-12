@@ -4,7 +4,7 @@ import type {
 } from "~/flow/type/ItemOriginSource";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
-export type ItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
+export type ItemOriginOperationKind = "line" | "units" | "merge" | "expiry";
 
 export const ItemOriginItemInputPortId = "item:self:input";
 export const ItemOriginItemOutputPortId = "item:self:output";
@@ -45,7 +45,7 @@ export interface ItemOriginItemNode {
 	readonly resourceIds: ItemSchema.Type["asset"]["default"];
 	readonly starterScopes: ReadonlyArray<"Board" | "Inventory" | "Toolbar">;
 	readonly title: string;
-	readonly type: ItemSchema.Type["type"] | "missing";
+	readonly missing: boolean;
 }
 
 export interface ItemOriginEdge {

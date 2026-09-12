@@ -1,6 +1,5 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 import type { ItemOutputEntrySchema } from "../schema/ItemOutputEntrySchema";
 import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
@@ -12,7 +11,7 @@ export namespace readItemOutputEntriesFn {
 	}
 }
 
-/** Reads line, charge-depletion, temporary, and merge outputs owned by one canonical item. */
+/** Reads line, unit-depletion, lifetime-expiry, and merge outputs owned by one canonical item. */
 export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesFn.Props) => {
 	const lines = readItemLineEntriesFn({
 		itemId,
@@ -32,25 +31,26 @@ export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesF
 				],
 	);
 
-	if (item.charges?.output !== undefined) {
+	if (item.units?.output !== undefined) {
 		entries.push({
-			output: item.charges.output,
+			output: item.units.output,
 			path: [
 				"items",
 				itemId,
-				"charges",
+				"units",
 				"output",
 			],
 		});
 	}
 
-	if (item.type === TypeSchema.enum.Temporary && item.output !== undefined) {
+	if (item.clock?.onExpire !== undefined) {
 		entries.push({
-			output: item.output,
+			output: item.clock.onExpire,
 			path: [
 				"items",
 				itemId,
-				"output",
+				"clock",
+				"onExpire",
 			],
 		});
 	}

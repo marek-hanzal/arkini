@@ -3,7 +3,6 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readDeliveryTravelDurationMsFn } from "~/production-delivery/fn/readDeliveryTravelDurationMsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
-import { isMaterialInputEligibleFn } from "~/production-input/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
@@ -76,7 +75,6 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 				if (
 					input === undefined ||
 					input.type !== TypeSchema.enum.Materials ||
-					!isMaterialInputEligibleFn(current.item) ||
 					!matchesItemSelectorFn({
 						item: current.item,
 						selector: input.selector,

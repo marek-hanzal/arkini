@@ -55,7 +55,6 @@ export const runBlueprint = <A, E>(
 
 export const sourceLine = (lineId: string) => {
 	const source = blueprintConfig.items["producer:blueprint-source"];
-	if (source?.type !== "producer") throw new Error("Missing blueprint source producer.");
 	const line = source.lines.find((candidate) => candidate.id === lineId);
 	if (line === undefined) throw new Error(`Missing source line ${lineId}.`);
 	return line;

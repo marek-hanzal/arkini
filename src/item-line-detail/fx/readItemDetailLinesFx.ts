@@ -1,3 +1,5 @@
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -13,8 +15,7 @@ import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 
@@ -45,12 +46,14 @@ const readLineDisabledHintFn = (
 const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
 	activeJob,
 	defaultLineId,
+	clockLineId,
 	line,
 	ownerItemId,
 	runtime,
 }: {
 	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
 	readonly defaultLineId: IdSchema.Type | undefined;
+	readonly clockLineId: IdSchema.Type | undefined;
 	readonly line: LineSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
@@ -64,6 +67,7 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 		itemId: ownerItemId,
 		runtime,
 	});
+	const canControl = canControlItemProductionFn(owner.item);
 	const resolution = start.run;
 	if (!resolution.show && activeJob === undefined) return undefined;
 	const allInputsReady = resolution.input.every((input) => input.resolution.ready);
@@ -99,8 +103,8 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 		resolved: resolution.input,
 		runtime,
 	});
-	const missingDepositTarget = input.find(
-		(candidate) => candidate.kind === "deposit" && candidate.targetItemIds.length === 0,
+	const missingUnitsTarget = input.find(
+		(candidate) => candidate.kind === "units" && candidate.targetItemIds.length === 0,
 	);
 	const availability: ItemDetailLines.Line["availability"] = !resolution.enable
 		? {
@@ -133,13 +137,13 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 							maxCount: downstreamOutputBlock.maxCount,
 						},
 					}
-				: missingDepositTarget?.kind === "deposit"
+				: missingUnitsTarget?.kind === "units"
 					? {
 							kind: "unavailable",
 							reason: {
-								kind: "deposit-target-missing",
-								selector: missingDepositTarget.selector,
-								distance: missingDepositTarget.distance,
+								kind: "units-target-missing",
+								selector: missingUnitsTarget.selector,
+								distance: missingUnitsTarget.distance,
 							},
 						}
 					: {
@@ -162,14 +166,26 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 				: [];
 		}),
 		isDefault: line.id === defaultLineId,
+		clock:
+			owner.schedule === undefined
+				? undefined
+				: {
+						selected: line.id === clockLineId,
+						canChange: canControl && isItemProductionAdmissionOpenFn(owner),
+					},
 		queuedRequestCount: runtime.jobQueue.filter(
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
+			canChangeDefault: canControl,
 			enqueue: {
-				enabled: availability.kind === "available" && start.queue.available,
+				enabled:
+					canControl &&
+					isItemProductionAdmissionOpenFn(owner) &&
+					availability.kind === "available" &&
+					start.queue.available,
 			},
-			canWithdraw,
+			canWithdraw: canControl && canWithdraw,
 		},
 		input,
 		output: yield* readItemDetailOutputFx({
@@ -222,6 +238,7 @@ const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx")(funct
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
+			canChangeDefault: false,
 			enqueue: {
 				enabled: false,
 			},
@@ -258,11 +275,18 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
 	if (ownerItem === undefined) return unavailable;
 
-	const lines = readLineOwnerLinesFn(ownerItem);
-	const defaultLineId = readEffectiveDefaultLineFn({
+	const lines = ownerItem.lines;
+	const defaultLineId = readEffectiveLineFn({
+		selection: "default",
 		ownerItemId: owner.id,
 		ownerItem,
 		runtime,
+	})?.id;
+	const clockLineId = readEffectiveLineFn({
+		ownerItemId: owner.id,
+		ownerItem,
+		runtime,
+		selection: "clock",
 	})?.id;
 	const projected: ItemDetailLines.Line[] = [];
 
@@ -287,6 +311,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		const boardLine = yield* readBoardItemDetailLineFx({
 			activeJob,
 			defaultLineId,
+			clockLineId,
 			line,
 			ownerItemId: owner.id,
 			runtime,

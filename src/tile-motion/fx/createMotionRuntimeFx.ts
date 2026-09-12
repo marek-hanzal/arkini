@@ -519,19 +519,8 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 
 	function startCue(cue: TileMotionCue) {
 		const cueKey = readCueKeyFn(cue);
-		const readSourceSurvivesFn = () => {
-			if (cue.kind !== "input") return false;
-			if (cue.sourceItem === undefined) {
-				return actorStore.canonicalItems.has(cue.sourceActorId);
-			}
-			const latest = readCuesFn()
-				.filter(
-					(candidate) =>
-						candidate.kind === "input" && candidate.sourceActorId === cue.sourceActorId,
-				)
-				.at(-1);
-			return latest?.kind === "input" && latest.resultingQuantity > 0;
-		};
+		const readSourceSurvivesFn = () =>
+			cue.kind === "input" && actorStore.canonicalItems.has(cue.sourceActorId);
 		RendererRuntime.runSync(
 			runMotionCueFx({
 				actorStore,
@@ -671,30 +660,24 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					yield* animator.cancelFx(animationKey);
 				}
 				if (cue.kind === "input" && started) {
-					const payload = lifecycle?.payloadActor ?? null;
-					const actor = payload ?? actorStore.actors.get(cue.sourceActorId);
+					const actor = actorStore.actors.get(cue.sourceActorId);
 					if (actor !== undefined && !actor.container.destroyed) {
 						yield* magneticField.releaseFx({
 							sourceActorId: actor.item.id,
 							sourceInstanceId: actor.instanceId,
 							sourceKind: "motion",
 						});
-						if (payload !== null) {
-							yield* animator.cancelActorFx(payload);
-							yield* destroyTileActorFx(payload);
-						} else {
-							// The real source survives for delivery; retire any input contact fade.
-							yield* animator.setFx({
-								actor,
-								channel: "lifecycle-opacity",
-								alpha: 1,
-							});
-							yield* animator.setFx({
-								actor,
-								channel: "lifecycle-scale",
-								scale: 1,
-							});
-						}
+						// The real source survives for delivery; retire any input contact fade.
+						yield* animator.setFx({
+							actor,
+							channel: "lifecycle-opacity",
+							alpha: 1,
+						});
+						yield* animator.setFx({
+							actor,
+							channel: "lifecycle-scale",
+							scale: 1,
+						});
 					}
 				}
 				if (!started && cue.kind === "spawn") {

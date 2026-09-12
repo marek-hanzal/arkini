@@ -81,8 +81,8 @@ describe("blueprint depleted-owner accounting", () => {
 					y: 0,
 				});
 				const stack = yield* spawnItemFx({
-					id: "runtime:charged-stack",
-					itemId: "producer:charged-stack",
+					id: "runtime:spent-stack",
+					itemId: "producer:spent-stack",
 					location: {
 						scope: "board",
 						space: 0,
@@ -104,7 +104,7 @@ describe("blueprint depleted-owner accounting", () => {
 				});
 				const started = yield* startLineFx({
 					ownerItemId: stack.id,
-					lineId: "line:producer:charged-stack",
+					lineId: "line:producer:spent-stack",
 				}).pipe(Effect.result);
 				return {
 					lines,

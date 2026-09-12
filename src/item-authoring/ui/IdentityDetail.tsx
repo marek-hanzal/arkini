@@ -54,7 +54,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							label={translator.textFn("Game limit")}
 							value={
 								item.maxCount === undefined
-									? translator.textFn("No configured limit")
+									? translator.textFn("Unlimited")
 									: item.maxCount
 							}
 						/>

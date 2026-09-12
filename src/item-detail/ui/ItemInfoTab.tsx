@@ -33,7 +33,7 @@ const readOwnedLabelFn = (ownedQuantity: number, maxCount: number | undefined) =
 	`${ownedQuantity}${maxCount === undefined ? "" : ` / ${maxCount}`}`;
 
 const readGameLimitLabelFn = (maxCount: number | undefined) =>
-	maxCount === undefined ? "No configured limit" : `${maxCount}`;
+	maxCount === undefined ? "Unlimited" : `${maxCount}`;
 
 const readLocationLabelFn = (location: readItemDetailInfoFn.Location) =>
 	match(location)

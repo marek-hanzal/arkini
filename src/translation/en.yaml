@@ -504,7 +504,7 @@ Item player controls help:
     **Automatic only** disables those production controls and leaves authored automation in charge. It does not change movement, merge or removal rules.
 Item production help:
   value: |
-    Production combines the item's queue, Clock and production lines. Player controls are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
+    Production combines the item's queue, Clock and production lines. Queue capacity and player controls are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
 
     **Default** selects the manual click line. **Clock** independently selects the line attempted at every timer pulse. Selecting either role clears only that role on the other lines. Without a Clock line, the timer continues without adding work.
 

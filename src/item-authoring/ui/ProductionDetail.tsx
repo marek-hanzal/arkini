@@ -4,7 +4,6 @@ import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
 import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
-import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -33,15 +32,6 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 					"Each line owns its inputs, outputs, runtime and rules. Manual and Clock requests share the same queue.",
 				)}
 			/>
-			<EditorRootCard dataUi="EditorProductionQueueSettings">
-				<DetailFact
-					label={translator.textFn("Queue capacity")}
-					description={translator.textFn(
-						"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
-					)}
-					value={item.maxQueueSize}
-				/>
-			</EditorRootCard>
 			{item.lines.length > 0 ? (
 				<div className="ak-list grid gap-3">
 					{item.lines.map((line) => (

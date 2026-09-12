@@ -295,7 +295,11 @@ it("virtualizes a large picker and scrolls keyboard selection to an unmounted la
 	const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(400);
 	const scrollHeight = vi
 		.spyOn(HTMLElement.prototype, "scrollHeight", "get")
-		.mockReturnValue(84_008);
+		.mockImplementation(function (this: HTMLElement) {
+			return Number.parseFloat(
+				(this.firstElementChild as HTMLElement | null)?.style.height ?? "0",
+			);
+		});
 	const previousScrollTo = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollTo");
 	Object.defineProperty(HTMLElement.prototype, "scrollTo", {
 		configurable: true,

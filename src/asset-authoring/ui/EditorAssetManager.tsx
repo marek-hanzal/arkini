@@ -232,17 +232,17 @@ const EditorAssetCard = ({
 				filter,
 				query,
 			}}
-			className="group grid min-h-0 min-w-0 grid-rows-[minmax(8rem,1fr)_auto] overflow-hidden rounded-xl border-0 border-l-2 border-line-strong bg-surface-raised/60 p-0 text-left shadow-none hover:bg-surface-raised"
+			className="group grid min-h-0 min-w-0 grid-rows-[minmax(12rem,1fr)_auto] overflow-hidden rounded-xl border-0 border-l-2 border-line-strong bg-surface-raised/60 p-0 text-left shadow-none hover:bg-surface-raised"
 			data-ui="EditorAssetCard"
 		>
-			<span className="grid min-h-32 place-items-center overflow-hidden p-4">
+			<span className="grid min-h-48 place-items-center overflow-hidden p-4">
 				{url === undefined ? (
 					<ImageIcon className="size-8 text-subtle" />
 				) : (
 					<img
 						src={url}
 						alt=""
-						className="max-h-44 max-w-full object-contain"
+						className="max-h-66 max-w-full object-contain"
 						draggable={false}
 						loading="lazy"
 					/>
@@ -282,9 +282,9 @@ const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps
 			items={resources}
 			itemKeyFn={readAssetKeyFn}
 			renderItemFn={renderAssetFn}
-			estimatedRowHeight={244}
+			estimatedRowHeight={332}
 			gapRem={0.75}
-			minColumnWidthRem={18}
+			minColumnWidthRem={19}
 		/>
 	);
 });

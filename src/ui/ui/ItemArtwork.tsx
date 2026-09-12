@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 const artworkSizeClassName = {
 	input: "size-[var(--ak-control-min-height)]",
 	lg: "size-16",
@@ -29,7 +31,7 @@ export const ItemArtwork = ({
 		"absolute object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)]";
 	return (
 		<span
-			className={`relative block shrink-0 ${artworkSizeClassName[size]} ${className}`}
+			className={twMerge(`relative block shrink-0 ${artworkSizeClassName[size]}`, className)}
 			data-ui={dataUi}
 		>
 			<img

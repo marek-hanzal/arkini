@@ -149,7 +149,7 @@ export const List = ({
 					items={filteredItems}
 					itemKeyFn={readItemKeyFn}
 					renderItemFn={renderItemFn}
-					estimatedRowHeight={88}
+					estimatedRowHeight={120}
 					gapRem={0.5}
 				/>
 			</div>

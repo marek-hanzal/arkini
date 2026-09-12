@@ -4,11 +4,11 @@ import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { twMerge } from "tailwind-merge";
 
 const thumbnailSizeClassName = {
-	input: "size-[var(--ak-control-min-height)]",
-	lg: "size-16",
-	md: "size-12",
-	sm: "size-11",
-	xl: "size-36",
+	input: "size-[calc(var(--ak-control-min-height)*1.5)]",
+	lg: "size-24",
+	md: "size-18",
+	sm: "size-16.5",
+	xl: "size-54",
 } as const;
 
 interface EditorItemThumbnailProps {
@@ -68,7 +68,7 @@ export const EditorItemThumbnail = ({
 		return (
 			<ItemArtwork
 				className={twMerge(
-					"overflow-hidden rounded-xl border border-line bg-canvas/70",
+					`${thumbnailSizeClassName[size]} overflow-hidden rounded-xl border border-line bg-canvas/70`,
 					className,
 				)}
 				compositeUrl={foregroundUrl}

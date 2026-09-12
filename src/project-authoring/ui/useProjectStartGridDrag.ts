@@ -19,6 +19,7 @@ interface ProjectStartGridDrag {
 	readonly pressX: number;
 	readonly pressY: number;
 	readonly source: ProjectStartGridCell;
+	readonly cellSize: number;
 	target?: ProjectStartGridPosition;
 }
 
@@ -26,6 +27,7 @@ interface ProjectStartGridDragVisual {
 	readonly clientX: number;
 	readonly clientY: number;
 	readonly source: ProjectStartGridCell;
+	readonly cellSize: number;
 	readonly targetKey?: string;
 }
 
@@ -88,6 +90,7 @@ export const useProjectStartGridDrag = ({
 					clientX: event.clientX,
 					clientY: event.clientY,
 					source: drag.source,
+					cellSize: drag.cellSize,
 					targetKey,
 				});
 			} else {
@@ -149,6 +152,7 @@ export const useProjectStartGridDrag = ({
 			pressX: event.clientX,
 			pressY: event.clientY,
 			source,
+			cellSize: event.currentTarget.getBoundingClientRect().width,
 		};
 	};
 

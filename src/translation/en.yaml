@@ -105,6 +105,8 @@ Board — required by Clock:
   value: Board — required by Clock
 Buffer:
   value: Buffer
+Buffer disabled:
+  value: Buffer disabled
 Build:
   value: Build
 Build help:

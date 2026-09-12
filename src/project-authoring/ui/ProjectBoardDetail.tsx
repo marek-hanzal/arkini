@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
-import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 
@@ -20,24 +19,6 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 		: (spaces[0] ?? project.config.start.currentSpace);
 	return (
 		<div className="grid gap-6">
-			<EditorRootCard dataUi="EditorProjectBoardSizeDetailCard">
-				<DetailSection title="Board size">
-					<DetailFacts columns={3}>
-						<DetailFact
-							label="Width"
-							value={board.width}
-						/>
-						<DetailFact
-							label="Height"
-							value={board.height}
-						/>
-						<DetailFact
-							label="Capacity"
-							value={board.width * board.height}
-						/>
-					</DetailFacts>
-				</DetailSection>
-			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectSpaceDetailCard">
 				<EditorSearchCombobox
 					displaySelectedLabel
@@ -70,6 +51,7 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 					height={board.height}
 					items={project.config.items}
 					mode="detail"
+					scope="board"
 					projectId={project.projectId}
 					width={board.width}
 				/>

@@ -55,11 +55,11 @@ const ItemImages = ({
 	ids.length === 0 ? (
 		<span className="text-xs text-subtle">({emptyLabel})</span>
 	) : (
-		<span className="flex flex-wrap items-center gap-1">
+		<span className="flex min-w-0 flex-wrap items-center gap-1">
 			{ids.map((id) => (
 				<EditorItemThumbnail
 					key={id}
-					className="size-8! rounded-md"
+					className="size-12 rounded-md"
 					resourceIds={
 						items[id]?.asset.default ?? [
 							"",
@@ -87,11 +87,11 @@ export const ProductionLineOption = ({
 			className="grid min-w-0 flex-1 gap-1.5"
 			data-ui="EditorProductionLineOption"
 		>
-			<span className="flex min-w-0 items-center gap-2">
+			<span className="flex min-w-0 flex-wrap items-center gap-2">
 				<span className="truncate text-sm font-semibold text-foreground">{label}</span>
 				<ProductionLineBadges line={line} />
 			</span>
-			<span className="flex min-w-0 items-center gap-2">
+			<span className="flex min-w-0 flex-wrap items-center gap-2">
 				<ItemImages
 					ids={inputs}
 					items={items}

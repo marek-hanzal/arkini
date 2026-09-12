@@ -182,7 +182,7 @@ export const EditorSearchCombobox = ({
 		enabled: open && virtualized,
 		getScrollElement: getScrollElementFn,
 		getItemKey: getOptionKeyFn,
-		estimateSize: () => 80,
+		estimateSize: () => 112,
 		gap: 4,
 		paddingStart: 6,
 		paddingEnd: 6,

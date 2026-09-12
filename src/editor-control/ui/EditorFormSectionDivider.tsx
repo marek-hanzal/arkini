@@ -15,7 +15,7 @@ export const EditorFormSectionDivider = ({
 	const primary = variant === "primary";
 	return (
 		<header
-			className={`flex min-w-0 items-center gap-3 ${primary ? "my-[clamp(-1rem,-1.375cqmin,-0.25rem)] py-1" : "py-0.5"}`}
+			className={`flex min-w-0 items-center gap-3 ${primary ? "my-[clamp(-1rem,-1.375cqmin,-0.25rem)] pt-1 pb-2" : "py-0.5"}`}
 			data-ui="EditorFormSectionDivider"
 			data-variant={variant}
 		>

@@ -7,13 +7,13 @@
 }
 
 @utility overflow-auto {
-	body:has([data-ui="EditorShell"]) & {
+	body:has([data-ui="EditorShell"]) &:not([data-ui="EditorSearchComboboxMenu"]) {
 		scrollbar-gutter: stable;
 	}
 }
 
 @utility overflow-y-auto {
-	body:has([data-ui="EditorShell"]) & {
+	body:has([data-ui="EditorShell"]) &:not([data-ui="EditorSearchComboboxMenu"]) {
 		scrollbar-gutter: stable;
 	}
 }

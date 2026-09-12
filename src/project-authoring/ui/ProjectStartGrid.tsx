@@ -24,6 +24,7 @@ import { ButtonLink } from "~/ui/ui/Button";
 interface ProjectStartGridCommonProps {
 	readonly cells: ReadonlyArray<ProjectStartGridCell>;
 	readonly height: number;
+	readonly scope: ProjectStartScope;
 	readonly width: number;
 }
 
@@ -37,7 +38,6 @@ interface ProjectStartGridEditProps extends ProjectStartGridCommonProps {
 	readonly invalidCells?: ReadonlyArray<ProjectStartGridPosition>;
 	readonly mode: "edit";
 	readonly onCellsChangeFn: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
-	readonly scope: ProjectStartScope;
 	readonly start: StartSchema.Type;
 }
 
@@ -73,13 +73,13 @@ const ProjectStartGridCellContent = ({
 			empty
 		) : (
 			<EditorItemThumbnail
-				className="size-14 border-0 bg-transparent"
+				className="absolute inset-[11%] size-[78%] border-0 bg-transparent"
 				resourceIds={resourceIds}
 				size="sm"
 			/>
 		)}
 		{quantity === undefined ? null : (
-			<span className="absolute right-1 bottom-1 rounded-md border border-line-strong bg-surface-raised/95 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-foreground">
+			<span className="absolute right-[4cqw] bottom-[4cqw] rounded-md border border-line-strong bg-surface-raised/95 px-[5cqw] py-[1cqw] font-mono text-[min(0.65rem,18cqw)] font-bold text-foreground">
 				×{quantity}
 			</span>
 		)}
@@ -121,7 +121,7 @@ const ProjectStartGridSlot = ({
 	readonly suppressClickRef: RefObject<boolean>;
 }) => (
 	<button
-		className="relative grid size-[4.5rem] place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:border-line-strong enabled:hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
+		className="relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:border-line-strong enabled:hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
 		data-start-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
@@ -188,7 +188,7 @@ const ProjectStartGridSlot = ({
 		}}
 	>
 		<ProjectStartGridCellContent
-			empty={<Plus className="size-4 opacity-35" />}
+			empty={<Plus className="size-[15%] opacity-35" />}
 			quantity={cell?.quantity}
 			resourceIds={item?.asset.default}
 		/>
@@ -201,6 +201,7 @@ const ProjectStartGridSurface = ({
 	height,
 	items,
 	projectId,
+	scope,
 	width,
 }: ProjectStartGridCommonProps & {
 	readonly edit?: {
@@ -241,15 +242,21 @@ const ProjectStartGridSurface = ({
 	);
 	return (
 		<div
-			className="max-w-full overflow-auto rounded-xl border border-line bg-canvas/50 p-3"
+			className="min-w-0 max-w-full overflow-x-auto rounded-xl border border-line bg-canvas/50 p-3 data-[mode=detail]:rounded-none data-[mode=detail]:border-0 data-[mode=detail]:bg-transparent data-[mode=detail]:p-0"
 			data-ui="EditorProjectStartGrid"
 			data-mode={edit === undefined ? "detail" : "edit"}
 		>
 			<div
-				className="mx-auto grid w-max gap-1.5"
+				className="mx-auto grid gap-1.5"
 				ref={edit?.gridRef}
 				style={{
-					gridTemplateColumns: `repeat(${Math.max(1, width)}, 4.5rem)`,
+					gridTemplateColumns: `repeat(${Math.max(1, width)}, minmax(0, 1fr))`,
+					// Fit square cells to the panel width and a viewport-bounded preview height.
+					// Toolbar intentionally retains fixed slots and horizontal scrolling.
+					width:
+						scope === "toolbar"
+							? `calc(${Math.max(1, width)} * 6.75rem + ${Math.max(0, width - 1)} * 0.375rem)`
+							: `min(100%, calc((70dvh - ${Math.max(0, height - 1)} * 0.375rem) / ${Math.max(1, height)} * ${Math.max(1, width)} + ${Math.max(0, width - 1)} * 0.375rem))`,
 				}}
 			>
 				{positions.map((position) => {
@@ -258,7 +265,7 @@ const ProjectStartGridSurface = ({
 					const item = cell === undefined ? undefined : items[cell.itemId];
 					if (edit === undefined) {
 						const className =
-							"relative grid size-[4.5rem] min-h-0 place-items-center rounded-lg border border-line bg-surface/70 p-0 text-subtle shadow-none";
+							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 p-0 text-subtle shadow-none";
 						const content = (
 							<ProjectStartGridCellContent
 								quantity={cell?.quantity}
@@ -332,22 +339,26 @@ const ProjectStartGridSurface = ({
 const ProjectStartGridDragPreview = ({
 	clientX,
 	clientY,
+	cellSize,
 	quantity,
 	resourceIds,
 	previewRef,
 }: {
 	readonly clientX: number;
 	readonly clientY: number;
+	readonly cellSize: number;
 	readonly previewRef: RefObject<HTMLDivElement | null>;
 	readonly quantity: number;
 	readonly resourceIds: ItemSchema.Type["asset"]["default"];
 }) => (
 	<div
-		className="pointer-events-none fixed top-0 left-0 z-[90] grid size-[4.5rem] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"
+		className="pointer-events-none fixed top-0 left-0 z-[90] grid [container-type:inline-size] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"
 		data-ui="EditorProjectStartGridDragPreview"
 		ref={previewRef}
 		style={{
 			transform: `translate3d(${clientX + 12}px, ${clientY + 12}px, 0)`,
+			width: cellSize,
+			height: cellSize,
 		}}
 	>
 		<ProjectStartGridCellContent
@@ -442,6 +453,7 @@ const ProjectStartGridEdit = ({
 				}}
 				height={height}
 				items={items}
+				scope={scope}
 				width={width}
 			/>
 			{pickerCell === undefined ? null : (
@@ -462,6 +474,7 @@ const ProjectStartGridEdit = ({
 				<ProjectStartGridDragPreview
 					clientX={dragVisual.clientX}
 					clientY={dragVisual.clientY}
+					cellSize={dragVisual.cellSize}
 					previewRef={dragPreviewRef}
 					quantity={dragVisual.source.quantity}
 					resourceIds={items[dragVisual.source.itemId]?.asset.default ?? []}

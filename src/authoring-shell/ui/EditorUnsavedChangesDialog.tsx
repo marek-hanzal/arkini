@@ -1,3 +1,4 @@
+import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Save, Trash2, X } from "lucide-react";
 import { useSyncExternalStore } from "react";
@@ -19,6 +20,11 @@ const EditorUnsavedChangesPrompt = ({
 		onCloseFn: () => void owner.decideFn("cancel"),
 	});
 
+	useEditorSaveShortcut({
+		target: focus.overlayRef,
+		saveEnabled: !state.saving && state.canSave,
+		saveFn: () => owner.decideFn("save"),
+	});
 	return (
 		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 			<div

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { detectPlatform } from "@tanstack/react-hotkeys";
 import type { Project } from "~/project-authoring/type/Project";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
@@ -278,7 +279,18 @@ describe("item section form session", () => {
 					...container.querySelectorAll("button"),
 				].find((button) => button.textContent === label);
 			await act(async () => {
-				buttonFn("Save")?.click();
+				if (sectionId === "clock") {
+					title.dispatchEvent(
+						new KeyboardEvent("keydown", {
+							key: "s",
+							code: "KeyS",
+							bubbles: true,
+							cancelable: true,
+							metaKey: detectPlatform() === "mac",
+							ctrlKey: detectPlatform() !== "mac",
+						}),
+					);
+				} else buttonFn("Save")?.click();
 			});
 			expect(state.navigate).toHaveBeenLastCalledWith(
 				expect.objectContaining({

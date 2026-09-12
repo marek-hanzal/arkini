@@ -1,3 +1,4 @@
+import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { FilePlus2, Pencil, X } from "lucide-react";
 
@@ -57,6 +58,11 @@ export const ProjectIdDialogForm = ({
 		if (!parsed.success || projectId === unchangedProjectId || pending) return;
 		onSubmitFn(parsed.data);
 	};
+	useEditorSaveShortcut({
+		target: formRef,
+		saveEnabled: !pending,
+		saveFn: () => formRef.current?.requestSubmit(),
+	});
 	return (
 		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 			<form

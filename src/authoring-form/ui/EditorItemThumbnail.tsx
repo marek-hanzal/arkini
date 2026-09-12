@@ -41,7 +41,7 @@ export const EditorItemSearchThumbnail = ({
 	) : (
 		<EditorItemThumbnail
 			resourceIds={item.asset.default}
-			size="sm"
+			size="lg"
 		/>
 	);
 

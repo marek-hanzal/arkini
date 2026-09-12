@@ -99,9 +99,7 @@ export const LineFields = withFieldGroupFn({
 											description={translator.textFn(
 												"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
 											)}
-											onChangeFn={(value) =>
-												onMarkerChangeFn("clock", value)
-											}
+											onChangeFn={(value) => onMarkerChangeFn("clock", value)}
 										/>
 									)}
 								</group.AppField>
@@ -135,10 +133,18 @@ export const LineFields = withFieldGroupFn({
 									<EditorChoiceControl
 										required={false}
 										value={field.state.value === true ? "enable" : "disable"}
-										onChangeFn={(value) => field.handleChange(value === "enable")}
+										onChangeFn={(value) =>
+											field.handleChange(value === "enable")
+										}
 										options={[
-											{ label: translator.textFn("Enable"), value: "enable" },
-											{ label: translator.textFn("Disable"), value: "disable" },
+											{
+												label: translator.textFn("Enable"),
+												value: "enable",
+											},
+											{
+												label: translator.textFn("Disable"),
+												value: "disable",
+											},
 										]}
 										label={translator.textFn("Check ahead")}
 										description={translator.textFn(

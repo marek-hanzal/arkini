@@ -25,7 +25,11 @@ it("keeps keyboard-selected results visible without moving focus or the outer pa
 					emptyMessage="No results"
 					onCloseFn={() => undefined}
 					onSelectItemFn={selectFn}
-					options={["alpha", "beta", "gamma"].map((id) => ({
+					options={[
+						"alpha",
+						"beta",
+						"gamma",
+					].map((id) => ({
 						artwork: <span />,
 						itemId: id,
 						label: id,

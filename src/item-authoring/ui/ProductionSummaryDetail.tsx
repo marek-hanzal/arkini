@@ -54,7 +54,9 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 			{item.lines.length > 2 ? (
 				<EditorRootCard dataUi="EditorItemProductionMoreCard">
 					<div className="flex items-center justify-between gap-4 text-sm">
-						<p className="text-muted">{translator.textFn("More entries are available.")}</p>
+						<p className="text-muted">
+							{translator.textFn("More entries are available.")}
+						</p>
 						<LinkButtonLink
 							className="inline-flex shrink-0 items-center gap-1.5"
 							to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"

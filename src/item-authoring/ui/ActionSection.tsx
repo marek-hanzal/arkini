@@ -11,7 +11,6 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 const RandomSpaceMinimum = 128;
@@ -91,14 +90,31 @@ export const ActionSection = () => {
 											)
 										}
 									/>
-									<Button
+									<LinkButton
+										className="flex h-[var(--ak-control-min-height)] items-center"
 										title={translator.textFn("Disable action")}
 										onClick={() => form.setFieldValue("action", undefined)}
 									>
 										<Trash2 className="size-4" />
-									</Button>
+									</LinkButton>
 								</div>
 							</EditorFormCard>
+							<EditorFormSectionDivider
+								title={
+									action.type === "space"
+										? translator.textFn("Space")
+										: translator.textFn("Inventory")
+								}
+								description={
+									action.type === "space"
+										? translator.textFn(
+												"Activating this item settles its requirements and unit costs, then enters the target space.",
+											)
+										: translator.textFn(
+												"Open the inventory after all requirements and rules pass.",
+											)
+								}
+							/>
 							{match(action)
 								.with(
 									{
@@ -106,13 +122,6 @@ export const ActionSection = () => {
 									},
 									() => (
 										<EditorFormCard>
-											<EditorFormSectionDivider
-												description={translator.textFn(
-													"Activating this item settles its requirements and unit costs, then enters the target space.",
-												)}
-												title={translator.textFn("Space action")}
-												variant="secondary"
-											/>
 											<form.AppField name="action.space">
 												{(field) => (
 													<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-3">

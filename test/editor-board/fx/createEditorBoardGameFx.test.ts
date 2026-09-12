@@ -1,10 +1,14 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { readProjectResourceUrlFn } from "~/project-authoring/fn/readProjectResourceUrlFn";
 import type { Project } from "~/project-authoring/type/Project";
 import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
 
 const project: Project = {
@@ -18,7 +22,7 @@ const project: Project = {
 	updatedAtMs: 1,
 	revision: 7,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 afterEach(() => {
@@ -65,8 +69,14 @@ describe("Editor Board createEditorBoardGameFx", () => {
 				}),
 			}),
 		]);
-		expect(game.getResourceUrlFn("item-water")).toBe("blob:editor-water");
-		expect(createObjectUrl).toHaveBeenCalledTimes(2);
+		expect(game.getResourceUrlFn("item-water")).toBe(
+			readProjectResourceUrlFn({
+				projectId: project.projectId,
+				resourceId: "item-water",
+				version: "1",
+			}),
+		);
+		expect(createObjectUrl).not.toHaveBeenCalled();
 		expect("arkpack" in game).toBe(false);
 		expect("saveKey" in game).toBe(false);
 
@@ -113,14 +123,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 			event: "session-ended",
 			sessionId: game.diagnosticSessionId,
 		});
-		expect(revokeObjectUrl.mock.calls).toEqual([
-			[
-				"blob:editor-hero",
-			],
-			[
-				"blob:editor-water",
-			],
-		]);
+		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		expect(() => game.getResourceUrlFn("item-water")).toThrow("unavailable");
 		await expect(
 			game.runFn(

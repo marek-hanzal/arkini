@@ -29,7 +29,10 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 });
 
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
@@ -84,7 +87,7 @@ describe("BuildCommandAtoms", () => {
 				createdAtMs: 1,
 				updatedAtMs: 1,
 				config: editorTestPayload.config,
-				resources: editorTestPayload.resources,
+				resources: editorTestResources,
 			},
 		});
 		const buildAtom = BuildCommandAtoms.build("editor-test");

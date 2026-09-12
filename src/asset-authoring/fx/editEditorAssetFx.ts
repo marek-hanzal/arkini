@@ -47,7 +47,7 @@ export const editEditorAssetFx = Effect.fn("editEditorAssetFx")(function* ({
 			const resource =
 				file === undefined
 					? {
-							...existing,
+							mime: existing.mime,
 							id: resourceId,
 						}
 					: yield* validateEditorAssetFileFx(file, resourceId);

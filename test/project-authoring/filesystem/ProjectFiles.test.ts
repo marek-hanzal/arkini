@@ -8,6 +8,7 @@ import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
 } from "~/game-config-source/constant/GameProjectReference";
+import type { ProjectFiles } from "~/project-authoring/filesystem/fx/ProjectFiles";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
@@ -32,6 +33,28 @@ describe("filesystem Editor project current tree", () => {
 			resources: editorTestPayload.resources,
 		} as const;
 
+		const expectCurrentTreeFn = async (expected: ProjectFiles) => {
+			expect(await harness.read()).toEqual({
+				...expected,
+				resources: expected.resources.map(({ id, mime, bytes }) => ({
+					id,
+					mime,
+					size: bytes.byteLength,
+					version: expect.any(String),
+				})),
+			});
+			for (const resource of expected.resources) {
+				const directory = Object.values(expected.config.resources).includes(resource.id)
+					? "resources"
+					: "assets";
+				expect(
+					new Uint8Array(
+						await readFile(join(harness.root, directory, `${resource.id}.png`)),
+					),
+				).toEqual(resource.bytes);
+			}
+		};
+
 		await harness.write(initial);
 		const canonicalInitial = {
 			...initial,
@@ -40,7 +63,7 @@ describe("filesystem Editor project current tree", () => {
 				$schema: GameProjectGameSchemaReference,
 			}),
 		};
-		expect(await harness.read()).toEqual(canonicalInitial);
+		await expectCurrentTreeFn(canonicalInitial);
 		expect(JSON.parse(await readFile(join(harness.root, "project.json"), "utf8"))).toEqual({
 			arkini: ArkiniAppVersion,
 			revision: initial.marker.revision,
@@ -98,7 +121,7 @@ describe("filesystem Editor project current tree", () => {
 			},
 		};
 		await harness.write(repaired, initial);
-		expect(await harness.read()).toEqual(repaired);
+		await expectCurrentTreeFn(repaired);
 
 		const next = {
 			arkpack: repaired.arkpack,
@@ -145,7 +168,7 @@ describe("filesystem Editor project current tree", () => {
 			$schema: GameProjectItemSchemaReference,
 			item: next.config.items.water,
 		});
-		expect(await harness.read()).toEqual(next);
+		await expectCurrentTreeFn(next);
 	});
 
 	it("rejects a stale root game schema", async () => {

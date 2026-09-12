@@ -6,7 +6,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectIdentityRenameDialog } from "~/project-authoring/ui/ProjectIdentityRenameDialog";
 import type { Project } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
@@ -45,7 +48,7 @@ describe("ProjectIdentityRenameDialog", () => {
 					id: "project-old",
 				},
 			},
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		} satisfies Project;
 		const controller = {
 			cancelFn: vi.fn(),

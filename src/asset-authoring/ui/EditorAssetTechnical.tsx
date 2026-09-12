@@ -23,7 +23,7 @@ export const EditorAssetTechnical = ({ resourceId }: { readonly resourceId: stri
 			/>
 			<Fact
 				label={translator.textFn("Byte size")}
-				value={formatByteSizeFn(resource.bytes.byteLength)}
+				value={formatByteSizeFn(resource.size)}
 			/>
 			<Fact
 				label={translator.textFn("Project revision")}

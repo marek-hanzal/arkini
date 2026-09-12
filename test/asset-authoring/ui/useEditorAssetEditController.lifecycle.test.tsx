@@ -14,7 +14,10 @@ import {
 	createTestPngBytes,
 	installTestPngDecoder,
 } from "~test/arkpack-support/fn/createTestPngBytes";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const state = vi.hoisted(() => ({
 	navigate: vi.fn(async () => undefined),
@@ -104,7 +107,7 @@ const mountEditor = async () => {
 		updatedAtMs: 2,
 		revision: 3,
 		config: editorTestPayload.config,
-		resources: editorTestPayload.resources,
+		resources: editorTestResources,
 	};
 	state.replaceResource.mockImplementation(() => EffectModule.succeed(state.project));
 	installTestPngDecoder();

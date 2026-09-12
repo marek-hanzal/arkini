@@ -7,6 +7,7 @@ import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import type { ApplicationLogRecordSchema } from "../contract/diagnostics/ApplicationLogRecord";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
+import { createEditorResourceProtocolFx } from "./createEditorResourceProtocolFx";
 import { handleArkiniProtocolRequestFx } from "./handleArkiniProtocolRequestFx";
 import { registerArkiniElectronIpcFx } from "./registerArkiniElectronIpcFx";
 import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
@@ -247,12 +248,21 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		launcherPath: packagedCliLauncherPath,
 		unavailableMessage: cliUnavailableMessage,
 	});
+	const editorResourceProtocol =
+		editorProjectServiceOwnership.type === "ready"
+			? yield* createEditorResourceProtocolFx({
+					readResourceLocationFx:
+						editorProjectServiceOwnership.repository.readResourceLocationFx,
+					isTrustedUrlFn: trustedRenderer.isTrustedUrlFn,
+				})
+			: undefined;
 	yield* Effect.sync(() => {
 		protocol.handle("arkini", (request) =>
 			ElectronMainRuntime.runPromise(
 				handleArkiniProtocolRequestFx({
 					request,
 					rendererRoot,
+					handleEditorResourceRequestFx: editorResourceProtocol?.handleRequestFx,
 				}),
 			),
 		);

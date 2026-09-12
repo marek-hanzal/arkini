@@ -285,3 +285,96 @@ it("keeps arrow navigation visible in the menu without stealing input focus or s
 	expect(document.activeElement).toBe(input);
 	expect(document.documentElement.scrollTop).toBe(0);
 });
+
+it("virtualizes a large picker and scrolls keyboard selection to an unmounted last result", async () => {
+	const height = vi
+		.spyOn(HTMLElement.prototype, "offsetHeight", "get")
+		.mockImplementation(function (this: HTMLElement) {
+			return this.dataset.ui === "EditorSearchComboboxMenu" ? 160 : 80;
+		});
+	const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(400);
+	const scrollHeight = vi
+		.spyOn(HTMLElement.prototype, "scrollHeight", "get")
+		.mockReturnValue(84_008);
+	const previousScrollTo = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollTo");
+	Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+		configurable: true,
+		value: function (this: HTMLElement, options: ScrollToOptions) {
+			this.scrollTop = options.top ?? 0;
+			this.dispatchEvent(new Event("scroll"));
+		},
+	});
+	try {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const onChangeFn = vi.fn();
+		await act(async () =>
+			root.render(
+				<EditorSearchCombobox
+					label="Item"
+					emptyLabel="No items"
+					value=""
+					onChangeFn={onChangeFn}
+					renderPreviewFn={() => null}
+					options={Array.from(
+						{
+							length: 1000,
+						},
+						(_, index) => ({
+							id: `item-${index}`,
+							label: `Item ${index}`,
+							terms: [
+								`item-${index}`,
+							],
+						}),
+					)}
+				/>,
+			),
+		);
+		const input = container.querySelector<HTMLInputElement>('input[type="search"]')!;
+		await act(async () => input.focus());
+		const optionsFn = () =>
+			document.querySelectorAll<HTMLButtonElement>('[data-ui="EditorSearchComboboxOption"]');
+		expect(optionsFn().length).toBeGreaterThan(0);
+		expect(optionsFn().length).toBeLessThan(15);
+		expect(
+			[
+				...optionsFn(),
+			].some((option) => option.textContent === "Item 999"),
+		).toBe(false);
+		await act(async () =>
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "ArrowUp",
+					bubbles: true,
+				}),
+			),
+		);
+		await act(async () => new Promise((resolve) => setTimeout(resolve, 30)));
+		const active = document.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorSearchComboboxOption"][data-ui-active="true"]',
+		);
+		expect(active?.textContent).toBe("Item 999");
+		expect(optionsFn().length).toBeLessThan(15);
+		expect(document.activeElement).toBe(input);
+		expect(document.documentElement.scrollTop).toBe(0);
+		await act(async () =>
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+				}),
+			),
+		);
+		expect(onChangeFn).toHaveBeenCalledExactlyOnceWith("item-999");
+	} finally {
+		height.mockRestore();
+		width.mockRestore();
+		scrollHeight.mockRestore();
+		if (previousScrollTo === undefined)
+			Reflect.deleteProperty(HTMLElement.prototype, "scrollTo");
+		else Object.defineProperty(HTMLElement.prototype, "scrollTo", previousScrollTo);
+	}
+});

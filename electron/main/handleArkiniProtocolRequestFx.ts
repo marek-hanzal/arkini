@@ -9,6 +9,9 @@ export namespace handleArkiniProtocolRequestFx {
 	export interface Props {
 		readonly request: Request;
 		readonly rendererRoot: string;
+		readonly handleEditorResourceRequestFx?: (
+			request: Request,
+		) => Effect.Effect<Response, never, never>;
 	}
 }
 
@@ -23,8 +26,19 @@ const withProductionContentSecurityPolicyFn = (response: Response) => {
 };
 
 export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequestFx")(
-	({ request, rendererRoot }: handleArkiniProtocolRequestFx.Props) =>
+	({
+		request,
+		rendererRoot,
+		handleEditorResourceRequestFx,
+	}: handleArkiniProtocolRequestFx.Props) =>
 		Effect.gen(function* () {
+			if (new URL(request.url).host === "editor") {
+				return handleEditorResourceRequestFx === undefined
+					? new Response("Editor storage is unavailable.", {
+							status: 503,
+						})
+					: yield* handleEditorResourceRequestFx(request);
+			}
 			if (request.method !== "GET" && request.method !== "HEAD") {
 				return withProductionContentSecurityPolicyFn(
 					new Response("Method not allowed.", {

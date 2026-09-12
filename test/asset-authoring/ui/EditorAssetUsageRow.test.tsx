@@ -21,7 +21,10 @@ vi.mock("~/ui/ui/Button", () => ({
 import { EditorAssetUsageRow } from "~/asset-authoring/ui/EditorAssetUsageRow";
 import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import type { Project } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -47,7 +50,7 @@ const project = {
 			"avatar-03": "avatar-three",
 		},
 	},
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 } satisfies Project;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];

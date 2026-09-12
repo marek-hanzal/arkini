@@ -147,15 +147,15 @@ Arkini-owned data is resolved independently from Electron below the effective sy
 
 Game Persistence observes changed Runtime root identity, debounces and always flushes the latest canonical snapshot. Event-only transitions do not wake it. Persistence is an observer, not gameplay truth.
 
-The Editor's portable current tree is canonical. The GUI Electron main and Node CLI alternatively compose the same filesystem Project Repository; renderer project state, forms, object URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and use one recoverable current-tree transaction while preserving `.git` and unrelated files.
+The Editor's portable current tree is canonical. The GUI Electron main and Node CLI alternatively compose the same filesystem Project Repository; renderer project state, forms, versioned asset URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and use one recoverable current-tree transaction while preserving `.git` and unrelated files.
 
-External changes are ignored while mounted. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the complete directory and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
+External authored JSON and asset-catalog changes are ignored while mounted. Project projections hold resource metadata, never PNG bodies; item/config saves write only changed JSON and the revision marker. Requested previews read current PNG bodies through a bounded cache keyed by disk metadata. Already mounted images and Editor Board are not watched. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the directory metadata and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
 
 The GUI Editor and `arkini-cli editor mcp` are alternative owners of that repository. Running them concurrently is unsupported by contract and is neither detected nor prevented.
 
 Gameplay version is output metadata stored as `{ major, minor, suffix? }` in `game.json`. Build remembers valid settings before compilation without advancing authoring revision or publishing a Board change; failed compilation retains those settings. The produced artifact owns the formatted version used by install compatibility. Ordinary content writes preserve output metadata and retain their normal revision boundary.
 
-Editor Build and CLI pack compile the current saved source tree and verify actual source-file identity and bytes before publication. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Arkpack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
+Editor Build and CLI pack compile the current saved source tree and verify actual source-file identity and bytes before publication. PNG bodies belong to that build snapshot, not the mounted authoring projection. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Arkpack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 
 ## Hosted validation and delivery
 

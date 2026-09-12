@@ -11,7 +11,10 @@ import {
 } from "~/project-authoring/service/ProjectRepository";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { editEditorAssetFx } from "~/asset-authoring/fx/editEditorAssetFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -27,7 +30,7 @@ const createProject = (revision = 3): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 const createRepository = (
@@ -74,7 +77,12 @@ describe("Asset Authoring editEditorAssetFx", () => {
 					updatedAtMs: project.updatedAtMs + 1,
 					config,
 					resources: project.resources.map((existing) =>
-						existing.id === "hero" ? resource : existing,
+						existing.id === "hero"
+							? {
+									...existing,
+									id: resource.id,
+								}
+							: existing,
 					),
 				}),
 		);
@@ -95,9 +103,10 @@ describe("Asset Authoring editEditorAssetFx", () => {
 				currentId: "hero",
 				expectedRevision: project.revision,
 				projectId: project.projectId,
-				resource: expect.objectContaining({
+				resource: {
 					id: "new-hero",
-				}),
+					mime: "image/png",
+				},
 			}),
 		);
 		expect(replaceResourceFx.mock.calls[0]?.[0].config.resources.hero).toBe("new-hero");

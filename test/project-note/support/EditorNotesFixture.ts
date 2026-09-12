@@ -16,12 +16,14 @@ export const editorNotesTestProject: Project = {
 		{
 			id: "asset-water",
 			mime: "image/png",
-			bytes: new Uint8Array(),
+			size: 0,
+			version: "1",
 		},
 		{
 			id: "asset-wood",
 			mime: "image/png",
-			bytes: new Uint8Array(),
+			size: 0,
+			version: "1",
 		},
 	],
 	config: {

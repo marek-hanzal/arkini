@@ -7,8 +7,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Project } from "~/project-authoring/type/Project";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
+	editorTestResources,
 	editorTestConfig,
-	editorTestPayload,
 } from "~test/project-authoring/support/editorTestPayload";
 
 const state = vi.hoisted(() => ({
@@ -48,7 +48,7 @@ const project: Project = {
 	updatedAtMs: 1,
 	revision: 0,
 	config: editorTestConfig,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 afterEach(async () => {

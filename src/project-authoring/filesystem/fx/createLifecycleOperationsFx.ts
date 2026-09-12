@@ -62,7 +62,6 @@ const cloneProjectFn = (project: Project): Project => ({
 	config: GameConfigSchema.parse(project.config),
 	resources: project.resources.map((resource) => ({
 		...resource,
-		bytes: resource.bytes.slice(),
 	})),
 });
 

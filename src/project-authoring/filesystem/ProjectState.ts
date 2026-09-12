@@ -3,7 +3,7 @@ import type { ProjectCatalogEntrySchema } from "~/project-authoring/schema/Proje
 import type { NoteSchema } from "~/project-note/schema/NoteSchema";
 import type { ProjectPaths } from "./ProjectPaths";
 
-/** One loaded canonical workspace; disk is consulted again only by explicit Refresh. */
+/** One loaded authored workspace; explicit Refresh replaces its metadata. Image requests read disk separately. */
 export interface ProjectState {
 	readonly catalog: ProjectCatalogEntrySchema.Type;
 	readonly notes: ReadonlyArray<NoteSchema.Type>;

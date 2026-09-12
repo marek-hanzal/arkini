@@ -1,3 +1,4 @@
+import { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
 import { Effect } from "effect";
 import { z } from "zod";
 
@@ -85,7 +86,7 @@ const replaceResourceSchema = z
 		currentId: IdSchema,
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		resource: ResourceSchema,
+		resource: ProjectResourceReplacementSchema,
 	})
 	.strict();
 const upsertResourcesSchema = z

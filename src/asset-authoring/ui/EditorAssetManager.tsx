@@ -12,7 +12,8 @@ import {
 	SearchX,
 	Sparkles,
 } from "lucide-react";
-import { memo } from "react";
+import { memo, useCallback } from "react";
+import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -260,18 +261,33 @@ interface EditorAssetGridProps {
 	readonly resources: Project["resources"];
 }
 
-const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps) => (
-	<div className="grid grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-3">
-		{resources.map((resource) => (
+const readAssetKeyFn = (resource: Project["resources"][number]) => resource.id;
+
+const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps) => {
+	const renderAssetFn = useCallback(
+		(resource: Project["resources"][number]) => (
 			<EditorAssetCard
-				key={resource.id}
 				filter={filter}
 				query={query}
 				resource={resource}
 			/>
-		))}
-	</div>
-));
+		),
+		[
+			filter,
+			query,
+		],
+	);
+	return (
+		<EditorVirtualCollection
+			items={resources}
+			itemKeyFn={readAssetKeyFn}
+			renderItemFn={renderAssetFn}
+			estimatedRowHeight={244}
+			gapRem={0.75}
+			minColumnWidthRem={18}
+		/>
+	);
+});
 
 export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 	const project = useEditorProject();

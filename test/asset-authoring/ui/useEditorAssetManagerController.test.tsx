@@ -28,12 +28,14 @@ vi.mock("~/asset-authoring/ui/useEditorAssetLibrary", () => ({
 		projectRevision: 42,
 		resources: [
 			{
-				bytes: new Uint8Array(),
+				size: 0,
+				version: "1",
 				id: "visible-one",
 				mime: "image/png",
 			},
 			{
-				bytes: new Uint8Array(),
+				size: 0,
+				version: "1",
 				id: "visible-two",
 				mime: "image/png",
 			},

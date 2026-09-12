@@ -32,6 +32,7 @@
 		"@tanstack/react-form": "^1.33.5",
 		"@tanstack/react-hotkeys": "^0.10.0",
 		"@tanstack/react-router": "1.170.31",
+		"@tanstack/react-virtual": "3.14.12",
 		"cytoscape": "3.34.1",
 		"cytoscape-fcose": "2.2.0",
 		"effect": "4.0.0-rc.111",

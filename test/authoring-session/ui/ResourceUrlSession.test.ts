@@ -9,15 +9,18 @@ import {
 	useResourceUrl,
 	useResourceUrls,
 } from "~/authoring-session/ui/ResourceUrlSession";
-import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import type { Project } from "~/project-authoring/type/Project";
+import { readProjectResourceUrlFn } from "~/project-authoring/fn/readProjectResourceUrlFn";
 
 const state = vi.hoisted(() => ({
-	resources: [] as ReadonlyArray<ResourceSchema.Type>,
+	projectId: "project-one",
+	resources: [] as Project["resources"],
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		resources: state.resources,
+		projectId: state.projectId,
 	}),
 }));
 
@@ -35,6 +38,7 @@ afterEach(async () => {
 	});
 	document.body.replaceChildren();
 	state.resources = [];
+	state.projectId = "project-one";
 	vi.restoreAllMocks();
 });
 
@@ -59,184 +63,121 @@ const UrlMapProbe = ({ resourceIds }: { readonly resourceIds: ReadonlyArray<stri
 	);
 };
 
-describe("ProjectResourceUrlProvider", () => {
-	it("allocates URLs only for mounted consumers and shares one active URL per resource", async () => {
-		const createObjectUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:hero");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
-		const resources = [
-			{
-				id: "hero",
-				mime: "image/png",
-				bytes: new Uint8Array([
-					1,
-				]),
-			},
-			{
-				id: "unused",
-				mime: "image/png",
-				bytes: new Uint8Array([
-					2,
-				]),
-			},
-		] satisfies ReadonlyArray<ResourceSchema.Type>;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		state.resources = resources;
-
-		await act(async () =>
-			root.render(
-				createElement(
-					ProjectResourceUrlProvider,
-					null,
-					createElement("span", null, "No preview"),
-				),
-			),
-		);
-		expect(createObjectUrl).not.toHaveBeenCalled();
-
-		await act(async () =>
-			root.render(
-				createElement(
-					ProjectResourceUrlProvider,
-					null,
-					createElement(UrlProbe, {
-						resourceId: "hero",
-					}),
-					createElement(UrlProbe, {
-						resourceId: "hero",
-					}),
-				),
-			),
-		);
-		expect(createObjectUrl).toHaveBeenCalledTimes(1);
-		expect(container.textContent).toBe("blob:heroblob:hero");
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-
-		await act(async () =>
-			root.render(
-				createElement(
-					ProjectResourceUrlProvider,
-					null,
-					createElement("span", null, "No preview"),
-				),
-			),
-		);
-		expect(revokeObjectUrl).toHaveBeenCalledTimes(1);
-		expect(revokeObjectUrl).toHaveBeenCalledWith("blob:hero");
+const resourceFn = (id: string, version = "1"): Project.Resource => ({
+	id,
+	version,
+	mime: "image/png",
+	size: 1024,
+});
+const urlFn = (resourceId: string, version = "1", projectId = "project-one") =>
+	readProjectResourceUrlFn({
+		projectId,
+		resourceId,
+		version,
 	});
 
-	it("reuses byte-equal active URLs and replaces only the changed requested resource", async () => {
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:first")
-			.mockReturnValueOnce("blob:second");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
-		const firstResources = [
-			{
-				id: "hero",
-				mime: "image/png",
-				bytes: new Uint8Array([
-					1,
-				]),
-			},
-			{
-				id: "unused",
-				mime: "image/png",
-				bytes: new Uint8Array([
-					9,
-					9,
-					9,
-				]),
-			},
-		] satisfies ReadonlyArray<ResourceSchema.Type>;
-		const secondResources = [
-			{
-				id: "hero",
-				mime: "image/png",
-				bytes: new Uint8Array([
-					2,
-				]),
-			},
-			firstResources[1]!,
-		] satisfies ReadonlyArray<ResourceSchema.Type>;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		const render = (resources: typeof firstResources) => {
-			state.resources = resources;
-			return root.render(
+const mountFn = () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	return {
+		container,
+		renderFn: (resourceIds: ReadonlyArray<string>) =>
+			root.render(
 				createElement(
 					ProjectResourceUrlProvider,
 					null,
-					createElement(UrlProbe, {
-						resourceId: "hero",
-					}),
+					...resourceIds.map((resourceId) =>
+						createElement(UrlProbe, {
+							key: resourceId,
+							resourceId,
+						}),
+					),
 				),
-			);
-		};
+			),
+	};
+};
 
-		await act(async () => render(firstResources));
-		expect(createObjectUrl).toHaveBeenCalledTimes(1);
-		expect(container.textContent).toBe("blob:first");
-
+describe("ProjectResourceUrlProvider", () => {
+	it("shares browser-cache URLs across unmounts without loading or copying image bodies", async () => {
+		const createObjectUrl = vi.spyOn(URL, "createObjectURL");
+		const fetchFn = vi.spyOn(globalThis, "fetch");
+		state.resources = [
+			resourceFn("hero"),
+			resourceFn("unused"),
+		];
+		const { container, renderFn } = mountFn();
 		await act(async () =>
-			render([
-				{
-					...firstResources[0]!,
-					bytes: firstResources[0]!.bytes.slice(),
-				},
-				{
-					...firstResources[1]!,
-					bytes: new Uint8Array(1024 * 1024),
-				},
+			renderFn([
+				"hero",
 			]),
 		);
-		expect(createObjectUrl).toHaveBeenCalledTimes(1);
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-		expect(container.textContent).toBe("blob:first");
-
-		await act(async () => render(secondResources));
-		expect(createObjectUrl).toHaveBeenCalledTimes(2);
-		expect(revokeObjectUrl).toHaveBeenCalledWith("blob:first");
-		expect(container.textContent).toBe("blob:second");
+		const firstUrl = container.textContent;
+		expect(firstUrl).toBe(urlFn("hero"));
+		await act(async () => renderFn([]));
+		await act(async () =>
+			renderFn([
+				"hero",
+			]),
+		);
+		expect(container.textContent).toBe(firstUrl);
+		expect(createObjectUrl).not.toHaveBeenCalled();
+		expect(fetchFn).not.toHaveBeenCalled();
 	});
 
-	it("acquires only the explicit URL set requested by a multi-resource consumer", async () => {
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:hero")
-			.mockReturnValueOnce("blob:overlay");
-		vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+	it("invalidates only a replaced asset and clears removed resources from mounted consumers", async () => {
+		const { container, renderFn } = mountFn();
+		state.resources = [
+			resourceFn("hero"),
+			resourceFn("overlay"),
+		];
+		await act(async () =>
+			renderFn([
+				"hero",
+				"overlay",
+			]),
+		);
+		expect(container.textContent).toBe(urlFn("hero") + urlFn("overlay"));
+		state.resources = [
+			resourceFn("hero", "2"),
+			resourceFn("overlay"),
+		];
+		await act(async () =>
+			renderFn([
+				"hero",
+				"overlay",
+			]),
+		);
+		expect(container.textContent).toBe(urlFn("hero", "2") + urlFn("overlay"));
+		state.resources = [
+			resourceFn("overlay"),
+		];
+		await act(async () =>
+			renderFn([
+				"hero",
+				"overlay",
+			]),
+		);
+		expect(container.textContent).toBe(urlFn("overlay"));
+	});
+
+	it("resolves only requested metadata and never reuses another project's asset identity", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
 		const resourceIds = [
 			"hero",
 			"overlay",
-		] as const;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		state.resources = [
-			{
-				id: "hero",
-				mime: "image/png",
-				bytes: Uint8Array.of(1),
-			},
-			{
-				id: "overlay",
-				mime: "image/png",
-				bytes: Uint8Array.of(2),
-			},
-			{
-				id: "unused",
-				mime: "image/png",
-				bytes: Uint8Array.of(3),
-			},
+			"missing",
 		];
-
-		await act(async () =>
+		state.resources = [
+			resourceFn("hero"),
+			resourceFn("overlay"),
+			resourceFn("unused"),
+		];
+		const renderFn = () =>
 			root.render(
 				createElement(
 					ProjectResourceUrlProvider,
@@ -245,10 +186,13 @@ describe("ProjectResourceUrlProvider", () => {
 						resourceIds,
 					}),
 				),
-			),
+			);
+		await act(async () => renderFn());
+		expect(container.textContent).toBe(`hero:${urlFn("hero")}|overlay:${urlFn("overlay")}`);
+		state.projectId = "project-two";
+		await act(async () => renderFn());
+		expect(container.textContent).toBe(
+			`hero:${urlFn("hero", "1", "project-two")}|overlay:${urlFn("overlay", "1", "project-two")}`,
 		);
-
-		expect(createObjectUrl).toHaveBeenCalledTimes(2);
-		expect(container.textContent).toBe("hero:blob:hero|overlay:blob:overlay");
 	});
 });

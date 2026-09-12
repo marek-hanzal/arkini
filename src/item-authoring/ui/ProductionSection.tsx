@@ -1,3 +1,4 @@
+import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
@@ -88,58 +89,70 @@ const ProductionFields = withFieldGroupFn({
 							);
 
 						return (
-							<EditorCollectionSelector
-								addLabel={translator.textFn("Add line")}
-								count={lines.length}
-								itemLabelFn={(index) => {
-									const line = lines[index];
-									return line.title.length === 0
-										? `${translator.textFn("Production line")} ${index + 1}`
-										: line.title;
-								}}
-								renderItemContentFn={(index, label) => (
-									<ProductionLineOption
-										line={lines[index]}
-										label={label}
-									/>
-								)}
-								itemSearchTermsFn={(index) => [
-									lines[index].id,
-									lines[index].description,
-								]}
-								itemRelatedSearchTermsFn={(index) =>
-									readCapabilityRelatedTermsFn(lines[index], project.config.items)
-								}
-								initialSelectedIndex={Math.max(
-									0,
-									lines.findIndex((line) => line.id === selectedLineId),
-								)}
-								selectedIndex={invalidLineIndex}
-								label={translator.textFn("Product lines")}
-								navigationCard
-								onAddFn={addLineFn}
-								onRemoveFn={(index) => linesField.removeValue(index)}
-								removeLabel={translator.textFn("Remove line")}
-							>
-								{(index) => (
-									<LineFields
-										form={group}
-										fields={`lines[${index}]`}
-										label={null}
-										onMarkerChangeFn={(marker, value) =>
-											form.setFieldValue(
-												"lines",
-												setLineMarkerFn(
-													form.state.values.lines ?? [],
-													index,
-													marker,
-													value,
-												),
-											)
-										}
-									/>
-								)}
-							</EditorCollectionSelector>
+							<>
+								<EditorCollectionSelector
+									addLabel={translator.textFn("Add line")}
+									count={lines.length}
+									itemLabelFn={(index) => {
+										const line = lines[index];
+										return line.title.length === 0
+											? `${translator.textFn("Production line")} ${index + 1}`
+											: line.title;
+									}}
+									renderItemContentFn={(index, label) => (
+										<ProductionLineOption
+											line={lines[index]}
+											label={label}
+										/>
+									)}
+									itemSearchTermsFn={(index) => [
+										lines[index].id,
+										lines[index].description,
+									]}
+									itemRelatedSearchTermsFn={(index) =>
+										readCapabilityRelatedTermsFn(
+											lines[index],
+											project.config.items,
+										)
+									}
+									initialSelectedIndex={Math.max(
+										0,
+										lines.findIndex((line) => line.id === selectedLineId),
+									)}
+									selectedIndex={invalidLineIndex}
+									label={translator.textFn("Product lines")}
+									navigationCard
+									onAddFn={addLineFn}
+									onRemoveFn={(index) => linesField.removeValue(index)}
+									removeLabel={translator.textFn("Remove line")}
+								>
+									{(index) => (
+										<LineFields
+											form={group}
+											fields={`lines[${index}]`}
+											label={null}
+											onMarkerChangeFn={(marker, value) =>
+												form.setFieldValue(
+													"lines",
+													setLineMarkerFn(
+														form.state.values.lines ?? [],
+														index,
+														marker,
+														value,
+													),
+												)
+											}
+										/>
+									)}
+								</EditorCollectionSelector>
+								<EditorCapabilityDisable
+									title={translator.textFn("Production configured")}
+									description={translator.textFn(
+										"Disable removes all production lines from this item.",
+									)}
+									onDisableFn={() => form.setFieldValue("lines", [])}
+								/>
+							</>
 						);
 					}}
 				</group.AppField>

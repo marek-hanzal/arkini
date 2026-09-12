@@ -3,7 +3,7 @@ import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOv
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
-import { EditorMcpCopyableUrl } from "./EditorMcpCopy";
+import { EditorMcpCopyableUrl } from "./EditorMcpCopyableUrl";
 import { EditorMcpStatus } from "./EditorMcpStatus";
 
 const editorMcpInputClassName =
@@ -11,9 +11,7 @@ const editorMcpInputClassName =
 
 interface EditorMcpSettingsProps {
 	readonly authtoken: string;
-	readonly copied?: string;
 	readonly ngrokDomain: string;
-	readonly onCopyFn: (key: string, value: string) => Promise<void>;
 	readonly onSaveNgrokFn: () => void;
 	readonly onSavePortFn: () => void;
 	readonly onSetAuthtokenFn: (value: string) => void;
@@ -26,9 +24,7 @@ interface EditorMcpSettingsProps {
 
 export const EditorMcpSettings = ({
 	authtoken,
-	copied,
 	ngrokDomain,
-	onCopyFn,
 	onSaveNgrokFn,
 	onSavePortFn,
 	onSetAuthtokenFn,
@@ -80,9 +76,7 @@ export const EditorMcpSettings = ({
 					</div>
 				</div>
 				<EditorMcpCopyableUrl
-					copied={copied === "local-url"}
 					label="Local endpoint"
-					onCopyFn={() => void onCopyFn("local-url", localUrl)}
 					url={localUrl}
 				/>
 			</div>

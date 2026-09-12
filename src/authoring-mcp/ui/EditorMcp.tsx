@@ -16,7 +16,6 @@ import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections"
 import { EditorMcpServer } from "./EditorMcpServer";
 import { EditorMcpSettings } from "./EditorMcpSettings";
 import { EditorMcpStatus } from "./EditorMcpStatus";
-import { useEditorMcpClipboardController } from "./useEditorMcpClipboardController";
 import { useEditorMcpOverviewController } from "./useEditorMcpOverviewController";
 import { useEditorMcpSettingsController } from "./useEditorMcpSettingsController";
 
@@ -27,10 +26,8 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 		onConfigureFn: overviewController.configureFn,
 		overview: overviewController.overview,
 	});
-	const clipboardController = useEditorMcpClipboardController();
 	const overview = overviewController.overview;
-	const error =
-		settingsController.error ?? clipboardController.error ?? overviewController.commandError;
+	const error = settingsController.error ?? overviewController.commandError;
 	const executeFn = (commandFn: () => void) => {
 		settingsController.clearErrorFn();
 		commandFn();
@@ -98,8 +95,6 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 						match(section)
 							.with("server", () => (
 								<EditorMcpServer
-									copied={clipboardController.copied}
-									onCopyFn={clipboardController.copyFn}
 									onResetAuthFn={() => executeFn(overviewController.resetAuthFn)}
 									onStartLocalFn={() =>
 										executeFn(overviewController.startLocalFn)
@@ -118,9 +113,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 							.with("settings", () => (
 								<EditorMcpSettings
 									authtoken={settingsController.authtoken}
-									copied={clipboardController.copied}
 									ngrokDomain={settingsController.ngrokDomain}
-									onCopyFn={clipboardController.copyFn}
 									onSaveNgrokFn={settingsController.saveNgrokFn}
 									onSavePortFn={settingsController.savePortFn}
 									onSetAuthtokenFn={settingsController.setAuthtokenFn}

@@ -3,7 +3,8 @@ import { match } from "ts-pattern";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
 import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
-import { EditorMcpCopyableUrl, EditorMcpCopyButton } from "./EditorMcpCopy";
+import { CopyButton } from "~/ui/ui/CopyButton";
+import { EditorMcpCopyableUrl } from "./EditorMcpCopyableUrl";
 import { EditorMcpStatus, type EditorMcpStatusTone } from "./EditorMcpStatus";
 
 const readLocalStatusFn = (
@@ -76,8 +77,6 @@ const readRemoteStatusFn = (
 		}));
 
 interface EditorMcpServerProps {
-	readonly copied?: string;
-	readonly onCopyFn: (key: string, value: string) => Promise<void>;
 	readonly onResetAuthFn: () => void;
 	readonly onStartLocalFn: () => void;
 	readonly onStartRemoteFn: () => void;
@@ -88,8 +87,6 @@ interface EditorMcpServerProps {
 }
 
 export const EditorMcpServer = ({
-	copied,
-	onCopyFn,
 	onResetAuthFn,
 	onStartLocalFn,
 	onStartRemoteFn,
@@ -105,7 +102,6 @@ export const EditorMcpServer = ({
 			? `http://127.0.0.1:${overview.local.port}/editor/mcp`
 			: undefined;
 	const remoteUrl = overview.remote.type === "ready" ? overview.remote.url : undefined;
-	const remotePasswordCopyKey = `remote-password:${overview.remotePassword ?? ""}`;
 	return (
 		<div className="grid gap-4">
 			{overview.remotePassword === undefined ? null : (
@@ -127,14 +123,8 @@ export const EditorMcpServer = ({
 								className="h-full min-w-0 w-full rounded-lg border border-line bg-surface px-3 py-2 pr-10 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
 							/>
 							<div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted">
-								<EditorMcpCopyButton
-									copied={copied === remotePasswordCopyKey}
-									onCopyFn={() =>
-										void onCopyFn(
-											remotePasswordCopyKey,
-											overview.remotePassword ?? "",
-										)
-									}
+								<CopyButton
+									value={overview.remotePassword}
 									title="Copy password"
 								/>
 							</div>
@@ -180,9 +170,7 @@ export const EditorMcpServer = ({
 						/>
 					) : (
 						<EditorMcpCopyableUrl
-							copied={copied === "local-url"}
 							label="Running at"
-							onCopyFn={() => void onCopyFn("local-url", localUrl)}
 							url={localUrl}
 						/>
 					)}
@@ -216,9 +204,7 @@ export const EditorMcpServer = ({
 						/>
 					) : (
 						<EditorMcpCopyableUrl
-							copied={copied === "remote-url"}
 							label="Running at"
-							onCopyFn={() => void onCopyFn("remote-url", remoteUrl)}
 							url={remoteUrl}
 						/>
 					)}

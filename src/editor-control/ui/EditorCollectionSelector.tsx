@@ -12,6 +12,7 @@ interface EditorCollectionSelectorProps {
 	readonly dataUi?: string;
 	readonly itemLabelFn: (index: number) => string;
 	readonly itemMetaFn?: (index: number) => string | undefined;
+	readonly itemRelatedSearchTermsFn?: (index: number) => ReadonlyArray<string>;
 	readonly itemSearchTermsFn?: (index: number) => ReadonlyArray<string>;
 	readonly initialSelectedIndex?: number;
 	readonly label: string;
@@ -25,7 +26,7 @@ interface EditorCollectionSelectorProps {
 	readonly selectedIndex?: number;
 }
 
-/** Keeps one form-owned collection item mounted behind a compact local selector. */
+/** Keeps one collection item mounted behind a compact local selector. */
 export const EditorCollectionSelector = ({
 	addLabel = "Add item",
 	children,
@@ -34,6 +35,7 @@ export const EditorCollectionSelector = ({
 	itemLabelFn,
 	itemMetaFn,
 	itemSearchTermsFn,
+	itemRelatedSearchTermsFn,
 	initialSelectedIndex = 0,
 	label,
 	navigationCard = false,
@@ -72,6 +74,7 @@ export const EditorCollectionSelector = ({
 								const optionMeta = itemMetaFn?.(index);
 								return {
 									id: String(index),
+									relatedTerms: itemRelatedSearchTermsFn?.(index),
 									label: optionLabel,
 									...(optionMeta === undefined
 										? {}

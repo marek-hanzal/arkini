@@ -33,6 +33,7 @@ export interface EditorSearchOption {
 	readonly label: string;
 	readonly meta?: string;
 	readonly terms: readonly string[];
+	readonly relatedTerms?: readonly string[];
 }
 
 interface EditorSearchComboboxProps {
@@ -123,9 +124,10 @@ export const EditorSearchCombobox = ({
 		]);
 	const candidates = useMemo(
 		() =>
-			options.map(({ id, terms }) => ({
+			options.map(({ id, terms, relatedTerms }) => ({
 				identity: id,
 				terms,
+				relatedTerms,
 			})),
 		[
 			options,

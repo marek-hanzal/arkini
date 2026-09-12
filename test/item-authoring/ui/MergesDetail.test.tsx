@@ -125,7 +125,7 @@ describe("MergesDetail", () => {
 		const more = container.querySelector<HTMLAnchorElement>(
 			'[data-ui="EditorItemMergesMoreCard"] a',
 		);
-		expect(more?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/form/$sectionId");
+		expect(more?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/detail/$sectionId");
 		expect(JSON.parse(more?.dataset.params ?? "null")).toEqual({
 			itemUid: item.uid,
 			projectId: project.projectId,

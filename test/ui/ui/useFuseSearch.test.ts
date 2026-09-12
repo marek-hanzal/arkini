@@ -134,5 +134,37 @@ describe("useFuseSearch", () => {
 		);
 		expect(container.textContent).toBe("second");
 		expect(fuseState.constructionCount).toBe(2);
+		await render(
+			[
+				{
+					identity: "second",
+					terms: [
+						"Gamma",
+					],
+					relatedTerms: [
+						"Copper",
+					],
+				},
+			],
+			"copper",
+		);
+		expect(container.textContent).toBe("second");
+		expect(fuseState.constructionCount).toBe(3);
+		await render(
+			[
+				{
+					identity: "second",
+					terms: [
+						"Gamma",
+					],
+					relatedTerms: [
+						"Silver",
+					],
+				},
+			],
+			"copper",
+		);
+		expect(container.textContent).toBe("");
+		expect(fuseState.constructionCount).toBe(4);
 	});
 });

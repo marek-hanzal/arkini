@@ -8,6 +8,45 @@ const candidate = (value: string, ...terms: string[]) => ({
 });
 
 describe("createFuzzySearchFn", () => {
+	it("ranks equally matching direct terms above related terms and searches across both", () => {
+		const fuzzyFn = createFuzzySearchFn({
+			candidates: [
+				{
+					value: "related",
+					terms: [
+						"Workshop",
+					],
+					relatedTerms: [
+						"Wood processing",
+					],
+				},
+				{
+					value: "direct",
+					terms: [
+						"Wood processing",
+					],
+					relatedTerms: [
+						"Paper",
+					],
+				},
+			],
+		});
+		expect(fuzzyFn("wood")).toEqual([
+			"direct",
+			"related",
+		]);
+		expect(fuzzyFn("wood processing")).toEqual([
+			"direct",
+			"related",
+		]);
+		expect(fuzzyFn("workshop wood")).toEqual([
+			"related",
+		]);
+		expect(fuzzyFn("paper")).toEqual([
+			"direct",
+		]);
+	});
+
 	it("keeps exact matches first without hiding broader fuzzy matches", () => {
 		const fuzzyFn = createFuzzySearchFn({
 			candidates: [

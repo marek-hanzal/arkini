@@ -26,5 +26,5 @@ export interface SectionDescriptor {
 
 export type DetailSectionId = Extract<
 	SectionId,
-	"identity" | "production" | "estimate" | "connections" | "notes" | "delete"
+	"identity" | "production" | "merges" | "estimate" | "connections" | "notes" | "delete"
 >;

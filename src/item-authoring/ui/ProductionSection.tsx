@@ -1,3 +1,4 @@
+import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -30,7 +31,7 @@ const ProductionFields = withFieldGroupFn({
 	},
 	render: ({ group, invalidLineIndex, selectedLineId }) => {
 		const translator = useTranslator();
-		const { form } = useFormSession();
+		const { form, project } = useFormSession();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormCard>
@@ -97,7 +98,11 @@ const ProductionFields = withFieldGroupFn({
 								}}
 								itemSearchTermsFn={(index) => [
 									lines[index].id,
+									lines[index].description,
 								]}
+								itemRelatedSearchTermsFn={(index) =>
+									readCapabilityRelatedTermsFn(lines[index], project.config.items)
+								}
 								initialSelectedIndex={Math.max(
 									0,
 									lines.findIndex((line) => line.id === selectedLineId),

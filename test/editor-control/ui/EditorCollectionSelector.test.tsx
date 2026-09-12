@@ -2,7 +2,7 @@
 
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 
@@ -19,6 +19,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	document.body.replaceChildren();
+	vi.useRealTimers();
 });
 
 const changeInput = async (input: HTMLInputElement, value: string) => {
@@ -63,5 +64,47 @@ describe("EditorCollectionSelector", () => {
 		await changeInput(input, "spoiled-rum-barrel");
 		const option = document.querySelector('[data-ui="EditorSearchComboboxOption"]');
 		expect(option?.textContent).toBe("Output set 1 — Spoiled Rum Barrel");
+	});
+	it("selects the authored index when related terms filter out preceding entries", async () => {
+		vi.useFakeTimers();
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				<EditorCollectionSelector
+					count={2}
+					itemLabelFn={(index) =>
+						[
+							"Workshop",
+							"Foundry",
+						][index]
+					}
+					itemRelatedSearchTermsFn={(index) =>
+						index === 1
+							? [
+									"Copper",
+								]
+							: []
+					}
+					label="Production lines"
+				>
+					{(index) => <div data-ui="SelectedLine">{index}</div>}
+				</EditorCollectionSelector>,
+			);
+		});
+		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (input === null) throw new Error("Expected collection search input.");
+		await act(async () => input.click());
+		await changeInput(input, "copper");
+		await act(async () => vi.advanceTimersByTime(250));
+		const option = document.querySelector<HTMLElement>(
+			'[data-ui="EditorSearchComboboxOption"]',
+		);
+		if (option === null) throw new Error("Expected related-item search result.");
+		await act(async () => option.click());
+		expect(container.querySelector('[data-ui="SelectedLine"]')?.textContent).toBe("1");
+		expect(container.querySelectorAll('[data-ui="SelectedLine"]')).toHaveLength(1);
 	});
 });

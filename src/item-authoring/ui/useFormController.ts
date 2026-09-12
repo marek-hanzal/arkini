@@ -60,14 +60,6 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 			item.asset.default[0],
 			item.asset.default[1] ?? "",
 		],
-		sources:
-			item.asset.sources === undefined
-				? [
-						"",
-					]
-				: [
-						...item.asset.sources,
-					],
 	},
 	merge:
 		item.merge === undefined
@@ -127,7 +119,6 @@ const FormIndexedPathLabelBySegment = {
 	roll: "Roll",
 	rules: "Rule",
 	set: "Output set",
-	sources: "Alternate artwork",
 	when: "Condition",
 } as const satisfies Partial<Record<string, string>>;
 

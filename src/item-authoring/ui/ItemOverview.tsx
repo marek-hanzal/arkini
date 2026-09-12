@@ -111,7 +111,6 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const enabledProductionLineCount = readAuthoredItemLinesFn(item).filter(
 		(line) => line.enable,
 	).length;
-	const progressArtworkCount = item.asset.sources?.length ?? 0;
 	const estimateSummary =
 		estimate.status === "ready"
 			? formatItemEstimateResultFn(estimate.estimate)
@@ -131,11 +130,6 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 					<p className="font-medium text-foreground">
 						{item.asset.default.length} default{" "}
 						{item.asset.default.length === 1 ? "layer" : "layers"}
-					</p>
-					<p>
-						{progressArtworkCount === 0
-							? "No progress artwork"
-							: `${progressArtworkCount} progress ${progressArtworkCount === 1 ? "state" : "states"}`}
 					</p>
 				</div>
 			</div>

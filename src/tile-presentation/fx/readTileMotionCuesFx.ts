@@ -3,7 +3,6 @@ import { Effect, Option } from "effect";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
-import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeItemFn";
@@ -136,20 +135,14 @@ const readSpawnCueFn = ({
 
 const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx")(function* ({
 	game,
-	runtime,
 	source,
 }: {
 	readonly game: Pick<GameEngine, "getResourceUrlFn">;
-	readonly runtime: RuntimeSchema.Type;
 	readonly source: GridRuntimeItemSchema.Type;
 }) {
 	const visual = yield* readTileActorVisualFx({
 		game,
 		item: source.item,
-		sourceIds: readTileActorAssetSourceIdsFn({
-			item: source,
-			runtime,
-		}),
 	});
 	const badgeCount = readTileActorBadgeCountFn(source);
 	return {
@@ -278,7 +271,6 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 			sourceActorId: event.sourceItemId,
 			sourceItem: yield* readInventoryInputSourceItemFx({
 				game,
-				runtime: transition.previousRuntime,
 				source,
 			}),
 			targetActorId: event.ownerItemId,

@@ -25,7 +25,6 @@ describe("FormSchema", () => {
 					"base",
 					"",
 				],
-				sources: [],
 			},
 		});
 		expect(result.success).toBe(false);
@@ -58,7 +57,6 @@ describe("FormSchema", () => {
 						"base",
 						"",
 					],
-					sources: [],
 				},
 			}),
 		).not.toHaveProperty("description");
@@ -82,20 +80,12 @@ describe("FormSchema", () => {
 						"base",
 						"",
 					],
-					sources: [
-						"",
-						"progress",
-						"",
-					],
 				},
 			}).asset,
 		).toEqual({
 			scale: 0.65,
 			default: [
 				"base",
-			],
-			sources: [
-				"progress",
 			],
 		});
 	});

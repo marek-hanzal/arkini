@@ -22,7 +22,6 @@ describe("validateGameResourcesFn", () => {
 		]);
 		for (const item of Object.values(startTestConfig.items)) {
 			item.asset.default.forEach((id) => ids.add(id));
-			item.asset.sources?.forEach((id) => ids.add(id));
 		}
 		const diagnostics = validateGameResourcesFn({
 			config: startTestConfig,
@@ -112,7 +111,7 @@ describe("validateGameResourcesFn", () => {
 		);
 	});
 
-	it("reports the exact missing default layer and progress source entries", () => {
+	it("reports the exact missing default layer entries", () => {
 		const [itemId, item] = Object.entries(startTestConfig.items)[0] ?? [];
 		if (itemId === undefined || item === undefined) throw new Error("Missing test item.");
 		const config = GameConfigSchema.parse({
@@ -126,9 +125,6 @@ describe("validateGameResourcesFn", () => {
 						default: [
 							"missing:base",
 							"missing:overlay",
-						],
-						sources: [
-							"missing:progress",
 						],
 					},
 				},
@@ -160,16 +156,6 @@ describe("validateGameResourcesFn", () => {
 						"asset",
 						"default",
 						1,
-					],
-				}),
-				expect.objectContaining({
-					resourceId: "missing:progress",
-					path: [
-						"items",
-						itemId,
-						"asset",
-						"sources",
-						0,
 					],
 				}),
 			]),

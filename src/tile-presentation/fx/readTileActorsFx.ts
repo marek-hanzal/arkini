@@ -6,7 +6,6 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
-import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
@@ -134,10 +133,6 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			const visual = yield* readTileActorVisualFx({
 				game,
 				item: item.item,
-				sourceIds: readTileActorAssetSourceIdsFn({
-					item,
-					runtime,
-				}),
 			});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
 			const queueBadgeCount = readQueueBadgeCountFn({

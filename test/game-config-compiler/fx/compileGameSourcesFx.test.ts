@@ -31,7 +31,7 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
-	it("preserves authored scale, default composition, and ordered progress sources", async () => {
+	it("preserves authored scale and layered default composition", async () => {
 		const item = {
 			...createSimpleItem("item:layered"),
 			asset: {
@@ -39,10 +39,6 @@ describe("compileGameSourcesFx", () => {
 				default: [
 					"asset:base",
 					"asset:overlay",
-				],
-				sources: [
-					"asset:progress-1",
-					"asset:progress-2",
 				],
 			},
 		};

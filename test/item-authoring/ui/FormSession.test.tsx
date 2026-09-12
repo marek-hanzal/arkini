@@ -320,12 +320,6 @@ describe("item section form session", () => {
 		expect(title.matches(":disabled")).toBe(false);
 	});
 
-	it("omits the artwork progression preview until a progress asset is selected", async () => {
-		const { container } = await render(<ArtworkSection />);
-
-		expect(container.querySelector('[data-ui="EditorItemArtworkProgression"]')).toBeNull();
-	});
-
 	it("keeps the persisted artwork scale in the form and saves the edited ratio", async () => {
 		const scaledItem = {
 			...item,

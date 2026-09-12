@@ -35,13 +35,13 @@ const productionLine = (id: string, input: ReadonlyArray<ReturnType<typeof mater
 	rules: [],
 });
 
-export const progressAssetTestConfig = GameConfigSchema.parse({
+export const tileActorTestConfig = GameConfigSchema.parse({
 	resources: {
 		hero: "asset:hero",
 	},
 	meta: {
-		id: "game:progress-assets",
-		title: "Progress assets",
+		id: "game:tile-actors",
+		title: "Tile actors",
 		board: {
 			width: 2,
 			height: 1,
@@ -62,7 +62,6 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 				scale: 0.8,
 				default: [
 					"asset:material-primary",
-					"asset:material-unused-stage",
 				],
 			},
 			maxStackSize: 10,
@@ -73,12 +72,7 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			asset: {
 				scale: 0.8,
 				default: [
-					"asset:stage-0",
-				],
-				sources: [
-					"asset:stage-1",
-					"asset:stage-2",
-					"asset:stage-3",
+					"asset:craft",
 				],
 			},
 			maxStackSize: 1,
@@ -95,11 +89,8 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			asset: {
 				scale: 0.8,
 				default: [
-					"asset:blueprint-empty",
-					"asset:blueprint-complete",
-				],
-				sources: [
-					"asset:blueprint-complete",
+					"asset:blueprint-base",
+					"asset:blueprint-overlay",
 				],
 			},
 			maxStackSize: 1,
@@ -117,12 +108,7 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 			asset: {
 				scale: 0.8,
 				default: [
-					"asset:temporary-stage-0",
-				],
-				sources: [
-					"asset:temporary-stage-1",
-					"asset:temporary-stage-2",
-					"asset:temporary-stage-3",
+					"asset:temporary",
 				],
 			},
 			durationMs: 1_000,
@@ -130,10 +116,10 @@ export const progressAssetTestConfig = GameConfigSchema.parse({
 	},
 });
 
-const craftItem = progressAssetTestConfig.items.craft;
-const blueprintItem = progressAssetTestConfig.items.blueprint;
+const craftItem = tileActorTestConfig.items.craft;
+const blueprintItem = tileActorTestConfig.items.blueprint;
 if (craftItem.type !== "craft" || blueprintItem.type !== "blueprint") {
-	throw new Error("Invalid progress asset test config.");
+	throw new Error("Invalid tile actor test config.");
 }
 
 const boardLocation = {
@@ -145,25 +131,18 @@ const boardLocation = {
 	},
 };
 
-export const createProgressAssetRuntime = ({
+export const createTileActorRuntime = ({
 	active = false,
 	artworkScale = 0.8,
 	owner = "craft",
 	queued = 0,
-	storedQuantity = 0,
-	storedQuantities,
 }: {
 	readonly active?: boolean;
 	readonly artworkScale?: number;
 	readonly owner?: "blueprint" | "craft";
 	readonly queued?: number;
-	readonly storedQuantity?: number;
-	readonly storedQuantities?: ReadonlyArray<number>;
 } = {}) => {
 	const ownerItem = owner === "craft" ? craftItem : blueprintItem;
-	const inputQuantities = storedQuantities ?? [
-		storedQuantity,
-	];
 	return RuntimeSchema.parse({
 		cheats: {
 			enabled: false,
@@ -185,24 +164,6 @@ export const createProgressAssetRuntime = ({
 				location: boardLocation,
 				quantity: 1,
 			},
-			...inputQuantities.flatMap((quantity, inputIndex) =>
-				quantity === 0
-					? []
-					: [
-							{
-								id: `runtime:material:${inputIndex}`,
-								revision: `revision:material:${inputIndex}:${quantity}`,
-								item: progressAssetTestConfig.items.material,
-								location: {
-									scope: "input" as const,
-									ownerItemId: "runtime:owner",
-									lineId: ownerItem.line.id,
-									inputIndex,
-								},
-								quantity,
-							},
-						],
-			),
 		],
 		jobs: active
 			? [
@@ -229,13 +190,7 @@ export const createProgressAssetRuntime = ({
 	});
 };
 
-export const readProgressAssetOwner = (runtime: RuntimeSchema.Type) => {
-	const owner = runtime.items.find((item) => item.id === "runtime:owner");
-	if (owner === undefined) throw new Error("Missing progress owner.");
-	return owner;
-};
-
-export const createTemporaryProgressRuntime = ({
+export const createTemporaryTileActorRuntime = ({
 	remainingDurationMs = 600,
 }: {
 	readonly remainingDurationMs?: number;
@@ -251,7 +206,7 @@ export const createTemporaryProgressRuntime = ({
 			{
 				id: "runtime:temporary",
 				revision: "revision:temporary",
-				item: progressAssetTestConfig.items.temporary,
+				item: tileActorTestConfig.items.temporary,
 				location: boardLocation,
 				quantity: 1,
 				remainingDurationMs,
@@ -262,6 +217,6 @@ export const createTemporaryProgressRuntime = ({
 		defaultLineByOwnerItemId: {},
 	});
 
-export const progressAssetGame = {
+export const tileActorGame = {
 	getResourceUrlFn: (resourceId: string) => `resource:${resourceId}`,
 };

@@ -34,7 +34,6 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 			item.asset.default[0],
 			"",
 		],
-		sources: [],
 	},
 });
 

@@ -1,6 +1,7 @@
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
 const thumbnailSizeClassName = {
+	input: "size-[var(--ak-control-min-height)]",
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-8",

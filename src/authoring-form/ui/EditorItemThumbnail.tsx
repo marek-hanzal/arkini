@@ -4,6 +4,7 @@ import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { twMerge } from "tailwind-merge";
 
 const thumbnailSizeClassName = {
+	input: "size-[var(--ak-control-min-height)]",
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-11",
@@ -22,9 +23,9 @@ const EditorItemSelectedThumbnail = ({
 	resourceIds,
 }: Pick<EditorItemThumbnailProps, "resourceIds">) => (
 	<EditorItemThumbnail
-		className="size-10 rounded-lg border-line-strong"
+		className="rounded-lg border-line-strong"
 		resourceIds={resourceIds}
-		size="sm"
+		size="input"
 	/>
 );
 

@@ -133,6 +133,7 @@ interface EditorSecondsFieldProps {
 	readonly label: string;
 	readonly min?: number;
 	readonly optional?: boolean;
+	readonly step?: number;
 }
 
 const EditorSecondsField = ({
@@ -140,6 +141,7 @@ const EditorSecondsField = ({
 	label,
 	min = 0,
 	optional = false,
+	step,
 }: EditorSecondsFieldProps) => {
 	const field = useFieldContext<number | undefined>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
@@ -159,6 +161,7 @@ const EditorSecondsField = ({
 						: Math.round(nextSeconds * 1_000),
 				)
 			}
+			step={step}
 			required={!optional}
 			value={seconds}
 		/>

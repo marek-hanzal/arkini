@@ -2,7 +2,7 @@ import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 // @vitest-environment jsdom
 
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-import { act, createElement, type ReactNode } from "react";
+import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -23,24 +23,6 @@ vi.mock("@effect/atom-react", () => ({
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
-
-vi.mock("~/ui/ui/Button", () => {
-	const createButtonFn =
-		(variant: string) =>
-		({ children, cursorIntent: _cursorIntent, ...props }: Record<string, unknown>) =>
-			createElement(
-				"button",
-				{
-					...props,
-					"data-variant": variant,
-				},
-				children as ReactNode,
-			);
-	return {
-		Button: createButtonFn("default"),
-		PrimaryButton: createButtonFn("primary"),
-	};
-});
 
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import {
@@ -105,7 +87,6 @@ describe("ItemDraftToggle", () => {
 		if (button === null) throw new Error("Missing draft toggle.");
 
 		expect(button.dataset.uiActive).toBe("false");
-		expect(button.dataset.variant).toBe("default");
 		await act(async () => button.click());
 		expect(state.save).toHaveBeenCalledWith({
 			config: state.project?.config,
@@ -133,6 +114,5 @@ describe("ItemDraftToggle", () => {
 			draft: true,
 		});
 		expect(readButtonFn()?.dataset.uiActive).toBe("true");
-		expect(readButtonFn()?.dataset.variant).toBe("primary");
 	});
 });

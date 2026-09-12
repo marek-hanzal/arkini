@@ -317,6 +317,8 @@ Finishing accepted work:
   value: Finishing accepted work
 Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.:
   value: Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.
+Fix the highlighted fields before saving.:
+  value: Fix the highlighted fields before saving.
 Flow:
   value: Flow
 Flow help:
@@ -853,6 +855,8 @@ Runtime multiplier:
   value: Runtime multiplier
 Save:
   value: Save
+Save or discard this draft before leaving the editor surface.:
+  value: Save or discard this draft before leaving the editor surface.
 Schedule:
   value: Schedule
 Search assets…:
@@ -1016,6 +1020,8 @@ Universe:
   dynamic: true
 Unlimited:
   value: Unlimited
+Unsaved changes:
+  value: Unsaved changes
 Unset clock:
   value: Unset clock
 Unset default:

@@ -7,6 +7,13 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 	itemId: item.item.id,
 	location: item.location,
 	quantity: item.quantity,
+	...(item.schedule === undefined
+		? {}
+		: {
+				schedule: {
+					...item.schedule,
+				},
+			}),
 	...(item.remainingCharges === undefined
 		? {}
 		: {

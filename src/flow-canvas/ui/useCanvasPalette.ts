@@ -88,6 +88,7 @@ export const useCanvasPalette = (scheduleDrawRef: RefObject<() => void>) => {
 				info: colors.info,
 				itemSurfaces: {
 					blueprint: colors.itemBlueprint,
+					clock: colors.itemProducer,
 					craft: colors.itemCraft,
 					deposit: colors.itemDeposit,
 					inventory: colors.itemInventory,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ScheduleStateSchema } from "~/item-schedule/schema/ScheduleStateSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -38,6 +39,7 @@ export const StateItemSchema = z
 		/**
 		 * Remaining fixed-step lifetime of one persisted temporary item instance.
 		 */
+		schedule: ScheduleStateSchema.optional(),
 		remainingDurationMs: TimeSchema.optional().describe(
 			"The optional remaining fixed-step lifetime of this persisted temporary item instance.",
 		),

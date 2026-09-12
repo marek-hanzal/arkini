@@ -118,6 +118,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			case "charges":
 				cleanup.removeChargesOutput = true;
 				break;
+			case "onExpire":
 			case "output":
 				cleanup.removeExpiryOutput = true;
 				break;
@@ -158,7 +159,8 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		if (owner === undefined) continue;
 		const mustDeleteOwner =
 			cleanup.removeLine ||
-			(owner.type === "producer" && cleanup.lineIndexes.size === owner.lines.length);
+			((owner.type === "producer" || owner.type === "clock") &&
+				cleanup.lineIndexes.size === owner.lines.length);
 		if (mustDeleteOwner) {
 			delete items[ownerItemId];
 			deletedOwnerItemIds.push(ownerItemId);
@@ -178,7 +180,10 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					inputNumber: index + 1,
 				});
 		}
-		if (owner.type === "space" && cleanup.actionRuleIndexes.size > 0) {
+		if (
+			(owner.type === "space" || owner.type === "clock") &&
+			cleanup.actionRuleIndexes.size > 0
+		) {
 			candidate.rules = owner.rules.filter(
 				(_rule, index) => !cleanup.actionRuleIndexes.has(index),
 			);
@@ -221,8 +226,8 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			};
 			removedChargeOutputOwnerIds.push(ownerItemId);
 		}
-		if (cleanup.removeExpiryOutput && "output" in owner) {
-			candidate.output = undefined;
+		if (cleanup.removeExpiryOutput) {
+			candidate[owner.type === "clock" ? "onExpire" : "output"] = undefined;
 			removedExpiryOutputOwnerIds.push(ownerItemId);
 		}
 		items[ownerItemId] = candidate;

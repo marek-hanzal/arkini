@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -38,11 +39,20 @@ export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 	remainingDurationMs,
 }: CreateRuntimeItemProps<Location>) {
 	const revision = yield* createRevisionFx();
+	const schedule = readItemScheduleFn(item);
 	return {
 		id,
 		item,
 		location,
 		quantity,
+		schedule:
+			schedule === undefined
+				? undefined
+				: {
+						running: true,
+						remainingIntervalMs: schedule.intervalMs,
+						remainingDurationMs: schedule.durationMs,
+					},
 		remainingCharges,
 		remainingDurationMs:
 			remainingDurationMs ??

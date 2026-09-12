@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { Project } from "~/project-authoring/type/Project";
+import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
@@ -632,6 +633,44 @@ describe("item section form session", () => {
 				}),
 		);
 		expect(document.activeElement).toBe(invalid);
+	});
+
+	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
+		const clock = ClockSchema.parse({
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+			type: "clock",
+			scope: "board",
+			maxStackSize: 1,
+			intervalMs: 1500,
+			durationMs: 2000,
+		});
+		state.persisted = clock;
+		(
+			state.project as {
+				config: {
+					items: Record<string, ItemSchema.Type>;
+				};
+			}
+		).config.items[item.id] = clock;
+		const { container } = await render(<ProductionSection />);
+		const duration = container.querySelector<HTMLInputElement>('input[name="durationMs"]');
+		if (duration === null) throw new Error("Missing clock lifetime field.");
+		await changeInput(duration, "");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					intervalMs: 1500,
+					lines: clock.lines,
+					durationMs: undefined,
+				}),
+			}),
+		);
 	});
 
 	it("names and focuses the invalid temporary duration", async () => {

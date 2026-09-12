@@ -45,6 +45,40 @@ describe("convertFn", () => {
 		expect(producer.draft).toBe(true);
 	});
 
+	it("retains production contracts through a Clock conversion while fixing its placement", () => {
+		const producer = createItem("producer");
+		if (producer.type !== "producer") throw new Error("Expected producer fixture.");
+		const source = {
+			...producer,
+			scope: "inventory" as const,
+			maxStackSize: 9,
+			maxQueueSize: 4,
+		};
+		const clock = convertFn(source, "clock");
+		expect(clock).toMatchObject({
+			type: "clock",
+			scope: "board",
+			maxStackSize: 1,
+			maxQueueSize: 4,
+			lines: source.lines,
+		});
+		expect(convertFn(clock, "producer")).toMatchObject({
+			type: "producer",
+			maxQueueSize: 4,
+			lines: source.lines,
+		});
+	});
+
+	it("retains a temporary lifetime when converting to a Clock", () => {
+		const temporary = createItem("temporary");
+		if (temporary.type !== "temporary") throw new Error("Expected temporary fixture.");
+		const clock = convertFn(temporary, "clock");
+		expect(clock).toMatchObject({
+			type: "clock",
+			durationMs: temporary.durationMs,
+		});
+	});
+
 	it("keeps the first producer line when converted to a single-line type", () => {
 		const producer = createItem("producer");
 		if (producer.type !== "producer") throw new Error("Expected producer fixture.");

@@ -46,6 +46,8 @@ Important invariants:
 | `game-event` | Strict downstream event vocabulary and committed-result projection | [`../game-event/schema/GameEventSchema.ts`](../game-event/schema/GameEventSchema.ts) |
 | `simulation-time` | Fixed simulation quantum | [`../simulation-time/constant/SimulationStepMs.ts`](../simulation-time/constant/SimulationStepMs.ts) |
 | `game-tick` | Elapsed budget, fixed-step replay, lifecycle order and loop | [`../game-tick/fx/advanceRuntimeStepFx.ts`](../game-tick/fx/advanceRuntimeStepFx.ts) |
+| `item-schedule` | Periodic admission state, enable evaluation and exhausted-owner settlement | [`../item-schedule/fx/advanceItemSchedulesFx.ts`](../item-schedule/fx/advanceItemSchedulesFx.ts) |
+| `item-expiry` | Shared atomic identity removal and expiry Output | [`../item-expiry/fx/expireItemRuntimeFx.ts`](../item-expiry/fx/expireItemRuntimeFx.ts) |
 | `temporary-item` | Duration advancement, visible-origin expiry and atomic job reconciliation | [`../temporary-item/fx/attemptTemporaryItemExpiryFx.ts`](../temporary-item/fx/attemptTemporaryItemExpiryFx.ts) |
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`../game-persistence/schema/StateSchema.ts`](../game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save scope, command admission, subscriptions and fail-stop | [`../game-session/fx/createGameSessionFx.ts`](../game-session/fx/createGameSessionFx.ts) |
@@ -61,7 +63,7 @@ The module graph is acyclic; this domain-level island is not.
 - `game-runtime ↔ game-event` crosses at different layers. Runtime owns publication and imports event contracts; event projection may read already-committed Runtime facts. Events stay downstream truth.
 - `game-session → game-runtime + game-tick + game-persistence` is lifecycle composition. Those owners do not import Game Session.
 - `installed-game → playable-game → game-session` is the live capability direction. Package identity never enters Game Session.
-- `game-tick → production-delivery + production-job + temporary-item` is orchestration. Those lifecycle owners cannot import Tick's clock, replay or loop.
+- `game-tick → production-delivery + production-job + temporary-item + item-schedule` is orchestration. Those lifecycle owners cannot import Tick's clock, replay or loop.
 
 See [`../production-line/README.md`](../production-line/README.md) for the production half of the behavior cluster.
 

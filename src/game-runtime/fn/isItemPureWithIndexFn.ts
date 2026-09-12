@@ -10,7 +10,7 @@ const readOwnedLinesFn = (item: RuntimeItemSchema.Type): readonly LineSchema.Typ
 	match(item.item)
 		.with(
 			{
-				type: TypeSchema.enum.Producer,
+				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
 			},
 			({ lines }) => lines,
 		)
@@ -45,6 +45,7 @@ export const isItemPureWithIndexFn = ({
 	readonly runtime: RuntimeSchema.Type;
 }) => {
 	if (
+		item.schedule !== undefined ||
 		item.remainingCharges !== undefined ||
 		item.remainingDurationMs !== undefined ||
 		Object.hasOwn(runtime.defaultLineByOwnerItemId, item.id)

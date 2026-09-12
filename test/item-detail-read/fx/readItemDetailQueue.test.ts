@@ -64,6 +64,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 2,
+			canClearQueue: true,
 			active: [
 				{
 					jobId: "job:active",
@@ -180,6 +181,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 1,
+			canClearQueue: true,
 			active: [],
 			request: [
 				{

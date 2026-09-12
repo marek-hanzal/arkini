@@ -55,12 +55,21 @@ const groups = [
 		],
 	},
 	{
-		name: "edits producer and deposit items through their dedicated tools",
+		name: "edits producer, deposit, and clock items through their dedicated tools",
 		cases: [
 			[
 				"producer",
 				{
 					title: "Edited producer",
+				},
+			],
+			[
+				"clock",
+				{
+					intervalMs: 500,
+					control: "interactive",
+					durationMs: null,
+					onExpire: null,
 				},
 			],
 			[

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ScheduleStateSchema } from "~/item-schedule/schema/ScheduleStateSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -40,6 +41,7 @@ export const RuntimeItemSchema = z
 		 *
 		 * Undefined is canonical for every non-temporary item.
 		 */
+		schedule: ScheduleStateSchema.optional(),
 		remainingDurationMs: TimeSchema.optional().describe(
 			"The optional remaining fixed-step lifetime of this temporary item instance.",
 		),

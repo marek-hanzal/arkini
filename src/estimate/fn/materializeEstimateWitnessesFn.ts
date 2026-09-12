@@ -83,6 +83,7 @@ const maximumWitnessSearchStates = 8;
 
 const isPartialDiagnosticFn = (diagnostic: ItemEstimateDiagnostic) =>
 	diagnostic.kind === "joint-output-accounting-unsupported" ||
+	diagnostic.kind === "finite-owner-lifetime-unsupported" ||
 	diagnostic.kind === "quantity-limit-exceeded" ||
 	diagnostic.kind === "witness-search-exhausted";
 
@@ -256,6 +257,23 @@ const materializeCandidateSelectionFn = (
 					route.id,
 					routeOptions.map(({ id: routeId }) => routeId),
 				);
+			if (route.executionConstraint !== undefined)
+				return {
+					diagnostics: [
+						route.executionConstraint === "finite-owner-lifetime"
+							? {
+									kind: "finite-owner-lifetime-unsupported",
+									routeId: route.id,
+								}
+							: {
+									kind: "unreachable",
+									factId: id,
+									quantity: missing,
+									routeId: route.id,
+								},
+					],
+					status: "failure",
+				};
 			if (policy.topology.unsupportedRoutes.has(route))
 				return {
 					diagnostics: [
@@ -502,6 +520,8 @@ const compareWitnessesFn = (left: EstimateWitness, right: EstimateWitness) =>
 const readRouteEstimateSignatureFn = (policy: EstimateRoutePolicy, route: AcquisitionRoute) =>
 	JSON.stringify({
 		durationMs: route.durationMs,
+		executionConstraint: route.executionConstraint,
+		minimumActionIntervalMs: route.minimumActionIntervalMs,
 		operation: route.operation,
 		operationOutputGroupId: route.output.operationOutputGroupId,
 		quantityDistribution: route.output.quantityDistribution,

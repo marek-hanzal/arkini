@@ -182,6 +182,9 @@ Item storage scope - toolbar:
 Item type - blueprint:
   value: Blueprint
   dynamic: true
+Item type - clock:
+  value: Clock
+  dynamic: true
 Item type - craft:
   value: Craft owner
   dynamic: true
@@ -211,6 +214,9 @@ Item type - temporary:
   dynamic: true
 Item type description - blueprint:
   value: A build plan with one construction line.
+  dynamic: true
+Item type description - clock:
+  value: A board item that periodically starts its default production line, with an optional lifetime.
   dynamic: true
 Item type description - craft:
   value: A consumable or quest-like item with one product line.

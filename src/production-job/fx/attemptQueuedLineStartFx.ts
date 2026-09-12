@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemChargesUnavailableError } from "~/production-action/error/ItemChargesUnavailableError";
@@ -77,6 +78,16 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 			} satisfies attemptQueuedLineStartFx.Result;
 		}
 		if (result.type === "incomplete") {
+			const owner = runtime.items.find((item) => item.id === request.ownerItemId);
+			if (owner !== undefined && !isItemProductionAdmissionOpenFn(owner))
+				return {
+					type: "blocked",
+					runtime,
+					error: new LineRunUnavailableError({
+						ownerItemId: request.ownerItemId,
+						lineId: request.lineId,
+					}),
+				} as const;
 			const autofill = yield* autofillLineInputsRuntimeFx({
 				ownerItemId: request.ownerItemId,
 				lineId: request.lineId,

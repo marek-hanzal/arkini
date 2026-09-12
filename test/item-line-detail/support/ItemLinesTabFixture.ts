@@ -119,6 +119,7 @@ export const projection = {
 	line: [
 		{
 			actions: {
+				canChangeDefault: true,
 				canWithdraw: false,
 				enqueue: {
 					enabled: true,

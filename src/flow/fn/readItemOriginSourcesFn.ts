@@ -22,6 +22,7 @@ const readOwnerItemIdFn = (route: AcquisitionRoute) => {
 		case "merge-charge-depletion":
 			return route.metadata.chargedItemId;
 		case "temporary-expiry":
+		case "clock-expiry":
 			return route.metadata.itemId;
 	}
 };
@@ -47,6 +48,7 @@ const readReferenceFn = (route: AcquisitionRoute): ItemOriginSourceReference => 
 				type: "charges",
 			};
 		case "temporary-expiry":
+		case "clock-expiry":
 			return {
 				type: "expiry",
 			};
@@ -114,6 +116,7 @@ const readLabelFn = (route: AcquisitionRoute) => {
 		case "merge-charge-depletion":
 			return "Depletion";
 		case "temporary-expiry":
+		case "clock-expiry":
 			return "Expiry";
 	}
 };
@@ -129,6 +132,7 @@ const readKindFn = (route: AcquisitionRoute): ItemOriginSource["kind"] => {
 		case "merge-charge-depletion":
 			return "charges";
 		case "temporary-expiry":
+		case "clock-expiry":
 			return "expiry";
 	}
 };

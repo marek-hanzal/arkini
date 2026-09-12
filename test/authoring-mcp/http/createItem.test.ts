@@ -13,12 +13,13 @@ afterEach(cleanupMcpHarnesses);
 
 const typeGroups = [
 	{
-		name: "creates simple, space, and producer item types through dedicated tools",
+		name: "creates simple, space, producer, and clock item types through dedicated tools",
 		projectId: "simple-space-producer-types-project",
 		types: [
 			"simple",
 			"space",
 			"producer",
+			"clock",
 		],
 	},
 	{

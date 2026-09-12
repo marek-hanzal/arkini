@@ -151,8 +151,30 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 				anyOf: [],
 			},
 			availability,
+			owner.type === "clock" && owner.control === "automatic-only"
+				? readAcquisitionAvailabilityRequirementsFn({
+						rules: owner.rules,
+						source: "line-condition",
+					})
+				: {
+						allOf: [],
+						anyOf: [],
+					},
 		),
 	} satisfies LineDescriptor;
+};
+
+const readLineExecutionConstraintFn = (
+	owner: ItemSchema.Type,
+	line: LineSchema.Type,
+): AcquisitionRoute["executionConstraint"] => {
+	if (owner.type !== "clock") return undefined;
+	if (
+		owner.control === "automatic-only" &&
+		(!line.default || (!owner.enable && !owner.rules.some(({ type }) => type === "enable")))
+	)
+		return "unavailable";
+	return owner.durationMs === undefined ? undefined : "finite-owner-lifetime";
 };
 
 const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescriptor) => {
@@ -175,6 +197,23 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 				accounting === "single-payer-exact" ? Math.floor(charges.amount / spendPerRun) : 0,
 		});
 	}
+	const executionConstraint = readLineExecutionConstraintFn(descriptor.owner, descriptor.line);
+	const minimumActionIntervalMs =
+		descriptor.owner.type === "clock" && descriptor.owner.control === "automatic-only"
+			? descriptor.owner.intervalMs
+			: undefined;
+	const execution = {
+		...(executionConstraint === undefined
+			? {}
+			: {
+					executionConstraint,
+				}),
+		...(minimumActionIntervalMs === undefined
+			? {}
+			: {
+					minimumActionIntervalMs,
+				}),
+	};
 	const outputModel = readAcquisitionOutputOccurrencesFn(descriptor.line.output);
 	const operation = {
 		...descriptor.operation,
@@ -187,6 +226,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	};
 	for (const occurrence of outputModel.occurrences)
 		routes.push({
+			...execution,
 			...(chargeUses.length === 0
 				? {}
 				: {
@@ -226,6 +266,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 		const chargeOutputModel = readAcquisitionOutputOccurrencesFn(charges.output);
 		for (const occurrence of chargeOutputModel.occurrences)
 			routes.push({
+				...execution,
 				chargeUses: chargeUses.filter(({ payerFactId }) => payerFactId !== chargedItemId),
 				durationMs: descriptor.line.runtimeMs,
 				id: readAcquisitionIdentityFn(
@@ -522,16 +563,29 @@ const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 	return routes;
 };
 
-const readTemporaryRoutesFn = (item: ItemSchema.Type) => {
-	if (item.type !== "temporary") return [];
-	const outputModel = readAcquisitionOutputOccurrencesFn(item.output);
+const readExpiryRoutesFn = (item: ItemSchema.Type) => {
+	if (item.type !== "temporary" && item.type !== "clock") return [];
+	if (item.durationMs === undefined) return [];
+	const durationMs = item.durationMs;
+	const kind = item.type === "temporary" ? "temporary-expiry" : "clock-expiry";
+	const outputModel = readAcquisitionOutputOccurrencesFn(
+		item.type === "temporary" ? item.output : item.onExpire,
+	);
 	return outputModel.occurrences.map(
 		(output): AcquisitionRoute => ({
-			durationMs: item.durationMs,
-			id: readAcquisitionIdentityFn("temporary-expiry", item.id, output.id, output.factId),
+			...(item.type === "clock"
+				? {
+						executionConstraint:
+							!item.enable && !item.rules.some(({ type }) => type === "enable")
+								? ("unavailable" as const)
+								: ("finite-owner-lifetime" as const),
+					}
+				: {}),
+			durationMs,
+			id: readAcquisitionIdentityFn(kind, item.id, output.id, output.factId),
 			metadata: {
 				itemId: item.id,
-				kind: "temporary-expiry",
+				kind,
 			},
 			operation: {
 				id: readAcquisitionIdentityFn("source", item.id, "expiry"),
@@ -549,29 +603,40 @@ const readTemporaryRoutesFn = (item: ItemSchema.Type) => {
 				operationOutputGroupId: output.operationOutputGroupId,
 				quantityDistribution: output.quantityDistribution,
 			},
-			requirements: {
-				allOf: [
-					{
-						factId: item.id,
-						quantity: 1,
-						source: "temporary-item",
-						usage: "consume",
-					},
-					...output.requirements.allOf,
-				],
-				anyOf: output.requirements.anyOf,
-				unsupported: output.requirements.unsupported ?? [],
-			},
+			requirements: combineRequirementsFn(
+				{
+					allOf: [
+						{
+							factId: item.id,
+							quantity: 1,
+							source: item.type === "temporary" ? "temporary-item" : "expiring-item",
+							usage: "consume",
+						},
+						...output.requirements.allOf,
+					],
+					anyOf: output.requirements.anyOf,
+					unsupported: output.requirements.unsupported ?? [],
+				},
+				item.type === "clock"
+					? readAcquisitionAvailabilityRequirementsFn({
+							rules: item.rules,
+							source: "line-condition",
+						})
+					: {
+							allOf: [],
+							anyOf: [],
+						},
+			),
 			runMultiplier: 1,
 		}),
 	);
 };
 
-/** Compiles temporary-expiry acquisition routes. */
-const compileAcquisitionTemporaryRoutesFn = (config: GameConfigSchema.Type) => {
+/** Compiles finite-owner expiry acquisition routes through the shared output model. */
+const compileAcquisitionExpiryRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items)) {
-		routes.push(...readTemporaryRoutesFn(item));
+		routes.push(...readExpiryRoutesFn(item));
 	}
 	return routes;
 };
@@ -582,7 +647,7 @@ export const createAcquisitionGraphFn = (config: GameConfigSchema.Type) => {
 	const routes = [
 		...compileAcquisitionLineRoutesFn(config),
 		...compileAcquisitionMergeRoutesFn(config),
-		...compileAcquisitionTemporaryRoutesFn(config),
+		...compileAcquisitionExpiryRoutesFn(config),
 	].sort((left, right) => Order.String(left.id, right.id));
 
 	return {

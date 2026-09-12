@@ -8,6 +8,7 @@ export type ItemDetailPendingAction =
 	| "clear-queue"
 	| "default"
 	| "enqueue"
+	| "schedule"
 	| "withdraw";
 
 export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unknown> {

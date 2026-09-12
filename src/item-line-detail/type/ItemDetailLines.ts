@@ -121,6 +121,7 @@ export namespace ItemDetailLines {
 		readonly isDefault: boolean;
 		readonly queuedRequestCount: number;
 		readonly actions: {
+			readonly canChangeDefault: boolean;
 			readonly enqueue: {
 				readonly enabled: boolean;
 			};

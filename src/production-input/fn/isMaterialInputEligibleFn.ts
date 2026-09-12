@@ -20,6 +20,7 @@ export const isMaterialInputEligibleFn = (item: ItemSchema.Type) =>
 					TypeSchema.enum.Deposit,
 					TypeSchema.enum.Inventory,
 					TypeSchema.enum.Producer,
+					TypeSchema.enum.Clock,
 					TypeSchema.enum.Simple,
 					TypeSchema.enum.Space,
 					TypeSchema.enum.Stash,

@@ -15,7 +15,7 @@ export namespace validateLineInputCapacityFn {
 	}
 }
 
-/** Allows positive material buffering capacity only on producer-owned lines. */
+/** Allows positive material buffering capacity only on Producer and Clock lines. */
 export const validateLineInputCapacityFn = ({
 	config,
 	provenance,
@@ -23,7 +23,7 @@ export const validateLineInputCapacityFn = ({
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type === ItemTypeSchema.enum.Producer) {
+		if (item.type === ItemTypeSchema.enum.Producer || item.type === ItemTypeSchema.enum.Clock) {
 			continue;
 		}
 		const lines = readItemLineEntriesFn({
@@ -45,7 +45,7 @@ export const validateLineInputCapacityFn = ({
 						"capacity",
 					],
 					source: provenance.items[itemId],
-					message: `Line ${line.id} owned by ${itemId} cannot buffer materials because only producers support positive input capacity.`,
+					message: `Line ${line.id} owned by ${itemId} cannot buffer materials because only producers and clocks support positive input capacity.`,
 					ownerItemId: itemId,
 					lineId: line.id,
 					inputIndex,

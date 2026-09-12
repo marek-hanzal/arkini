@@ -18,6 +18,7 @@ export namespace narrowLineOwnerItemFn {
 					readonly type:
 						| typeof TypeSchema.enum.Blueprint
 						| typeof TypeSchema.enum.Craft
+						| typeof TypeSchema.enum.Clock
 						| typeof TypeSchema.enum.Producer
 						| typeof TypeSchema.enum.Stash;
 				}
@@ -35,6 +36,7 @@ export const narrowLineOwnerItemFn = (
 		item,
 		(candidate): candidate is narrowLineOwnerItemFn.Result =>
 			candidate.type === TypeSchema.enum.Producer ||
+			candidate.type === TypeSchema.enum.Clock ||
 			(candidate.type === TypeSchema.enum.Deposit && candidate.lines !== undefined) ||
 			candidate.type === TypeSchema.enum.Blueprint ||
 			candidate.type === TypeSchema.enum.Craft ||

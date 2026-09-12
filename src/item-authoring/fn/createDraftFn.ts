@@ -100,6 +100,25 @@ export const createDraftFn = ({
 				LineSchema.Type,
 			],
 		}))
+		.with("clock", (matchedType) => ({
+			...base,
+			type: matchedType,
+			scope: "board" as const,
+			intervalMs: 1_000,
+			enable: true,
+			rules: [],
+			control: "automatic-only" as const,
+			maxQueueSize: 1,
+			lines: [
+				{
+					...lineBase,
+					title: `New ${matchedType} line`,
+					description: `Describe what this ${matchedType} line consumes and produces.`,
+				},
+			] as [
+				LineSchema.Type,
+			],
+		}))
 		.with("blueprint", "craft", "stash", (lineType) => ({
 			...base,
 			type: lineType,

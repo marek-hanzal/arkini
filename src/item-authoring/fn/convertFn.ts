@@ -53,9 +53,9 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					...common,
 					type: fallback.type,
 					space: item.type === "space" ? item.space : 0,
-					enable: item.type === "space" ? item.enable : true,
+					enable: item.type === "space" || item.type === "clock" ? item.enable : true,
 					input: item.type === "space" ? item.input : [],
-					rules: item.type === "space" ? item.rules : [],
+					rules: item.type === "space" || item.type === "clock" ? item.rules : [],
 				};
 			case "inventory":
 				return {
@@ -83,7 +83,7 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					...common,
 					type: fallback.type,
 					maxQueueSize:
-						item.type === "deposit" || item.type === "producer"
+						item.type === "deposit" || item.type === "producer" || item.type === "clock"
 							? item.maxQueueSize
 							: fallback.maxQueueSize,
 					...(lines.length === 0
@@ -100,9 +100,35 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					...common,
 					type: fallback.type,
 					maxQueueSize:
-						item.type === "deposit" || item.type === "producer"
+						item.type === "deposit" || item.type === "producer" || item.type === "clock"
 							? item.maxQueueSize
 							: fallback.maxQueueSize,
+					lines:
+						lines.length === 0
+							? fallback.lines
+							: [
+									lines[0],
+									...lines.slice(1),
+								],
+				};
+			case "clock":
+				return {
+					...common,
+					type: fallback.type,
+					scope: fallback.scope,
+					maxStackSize: fallback.maxStackSize,
+					intervalMs: fallback.intervalMs,
+					enable: item.type === "space" ? item.enable : fallback.enable,
+					rules: item.type === "space" ? item.rules : fallback.rules,
+					control: fallback.control,
+					...(item.type === "temporary"
+						? {
+								durationMs: item.durationMs,
+								onExpire: item.output,
+							}
+						: {}),
+					maxQueueSize:
+						"maxQueueSize" in item ? item.maxQueueSize : fallback.maxQueueSize,
 					lines:
 						lines.length === 0
 							? fallback.lines

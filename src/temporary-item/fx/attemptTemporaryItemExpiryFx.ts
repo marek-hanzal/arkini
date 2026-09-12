@@ -1,23 +1,18 @@
-import { Effect, Random } from "effect";
+import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
+import { Effect } from "effect";
 
-import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
-import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
-import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/fn/isExpectedPlacementDeliveryBlockFn";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reconcileJobAfterTemporaryMaterialExpiryFx } from "~/production-job/fx/reconcileJobAfterTemporaryMaterialExpiryFx";
-import { outputFx } from "~/production-output/fx/outputFx";
 
 /** Bump only when intentionally changing temporary-expiry random compatibility. */
 const TemporaryExpiryRandomVersion = 3;
@@ -48,30 +43,6 @@ interface TemporaryExpiryContext {
 	readonly jobId?: IdSchema.Type;
 	readonly origin: BoardLocationSchema.Type;
 }
-
-/** Runs the owned program with deterministic random from one temporary runtime identity. */
-const makeTemporaryExpiryRandomFx = Effect.fn("makeTemporaryExpiryRandomFx")(function* <
-	Result,
-	Error,
-	Requirements,
->({
-	item,
-	program,
-}: {
-	item: RuntimeItemSchema.Type;
-	program: Effect.Effect<Result, Error, Requirements>;
-}) {
-	return yield* program.pipe(
-		Random.withSeed(
-			[
-				"arkini:temporary-expiry",
-				`v${TemporaryExpiryRandomVersion}`,
-				item.id,
-				item.item.id,
-			].join(":"),
-		),
-	);
-});
 
 const readTemporaryExpiryOwnerOriginFx = Effect.fn("readTemporaryExpiryOwnerOriginFx")(function* ({
 	ownerItemId,
@@ -161,61 +132,20 @@ const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 		runtime,
 	});
 
-	const expiredEvent = {
-		type: GameEventEnumSchema.enum.ItemExpired,
-		itemId: item.id,
-		canonicalItemId: item.item.id,
-		location: context.origin,
-		quantity: item.quantity,
-	} satisfies GameEventSchema.Type;
-	let draft: RuntimeSchema.Type = yield* removeRuntimeItemIdentityFx({
+	const expiry = yield* expireItemRuntimeFx({
 		item,
+		origin: context.origin,
+		output: item.item.output,
+		randomSeed: [
+			"arkini:temporary-expiry",
+			`v${TemporaryExpiryRandomVersion}`,
+			item.id,
+			item.item.id,
+		].join(":"),
 		runtime,
 	});
-	const events: GameEventSchema.Type[] = [
-		expiredEvent,
-	];
-	if (item.item.output !== undefined) {
-		const configuredOutput = item.item.output;
-		const outputTransition = yield* makeTemporaryExpiryRandomFx({
-			item,
-			program: Effect.gen(function* () {
-				// Pin this expiry's input, not the outer Tick transaction or removed-item draft.
-				const output = yield* outputFx({
-					origin: context.origin,
-					output: configuredOutput,
-				}).pipe(
-					Effect.provideService(RuntimeFx, {
-						read: Effect.succeed(runtime),
-					}),
-				);
-				if (output.drop.length === 0) {
-					return {
-						events: [] as GameEventSchema.Type[],
-						runtime: draft,
-					};
-				}
-
-				const [placement, withOutput] = yield* applyOutputPlacementFx({
-					origin: context.origin,
-					output,
-					runtime: draft,
-				});
-				draft = withOutput;
-				const placementEvents = yield* readOutputPlacementItemEventsFx({
-					originItemId: item.id,
-					placement,
-				});
-
-				return {
-					events: placementEvents,
-					runtime: draft,
-				};
-			}),
-		});
-		draft = outputTransition.runtime;
-		events.push(...outputTransition.events);
-	}
+	let draft = expiry.runtime;
+	const events = expiry.events;
 	if (context.jobId !== undefined) {
 		const jobTransition = yield* reconcileJobAfterTemporaryMaterialExpiryFx({
 			jobId: context.jobId,

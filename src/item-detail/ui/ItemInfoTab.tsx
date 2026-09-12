@@ -1,3 +1,7 @@
+import { Button } from "~/ui/ui/Button";
+import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
+import type { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { match } from "ts-pattern";
 
 import type { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
@@ -11,6 +15,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 export namespace ItemInfoTab {
 	export interface Detail {
 		readonly description?: string;
+		readonly schedule?: readItemDetailScheduleFx.Schedule;
 		readonly itemType: TypeSchema.Type;
 		readonly storageScope: StorageSchema.Type;
 		readonly location?: readItemDetailInfoFn.Location;
@@ -81,8 +86,16 @@ const readLocationLabelFn = (location: readItemDetailInfoFn.Location) =>
 		.exhaustive();
 
 /** Renders the canonical description-and-facts presentation for configured and live items. */
-export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail }) => {
+export const ItemInfoTab = ({
+	detail,
+	scheduleControl,
+}: {
+	readonly detail: ItemInfoTab.Detail;
+	readonly scheduleControl?: useRuntimeItemDetailSceneController.ScheduleControl;
+}) => {
 	const translator = useTranslator();
+	const schedule = detail.schedule;
+	const scheduleRuntime = schedule?.runtime;
 	const fact = [
 		{
 			label: translator.textFn("Type"),
@@ -135,6 +148,60 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 						label: translator.textFn(detail.charges.label),
 					},
 				]),
+		...(schedule === undefined
+			? []
+			: [
+					{
+						label: "Interval",
+						value: formatDurationFn(schedule.intervalMs),
+					},
+					{
+						label: "Lifetime",
+						value:
+							schedule.durationMs === undefined
+								? "Unlimited"
+								: formatDurationFn(schedule.durationMs),
+					},
+					{
+						label: "Control",
+						value:
+							schedule.control === "interactive" ? "Interactive" : "Automatic only",
+					},
+					...(schedule.runtime === undefined
+						? []
+						: [
+								{
+									label: "Schedule",
+									value:
+										schedule.runtime.status === "draining"
+											? "Finishing accepted work"
+											: schedule.runtime.status === "running"
+												? "Running"
+												: "Paused",
+								},
+								...(schedule.runtime.status === "draining"
+									? []
+									: [
+											{
+												label: "Next pulse",
+												value: formatDurationFn(
+													schedule.runtime.remainingIntervalMs,
+												),
+											},
+											...(schedule.runtime.remainingDurationMs === undefined
+												? []
+												: [
+														{
+															label: "Lifetime remaining",
+															value: formatDurationFn(
+																schedule.runtime
+																	.remainingDurationMs,
+															),
+														},
+													]),
+										]),
+							]),
+				]),
 	];
 	return (
 		<Scrollable
@@ -170,6 +237,37 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 							value={entry.value}
 						/>
 					))}
+					{schedule?.control === "interactive" &&
+					scheduleRuntime !== undefined &&
+					scheduleControl !== undefined ? (
+						<Fact
+							label="Timer control"
+							value={
+								<div className="flex flex-col items-start gap-2">
+									<Button
+										data-ui="ItemScheduleRunningButton"
+										disabled={
+											scheduleControl.pending ||
+											scheduleRuntime.status === "draining"
+										}
+										cursorIntent={
+											scheduleControl.pending ? "progress" : undefined
+										}
+										onClick={() =>
+											scheduleControl.setRunningFn(!scheduleRuntime.running)
+										}
+									>
+										{scheduleRuntime.running ? "Turn off" : "Turn on"}
+									</Button>
+									{scheduleControl.error === null ? null : (
+										<p className="text-sm text-danger">
+											{scheduleControl.error}
+										</p>
+									)}
+								</div>
+							}
+						/>
+					) : null}
 				</FactList>
 			</section>
 		</Scrollable>

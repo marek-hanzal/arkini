@@ -18,6 +18,67 @@ const waterOutput = createOutput([
 ]);
 
 describe("forceDeleteFx", () => {
+	it("clears Clock timer references and expiry output, deleting owners only when their final line is removed", () => {
+		const clock = {
+			...createProducerItem({
+				id: "clock",
+			}),
+			type: "clock",
+			scope: "board",
+			maxStackSize: 1,
+			intervalMs: 1000,
+			rules: [
+				{
+					type: "enable",
+					when: [
+						{
+							type: "exists",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "water",
+								},
+							},
+						},
+					],
+				},
+			],
+			onExpire: waterOutput,
+		};
+		const config = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				...editorTestConfig.items,
+				clock,
+				"clock-with-line": {
+					...clock,
+					id: "clock-with-line",
+					uid: "clock-with-line",
+					lines: [
+						createLine({
+							output: waterOutput,
+						}),
+					],
+				},
+			},
+		});
+		const result = Effect.runSync(
+			forceDeleteFx({
+				config,
+				itemId: "water",
+			}),
+		);
+		expect(result.config.items.clock).toMatchObject({
+			rules: [],
+			lines: clock.lines,
+		});
+		expect(result.config.items.clock).toHaveProperty("onExpire", undefined);
+		expect(result.config.items["clock-with-line"]).toBeUndefined();
+		expect(result.impact.removedExpiryOutputOwnerIds).toContain("clock");
+		expect(result.impact.deletedOwnerItemIds).toContain("clock-with-line");
+	});
+
 	it("removes every directly referencing structure and keeps unrelated authoring intact", () => {
 		const oil = createSimpleItem("oil");
 		const config = GameConfigSchema.parse({

@@ -118,6 +118,7 @@ export namespace ItemDetailLinesProjection {
 		  };
 
 	interface LineActions {
+		readonly canChangeDefault: boolean;
 		readonly enqueue: {
 			readonly enabled: boolean;
 		};

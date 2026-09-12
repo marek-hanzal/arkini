@@ -43,6 +43,7 @@ const readActivityEffectFn = ({
 				TypeSchema.enum.Craft,
 				TypeSchema.enum.Deposit,
 				TypeSchema.enum.Producer,
+				TypeSchema.enum.Clock,
 			),
 			() => running,
 		)

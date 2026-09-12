@@ -81,6 +81,8 @@ clear pending owner queue
 
 A queued request owns no time, material, charges or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
+Scheduled owners use the same line/default readers and one-intent admission. `item-schedule` owns phase and lifetime, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally. Player-control admission is separate from autonomous work and shared by production commands and their projections.
+
 ## Important invariants
 
 - Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.

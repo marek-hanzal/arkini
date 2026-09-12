@@ -1,3 +1,4 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option, Result } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
@@ -42,6 +43,7 @@ export namespace readItemDetailQueueFx {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly capacity: number;
+				readonly canClearQueue: boolean;
 				readonly active: readonly ItemDetailQueueActiveJob[];
 				readonly request: readonly ItemDetailQueueRequest[];
 		  }
@@ -173,6 +175,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 		kind: "available",
 		itemId: owner.id,
 		capacity,
+		canClearQueue: canControlItemProductionFn(owner.item),
 		active,
 		request: projectedRequests,
 	} satisfies readItemDetailQueueFx.Result;

@@ -16,6 +16,8 @@ const itemReferenceFn = (project: Project, itemId: string) => {
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "finite-owner-lifetime-unsupported":
+			return `${diagnostic.routeId} depends on a finite owner lifetime that static estimation cannot settle`;
 		case "joint-output-accounting-unsupported":
 			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space`;
 		case "quantity-limit-exceeded":

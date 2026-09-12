@@ -4,6 +4,7 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
+import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";
 import { DepositSchema } from "~/item-definition/schema/DepositSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
@@ -31,6 +32,7 @@ const createItemInputSchemaIds = {
 	simple: "urn:arkini:schema:mcp:create-simple-item-input",
 	space: "urn:arkini:schema:mcp:create-space-item-input",
 	producer: "urn:arkini:schema:mcp:create-producer-item-input",
+	clock: "urn:arkini:schema:mcp:create-clock-item-input",
 	craft: "urn:arkini:schema:mcp:create-craft-item-input",
 	blueprint: "urn:arkini:schema:mcp:create-blueprint-item-input",
 	deposit: "urn:arkini:schema:mcp:create-deposit-item-input",
@@ -112,6 +114,38 @@ export const CreateItemInputSchemas = {
 			title: "Create producer item tool input",
 			description: "Authoring fields accepted when creating one producer item.",
 		}),
+	clock: ClockSchema.omit({
+		asset: true,
+		lines: true,
+		intervalMs: true,
+		enable: true,
+		rules: true,
+		control: true,
+		maxQueueSize: true,
+		maxStackSize: true,
+		scope: true,
+		type: true,
+		uid: true,
+	})
+		.extend({
+			asset: draftAsset,
+			maxQueueSize: draftMaxQueueSize,
+			lines: ClockSchema.shape.lines.optional(),
+			intervalMs: ClockSchema.shape.intervalMs
+				.optional()
+				.describe("Pulse interval in whole milliseconds; defaults to 1000."),
+			enable: ClockSchema.shape.enable.removeDefault().optional(),
+			rules: ClockSchema.shape.rules.removeDefault().optional(),
+			control: ClockSchema.shape.control.removeDefault().optional(),
+		})
+		.strict()
+		.meta({
+			id: createItemInputSchemaIds.clock,
+			$id: createItemInputSchemaIds.clock,
+			title: "Create clock item tool input",
+			description: "Authoring fields accepted when creating one clock item.",
+		}),
+
 	craft: CraftSchema.omit({
 		asset: true,
 		line: true,

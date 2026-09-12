@@ -32,6 +32,7 @@ const itemTypes = [
 	"simple",
 	"space",
 	"producer",
+	"clock",
 	"craft",
 	"blueprint",
 	"deposit",

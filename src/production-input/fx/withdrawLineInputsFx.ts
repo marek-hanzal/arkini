@@ -1,3 +1,4 @@
+import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -25,6 +26,10 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 }: withdrawLineInputsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
+			yield* assertItemProductionPlayerControlFx({
+				ownerItemId,
+				runtime,
+			});
 			const { owner } = yield* readBoardItemLineFx({
 				ownerItemId,
 				lineId,

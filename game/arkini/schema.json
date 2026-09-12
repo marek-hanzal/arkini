@@ -2100,7 +2100,7 @@
 				},
 				"maxQueueSize": {
 					"default": 1,
-					"description": "The maximum number of this producer's product lines that may run in parallel; defaults to one.",
+					"description": "The maximum number of accepted active and queued runs for this producer; defaults to one.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
 				"type": {
@@ -2136,6 +2136,145 @@
 			],
 			"additionalProperties": false,
 			"description": "An item that provides one or more selectable product lines."
+		},
+		"item.ClockSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
+				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
+				"description": {
+					"description": "The optional human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
+				},
+				"scope": {
+					"default": "board",
+					"type": "string",
+					"enum": [
+						"board"
+					]
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"default": 1,
+					"maximum": 1,
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:project#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
+					},
+					"minItems": 1
+				},
+				"maxQueueSize": {
+					"default": 1,
+					"description": "The maximum number of accepted active and queued runs for this producer; defaults to one.",
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"clock"
+					]
+				},
+				"lines": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
+					},
+					"minItems": 1,
+					"description": "One or more product lines provided by this producer."
+				},
+				"intervalMs": {
+					"type": "integer",
+					"minimum": 100,
+					"maximum": 9007199254740991,
+					"description": "Active milliseconds between attempts to enqueue one effective default line.",
+					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
+				},
+				"durationMs": {
+					"description": "Optional active lifetime; accepted work can outlive the schedule.",
+					"minimum": 100,
+					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
+				},
+				"enable": {
+					"default": true,
+					"type": "boolean"
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/action.RuleSchema"
+					}
+				},
+				"onExpire": {
+					"description": "Output emitted atomically when the expired owner finishes settling production.",
+					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
+				},
+				"control": {
+					"default": "automatic-only",
+					"description": "Whether the player can operate production controls in addition to automatic impulses.",
+					"type": "string",
+					"enum": [
+						"automatic-only",
+						"interactive"
+					]
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"maxQueueSize",
+				"type",
+				"lines",
+				"intervalMs",
+				"enable",
+				"rules",
+				"control"
+			],
+			"additionalProperties": false,
+			"description": "A scheduled producer with ordinary lines and optional active lifetime."
 		},
 		"item.CraftSchema": {
 			"type": "object",
@@ -2492,6 +2631,9 @@
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.ProducerSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/item.ClockSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.CraftSchema"

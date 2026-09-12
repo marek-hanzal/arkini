@@ -90,6 +90,9 @@ const FormPathLabelBySegment = {
 	description: "Description",
 	distance: "Board distance",
 	durationMs: "Duration",
+	intervalMs: "Interval",
+	control: "Player controls",
+	onExpire: "Expiry output",
 	effect: "Target effect",
 	enable: "Enabled",
 	from: "Paid by",
@@ -285,7 +288,10 @@ export const useFormController = ({
 			const issue = result.error.issues[0];
 			if (issue === undefined) return false;
 
-			await onInvalidSectionFn(readSectionForPathFn(issue.path), issue.path);
+			await onInvalidSectionFn(
+				readSectionForPathFn(issue.path, form.state.values.type),
+				issue.path,
+			);
 			const focusInvalidFieldFn = () =>
 				document
 					.querySelector<HTMLElement>(

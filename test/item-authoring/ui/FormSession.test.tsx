@@ -963,7 +963,9 @@ describe("item section form session", () => {
 			);
 			const disable = [
 				...container.querySelectorAll("button"),
-			].findLast((button) => button.textContent === "Disable");
+			]
+				.reverse()
+				.find((button) => button.textContent === "Disable");
 			if (disable === undefined) throw new Error("Missing disable capability control.");
 			await act(async () => disable.click());
 			expect(state.saveItem).not.toHaveBeenCalled();

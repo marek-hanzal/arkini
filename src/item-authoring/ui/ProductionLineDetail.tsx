@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
@@ -38,12 +39,11 @@ export const ProductionLineDetail = ({
 }) => {
 	const translator = useTranslator();
 	return (
-		<article
-			className="ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line border-l-line/55 px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5"
-			data-ui="EditorProductionLineDetail"
+		<EditorRootCard
+			dataUi="EditorProductionLineDetail"
 			data-line-id={line.id}
 		>
-			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
+			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-2">
 						<h3 className="text-lg font-semibold leading-tight text-foreground">
@@ -114,7 +114,7 @@ export const ProductionLineDetail = ({
 				</div>
 				<LineRuntime runtimeMs={line.runtimeMs} />
 			</div>
-			<div className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
+			<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
 				<ProductionLineInputs input={line.input} />
 				<div
 					className="grid place-items-center text-muted"
@@ -130,14 +130,12 @@ export const ProductionLineDetail = ({
 					output={line.output}
 				/>
 			</div>
-			<div className="mt-4">
-				<RulesDetail
-					rules={line.rules}
-					description={translator.textFn(
-						"Every condition of a rule must pass. Show and Hide control visibility; Enable rules must all pass and Disable vetoes availability. Runtime multipliers apply before signed runtime adjustments.",
-					)}
-				/>
-			</div>
-		</article>
+			<RulesDetail
+				rules={line.rules}
+				description={translator.textFn(
+					"Every condition of a rule must pass. Show and Hide control visibility; Enable rules must all pass and Disable vetoes availability. Runtime multipliers apply before signed runtime adjustments.",
+				)}
+			/>
+		</EditorRootCard>
 	);
 };

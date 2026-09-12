@@ -44,31 +44,31 @@ export const IdentitySection = () => {
 				<form.AppField name="title">
 					{(field) => <field.TextField label={translator.textFn("Title")} />}
 				</form.AppField>
-				{clock !== undefined ? (
-					<div className="grid content-start gap-1.5 text-sm">
-						<EditorValueLabel
-							label={translator.textFn("Storage scope")}
-							description={<Mx label="Item storage scope help" />}
-						/>
-						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
-							{translator.textFn("Board — required by Clock")}
-						</span>
-					</div>
-				) : (
-					<form.AppField name="scope">
-						{(field) => (
-							<field.ChoiceField
+				<div className="flex items-start justify-between gap-4">
+					{clock !== undefined ? (
+						<div className="grid content-start gap-1.5 text-sm">
+							<EditorValueLabel
 								label={translator.textFn("Storage scope")}
 								description={<Mx label="Item storage scope help" />}
-								options={scopeOptions.map((option) => ({
-									...option,
-									label: translator.textFn(option.label),
-								}))}
 							/>
-						)}
-					</form.AppField>
-				)}
-				{
+							<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
+								{translator.textFn("Board — required by Clock")}
+							</span>
+						</div>
+					) : (
+						<form.AppField name="scope">
+							{(field) => (
+								<field.ChoiceField
+									label={translator.textFn("Storage scope")}
+									description={<Mx label="Item storage scope help" />}
+									options={scopeOptions.map((option) => ({
+										...option,
+										label: translator.textFn(option.label),
+									}))}
+								/>
+							)}
+						</form.AppField>
+					)}
 					<form.AppField name="control">
 						{(field) => (
 							<EditorChoiceControl
@@ -89,7 +89,7 @@ export const IdentitySection = () => {
 							/>
 						)}
 					</form.AppField>
-				}
+				</div>
 				{
 					<form.AppField name="maxCount">
 						{(field) => (

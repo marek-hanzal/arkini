@@ -3,7 +3,6 @@ import { Effect, Option } from "effect";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
-import { readTileActorAssetSourceIdsFn } from "~/tile-presentation/fn/readTileActorAssetSourceIdsFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -96,10 +95,6 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 		const visual = yield* readTileActorVisualFx({
 			game,
 			item: current.item,
-			sourceIds: readTileActorAssetSourceIdsFn({
-				item: current,
-				runtime,
-			}),
 		});
 		const badgeCount = readTileActorBadgeCountFn(current);
 		deliveries.push({

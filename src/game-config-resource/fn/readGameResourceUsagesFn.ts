@@ -97,23 +97,6 @@ export const readGameResourceUsagesFn = (
 				],
 			});
 		});
-		item.asset.sources?.forEach((resourceId, index) => {
-			usages.push({
-				resourceId,
-				owner: "item",
-				ownerId: itemId,
-				ownerUid: item.uid,
-				ownerLabel: item.title,
-				roleLabel: `Progress artwork ${index + 1}`,
-				path: [
-					"items",
-					itemId,
-					"asset",
-					"sources",
-					index,
-				],
-			});
-		});
 	}
 	return usages;
 };

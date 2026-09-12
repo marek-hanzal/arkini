@@ -18,7 +18,6 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 			string,
 			string,
 		];
-		readonly sources: string[];
 	};
 	readonly description: string;
 	readonly type: TypeSchema.Type;
@@ -42,7 +41,6 @@ export const readCanonicalItemArtworkFn = (
 	asset: FormValues["asset"],
 ): ItemSchema.Type["asset"] => {
 	const overlay = asset.default[1];
-	const sources = asset.sources.filter((resourceId) => resourceId !== "");
 	return {
 		scale: asset.scale,
 		default:
@@ -54,11 +52,6 @@ export const readCanonicalItemArtworkFn = (
 						asset.default[0],
 						overlay,
 					],
-		...(sources.length === 0
-			? {}
-			: {
-					sources,
-				}),
 	};
 };
 

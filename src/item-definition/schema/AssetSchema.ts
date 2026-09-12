@@ -1,14 +1,11 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/game-value/schema/IdSchema";
 import { CompositionSchema } from "./CompositionSchema";
 
 /**
  * Describes the visual representation of a game item.
  *
- * `default` is the complete one- or two-layer composition shown when the engine
- * does not project progress. Optional `sources` are later single-layer progress
- * states. The asset contract itself is item-type agnostic.
+ * `default` is the complete one- or two-layer composition.
  */
 export const AssetSchema = z
 	.object({
@@ -23,14 +20,6 @@ export const AssetSchema = z
 		default: CompositionSchema.describe(
 			"The default one- or two-layer visual composition in back-to-front order.",
 		),
-		/**
-		 * Later single-layer states selected by engine-owned progress.
-		 */
-		sources: z
-			.array(IdSchema)
-			.min(1)
-			.optional()
-			.describe("The optional ordered single-layer progress states after the default."),
 	})
 	.strict()
 	.meta({

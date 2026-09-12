@@ -77,7 +77,7 @@ Exact item variants, line/input/rule/output shapes, conditions, rolls, and field
 
 The canonical immutable Item vocabulary lives in [`src/item-definition`](src/item-definition): Item schema identities, storage permission, bounded quantities, selectors, and total selection policy over explicit definitions. Authored query scope/reach schemas and canonical Runtime Item query execution live together in `src/item-query`; canonical aggregate reads remain in `src/game-runtime`, while drop/write plus ordinary click reads live in `src/item-interaction`. `SpaceSchema` remains with the Space action that interprets it, game metadata remains in `src/game-config`, and toolbar size is owned beside location contracts in `src/item-location`.
 
-- every item requires finite `asset.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including default layers and progress frames, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
+- every item requires finite `asset.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including both default layers, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
@@ -93,6 +93,8 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - an item type, field, or schema variant is not runtime-backed until an owned command/Tick path and focused behavior proof implement it.
 
 Do not repeat field catalogs in prose or weaken a schema to silence malformed data. Change the owning schema/behavior together and regenerate the project schema.
+
+Item artwork currently uses its authored default composition and scale throughout runtime. Progress-based artwork selection is deferred to [issue #725](https://github.com/marek-hanzal/arkini/issues/725).
 
 ## Validation
 

@@ -476,14 +476,6 @@
 				"default": {
 					"description": "The default one- or two-layer visual composition in back-to-front order.",
 					"$ref": "urn:arkini:schema:project#/$defs/item.CompositionSchema"
-				},
-				"sources": {
-					"description": "The optional ordered single-layer progress states after the default.",
-					"minItems": 1,
-					"type": "array",
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-					}
 				}
 			},
 			"required": [

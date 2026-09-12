@@ -5,6 +5,7 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
+import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 import { FormProvider } from "~/item-authoring/ui/FormContext";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
@@ -169,6 +170,7 @@ export const FormSession = ({
 				data-ui="EditorItemForm"
 			>
 				<EditorFormSectionPage
+					help={ItemSectionHelp[sectionId]}
 					discardFn={discardFn}
 					error={controller.error}
 					rootCard={

@@ -20,12 +20,16 @@ Allows the timer to run before availability rules are applied.:
   value: Allows the timer to run before availability rules are applied.
 An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.:
   value: An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.
+Artwork:
+  value: Artwork
 Asset notes empty description:
   value: Create a note here to keep art direction and decisions linked to this asset.
 Asset notes empty title:
   value: No notes for this asset yet
 Automatic only:
   value: Automatic only
+Base tile scale:
+  value: Base tile scale
 Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.:
   value: Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.
 Board:
@@ -153,8 +157,6 @@ Enable Units on this item before selecting Spend.:
   value: Enable Units on this item before selecting Spend.
 Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.:
   value: Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.
-Enable a clock for periodic production or a one-time lifetime.:
-  value: Enable a clock for periodic production or a one-time lifetime.
 Enable action:
   value: Enable action
 Enable clock:
@@ -244,6 +246,24 @@ Item:
   value: Item
 Item ID:
   value: Item ID
+Item artwork help:
+  value: |
+    Artwork combines a base asset with an optional overlay, drawn back to front.
+
+    **Base tile scale** changes the artwork size within its tile. A value of 1 fills the tile with the artwork canvas; transparent PNG padding remains visible. Scale does not change occupied cells, storage, interaction reach, or image resolution.
+
+    The preview frame marks the complete tile.
+Item clock help:
+  value: |
+    A Clock adds periodic production, a finite lifetime, or both.
+
+    - **Interval** attempts the line marked Clock periodically. Leave it empty for a one-shot lifetime without pulses.
+    - **Lifetime** sets how long the timer may run. Leave it empty for an unlimited lifetime.
+    - At least one timer is required. **Expiry output** is available only with a lifetime and is emitted after accepted production settles.
+
+    **Enabled** and availability rules determine whether the timer runs. Every Enable rule must pass; any matching Disable rule pauses it. Accepted production keeps its own line rules.
+
+    Enabling Clock removes the item's action and requires Board storage with a stack size of one. New clocks start with a five-minute interval and a one-hour lifetime.
 Item connections help:
   value: |
     Connections explores one explicit authored relationship for any item.
@@ -269,6 +289,13 @@ Item estimate help:
     Arkini uses authored runtimes, output quantities and chances. Random outputs are converted into an expected number of attempts. Independent work can happen in parallel, so its time is not blindly added together.
 
     Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
+Item merges help:
+  value: |
+    Merges trigger when this item is dropped onto a matching target.
+
+    The **Source action** decides whether the dropped item is consumed, retained, or spends a unit. The **Target effect** decides what happens to the target. A merge may also emit an extra output.
+
+    Enable merges to add the first interaction, then select a target and configure both sides. Changes take effect when you save.
 Item notes empty description:
   value: Create a note here to keep ideas and decisions linked to this item.
 Item notes empty title:
@@ -285,6 +312,11 @@ Item storage scope - inventory:
 Item storage scope - toolbar:
   value: Toolbar only
   dynamic: true
+Item units help:
+  value: |
+    Units are a finite amount inside one item, such as health, resource stock, or uses. **Quantity** counts separate items in a stack.
+
+    **Initial units** sets the supply of each new instance. Spending the final unit depletes the item and may emit its configured **Depletion output**.
 Keep:
   value: Keep
 Leave empty for a one-shot lifetime without periodic production.:
@@ -313,6 +345,8 @@ Max count reached:
   value: "Maximum accepted work count across this item’s production lines: one active job plus queued requests."
 Merge output:
   value: Merge output
+Merges:
+  value: Merges
 Missing item:
   value: Missing item
 New item:
@@ -455,8 +489,6 @@ Self:
   value: Self
 Self-paid units input:
   value: Self-paid units input
-Set an interval, a lifetime, or both. Without an interval, the clock expires once. Without a lifetime, it runs indefinitely.:
-  value: Set an interval, a lifetime, or both. Without an interval, the clock expires once. Without a lifetime, it runs indefinitely.
 Set clock:
   value: Set clock
 Set default:
@@ -522,8 +554,6 @@ UID:
   value: UID
 Unit cost:
   value: Unit cost
-Unit settings:
-  value: Unit settings
 Units:
   value: Units
   dynamic: true
@@ -531,8 +561,6 @@ Units are a finite amount inside one item, such as health, resources, or uses. S
   value: Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.
 Units are disabled:
   value: Units are disabled
-"Units belong to one item: health, resources, or uses. Quantity counts separate items in a stack.":
-  value: "Units belong to one item: health, resources, or uses. Quantity counts separate items in a stack."
 Units input:
   value: Units input
 Units per item:

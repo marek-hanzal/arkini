@@ -199,7 +199,12 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (children: ReactNode, newItem = false, defaultDraft?: boolean) => {
+const render = async (
+	children: ReactNode,
+	newItem = false,
+	defaultDraft?: boolean,
+	enableClock = false,
+) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -217,6 +222,7 @@ const render = async (children: ReactNode, newItem = false, defaultDraft?: boole
 							}
 						: {})}
 					sectionId={sectionId}
+					enableCapability={enableClock ? "clock" : undefined}
 					uid={item.uid}
 				>
 					{section}
@@ -931,7 +937,10 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("enables a clock on an action item as one valid saved Common", async () => {
+	it.each([
+		"form",
+		"detail",
+	] as const)("enables a clock through the %s entry as one valid saved item", async (entry) => {
 		const common = {
 			...item,
 
@@ -946,12 +955,15 @@ describe("item section form session", () => {
 		};
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
-		const { container } = await render(<ClockSection />);
-		const enable = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable clock");
-		if (enable === undefined) throw new Error("Missing clock enable control.");
-		await act(async () => enable.click());
+		const { container } = await render(<ClockSection />, false, undefined, entry === "detail");
+		if (entry === "form") {
+			const enable = [
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === "Enable clock");
+			if (enable === undefined) throw new Error("Missing clock enable control.");
+			await act(async () => enable.click());
+		}
+		expect(state.saveItem).not.toHaveBeenCalled();
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});

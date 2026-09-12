@@ -225,11 +225,28 @@ export const useFormController = ({
 			if (notifyOnSaved.current) await onSavedFn?.(saved);
 		},
 	});
+	const enableClockFn = useCallback(() => {
+		if (form.state.values.clock !== undefined) return;
+		form.setFieldValue("action", undefined);
+		form.setFieldValue("scope", "board");
+		form.setFieldValue("maxStackSize", 1);
+		form.setFieldValue("clock", {
+			intervalMs: 300_000,
+			durationMs: 3_600_000,
+			enable: true,
+			rules: [],
+		});
+	}, [
+		form,
+	]);
 	const initializedCapability = useRef(false);
 	useLayoutEffect(() => {
 		if (initializedCapability.current || enableCapability === undefined) return;
 		initializedCapability.current = true;
 		switch (enableCapability) {
+			case "clock":
+				enableClockFn();
+				break;
 			case "units":
 				if (form.state.values.units === undefined) {
 					form.setFieldValue("units", {
@@ -247,6 +264,7 @@ export const useFormController = ({
 		}
 	}, [
 		enableCapability,
+		enableClockFn,
 		form,
 	]);
 	const dirty = useStore(form.store, (state) => state.isDirty);
@@ -343,6 +361,7 @@ export const useFormController = ({
 		() => ({
 			canonicalItem: initialItem,
 			discardFn,
+			enableClockFn,
 			error,
 			isDirty: dirty,
 			isSaving: submitting,
@@ -355,6 +374,7 @@ export const useFormController = ({
 		}),
 		[
 			discardFn,
+			enableClockFn,
 			dirty,
 			error,
 			form,

@@ -36,13 +36,6 @@ export const UnitsSection = () => {
 					) : (
 						<>
 							<EditorFormCard>
-								<EditorFormSectionDivider
-									description={translator.textFn(
-										"Units belong to one item: health, resources, or uses. Quantity counts separate items in a stack.",
-									)}
-									title={translator.textFn("Unit settings")}
-									variant="secondary"
-								/>
 								<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
 									<div className="min-w-0">
 										<form.AppField name="units.amount">

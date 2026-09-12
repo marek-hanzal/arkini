@@ -2,7 +2,6 @@ import { Trash2 } from "lucide-react";
 
 import { Button } from "~/ui/ui/Button";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
@@ -22,11 +21,6 @@ const ArtworkFields = withFieldGroupFn({
 	defaultValues: defaultArtwork,
 	render: ({ group }) => (
 		<>
-			<EditorFormSectionDivider
-				description="The visual composition shown on the item tile."
-				title="Default artwork"
-				variant="secondary"
-			/>
 			<group.AppField name="default[0]">
 				{(field) => <field.AssetField label="Base asset" />}
 			</group.AppField>
@@ -65,10 +59,6 @@ const ArtworkFields = withFieldGroupFn({
 					)}
 				</group.AppField>
 			</div>
-			<p className="text-sm text-muted">
-				Scale changes artwork only. Occupied cells, storage, interaction reach and image
-				resolution stay the same. Transparent padding inside the PNG remains visible.
-			</p>
 		</>
 	),
 });

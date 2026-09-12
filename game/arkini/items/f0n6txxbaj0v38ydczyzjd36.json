@@ -1,0 +1,23 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "f0n6txxbaj0v38ydczyzjd36",
+		"id": "food-portal",
+		"title": "Food Portal",
+		"description": "Food stuff",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"food-portal"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"action": {
+			"type": "space",
+			"space": 753,
+			"input": [],
+			"rules": []
+		}
+	}
+}

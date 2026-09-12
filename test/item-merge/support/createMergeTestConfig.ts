@@ -39,7 +39,6 @@ const simpleItem = ({
 	maxCount,
 	maxStackSize,
 	merge,
-	type: "common" as const,
 });
 
 export const createMergeTestConfig = ({

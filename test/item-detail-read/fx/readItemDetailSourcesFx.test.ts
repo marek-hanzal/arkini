@@ -131,8 +131,7 @@ describe("readItemDetailSourcesFx", () => {
 	it("applies show rules to hidden Board lines", () => {
 		const alpha = config.items.alpha;
 		const runtimeTarget = runtime.items.find(({ id }) => id === "runtime:target");
-		if (alpha.type !== "common" || runtimeTarget === undefined)
-			throw new Error("Missing fixtures.");
+		if (runtimeTarget === undefined) throw new Error("Missing fixtures.");
 		const hiddenOwner = {
 			...runtimeItem({
 				definition: "alpha",

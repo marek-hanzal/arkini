@@ -61,7 +61,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 		items: {
 			owner: {
 				...baseItem("owner"),
-				type: "common",
+
 				maxQueueSize: 2,
 				lines: [
 					{
@@ -91,7 +91,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 			},
 			temporary: {
 				...baseItem("temporary"),
-				type: "common",
+
 				lines: [],
 				maxQueueSize: 1,
 				clock: {
@@ -104,21 +104,18 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 				lines: [],
 
 				...baseItem("residue", 10),
-				type: "common",
 			},
 			product: {
 				maxQueueSize: 1,
 				lines: [],
 
 				...baseItem("product", 10),
-				type: "common",
 			},
 			blocker: {
 				maxQueueSize: 1,
 				lines: [],
 
 				...baseItem("blocker"),
-				type: "common",
 			},
 		},
 	});

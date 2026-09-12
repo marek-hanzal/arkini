@@ -9,7 +9,6 @@ import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
 } from "~test/support/expectNamedJsonSchemaGraph";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
@@ -31,10 +30,8 @@ describe("editor MCP server", () => {
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
 			"schema_detail",
-			"create_common_item",
-			"create_inventory_item",
-			"edit_common_item",
-			"edit_inventory_item",
+			"create_item",
+			"edit_item",
 			"project_config",
 			"edit_project",
 			"edit_project_layout",
@@ -60,26 +57,6 @@ describe("editor MCP server", () => {
 			"item_output",
 			"item_estimate",
 		]);
-		const collectionProperties = tools.tools.find(({ name }) => name === "item_collection")
-			?.inputSchema.properties;
-		if (collectionProperties === undefined)
-			throw new Error("item_collection schema is missing.");
-		expect(collectionProperties.itemTypes).toMatchObject({
-			items: {
-				$ref: "#/$defs/ItemTypeSchema",
-			},
-			type: "array",
-		});
-		const collectionSchema = tools.tools.find(
-			({ name }) => name === "item_collection",
-		)?.inputSchema;
-		const collectionDefinitions = isJsonSchemaRecord(collectionSchema?.$defs)
-			? collectionSchema.$defs
-			: {};
-		expect(collectionDefinitions.ItemTypeSchema).toMatchObject({
-			enum: TypeSchema.options,
-			type: "string",
-		});
 		const assetCollectionSchema = tools.tools.find(
 			({ name }) => name === "asset_collection",
 		)?.inputSchema;
@@ -111,13 +88,8 @@ describe("editor MCP server", () => {
 			type: "string",
 		});
 		const jsonInputToolNames = new Set([
-			...[
-				"common",
-				"inventory",
-			].flatMap((type) => [
-				`create_${type}_item`,
-				`edit_${type}_item`,
-			]),
+			"create_item",
+			"edit_item",
 			"edit_project",
 		]);
 		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {

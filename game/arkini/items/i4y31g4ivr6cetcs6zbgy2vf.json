@@ -1,0 +1,43 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "i4y31g4ivr6cetcs6zbgy2vf",
+		"id": "bubble-reservoir",
+		"title": "Bubble Reservoir",
+		"description": "Bubble world",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bubble-reservoir"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"units": {
+			"amount": 8,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-bubble-reservoir",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

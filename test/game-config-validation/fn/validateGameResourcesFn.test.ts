@@ -175,7 +175,7 @@ describe("validateGameResourcesFn", () => {
 			uid: id,
 			id,
 			maxQueueSize: 1,
-			type: "common" as const,
+
 			units: {
 				amount: 1,
 			},

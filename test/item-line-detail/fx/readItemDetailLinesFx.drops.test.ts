@@ -44,7 +44,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 				workshop: {
 					uid: "workshop",
 					id: "workshop",
-					type: "common",
+
 					title: "Workshop",
 					description: "Produces grouped output.",
 					asset: {
@@ -139,7 +139,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 
 					uid: "wood",
 					id: "wood",
-					type: "common",
+
 					title: "Wood",
 					description: "Wood.",
 					asset: {
@@ -157,7 +157,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 
 					uid: "gem",
 					id: "gem",
-					type: "common",
+
 					title: "Gem",
 					description: "Gem.",
 					asset: {

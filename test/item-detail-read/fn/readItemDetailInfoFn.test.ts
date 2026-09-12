@@ -67,7 +67,6 @@ describe("tile identity and Info projections", () => {
 			kind: "available",
 			itemId: owner.id,
 			description: "workshop",
-			itemType: "common",
 			storageScope: "board",
 			location: {
 				kind: "board",

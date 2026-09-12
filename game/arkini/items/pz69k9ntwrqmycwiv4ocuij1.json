@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "pz69k9ntwrqmycwiv4ocuij1",
+		"id": "laboratory-glassware",
+		"title": "Laboratory Glassware",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

@@ -8,7 +8,6 @@ import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailContro
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -34,7 +33,6 @@ export namespace useDefinitionItemDetailSceneController {
 				readonly compositeUrl?: string;
 				readonly description?: string;
 				readonly schedule?: readItemDetailScheduleFx.Schedule;
-				readonly itemType: TypeSchema.Type;
 				readonly storageScope: StorageSchema.Type;
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
@@ -78,14 +76,13 @@ const useItemDefinitionDetail = (
 						}),
 				description: item.description,
 				schedule:
-					item.type === "common" && item.clock !== undefined
+					item.clock !== undefined
 						? {
 								intervalMs: item.clock.intervalMs,
 								durationMs: item.clock.durationMs,
 								control: item.control ?? "interactive",
 							}
 						: undefined,
-				itemType: item.type,
 				storageScope: item.scope,
 				maxStackSize: item.maxStackSize,
 				ownedQuantity: runtime.items.reduce(

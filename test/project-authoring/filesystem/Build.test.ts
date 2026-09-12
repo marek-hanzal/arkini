@@ -196,7 +196,7 @@ describe("filesystem Editor project build", () => {
 			diagnostics: [
 				expect.objectContaining({
 					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
-					source: "items/common/water.json",
+					source: "items/water.json",
 				}),
 			],
 		});

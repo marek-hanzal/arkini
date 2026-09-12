@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zfe1uedywgk7jmtxlzk7wai4",
+		"id": "empty-bubble-reservoir",
+		"title": "Empty Bubble Reservoir",
+		"description": "No more bubbles, you need refill.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-bubble-reservoir"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6
+	}
+}

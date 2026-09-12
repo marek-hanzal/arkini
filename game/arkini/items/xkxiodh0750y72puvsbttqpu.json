@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xkxiodh0750y72puvsbttqpu",
+		"id": "luxury-furniture",
+		"title": "Luxury Furniture",
+		"description": "Quite an expensive stuff",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"luxury-furniture"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4
+	}
+}

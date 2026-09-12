@@ -10,7 +10,6 @@ import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -65,9 +64,7 @@ export const resolveLineInputStoreFn = ({
 			: undefined;
 	const lineId = requestedLineId ?? effectiveDefaultLine?.id;
 	if (lineId === undefined) return undefined;
-	const line = readLineOwnerLinesFn(narrowedLineOwnerItem).find(
-		(candidate) => candidate.id === lineId,
-	);
+	const line = narrowedLineOwnerItem.lines.find((candidate) => candidate.id === lineId);
 	if (line === undefined) return undefined;
 
 	for (const [inputIndex, input] of line.input.entries()) {

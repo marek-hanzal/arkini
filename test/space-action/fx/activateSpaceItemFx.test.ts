@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { board, inventory, run, spawnAndActivate, toolbar } from "../support/spaceActionFixture";
 
@@ -14,10 +14,6 @@ describe("Space item activation", () => {
 			[
 				"board",
 				board(0),
-			],
-			[
-				"inventory",
-				inventory(0),
 			],
 			[
 				"toolbar",
@@ -44,12 +40,14 @@ describe("Space item activation", () => {
 					};
 				}),
 			);
-			expect(result.space).toBe(7);
+			expect(result.space).toMatchObject({
+				type: "space",
+				space: 7,
+			});
 			expect(result.runtime.currentSpace).toBe(7);
 			expect(result.state.currentSpace).toBe(7);
 			expect(result.restored.currentSpace).toBe(7);
 			expect(result.restored.items[0]?.item).toMatchObject({
-				type: "common",
 				action: {
 					type: "space",
 					space: 7,
@@ -74,7 +72,7 @@ describe("Space item activation", () => {
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: before.currentSpace,
 						itemId: item.id,
 						location: item.location,
@@ -92,7 +90,7 @@ describe("Space item activation", () => {
 		expect(Result.isFailure(result.attempt)).toBe(true);
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
-				_tag: "SpaceActionUnavailableError",
+				_tag: "ItemActionUnavailableError",
 			});
 		}
 		expect(result.after).toEqual(result.before);
@@ -181,7 +179,7 @@ describe("Space item activation", () => {
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
-					activateSpaceItemFx({
+					activateItemActionFx({
 						currentSpace: before.currentSpace,
 						itemId: portal.id,
 						location: portal.location,

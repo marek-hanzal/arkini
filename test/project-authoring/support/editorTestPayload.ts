@@ -40,7 +40,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 
 			uid: "water",
 			id: "water",
-			type: "common",
+
 			title: "Water",
 			description: "Water",
 			asset: {

@@ -119,7 +119,7 @@ const readItemOriginRelationSubgraphFn = ({
 
 const itemReferenceFn = (project: Project, itemId: string) => {
 	const item = project.config.items[itemId];
-	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
+	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}]`;
 };
 
 const formatQuantityFn = ({ max, min }: { readonly max: number; readonly min: number }) =>
@@ -235,7 +235,6 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 		`Item ${direction}`,
 		`Item ID: ${item.id}`,
 		`Title: ${item.title}`,
-		`Type: ${item.type}`,
 		`Level: ${level}`,
 		"",
 		"Operations:",

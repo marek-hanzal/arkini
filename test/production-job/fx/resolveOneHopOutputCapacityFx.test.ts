@@ -12,9 +12,6 @@ import { useGameFx } from "~test/support/useGameFx";
 
 const intermediate = blueprintConfig.items["blueprint:plain"];
 const safeIntermediate = blueprintConfig.items["blueprint:output"];
-if (intermediate.type !== "common" || safeIntermediate.type !== "common") {
-	throw new Error("Expected Common line owners.");
-}
 const blockedLine = intermediate.lines[0];
 const safeLine = {
 	...safeIntermediate.lines[0],
@@ -28,7 +25,7 @@ const checkCapacity = (type: "common" | "clock", lines: LineSchema.Type[]) => {
 			...blueprintConfig.items,
 			[intermediate.id]: {
 				...intermediate,
-				type: "common",
+
 				lines,
 				...(type === "clock"
 					? {

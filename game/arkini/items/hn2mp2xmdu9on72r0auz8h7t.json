@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "hn2mp2xmdu9on72r0auz8h7t",
+		"id": "faith-bear",
+		"title": "Faith Bear",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"faith-bear"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

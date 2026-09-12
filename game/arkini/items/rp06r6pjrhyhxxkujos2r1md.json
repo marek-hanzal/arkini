@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "rp06r6pjrhyhxxkujos2r1md",
+		"id": "loose-ash",
+		"title": "Loose Ash",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"loose-ash"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

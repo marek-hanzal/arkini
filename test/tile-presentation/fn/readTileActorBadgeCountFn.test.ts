@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 const runtimeItem = (overrides: {
@@ -10,7 +9,6 @@ const runtimeItem = (overrides: {
 			readonly amount: number;
 		};
 		readonly durationMs?: number;
-		readonly type: RuntimeItemSchema.Type["item"]["type"];
 	};
 	readonly quantity?: number;
 	readonly remainingUnits?: number;
@@ -23,16 +21,12 @@ const runtimeItem = (overrides: {
 	}) as unknown as RuntimeItemSchema.Type;
 
 describe("tile actor overlay projection", () => {
-	it("shows stack quantity only above one and projects units for every item type", () => {
+	it("shows stack quantity only above one and projects units for finite items", () => {
 		const single = runtimeItem({
-			item: {
-				type: TypeSchema.enum.Common,
-			},
+			item: {},
 		});
 		const stack = runtimeItem({
-			item: {
-				type: TypeSchema.enum.Common,
-			},
+			item: {},
 			quantity: 120,
 		});
 		const freshProducer = runtimeItem({
@@ -40,7 +34,6 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 12,
 				},
-				type: TypeSchema.enum.Common,
 			},
 		});
 		const usedProducer = runtimeItem({
@@ -48,7 +41,6 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 12,
 				},
-				type: TypeSchema.enum.Common,
 			},
 			remainingUnits: 4,
 		});
@@ -57,7 +49,6 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 8,
 				},
-				type: TypeSchema.enum.Common,
 			},
 		});
 		const usedFiniteItem = runtimeItem({
@@ -65,7 +56,6 @@ describe("tile actor overlay projection", () => {
 				units: {
 					amount: 8,
 				},
-				type: TypeSchema.enum.Common,
 			},
 			remainingUnits: 3,
 		});

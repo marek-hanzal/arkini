@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xrdeluarbzrl0z2uimh88olz",
+		"id": "bandage-satchel",
+		"title": "Bandage Satchel",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bandage-satchel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

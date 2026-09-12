@@ -10,7 +10,6 @@ import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisi
 import { readAcquisitionOutputOccurrencesFn } from "~/flow/fn/readAcquisitionOutputOccurrencesFn";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { compileAcquisitionRootsFn } from "~/flow/fn/compileAcquisitionRootsFn";
@@ -151,9 +150,7 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 				anyOf: [],
 			},
 			availability,
-			owner.type === "common" &&
-				owner.clock !== undefined &&
-				owner.control === "automatic-only"
+			owner.clock !== undefined && owner.control === "automatic-only"
 				? readAcquisitionAvailabilityRequirementsFn({
 						rules: owner.clock.rules,
 						source: "line-condition",
@@ -170,7 +167,6 @@ const readLineExecutionConstraintFn = (
 	owner: ItemSchema.Type,
 	line: LineSchema.Type,
 ): AcquisitionRoute["executionConstraint"] => {
-	if (owner.type !== "common") return undefined;
 	const clock = owner.clock;
 	if (clock === undefined) return owner.control === "automatic-only" ? "unavailable" : undefined;
 	if (
@@ -205,9 +201,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	}
 	const executionConstraint = readLineExecutionConstraintFn(descriptor.owner, descriptor.line);
 	const minimumActionIntervalMs =
-		descriptor.owner.type === "common" &&
-		descriptor.owner.clock !== undefined &&
-		descriptor.owner.control === "automatic-only"
+		descriptor.owner.clock !== undefined && descriptor.owner.control === "automatic-only"
 			? descriptor.owner.clock.intervalMs
 			: undefined;
 	const execution = {
@@ -322,7 +316,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 const compileAcquisitionLineRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items))
-		for (const line of readAuthoredItemLinesFn(item)) {
+		for (const line of item.lines) {
 			const descriptor = readLineDescriptorFn(item, line);
 			if (descriptor !== undefined) routes.push(...readLineRoutesFn(config, descriptor));
 		}
@@ -568,7 +562,7 @@ const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 };
 
 const readExpiryRoutesFn = (item: ItemSchema.Type) => {
-	const clock = item.type === "common" ? item.clock : undefined;
+	const clock = item.clock;
 	const durationMs = clock?.durationMs;
 	if (clock === undefined || durationMs === undefined) return [];
 	const kind = "clock-expiry";
@@ -579,7 +573,7 @@ const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 				? {
 						executionConstraint: "unavailable" as const,
 					}
-				: item.type === "common" && item.lines.length > 0
+				: item.lines.length > 0
 					? {
 							executionConstraint: "finite-owner-lifetime" as const,
 						}

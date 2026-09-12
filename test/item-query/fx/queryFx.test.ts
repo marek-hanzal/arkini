@@ -47,7 +47,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "common",
 		},
 	},
 });

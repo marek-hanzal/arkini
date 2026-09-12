@@ -12,7 +12,6 @@ export const searchFn = (
 				item.id,
 				item.title,
 				item.description ?? "",
-				item.type,
 			],
 			value: item,
 		})),

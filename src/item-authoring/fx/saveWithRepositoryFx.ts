@@ -17,7 +17,7 @@ export const saveWithRepositoryFx = Effect.fn("saveEditorItemWithRepositoryFx")(
 }: {
 	readonly config: GameConfigSchema.Type;
 	readonly expectedRevision?: number;
-	readonly item: Pick<ItemSchema.Type, "id" | "type"> & Record<string, unknown>;
+	readonly item: Pick<ItemSchema.Type, "id"> & Record<string, unknown>;
 	readonly projectId: string;
 	readonly repository: ProjectRepositoryService;
 }) {
@@ -26,7 +26,7 @@ export const saveWithRepositoryFx = Effect.fn("saveEditorItemWithRepositoryFx")(
 		catch: (cause) =>
 			new ProjectOperationError({
 				reason: "invalid-item",
-				message: `Item ${candidate.id} does not satisfy its ${candidate.type} schema.`,
+				message: `Item ${candidate.id} does not satisfy the item schema.`,
 				cause,
 			}),
 	});

@@ -3,243 +3,94 @@ import { Effect } from "effect";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { run } from "../support/dropItemFixture";
 
-import {
-	configInput,
-	run,
-	sourceLocation,
-	spawnInventoryOpenerFx,
-} from "../support/dropItemFixture";
-
-const toolbarReleaseConfig = GameConfigSchema.parse({
-	...configInput,
-	meta: {
-		...configInput.meta,
-		id: "game:release-inventory-item-toolbar",
-		toolbarSize: 2,
+const inventory = {
+	scope: "inventory" as const,
+	position: {
+		x: 0,
+		y: 0,
+	},
+};
+const board = (x: number, y: number) => ({
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x,
+		y,
 	},
 });
 
 describe("releaseInventoryItemFx placement", () => {
-	it("releases the whole Inventory stack through board-first placement", () => {
-		const inventoryLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
+	it("releases the exact whole stack without an opener into the first free cell, without stacking", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const inventoryOpener = yield* spawnInventoryOpenerFx();
 				yield* spawnItemFx({
-					id: "runtime:board-water",
+					id: "blocked:0",
 					itemId: "water",
-					location: sourceLocation,
+					location: board(0, 0),
 					quantity: 8,
 				});
-				const inventoryItem = yield* spawnItemFx({
-					id: "runtime:inventory-water",
-					itemId: "water",
-					location: inventoryLocation,
-					quantity: 4,
-				});
-				const outcome = yield* releaseInventoryItemFx({
-					itemId: inventoryItem.id,
-					revision: inventoryItem.revision,
-					location: inventoryLocation,
-				});
-				return {
-					inventoryOpenerId: inventoryOpener.id,
-					outcome,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
-
-		expect(result.outcome.events.map((event) => event.type)).toEqual([
-			"item:stacked",
-			"item:spawned",
-		]);
-		expect(
-			result.outcome.events.every(
-				(event) =>
-					!("originItemId" in event) || event.originItemId === result.inventoryOpenerId,
-			),
-		).toBe(true);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "water")
-				.map((item) => ({
-					location: item.location,
-					quantity: item.quantity,
-				})),
-		).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					location: sourceLocation,
-					quantity: 10,
-				}),
-				expect.objectContaining({
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 2,
-				}),
-			]),
-		);
-		expect(result.runtime.items.some((item) => item.id === "runtime:inventory-water")).toBe(
-			false,
-		);
-	});
-	it("releases into compatible Board stack capacity when every cell is occupied", () => {
-		const inventoryLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const result = run(
-			Effect.gen(function* () {
-				yield* spawnInventoryOpenerFx();
 				yield* spawnItemFx({
-					id: "runtime:board-water",
-					itemId: "water",
-					location: sourceLocation,
-					quantity: 8,
-				});
-				let blockerIndex = 0;
-				for (let y = 0; y < 2; y += 1) {
-					for (let x = 0; x < 3; x += 1) {
-						if (x === sourceLocation.position.x && y === sourceLocation.position.y) {
-							continue;
-						}
-						yield* spawnItemFx({
-							id: `runtime:blocker:${blockerIndex}`,
-							itemId: "stone",
-							location: {
-								scope: "board",
-								space: 0,
-								position: {
-									x,
-									y,
-								},
-							},
-							quantity: 1,
-						});
-						blockerIndex += 1;
-					}
-				}
-				const inventoryItem = yield* spawnItemFx({
-					id: "runtime:inventory-water",
-					itemId: "water",
-					location: inventoryLocation,
-					quantity: 2,
-				});
-				const outcome = yield* releaseInventoryItemFx({
-					itemId: inventoryItem.id,
-					revision: inventoryItem.revision,
-					location: inventoryLocation,
-				});
-				return {
-					outcome,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
-
-		expect(result.outcome.events.map((event) => event.type)).toEqual([
-			"item:stacked",
-		]);
-		expect(
-			result.runtime.items.find((item) => item.id === "runtime:board-water")?.quantity,
-		).toBe(10);
-		expect(result.runtime.items.some((item) => item.id === "runtime:inventory-water")).toBe(
-			false,
-		);
-		expect(result.runtime.items.filter((item) => item.location.scope === "board")).toHaveLength(
-			6,
-		);
-	});
-
-	it("releases an any-scoped item into Toolbar when the current Board is full", () => {
-		const inventoryLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const result = run(
-			Effect.gen(function* () {
-				yield* spawnInventoryOpenerFx();
-				let blockerIndex = 0;
-				for (let y = 0; y < 2; y += 1) {
-					for (let x = 0; x < 3; x += 1) {
-						yield* spawnItemFx({
-							id: `runtime:toolbar-fallback-blocker:${blockerIndex}`,
-							itemId: "stone",
-							location: {
-								scope: "board",
-								space: 0,
-								position: {
-									x,
-									y,
-								},
-							},
-							quantity: 1,
-						});
-						blockerIndex += 1;
-					}
-				}
-				const inventoryItem = yield* spawnItemFx({
-					id: "runtime:inventory-water",
-					itemId: "water",
-					location: inventoryLocation,
+					id: "blocked:1",
+					itemId: "stone",
+					location: board(1, 0),
 					quantity: 1,
 				});
-				const outcome = yield* releaseInventoryItemFx({
-					itemId: inventoryItem.id,
-					revision: inventoryItem.revision,
-					location: inventoryLocation,
+				const source = yield* spawnItemFx({
+					id: "source",
+					itemId: "water",
+					location: inventory,
+					quantity: 4,
 				});
-				return {
-					outcome,
-					runtime: yield* readRuntimeFx(),
-				};
+				yield* releaseInventoryItemFx({
+					itemId: source.id,
+					revision: source.revision,
+					location: inventory,
+				});
+				return yield* readRuntimeFx();
 			}),
-			toolbarReleaseConfig,
 		);
-
-		expect(result.outcome.events).toEqual([
-			expect.objectContaining({
-				canonicalItemId: "water",
-				location: {
-					scope: "toolbar",
-					position: {
-						x: 1,
-						y: 0,
-					},
-				},
-				type: "item:spawned",
+		expect(result.items.find((item) => item.id === "source")).toMatchObject({
+			quantity: 4,
+			location: board(2, 0),
+		});
+		expect(result.items.find((item) => item.id === "blocked:0")?.quantity).toBe(8);
+	});
+	it("falls back to the first Toolbar cell when Board is full, even when Board stacks have capacity", () => {
+		const result = run(
+			Effect.gen(function* () {
+				for (let y = 0; y < 2; y++)
+					for (let x = 0; x < 3; x++) {
+						yield* spawnItemFx({
+							id: `block:${x}:${y}`,
+							itemId: "water",
+							location: board(x, y),
+							quantity: 1,
+						});
+					}
+				const source = yield* spawnItemFx({
+					id: "source",
+					itemId: "water",
+					location: inventory,
+					quantity: 4,
+				});
+				yield* releaseInventoryItemFx({
+					itemId: source.id,
+					revision: source.revision,
+					location: inventory,
+				});
+				return yield* readRuntimeFx();
 			}),
-		]);
-		expect(
-			result.runtime.items.find(
-				(item) => item.item.id === "water" && item.location.scope === "toolbar",
-			)?.location,
-		).toEqual({
-			scope: "toolbar",
-			position: {
-				x: 1,
-				y: 0,
+		);
+		expect(result.items.find((item) => item.id === "source")).toMatchObject({
+			quantity: 4,
+			location: {
+				scope: "toolbar",
+				position: {
+					x: 0,
+					y: 0,
+				},
 			},
 		});
 	});

@@ -116,7 +116,6 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 							badgeKind,
 						}),
 				id: item.id,
-				itemType: item.item.type,
 				revision: item.revision,
 				quantity: item.quantity,
 				location: item.location,

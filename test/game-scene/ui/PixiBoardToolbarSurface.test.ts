@@ -51,7 +51,7 @@ vi.mock("@effect/atom-react", () => ({
 vi.mock("~/tile-interaction/ui/useTileCommands", () => ({
 	useTileCommands: () => ({
 		runDropFn: boardState.runDrop,
-		runSpaceActivationFn: boardState.runSpaceActivation,
+		runItemActionFn: boardState.runSpaceActivation,
 		runSplitFn: boardState.splitStack,
 	}),
 }));
@@ -178,7 +178,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const owner = {
 			id: "runtime:producer",
 			itemId: "producer",
-			itemType: "common",
+
 			location: {
 				scope: "board",
 				space: 0,
@@ -240,7 +240,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const stack = {
 			id: "runtime:stack",
 			itemId: "material",
-			itemType: "common",
+
 			location: {
 				scope: "board",
 				space: 0,
@@ -251,6 +251,7 @@ describe("PixiBoardToolbarSurface", () => {
 			},
 			primaryAction: {
 				kind: "open-inventory",
+				currentSpace: 0,
 			},
 			quantity: 5,
 			revision: "revision:stack",
@@ -279,7 +280,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const producer = {
 			id: "runtime:producer",
 			itemId: "producer",
-			itemType: "common",
+
 			location: {
 				scope: "board",
 				space: 0,
@@ -348,7 +349,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const item = {
 			id: "runtime:inventory",
 			itemId: "inventory",
-			itemType: "inventory",
+
 			location: {
 				scope: "board",
 				space: 0,
@@ -359,6 +360,7 @@ describe("PixiBoardToolbarSurface", () => {
 			},
 			primaryAction: {
 				kind: "open-inventory",
+				currentSpace: 0,
 			},
 			quantity: 1,
 			revision: "revision:inventory",
@@ -373,6 +375,55 @@ describe("PixiBoardToolbarSurface", () => {
 
 		expect(boardState.navigate).toHaveBeenCalledWith();
 		expect(boardState.registerInteraction).toHaveBeenCalledOnce();
+	});
+
+	it.each([
+		"rejected",
+		"unmounted",
+	] as const)("suppresses late Inventory navigation when %s", async (scenario) => {
+		await renderSurface();
+		const props = boardState.createProps;
+		if (props === null) throw new Error("Expected the Board runtime.");
+		let resolveAction!: (result: boolean | null) => void;
+		boardState.runSpaceActivation.mockReturnValueOnce(
+			new Promise<boolean | null>((resolve) => {
+				resolveAction = resolve;
+			}) as Promise<boolean>,
+		);
+		const pending = props.onActivateFn(
+			{
+				id: "inventory-action",
+				itemId: "inventory-action",
+				revision: "revision:1",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				primaryAction: {
+					kind: "open-inventory",
+					currentSpace: 0,
+				},
+				quantity: 1,
+				running: false,
+				activityEffect: false,
+				artworkScale: 0.8,
+				sourceUrl: "asset",
+				title: "Inventory",
+			},
+			"primary",
+			document.createElement("canvas"),
+		);
+		if (scenario === "unmounted")
+			await act(async () => {
+				roots.pop()?.unmount();
+			});
+		resolveAction(scenario === "rejected" ? null : true);
+		await pending;
+		expect(boardState.navigate).not.toHaveBeenCalled();
 	});
 
 	it("opens Inventory with an unmodified i key while the Board is idle", async () => {

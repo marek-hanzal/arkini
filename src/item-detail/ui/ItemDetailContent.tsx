@@ -95,7 +95,6 @@ const ItemInfoContent = ({
 									runtime: undefined,
 								}
 							: info.schedule,
-					itemType: info.itemType,
 					storageScope: info.storageScope,
 					maxStackSize: info.maxStackSize,
 					...(info.maxCount === undefined
@@ -306,7 +305,6 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 				detail={{
 					description: props.definition.description,
 					schedule: props.definition.schedule,
-					itemType: props.definition.itemType,
 					storageScope: props.definition.storageScope,
 					maxStackSize: props.definition.maxStackSize,
 					ownedQuantity: props.definition.ownedQuantity,

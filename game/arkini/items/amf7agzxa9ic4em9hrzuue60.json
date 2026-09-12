@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "amf7agzxa9ic4em9hrzuue60",
+		"id": "empty-wine-barrel",
+		"title": "Empty Wine Barrel",
+		"description": "Wanna more",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-wine-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

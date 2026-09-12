@@ -1,5 +1,4 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
@@ -22,7 +21,7 @@ export const FormSession = ({
 	enableCapability,
 	initialItem,
 	isNew,
-	itemType,
+	create,
 	mergeIndex,
 	productionLineId,
 	resourceId,
@@ -34,7 +33,7 @@ export const FormSession = ({
 	readonly enableCapability?: OptionalCapability;
 	readonly initialItem: ItemSchema.Type;
 	readonly isNew: boolean;
-	readonly itemType?: TypeSchema.Type;
+	readonly create?: boolean;
 	readonly mergeIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
@@ -67,10 +66,10 @@ export const FormSession = ({
 						: {
 								defaultTitle,
 							}),
-					...(itemType === undefined
+					...(create === undefined
 						? {}
 						: {
-								itemType,
+								create,
 							}),
 					...(resourceId === undefined
 						? {}
@@ -89,7 +88,7 @@ export const FormSession = ({
 			defaultItemId,
 			defaultTitle,
 			initialItem.uid,
-			itemType,
+			create,
 			navigateFn,
 			project.projectId,
 			resourceId,
@@ -145,24 +144,24 @@ export const FormSession = ({
 		() => ({
 			...controller,
 			isNew,
-			itemType,
+			create,
 			mergeIndex,
 			productionLineId,
 		}),
 		[
 			controller,
 			isNew,
-			itemType,
+			create,
 			mergeIndex,
 			productionLineId,
 		],
 	);
-	const sections = readSectionsFn(initialItem, "form");
+	const sections = readSectionsFn("form");
 	const params = {
 		projectId: project.projectId,
 		itemUid: initialItem.uid,
 	};
-	const title = isNew ? `New ${initialItem.type}` : initialItem.title || initialItem.id;
+	const title = isNew ? "New item" : initialItem.title || initialItem.id;
 	return (
 		<FormProvider value={context}>
 			<section
@@ -210,7 +209,7 @@ export const FormSession = ({
 									defaultItemId={defaultItemId}
 									defaultTitle={defaultTitle}
 									key={candidate.id}
-									itemType={itemType}
+									create={create}
 									itemUid={params.itemUid}
 									projectId={params.projectId}
 									resourceId={resourceId}

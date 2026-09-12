@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "w1icsk6chjx802whummot9pd",
+		"id": "labor-t3",
+		"title": "Labor T3",
+		"description": "Expensive ones",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"labor-t3"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

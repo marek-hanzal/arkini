@@ -1,7 +1,6 @@
 import { Order } from "effect";
 
 import type { AcquisitionGraph, AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -27,17 +26,17 @@ const requiresAbsentFactFn = (when: WhenSchema.Type) => {
 
 const readItemOutputsFn = (item: ItemSchema.Type) => {
 	return [
-		...readAuthoredItemLinesFn(item).map(({ output }) => output),
+		...item.lines.map(({ output }) => output),
 		item.units?.output,
 		...(item.merge ?? []).map(({ output }) => output),
-		item.type === "common" ? item.clock?.onExpire : undefined,
+		item.clock?.onExpire,
 	];
 };
 
 const readLimitationsFn = (config: GameConfigSchema.Type) => {
 	const limitations = new Set<AcquisitionLimitation>();
 	for (const item of Object.values(config.items)) {
-		for (const line of readAuthoredItemLinesFn(item)) {
+		for (const line of item.lines) {
 			if (
 				line.rules.some(
 					(rule) => rule.type === "disable" && rule.when.some(requiresAbsentFactFn),

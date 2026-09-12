@@ -171,7 +171,7 @@ export const createItem = (
 	artworkScale: 0.8,
 	id,
 	itemId: id,
-	itemType: "common",
+
 	location,
 	primaryAction: {
 		kind: "none",

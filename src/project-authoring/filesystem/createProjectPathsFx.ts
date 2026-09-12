@@ -50,8 +50,8 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		assets,
 		resources,
 		notes,
-		itemFileFx: ({ type, uid }) =>
-			Effect.succeed(path.join(items, type, `${encodeGameProjectFileStemFn(uid)}.json`)),
+		itemFileFx: ({ uid }) =>
+			Effect.succeed(path.join(items, `${encodeGameProjectFileStemFn(uid)}.json`)),
 		assetFileFx: (resourceId) => readResourceFileFx(assets, resourceId),
 		resourceFileFx: (resourceId) => readResourceFileFx(resources, resourceId),
 		noteFileFx: (noteId) =>

@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "g820g0sxzhyuon040x3j5qje",
+		"id": "grain",
+		"title": "Grain",
+		"description": "All you can eat!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"grain"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12
+	}
+}

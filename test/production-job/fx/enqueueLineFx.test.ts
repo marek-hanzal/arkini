@@ -21,7 +21,6 @@ const props = {
 const createDisabledJobConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
-	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {
@@ -52,7 +51,6 @@ const createDisabledJobConfig = () => {
 const createExhaustedUnitJobConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
-	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {
@@ -84,7 +82,6 @@ const createExhaustedUnitJobConfig = () => {
 const createStackedJobConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
-	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {
@@ -100,7 +97,6 @@ const createStackedJobConfig = () => {
 const createInstantQueueJobConfig = () => {
 	const base = createJobTestConfig(3);
 	const forge = base.items.forge;
-	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {

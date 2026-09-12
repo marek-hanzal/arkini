@@ -1,0 +1,24 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "a1uvhs9kpbrn27746u03t6u8",
+		"id": "workshop-portal",
+		"title": "Workshop Portal",
+		"description": "Workshops",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"workshop-portal"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"action": {
+			"type": "space",
+			"space": 696,
+			"input": [],
+			"rules": []
+		}
+	}
+}

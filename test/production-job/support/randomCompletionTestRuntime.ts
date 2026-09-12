@@ -13,7 +13,6 @@ const stableJobId = "job:completion-random-test";
 export const createRandomCompletionConfig = () => {
 	const base = createJobTestConfig(1);
 	const forge = base.items.forge;
-	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	const line = forge.lines[0];
 	if (line === undefined) throw new Error("Expected producer line fixture.");
 

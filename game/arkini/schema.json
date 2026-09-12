@@ -45,7 +45,7 @@
 			"additionalProperties": false,
 			"$id": "urn:arkini:schema:game-file",
 			"title": "Arkini game source file",
-			"description": "The complete game.json contract excluding items owned by items/<type> files."
+			"description": "The complete game.json contract excluding items owned by items/<uid>.json files."
 		},
 		"IdSchema": {
 			"type": "string",
@@ -333,7 +333,7 @@
 			"properties": {
 				"$schema": {
 					"type": "string",
-					"const": "../../schema.json"
+					"const": "../schema.json"
 				},
 				"item": {
 					"description": "The canonical item owned by this UID-named file.",
@@ -347,146 +347,7 @@
 			"additionalProperties": false,
 			"$id": "urn:arkini:schema:item-file",
 			"title": "Arkini item source file",
-			"description": "One item stored at items/<type>/<encoded uid>.json."
-		},
-		"item.CommonSchema": {
-			"type": "object",
-			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"description": "The part of game state in which this item may be stored.",
-					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"clock": {
-					"$ref": "urn:arkini:schema:project#/$defs/ItemScheduleSchema"
-				},
-				"control": {
-					"description": "Player production control; omission means interactive.",
-					"type": "string",
-					"enum": [
-						"automatic-only",
-						"interactive"
-					]
-				},
-				"action": {
-					"description": "An optional immediate action; mutually exclusive with production lines.",
-					"$ref": "urn:arkini:schema:project#/$defs/itemAction.ActionSchema"
-				},
-				"maxQueueSize": {
-					"default": 1,
-					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"common"
-					]
-				},
-				"lines": {
-					"default": [],
-					"description": "Optional production lines; an item without lines or an action is passive.",
-					"type": "array",
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-					}
-				}
-			},
-			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"maxQueueSize",
-				"type",
-				"lines"
-			],
-			"additionalProperties": false,
-			"if": {
-				"required": [
-					"clock"
-				]
-			},
-			"then": {
-				"required": [
-					"scope"
-				],
-				"properties": {
-					"scope": {
-						"const": "board"
-					},
-					"maxStackSize": {
-						"const": 1
-					}
-				},
-				"not": {
-					"required": [
-						"action"
-					]
-				}
-			},
-			"not": {
-				"required": [
-					"action",
-					"lines"
-				],
-				"properties": {
-					"lines": {
-						"minItems": 1
-					}
-				}
-			},
-			"description": "An ordinary item with optional production, Clock scheduling, or one immediate action."
+			"description": "One item stored at items/<encoded uid>.json."
 		},
 		"DescriptionSchema": {
 			"type": "string",
@@ -1472,6 +1333,9 @@
 			"oneOf": [
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/itemAction.SpaceActionSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/itemAction.InventoryActionSchema"
 				}
 			],
 			"description": "One immediate item action selected by its type discriminator."
@@ -1595,6 +1459,36 @@
 			],
 			"additionalProperties": false,
 			"description": "A board query that resolves one Board item that can pay units."
+		},
+		"itemAction.InventoryActionSchema": {
+			"type": "object",
+			"properties": {
+				"input": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/action.InputSchema"
+					}
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/action.RuleSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"const": "inventory"
+				}
+			},
+			"required": [
+				"input",
+				"rules",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "An immediate action opening the Inventory screen."
 		},
 		"LineSchema": {
 			"type": "object",
@@ -1922,7 +1816,7 @@
 			"exclusiveMinimum": 0,
 			"description": "A number greater than zero."
 		},
-		"item.InventorySchema": {
+		"ItemSchema": {
 			"type": "object",
 			"properties": {
 				"uid": {
@@ -1950,23 +1844,15 @@
 					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
 				},
 				"scope": {
-					"default": "board",
-					"description": "Uses Board for automatic placement; the inventory item type also permits an exact Toolbar location.",
-					"type": "string",
-					"enum": [
-						"board"
-					]
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
 				},
 				"maxCount": {
-					"default": 1,
-					"description": "Allows exactly one inventory opener in game state.",
-					"maximum": 1,
+					"description": "The optional maximum number of this item allowed across the game state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
 				"maxStackSize": {
-					"default": 1,
-					"description": "Prevents the inventory opener from stacking.",
-					"maximum": 1,
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
 				"units": {
@@ -1986,12 +1872,33 @@
 					},
 					"minItems": 1
 				},
-				"type": {
+				"clock": {
+					"$ref": "urn:arkini:schema:project#/$defs/ItemScheduleSchema"
+				},
+				"control": {
+					"description": "Player production control; omission means interactive.",
 					"type": "string",
 					"enum": [
-						"inventory"
-					],
-					"description": "Identifies this item as the shared inventory opener."
+						"automatic-only",
+						"interactive"
+					]
+				},
+				"action": {
+					"description": "An optional immediate action; mutually exclusive with production lines.",
+					"$ref": "urn:arkini:schema:project#/$defs/itemAction.ActionSchema"
+				},
+				"maxQueueSize": {
+					"default": 1,
+					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"lines": {
+					"default": [],
+					"description": "Optional production lines; an item without lines or an action is passive.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
+					}
 				}
 			},
 			"required": [
@@ -2000,23 +1907,46 @@
 				"title",
 				"asset",
 				"scope",
-				"maxCount",
 				"maxStackSize",
-				"type"
+				"maxQueueSize",
+				"lines"
 			],
 			"additionalProperties": false,
-			"description": "A singleton Board/Toolbar item that opens the shared inventory surface."
-		},
-		"ItemSchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.CommonSchema"
+			"if": {
+				"required": [
+					"clock"
+				]
+			},
+			"then": {
+				"required": [
+					"scope"
+				],
+				"properties": {
+					"scope": {
+						"const": "board"
+					},
+					"maxStackSize": {
+						"const": 1
+					}
 				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.InventorySchema"
+				"not": {
+					"required": [
+						"action"
+					]
 				}
-			],
-			"description": "A game item selected by its type discriminator."
+			},
+			"not": {
+				"required": [
+					"action",
+					"lines"
+				],
+				"properties": {
+					"lines": {
+						"minItems": 1
+					}
+				}
+			},
+			"description": "An ordinary item with optional production, Clock scheduling, or one immediate action."
 		}
 	}
 }

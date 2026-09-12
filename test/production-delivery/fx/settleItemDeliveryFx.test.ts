@@ -22,7 +22,6 @@ import {
 const ownerItemId = "runtime:workshop";
 const lineId = "line:workshop:build";
 const workshop = inputRuntimeTestConfig.items.workshop;
-if (workshop.type !== "common") throw new Error("Expected producer test owner.");
 const twoMaterialInputConfig = GameConfigSchema.parse({
 	...inputRuntimeTestConfig,
 	items: {

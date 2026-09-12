@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
@@ -42,7 +41,6 @@ export namespace readItemDetailInfoFn {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly description?: string;
-				readonly itemType: TypeSchema.Type;
 				readonly storageScope: StorageSchema.Type;
 				readonly location: Location;
 				readonly quantity: number;
@@ -136,7 +134,6 @@ export const readItemDetailInfoFn = ({
 		kind: "available",
 		itemId: item.id,
 		description: item.item.description,
-		itemType: item.item.type,
 		storageScope: item.item.scope,
 		location: readLocationFn(item.location),
 		quantity: item.quantity,

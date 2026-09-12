@@ -8,7 +8,6 @@ import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequ
 
 const base = createJobTestConfig(4, "any");
 const forge = base.items.forge;
-if (forge.type !== "common") throw new Error("Expected producer fixture.");
 
 export const queueConfig = GameConfigSchema.parse({
 	...base,
@@ -80,7 +79,6 @@ export const queueConfig = GameConfigSchema.parse({
 
 export const createContendedQueueConfigFn = (budget: "units" | "output") => {
 	const producer = queueConfig.items.forge;
-	if (producer.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...queueConfig,
 		items: {

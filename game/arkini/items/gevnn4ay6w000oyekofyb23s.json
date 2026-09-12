@@ -1,0 +1,51 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "gevnn4ay6w000oyekofyb23s",
+		"id": "bobik",
+		"title": "Bobík",
+		"description": "The less older son",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"avatar-05"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "tomasek"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "toy-sloth",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		]
+	}
+}

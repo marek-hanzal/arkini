@@ -55,7 +55,6 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 		if (phase !== undefined && phase <= 0) {
 			// Only expected admission rejection consumes the pulse without state, randomness or delivery side effects.
 			const attempt = yield* Effect.gen(function* () {
-				if (item.item.type !== "common") return undefined;
 				const line = readEffectiveLineFn({
 					ownerItemId: item.id,
 					ownerItem: item.item,

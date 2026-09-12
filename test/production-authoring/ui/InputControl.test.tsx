@@ -111,7 +111,7 @@ const createSearchItem = (id: string, spent: boolean) =>
 
 		uid: `uid:${id}`,
 		id,
-		type: "common",
+
 		title: id,
 		description: id,
 		asset: {

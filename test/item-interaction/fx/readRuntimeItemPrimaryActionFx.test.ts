@@ -51,7 +51,7 @@ const config = GameConfigSchema.parse({
 		producer: {
 			uid: "producer",
 			id: "producer",
-			type: "common",
+
 			title: "Producer",
 			description: "Produces resources.",
 			asset: {
@@ -85,7 +85,7 @@ const config = GameConfigSchema.parse({
 
 			uid: "resource",
 			id: "resource",
-			type: "common",
+
 			title: "Resource",
 			description: "One resource.",
 			asset: {
@@ -100,7 +100,11 @@ const config = GameConfigSchema.parse({
 		"satchel-control": {
 			uid: "satchel-control",
 			id: "satchel-control",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Satchel",
 			description: "Opens the shared inventory.",
 			asset: {
@@ -131,7 +135,7 @@ if (producer === undefined || resource === undefined || inventoryOpener === unde
 describe("readRuntimeItemPrimaryActionFx", () => {
 	it("admits default production only when the Common item has lines", () => {
 		const item = config.items.producer;
-		if (item.type !== "common") throw new Error("Expected Common fixture.");
+		if (item === undefined) throw new Error("Expected Common fixture.");
 		for (const active of [
 			false,
 			true,
@@ -197,7 +201,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		}
 	});
 
-	it("opens Inventory by canonical item type from either Board or Toolbar", () => {
+	it("opens Inventory by its authored action from either Board or Toolbar", () => {
 		expect(
 			Effect.runSync(
 				readRuntimeItemPrimaryActionFx({
@@ -207,6 +211,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "open-inventory",
+			currentSpace: 0,
 		});
 		expect(
 			Effect.runSync(
@@ -226,6 +231,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "open-inventory",
+			currentSpace: 0,
 		});
 	});
 

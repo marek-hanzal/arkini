@@ -28,11 +28,20 @@ interface PixiBoardToolbarSurfaceProps {
 
 export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarSurfaceProps) => {
 	const game = useGameEngine();
-	const { runSpaceActivationFn, runDropFn, runSplitFn } = useTileCommands(game);
+	const { runItemActionFn, runDropFn, runSplitFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
 	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
+	const actionGenerationRef = useRef(0);
+	useEffect(() => {
+		actionGenerationRef.current += 1;
+		return () => {
+			actionGenerationRef.current += 1;
+		};
+	}, [
+		game,
+	]);
 	const controlsRef = useRef({
 		itemDetail,
 	});
@@ -42,6 +51,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 
 	const activateFn = useCallback(
 		async (item: TileActorItem, intent: MainActivationIntent, origin: HTMLElement) => {
+			const actionGeneration = actionGenerationRef.current;
 			const { itemDetail: currentItemDetail } = controlsRef.current;
 			if (intent === "detail") {
 				RendererRuntime.runSync(
@@ -86,7 +96,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 						kind: "activate-space",
 					},
 					(primaryAction) =>
-						runSpaceActivationFn({
+						runItemActionFn({
 							currentSpace: primaryAction.currentSpace,
 							itemId: item.id,
 							location: item.location,
@@ -97,7 +107,17 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 					{
 						kind: "open-inventory",
 					},
-					() => onOpenInventoryFn(),
+					(action) =>
+						runItemActionFn({
+							currentSpace: action.currentSpace,
+							itemId: item.id,
+							location: item.location,
+							revision: item.revision,
+						}).then((result) =>
+							result === null || actionGenerationRef.current !== actionGeneration
+								? undefined
+								: onOpenInventoryFn(),
+						),
 				)
 				.with(
 					{
@@ -115,7 +135,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 		[
 			enqueueLineFn,
 			onOpenInventoryFn,
-			runSpaceActivationFn,
+			runItemActionFn,
 			runSplitFn,
 		],
 	);

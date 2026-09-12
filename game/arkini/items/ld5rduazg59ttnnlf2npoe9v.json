@@ -1,0 +1,28 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ld5rduazg59ttnnlf2npoe9v",
+		"id": "corrupted-beagle-puppy",
+		"title": "Corrupted Beagle Puppy",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"corrupted-beagle-puppy"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fawn"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "corrupted-beagle-puppy-with-fawn"
+			}
+		]
+	}
+}

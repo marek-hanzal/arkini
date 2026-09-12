@@ -6,7 +6,7 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 
 const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => ({
 	uid: `uid:${id}`,
@@ -70,8 +70,8 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		sameSpacePortal: {
-			...baseItem("sameSpacePortal", "inventory"),
-			type: "common",
+			...baseItem("sameSpacePortal"),
+
 			action: {
 				type: "space" as const,
 				space: 0,
@@ -79,7 +79,7 @@ const config = GameConfigSchema.parse({
 		},
 		portal: {
 			...baseItem("portal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 7,
@@ -87,7 +87,7 @@ const config = GameConfigSchema.parse({
 		},
 		blockedPortal: {
 			...baseItem("blockedPortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 2,
@@ -112,7 +112,7 @@ const config = GameConfigSchema.parse({
 		},
 		proximityPortal: {
 			...baseItem("proximityPortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 10,
@@ -137,8 +137,8 @@ const config = GameConfigSchema.parse({
 			},
 		},
 		passiveZeroBoardRulePortal: {
-			...baseItem("passiveZeroBoardRulePortal", "inventory"),
-			type: "common",
+			...baseItem("passiveZeroBoardRulePortal"),
+
 			action: {
 				type: "space" as const,
 				space: 11,
@@ -165,7 +165,7 @@ const config = GameConfigSchema.parse({
 		},
 		unitsPortal: {
 			...baseItem("unitsPortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 3,
@@ -190,7 +190,7 @@ const config = GameConfigSchema.parse({
 		},
 		ownerUnitsPortal: {
 			...baseItem("ownerUnitsPortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 8,
@@ -219,7 +219,7 @@ const config = GameConfigSchema.parse({
 		},
 		spentPortal: {
 			...baseItem("spentPortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 4,
@@ -231,7 +231,7 @@ const config = GameConfigSchema.parse({
 		},
 		passiveFinitePortal: {
 			...baseItem("passiveFinitePortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 4,
@@ -252,7 +252,7 @@ const config = GameConfigSchema.parse({
 		},
 		cumulativePortal: {
 			...baseItem("cumulativePortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 5,
@@ -280,7 +280,7 @@ const config = GameConfigSchema.parse({
 		},
 		depletingPortal: {
 			...baseItem("depletingPortal"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 6,
@@ -301,8 +301,8 @@ const config = GameConfigSchema.parse({
 			},
 		},
 		passiveFailurePortal: {
-			...baseItem("passiveFailurePortal", "inventory"),
-			type: "common",
+			...baseItem("passiveFailurePortal"),
+
 			action: {
 				type: "space" as const,
 				space: 9,
@@ -327,7 +327,7 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			...baseItem("payer", "board"),
-			type: "common",
+
 			units: {
 				amount: 2,
 			},
@@ -337,21 +337,18 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			...baseItem("permit"),
-			type: "common",
 		},
 		token: {
 			maxQueueSize: 1,
 			lines: [],
 
 			...baseItem("token", "inventory"),
-			type: "common",
 		},
 		boardToken: {
 			maxQueueSize: 1,
 			lines: [],
 
 			...baseItem("boardToken", "board"),
-			type: "common",
 		},
 	},
 });
@@ -411,7 +408,7 @@ export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({
 		quantity,
 	});
 	const runtime = yield* readRuntimeFx();
-	const space = yield* activateSpaceItemFx({
+	const space = yield* activateItemActionFx({
 		currentSpace: runtime.currentSpace,
 		itemId: item.id,
 		location: item.location as GridLocationSchema.Type,

@@ -48,7 +48,6 @@ const output = (itemId: string, conditional = false) => ({
 export const createConfig = (path: OutputPath, markerDuration = 500) => {
 	const base = createTemporaryLifetimeTestConfig();
 	const producer = base.items.producer;
-	if (producer?.type !== "common") throw new Error("Expected producer fixture.");
 	const line = producer.lines[0];
 	return GameConfigSchema.parse({
 		...base,

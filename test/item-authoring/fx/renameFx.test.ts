@@ -21,7 +21,7 @@ describe("renameFx", () => {
 					...createProducerItem({
 						id: "clock",
 					}),
-					type: "common",
+
 					scope: "board",
 					maxStackSize: 1,
 					clock: {

@@ -90,7 +90,6 @@ describe("createGameSessionFx / final save lifecycle", () => {
 	it("runs the production Tick loop from Effect Clock and completes jobs", async () => {
 		const config = createJobTestConfig();
 		const forge = config.items.forge;
-		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		forge.lines[0]!.runtimeMs = 25;
 		const session = await createTestGameSession({
 			config,

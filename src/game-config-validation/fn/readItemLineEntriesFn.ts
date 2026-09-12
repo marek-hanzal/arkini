@@ -1,8 +1,5 @@
-import { match } from "ts-pattern";
-
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 import type { ItemLineEntrySchema } from "../schema/ItemLineEntrySchema";
 
@@ -15,30 +12,15 @@ export namespace readItemLineEntriesFn {
 
 /** Reads every product line owned by one canonical item with stable authoring paths. */
 export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Props) =>
-	match(item)
-		.with(
-			{
-				type: TypeSchema.enum.Common,
-			},
-			({ lines }) =>
-				lines.map(
-					(line, index) =>
-						({
-							line,
-							path: [
-								"items",
-								itemId,
-								"lines",
-								index,
-							],
-						}) satisfies ItemLineEntrySchema.Type,
-				),
-		)
-
-		.with(
-			{
-				type: TypeSchema.enum.Inventory,
-			},
-			() => [] as ItemLineEntrySchema.Type[],
-		)
-		.exhaustive();
+	item.lines.map(
+		(line, index) =>
+			({
+				line,
+				path: [
+					"items",
+					itemId,
+					"lines",
+					index,
+				],
+			}) satisfies ItemLineEntrySchema.Type,
+	);

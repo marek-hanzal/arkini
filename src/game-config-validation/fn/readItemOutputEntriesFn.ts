@@ -1,6 +1,5 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 import type { ItemOutputEntrySchema } from "../schema/ItemOutputEntrySchema";
 import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
@@ -44,7 +43,7 @@ export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesF
 		});
 	}
 
-	if (item.type === TypeSchema.enum.Common && item.clock?.onExpire !== undefined) {
+	if (item.clock?.onExpire !== undefined) {
 		entries.push({
 			output: item.clock.onExpire,
 			path: [

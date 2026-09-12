@@ -3,7 +3,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
-import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
@@ -27,10 +26,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const section = sectionId as SectionId;
-		const session = useFormSession();
-		const available = readSectionsFn(session.initialItem, "form").some(
-			(candidate) => candidate.id === section,
-		);
+		const available = readSectionsFn("form").some((candidate) => candidate.id === section);
 		if (!available)
 			return (
 				<section

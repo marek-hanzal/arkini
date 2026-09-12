@@ -1,21 +1,14 @@
-import { useEditorItemTypeFilter } from "~/item-authoring/ui/useEditorItemTypeFilter";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { List } from "~/item-authoring/ui/List";
 
 interface EditorItemsRouteSearch {
 	readonly draft?: true;
-	readonly itemType?: TypeSchema.Type;
 	readonly query?: string;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 	validateSearch: (search): EditorItemsRouteSearch => ({
 		draft: search.draft === true ? true : undefined,
-		itemType:
-			TypeSchema.options.find((type) => type === search.itemType) === undefined
-				? undefined
-				: (search.itemType as TypeSchema.Type),
 		query:
 			typeof search.query === "string" && search.query.length > 0 ? search.query : undefined,
 	}),
@@ -24,14 +17,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
-		const onItemTypeChangeFn = useEditorItemTypeFilter(Route.fullPath);
 
 		return (
 			<List
 				draft={search.draft === true}
-				itemType={search.itemType}
 				query={search.query ?? ""}
-				onItemTypeChangeFn={onItemTypeChangeFn}
 				onDraftChangeFn={(draft) =>
 					void navigateFn({
 						replace: true,

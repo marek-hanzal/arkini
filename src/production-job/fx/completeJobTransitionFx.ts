@@ -1,8 +1,6 @@
 import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { JobCompletionOwner } from "~/production-job/type/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/production-job/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
@@ -78,21 +76,13 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	});
 	if (line === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
-	if (owner.item.type !== TypeSchema.enum.Common) {
-		return yield* Effect.die(
-			new Error(`Job ${job.id} owner ${owner.id} does not expose a product line.`),
-		);
-	}
 	const consumedItems = Array.getSomes(runtime.items.map(isJobRuntimeItemFn)).filter(
 		(item) => item.location.jobId === job.id,
 	);
 	const reservations = Array.getSomes(runtime.items.map(isReservedRuntimeItemFn)).filter(
 		(item) => item.location.jobId === job.id,
 	);
-	const completionOwner = {
-		...owner,
-		item: owner.item,
-	} satisfies JobCompletionOwner;
+	const completionOwner = owner;
 	let completionRuntime = {
 		...runtime,
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),

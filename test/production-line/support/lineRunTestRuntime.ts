@@ -58,7 +58,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				scope: "board",
 			}),
 			maxStackSize: 1,
-			type: "common",
+
 			maxQueueSize: 2,
 			lines: [
 				{
@@ -144,7 +144,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				id: "water",
 				scope: "any",
 			}),
-			type: "common",
 		},
 		permit: {
 			maxQueueSize: 1,
@@ -154,7 +153,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				id: "permit",
 				scope: "any",
 			}),
-			type: "common",
 		},
 		booster: {
 			maxQueueSize: 1,
@@ -164,7 +162,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				id: "booster",
 				scope: "any",
 			}),
-			type: "common",
 		},
 		adjuster: {
 			maxQueueSize: 1,
@@ -174,7 +171,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				id: "adjuster",
 				scope: "any",
 			}),
-			type: "common",
 		},
 		floor: {
 			maxQueueSize: 1,
@@ -184,7 +180,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				id: "floor",
 				scope: "any",
 			}),
-			type: "common",
 		},
 		blocker: {
 			maxQueueSize: 1,
@@ -194,7 +189,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 				id: "blocker",
 				scope: "any",
 			}),
-			type: "common",
 		},
 	},
 });

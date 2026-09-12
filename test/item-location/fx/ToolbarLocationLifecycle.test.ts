@@ -1,3 +1,4 @@
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -48,7 +49,7 @@ const configInput = {
 
 			uid: "water",
 			id: "water",
-			type: "common",
+
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -66,7 +67,7 @@ const configInput = {
 
 			uid: "stone",
 			id: "stone",
-			type: "common",
+
 			title: "Stone",
 			description: "Stone",
 			asset: {
@@ -84,7 +85,7 @@ const configInput = {
 
 			uid: "boardOnly",
 			id: "boardOnly",
-			type: "common",
+
 			title: "Board only",
 			description: "Board only",
 			asset: {
@@ -102,7 +103,7 @@ const configInput = {
 
 			uid: "inventoryOnly",
 			id: "inventoryOnly",
-			type: "common",
+
 			title: "Inventory only",
 			description: "Inventory only",
 			asset: {
@@ -117,7 +118,11 @@ const configInput = {
 		backpack: {
 			uid: "backpack",
 			id: "backpack",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
 			asset: {
@@ -297,7 +302,7 @@ describe("Toolbar location lifecycle", () => {
 		expect(result.runtime.items[0]?.location).toEqual(board(1, 0));
 	});
 
-	it("moves the inventory opener between Board and Toolbar but rejects Inventory", () => {
+	it("lets an Inventory action item itself move between Board, Toolbar, and Inventory", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -306,110 +311,50 @@ describe("Toolbar location lifecycle", () => {
 					location: board(0, 0),
 					quantity: 1,
 				});
-				const storePreview = yield* readDropItemPreviewFx({
-					sourceItemId: source.id,
-					sourceRevision: source.revision,
-					sourceLocation: source.location,
-					target: {
-						kind: "slot",
-						location: toolbar(1),
-						occupant: null,
+				let current: GridRuntimeItemSchema.Type = source;
+				for (const location of [
+					toolbar(1),
+					{
+						scope: "inventory" as const,
+						position: {
+							x: 0,
+							y: 0,
+						},
 					},
-				});
-				const stored = yield* dropItemFx({
-					sourceItemId: source.id,
-					sourceRevision: source.revision,
-					sourceLocation: source.location,
-					target: {
-						kind: "slot",
-						location: toolbar(1),
-						occupant: null,
-					},
-				});
-				if (stored.kind !== DropItemResultKind.Move) {
-					throw new Error("Expected Backpack toolbar move.");
+					board(2, 1),
+				]) {
+					const moved = yield* dropItemFx({
+						sourceItemId: current.id,
+						sourceRevision: current.revision,
+						sourceLocation: current.location,
+						target: {
+							kind: "slot",
+							location,
+							occupant: null,
+						},
+					});
+					if (moved.kind !== "move") throw new Error("Expected an ordinary move.");
+					const next = (yield* readRuntimeFx()).items.find(
+						(item) => item.id === source.id,
+					);
+					if (
+						next === undefined ||
+						(next.location.scope !== "board" &&
+							next.location.scope !== "toolbar" &&
+							next.location.scope !== "inventory")
+					)
+						throw new Error("Expected exact item on grid.");
+					current = {
+						...source,
+						...next,
+						location: next.location,
+					};
 				}
-				const inventoryLocation = {
-					scope: "inventory" as const,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				};
-				const preview = yield* readDropItemPreviewFx({
-					sourceItemId: stored.itemId,
-					sourceRevision: stored.revision,
-					sourceLocation: stored.location,
-					target: {
-						kind: "slot",
-						location: inventoryLocation,
-						occupant: null,
-					},
-				});
-				const rejected = yield* dropItemFx({
-					sourceItemId: stored.itemId,
-					sourceRevision: stored.revision,
-					sourceLocation: stored.location,
-					target: {
-						kind: "slot",
-						location: inventoryLocation,
-						occupant: null,
-					},
-				});
-				const afterRejected = yield* readRuntimeFx();
-				const restored = yield* dropItemFx({
-					sourceItemId: stored.itemId,
-					sourceRevision: stored.revision,
-					sourceLocation: stored.location,
-					target: {
-						kind: "slot",
-						location: board(2, 1),
-						occupant: null,
-					},
-				});
-
-				return {
-					afterRejected,
-					preview,
-					rejected,
-					restored,
-					runtime: yield* readRuntimeFx(),
-					stored,
-					storePreview,
-				};
+				return current;
 			}),
 		);
-
-		expect(result.storePreview).toEqual({
-			kind: DropItemResultKind.Move,
-		});
-		expect(result.preview).toEqual({
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.InvalidTarget,
-		});
-		expect(result.rejected).toEqual({
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.InvalidTarget,
-			itemId: "runtime:backpack",
-		});
-		expect(result.afterRejected.items).toEqual([
-			expect.objectContaining({
-				id: "runtime:backpack",
-				location: toolbar(1),
-				revision: result.stored.revision,
-			}),
-		]);
-		expect(result.restored).toMatchObject({
-			kind: DropItemResultKind.Move,
-			previousLocation: toolbar(1),
-			location: board(2, 1),
-		});
-		expect(result.runtime.items).toEqual([
-			expect.objectContaining({
-				id: "runtime:backpack",
-				location: board(2, 1),
-			}),
-		]);
+		expect(result.location).toEqual(board(2, 1));
+		expect(result.item.action?.type).toBe("inventory");
 	});
 
 	it("rejects occupied-swap previews when either resulting scope is ineligible", () => {
@@ -417,7 +362,7 @@ describe("Toolbar location lifecycle", () => {
 			Effect.gen(function* () {
 				const backpack = yield* spawnItemFx({
 					id: "runtime:backpack",
-					itemId: "backpack",
+					itemId: "boardOnly",
 					location: board(0, 0),
 					quantity: 1,
 				});

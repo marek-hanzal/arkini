@@ -37,7 +37,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "common",
 		},
 		permit: {
 			maxQueueSize: 1,
@@ -55,7 +54,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "common",
 		},
 		booster: {
 			maxQueueSize: 1,
@@ -73,7 +71,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "common",
 		},
 		blocker: {
 			maxQueueSize: 1,
@@ -91,7 +88,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "common",
 		},
 	},
 });

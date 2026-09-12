@@ -3,7 +3,6 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 import { readResourceDescriptorsFx } from "~/game-config-resource/fx/readResourceDescriptorsFx";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
@@ -73,15 +72,8 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	for (const relativeFile of itemFiles) {
 		const sourcePath = path.join(paths.items, relativeFile);
 		const segments = relativeFile.replaceAll("\\", "/").split("/");
-		if (segments.length !== 2) {
-			return yield* failInvalidItemFileFx(
-				sourcePath,
-				"expected items/<type>/<encoded uid>.json.",
-			);
-		}
-		const parsedType = TypeSchema.safeParse(segments[0]);
-		if (!parsedType.success) {
-			return yield* failInvalidItemFileFx(sourcePath, "the directory is not an item type.");
+		if (segments.length !== 1) {
+			return yield* failInvalidItemFileFx(sourcePath, "expected items/<encoded uid>.json.");
 		}
 		const source = yield* parseJsonFx(
 			sourcePath,
@@ -98,14 +90,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 		}
 		itemIds.add(itemId);
 		itemUids.add(item.uid);
-		if (item.type !== parsedType.data) {
-			return yield* failInvalidItemFileFx(
-				sourcePath,
-				`item type ${JSON.stringify(item.type)} differs from its directory.`,
-			);
-		}
 		const expectedPath = yield* paths.itemFileFx({
-			type: item.type,
 			uid: item.uid,
 		});
 		if (path.resolve(sourcePath) !== expectedPath) {

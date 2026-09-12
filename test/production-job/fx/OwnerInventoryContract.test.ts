@@ -8,7 +8,7 @@ import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
-import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
+import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -28,7 +28,11 @@ const createInventoryOpenerJobConfig = () => {
 			backpack: {
 				uid: "backpack",
 				id: "backpack",
-				type: "inventory",
+				action: {
+					type: "inventory",
+				},
+				scope: "any",
+				maxStackSize: 1,
 				title: "Backpack",
 				description: "Stores items.",
 				asset: {
@@ -187,23 +191,10 @@ describe("job owner inventory contract", () => {
 		).toBe(false);
 	});
 
-	it("preserves an active owner through opener storage and Inventory release", () => {
+	it("preserves an active owner through direct storage and Inventory release", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
-				const opener = yield* spawnItemFx({
-					id: "runtime:backpack",
-					itemId: "backpack",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 4,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
 				yield* startLineFx({
 					ownerItemId,
 					lineId,
@@ -216,18 +207,10 @@ describe("job owner inventory contract", () => {
 				if (activeOwner === undefined || activeOwner.location.scope !== "board") {
 					throw new Error("Expected active Board owner.");
 				}
-				const stored = yield* dropItemFx({
+				const stored = yield* storeInventoryItemFx({
 					sourceItemId: activeOwner.id,
 					sourceRevision: activeOwner.revision,
 					sourceLocation: activeOwner.location,
-					target: {
-						kind: "slot",
-						location: opener.location,
-						occupant: {
-							itemId: opener.id,
-							revision: opener.revision,
-						},
-					},
 				});
 				if (stored.kind !== DropItemResultKind.StoreInventory) {
 					return yield* Effect.die(

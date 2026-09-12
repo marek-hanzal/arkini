@@ -5,7 +5,7 @@ import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
 	createLine,
 	createOutput,
@@ -29,7 +29,7 @@ const createClockGraph = async ({
 	once?: boolean;
 	passive?: boolean;
 } = {}) => {
-	const clock = CommonSchema.parse({
+	const clock = ItemSchema.parse({
 		...createProducerItem({
 			id: "clock",
 			lines: passive
@@ -59,7 +59,7 @@ const createClockGraph = async ({
 						}),
 					],
 		}),
-		type: "common",
+
 		scope: "board",
 		maxStackSize: 1,
 		control,

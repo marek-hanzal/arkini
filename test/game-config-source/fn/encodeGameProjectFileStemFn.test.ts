@@ -36,8 +36,8 @@ describe("encodeGameProjectFileStemFn", () => {
 		const uid = "\ud800";
 		const result = Effect.runSync(
 			parseGameSourceFileFx({
-				path: "/game/items/common/%ED%A0%80.json",
-				relative: "items/common/%ED%A0%80.json",
+				path: "/game/items/%ED%A0%80.json",
+				relative: "items/%ED%A0%80.json",
 				source: JSON.stringify({
 					$schema: GameProjectItemSchemaReference,
 					item: {

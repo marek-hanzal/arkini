@@ -34,9 +34,9 @@ describe("editor MCP authoring schema registry", () => {
 			return schema;
 		};
 
-		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-common-item-input");
+		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-item-input");
 		expect(producer).toMatchObject({
-			$id: "urn:arkini:schema:mcp:create-common-item-input",
+			$id: "urn:arkini:schema:mcp:create-item-input",
 			properties: {
 				asset: {
 					$ref: "AssetSchema",
@@ -54,16 +54,14 @@ describe("editor MCP authoring schema registry", () => {
 			},
 			type: "object",
 		});
-		expect(
-			await readSchemaDetail("urn:arkini:schema:mcp:edit-common-item-input"),
-		).toMatchObject({
+		expect(await readSchemaDetail("urn:arkini:schema:mcp:edit-item-input")).toMatchObject({
 			properties: {
 				patch: {
-					$ref: "CommonItemPatchSchema",
+					$ref: "ItemPatchSchema",
 				},
 			},
 		});
-		expect(await readSchemaDetail("CommonItemPatchSchema")).toMatchObject({
+		expect(await readSchemaDetail("ItemPatchSchema")).toMatchObject({
 			minProperties: 1,
 			type: "object",
 		});
@@ -161,15 +159,9 @@ describe("editor MCP authoring schema registry", () => {
 				type: "object",
 			});
 		}
-		const itemTypes = [
-			"common",
-			"inventory",
-		];
 		const pending = [
-			...itemTypes.flatMap((type) => [
-				`urn:arkini:schema:mcp:create-${type}-item-input`,
-				`urn:arkini:schema:mcp:edit-${type}-item-input`,
-			]),
+			"urn:arkini:schema:mcp:create-item-input",
+			"urn:arkini:schema:mcp:edit-item-input",
 			"urn:arkini:schema:mcp:edit-project-input",
 		];
 		const visited = new Set<string>();
@@ -195,7 +187,6 @@ describe("editor MCP authoring schema registry", () => {
 				}
 			}
 		}
-		expect(visited.size).toBeGreaterThan(70);
 		expect([
 			...visited,
 		]).toEqual(
@@ -232,12 +223,10 @@ describe("editor MCP authoring schema registry", () => {
 				),
 				schemaUri(id),
 			);
-		const validateCreate = ajv.getSchema(
-			schemaUri("urn:arkini:schema:mcp:create-common-item-input"),
-		);
-		const validatePatch = ajv.getSchema(schemaUri("CommonItemPatchSchema"));
+		const validateCreate = ajv.getSchema(schemaUri("urn:arkini:schema:mcp:create-item-input"));
+		const validatePatch = ajv.getSchema(schemaUri("ItemPatchSchema"));
 		if (validateCreate === undefined || validatePatch === undefined)
-			throw new Error("Missing public Common schema.");
+			throw new Error("Missing public item schema.");
 		const action = {
 			type: "space",
 			space: 1,
@@ -248,6 +237,24 @@ describe("editor MCP authoring schema registry", () => {
 			action,
 		};
 		expect(validateCreate(input), JSON.stringify(validateCreate.errors)).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				action: {
+					type: "inventory",
+				},
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				action: {
+					type: "inventory",
+					space: 1,
+				},
+			}),
+		).toBe(false);
 		expect(
 			validateCreate({
 				...input,

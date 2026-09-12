@@ -1,4 +1,3 @@
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
 
 const Sections = [
@@ -48,9 +47,8 @@ const Sections = [
 	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
-/** Returns the explicit sections supported by one item discriminator and surface. */
+/** Returns the explicit sections supported by the item surface. */
 export const readSectionsFn = (
-	item: Pick<ItemSchema.Type, "type">,
 	mode: "detail" | "form" = "detail",
 ): ReadonlyArray<SectionDescriptor> =>
 	Sections.filter((section) => {
@@ -62,16 +60,5 @@ export const readSectionsFn = (
 				section.id === "notes")
 		)
 			return false;
-		switch (section.id) {
-			case "units":
-			case "merges":
-				return item.type !== "inventory";
-			case "production":
-				return item.type === "common";
-			case "clock":
-			case "action":
-				return item.type === "common";
-			default:
-				return true;
-		}
+		return true;
 	});

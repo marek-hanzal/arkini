@@ -32,7 +32,7 @@ const config = GameConfigSchema.parse({
 
 			uid: "stone",
 			id: "stone",
-			type: "common",
+
 			title: "Stone",
 			description: "Stone",
 			asset: {
@@ -50,7 +50,7 @@ const config = GameConfigSchema.parse({
 
 			uid: "mud",
 			id: "mud",
-			type: "common",
+
 			title: "Mud",
 			description: "Mud",
 			asset: {

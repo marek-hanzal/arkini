@@ -1,13 +1,12 @@
 import { Factory } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
 import { Status } from "~/ui/ui/Status";
 
 /** Presents production lines or the disabled contract. */
 export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
-	const lines = readAuthoredItemLinesFn(item);
+	const lines = item.lines;
 	if (lines.length > 0)
 		return (
 			<div className="ak-list grid gap-3">

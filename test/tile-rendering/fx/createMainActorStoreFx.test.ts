@@ -31,7 +31,7 @@ const item = (
 	activityEffect: false,
 	id,
 	itemId: id,
-	itemType: "common",
+
 	location,
 	primaryAction: {
 		kind: "none",

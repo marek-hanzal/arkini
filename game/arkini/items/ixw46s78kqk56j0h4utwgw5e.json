@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ixw46s78kqk56j0h4utwgw5e",
+		"id": "pickaxe",
+		"title": "Pickaxe",
+		"description": "Miners, go deep!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"pickaxe"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

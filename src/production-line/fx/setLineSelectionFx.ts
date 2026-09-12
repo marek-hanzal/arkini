@@ -8,7 +8,6 @@ import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -47,7 +46,7 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* ({
 						itemId: ownerItemId,
 					}),
 				);
-			const lines = ownerItem === undefined ? undefined : readLineOwnerLinesFn(ownerItem);
+			const lines = ownerItem === undefined ? undefined : ownerItem.lines;
 			if (lineId !== null && lines?.some((line) => line.id === lineId) !== true) {
 				return yield* Effect.fail(
 					new LineNotFoundError({

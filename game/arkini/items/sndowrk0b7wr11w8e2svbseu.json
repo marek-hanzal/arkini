@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "sndowrk0b7wr11w8e2svbseu",
+		"id": "honeyed-fruit-pancake-with-cream",
+		"title": "Honeyed Fruit Pancake With Cream",
+		"description": "Yamm",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"honeyed-fruit-pancake-with-cream"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

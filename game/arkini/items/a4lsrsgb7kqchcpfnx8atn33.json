@@ -1,0 +1,55 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "a4lsrsgb7kqchcpfnx8atn33",
+		"id": "compost",
+		"title": "Compost",
+		"description": "Nice thing, flowers would like it.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"compost"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-grain-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-grain-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-grape-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-grape-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cotton-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-cotton-field"
+			}
+		]
+	}
+}

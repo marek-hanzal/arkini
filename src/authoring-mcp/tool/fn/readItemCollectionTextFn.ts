@@ -16,11 +16,7 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 	const items = Object.values(project.config.items).sort((left, right) =>
 		Order.String(left.title, right.title),
 	);
-	const allowedTypes = input.itemTypes === undefined ? undefined : new Set(input.itemTypes);
-	const typeFilteredItems =
-		allowedTypes === undefined ? items : items.filter((item) => allowedTypes.has(item.type));
-	const matches =
-		input.query === undefined ? typeFilteredItems : searchFn(typeFilteredItems, input.query);
+	const matches = input.query === undefined ? items : searchFn(items, input.query);
 	const totalPages = Math.ceil(matches.length / input.limit);
 	const pageItems = matches.slice((input.page - 1) * input.limit, input.page * input.limit);
 	const hasPreviousPage = input.page > 1;
@@ -30,7 +26,6 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 			[
 				`- ${item.title}`,
 				`  ID: ${item.id}`,
-				`  Type: ${item.type}`,
 				`  Draft: ${readDraftFn(item)}`,
 				...(item.description === undefined
 					? []
@@ -44,12 +39,6 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 	return [
 		"Item collection",
 		`Project items: ${items.length}`,
-		...(input.itemTypes === undefined
-			? []
-			: [
-					`Item type filter (OR): ${input.itemTypes.join(", ")}`,
-				]),
-		`Type-filtered items: ${typeFilteredItems.length}`,
 		`Matched items: ${matches.length}`,
 		`Page: ${input.page}`,
 		`Total pages: ${totalPages}`,

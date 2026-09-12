@@ -13,7 +13,7 @@ const simpleItem = (id: string) => ({
 
 	uid: id,
 	id,
-	type: "common" as const,
+
 	title: id,
 	description: id,
 	asset: {
@@ -74,7 +74,7 @@ const producer = ({
 }) => ({
 	uid: id,
 	id,
-	type: "common" as const,
+
 	title: id,
 	description: id,
 	asset: {

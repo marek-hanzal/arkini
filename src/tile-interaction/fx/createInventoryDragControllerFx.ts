@@ -70,7 +70,6 @@ interface ActiveInventoryDrag {
 }
 
 const expectedActivationFailureTags = new Set([
-	"InventoryOpenerUnavailableError",
 	"ItemLocationConflictError",
 	"ItemNotFoundError",
 	"ItemNotOnGridError",
@@ -156,12 +155,6 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 						kind: DropItemResultKind.StoreInput,
 					},
 					({ owner }) => owner.itemId,
-				)
-				.with(
-					{
-						kind: DropItemResultKind.StoreInventory,
-					},
-					({ inventory }) => inventory.itemId,
 				)
 				.otherwise(() => null);
 			if (receiverActorId === null) return;

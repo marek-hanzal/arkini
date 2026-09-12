@@ -31,22 +31,12 @@ export const placeFx = Effect.fn("placeFx")(
 		{ communities, communityByNodeId }: Communities,
 	) =>
 		Effect.sync(() => {
-			const types = [
-				...new Set(flow.nodes.map(({ type }) => type)),
-			].sort((left, right) => left.localeCompare(right));
 			const elements: ElementDefinition[] = [];
 			for (const communityId of communities.keys())
 				elements.push({
 					data: {
 						anchor: true,
 						id: `community:${communityId}`,
-					},
-				});
-			for (const type of types)
-				elements.push({
-					data: {
-						anchor: true,
-						id: `type:${type}`,
 					},
 				});
 
@@ -74,15 +64,6 @@ export const placeFx = Effect.fn("placeFx")(
 							virtualKind: "community",
 						},
 					});
-				elements.push({
-					data: {
-						id: `type-edge:${node.id}`,
-						importance: profile.importance,
-						source: node.id,
-						target: `type:${node.type}`,
-						virtualKind: "type",
-					},
-				});
 			}
 			for (const [index, pair] of pairs.entries()) {
 				const source = profiles.get(pair.a);
@@ -132,7 +113,6 @@ export const placeFx = Effect.fn("placeFx")(
 							const kind = edge.data("virtualKind") as string | undefined;
 							const importance = Number(edge.data("importance") ?? 0);
 							if (kind === "community") return 0.02 + 0.08 * (1 - importance);
-							if (kind === "type") return 0.006 + 0.025 * (1 - importance);
 							return 0.28 / (1 + Number(edge.data("pressure") ?? 0));
 						},
 						fit: false,
@@ -141,7 +121,6 @@ export const placeFx = Effect.fn("placeFx")(
 						idealEdgeLength: (edge: cytoscape.EdgeSingular) => {
 							const kind = edge.data("virtualKind") as string | undefined;
 							if (kind === "community") return 480;
-							if (kind === "type") return 760;
 							return 130 + 250 * Number(edge.data("pressure") ?? 0) ** 1.2;
 						},
 						name: "fcose",

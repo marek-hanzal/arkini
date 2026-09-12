@@ -229,7 +229,7 @@ describe("validateInputUnitsFn", () => {
 	it("counts only authored Space Action self costs", async () => {
 		const portal = {
 			...createItemBase("space:cumulative"),
-			type: "common" as const,
+
 			action: {
 				type: "space" as const,
 				space: 1,
@@ -319,7 +319,7 @@ describe("validateInputUnitsFn", () => {
 	it("allows a Space units requirement to unit its action owner", async () => {
 		const portal = {
 			...createItemBase("space:owner-paid"),
-			type: "common" as const,
+
 			action: {
 				type: "space" as const,
 				space: 1,

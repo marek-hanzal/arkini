@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "rlu8j1ab449tif0zotlwervi",
+		"id": "broken-toilet",
+		"title": "Broken Toilet",
+		"description": "It does not work anymore",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"broken-toilet"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

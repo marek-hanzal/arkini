@@ -4,7 +4,6 @@ import { match } from "ts-pattern";
 
 import type { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { Scrollable } from "~/ui/ui/Scrollable";
@@ -14,7 +13,6 @@ export namespace ItemInfoTab {
 	export interface Detail {
 		readonly description?: string;
 		readonly schedule?: readItemDetailScheduleFx.Schedule;
-		readonly itemType: TypeSchema.Type;
 		readonly storageScope: StorageSchema.Type;
 		readonly location?: readItemDetailInfoFn.Location;
 		readonly currentStack?: number;
@@ -88,10 +86,6 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 	const translator = useTranslator();
 	const schedule = detail.schedule;
 	const fact = [
-		{
-			label: translator.textFn("Type"),
-			value: translator.textFn(`Item type - ${detail.itemType}`),
-		},
 		...(detail.location === undefined
 			? []
 			: [
@@ -102,10 +96,7 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 				]),
 		{
 			label: translator.textFn("Storage"),
-			value:
-				detail.itemType === "inventory"
-					? translator.textFn("Item storage scope - inventory-control")
-					: translator.textFn(`Item storage scope - ${detail.storageScope}`),
+			value: translator.textFn(`Item storage scope - ${detail.storageScope}`),
 		},
 		...(detail.currentStack === undefined
 			? []

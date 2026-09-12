@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
-import type { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -13,7 +13,7 @@ import {
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
 export const createClockConfig = (
-	overrides: Omit<Partial<CommonSchema.Type>, "clock"> & {
+	overrides: Omit<Partial<ItemSchema.Type>, "clock"> & {
 		clock?: Partial<ItemScheduleSchema.Type>;
 	} = {},
 ) =>
@@ -67,7 +67,7 @@ export const createClockConfig = (
 						},
 					],
 				}),
-				type: "common",
+
 				scope: "board",
 				maxStackSize: 1,
 				maxQueueSize: 3,

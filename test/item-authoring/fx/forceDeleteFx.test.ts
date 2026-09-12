@@ -23,7 +23,7 @@ describe("forceDeleteFx", () => {
 			...createProducerItem({
 				id: "clock",
 			}),
-			type: "common",
+
 			scope: "board",
 			maxStackSize: 1,
 			clock: {
@@ -203,7 +203,7 @@ describe("forceDeleteFx", () => {
 		} = createSimpleItem("portal");
 		const portal = {
 			...portalBase,
-			type: "common" as const,
+
 			action: {
 				type: "space" as const,
 				space: 1,
@@ -314,7 +314,6 @@ describe("forceDeleteFx", () => {
 		);
 
 		expect(result.config.items.producer).toMatchObject({
-			type: "common",
 			lines: [],
 		});
 		expect(result.config.start.board).toEqual(config.start.board);

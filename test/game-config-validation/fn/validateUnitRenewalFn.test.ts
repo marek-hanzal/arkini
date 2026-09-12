@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import {
 	createOutput,
@@ -14,9 +14,9 @@ import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 
 const createFiniteItem = (id: string) =>
-	CommonSchema.parse({
+	ItemSchema.parse({
 		...createSimpleItem(id),
-		type: "common",
+
 		units: {
 			amount: 10,
 		},

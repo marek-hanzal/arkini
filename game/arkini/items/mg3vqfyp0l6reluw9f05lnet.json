@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "mg3vqfyp0l6reluw9f05lnet",
+		"id": "bed-beer",
+		"title": "Bed Beer",
+		"description": "Bleh",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bed-beer"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

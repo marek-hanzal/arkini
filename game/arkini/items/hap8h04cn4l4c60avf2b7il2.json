@@ -1,0 +1,16 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "hap8h04cn4l4c60avf2b7il2",
+		"id": "empty-sugar-beet-field",
+		"title": "Empty Sugar Beet Field",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-sugar-beet-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

@@ -1,4 +1,4 @@
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import {
 	Effect,
@@ -11,10 +11,10 @@ import {
 	readLines,
 } from "../support/readItemDetailLinesFxFixture";
 
-const readControlledOwner = (control: CommonSchema.Type["control"], remainingDurationMs = 300) => {
-	const item = CommonSchema.parse({
+const readControlledOwner = (control: ItemSchema.Type["control"], remainingDurationMs = 300) => {
+	const item = ItemSchema.parse({
 		...lineRunTestConfig.items.workshop,
-		type: "common",
+
 		scope: "board",
 		maxStackSize: 1,
 		clock: {

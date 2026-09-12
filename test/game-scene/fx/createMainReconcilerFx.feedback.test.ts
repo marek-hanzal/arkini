@@ -16,7 +16,7 @@ import {
 } from "./createMainReconcilerFx.test/fixture";
 
 describe("main reconciliation / feedback acknowledgements", () => {
-	it("retains a pending source, then fades it while bursting the Inventory receiver", () => {
+	it("retains a pending source, then fades it after direct Inventory storage", () => {
 		const now = vi.spyOn(performance, "now").mockReturnValue(1_000);
 		const source = createItem("runtime:water-source", boardLocation);
 		const inventorySpawn = createItem("runtime:water-inventory-new-id", inventoryLocation);
@@ -64,11 +64,6 @@ describe("main reconciliation / feedback acknowledgements", () => {
 				previousQuantity: source.quantity,
 				current: null,
 			},
-			inventory: {
-				itemId: "runtime:backpack",
-				revision: "revision:backpack",
-				location: boardLocation,
-			},
 		} satisfies DropItemResult;
 		Effect.runSync(
 			harness.dropPresentation.completeFx({
@@ -102,7 +97,7 @@ describe("main reconciliation / feedback acknowledgements", () => {
 				durationMs: remainingLifecycleDurationMs,
 			}),
 		);
-		expect(harness.animations).toContainEqual(
+		expect(harness.animations).not.toContainEqual(
 			expect.objectContaining({
 				actor: inventoryActor,
 				channel: "activity-particles",

@@ -72,7 +72,7 @@ describe("compileGameSourcesFx", () => {
 			}),
 		);
 		const compiled = result.config?.items[item.id];
-		if (compiled?.type !== "common") {
+		if (compiled === undefined) {
 			throw new Error("Expected compiled producer.");
 		}
 
@@ -222,7 +222,7 @@ describe("compileGameSourcesFx", () => {
 			GameSourceFileSchema.parse({
 				path: "/game/items/a.json",
 				value: {
-					$schema: "../../schema.json",
+					$schema: "../schema.json",
 					items: {},
 				},
 			}),
@@ -235,7 +235,7 @@ describe("compileGameSourcesFx", () => {
 				}),
 			]),
 		);
-		expect(result.config?.$schema).toBe("../schema.json");
+		expect(result.config?.$schema).toBe("schema.json");
 	});
 
 	it("accepts equivalent portable relative JSON Schema references", async () => {
@@ -244,9 +244,9 @@ describe("compileGameSourcesFx", () => {
 				path: "game.json",
 			}),
 			GameSourceFileSchema.parse({
-				path: "simple/a.json",
+				path: "items/a.json",
 				value: {
-					$schema: "../../schema.json",
+					$schema: "../schema.json",
 				},
 			}),
 		);
@@ -258,7 +258,7 @@ describe("compileGameSourcesFx", () => {
 				}),
 			]),
 		);
-		expect(result.config?.$schema).toBe("../schema.json");
+		expect(result.config?.$schema).toBe("schema.json");
 	});
 
 	it("completes an absent item fragment collection as empty", async () => {

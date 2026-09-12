@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "oryldez7t6fhoaa0hgxhd27l",
+		"id": "magic-sawmill",
+		"title": "Magic Sawmill",
+		"description": "Magical wood",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"magic-sawmill"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

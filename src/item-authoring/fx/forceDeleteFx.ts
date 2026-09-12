@@ -153,7 +153,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			...owner,
 		};
 		if (
-			owner.type === "common" &&
 			owner.action !== undefined &&
 			(cleanup.actionInputIndexes.size > 0 || cleanup.actionRuleIndexes.size > 0)
 		) {
@@ -167,11 +166,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 				),
 			};
 		}
-		if (
-			owner.type === "common" &&
-			owner.clock !== undefined &&
-			cleanup.actionRuleIndexes.size > 0
-		)
+		if (owner.clock !== undefined && cleanup.actionRuleIndexes.size > 0)
 			candidate.clock = {
 				...owner.clock,
 				rules: owner.clock.rules.filter(
@@ -223,7 +218,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			removedUnitOutputOwnerIds.push(ownerItemId);
 		}
 		if (cleanup.removeExpiryOutput) {
-			if (owner.type === "common" && owner.clock !== undefined)
+			if (owner.clock !== undefined)
 				candidate.clock = {
 					...(candidate.clock as typeof owner.clock),
 					onExpire: undefined,

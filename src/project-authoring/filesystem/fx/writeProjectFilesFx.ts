@@ -126,7 +126,6 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 		}
 		itemUids.add(item.uid);
 		const target = yield* paths.itemFileFx({
-			type: item.type,
 			uid: item.uid,
 		});
 		const value = {

@@ -5,8 +5,7 @@ import { filterFn } from "~/item-authoring/fn/filterFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
+import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
 import { ListRow } from "~/item-authoring/ui/ListRow";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
@@ -18,16 +17,12 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
 	draft,
-	itemType,
 	onDraftChangeFn,
-	onItemTypeChangeFn,
 	onQueryChangeFn,
 	query,
 }: {
 	readonly draft: boolean;
-	readonly itemType?: TypeSchema.Type;
 	readonly onDraftChangeFn: (draft: boolean) => void;
-	readonly onItemTypeChangeFn: (itemType: TypeSchema.Type | undefined) => void;
 	readonly onQueryChangeFn: (query: string) => void;
 	readonly query: string;
 }) => {
@@ -48,12 +43,10 @@ export const List = ({
 		() =>
 			filterFn(items, {
 				draft,
-				itemType,
 				query: settledQuery,
 			}),
 		[
 			draft,
-			itemType,
 			items,
 			settledQuery,
 		],
@@ -63,31 +56,26 @@ export const List = ({
 			filteredItems.map((item) => (
 				<ListRow
 					key={item.uid}
-					activeType={itemType}
 					item={item}
-					onSelectTypeFn={onItemTypeChangeFn}
 					projectId={project.projectId}
 				/>
 			)),
 		[
 			filteredItems,
-			itemType,
-			onItemTypeChangeFn,
 			project.projectId,
 		],
 	);
 	const newItemMenu = (
-		<ItemTypeMenu
+		<CreateItemLink
 			dataUi="EditorNewItemMenu"
 			defaultDraft={false}
-			description="Choose the item type to start authoring."
-			icon={Plus}
-			label="New item"
 			projectId={project.projectId}
-			triggerClassName={empty ? "gap-2" : "h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"}
-			types={TypeSchema.options}
+			className={empty ? "gap-2" : "h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"}
 			variant="primary"
-		/>
+		>
+			<Plus className="size-4" />
+			{translator.textFn("New item")}
+		</CreateItemLink>
 	);
 	const DraftFilterButton = draft ? PrimaryButton : Button;
 	return (
@@ -99,20 +87,9 @@ export const List = ({
 						value={query}
 						containerClassName="min-w-64 flex-1"
 						className="h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
-						placeholder={`${translator.textFn("Search item title, ID or type…")} (${filteredItems.length})`}
+						placeholder={`${translator.textFn("Search item title or ID…")} (${filteredItems.length})`}
 						onValueChangeFn={onQueryChangeFn}
 					/>
-					{itemType === undefined ? null : (
-						<button
-							type="button"
-							className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
-							data-ui="EditorItemTypeFilter"
-							onClick={() => onItemTypeChangeFn(undefined)}
-						>
-							{itemType}
-							<span>×</span>
-						</button>
-					)}
 					<DraftFilterButton
 						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
 						onClick={() => onDraftChangeFn(!draft)}

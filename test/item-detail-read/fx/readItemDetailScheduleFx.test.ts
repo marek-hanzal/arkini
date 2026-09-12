@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { CommonSchema } from "~/item-definition/schema/CommonSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import {
 	lineRunRuntime,
@@ -16,9 +16,9 @@ const readSchedule = ({
 	readonly remainingDurationMs?: number;
 	readonly enable?: boolean;
 }) => {
-	const item = CommonSchema.parse({
+	const item = ItemSchema.parse({
 		...lineRunTestConfig.items.workshop,
-		type: "common",
+
 		scope: "board",
 		maxStackSize: 1,
 		control: "interactive",

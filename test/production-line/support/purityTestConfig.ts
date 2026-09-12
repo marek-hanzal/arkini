@@ -42,7 +42,6 @@ export const purityTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "material",
 			}),
-			type: "common",
 		},
 		producer: {
 			maxQueueSize: 1,
@@ -50,7 +49,7 @@ export const purityTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "producer",
 			}),
-			type: "common",
+
 			lines: [
 				{
 					id: "line:producer:zero",
@@ -101,7 +100,7 @@ export const purityTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "craft",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 			},

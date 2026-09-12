@@ -14,8 +14,7 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 /**
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
  *
- * Ordinary activation releases the canonical Inventory item from the engine-owned physical
- * opener. Right click opens Item Detail and never initiates the release command.
+ * Ordinary activation releases the canonical Inventory item to the current Board or Toolbar. Right click opens Item Detail and never initiates the release command.
  */
 export const PixiInventorySurface = () => {
 	const game = useGameEngine();

@@ -4,7 +4,6 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileInputMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
-import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
@@ -17,7 +16,6 @@ import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";
 import { flashMotionTargetFx } from "~/tile-motion/fx/flashMotionTargetFx";
-import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
@@ -36,8 +34,6 @@ export namespace runInputMotionFx {
 		readonly onCompleteFn: () => void;
 		readonly onRemainderRevealedFn: () => void;
 		readonly readSourceSurvivesFn: () => boolean;
-		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
-		readonly origin: ActorPose;
 		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -54,82 +50,28 @@ const inputReturnCurve = {
 	kind: "spring",
 } as const;
 
-const destroyInputTransientFx = Effect.fn("destroyInputTransientFx")(function* ({
-	animator,
-	transient,
-}: {
-	readonly animator: ActorAnimator;
-	readonly transient: PixiTileActor;
-}) {
-	yield* animator.cancelActorFx(transient);
-	yield* destroyTileActorFx(transient);
-});
-
-const exitAndDestroyInputTransientFx = Effect.fn("exitAndDestroyInputTransientFx")(function* ({
-	animator,
-	onCompleteFn,
-	transient,
-}: {
-	readonly animator: ActorAnimator;
-	readonly onCompleteFn: () => void;
-	readonly transient: PixiTileActor;
-}) {
-	let settled = false;
-	const settleFn = () => {
-		if (settled) return;
-		settled = true;
-		RendererRuntime.runSync(
-			Effect.gen(function* () {
-				yield* destroyInputTransientFx({
-					animator,
-					transient,
-				});
-				onCompleteFn();
-			}),
-		);
-	};
-	yield* startActorExitFx({
-		actor: transient,
-		animator,
-		onCancelFn: settleFn,
-		onCompleteFn: settleFn,
-	});
-});
-
 const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	actorStore,
 	animator,
 	onCompleteFn,
 	source,
-	transient,
 }: {
 	readonly actorStore: MainActorStore;
 	readonly animator: ActorAnimator;
 	readonly onCompleteFn: () => void;
-	readonly source: PixiTileActor | null;
-	readonly transient: PixiTileActor;
+	readonly source: PixiTileActor;
 }) {
-	const sourceStillCanonical =
-		source !== null &&
-		source === transient &&
-		actorStore.actors.get(source.item.id) === source &&
-		actorStore.canonicalItems.has(source.item.id);
-	if (!sourceStillCanonical) {
-		yield* destroyInputTransientFx({
-			animator,
-			transient,
-		});
+	const retained = actorStore.actors.get(source.item.id) === source;
+	const canonical = actorStore.canonicalItems.has(source.item.id);
+	if (!retained || !canonical) {
+		yield* animator.cancelActorFx(source);
+		yield* destroyTileActorFx(source);
 	}
 	if (
-		source !== null &&
 		actorStore.actors.get(source.item.id) === source &&
 		!actorStore.canonicalItems.has(source.item.id)
 	) {
 		yield* actorStore.releaseActorFx(source.item.id);
-		yield* animator.cancelActorFx(source);
-		if (!source.container.destroyed) {
-			yield* actorStore.destroyExitingActorFx(source);
-		}
 	}
 	onCompleteFn();
 });
@@ -139,17 +81,17 @@ const flashInputRemainderFx = Effect.fn("flashInputRemainderFx")(function* ({
 	cueKey,
 	onCompleteFn,
 	onRemainderRevealedFn,
-	transient,
+	source,
 }: {
 	readonly animator: ActorAnimator;
 	readonly cueKey: string;
 	readonly onCompleteFn: () => void;
 	readonly onRemainderRevealedFn: () => void;
-	readonly transient: PixiTileActor;
+	readonly source: PixiTileActor;
 }) {
 	const ownerKey = `motion:${cueKey}:consume`;
 	yield* startRemainderFeedbackFx({
-		actor: transient,
+		actor: source,
 		animator,
 		onCancelFn: onCompleteFn,
 		onHiddenFx: Effect.sync(onRemainderRevealedFn),
@@ -169,7 +111,6 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	source,
 	sourceHome,
 	surface,
-	transient,
 }: {
 	readonly actorStore: MainActorStore;
 	readonly animator: ActorAnimator;
@@ -178,31 +119,21 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	readonly magneticField: MagneticField;
 	readonly isCueActiveFn: () => boolean;
 	readonly onCompleteFn: () => void;
-	readonly source: PixiTileActor | null;
+	readonly source: PixiTileActor;
 	readonly sourceHome: ActorPose;
 	readonly surface: MainSurface;
-	readonly transient: PixiTileActor;
 }) {
-	const readLiveContactPoseFn = yield* createLiveContactPoseReaderFx();
 	const magneticProjector = yield* createMagneticProjectorFx({
-		actor: transient,
+		actor: source,
 		attractedActorId: null,
 		eligibleAttractionActorIds: new Set([
-			source?.item.id ?? cue.originActorId,
+			source.item.id,
 		]),
 		magneticField,
 		surface,
 	});
-	const readLiveOriginFn = () => {
-		if (source !== null) return null;
-		return readLiveContactPoseFn({
-			actorId: cue.originActorId,
-			actors: actorStore.actors,
-			movingActor: transient,
-		});
-	};
 	yield* chaseTargetFx({
-		actor: transient,
+		actor: source,
 		animator,
 		curve: inputReturnCurve,
 		fallbackTarget: sourceHome,
@@ -214,14 +145,6 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 				Effect.gen(function* () {
 					const latestHome =
 						(yield* surface.readLocationPoseFx(cue.originLocation)) ?? sourceHome;
-					if (source === null) {
-						yield* exitAndDestroyInputTransientFx({
-							animator,
-							onCompleteFn,
-							transient,
-						});
-						return;
-					}
 					if (
 						actorStore.actors.get(cue.sourceActorId) === source &&
 						!source.container.destroyed
@@ -241,7 +164,7 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 			);
 		},
 		ownerKey: `motion:${cueKey}`,
-		readLiveTargetFn: readLiveOriginFn,
+		readLiveTargetFn: () => null,
 		surface,
 		targetLocation: cue.originLocation,
 	});
@@ -249,8 +172,8 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 
 /**
  * Delivers one complete source stack and returns only a remainder that survives canonical truth.
- * A visible source keeps one physical actor through delivery and return. Inventory-only sources
- * use a short-lived payload because their actor belongs to another surface.
+ * The source keeps one physical actor through delivery and return; missing visual identities
+ * receive target feedback without inventing an off-canvas payload.
  *
  * Several immediately committed input stores may consume one source before the oldest visual cue
  * reaches contact. An intermediate event remainder must not return as a ghost when the latest
@@ -267,8 +190,6 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	isCueActiveFn,
 	onCompleteFn,
 	onRemainderRevealedFn,
-	onPayloadCreatedFn,
-	origin,
 	readPaletteFn,
 	readSourceSurvivesFn,
 	surface,
@@ -276,70 +197,34 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	textures,
 }: runInputMotionFx.Props) {
 	const readLiveContactPoseFn = yield* createLiveContactPoseReaderFx();
-	const candidateSource = actorStore.actors.get(cue.sourceActorId);
-	const source =
-		candidateSource === undefined || candidateSource.container.destroyed
-			? null
-			: candidateSource;
-	const sourceItem = source?.item ?? cue.sourceItem;
-	if (sourceItem === undefined) {
+	const source = actorStore.actors.get(cue.sourceActorId);
+	if (source === undefined || source.container.destroyed) {
 		const targetActor = actorStore.actors.get(cue.targetActorId);
-		if (targetActor !== undefined) {
+		if (targetActor !== undefined)
 			yield* burstFeedbackParticlesFx({
 				actor: targetActor,
 				animator,
 			});
-		}
 		onCompleteFn();
 		return;
 	}
-
-	const deliveryItem = projectMotionItemFn(
-		{
-			...sourceItem,
-			id: source === null ? `motion:${cueKey}` : sourceItem.id,
-		},
-		{
-			kind: "exact",
-			quantity: cue.previousQuantity,
-		},
-	);
 	const sourceSurvivesFn = () => cue.resultingQuantity > 0 && readSourceSurvivesFn();
-	const transient =
-		source === null
-			? yield* createTileActorFx({
-					frames: application.frames,
-					item: deliveryItem,
-					palette: readPaletteFn(),
-					textures,
-				})
-			: source;
-	transient.container.eventMode = "none";
-	if (source === null) onPayloadCreatedFn(transient);
-	surface.transientActorLayer.addChild(transient.container);
+	source.container.eventMode = "none";
+	surface.transientActorLayer.addChild(source.container);
 	yield* updateTileActorFx({
-		actor: transient,
+		actor: source,
 		animator,
 		frames: application.frames,
-		item: source === null ? deliveryItem : source.item,
+		item: source.item,
 		palette: readPaletteFn(),
 		size: target.size,
 		textures,
 	});
 	yield* animator.setFx({
-		actor: transient,
+		actor: source,
 		alpha: 1,
 		channel: "lifecycle-opacity",
 	});
-	if (transient !== source) {
-		yield* animator.setFx({
-			actor: transient,
-			channel: "pose",
-			scale: origin.size / Math.max(1, transient.size),
-			x: origin.x,
-			y: origin.y,
-		});
-	}
 
 	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
 
@@ -347,11 +232,11 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		return readLiveContactPoseFn({
 			actorId: cue.targetActorId,
 			actors: actorStore.actors,
-			movingActor: transient,
+			movingActor: source,
 		});
 	};
 	const magneticProjector = yield* createMagneticProjectorFx({
-		actor: transient,
+		actor: source,
 		attractedActorId: cue.targetActorId,
 		eligibleAttractionActorIds: new Set([
 			cue.targetActorId,
@@ -360,7 +245,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		surface,
 	});
 	yield* chaseTargetFx({
-		actor: transient,
+		actor: source,
 		animator,
 		curve: inputArrivalCurve,
 		delayMs,
@@ -396,47 +281,20 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 										source,
 										sourceHome,
 										surface,
-										transient,
 									}),
 								);
 							},
+							source,
 							onRemainderRevealedFn: () => {
 								if (!isCueActiveFn()) return;
-								if (source === null) {
-									RendererRuntime.runSync(
-										updateTileActorFx({
-											actor: transient,
-											animator,
-											frames: application.frames,
-											item: projectMotionItemFn(transient.item, {
-												kind: "exact",
-												quantity: cue.resultingQuantity,
-											}),
-											palette: readPaletteFn(),
-											size: transient.size,
-											textures,
-										}),
-									);
-								}
 								onRemainderRevealedFn();
 							},
-							transient,
 						}),
 					);
 					return;
 				}
-				if (source !== null) {
-					source.container.eventMode = "static";
-					onCompleteFn();
-					return;
-				}
-				RendererRuntime.runSync(
-					exitAndDestroyInputTransientFx({
-						animator,
-						onCompleteFn,
-						transient,
-					}),
-				);
+				source.container.eventMode = "static";
+				onCompleteFn();
 				return;
 			}
 			RendererRuntime.runSync(
@@ -451,12 +309,11 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 								animator,
 								onCompleteFn,
 								source,
-								transient,
 							}),
 						);
 					};
 					yield* startActorExitFx({
-						actor: transient,
+						actor: source,
 						animator,
 						onCancelFn: settleFn,
 						onCompleteFn: settleFn,

@@ -57,11 +57,11 @@ describe("parseGameSourceFileFx", () => {
 				},
 			}),
 		).toBe(true);
-		const path = "/project/items/common/portal.json";
+		const path = "/project/items/portal.json";
 		const result = Effect.runSync(
 			parseGameSourceFileFx({
 				path,
-				relative: "items/common/portal.json",
+				relative: "items/portal.json",
 				source: JSON.stringify(document),
 			}),
 		);

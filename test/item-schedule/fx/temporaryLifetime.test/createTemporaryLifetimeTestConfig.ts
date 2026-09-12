@@ -86,7 +86,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "transformer",
 				}),
-				type: "common",
+
 				merge: [
 					{
 						target: {
@@ -106,7 +106,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "blocker",
 				}),
-				type: "common",
 			},
 			result: {
 				maxQueueSize: 1,
@@ -115,7 +114,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "result",
 				}),
-				type: "common",
 			},
 			cappedResult: {
 				maxQueueSize: 1,
@@ -125,13 +123,12 @@ export const createTemporaryLifetimeTestConfig = () =>
 					id: "cappedResult",
 					maxCount: 1,
 				}),
-				type: "common",
 			},
 			temporaryPlain: {
 				...baseItem({
 					id: "temporaryPlain",
 				}),
-				type: "common",
+
 				lines: [],
 				maxQueueSize: 1,
 				clock: {
@@ -142,7 +139,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "temporaryOutput",
 				}),
-				type: "common",
+
 				lines: [],
 				maxQueueSize: 1,
 				clock: {
@@ -156,7 +153,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "temporaryRandomOutput",
 				}),
-				type: "common",
+
 				lines: [],
 				maxQueueSize: 1,
 				clock: {
@@ -175,7 +172,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "temporaryCappedOutput",
 				}),
-				type: "common",
+
 				lines: [],
 				maxQueueSize: 1,
 				clock: {
@@ -189,7 +186,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "producer",
 				}),
-				type: "common",
+
 				maxQueueSize: 1,
 				lines: [
 					{

@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "a9ntvac0bvpmj3npntiyy3wh",
+		"id": "flax-fiber",
+		"title": "Flax Fiber",
+		"description": "Fibers everywhre",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"flax-fiber"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8
+	}
+}

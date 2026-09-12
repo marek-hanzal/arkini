@@ -15,11 +15,21 @@ beforeEach(resetPixiInventorySurfaceFixture);
 afterEach(cleanupPixiInventorySurfaceFixture);
 
 describe("PixiInventorySurface", () => {
-	it("hands an ordinary click to the exact Inventory release command", async () => {
+	it("releases an Inventory action item on click instead of activating its action", async () => {
 		const { root, scene } = await renderPixiInventorySurface();
 		const canvas = document.createElement("canvas");
 
-		await scene.onActivateFn(item, false, canvas);
+		await scene.onActivateFn(
+			{
+				...item,
+				primaryAction: {
+					kind: "open-inventory",
+					currentSpace: 0,
+				},
+			},
+			false,
+			canvas,
+		);
 
 		expect(surfaceState.release).toHaveBeenCalledWith({
 			itemId: item.id,

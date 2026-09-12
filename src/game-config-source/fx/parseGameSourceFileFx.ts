@@ -80,13 +80,11 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 				const segments = relative.split("/");
 				const expectedFilename = `${encodeGameProjectFileStemFn(item.uid)}.json`;
 				const formatError =
-					segments.length !== 3 || segments[0] !== "items"
-						? "Expected items/<type>/<encoded uid>.json."
-						: item.type !== segments[1]
-							? `Item type ${JSON.stringify(item.type)} differs from directory ${JSON.stringify(segments[1])}.`
-							: segments[2] !== expectedFilename
-								? `Item UID ${JSON.stringify(item.uid)} requires filename ${JSON.stringify(expectedFilename)}.`
-								: undefined;
+					segments.length !== 2 || segments[0] !== "items"
+						? "Expected items/<encoded uid>.json."
+						: segments[1] !== expectedFilename
+							? `Item UID ${JSON.stringify(item.uid)} requires filename ${JSON.stringify(expectedFilename)}.`
+							: undefined;
 				if (formatError !== undefined) {
 					return {
 						diagnostics: [

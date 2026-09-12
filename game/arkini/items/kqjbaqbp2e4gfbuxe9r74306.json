@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "kqjbaqbp2e4gfbuxe9r74306",
+		"id": "spoiled-cutting-board-with-raw-steak",
+		"title": "Spoiled Cutting Board With Raw Steak",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-cutting-board-with-raw-steak"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

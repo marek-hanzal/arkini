@@ -19,7 +19,6 @@ const item = {
 	},
 	scope: "board",
 	maxStackSize: 1,
-	type: "common",
 } satisfies ItemSchema.Type;
 
 const stone = {

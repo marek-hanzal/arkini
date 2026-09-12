@@ -45,7 +45,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "common",
 		},
 		limited: {
 			maxQueueSize: 1,
@@ -64,7 +63,6 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxCount: 3,
 			maxStackSize: 2,
-			type: "common",
 		},
 		board: {
 			maxQueueSize: 1,
@@ -82,7 +80,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "common",
 		},
 	},
 });

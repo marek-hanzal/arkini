@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "axpgheijxv8sypvu52ux6sxy",
+		"id": "gear-t1",
+		"title": "Gear - Tier 1",
+		"description": "Simple gear for simple machines",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"gear-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8
+	}
+}

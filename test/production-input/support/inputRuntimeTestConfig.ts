@@ -53,7 +53,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "common",
+
 			lines: [
 				{
 					id: "line:workshop:build",
@@ -90,7 +90,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "common",
 		},
 		stone: {
 			maxQueueSize: 1,
@@ -101,7 +100,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "common",
+
 			units: {
 				amount: 2,
 			},
@@ -123,7 +122,10 @@ export const inputRuntimeToolbarTestConfig = GameConfigSchema.parse({
 				maxStackSize: 1,
 				scope: "board",
 			}),
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
 		},
 	},
 });

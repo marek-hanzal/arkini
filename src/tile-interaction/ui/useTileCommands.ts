@@ -8,9 +8,9 @@ import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
 import { splitBoardItemStackFx } from "~/item-interaction/fx/splitBoardItemStackFx";
 import {
-	activateSpaceItemWithTransitionFx,
-	type activateSpaceItemFx,
-} from "~/space-action/fx/activateSpaceItemFx";
+	activateItemActionWithTransitionFx,
+	type activateItemActionFx,
+} from "~/item-action/fx/activateItemActionFx";
 
 /**
  * Binds gestures to one exact Game with an independent Promise for every submission.
@@ -31,9 +31,9 @@ export const useTileCommands = (game: PlayableGame) =>
 						Effect.catch(() => Effect.succeed(false)),
 					),
 				),
-			runSpaceActivationFn: (command: activateSpaceItemFx.Props) =>
+			runItemActionFn: (command: activateItemActionFx.Props) =>
 				RendererRuntime.runPromise(
-					game.runFx(activateSpaceItemWithTransitionFx(command)).pipe(
+					game.runFx(activateItemActionWithTransitionFx(command)).pipe(
 						Effect.map(({ transition }) => ({
 							transition,
 						})),

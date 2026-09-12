@@ -46,18 +46,16 @@ export const config = GameConfigSchema.parse({
 			lines: [],
 
 			...base("first"),
-			type: "common",
 		},
 		second: {
 			maxQueueSize: 1,
 			lines: [],
 
 			...base("second"),
-			type: "common",
 		},
 		blocked: {
 			...base("blocked"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 2,
@@ -82,7 +80,7 @@ export const config = GameConfigSchema.parse({
 		},
 		ready: {
 			...base("ready"),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 7,
@@ -93,7 +91,6 @@ export const config = GameConfigSchema.parse({
 			lines: [],
 
 			...base("permit"),
-			type: "common",
 		},
 	},
 });

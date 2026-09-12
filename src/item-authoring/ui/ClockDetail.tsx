@@ -10,7 +10,6 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 /** Presents the authored schedule independently of production lines. */
 export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
-	if (item.type !== "common") return null;
 	const clock = item.clock;
 	if (clock === undefined)
 		return (

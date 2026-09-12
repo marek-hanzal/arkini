@@ -23,7 +23,6 @@ const unitOwnerItem = {
 	units: {
 		amount: 2,
 	},
-	type: "common",
 };
 
 const payerLocation = {

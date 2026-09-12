@@ -45,7 +45,7 @@ const mergeBeforeInputConfig = GameConfigSchema.parse({
 });
 
 const workshopDefinition = inputRuntimeTestConfig.items.workshop;
-if (workshopDefinition?.type !== "common") {
+if (workshopDefinition === undefined) {
 	throw new Error("Expected workshop producer definition.");
 }
 

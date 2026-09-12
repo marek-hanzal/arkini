@@ -3,4 +3,4 @@ import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSche
 
 /** Reads the authored scheduling capability without introducing another owner registry. */
 export const readItemScheduleFn = (item: ItemSchema.Type): ItemScheduleSchema.Type | undefined =>
-	item.type === "common" ? item.clock : undefined;
+	item.clock;

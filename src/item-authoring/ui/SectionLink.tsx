@@ -1,5 +1,4 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ButtonLink } from "~/ui/ui/Button";
 import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
@@ -16,7 +15,7 @@ export const SectionLink = ({
 	defaultItemId,
 	defaultTitle,
 	destination = "form",
-	itemType,
+	create,
 	itemUid,
 	projectId,
 	resourceId,
@@ -26,7 +25,7 @@ export const SectionLink = ({
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly destination?: "detail" | "form";
-	readonly itemType?: TypeSchema.Type;
+	readonly create?: boolean;
 	readonly itemUid: string;
 	readonly projectId: string;
 	readonly resourceId?: string;
@@ -61,10 +60,10 @@ export const SectionLink = ({
 					: {
 							defaultTitle,
 						}),
-				...(itemType === undefined
+				...(create === undefined
 					? {}
 					: {
-							itemType,
+							create,
 						}),
 				...(resourceId === undefined
 					? {}

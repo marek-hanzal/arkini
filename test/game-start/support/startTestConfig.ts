@@ -25,7 +25,6 @@ const simpleItem = ({
 		},
 		scope,
 		maxStackSize,
-		type: "common",
 	} as const;
 };
 
@@ -95,7 +94,11 @@ export const startTestConfig = GameConfigSchema.parse({
 		backpack: {
 			uid: "backpack",
 			id: "backpack",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
 			asset: {

@@ -71,7 +71,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "portal",
 				scope: "board",
 			}),
-			type: "common",
+
 			action: {
 				type: "space" as const,
 				space: 1,
@@ -85,7 +85,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "origin",
 				scope: "board",
 			}),
-			type: "common",
 		},
 		log: {
 			maxQueueSize: 1,
@@ -95,7 +94,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "log",
 				maxStackSize: 3,
 			}),
-			type: "common",
 		},
 		blocker: {
 			maxQueueSize: 1,
@@ -105,7 +103,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "blocker",
 				scope: "board",
 			}),
-			type: "common",
 		},
 		mergeSource: {
 			maxQueueSize: 1,
@@ -114,7 +111,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "mergeSource",
 			}),
-			type: "common",
+
 			merge: [
 				{
 					target: {
@@ -134,7 +131,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "mergeTarget",
 				scope: "board",
 			}),
-			type: "common",
 		},
 		payer: {
 			maxQueueSize: 1,
@@ -144,7 +140,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "payer",
 				scope: "board",
 			}),
-			type: "common",
+
 			units: {
 				amount: 1,
 			},
@@ -154,7 +150,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "workshop",
 				scope: "board",
 			}),
-			type: "common",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -186,7 +182,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "unitsProducer",
 				scope: "board",
 			}),
-			type: "common",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -220,7 +216,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "worker",
 				scope: "board",
 			}),
-			type: "common",
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -243,7 +239,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "temporary",
 				scope: "board",
 			}),
-			type: "common",
+
 			lines: [],
 			maxQueueSize: 1,
 			clock: {

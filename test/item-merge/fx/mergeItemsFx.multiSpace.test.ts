@@ -44,7 +44,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "common",
+
 			merge: [
 				{
 					target: {
@@ -72,7 +72,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "common",
 		},
 	},
 });

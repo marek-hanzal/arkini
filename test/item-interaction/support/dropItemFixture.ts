@@ -34,7 +34,7 @@ export const configInput = {
 
 			uid: "water",
 			id: "water",
-			type: "common",
+
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -52,7 +52,7 @@ export const configInput = {
 
 			uid: "stone",
 			id: "stone",
-			type: "common",
+
 			title: "Stone",
 			description: "Stone",
 			asset: {
@@ -67,7 +67,11 @@ export const configInput = {
 		backpack: {
 			uid: "backpack",
 			id: "backpack",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
 			asset: {

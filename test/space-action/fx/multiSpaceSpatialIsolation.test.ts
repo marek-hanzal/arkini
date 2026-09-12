@@ -13,7 +13,7 @@ import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRun
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import {
 	boardLocation,
 	inventoryLocation,
@@ -459,7 +459,7 @@ describe("multi-space spatial isolation", () => {
 					quantity: 1,
 				});
 				const beforeNavigation = yield* readRuntimeFx();
-				yield* activateSpaceItemFx({
+				yield* activateItemActionFx({
 					currentSpace: beforeNavigation.currentSpace,
 					itemId: portal.id,
 					location: portal.location,

@@ -43,7 +43,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "common",
 		},
 	},
 });

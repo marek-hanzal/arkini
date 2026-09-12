@@ -5,7 +5,6 @@ import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobSt
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
@@ -76,7 +75,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 	});
 	if (capacity === undefined) return unavailable;
 	const lineById = new Map(
-		readLineOwnerLinesFn(lineOwner.value).map((line) => [
+		lineOwner.value.lines.map((line) => [
 			line.id,
 			line,
 		]),

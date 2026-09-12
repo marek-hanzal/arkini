@@ -1,0 +1,23 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xe74iqtksvx9rc11dtz0w7qw",
+		"id": "trade-portal",
+		"title": "Trade Portal",
+		"description": "Trader's land",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"trade-portal"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"action": {
+			"type": "space",
+			"space": 338,
+			"input": [],
+			"rules": []
+		}
+	}
+}

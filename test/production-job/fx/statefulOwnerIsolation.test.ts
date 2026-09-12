@@ -43,7 +43,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "common",
+
 			lines: [
 				{
 					id: "line:producer",
@@ -110,7 +110,6 @@ const config = GameConfigSchema.parse({
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 4,
-			type: "common",
 		},
 		blocker: {
 			maxQueueSize: 1,
@@ -128,7 +127,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "common",
 		},
 	},
 });

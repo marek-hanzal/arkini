@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "pektmrtnnwg2te0zso1ezkwc",
+		"id": "empty-oven",
+		"title": "Empty Oven",
+		"description": "Heat source",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-oven"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

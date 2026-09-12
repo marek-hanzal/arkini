@@ -568,6 +568,8 @@ Lifetime remaining:
   value: Lifetime remaining
 Line ID:
   value: Line ID
+Line count:
+  value: Line count
 Line description:
   value: Line description
 Line selection could not be changed.:
@@ -747,6 +749,8 @@ Product lines:
   value: Product lines
 Production:
   value: Production
+Production is enabled when at least one line is configured. Each line keeps its own availability rules.:
+  value: Production is enabled when at least one line is configured. Each line keeps its own availability rules.
 Production line:
   value: Production line
 Production line output empty title:

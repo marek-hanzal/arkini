@@ -45,9 +45,6 @@ const MergeFields = ({
 				<EditorFormCard>
 					<EditorCapabilityStatus
 						actionLabel={translator.textFn("Enable merges")}
-						description={translator.textFn(
-							"Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output.",
-						)}
 						icon={Combine}
 						onEnableFn={() =>
 							onChangeFn([

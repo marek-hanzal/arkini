@@ -147,9 +147,6 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					<DisabledCapabilityDetail
 						actionLabel={translator.textFn("Enable merges")}
 						capability="merges"
-						description={translator.textFn(
-							"Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output.",
-						)}
 						icon={Combine}
 						itemUid={item.uid}
 						title={translator.textFn("Item merges empty title")}

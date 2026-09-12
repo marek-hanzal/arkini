@@ -20,9 +20,6 @@ export const ActionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					icon={MousePointerClick}
 					title={translator.textFn("Item action empty title")}
 					actionLabel={translator.textFn("Enable action")}
-					description={translator.textFn(
-						"An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.",
-					)}
 				/>
 			</EditorRootCard>
 		);

@@ -20,16 +20,12 @@ Add lines to enable production. Adding a line removes the configured action. Eac
   value: Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.
 Add merge:
   value: Add merge
-Adding the first line enables production and removes the configured action. Changes take effect when you save.:
-  value: Adding the first line enables production and removes the configured action. Changes take effect when you save.
 Adds no item or units requirement. The action may start without delivering or targeting another item.:
   value: Adds no item or units requirement. The action may start without delivering or targeting another item.
 Allows the timer to run before availability rules are applied.:
   value: Allows the timer to run before availability rules are applied.
 Alternative:
   value: Alternative
-An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.:
-  value: An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.
 Any local:
   value: Any local
   dynamic: true
@@ -612,10 +608,6 @@ Merge output:
   value: Merge output
 Merges:
   value: Merges
-Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output.:
-  value: Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output.
-Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output.:
-  value: Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output.
 Missing item:
   value: Missing item
 Near:

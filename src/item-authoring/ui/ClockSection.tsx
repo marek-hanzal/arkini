@@ -131,9 +131,6 @@ export const ClockSection = () => {
 							icon={Clock}
 							title={translator.textFn("Item clock empty title")}
 							actionLabel={translator.textFn("Enable clock")}
-							description={translator.textFn(
-								"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
-							)}
 							onEnableFn={enableClockFn}
 						/>
 					</EditorFormCard>

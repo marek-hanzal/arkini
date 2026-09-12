@@ -47,7 +47,7 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 					<DisabledCapabilityDetail
 						capability="production"
 						itemUid={item.uid}
-						title={translator.textFn("Production lines are disabled")}
+						title={translator.textFn("Item production empty title")}
 						actionLabel={translator.textFn("Enable production")}
 						icon={Factory}
 						description={translator.textFn(

@@ -20,7 +20,7 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					itemUid={item.uid}
 					actionLabel={translator.textFn("Enable clock")}
 					icon={Clock}
-					title={translator.textFn("Clock is disabled")}
+					title={translator.textFn("Item clock empty title")}
 					description={translator.textFn(
 						"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
 					)}

@@ -110,34 +110,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 			</section>
 			<section
 				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-				data-ui="EditorItemUnitsDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="units"
-					title={translator.textFn("Units")}
-					description={translator.textFn(
-						"Units are the supply inside each item, independently of how many items are stacked.",
-					)}
-				/>
-				<UnitsDetail item={item} />
-			</section>
-			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-				data-ui="EditorItemClockDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="clock"
-					title={translator.textFn("Clock")}
-					description={translator.textFn(
-						"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
-					)}
-				/>
-				<ClockDetail item={item} />
-			</section>
-			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
 				data-ui="EditorItemMergesDetail"
 			>
 				<ItemDetailSectionHeader
@@ -163,6 +135,34 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					)}
 				/>
 				<ProductionSummaryDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemUnitsDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="units"
+					title={translator.textFn("Units")}
+					description={translator.textFn(
+						"Units are the supply inside each item, independently of how many items are stacked.",
+					)}
+				/>
+				<UnitsDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemClockDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="clock"
+					title={translator.textFn("Clock")}
+					description={translator.textFn(
+						"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
+					)}
+				/>
+				<ClockDetail item={item} />
 			</section>
 			<section
 				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"

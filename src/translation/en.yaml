@@ -544,8 +544,6 @@ Lifetime remaining:
   value: Lifetime remaining
 Line ID:
   value: Line ID
-Line count:
-  value: Line count
 Line description:
   value: Line description
 Line selection could not be changed.:
@@ -588,6 +586,8 @@ Merges:
   value: Merges
 Missing item:
   value: Missing item
+More entries are available.:
+  value: More entries are available.
 Near:
   value: Near
   dynamic: true
@@ -871,6 +871,8 @@ Set default:
   value: Set default
 Show:
   value: Show
+Show all:
+  value: Show all
 Simple:
   value: Simple
 Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.:

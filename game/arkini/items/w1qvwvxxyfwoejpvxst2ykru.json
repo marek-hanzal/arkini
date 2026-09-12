@@ -46,6 +46,8 @@
 				},
 				"effect": "keep"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

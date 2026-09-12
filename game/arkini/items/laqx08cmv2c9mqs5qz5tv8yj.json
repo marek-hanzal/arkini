@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "amethyst-cow"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

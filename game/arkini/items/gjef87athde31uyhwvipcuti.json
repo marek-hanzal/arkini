@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "hot-chocolate-cauldron"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

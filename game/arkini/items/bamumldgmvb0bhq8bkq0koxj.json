@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "british-shorthair-kitten-with-mouse"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

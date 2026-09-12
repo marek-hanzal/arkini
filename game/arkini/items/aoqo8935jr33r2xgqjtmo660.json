@@ -17,11 +17,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "vegetable-garden",
 				"title": "Vegetable Garden",
 				"description": "Build a new vegetable garden",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -66,8 +68,7 @@
 						}
 					]
 				},
-				"rules": [],
-				"ahead": true
+				"rules": []
 			}
 		]
 	}

@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "ash"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

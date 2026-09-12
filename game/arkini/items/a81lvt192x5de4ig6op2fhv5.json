@@ -24,6 +24,8 @@
 				"effect": "replace",
 				"result": "cotton-field"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

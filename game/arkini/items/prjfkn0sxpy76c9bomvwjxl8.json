@@ -41,6 +41,8 @@
 				"effect": "replace",
 				"result": "pillow-with-coins"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

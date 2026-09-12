@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "bed-beer"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

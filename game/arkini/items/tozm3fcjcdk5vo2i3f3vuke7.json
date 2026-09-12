@@ -58,6 +58,8 @@
 				"effect": "replace",
 				"result": "faith-cow"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

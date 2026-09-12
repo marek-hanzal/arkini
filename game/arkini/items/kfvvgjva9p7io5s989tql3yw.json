@@ -109,6 +109,8 @@
 				"effect": "replace",
 				"result": "well-fed-sarka"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

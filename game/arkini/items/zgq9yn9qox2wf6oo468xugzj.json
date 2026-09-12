@@ -15,11 +15,11 @@
 		"maxCount": 1,
 		"maxStackSize": 1,
 		"action": {
-			"type": "inventory",
 			"input": [],
-			"rules": []
+			"rules": [],
+			"type": "inventory"
 		},
-		"lines": [],
-		"maxQueueSize": 1
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

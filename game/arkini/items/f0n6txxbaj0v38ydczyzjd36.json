@@ -14,10 +14,12 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"action": {
-			"type": "space",
-			"space": 753,
 			"input": [],
-			"rules": []
-		}
+			"rules": [],
+			"type": "space",
+			"space": 753
+		},
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

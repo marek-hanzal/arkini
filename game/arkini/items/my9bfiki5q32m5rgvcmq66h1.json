@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "toilet"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

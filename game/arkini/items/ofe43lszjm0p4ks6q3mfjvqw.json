@@ -13,6 +13,7 @@
 		},
 		"scope": "any",
 		"maxStackSize": 4,
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "line:treasure-chest-t3:default",

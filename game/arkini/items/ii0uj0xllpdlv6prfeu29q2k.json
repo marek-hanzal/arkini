@@ -17,11 +17,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "magic-sawmill",
 				"title": "Magic Sawmill",
 				"description": "Better sawmill-jack",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": false,
@@ -108,8 +110,7 @@
 						],
 						"type": "enable"
 					}
-				],
-				"ahead": true
+				]
 			}
 		]
 	}

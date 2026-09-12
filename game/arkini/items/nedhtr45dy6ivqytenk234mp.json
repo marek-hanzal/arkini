@@ -13,6 +13,8 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 6
+		"maxStackSize": 6,
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

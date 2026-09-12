@@ -26,6 +26,8 @@
 				"effect": "replace",
 				"result": "leather-satchel"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

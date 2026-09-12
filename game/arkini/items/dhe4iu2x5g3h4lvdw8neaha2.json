@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "empty-cauldron"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

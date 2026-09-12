@@ -4,6 +4,7 @@
 		"uid": "i4hjvnsdb2vgk8n6fi0p2grz",
 		"id": "lumber-camp-blueprint",
 		"title": "Lumber Camp Blueprint",
+		"draft": false,
 		"description": "If you need a new one, here we go.",
 		"asset": {
 			"scale": 1,
@@ -17,11 +18,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "lumber-camp",
 				"title": "Lumber Camp",
 				"description": "Build a new lumber-camp",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -66,8 +69,7 @@
 						}
 					]
 				},
-				"rules": [],
-				"ahead": true
+				"rules": []
 			}
 		]
 	}

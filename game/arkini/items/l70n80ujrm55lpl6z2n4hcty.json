@@ -41,6 +41,8 @@
 				"effect": "replace",
 				"result": "copper-bathtub-with-bio-waste"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

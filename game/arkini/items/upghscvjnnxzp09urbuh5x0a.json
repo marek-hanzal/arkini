@@ -65,6 +65,8 @@
 				"effect": "replace",
 				"result": "sick-beagle"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

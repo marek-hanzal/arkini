@@ -40,6 +40,8 @@
 				"effect": "replace",
 				"result": "poison-jar"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

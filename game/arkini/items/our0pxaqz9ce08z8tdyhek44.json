@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "cauldron-with-boiling-beeswax"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

@@ -32,6 +32,8 @@
 				"effect": "replace",
 				"result": "beagle-puppy-with-fawn"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

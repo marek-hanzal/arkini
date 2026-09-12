@@ -16,6 +16,7 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "stone-deposit",

@@ -35,6 +35,8 @@
 				"effect": "replace",
 				"result": "corrupted-british-shorthair-full-belly"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

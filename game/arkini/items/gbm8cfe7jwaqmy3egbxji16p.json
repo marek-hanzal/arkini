@@ -53,6 +53,8 @@
 				"effect": "replace",
 				"result": "burning-oven"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

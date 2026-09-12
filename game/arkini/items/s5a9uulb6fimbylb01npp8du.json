@@ -17,11 +17,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "Cow Farm",
 				"title": "Cow Farm",
 				"description": "Wanna cows?",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -54,8 +56,7 @@
 						}
 					]
 				},
-				"rules": [],
-				"ahead": true
+				"rules": []
 			}
 		]
 	}

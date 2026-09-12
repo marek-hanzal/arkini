@@ -49,6 +49,8 @@
 				"effect": "replace",
 				"result": "hunted-game"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

@@ -232,6 +232,8 @@
 				},
 				"effect": "spend"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

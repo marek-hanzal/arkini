@@ -73,6 +73,8 @@
 				"effect": "replace",
 				"result": "sack-with-water"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

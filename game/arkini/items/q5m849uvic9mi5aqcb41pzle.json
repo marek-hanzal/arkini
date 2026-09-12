@@ -87,6 +87,8 @@
 				"effect": "replace",
 				"result": "bed-t1"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

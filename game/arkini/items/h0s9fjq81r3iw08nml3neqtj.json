@@ -4,6 +4,7 @@
 		"uid": "h0s9fjq81r3iw08nml3neqtj",
 		"id": "adventurers-guild",
 		"title": "Adventurers Guild",
+		"draft": false,
 		"asset": {
 			"scale": 1,
 			"default": [

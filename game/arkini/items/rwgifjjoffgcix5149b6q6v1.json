@@ -87,6 +87,8 @@
 				"effect": "replace",
 				"result": "oven-with-wood"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

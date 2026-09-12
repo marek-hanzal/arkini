@@ -50,6 +50,8 @@
 				"effect": "replace",
 				"result": "fertilized-cotton-field"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

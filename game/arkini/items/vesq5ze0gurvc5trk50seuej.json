@@ -12,6 +12,8 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 10
+		"maxStackSize": 10,
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

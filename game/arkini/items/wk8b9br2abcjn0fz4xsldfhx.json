@@ -55,6 +55,8 @@
 				"effect": "replace",
 				"result": "toilet-golem"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

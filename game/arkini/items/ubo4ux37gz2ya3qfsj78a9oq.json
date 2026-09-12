@@ -31,6 +31,8 @@
 				"effect": "replace",
 				"result": "broken-toilet"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

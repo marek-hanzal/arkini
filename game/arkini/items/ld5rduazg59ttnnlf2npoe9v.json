@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "corrupted-beagle-puppy-with-fawn"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

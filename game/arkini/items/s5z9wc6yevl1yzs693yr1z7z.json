@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "piggy-bank"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

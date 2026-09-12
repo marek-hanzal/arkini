@@ -64,6 +64,8 @@
 				"effect": "replace",
 				"result": "dirty-cutting-board"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

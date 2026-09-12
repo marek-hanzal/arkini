@@ -4,6 +4,7 @@
 		"uid": "gr30098zsatmrlc4vorfmjgm",
 		"id": "grain-farm-blueprint",
 		"title": "Grain Farm Blueprint",
+		"draft": false,
 		"description": "Blueprint for Grain Farm. Usual boring stuff.",
 		"asset": {
 			"scale": 1,
@@ -17,11 +18,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "grain-farm",
 				"title": "Grain Farm",
 				"description": "Soon there will be some farming simulator available...",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -66,8 +69,7 @@
 						}
 					]
 				},
-				"rules": [],
-				"ahead": true
+				"rules": []
 			}
 		]
 	}

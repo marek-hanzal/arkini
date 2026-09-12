@@ -15,10 +15,12 @@
 		"maxCount": 1,
 		"maxStackSize": 1,
 		"action": {
-			"type": "space",
-			"space": 2,
 			"input": [],
-			"rules": []
-		}
+			"rules": [],
+			"type": "space",
+			"space": 2
+		},
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

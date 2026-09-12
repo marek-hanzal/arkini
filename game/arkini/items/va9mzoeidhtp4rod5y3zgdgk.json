@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "dynamite"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

@@ -53,6 +53,8 @@
 				"effect": "replace",
 				"result": "recovering-sheep"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

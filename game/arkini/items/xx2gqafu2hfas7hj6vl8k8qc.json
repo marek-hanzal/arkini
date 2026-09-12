@@ -17,11 +17,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "well",
 				"title": "Well",
 				"description": "Build a well well.",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -66,8 +68,7 @@
 						}
 					]
 				},
-				"rules": [],
-				"ahead": true
+				"rules": []
 			}
 		]
 	}

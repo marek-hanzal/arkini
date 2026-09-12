@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "honeyed-fruit-pancake-with-cream-and-sugar"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

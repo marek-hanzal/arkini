@@ -24,6 +24,8 @@
 				"effect": "replace",
 				"result": "grape-field"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

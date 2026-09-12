@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "honeyed-fruit"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

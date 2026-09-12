@@ -330,6 +330,8 @@
 				"effect": "replace",
 				"result": "raw-chicken"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

@@ -134,6 +134,8 @@
 				"effect": "replace",
 				"result": "corrupted-british-shorthair"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

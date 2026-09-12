@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "campfire-extinguished"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

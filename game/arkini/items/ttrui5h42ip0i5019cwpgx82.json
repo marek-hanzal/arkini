@@ -23,6 +23,8 @@
 				"effect": "replace",
 				"result": "bedding"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

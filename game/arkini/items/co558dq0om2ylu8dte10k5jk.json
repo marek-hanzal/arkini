@@ -24,6 +24,8 @@
 				"effect": "replace",
 				"result": "sugar-beet-field"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

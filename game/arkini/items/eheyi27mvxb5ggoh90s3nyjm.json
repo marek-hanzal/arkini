@@ -18,11 +18,13 @@
 		"units": {
 			"amount": 1
 		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "townhall-t1",
 				"title": "Townhall I",
 				"description": "Longer wait, bigger gain!",
+				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -80,8 +82,7 @@
 						}
 					]
 				},
-				"rules": [],
-				"ahead": true
+				"rules": []
 			}
 		]
 	}

@@ -96,6 +96,8 @@
 				"effect": "replace",
 				"result": "coin-stack"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

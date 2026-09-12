@@ -104,6 +104,8 @@
 				},
 				"effect": "remove"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

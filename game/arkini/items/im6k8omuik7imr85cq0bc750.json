@@ -46,6 +46,8 @@
 				"effect": "replace",
 				"result": "soapy-scrubbing-brush"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

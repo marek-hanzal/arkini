@@ -41,6 +41,8 @@
 				"effect": "replace",
 				"result": "firewood"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

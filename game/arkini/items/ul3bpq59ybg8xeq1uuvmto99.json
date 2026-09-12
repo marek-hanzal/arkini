@@ -78,6 +78,8 @@
 				"effect": "replace",
 				"result": "oven-with-ash"
 			}
-		]
+		],
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

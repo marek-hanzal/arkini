@@ -1,5 +1,6 @@
 import { CircleCheck, CircleX, Clock, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -71,78 +72,81 @@ export const LineFields = withFieldGroupFn({
 									/>
 								)}
 							</group.AppField>
-							<div className="flex min-w-0 items-center justify-between gap-4">
-								<div className="flex min-w-0 flex-wrap items-center gap-4">
-									<group.AppField name="default">
-										{(field) => (
-											<EditorBooleanToggleBadge
-												checked={field.state.value}
-												checkedIcon={Star}
-												uncheckedIcon={StarOff}
-												label={translator.textFn("Default")}
-												description={translator.textFn(
-													"The line selected by default for manual production. Selecting this line clears Default on sibling lines.",
-												)}
-												onChangeFn={(value) =>
-													onMarkerChangeFn("default", value)
-												}
-											/>
-										)}
-									</group.AppField>
-									<group.AppField name="clock">
-										{(field) => (
-											<EditorBooleanToggleBadge
-												checked={field.state.value === true}
-												checkedIcon={Clock}
-												uncheckedIcon={Clock}
-												label={translator.textFn("Clock")}
-												description={translator.textFn(
-													"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
-												)}
-												onChangeFn={(value) =>
-													onMarkerChangeFn("clock", value)
-												}
-											/>
-										)}
-									</group.AppField>
-									<group.AppField name="show">
-										{(field) => (
-											<field.BoolToggle
-												checkedIcon={Eye}
-												description={translator.textFn(
-													"Visible lines are shown to the player before runtime rules alter their visibility.",
-												)}
-												label={translator.textFn("Visible")}
-												uncheckedIcon={EyeOff}
-											/>
-										)}
-									</group.AppField>
-									<group.AppField name="enable">
-										{(field) => (
-											<field.BoolToggle
-												checkedIcon={CircleCheck}
-												description={translator.textFn(
-													"Enabled lines can accept production jobs before runtime rules alter their availability.",
-												)}
-												label={translator.textFn("Enabled")}
-												uncheckedIcon={CircleX}
-											/>
-										)}
-									</group.AppField>
-								</div>
-								<group.AppField name="ahead">
+							<div className="flex min-w-0 flex-wrap items-center gap-4">
+								<group.AppField name="default">
+									{(field) => (
+										<EditorBooleanToggleBadge
+											checked={field.state.value}
+											checkedIcon={Star}
+											uncheckedIcon={StarOff}
+											label={translator.textFn("Default")}
+											description={translator.textFn(
+												"The line selected by default for manual production. Selecting this line clears Default on sibling lines.",
+											)}
+											onChangeFn={(value) =>
+												onMarkerChangeFn("default", value)
+											}
+										/>
+									)}
+								</group.AppField>
+								<group.AppField name="clock">
+									{(field) => (
+										<EditorBooleanToggleBadge
+											checked={field.state.value === true}
+											checkedIcon={Clock}
+											uncheckedIcon={Clock}
+											label={translator.textFn("Clock")}
+											description={translator.textFn(
+												"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
+											)}
+											onChangeFn={(value) =>
+												onMarkerChangeFn("clock", value)
+											}
+										/>
+									)}
+								</group.AppField>
+								<group.AppField name="show">
+									{(field) => (
+										<field.BoolToggle
+											checkedIcon={Eye}
+											description={translator.textFn(
+												"Visible lines are shown to the player before runtime rules alter their visibility.",
+											)}
+											label={translator.textFn("Visible")}
+											uncheckedIcon={EyeOff}
+										/>
+									)}
+								</group.AppField>
+								<group.AppField name="enable">
 									{(field) => (
 										<field.BoolToggle
 											checkedIcon={CircleCheck}
-											uncheckedIcon={CircleX}
-											label={translator.textFn("Check ahead")}
 											description={translator.textFn(
-												"Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.",
+												"Enabled lines can accept production jobs before runtime rules alter their availability.",
 											)}
+											label={translator.textFn("Enabled")}
+											uncheckedIcon={CircleX}
 										/>
 									)}
 								</group.AppField>
 							</div>
+							<group.AppField name="ahead">
+								{(field) => (
+									<EditorChoiceControl
+										required={false}
+										value={field.state.value === true ? "enable" : "disable"}
+										onChangeFn={(value) => field.handleChange(value === "enable")}
+										options={[
+											{ label: translator.textFn("Enable"), value: "enable" },
+											{ label: translator.textFn("Disable"), value: "disable" },
+										]}
+										label={translator.textFn("Check ahead")}
+										description={translator.textFn(
+											"Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.",
+										)}
+									/>
+								)}
+							</group.AppField>
 						</div>
 						<group.AppField name="description">
 							{(field) => (

@@ -35,7 +35,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				...base({
 					id: "payer",
 				}),
-				type: "deposit",
+				type: "producer",
 				charges: {
 					amount,
 				},

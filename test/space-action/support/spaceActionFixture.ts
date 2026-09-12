@@ -282,7 +282,7 @@ const config = GameConfigSchema.parse({
 		},
 		payer: {
 			...baseItem("payer", "board"),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 2,
 			},

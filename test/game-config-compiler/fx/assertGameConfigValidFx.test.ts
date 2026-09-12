@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { DepositSchema } from "~/item-definition/schema/DepositSchema";
+import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
 import {
 	createRootSource,
@@ -13,9 +13,9 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 
 describe("assertGameConfigValidFx", () => {
 	it("returns a completed config when diagnostics contain only warnings", async () => {
-		const deposit = DepositSchema.parse({
+		const deposit = SimpleSchema.parse({
 			...createSimpleItem("item:deposit"),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 1,
 			},
@@ -34,7 +34,7 @@ describe("assertGameConfigValidFx", () => {
 		expect(compilation.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+					code: DiagnosticCodeEnumSchema.enum.ChargeRenewalMissing,
 					severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				}),
 			]),

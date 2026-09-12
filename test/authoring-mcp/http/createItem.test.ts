@@ -31,10 +31,9 @@ const typeGroups = [
 		],
 	},
 	{
-		name: "creates deposit and stash item types through dedicated tools",
-		projectId: "deposit-stash-types-project",
+		name: "creates stash item type through dedicated tools",
+		projectId: "stash-types-project",
 		types: [
-			"deposit",
 			"stash",
 		],
 	},

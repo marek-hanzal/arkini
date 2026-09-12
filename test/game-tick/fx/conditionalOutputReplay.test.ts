@@ -14,14 +14,13 @@ const run = (path: OutputPath, steps: readonly number[], markerDuration = 500) =
 	const config = createConfig(path, markerDuration);
 	return Effect.runSync(
 		Effect.gen(function* () {
-			expect(
-				yield* validateGameConfigFx({
-					config,
-					provenance: {
-						items: {},
-					},
-				}),
-			).toEqual([]);
+			const diagnostics = yield* validateGameConfigFx({
+				config,
+				provenance: {
+					items: {},
+				},
+			});
+			expect(diagnostics.filter(({ severity }) => severity === "error")).toEqual([]);
 			const itemIds = [
 				"temporaryPlain",
 				path === "expiry" ? "temporaryOutput" : "producer",

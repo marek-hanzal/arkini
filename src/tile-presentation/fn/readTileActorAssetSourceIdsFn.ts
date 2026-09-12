@@ -42,7 +42,6 @@ export const readTileActorAssetSourceIdsFn = ({
 		.with(
 			{
 				type: P.union(
-					TypeSchema.enum.Deposit,
 					TypeSchema.enum.Inventory,
 					TypeSchema.enum.Producer,
 					TypeSchema.enum.Clock,

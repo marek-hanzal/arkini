@@ -24,7 +24,6 @@ const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["t
 		case "producer":
 			return palette.accent;
 		case "craft":
-		case "deposit":
 			return palette.warning;
 		case "inventory":
 		case "stash":

@@ -21,12 +21,7 @@ export const readItemLineFn = ({ item, lineId }: readItemLineFn.Props) =>
 			},
 			({ lines }) => lines.find((line) => line.id === lineId),
 		)
-		.with(
-			{
-				type: TypeSchema.enum.Deposit,
-			},
-			({ lines }) => lines?.find((line) => line.id === lineId),
-		)
+
 		.with(
 			{
 				type: P.union(

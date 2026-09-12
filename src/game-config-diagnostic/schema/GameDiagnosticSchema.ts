@@ -15,8 +15,8 @@ import { InvalidInputChargesDiagnosticSchema } from "./InvalidInputChargesDiagno
 import { IneligibleMaterialInputDiagnosticSchema } from "./IneligibleMaterialInputDiagnosticSchema";
 import { InvalidMergeDiagnosticSchema } from "./InvalidMergeDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./KeyIdMismatchDiagnosticSchema";
-import { LimitedDepositWarningDiagnosticSchema } from "./LimitedDepositWarningDiagnosticSchema";
-import { StochasticLimitedDepositWarningDiagnosticSchema } from "./StochasticLimitedDepositWarningDiagnosticSchema";
+import { MissingChargeRenewalWarningDiagnosticSchema } from "./MissingChargeRenewalWarningDiagnosticSchema";
+import { StochasticChargeRenewalWarningDiagnosticSchema } from "./StochasticChargeRenewalWarningDiagnosticSchema";
 import { MissingReferenceDiagnosticSchema } from "./MissingReferenceDiagnosticSchema";
 import { SchemaReferenceConflictDiagnosticSchema } from "./SchemaReferenceConflictDiagnosticSchema";
 import { StartInvalidDiagnosticSchema } from "./StartInvalidDiagnosticSchema";
@@ -39,8 +39,8 @@ export const GameDiagnosticSchema = z
 		IneligibleMaterialInputDiagnosticSchema,
 		InvalidMergeDiagnosticSchema,
 		UnsupportedInputCapacityDiagnosticSchema,
-		LimitedDepositWarningDiagnosticSchema,
-		StochasticLimitedDepositWarningDiagnosticSchema,
+		MissingChargeRenewalWarningDiagnosticSchema,
+		StochasticChargeRenewalWarningDiagnosticSchema,
 		StartInvalidDiagnosticSchema,
 		SourceJsonDiagnosticSchema,
 		SourceSchemaDiagnosticSchema,

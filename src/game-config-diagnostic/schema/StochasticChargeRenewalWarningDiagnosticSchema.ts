@@ -6,11 +6,11 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
-export const StochasticLimitedDepositWarningDiagnosticSchema = z
+export const StochasticChargeRenewalWarningDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
 		code: DiagnosticCodeEnumSchema.extract([
-			"DepositStochasticSoftlock",
+			"ChargeRenewalStochastic",
 		]),
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Warning",
@@ -19,14 +19,14 @@ export const StochasticLimitedDepositWarningDiagnosticSchema = z
 	})
 	.strict()
 	.meta({
-		id: "StochasticLimitedDepositWarningDiagnosticSchema",
+		id: "StochasticChargeRenewalWarningDiagnosticSchema",
 		description:
-			"A finite deposit is recreated only through probabilistic, weighted, or conditional output paths.",
+			"A charged item is recreated only through probabilistic, weighted, or conditional output paths.",
 	});
 
-export type StochasticLimitedDepositWarningDiagnosticSchema =
-	typeof StochasticLimitedDepositWarningDiagnosticSchema;
+export type StochasticChargeRenewalWarningDiagnosticSchema =
+	typeof StochasticChargeRenewalWarningDiagnosticSchema;
 
-export namespace StochasticLimitedDepositWarningDiagnosticSchema {
-	export type Type = z.infer<StochasticLimitedDepositWarningDiagnosticSchema>;
+export namespace StochasticChargeRenewalWarningDiagnosticSchema {
+	export type Type = z.infer<StochasticChargeRenewalWarningDiagnosticSchema>;
 }

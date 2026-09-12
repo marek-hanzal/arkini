@@ -165,7 +165,6 @@ describe("editor MCP authoring schema registry", () => {
 			"producer",
 			"craft",
 			"blueprint",
-			"deposit",
 			"stash",
 			"temporary",
 			"inventory",

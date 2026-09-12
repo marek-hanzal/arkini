@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import {
-	createLine,
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
@@ -80,28 +79,13 @@ const selfDepositInput = (itemId: string, cost = 1) => ({
 });
 
 describe("validateInputChargesFn", () => {
-	it("allows self distance only for a deposit line owner", async () => {
+	it("accepts self-targeted charges on a Producer and rejects the same owner without charges", async () => {
 		const producer = createProducerItem({
 			id: "producer:self",
 			input: [
 				selfDepositInput("producer:self"),
 			],
 		});
-		const deposit = {
-			...createSimpleItem("deposit:self"),
-			type: "deposit" as const,
-			charges: {
-				amount: 2,
-			},
-			lines: [
-				createLine({
-					input: [
-						selfDepositInput("deposit:self"),
-					],
-				}),
-			],
-		};
-
 		expect(
 			await chargeDiagnostics({
 				[producer.id]: producer,
@@ -109,12 +93,17 @@ describe("validateInputChargesFn", () => {
 		).toEqual([
 			expect.objectContaining({
 				ownerItemId: producer.id,
-				reason: InvalidInputChargesReasonEnumSchema.enum.DepositSelfRequiresDepositOwner,
+				reason: InvalidInputChargesReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 		expect(
 			await chargeDiagnostics({
-				[deposit.id]: deposit,
+				[producer.id]: {
+					...producer,
+					charges: {
+						amount: 2,
+					},
+				},
 			}),
 		).toEqual([]);
 	});

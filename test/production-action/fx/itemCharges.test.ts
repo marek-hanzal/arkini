@@ -14,7 +14,7 @@ import {
 } from "./itemCharges.test/fixture";
 
 describe("item charges / owner lifecycle", () => {
-	it("subtracts a self deposit charge and removes the deposit after its final job", () => {
+	it("subtracts a self-targeted Producer charge and removes the owner after its final job", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const well = yield* spawnItemFx({

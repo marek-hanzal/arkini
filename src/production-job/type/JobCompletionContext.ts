@@ -12,7 +12,6 @@ type JobCompletionItem = Extract<
 		readonly type:
 			| typeof TypeSchema.enum.Blueprint
 			| typeof TypeSchema.enum.Craft
-			| typeof TypeSchema.enum.Deposit
 			| typeof TypeSchema.enum.Clock
 			| typeof TypeSchema.enum.Producer
 			| typeof TypeSchema.enum.Stash;

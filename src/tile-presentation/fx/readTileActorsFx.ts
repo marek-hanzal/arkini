@@ -41,7 +41,6 @@ const readActivityEffectFn = ({
 			P.union(
 				TypeSchema.enum.Blueprint,
 				TypeSchema.enum.Craft,
-				TypeSchema.enum.Deposit,
 				TypeSchema.enum.Producer,
 				TypeSchema.enum.Clock,
 			),

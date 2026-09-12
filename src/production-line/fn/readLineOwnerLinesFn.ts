@@ -6,12 +6,7 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 /** Reads the canonical authored lines owned by one exact line-capable item. */
 export const readLineOwnerLinesFn = (item: narrowLineOwnerItemFn.Result) =>
 	match(item)
-		.with(
-			{
-				type: TypeSchema.enum.Deposit,
-			},
-			({ lines }) => lines,
-		)
+
 		.with(
 			{
 				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { DepositSchema } from "~/item-definition/schema/DepositSchema";
+import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import {
 	createOutput,
@@ -13,10 +13,10 @@ import {
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 
-const createDeposit = (id: string) =>
-	DepositSchema.parse({
+const createChargedItem = (id: string) =>
+	SimpleSchema.parse({
 		...createSimpleItem(id),
-		type: "deposit",
+		type: "simple",
 		charges: {
 			amount: 10,
 		},
@@ -31,7 +31,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code.startsWith("deposit:"));
+	).diagnostics.filter(({ code }) => code.startsWith("charges:"));
 
 const chanceOutput = (itemId: string, chance: number) =>
 	OutputSchema.parse({
@@ -58,9 +58,9 @@ const chanceOutput = (itemId: string, chance: number) =>
 		],
 	});
 
-describe("validateLimitedDepositsFn", () => {
-	it("warns when a finite deposit has no configured recreation path", async () => {
-		const deposit = createDeposit("item:deposit");
+describe("validateChargeRenewalFn", () => {
+	it("warns when a charged item has no configured recreation path", async () => {
+		const deposit = createChargedItem("item:deposit");
 
 		expect(
 			await diagnostics({
@@ -68,7 +68,7 @@ describe("validateLimitedDepositsFn", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+				code: DiagnosticCodeEnumSchema.enum.ChargeRenewalMissing,
 				severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				itemId: deposit.id,
 			}),
@@ -76,7 +76,7 @@ describe("validateLimitedDepositsFn", () => {
 	});
 
 	it("does not count a zero-chance output as recreation", async () => {
-		const deposit = createDeposit("item:deposit");
+		const deposit = createChargedItem("item:deposit");
 		const producer = createProducerItem({
 			id: "item:producer",
 			output: chanceOutput(deposit.id, 0),
@@ -89,13 +89,13 @@ describe("validateLimitedDepositsFn", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+				code: DiagnosticCodeEnumSchema.enum.ChargeRenewalMissing,
 			}),
 		]);
 	});
 
 	it("warns when recreation is only stochastic", async () => {
-		const deposit = createDeposit("item:deposit");
+		const deposit = createChargedItem("item:deposit");
 		const producer = createProducerItem({
 			id: "item:producer",
 			output: chanceOutput(deposit.id, 0.5),
@@ -108,13 +108,13 @@ describe("validateLimitedDepositsFn", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				code: DiagnosticCodeEnumSchema.enum.DepositStochasticSoftlock,
+				code: DiagnosticCodeEnumSchema.enum.ChargeRenewalStochastic,
 			}),
 		]);
 	});
 
 	it("accepts a guaranteed recreation path and suppresses weaker warnings", async () => {
-		const deposit = createDeposit("item:deposit");
+		const deposit = createChargedItem("item:deposit");
 		const guaranteed = createProducerItem({
 			id: "item:guaranteed",
 			output: createOutput([

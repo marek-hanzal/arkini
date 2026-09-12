@@ -15,7 +15,7 @@ const diagnosticTitles = {
 	"source:schema-invalid": "Invalid source value",
 	"input:charges-invalid": "Invalid input charge contract",
 	"merge:invalid": "Invalid merge",
-	"deposit:stochastic-softlock": "Deposit may become unavailable",
+	"charges:stochastic-renewal": "Charged item may become unavailable",
 	"input:acceptance-cycle": "Circular material acceptance",
 	"source:schema-reference-conflict": "Conflicting schema references",
 	"config:schema": "Invalid project value",
@@ -23,7 +23,7 @@ const diagnosticTitles = {
 	"line:duplicate-id": "Duplicate production line ID",
 	"line:multiple-defaults": "Multiple default production lines",
 	"config:key-id-mismatch": "Item key and ID differ",
-	"deposit:unsustainable": "Deposit cannot be recreated",
+	"charges:missing-renewal": "Charged item cannot be recreated",
 } satisfies Record<DiagnosticCodeEnumSchema.Type, string>;
 
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
@@ -40,8 +40,8 @@ const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string 
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineIds.join(" / ")}`;
 		case "item:duplicate-uid":
 			return diagnostic.itemIds.join(" / ");
-		case "deposit:stochastic-softlock":
-		case "deposit:unsustainable":
+		case "charges:stochastic-renewal":
+		case "charges:missing-renewal":
 			return diagnostic.itemId;
 		case "resource:duplicate":
 		case "resource:missing":

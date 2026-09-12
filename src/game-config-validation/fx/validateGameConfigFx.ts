@@ -12,7 +12,7 @@ import { validateInputChargesFn } from "../fn/validateInputChargesFn";
 import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
 import { validateItemUidsFn } from "../fn/validateItemUidsFn";
 import { validateMaterialInputEligibilityFn } from "../fn/validateMaterialInputEligibilityFn";
-import { validateLimitedDepositsFn } from "../fn/validateLimitedDepositsFn";
+import { validateChargeRenewalFn } from "../fn/validateChargeRenewalFn";
 import { validateLineInputCapacityFn } from "../fn/validateLineInputCapacityFn";
 import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "./validateStartStateFx";
@@ -96,7 +96,7 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			config,
 			provenance,
 		}),
-		validateLimitedDepositsFn({
+		validateChargeRenewalFn({
 			config,
 			provenance,
 		}),

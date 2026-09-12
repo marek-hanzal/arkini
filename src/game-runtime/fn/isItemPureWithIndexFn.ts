@@ -14,12 +14,7 @@ const readOwnedLinesFn = (item: RuntimeItemSchema.Type): readonly LineSchema.Typ
 			},
 			({ lines }) => lines,
 		)
-		.with(
-			{
-				type: TypeSchema.enum.Deposit,
-			},
-			({ lines }) => lines ?? [],
-		)
+
 		.with(
 			{
 				type: P.union(

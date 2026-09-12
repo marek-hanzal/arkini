@@ -9,11 +9,7 @@ export const readItemQueueSizeFn = ({ item }: { readonly item: ItemSchema.Type }
 	match(item)
 		.with(
 			{
-				type: P.union(
-					TypeSchema.enum.Deposit,
-					TypeSchema.enum.Producer,
-					TypeSchema.enum.Clock,
-				),
+				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
 			},
 			({ maxQueueSize }) => maxQueueSize,
 		)

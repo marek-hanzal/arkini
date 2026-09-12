@@ -55,7 +55,7 @@ const groups = [
 		],
 	},
 	{
-		name: "edits producer, deposit, and clock items through their dedicated tools",
+		name: "edits producer and clock items through their dedicated tools",
 		cases: [
 			[
 				"producer",
@@ -70,13 +70,6 @@ const groups = [
 					control: "interactive",
 					durationMs: null,
 					onExpire: null,
-				},
-			],
-			[
-				"deposit",
-				{
-					lines: null,
-					title: "Edited deposit",
 				},
 			],
 		],
@@ -103,13 +96,6 @@ const groups = [
 const itemId = (type: TypeSchema.Type) =>
 	`${type === "producer" ? "producer" : "item"}:edit-${type}`;
 const resourceId = editorTestPayload.resources[0]?.id ?? "missing-asset";
-const producerDraft = createDraftFn({
-	resourceId,
-	type: "producer",
-	uid: "uid:deposit-line-source",
-});
-if (producerDraft.type !== "producer") throw new Error("Expected a producer draft.");
-
 const types = groups.flatMap(({ cases }) => cases.map(([type]) => type));
 const seededConfig = GameConfigSchema.parse({
 	...editorTestPayload.config,
@@ -133,14 +119,9 @@ const seededConfig = GameConfigSchema.parse({
 						description: `Existing ${type} item.`,
 						id,
 						title: `Original ${type}`,
-						...(type === "producer" || type === "deposit"
+						...(type === "producer"
 							? {
 									maxQueueSize: 4,
-								}
-							: {}),
-						...(type === "deposit"
-							? {
-									lines: producerDraft.lines,
 								}
 							: {}),
 					},
@@ -215,19 +196,13 @@ describe.sequential("editor MCP typed item editing", () => {
 			expect(project.config.items[itemId("producer")]).toMatchObject({
 				maxQueueSize: 4,
 			});
-		if (cases.some(([type]) => type === "deposit"))
-			expect(project.config.items[itemId("deposit")]).toMatchObject({
-				maxQueueSize: 4,
-			});
 		expect(project.revision).toBeGreaterThan(revisionBefore);
 		revision = project.revision;
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length);
 
 		const rejectedTypes = cases
 			.map(([type]) => type)
-			.filter(
-				(type): type is "producer" | "deposit" => type === "producer" || type === "deposit",
-			);
+			.filter((type): type is "producer" => type === "producer");
 		for (const type of rejectedTypes) {
 			const rejected = await client.callTool({
 				name: `edit_${type}_item`,

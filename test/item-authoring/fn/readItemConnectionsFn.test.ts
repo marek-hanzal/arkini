@@ -107,16 +107,6 @@ describe("readItemConnectionsFn", () => {
 						line,
 					],
 				},
-				deposit: {
-					...common,
-					id: "deposit",
-					uid: "deposit",
-					title: "deposit",
-					type: "deposit",
-					lines: [
-						line,
-					],
-				},
 				blueprint: {
 					...common,
 					id: "blueprint",
@@ -176,7 +166,6 @@ describe("readItemConnectionsFn", () => {
 
 		for (const ownerItemId of [
 			"producer",
-			"deposit",
 			"blueprint",
 			"craft",
 			"stash",

@@ -6,7 +6,6 @@ import { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";
-import { DepositSchema } from "~/item-definition/schema/DepositSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
 import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
@@ -35,7 +34,6 @@ const createItemInputSchemaIds = {
 	clock: "urn:arkini:schema:mcp:create-clock-item-input",
 	craft: "urn:arkini:schema:mcp:create-craft-item-input",
 	blueprint: "urn:arkini:schema:mcp:create-blueprint-item-input",
-	deposit: "urn:arkini:schema:mcp:create-deposit-item-input",
 	stash: "urn:arkini:schema:mcp:create-stash-item-input",
 	temporary: "urn:arkini:schema:mcp:create-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:create-inventory-item-input",
@@ -193,29 +191,6 @@ export const CreateItemInputSchemas = {
 			$id: createItemInputSchemaIds.blueprint,
 			title: "Create blueprint item tool input",
 			description: "Authoring fields accepted when creating one blueprint item.",
-		}),
-	deposit: DepositSchema.omit({
-		asset: true,
-		lines: true,
-		maxQueueSize: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			scope: draftScope,
-			maxStackSize: draftMaxStackSize,
-			maxQueueSize: draftMaxQueueSize,
-			lines: DepositSchema.shape.lines.optional(),
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.deposit,
-			$id: createItemInputSchemaIds.deposit,
-			title: "Create deposit item tool input",
-			description: "Authoring fields accepted when creating one deposit item.",
 		}),
 	stash: StashSchema.omit({
 		asset: true,

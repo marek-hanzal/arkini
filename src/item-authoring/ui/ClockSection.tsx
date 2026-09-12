@@ -21,7 +21,7 @@ const ClockFields = () => {
 			data-ui="EditorClockFields"
 		>
 			<EditorFormCard>
-				<div className="grid w-1/2 gap-4">
+				<div className="grid grid-cols-2 gap-4">
 					<form.AppField name="clock.intervalMs">
 						{(field) => (
 							<field.SecondsField

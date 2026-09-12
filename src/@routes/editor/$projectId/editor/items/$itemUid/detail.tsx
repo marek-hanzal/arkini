@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
 import { Detail } from "~/item-authoring/ui/Detail";
-import type { SectionId } from "~/item-authoring/type/Section";
+import type { DetailSectionId } from "~/item-authoring/type/Section";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail")({
 	component: () => {
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		});
 		const sectionId = (
 			typeof params.sectionId === "string" ? params.sectionId : "identity"
-		) as SectionId;
+		) as DetailSectionId;
 		return (
 			<Detail
 				sectionId={sectionId}

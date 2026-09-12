@@ -6,13 +6,13 @@ import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
-import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
+import { type SectionId } from "~/item-authoring/type/Section";
 import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
 	beforeLoad: ({ params }) => {
-		if (SectionIds.some((section) => section === params.sectionId)) return;
+		if (readSectionsFn("form").some((section) => section.id === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
 			params: {
@@ -26,19 +26,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const section = sectionId as SectionId;
-		const available = readSectionsFn("form").some((candidate) => candidate.id === section);
-		if (!available)
-			return (
-				<section
-					className="grid gap-2 py-8 text-center"
-					data-ui="EditorItemSectionUnavailable"
-				>
-					<h2 className="text-lg font-semibold">Section unavailable</h2>
-					<p className="text-sm text-muted">
-						This item type does not use the {section} section.
-					</p>
-				</section>
-			);
 		switch (section) {
 			case "identity":
 				return <IdentitySection />;

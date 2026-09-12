@@ -1,3 +1,5 @@
+import { Trash2 } from "lucide-react";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import type { ReactNode } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -19,6 +21,7 @@ interface EditorNamedValueControlProps extends EditorValueControlProps {
 }
 
 interface EditorNumericControlProps extends EditorNamedValueControlProps {
+	readonly clearLabel?: string;
 	readonly children?: ReactNode;
 	readonly max?: number;
 	readonly min?: number;
@@ -66,6 +69,7 @@ const EditorValueField = ({
 );
 
 const EditorNumericControl = ({
+	clearLabel,
 	children,
 	description,
 	error,
@@ -85,23 +89,38 @@ const EditorNumericControl = ({
 		label={label}
 		required={required}
 	>
-		<input
-			type="number"
-			name={name}
-			value={Number.isNaN(value) ? "" : value}
-			className={editorInputClassName}
-			max={max}
-			min={min}
-			step={step}
-			onBlur={onBlurFn}
-			onChange={(event) => onChangeFn(event.currentTarget.valueAsNumber)}
-			{...readDataUiFn({
-				dataUi: "EditorNumericControlInput",
-				state: {
-					invalid: error !== undefined,
-				},
-			})}
-		/>
+		<div className="flex min-w-0 items-center gap-3">
+			<input
+				type="number"
+				name={name}
+				value={Number.isNaN(value) ? "" : value}
+				className={`${editorInputClassName} min-w-0 flex-1`}
+				max={max}
+				min={min}
+				step={step}
+				onBlur={onBlurFn}
+				onChange={(event) => onChangeFn(event.currentTarget.valueAsNumber)}
+				{...readDataUiFn({
+					dataUi: "EditorNumericControlInput",
+					state: {
+						invalid: error !== undefined,
+					},
+				})}
+			/>
+			{clearLabel === undefined ? null : (
+				<LinkButton
+					title={clearLabel}
+					disabled={Number.isNaN(value)}
+					className="inline-flex h-[var(--ak-control-min-height)] shrink-0 items-center"
+					onClick={(event) => {
+						event.preventDefault();
+						onChangeFn(Number.NaN);
+					}}
+				>
+					<Trash2 className="size-4" />
+				</LinkButton>
+			)}
+		</div>
 		{children}
 	</EditorValueField>
 );
@@ -215,6 +234,7 @@ export const EditorSecondsControl = ({
 	step = 0.001,
 	...props
 }: {
+	readonly clearLabel?: string;
 	readonly max?: number;
 	readonly min?: number;
 	readonly step?: number;

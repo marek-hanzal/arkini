@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, useMatchRoute, useSearch } from "@tanstack/react-router";
 
+import { EditorAssetSectionHelp } from "~/asset-authoring/ui/EditorAssetSectionHelp";
 import { EditorAssetDetail } from "~/asset-authoring/ui/EditorAssetDetail";
 
 const FlatAssetDetailRoutes = [
@@ -28,8 +29,26 @@ export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/deta
 					to,
 				}) !== false,
 		);
+		const section =
+			(
+				[
+					"usage",
+					"technical",
+					"notes",
+					"delete",
+				] as const
+			).find(
+				(section) =>
+					matchRouteFn({
+						to: `/editor/$projectId/assets/$resourceId/detail/${section}`,
+						params: detailParams,
+						pending: false,
+						includeSearch: false,
+					}) !== false,
+			) ?? "overview";
 		return (
 			<EditorAssetDetail
+				help={EditorAssetSectionHelp[section]}
 				contentVariant={flatContentActive ? "flat" : "card"}
 				filter={search.filter ?? "all"}
 				query={search.query ?? ""}

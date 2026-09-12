@@ -3,7 +3,13 @@ import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { ProjectSectionHelp } from "~/project-authoring/ui/ProjectSectionHelp";
+import { Tx } from "~/translation/ui/Tx";
+import {
+	EditorSectionNavigation,
+	EditorSectionNavigationSeparator,
+} from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
@@ -26,6 +32,8 @@ export const ProjectDetail = ({
 				<EditorSectionNavigation
 					action={
 						<div className="flex items-center gap-4">
+							<EditorPageHelp {...ProjectSectionHelp[sectionId]} />
+							<EditorSectionNavigationSeparator />
 							<ProjectSourceExport projectId={project.projectId} />
 							<PrimaryButtonLink
 								ref={editActionRef}
@@ -37,7 +45,7 @@ export const ProjectDetail = ({
 								}}
 							>
 								<Pencil className="size-4" />
-								Edit
+								<Tx label="Edit" />
 							</PrimaryButtonLink>
 						</div>
 					}

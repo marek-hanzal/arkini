@@ -22,6 +22,7 @@ vi.mock("~/asset-authoring/ui/useEditorAssetEditController", () => ({
 		projectId: "project",
 		resourceFound: true,
 		saveFn: vi.fn().mockResolvedValue(true),
+		discardFn: vi.fn().mockResolvedValue(undefined),
 		saving: false,
 		setFileFn: vi.fn(),
 		setNextIdFn: vi.fn(),
@@ -33,6 +34,7 @@ vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 }));
 
 vi.mock("~/authoring-shell/ui/EditorSectionNavigation", () => ({
+	EditorSectionNavigationSeparator: () => null,
 	EditorSectionNavigation: ({ action }: { readonly action?: ReactNode }) => action,
 }));
 
@@ -50,6 +52,7 @@ vi.mock("~/editor-control/ui/EditorFormContent", () => ({
 	EditorFormContent: ({ children }: { readonly children?: ReactNode }) => children,
 }));
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 import { EditorAssetEdit } from "~/asset-authoring/ui/EditorAssetEdit";
 
 (
@@ -82,11 +85,15 @@ describe("EditorAssetEdit", () => {
 
 		await act(async () =>
 			root.render(
-				createElement(EditorAssetEdit, {
-					filter: "all",
-					query: "",
-					resourceId: "hero",
-				}),
+				createElement(
+					TranslationTestProvider,
+					null,
+					createElement(EditorAssetEdit, {
+						filter: "all",
+						query: "",
+						resourceId: "hero",
+					}),
+				),
 			),
 		);
 
@@ -117,11 +124,15 @@ describe("EditorAssetEdit", () => {
 
 		await act(async () =>
 			root.render(
-				createElement(EditorAssetEdit, {
-					filter: "all",
-					query: "",
-					resourceId: "hero",
-				}),
+				createElement(
+					TranslationTestProvider,
+					null,
+					createElement(EditorAssetEdit, {
+						filter: "all",
+						query: "",
+						resourceId: "hero",
+					}),
+				),
 			),
 		);
 		expect(createObjectUrl).toHaveBeenCalledWith(state.file);

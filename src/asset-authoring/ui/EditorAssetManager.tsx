@@ -1,3 +1,5 @@
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { Mx } from "~/translation/ui/Mx";
 import { FloatingPortal } from "@floating-ui/react";
 import {
 	BadgeCheck,
@@ -413,6 +415,10 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						</Button>
 					)}
 					{controller.catalogState === "empty" ? null : importButton}
+					<EditorPageHelp
+						title={translator.textFn("Assets")}
+						content={<Mx label="Asset catalog help" />}
+					/>
 				</header>
 			}
 			scrollRestorationId="editor-asset-list"

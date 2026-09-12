@@ -1,16 +1,17 @@
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 
 export const ProjectGeneralSection = () => {
 	const { form } = useProjectFormSession();
+	const translator = useTranslator();
 	return (
-		<EditorFormSection title="General">
+		<>
 			<EditorFormCard>
 				<form.AppField name="title">
-					{(field) => <field.TextField label="Title" />}
+					{(field) => <field.TextField label={translator.textFn("Title")} />}
 				</form.AppField>
 			</EditorFormCard>
-		</EditorFormSection>
+		</>
 	);
 };

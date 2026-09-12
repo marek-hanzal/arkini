@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { ArrowUpRight, BatteryCharging, Combine } from "lucide-react";
@@ -33,6 +34,9 @@ export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 			<EditorRootCard dataUi="EditorItemUnitsCard">
 				<DetailFact
 					label={translator.textFn("Initial units")}
+					description={translator.textFn(
+						"Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.",
+					)}
 					value={item.units.amount}
 				/>
 			</EditorRootCard>
@@ -40,6 +44,9 @@ export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				<OutputDetail
 					emptyLabel={translator.textFn("No depletion output configured.")}
 					output={item.units.output}
+					description={translator.textFn(
+						"Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.",
+					)}
 					title={translator.textFn("Depletion output")}
 				/>
 			</EditorRootCard>
@@ -74,64 +81,95 @@ const MergeDetail = ({
 					className="group inline-flex min-h-0 w-fit max-w-full flex-none items-center justify-start gap-1.5 rounded-none border-0 bg-transparent p-0 text-left text-[inherit] font-[inherit] decoration-accent/55 underline-offset-4 shadow-none hover:border-transparent hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
 					data-ui="EditorItemMergeDetailEditLink"
 				>
-					Merge {index + 1}
+					<Tx label="Merge" /> {index + 1}
 					<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 				</ButtonLink>
 			</h3>
 			<DetailFacts>
 				<DetailFact
-					label="Target"
+					label={translator.textFn("Target")}
+					description={translator.textFn(
+						"The receiving item must match this selector for the merge to apply.",
+					)}
 					value={<SelectorDetail selector={merge.target} />}
 				/>
 				<DetailFact
-					label="Source action"
-					value={merge.action === "spend" ? translator.textFn("Spend") : merge.action}
+					label={translator.textFn("Source action")}
+					description={translator.textFn(
+						"Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.",
+					)}
+					value={translator.textFn(
+						merge.action === "spend"
+							? "Spend"
+							: merge.action === "use"
+								? "Use"
+								: "Consume",
+					)}
 				/>
 				<DetailFact
-					label="Target effect"
-					value={merge.effect === "spend" ? translator.textFn("Spend") : merge.effect}
+					label={translator.textFn("Target effect")}
+					description={translator.textFn(
+						"Keep leaves the receiving item unchanged, Remove takes one item from its stack, Spend removes one unit, and Replace swaps one item for the configured result.",
+					)}
+					value={translator.textFn(
+						merge.effect === "spend"
+							? "Spend"
+							: merge.effect === "keep"
+								? "Keep"
+								: merge.effect === "remove"
+									? "Remove"
+									: "Replace",
+					)}
 				/>
 				{"result" in merge ? (
 					<DetailFact
-						label="Replacement item"
+						label={translator.textFn("Replacement item")}
 						value={<DetailReference itemId={merge.result} />}
 					/>
 				) : null}
 			</DetailFacts>
 			<OutputDetail
-				emptyLabel="No extra output configured."
+				emptyLabel={translator.textFn("No extra output configured.")}
 				output={merge.output}
-				title="Extra output"
+				title={translator.textFn("Extra output")}
+				description={translator.textFn(
+					"Optional output resolved after the source action and target effect complete.",
+				)}
 			/>
 		</EditorRootCard>
 	);
 };
 
 /** Presents authored merge interactions or their explicit disabled state. */
-export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
-	<div className="grid gap-[var(--ak-viewport-gap)]">
-		{item.merge === undefined || item.merge.length === 0 ? (
-			<EditorRootCard dataUi="EditorItemMergesDisabledCard">
-				<DisabledCapabilityDetail
-					actionLabel="Enable merges"
-					capability="merges"
-					description="Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output."
-					icon={Combine}
-					itemUid={item.uid}
-					title="Merges are disabled"
-				/>
-			</EditorRootCard>
-		) : (
-			<div className="grid gap-3">
-				{item.merge.map((merge, index) => (
-					<MergeDetail
-						key={`${merge.effect}-${index}`}
-						index={index}
+export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+	const translator = useTranslator();
+	return (
+		<div className="grid gap-[var(--ak-viewport-gap)]">
+			{item.merge === undefined || item.merge.length === 0 ? (
+				<EditorRootCard dataUi="EditorItemMergesDisabledCard">
+					<DisabledCapabilityDetail
+						actionLabel={translator.textFn("Enable merges")}
+						capability="merges"
+						description={translator.textFn(
+							"Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output.",
+						)}
+						icon={Combine}
 						itemUid={item.uid}
-						merge={merge}
+						title={translator.textFn("Merges are disabled")}
 					/>
-				))}
-			</div>
-		)}
-	</div>
-);
+				</EditorRootCard>
+			) : (
+				<div className="grid gap-3">
+					{item.merge.map((merge, index) => (
+						<MergeDetail
+							key={`${merge.effect}-${index}`}
+							index={index}
+							itemUid={item.uid}
+							merge={merge}
+						/>
+					))}
+				</div>
+			)}
+		</div>
+	);
+};

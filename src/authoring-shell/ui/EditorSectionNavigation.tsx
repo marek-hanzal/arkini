@@ -27,7 +27,7 @@ export const EditorSectionNavigation = ({
 		{leading}
 		{tabs === undefined ? null : (
 			<div
-				className="min-w-0 shrink-0"
+				className="min-w-0 max-w-full"
 				data-ui="EditorSectionNavigationTabs"
 			>
 				{tabs}

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { createFormHook } from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
 
@@ -16,7 +17,7 @@ import { AssetAutocompleteField } from "~/authoring-form/ui/AssetAutocompleteFie
 
 interface EditorTextFieldProps {
 	readonly autoComplete?: string;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
 	readonly placeholder?: string;
 	readonly readOnly?: boolean;
@@ -48,7 +49,7 @@ const EditorTextField = ({
 };
 
 interface EditorTextAreaFieldProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly fill?: boolean;
 	readonly label: string;
 	readonly optional?: boolean;
@@ -84,7 +85,7 @@ const EditorTextAreaField = ({
 };
 
 interface EditorNumberFieldProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
 	readonly max?: number;
 	readonly min?: number;
@@ -129,7 +130,8 @@ const EditorNumberField = ({
 };
 
 interface EditorSecondsFieldProps {
-	readonly description?: string;
+	readonly clearLabel?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
 	readonly min?: number;
 	readonly optional?: boolean;
@@ -137,6 +139,7 @@ interface EditorSecondsFieldProps {
 }
 
 const EditorSecondsField = ({
+	clearLabel,
 	description,
 	label,
 	min = 0,
@@ -148,6 +151,7 @@ const EditorSecondsField = ({
 	const seconds = (field.state.value ?? Number.NaN) / 1_000;
 	return (
 		<EditorSecondsControl
+			clearLabel={clearLabel}
 			description={description}
 			error={error}
 			label={label}
@@ -169,7 +173,7 @@ const EditorSecondsField = ({
 };
 
 interface EditorChoiceFieldProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
 	readonly options: ReadonlyArray<{
 		readonly label: string;

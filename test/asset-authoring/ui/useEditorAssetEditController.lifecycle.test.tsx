@@ -282,3 +282,34 @@ it.each([
 	}
 	expect(state.navigate).not.toHaveBeenCalled();
 });
+
+it("discards the asset draft before navigating without persisting a rename or image", async () => {
+	const editor = await mountEditor();
+	await act(async () => {
+		editor.read().setNextIdFn("renamed-hero");
+		editor.read().setFileFn(
+			new File([], "replacement.png", {
+				type: "image/png",
+			}),
+		);
+	});
+	expect(editor.read().dirty).toBe(true);
+	await act(async () => editor.read().discardFn());
+	expect(editor.read().dirty).toBe(false);
+	expect(editor.read().nextId).toBe("hero");
+	expect(editor.read().file).toBeUndefined();
+	expect(state.session.isDirtyFn()).toBe(false);
+	expect(state.replaceResource).not.toHaveBeenCalled();
+	expect(state.navigate).toHaveBeenCalledWith({
+		to: "/editor/$projectId/assets/$resourceId/detail/overview",
+		params: {
+			projectId: "project",
+			resourceId: "hero",
+		},
+		search: {
+			filter: "all",
+			query: "",
+		},
+		replace: true,
+	});
+});

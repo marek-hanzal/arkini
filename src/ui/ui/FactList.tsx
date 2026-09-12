@@ -18,11 +18,13 @@ export const FactList = ({
 export const Fact = ({
 	dataUi,
 	label,
+	labelSuffix,
 	mono = false,
 	value,
 }: {
 	readonly dataUi?: string;
 	readonly label: string;
+	readonly labelSuffix?: ReactNode;
 	readonly mono?: boolean;
 	readonly value: ReactNode;
 }) => (
@@ -31,7 +33,10 @@ export const Fact = ({
 		data-ui={dataUi}
 		data-label={label}
 	>
-		<dt className="text-xs font-medium uppercase tracking-[0.08em] text-muted">{label}</dt>
+		<dt className="flex items-center gap-1 text-xs font-medium uppercase tracking-[0.08em] text-muted">
+			{label}
+			{labelSuffix}
+		</dt>
 		<dd
 			className={`min-w-0 text-pretty text-sm font-medium leading-snug text-foreground ${
 				mono ? "break-all font-mono" : ""

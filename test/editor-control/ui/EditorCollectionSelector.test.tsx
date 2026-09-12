@@ -65,7 +65,7 @@ describe("EditorCollectionSelector", () => {
 		const option = document.querySelector('[data-ui="EditorSearchComboboxOption"]');
 		expect(option?.textContent).toBe("Output set 1 — Spoiled Rum Barrel");
 	});
-	it("clears a related-term selection and allows selecting another authored entry", async () => {
+	it("keeps one selected entry while searching related terms and switching entries", async () => {
 		vi.useFakeTimers();
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -75,9 +75,6 @@ describe("EditorCollectionSelector", () => {
 			root.render(
 				<EditorCollectionSelector
 					count={2}
-					initialSelectedIndex={null}
-					clearSelectionLabel="Clear filter"
-					unselectedContent={<div data-ui="AllLines">All lines</div>}
 					itemLabelFn={(index) =>
 						[
 							"Workshop",
@@ -99,8 +96,8 @@ describe("EditorCollectionSelector", () => {
 		});
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (input === null) throw new Error("Expected collection search input.");
-		expect(input.value).toBe("");
-		expect(container.querySelector('[data-ui="AllLines"]')).not.toBeNull();
+		expect(input.value).toBe("Workshop");
+		expect(container.querySelector('[data-ui="SelectedLine"]')?.textContent).toBe("0");
 		await act(async () => input.click());
 		await changeInput(input, "copper");
 		await act(async () => vi.advanceTimersByTime(250));
@@ -111,13 +108,6 @@ describe("EditorCollectionSelector", () => {
 		await act(async () => option.click());
 		expect(container.querySelector('[data-ui="SelectedLine"]')?.textContent).toBe("1");
 		expect(container.querySelectorAll('[data-ui="SelectedLine"]')).toHaveLength(1);
-		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear filter"]');
-		if (clear === null) throw new Error("Expected clear filter button.");
-		await act(async () => clear.click());
-		expect(input.value).toBe("");
-		expect(container.querySelector('[data-ui="SelectedLine"]')).toBeNull();
-		expect(container.querySelector('[data-ui="AllLines"]')).not.toBeNull();
-		expect(clear.disabled).toBe(true);
 
 		await act(async () => input.click());
 		await act(async () => vi.advanceTimersByTime(250));
@@ -127,7 +117,6 @@ describe("EditorCollectionSelector", () => {
 		expect(options).toHaveLength(2);
 		await act(async () => options[0].click());
 		expect(container.querySelector('[data-ui="SelectedLine"]')?.textContent).toBe("0");
-		expect(container.querySelector('[data-ui="AllLines"]')).toBeNull();
-		expect(clear.disabled).toBe(false);
+		expect(container.querySelectorAll('[data-ui="SelectedLine"]')).toHaveLength(1);
 	});
 });

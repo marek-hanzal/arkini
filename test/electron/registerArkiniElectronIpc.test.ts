@@ -54,4 +54,35 @@ describe("registerArkiniElectronIpcFx authorization", () => {
 		}
 		expect(harness.writeClipboardText).toHaveBeenCalledTimes(1);
 	});
+
+	it("waits for native clipboard settlement and propagates a rejected write", async () => {
+		const harness = await createRegisteredIpcHarness();
+		let rejectWriteFn!: (error: Error) => void;
+		const write = new Promise<void>((_resolve, reject) => {
+			rejectWriteFn = reject;
+		});
+		harness.writeClipboardText.mockReturnValueOnce(write);
+		let settled = false;
+		const result = Promise.resolve(
+			harness.invoke(
+				ArkiniElectronApi.channels.clipboardWriteText,
+				harness.trustedEvent,
+				"clipboard text",
+			),
+		);
+		const rejection = expect(result).rejects.toThrow("Clipboard unavailable");
+		void result.then(
+			() => {
+				settled = true;
+			},
+			() => {
+				settled = true;
+			},
+		);
+		await new Promise<void>((resolve) => setImmediate(resolve));
+		expect(harness.writeClipboardText).toHaveBeenCalledOnce();
+		expect(settled).toBe(false);
+		rejectWriteFn(new Error("Clipboard unavailable"));
+		await rejection;
+	});
 });

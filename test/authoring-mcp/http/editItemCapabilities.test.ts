@@ -71,7 +71,9 @@ beforeAll(async () => {
 
 afterAll(cleanupMcpHarnesses);
 
-describe.sequential("editor MCP optional item capabilities", () => {
+describe("editor MCP optional item capabilities", {
+	concurrent: false,
+}, () => {
 	it("retains the clock when its final production line is explicitly removed", async () => {
 		const edited = await client.callTool({
 			name: "edit_item",

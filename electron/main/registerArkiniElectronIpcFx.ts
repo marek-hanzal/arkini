@@ -116,15 +116,15 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(ArkiniElectronApi.channels.clipboardWriteText, (event, candidate) =>
 					runAuthorizedFn(
 						event,
-						Effect.try({
-							try: () => {
+						Effect.tryPromise({
+							try: async () => {
 								if (
 									typeof candidate !== "string" ||
 									candidate.length > maxClipboardTextLength
 								) {
 									throw new Error("Clipboard text is invalid or too large.");
 								}
-								clipboard.writeText(candidate);
+								await clipboard.writeText(candidate);
 							},
 							catch: (cause) => cause,
 						}),

@@ -14,7 +14,7 @@ const runArkpackVerifyFx = Effect.fn("runArkpackVerifyFx")(function* (arkpackPat
 export const ArkpackVerifyCommand = Command.make(
 	"verify",
 	{
-		arkpack: Argument.file("arkpack"),
+		arkpack: Argument.File("arkpack"),
 	},
 	({ arkpack }) => runArkpackVerifyFx(arkpack),
 ).pipe(Command.withDescription("Offline-classify one Arkpack as Official or Community."));

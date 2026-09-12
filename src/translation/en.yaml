@@ -122,8 +122,6 @@ Check ahead:
   value: Check ahead
 Choose a different Project ID.:
   value: Choose a different Project ID.
-Clear filter:
-  value: Clear filter
 Clear interval:
   value: Clear interval
 Clear lifetime:
@@ -216,8 +214,6 @@ Dropping this item onto a matching target applies its source action, target effe
   value: Dropping this item onto a matching target applies its source action, target effect and optional output.
 Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.:
   value: Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.
-Each line owns its inputs, outputs, runtime and rules. Manual and Clock requests share the same queue.:
-  value: Each line owns its inputs, outputs, runtime and rules. Manual and Clock requests share the same queue.
 Edit:
   value: Edit
 Edit asset:
@@ -638,6 +634,8 @@ No output:
   value: No output
 No output configured.:
   value: No output configured.
+No outputs:
+  value: No outputs
 No rules:
   value: No rules
 No saved project or item currently references this asset.:
@@ -743,8 +741,6 @@ Production line:
   value: Production line
 Production line output empty title:
   value: Create items when this production line completes.
-Production lines:
-  value: Production lines
 Project:
   value: Project
 Project ID:

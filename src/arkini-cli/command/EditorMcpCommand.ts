@@ -92,8 +92,8 @@ const runEditorMcpFx = Effect.fn("runEditorMcpFx")(function* ({
 export const EditorMcpCommand = Command.make(
 	"mcp",
 	{
-		projectId: Argument.string("projectId"),
-		remote: Flag.boolean("remote").pipe(
+		projectId: Argument.String("projectId"),
+		remote: Flag.Boolean("remote").pipe(
 			Flag.withDefault(false),
 			Flag.withDescription("Also start the configured ngrok Remote MCP tunnel."),
 		),

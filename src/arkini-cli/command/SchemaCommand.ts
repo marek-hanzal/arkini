@@ -27,7 +27,7 @@ export const SchemaCommand = ({ output }: SchemaCommand.Props) =>
 	Command.make(
 		"schema",
 		{
-			output: Flag.string("output").pipe(
+			output: Flag.String("output").pipe(
 				Flag.withDefault(output),
 				Flag.withDescription("Destination where the generated JSON Schema is written."),
 			),

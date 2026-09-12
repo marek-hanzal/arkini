@@ -14,6 +14,9 @@ const ClockFields = () => {
 	const translator = useTranslator();
 	const { form } = useFormSession();
 	const clock = useStore(form.store, (state) => state.values.clock);
+	const rulesDescription = translator.textFn(
+		"These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.",
+	);
 	if (clock === undefined) return null;
 	return (
 		<div
@@ -21,7 +24,7 @@ const ClockFields = () => {
 			data-ui="EditorClockFields"
 		>
 			<EditorFormCard>
-				<div className="grid grid-cols-2 gap-4">
+				<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-4">
 					<form.AppField name="clock.intervalMs">
 						{(field) => (
 							<field.SecondsField
@@ -50,7 +53,7 @@ const ClockFields = () => {
 							/>
 						)}
 					</form.AppField>
-					<div className="w-fit">
+					<div className="w-fit pt-6">
 						<form.AppField name="clock.enable">
 							{(field) => (
 								<field.BoolToggle
@@ -66,19 +69,22 @@ const ClockFields = () => {
 					</div>
 				</div>
 			</EditorFormCard>
+			<EditorFormSectionDivider
+				title={translator.textFn("Rules")}
+				description={rulesDescription}
+			/>
 			<EditorFormCard>
 				<form.Subscribe selector={(state) => state.values.clock?.rules ?? []}>
 					{(rules) => (
 						<RulesControl
+							headerVisible={false}
 							rules={rules}
 							target="action"
 							allowedTypes={[
 								"enable",
 								"disable",
 							]}
-							description={translator.textFn(
-								"These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.",
-							)}
+							description={rulesDescription}
 							onChangeFn={(next) =>
 								form.setFieldValue("clock.rules", next as RuleSchema.Type[])
 							}

@@ -1,19 +1,109 @@
+import { ArrowRight } from "lucide-react";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** Identifies a selectable line and its independent manual and automatic roles. */
+/** Keeps authored order and deduplicates references independently on each side. */
+const readItemSidesFn = (line: LineSchema.Type) => {
+	const inputs = new Set<string>();
+	const outputs = new Set<string>();
+	for (const input of line.input) {
+		switch (input.type) {
+			case "materials":
+				inputs.add(input.selector.itemId);
+				break;
+			case "units":
+				inputs.add(input.query.selector.itemId);
+				break;
+			case "simple":
+				break;
+		}
+	}
+	for (const rule of line.rules)
+		for (const when of rule.when) inputs.add(when.query.selector.itemId);
+	for (const set of line.output?.set ?? []) {
+		for (const roll of set.roll) {
+			const drops =
+				roll.type === "weight" ? roll.drop.flatMap((entry) => entry.drop) : roll.drop;
+			for (const drop of drops) outputs.add(drop.itemId);
+			for (const drop of drops)
+				for (const rule of drop.rules)
+					for (const when of rule.when) outputs.add(when.query.selector.itemId);
+		}
+	}
+	return {
+		inputs: [
+			...inputs,
+		],
+		outputs: [
+			...outputs,
+		],
+	};
+};
+
+const ItemImages = ({
+	ids,
+	items,
+	emptyLabel,
+}: {
+	readonly ids: readonly string[];
+	readonly items: GameConfigSchema.Type["items"];
+	readonly emptyLabel: string;
+}) =>
+	ids.length === 0 ? (
+		<span className="text-xs text-subtle">({emptyLabel})</span>
+	) : (
+		<span className="flex flex-wrap items-center gap-1">
+			{ids.map((id) => (
+				<EditorItemThumbnail
+					key={id}
+					className="size-8! rounded-md"
+					resourceIds={
+						items[id]?.asset.default ?? [
+							"",
+						]
+					}
+				/>
+			))}
+		</span>
+	);
+
+/** Identifies a line and previews its authored input/rule and output references. */
 export const ProductionLineOption = ({
 	line,
 	label,
+	items,
 }: {
 	readonly line: LineSchema.Type;
 	readonly label: string;
-}) => (
-	<span
-		className="flex min-w-0 flex-1 items-center gap-2"
-		data-ui="EditorProductionLineOption"
-	>
-		<span className="truncate text-sm font-semibold text-foreground">{label}</span>
-		<ProductionLineBadges line={line} />
-	</span>
-);
+	readonly items: GameConfigSchema.Type["items"];
+}) => {
+	const translator = useTranslator();
+	const { inputs, outputs } = readItemSidesFn(line);
+	return (
+		<span
+			className="grid min-w-0 flex-1 gap-1.5"
+			data-ui="EditorProductionLineOption"
+		>
+			<span className="flex min-w-0 items-center gap-2">
+				<span className="truncate text-sm font-semibold text-foreground">{label}</span>
+				<ProductionLineBadges line={line} />
+			</span>
+			<span className="flex min-w-0 items-center gap-2">
+				<ItemImages
+					ids={inputs}
+					items={items}
+					emptyLabel={translator.textFn("No inputs")}
+				/>
+				<ArrowRight className="size-3.5 shrink-0 text-subtle" />
+				<ItemImages
+					ids={outputs}
+					items={items}
+					emptyLabel={translator.textFn("No outputs")}
+				/>
+			</span>
+		</span>
+	);
+};

@@ -104,6 +104,12 @@ export const MergeDetail = ({
 								: "Consume",
 					)}
 				/>
+				{"result" in merge ? (
+					<DetailFact
+						label={translator.textFn("Replacement item")}
+						value={<DetailReference itemId={merge.result} />}
+					/>
+				) : null}
 				<DetailFact
 					label={translator.textFn("Target effect")}
 					description={translator.textFn(
@@ -119,12 +125,6 @@ export const MergeDetail = ({
 									: "Replace",
 					)}
 				/>
-				{"result" in merge ? (
-					<DetailFact
-						label={translator.textFn("Replacement item")}
-						value={<DetailReference itemId={merge.result} />}
-					/>
-				) : null}
 			</DetailFacts>
 			<OutputDetail
 				emptyLabel={translator.textFn("No extra output configured.")}

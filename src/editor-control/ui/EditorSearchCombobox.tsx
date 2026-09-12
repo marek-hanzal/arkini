@@ -111,7 +111,7 @@ export const EditorSearchCombobox = ({
 				padding: 8,
 				apply: ({ availableHeight, elements, rects }) => {
 					elements.floating.style.width = `${rects.reference.width}px`;
-					elements.floating.style.maxHeight = `${Math.min(288, availableHeight)}px`;
+					elements.floating.style.maxHeight = `${Math.min(560, availableHeight)}px`;
 				},
 			}),
 		],

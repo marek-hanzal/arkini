@@ -7,7 +7,7 @@ const electronHarness = vi.hoisted(() => {
 	const setBackgroundColor = vi.fn();
 	const requestWindowMode = vi.fn();
 	const openPath = vi.fn(() => Promise.resolve(""));
-	const writeClipboardText = vi.fn();
+	const writeClipboardText = vi.fn(() => Promise.resolve());
 	const preferredSystemLanguages = {
 		value: [
 			"cs-CZ",

@@ -69,15 +69,15 @@ const runDiagnosticsSliceFx = Effect.fn("runDiagnosticsSliceFx")(function* ({
 export const DiagnosticsSliceCommand = Command.make(
 	"slice",
 	{
-		input: Argument.path("input"),
+		input: Argument.Path("input"),
 		sessionId: Flag.optional(
-			Flag.string("session-id").pipe(
+			Flag.String("session-id").pipe(
 				Flag.withDescription(
 					"Exact JSONL session ID; defaults to the latest failed session.",
 				),
 			),
 		),
-		section: Flag.string("section").pipe(
+		section: Flag.String("section").pipe(
 			Flag.withDefault("all"),
 			Flag.withDescription("Text section: all, summary, failure, history, or runtime."),
 		),

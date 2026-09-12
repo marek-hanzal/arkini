@@ -6,7 +6,6 @@ import { Factory } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
-import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -19,30 +18,14 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 			className="grid gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorItemProductionDetail"
 		>
-			<ItemDetailSectionHeader
-				itemUid={item.uid}
-				sectionId="production"
-				title={translator.textFn("Production lines")}
-				description={translator.textFn(
-					"Each line owns its inputs, outputs, runtime and rules. Manual and Clock requests share the same queue.",
-				)}
-			/>
 			{item.lines.length > 0 ? (
 				<EditorCollectionSelector
 					key={item.uid}
 					count={item.lines.length}
-					initialSelectedIndex={null}
-					clearSelectionLabel={translator.textFn("Clear filter")}
-					unselectedContent={item.lines.map((line) => (
-						<ProductionLineDetail
-							key={line.id}
-							itemUid={item.uid}
-							line={line}
-						/>
-					))}
 					itemLabelFn={(index) => item.lines[index].title}
 					renderItemContentFn={(index, label) => (
 						<ProductionLineOption
+							items={project.config.items}
 							line={item.lines[index]}
 							label={label}
 						/>

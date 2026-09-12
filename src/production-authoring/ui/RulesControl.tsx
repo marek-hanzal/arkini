@@ -423,12 +423,14 @@ const RuleControl = ({
 export const RulesControl = ({
 	allowedTypes,
 	description,
+	headerVisible = true,
 	onChangeFn,
 	rules,
 	target,
 }: {
 	readonly allowedTypes: ReadonlyArray<RuleType>;
 	readonly description: string;
+	readonly headerVisible?: boolean;
 	readonly onChangeFn: (rules: RuleValue[]) => void;
 	readonly rules: ReadonlyArray<RuleValue>;
 	readonly target: RuleTarget;
@@ -454,11 +456,13 @@ export const RulesControl = ({
 		}) as LineRuleSchema.Type;
 	return (
 		<section className="grid gap-3">
-			<EditorFormSectionDivider
-				description={description}
-				title="Rules"
-				variant="secondary"
-			/>
+			{headerVisible ? (
+				<EditorFormSectionDivider
+					description={description}
+					title="Rules"
+					variant="secondary"
+				/>
+			) : null}
 			<EditorCollectionSelector
 				addLabel="Add rule"
 				count={rules.length}

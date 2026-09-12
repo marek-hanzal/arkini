@@ -237,20 +237,20 @@ export const ReplayCommand = Command.make(
 	"replay",
 	{
 		incident: Flag.optional(
-			Flag.directory("incident").pipe(
+			Flag.Directory("incident").pipe(
 				Flag.withDescription(
 					"Latest incident directory containing game.arkpack and save.arksave.",
 				),
 			),
 		),
 		arkpack: Flag.optional(
-			Flag.file("arkpack").pipe(Flag.withDescription("Exact Arkpack to replay.")),
+			Flag.File("arkpack").pipe(Flag.withDescription("Exact Arkpack to replay.")),
 		),
-		save: Flag.optional(Flag.file("save").pipe(Flag.withDescription("Exact save to replay."))),
-		untilFatal: Flag.boolean("until-fatal").pipe(
+		save: Flag.optional(Flag.File("save").pipe(Flag.withDescription("Exact save to replay."))),
+		untilFatal: Flag.Boolean("until-fatal").pipe(
 			Flag.withDescription("Run until the session fails or the bounded timeout expires."),
 		),
-		timeoutMs: Flag.integer("timeout-ms").pipe(
+		timeoutMs: Flag.Int("timeout-ms").pipe(
 			Flag.withDefault(10_000),
 			Flag.withDescription("Maximum replay duration in milliseconds."),
 		),

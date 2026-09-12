@@ -1,3 +1,4 @@
+import { MergeOption } from "~/item-authoring/ui/MergeOption";
 import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -69,6 +70,13 @@ const MergeFields = ({
 								translator.textFn("No item selected"),
 							)}`;
 						}}
+						renderItemContentFn={(index, label) => (
+							<MergeOption
+								label={label}
+								merge={merges[index]}
+								target={targetItems[merges[index].target.itemId]}
+							/>
+						)}
 						itemSearchTermsFn={(index) => [
 							merges[index].target.itemId,
 							merges[index].action,

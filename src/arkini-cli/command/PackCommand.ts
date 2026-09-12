@@ -55,7 +55,7 @@ export const PackCommand = ({ input, name = "pack" }: PackCommand.Props) =>
 	Command.make(
 		name,
 		{
-			input: Argument.directory("input").pipe(Argument.withDefault(input)),
+			input: Argument.Directory("input").pipe(Argument.withDefault(input)),
 		},
 		({ input }) =>
 			runPackCommandFx({

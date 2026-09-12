@@ -9,33 +9,28 @@ interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
 	readonly children: (activeIndex: number) => ReactNode;
 	readonly count: number;
-	readonly clearSelectionLabel?: string;
-	readonly unselectedContent?: ReactNode;
 	readonly dataUi?: string;
 	readonly itemLabelFn: (index: number) => string;
 	readonly itemMetaFn?: (index: number) => string | undefined;
 	readonly itemRelatedSearchTermsFn?: (index: number) => ReadonlyArray<string>;
 	readonly itemSearchTermsFn?: (index: number) => ReadonlyArray<string>;
-	readonly initialSelectedIndex?: number | null;
+	readonly initialSelectedIndex?: number;
 	readonly label: string;
 	readonly navigationCard?: boolean;
 	readonly navigationHeader?: ReactNode;
 	readonly onAddFn?: () => void;
 	readonly onRemoveFn?: (activeIndex: number) => void;
-	readonly onSelectedIndexChangeFn?: (index: number | null) => void;
 	readonly removeLabel?: string;
 	readonly renderItemContentFn?: (index: number, label: string) => ReactNode;
 	readonly renderItemPreviewFn?: (index: number) => ReactNode;
-	readonly selectedIndex?: number | null;
+	readonly selectedIndex?: number;
 }
 
-/** Shows the selected collection item, with optional clearing to caller-owned content. */
+/** Shows exactly one selected collection item when the collection is nonempty. */
 export const EditorCollectionSelector = ({
 	addLabel = "Add item",
 	children,
 	count,
-	clearSelectionLabel,
-	unselectedContent,
 	dataUi = "EditorCollectionSelector",
 	itemLabelFn,
 	itemMetaFn,
@@ -47,22 +42,14 @@ export const EditorCollectionSelector = ({
 	navigationHeader,
 	onAddFn,
 	onRemoveFn,
-	onSelectedIndexChangeFn,
 	removeLabel = "Remove item",
 	renderItemContentFn,
 	renderItemPreviewFn,
 	selectedIndex,
 }: EditorCollectionSelectorProps) => {
-	const [internalSelectedIndex, setInternalSelectedIndexFn] = useState<number | null>(
-		initialSelectedIndex,
-	);
+	const [internalSelectedIndex, selectIndexFn] = useState(initialSelectedIndex);
 	const requestedIndex = selectedIndex === undefined ? internalSelectedIndex : selectedIndex;
-	const selectIndexFn = (index: number | null) => {
-		setInternalSelectedIndexFn(index);
-		onSelectedIndexChangeFn?.(index);
-	};
-	const activeIndex =
-		count === 0 || requestedIndex === null ? undefined : Math.min(requestedIndex, count - 1);
+	const activeIndex = count === 0 ? undefined : Math.min(requestedIndex, count - 1);
 	const navigation = (
 		<>
 			{navigationHeader}
@@ -115,16 +102,6 @@ export const EditorCollectionSelector = ({
 					/>
 				</div>
 				<div className="flex shrink-0 items-center gap-2">
-					{clearSelectionLabel === undefined ? null : (
-						<Button
-							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
-							title={clearSelectionLabel}
-							disabled={activeIndex === undefined}
-							onClick={() => selectIndexFn(null)}
-						>
-							<Trash2 className="size-4" />
-						</Button>
-					)}
 					{onAddFn === undefined ? null : (
 						<Button
 							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
@@ -159,9 +136,7 @@ export const EditorCollectionSelector = ({
 			data-ui={dataUi}
 		>
 			{navigationCard ? <EditorFormCard>{navigation}</EditorFormCard> : navigation}
-			{activeIndex === undefined ? (
-				unselectedContent
-			) : (
+			{activeIndex === undefined ? null : (
 				<div key={activeIndex}>{children(activeIndex)}</div>
 			)}
 		</section>

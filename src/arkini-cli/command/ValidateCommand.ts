@@ -27,7 +27,7 @@ export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 	Command.make(
 		"validate",
 		{
-			input: Argument.directory("input").pipe(Argument.withDefault(input)),
+			input: Argument.Directory("input").pipe(Argument.withDefault(input)),
 		},
 		({ input }) =>
 			runValidateCommandFx({

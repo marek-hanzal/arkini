@@ -101,6 +101,7 @@ const ProductionFields = withFieldGroupFn({
 									}}
 									renderItemContentFn={(index, label) => (
 										<ProductionLineOption
+											items={project.config.items}
 											line={lines[index]}
 											label={label}
 										/>

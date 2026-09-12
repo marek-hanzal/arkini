@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
+import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
+import { setItemScheduleRunningFx } from "~/item-schedule/fx/setItemScheduleRunningFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
@@ -153,4 +155,89 @@ it("does not age a Clock created by a job completion until the next simulation b
 	expect(
 		result.items.find((item) => item.id !== "runtime:clock")?.schedule?.remainingIntervalMs,
 	).toBe(1000);
+});
+
+it("runs a manually chosen line ahead of the next pulse without shifting cadence, including manual production while paused", () => {
+	const config = createClockConfig({
+		intervalMs: 500,
+		durationMs: 2000,
+		maxQueueSize: 2,
+		lines: [
+			{
+				...createLine({
+					id: "automatic",
+					default: true,
+				}),
+				runtimeMs: 100,
+			},
+			{
+				...createLine({
+					id: "manual",
+				}),
+				runtimeMs: 700,
+			},
+		],
+	});
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const owner = yield* spawnClockItemFx();
+			const before = yield* tickClockFx(100);
+			yield* enqueueLineFx({
+				ownerItemId: owner.id,
+				lineId: "manual",
+			});
+			const admitted = yield* readRuntimeFx();
+			const pulse = yield* tickClockFx(400);
+			yield* setItemScheduleRunningFx({
+				ownerItemId: owner.id,
+				running: false,
+			});
+			const paused = yield* readRuntimeFx();
+			const drained = yield* tickClockFx(400);
+			yield* enqueueLineFx({
+				ownerItemId: owner.id,
+				lineId: "manual",
+			});
+			const manualWhilePaused = yield* tickClockFx(100);
+			return {
+				before,
+				admitted,
+				pulse,
+				paused,
+				drained,
+				manualWhilePaused,
+			};
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+	expect(result.admitted.items[0].schedule).toEqual(result.before.items[0].schedule);
+	expect(result.admitted.jobQueue.map((request) => request.lineId)).toEqual([
+		"manual",
+	]);
+	expect(result.pulse.jobs).toMatchObject([
+		{
+			lineId: "manual",
+			remainingMs: 300,
+		},
+	]);
+	expect(result.pulse.jobQueue.map((request) => request.lineId)).toEqual([
+		"automatic",
+	]);
+	expect(result.pulse.items[0].schedule).toMatchObject({
+		remainingIntervalMs: 500,
+		remainingDurationMs: 1500,
+	});
+	expect(result.drained.jobs).toHaveLength(0);
+	expect(result.drained.jobQueue).toHaveLength(0);
+	expect(result.drained.items[0].schedule).toEqual(result.paused.items[0].schedule);
+	expect(result.manualWhilePaused.jobs).toMatchObject([
+		{
+			lineId: "manual",
+			remainingMs: 600,
+		},
+	]);
+	expect(result.manualWhilePaused.items[0].schedule).toEqual(result.paused.items[0].schedule);
 });

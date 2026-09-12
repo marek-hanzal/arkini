@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { projectAuthoredOutputFn } from "~/production-output/fn/projectAuthoredOutputFn";
@@ -42,7 +43,7 @@ export const OutputDetail = ({
 }: {
 	readonly emptyLabel?: string;
 	readonly output?: OutputSchema.Type;
-	readonly title?: string;
+	readonly title?: ReactNode;
 	readonly description?: string;
 }) => {
 	const project = useEditorProject();

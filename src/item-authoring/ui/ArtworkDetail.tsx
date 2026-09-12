@@ -8,12 +8,8 @@ import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLin
 export const ArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
-		<div className="grid gap-6">
-			<DetailFact
-				label={translator.textFn("Base tile scale")}
-				value={item.asset.scale}
-			/>
-			<div className="flex items-center gap-5">
+		<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-6">
+			<div className="flex min-w-0 items-center gap-5">
 				<ArtworkTilePreview
 					resourceIds={item.asset.default}
 					scale={item.asset.scale}
@@ -31,6 +27,12 @@ export const ArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					))}
 				</ol>
 			</div>
+			<dl>
+				<DetailFact
+					label={translator.textFn("Base tile scale")}
+					value={item.asset.scale}
+				/>
+			</dl>
 		</div>
 	);
 };

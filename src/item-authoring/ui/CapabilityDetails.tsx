@@ -138,7 +138,7 @@ const MergeDetail = ({
 	);
 };
 
-/** Shows two authored merge interactions with access to the complete merge editor. */
+/** Shows the first authored merge interaction with access to the complete merge editor. */
 export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
@@ -156,7 +156,7 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				</EditorRootCard>
 			) : (
 				<div className="grid gap-3">
-					{item.merge.slice(0, 2).map((merge, index) => (
+					{item.merge.slice(0, 1).map((merge, index) => (
 						<MergeDetail
 							key={`${merge.effect}-${index}`}
 							index={index}
@@ -164,7 +164,7 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 							merge={merge}
 						/>
 					))}
-					{item.merge.length > 2 ? (
+					{item.merge.length > 1 ? (
 						<EditorRootCard dataUi="EditorItemMergesMoreCard">
 							<div className="flex items-center justify-between gap-4 text-sm">
 								<p className="text-muted">

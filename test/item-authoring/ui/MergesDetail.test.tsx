@@ -105,14 +105,6 @@ describe("MergesDetail", () => {
 						type: "item",
 					},
 				},
-				{
-					action: "consume",
-					effect: "remove",
-					target: {
-						itemId: "water",
-						type: "item",
-					},
-				},
 			],
 		};
 		const container = document.createElement("div");
@@ -129,7 +121,7 @@ describe("MergesDetail", () => {
 				'[data-ui="EditorItemMergeDetailEditLink"]',
 			),
 		);
-		expect(links).toHaveLength(2);
+		expect(links).toHaveLength(1);
 		const more = container.querySelector<HTMLAnchorElement>(
 			'[data-ui="EditorItemMergesMoreCard"] a',
 		);

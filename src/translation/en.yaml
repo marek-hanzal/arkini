@@ -192,6 +192,10 @@ Dimensions:
   value: Dimensions
 Disable:
   value: Disable
+Disable removes all merge interactions from this item.:
+  value: Disable removes all merge interactions from this item.
+Disable removes all production lines from this item.:
+  value: Disable removes all production lines from this item.
 Disable removes the unit supply and depletion output from this item.:
   value: Disable removes the unit supply and depletion output from this item.
 Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.:
@@ -588,6 +592,8 @@ Merge output:
   value: Merge output
 Merges:
   value: Merges
+Merges configured:
+  value: Merges configured
 Missing item:
   value: Missing item
 More entries are available.:
@@ -729,6 +735,8 @@ Product lines:
   value: Product lines
 Production:
   value: Production
+Production configured:
+  value: Production configured
 Production is enabled when at least one line is configured. Each line keeps its own availability rules.:
   value: Production is enabled when at least one line is configured. Each line keeps its own availability rules.
 Production line:

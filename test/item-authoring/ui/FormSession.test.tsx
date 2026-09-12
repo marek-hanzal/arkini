@@ -108,6 +108,7 @@ import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { ClockSection } from "~/item-authoring/ui/ClockSection";
+import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
@@ -913,6 +914,76 @@ describe("item section form session", () => {
 			}),
 		);
 	});
+
+	it.each([
+		"merges",
+		"production",
+	] as const)(
+		"disables all %s only in the draft until Save and preserves the other capabilities",
+		async (capability) => {
+			const configured = ItemSchema.parse({
+				...item,
+				scope: "board",
+				maxQueueSize: 4,
+				clock: {
+					intervalMs: 1500,
+					durationMs: 2000,
+				},
+				lines: [
+					createLine({
+						id: "line:first",
+					}),
+					createLine({
+						id: "line:second",
+					}),
+				],
+				merge: [
+					{
+						action: "consume",
+						effect: "keep",
+						target: {
+							type: "item",
+							itemId: item.id,
+						},
+					},
+					{
+						action: "use",
+						effect: "remove",
+						target: {
+							type: "item",
+							itemId: item.id,
+						},
+					},
+				],
+			});
+			state.persisted = configured;
+			(state.project as Project).config.items[item.id] = configured;
+			const { container } = await render(
+				capability === "merges" ? <MergesSection /> : <ProductionSection />,
+			);
+			const disable = [
+				...container.querySelectorAll("button"),
+			].findLast((button) => button.textContent === "Disable");
+			if (disable === undefined) throw new Error("Missing disable capability control.");
+			await act(async () => disable.click());
+			expect(state.saveItem).not.toHaveBeenCalled();
+			expect(state.persisted).toBe(configured);
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			expect(state.saveItem).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					item: expect.objectContaining({
+						id: configured.id,
+						maxQueueSize: configured.maxQueueSize,
+						clock: configured.clock,
+						lines: capability === "production" ? [] : configured.lines,
+						merge: capability === "merges" ? undefined : configured.merge,
+					}),
+				}),
+			);
+		},
+	);
 
 	it("adds production to a passive Common through the ordinary line editor", async () => {
 		const { container } = await render(<ProductionSection />);

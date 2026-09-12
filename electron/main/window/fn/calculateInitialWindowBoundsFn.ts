@@ -1,6 +1,6 @@
 import type { Rectangle } from "electron";
 
-const WINDOW_SCALE = 0.75;
+const WINDOW_SCALE = 0.85;
 const MAXIMUM_MIN_WIDTH = 480;
 const MAXIMUM_MIN_HEIGHT = 360;
 

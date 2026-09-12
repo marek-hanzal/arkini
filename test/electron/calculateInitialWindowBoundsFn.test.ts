@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { calculateInitialWindowBoundsFn } from "~electron/main/window/fn/calculateInitialWindowBoundsFn";
 
 describe("calculateInitialWindowBoundsFn", () => {
-	it("centers a window at three quarters of the active display work area", () => {
+	it("centers a window at eighty-five percent of the active display work area", () => {
 		expect(
 			calculateInitialWindowBoundsFn({
 				x: 100,
@@ -11,10 +11,10 @@ describe("calculateInitialWindowBoundsFn", () => {
 				height: 1000,
 			}),
 		).toEqual({
-			x: 300,
-			y: 175,
-			width: 1200,
-			height: 750,
+			x: 220,
+			y: 125,
+			width: 1360,
+			height: 850,
 			minWidth: 480,
 			minHeight: 360,
 		});
@@ -29,12 +29,12 @@ describe("calculateInitialWindowBoundsFn", () => {
 				height: 240,
 			}),
 		).toEqual({
-			x: 40,
-			y: 30,
-			width: 240,
-			height: 180,
-			minWidth: 240,
-			minHeight: 180,
+			x: 24,
+			y: 18,
+			width: 272,
+			height: 204,
+			minWidth: 272,
+			minHeight: 204,
 		});
 	});
 });

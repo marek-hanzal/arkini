@@ -42,12 +42,18 @@ export const config = GameConfigSchema.parse({
 	},
 	items: {
 		first: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("first"),
-			type: "simple",
+			type: "common",
 		},
 		second: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("second"),
-			type: "simple",
+			type: "common",
 		},
 		blocked: {
 			...base("blocked"),
@@ -77,8 +83,11 @@ export const config = GameConfigSchema.parse({
 			space: 7,
 		},
 		permit: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("permit"),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

@@ -21,17 +21,14 @@ const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["t
 	switch (type) {
 		case "blueprint":
 		case "clock":
-		case "producer":
 			return palette.accent;
-		case "craft":
+		case "common":
 			return palette.warning;
 		case "inventory":
-		case "stash":
 			return palette.info;
 		case "missing":
 		case "temporary":
 			return palette.danger;
-		case "simple":
 		case "space":
 			return palette.lineStrong;
 	}

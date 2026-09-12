@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ecihjakbzjlagfsrswt4cdji",
+		"id": "toilet",
+		"title": "Toilet",
+		"description": "Universal bio remover",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"toilet"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

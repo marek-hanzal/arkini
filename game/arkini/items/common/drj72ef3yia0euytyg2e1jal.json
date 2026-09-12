@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "drj72ef3yia0euytyg2e1jal",
+		"id": "oven-with-ash",
+		"title": "Oven With Ash",
+		"description": "It's done",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"oven-with-ash"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

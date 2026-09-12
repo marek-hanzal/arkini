@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "np1l0eoz4og6il6t5bzy8n76",
+		"id": "spoiled-rum-barrel",
+		"title": "Spoiled Rum Barrel",
+		"description": "Ages ago, it was a nice barrel",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-rum-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

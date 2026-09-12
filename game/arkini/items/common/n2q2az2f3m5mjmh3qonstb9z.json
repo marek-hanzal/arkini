@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "n2q2az2f3m5mjmh3qonstb9z",
+		"id": "dirty-clay-jug",
+		"title": "Dirty Clay Jug",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-clay-jug"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

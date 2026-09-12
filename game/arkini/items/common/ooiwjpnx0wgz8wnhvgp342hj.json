@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ooiwjpnx0wgz8wnhvgp342hj",
+		"id": "book-t1",
+		"title": "Book - Tier 1",
+		"description": "Just a book. It could be empty. Or has some poem. Or whatever.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"book-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "common"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "y9cwptcb1jtevcufgotv1kqs",
+		"id": "cotton-thread",
+		"title": "Cotton Thread",
+		"description": "Cotton thread",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cotton-thread"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "common"
+	}
+}

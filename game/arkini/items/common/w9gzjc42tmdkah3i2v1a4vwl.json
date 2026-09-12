@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "w9gzjc42tmdkah3i2v1a4vwl",
+		"id": "empty-rum-barrel",
+		"title": "Empty Rum Barrel",
+		"description": "Waiting for an another round",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-rum-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

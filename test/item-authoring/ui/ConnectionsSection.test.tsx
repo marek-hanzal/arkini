@@ -9,6 +9,9 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		config: {
 			items: {
 				consumer: {
+					maxQueueSize: 1,
+					lines: [],
+
 					asset: {
 						scale: 0.8,
 						default: [],
@@ -16,10 +19,13 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 					id: "consumer",
 					description: "Consumes the selected item.",
 					title: "Consumer",
-					type: "simple",
+					type: "common",
 					uid: "consumer-uid",
 				},
 				peer: {
+					maxQueueSize: 1,
+					lines: [],
+
 					asset: {
 						scale: 0.8,
 						default: [],
@@ -27,10 +33,13 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 					description: "Also consumes the selected item.",
 					id: "peer",
 					title: "Peer",
-					type: "simple",
+					type: "common",
 					uid: "peer-uid",
 				},
 				unrelated: {
+					maxQueueSize: 1,
+					lines: [],
+
 					asset: {
 						scale: 0.8,
 						default: [],
@@ -38,7 +47,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 					description: "Not connected.",
 					id: "unrelated",
 					title: "Unrelated",
-					type: "simple",
+					type: "common",
 					uid: "unrelated-uid",
 				},
 			},
@@ -56,6 +65,9 @@ vi.mock("~/translation/ui/useTranslator", () => ({
 vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 	readItemConnectionsFn: () => [
 		{
+			maxQueueSize: 1,
+			lines: [],
+
 			asset: {
 				scale: 0.8,
 				default: [],
@@ -63,10 +75,13 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 			description: "Consumes the selected item.",
 			id: "consumer",
 			title: "Consumer",
-			type: "simple",
+			type: "common",
 			uid: "consumer-uid",
 		},
 		{
+			maxQueueSize: 1,
+			lines: [],
+
 			asset: {
 				scale: 0.8,
 				default: [],
@@ -74,7 +89,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 			description: "Also consumes the selected item.",
 			id: "peer",
 			title: "Peer",
-			type: "simple",
+			type: "common",
 			uid: "peer-uid",
 		},
 	],

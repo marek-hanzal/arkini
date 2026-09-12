@@ -49,7 +49,7 @@ export const createJobTestConfig = (
 					id: "forge",
 					scope: forgeScope,
 				}),
-				type: "producer",
+				type: "common",
 				maxStackSize: 1,
 				maxQueueSize,
 				lines: [
@@ -91,18 +91,24 @@ export const createJobTestConfig = (
 				],
 			},
 			water: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "water",
 					scope: "any",
 				}),
-				type: "simple",
+				type: "common",
 			},
 			tool: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "tool",
 					scope: "any",
 				}),
-				type: "simple",
+				type: "common",
 			},
 		},
 	});

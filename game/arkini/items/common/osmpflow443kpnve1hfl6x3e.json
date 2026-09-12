@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "osmpflow443kpnve1hfl6x3e",
+		"id": "copper-bathtub-with-water",
+		"title": "Copper Bathtub With Water",
+		"description": "Water. In a bathtub",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"copper-bathtub-with-water"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

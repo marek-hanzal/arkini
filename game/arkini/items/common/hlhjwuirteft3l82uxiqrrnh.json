@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hlhjwuirteft3l82uxiqrrnh",
+		"id": "empty-corn-field",
+		"title": "Empty Corn Field",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-corn-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

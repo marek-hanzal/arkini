@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "yofqa330f03b3dexsmde5aeu",
+		"id": "oven-with-wood",
+		"title": "Oven With Wood",
+		"description": "Ready to be fired!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"oven-with-wood"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

@@ -22,7 +22,7 @@ const flow: ItemOriginFlow = {
 			],
 			starterScopes: [],
 			title: "Wine",
-			type: "producer",
+			type: "common",
 		},
 	],
 };
@@ -85,7 +85,7 @@ describe("layoutInWorkerFx", () => {
 								y: -21,
 							},
 						],
-						type: "producer",
+						type: "common",
 						width: 420,
 					},
 				],

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gknt8tkntf6cx7a4vb5jre1j",
+		"id": "dirty-cauldron",
+		"title": "Dirty Cauldron",
+		"description": "You should clean it up",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-cauldron"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

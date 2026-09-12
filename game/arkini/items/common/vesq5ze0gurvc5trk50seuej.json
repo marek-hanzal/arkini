@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "vesq5ze0gurvc5trk50seuej",
+		"id": "cotton-fiber",
+		"title": "Cotton Fiber",
+		"description": "Fiber. Cotton",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cotton-fiber"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 10,
+		"type": "common"
+	}
+}

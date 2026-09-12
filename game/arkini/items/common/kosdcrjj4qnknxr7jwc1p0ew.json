@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "kosdcrjj4qnknxr7jwc1p0ew",
+		"id": "bed-milk",
+		"title": "Bed Milk",
+		"description": "Milk everywhere.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bed-milk"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

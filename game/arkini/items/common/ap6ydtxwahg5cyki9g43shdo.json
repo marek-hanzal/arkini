@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ap6ydtxwahg5cyki9g43shdo",
+		"id": "copper-pan",
+		"title": "Copper Pan",
+		"description": "Wanna cook something?",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"copper-pan"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

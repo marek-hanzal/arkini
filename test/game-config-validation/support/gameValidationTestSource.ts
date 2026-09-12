@@ -1,26 +1,29 @@
 import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
-import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 
+export const createItemBase = (id: string) => ({
+	uid: id,
+	id,
+	title: id,
+	description: id,
+	asset: {
+		scale: 0.8,
+		default: [
+			`asset:${id}`,
+		],
+	},
+	scope: "any",
+	maxStackSize: 10,
+});
+
 export const createSimpleItem = (id: string) =>
-	SimpleSchema.parse({
-		uid: id,
-		id,
-		title: id,
-		description: id,
-		asset: {
-			scale: 0.8,
-			default: [
-				`asset:${id}`,
-			],
-		},
-		scope: "any",
-		maxStackSize: 10,
-		type: "simple",
+	CommonSchema.parse({
+		...createItemBase(id),
+		type: "common",
 	});
 
 export const createLine = ({
@@ -60,9 +63,9 @@ export const createProducerItem = ({
 	output?: OutputSchema.Type;
 	lines?: ReadonlyArray<LineSchema.Type>;
 }) =>
-	ProducerSchema.parse({
+	CommonSchema.parse({
 		...createSimpleItem(id),
-		type: "producer",
+		type: "common",
 		lines: lines ?? [
 			createLine({
 				input,

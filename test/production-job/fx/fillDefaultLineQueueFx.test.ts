@@ -18,7 +18,7 @@ const lineId = "line:forge:run";
 const createDefaultLineConfig = (capacity: number) => {
 	const base = createJobTestConfig(capacity);
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {

@@ -32,9 +32,9 @@ describe("editor MCP authoring schema registry", () => {
 			return schema;
 		};
 
-		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-producer-item-input");
+		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-common-item-input");
 		expect(producer).toMatchObject({
-			$id: "urn:arkini:schema:mcp:create-producer-item-input",
+			$id: "urn:arkini:schema:mcp:create-common-item-input",
 			properties: {
 				asset: {
 					$ref: "AssetSchema",
@@ -53,15 +53,15 @@ describe("editor MCP authoring schema registry", () => {
 			type: "object",
 		});
 		expect(
-			await readSchemaDetail("urn:arkini:schema:mcp:edit-producer-item-input"),
+			await readSchemaDetail("urn:arkini:schema:mcp:edit-common-item-input"),
 		).toMatchObject({
 			properties: {
 				patch: {
-					$ref: "ProducerItemPatchSchema",
+					$ref: "CommonItemPatchSchema",
 				},
 			},
 		});
-		expect(await readSchemaDetail("ProducerItemPatchSchema")).toMatchObject({
+		expect(await readSchemaDetail("CommonItemPatchSchema")).toMatchObject({
 			minProperties: 1,
 			type: "object",
 		});
@@ -160,12 +160,10 @@ describe("editor MCP authoring schema registry", () => {
 			});
 		}
 		const itemTypes = [
-			"simple",
 			"space",
-			"producer",
-			"craft",
+			"common",
+			"clock",
 			"blueprint",
-			"stash",
 			"temporary",
 			"inventory",
 		];

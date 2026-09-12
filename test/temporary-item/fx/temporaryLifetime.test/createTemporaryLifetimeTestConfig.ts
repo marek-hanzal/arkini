@@ -80,10 +80,13 @@ export const createTemporaryLifetimeTestConfig = () =>
 		},
 		items: {
 			transformer: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "transformer",
 				}),
-				type: "simple",
+				type: "common",
 				merge: [
 					{
 						target: {
@@ -97,23 +100,32 @@ export const createTemporaryLifetimeTestConfig = () =>
 				],
 			},
 			blocker: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "blocker",
 				}),
-				type: "simple",
+				type: "common",
 			},
 			result: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "result",
 				}),
-				type: "simple",
+				type: "common",
 			},
 			cappedResult: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem({
 					id: "cappedResult",
 					maxCount: 1,
 				}),
-				type: "simple",
+				type: "common",
 			},
 			temporaryPlain: {
 				...baseItem({
@@ -161,7 +173,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "producer",
 				}),
-				type: "producer",
+				type: "common",
 				maxQueueSize: 1,
 				lines: [
 					{

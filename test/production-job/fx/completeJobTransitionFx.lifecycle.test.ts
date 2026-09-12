@@ -74,7 +74,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 	items: {
 		"producer:trader": {
 			...base("producer:trader"),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 1,
 			},
@@ -110,7 +110,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		},
 		"producer:phoenix": {
 			...base("producer:phoenix"),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 1,
 			},
@@ -159,7 +159,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 		},
 		"producer:finite-queue": {
 			...base("producer:finite-queue"),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 2,
 			},
@@ -207,33 +207,43 @@ const lifecycleConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:repeatable": {
+			maxQueueSize: 1,
+
 			...base("craft:repeatable"),
-			type: "craft",
-			line: {
-				id: "line:craft:repeatable",
-				title: "Repeat",
-				description: "Repeat without consuming the owner.",
-				runtimeMs: 200,
-				input: [
-					{
-						type: "simple",
-					},
-				],
-				output,
-				rules: [],
-			},
+			type: "common",
+			lines: [
+				{
+					id: "line:craft:repeatable",
+					title: "Repeat",
+					description: "Repeat without consuming the owner.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					output,
+					rules: [],
+				},
+			],
 		},
 		"item:material": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:material"),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 2,
 			},
 			maxStackSize: 2,
 		},
 		"item:gift": {
+			maxQueueSize: 1,
+			lines: [],
+
 			...base("item:gift"),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

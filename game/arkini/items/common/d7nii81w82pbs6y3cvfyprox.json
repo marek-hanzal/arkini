@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "d7nii81w82pbs6y3cvfyprox",
+		"id": "unlit-candle",
+		"title": "Unlit Candle",
+		"description": "Just a candle. It does not emit any light.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"unlit-candle"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "common"
+	}
+}

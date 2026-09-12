@@ -12,7 +12,7 @@ import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 it("preserves the full lifetime of temporary depletion output created by queue dispatch", () => {
 	const base = createTemporaryLifetimeTestConfig();
 	const producer = base.items.producer;
-	if (producer?.type !== "producer") throw new Error("Expected producer fixture.");
+	if (producer?.type !== "common") throw new Error("Expected producer fixture.");
 	const config = GameConfigSchema.parse({
 		...base,
 		items: {

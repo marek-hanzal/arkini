@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "t3ms6btsehfibf9l0ld39zzr",
+		"id": "spoiled-corn",
+		"title": "Spoiled Corn",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-corn"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

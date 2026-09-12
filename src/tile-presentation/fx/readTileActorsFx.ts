@@ -1,9 +1,9 @@
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { Array, Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
@@ -27,35 +27,6 @@ const readQueueBadgeCountFn = ({
 		runtime.jobQueue.filter((request) => request.ownerItemId === ownerItemId).length;
 	return count > 0 ? count : undefined;
 };
-
-const readActivityEffectFn = ({
-	itemType,
-	running,
-}: {
-	readonly itemType: TypeSchema.Type;
-	readonly running: boolean;
-}) =>
-	match(itemType)
-		.with(
-			P.union(
-				TypeSchema.enum.Blueprint,
-				TypeSchema.enum.Craft,
-				TypeSchema.enum.Producer,
-				TypeSchema.enum.Clock,
-			),
-			() => running,
-		)
-		.with(
-			P.union(
-				TypeSchema.enum.Inventory,
-				TypeSchema.enum.Simple,
-				TypeSchema.enum.Space,
-				TypeSchema.enum.Stash,
-				TypeSchema.enum.Temporary,
-			),
-			() => false,
-		)
-		.exhaustive();
 
 const clampRatioFn = (ratio: number) => Math.max(0, Math.min(1, ratio));
 
@@ -180,10 +151,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					: {
 							progressRatio,
 						}),
-				activityEffect: readActivityEffectFn({
-					itemType: item.item.type,
-					running,
-				}),
+				activityEffect: running,
 				primaryAction: yield* readRuntimeItemPrimaryActionFx({
 					item,
 					runtime,

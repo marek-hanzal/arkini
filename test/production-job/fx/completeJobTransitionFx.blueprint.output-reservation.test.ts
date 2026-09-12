@@ -80,7 +80,7 @@ describe("blueprint output reservation", () => {
 					throw new Error("Expected exact consuming plan.");
 				}
 				const consumerDefinition = blueprintConfig.items["producer:shared-consumer"];
-				if (consumerDefinition?.type !== "producer") {
+				if (consumerDefinition?.type !== "common") {
 					throw new Error("Missing shared consumer producer.");
 				}
 				const line = consumerDefinition.lines[0];

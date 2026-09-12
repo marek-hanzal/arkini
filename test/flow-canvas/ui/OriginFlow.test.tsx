@@ -43,7 +43,7 @@ vi.mock("~/flow-canvas/ui/useOriginFlow", () => ({
 					resourceIds: [],
 					starterScopes: [],
 					title: "Tool",
-					type: "simple",
+					type: "common",
 				},
 			],
 		},

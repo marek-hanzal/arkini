@@ -1,9 +1,11 @@
-import { Effect } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { startFx } from "~/game-start/fx/startFx";
 
 const config = GameConfigSchema.parse({
@@ -49,7 +51,7 @@ const config = GameConfigSchema.parse({
 		producer: {
 			uid: "producer",
 			id: "producer",
-			type: "producer",
+			type: "common",
 			title: "Producer",
 			description: "Produces resources.",
 			asset: {
@@ -78,9 +80,12 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		resource: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "resource",
 			id: "resource",
-			type: "simple",
+			type: "common",
 			title: "Resource",
 			description: "One resource.",
 			asset: {
@@ -124,33 +129,72 @@ if (producer === undefined || resource === undefined || inventoryOpener === unde
 }
 
 describe("readRuntimeItemPrimaryActionFx", () => {
-	it("does nothing for ordinary items and uses an authored owner fallback", () => {
-		expect(
-			Effect.runSync(
-				readRuntimeItemPrimaryActionFx({
-					item: resource,
-					runtime,
-				}),
-			),
-		).toEqual({
-			kind: "none",
-		});
-		expect(
-			Effect.runSync(
-				readRuntimeItemPrimaryActionFx({
-					item: producer,
-					runtime,
-				}),
-			),
-		).toEqual({
-			kind: "enqueue-default-line",
-			lineId: "line:produce",
-			queue: {
-				available: true,
-				capacity: 1,
-				used: 0,
-			},
-		});
+	it("admits default production only when the Common item has lines", () => {
+		const item = config.items.producer;
+		if (item.type !== "common") throw new Error("Expected Common fixture.");
+		for (const active of [
+			false,
+			true,
+		]) {
+			const result = Effect.runSync(
+				Effect.gen(function* () {
+					const started = yield* startFx();
+					const owner = started.items.find(({ item }) => item.id === "producer");
+					if (owner === undefined) throw new Error("Missing Common owner.");
+					const action = yield* readRuntimeItemPrimaryActionFx({
+						item: owner,
+						runtime: started,
+					});
+					const admission = yield* Effect.result(
+						enqueueDefaultLineFx({
+							ownerItemId: owner.id,
+						}),
+					);
+					return {
+						action,
+						admission,
+						before: started,
+						after: yield* readRuntimeFx(),
+					};
+				}).pipe(
+					useGameFx({
+						config: GameConfigSchema.parse({
+							...config,
+							items: {
+								...config.items,
+								producer: {
+									...item,
+									lines: active ? item.lines : [],
+								},
+							},
+						}),
+					}),
+				),
+			);
+			if (active) {
+				expect(result.action).toEqual({
+					kind: "enqueue-default-line",
+					lineId: "line:produce",
+					queue: {
+						available: true,
+						capacity: 1,
+						used: 0,
+					},
+				});
+				expect(Result.isSuccess(result.admission)).toBe(true);
+				expect(result.after.jobQueue).toHaveLength(1);
+			} else {
+				expect(result.action).toEqual({
+					kind: "none",
+				});
+				expect(Result.isFailure(result.admission)).toBe(true);
+				if (Result.isFailure(result.admission))
+					expect(result.admission.failure).toMatchObject({
+						_tag: "DefaultLineQueueUnavailableError",
+					});
+				expect(result.after).toEqual(result.before);
+			}
+		}
 	});
 
 	it("opens Inventory by canonical item type from either Board or Toolbar", () => {

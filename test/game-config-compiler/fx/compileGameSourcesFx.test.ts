@@ -72,7 +72,7 @@ describe("compileGameSourcesFx", () => {
 			}),
 		);
 		const compiled = result.config?.items[item.id];
-		if (compiled?.type !== "producer") {
+		if (compiled?.type !== "common") {
 			throw new Error("Expected compiled producer.");
 		}
 

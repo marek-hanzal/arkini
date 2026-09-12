@@ -1,0 +1,38 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "di926lypctzw8e6a4twmyeme",
+		"id": "cotton-fabric",
+		"title": "Cotton Fabric",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cotton-fabric"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "leather-satchel"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bandage-satchel"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "medicine-satchel"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "healing-kit"
+			}
+		],
+		"type": "common"
+	}
+}

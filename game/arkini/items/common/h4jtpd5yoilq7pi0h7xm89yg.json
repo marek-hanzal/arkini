@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "h4jtpd5yoilq7pi0h7xm89yg",
+		"id": "goose-quill",
+		"title": "Goose Quill",
+		"description": "Time for school",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"goose-quill"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

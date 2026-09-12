@@ -178,7 +178,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const owner = {
 			id: "runtime:producer",
 			itemId: "producer",
-			itemType: "producer",
+			itemType: "common",
 			location: {
 				scope: "board",
 				space: 0,
@@ -240,7 +240,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const stack = {
 			id: "runtime:stack",
 			itemId: "material",
-			itemType: "simple",
+			itemType: "common",
 			location: {
 				scope: "board",
 				space: 0,
@@ -279,7 +279,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const producer = {
 			id: "runtime:producer",
 			itemId: "producer",
-			itemType: "producer",
+			itemType: "common",
 			location: {
 				scope: "board",
 				space: 0,

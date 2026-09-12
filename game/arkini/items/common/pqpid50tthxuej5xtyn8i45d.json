@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "pqpid50tthxuej5xtyn8i45d",
+		"id": "spoiled-sausage",
+		"title": "Spoiled Sausage",
+		"description": "I almost threw",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-sausage"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

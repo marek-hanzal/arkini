@@ -22,6 +22,9 @@ export const lineTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		source: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "source",
 			id: "source",
 			title: "Source",
@@ -34,9 +37,12 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 		permit: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "permit",
 			id: "permit",
 			title: "Permit",
@@ -49,9 +55,12 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 		booster: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "booster",
 			id: "booster",
 			title: "Booster",
@@ -64,9 +73,12 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 		blocker: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "blocker",
 			id: "blocker",
 			title: "Blocker",
@@ -79,7 +91,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 	},
 });

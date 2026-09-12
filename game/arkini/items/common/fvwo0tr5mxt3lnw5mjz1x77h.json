@@ -1,0 +1,145 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "fvwo0tr5mxt3lnw5mjz1x77h",
+		"id": "glass-goblet",
+		"title": "Glass Goblet",
+		"description": "Prepared for drink",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"glass-goblet"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wine-barrel"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "glass-goblet-with-wine",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "spend"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beer-barrel"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "glass-goblet-with-beer",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "spend"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "glass-goblet-with-milk",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wine-toilet"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "toilet"
+			}
+		],
+		"type": "common"
+	}
+}

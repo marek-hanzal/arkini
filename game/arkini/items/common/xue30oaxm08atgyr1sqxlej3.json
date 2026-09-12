@@ -1,0 +1,89 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "xue30oaxm08atgyr1sqxlej3",
+		"id": "clay-camp",
+		"title": "Clay Camp",
+		"description": "Gives you a clay",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"clay-camp"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 6,
+		"type": "common",
+		"lines": [
+			{
+				"id": "clay",
+				"title": "Clay",
+				"description": "Mugs and other clay-based stuff is waiting",
+				"default": true,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 32000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "clay-deposit"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "clay",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "Clay deposit must be next",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "clay-deposit"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
+	}
+}

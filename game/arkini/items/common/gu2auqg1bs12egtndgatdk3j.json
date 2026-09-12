@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gu2auqg1bs12egtndgatdk3j",
+		"id": "faith-paper-scriptorium",
+		"title": "Faith Paper Scriptorium",
+		"description": "Somebody bless papers and books!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"faith-paper-scriptorium"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

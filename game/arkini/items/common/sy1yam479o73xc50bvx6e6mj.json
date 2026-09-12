@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "sy1yam479o73xc50bvx6e6mj",
+		"id": "industrial-chemicals",
+		"title": "Industrial Chemicals",
+		"description": "Be careful, it may go kaboom",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"industrial-chemicals"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

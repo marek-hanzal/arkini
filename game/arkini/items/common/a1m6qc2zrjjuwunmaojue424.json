@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "a1m6qc2zrjjuwunmaojue424",
+		"id": "sewn-pillow-with-coins",
+		"title": "Sewn Pillow With Coins",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sewn-pillow-with-coins"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

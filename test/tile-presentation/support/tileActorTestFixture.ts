@@ -56,8 +56,11 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		material: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...itemBase("material"),
-			type: "simple",
+			type: "common",
 			asset: {
 				scale: 0.8,
 				default: [
@@ -67,8 +70,10 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			maxStackSize: 10,
 		},
 		craft: {
+			maxQueueSize: 1,
+
 			...itemBase("craft"),
-			type: "craft",
+			type: "common",
 			asset: {
 				scale: 0.8,
 				default: [
@@ -79,9 +84,11 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			units: {
 				amount: 1,
 			},
-			line: productionLine("craft", [
-				materialInput(6, 3),
-			]),
+			lines: [
+				productionLine("craft", [
+					materialInput(6, 3),
+				]),
+			],
 		},
 		blueprint: {
 			...itemBase("blueprint"),
@@ -118,7 +125,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 
 const craftItem = tileActorTestConfig.items.craft;
 const blueprintItem = tileActorTestConfig.items.blueprint;
-if (craftItem.type !== "craft" || blueprintItem.type !== "blueprint") {
+if (craftItem.type !== "common" || blueprintItem.type !== "blueprint") {
 	throw new Error("Invalid tile actor test config.");
 }
 
@@ -143,6 +150,7 @@ export const createTileActorRuntime = ({
 	readonly queued?: number;
 } = {}) => {
 	const ownerItem = owner === "craft" ? craftItem : blueprintItem;
+	const ownerLine = ownerItem.type === "common" ? ownerItem.lines[0] : ownerItem.line;
 	return RuntimeSchema.parse({
 		cheats: {
 			enabled: false,
@@ -170,7 +178,7 @@ export const createTileActorRuntime = ({
 					{
 						id: "job:owner",
 						ownerItemId: "runtime:owner",
-						lineId: ownerItem.line.id,
+						lineId: ownerLine.id,
 						durationMs: 1_000,
 						remainingMs: 500,
 					},
@@ -183,7 +191,7 @@ export const createTileActorRuntime = ({
 			(_, index) => ({
 				id: `job:queue:${index}`,
 				ownerItemId: "runtime:owner",
-				lineId: ownerItem.line.id,
+				lineId: ownerLine.id,
 			}),
 		),
 		defaultLineByOwnerItemId: {},

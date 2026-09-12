@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "htit9hm4frfnp54sif48id4v",
+		"id": "key-t6",
+		"title": "Key - Tier 6",
+		"description": "Master key of Life and Death. Just kidding, it's a key, just nicer.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"key-t6"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 2,
+		"type": "common"
+	}
+}

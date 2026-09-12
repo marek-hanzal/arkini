@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "prt6rkka0at1honkbw36rnd3",
+		"id": "foundry-extinguished",
+		"title": "Foundry Extinguished",
+		"description": "We're offline",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"foundry-extinguished"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

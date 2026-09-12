@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "r8tf0spk6xl9vlkv80jebrxr",
+		"id": "cotton-wool",
+		"title": "Cotton Wool",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cotton-wool"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "common"
+	}
+}

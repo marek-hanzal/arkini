@@ -92,7 +92,7 @@ const FormPathLabelBySegment = {
 	id: "ID",
 	max: "Maximum",
 	maxCount: "Maximum global count",
-	maxQueueSize: "Maximum parallel jobs",
+	maxQueueSize: "Queue capacity",
 	maxStackSize: "Maximum stack size",
 	min: "Minimum",
 	mode: "Material mode",

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "rw4gsk55m78q58bresm6fcas",
+		"id": "pot-with-coins",
+		"title": "Pot With Coins",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"pot-with-coins"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

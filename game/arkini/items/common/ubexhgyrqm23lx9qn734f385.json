@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ubexhgyrqm23lx9qn734f385",
+		"id": "clay-plate",
+		"title": "Clay Plate",
+		"description": "So sad",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"clay-plate"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

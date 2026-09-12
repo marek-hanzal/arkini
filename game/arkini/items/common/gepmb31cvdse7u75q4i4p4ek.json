@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gepmb31cvdse7u75q4i4p4ek",
+		"id": "empty-lantern",
+		"title": "Empty Lantern",
+		"description": "Just an unlit lanter. Needs something to make it work",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-lantern"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "common"
+	}
+}

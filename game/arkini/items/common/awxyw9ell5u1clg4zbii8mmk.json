@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "awxyw9ell5u1clg4zbii8mmk",
+		"id": "clay",
+		"title": "Clay",
+		"description": "Clay",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"clay"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "common"
+	}
+}

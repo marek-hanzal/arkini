@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "g5xkc3f2hw5xr6iipq2wf9lj",
+		"id": "dirty-copper-pan",
+		"title": "Dirty Copper Pan",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-copper-pan"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

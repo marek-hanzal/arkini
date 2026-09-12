@@ -43,11 +43,6 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 	const lines = readAuthoredItemLinesFn(item);
 	const candidate: ItemSchema.Type = (() => {
 		switch (fallback.type) {
-			case "simple":
-				return {
-					...common,
-					type: fallback.type,
-				};
 			case "space":
 				return {
 					...common,
@@ -78,21 +73,17 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 							}
 						: {}),
 				};
-			case "producer":
+			case "common":
 				return {
 					...common,
 					type: fallback.type,
 					maxQueueSize:
-						item.type === "producer" || item.type === "clock"
+						item.type === "common" || item.type === "clock"
 							? item.maxQueueSize
 							: fallback.maxQueueSize,
-					lines:
-						lines.length === 0
-							? fallback.lines
-							: [
-									lines[0],
-									...lines.slice(1),
-								],
+					lines: [
+						...lines,
+					],
 				};
 			case "clock":
 				return {
@@ -121,8 +112,6 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 								],
 				};
 			case "blueprint":
-			case "craft":
-			case "stash":
 				return {
 					...common,
 					type: fallback.type,

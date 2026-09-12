@@ -29,6 +29,9 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		source: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "source",
 			id: "source",
 			title: "Source",
@@ -41,7 +44,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 			merge: [
 				{
 					target: {
@@ -54,6 +57,9 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		target: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "target",
 			id: "target",
 			title: "Target",
@@ -66,7 +72,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 1,
-			type: "simple",
+			type: "common",
 		},
 	},
 });

@@ -62,7 +62,7 @@ const config = GameConfigSchema.parse({
 			...baseItem({
 				id: "outer",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -90,7 +90,7 @@ const config = GameConfigSchema.parse({
 			...baseItem({
 				id: "worker",
 			}),
-			type: "producer",
+			type: "common",
 			units: {
 				amount: 2,
 			},
@@ -109,23 +109,32 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		payload: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "payload",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		material: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "material",
 				maxStackSize: 10,
 			}),
-			type: "simple",
+			type: "common",
 		},
 		blocker: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "blocker",
 			}),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

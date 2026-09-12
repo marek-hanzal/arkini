@@ -6,6 +6,7 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
+	createItemBase,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { InvalidInputUnitsReasonEnumSchema } from "~/game-config-diagnostic/schema/InvalidInputUnitsReasonEnumSchema";
@@ -227,7 +228,7 @@ describe("validateInputUnitsFn", () => {
 
 	it("counts only authored Space Action self costs", async () => {
 		const portal = {
-			...createSimpleItem("space:cumulative"),
+			...createItemBase("space:cumulative"),
 			type: "space" as const,
 			space: 1,
 			units: {
@@ -313,7 +314,7 @@ describe("validateInputUnitsFn", () => {
 
 	it("allows a Space units requirement to unit its action owner", async () => {
 		const portal = {
-			...createSimpleItem("space:owner-paid"),
+			...createItemBase("space:owner-paid"),
 			type: "space" as const,
 			space: 1,
 			units: {

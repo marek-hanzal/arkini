@@ -1,0 +1,172 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "h0s9fjq81r3iw08nml3neqtj",
+		"id": "adventurers-guild",
+		"title": "Adventurers Guild",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"adventurers-guild"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "common",
+		"lines": [
+			{
+				"id": "chest-t1",
+				"title": "Chest - Tier 1",
+				"description": "Some common basic stuff",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "treasure-chest-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "chest-t2",
+				"title": "Chest - Tier 2",
+				"description": "A bit better chest if you want",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 36000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "treasure-chest-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "chest-t3",
+				"title": "Chest - Tier 3",
+				"description": "Quite a nice chest",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "treasure-chest-t3",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "chest-t4",
+				"title": "Chest - Tier 4",
+				"description": "Best of the best",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 120000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "treasure-chest-t4",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

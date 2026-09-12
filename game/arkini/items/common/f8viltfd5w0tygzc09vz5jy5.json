@@ -1,0 +1,29 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "f8viltfd5w0tygzc09vz5jy5",
+		"id": "sugar",
+		"title": "Sugar",
+		"description": "Pure sweetness",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sugar"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 10,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "honeyed-fruit-pancake-with-cream"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "honeyed-fruit-pancake-with-cream-and-sugar"
+			}
+		],
+		"type": "common"
+	}
+}

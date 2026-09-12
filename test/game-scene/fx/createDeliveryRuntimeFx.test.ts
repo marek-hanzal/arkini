@@ -59,7 +59,7 @@ const target = {
 const item = {
 	id: "runtime:water",
 	itemId: "water",
-	itemType: "simple" as const,
+	itemType: "common" as const,
 	title: "Water",
 	artworkScale: 0.8,
 	sourceUrl: "resource:water",

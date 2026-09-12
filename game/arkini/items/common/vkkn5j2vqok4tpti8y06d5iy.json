@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "vkkn5j2vqok4tpti8y06d5iy",
+		"id": "book-t2",
+		"title": "Book - Tier 2",
+		"description": "A better book. Maybe Hobbit",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"book-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "common"
+	}
+}

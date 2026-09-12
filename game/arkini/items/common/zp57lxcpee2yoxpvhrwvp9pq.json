@@ -1,0 +1,79 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "zp57lxcpee2yoxpvhrwvp9pq",
+		"id": "air-purifier",
+		"title": "Air Purifier",
+		"description": "Fresh air",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"air-purifier"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 12,
+		"type": "common",
+		"lines": [
+			{
+				"id": "purify-air",
+				"title": "Purify Air",
+				"description": "Takes ugly air-pollution and make the air clean again",
+				"default": true,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "air-pollution"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 4
+						},
+						"capacity": 0
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "filter-bank"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"rules": [
+					{
+						"hint": "You need air-filter to make this work",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "filter-bank"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
+	}
+}

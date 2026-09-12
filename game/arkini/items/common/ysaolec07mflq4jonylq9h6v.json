@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ysaolec07mflq4jonylq9h6v",
+		"id": "spoiled-wine-barrel",
+		"title": "Spoiled Wine Barrel",
+		"description": "Too much archived vine",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-wine-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

@@ -97,7 +97,7 @@ export const focusRuntime = ({
 };
 
 const unitsWorkshop = lineRunTestConfig.items.workshop;
-if (unitsWorkshop.type !== "producer") throw new Error("Expected a producer fixture.");
+if (unitsWorkshop.type !== "common") throw new Error("Expected a producer fixture.");
 
 export const createUnitsConfig = (inputCount: number) =>
 	GameConfigSchema.parse({

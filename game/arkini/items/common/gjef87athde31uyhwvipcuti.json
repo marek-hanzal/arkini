@@ -1,0 +1,52 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gjef87athde31uyhwvipcuti",
+		"id": "cocoa-powder",
+		"title": "Cocoa Powder",
+		"description": "Can you smell it?",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cocoa-powder"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cauldron-with-milk"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "clay-bowl",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "hot-chocolate-cauldron"
+			}
+		],
+		"type": "common"
+	}
+}

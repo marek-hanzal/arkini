@@ -46,12 +46,14 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		workshop: {
+			maxQueueSize: 1,
+
 			...baseItem({
 				id: "workshop",
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "producer",
+			type: "common",
 			lines: [
 				{
 					id: "line:workshop:build",
@@ -80,20 +82,26 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			],
 		},
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "water",
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		stone: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "stone",
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 2,
 			},

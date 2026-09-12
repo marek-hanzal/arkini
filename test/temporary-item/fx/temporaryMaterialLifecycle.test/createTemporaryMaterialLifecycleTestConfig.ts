@@ -61,7 +61,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 		items: {
 			owner: {
 				...baseItem("owner"),
-				type: "producer",
+				type: "common",
 				maxQueueSize: 2,
 				lines: [
 					{
@@ -96,16 +96,25 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 				output: guaranteedOutput("residue"),
 			},
 			residue: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem("residue", 10),
-				type: "simple",
+				type: "common",
 			},
 			product: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem("product", 10),
-				type: "simple",
+				type: "common",
 			},
 			blocker: {
+				maxQueueSize: 1,
+				lines: [],
+
 				...baseItem("blocker"),
-				type: "simple",
+				type: "common",
 			},
 		},
 	});

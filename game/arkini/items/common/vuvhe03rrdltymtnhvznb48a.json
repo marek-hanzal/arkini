@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "vuvhe03rrdltymtnhvznb48a",
+		"id": "clay-vase",
+		"title": "Clay Vase",
+		"description": "Something could be put inside.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"clay-vase"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"type": "common"
+	}
+}

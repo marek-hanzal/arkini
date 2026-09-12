@@ -75,31 +75,43 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			space: 1,
 		},
 		origin: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "origin",
 				scope: "board",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		log: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "log",
 				maxStackSize: 3,
 			}),
-			type: "simple",
+			type: "common",
 		},
 		blocker: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "blocker",
 				scope: "board",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		mergeSource: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "mergeSource",
 			}),
-			type: "simple",
+			type: "common",
 			merge: [
 				{
 					target: {
@@ -112,18 +124,24 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			],
 		},
 		mergeTarget: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "mergeTarget",
 				scope: "board",
 			}),
-			type: "simple",
+			type: "common",
 		},
 		payer: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "payer",
 				scope: "board",
 			}),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 1,
 			},
@@ -133,7 +151,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "workshop",
 				scope: "board",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -165,7 +183,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "unitsProducer",
 				scope: "board",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -199,7 +217,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "worker",
 				scope: "board",
 			}),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 1,
 			lines: [
 				{

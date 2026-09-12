@@ -64,7 +64,7 @@ const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
 const createLiveRuleConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		items: {

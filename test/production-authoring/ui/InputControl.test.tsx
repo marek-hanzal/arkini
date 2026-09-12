@@ -106,9 +106,12 @@ const findChoiceControl = (container: Element, label: string) => {
 
 const createSearchItem = (id: string, spent: boolean) =>
 	({
+		maxQueueSize: 1,
+		lines: [],
+
 		uid: `uid:${id}`,
 		id,
-		type: "simple",
+		type: "common",
 		title: id,
 		description: id,
 		asset: {

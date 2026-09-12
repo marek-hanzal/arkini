@@ -188,7 +188,7 @@ describe("packDirectoryFx game-project contract", () => {
 			const fileSystem = yield* FileSystem.FileSystem;
 			const path = yield* Path.Path;
 			const input = yield* writeGameProjectFixtureFx();
-			const itemDirectory = path.join(input, "items", "simple");
+			const itemDirectory = path.join(input, "items", "common");
 			yield* fileSystem.rename(
 				path.join(itemDirectory, "water.json"),
 				path.join(itemDirectory, "wrong.json"),

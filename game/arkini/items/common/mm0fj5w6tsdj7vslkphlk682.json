@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "mm0fj5w6tsdj7vslkphlk682",
+		"id": "filter-bank-depleted",
+		"title": "Filter Bank Depleted",
+		"description": "Job is done. Now throw it away or recycle it.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"filter-bank-depleted"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

@@ -9,10 +9,8 @@ export namespace narrowLineOwnerItemFn {
 		{
 			readonly type:
 				| typeof TypeSchema.enum.Blueprint
-				| typeof TypeSchema.enum.Craft
 				| typeof TypeSchema.enum.Clock
-				| typeof TypeSchema.enum.Producer
-				| typeof TypeSchema.enum.Stash;
+				| typeof TypeSchema.enum.Common;
 		}
 	>;
 }
@@ -24,9 +22,7 @@ export const narrowLineOwnerItemFn = (
 	Option.liftPredicate(
 		item,
 		(candidate): candidate is narrowLineOwnerItemFn.Result =>
-			candidate.type === TypeSchema.enum.Producer ||
+			(candidate.type === TypeSchema.enum.Common && candidate.lines.length > 0) ||
 			candidate.type === TypeSchema.enum.Clock ||
-			candidate.type === TypeSchema.enum.Blueprint ||
-			candidate.type === TypeSchema.enum.Craft ||
-			candidate.type === TypeSchema.enum.Stash,
+			candidate.type === TypeSchema.enum.Blueprint,
 	);

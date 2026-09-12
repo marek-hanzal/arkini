@@ -1,0 +1,59 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "emyfwxfa8g1gi9iwj7v9rzru",
+		"id": "forester",
+		"title": "Forester",
+		"description": "Finds forests. Or trees. Or both",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"forester"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "common",
+		"lines": [
+			{
+				"id": "forest",
+				"title": "Forest",
+				"description": "Keeps care of forest so you'll get one",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "forest",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

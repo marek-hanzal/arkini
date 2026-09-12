@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "qs93ro2wex61c7emcew4s9ek",
+		"id": "herb-garden",
+		"title": "Herb Garden",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"herb-garden"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

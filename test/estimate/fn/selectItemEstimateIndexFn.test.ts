@@ -5,7 +5,7 @@ import { selectItemEstimateIndexFn } from "~/estimate/fn/selectItemEstimateIndex
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
-const item = (id: string, title: string, type: TypeSchema.Type = "simple") =>
+const item = (id: string, title: string, type: TypeSchema.Type = "common") =>
 	({
 		description: `${title} description`,
 		id,
@@ -44,9 +44,9 @@ const entries: ReadonlyArray<ItemEstimateIndexEntry> = [
 ];
 
 const items = [
-	item("bakery", "Bakery", "producer"),
+	item("bakery", "Bakery", "clock"),
 	item("water", "Water"),
-	item("well", "Well", "producer"),
+	item("well", "Well", "clock"),
 	item("unused", "Unused"),
 ];
 
@@ -92,11 +92,11 @@ describe("selectItemEstimateIndexFn", () => {
 	});
 
 	it("filters estimates by authored item type before ordering", () => {
-		expect(readItemIds("slowest", "", "producer")).toEqual([
+		expect(readItemIds("slowest", "", "clock")).toEqual([
 			"bakery",
 			"well",
 		]);
-		expect(readItemIds("incomplete", "", "producer")).toEqual([
+		expect(readItemIds("incomplete", "", "clock")).toEqual([
 			"well",
 		]);
 	});

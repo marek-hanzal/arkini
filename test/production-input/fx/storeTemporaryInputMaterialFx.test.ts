@@ -43,8 +43,10 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		owner: {
+			maxQueueSize: 1,
+
 			...baseItem("owner"),
-			type: "producer",
+			type: "common",
 			lines: [
 				{
 					id: "line:owner",

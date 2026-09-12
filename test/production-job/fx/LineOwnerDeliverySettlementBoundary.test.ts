@@ -73,13 +73,16 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		material: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("material"),
-			type: "simple",
+			type: "common",
 			maxStackSize: 10,
 		},
 		producer: {
 			...baseItem("producer"),
-			type: "producer",
+			type: "common",
 			maxQueueSize: 2,
 			lines: [
 				makeLine("line:producer"),
@@ -98,9 +101,13 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		craft: {
+			maxQueueSize: 1,
+
 			...baseItem("craft"),
-			type: "craft",
-			line: makeLine("line:craft"),
+			type: "common",
+			lines: [
+				makeLine("line:craft"),
+			],
 		},
 		blueprint: {
 			...baseItem("blueprint"),

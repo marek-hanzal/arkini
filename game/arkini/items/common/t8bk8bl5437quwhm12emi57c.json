@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "t8bk8bl5437quwhm12emi57c",
+		"id": "spoiled-raw-steak-slices",
+		"title": "Spoiled Raw Steak Slices",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-raw-steak-slices"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

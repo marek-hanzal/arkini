@@ -9,29 +9,13 @@ export const readLineOwnerLinesFn = (item: narrowLineOwnerItemFn.Result) =>
 
 		.with(
 			{
-				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
+				type: P.union(TypeSchema.enum.Common, TypeSchema.enum.Clock),
 			},
 			({ lines }) => lines,
 		)
 		.with(
 			{
 				type: TypeSchema.enum.Blueprint,
-			},
-			({ line }) => [
-				line,
-			],
-		)
-		.with(
-			{
-				type: TypeSchema.enum.Craft,
-			},
-			({ line }) => [
-				line,
-			],
-		)
-		.with(
-			{
-				type: TypeSchema.enum.Stash,
 			},
 			({ line }) => [
 				line,

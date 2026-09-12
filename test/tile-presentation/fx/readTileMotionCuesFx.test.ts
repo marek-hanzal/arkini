@@ -305,7 +305,7 @@ describe("readTileMotionCuesFx", () => {
 					badgeCount: 2,
 					id: source.id,
 					itemId: source.item.id,
-					itemType: "simple",
+					itemType: "common",
 					location: inventorySourceLocation,
 					quantity: 2,
 					sourceUrl: "asset:water",

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "jfasoxfbquu6b1yfqtbukqj3",
+		"id": "pottery",
+		"title": "Pottery",
+		"description": "Tavern may need this",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"pottery"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

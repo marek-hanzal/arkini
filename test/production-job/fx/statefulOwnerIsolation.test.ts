@@ -29,6 +29,8 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		producer: {
+			maxQueueSize: 1,
+
 			uid: "producer",
 			id: "producer",
 			title: "Producer",
@@ -41,7 +43,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "producer",
+			type: "common",
 			lines: [
 				{
 					id: "line:producer",
@@ -92,6 +94,9 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		limited: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "limited",
 			id: "limited",
 			title: "Limited",
@@ -105,9 +110,12 @@ const config = GameConfigSchema.parse({
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 4,
-			type: "simple",
+			type: "common",
 		},
 		blocker: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "blocker",
 			id: "blocker",
 			title: "Blocker",
@@ -120,7 +128,7 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "simple",
+			type: "common",
 		},
 	},
 });

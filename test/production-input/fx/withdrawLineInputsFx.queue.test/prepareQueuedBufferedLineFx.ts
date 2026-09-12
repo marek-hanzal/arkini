@@ -16,8 +16,7 @@ export const otherOwnerItemId = "runtime:other-workshop";
 export const lineId = "line:workshop:build";
 
 const workshop = inputRuntimeTestConfig.items.workshop;
-if (workshop.type !== "producer")
-	throw new Error("Expected the Workshop fixture to be a producer.");
+if (workshop.type !== "common") throw new Error("Expected the Workshop fixture to be a producer.");
 
 export const queuedInputTestConfig = GameConfigSchema.parse({
 	...inputRuntimeTestConfig,

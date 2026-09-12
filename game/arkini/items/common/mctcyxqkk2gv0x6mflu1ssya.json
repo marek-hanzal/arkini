@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "mctcyxqkk2gv0x6mflu1ssya",
+		"id": "empty-grape-field",
+		"title": "Empty Grape Field",
+		"description": "Ready for another grape cycle.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-grape-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

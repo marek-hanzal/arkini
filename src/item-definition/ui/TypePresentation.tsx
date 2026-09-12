@@ -1,15 +1,4 @@
-import {
-	Backpack,
-	Box,
-	Clock,
-	Factory,
-	Hammer,
-	MapPinned,
-	PackageOpen,
-	ScrollText,
-	Timer,
-	type LucideIcon,
-} from "lucide-react";
+import { Backpack, Box, Clock, MapPinned, ScrollText, Timer, type LucideIcon } from "lucide-react";
 
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -21,23 +10,14 @@ const presentations = {
 	clock: {
 		icon: Clock,
 	},
-	craft: {
-		icon: Hammer,
-	},
 	inventory: {
 		icon: Backpack,
 	},
-	producer: {
-		icon: Factory,
-	},
-	simple: {
+	common: {
 		icon: Box,
 	},
 	space: {
 		icon: MapPinned,
-	},
-	stash: {
-		icon: PackageOpen,
 	},
 	temporary: {
 		icon: Timer,

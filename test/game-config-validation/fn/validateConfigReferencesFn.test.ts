@@ -9,6 +9,7 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
+	createItemBase,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticRecordEntityEnumSchema";
@@ -133,7 +134,7 @@ describe("completed config reference validation", () => {
 
 	it("reports selectors authored by Space requirements and availability rules", async () => {
 		const portal = {
-			...createSimpleItem("item:portal"),
+			...createItemBase("item:portal"),
 			type: "space" as const,
 			space: 1,
 			input: [

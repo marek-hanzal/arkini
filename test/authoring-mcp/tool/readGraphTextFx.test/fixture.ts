@@ -5,7 +5,7 @@ import { createGraphProject, createToolProject } from "../support/createToolProj
 export const createRelationTraversalProject = () => {
 	const base = createGraphProject();
 	const forge = base.config.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	const readOutput = (itemId: string) => ({
 		set: [
 			{

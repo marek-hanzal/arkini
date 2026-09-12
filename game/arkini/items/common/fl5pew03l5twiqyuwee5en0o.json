@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "fl5pew03l5twiqyuwee5en0o",
+		"id": "wool-cloth",
+		"title": "Wool Cloth",
+		"description": "It's warm",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"wool-cloth"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "common"
+	}
+}

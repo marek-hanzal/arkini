@@ -1,0 +1,29 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "bamumldgmvb0bhq8bkq0koxj",
+		"id": "british-shorthair-kitten",
+		"title": "British Shorthair Kitten",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"british-shorthair-kitten"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "mouse"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "british-shorthair-kitten-with-mouse"
+			}
+		],
+		"type": "common"
+	}
+}

@@ -22,7 +22,7 @@ export const createDraftFn = ({
 	type,
 	uid,
 }: CreateDraftFnProps): ItemSchema.Type => {
-	const itemId = requestedItemId ?? (type === "producer" ? "producer:new-item" : "item:new-item");
+	const itemId = requestedItemId ?? "item:new-item";
 	const base = {
 		uid,
 		id: itemId,
@@ -40,7 +40,7 @@ export const createDraftFn = ({
 		maxStackSize: 1,
 	};
 	const lineBase = {
-		id: `line:${itemId.replace(/^(?:item|producer):/, "") || "new-item"}:default`,
+		id: `line:${itemId.replace(/^item:/, "") || "new-item"}:default`,
 		default: true,
 		show: true,
 		enable: true,
@@ -55,9 +55,11 @@ export const createDraftFn = ({
 		rules: [],
 	} satisfies Omit<LineSchema.Type, "description" | "title">;
 	return match(type)
-		.with("simple", (matchedType) => ({
+		.with("common", (matchedType) => ({
 			...base,
 			type: matchedType,
+			lines: [],
+			maxQueueSize: 1,
 		}))
 		.with("space", (matchedType) => ({
 			...base,
@@ -81,20 +83,6 @@ export const createDraftFn = ({
 			maxStackSize: 1,
 			durationMs: 300_000,
 		}))
-		.with("producer", (matchedType) => ({
-			...base,
-			type: matchedType,
-			maxQueueSize: 1,
-			lines: [
-				{
-					...lineBase,
-					title: `New ${matchedType} line`,
-					description: `Describe what this ${matchedType} line consumes and produces.`,
-				},
-			] as [
-				LineSchema.Type,
-			],
-		}))
 		.with("clock", (matchedType) => ({
 			...base,
 			type: matchedType,
@@ -114,7 +102,7 @@ export const createDraftFn = ({
 				LineSchema.Type,
 			],
 		}))
-		.with("blueprint", "craft", "stash", (lineType) => ({
+		.with("blueprint", (lineType) => ({
 			...base,
 			type: lineType,
 			line: {

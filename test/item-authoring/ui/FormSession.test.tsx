@@ -124,9 +124,12 @@ import {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const item: ItemSchema.Type = {
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: "q12cmsx5ussy30wyjiea8yaw",
 	id: "item:water",
-	type: "simple",
+	type: "common",
 	title: "Water",
 	description: "Fresh water.",
 	asset: {
@@ -209,7 +212,7 @@ const render = async (children: ReactNode, newItem = false, defaultDraft?: boole
 								defaultDraft,
 								defaultItemId: "dirty-bucket",
 								defaultTitle: "Dirty Bucket",
-								itemType: "simple" as const,
+								itemType: "common" as const,
 							}
 						: {})}
 					sectionId={sectionId}
@@ -253,7 +256,7 @@ describe("item section form session", () => {
 			defaultDraft: true,
 			defaultItemId: "dirty-bucket",
 			defaultTitle: "Dirty Bucket",
-			itemType: "simple",
+			itemType: "common",
 		});
 	});
 
@@ -629,6 +632,55 @@ describe("item section form session", () => {
 		expect(document.activeElement).toBe(invalid);
 	});
 
+	it("adds production to a passive Common through the ordinary line editor", async () => {
+		const { container } = await render(<ProductionSection />);
+		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		if (addLine === null) throw new Error("Missing add line control.");
+		await act(async () => addLine.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					type: "common",
+					lines: [
+						expect.objectContaining({
+							default: true,
+						}),
+					],
+				}),
+			}),
+		);
+	});
+	it("saves a passive Common after removing its last production line", async () => {
+		const common = {
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ProductionSection />);
+		const removeLine = container.querySelector<HTMLButtonElement>(
+			'button[title="Remove line"]',
+		);
+		if (removeLine === null) throw new Error("Missing remove line control.");
+		await act(async () => removeLine.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					type: "common",
+					lines: [],
+				}),
+			}),
+		);
+	});
+
 	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
 		const clock = ClockSchema.parse({
 			...createProducerItem({
@@ -650,6 +702,7 @@ describe("item section form session", () => {
 			}
 		).config.items[item.id] = clock;
 		const { container } = await render(<ProductionSection />);
+		expect(container.querySelector('button[title="Remove line"]')).toBeNull();
 		const duration = container.querySelector<HTMLInputElement>('input[name="durationMs"]');
 		if (duration === null) throw new Error("Missing clock lifetime field.");
 		await changeInput(duration, "");

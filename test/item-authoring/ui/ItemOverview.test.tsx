@@ -88,6 +88,7 @@ describe("ItemOverview", () => {
 			"artwork",
 			"units",
 			"merges",
+			"production",
 			"estimate",
 			"connections",
 			"notes",

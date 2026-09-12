@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "cbivn53v6dc91xiuq55q52m2",
+		"id": "sack-with-coffee",
+		"title": "Sack With Coffee",
+		"description": "You'd better drink it yourself",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sack-with-coffee"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "pwa7i4khtnmvijdvtfgdzyhj",
+		"id": "dye",
+		"title": "Dye",
+		"description": "Wanna color something?",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dye"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "common"
+	}
+}

@@ -18,7 +18,7 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 	match(item)
 		.with(
 			{
-				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
+				type: P.union(TypeSchema.enum.Common, TypeSchema.enum.Clock),
 			},
 			({ lines }) =>
 				lines.map(
@@ -37,11 +37,7 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 
 		.with(
 			{
-				type: P.union(
-					TypeSchema.enum.Blueprint,
-					TypeSchema.enum.Craft,
-					TypeSchema.enum.Stash,
-				),
+				type: TypeSchema.enum.Blueprint,
 			},
 			({ line }) => [
 				{
@@ -57,7 +53,6 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 		.with(
 			{
 				type: P.union(
-					TypeSchema.enum.Simple,
 					TypeSchema.enum.Space,
 					TypeSchema.enum.Temporary,
 					TypeSchema.enum.Inventory,

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hhq1jyc6purkrnzfh6bqsk51",
+		"id": "ash",
+		"title": "Ash",
+		"description": "Fire was once there",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"ash"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"type": "common"
+	}
+}

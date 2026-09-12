@@ -5,7 +5,7 @@ import { createJobTestConfig } from "~test/production-job/support/jobTestConfig"
 export const createTickFailureTestConfig = () => {
 	const base = createJobTestConfig(1);
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	const line = forge.lines[0];
 	if (line === undefined) throw new Error("Expected producer line fixture.");
 

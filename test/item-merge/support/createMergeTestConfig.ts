@@ -21,6 +21,9 @@ const simpleItem = ({
 	];
 	scope?: "any" | "board" | "inventory";
 }) => ({
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: id,
 	id,
 	title: id,
@@ -36,7 +39,7 @@ const simpleItem = ({
 	maxCount,
 	maxStackSize,
 	merge,
-	type: "simple" as const,
+	type: "common" as const,
 });
 
 export const createMergeTestConfig = ({

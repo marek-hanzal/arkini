@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "tuxpnq2m8g5kjnl4n2lu8znt",
+		"id": "dirty-kitchen-knife",
+		"title": "Dirty Kitchen Knife",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-kitchen-knife"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

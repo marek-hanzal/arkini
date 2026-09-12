@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "aygivt7zvn1bhvhe7emo5g86",
+		"id": "faith-toilet",
+		"title": "Faith Toilet",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"faith-toilet"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

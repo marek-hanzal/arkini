@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "jaw4snt90jfd4fc8pyh128xy",
+		"id": "mana-reservoir",
+		"title": "Mana Reservoir",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"mana-reservoir"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

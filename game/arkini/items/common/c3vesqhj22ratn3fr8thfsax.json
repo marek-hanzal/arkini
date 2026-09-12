@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "c3vesqhj22ratn3fr8thfsax",
+		"id": "spoiled-clay-bowl",
+		"title": "Spoiled Clay Bowl",
+		"description": "Do you remember previous content?",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-clay-bowl"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "common"
+	}
+}

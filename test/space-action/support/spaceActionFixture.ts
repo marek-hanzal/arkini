@@ -281,23 +281,35 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		payer: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("payer", "board"),
-			type: "simple",
+			type: "common",
 			units: {
 				amount: 2,
 			},
 		},
 		permit: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("permit"),
-			type: "simple",
+			type: "common",
 		},
 		token: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("token", "inventory"),
-			type: "simple",
+			type: "common",
 		},
 		boardToken: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("boardToken", "board"),
-			type: "simple",
+			type: "common",
 		},
 	},
 });

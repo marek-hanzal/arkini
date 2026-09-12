@@ -1742,7 +1742,7 @@
 			"additionalProperties": false,
 			"description": "A single product line with its accepted inputs and produced output."
 		},
-		"item.SimpleSchema": {
+		"item.CommonSchema": {
 			"type": "object",
 			"properties": {
 				"uid": {
@@ -1798,11 +1798,24 @@
 					},
 					"minItems": 1
 				},
+				"maxQueueSize": {
+					"default": 1,
+					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				},
 				"type": {
 					"type": "string",
 					"enum": [
-						"simple"
+						"common"
 					]
+				},
+				"lines": {
+					"default": [],
+					"description": "Optional production lines; an empty collection leaves the item passive.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
+					}
 				}
 			},
 			"required": [
@@ -1812,10 +1825,12 @@
 				"asset",
 				"scope",
 				"maxStackSize",
-				"type"
+				"maxQueueSize",
+				"type",
+				"lines"
 			],
 			"additionalProperties": false,
-			"description": "An item without specialized gameplay behavior."
+			"description": "An item that provides zero or more selectable product lines."
 		},
 		"item.SpaceSchema": {
 			"type": "object",
@@ -1940,101 +1955,6 @@
 			],
 			"description": "Enable gates and disable vetoes evaluated for an immediate item action."
 		},
-		"item.ProducerSchema": {
-			"type": "object",
-			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"description": "The part of game state in which this item may be stored.",
-					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"maxQueueSize": {
-					"default": 1,
-					"description": "The maximum number of accepted active and queued runs for this producer; defaults to one.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"producer"
-					]
-				},
-				"lines": {
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-					},
-					"minItems": 1,
-					"description": "One or more product lines provided by this producer."
-				}
-			},
-			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"maxQueueSize",
-				"type",
-				"lines"
-			],
-			"additionalProperties": false,
-			"description": "An item that provides one or more selectable product lines."
-		},
 		"item.ClockSchema": {
 			"type": "object",
 			"properties": {
@@ -2097,7 +2017,7 @@
 				},
 				"maxQueueSize": {
 					"default": 1,
-					"description": "The maximum number of accepted active and queued runs for this producer; defaults to one.",
+					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
 				"type": {
@@ -2107,17 +2027,12 @@
 					]
 				},
 				"lines": {
+					"minItems": 1,
 					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-						}
-					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
 					},
-					"minItems": 1,
-					"description": "One or more product lines provided by this producer."
+					"description": "One or more production lines available to the schedule."
 				},
 				"intervalMs": {
 					"type": "integer",
@@ -2173,166 +2088,6 @@
 			],
 			"additionalProperties": false,
 			"description": "A scheduled producer with ordinary lines and optional active lifetime."
-		},
-		"item.CraftSchema": {
-			"type": "object",
-			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"description": "The part of game state in which this item may be stored.",
-					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"craft"
-					]
-				},
-				"line": {
-					"description": "The one product line owned by this craft.",
-					"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-				}
-			},
-			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"type",
-				"line"
-			],
-			"additionalProperties": false,
-			"description": "An item configuration that owns one craft product line."
-		},
-		"item.StashSchema": {
-			"type": "object",
-			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"description": "The part of game state in which this item may be stored.",
-					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"stash"
-					]
-				},
-				"line": {
-					"description": "The one product line owned by this stash.",
-					"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-				}
-			},
-			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"type",
-				"line"
-			],
-			"additionalProperties": false,
-			"description": "An item configuration with one product line."
 		},
 		"item.TemporarySchema": {
 			"type": "object",
@@ -2519,22 +2274,13 @@
 					"$ref": "urn:arkini:schema:project#/$defs/item.BlueprintSchema"
 				},
 				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.SimpleSchema"
+					"$ref": "urn:arkini:schema:project#/$defs/item.CommonSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.SpaceSchema"
 				},
 				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.ProducerSchema"
-				},
-				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.ClockSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.CraftSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.StashSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.TemporarySchema"

@@ -78,7 +78,7 @@ const availabilityRule = (
 const createReachabilityConfig = (includeTool: boolean) => {
 	const base = createJobTestConfig();
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+	if (forge.type !== "common") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...base,
 		start: {
@@ -290,7 +290,7 @@ describe("readItemOriginFlow", () => {
 	it("keeps raw line and output conditions in canonical graph sources", async () => {
 		const base = createReachabilityConfig(true);
 		const forge = base.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		const conditionedOutput: OutputSchema.Type = {
 			set: [
 				{
@@ -354,7 +354,7 @@ describe("readItemOriginFlow", () => {
 	it("embeds chance outputs and omits depletion without an authored unit spender", async () => {
 		const base = createReachabilityConfig(true);
 		const forge = base.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		if (forge.type !== "common") throw new Error("Expected producer fixture.");
 		const chanceOutput: OutputSchema.Type = {
 			set: [
 				{

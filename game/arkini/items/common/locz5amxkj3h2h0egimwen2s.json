@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "locz5amxkj3h2h0egimwen2s",
+		"id": "work-clothes",
+		"title": "Work Clothes",
+		"description": "You should go the the work",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"work-clothes"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4,
+		"type": "common"
+	}
+}

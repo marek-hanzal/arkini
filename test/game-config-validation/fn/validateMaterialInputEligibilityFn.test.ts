@@ -7,11 +7,12 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
+	createItemBase,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const temporaryItem = (id: string) => ({
-	...createSimpleItem(id),
+	...createItemBase(id),
 	type: "temporary" as const,
 	scope: "board" as const,
 	maxStackSize: 1,

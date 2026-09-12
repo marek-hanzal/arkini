@@ -1,0 +1,82 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "jaem2mwc184a9wyurctnfvd1",
+		"id": "bakery",
+		"title": "Bakery",
+		"description": "Bake a thing. Yummi thing",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bakery"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"type": "common",
+		"lines": [
+			{
+				"id": "bread",
+				"title": "Bread",
+				"description": "Yummi bread.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "flour"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bread-basket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

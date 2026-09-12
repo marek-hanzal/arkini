@@ -1,0 +1,30 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "a81lvt192x5de4ig6op2fhv5",
+		"id": "cotton-seed",
+		"title": "Cotton Seed",
+		"description": "Cotton. Want. To. Grow",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"seed",
+				"cotton"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 6,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-cotton-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cotton-field"
+			}
+		],
+		"type": "common"
+	}
+}

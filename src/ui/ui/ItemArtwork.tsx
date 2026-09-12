@@ -1,4 +1,5 @@
 const artworkSizeClassName = {
+	input: "size-[var(--ak-control-min-height)]",
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-11",

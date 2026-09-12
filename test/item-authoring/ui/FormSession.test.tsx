@@ -258,7 +258,7 @@ describe("item section form session", () => {
 		],
 		[
 			"action",
-			"interactions",
+			"identity",
 		],
 		[
 			"clock",

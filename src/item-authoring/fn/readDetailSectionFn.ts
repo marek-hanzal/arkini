@@ -5,10 +5,9 @@ export const readDetailSectionFn = (section: SectionId): DetailSectionId => {
 	switch (section) {
 		case "artwork":
 		case "units":
-			return "identity";
 		case "action":
 		case "merges":
-			return "interactions";
+			return "identity";
 		case "clock":
 			return "production";
 		default:

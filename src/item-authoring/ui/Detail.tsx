@@ -41,13 +41,7 @@ export const Detail = ({
 		itemUid: item.uid,
 	};
 	const editableSectionId =
-		sectionId === "identity"
-			? "identity"
-			: sectionId === "interactions"
-				? "action"
-				: sectionId === "production"
-					? "production"
-					: undefined;
+		sectionId === "identity" || sectionId === "production" ? sectionId : undefined;
 	const help = ItemSectionHelp[sectionId];
 	const sections = readSectionsFn();
 	return (

@@ -9,10 +9,6 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 		title: <Tx label="Item" />,
 		content: <Mx label="Item identity help" />,
 	},
-	interactions: {
-		title: <Tx label="Interactions" />,
-		content: <Mx label="Item interactions help" />,
-	},
 	action: {
 		title: <Tx label="Action" />,
 		content: <Mx label="Item action help" />,

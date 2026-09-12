@@ -4,7 +4,8 @@ import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
-import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
+import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 
@@ -112,6 +113,34 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						)}
 					/>
 					<UnitsDetail item={item} />
+				</section>
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemActionDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="action"
+						title={translator.textFn("Action")}
+						description={translator.textFn(
+							"Clicking this item can enter a space or open Inventory after its requirements pass.",
+						)}
+					/>
+					<ActionDetail item={item} />
+				</section>
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemMergesDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="merges"
+						title={translator.textFn("Merges")}
+						description={translator.textFn(
+							"Dropping this item onto a matching target applies its source action, target effect and optional output.",
+						)}
+					/>
+					<MergesDetail item={item} />
 				</section>
 				<section
 					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"

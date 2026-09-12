@@ -374,8 +374,6 @@ Input type:
 Inputs:
   value: Inputs
   dynamic: true
-Interactions:
-  value: Interactions
 Interactive:
   value: Interactive
 Interval:
@@ -466,21 +464,17 @@ Item global count help:
     Limits the total quantity of this item across the game. Stack quantities contribute to the same global limit. Leave empty for no global limit.
 Item identity help:
   value: |
-    Item brings together identity, artwork, storage limits and the optional unit supply. Use each section's **Edit** action to open its exact settings.
+    Item brings together identity, artwork, storage limits, units, actions, merges and a production summary. Use each section's **Edit** action to open its exact settings.
 
     **Storage scope** controls placement on Board, Toolbar and Inventory. **Stack capacity** counts separate items in one stack; **Units** are the supply inside each item. **Game limit** limits the item across the game.
+
+    **Action** opens a Space or Inventory after its inputs and rules pass. **Merges** apply a source action, target effect and optional output when this item is dropped onto a matching target. Action cannot coexist with production lines or Clock; Merges are independent.
+
+    **Production** shows whether lines are configured and how many there are. Open the Production page for their full details and Clock settings.
 
     Item IDs can be renamed with their project references. The UID remains the item's stable identity. Artwork changes appearance without changing occupied cells.
 
     **Draft** is saved immediately as an Editor organization flag. Draft items still participate in the game and the built Arkpack. Other edits are applied with **Save**; **Discard** leaves the saved item unchanged.
-Item interactions help:
-  value: |
-    Interactions describes what happens when a player clicks this item or drops it onto another item.
-
-    - **Action** is an immediate click interaction: enter a Space or open Inventory after its inputs and rules pass.
-    - **Merges** are directional drop interactions. Their source action and target effect are independent, with an optional extra output.
-
-    Action cannot coexist with production lines or Clock. Merges are configured independently. Use the local **Edit** links to change either interaction.
 Item list help:
   value: |
     Browse the project's saved items by title or ID. Open an item to inspect its capabilities, acquisition estimate, connections and Notes.

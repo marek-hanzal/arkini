@@ -3,7 +3,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { useItemDraftController } from "~/item-authoring/ui/useItemDraftController";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemDraftToggleProps extends useItemDraftController.Props {
@@ -16,11 +16,10 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 		item,
 	});
 	const draft = readDraftFn(item);
-	const DraftButton = draft ? PrimaryButton : Button;
 	return (
 		<div className="grid justify-items-end gap-1">
-			<DraftButton
-				className="h-10 min-h-10 border px-3 py-2 text-sm data-[ui-active=true]:border-transparent"
+			<LinkButton
+				className="inline-flex h-10 min-h-10 items-center justify-center rounded-lg border border-transparent px-3 py-2 text-sm data-[ui-active=true]:border-line data-[ui-active=true]:text-foreground data-[ui-active=true]:hover:text-foreground data-[ui-active=true]:hover:no-underline"
 				cursorIntent={controller.pending ? "wait" : "pointer"}
 				disabled={controller.pending}
 				onClick={() => void controller.toggleFn()}
@@ -33,7 +32,7 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 				})}
 			>
 				<Tx label="Draft" />
-			</DraftButton>
+			</LinkButton>
 			{controller.error === undefined ? null : (
 				<p
 					className="max-w-80 text-right text-xs text-danger"

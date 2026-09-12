@@ -31,6 +31,13 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 									: "Interactive",
 							)}
 						/>
+						<DetailFact
+							label={translator.textFn("Queue capacity")}
+							description={translator.textFn(
+								"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
+							)}
+							value={item.maxQueueSize}
+						/>
 						<Fact
 							label={translator.textFn("Storage")}
 							value={translator.textFn(`Item storage scope - ${item.scope}`)}

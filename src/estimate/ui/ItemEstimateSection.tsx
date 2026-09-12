@@ -7,6 +7,7 @@ import { formatItemEstimateResultFn } from "~/estimate/ui/formatItemEstimateResu
 import { ItemEstimateRouteGraph } from "~/estimate/ui/ItemEstimateRouteGraph";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Status } from "~/ui/ui/Status";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
@@ -57,11 +58,14 @@ const ItemEstimateResult = ({
 	readonly limit?: number;
 }) =>
 	estimate.status === "unreachable" ? (
-		<Status
-			dataUi="EditorItemEstimateUnreachable"
-			icon={Unlink}
-			title="This item is unreachable."
-		/>
+		<EditorRootCard dataUi="EditorItemEstimateUnreachableCard">
+			<Status
+				dataUi="EditorItemEstimateUnreachable"
+				icon={Unlink}
+				title="This item is unreachable."
+				variant="flat"
+			/>
+		</EditorRootCard>
 	) : estimate.obtainable ? (
 		<ItemEstimateRouteGraph
 			config={config}
@@ -125,8 +129,14 @@ export const ItemEstimateSection = ({
 	const state = useItemEstimate(project, itemId);
 	return (
 		<section
-			className="grid content-start gap-4"
-			data-ui="EditorItemEstimateSection"
+			className="grid content-start gap-4 data-[ui-unreachable=true]:content-stretch"
+			{...readDataUiFn({
+				dataUi: "EditorItemEstimateSection",
+				state: {
+					unreachable:
+						state.status === "ready" && state.estimate.status === "unreachable",
+				},
+			})}
 		>
 			{state.status === "ready" ? null : (
 				<div

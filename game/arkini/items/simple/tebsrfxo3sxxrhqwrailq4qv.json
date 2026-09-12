@@ -2,13 +2,13 @@
 	"$schema": "../../schema.json",
 	"item": {
 		"uid": "tebsrfxo3sxxrhqwrailq4qv",
-		"id": "wine-with-milk",
-		"title": "Wine With Milk",
+		"id": "glass-goblet-with-milk",
+		"title": "Glass Goblet with Milk",
 		"description": "Somebody may tell you a wine belongs there",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"wine-with-milk"
+				"glass-goblet-with-milk"
 			]
 		},
 		"scope": "any",

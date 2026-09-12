@@ -2,13 +2,13 @@
 	"$schema": "../../schema.json",
 	"item": {
 		"uid": "khhjiqer051bo8c6931ze935",
-		"id": "spoiled-wine",
-		"title": "Spoiled Wine",
+		"id": "glass-goblet-spoiled",
+		"title": "Spoiled Glass Goblet",
 		"description": "You've forgot it in the corner month ago?",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"spoiled-wine"
+				"glass-goblet-spoiled"
 			]
 		},
 		"scope": "any",

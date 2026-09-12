@@ -2,13 +2,13 @@
 	"$schema": "../../schema.json",
 	"item": {
 		"uid": "vwq92k7xdri5r6cety12sj8b",
-		"id": "wine-with-beer",
-		"title": "Wine With Beer",
+		"id": "glass-goblet-with-beer",
+		"title": "Glass Goblet with Beer",
 		"description": "Disgusting",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"wine-with-beer"
+				"glass-goblet-with-beer"
 			]
 		},
 		"scope": "any",

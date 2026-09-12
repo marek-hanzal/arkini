@@ -34,7 +34,7 @@ The production domain graph contains real behavior cycles even though the concre
 
 Schema composition adds further non-behavioral back edges:
 
-- Item Definition embeds Line and Output schemas; production reads Item definitions.
+- Item Definition embeds Line, Output and the `item-action` discriminated union; production reads Item definitions. Common action payloads reuse immediate Input/Rule schemas, and `space-action` owns the concrete navigation transaction. Action and production lines are mutually exclusive.
 - Runtime schemas embed Job, default-line, input and delivery state; production operations consume Runtime values.
 - Production errors and schemas reuse exact Game Value identity, quantity and time contracts.
 

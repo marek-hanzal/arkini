@@ -13,10 +13,12 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"type": "space",
-		"space": 338,
-		"enable": true,
-		"input": [],
-		"rules": []
+		"type": "common",
+		"action": {
+			"type": "space",
+			"space": 338,
+			"input": [],
+			"rules": []
+		}
 	}
 }

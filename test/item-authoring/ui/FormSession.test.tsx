@@ -109,7 +109,7 @@ import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
-import { SpaceActionSection } from "~/item-authoring/ui/SpaceActionSection";
+import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import type { SectionId } from "~/item-authoring/type/Section";
 import {
 	createOutput,
@@ -351,11 +351,13 @@ describe("item section form session", () => {
 	it("picks both bounds of the reserved random space range into the local draft", async () => {
 		const spaceItem = {
 			...item,
-			type: "space",
-			space: 0,
-			enable: true,
-			input: [],
-			rules: [],
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 0,
+				input: [],
+				rules: [],
+			},
 		} satisfies ItemSchema.Type;
 		state.persisted = spaceItem;
 		(
@@ -370,8 +372,8 @@ describe("item section form session", () => {
 			.mockReturnValueOnce(0)
 			.mockReturnValueOnce(1 - Number.EPSILON);
 		try {
-			const { container } = await render(<SpaceActionSection />);
-			const input = container.querySelector<HTMLInputElement>('input[name="space"]');
+			const { container } = await render(<ActionSection />);
+			const input = container.querySelector<HTMLInputElement>('input[name="action.space"]');
 			const pickRandomSpaceButton = [
 				...container.querySelectorAll("button"),
 			].find((button) => button.textContent === "Pick random space");
@@ -630,6 +632,105 @@ describe("item section form session", () => {
 				}),
 		);
 		expect(document.activeElement).toBe(invalid);
+	});
+
+	it("replaces production with an action in the canonical saved item", async () => {
+		const common = {
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ActionSection />);
+		const enable = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable action");
+		if (enable === undefined) throw new Error("Missing enable action control.");
+		await act(async () => enable.click());
+		// Persist the action and empty lines as one canonical item.
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					lines: [],
+					action: {
+						type: "space",
+						space: 0,
+						input: [],
+						rules: [],
+					},
+				}),
+			}),
+		);
+	});
+	it("replaces a configured action when the first production line is added", async () => {
+		const common = {
+			...item,
+			type: "common" as const,
+			action: {
+				type: "space" as const,
+				space: 7,
+				input: [],
+				rules: [],
+			},
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ProductionSection />);
+		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		if (add === null) throw new Error("Missing add line control.");
+		await act(async () => add.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					action: undefined,
+					lines: [
+						expect.objectContaining({
+							default: true,
+						}),
+					],
+				}),
+			}),
+		);
+	});
+	it("disables a configured action without changing the item identity", async () => {
+		const common = {
+			...item,
+			type: "common" as const,
+			action: {
+				type: "space" as const,
+				space: 7,
+				input: [],
+				rules: [],
+			},
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ActionSection />);
+		const disable = container.querySelector<HTMLButtonElement>(
+			'button[title="Disable action"]',
+		);
+		if (disable === null) throw new Error("Missing disable action control.");
+		await act(async () => disable.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					id: item.id,
+					action: undefined,
+					lines: [],
+				}),
+			}),
+		);
 	});
 
 	it("adds production to a passive Common through the ordinary line editor", async () => {

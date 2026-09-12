@@ -1798,6 +1798,10 @@
 					},
 					"minItems": 1
 				},
+				"action": {
+					"description": "An optional immediate action; mutually exclusive with production lines.",
+					"$ref": "urn:arkini:schema:project#/$defs/itemAction.ActionSchema"
+				},
 				"maxQueueSize": {
 					"default": 1,
 					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
@@ -1811,7 +1815,7 @@
 				},
 				"lines": {
 					"default": [],
-					"description": "Optional production lines; an empty collection leaves the item passive.",
+					"description": "Optional production lines; an item without lines or an action is passive.",
 					"type": "array",
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
@@ -1830,78 +1834,30 @@
 				"lines"
 			],
 			"additionalProperties": false,
-			"description": "An item that provides zero or more selectable product lines."
+			"not": {
+				"required": [
+					"action",
+					"lines"
+				],
+				"properties": {
+					"lines": {
+						"minItems": 1
+					}
+				}
+			},
+			"description": "An ordinary item with optional production or one immediate action."
 		},
-		"item.SpaceSchema": {
+		"itemAction.ActionSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/itemAction.SpaceActionSchema"
+				}
+			],
+			"description": "One immediate item action selected by its type discriminator."
+		},
+		"itemAction.SpaceActionSchema": {
 			"type": "object",
 			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"description": "The part of game state in which this item may be stored.",
-					"$ref": "urn:arkini:schema:project#/$defs/scope.StorageSchema"
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"space"
-					]
-				},
-				"space": {
-					"description": "The authored board space selected after successful activation.",
-					"$ref": "urn:arkini:schema:project#/$defs/NonNegativeIntegerSchema"
-				},
-				"enable": {
-					"default": true,
-					"type": "boolean"
-				},
 				"input": {
 					"default": [],
 					"type": "array",
@@ -1915,23 +1871,24 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/action.RuleSchema"
 					}
+				},
+				"type": {
+					"type": "string",
+					"const": "space"
+				},
+				"space": {
+					"description": "The board space selected after successful activation.",
+					"$ref": "urn:arkini:schema:project#/$defs/NonNegativeIntegerSchema"
 				}
 			},
 			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"type",
-				"space",
-				"enable",
 				"input",
-				"rules"
+				"rules",
+				"type",
+				"space"
 			],
 			"additionalProperties": false,
-			"description": "An item whose shared immediate action requirements settle atomically with navigation."
+			"description": "An immediate action whose requirements settle atomically with navigation."
 		},
 		"action.InputSchema": {
 			"oneOf": [
@@ -2275,9 +2232,6 @@
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.CommonSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.SpaceSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.ClockSchema"

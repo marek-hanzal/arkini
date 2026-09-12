@@ -71,214 +71,256 @@ const config = GameConfigSchema.parse({
 	items: {
 		sameSpacePortal: {
 			...baseItem("sameSpacePortal", "inventory"),
-			type: "space",
-			space: 0,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 0,
+			},
 		},
 		portal: {
 			...baseItem("portal"),
-			type: "space",
-			space: 7,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 7,
+			},
 		},
 		blockedPortal: {
 			...baseItem("blockedPortal"),
-			type: "space",
-			space: 2,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "exists",
-							query: {
-								scope: "universe",
-								selector: {
-									type: "item",
-									itemId: "permit",
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 2,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "exists",
+								query: {
+									scope: "universe",
+									selector: {
+										type: "item",
+										itemId: "permit",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		},
 		proximityPortal: {
 			...baseItem("proximityPortal"),
-			type: "space",
-			space: 10,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "exists",
-							query: {
-								scope: "board",
-								distance: "close",
-								selector: {
-									type: "item",
-									itemId: "permit",
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 10,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "exists",
+								query: {
+									scope: "board",
+									distance: "close",
+									selector: {
+										type: "item",
+										itemId: "permit",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		},
 		passiveZeroBoardRulePortal: {
 			...baseItem("passiveZeroBoardRulePortal", "inventory"),
-			type: "space",
-			space: 11,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "count",
-							count: 0,
-							query: {
-								scope: "board",
-								distance: "close",
-								selector: {
-									type: "item",
-									itemId: "permit",
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 11,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "count",
+								count: 0,
+								query: {
+									scope: "board",
+									distance: "close",
+									selector: {
+										type: "item",
+										itemId: "permit",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		},
 		unitsPortal: {
 			...baseItem("unitsPortal"),
-			type: "space",
-			space: 3,
-			input: [
-				{
-					type: "units",
-					query: {
-						scope: "board",
-						distance: "close",
-						selector: {
-							type: "item",
-							itemId: "payer",
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 3,
+				input: [
+					{
+						type: "units",
+						query: {
+							scope: "board",
+							distance: "close",
+							selector: {
+								type: "item",
+								itemId: "payer",
+							},
+						},
+						units: {
+							from: "target",
+							cost: 1,
 						},
 					},
-					units: {
-						from: "target",
-						cost: 1,
-					},
-				},
-			],
+				],
+			},
 		},
 		ownerUnitsPortal: {
 			...baseItem("ownerUnitsPortal"),
-			type: "space",
-			space: 8,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 8,
+				input: [
+					{
+						type: "units",
+						query: {
+							scope: "board",
+							distance: "close",
+							selector: {
+								type: "item",
+								itemId: "payer",
+							},
+						},
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
 			units: {
 				amount: 3,
 			},
-			input: [
-				{
-					type: "units",
-					query: {
-						scope: "board",
-						distance: "close",
-						selector: {
-							type: "item",
-							itemId: "payer",
-						},
-					},
-					units: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		spentPortal: {
 			...baseItem("spentPortal"),
-			type: "space",
-			space: 4,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 4,
+			},
+
 			units: {
 				amount: 2,
 			},
 		},
 		passiveFinitePortal: {
 			...baseItem("passiveFinitePortal"),
-			type: "space",
-			space: 4,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 4,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
 			units: {
 				amount: 2,
 			},
-			input: [
-				{
-					type: "simple",
-					units: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		cumulativePortal: {
 			...baseItem("cumulativePortal"),
-			type: "space",
-			space: 5,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 5,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
 			units: {
 				amount: 2,
 			},
-			input: [
-				{
-					type: "simple",
-					units: {
-						from: "self",
-						cost: 1,
-					},
-				},
-				{
-					type: "simple",
-					units: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		depletingPortal: {
 			...baseItem("depletingPortal"),
-			type: "space",
-			space: 6,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 6,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
 			units: {
 				amount: 1,
 				output: depletionOutput("token"),
 			},
-			input: [
-				{
-					type: "simple",
-					units: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		passiveFailurePortal: {
 			...baseItem("passiveFailurePortal", "inventory"),
-			type: "space",
-			space: 9,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 9,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
 			units: {
 				amount: 1,
 				output: depletionOutput("boardToken"),
 			},
-			input: [
-				{
-					type: "simple",
-					units: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		payer: {
 			maxQueueSize: 1,

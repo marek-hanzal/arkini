@@ -7,13 +7,11 @@ export const readSectionForPathFn = (
 	itemType?: TypeSchema.Type,
 ): SectionId => {
 	switch (path[0]) {
+		case "action":
+			return "action";
 		case "enable":
 		case "rules":
-			return itemType === "space"
-				? "action"
-				: itemType === "clock"
-					? "production"
-					: "identity";
+			return itemType === "clock" ? "production" : "identity";
 		case "asset":
 			return "artwork";
 		case "maxCount":

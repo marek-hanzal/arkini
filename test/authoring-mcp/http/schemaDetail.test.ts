@@ -1,4 +1,6 @@
+import Ajv2020 from "ajv/dist/2020";
 import { Effect } from "effect";
+import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -160,7 +162,6 @@ describe("editor MCP authoring schema registry", () => {
 			});
 		}
 		const itemTypes = [
-			"space",
 			"common",
 			"clock",
 			"blueprint",
@@ -216,6 +217,75 @@ describe("editor MCP authoring schema registry", () => {
 				"start.ToolbarItemSchema",
 			]),
 		);
+
+		// MCP clients validate this exported graph before sending canonical authoring writes.
+		const ajv = new Ajv2020({
+			strict: false,
+		});
+		const schemaUri = (id: string) => `https://schema.arkini.test/${encodeURIComponent(id)}`;
+		// MCP refs are exact registry IDs; give Ajv absolute addresses for that same graph.
+		for (const [id, schema] of schemasById)
+			ajv.addSchema(
+				JSON.parse(
+					JSON.stringify(schema, (key, value) =>
+						(key === "$id" || key === "$ref") && typeof value === "string"
+							? schemaUri(value)
+							: value,
+					),
+				),
+				schemaUri(id),
+			);
+		const validateCreate = ajv.getSchema(
+			schemaUri("urn:arkini:schema:mcp:create-common-item-input"),
+		);
+		const validatePatch = ajv.getSchema(schemaUri("CommonItemPatchSchema"));
+		if (validateCreate === undefined || validatePatch === undefined)
+			throw new Error("Missing public Common schema.");
+		const clockDraft = createDraftFn({
+			type: "clock",
+			uid: "uid:template",
+			resourceId: "asset:template",
+		});
+		if (clockDraft.type !== "clock") throw new Error("Expected Clock draft.");
+		const action = {
+			type: "space",
+			space: 1,
+		};
+		const input = {
+			id: "item:portal",
+			title: "Portal",
+			action,
+		};
+		expect(validateCreate(input), JSON.stringify(validateCreate.errors)).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				lines: [],
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		expect(
+			validateCreate({
+				...input,
+				lines: clockDraft.lines,
+			}),
+		).toBe(false);
+		expect(
+			validateCreate({
+				id: "item:workshop",
+				title: "Workshop",
+				lines: clockDraft.lines,
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		// Patches may clear an action and replace lines together; the complete candidate enforces exclusivity.
+		expect(
+			validatePatch({
+				action: null,
+				lines: clockDraft.lines,
+			}),
+			JSON.stringify(validatePatch.errors),
+		).toBe(true);
 
 		const wrongCase = await client.callTool({
 			name: "schema_detail",

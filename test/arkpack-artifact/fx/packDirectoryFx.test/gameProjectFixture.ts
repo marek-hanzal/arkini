@@ -45,8 +45,12 @@ const config = GameConfigSchema.parse({
 		portal: {
 			uid: "portal",
 			id: "portal",
-			type: "space",
-			space: 9,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 9,
+			},
+
 			title: "Portal",
 			description: "Portal",
 			asset: {
@@ -83,16 +87,12 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const input = yield* fileSystem.makeTempDirectoryScoped();
-	const simpleItems = path.join(input, "items", "common");
-	const spaceItems = path.join(input, "items", "space");
+	const commonItems = path.join(input, "items", "common");
 	const assets = path.join(input, "assets");
 	const resources = path.join(input, "resources");
 	const { items: authoredItems, ...root } = config;
 
-	yield* fileSystem.makeDirectory(simpleItems, {
-		recursive: true,
-	});
-	yield* fileSystem.makeDirectory(spaceItems, {
+	yield* fileSystem.makeDirectory(commonItems, {
 		recursive: true,
 	});
 	yield* fileSystem.makeDirectory(assets, {
@@ -124,14 +124,14 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		}),
 	);
 	yield* fileSystem.writeFileString(
-		path.join(simpleItems, "water.json"),
+		path.join(commonItems, "water.json"),
 		JSON.stringify({
 			$schema: "../../schema.json",
 			item: authoredItems.water,
 		}),
 	);
 	yield* fileSystem.writeFileString(
-		path.join(spaceItems, "portal.json"),
+		path.join(commonItems, "portal.json"),
 		JSON.stringify({
 			$schema: "../../schema.json",
 			item: authoredItems.portal,

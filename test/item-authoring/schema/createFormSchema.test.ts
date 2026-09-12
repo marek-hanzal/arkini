@@ -375,4 +375,65 @@ describe("createFormSchema", () => {
 			}),
 		);
 	});
+	it("binds nested action Self inputs to the renamed owner and reports disabled Units at the action field", () => {
+		const owner = {
+			...createSimpleItem("draft-owner"),
+			units: {
+				amount: 2,
+			},
+			action: {
+				type: "space" as const,
+				space: 3,
+				input: [
+					{
+						...createTargetPaidInput(""),
+						units: {
+							cost: 1,
+							from: "self" as const,
+						},
+					},
+				],
+				rules: [],
+			},
+		};
+		const project = {
+			config: {
+				items: {},
+			} as GameConfigSchema.Type,
+		};
+		const schema = createFormSchema(project, owner.uid);
+		const form = {
+			...readFormValues(owner),
+			id: "final-owner",
+		};
+		const accepted = schema.safeParse(form);
+		expect(accepted.success).toBe(true);
+		if (!accepted.success || accepted.data.type !== "common")
+			throw new Error("Expected Common action.");
+		expect(accepted.data.action?.input[0]).toMatchObject({
+			query: {
+				distance: "self",
+				selector: {
+					itemId: "final-owner",
+				},
+			},
+		});
+		const rejected = schema.safeParse({
+			...form,
+			units: undefined,
+		});
+		expect(rejected.success).toBe(false);
+		if (rejected.success) throw new Error("Expected invalid owner Units.");
+		expect(rejected.error.issues).toContainEqual(
+			expect.objectContaining({
+				path: [
+					"action",
+					"input",
+					0,
+					"units",
+					"from",
+				],
+			}),
+		);
+	});
 });

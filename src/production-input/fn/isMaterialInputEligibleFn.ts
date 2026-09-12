@@ -19,7 +19,6 @@ export const isMaterialInputEligibleFn = (item: ItemSchema.Type) =>
 					TypeSchema.enum.Inventory,
 					TypeSchema.enum.Clock,
 					TypeSchema.enum.Common,
-					TypeSchema.enum.Space,
 				),
 			},
 			() => true,

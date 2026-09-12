@@ -6,7 +6,6 @@ import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
-import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 
 const requireReplacementFn = <Schema extends z.ZodType<Record<string, unknown>>>(patch: Schema) =>
@@ -29,7 +28,6 @@ const nullableBaseItemFields = {
 } as const;
 
 const editItemInputSchemaIds = {
-	space: "urn:arkini:schema:mcp:edit-space-item-input",
 	common: "urn:arkini:schema:mcp:edit-common-item-input",
 	clock: "urn:arkini:schema:mcp:edit-clock-item-input",
 	blueprint: "urn:arkini:schema:mcp:edit-blueprint-item-input",
@@ -37,17 +35,12 @@ const editItemInputSchemaIds = {
 	inventory: "urn:arkini:schema:mcp:edit-inventory-item-input",
 } as const;
 
-const spacePatch = requireReplacementFn(
-	SpaceSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
-).meta({
-	id: "SpaceItemPatchSchema",
-	description: "Top-level replacements accepted for an existing space item.",
-});
 const commonPatch = requireReplacementFn(
 	CommonSchema.omit(immutableItemFields)
 		.partial()
 		.extend({
 			...nullableBaseItemFields,
+			action: CommonSchema.shape.action.nullable(),
 			lines: CommonSchema.shape.lines.removeDefault().optional(),
 			maxQueueSize: CommonSchema.shape.maxQueueSize.removeDefault().optional(),
 		})
@@ -151,11 +144,6 @@ const editItemInputFn = <Schema extends z.ZodType<Record<string, unknown>>>(
 
 /** Type-owned replace patches; omitted fields remain untouched and null clears optional fields. */
 export const EditItemInputSchemas = {
-	space: editItemInputFn(spacePatch, {
-		schemaId: editItemInputSchemaIds.space,
-		title: "Edit space item tool input",
-		description: "Identity, revision, and replacement patch for one space item.",
-	}),
 	common: editItemInputFn(commonPatch, {
 		schemaId: editItemInputSchemaIds.common,
 		title: "Edit common item tool input",

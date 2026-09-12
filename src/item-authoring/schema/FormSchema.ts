@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { InputSchema } from "~/production-action/schema/InputSchema";
+import type { ActionSchema } from "~/item-action/schema/ActionSchema";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
@@ -26,14 +26,13 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 	readonly onExpire?: OutputSchema.Type;
 	readonly control?: "automatic-only" | "interactive";
 	readonly enable?: boolean;
-	readonly input?: InputSchema.Type[];
+	readonly action?: ActionSchema.Type;
 	readonly line?: LineSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
 	readonly merge?: MergeSchema.Type[];
 	readonly output?: OutputSchema.Type;
 	readonly rules?: RuleSchema.Type[];
-	readonly space?: number;
 };
 
 /** Removes empty optional artwork slots from the local form representation. */
@@ -78,10 +77,13 @@ const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchem
 
 const bindSelfPaidUnitsInputsToOwnerFn = (candidate: FormValues): FormValues => ({
 	...candidate,
-	...(candidate.input === undefined
+	...(candidate.action === undefined
 		? {}
 		: {
-				input: bindSelfPaidInputsToOwnerFn(candidate.input, candidate.id),
+				action: {
+					...candidate.action,
+					input: bindSelfPaidInputsToOwnerFn(candidate.action.input, candidate.id),
+				},
 			}),
 	...(candidate.line === undefined
 		? {}

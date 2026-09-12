@@ -13,11 +13,10 @@ afterEach(cleanupMcpHarnesses);
 
 const typeGroups = [
 	{
-		name: "creates Common, Space, and Clock items through dedicated tools",
+		name: "creates Common and Clock items through dedicated tools",
 		projectId: "common-space-clock-types-project",
 		types: [
 			"common",
-			"space",
 			"clock",
 		],
 	},
@@ -199,11 +198,6 @@ describe("editor MCP item creation", () => {
 					...(type === "common"
 						? {
 								draft: true,
-							}
-						: {}),
-					...(type === "space"
-						? {
-								space: 4,
 							}
 						: {}),
 				}),

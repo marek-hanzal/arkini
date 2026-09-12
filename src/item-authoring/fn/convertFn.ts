@@ -43,15 +43,6 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 	const lines = readAuthoredItemLinesFn(item);
 	const candidate: ItemSchema.Type = (() => {
 		switch (fallback.type) {
-			case "space":
-				return {
-					...common,
-					type: fallback.type,
-					space: item.type === "space" ? item.space : 0,
-					enable: item.type === "space" || item.type === "clock" ? item.enable : true,
-					input: item.type === "space" ? item.input : [],
-					rules: item.type === "space" || item.type === "clock" ? item.rules : [],
-				};
 			case "inventory":
 				return {
 					...common,
@@ -92,8 +83,8 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					scope: fallback.scope,
 					maxStackSize: fallback.maxStackSize,
 					intervalMs: fallback.intervalMs,
-					enable: item.type === "space" ? item.enable : fallback.enable,
-					rules: item.type === "space" ? item.rules : fallback.rules,
+					enable: fallback.enable,
+					rules: fallback.rules,
 					control: fallback.control,
 					...(item.type === "temporary"
 						? {

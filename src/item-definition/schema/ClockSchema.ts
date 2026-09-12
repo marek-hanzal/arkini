@@ -8,7 +8,9 @@ import { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 /** A non-stackable Board producer whose schedule enqueues its effective default line. */
 export const ClockSchema = z
 	.object({
-		...CommonSchema.shape,
+		...CommonSchema.omit({
+			action: true,
+		}).shape,
 		lines: CommonSchema.shape.lines
 			.removeDefault()
 			.min(1)

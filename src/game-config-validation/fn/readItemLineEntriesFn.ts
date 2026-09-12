@@ -52,11 +52,7 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 		)
 		.with(
 			{
-				type: P.union(
-					TypeSchema.enum.Space,
-					TypeSchema.enum.Temporary,
-					TypeSchema.enum.Inventory,
-				),
+				type: P.union(TypeSchema.enum.Temporary, TypeSchema.enum.Inventory),
 			},
 			() => [] as ItemLineEntrySchema.Type[],
 		)

@@ -23,7 +23,7 @@ export namespace validateInputUnitsFn {
 	}
 }
 
-/** Validates who may pay each authored Line or Space action unit cost. */
+/** Validates who may pay each authored line or immediate action unit cost. */
 export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
@@ -41,13 +41,14 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 			input: line.input,
 			path,
 		}));
-		if (item.type === ItemTypeSchema.enum.Space) {
+		if (item.type === ItemTypeSchema.enum.Common && item.action !== undefined) {
 			actions.push({
 				id: item.id,
-				input: item.input,
+				input: item.action.input,
 				path: [
 					"items",
 					itemId,
+					"action",
 				],
 			});
 		}

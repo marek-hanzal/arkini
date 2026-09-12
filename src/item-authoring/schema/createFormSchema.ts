@@ -9,31 +9,31 @@ interface InputCollection {
 }
 
 const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputCollection> => {
+	const collections: InputCollection[] = [];
 	if ("lines" in item)
-		return (item.lines ?? []).map((line, index) => ({
-			input: line.input,
-			path: [
-				"lines",
-				index,
-			],
-		}));
-	if ("line" in item)
-		return [
-			{
-				input: item.line.input,
+		for (const [index, line] of item.lines.entries())
+			collections.push({
+				input: line.input,
 				path: [
-					"line",
+					"lines",
+					index,
 				],
-			},
-		];
-	if (item.type === "space")
-		return [
-			{
-				input: item.input,
-				path: [],
-			},
-		];
-	return [];
+			});
+	if ("line" in item)
+		collections.push({
+			input: item.line.input,
+			path: [
+				"line",
+			],
+		});
+	if (item.type === "common" && item.action !== undefined)
+		collections.push({
+			input: item.action.input,
+			path: [
+				"action",
+			],
+		});
+	return collections;
 };
 
 /** Adds project-local identity and selected-target validation to the canonical item form schema. */

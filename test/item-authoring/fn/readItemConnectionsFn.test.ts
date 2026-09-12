@@ -236,25 +236,27 @@ describe("readItemConnectionsFn", () => {
 					id: "portal",
 					uid: "portal",
 					title: "portal",
-					type: "space",
-					space: 1,
-					enable: false,
-					input: [
-						{
-							type: "units",
-							query: {
-								distance: "far",
-								scope: "board",
-								selector: {
-									itemId: "water",
-									type: "item",
+					type: "common",
+					action: {
+						type: "space" as const,
+						space: 1,
+						input: [
+							{
+								type: "units",
+								query: {
+									distance: "far",
+									scope: "board",
+									selector: {
+										itemId: "water",
+										type: "item",
+									},
 								},
 							},
-						},
-					],
-					rules: [
-						enableRuleFn("line-permit"),
-					],
+						],
+						rules: [
+							enableRuleFn("line-permit"),
+						],
+					},
 				},
 				result: {
 					...common,

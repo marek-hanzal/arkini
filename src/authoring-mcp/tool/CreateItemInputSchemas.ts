@@ -7,7 +7,6 @@ import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
-import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
@@ -25,7 +24,6 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 );
 
 const createItemInputSchemaIds = {
-	space: "urn:arkini:schema:mcp:create-space-item-input",
 	common: "urn:arkini:schema:mcp:create-common-item-input",
 	clock: "urn:arkini:schema:mcp:create-clock-item-input",
 	blueprint: "urn:arkini:schema:mcp:create-blueprint-item-input",
@@ -35,31 +33,6 @@ const createItemInputSchemaIds = {
 
 /** Human-facing create inputs; omitted fields use the matching Editor form's draft values. */
 export const CreateItemInputSchemas = {
-	space: SpaceSchema.omit({
-		asset: true,
-		enable: true,
-		input: true,
-		maxStackSize: true,
-		rules: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			enable: SpaceSchema.shape.enable.removeDefault().optional(),
-			input: SpaceSchema.shape.input.removeDefault().optional(),
-			rules: SpaceSchema.shape.rules.removeDefault().optional(),
-			scope: draftScope,
-			maxStackSize: draftMaxStackSize,
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.space,
-			$id: createItemInputSchemaIds.space,
-			title: "Create space item tool input",
-			description: "Authoring fields accepted when creating one space item.",
-		}),
 	common: CommonSchema.omit({
 		asset: true,
 		lines: true,
@@ -83,6 +56,7 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
+			not: CommonSchema.meta()?.not,
 			id: createItemInputSchemaIds.common,
 			$id: createItemInputSchemaIds.common,
 			title: "Create common item tool input",

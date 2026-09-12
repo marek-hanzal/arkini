@@ -92,7 +92,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		},
 		blueprint: {
 			...itemBase("blueprint"),
-			type: "blueprint",
+			type: "common",
 			asset: {
 				scale: 0.8,
 				default: [
@@ -104,10 +104,15 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			units: {
 				amount: 1,
 			},
-			line: productionLine("blueprint", [
-				materialInput(3),
-				materialInput(3),
-			]),
+			lines: [
+				{
+					...productionLine("blueprint", [
+						materialInput(3),
+						materialInput(3),
+					]),
+					checkAhead: true,
+				},
+			],
 		},
 		temporary: {
 			...itemBase("temporary", "board"),
@@ -125,7 +130,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 
 const craftItem = tileActorTestConfig.items.craft;
 const blueprintItem = tileActorTestConfig.items.blueprint;
-if (craftItem.type !== "common" || blueprintItem.type !== "blueprint") {
+if (craftItem.type !== "common" || blueprintItem.type !== "common") {
 	throw new Error("Invalid tile actor test config.");
 }
 
@@ -150,7 +155,7 @@ export const createTileActorRuntime = ({
 	readonly queued?: number;
 } = {}) => {
 	const ownerItem = owner === "craft" ? craftItem : blueprintItem;
-	const ownerLine = ownerItem.type === "common" ? ownerItem.lines[0] : ownerItem.line;
+	const ownerLine = ownerItem.lines[0];
 	return RuntimeSchema.parse({
 		cheats: {
 			enabled: false,

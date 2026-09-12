@@ -25,7 +25,6 @@ export const readSectionForPathFn = (
 		case "onExpire":
 		case "control":
 		case "durationMs":
-		case "line":
 		case "lines":
 		case "maxQueueSize":
 		case "output":

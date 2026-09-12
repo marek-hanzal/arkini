@@ -8,7 +8,6 @@ const diagnosticTitles = {
 	"source:duplicate-record": "Duplicate source record",
 	"start:invalid": "Invalid game start",
 	"resource:unused": "Unused asset",
-	"input:capacity-unsupported": "Unsupported input capacity",
 	"source:duplicate-provider": "Duplicate source provider",
 	"config:missing-reference": "Missing item reference",
 	"input:material-ineligible": "Ineligible material input",
@@ -28,7 +27,6 @@ const diagnosticTitles = {
 
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
 	switch (diagnostic.code) {
-		case "input:capacity-unsupported":
 		case "input:material-ineligible":
 		case "input:units-invalid":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineId} · input ${diagnostic.inputIndex + 1}`;

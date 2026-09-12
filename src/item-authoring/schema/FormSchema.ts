@@ -27,7 +27,6 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 	readonly control?: "automatic-only" | "interactive";
 	readonly enable?: boolean;
 	readonly action?: ActionSchema.Type;
-	readonly line?: LineSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
 	readonly merge?: MergeSchema.Type[];
@@ -83,14 +82,6 @@ const bindSelfPaidUnitsInputsToOwnerFn = (candidate: FormValues): FormValues => 
 				action: {
 					...candidate.action,
 					input: bindSelfPaidInputsToOwnerFn(candidate.action.input, candidate.id),
-				},
-			}),
-	...(candidate.line === undefined
-		? {}
-		: {
-				line: {
-					...candidate.line,
-					input: bindSelfPaidInputsToOwnerFn(candidate.line.input, candidate.id),
 				},
 			}),
 	...(candidate.lines === undefined

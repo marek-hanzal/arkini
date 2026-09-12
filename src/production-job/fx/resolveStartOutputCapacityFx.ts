@@ -98,8 +98,8 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 				});
 	/*
 	 * Prefer the purpose-bound target violation over an intermediate
-	 * Blueprint's own cap so the player sees the limit that actually makes
-	 * another Blueprint useless.
+	 * item's own cap so the player sees the limit that actually makes
+	 * another intermediate useless.
 	 */
 	const downstream = yield* resolveOneHopOutputCapacityFx({
 		line,

@@ -1,6 +1,5 @@
 import type { z } from "zod";
 
-import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
@@ -48,10 +47,10 @@ const blueprintItem = ({
 	output?: z.input<typeof OutputSchema>;
 	reserveTool?: boolean;
 }) =>
-	BlueprintSchema.parse({
+	CommonSchema.parse({
 		uid: id,
 		id,
-		type: "blueprint" as const,
+		type: "common" as const,
 		units: {
 			amount: 1,
 		},
@@ -65,42 +64,45 @@ const blueprintItem = ({
 		},
 		scope: "board" as const,
 		maxStackSize: 1,
-		line: {
-			id: lineId,
-			title: lineId,
-			description: lineId,
-			runtimeMs: 200,
-			input: reserveTool
-				? [
-						{
-							type: "materials" as const,
-							units: {
-								from: "self" as const,
-								cost: 1,
+		lines: [
+			{
+				checkAhead: true,
+				id: lineId,
+				title: lineId,
+				description: lineId,
+				runtimeMs: 200,
+				input: reserveTool
+					? [
+							{
+								type: "materials" as const,
+								units: {
+									from: "self" as const,
+									cost: 1,
+								},
+								selector: {
+									type: "item" as const,
+									itemId: "item:tool",
+								},
+								mode: "reserve" as const,
+								quantity: {
+									min: 1,
+									max: 1,
+								},
 							},
-							selector: {
-								type: "item" as const,
-								itemId: "item:tool",
+						]
+					: [
+							{
+								type: "simple" as const,
+								units: {
+									from: "self" as const,
+									cost: 1,
+								},
 							},
-							mode: "reserve" as const,
-							quantity: {
-								min: 1,
-								max: 1,
-							},
-						},
-					]
-				: [
-						{
-							type: "simple" as const,
-							units: {
-								from: "self" as const,
-								cost: 1,
-							},
-						},
-					],
-			output,
-			rules: [],
-		},
+						],
+				output,
+				rules: [],
+			},
+		],
 	});
 
 const guaranteedOutput = (

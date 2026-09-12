@@ -93,14 +93,5 @@ export const createDraftFn = ({
 				LineSchema.Type,
 			],
 		}))
-		.with("blueprint", (lineType) => ({
-			...base,
-			type: lineType,
-			line: {
-				...lineBase,
-				title: `New ${lineType} line`,
-				description: `Describe what this ${lineType} line consumes and produces.`,
-			},
-		}))
 		.exhaustive();
 };

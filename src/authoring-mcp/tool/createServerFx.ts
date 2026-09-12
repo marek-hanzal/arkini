@@ -31,7 +31,6 @@ import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 const itemTypes = [
 	"common",
 	"clock",
-	"blueprint",
 	"temporary",
 	"inventory",
 ] as const;
@@ -310,7 +309,7 @@ const createServerFn = (
 		server.registerTool(
 			`edit_${type}_item`,
 			{
-				description: `Patch one existing ${type} item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, units, merge, line, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
+				description: `Patch one existing ${type} item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, units, merge, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>

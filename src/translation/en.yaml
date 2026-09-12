@@ -22,6 +22,8 @@ Asset notes empty title:
   value: No notes for this asset yet
 Automatic only:
   value: Automatic only
+Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.:
+  value: Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.
 Board:
   value: Board
 Board editing:
@@ -44,6 +46,8 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
+Check ahead:
+  value: Check ahead
 Choose a different Project ID.:
   value: Choose a different Project ID.
 Close:
@@ -241,9 +245,6 @@ Item storage scope - inventory-control:
 Item storage scope - toolbar:
   value: Toolbar only
   dynamic: true
-Item type - blueprint:
-  value: Blueprint
-  dynamic: true
 Item type - clock:
   value: Clock
   dynamic: true
@@ -258,9 +259,6 @@ Item type - missing:
   dynamic: true
 Item type - temporary:
   value: Temporary item
-  dynamic: true
-Item type description - blueprint:
-  value: A build plan with one construction line.
   dynamic: true
 Item type description - clock:
   value: A board item that periodically starts its default production line, with an optional lifetime.

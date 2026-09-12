@@ -82,9 +82,10 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
-- Common has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Empty Common items expose no runtime production controls; adding lines enables the ordinary production contract. Clock requires at least one line. Blueprint retains its singular construction `line`;
+- Common has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Empty Common items expose no runtime production controls; adding lines enables the ordinary production contract. Clock requires at least one line;
 - Common may author one optional `action`, a strict discriminated union currently containing `space` with its target `space`, optional `input` and `rules` collections defaulting to empty. Action rules alone determine availability; no `enable` field exists. Inventory remains a dedicated item type;
 - canonical Item validation rejects simultaneous `action` and nonempty `lines`. Editor capability switches clear the opposing capability in one form update with advance help; JSON and MCP reject conflicting data without silently deleting authored fields;
+- optional line `checkAhead` opts its owner into one-hop future output-capacity checks when produced; omitted or false leaves that line out of the check. This capability works on Common and Clock lines;
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
 - positive extra material capacity is supported for Common and Clock lines;

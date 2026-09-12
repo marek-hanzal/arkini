@@ -37,21 +37,6 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 
 		.with(
 			{
-				type: TypeSchema.enum.Blueprint,
-			},
-			({ line }) => [
-				{
-					line,
-					path: [
-						"items",
-						itemId,
-						"line",
-					],
-				} satisfies ItemLineEntrySchema.Type,
-			],
-		)
-		.with(
-			{
 				type: P.union(TypeSchema.enum.Temporary, TypeSchema.enum.Inventory),
 			},
 			() => [] as ItemLineEntrySchema.Type[],

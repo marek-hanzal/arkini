@@ -146,10 +146,6 @@ const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
 			index += 1;
 			continue;
 		}
-		if (segment === "line") {
-			labels.push("Product line");
-			continue;
-		}
 		if (segment === "drop" && typeof nestedIndex === "number") {
 			labels.push(
 				dropCollectionCount > 1 && dropCollectionIndex === 0

@@ -46,7 +46,6 @@ const Sections = [
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
 const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
-	"blueprint",
 	"common",
 	"clock",
 	"temporary",

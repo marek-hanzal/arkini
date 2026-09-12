@@ -26,14 +26,8 @@ const groups = [
 		],
 	},
 	{
-		name: "edits Blueprint and Inventory items through their dedicated tools",
+		name: "edits Inventory items through its dedicated tool",
 		cases: [
-			[
-				"blueprint",
-				{
-					title: "Edited Blueprint",
-				},
-			],
 			[
 				"inventory",
 				{

@@ -5,7 +5,6 @@ import { DuplicateItemUidDiagnosticSchema } from "./DuplicateItemUidDiagnosticSc
 import { DuplicateLineIdDiagnosticSchema } from "./DuplicateLineIdDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./DuplicateProviderDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./UnusedResourceDiagnosticSchema";
-import { UnsupportedInputCapacityDiagnosticSchema } from "./UnsupportedInputCapacityDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./MissingResourceDiagnosticSchema";
 import { MultipleDefaultLinesDiagnosticSchema } from "./MultipleDefaultLinesDiagnosticSchema";
 import { DuplicateResourceDiagnosticSchema } from "./DuplicateResourceDiagnosticSchema";
@@ -38,7 +37,6 @@ export const GameDiagnosticSchema = z
 		InvalidInputUnitsDiagnosticSchema,
 		IneligibleMaterialInputDiagnosticSchema,
 		InvalidMergeDiagnosticSchema,
-		UnsupportedInputCapacityDiagnosticSchema,
 		MissingUnitRenewalWarningDiagnosticSchema,
 		StochasticUnitRenewalWarningDiagnosticSchema,
 		StartInvalidDiagnosticSchema,

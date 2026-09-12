@@ -13,7 +13,6 @@ interface ItemCleanup {
 	readonly lineIndexes: Set<number>;
 	removeUnitsOutput: boolean;
 	removeExpiryOutput: boolean;
-	removeLine: boolean;
 }
 
 export namespace forceDeleteFx {
@@ -59,7 +58,6 @@ const createItemCleanupFn = (): ItemCleanup => ({
 	lineIndexes: new Set(),
 	removeUnitsOutput: false,
 	removeExpiryOutput: false,
-	removeLine: false,
 });
 
 /** Mechanically removes one item and every authored structure that directly references it. */
@@ -114,9 +112,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					throw new Error(`Invalid line reference path ${blocker.path.join(".")}.`);
 				cleanup.lineIndexes.add(fourth);
 				break;
-			case "line":
-				cleanup.removeLine = true;
-				break;
 			case "units":
 				cleanup.removeUnitsOutput = true;
 				break;
@@ -160,8 +155,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		const owner = config.items[ownerItemId];
 		if (owner === undefined) continue;
 		const mustDeleteOwner =
-			cleanup.removeLine ||
-			(owner.type === "clock" && cleanup.lineIndexes.size === owner.lines.length);
+			owner.type === "clock" && cleanup.lineIndexes.size === owner.lines.length;
 		if (mustDeleteOwner) {
 			delete items[ownerItemId];
 			deletedOwnerItemIds.push(ownerItemId);

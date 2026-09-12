@@ -114,8 +114,13 @@ describe("readItemConnectionsFn", () => {
 					id: "blueprint",
 					uid: "blueprint",
 					title: "blueprint",
-					type: "blueprint",
-					line,
+					type: "common",
+					lines: [
+						{
+							...line,
+							checkAhead: true,
+						},
+					],
 				},
 				craft: {
 					...common,

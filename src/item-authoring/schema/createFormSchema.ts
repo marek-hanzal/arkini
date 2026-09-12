@@ -19,13 +19,6 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 					index,
 				],
 			});
-	if ("line" in item)
-		collections.push({
-			input: item.line.input,
-			path: [
-				"line",
-			],
-		});
 	if (item.type === "common" && item.action !== undefined)
 		collections.push({
 			input: item.action.input,

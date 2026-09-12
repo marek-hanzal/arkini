@@ -1,12 +1,9 @@
-import { Backpack, Box, Clock, ScrollText, Timer, type LucideIcon } from "lucide-react";
+import { Backpack, Box, Clock, Timer, type LucideIcon } from "lucide-react";
 
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 const presentations = {
-	blueprint: {
-		icon: ScrollText,
-	},
 	clock: {
 		icon: Clock,
 	},

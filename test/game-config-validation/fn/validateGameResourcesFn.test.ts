@@ -174,7 +174,8 @@ describe("validateGameResourcesFn", () => {
 		}) => ({
 			uid: id,
 			id,
-			type: "blueprint" as const,
+			maxQueueSize: 1,
+			type: "common" as const,
 			units: {
 				amount: 1,
 			},
@@ -189,40 +190,43 @@ describe("validateGameResourcesFn", () => {
 			},
 			scope: "any" as const,
 			maxStackSize: 1,
-			line: {
-				id: `line:${id}:construct`,
-				title: id,
-				description: id,
-				runtimeMs: 0,
-				input: [
-					{
-						type: "simple" as const,
-					},
-				],
-				output: {
-					set: [
+			lines: [
+				{
+					checkAhead: true,
+					id: `line:${id}:construct`,
+					title: id,
+					description: id,
+					runtimeMs: 0,
+					input: [
 						{
-							roll: [
-								{
-									type: "guaranteed" as const,
-									drop: [
-										{
-											itemId: targetId,
-											quantity: {
-												min: 1,
-												max: 1,
-											},
-											placement: "drop" as const,
-											rules: [],
-										},
-									],
-								},
-							],
+							type: "simple" as const,
 						},
 					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										type: "guaranteed" as const,
+										drop: [
+											{
+												itemId: targetId,
+												quantity: {
+													min: 1,
+													max: 1,
+												},
+												placement: "drop" as const,
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					rules: [],
 				},
-				rules: [],
-			},
+			],
 		});
 		const config = GameConfigSchema.parse({
 			...startTestConfig,

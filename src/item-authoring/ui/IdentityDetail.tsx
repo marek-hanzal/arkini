@@ -113,6 +113,33 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					/>
 					<UnitsDetail item={item} />
 				</section>
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemProductionSummary"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="production"
+						title={translator.textFn("Production")}
+						description={translator.textFn(
+							"Production is enabled when at least one line is configured. Each line keeps its own availability rules.",
+						)}
+					/>
+					<EditorRootCard dataUi="EditorItemProductionSummaryCard">
+						<FactList>
+							<Fact
+								label={translator.textFn("Status")}
+								value={translator.textFn(
+									item.lines.length > 0 ? "Enabled" : "Disabled",
+								)}
+							/>
+							<Fact
+								label={translator.textFn("Line count")}
+								value={item.lines.length}
+							/>
+						</FactList>
+					</EditorRootCard>
+				</section>
 			</div>
 		</div>
 	);

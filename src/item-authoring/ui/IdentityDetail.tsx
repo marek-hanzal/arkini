@@ -16,170 +16,178 @@ import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
-		<div className="grid gap-[var(--ak-viewport-gap)]">
-			<EditorRootCard dataUi="EditorItemDetailCard">
-				<div className="grid gap-x-8 gap-y-5 min-[64rem]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-					<FactList>
-						<DetailFact
-							label={translator.textFn("Player controls")}
-							description={translator.textFn(
-								"Player controls govern manual production, material management, queue changes and line selection.",
-							)}
-							value={translator.textFn(
-								item.control === "automatic-only"
-									? "Automatic only"
-									: "Interactive",
-							)}
-						/>
-						<DetailFact
-							label={translator.textFn("Queue capacity")}
-							description={translator.textFn(
-								"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
-							)}
-							value={item.maxQueueSize}
-						/>
-						<Fact
-							label={translator.textFn("Storage")}
-							value={translator.textFn(`Item storage scope - ${item.scope}`)}
-						/>
-						<Fact
-							label={translator.textFn("Stack capacity")}
-							value={
-								item.maxStackSize === 1
-									? translator.textFn("Single item")
-									: item.maxStackSize
-							}
-						/>
-						<Fact
-							label={translator.textFn("Game limit")}
-							value={
-								item.maxCount === undefined
-									? translator.textFn("Unlimited")
-									: item.maxCount
-							}
-						/>
-						<Fact
-							label={translator.textFn("Item ID")}
-							mono
-							value={item.id}
-						/>
-						<Fact
-							label={translator.textFn("UID")}
-							mono
-							value={item.uid}
-						/>
-					</FactList>
-					{item.description === undefined ? null : (
-						<FactList columns={1}>
+		<div className="grid gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemArtworkDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="artwork"
+					title={translator.textFn("Artwork")}
+					description={translator.textFn(
+						"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
+					)}
+				/>
+				<EditorRootCard
+					className="content-start"
+					dataUi="EditorItemArtworkDetailCard"
+				>
+					<ArtworkDetail item={item} />
+				</EditorRootCard>
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemIdentityDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="identity"
+					title={translator.textFn("Item")}
+				/>
+				<EditorRootCard dataUi="EditorItemDetailCard">
+					<div className="grid content-start gap-5">
+						<FactList>
+							<DetailFact
+								label={translator.textFn("Player controls")}
+								description={translator.textFn(
+									"Player controls govern manual production, material management, queue changes and line selection.",
+								)}
+								value={translator.textFn(
+									item.control === "automatic-only"
+										? "Automatic only"
+										: "Interactive",
+								)}
+							/>
+							<DetailFact
+								label={translator.textFn("Queue capacity")}
+								description={translator.textFn(
+									"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
+								)}
+								value={item.maxQueueSize}
+							/>
 							<Fact
-								label={translator.textFn("Description")}
-								value={item.description}
+								label={translator.textFn("Storage")}
+								value={translator.textFn(`Item storage scope - ${item.scope}`)}
+							/>
+							<Fact
+								label={translator.textFn("Stack capacity")}
+								value={
+									item.maxStackSize === 1
+										? translator.textFn("Single item")
+										: item.maxStackSize
+								}
+							/>
+							<Fact
+								label={translator.textFn("Game limit")}
+								value={
+									item.maxCount === undefined
+										? translator.textFn("Unlimited")
+										: item.maxCount
+								}
+							/>
+							<Fact
+								label={translator.textFn("Item ID")}
+								mono
+								value={item.id}
+							/>
+							<Fact
+								label={translator.textFn("UID")}
+								mono
+								value={item.uid}
 							/>
 						</FactList>
+						{item.description === undefined ? null : (
+							<FactList columns={1}>
+								<Fact
+									label={translator.textFn("Description")}
+									value={item.description}
+								/>
+							</FactList>
+						)}
+					</div>
+				</EditorRootCard>
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemUnitsDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="units"
+					title={translator.textFn("Units")}
+					description={translator.textFn(
+						"Units are the supply inside each item, independently of how many items are stacked.",
 					)}
-				</div>
-			</EditorRootCard>
-			<div className="grid gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemArtworkDetail"
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="artwork"
-						title={translator.textFn("Artwork")}
-						description={translator.textFn(
-							"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
-						)}
-					/>
-					<EditorRootCard
-						className="content-start"
-						dataUi="EditorItemArtworkDetailCard"
-					>
-						<ArtworkDetail item={item} />
-					</EditorRootCard>
-				</section>
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemUnitsDetail"
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="units"
-						title={translator.textFn("Units")}
-						description={translator.textFn(
-							"Units are the supply inside each item, independently of how many items are stacked.",
-						)}
-					/>
-					<UnitsDetail item={item} />
-				</section>
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemClockDetail"
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="clock"
-						title={translator.textFn("Clock")}
-						description={translator.textFn(
-							"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
-						)}
-					/>
-					<ClockDetail item={item} />
-				</section>
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemMergesDetail"
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="merges"
-						title={translator.textFn("Merges")}
-						description={translator.textFn(
-							"Dropping this item onto a matching target applies its source action, target effect and optional output.",
-						)}
-					/>
-					<MergesDetail item={item} />
-				</section>
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemProductionSummary"
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="production"
-						title={translator.textFn("Production")}
-						description={translator.textFn(
-							"Production is enabled when at least one line is configured. Each line keeps its own availability rules.",
-						)}
-					/>
-					<ProductionSummaryDetail item={item} />
-				</section>
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemActionDetail"
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="action"
-						title={translator.textFn("Action")}
-						description={translator.textFn(
-							"Clicking this item can enter a space or open Inventory after its requirements pass.",
-						)}
-					/>
-					<ActionDetail item={item} />
-				</section>
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemEstimateDetail"
-				>
-					<EditorFormSectionDivider title={translator.textFn("Estimate")} />
-					<ItemEstimateSection
-						itemId={item.id}
-						previewItemUid={item.uid}
-					/>
-				</section>
-			</div>
+				/>
+				<UnitsDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemClockDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="clock"
+					title={translator.textFn("Clock")}
+					description={translator.textFn(
+						"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
+					)}
+				/>
+				<ClockDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemMergesDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="merges"
+					title={translator.textFn("Merges")}
+					description={translator.textFn(
+						"Dropping this item onto a matching target applies its source action, target effect and optional output.",
+					)}
+				/>
+				<MergesDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemProductionSummary"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="production"
+					title={translator.textFn("Production")}
+					description={translator.textFn(
+						"Production is enabled when at least one line is configured. Each line keeps its own availability rules.",
+					)}
+				/>
+				<ProductionSummaryDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemActionDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="action"
+					title={translator.textFn("Action")}
+					description={translator.textFn(
+						"Clicking this item can enter a space or open Inventory after its requirements pass.",
+					)}
+				/>
+				<ActionDetail item={item} />
+			</section>
+			<section
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				data-ui="EditorItemEstimateDetail"
+			>
+				<EditorFormSectionDivider title={translator.textFn("Estimate")} />
+				<ItemEstimateSection
+					itemId={item.id}
+					previewItemUid={item.uid}
+				/>
+			</section>
 		</div>
 	);
 };

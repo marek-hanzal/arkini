@@ -15,7 +15,7 @@ export const ItemDetailSectionHeader = ({
 	readonly itemUid: string;
 	readonly sectionId: SectionId;
 	readonly title: string;
-	readonly description: string;
+	readonly description?: string;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();

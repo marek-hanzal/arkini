@@ -1,0 +1,24 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "nh9tf1n52h19igah115s36jk",
+		"id": "air-pollution",
+		"title": "Air Pollution",
+		"description": "Ugly thing, it will disappear by itself, but you can also clear it by yourself.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"air-pollution"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 1200000,
+			"enable": true,
+			"rules": []
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

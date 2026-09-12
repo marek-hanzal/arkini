@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "l5bda2bzpvcb2c6tonsukrw1",
+		"id": "spoiled-fruit-crate",
+		"title": "Spoiled Fruit Crate",
+		"description": "Ugly thing",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-fruit-crate"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { Effect } from "effect";
 
@@ -14,11 +13,8 @@ import {
 
 describe("main reconciliation / work and consumption", () => {
 	it("dims a craft as soon as its active job starts collecting inputs", () => {
-		const idle = createItem("runtime:craft", boardLocation, {
-			itemType: TypeSchema.enum.Craft,
-		});
+		const idle = createItem("runtime:craft", boardLocation, {});
 		const collecting = createItem(idle.id, boardLocation, {
-			itemType: TypeSchema.enum.Craft,
 			jobStatus: JobStatusEnumSchema.enum.Paused,
 		});
 		const actor = createActor(idle);
@@ -89,7 +85,7 @@ describe("main reconciliation / work and consumption", () => {
 			}),
 		);
 	});
-	it("starts terminal deposit feedback before its longer fade-off releases the actor", () => {
+	it("starts terminal units feedback before its longer fade-off releases the actor", () => {
 		const item = createItem("runtime:depleted-tree", boardLocation);
 		const actor = createActor(item);
 		const harness = createReconcilerHarness({

@@ -11,14 +11,12 @@ interface ItemCleanup {
 	readonly actionRuleIndexes: Set<number>;
 	readonly mergeIndexes: Set<number>;
 	readonly lineIndexes: Set<number>;
-	removeChargesOutput: boolean;
+	removeUnitsOutput: boolean;
 	removeExpiryOutput: boolean;
-	removeLine: boolean;
 }
 
 export namespace forceDeleteFx {
 	export interface Impact {
-		readonly deletedOwnerItemIds: ReadonlyArray<string>;
 		readonly removedActionInputs: ReadonlyArray<{
 			readonly ownerItemId: string;
 			readonly inputNumber: number;
@@ -27,7 +25,7 @@ export namespace forceDeleteFx {
 			readonly ownerItemId: string;
 			readonly ruleNumber: number;
 		}>;
-		readonly removedChargeOutputOwnerIds: ReadonlyArray<string>;
+		readonly removedUnitOutputOwnerIds: ReadonlyArray<string>;
 		readonly removedExpiryOutputOwnerIds: ReadonlyArray<string>;
 		readonly removedLines: ReadonlyArray<{
 			readonly ownerItemId: string;
@@ -57,9 +55,8 @@ const createItemCleanupFn = (): ItemCleanup => ({
 	actionRuleIndexes: new Set(),
 	mergeIndexes: new Set(),
 	lineIndexes: new Set(),
-	removeChargesOutput: false,
+	removeUnitsOutput: false,
 	removeExpiryOutput: false,
-	removeLine: false,
 });
 
 /** Mechanically removes one item and every authored structure that directly references it. */
@@ -78,7 +75,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	};
 	const itemCleanups = new Map<string, ItemCleanup>();
 	for (const blocker of blockers) {
-		const [root, second, third, fourth] = blocker.path;
+		const [root, second, third, fourth, fifth] = blocker.path;
 		if (
 			root === "start" &&
 			(second === "board" || second === "inventory" || second === "toolbar") &&
@@ -92,15 +89,18 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		const cleanup = itemCleanups.get(second) ?? createItemCleanupFn();
 		itemCleanups.set(second, cleanup);
 		switch (third) {
-			case "input":
-				if (typeof fourth !== "number")
-					throw new Error(`Invalid action input path ${blocker.path.join(".")}.`);
-				cleanup.actionInputIndexes.add(fourth);
+			case "action":
+				if (typeof fifth !== "number" || (fourth !== "input" && fourth !== "rules"))
+					throw new Error(`Invalid action reference path ${blocker.path.join(".")}.`);
+				(fourth === "input" ? cleanup.actionInputIndexes : cleanup.actionRuleIndexes).add(
+					fifth,
+				);
 				break;
-			case "rules":
-				if (typeof fourth !== "number")
-					throw new Error(`Invalid action rule path ${blocker.path.join(".")}.`);
-				cleanup.actionRuleIndexes.add(fourth);
+			case "clock":
+				if (fourth === "onExpire") cleanup.removeExpiryOutput = true;
+				else if (fourth === "rules" && typeof fifth === "number")
+					cleanup.actionRuleIndexes.add(fifth);
+				else throw new Error(`Invalid clock reference path ${blocker.path.join(".")}.`);
 				break;
 			case "merge":
 				if (typeof fourth !== "number")
@@ -112,14 +112,8 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					throw new Error(`Invalid line reference path ${blocker.path.join(".")}.`);
 				cleanup.lineIndexes.add(fourth);
 				break;
-			case "line":
-				cleanup.removeLine = true;
-				break;
-			case "charges":
-				cleanup.removeChargesOutput = true;
-				break;
-			case "output":
-				cleanup.removeExpiryOutput = true;
+			case "units":
+				cleanup.removeUnitsOutput = true;
 				break;
 			default:
 				throw new Error(
@@ -128,7 +122,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		}
 	}
 
-	const deletedOwnerItemIds: string[] = [];
 	const removedActionInputs: Array<{
 		ownerItemId: string;
 		inputNumber: number;
@@ -137,7 +130,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		ownerItemId: string;
 		ruleNumber: number;
 	}> = [];
-	const removedChargeOutputOwnerIds: string[] = [];
+	const removedUnitOutputOwnerIds: string[] = [];
 	const removedExpiryOutputOwnerIds: string[] = [];
 	const removedLines: Array<{
 		ownerItemId: string;
@@ -156,38 +149,41 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	for (const [ownerItemId, cleanup] of itemCleanups) {
 		const owner = config.items[ownerItemId];
 		if (owner === undefined) continue;
-		const mustDeleteOwner =
-			cleanup.removeLine ||
-			(owner.type === "producer" && cleanup.lineIndexes.size === owner.lines.length);
-		if (mustDeleteOwner) {
-			delete items[ownerItemId];
-			deletedOwnerItemIds.push(ownerItemId);
-			continue;
-		}
-
 		const candidate: Record<string, unknown> = {
 			...owner,
 		};
-		if (owner.type === "space" && cleanup.actionInputIndexes.size > 0) {
-			candidate.input = owner.input.filter(
-				(_input, index) => !cleanup.actionInputIndexes.has(index),
-			);
-			for (const index of cleanup.actionInputIndexes)
-				removedActionInputs.push({
-					ownerItemId,
-					inputNumber: index + 1,
-				});
+		if (
+			owner.action !== undefined &&
+			(cleanup.actionInputIndexes.size > 0 || cleanup.actionRuleIndexes.size > 0)
+		) {
+			candidate.action = {
+				...owner.action,
+				input: owner.action.input.filter(
+					(_input, index) => !cleanup.actionInputIndexes.has(index),
+				),
+				rules: owner.action.rules.filter(
+					(_rule, index) => !cleanup.actionRuleIndexes.has(index),
+				),
+			};
 		}
-		if (owner.type === "space" && cleanup.actionRuleIndexes.size > 0) {
-			candidate.rules = owner.rules.filter(
-				(_rule, index) => !cleanup.actionRuleIndexes.has(index),
-			);
-			for (const index of cleanup.actionRuleIndexes)
-				removedActionRules.push({
-					ownerItemId,
-					ruleNumber: index + 1,
-				});
-		}
+		if (owner.clock !== undefined && cleanup.actionRuleIndexes.size > 0)
+			candidate.clock = {
+				...owner.clock,
+				rules: owner.clock.rules.filter(
+					(_rule, index) => !cleanup.actionRuleIndexes.has(index),
+				),
+			};
+		for (const index of cleanup.actionInputIndexes)
+			removedActionInputs.push({
+				ownerItemId,
+				inputNumber: index + 1,
+			});
+		for (const index of cleanup.actionRuleIndexes)
+			removedActionRules.push({
+				ownerItemId,
+				ruleNumber: index + 1,
+			});
+
 		if (cleanup.mergeIndexes.size > 0) {
 			const merge = (owner.merge ?? []).filter(
 				(_rule, index) => !cleanup.mergeIndexes.has(index),
@@ -214,15 +210,19 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					});
 			}
 		}
-		if (cleanup.removeChargesOutput && owner.charges !== undefined) {
-			candidate.charges = {
-				...owner.charges,
+		if (cleanup.removeUnitsOutput && owner.units !== undefined) {
+			candidate.units = {
+				...owner.units,
 				output: undefined,
 			};
-			removedChargeOutputOwnerIds.push(ownerItemId);
+			removedUnitOutputOwnerIds.push(ownerItemId);
 		}
-		if (cleanup.removeExpiryOutput && "output" in owner) {
-			candidate.output = undefined;
+		if (cleanup.removeExpiryOutput) {
+			if (owner.clock !== undefined)
+				candidate.clock = {
+					...(candidate.clock as typeof owner.clock),
+					onExpire: undefined,
+				};
 			removedExpiryOutputOwnerIds.push(ownerItemId);
 		}
 		items[ownerItemId] = candidate;
@@ -244,10 +244,9 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			items,
 		}),
 		impact: {
-			deletedOwnerItemIds,
 			removedActionInputs,
 			removedActionRules,
-			removedChargeOutputOwnerIds,
+			removedUnitOutputOwnerIds,
 			removedExpiryOutputOwnerIds,
 			removedLines,
 			removedMergeRules,

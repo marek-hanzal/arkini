@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import {
 	ArrowRight,
 	BatteryCharging,
@@ -24,13 +25,13 @@ import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import type { SectionDescriptor, SectionId } from "~/item-authoring/type/Section";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 const OverviewIconBySection = {
 	action: MapPinned,
+	clock: Clock3,
 	artwork: ImageIcon,
-	charges: BatteryCharging,
+	units: BatteryCharging,
 	delete: ShieldCheck,
 	estimate: Clock3,
 	merges: Combine,
@@ -52,7 +53,14 @@ const ItemOverviewCard = ({
 	readonly projectId: string;
 	readonly section: SectionDescriptor;
 }) => {
+	const translator = useTranslator();
 	if (section.id === "identity") return null;
+	const label =
+		section.id === "units"
+			? translator.textFn("Units")
+			: section.id === "action"
+				? translator.textFn("Action")
+				: section.label;
 	return (
 		<EditorOverviewCard
 			body={children}
@@ -76,18 +84,19 @@ const ItemOverviewCard = ({
 					}
 					to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 				>
-					{section.label}
+					{label}
 					<ArrowRight className="size-4" />
 				</LinkButtonLink>
 			}
 			icon={Icon}
-			title={section.label}
+			title={label}
 		/>
 	);
 };
 
 /** Presents a compact, routed summary for every detail section supported by one item. */
 export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const estimate = useItemEstimate(project, item.id);
 	const requiredByItems = useMemo(
@@ -108,10 +117,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 			project.config,
 		],
 	);
-	const enabledProductionLineCount = readAuthoredItemLinesFn(item).filter(
-		(line) => line.enable,
-	).length;
-	const progressArtworkCount = item.asset.sources?.length ?? 0;
+	const enabledProductionLineCount = item.lines.filter((line) => line.enable).length;
 	const estimateSummary =
 		estimate.status === "ready"
 			? formatItemEstimateResultFn(estimate.estimate)
@@ -119,7 +125,10 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				? "Calculating…"
 				: "Unavailable";
 	const summaries = {
-		action: item.type === "space" ? (item.enable ? "Enabled" : "Disabled") : null,
+		action:
+			item.action === undefined
+				? translator.textFn("Disabled")
+				: translator.textFn(item.action.type === "space" ? "Space" : "Inventory"),
 		artwork: (
 			<div className="flex items-center gap-3">
 				<EditorItemThumbnail
@@ -132,16 +141,12 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 						{item.asset.default.length} default{" "}
 						{item.asset.default.length === 1 ? "layer" : "layers"}
 					</p>
-					<p>
-						{progressArtworkCount === 0
-							? "No progress artwork"
-							: `${progressArtworkCount} progress ${progressArtworkCount === 1 ? "state" : "states"}`}
-					</p>
 				</div>
 			</div>
 		),
+		clock: item.clock !== undefined ? "Enabled" : "Disabled",
 		notes: "Ideas and decisions linked to this item",
-		charges: item.charges === undefined ? "Disabled" : "Enabled",
+		units: item.units === undefined ? "Disabled" : "Enabled",
 		delete:
 			deleteBlockers.length === 0
 				? "Can be deleted"
@@ -160,7 +165,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 			className="flex flex-col gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorItemOverview"
 		>
-			{readSectionsFn(item).map((section) =>
+			{readSectionsFn().map((section) =>
 				section.id === "identity" ? null : (
 					<ItemOverviewCard
 						icon={

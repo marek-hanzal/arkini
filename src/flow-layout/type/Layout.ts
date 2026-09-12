@@ -1,5 +1,3 @@
-import type { ItemOriginItemNode } from "~/flow/type/ItemOriginFlow";
-
 export interface LayoutInput {
 	readonly edges: ReadonlyArray<{
 		readonly id: string;
@@ -16,7 +14,6 @@ export interface LayoutInput {
 			readonly x: number;
 			readonly y: number;
 		}>;
-		readonly type: ItemOriginItemNode["type"];
 		readonly width: number;
 	}>;
 }

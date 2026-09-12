@@ -9,7 +9,6 @@ import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
 } from "~test/support/expectNamedJsonSchemaGraph";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
@@ -31,24 +30,8 @@ describe("editor MCP server", () => {
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
 			"schema_detail",
-			"create_simple_item",
-			"create_space_item",
-			"create_producer_item",
-			"create_craft_item",
-			"create_blueprint_item",
-			"create_deposit_item",
-			"create_stash_item",
-			"create_temporary_item",
-			"create_inventory_item",
-			"edit_simple_item",
-			"edit_space_item",
-			"edit_producer_item",
-			"edit_craft_item",
-			"edit_blueprint_item",
-			"edit_deposit_item",
-			"edit_stash_item",
-			"edit_temporary_item",
-			"edit_inventory_item",
+			"create_item",
+			"edit_item",
 			"project_config",
 			"edit_project",
 			"edit_project_layout",
@@ -74,26 +57,6 @@ describe("editor MCP server", () => {
 			"item_output",
 			"item_estimate",
 		]);
-		const collectionProperties = tools.tools.find(({ name }) => name === "item_collection")
-			?.inputSchema.properties;
-		if (collectionProperties === undefined)
-			throw new Error("item_collection schema is missing.");
-		expect(collectionProperties.itemTypes).toMatchObject({
-			items: {
-				$ref: "#/$defs/ItemTypeSchema",
-			},
-			type: "array",
-		});
-		const collectionSchema = tools.tools.find(
-			({ name }) => name === "item_collection",
-		)?.inputSchema;
-		const collectionDefinitions = isJsonSchemaRecord(collectionSchema?.$defs)
-			? collectionSchema.$defs
-			: {};
-		expect(collectionDefinitions.ItemTypeSchema).toMatchObject({
-			enum: TypeSchema.options,
-			type: "string",
-		});
 		const assetCollectionSchema = tools.tools.find(
 			({ name }) => name === "asset_collection",
 		)?.inputSchema;
@@ -125,20 +88,8 @@ describe("editor MCP server", () => {
 			type: "string",
 		});
 		const jsonInputToolNames = new Set([
-			...[
-				"simple",
-				"space",
-				"producer",
-				"craft",
-				"blueprint",
-				"deposit",
-				"stash",
-				"temporary",
-				"inventory",
-			].flatMap((type) => [
-				`create_${type}_item`,
-				`edit_${type}_item`,
-			]),
+			"create_item",
+			"edit_item",
 			"edit_project",
 		]);
 		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {

@@ -130,3 +130,9 @@ describe("MergesDetail", () => {
 		}
 	});
 });
+
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (key: string) => key,
+	}),
+}));

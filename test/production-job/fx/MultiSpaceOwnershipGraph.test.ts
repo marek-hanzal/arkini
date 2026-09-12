@@ -1,3 +1,4 @@
+import { createItemBase } from "~test/game-config-validation/support/gameValidationTestSource";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -7,7 +8,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
@@ -17,20 +18,22 @@ const lineId = "line:forge:run";
 const createConfig = (scope: "any" | "universe") => {
 	const base = createJobTestConfig(2, "any");
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 
 	return GameConfigSchema.parse({
 		...base,
 		items: {
 			...base.items,
 			portal: {
-				...base.items.tool,
+				...createItemBase("portal"),
 				uid: "portal",
 				id: "portal",
 				title: "Portal",
 				description: "Moves the active board to the destination space.",
-				type: "space",
-				space: 1,
+
+				action: {
+					type: "space" as const,
+					space: 1,
+				},
 			},
 			permit: {
 				...base.items.tool,
@@ -133,7 +136,7 @@ const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: num
 		},
 		quantity: 1,
 	});
-	yield* activateSpaceItemFx({
+	yield* activateItemActionFx({
 		currentSpace: runtime.currentSpace,
 		itemId: portal.id,
 		location: portal.location,

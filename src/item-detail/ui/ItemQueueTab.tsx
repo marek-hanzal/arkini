@@ -60,7 +60,9 @@ export const ItemQueueTab = ({ disabled = false, queue }: ItemQueueTabProps) => 
 								<LinkButton
 									className="text-sm"
 									data-ui="ItemQueueClearButton"
-									disabled={disabled || controller.pending}
+									disabled={
+										disabled || controller.pending || !queue.canClearQueue
+									}
 									cursorIntent={controller.pending ? "progress" : undefined}
 									onClick={controller.clearQueueFn}
 								>

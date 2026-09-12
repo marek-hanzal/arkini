@@ -25,15 +25,15 @@ export const readGameDiagnosticRuntimeFn = ({
 		items: runtime.items.map((item) => ({
 			item: readOwnerFn(item.id),
 			quantity: item.quantity,
-			...(item.remainingCharges === undefined
+			...(item.remainingUnits === undefined
 				? {}
 				: {
-						remainingCharges: item.remainingCharges,
+						remainingUnits: item.remainingUnits,
 					}),
-			...(item.remainingDurationMs === undefined
+			...(item.schedule?.remainingDurationMs === undefined
 				? {}
 				: {
-						remainingDurationMs: item.remainingDurationMs,
+						remainingDurationMs: item.schedule?.remainingDurationMs,
 					}),
 			location: toDiagnosticValueFn(item.location),
 		})),

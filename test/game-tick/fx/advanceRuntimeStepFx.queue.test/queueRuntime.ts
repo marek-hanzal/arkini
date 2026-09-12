@@ -8,7 +8,6 @@ import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequ
 
 const base = createJobTestConfig(4, "any");
 const forge = base.items.forge;
-if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 
 export const queueConfig = GameConfigSchema.parse({
 	...base,
@@ -78,9 +77,8 @@ export const queueConfig = GameConfigSchema.parse({
 	},
 });
 
-export const createContendedQueueConfigFn = (budget: "charges" | "output") => {
+export const createContendedQueueConfigFn = (budget: "units" | "output") => {
 	const producer = queueConfig.items.forge;
-	if (producer.type !== "producer") throw new Error("Expected producer fixture.");
 	return GameConfigSchema.parse({
 		...queueConfig,
 		items: {
@@ -89,7 +87,7 @@ export const createContendedQueueConfigFn = (budget: "charges" | "output") => {
 				...queueConfig.items.water,
 				id: "payer",
 				uid: "payer",
-				charges: {
+				units: {
 					amount: 3,
 				},
 			},
@@ -106,11 +104,11 @@ export const createContendedQueueConfigFn = (budget: "charges" | "output") => {
 						? line
 						: {
 								...line,
-								...(budget === "charges"
+								...(budget === "units"
 									? {
 											input: [
 												{
-													type: "deposit",
+													type: "units",
 													query: {
 														scope: "board",
 														selector: {
@@ -119,7 +117,7 @@ export const createContendedQueueConfigFn = (budget: "charges" | "output") => {
 														},
 														distance: "close",
 													},
-													charges: {
+													units: {
 														from: "target",
 														cost: 2,
 													},

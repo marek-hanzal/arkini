@@ -1,16 +1,13 @@
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { Form } from "~/item-authoring/ui/Form";
-import type { SectionId } from "~/item-authoring/type/Section";
-
-type OptionalCapability = "charges" | "merges";
+import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 
 interface EditorItemFormSearch {
 	readonly defaultDraft?: boolean;
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enable?: OptionalCapability;
-	readonly itemType?: TypeSchema.Type;
+	readonly create?: boolean;
 	readonly lineId?: string;
 	readonly merge?: number;
 	readonly resourceId?: string;
@@ -35,16 +32,16 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						defaultTitle: search.defaultTitle,
 					}
 				: {}),
-			...(search.enable === "charges" || search.enable === "merges"
+			...(search.enable === "units" || search.enable === "merges" || search.enable === "clock"
 				? {
 						enable: search.enable,
 					}
 				: {}),
-			...(search.itemType === undefined
-				? {}
-				: {
-						itemType: TypeSchema.parse(search.itemType),
-					}),
+			...(search.create === true
+				? {
+						create: true as const,
+					}
+				: {}),
 			...(typeof search.lineId === "string" && search.lineId.length > 0
 				? {
 						lineId: search.lineId,
@@ -69,7 +66,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			defaultItemId,
 			defaultTitle,
 			enable,
-			itemType,
+			create,
 			lineId,
 			merge,
 			resourceId,
@@ -86,7 +83,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				defaultItemId={defaultItemId}
 				defaultTitle={defaultTitle}
 				enableCapability={enable}
-				itemType={itemType}
+				create={create}
 				mergeIndex={merge}
 				productionLineId={lineId}
 				resourceId={resourceId}

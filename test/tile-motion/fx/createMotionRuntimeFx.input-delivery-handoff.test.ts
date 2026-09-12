@@ -14,7 +14,6 @@ import {
 	createRecordingMagneticField,
 	firstBoardLocation,
 	secondBoardLocation,
-	inventoryLocation,
 	palette,
 } from "./createMotionRuntimeFx.test/fixture";
 import { createActorAnimatorFx } from "~/tile-rendering/fx/createActorAnimatorFx";
@@ -29,7 +28,6 @@ for (const phase of [
 	"fade-out",
 	"fade-in",
 	"return",
-	"inventory-payload",
 ] as const) {
 	it(`retires ${phase} input playback before canonical delivery takes the remainder`, () => {
 		const source = createActor("runtime:source"),
@@ -48,30 +46,14 @@ for (const phase of [
 		};
 		receiver.container.position.set(200, 40);
 		receiver.container.alpha = 1;
-		const inventory = phase === "inventory-payload";
 		const actorStore = createActorStore({
-			actors: createActorMap(
-				...(inventory
-					? [
-							receiver,
-						]
-					: [
-							source,
-							receiver,
-						]),
-			),
+			actors: createActorMap(source, receiver),
 			canonicalItems: createItemMap(
-				...(inventory
-					? [
-							receiver.item,
-						]
-					: [
-							{
-								...source.item,
-								quantity: 2,
-							},
-							receiver.item,
-						]),
+				{
+					...source.item,
+					quantity: 2,
+				},
+				receiver.item,
 			),
 		});
 		const application = createApplication();
@@ -156,14 +138,6 @@ for (const phase of [
 			storedQuantity: 5,
 			targetActorId: receiver.item.id,
 			targetLocation: secondBoardLocation,
-			...(inventory
-				? {
-						sourceItem: {
-							...source.item,
-							location: inventoryLocation,
-						},
-					}
-				: {}),
 		};
 		const finishTween = (tween: (typeof tweens)[number]) => {
 			tween.props.onUpdateFn(1);
@@ -183,12 +157,11 @@ for (const phase of [
 				expect(outward).toBeDefined();
 				outward!.props.onUpdateFn(0.25);
 			}
-			if (phase === "fade-out" || phase === "fade-in" || phase === "return" || inventory) {
+			if (phase === "fade-out" || phase === "fade-in" || phase === "return") {
 				finishTween(outward!);
 				if (phase === "fade-in" || phase === "return") finishTween(tweens.at(-1)!);
 				if (phase === "return") finishTween(tweens.at(-1)!);
 			}
-			const payload = inventory ? surface.transientActorLayer.children[0] : null;
 			// A queued sibling is obsolete too; an unrelated successor must remain runnable.
 			Effect.runSync(
 				runtime.enqueueFx([
@@ -235,15 +208,12 @@ for (const phase of [
 					source.item.id,
 				),
 			).toBe(false);
-			if (payload !== null) expect(payload.destroyed).toBe(true);
-			else {
-				expect(source.container.destroyed).toBe(false);
-				expect(source.container).toMatchObject({
-					...livePose,
-					alpha: 1,
-				});
-				expect(source.lifecycleLayer.scale.x).toBe(1);
-			}
+			expect(source.container.destroyed).toBe(false);
+			expect(source.container).toMatchObject({
+				...livePose,
+				alpha: 1,
+			});
+			expect(source.lifecycleLayer.scale.x).toBe(1);
 			expect(Effect.runSync(magneticField.readActiveSourceActorIdsFx)).toEqual([]);
 			Effect.runSync(
 				delivery.syncFx([

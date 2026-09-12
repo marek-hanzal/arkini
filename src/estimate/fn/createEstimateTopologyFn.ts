@@ -23,7 +23,7 @@ export interface EstimateTopology {
 }
 
 const projectRequirementFn = (requirement: AcquisitionRequirement): AcquisitionRequirement =>
-	requirement.source === "charged-item"
+	requirement.source === "unit-owner"
 		? {
 				...requirement,
 				quantity: 1,
@@ -120,7 +120,9 @@ export const createEstimateTopologyFn = (graph: AcquisitionGraph): EstimateTopol
 	);
 	const unsupportedRoutes = new Set(
 		graph.routes.filter(
-			(route) => route.operation?.outputCompilation === "state-space-unsupported",
+			(route) =>
+				route.executionConstraint !== undefined ||
+				route.operation?.outputCompilation === "state-space-unsupported",
 		),
 	);
 	const routesByFact = new Map<string, AcquisitionRoute[]>();

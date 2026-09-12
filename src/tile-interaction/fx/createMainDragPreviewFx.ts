@@ -87,7 +87,6 @@ const readAttractionActorIdFn = ({
 			DropItemResultKind.Ignored,
 			DropItemResultKind.Move,
 			DropItemResultKind.Reject,
-			DropItemResultKind.StoreInventory,
 			DropItemResultKind.Swap,
 			() => null,
 		)

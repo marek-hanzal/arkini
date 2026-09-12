@@ -1,7 +1,5 @@
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 interface ItemLocationScopeAllowedProps {
@@ -9,18 +7,9 @@ interface ItemLocationScopeAllowedProps {
 	readonly locationScope: GridLocationSchema.Type["scope"];
 }
 
-/**
- * Reads whether one canonical item may own one concrete passive-grid scope.
- *
- * The inventory opener is the one intentional Board/Toolbar utility item. Its
- * authored Board scope remains the automatic-placement policy, not permission
- * to store the opener inside Inventory itself.
- */
+/** Reads whether the authored scope permits one concrete grid location. */
 export const isItemLocationScopeAllowedFn = ({
 	item,
 	locationScope,
 }: ItemLocationScopeAllowedProps) =>
-	item.type === TypeSchema.enum.Inventory
-		? locationScope === LocationScopeEnumSchema.enum.Board ||
-			locationScope === LocationScopeEnumSchema.enum.Toolbar
-		: item.scope === StorageSchema.enum.Any || item.scope === locationScope;
+	item.scope === StorageSchema.enum.Any || item.scope === locationScope;

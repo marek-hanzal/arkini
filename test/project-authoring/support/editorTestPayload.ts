@@ -35,9 +35,12 @@ export const editorTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "water",
 			id: "water",
-			type: "simple",
+
 			title: "Water",
 			description: "Water",
 			asset: {

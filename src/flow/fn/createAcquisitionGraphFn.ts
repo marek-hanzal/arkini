@@ -10,7 +10,6 @@ import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisi
 import { readAcquisitionOutputOccurrencesFn } from "~/flow/fn/readAcquisitionOutputOccurrencesFn";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { compileAcquisitionRootsFn } from "~/flow/fn/compileAcquisitionRootsFn";
@@ -27,35 +26,35 @@ const combineRequirementsFn = (
 	unsupported: groups.flatMap(({ unsupported }) => unsupported ?? []),
 });
 
-const makeChargeDepletionRequirementsFn = (
+const makeUnitDepletionRequirementsFn = (
 	requirements: AcquisitionRoute["requirements"],
-	chargedItemId: string,
+	unitOwnerItemId: string,
 ): AcquisitionRoute["requirements"] => ({
 	...requirements,
 	allOf: [
 		...requirements.allOf.filter(
 			(requirement) =>
-				requirement.factId !== chargedItemId ||
-				(requirement.source !== "charged-item" &&
-					requirement.source !== "deposit-input" &&
+				requirement.factId !== unitOwnerItemId ||
+				(requirement.source !== "unit-owner" &&
+					requirement.source !== "units-input" &&
 					requirement.source !== "owner"),
 		),
 		{
-			factId: chargedItemId,
+			factId: unitOwnerItemId,
 			quantity: 1,
-			source: "charged-item",
+			source: "unit-owner",
 			usage: "consume",
 		},
 	],
 });
 
-interface ChargeCost {
+interface UnitCost {
 	readonly cost: number;
 	readonly from: "self" | "target";
 }
 
 interface LineDescriptor {
-	readonly chargeCostsByItemId: ReadonlyMap<IdSchema.Type, ReadonlyArray<ChargeCost>>;
+	readonly unitCostsByItemId: ReadonlyMap<IdSchema.Type, ReadonlyArray<UnitCost>>;
 	readonly line: LineSchema.Type;
 	readonly operation: AcquisitionOperation;
 	readonly owner: ItemSchema.Type;
@@ -74,7 +73,7 @@ const readLineOperationInputsFn = (line: LineSchema.Type) =>
 						quantity: input.quantity,
 					},
 				];
-			case "deposit":
+			case "units":
 				return [
 					{
 						factId: input.query.selector.itemId,
@@ -97,11 +96,11 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 			usage: "one-time",
 		},
 	];
-	const chargeCostsByItemId = new Map<string, ChargeCost[]>();
-	const addChargeFn = (itemId: string, cost: ChargeCost) => {
-		const costs = chargeCostsByItemId.get(itemId) ?? [];
+	const unitCostsByItemId = new Map<string, UnitCost[]>();
+	const addUnitFn = (itemId: string, cost: UnitCost) => {
+		const costs = unitCostsByItemId.get(itemId) ?? [];
 		costs.push(cost);
-		chargeCostsByItemId.set(itemId, costs);
+		unitCostsByItemId.set(itemId, costs);
 	};
 
 	for (const input of line.input) {
@@ -112,22 +111,22 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 				source: "material-input",
 				usage: input.mode === "consume" ? "consume" : "ongoing",
 			});
-		if (input.type === "deposit")
+		if (input.type === "units")
 			requirements.push({
 				factId: input.query.selector.itemId,
 				quantity: 1,
-				source: "deposit-input",
+				source: "units-input",
 				usage: "one-time",
 			});
-		if (input.charges === undefined) continue;
-		if (input.charges.from === "self")
-			addChargeFn(owner.id, {
-				cost: input.charges.cost,
+		if (input.units === undefined) continue;
+		if (input.units.from === "self")
+			addUnitFn(owner.id, {
+				cost: input.units.cost,
 				from: "self",
 			});
-		else if (input.type === "deposit")
-			addChargeFn(input.query.selector.itemId, {
-				cost: input.charges.cost,
+		else if (input.type === "units")
+			addUnitFn(input.query.selector.itemId, {
+				cost: input.units.cost,
 				from: "target",
 			});
 		else continue;
@@ -138,7 +137,7 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 		source: "line-condition",
 	});
 	return {
-		chargeCostsByItemId,
+		unitCostsByItemId,
 		line,
 		operation: {
 			id: readAcquisitionIdentityFn("source", owner.id, "line", line.id),
@@ -151,30 +150,72 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 				anyOf: [],
 			},
 			availability,
+			owner.clock !== undefined && owner.control === "automatic-only"
+				? readAcquisitionAvailabilityRequirementsFn({
+						rules: owner.clock.rules,
+						source: "line-condition",
+					})
+				: {
+						allOf: [],
+						anyOf: [],
+					},
 		),
 	} satisfies LineDescriptor;
 };
 
+const readLineExecutionConstraintFn = (
+	owner: ItemSchema.Type,
+	line: LineSchema.Type,
+): AcquisitionRoute["executionConstraint"] => {
+	const clock = owner.clock;
+	if (clock === undefined) return owner.control === "automatic-only" ? "unavailable" : undefined;
+	if (
+		owner.control === "automatic-only" &&
+		(clock.intervalMs === undefined ||
+			!line.clock ||
+			(!clock.enable && !clock.rules.some(({ type }) => type === "enable")))
+	)
+		return "unavailable";
+	return clock.durationMs === undefined ? undefined : "finite-owner-lifetime";
+};
+
 const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescriptor) => {
 	const routes: AcquisitionRoute[] = [];
-	const chargeUses: NonNullable<AcquisitionRoute["chargeUses"]>[number][] = [];
-	for (const [chargedItemId, costs] of descriptor.chargeCostsByItemId) {
-		const charges = config.items[chargedItemId]?.charges;
+	const unitUses: NonNullable<AcquisitionRoute["unitUses"]>[number][] = [];
+	for (const [unitOwnerItemId, costs] of descriptor.unitCostsByItemId) {
+		const units = config.items[unitOwnerItemId]?.units;
 		const spendPerRun = costs.reduce((total, { cost }) => total + cost, 0);
-		if (charges === undefined || spendPerRun <= 0) continue;
+		if (units === undefined || spendPerRun <= 0) continue;
 		const accounting =
-			spendPerRun <= charges.amount &&
+			spendPerRun <= units.amount &&
 			new Set(costs.map(({ cost }) => cost)).size === 1 &&
 			new Set(costs.map(({ from }) => from)).size === 1
 				? "single-payer-exact"
 				: "multi-payer-unsupported";
-		chargeUses.push({
+		unitUses.push({
 			accounting,
-			payerFactId: chargedItemId,
+			payerFactId: unitOwnerItemId,
 			usableActionRuns:
-				accounting === "single-payer-exact" ? Math.floor(charges.amount / spendPerRun) : 0,
+				accounting === "single-payer-exact" ? Math.floor(units.amount / spendPerRun) : 0,
 		});
 	}
+	const executionConstraint = readLineExecutionConstraintFn(descriptor.owner, descriptor.line);
+	const minimumActionIntervalMs =
+		descriptor.owner.clock !== undefined && descriptor.owner.control === "automatic-only"
+			? descriptor.owner.clock.intervalMs
+			: undefined;
+	const execution = {
+		...(executionConstraint === undefined
+			? {}
+			: {
+					executionConstraint,
+				}),
+		...(minimumActionIntervalMs === undefined
+			? {}
+			: {
+					minimumActionIntervalMs,
+				}),
+	};
 	const outputModel = readAcquisitionOutputOccurrencesFn(descriptor.line.output);
 	const operation = {
 		...descriptor.operation,
@@ -187,10 +228,11 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	};
 	for (const occurrence of outputModel.occurrences)
 		routes.push({
-			...(chargeUses.length === 0
+			...execution,
+			...(unitUses.length === 0
 				? {}
 				: {
-						chargeUses,
+						unitUses,
 					}),
 			durationMs: descriptor.line.runtimeMs,
 			id: readAcquisitionIdentityFn(
@@ -217,41 +259,42 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 			runMultiplier: 1,
 		});
 
-	for (const [chargedItemId, costs] of descriptor.chargeCostsByItemId) {
-		const charges = config.items[chargedItemId]?.charges;
+	for (const [unitOwnerItemId, costs] of descriptor.unitCostsByItemId) {
+		const units = config.items[unitOwnerItemId]?.units;
 		const spendPerRun = costs.reduce((total, { cost }) => total + cost, 0);
-		if (charges?.output === undefined || spendPerRun > charges.amount) continue;
-		if (charges.amount % spendPerRun !== 0) continue;
-		const runMultiplier = charges.amount / spendPerRun;
-		const chargeOutputModel = readAcquisitionOutputOccurrencesFn(charges.output);
-		for (const occurrence of chargeOutputModel.occurrences)
+		if (units?.output === undefined || spendPerRun > units.amount) continue;
+		if (units.amount % spendPerRun !== 0) continue;
+		const runMultiplier = units.amount / spendPerRun;
+		const unitOutputModel = readAcquisitionOutputOccurrencesFn(units.output);
+		for (const occurrence of unitOutputModel.occurrences)
 			routes.push({
-				chargeUses: chargeUses.filter(({ payerFactId }) => payerFactId !== chargedItemId),
+				...execution,
+				unitUses: unitUses.filter(({ payerFactId }) => payerFactId !== unitOwnerItemId),
 				durationMs: descriptor.line.runtimeMs,
 				id: readAcquisitionIdentityFn(
-					"line-charge-depletion",
+					"line-unit-depletion",
 					descriptor.owner.id,
 					descriptor.line.id,
-					chargedItemId,
+					unitOwnerItemId,
 					occurrence.id,
 					occurrence.factId,
 				),
 				metadata: {
-					chargedItemId,
-					kind: "line-charge-depletion",
+					unitOwnerItemId,
+					kind: "line-unit-depletion",
 					lineId: descriptor.line.id,
 					lineTitle: descriptor.line.title,
 					ownerItemId: descriptor.owner.id,
 				},
 				operation: {
-					id: readAcquisitionIdentityFn("source", chargedItemId, "charges"),
+					id: readAcquisitionIdentityFn("source", unitOwnerItemId, "units"),
 					inputs: [],
-					...(chargeOutputModel.compilation === "complete"
+					...(unitOutputModel.compilation === "complete"
 						? {}
 						: {
-								outputCompilation: chargeOutputModel.compilation,
+								outputCompilation: unitOutputModel.compilation,
 							}),
-					outputDistribution: chargeOutputModel.outputDistribution,
+					outputDistribution: unitOutputModel.outputDistribution,
 				},
 				output: {
 					annotation: occurrence.annotation,
@@ -260,7 +303,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 					quantityDistribution: occurrence.quantityDistribution,
 				},
 				requirements: combineRequirementsFn(
-					makeChargeDepletionRequirementsFn(descriptor.requirements, chargedItemId),
+					makeUnitDepletionRequirementsFn(descriptor.requirements, unitOwnerItemId),
 					occurrence.requirements,
 				),
 				runMultiplier,
@@ -269,11 +312,11 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	return routes;
 };
 
-/** Compiles line-output and exact charge-depletion acquisition routes. */
+/** Compiles line-output and exact unit-depletion acquisition routes. */
 const compileAcquisitionLineRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items))
-		for (const line of readAuthoredItemLinesFn(item)) {
+		for (const line of item.lines) {
 			const descriptor = readLineDescriptorFn(item, line);
 			if (descriptor !== undefined) routes.push(...readLineRoutesFn(config, descriptor));
 		}
@@ -317,21 +360,21 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 			anyOf: [],
 		};
 		const target = config.items[merge.target.itemId];
-		const chargeParticipants = [
-			...(merge.action === "deposit" && source.charges !== undefined
+		const unitParticipants = [
+			...(merge.action === "spend" && source.units !== undefined
 				? [
 						{
-							charges: source.charges,
+							units: source.units,
 							itemId: source.id,
 							requirementSource: "merge-source" as const,
 							role: "source" as const,
 						},
 					]
 				: []),
-			...(merge.effect === "deposit" && target?.charges !== undefined
+			...(merge.effect === "spend" && target?.units !== undefined
 				? [
 						{
-							charges: target.charges,
+							units: target.units,
 							itemId: target.id,
 							requirementSource: "merge-target" as const,
 							role: "target" as const,
@@ -339,10 +382,10 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 					]
 				: []),
 		];
-		const chargeUses = chargeParticipants.map(({ charges, itemId }) => ({
+		const unitUses = unitParticipants.map(({ units, itemId }) => ({
 			accounting: "single-payer-exact" as const,
 			payerFactId: itemId,
-			usableActionRuns: charges.amount,
+			usableActionRuns: units.amount,
 		}));
 		const metadata = {
 			kind: "merge-output",
@@ -384,10 +427,10 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 		} satisfies AcquisitionOperation;
 		if (merge.effect === "replace")
 			routes.push({
-				...(chargeUses.length === 0
+				...(unitUses.length === 0
 					? {}
 					: {
-							chargeUses,
+							unitUses,
 						}),
 				durationMs: 0,
 				id: readAcquisitionIdentityFn(
@@ -423,10 +466,10 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 			});
 		for (const output of outputModel.occurrences)
 			routes.push({
-				...(chargeUses.length === 0
+				...(unitUses.length === 0
 					? {}
 					: {
-							chargeUses,
+							unitUses,
 						}),
 				durationMs: 0,
 				id: readAcquisitionIdentityFn(
@@ -449,11 +492,9 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 				runMultiplier: 1,
 			});
 
-		for (const [participantIndex, participant] of chargeParticipants.entries()) {
-			if (participant.charges.output === undefined) continue;
-			const chargeOutputModel = readAcquisitionOutputOccurrencesFn(
-				participant.charges.output,
-			);
+		for (const [participantIndex, participant] of unitParticipants.entries()) {
+			if (participant.units.output === undefined) continue;
+			const unitOutputModel = readAcquisitionOutputOccurrencesFn(participant.units.output);
 			const depletionRequirements: AcquisitionRoute["requirements"] = {
 				...requirements,
 				allOf: requirements.allOf.map((requirement) =>
@@ -461,20 +502,18 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 					requirement.source === participant.requirementSource
 						? {
 								...requirement,
-								source: "charged-item" as const,
+								source: "unit-owner" as const,
 								usage: "consume" as const,
 							}
 						: requirement,
 				),
 			};
-			for (const output of chargeOutputModel.occurrences)
+			for (const output of unitOutputModel.occurrences)
 				routes.push({
-					chargeUses: chargeUses.filter(
-						(_chargeUse, index) => index !== participantIndex,
-					),
+					unitUses: unitUses.filter((_unitUse, index) => index !== participantIndex),
 					durationMs: 0,
 					id: readAcquisitionIdentityFn(
-						"merge-charge-depletion",
+						"merge-unit-depletion",
 						source.id,
 						merge.target.itemId,
 						mergeIndex,
@@ -483,21 +522,21 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 						output.factId,
 					),
 					metadata: {
-						chargedItemId: participant.itemId,
-						kind: "merge-charge-depletion",
+						unitOwnerItemId: participant.itemId,
+						kind: "merge-unit-depletion",
 						mergeIndex,
 						sourceItemId: source.id,
 						targetItemId: merge.target.itemId,
 					},
 					operation: {
-						id: readAcquisitionIdentityFn("source", participant.itemId, "charges"),
+						id: readAcquisitionIdentityFn("source", participant.itemId, "units"),
 						inputs: [],
-						...(chargeOutputModel.compilation === "complete"
+						...(unitOutputModel.compilation === "complete"
 							? {}
 							: {
-									outputCompilation: chargeOutputModel.compilation,
+									outputCompilation: unitOutputModel.compilation,
 								}),
-						outputDistribution: chargeOutputModel.outputDistribution,
+						outputDistribution: unitOutputModel.outputDistribution,
 					},
 					output: {
 						annotation: output.annotation,
@@ -506,7 +545,7 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 						quantityDistribution: output.quantityDistribution,
 					},
 					requirements: combineRequirementsFn(depletionRequirements, output.requirements),
-					runMultiplier: participant.charges.amount,
+					runMultiplier: participant.units.amount,
 				});
 		}
 	}
@@ -522,16 +561,28 @@ const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 	return routes;
 };
 
-const readTemporaryRoutesFn = (item: ItemSchema.Type) => {
-	if (item.type !== "temporary") return [];
-	const outputModel = readAcquisitionOutputOccurrencesFn(item.output);
+const readExpiryRoutesFn = (item: ItemSchema.Type) => {
+	const clock = item.clock;
+	const durationMs = clock?.durationMs;
+	if (clock === undefined || durationMs === undefined) return [];
+	const kind = "clock-expiry";
+	const outputModel = readAcquisitionOutputOccurrencesFn(clock.onExpire);
 	return outputModel.occurrences.map(
 		(output): AcquisitionRoute => ({
-			durationMs: item.durationMs,
-			id: readAcquisitionIdentityFn("temporary-expiry", item.id, output.id, output.factId),
+			...(!clock.enable && !clock.rules.some(({ type }) => type === "enable")
+				? {
+						executionConstraint: "unavailable" as const,
+					}
+				: item.lines.length > 0
+					? {
+							executionConstraint: "finite-owner-lifetime" as const,
+						}
+					: {}),
+			durationMs,
+			id: readAcquisitionIdentityFn(kind, item.id, output.id, output.factId),
 			metadata: {
 				itemId: item.id,
-				kind: "temporary-expiry",
+				kind,
 			},
 			operation: {
 				id: readAcquisitionIdentityFn("source", item.id, "expiry"),
@@ -549,29 +600,35 @@ const readTemporaryRoutesFn = (item: ItemSchema.Type) => {
 				operationOutputGroupId: output.operationOutputGroupId,
 				quantityDistribution: output.quantityDistribution,
 			},
-			requirements: {
-				allOf: [
-					{
-						factId: item.id,
-						quantity: 1,
-						source: "temporary-item",
-						usage: "consume",
-					},
-					...output.requirements.allOf,
-				],
-				anyOf: output.requirements.anyOf,
-				unsupported: output.requirements.unsupported ?? [],
-			},
+			requirements: combineRequirementsFn(
+				{
+					allOf: [
+						{
+							factId: item.id,
+							quantity: 1,
+							source: "expiring-item",
+							usage: "consume",
+						},
+						...output.requirements.allOf,
+					],
+					anyOf: output.requirements.anyOf,
+					unsupported: output.requirements.unsupported ?? [],
+				},
+				readAcquisitionAvailabilityRequirementsFn({
+					rules: clock.rules,
+					source: "line-condition",
+				}),
+			),
 			runMultiplier: 1,
 		}),
 	);
 };
 
-/** Compiles temporary-expiry acquisition routes. */
-const compileAcquisitionTemporaryRoutesFn = (config: GameConfigSchema.Type) => {
+/** Compiles finite-owner expiry acquisition routes through the shared output model. */
+const compileAcquisitionExpiryRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items)) {
-		routes.push(...readTemporaryRoutesFn(item));
+		routes.push(...readExpiryRoutesFn(item));
 	}
 	return routes;
 };
@@ -582,7 +639,7 @@ export const createAcquisitionGraphFn = (config: GameConfigSchema.Type) => {
 	const routes = [
 		...compileAcquisitionLineRoutesFn(config),
 		...compileAcquisitionMergeRoutesFn(config),
-		...compileAcquisitionTemporaryRoutesFn(config),
+		...compileAcquisitionExpiryRoutesFn(config),
 	].sort((left, right) => Order.String(left.id, right.id));
 
 	return {

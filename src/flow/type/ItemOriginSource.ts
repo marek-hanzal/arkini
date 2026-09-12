@@ -4,7 +4,7 @@ import type {
 	AcquisitionUnsupportedRequirement,
 } from "~/flow/type/AcquisitionGraph";
 
-export type ItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
+export type ItemOriginOperationKind = "line" | "units" | "merge" | "expiry";
 type ItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
 
 export interface ItemOriginOutputOccurrence {
@@ -47,7 +47,7 @@ export type ItemOriginSourceReference =
 			readonly lineId: string;
 	  }
 	| {
-			readonly type: "charges";
+			readonly type: "units";
 	  }
 	| {
 			readonly type: "expiry";

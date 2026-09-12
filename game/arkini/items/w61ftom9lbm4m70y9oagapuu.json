@@ -1,0 +1,69 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "w61ftom9lbm4m70y9oagapuu",
+		"id": "dirty-scrubbing-brush",
+		"title": "Dirty Scrubbing Brush",
+		"description": "No longer is able to clean up things",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-scrubbing-brush"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "toilet"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "toilet-biowaste"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "water"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "scrubbing-brush",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "bio-waste-bucket"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cutting-board"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "dirty-cutting-board"
+			}
+		]
+	}
+}

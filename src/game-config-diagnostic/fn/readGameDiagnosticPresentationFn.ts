@@ -8,40 +8,36 @@ const diagnosticTitles = {
 	"source:duplicate-record": "Duplicate source record",
 	"start:invalid": "Invalid game start",
 	"resource:unused": "Unused asset",
-	"input:capacity-unsupported": "Unsupported input capacity",
 	"source:duplicate-provider": "Duplicate source provider",
 	"config:missing-reference": "Missing item reference",
-	"input:material-ineligible": "Ineligible material input",
 	"source:schema-invalid": "Invalid source value",
-	"input:charges-invalid": "Invalid input charge contract",
+	"input:units-invalid": "Invalid input unit contract",
 	"merge:invalid": "Invalid merge",
-	"deposit:stochastic-softlock": "Deposit may become unavailable",
+	"units:stochastic-renewal": "Finite item may become unavailable",
 	"input:acceptance-cycle": "Circular material acceptance",
 	"source:schema-reference-conflict": "Conflicting schema references",
 	"config:schema": "Invalid project value",
 	"item:duplicate-uid": "Duplicate item UID",
 	"line:duplicate-id": "Duplicate production line ID",
-	"line:multiple-defaults": "Multiple default production lines",
+	"line:multiple-selections": "Multiple selected production lines",
 	"config:key-id-mismatch": "Item key and ID differ",
-	"deposit:unsustainable": "Deposit cannot be recreated",
+	"units:missing-renewal": "Finite item cannot be recreated",
 } satisfies Record<DiagnosticCodeEnumSchema.Type, string>;
 
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
 	switch (diagnostic.code) {
-		case "input:capacity-unsupported":
-		case "input:material-ineligible":
-		case "input:charges-invalid":
+		case "input:units-invalid":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineId} · input ${diagnostic.inputIndex + 1}`;
 		case "merge:invalid":
 			return `${diagnostic.ownerItemId} · merge ${diagnostic.mergeIndex + 1}`;
 		case "line:duplicate-id":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineId}`;
-		case "line:multiple-defaults":
+		case "line:multiple-selections":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineIds.join(" / ")}`;
 		case "item:duplicate-uid":
 			return diagnostic.itemIds.join(" / ");
-		case "deposit:stochastic-softlock":
-		case "deposit:unsustainable":
+		case "units:stochastic-renewal":
+		case "units:missing-renewal":
 			return diagnostic.itemId;
 		case "resource:duplicate":
 		case "resource:missing":

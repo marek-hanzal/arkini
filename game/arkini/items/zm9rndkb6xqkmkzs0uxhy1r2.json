@@ -1,0 +1,16 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zm9rndkb6xqkmkzs0uxhy1r2",
+		"id": "glass-goblet-dirty",
+		"title": "Dirty Glass Goblet",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"glass-goblet-dirty"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

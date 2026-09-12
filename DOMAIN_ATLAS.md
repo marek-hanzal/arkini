@@ -49,7 +49,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-event` | Ordered facts emitted by an already committed transition | [`src/game-event/schema/GameEventSchema.ts`](src/game-event/schema/GameEventSchema.ts) |
 | `simulation-time` | Immutable fixed simulation quantum | [`src/simulation-time/constant/SimulationStepMs.ts`](src/simulation-time/constant/SimulationStepMs.ts) |
 | `game-tick` | Fixed-step budget, replay and lifecycle advancement | [`src/game-tick/fx/advanceRuntimeStepFx.ts`](src/game-tick/fx/advanceRuntimeStepFx.ts) |
-| `temporary-item` | Temporary duration advancement and expiry transition | [`src/temporary-item/fx/attemptTemporaryItemExpiryFx.ts`](src/temporary-item/fx/attemptTemporaryItemExpiryFx.ts) |
+| `item-schedule` | Optional Clock-line admission, lifetime across storage, saved phase/selection and owner/material expiry | [`src/item-schedule/fx/advanceItemSchedulesFx.ts`](src/item-schedule/fx/advanceItemSchedulesFx.ts) |
+| `item-expiry` | Atomic identity expiry and deterministic optional output shared by lifetime owners | [`src/item-expiry/fx/expireItemRuntimeFx.ts`](src/item-expiry/fx/expireItemRuntimeFx.ts) |
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`src/game-persistence/schema/StateSchema.ts`](src/game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save execution scope and fail-stop lifecycle | [`src/game-session/fx/createGameSessionFx.ts`](src/game-session/fx/createGameSessionFx.ts) |
 | `playable-game` | Package-independent live Game capability and resource URLs | [`src/playable-game/type/PlayableGame.ts`](src/playable-game/type/PlayableGame.ts) |
@@ -65,7 +66,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-merge` | Directional merge admission and atomic lifecycle | [`src/item-merge/fx/mergeItemsFx.ts`](src/item-merge/fx/mergeItemsFx.ts) |
 | `item-state-isolation` | Identity-bound owner isolation and remainder placement | [`src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts`](src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts) |
 | `item-interaction` | Drop preview/commit, release, split, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
-| `space-action` | Space activation, charge settlement and navigation | [`src/space-action/fx/activateSpaceItemFx.ts`](src/space-action/fx/activateSpaceItemFx.ts) |
+| `item-action` | Immediate inventory/space action admission and unit settlement | [`src/item-action/fx/activateItemActionFx.ts`](src/item-action/fx/activateItemActionFx.ts) |
 
 [`GAME.MD`](GAME.MD) owns gameplay meaning. The Runtime map owns state and lifecycle navigation.
 
@@ -75,7 +76,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | --- | --- | --- |
 | `production-condition` | Authored runtime condition evaluation | [`src/production-condition/fx/whenFx.ts`](src/production-condition/fx/whenFx.ts) |
 | `production-output` | Output/drop/roll contracts and resolution | [`src/production-output/fx/outputFx.ts`](src/production-output/fx/outputFx.ts) |
-| `production-action` | Immediate action admission, inputs and charge settlement | [`src/production-action/fx/resolveActionRuleFx.ts`](src/production-action/fx/resolveActionRuleFx.ts) |
+| `production-action` | Immediate action admission, inputs and unit settlement | [`src/production-action/fx/resolveActionRuleFx.ts`](src/production-action/fx/resolveActionRuleFx.ts) |
 | `production-input` | Material planning, buffers, autofill and withdrawal | [`src/production-input/fx/resolveInputRunFx.ts`](src/production-input/fx/resolveInputRunFx.ts) |
 | `production-line` | Line definitions, rules, reads and run planning | [`src/production-line/README.md`](src/production-line/README.md) |
 | `production-job` | Queue, reservation, start, completion and cancellation | [`src/production-job/fx/enqueueLineFx.ts`](src/production-job/fx/enqueueLineFx.ts) |

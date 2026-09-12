@@ -7,25 +7,22 @@ const itemFn = ({
 	draft,
 	id,
 	title,
-	type = "simple",
 }: {
 	readonly draft: boolean;
 	readonly id: string;
 	readonly title: string;
-	readonly type?: "producer" | "simple";
 }) => ({
 	...createDraftFn({
 		draft,
 		itemId: id,
 		resourceId: `asset:${id}`,
-		type,
 		uid: `uid:${id}`,
 	}),
 	title,
 });
 
 describe("filterFn", () => {
-	it("composes draft status, item type, and fuzzy query", () => {
+	it("composes draft status and fuzzy query", () => {
 		const matching = itemFn({
 			draft: true,
 			id: "item:draft-herb",
@@ -40,12 +37,6 @@ describe("filterFn", () => {
 			}),
 			itemFn({
 				draft: true,
-				id: "producer:draft-herb",
-				title: "Draft Herb Producer",
-				type: "producer",
-			}),
-			itemFn({
-				draft: true,
 				id: "item:draft-stone",
 				title: "Draft Stone",
 			}),
@@ -54,7 +45,6 @@ describe("filterFn", () => {
 		expect(
 			filterFn(items, {
 				draft: true,
-				itemType: "simple",
 				query: "herb",
 			}),
 		).toEqual([
@@ -65,6 +55,6 @@ describe("filterFn", () => {
 				draft: false,
 				query: "herb",
 			}),
-		).toHaveLength(3);
+		).toHaveLength(2);
 	});
 });

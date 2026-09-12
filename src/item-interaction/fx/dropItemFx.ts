@@ -4,7 +4,6 @@ import { match } from "ts-pattern";
 import { commitMergeDropFx } from "~/item-interaction/fx/commitMergeDropFx";
 import { commitMoveDropFx } from "~/item-interaction/fx/commitMoveDropFx";
 import { commitStackDropFx } from "~/item-interaction/fx/commitStackDropFx";
-import { commitStoreInventoryDropFx } from "~/item-interaction/fx/commitStoreInventoryDropFx";
 import { commitStoreInputDropFx } from "~/item-interaction/fx/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/item-interaction/fx/commitSwapDropFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
@@ -86,20 +85,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					sourceRevision,
 					targetItemId,
 					targetRevision,
-				}),
-		)
-		.with(
-			{
-				kind: DropItemResultKind.StoreInventory,
-			},
-			() =>
-				commitStoreInventoryDropFx({
-					sourceItemId,
-					sourceRevision,
-					sourceLocation,
-					inventoryItemId: targetItemId,
-					inventoryRevision: targetRevision,
-					inventoryLocation: targetLocation,
 				}),
 		)
 		.with(

@@ -375,21 +375,32 @@ export const validateConfigReferencesFn = ({
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		if (item.type === "space") {
+		const action = item.action;
+		const clock = item.clock;
+		if (action !== undefined || clock !== undefined) {
+			const rules = action?.rules ?? clock?.rules ?? [];
 			diagnostics.push(
 				...validateActionReferencesFn({
 					config,
-					inputs: item.input.map((input, index) => ({
+					inputs: (action?.input ?? []).map((input, index) => ({
 						input,
 						index,
 					})),
-					path: [
-						"items",
-						itemId,
-					],
-					rules: item.rules.map((rule, index) => ({
-						index,
+					path:
+						action === undefined
+							? [
+									"items",
+									itemId,
+									"clock",
+								]
+							: [
+									"items",
+									itemId,
+									"action",
+								],
+					rules: rules.map((rule, index) => ({
 						rule,
+						index,
 					})),
 					source,
 				}),
@@ -414,7 +425,7 @@ export const validateConfigReferencesFn = ({
 			match(merge)
 				.with(
 					{
-						effect: TargetEffectSchema.enum.Deposit,
+						effect: TargetEffectSchema.enum.Spend,
 					},
 					() => undefined,
 				)

@@ -14,7 +14,6 @@ import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeD
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 
 const workshop = inputRuntimeTestConfig.items.workshop;
-if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
 const config = GameConfigSchema.parse({
 	...inputRuntimeTestConfig,
 	items: {

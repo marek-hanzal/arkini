@@ -71,7 +71,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 		sceneState.items = [
 			{
 				...inventoryItem,
-				itemType: "space",
+
 				primaryAction: {
 					currentSpace: 0,
 					kind: "activate-space",

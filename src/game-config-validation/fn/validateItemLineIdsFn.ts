@@ -14,17 +14,18 @@ export namespace validateItemLineIdsFn {
 	}
 }
 
-/** Enforces owner-local line identity and at most one authored default. */
+/** Enforces owner-local line identity and at most one authored line per selection. */
 export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineIdsFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [ownerItemId, item] of Object.entries(config.items)) {
 		const firstById = new Map<IdSchema.Type, DiagnosticPathSchema.Type>();
-		let firstDefault:
-			| {
-					readonly lineId: IdSchema.Type;
-					readonly path: DiagnosticPathSchema.Type;
-			  }
-			| undefined;
+		const firstSelections = new Map<
+			"default" | "clock",
+			{
+				lineId: IdSchema.Type;
+				path: DiagnosticPathSchema.Type;
+			}
+		>();
 		const entries = readItemLineEntriesFn({
 			itemId: ownerItemId,
 			item,
@@ -34,34 +35,39 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 				...entry.path,
 				"id",
 			] satisfies DiagnosticPathSchema.Type;
-			if (entry.line.default) {
-				const defaultPath = [
+			for (const selection of [
+				"default",
+				"clock",
+			] as const) {
+				if (!entry.line[selection]) continue;
+				const path = [
 					...entry.path,
-					"default",
-				] satisfies DiagnosticPathSchema.Type;
-				if (firstDefault !== undefined) {
+					selection,
+				];
+				const first = firstSelections.get(selection);
+				if (first === undefined)
+					firstSelections.set(selection, {
+						lineId: entry.line.id,
+						path,
+					});
+				else
 					diagnostics.push({
-						code: DiagnosticCodeEnumSchema.enum.LineMultipleDefaults,
+						code: DiagnosticCodeEnumSchema.enum.LineMultipleSelections,
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
-						path: defaultPath,
+						path,
 						source: provenance.items[ownerItemId],
-						message: `Item ${ownerItemId} marks both ${firstDefault.lineId} and ${entry.line.id} as authored default lines.`,
+						selection,
+						message: `Item ${ownerItemId} marks both ${first.lineId} and ${entry.line.id} as authored ${selection} lines.`,
 						ownerItemId,
 						lineIds: [
-							firstDefault.lineId,
+							first.lineId,
 							entry.line.id,
 						],
 						paths: [
-							firstDefault.path,
-							defaultPath,
+							first.path,
+							path,
 						],
 					});
-				} else {
-					firstDefault = {
-						lineId: entry.line.id,
-						path: defaultPath,
-					};
-				}
 			}
 			const previousPath = firstById.get(entry.line.id);
 			if (previousPath !== undefined) {

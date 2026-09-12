@@ -10,7 +10,7 @@ describe("printGameDiagnosticsForCliFx", () => {
 		await Effect.runPromise(
 			printGameDiagnosticsForCliFx([
 				{
-					code: "input:capacity-unsupported",
+					code: "input:units-invalid",
 					severity: "error",
 					path: [
 						"items",
@@ -21,17 +21,17 @@ describe("printGameDiagnosticsForCliFx", () => {
 						0,
 					],
 					source: "items.json",
-					message: "This input buffer is only supported by producer lines.",
+					message: "The item has no units to pay its own input cost.",
 					ownerItemId: "producer:academy",
 					lineId: "line:academy:knowledge",
 					inputIndex: 0,
-					capacity: 2,
+					reason: "self-missing-units" as const,
 				},
 			]),
 		);
 
 		expect(consoleError).toHaveBeenCalledWith(
-			"ERROR input:capacity-unsupported — Unsupported input capacity [producer:academy · line:academy:knowledge · input 1] (items.json:items.producer:academy.lines.0.inputs.0)\n  This input buffer is only supported by producer lines.",
+			"ERROR input:units-invalid — Invalid input unit contract [producer:academy · line:academy:knowledge · input 1] (items.json:items.producer:academy.lines.0.inputs.0)\n  The item has no units to pay its own input cost.",
 		);
 	});
 });

@@ -1,0 +1,20 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ogg44k9gjs7zo0wbn5ebahm8",
+		"id": "corrupted-wolf",
+		"title": "Corrupted Wolf",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"corrupted-wolf"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 24
+		}
+	}
+}

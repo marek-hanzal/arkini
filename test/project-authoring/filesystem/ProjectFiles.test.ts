@@ -78,7 +78,7 @@ describe("filesystem Editor project current tree", () => {
 		expect(game.$schema).toBe(GameProjectGameSchemaReference);
 		expect(game.version).toEqual(parseVersionFn(editorTestPayload.version));
 		expect(game).not.toHaveProperty("items");
-		const waterPath = join(harness.root, "items", "simple", "water.json");
+		const waterPath = join(harness.root, "items", "water.json");
 		expect(JSON.parse(await readFile(waterPath, "utf8")).$schema).toBe(
 			GameProjectItemSchemaReference,
 		);
@@ -136,15 +136,10 @@ describe("filesystem Editor project current tree", () => {
 		await expect(readFile(join(harness.root, "unrelated.txt"), "utf8")).resolves.toBe(
 			"keep-unrelated",
 		);
-		await expect(
-			access(join(harness.root, "items", "simple", "water.json")),
-		).rejects.toBeDefined();
+		await expect(access(join(harness.root, "items", "water.json"))).rejects.toBeDefined();
 		expect(
 			JSON.parse(
-				await readFile(
-					join(harness.root, "items", "simple", "water%2E%ED%A0%80.json"),
-					"utf8",
-				),
+				await readFile(join(harness.root, "items", "water%2E%ED%A0%80.json"), "utf8"),
 			),
 		).toEqual({
 			$schema: GameProjectItemSchemaReference,

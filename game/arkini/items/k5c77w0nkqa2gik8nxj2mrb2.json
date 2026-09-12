@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "k5c77w0nkqa2gik8nxj2mrb2",
+		"id": "bed-with-teddy-bear",
+		"title": "Bed With Teddy Bear",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bed-with-teddy-bear"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

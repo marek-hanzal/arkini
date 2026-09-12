@@ -89,22 +89,22 @@ const runMergeFx = () =>
 		};
 	});
 
-const depositRule = {
+const spendRule = {
 	target: {
 		type: "item",
 		itemId: "target",
 	},
-	action: "deposit",
+	action: "spend",
 	effect: "keep",
 } satisfies MergeSchema.Type;
 
-const targetDepositRule = {
+const targetSpendRule = {
 	target: {
 		type: "item",
 		itemId: "target",
 	},
 	action: "consume",
-	effect: "deposit",
+	effect: "spend",
 } satisfies MergeSchema.Type;
 
 const combinations: ReadonlyArray<{
@@ -244,13 +244,13 @@ describe("mergeItemsFx", () => {
 		);
 	});
 
-	it("spends one real source charge for a Deposit merge", () => {
+	it("spends one real source unit for a Spend merge", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
 				useGameFx({
 					config: createMergeTestConfig({
-						rule: depositRule,
-						sourceCharges: {
+						rule: spendRule,
+						sourceUnits: {
 							amount: 2,
 						},
 					}),
@@ -263,7 +263,7 @@ describe("mergeItemsFx", () => {
 
 		expect(result.after.items.find((item) => item.id === "runtime:source")).toMatchObject({
 			quantity: 1,
-			remainingCharges: 1,
+			remainingUnits: 1,
 		});
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
@@ -273,7 +273,7 @@ describe("mergeItemsFx", () => {
 		});
 	});
 
-	it("rejects a Deposit merge when the source has no charges without changing runtime", () => {
+	it("rejects a Spend merge when the source has no units without changing runtime", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const before = yield* readRuntimeFx();
@@ -286,7 +286,7 @@ describe("mergeItemsFx", () => {
 			}).pipe(
 				useGameFx({
 					config: createMergeTestConfig({
-						rule: depositRule,
+						rule: spendRule,
 					}),
 					state: makeState({
 						sourceQuantity: 1,
@@ -298,21 +298,21 @@ describe("mergeItemsFx", () => {
 		expect(Result.isFailure(result.attempt)).toBe(true);
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
-				_tag: "ItemChargesUnavailableError",
+				_tag: "ItemUnitsUnavailableError",
 				itemId: "runtime:source",
-				remainingCharges: 0,
+				remainingUnits: 0,
 			});
 		}
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("runs the standard depletion output after the last deposited source charge", () => {
+	it("runs the standard depletion output after the last spended source unit", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
 				useGameFx({
 					config: createMergeTestConfig({
-						rule: depositRule,
-						sourceCharges: {
+						rule: spendRule,
+						sourceUnits: {
 							amount: 1,
 							output: guaranteedMergeOutput(),
 						},
@@ -349,13 +349,13 @@ describe("mergeItemsFx", () => {
 		expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
 	});
 
-	it("spends one real charge from a Deposit merge target", () => {
+	it("spends one real unit from a Spend merge target", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
 				useGameFx({
 					config: createMergeTestConfig({
-						rule: targetDepositRule,
-						targetCharges: {
+						rule: targetSpendRule,
+						targetUnits: {
 							amount: 2,
 						},
 					}),
@@ -366,29 +366,29 @@ describe("mergeItemsFx", () => {
 
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			quantity: 1,
-			remainingCharges: 1,
+			remainingUnits: 1,
 		});
 		expect(result.transition.events).toEqual([
 			result.event,
 			{
-				type: GameEventEnumSchema.enum.ItemChargeSpent,
+				type: GameEventEnumSchema.enum.ItemUnitSpent,
 				itemId: "runtime:target",
 				canonicalItemId: "target",
 				location: result.before.items.find((item) => item.id === "runtime:target")
 					?.location,
-				previousCharges: 2,
-				resultingCharges: 1,
+				previousUnits: 2,
+				resultingUnits: 1,
 			},
 		]);
 	});
 
-	it("runs the standard depletion output after the last deposited target charge", () => {
+	it("runs the standard depletion output after the last spended target unit", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
 				useGameFx({
 					config: createMergeTestConfig({
-						rule: targetDepositRule,
-						targetCharges: {
+						rule: targetSpendRule,
+						targetUnits: {
 							amount: 1,
 							output: guaranteedMergeOutput(),
 						},
@@ -423,7 +423,7 @@ describe("mergeItemsFx", () => {
 		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
 	});
 
-	it("rejects a Deposit target without Charges without changing runtime", () => {
+	it("rejects a Spend target without Units without changing runtime", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const before = yield* readRuntimeFx();
@@ -436,7 +436,7 @@ describe("mergeItemsFx", () => {
 			}).pipe(
 				useGameFx({
 					config: createMergeTestConfig({
-						rule: targetDepositRule,
+						rule: targetSpendRule,
 					}),
 					state: makeState(),
 				}),
@@ -446,9 +446,9 @@ describe("mergeItemsFx", () => {
 		expect(Result.isFailure(result.attempt)).toBe(true);
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
-				_tag: "ItemChargesUnavailableError",
+				_tag: "ItemUnitsUnavailableError",
 				itemId: "runtime:target",
-				remainingCharges: 0,
+				remainingUnits: 0,
 			});
 		}
 		expect(result.after).toEqual(result.before);

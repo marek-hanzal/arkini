@@ -33,8 +33,8 @@ describe("editor MCP graph tool text", () => {
 			'- Level 2: line "Mill Run"',
 		]);
 		expect(inputText.match(/^    - .* -> .*$/gm)).toEqual([
-			"    - water [water; simple] -> forge [forge; producer]",
-			"    - forge [forge; producer] -> mill [Mill; producer]",
+			"    - water [water] -> forge [forge]",
+			"    - forge [forge] -> mill [Mill]",
 		]);
 		expect(inputText).toContain("Inputs:\n    - tool");
 		expect(inputText).toContain("Outputs:\n    - ingot");
@@ -44,16 +44,15 @@ describe("editor MCP graph tool text", () => {
 			'- Level 2: line "Kiln Run"',
 		]);
 		expect(outputText.match(/^    - .* -> .*$/gm)).toEqual([
-			"    - ingot [Ingot; producer] -> plate [Plate; simple]",
-			"    - forge [forge; producer] -> ingot [Ingot; producer]",
-			"    - kiln [Kiln; producer] -> ingot [Ingot; producer]",
+			"    - ingot [Ingot] -> plate [Plate]",
+			"    - forge [forge] -> ingot [Ingot]",
+			"    - kiln [Kiln] -> ingot [Ingot]",
 		]);
 	});
 
 	it("preserves unsupported output requirement reason and source", () => {
 		const base = createGraphProject();
 		const forge = base.config.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 		const config = GameConfigSchema.parse({
 			...base.config,
 			items: {
@@ -110,7 +109,7 @@ describe("editor MCP graph tool text", () => {
 		);
 
 		expect(text).toContain(
-			"unsupported requirement: water [water; simple] (upper-bound, output-condition)",
+			"unsupported requirement: water [water] (upper-bound, output-condition)",
 		);
 	});
 
@@ -124,7 +123,7 @@ describe("editor MCP graph tool text", () => {
 
 		expect(complete).toContain("Status: complete");
 		expect(complete).toContain("Approximate action runs: 1");
-		expect(complete).toContain("- ingot [Ingot; simple] x 1 via");
+		expect(complete).toContain("- ingot [Ingot] x 1 via");
 		expect(unreachable).toContain("Status: unreachable");
 		expect(bounded).toContain(`static estimate limit of ${itemEstimateMaximumQuantity}`);
 	});

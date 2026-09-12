@@ -25,14 +25,19 @@ const sourceProjection = {
 
 describe("resolveItemDetailTargetFn", () => {
 	it("exposes Queue for every runtime line-owner variant", () => {
+		const craft = purityTestConfig.items.craft;
+		const { lines, maxQueueSize: _maxQueueSize, ...base } = craft;
 		const lineOwners = [
 			lineRunTestConfig.items.workshop,
 			{
-				...purityTestConfig.items.craft,
-				type: "blueprint" as const,
+				...base,
+				lines: [
+					{
+						...lines[0],
+						ahead: true,
+					},
+				],
 			},
-			purityTestConfig.items.craft,
-			purityTestConfig.items.stash,
 		];
 		for (const [index, item] of lineOwners.entries()) {
 			const runtimeItem = RuntimeItemSchema.parse({

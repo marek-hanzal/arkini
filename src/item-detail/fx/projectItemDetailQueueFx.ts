@@ -35,6 +35,7 @@ export type ItemDetailQueueProjection =
 			readonly kind: "available";
 			readonly itemId: EngineQueue["itemId"];
 			readonly capacity: EngineQueue["capacity"];
+			readonly canClearQueue: boolean;
 			readonly active: readonly ProjectedWork<EngineQueue["active"][number]>[];
 			readonly request: readonly ProjectedWork<EngineQueue["request"][number]>[];
 	  }
@@ -113,6 +114,7 @@ export const projectItemDetailQueueFx = Effect.fn("projectItemDetailQueueFx")(fu
 		kind: "available",
 		itemId: queue.itemId,
 		capacity: queue.capacity,
+		canClearQueue: queue.canClearQueue,
 		active,
 		request,
 	} satisfies ItemDetailQueueProjection;

@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "atcdihdj87zfj52oagbqxcri",
+		"id": "empty-herb-garden",
+		"title": "Empty Herb Garden",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-herb-garden"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

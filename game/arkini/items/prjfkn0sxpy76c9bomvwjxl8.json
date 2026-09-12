@@ -1,0 +1,46 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "prjfkn0sxpy76c9bomvwjxl8",
+		"id": "coin-stack",
+		"title": "Coin Stack",
+		"description": "Quite valuable thing, keep an eye on them!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"coin-stack"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "coin-bag"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pot"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "pot-with-coins"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pillow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "pillow-with-coins"
+			}
+		]
+	}
+}

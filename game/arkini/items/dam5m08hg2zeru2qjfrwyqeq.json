@@ -1,0 +1,47 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "dam5m08hg2zeru2qjfrwyqeq",
+		"id": "sick-pig",
+		"title": "Sick Pig",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sick-pig"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-raw-game-meat",
+										"quantity": {
+											"min": 3,
+											"max": 6
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

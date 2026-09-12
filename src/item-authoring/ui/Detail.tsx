@@ -1,11 +1,10 @@
-import { Pencil, Replace } from "lucide-react";
+import { Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
-import { Link } from "@tanstack/react-router";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import {
 	EditorSectionNavigation,
 	EditorSectionNavigationSeparator,
@@ -14,28 +13,13 @@ import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { TypePresentation } from "~/item-definition/ui/TypePresentation";
 import { NotFound } from "~/item-authoring/ui/NotFound";
-import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
-import { Mx } from "~/translation/ui/Mx";
-import { Tx } from "~/translation/ui/Tx";
-
-const ItemDetailHelpBySection: Partial<Record<SectionId, EditorPageHelpContent>> = {
-	estimate: {
-		content: <Mx label="Item estimate help" />,
-		title: <Tx label="Estimate" />,
-	},
-	connections: {
-		content: <Mx label="Item connections help" />,
-		title: <Tx label="Connections" />,
-	},
-};
+import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
 export const Detail = ({
@@ -61,8 +45,8 @@ export const Detail = ({
 		sectionId === "notes"
 			? "identity"
 			: sectionId;
-	const help = ItemDetailHelpBySection[sectionId];
-	const sections = readSectionsFn(item);
+	const help = ItemSectionHelp[sectionId];
+	const sections = readSectionsFn();
 	return (
 		<EditorSectionPage
 			header={
@@ -78,20 +62,6 @@ export const Detail = ({
 					title={
 						<h1 className="flex min-w-0 items-center gap-2 text-xl font-semibold">
 							<span className="truncate">{item.title || item.id}</span>
-							<span className="shrink-0 text-muted">·</span>
-							<Link
-								className="shrink-0 text-base"
-								data-ui="EditorItemType"
-								params={{
-									projectId: project.projectId,
-								}}
-								search={{
-									itemType: item.type,
-								}}
-								to="/editor/$projectId/editor/items/list"
-							>
-								<TypePresentation type={item.type} />
-							</Link>
 						</h1>
 					}
 					tabs={
@@ -117,17 +87,6 @@ export const Detail = ({
 							)}
 							<ItemDraftToggle item={item} />
 							<EditorSectionNavigationSeparator />
-							<ItemTypeMenu
-								dataUi="EditorItemConvertMenu"
-								description="Compatible data is kept; unsupported fields are removed on Save."
-								icon={Replace}
-								itemUid={item.uid}
-								label="Convert"
-								projectId={project.projectId}
-								triggerClassName="h-10 min-h-10 gap-2"
-								types={TypeSchema.options.filter((type) => type !== item.type)}
-							/>
-							<EditorSectionNavigationSeparator />
 							<PrimaryButtonLink
 								ref={editActionRef}
 								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
@@ -146,7 +105,8 @@ export const Detail = ({
 			}
 		>
 			{sectionId === "identity" ||
-			sectionId === "charges" ||
+			sectionId === "units" ||
+			sectionId === "clock" ||
 			sectionId === "delete" ||
 			sectionId === "notes" ||
 			sectionId === "estimate" ||

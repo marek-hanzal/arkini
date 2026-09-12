@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "lmnh1x5m8bk40sk8xq5qe6w5",
+		"id": "rapeseed-field",
+		"title": "Rapeseed Field",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"rapeseed-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

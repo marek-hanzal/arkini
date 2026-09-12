@@ -1,5 +1,4 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemEstimateIndexEntry } from "~/estimate/type/ItemEstimateIndex";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { ListRow } from "~/item-authoring/ui/ListRow";
@@ -30,25 +29,19 @@ const demandLabelFn = (demand: number, maximumDemand: number) => {
 
 /** Presents one compact projection of the cached static estimate. */
 export const ItemEstimateListRow = ({
-	activeType,
 	estimate,
 	item,
 	maximumDemand,
-	onSelectTypeFn,
 	projectId,
 }: {
-	readonly activeType: TypeSchema.Type | undefined;
 	readonly estimate: ItemEstimateIndexEntry;
 	readonly item: ItemSchema.Type;
 	readonly maximumDemand: number;
-	readonly onSelectTypeFn: (type: TypeSchema.Type) => void;
 	readonly projectId: string;
 }) => (
 	<ListRow
-		activeType={activeType}
 		dataUi="EditorItemEstimateRow"
 		item={item}
-		onSelectTypeFn={onSelectTypeFn}
 		projectId={projectId}
 		sectionId="estimate"
 		details={

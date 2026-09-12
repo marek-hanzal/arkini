@@ -29,6 +29,18 @@ export const LineSchema = z
 		description: DescriptionSchema.describe(
 			"The human-readable explanation of this product line's purpose.",
 		),
+		clock: z
+			.boolean()
+			.optional()
+			.describe(
+				"Whether this is the authored line selected for Clock impulses, independently of Default.",
+			),
+		ahead: z
+			.boolean()
+			.optional()
+			.describe(
+				"When producing this line owner, check whether one future run fits output count limits. Only marked visible, enabled lines participate; one fitting alternative is enough. Checks exactly one hop, without reserving future work.",
+			),
 		/**
 		 * Whether this line is the authored fallback default for its owning item.
 		 *

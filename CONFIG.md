@@ -10,13 +10,13 @@ A project is one directly versionable directory:
 project.json
 schema.json
 game.json
-items/<type>/<uid>.json
+items/<uid>.json
 assets/<id>.png
 resources/<id>.png
 notes/<noteId>.json
 ```
 
-Only `game.json`, `items/<type>/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, Notes, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` validate and build the current saved sources directly.
+Only `game.json`, `items/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, Notes, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` validate and build the current saved sources directly.
 
 - `project.json` is the root marker and contains Arkini writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
@@ -65,7 +65,9 @@ The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. 
 
 All exact IDs use [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/IdSchema.ts); prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
 
-Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item type/UID and its path.
+There is one Item schema, without an item-type discriminator. Authoring uses `create_item` and `edit_item`; item files live directly in `items/`.
+
+Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item UID and its path.
 
 The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests, and artifacts derive or verify it rather than copying a competing identity.
 
@@ -73,28 +75,38 @@ Renaming `meta.id` creates a different game namespace: existing installed saves 
 
 ## Authoring semantics
 
-Exact item variants, line/input/rule/output shapes, conditions, rolls, and fields come from `schema.json`. Important cross-field rules are:
+Exact Item capabilities, line/input/rule/output shapes, conditions, rolls, and fields come from `schema.json`. Important cross-field rules are:
 
-The canonical immutable Item vocabulary lives in [`src/item-definition`](src/item-definition): Item schema identities, storage permission, bounded quantities, selectors, and total selection policy over explicit definitions. Authored query scope/reach schemas and canonical Runtime Item query execution live together in `src/item-query`; canonical aggregate reads remain in `src/game-runtime`, while drop/write plus ordinary click reads live in `src/item-interaction`. `SpaceSchema` remains with the Space action that interprets it, game metadata remains in `src/game-config`, and toolbar size is owned beside location contracts in `src/item-location`.
+The canonical immutable Item vocabulary lives in [`src/item-definition`](src/item-definition): Item schema identities, storage permission, bounded quantities, selectors, and total selection policy over explicit definitions. Authored query scope/reach schemas and canonical Runtime Item query execution live together in `src/item-query`; canonical aggregate reads remain in `src/game-runtime`, while drop/write plus ordinary click reads live in `src/item-interaction`. `SpaceActionSchema` remains with the Space action that interprets it, while `item-action` owns the discriminated action contract, game metadata remains in `src/game-config`, and toolbar size is owned beside location contracts in `src/item-location`.
 
-- every item requires finite `asset.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including default layers and progress frames, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
+- every item requires finite `asset.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including both default layers, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
+- An item has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Items without lines expose no runtime production controls; adding lines enables the ordinary production contract. An item with `clock` may also have no lines;
+- An item may author one optional `action`, a strict discriminated union containing `space` with its target `space` and `inventory` without a target. Both share optional `input` and `rules` collections defaulting to empty. Action rules alone determine availability; no `enable` field exists. `inventory` opens global Inventory without additional data;
+- canonical Item validation rejects simultaneous `action` and nonempty `lines`. Editor capability switches clear the opposing capability in one form update with advance help; JSON and MCP reject conflicting data without silently deleting authored fields;
+- optional line `ahead` opts its owner into one-hop future output-capacity checks when produced; omitted or false leaves that line out of the check. This capability works on every item line;
 - line input is passive; Enqueue and Tick own execution;
-- material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
-- positive extra material capacity is supported only for producer-owned lines;
-- `self` charge costs use the line owner, while `target` is valid only for a deposit input and its deterministic Board payer;
+- material selectors may name any canonical item, including finite-lifetime Board identities whose lifetime continues in input and job storage;
+- positive extra material capacity is supported for item lines;
+- `units` defines a finite supply inside each item instance (health, resource stock, or uses), separately from stack `quantity`: passive and manually operated resources use ordinary items; scheduled production adds Item.clock;
+- `self` unit costs use the line owner, while `target` is valid only for a units input and its deterministic Board payer (including an owner with units selected at self distance);
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode;
 - directional merge rules belong to the source item and never imply a reverse rule;
-- an item type, field, or schema variant is not runtime-backed until an owned command/Tick path and focused behavior proof implement it.
+- optional item `clock` groups optional `intervalMs`, optional `durationMs`, `enable`, `rules`, and `onExpire`. At least one timer is required. It requires Board scope, `maxStackSize: 1` and no Action; lines may be empty. Its authored `enable` defaults to true; missing duration means unlimited active lifetime. Missing interval gives a one-shot lifetime without pulses. the Editor exposes both timers as optional fields and offers expiry output only with a lifetime;
+- Item `control` is optional and defaults to interactive behavior; `automatic-only` restricts player production independently of the Clock capability;
+- line `default` and optional `clock` independently select the manual and automatic line. At most one authored line per role is allowed; Editor controls clear the same flag on siblings. Clock without a selected line still ages normally and creates no work;
+- a capability, field, or schema variant is not runtime-backed until an owned command/Tick path and focused behavior proof implement it.
 
 Do not repeat field catalogs in prose or weaken a schema to silence malformed data. Change the owning schema/behavior together and regenerate the project schema.
 
+Item artwork currently uses its authored default composition and scale throughout runtime. Progress-based artwork selection is deferred to [issue #725](https://github.com/marek-hanzal/arkini/issues/725).
+
 ## Validation
 
-Validation extends beyond Zod shape parsing. It owns source/path identity, duplicate providers and records, reference integrity, semantic relationships/cycles, charge payer and affordability constraints, scope/capability compatibility, resource existence/usage, completed config, and other runtime preconditions. Diagnostics preserve source and entity provenance.
+Validation extends beyond Zod shape parsing. It owns source/path identity, duplicate providers and records, reference integrity, semantic relationships/cycles, unit payer and affordability constraints, scope/capability compatibility, resource existence/usage, completed config, and other runtime preconditions. Diagnostics preserve source and entity provenance. Finite items without a configured recreation path, or with only stochastic recreation, receive non-blocking unit-renewal warnings for every item.
 
 The compiler must reject an invalid project without producing a usable artifact.
 

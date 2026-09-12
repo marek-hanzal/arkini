@@ -211,17 +211,19 @@ export const EditorNumberControl = ({
 	/>
 );
 
-export const EditorSecondsControl = (
-	props: {
-		readonly max?: number;
-		readonly min?: number;
-		readonly onChangeFn: (value: number) => void;
-		readonly value: number;
-	} & EditorNamedValueControlProps,
-) => (
+export const EditorSecondsControl = ({
+	step = 0.001,
+	...props
+}: {
+	readonly max?: number;
+	readonly min?: number;
+	readonly step?: number;
+	readonly onChangeFn: (value: number) => void;
+	readonly value: number;
+} & EditorNamedValueControlProps) => (
 	<EditorNumericControl
 		{...props}
-		step={0.001}
+		step={step}
 	>
 		<EditorDurationHint seconds={props.value} />
 	</EditorNumericControl>

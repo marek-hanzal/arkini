@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zhlnd02hgpl3gxnekxmrt3y9",
+		"id": "sack-with-beer",
+		"title": "Sack With Beer",
+		"description": "Oh god...",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sack-with-beer"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

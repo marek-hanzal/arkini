@@ -19,7 +19,6 @@ export const createToolProject = (config: GameConfigSchema.Type): Project => ({
 export const createGraphProject = () => {
 	const base = createJobTestConfig();
 	const forge = base.items.forge;
-	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 	return createToolProject(
 		GameConfigSchema.parse({
 			...base,

@@ -63,7 +63,7 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 					"default",
 					0,
 				],
-				source: "items/simple/water.json",
+				source: "items/water.json",
 				resourceId: "item-water",
 			},
 		];

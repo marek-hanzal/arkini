@@ -8,7 +8,6 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 export namespace resolveJobRunnableFx {
 	export interface Props {
 		job: JobSchema.Type;
@@ -20,15 +19,14 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 	job,
 	runtime,
 }: resolveJobRunnableFx.Props) {
-	const hasReadyTemporaryMaterial = runtime.items.some(
+	const hasReadyMaterial = runtime.items.some(
 		(item) =>
-			item.item.type === TypeSchema.enum.Temporary &&
-			item.remainingDurationMs === 0 &&
+			item.schedule?.remainingDurationMs === 0 &&
 			(item.location.scope === LocationScopeEnumSchema.enum.Job ||
 				item.location.scope === LocationScopeEnumSchema.enum.Reserved) &&
 			item.location.jobId === job.id,
 	);
-	if (hasReadyTemporaryMaterial) return false;
+	if (hasReadyMaterial) return false;
 	const runtimeOwner = yield* readRuntimeItemByIdFx({
 		itemId: job.ownerItemId,
 		runtime,

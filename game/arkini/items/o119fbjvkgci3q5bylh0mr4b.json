@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "o119fbjvkgci3q5bylh0mr4b",
+		"id": "sand",
+		"title": "Sand",
+		"description": "Sand",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sand"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4
+	}
+}

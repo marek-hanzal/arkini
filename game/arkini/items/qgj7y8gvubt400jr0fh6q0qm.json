@@ -1,0 +1,46 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "qgj7y8gvubt400jr0fh6q0qm",
+		"id": "sugar-cane",
+		"title": "Sugar Cane",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sugar-cane"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-sugar-cane",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

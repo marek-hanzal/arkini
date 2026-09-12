@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "z862wkp11q7pxv1ans0sjpl3",
+		"id": "wine-mug",
+		"title": "Wine Mug",
+		"description": "You're a barbar!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"wine-mug"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

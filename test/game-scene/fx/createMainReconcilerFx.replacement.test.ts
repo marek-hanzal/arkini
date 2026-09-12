@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { Effect } from "effect";
 import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 import { runVisualReadinessFx } from "~/tile-rendering/fx/runVisualReadinessFx";
@@ -24,6 +25,7 @@ describe("main reconciliation / replacement visuals", () => {
 			itemId: "producer:running",
 			revision: "revision:producer-running",
 			running: true,
+			jobStatus: JobStatusEnumSchema.enum.Running,
 			activityEffect: true,
 			sourceUrl: "resource:producer-running",
 			title: "Running producer",
@@ -94,7 +96,7 @@ describe("main reconciliation / replacement visuals", () => {
 				channel: "crowd-opacity",
 				durationMs: 180,
 				ownerKey: `running:${actor.item.id}`,
-				toCrowdAlpha: 0.82,
+				toCrowdAlpha: 0.6,
 			},
 		);
 		expect(

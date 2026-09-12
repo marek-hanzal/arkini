@@ -46,12 +46,14 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		workshop: {
+			maxQueueSize: 1,
+
 			...baseItem({
 				id: "workshop",
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "producer",
+
 			lines: [
 				{
 					id: "line:workshop:build",
@@ -80,21 +82,26 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			],
 		},
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "water",
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "simple",
 		},
 		stone: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "stone",
 				maxStackSize: 10,
 				scope: "any",
 			}),
-			type: "simple",
-			charges: {
+
+			units: {
 				amount: 2,
 			},
 		},
@@ -115,7 +122,10 @@ export const inputRuntimeToolbarTestConfig = GameConfigSchema.parse({
 				maxStackSize: 1,
 				scope: "board",
 			}),
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
 		},
 	},
 });

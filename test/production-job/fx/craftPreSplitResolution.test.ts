@@ -29,6 +29,8 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		craft: {
+			maxQueueSize: 1,
+
 			uid: "craft",
 			id: "craft",
 			title: "Craft",
@@ -41,39 +43,41 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "any",
 			maxStackSize: 10,
-			type: "craft",
-			charges: {
+
+			units: {
 				amount: 1,
 			},
-			line: {
-				id: "line:craft",
-				title: "Run",
-				description: "Runs until another craft is close.",
-				runtimeMs: 1_000,
-				input: [
-					{
-						type: "simple",
-					},
-				],
-				rules: [
-					{
-						type: "disable",
-						when: [
-							{
-								type: "exists",
-								query: {
-									scope: "board",
-									distance: "close",
-									selector: {
-										type: "item",
-										itemId: "craft",
+			lines: [
+				{
+					id: "line:craft",
+					title: "Run",
+					description: "Runs until another craft is close.",
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					rules: [
+						{
+							type: "disable",
+							when: [
+								{
+									type: "exists",
+									query: {
+										scope: "board",
+										distance: "close",
+										selector: {
+											type: "item",
+											itemId: "craft",
+										},
 									},
 								},
-							},
-						],
-					},
-				],
-			},
+							],
+						},
+					],
+				},
+			],
 		},
 	},
 });

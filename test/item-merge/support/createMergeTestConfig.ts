@@ -1,17 +1,17 @@
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { ChargeSchema } from "~/item-definition/schema/ChargeSchema";
+import type { UnitsSchema } from "~/item-definition/schema/UnitsSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({
-	charges,
+	units,
 	id,
 	maxCount,
 	maxStackSize = 10,
 	merge,
 	scope = "any",
 }: {
-	charges?: ChargeSchema.Type;
+	units?: UnitsSchema.Type;
 	id: string;
 	maxCount?: number;
 	maxStackSize?: number;
@@ -21,11 +21,14 @@ const simpleItem = ({
 	];
 	scope?: "any" | "board" | "inventory";
 }) => ({
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: id,
 	id,
 	title: id,
 	description: id,
-	charges,
+	units,
 	asset: {
 		scale: 0.8,
 		default: [
@@ -36,7 +39,6 @@ const simpleItem = ({
 	maxCount,
 	maxStackSize,
 	merge,
-	type: "simple" as const,
 });
 
 export const createMergeTestConfig = ({
@@ -51,12 +53,12 @@ export const createMergeTestConfig = ({
 	outputMaxStackSize = 10,
 	resultMaxCount,
 	rule,
-	sourceCharges,
+	sourceUnits,
 	sourceMaxCount,
 	sourceMaxStackSize = 10,
 	sourceScope = "any",
 	targetMaxStackSize = 10,
-	targetCharges,
+	targetUnits,
 }: {
 	board?: {
 		width: number;
@@ -74,12 +76,12 @@ export const createMergeTestConfig = ({
 				MergeSchema.Type,
 				...MergeSchema.Type[],
 		  ];
-	sourceCharges?: ChargeSchema.Type;
+	sourceUnits?: UnitsSchema.Type;
 	sourceMaxCount?: number;
 	sourceMaxStackSize?: number;
 	sourceScope?: "any" | "board" | "inventory";
 	targetMaxStackSize?: number;
-	targetCharges?: ChargeSchema.Type;
+	targetUnits?: UnitsSchema.Type;
 }) =>
 	GameConfigSchema.parse({
 		resources: {
@@ -96,7 +98,7 @@ export const createMergeTestConfig = ({
 		},
 		items: {
 			source: simpleItem({
-				charges: sourceCharges,
+				units: sourceUnits,
 				id: "source",
 				maxCount: sourceMaxCount,
 				maxStackSize: sourceMaxStackSize,
@@ -111,7 +113,7 @@ export const createMergeTestConfig = ({
 				scope: sourceScope,
 			}),
 			target: simpleItem({
-				charges: targetCharges,
+				units: targetUnits,
 				id: "target",
 				maxStackSize: targetMaxStackSize,
 			}),

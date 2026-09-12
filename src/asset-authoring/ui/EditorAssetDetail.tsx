@@ -17,8 +17,7 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
+import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
 import { Status } from "~/ui/ui/Status";
 
 type EditorAssetDetailPath =
@@ -176,19 +175,17 @@ export const EditorAssetDetail = ({
 					}
 					action={
 						<div className="flex items-center gap-2">
-							<ItemTypeMenu
-								dataUi="EditorAssetCreateItemMenu"
+							<CreateItemLink
+								dataUi="EditorAssetCreateItem"
 								defaultDraft
 								defaultItemId={resource.id}
 								defaultTitle={readAssetNameFn(resource.id)}
-								description="Choose the item type to create with this asset."
-								icon={PackagePlus}
-								label="Create item"
 								projectId={project.projectId}
 								resourceId={resource.id}
-								triggerClassName="h-10 min-h-10 gap-2"
-								types={TypeSchema.options}
-							/>
+								className="h-10 min-h-10 gap-2"
+							>
+								<PackagePlus className="size-4" /> Create item
+							</CreateItemLink>
 							<EditorSectionNavigationSeparator />
 							<PrimaryButtonLink
 								ref={editActionRef}

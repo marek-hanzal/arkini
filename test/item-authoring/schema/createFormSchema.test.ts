@@ -10,8 +10,8 @@ import {
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
 const createTargetPaidInput = (itemId: string) => ({
-	type: "deposit" as const,
-	charges: {
+	type: "units" as const,
+	units: {
 		cost: 1,
 		from: "target" as const,
 	},
@@ -34,18 +34,17 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 			item.asset.default[0],
 			"",
 		],
-		sources: [],
 	},
 });
 
 describe("createFormSchema", () => {
-	it("rejects a Deposit merge action after Charges are disabled on its source", () => {
+	it("rejects a Spend merge action after Units are disabled on its source", () => {
 		const target = createSimpleItem("target");
 		const source = {
 			...createSimpleItem("source"),
 			merge: [
 				{
-					action: "deposit" as const,
+					action: "spend" as const,
 					effect: "keep" as const,
 					target: {
 						type: "item" as const,
@@ -68,7 +67,7 @@ describe("createFormSchema", () => {
 		if (result.success) return;
 		expect(result.error.issues).toContainEqual(
 			expect.objectContaining({
-				message: "Enable Charges on this item before selecting Deposit.",
+				message: "Enable Units on this item before selecting Spend.",
 				path: [
 					"merge",
 					0,
@@ -78,14 +77,14 @@ describe("createFormSchema", () => {
 		);
 	});
 
-	it("rejects a Deposit target effect when the selected item has no Charges", () => {
+	it("rejects a Spend target effect when the selected item has no Units", () => {
 		const target = createSimpleItem("target");
 		const source = {
 			...createSimpleItem("source"),
 			merge: [
 				{
 					action: "consume" as const,
-					effect: "deposit" as const,
+					effect: "spend" as const,
 					target: {
 						type: "item" as const,
 						itemId: target.id,
@@ -108,7 +107,7 @@ describe("createFormSchema", () => {
 		if (result.success) return;
 		expect(result.error.issues).toContainEqual(
 			expect.objectContaining({
-				message: "Selected target must have Charges enabled before choosing Deposit.",
+				message: "Selected target must have Units enabled before choosing Spend.",
 				path: [
 					"merge",
 					0,
@@ -118,10 +117,10 @@ describe("createFormSchema", () => {
 		);
 	});
 
-	it("accepts a Deposit target effect when the selected item has Charges", () => {
+	it("accepts a Spend target effect when the selected item has Units", () => {
 		const target = {
 			...createSimpleItem("target"),
-			charges: {
+			units: {
 				amount: 2,
 			},
 		};
@@ -130,7 +129,7 @@ describe("createFormSchema", () => {
 			merge: [
 				{
 					action: "consume" as const,
-					effect: "deposit" as const,
+					effect: "spend" as const,
 					target: {
 						type: "item" as const,
 						itemId: target.id,
@@ -152,7 +151,7 @@ describe("createFormSchema", () => {
 		).toBe(true);
 	});
 
-	it("rejects a target-paid Deposit that selects an item without Charges", () => {
+	it("rejects a target-paid Units that selects an item without Units", () => {
 		const target = createSimpleItem("target");
 		const producer = createProducerItem({
 			id: "producer",
@@ -188,10 +187,10 @@ describe("createFormSchema", () => {
 		);
 	});
 
-	it("accepts the same Deposit target after Charges are enabled", () => {
+	it("accepts the same Units target after Units are enabled", () => {
 		const target = {
 			...createSimpleItem("target"),
-			charges: {
+			units: {
 				amount: 1,
 			},
 		};
@@ -215,14 +214,14 @@ describe("createFormSchema", () => {
 		).toBe(true);
 	});
 
-	it("accepts a self-paid Deposit bound to a charged line owner", () => {
+	it("accepts a self-paid Units bound to a spent line owner", () => {
 		const producer = {
 			...createProducerItem({
 				id: "producer",
 				input: [
 					{
-						type: "deposit" as const,
-						charges: {
+						type: "units" as const,
+						units: {
 							cost: 1,
 							from: "self" as const,
 						},
@@ -237,7 +236,7 @@ describe("createFormSchema", () => {
 					},
 				],
 			}),
-			charges: {
+			units: {
 				amount: 1,
 			},
 		};
@@ -254,13 +253,13 @@ describe("createFormSchema", () => {
 		).toBe(true);
 	});
 
-	it("rejects a self-paid Deposit after Charges are disabled on its owner", () => {
+	it("rejects a self-paid Units after Units are disabled on its owner", () => {
 		const producer = createProducerItem({
 			id: "producer",
 			input: [
 				{
-					type: "deposit" as const,
-					charges: {
+					type: "units" as const,
+					units: {
 						cost: 1,
 						from: "self" as const,
 					},
@@ -289,27 +288,27 @@ describe("createFormSchema", () => {
 		if (result.success) return;
 		expect(result.error.issues).toContainEqual(
 			expect.objectContaining({
-				message: "Enable Charges on this item before selecting Self.",
+				message: "Enable Units on this item before selecting Self.",
 				path: [
 					"lines",
 					0,
 					"input",
 					0,
-					"charges",
+					"units",
 					"from",
 				],
 			}),
 		);
 	});
 
-	it("rebinds an empty self-paid Deposit selector when a new line owner's ID is entered", () => {
+	it("rebinds an empty self-paid Units selector when a new line owner's ID is entered", () => {
 		const producer = {
 			...createProducerItem({
 				id: "draft-owner",
 				input: [
 					{
-						type: "deposit" as const,
-						charges: {
+						type: "units" as const,
+						units: {
 							cost: 1,
 							from: "self" as const,
 						},
@@ -324,7 +323,7 @@ describe("createFormSchema", () => {
 					},
 				],
 			}),
-			charges: {
+			units: {
 				amount: 1,
 			},
 		};
@@ -336,8 +335,8 @@ describe("createFormSchema", () => {
 		const formValues = readFormValues(producer);
 		const line = formValues.lines?.[0];
 		const firstInput = line?.input[0];
-		expect(firstInput?.type).toBe("deposit");
-		if (line === undefined || firstInput?.type !== "deposit") return;
+		expect(firstInput?.type).toBe("units");
+		if (line === undefined || firstInput?.type !== "units") return;
 		const result = createFormSchema(project, producer.uid).safeParse({
 			...formValues,
 			id: "final-owner",
@@ -373,6 +372,66 @@ describe("createFormSchema", () => {
 						itemId: "final-owner",
 					}),
 				}),
+			}),
+		);
+	});
+	it("binds nested action Self inputs to the renamed owner and reports disabled Units at the action field", () => {
+		const owner = {
+			...createSimpleItem("draft-owner"),
+			units: {
+				amount: 2,
+			},
+			action: {
+				type: "space" as const,
+				space: 3,
+				input: [
+					{
+						...createTargetPaidInput(""),
+						units: {
+							cost: 1,
+							from: "self" as const,
+						},
+					},
+				],
+				rules: [],
+			},
+		};
+		const project = {
+			config: {
+				items: {},
+			} as GameConfigSchema.Type,
+		};
+		const schema = createFormSchema(project, owner.uid);
+		const form = {
+			...readFormValues(owner),
+			id: "final-owner",
+		};
+		const accepted = schema.safeParse(form);
+		expect(accepted.success).toBe(true);
+		if (!accepted.success) throw new Error("Expected Common action.");
+		expect(accepted.data.action?.input[0]).toMatchObject({
+			query: {
+				distance: "self",
+				selector: {
+					itemId: "final-owner",
+				},
+			},
+		});
+		const rejected = schema.safeParse({
+			...form,
+			units: undefined,
+		});
+		expect(rejected.success).toBe(false);
+		if (rejected.success) throw new Error("Expected invalid owner Units.");
+		expect(rejected.error.issues).toContainEqual(
+			expect.objectContaining({
+				path: [
+					"action",
+					"input",
+					0,
+					"units",
+					"from",
+				],
 			}),
 		);
 	});

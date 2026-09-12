@@ -27,7 +27,7 @@ export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_delete_impact again before deleting the item.`,
 			),
 		);
-	const { blockers, impact, item } = yield* readItemDeleteImpactFx(project, itemId);
+	const { blockers, item } = yield* readItemDeleteImpactFx(project, itemId);
 	const commit = yield* repository.deleteItemFx({
 		expectedRevision: revision,
 		force,
@@ -42,6 +42,5 @@ export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 		`Revision: ${commit.revision}`,
 		`Mode: ${force ? "force" : "safe"}`,
 		`References removed: ${force ? blockers.length : 0}`,
-		`Owner items deleted: ${impact.deletedOwnerItemIds.length}`,
 	].join("\n");
 });

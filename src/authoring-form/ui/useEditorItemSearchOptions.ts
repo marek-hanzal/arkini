@@ -22,12 +22,11 @@ export const useEditorItemSearchOptions = (
 						({
 							id: item.id,
 							label: item.title,
-							meta: `${item.type} · ${item.id}`,
+							meta: item.id,
 							terms: [
 								item.id,
 								item.title,
 								item.description ?? "",
-								item.type,
 							],
 						}) satisfies EditorSearchOption,
 				),

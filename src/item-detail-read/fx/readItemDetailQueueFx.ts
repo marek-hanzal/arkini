@@ -1,10 +1,10 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option, Result } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
@@ -42,6 +42,7 @@ export namespace readItemDetailQueueFx {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly capacity: number;
+				readonly canClearQueue: boolean;
 				readonly active: readonly ItemDetailQueueActiveJob[];
 				readonly request: readonly ItemDetailQueueRequest[];
 		  }
@@ -74,7 +75,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 	});
 	if (capacity === undefined) return unavailable;
 	const lineById = new Map(
-		readLineOwnerLinesFn(lineOwner.value).map((line) => [
+		lineOwner.value.lines.map((line) => [
 			line.id,
 			line,
 		]),
@@ -173,6 +174,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 		kind: "available",
 		itemId: owner.id,
 		capacity,
+		canClearQueue: canControlItemProductionFn(owner.item),
 		active,
 		request: projectedRequests,
 	} satisfies readItemDetailQueueFx.Result;

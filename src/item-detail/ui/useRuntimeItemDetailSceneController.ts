@@ -1,3 +1,4 @@
+import { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { Equal } from "effect";
 import { useCallback, useEffect } from "react";
 
@@ -48,9 +49,13 @@ export namespace useRuntimeItemDetailSceneController {
 		readonly target: Target;
 	}
 
+	export type InfoProjection = readItemDetailInfoFn.Result & {
+		readonly schedule?: readItemDetailScheduleFx.Schedule;
+	};
+
 	export interface Output {
 		readonly identity?: IdentityProjection;
-		readonly info?: readItemDetailInfoFn.Result;
+		readonly info?: InfoProjection;
 		readonly lineCount?: number;
 		readonly lines?: ItemDetailLinesProjection.Projection;
 		readonly queue?: ItemDetailQueueProjection;
@@ -96,38 +101,33 @@ const useItemDetailIdentity = (
 	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };
 
-const useItemDetailInfo = (itemId: IdSchema.Type): readItemDetailInfoFn.Result => {
+const useItemDetailInfo = (
+	itemId: IdSchema.Type,
+): useRuntimeItemDetailSceneController.InfoProjection => {
 	const game = useGameEngine();
 	const selectorFn = useCallback(
-		(runtime: RuntimeSchema.Type): readItemDetailInfoFn.Result =>
-			readItemDetailInfoFn({
+		(runtime: RuntimeSchema.Type): useRuntimeItemDetailSceneController.InfoProjection => {
+			const info = readItemDetailInfoFn({
 				itemId,
 				runtime,
-			}),
+			});
+			if (info.kind === "unavailable") return info;
+			return {
+				...info,
+				schedule: game.readOrThrowFn(
+					readItemDetailScheduleFx({
+						itemId,
+						runtime,
+					}),
+				),
+			};
+		},
 		[
+			game,
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selectorFn, (left, right) => {
-		if (left.kind !== right.kind) return false;
-		if (left.kind === "unavailable" || right.kind === "unavailable") return true;
-		return (
-			left.itemId === right.itemId &&
-			left.description === right.description &&
-			left.itemType === right.itemType &&
-			left.storageScope === right.storageScope &&
-			left.location.kind === right.location.kind &&
-			(left.location.kind !== "board" ||
-				right.location.kind !== "board" ||
-				left.location.space === right.location.space) &&
-			left.quantity === right.quantity &&
-			left.maxStackSize === right.maxStackSize &&
-			left.ownedQuantity === right.ownedQuantity &&
-			left.maxCount === right.maxCount &&
-			left.charges?.remaining === right.charges?.remaining &&
-			left.charges?.total === right.charges?.total
-		);
-	});
+	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };
 
 const useItemDetailQueue = (itemId: IdSchema.Type): ItemDetailQueueProjection => {

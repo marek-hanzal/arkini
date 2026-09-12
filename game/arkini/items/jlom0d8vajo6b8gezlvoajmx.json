@@ -1,0 +1,58 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "jlom0d8vajo6b8gezlvoajmx",
+		"id": "healing-kit",
+		"title": "Healing Kit",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"healing-kit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 6
+		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "mouse-with-cut-tail"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "mouse-with-bandaged-tail"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-cow"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-cow"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-pig"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-pig"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-sheep"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-sheep"
+			}
+		]
+	}
+}

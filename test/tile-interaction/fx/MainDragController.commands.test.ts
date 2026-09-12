@@ -146,7 +146,6 @@ describe("main drag controller: commands", () => {
 	it("rebases a held stack to its latest canonical revision before an Inventory release", () => {
 		const inventory = {
 			...createItem("runtime:inventory", 1),
-			itemType: "inventory",
 		} as TileActorItem;
 		const mounted = mountController({
 			targetItems: [

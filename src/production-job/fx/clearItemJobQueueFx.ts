@@ -1,3 +1,4 @@
+import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -22,6 +23,10 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 }: clearItemJobQueueFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
+			yield* assertItemProductionPlayerControlFx({
+				ownerItemId,
+				runtime,
+			});
 			const owner = yield* readRuntimeItemByIdFx({
 				itemId: ownerItemId,
 				runtime,

@@ -20,12 +20,8 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 	if (yield* fileSystem.exists(game)) json.push(game);
 	const items = path.join(root, "items");
 	if (yield* fileSystem.exists(items)) {
-		for (const type of yield* fileSystem.readDirectory(items)) {
-			const directory = path.join(items, type);
-			if ((yield* fileSystem.stat(directory)).type !== "Directory") continue;
-			for (const file of yield* fileSystem.readDirectory(directory)) {
-				if (file.endsWith(".json")) json.push(path.join(directory, file));
-			}
+		for (const file of yield* fileSystem.readDirectory(items)) {
+			if (file.endsWith(".json")) json.push(path.join(items, file));
 		}
 	}
 	for (const kind of [

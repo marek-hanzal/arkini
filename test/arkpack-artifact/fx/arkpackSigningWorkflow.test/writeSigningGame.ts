@@ -9,7 +9,7 @@ export const writeSigningGame = async (root: string) => {
 	await mkdir(join(gameDirectory, "assets"), {
 		recursive: true,
 	});
-	await mkdir(join(gameDirectory, "items", "simple"), {
+	await mkdir(join(gameDirectory, "items"), {
 		recursive: true,
 	});
 	await writeFile(
@@ -52,13 +52,16 @@ export const writeSigningGame = async (root: string) => {
 		})}\n`,
 	);
 	await writeFile(
-		join(gameDirectory, "items", "simple", "item.json"),
+		join(gameDirectory, "items", "item.json"),
 		`${JSON.stringify({
-			$schema: "../../schema.json",
+			$schema: "../schema.json",
 			item: {
+				maxQueueSize: 1,
+				lines: [],
+
 				uid: "item",
 				id: "item",
-				type: "simple",
+
 				title: "Item",
 				description: "Signing fixture item.",
 				asset: {

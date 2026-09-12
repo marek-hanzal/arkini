@@ -1,0 +1,58 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "lbyiwjest0kicpb3c1w5pen9",
+		"id": "bear",
+		"title": "Bear",
+		"description": "A bit scary, but he will eventually go to otehr business",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bear"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bed-t1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bed-with-teddy-bear"
+			}
+		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

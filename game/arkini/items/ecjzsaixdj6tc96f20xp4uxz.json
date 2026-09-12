@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ecjzsaixdj6tc96f20xp4uxz",
+		"id": "coffee-field",
+		"title": "Coffee Field",
+		"description": "Coffee",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"coffee-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

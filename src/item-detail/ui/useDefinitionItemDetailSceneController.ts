@@ -1,3 +1,4 @@
+import type { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { Equal } from "effect";
 import { useCallback, useEffect } from "react";
 
@@ -7,7 +8,6 @@ import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailContro
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -32,12 +32,12 @@ export namespace useDefinitionItemDetailSceneController {
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
 				readonly description?: string;
-				readonly itemType: TypeSchema.Type;
+				readonly schedule?: readItemDetailScheduleFx.Schedule;
 				readonly storageScope: StorageSchema.Type;
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
 				readonly maxCount?: number;
-				readonly totalCharges?: number;
+				readonly totalUnits?: number;
 		  }
 		| {
 				readonly kind: "unavailable";
@@ -75,7 +75,14 @@ const useItemDefinitionDetail = (
 							compositeUrl: game.getResourceUrlFn(item.asset.default[1]),
 						}),
 				description: item.description,
-				itemType: item.type,
+				schedule:
+					item.clock !== undefined
+						? {
+								intervalMs: item.clock.intervalMs,
+								durationMs: item.clock.durationMs,
+								control: item.control ?? "interactive",
+							}
+						: undefined,
 				storageScope: item.scope,
 				maxStackSize: item.maxStackSize,
 				ownedQuantity: runtime.items.reduce(
@@ -88,10 +95,10 @@ const useItemDefinitionDetail = (
 					: {
 							maxCount: item.maxCount,
 						}),
-				...(item.charges === undefined
+				...(item.units === undefined
 					? {}
 					: {
-							totalCharges: item.charges.amount,
+							totalUnits: item.units.amount,
 						}),
 			};
 		},

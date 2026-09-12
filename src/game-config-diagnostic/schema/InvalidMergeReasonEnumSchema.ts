@@ -3,8 +3,8 @@ import { z } from "zod";
 /** Why one authored merge rule cannot participate in the board runtime topology. */
 export const InvalidMergeReasonEnumSchema = z
 	.enum({
-		SourceChargesDisabled: "source-charges-disabled",
-		TargetChargesDisabled: "target-charges-disabled",
+		SourceUnitsDisabled: "source-units-disabled",
+		TargetUnitsDisabled: "target-units-disabled",
 		TargetUnavailable: "target-unavailable",
 		ResultUnavailable: "result-unavailable",
 		SelfTargetUnavailable: "self-target-unavailable",

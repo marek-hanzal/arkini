@@ -19,13 +19,14 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
+import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
 const MergeRandomVersion = 3;
 
-const readRemainingChargesSeedFn = (item: RuntimeItemSchema.Type) => {
-	return item.remainingCharges ?? item.item.charges?.amount ?? "full";
+const readRemainingUnitsSeedFn = (item: RuntimeItemSchema.Type) => {
+	return item.remainingUnits ?? item.item.units?.amount ?? "full";
 };
 
 const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Error, Requirements>({
@@ -41,6 +42,9 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 	readonly source: RuntimeItemSchema.Type;
 	readonly target: RuntimeItemSchema.Type;
 }) {
+	// Seed tags are stable gameplay identity; renaming an operation must not reroll output.
+	const actionSeed = rule.action === SourceActionSchema.enum.Spend ? "deposit" : rule.action;
+	const effectSeed = rule.effect === TargetEffectSchema.enum.Spend ? "deposit" : rule.effect;
 	const result = rule.effect === TargetEffectSchema.enum.Replace ? rule.result : "none";
 
 	return yield* program.pipe(
@@ -51,14 +55,14 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 				source.id,
 				source.item.id,
 				source.quantity,
-				readRemainingChargesSeedFn(source),
+				readRemainingUnitsSeedFn(source),
 				target.id,
 				target.item.id,
 				target.quantity,
-				readRemainingChargesSeedFn(target),
+				readRemainingUnitsSeedFn(target),
 				ruleIndex,
-				rule.action,
-				rule.effect,
+				actionSeed,
+				effectSeed,
 				result,
 			].join(":"),
 		),

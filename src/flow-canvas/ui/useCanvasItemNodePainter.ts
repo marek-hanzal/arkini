@@ -17,31 +17,11 @@ import {
 import type { LayoutNode } from "~/flow-layout/type/Layout";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["type"]) => {
-	switch (type) {
-		case "blueprint":
-		case "producer":
-			return palette.accent;
-		case "craft":
-		case "deposit":
-			return palette.warning;
-		case "inventory":
-		case "stash":
-			return palette.info;
-		case "missing":
-		case "temporary":
-			return palette.danger;
-		case "simple":
-		case "space":
-			return palette.lineStrong;
-	}
-};
-
 const readSourceKindColorFn = (palette: CanvasPalette, kind: ItemOriginOperationKind) => {
 	switch (kind) {
 		case "line":
 			return palette.accent;
-		case "charges":
+		case "units":
 			return palette.warning;
 		case "merge":
 			return palette.success;
@@ -52,8 +32,7 @@ const readSourceKindColorFn = (palette: CanvasPalette, kind: ItemOriginOperation
 
 const SourceKindIconPath: Record<ItemOriginOperationKind, string> = {
 	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
-	charges:
-		"m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
+	units: "m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
 	merge: "M14 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1m5-7a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1M7 15l3 3m-3 3 3-3H5a2 2 0 0 1-2-2v-2",
 	expiry: "M10 2h4m-2 12 3-3",
 };
@@ -100,27 +79,27 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 			position,
 			resourceUrls,
 		}: DrawCanvasItemNodeProps) => {
-			const typeColor = readItemTypeColorFn(palette, node.type);
+			const itemColor = node.missing ? palette.danger : palette.warning;
+			const itemSurface = node.missing ? palette.missingItemSurface : palette.itemSurface;
 			context.save();
 			context.globalAlpha = opacity;
 			context.beginPath();
 			context.rect(position.x, position.y, position.width, position.height);
-			context.fillStyle = palette.itemSurfaces[node.type];
+			context.fillStyle = itemSurface;
 			context.fill();
 			context.lineWidth = highlight === "selected" ? 4 : highlight === "active" ? 2.5 : 2;
-			context.strokeStyle = highlight === "idle" ? typeColor : palette.accent;
+			context.strokeStyle = highlight === "idle" ? itemColor : palette.accent;
 			context.stroke();
 
 			if (connectedPortIds?.has(ItemOriginItemInputPortId) === true) {
 				context.beginPath();
 				context.arc(position.x, position.y + metrics.itemPortY, 6, 0, Math.PI * 2);
 				context.fillStyle =
-					highlightedPortColors?.get(ItemOriginItemInputPortId) ??
-					palette.itemSurfaces[node.type];
+					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? itemSurface;
 				context.fill();
 				context.lineWidth = 2.5;
 				context.strokeStyle =
-					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? typeColor;
+					highlightedPortColors?.get(ItemOriginItemInputPortId) ?? itemColor;
 				context.stroke();
 			}
 			if (connectedPortIds?.has(ItemOriginItemOutputPortId) === true) {
@@ -133,12 +112,11 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 					Math.PI * 2,
 				);
 				context.fillStyle =
-					highlightedPortColors?.get(ItemOriginItemOutputPortId) ??
-					palette.itemSurfaces[node.type];
+					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? itemSurface;
 				context.fill();
 				context.lineWidth = 2.5;
 				context.strokeStyle =
-					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? typeColor;
+					highlightedPortColors?.get(ItemOriginItemOutputPortId) ?? itemColor;
 				context.stroke();
 			}
 
@@ -189,9 +167,9 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 			const label =
 				node.starterScopes.length > 0
 					? `Starter: ${node.starterScopes.join(", ")}`
-					: node.type === "missing"
-						? translator.textFn("Item type - missing")
-						: translator.textFn(`Item type - ${node.type}`);
+					: node.missing
+						? translator.textFn("Missing item")
+						: "";
 			context.fillText(
 				textPainter.fitTextFn(context, label.toUpperCase(), maxTextWidth),
 				textX,
@@ -280,8 +258,7 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 					if (connectedPortIds?.has(input.id) === true) {
 						context.beginPath();
 						context.arc(position.x, worldY, 6, 0, Math.PI * 2);
-						context.fillStyle =
-							highlightedPortColors?.get(input.id) ?? palette.itemSurfaces[node.type];
+						context.fillStyle = highlightedPortColors?.get(input.id) ?? itemSurface;
 						context.fill();
 						context.lineWidth = 2.5;
 						context.strokeStyle = highlightedPortColors?.get(input.id) ?? kindColor;
@@ -303,9 +280,7 @@ export const useCanvasItemNodePainter = (drawItemArtworkFn: DrawCanvasItemArtwor
 					if (connectedPortIds?.has(output.id) === true) {
 						context.beginPath();
 						context.arc(position.x + position.width, worldY, 6, 0, Math.PI * 2);
-						context.fillStyle =
-							highlightedPortColors?.get(output.id) ??
-							palette.itemSurfaces[node.type];
+						context.fillStyle = highlightedPortColors?.get(output.id) ?? itemSurface;
 						context.fill();
 						context.lineWidth = 2.5;
 						context.strokeStyle = highlightedPortColors?.get(output.id) ?? kindColor;

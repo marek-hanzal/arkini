@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "vyfuf85geftz9twwyfdteezh",
+		"id": "spoiled-sunflower",
+		"title": "Spoiled Sunflower",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-sunflower"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

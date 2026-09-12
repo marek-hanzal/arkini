@@ -14,6 +14,8 @@ const formatQuantityFn = (quantity: number) =>
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "finite-owner-lifetime-unsupported":
+			return `${diagnostic.routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.`;
 		case "joint-output-accounting-unsupported":
 			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space.`;
 		case "witness-search-exhausted":

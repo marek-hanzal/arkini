@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "k15swyx61qiijkyymoxe5raz",
+		"id": "raw-diamond",
+		"title": "Raw Diamond",
+		"description": "It's raw",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"raw-diamond"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8
+	}
+}

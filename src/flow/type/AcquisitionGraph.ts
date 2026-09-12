@@ -17,15 +17,15 @@ export interface AcquisitionRequirement {
 	readonly identity?: "distinct";
 	readonly quantity: number;
 	readonly source:
-		| "charged-item"
-		| "deposit-input"
+		| "unit-owner"
+		| "units-input"
 		| "line-condition"
 		| "material-input"
 		| "merge-source"
 		| "merge-target"
 		| "output-condition"
 		| "owner"
-		| "temporary-item";
+		| "expiring-item";
 	readonly usage: AcquisitionRequirementUsage;
 }
 
@@ -71,8 +71,8 @@ export type AcquisitionRouteMetadata =
 			readonly ownerItemId: string;
 	  }
 	| {
-			readonly chargedItemId: string;
-			readonly kind: "line-charge-depletion";
+			readonly unitOwnerItemId: string;
+			readonly kind: "line-unit-depletion";
 			readonly lineId: string;
 			readonly lineTitle: string;
 			readonly ownerItemId: string;
@@ -84,19 +84,23 @@ export type AcquisitionRouteMetadata =
 			readonly targetItemId: string;
 	  }
 	| {
-			readonly chargedItemId: string;
-			readonly kind: "merge-charge-depletion";
+			readonly unitOwnerItemId: string;
+			readonly kind: "merge-unit-depletion";
 			readonly mergeIndex: number;
 			readonly sourceItemId: string;
 			readonly targetItemId: string;
 	  }
 	| {
 			readonly itemId: string;
-			readonly kind: "temporary-expiry";
+			readonly kind: "clock-expiry";
 	  };
 
 export interface AcquisitionRoute {
-	readonly chargeUses?: ReadonlyArray<{
+	/** Authored lifecycle restrictions retained for static analysis without hiding Flow relations. */
+	readonly executionConstraint?: "unavailable" | "finite-owner-lifetime";
+	/** Optimistic action cadence; owner startup and runtime queue delays remain outside the model. */
+	readonly minimumActionIntervalMs?: number;
+	readonly unitUses?: ReadonlyArray<{
 		/** Signals when concrete payer-identity packing cannot be summarized statically. */
 		readonly accounting?: "multi-payer-unsupported" | "single-payer-exact";
 		readonly payerFactId: string;

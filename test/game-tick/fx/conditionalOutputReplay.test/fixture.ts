@@ -1,5 +1,5 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 
 export type OutputPath = "expiry" | "line" | "deferred-depletion" | "immediate-depletion";
 
@@ -48,7 +48,6 @@ const output = (itemId: string, conditional = false) => ({
 export const createConfig = (path: OutputPath, markerDuration = 500) => {
 	const base = createTemporaryLifetimeTestConfig();
 	const producer = base.items.producer;
-	if (producer?.type !== "producer") throw new Error("Expected producer fixture.");
 	const line = producer.lines[0];
 	return GameConfigSchema.parse({
 		...base,
@@ -56,19 +55,23 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			...base.items,
 			temporaryPlain: {
 				...base.items.temporaryPlain,
-				durationMs: markerDuration,
-				output: output("blocker"),
+				clock: {
+					durationMs: markerDuration,
+					onExpire: output("blocker"),
+				},
 			},
 			temporaryOutput: {
 				...base.items.temporaryOutput,
-				durationMs: 600,
-				output: output("result", true),
+				clock: {
+					durationMs: 600,
+					onExpire: output("result", true),
+				},
 			},
 			payer: {
 				...base.items.blocker,
 				uid: "payer",
 				id: "payer",
-				charges: {
+				units: {
 					amount: 1,
 					output: output("result", true),
 				},
@@ -76,7 +79,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			producer: {
 				...producer,
 				maxQueueSize: 2,
-				charges:
+				units:
 					path === "deferred-depletion"
 						? {
 								amount: 1,
@@ -90,7 +93,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 						input: [
 							{
 								type: "simple",
-								charges:
+								units:
 									path === "deferred-depletion"
 										? {
 												from: "self",
@@ -107,7 +110,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 						output: undefined,
 						input: [
 							{
-								type: "deposit",
+								type: "units",
 								query: {
 									scope: "board",
 									distance: "close",
@@ -116,7 +119,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 										itemId: "payer",
 									},
 								},
-								charges: {
+								units: {
 									from: "target",
 									cost: 1,
 								},

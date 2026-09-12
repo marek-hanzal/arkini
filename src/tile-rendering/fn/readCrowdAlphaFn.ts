@@ -1,28 +1,4 @@
-import { match } from "ts-pattern";
-
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
-const activeCraftAlpha = 0.6;
-const runningLineOwnerAlpha = 0.82;
-
-/** Keeps active crafts visibly unavailable while preserving the lighter running treatment elsewhere. */
-export const readCrowdAlphaFn = (item: TileActorItem) =>
-	match({
-		active: item.jobStatus !== undefined,
-		itemType: item.itemType,
-		running: item.running,
-	})
-		.with(
-			{
-				active: true,
-				itemType: "craft",
-			},
-			() => activeCraftAlpha,
-		)
-		.with(
-			{
-				running: true,
-			},
-			() => runningLineOwnerAlpha,
-		)
-		.otherwise(() => 1);
+/** Keeps every active production owner visibly occupied, including blocked jobs. */
+export const readCrowdAlphaFn = (item: TileActorItem) => (item.jobStatus === undefined ? 1 : 0.6);

@@ -77,7 +77,7 @@ describe("Item Detail frame provider", () => {
 		const firstFailure = Effect.runSync(Deferred.make<never, Error>());
 		await act(async () => {
 			runPendingAction(readControl(), {
-				action: "default",
+				action: "selection",
 				failureMessage: "First action failed.",
 				key: "line:runtime:first",
 				run: Deferred.await(firstFailure),

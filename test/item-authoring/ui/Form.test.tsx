@@ -69,7 +69,7 @@ describe("Form", () => {
 		await act(async () => {
 			root.render(
 				createElement(Form, {
-					itemType: "simple",
+					create: true,
 					uid,
 				}),
 			);
@@ -78,6 +78,9 @@ describe("Form", () => {
 			container.querySelector("output")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
+			maxQueueSize: 1,
+			lines: [],
+
 			asset: {
 				scale: 1,
 				default: [
@@ -85,12 +88,12 @@ describe("Form", () => {
 				],
 			},
 			draft: false,
-			type: "simple",
+
 			uid,
 		});
 	});
 
-	it("seeds asset entry-point defaults through the complete blueprint draft", async () => {
+	it("seeds asset entry-point defaults through the Common draft", async () => {
 		state.project = project;
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -102,7 +105,7 @@ describe("Form", () => {
 					defaultDraft: true,
 					defaultItemId: "selected_asset-name",
 					defaultTitle: "Selected Asset Name",
-					itemType: "blueprint",
+					create: true,
 					resourceId: "selected_asset-name",
 					uid: "draft-with-selected-asset",
 				}),
@@ -120,20 +123,8 @@ describe("Form", () => {
 			},
 			draft: true,
 			id: "selected_asset-name",
-			line: {
-				id: "line:selected_asset-name:default",
-				input: [
-					{
-						query: {
-							selector: {
-								itemId: "selected_asset-name",
-							},
-						},
-					},
-				],
-			},
+			lines: [],
 			title: "Selected Asset Name",
-			type: "blueprint",
 		});
 	});
 });

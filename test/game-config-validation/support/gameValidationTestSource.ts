@@ -1,30 +1,33 @@
 import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
-import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 
+export const createItemBase = (id: string) => ({
+	uid: id,
+	id,
+	title: id,
+	description: id,
+	asset: {
+		scale: 0.8,
+		default: [
+			`asset:${id}`,
+		],
+	},
+	scope: "any",
+	maxStackSize: 10,
+});
+
 export const createSimpleItem = (id: string) =>
-	SimpleSchema.parse({
-		uid: id,
-		id,
-		title: id,
-		description: id,
-		asset: {
-			scale: 0.8,
-			default: [
-				`asset:${id}`,
-			],
-		},
-		scope: "any",
-		maxStackSize: 10,
-		type: "simple",
+	ItemSchema.parse({
+		...createItemBase(id),
 	});
 
 export const createLine = ({
 	default: isDefault = false,
+	clock,
 	id = "line:test",
 	input = [
 		{
@@ -34,6 +37,7 @@ export const createLine = ({
 	output,
 }: {
 	default?: boolean;
+	clock?: boolean;
 	id?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	output?: OutputSchema.Type;
@@ -43,6 +47,7 @@ export const createLine = ({
 		title: id,
 		description: id,
 		default: isDefault,
+		clock,
 		runtimeMs: 0,
 		input,
 		output,
@@ -60,9 +65,9 @@ export const createProducerItem = ({
 	output?: OutputSchema.Type;
 	lines?: ReadonlyArray<LineSchema.Type>;
 }) =>
-	ProducerSchema.parse({
+	ItemSchema.parse({
 		...createSimpleItem(id),
-		type: "producer",
+
 		lines: lines ?? [
 			createLine({
 				input,
@@ -115,7 +120,7 @@ export const createRootSource = ({
 	GameSourceFileSchema.parse({
 		path,
 		value: {
-			$schema: "../schema.json",
+			$schema: "schema.json",
 			resources: {
 				hero: "hero",
 			},

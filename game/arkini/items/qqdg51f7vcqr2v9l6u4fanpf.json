@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "qqdg51f7vcqr2v9l6u4fanpf",
+		"id": "spoiled-raw-chicken",
+		"title": "Spoiled Raw Chicken",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-raw-chicken"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

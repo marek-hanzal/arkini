@@ -41,17 +41,15 @@ const readItemIdFromPathFn = (path: ReadonlyArray<PropertyKey>) =>
 
 const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): ReadonlyArray<string> => {
 	switch (diagnostic.code) {
-		case "input:capacity-unsupported":
-		case "input:material-ineligible":
-		case "input:charges-invalid":
+		case "input:units-invalid":
 		case "merge:invalid":
 		case "line:duplicate-id":
-		case "line:multiple-defaults":
+		case "line:multiple-selections":
 			return [
 				diagnostic.ownerItemId,
 			];
-		case "deposit:stochastic-softlock":
-		case "deposit:unsustainable":
+		case "units:stochastic-renewal":
+		case "units:missing-renewal":
 			return [
 				diagnostic.itemId,
 			];
@@ -77,15 +75,14 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 	switch (diagnostic.code) {
 		case "merge:invalid":
 			return "merges";
-		case "input:capacity-unsupported":
-		case "input:material-ineligible":
-		case "input:charges-invalid":
+		case "input:units-invalid":
 		case "input:acceptance-cycle":
 		case "line:duplicate-id":
-		case "line:multiple-defaults":
-		case "deposit:stochastic-softlock":
-		case "deposit:unsustainable":
+		case "line:multiple-selections":
 			return "production";
+		case "units:stochastic-renewal":
+		case "units:missing-renewal":
+			return "units";
 		case "resource:missing":
 			return "artwork";
 		default:
@@ -97,8 +94,7 @@ const readEditorGameDiagnosticTargetsFn = (
 	diagnostic: GameDiagnosticSchema.Type,
 	project: Pick<Project, "config" | "resources">,
 ): ReadonlyArray<EditorDiagnosticTarget> => {
-	const itemSection =
-		readOwnedItemSectionFn(diagnostic) ?? readSectionForPathFn(diagnostic.path.slice(2));
+	const itemSection = readOwnedItemSectionFn(diagnostic);
 	const itemTargets = [
 		...new Set(readDiagnosticItemIdsFn(diagnostic)),
 	].flatMap((itemId) => {
@@ -109,7 +105,7 @@ const readEditorGameDiagnosticTargetsFn = (
 					{
 						kind: "item",
 						itemUid: item.uid,
-						sectionId: itemSection,
+						sectionId: itemSection ?? readSectionForPathFn(diagnostic.path.slice(2)),
 						label: item.title,
 					} satisfies EditorDiagnosticTarget,
 				];

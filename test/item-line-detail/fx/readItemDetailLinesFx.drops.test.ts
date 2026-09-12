@@ -44,7 +44,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 				workshop: {
 					uid: "workshop",
 					id: "workshop",
-					type: "producer",
+
 					title: "Workshop",
 					description: "Produces grouped output.",
 					asset: {
@@ -134,9 +134,12 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					],
 				},
 				wood: {
+					maxQueueSize: 1,
+					lines: [],
+
 					uid: "wood",
 					id: "wood",
-					type: "simple",
+
 					title: "Wood",
 					description: "Wood.",
 					asset: {
@@ -149,9 +152,12 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					maxStackSize: 10,
 				},
 				gem: {
+					maxQueueSize: 1,
+					lines: [],
+
 					uid: "gem",
 					id: "gem",
-					type: "simple",
+
 					title: "Gem",
 					description: "Gem.",
 					asset: {

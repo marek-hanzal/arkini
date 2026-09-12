@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "lphz3b889r4j02iyh4c5zv0w",
+		"id": "linen",
+		"title": "Linen",
+		"description": "Some linen over here",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"linen"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8
+	}
+}

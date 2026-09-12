@@ -1,4 +1,4 @@
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { ButtonLink } from "~/ui/ui/Button";
 import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
@@ -15,7 +15,7 @@ export const SectionLink = ({
 	defaultItemId,
 	defaultTitle,
 	destination = "form",
-	itemType,
+	create,
 	itemUid,
 	projectId,
 	resourceId,
@@ -25,54 +25,61 @@ export const SectionLink = ({
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly destination?: "detail" | "form";
-	readonly itemType?: TypeSchema.Type;
+	readonly create?: boolean;
 	readonly itemUid: string;
 	readonly projectId: string;
 	readonly resourceId?: string;
 	readonly section: SectionDescriptor;
-}) => (
-	<ButtonLink
-		to={
-			destination === "detail"
-				? "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-				: "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-		}
-		params={{
-			projectId,
-			itemUid,
-			sectionId: section.id,
-		}}
-		search={{
-			...(defaultDraft === undefined
-				? {}
-				: {
-						defaultDraft,
-					}),
-			...(defaultItemId === undefined
-				? {}
-				: {
-						defaultItemId,
-					}),
-			...(defaultTitle === undefined
-				? {}
-				: {
-						defaultTitle,
-					}),
-			...(itemType === undefined
-				? {}
-				: {
-						itemType,
-					}),
-			...(resourceId === undefined
-				? {}
-				: {
-						resourceId,
-					}),
-		}}
-		activeProps={activeProps}
-		inactiveProps={inactiveProps}
-		className={editorSectionTabClassName}
-	>
-		{section.label}
-	</ButtonLink>
-);
+}) => {
+	const translator = useTranslator();
+	return (
+		<ButtonLink
+			to={
+				destination === "detail"
+					? "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+					: "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+			}
+			params={{
+				projectId,
+				itemUid,
+				sectionId: section.id,
+			}}
+			search={{
+				...(defaultDraft === undefined
+					? {}
+					: {
+							defaultDraft,
+						}),
+				...(defaultItemId === undefined
+					? {}
+					: {
+							defaultItemId,
+						}),
+				...(defaultTitle === undefined
+					? {}
+					: {
+							defaultTitle,
+						}),
+				...(create === undefined
+					? {}
+					: {
+							create,
+						}),
+				...(resourceId === undefined
+					? {}
+					: {
+							resourceId,
+						}),
+			}}
+			activeProps={activeProps}
+			inactiveProps={inactiveProps}
+			className={editorSectionTabClassName}
+		>
+			{section.id === "units"
+				? translator.textFn("Units")
+				: section.id === "action"
+					? translator.textFn("Action")
+					: section.label}
+		</ButtonLink>
+	);
+};

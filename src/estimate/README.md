@@ -58,9 +58,12 @@ authored acquisition graph
 - Route selection is deterministic and quantity-aware. Stable route identity breaks equal-cost ties.
 - Alternative refinement is bounded where finite roots or co-products invalidate the locally ranked route set; this is not exhaustive combinatorial optimization.
 - Additive consumed demand sums. Reusable one-time and ongoing requirements share by maximum. Concurrent route demand uses the larger consumed-plus-reusable requirement.
-- A finite root is credited once across the witness. One selected co-product operation is charged once.
+- A finite root is credited once across the witness. One selected co-product operation is spent once.
 - Independent witness branches overlap on the optimistic critical path.
 - Unsupported bounded distribution state returns `partial`; it never invents a scalar answer.
+- Clock lines remain ordinary authored Flow relations, and finite Clock `onExpire` uses the shared expiry projection. Automatic-only lines without both an interval and the Clock flag, and permanently disabled automatic schedules, have no Estimate execution route.
+- An unbounded automatic Clock line uses the larger of interval and line runtime as its optimistic action cadence. Initial impulse delay, queue contention and conditional runtime changes remain outside this lower bound; interactive production retains ordinary line timing.
+- Finite production-owner lifetime and expiry settlement return `partial` with an explicit diagnostic. A passive finite-lifetime item has no production to drain, so its expiry retains ordinary bounded acquisition timing. Estimate does not claim unlimited output from a finite Clock or simulate its draining jobs.
 - Cycles and dead ends are diagnostics. Runtime rules, placement, concrete identity packing, renewable capacity and engine execution are outside the model.
 
 ## Revision and UI boundaries
@@ -73,7 +76,7 @@ Query, filtering, sorting and selection belong to [`fn/createItemEstimateIndexFn
 
 Likely affected:
 
-- `flow` regression proofs when acquisition facts, line inputs, charges, outputs or co-products change.
+- `flow` regression proofs when acquisition facts, line inputs, units, outputs or co-products change.
 - Estimate topology, routes, demand sharing, diagnostics, witness projection and cache identity.
 - Flow Layout only when graph shape or layout inputs change.
 - Flow Canvas only when origin/highlight/navigation projection changes.

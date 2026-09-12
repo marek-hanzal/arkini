@@ -1,7 +1,6 @@
 import type { z } from "zod";
 
-import { CraftSchema } from "~/item-definition/schema/CraftSchema";
-import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
@@ -58,63 +57,70 @@ const craftItem = ({
 	readonly output?: OutputInput;
 }) =>
 	({
+		maxQueueSize: 1,
+
 		asset: {
 			scale: 0.8,
 			default: [
 				`asset:${id}`,
 			],
 		},
-		charges: {
+		units: {
 			amount: 1,
 		},
 		description: id,
 		id,
-		line: {
-			description: `line:${id}`,
-			id: `line:${id}`,
-			input:
-				inputItemId === undefined
-					? [
-							{
-								charges: {
-									cost: 1,
-									from: "self",
+		lines: [
+			{
+				description: `line:${id}`,
+				id: `line:${id}`,
+				input:
+					inputItemId === undefined
+						? [
+								{
+									units: {
+										cost: 1,
+										from: "self",
+									},
+									type: "simple",
 								},
-								type: "simple",
-							},
-						]
-					: [
-							{
-								charges: {
-									cost: 1,
-									from: "self",
+							]
+						: [
+								{
+									units: {
+										cost: 1,
+										from: "self",
+									},
+									mode: "reserve",
+									quantity: {
+										max: 1,
+										min: 1,
+									},
+									selector: {
+										itemId: inputItemId,
+										type: "item",
+									},
+									type: "materials",
 								},
-								mode: "reserve",
-								quantity: {
-									max: 1,
-									min: 1,
-								},
-								selector: {
-									itemId: inputItemId,
-									type: "item",
-								},
-								type: "materials",
-							},
-						],
-			output,
-			rules: [],
-			runtimeMs: 200,
-			title: `line:${id}`,
-		},
+							],
+				output,
+				rules: [],
+				runtimeMs: 200,
+				title: `line:${id}`,
+			},
+		],
 		maxStackSize,
 		scope: "any",
 		title: id,
-		type: "craft",
+
 		uid: id,
-	}) satisfies z.input<typeof CraftSchema>;
+	}) satisfies z.input<typeof ItemSchema>;
 
 const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 	({
+		maxQueueSize: 1,
+		lines: [],
+
 		asset: {
 			scale: 0.8,
 			default: [
@@ -126,9 +132,9 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 		maxStackSize: 1,
 		scope,
 		title: id,
-		type: "simple",
+
 		uid: id,
-	}) satisfies z.input<typeof SimpleSchema>;
+	}) satisfies z.input<typeof ItemSchema>;
 
 /** One canonical parse owns every compact authored fixture builder above. */
 export const craftCompletionConfig = GameConfigSchema.parse({

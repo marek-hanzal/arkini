@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "j1qvbr13f0cxd3ds0c642yjo",
+		"id": "sunflower-field",
+		"title": "Sunflower Field",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sunflower-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

@@ -4,10 +4,10 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 
 describe("projectMotionItemFn", () => {
-	it("preserves a charged item's use count while quantity motion is delayed", () => {
+	it("preserves a item with units's use count while quantity motion is delayed", () => {
 		const item = {
 			badgeCount: 4,
-			badgeKind: "charges",
+			badgeKind: "units",
 			quantity: 3,
 		} as TileActorItem;
 
@@ -18,7 +18,7 @@ describe("projectMotionItemFn", () => {
 			}),
 		).toMatchObject({
 			badgeCount: 4,
-			badgeKind: "charges",
+			badgeKind: "units",
 			quantity: 1,
 		});
 	});

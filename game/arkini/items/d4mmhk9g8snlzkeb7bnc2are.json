@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "d4mmhk9g8snlzkeb7bnc2are",
+		"id": "gear-t2",
+		"title": "Gear - Tier 2",
+		"description": "Better gears",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"gear-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 4
+	}
+}

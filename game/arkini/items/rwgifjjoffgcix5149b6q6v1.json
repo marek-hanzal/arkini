@@ -1,0 +1,92 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "rwgifjjoffgcix5149b6q6v1",
+		"id": "firewood",
+		"title": "Firewood",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"firewood"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "campfire-extinguished"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "loose-ash",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "campfire"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-oven"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "oven-with-wood"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "oven-with-ash"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "loose-ash",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "oven-with-wood"
+			}
+		]
+	}
+}

@@ -18,6 +18,75 @@ const waterOutput = createOutput([
 ]);
 
 describe("forceDeleteFx", () => {
+	it("clears Clock timer references and expiry output, retaining owners after their final line is removed", () => {
+		const clock = {
+			...createProducerItem({
+				id: "clock",
+			}),
+
+			scope: "board",
+			maxStackSize: 1,
+			clock: {
+				intervalMs: 1000,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "exists",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "water",
+									},
+								},
+							},
+						],
+					},
+				],
+				onExpire: waterOutput,
+			},
+		};
+		const config = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				...editorTestConfig.items,
+				clock,
+				"clock-with-line": {
+					...clock,
+					id: "clock-with-line",
+					uid: "clock-with-line",
+					lines: [
+						createLine({
+							output: waterOutput,
+						}),
+					],
+				},
+			},
+		});
+		const result = Effect.runSync(
+			forceDeleteFx({
+				config,
+				itemId: "water",
+			}),
+		);
+		expect(result.config.items.clock).toMatchObject({
+			clock: expect.objectContaining({
+				rules: [],
+			}),
+			lines: clock.lines,
+		});
+		expect(result.config.items.clock).toHaveProperty("clock.onExpire", undefined);
+		expect(result.config.items["clock-with-line"]).toMatchObject({
+			lines: [],
+			clock: {
+				intervalMs: 1000,
+			},
+		});
+		expect(result.impact.removedExpiryOutputOwnerIds).toContain("clock");
+	});
+
 	it("removes every directly referencing structure and keeps unrelated authoring intact", () => {
 		const oil = createSimpleItem("oil");
 		const config = GameConfigSchema.parse({
@@ -49,7 +118,7 @@ describe("forceDeleteFx", () => {
 							},
 						},
 					],
-					charges: {
+					units: {
 						amount: 1,
 						output: waterOutput,
 					},
@@ -86,7 +155,7 @@ describe("forceDeleteFx", () => {
 		expect(result.config.start.board).toEqual([]);
 		expect(result.config.start.inventory).toEqual([]);
 		expect(result.config.items.oil).toMatchObject({
-			charges: {
+			units: {
 				amount: 1,
 			},
 		});
@@ -99,10 +168,9 @@ describe("forceDeleteFx", () => {
 			],
 		});
 		expect(result.impact).toEqual({
-			deletedOwnerItemIds: [],
 			removedActionInputs: [],
 			removedActionRules: [],
-			removedChargeOutputOwnerIds: [
+			removedUnitOutputOwnerIds: [
 				"oil",
 			],
 			removedExpiryOutputOwnerIds: [],
@@ -128,44 +196,52 @@ describe("forceDeleteFx", () => {
 	});
 
 	it("removes only Space action entries that reference the deleted item", () => {
+		const {
+			lines: _lines,
+			maxQueueSize: _queueSize,
+			...portalBase
+		} = createSimpleItem("portal");
 		const portal = {
-			...createSimpleItem("portal"),
-			type: "space" as const,
-			space: 1,
-			input: [
-				{
-					type: "deposit" as const,
-					query: {
-						scope: "board" as const,
-						distance: "close" as const,
-						selector: {
-							type: "item" as const,
-							itemId: "water",
-						},
-					},
-					charges: {
-						from: "target" as const,
-						cost: 1,
-					},
-				},
-			],
-			rules: [
-				{
-					type: "enable" as const,
-					when: [
-						{
-							type: "exists" as const,
-							query: {
-								scope: "universe" as const,
-								selector: {
-									type: "item" as const,
-									itemId: "water",
-								},
+			...portalBase,
+
+			action: {
+				type: "space" as const,
+				space: 1,
+				input: [
+					{
+						type: "units" as const,
+						query: {
+							scope: "board" as const,
+							distance: "close" as const,
+							selector: {
+								type: "item" as const,
+								itemId: "water",
 							},
 						},
-					],
-				},
-			],
+						units: {
+							from: "target" as const,
+							cost: 1,
+						},
+					},
+				],
+				rules: [
+					{
+						type: "enable" as const,
+						when: [
+							{
+								type: "exists" as const,
+								query: {
+									scope: "universe" as const,
+									selector: {
+										type: "item" as const,
+										itemId: "water",
+									},
+								},
+							},
+						],
+					},
+				],
+			},
 		};
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
@@ -186,8 +262,12 @@ describe("forceDeleteFx", () => {
 		);
 
 		expect(result.config.items.portal).toMatchObject({
-			input: [],
-			rules: [],
+			action: {
+				type: "space",
+				space: 1,
+				input: [],
+				rules: [],
+			},
 		});
 		expect(result.impact.removedActionInputs).toEqual([
 			{
@@ -203,12 +283,19 @@ describe("forceDeleteFx", () => {
 		]);
 	});
 
-	it("deletes an owner whose required production structure references the item", () => {
+	it("retains a passive Common owner after its last dependent line is removed", () => {
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
 			start: {
 				...editorTestConfig.start,
-				board: [],
+				board: [
+					{
+						itemId: "producer",
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
 			},
 			items: {
 				...editorTestConfig.items,
@@ -226,9 +313,10 @@ describe("forceDeleteFx", () => {
 			}),
 		);
 
-		expect(result.config.items).toEqual({});
-		expect(result.impact.deletedOwnerItemIds).toEqual([
-			"producer",
-		]);
+		expect(result.config.items.producer).toMatchObject({
+			lines: [],
+		});
+		expect(result.config.start.board).toEqual(config.start.board);
+		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 	});
 });

@@ -1,0 +1,74 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "cqwmnos0386zfehpbx8iibfy",
+		"id": "house-t1-blueprint",
+		"title": "House - Tier 1 Blueprint",
+		"description": "People should live somewhere",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"house-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"lines": [
+			{
+				"id": "line:new-item:default",
+				"title": "New blueprint line",
+				"description": "Describe what this blueprint line consumes and produces.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "house-t1-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "house-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [],
+				"ahead": true
+			}
+		]
+	}
+}

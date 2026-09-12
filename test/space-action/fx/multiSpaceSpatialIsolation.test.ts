@@ -13,7 +13,7 @@ import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRun
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import {
 	boardLocation,
 	inventoryLocation,
@@ -141,12 +141,12 @@ describe("multi-space spatial isolation", () => {
 		]);
 	});
 
-	it("keeps external charge targets inside the owner space", () => {
+	it("keeps external unit targets inside the owner space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
-					id: "runtime:deposit-owner",
-					itemId: "depositProducer",
+					id: "runtime:units-owner",
+					itemId: "unitsProducer",
 					location: boardLocation(1, 0),
 					quantity: 1,
 				});
@@ -158,7 +158,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				const remoteOnly = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:deposit:run",
+					lineId: "line:units:run",
 					runtime: yield* readRuntimeFx(),
 				});
 				yield* spawnItemFx({
@@ -169,7 +169,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				const local = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:deposit:run",
+					lineId: "line:units:run",
 					runtime: yield* readRuntimeFx(),
 				});
 
@@ -459,7 +459,7 @@ describe("multi-space spatial isolation", () => {
 					quantity: 1,
 				});
 				const beforeNavigation = yield* readRuntimeFx();
-				yield* activateSpaceItemFx({
+				yield* activateItemActionFx({
 					currentSpace: beforeNavigation.currentSpace,
 					itemId: portal.id,
 					location: portal.location,

@@ -1,0 +1,47 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "bo9nafcuzyb3p0g3h4sz6c9r",
+		"id": "cauldron-with-boiling-beeswax",
+		"title": "Cauldron With Boiling Beeswax",
+		"description": "Boiling beeswax. It could be useful, but keep it warm",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cauldron-with-boiling-beeswax"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "cauldron-with-beeswax",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

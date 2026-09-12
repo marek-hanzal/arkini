@@ -1,3 +1,4 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -8,8 +9,7 @@ import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotIte
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
-import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -48,14 +48,15 @@ export const resolveLineInputStoreFn = ({
 	source,
 }: resolveLineInputStoreFn.Props) => {
 	const lineOwnerItem = owner.item;
-	if (owner.id === source.id) return undefined;
+	if (owner.id === source.id || !canControlItemProductionFn(owner.item)) return undefined;
 	const narrowedLineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(lineOwnerItem));
 	if (narrowedLineOwnerItem === undefined) return undefined;
 	const boardOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));
 	if (boardOwner === undefined) return undefined;
 	const effectiveDefaultLine =
 		requestedLineId === undefined
-			? readEffectiveDefaultLineFn({
+			? readEffectiveLineFn({
+					selection: "default",
 					ownerItemId: boardOwner.id,
 					ownerItem: narrowedLineOwnerItem,
 					runtime,
@@ -63,9 +64,7 @@ export const resolveLineInputStoreFn = ({
 			: undefined;
 	const lineId = requestedLineId ?? effectiveDefaultLine?.id;
 	if (lineId === undefined) return undefined;
-	const line = readLineOwnerLinesFn(narrowedLineOwnerItem).find(
-		(candidate) => candidate.id === lineId,
-	);
+	const line = narrowedLineOwnerItem.lines.find((candidate) => candidate.id === lineId);
 	if (line === undefined) return undefined;
 
 	for (const [inputIndex, input] of line.input.entries()) {

@@ -1,7 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import type { ComponentProps } from "react";
 
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
@@ -15,8 +14,7 @@ export const EditorBoardProductionLineLink = ({
 }: ComponentProps<ItemLineSummaryIdentityRenderer>) => {
 	const project = useEditorProject();
 	const item = project.config.items[itemId];
-	if (item === undefined || !readAuthoredItemLinesFn(item).some((line) => line.id === lineId))
-		return children;
+	if (item === undefined || !item.lines.some((line) => line.id === lineId)) return children;
 	return (
 		<LineEditLink
 			disabled={disabled}

@@ -8,9 +8,12 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
 const simpleItem = (id: string) => ({
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: id,
 	id,
-	type: "simple" as const,
+
 	title: id,
 	description: id,
 	asset: {
@@ -71,7 +74,7 @@ const producer = ({
 }) => ({
 	uid: id,
 	id,
-	type: "producer" as const,
+
 	title: id,
 	description: id,
 	asset: {

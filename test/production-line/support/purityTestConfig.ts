@@ -36,16 +36,20 @@ export const purityTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		material: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem({
 				id: "material",
 			}),
-			type: "simple",
 		},
 		producer: {
+			maxQueueSize: 1,
+
 			...baseItem({
 				id: "producer",
 			}),
-			type: "producer",
+
 			lines: [
 				{
 					id: "line:producer:zero",
@@ -91,62 +95,37 @@ export const purityTestConfig = GameConfigSchema.parse({
 			],
 		},
 		craft: {
+			maxQueueSize: 1,
+
 			...baseItem({
 				id: "craft",
 			}),
-			type: "craft",
-			charges: {
+
+			units: {
 				amount: 1,
 			},
-			line: {
-				id: "line:craft",
-				title: "Craft",
-				description: "One single-use line.",
-				runtimeMs: 1_000,
-				input: [
-					{
-						type: "materials",
-						selector: {
-							type: "item",
-							itemId: "material",
+			lines: [
+				{
+					id: "line:craft",
+					title: "Craft",
+					description: "One single-use line.",
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "materials",
+							selector: {
+								type: "item",
+								itemId: "material",
+							},
+							quantity: {
+								min: 1,
+								max: 1,
+							},
 						},
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-					},
-				],
-				rules: [],
-			},
-		},
-		stash: {
-			...baseItem({
-				id: "stash",
-			}),
-			type: "stash",
-			charges: {
-				amount: 1,
-			},
-			line: {
-				id: "line:stash",
-				title: "Stash",
-				description: "One stash line.",
-				runtimeMs: 1_000,
-				input: [
-					{
-						type: "materials",
-						selector: {
-							type: "item",
-							itemId: "material",
-						},
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-					},
-				],
-				rules: [],
-			},
+					],
+					rules: [],
+				},
+			],
 		},
 	},
 });

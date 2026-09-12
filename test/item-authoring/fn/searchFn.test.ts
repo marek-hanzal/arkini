@@ -3,14 +3,24 @@ import { describe, expect, it } from "vitest";
 import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
-const item = (id: string, title: string) =>
-	({
-		description: `${title} description`,
-		id,
-		title,
-		type: "simple",
-		uid: id,
-	}) as ItemSchema.Type;
+const item = (id: string, title: string): ItemSchema.Type => ({
+	asset: {
+		default: [
+			"asset:item",
+		],
+		scale: 1,
+	},
+	scope: "any",
+	maxStackSize: 1,
+	maxQueueSize: 1,
+	lines: [],
+
+	description: `${title} description`,
+	id,
+	title,
+
+	uid: id,
+});
 
 describe("searchFn", () => {
 	it("uses deterministic Unicode casing to rank exact matches first", () => {

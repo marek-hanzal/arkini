@@ -6,7 +6,7 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 
 const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => ({
 	uid: `uid:${id}`,
@@ -70,234 +70,285 @@ const config = GameConfigSchema.parse({
 	},
 	items: {
 		sameSpacePortal: {
-			...baseItem("sameSpacePortal", "inventory"),
-			type: "space",
-			space: 0,
+			...baseItem("sameSpacePortal"),
+
+			action: {
+				type: "space" as const,
+				space: 0,
+			},
 		},
 		portal: {
 			...baseItem("portal"),
-			type: "space",
-			space: 7,
+
+			action: {
+				type: "space" as const,
+				space: 7,
+			},
 		},
 		blockedPortal: {
 			...baseItem("blockedPortal"),
-			type: "space",
-			space: 2,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "exists",
-							query: {
-								scope: "universe",
-								selector: {
-									type: "item",
-									itemId: "permit",
+
+			action: {
+				type: "space" as const,
+				space: 2,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "exists",
+								query: {
+									scope: "universe",
+									selector: {
+										type: "item",
+										itemId: "permit",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		},
 		proximityPortal: {
 			...baseItem("proximityPortal"),
-			type: "space",
-			space: 10,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "exists",
-							query: {
-								scope: "board",
-								distance: "close",
-								selector: {
-									type: "item",
-									itemId: "permit",
+
+			action: {
+				type: "space" as const,
+				space: 10,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "exists",
+								query: {
+									scope: "board",
+									distance: "close",
+									selector: {
+										type: "item",
+										itemId: "permit",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		},
 		passiveZeroBoardRulePortal: {
-			...baseItem("passiveZeroBoardRulePortal", "inventory"),
-			type: "space",
-			space: 11,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "count",
-							count: 0,
-							query: {
-								scope: "board",
-								distance: "close",
-								selector: {
-									type: "item",
-									itemId: "permit",
+			...baseItem("passiveZeroBoardRulePortal"),
+
+			action: {
+				type: "space" as const,
+				space: 11,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "count",
+								count: 0,
+								query: {
+									scope: "board",
+									distance: "close",
+									selector: {
+										type: "item",
+										itemId: "permit",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		},
-		depositPortal: {
-			...baseItem("depositPortal"),
-			type: "space",
-			space: 3,
-			input: [
-				{
-					type: "deposit",
-					query: {
-						scope: "board",
-						distance: "close",
-						selector: {
-							type: "item",
-							itemId: "payer",
+		unitsPortal: {
+			...baseItem("unitsPortal"),
+
+			action: {
+				type: "space" as const,
+				space: 3,
+				input: [
+					{
+						type: "units",
+						query: {
+							scope: "board",
+							distance: "close",
+							selector: {
+								type: "item",
+								itemId: "payer",
+							},
+						},
+						units: {
+							from: "target",
+							cost: 1,
 						},
 					},
-					charges: {
-						from: "target",
-						cost: 1,
-					},
-				},
-			],
+				],
+			},
 		},
-		ownerDepositPortal: {
-			...baseItem("ownerDepositPortal"),
-			type: "space",
-			space: 8,
-			charges: {
+		ownerUnitsPortal: {
+			...baseItem("ownerUnitsPortal"),
+
+			action: {
+				type: "space" as const,
+				space: 8,
+				input: [
+					{
+						type: "units",
+						query: {
+							scope: "board",
+							distance: "close",
+							selector: {
+								type: "item",
+								itemId: "payer",
+							},
+						},
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
+			units: {
 				amount: 3,
 			},
-			input: [
-				{
-					type: "deposit",
-					query: {
-						scope: "board",
-						distance: "close",
-						selector: {
-							type: "item",
-							itemId: "payer",
+		},
+		spentPortal: {
+			...baseItem("spentPortal"),
+
+			action: {
+				type: "space" as const,
+				space: 4,
+			},
+
+			units: {
+				amount: 2,
+			},
+		},
+		passiveFinitePortal: {
+			...baseItem("passiveFinitePortal"),
+
+			action: {
+				type: "space" as const,
+				space: 4,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
 						},
 					},
-					charges: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
-		},
-		chargedPortal: {
-			...baseItem("chargedPortal"),
-			type: "space",
-			space: 4,
-			charges: {
+				],
+			},
+
+			units: {
 				amount: 2,
 			},
-		},
-		passiveChargedPortal: {
-			...baseItem("passiveChargedPortal"),
-			type: "space",
-			space: 4,
-			charges: {
-				amount: 2,
-			},
-			input: [
-				{
-					type: "simple",
-					charges: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		cumulativePortal: {
 			...baseItem("cumulativePortal"),
-			type: "space",
-			space: 5,
-			charges: {
+
+			action: {
+				type: "space" as const,
+				space: 5,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
+			units: {
 				amount: 2,
 			},
-			input: [
-				{
-					type: "simple",
-					charges: {
-						from: "self",
-						cost: 1,
-					},
-				},
-				{
-					type: "simple",
-					charges: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		depletingPortal: {
 			...baseItem("depletingPortal"),
-			type: "space",
-			space: 6,
-			charges: {
+
+			action: {
+				type: "space" as const,
+				space: 6,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
+			units: {
 				amount: 1,
 				output: depletionOutput("token"),
 			},
-			input: [
-				{
-					type: "simple",
-					charges: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		passiveFailurePortal: {
-			...baseItem("passiveFailurePortal", "inventory"),
-			type: "space",
-			space: 9,
-			charges: {
+			...baseItem("passiveFailurePortal"),
+
+			action: {
+				type: "space" as const,
+				space: 9,
+				input: [
+					{
+						type: "simple",
+						units: {
+							from: "self",
+							cost: 1,
+						},
+					},
+				],
+			},
+
+			units: {
 				amount: 1,
 				output: depletionOutput("boardToken"),
 			},
-			input: [
-				{
-					type: "simple",
-					charges: {
-						from: "self",
-						cost: 1,
-					},
-				},
-			],
 		},
 		payer: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("payer", "board"),
-			type: "deposit",
-			charges: {
+
+			units: {
 				amount: 2,
 			},
 		},
 		permit: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("permit"),
-			type: "simple",
 		},
 		token: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("token", "inventory"),
-			type: "simple",
 		},
 		boardToken: {
+			maxQueueSize: 1,
+			lines: [],
+
 			...baseItem("boardToken", "board"),
-			type: "simple",
 		},
 	},
 });
@@ -357,7 +408,7 @@ export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({
 		quantity,
 	});
 	const runtime = yield* readRuntimeFx();
-	const space = yield* activateSpaceItemFx({
+	const space = yield* activateItemActionFx({
 		currentSpace: runtime.currentSpace,
 		itemId: item.id,
 		location: item.location as GridLocationSchema.Type,

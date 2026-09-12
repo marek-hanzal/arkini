@@ -1,0 +1,31 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "g62nlx8ntlb4fiqj584uf87e",
+		"id": "cotton-sewing-kit",
+		"title": "Cotton Sewing Kit",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cotton-sewing-kit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 8
+		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "pillow-with-coins"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "sewn-pillow-with-coins"
+			}
+		]
+	}
+}

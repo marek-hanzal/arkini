@@ -7,7 +7,7 @@ import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFee
 import { readTileActorFeedbackCuesFn } from "~/tile-presentation/fn/readTileActorFeedbackCuesFn";
 import { readCommittedTileReplacementsFx } from "~/tile-presentation/fx/readCommittedTileReplacementsFx";
 import { readCommittedTileSwapMotionCueFn } from "~/tile-presentation/fn/readCommittedTileSwapMotionCueFn";
-import { readTileMotionCuesFx } from "~/tile-presentation/fx/readTileMotionCuesFx";
+import { readTileMotionCuesFn } from "~/tile-presentation/fn/readTileMotionCuesFn";
 import { readTileActorsFx } from "~/tile-presentation/fx/readTileActorsFx";
 import { readTileDeliveriesFx } from "~/game-scene/fx/readTileDeliveriesFx";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
@@ -272,14 +272,9 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		yield* delivery.syncFx(deliveries);
 		const deliverySnapshot = yield* delivery.readSnapshotFx;
 		const compiledCues = presentCommittedEffects
-			? [
-					...RendererRuntime.runSync(
-						readTileMotionCuesFx({
-							game,
-							transition,
-						}),
-					),
-				]
+			? readTileMotionCuesFn({
+					transition,
+				})
 			: [];
 		const replacements = presentCommittedEffects
 			? RendererRuntime.runSync(

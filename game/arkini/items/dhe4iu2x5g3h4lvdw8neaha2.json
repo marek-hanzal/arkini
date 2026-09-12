@@ -1,0 +1,51 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "dhe4iu2x5g3h4lvdw8neaha2",
+		"id": "wick",
+		"title": "Wick",
+		"description": "I heard - a candle?",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"wick"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 10,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cauldron-with-boiling-beeswax"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "unlit-candle",
+											"quantity": {
+												"min": 2,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "empty-cauldron"
+			}
+		]
+	}
+}

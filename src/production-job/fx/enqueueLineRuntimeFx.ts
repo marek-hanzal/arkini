@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -36,6 +38,14 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	ownerItemId,
 	runtime,
 }: enqueueLineRuntimeFx.Props) {
+	const owner = runtime.items.find((item) => item.id === ownerItemId);
+	if (owner !== undefined && !isItemProductionAdmissionOpenFn(owner))
+		return yield* Effect.fail(
+			new LineRunUnavailableError({
+				ownerItemId,
+				lineId,
+			}),
+		);
 	const resolution = yield* resolveLineStartFx({
 		ownerItemId,
 		lineId,

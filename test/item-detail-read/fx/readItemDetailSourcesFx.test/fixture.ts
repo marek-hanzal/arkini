@@ -1,3 +1,4 @@
+import { createItemBase } from "~test/game-config-validation/support/gameValidationTestSource";
 import { Effect } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -10,9 +11,12 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const item = (id: string, title = id) => ({
+	maxQueueSize: 1,
+	lines: [],
+
 	uid: id,
 	id,
-	type: "simple" as const,
+
 	title,
 	description: id,
 	asset: {
@@ -128,7 +132,7 @@ const targetLine = ({
 
 const producer = (id: string, title: string, lines: readonly object[]) => ({
 	...item(id, title),
-	type: "producer" as const,
+
 	scope: "board" as const,
 	maxStackSize: 1,
 	maxQueueSize: 1,
@@ -195,24 +199,29 @@ export const config = GameConfigSchema.parse({
 			acquisitionLine("line:irrelevant", "byproduct"),
 		]),
 		blueprint: {
-			...item("blueprint", "Blueprint"),
-			type: "blueprint",
-			charges: {
+			...createItemBase("blueprint"),
+			title: "Blueprint",
+			maxQueueSize: 1,
+
+			units: {
 				amount: 1,
 			},
 			maxStackSize: 1,
-			line: {
-				...acquisitionLine("line:blueprint", "product"),
-				input: [
-					{
-						type: "simple",
-						charges: {
-							from: "self",
-							cost: 1,
+			lines: [
+				{
+					ahead: true,
+					...acquisitionLine("line:blueprint", "product"),
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
 						},
-					},
-				],
-			},
+					],
+				},
+			],
 		},
 		"town-hall": producer("town-hall", "Town Hall", [
 			acquisitionLine("line:town-hall:blueprint", "blueprint"),

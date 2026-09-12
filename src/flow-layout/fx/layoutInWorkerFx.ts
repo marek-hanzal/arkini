@@ -68,7 +68,6 @@ export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 							x: offset.x,
 							y: offset.y,
 						})),
-						type: node.type,
 						width: metrics.width,
 					};
 				}),

@@ -2,7 +2,6 @@ import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIn
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
-import { readMaterialInputEligibilityFn } from "~/production-input/fn/readMaterialInputEligibilityFn";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 
@@ -35,12 +34,7 @@ export const planInputMaterialStoreFn = ({
 		],
 		selector: input.selector,
 	});
-	const eligibility = readMaterialInputEligibilityFn({
-		items: [
-			item.item,
-		],
-	});
-	if (matches.length === 0 || eligibility.eligibleItems.length === 0) {
+	if (matches.length === 0) {
 		return undefined;
 	}
 

@@ -60,14 +60,6 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 			item.asset.default[0],
 			item.asset.default[1] ?? "",
 		],
-		sources:
-			item.asset.sources === undefined
-				? [
-						"",
-					]
-				: [
-						...item.asset.sources,
-					],
 	},
 	merge:
 		item.merge === undefined
@@ -84,12 +76,15 @@ const FormPathLabelBySegment = {
 	asset: "Artwork",
 	capacity: "Buffer",
 	chance: "Chance",
-	charges: "Charges",
+	units: "Units",
 	cost: "Cost",
 	default: "Default",
 	description: "Description",
 	distance: "Board distance",
-	durationMs: "Duration",
+	durationMs: "Lifetime",
+	intervalMs: "Interval",
+	control: "Player controls",
+	onExpire: "Expiry output",
 	effect: "Target effect",
 	enable: "Enabled",
 	from: "Paid by",
@@ -97,7 +92,7 @@ const FormPathLabelBySegment = {
 	id: "ID",
 	max: "Maximum",
 	maxCount: "Maximum global count",
-	maxQueueSize: "Maximum parallel jobs",
+	maxQueueSize: "Queue capacity",
 	maxStackSize: "Maximum stack size",
 	min: "Minimum",
 	mode: "Material mode",
@@ -124,7 +119,6 @@ const FormIndexedPathLabelBySegment = {
 	roll: "Roll",
 	rules: "Rule",
 	set: "Output set",
-	sources: "Alternate artwork",
 	when: "Condition",
 } as const satisfies Partial<Record<string, string>>;
 
@@ -136,6 +130,10 @@ const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
 	let dropCollectionIndex = 0;
 	for (let index = 0; index < path.length; index += 1) {
 		const segment = path[index];
+		if (index === 0 && segment === "action") {
+			labels.push("Action");
+			continue;
+		}
 		const nestedIndex = path[index + 1];
 		const indexedLabel =
 			typeof segment === "string" && typeof nestedIndex === "number"
@@ -146,10 +144,6 @@ const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
 		if (indexedLabel !== undefined && typeof nestedIndex === "number") {
 			labels.push(`${indexedLabel} ${nestedIndex + 1}`);
 			index += 1;
-			continue;
-		}
-		if (segment === "line") {
-			labels.push("Product line");
 			continue;
 		}
 		if (segment === "drop" && typeof nestedIndex === "number") {
@@ -231,14 +225,31 @@ export const useFormController = ({
 			if (notifyOnSaved.current) await onSavedFn?.(saved);
 		},
 	});
+	const enableClockFn = useCallback(() => {
+		if (form.state.values.clock !== undefined) return;
+		form.setFieldValue("action", undefined);
+		form.setFieldValue("scope", "board");
+		form.setFieldValue("maxStackSize", 1);
+		form.setFieldValue("clock", {
+			intervalMs: 300_000,
+			durationMs: 3_600_000,
+			enable: true,
+			rules: [],
+		});
+	}, [
+		form,
+	]);
 	const initializedCapability = useRef(false);
 	useLayoutEffect(() => {
 		if (initializedCapability.current || enableCapability === undefined) return;
 		initializedCapability.current = true;
 		switch (enableCapability) {
-			case "charges":
-				if (form.state.values.charges === undefined) {
-					form.setFieldValue("charges", {
+			case "clock":
+				enableClockFn();
+				break;
+			case "units":
+				if (form.state.values.units === undefined) {
+					form.setFieldValue("units", {
 						amount: 1,
 					});
 				}
@@ -253,6 +264,7 @@ export const useFormController = ({
 		}
 	}, [
 		enableCapability,
+		enableClockFn,
 		form,
 	]);
 	const dirty = useStore(form.store, (state) => state.isDirty);
@@ -349,6 +361,7 @@ export const useFormController = ({
 		() => ({
 			canonicalItem: initialItem,
 			discardFn,
+			enableClockFn,
 			error,
 			isDirty: dirty,
 			isSaving: submitting,
@@ -361,6 +374,7 @@ export const useFormController = ({
 		}),
 		[
 			discardFn,
+			enableClockFn,
 			dirty,
 			error,
 			form,

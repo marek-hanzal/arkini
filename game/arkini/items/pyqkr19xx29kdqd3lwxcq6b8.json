@@ -1,0 +1,18 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "pyqkr19xx29kdqd3lwxcq6b8",
+		"id": "house-of-engineers",
+		"title": "House Of Engineers",
+		"description": "Your mechanical journey starts here",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"house-of-engineers"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1
+	}
+}

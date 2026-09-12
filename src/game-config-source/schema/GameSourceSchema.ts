@@ -8,7 +8,7 @@ import { RolesSchema } from "~/game-config/schema/RolesSchema";
 
 /**
  * Internal assembly value shared by the canonical `game.json` root and
- * `items/<type>/<uid>.json` project files.
+ * `items/<uid>.json` project files.
  */
 export const GameSourceSchema = z
 	.object({

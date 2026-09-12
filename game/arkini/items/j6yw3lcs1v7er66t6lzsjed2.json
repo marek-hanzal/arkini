@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "j6yw3lcs1v7er66t6lzsjed2",
+		"id": "water-jar",
+		"title": "Water Jar",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"water-jar"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

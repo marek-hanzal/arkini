@@ -79,10 +79,9 @@ vi.mock("~/tile-presentation/fx/readCommittedTileReplacementsFx", async () => {
 	};
 });
 
-vi.mock("~/tile-presentation/fx/readTileMotionCuesFx", async () => {
-	const { Effect: EffectModule } = await import("effect");
+vi.mock("~/tile-presentation/fn/readTileMotionCuesFn", async () => {
 	return {
-		readTileMotionCuesFx: () => EffectModule.succeed(projectionState.cues),
+		readTileMotionCuesFn: () => projectionState.cues,
 	};
 });
 
@@ -159,7 +158,7 @@ export const createItem = (
 	compositeUrl: undefined,
 	id,
 	itemId: "water",
-	itemType: "simple",
+
 	location,
 	primaryAction: {
 		kind: "none",

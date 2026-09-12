@@ -7,7 +7,7 @@ import {
 	guaranteedMergeOutput,
 } from "~test/item-merge/support/createMergeTestConfig";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 
 const readIdsFn = (
 	config: GameConfigSchema.Type,
@@ -35,7 +35,6 @@ describe("readItemConnectionsFn", () => {
 	it("keeps inputs from disabled outputless authored lines", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 		const config = GameConfigSchema.parse({
 			...base,
 			items: {
@@ -85,11 +84,11 @@ describe("readItemConnectionsFn", () => {
 		expect(readIdsFn(config, "source", "produces")).toEqual([]);
 	});
 
-	it("reads line, merge, charge-depletion, and temporary-expiry outputs", () => {
+	it("reads line, merge, unit-depletion, and temporary-expiry outputs", () => {
 		const base = createTemporaryLifetimeTestConfig();
 		const common = base.items.blocker;
+		const { lines: _lines, maxQueueSize: _queueSize, ...baseItem } = common;
 		const producer = base.items.producer;
-		if (producer.type !== "producer") throw new Error("Expected producer fixture.");
 		const output = guaranteedMergeOutput({
 			itemId: "result",
 		});
@@ -107,47 +106,46 @@ describe("readItemConnectionsFn", () => {
 						line,
 					],
 				},
-				deposit: {
-					...common,
-					id: "deposit",
-					uid: "deposit",
-					title: "deposit",
-					type: "deposit",
-					lines: [
-						line,
-					],
-				},
 				blueprint: {
-					...common,
+					...baseItem,
 					id: "blueprint",
 					uid: "blueprint",
 					title: "blueprint",
-					type: "blueprint",
-					line,
+
+					lines: [
+						{
+							...line,
+							ahead: true,
+						},
+					],
 				},
 				craft: {
 					...common,
 					id: "craft",
 					uid: "craft",
 					title: "craft",
-					type: "craft",
-					line,
+
+					lines: [
+						line,
+					],
 				},
 				stash: {
 					...common,
 					id: "stash",
 					uid: "stash",
 					title: "stash",
-					type: "stash",
-					line,
+
+					lines: [
+						line,
+					],
 				},
-				charged: {
+				spent: {
 					...common,
-					id: "charged",
-					uid: "charged",
-					title: "charged",
-					type: "simple",
-					charges: {
+					id: "spent",
+					uid: "spent",
+					title: "spent",
+
+					units: {
 						amount: 1,
 						output,
 					},
@@ -157,7 +155,7 @@ describe("readItemConnectionsFn", () => {
 					id: "mergeSource",
 					uid: "mergeSource",
 					title: "mergeSource",
-					type: "simple",
+
 					merge: [
 						{
 							action: "consume",
@@ -176,11 +174,10 @@ describe("readItemConnectionsFn", () => {
 
 		for (const ownerItemId of [
 			"producer",
-			"deposit",
 			"blueprint",
 			"craft",
 			"stash",
-			"charged",
+			"spent",
 			"temporaryOutput",
 		])
 			expect(readIdsFn(config, ownerItemId, "produces")).toEqual([
@@ -196,7 +193,7 @@ describe("readItemConnectionsFn", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		const common = base.items.tool;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		const { lines: _lines, maxQueueSize: _queueSize, ...baseItem } = common;
 		const config = GameConfigSchema.parse({
 			...base,
 			items: {
@@ -235,29 +232,31 @@ describe("readItemConnectionsFn", () => {
 					})),
 				},
 				portal: {
-					...common,
+					...baseItem,
 					id: "portal",
 					uid: "portal",
 					title: "portal",
-					type: "space",
-					space: 1,
-					enable: false,
-					input: [
-						{
-							type: "deposit",
-							query: {
-								distance: "far",
-								scope: "board",
-								selector: {
-									itemId: "water",
-									type: "item",
+
+					action: {
+						type: "space" as const,
+						space: 1,
+						input: [
+							{
+								type: "units",
+								query: {
+									distance: "far",
+									scope: "board",
+									selector: {
+										itemId: "water",
+										type: "item",
+									},
 								},
 							},
-						},
-					],
-					rules: [
-						enableRuleFn("line-permit"),
-					],
+						],
+						rules: [
+							enableRuleFn("line-permit"),
+						],
+					},
 				},
 				result: {
 					...common,

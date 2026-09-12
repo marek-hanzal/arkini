@@ -29,9 +29,12 @@ export const configInput = {
 	},
 	items: {
 		water: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "water",
 			id: "water",
-			type: "simple",
+
 			title: "Water",
 			description: "Water",
 			asset: {
@@ -44,9 +47,12 @@ export const configInput = {
 			maxStackSize: 10,
 		},
 		stone: {
+			maxQueueSize: 1,
+			lines: [],
+
 			uid: "stone",
 			id: "stone",
-			type: "simple",
+
 			title: "Stone",
 			description: "Stone",
 			asset: {
@@ -61,7 +67,11 @@ export const configInput = {
 		backpack: {
 			uid: "backpack",
 			id: "backpack",
-			type: "inventory",
+			action: {
+				type: "inventory",
+			},
+			scope: "any",
+			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
 			asset: {

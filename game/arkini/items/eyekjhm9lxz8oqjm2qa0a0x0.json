@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "eyekjhm9lxz8oqjm2qa0a0x0",
+		"id": "clay-jug",
+		"title": "Clay Jug",
+		"description": "A lot of stuff you can put stuff into",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"clay-jug"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

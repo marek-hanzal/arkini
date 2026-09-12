@@ -1,3 +1,5 @@
+import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { CircleAlert, Clock3, Info } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { match } from "ts-pattern";
@@ -16,6 +18,7 @@ const ItemLineUnavailableReason = ({
 }: {
 	readonly reason: ItemDetailLinesProjection.DisabledReason;
 }) => {
+	const translator = useTranslator();
 	return match(reason)
 		.with(
 			{
@@ -42,12 +45,13 @@ const ItemLineUnavailableReason = ({
 		)
 		.with(
 			{
-				kind: "deposit-target-missing",
+				kind: "units-target-missing",
 			},
 			(reason) => (
 				<p>
-					Requires {reason.selector.label} · None available (Board ·{" "}
-					{BoardDistancePresentation[reason.distance].label}).
+					{translator.textFn("Requires")} {reason.selector.label} ·{" "}
+					{translator.textFn("None available")} ({translator.textFn("Board")} ·{" "}
+					{translator.textFn(BoardDistancePresentation[reason.distance].label)}).
 				</p>
 			),
 		)
@@ -59,22 +63,22 @@ interface UnavailableDependency {
 		Extract<
 			ItemDetailLinesProjection.DisabledReason,
 			{
-				readonly kind: "deposit-target-missing";
+				readonly kind: "units-target-missing";
 			}
 		>["detail"]
 	>;
-	readonly status: string;
+	readonly distance: DistanceSchema.Type;
 }
 
 const readUnavailableDependencyFn = (
 	reason: ItemDetailLinesProjection.DisabledReason,
 ): UnavailableDependency | undefined => {
-	if (reason.kind === "deposit-target-missing") {
+	if (reason.kind === "units-target-missing") {
 		return reason.detail === undefined
 			? undefined
 			: {
 					detail: reason.detail,
-					status: `Required · None available (Board · ${BoardDistancePresentation[reason.distance].label})`,
+					distance: reason.distance,
 				};
 	}
 	return undefined;
@@ -86,26 +90,31 @@ const ItemLineUnavailableDependency = ({
 }: {
 	readonly dependency: UnavailableDependency;
 	readonly disabled: boolean;
-}) => (
-	<div
-		className="mt-4 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted"
-		data-ui="TileLineUnavailableReason"
-	>
-		<ItemReferenceButton
-			compositeUrl={dependency.detail.compositeUrl}
-			dataUi="TileLineUnavailableDependencyLink"
-			definitionItemId={dependency.detail.itemId}
-			disabled={disabled}
-			label={dependency.detail.title}
-			runtimeItemId={dependency.detail.detailItemId}
-			sourceUrl={dependency.detail.sourceUrl}
-		/>
-		<span className="flex items-center gap-1.5">
-			{dependency.status}
-			<CircleAlert className="size-4 shrink-0 text-warning" />
-		</span>
-	</div>
-);
+}) => {
+	const translator = useTranslator();
+	return (
+		<div
+			className="mt-4 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted"
+			data-ui="TileLineUnavailableReason"
+		>
+			<ItemReferenceButton
+				compositeUrl={dependency.detail.compositeUrl}
+				dataUi="TileLineUnavailableDependencyLink"
+				definitionItemId={dependency.detail.itemId}
+				disabled={disabled}
+				label={dependency.detail.title}
+				runtimeItemId={dependency.detail.detailItemId}
+				sourceUrl={dependency.detail.sourceUrl}
+			/>
+			<span className="flex items-center gap-1.5">
+				{translator.textFn("Required")} · {translator.textFn("None available")} (
+				{translator.textFn("Board")} ·{" "}
+				{translator.textFn(BoardDistancePresentation[dependency.distance].label)})
+				<CircleAlert className="size-4 shrink-0 text-warning" />
+			</span>
+		</div>
+	);
+};
 
 const ItemLineUnavailableMessage = ({
 	reason,

@@ -5,7 +5,7 @@ import { z } from "zod";
  */
 export const TargetEffectSchema = z
 	.enum({
-		Deposit: "deposit",
+		Spend: "spend",
 		Keep: "keep",
 		Remove: "remove",
 		Replace: "replace",

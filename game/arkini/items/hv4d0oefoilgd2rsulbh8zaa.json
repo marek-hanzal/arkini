@@ -1,0 +1,17 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "hv4d0oefoilgd2rsulbh8zaa",
+		"id": "medicine-satchel",
+		"title": "Medicine Satchel",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"medicine-satchel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1
+	}
+}

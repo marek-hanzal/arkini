@@ -7,6 +7,7 @@ import { afterEach, beforeEach, vi } from "vitest";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import type { ItemDetailPendingAction } from "~/item-detail-frame/type/ItemDetailControl";
+import { TranslationContext } from "~/translation/ui/TranslationContext";
 import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
 
 (
@@ -25,8 +26,7 @@ const control = vi.hoisted(() => ({
 
 const commandSpies = vi.hoisted(() => ({
 	enqueue: vi.fn(),
-	setDefault: vi.fn(),
-	unsetDefault: vi.fn(),
+	select: vi.fn(),
 	withdraw: vi.fn(),
 }));
 
@@ -53,16 +53,9 @@ vi.mock("~/production-job/fx/enqueueLineFx", () => ({
 	},
 }));
 
-vi.mock("~/production-line/fx/setDefaultLineFx", () => ({
-	setDefaultLineFx: (command: unknown) => {
-		commands.setDefault(command);
-		return command;
-	},
-}));
-
-vi.mock("~/production-line/fx/unsetDefaultLineFx", () => ({
-	unsetDefaultLineFx: (command: unknown) => {
-		commands.unsetDefault(command);
+vi.mock("~/production-line/fx/setLineSelectionFx", () => ({
+	setLineSelectionFx: (command: unknown) => {
+		commands.select(command);
 		return command;
 	},
 }));
@@ -119,6 +112,7 @@ export const projection = {
 	line: [
 		{
 			actions: {
+				canChangeDefault: true,
 				canWithdraw: false,
 				enqueue: {
 					enabled: true,
@@ -181,10 +175,18 @@ export const renderLines = async (lines: AvailableProjection) => {
 	const rerender = async (nextLines: AvailableProjection) => {
 		await act(async () => {
 			root.render(
-				createElement(ItemLinesTab, {
-					disabled: false,
-					lines: nextLines,
-				}),
+				createElement(
+					TranslationContext,
+					{
+						value: {
+							textFn: (key) => key,
+						},
+					},
+					createElement(ItemLinesTab, {
+						disabled: false,
+						lines: nextLines,
+					}),
+				),
 			);
 		});
 	};

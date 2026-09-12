@@ -20,16 +20,16 @@ const inputLocation = {
 };
 
 describe("readTileActorFeedbackCuesFn", () => {
-	it("derives receiver, charge, replacement and depletion-spawn feedback from exact facts", () => {
+	it("derives receiver, unit, replacement and depletion-spawn feedback from exact facts", () => {
 		const transition = {
 			events: [
 				{
-					type: "item:charge-spent",
+					type: "item:unit-spent",
 					itemId: "runtime:tree",
-					canonicalItemId: "deposit:tree",
+					canonicalItemId: "units:tree",
 					location: boardLocation,
-					previousCharges: 2,
-					resultingCharges: 1,
+					previousUnits: 2,
+					resultingUnits: 1,
 				},
 				{
 					type: "job:started",
@@ -51,15 +51,15 @@ describe("readTileActorFeedbackCuesFn", () => {
 					sourceItemId: "runtime:seed",
 					sourceCanonicalItemId: "item:seed",
 					targetItemId: "runtime:tree",
-					targetCanonicalItemId: "deposit:sapling",
+					targetCanonicalItemId: "units:sapling",
 					action: "consume",
 					effect: "replace",
-					resultCanonicalItemId: "deposit:tree",
+					resultCanonicalItemId: "units:tree",
 				},
 				{
 					type: "item:depleted",
 					itemId: "runtime:tree",
-					canonicalItemId: "deposit:tree",
+					canonicalItemId: "units:tree",
 					location: boardLocation,
 					previousQuantity: 1,
 					resultingQuantity: 0,

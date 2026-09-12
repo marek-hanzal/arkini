@@ -12,11 +12,17 @@ export const useFuseSearch = <Identity extends string>(
 	candidates: readonly FuseSearchCandidate<Identity>[],
 	query: string,
 ): readonly Identity[] => {
-	const corpusKey = JSON.stringify(
-		candidates.map(({ identity, terms }) => [
-			identity,
-			terms,
-		]),
+	const corpusKey = useMemo(
+		() =>
+			JSON.stringify(
+				candidates.map(({ identity, terms }) => [
+					identity,
+					terms,
+				]),
+			),
+		[
+			candidates,
+		],
 	);
 	const fuzzyFn = useMemo(
 		() =>

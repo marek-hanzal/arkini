@@ -15,7 +15,10 @@ import {
 } from "./CheatItemSpotlight.test/harness";
 
 beforeEach(beforeEachSpotlightTest);
-afterEach(afterEachSpotlightTest);
+afterEach(async () => {
+	await afterEachSpotlightTest();
+	vi.useRealTimers();
+});
 
 describe("CheatItemSpotlight", () => {
 	it("allows an editor-owned override of the global player preference", async () => {
@@ -109,10 +112,25 @@ describe("CheatItemSpotlight", () => {
 		expect(spotlightState.spawn).toHaveBeenCalledTimes(2);
 	});
 
-	it("searches the authoritative catalog by shared Fuse terms", async () => {
+	it("waits for the settled query before admitting a search result", async () => {
+		vi.useFakeTimers();
 		const { container } = await renderSpotlight();
 		await toggleSpotlight();
 		await changeSearchQuery(readSearchInput(container), "item:beta");
+		await act(async () => {
+			readSearchInput(container).dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		expect(spotlightState.spawn).not.toHaveBeenCalled();
+		expect(
+			container.querySelectorAll('[data-ui="CheatItemSpotlightResults"] button'),
+		).toHaveLength(2);
+		await act(async () => vi.advanceTimersByTime(250));
 
 		const options = Array.from(
 			container.querySelectorAll<HTMLButtonElement>(
@@ -121,6 +139,8 @@ describe("CheatItemSpotlight", () => {
 		);
 		expect(options).toHaveLength(1);
 		expect(options[0]?.dataset.itemId).toBe("item:beta");
+		await act(async () => options[0]?.click());
+		expect(spotlightState.spawn).toHaveBeenCalledExactlyOnceWith("item:beta");
 	});
 
 	it("renders the complete default artwork composition", async () => {

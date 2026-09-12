@@ -2,12 +2,14 @@ import {
 	type KeyboardEvent,
 	type ReactNode,
 	type RefObject,
+	useCallback,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
 
+import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
 export namespace useItemSpotlightController {
@@ -38,6 +40,7 @@ export namespace useItemSpotlightController {
 		readonly inputRef: RefObject<HTMLInputElement | null>;
 		readonly onKeyDownFn: (event: KeyboardEvent<HTMLDivElement>) => void;
 		readonly query: string;
+		readonly searchPending: boolean;
 		readonly requestSelectedFn: () => void;
 		readonly results: ReadonlyArray<Option>;
 		readonly selectItemFn: (props: SelectItemProps) => void;
@@ -69,7 +72,9 @@ export const useItemSpotlightController = ({
 			options,
 		],
 	);
-	const matchingIds = useFuseSearch(candidates, query);
+	const searchQuery = useDebouncedSearchQuery(query);
+	const searchPending = query !== searchQuery;
+	const matchingIds = useFuseSearch(candidates, searchQuery);
 	const optionsById = useMemo(
 		() =>
 			new Map(
@@ -102,12 +107,20 @@ export const useItemSpotlightController = ({
 		setSelectedIndexFn(0);
 		onQueryChangeFn?.(value);
 	};
-	const selectItemFn = ({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
-		const option = results[index];
-		if (option?.itemId !== itemId || option.disabled === true) return;
-		setSelectedIndexFn(index);
-		onSelectItemFn(itemId);
-	};
+	const selectItemFn = useCallback(
+		({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
+			if (searchPending) return;
+			const option = results[index];
+			if (option?.itemId !== itemId || option.disabled === true) return;
+			setSelectedIndexFn(index);
+			onSelectItemFn(itemId);
+		},
+		[
+			onSelectItemFn,
+			results,
+			searchPending,
+		],
+	);
 	const requestSelectedFn = () => {
 		const selected = results[selectedIndex];
 		if (selected === undefined) return;
@@ -123,6 +136,11 @@ export const useItemSpotlightController = ({
 		onCloseFn();
 	};
 
+	useEffect(() => {
+		setSelectedIndexFn(0);
+	}, [
+		searchQuery,
+	]);
 	useEffect(() => {
 		setSelectedIndexFn((current) => Math.min(current, Math.max(0, results.length - 1)));
 	}, [
@@ -142,6 +160,7 @@ export const useItemSpotlightController = ({
 		inputRef,
 		onKeyDownFn,
 		query,
+		searchPending,
 		requestSelectedFn,
 		results,
 		selectItemFn,

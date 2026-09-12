@@ -10,6 +10,7 @@ import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { ListRow } from "~/item-authoring/ui/ListRow";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
+import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -32,6 +33,7 @@ export const List = ({
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
+	const settledQuery = useDebouncedSearchQuery(query);
 	const items = useMemo(
 		() =>
 			Object.values(project.config?.items ?? {}).sort((left, right) =>
@@ -47,13 +49,31 @@ export const List = ({
 			filterFn(items, {
 				draft,
 				itemType,
-				query,
+				query: settledQuery,
 			}),
 		[
 			draft,
 			itemType,
 			items,
-			query,
+			settledQuery,
+		],
+	);
+	const rows = useMemo(
+		() =>
+			filteredItems.map((item) => (
+				<ListRow
+					key={item.uid}
+					activeType={itemType}
+					item={item}
+					onSelectTypeFn={onItemTypeChangeFn}
+					projectId={project.projectId}
+				/>
+			)),
+		[
+			filteredItems,
+			itemType,
+			onItemTypeChangeFn,
+			project.projectId,
 		],
 	);
 	const newItemMenu = (
@@ -132,15 +152,7 @@ export const List = ({
 						No items match the active filters.
 					</p>
 				) : null}
-				{filteredItems.map((item) => (
-					<ListRow
-						key={item.uid}
-						activeType={itemType}
-						item={item}
-						onSelectTypeFn={onItemTypeChangeFn}
-						projectId={project.projectId}
-					/>
-				))}
+				{rows}
 			</div>
 		</EditorSectionPage>
 	);

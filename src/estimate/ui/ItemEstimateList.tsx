@@ -1,4 +1,5 @@
 import { TriangleAlert } from "lucide-react";
+import { useMemo } from "react";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -14,6 +15,7 @@ import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
+import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 
 const EstimateViewOptions: ReadonlyArray<EditorSelectOption<ItemEstimateViewSchema.Type>> = [
 	{
@@ -51,11 +53,33 @@ export const ItemEstimateList = ({
 	readonly view: ItemEstimateViewSchema.Type;
 }) => {
 	const project = useEditorProject();
+	const settledQuery = useDebouncedSearchQuery(query);
 	const state = useItemEstimateIndex(project, {
 		itemType,
-		query,
+		query: settledQuery,
 		view,
 	});
+	const rows = useMemo(
+		() =>
+			state.rows.map(({ estimate, item }) => (
+				<ItemEstimateListRow
+					activeType={itemType}
+					estimate={estimate}
+					item={item}
+					key={item.uid}
+					maximumDemand={state.maximumDemand}
+					onSelectTypeFn={onItemTypeChangeFn}
+					projectId={project.projectId}
+				/>
+			)),
+		[
+			itemType,
+			onItemTypeChangeFn,
+			project.projectId,
+			state.maximumDemand,
+			state.rows,
+		],
+	);
 	return (
 		<EditorSectionPage
 			header={
@@ -119,17 +143,7 @@ export const ItemEstimateList = ({
 						No item estimates match the current filters.
 					</p>
 				) : null}
-				{state.rows.map(({ estimate, item }) => (
-					<ItemEstimateListRow
-						activeType={itemType}
-						estimate={estimate}
-						item={item}
-						key={item.uid}
-						maximumDemand={state.maximumDemand}
-						onSelectTypeFn={onItemTypeChangeFn}
-						projectId={project.projectId}
-					/>
-				))}
+				{rows}
 			</div>
 		</EditorSectionPage>
 	);

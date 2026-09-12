@@ -5,6 +5,7 @@ import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDeta
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
+import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 
 type ItemLineAvailabilityFilter = "available" | "all";
 
@@ -222,6 +223,7 @@ export const useItemLineSearch = (
 	ignoreAvailability = false,
 ) => {
 	const [query, setQueryFn] = useState(initialQuery);
+	const settledQuery = useDebouncedSearchQuery(query);
 	const availableLineCount = useMemo(
 		() => lines.line.filter(isAvailableLineFn).length,
 		[
@@ -263,7 +265,7 @@ export const useItemLineSearch = (
 		],
 	);
 	const searchCandidates = useItemLineSearchCandidates(selectedProjection);
-	const matchingLineIds = useFuseSearch(searchCandidates, query);
+	const matchingLineIds = useFuseSearch(searchCandidates, settledQuery);
 	const matchingLineIdSet = useMemo(
 		() => new Set(matchingLineIds),
 		[
@@ -284,6 +286,6 @@ export const useItemLineSearch = (
 		query,
 		setQueryFn,
 		filteredLines,
-		normalizedQuery: query.trim(),
+		normalizedQuery: settledQuery.trim(),
 	};
 };

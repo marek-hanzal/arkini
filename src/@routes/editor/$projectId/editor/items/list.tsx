@@ -1,3 +1,4 @@
+import { useEditorItemTypeFilter } from "~/item-authoring/ui/useEditorItemTypeFilter";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { List } from "~/item-authoring/ui/List";
@@ -23,20 +24,14 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 		const navigateFn = useNavigate({
 			from: Route.fullPath,
 		});
+		const onItemTypeChangeFn = useEditorItemTypeFilter(Route.fullPath);
+
 		return (
 			<List
 				draft={search.draft === true}
 				itemType={search.itemType}
 				query={search.query ?? ""}
-				onItemTypeChangeFn={(itemType) =>
-					void navigateFn({
-						replace: true,
-						search: (current) => ({
-							...current,
-							itemType,
-						}),
-					})
-				}
+				onItemTypeChangeFn={onItemTypeChangeFn}
 				onDraftChangeFn={(draft) =>
 					void navigateFn({
 						replace: true,

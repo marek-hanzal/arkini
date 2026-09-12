@@ -11,9 +11,18 @@ import {
 	useFloating,
 	useInteractions,
 } from "@floating-ui/react";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+	type ReactNode,
+} from "react";
 
 import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { SearchInput } from "~/ui/ui/SearchInput";
@@ -74,16 +83,20 @@ export const EditorSearchCombobox = ({
 	const [query, setQueryFn] = useState(selectedLabel);
 	const [open, setOpenFn] = useState(false);
 	const [activeIndex, setActiveIndexFn] = useState(0);
+	const keyboardScrollPendingRef = useRef(false);
 	const handleOpenChangeFn = useCallback(
 		(nextOpen: boolean) => {
 			setOpenFn(nextOpen);
-			if (!nextOpen) setQueryFn(selectedLabel);
+			if (!nextOpen) {
+				keyboardScrollPendingRef.current = false;
+				setQueryFn(selectedLabel);
+			}
 		},
 		[
 			selectedLabel,
 		],
 	);
-	const { context, floatingStyles, refs } = useFloating({
+	const { context, elements, floatingStyles, refs } = useFloating({
 		open,
 		onOpenChange: handleOpenChangeFn,
 		placement: "bottom-start",
@@ -118,7 +131,9 @@ export const EditorSearchCombobox = ({
 			options,
 		],
 	);
-	const matchingIds = useFuseSearch(candidates, query);
+	const searchQuery = useDebouncedSearchQuery(open ? query : "");
+	const searchPending = open && query !== searchQuery;
+	const matchingIds = useFuseSearch(candidates, searchQuery);
 	const optionsById = useMemo(
 		() =>
 			new Map(
@@ -131,14 +146,43 @@ export const EditorSearchCombobox = ({
 			options,
 		],
 	);
-	const matches = matchingIds.flatMap((id) => {
-		const option = optionsById.get(id);
-		return option === undefined
-			? []
-			: [
-					option,
-				];
-	});
+	const matches = useMemo(
+		() =>
+			matchingIds.flatMap((id) => {
+				const option = optionsById.get(id);
+				return option === undefined
+					? []
+					: [
+							option,
+						];
+			}),
+		[
+			matchingIds,
+			optionsById,
+		],
+	);
+	useLayoutEffect(() => {
+		const menu = elements.floating;
+		if (!open || menu === null || !keyboardScrollPendingRef.current) return;
+		const activeOption = menu.querySelector<HTMLElement>(
+			'[data-ui="EditorSearchComboboxOption"][data-ui-active="true"]',
+		);
+		if (activeOption === null) return;
+		keyboardScrollPendingRef.current = false;
+		// Keep keyboard navigation inside the menu; scrollIntoView also moves outer scrollers.
+		const viewportTop = menu.getBoundingClientRect().top + menu.clientTop;
+		const viewportBottom = viewportTop + menu.clientHeight;
+		const optionBounds = activeOption.getBoundingClientRect();
+		if (optionBounds.top < viewportTop) {
+			menu.scrollTop -= viewportTop - optionBounds.top;
+		} else if (optionBounds.bottom > viewportBottom) {
+			menu.scrollTop += optionBounds.bottom - viewportBottom;
+		}
+	}, [
+		activeIndex,
+		elements.floating,
+		open,
+	]);
 
 	useEffect(() => {
 		setQueryFn(selectedLabel);
@@ -148,23 +192,106 @@ export const EditorSearchCombobox = ({
 	useEffect(() => {
 		setActiveIndexFn(0);
 	}, [
-		query,
+		searchQuery,
 	]);
 
-	const chooseFn = (option: EditorSearchOption) => {
-		onChangeFn(option.id);
-		setQueryFn(displaySelectedLabel ? option.label : option.id);
-		setOpenFn(false);
-	};
+	const chooseFn = useCallback(
+		(option: EditorSearchOption) => {
+			if (searchPending) return;
+			onChangeFn(option.id);
+			setQueryFn(displaySelectedLabel ? option.label : option.id);
+			setOpenFn(false);
+		},
+		[
+			displaySelectedLabel,
+			onChangeFn,
+			searchPending,
+		],
+	);
 	const beginSearchFn = () => {
 		if (!open && query === selectedLabel) setQueryFn("");
 		setOpenFn(true);
 	};
 	const updateQueryFn = (nextQuery: string) => {
+		keyboardScrollPendingRef.current = false;
 		setQueryFn(nextQuery);
 		onInputChangeFn?.(nextQuery);
 		setOpenFn(true);
 	};
+
+	const resultOptions = useMemo(
+		() =>
+			open
+				? matches.map((option, index) => (
+						<button
+							key={option.id}
+							type="button"
+							disabled={searchPending}
+							className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised data-[ui-active=true]:bg-surface-raised"
+							onMouseDown={(event) => event.preventDefault()}
+							onMouseEnter={() => {
+								keyboardScrollPendingRef.current = false;
+								setActiveIndexFn(index);
+							}}
+							onClick={() => chooseFn(option)}
+							{...readDataUiFn({
+								dataUi: "EditorSearchComboboxOption",
+								state: {
+									active: index === activeIndex,
+									selected: option.id === value,
+								},
+							})}
+						>
+							{renderPreviewFn(option)}
+							{renderOptionContentFn === undefined ? (
+								<span
+									className="min-w-0 flex-1 data-[ui-layout=inline]:flex data-[ui-layout=inline]:items-center data-[ui-layout=inline]:gap-1.5"
+									data-ui-layout={optionContentLayout}
+								>
+									<span
+										className="block truncate text-sm font-semibold text-foreground data-[ui-layout=inline]:shrink-0"
+										data-ui-layout={optionContentLayout}
+									>
+										{option.label}
+									</span>
+									{option.meta === undefined ? null : (
+										<>
+											<span
+												className="hidden shrink-0 text-subtle data-[ui-layout=inline]:inline"
+												data-ui-layout={optionContentLayout}
+											>
+												·
+											</span>
+											<span
+												className="mt-0.5 block truncate text-xs text-subtle data-[ui-layout=inline]:mt-0 data-[ui-layout=inline]:min-w-0 data-[ui-layout=inline]:flex-1 data-[ui-layout=inline]:text-sm"
+												data-ui-layout={optionContentLayout}
+											>
+												{option.meta}
+											</span>
+										</>
+									)}
+								</span>
+							) : (
+								renderOptionContentFn(option)
+							)}
+							{option.id === value ? (
+								<Check className="size-4 shrink-0 text-accent" />
+							) : null}
+						</button>
+					))
+				: null,
+		[
+			open,
+			matches,
+			activeIndex,
+			value,
+			chooseFn,
+			searchPending,
+			renderPreviewFn,
+			renderOptionContentFn,
+			optionContentLayout,
+		],
+	);
 
 	return (
 		<label className="grid min-w-0 content-start gap-1.5 text-sm">
@@ -209,6 +336,7 @@ export const EditorSearchCombobox = ({
 							}
 							if (event.key === "ArrowDown" || event.key === "ArrowUp") {
 								event.preventDefault();
+								keyboardScrollPendingRef.current = true;
 								setOpenFn(true);
 								setActiveIndexFn((current) => {
 									if (matches.length === 0) return 0;
@@ -217,13 +345,10 @@ export const EditorSearchCombobox = ({
 								});
 								return;
 							}
-							if (
-								event.key === "Enter" &&
-								open &&
-								matches[activeIndex] !== undefined
-							) {
+							if (event.key === "Enter" && open) {
 								event.preventDefault();
-								chooseFn(matches[activeIndex]);
+								if (matches[activeIndex] !== undefined)
+									chooseFn(matches[activeIndex]);
 							}
 						}}
 						{...readDataUiFn({
@@ -246,64 +371,12 @@ export const EditorSearchCombobox = ({
 						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
 						{...getFloatingPropsFn()}
 					>
-						{matches.length === 0 ? (
+						{matches.length === 0 && !searchPending ? (
 							<span className="px-3 py-4 text-center text-xs text-muted">
 								{emptyLabel}
 							</span>
 						) : null}
-						{matches.map((option, index) => (
-							<button
-								key={option.id}
-								type="button"
-								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised data-[ui-active=true]:bg-surface-raised"
-								onMouseDown={(event) => event.preventDefault()}
-								onMouseEnter={() => setActiveIndexFn(index)}
-								onClick={() => chooseFn(option)}
-								{...readDataUiFn({
-									dataUi: "EditorSearchComboboxOption",
-									state: {
-										active: index === activeIndex,
-										selected: option.id === value,
-									},
-								})}
-							>
-								{renderPreviewFn(option)}
-								{renderOptionContentFn === undefined ? (
-									<span
-										className="min-w-0 flex-1 data-[ui-layout=inline]:flex data-[ui-layout=inline]:items-center data-[ui-layout=inline]:gap-1.5"
-										data-ui-layout={optionContentLayout}
-									>
-										<span
-											className="block truncate text-sm font-semibold text-foreground data-[ui-layout=inline]:shrink-0"
-											data-ui-layout={optionContentLayout}
-										>
-											{option.label}
-										</span>
-										{option.meta === undefined ? null : (
-											<>
-												<span
-													className="hidden shrink-0 text-subtle data-[ui-layout=inline]:inline"
-													data-ui-layout={optionContentLayout}
-												>
-													·
-												</span>
-												<span
-													className="mt-0.5 block truncate text-xs text-subtle data-[ui-layout=inline]:mt-0 data-[ui-layout=inline]:min-w-0 data-[ui-layout=inline]:flex-1 data-[ui-layout=inline]:text-sm"
-													data-ui-layout={optionContentLayout}
-												>
-													{option.meta}
-												</span>
-											</>
-										)}
-									</span>
-								) : (
-									renderOptionContentFn(option)
-								)}
-								{option.id === value ? (
-									<Check className="size-4 shrink-0 text-accent" />
-								) : null}
-							</button>
-						))}
+						{resultOptions}
 					</span>
 				</FloatingPortal>
 			) : null}

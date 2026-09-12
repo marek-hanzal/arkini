@@ -23,6 +23,7 @@ import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorA
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
+import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -273,9 +274,10 @@ const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps
 export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
+	const settledQuery = useDebouncedSearchQuery(props.query);
 	const controller = useEditorAssetManagerController({
 		filter: props.filter,
-		query: props.query,
+		query: settledQuery,
 	});
 	const catalogStatus =
 		controller.catalogState === undefined
@@ -450,7 +452,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 				)}
 				<EditorAssetGrid
 					filter={props.filter}
-					query={props.query}
+					query={settledQuery}
 					resources={controller.resources}
 				/>
 			</div>

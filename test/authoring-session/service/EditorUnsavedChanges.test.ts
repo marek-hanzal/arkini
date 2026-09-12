@@ -39,7 +39,7 @@ describe("EditorUnsavedChanges", () => {
 		expect(session.discardFn).not.toHaveBeenCalled();
 	});
 
-	it("omits Save for an invalid draft and allows an explicit discard", async () => {
+	it("rejects Save for an invalid draft and allows an explicit discard", async () => {
 		const owner = Effect.runSync(createEditorUnsavedChangesOwnerFx());
 		const session = createSession({
 			valid: false,

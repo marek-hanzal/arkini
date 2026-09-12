@@ -152,7 +152,7 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 						)}
 						icon={Combine}
 						itemUid={item.uid}
-						title={translator.textFn("Merges are disabled")}
+						title={translator.textFn("Item merges empty title")}
 					/>
 				</EditorRootCard>
 			) : (

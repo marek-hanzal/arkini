@@ -103,7 +103,7 @@ const ClockFields = () => {
 										"Without an output, the clock disappears after expiry and production settlement.",
 									)}
 									emptyIcon={PackagePlus}
-									emptyTitle={translator.textFn("No expiry output")}
+									emptyTitle={translator.textFn("Item expiry output empty title")}
 									value={output}
 									onChangeFn={(next) =>
 										form.setFieldValue("clock.onExpire", next)
@@ -129,7 +129,7 @@ export const ClockSection = () => {
 					<EditorFormCard>
 						<EditorCapabilityStatus
 							icon={Clock}
-							title={translator.textFn("Clock is disabled")}
+							title={translator.textFn("Item clock empty title")}
 							actionLabel={translator.textFn("Enable clock")}
 							description={translator.textFn(
 								"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",

@@ -54,7 +54,7 @@ const MergeFields = ({
 								structuredClone(MergeDraftDefault),
 							])
 						}
-						title={translator.textFn("Merges are disabled")}
+						title={translator.textFn("Item merges empty title")}
 					/>
 				</EditorFormCard>
 			) : (

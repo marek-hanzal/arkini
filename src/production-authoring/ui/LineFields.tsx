@@ -210,7 +210,9 @@ export const LineFields = withFieldGroupFn({
 													structuredClone(DraftDefaults.output),
 												)
 											}
-											title={translator.textFn("Line output is disabled")}
+											title={translator.textFn(
+												"Production line output empty title",
+											)}
 										/>
 									) : (
 										<>

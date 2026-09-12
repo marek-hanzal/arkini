@@ -6,8 +6,6 @@ Action:
   value: Action
 Action configured:
   value: Action configured
-Action is disabled:
-  value: Action is disabled
 Action type:
   value: Action type
 Activating this item settles its requirements and unit costs, then enters the target space.:
@@ -142,8 +140,6 @@ Clock attempts the marked line at each interval and can also limit this item's l
   value: Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.
 Clock configured:
   value: Clock configured
-Clock is disabled:
-  value: Clock is disabled
 Close:
   value: Close
   dynamic: true
@@ -400,6 +396,8 @@ Item:
   value: Item
 Item ID:
   value: Item ID
+Item action empty title:
+  value: Let a click open Inventory or move to another space.
 Item action help:
   value: |
     Action is the item's immediate click handler. Choose **Space** to enter a target board space or **Inventory** to open Inventory.
@@ -416,6 +414,8 @@ Item artwork help:
     **Base tile scale** changes the artwork size within its tile. A value of 1 fills the tile with the artwork canvas; transparent PNG padding remains visible. Scale does not change occupied cells, storage, interaction reach, or image resolution.
 
     The artwork preview in Item detail marks the complete tile.
+Item clock empty title:
+  value: Automate production or give this item a limited lifetime.
 Item clock help:
   value: |
     A Clock adds periodic production, a finite lifetime, or both.
@@ -443,6 +443,8 @@ Item delete help:
     Ordinary deletion requires those references to be removed. **Force delete** also removes the listed starting entries, operations and outputs that depend on this item; review the concrete impact in the confirmation dialog.
 
     Asset files remain in the project. Linked Notes remain, with this item's link removed. Deletion is applied only after confirmation.
+Item depletion output empty title:
+  value: Create items when the last unit is spent.
 Item estimate help:
   value: |
     Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.
@@ -459,6 +461,8 @@ Item estimate help:
     Arkini uses authored runtimes, output quantities and chances. Random outputs are converted into an expected number of attempts. Independent work can happen in parallel, so its time is not blindly added together.
 
     Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
+Item expiry output empty title:
+  value: Create items when this item's lifetime ends.
 Item global count help:
   value: |
     Limits the total quantity of this item across the game. Stack quantities contribute to the same global limit. Leave empty for no global limit.
@@ -486,6 +490,10 @@ Item list help:
     **Draft** filters to items marked as drafts. This is an Editor organization flag: drafts still participate in the game and Arkpack builds.
 
     **New item** opens an unsaved draft. You can also create an item from an asset, which supplies its initial artwork and title. Save applies changes to the project.
+Item merge output empty title:
+  value: Create extra items when this merge completes.
+Item merges empty title:
+  value: Define what happens when this item is dropped onto another.
 Item merges help:
   value: |
     Merges trigger when this item is dropped onto a matching target.
@@ -502,6 +510,8 @@ Item player controls help:
     **Interactive** allows players to start production, store or withdraw input materials, change the queue, and select the **Default** and **Clock** lines.
 
     **Automatic only** disables those production controls and leaves authored automation in charge. It does not change movement, merge or removal rules.
+Item production empty title:
+  value: Let this item produce other items.
 Item production help:
   value: |
     Production combines the item's queue, Clock and production lines. Queue capacity and player controls are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
@@ -562,8 +572,6 @@ Line ID:
   value: Line ID
 Line description:
   value: Line description
-Line output is disabled:
-  value: Line output is disabled
 Line selection could not be changed.:
   value: Line selection could not be changed.
 Line title:
@@ -602,8 +610,6 @@ Merge output:
   value: Merge output
 Merges:
   value: Merges
-Merges are disabled:
-  value: Merges are disabled
 Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output.:
   value: Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output.
 Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output.:
@@ -632,12 +638,8 @@ No authored operation owned by this item outputs another item.:
   dynamic: true
 No configured limit:
   value: No configured limit
-No depletion output:
-  value: No depletion output
 No depletion output configured.:
   value: No depletion output configured.
-No expiry output:
-  value: No expiry output
 No expiry output configured.:
   value: No expiry output configured.
 No extra output configured.:
@@ -652,8 +654,6 @@ No items match the active filters.:
   value: No items match the active filters.
 No items yet:
   value: No items yet
-No merge output:
-  value: No merge output
 No output:
   value: No output
 No output configured.:
@@ -755,10 +755,10 @@ Production:
   value: Production
 Production line:
   value: Production line
+Production line output empty title:
+  value: Create items when this production line completes.
 Production lines:
   value: Production lines
-Production lines are disabled:
-  value: Production lines are disabled
 Project:
   value: Project
 Project ID:

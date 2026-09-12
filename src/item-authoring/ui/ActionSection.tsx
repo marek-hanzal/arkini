@@ -38,7 +38,7 @@ export const ActionSection = () => {
 								)}
 								icon={MapPinned}
 								onEnableFn={enableActionFn}
-								title={translator.textFn("Action is disabled")}
+								title={translator.textFn("Item action empty title")}
 							/>
 						</EditorFormCard>
 					) : (

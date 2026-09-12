@@ -4,6 +4,7 @@ const thumbnailSizeClassName = {
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-8",
+	xl: "size-18",
 } as const;
 
 /** Renders one project asset inside compact authoring selectors and fields. */

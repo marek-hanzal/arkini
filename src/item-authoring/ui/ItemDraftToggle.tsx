@@ -1,3 +1,4 @@
+import { Square, SquareCheck } from "lucide-react";
 import { Tx } from "~/translation/ui/Tx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
@@ -16,10 +17,11 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 		item,
 	});
 	const draft = readDraftFn(item);
+	const DraftIcon = draft ? SquareCheck : Square;
 	return (
 		<div className="grid justify-items-end gap-1">
 			<LinkButton
-				className="inline-flex h-10 min-h-10 items-center justify-center rounded-lg border border-transparent px-3 py-2 text-sm data-[ui-active=true]:border-line data-[ui-active=true]:text-foreground data-[ui-active=true]:hover:text-foreground data-[ui-active=true]:hover:no-underline"
+				className="inline-flex h-10 min-h-10 items-center justify-center gap-1.5 rounded-lg border border-transparent px-3 py-2 text-sm data-[ui-active=true]:border-line data-[ui-active=true]:text-foreground data-[ui-active=true]:hover:text-foreground data-[ui-active=true]:hover:no-underline"
 				cursorIntent={controller.pending ? "wait" : "pointer"}
 				disabled={controller.pending}
 				onClick={() => void controller.toggleFn()}
@@ -32,6 +34,7 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 				})}
 			>
 				<Tx label="Draft" />
+				<DraftIcon className="size-4 shrink-0" />
 			</LinkButton>
 			{controller.error === undefined ? null : (
 				<p

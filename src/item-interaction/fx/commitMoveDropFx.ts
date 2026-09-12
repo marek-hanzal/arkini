@@ -1,6 +1,5 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -16,7 +15,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
@@ -29,7 +27,6 @@ class LocationOccupiedError extends Data.TaggedError("LocationOccupiedError")<{
 }> {}
 
 interface MoveItemProps {
-	readonly interactionLayer?: BaseSchema.Type["layer"];
 	readonly itemId: IdSchema.Type;
 	readonly location: GridLocationSchema.Type;
 	readonly revision: RevisionSchema.Type;
@@ -42,7 +39,6 @@ interface MoveItemResult {
 }
 
 const moveItemFx = Effect.fn("moveItemFx")(function* ({
-	interactionLayer,
 	itemId,
 	location,
 	revision,
@@ -91,11 +87,6 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					}),
 				);
 			}
-			yield* assertGridItemExposedFx({
-				interactionLayer,
-				item,
-				runtime,
-			});
 			if (
 				isSameGridLocationFn({
 					left: item.location,
@@ -136,7 +127,6 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			const claim = readGridLocationClaimAtFn({
-				layer: item.item.layer,
 				claims: readGridLocationClaimsFn({
 					runtime,
 				}).filter((candidate) => candidate.itemId !== itemId),
@@ -174,7 +164,6 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 
 export namespace commitMoveDropFx {
 	export interface Props {
-		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -184,14 +173,12 @@ export namespace commitMoveDropFx {
 
 /** Commits one exact empty-slot drop and normalizes its public result. */
 export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
 	targetLocation,
 }: commitMoveDropFx.Props) {
 	return yield* moveItemFx({
-		interactionLayer,
 		itemId: sourceItemId,
 		revision: sourceRevision,
 		expectedLocation: sourceLocation,
@@ -207,12 +194,6 @@ export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
 			}),
 		),
 		Effect.catchTags({
-			ItemCoveredError: () =>
-				Effect.succeed({
-					kind: DropItemResultKind.Reject,
-					reason: DropItemRejectedReason.InvalidSource,
-					itemId: sourceItemId,
-				}),
 			LocationOccupiedError: (error) =>
 				Effect.succeed({
 					kind: DropItemResultKind.Reject,

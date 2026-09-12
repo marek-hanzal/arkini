@@ -40,7 +40,6 @@ export const configInput = {
 					"asset:water",
 				],
 			},
-			layer: "content",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -56,7 +55,6 @@ export const configInput = {
 					"asset:stone",
 				],
 			},
-			layer: "content",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -66,7 +64,6 @@ export const configInput = {
 			type: "inventory",
 			title: "Backpack",
 			description: "Backpack",
-			layer: "content",
 			asset: {
 				scale: 0.8,
 				default: [
@@ -155,7 +152,6 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 			id: "mud",
 			title: "Mud",
 			description: "Mud",
-			layer: "content",
 			asset: {
 				scale: 0.8,
 				default: [

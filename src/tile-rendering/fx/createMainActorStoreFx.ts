@@ -4,34 +4,15 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 
-const readCanonicalSlotKeyFn = (
-	location: PixiTileActor["item"]["location"],
-	layer: PixiTileActor["item"]["layer"],
-) => {
+const readCanonicalSlotKeyFn = (location: PixiTileActor["item"]["location"]) => {
 	switch (location.scope) {
 		case "board":
-			return `board:${location.space}:${location.position.x}:${location.position.y}:${layer}`;
+			return `board:${location.space}:${location.position.x}:${location.position.y}`;
 		case "toolbar":
 			return `toolbar:${location.position.x}`;
 		default:
 			return null;
 	}
-};
-
-const readVisibleOccupantFn = (
-	occupants: ReadonlyMap<string, PixiTileActor["item"]>,
-	location: PixiTileActor["item"]["location"],
-	interactionLayer: PixiTileActor["item"]["layer"],
-) => {
-	const preferredKey = readCanonicalSlotKeyFn(location, interactionLayer);
-	if (preferredKey === null) return null;
-	const preferred = occupants.get(preferredKey);
-	if (preferred !== undefined || location.scope !== "board") return preferred ?? null;
-	const backgroundKey = readCanonicalSlotKeyFn(
-		location,
-		interactionLayer === "content" ? "ground" : "content",
-	);
-	return backgroundKey === null ? null : (occupants.get(backgroundKey) ?? null);
 };
 
 /** Owns canonical item projections and retained actor identity for the main Pixi scene. */
@@ -66,23 +47,22 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 				Effect.sync(() => canonicalItems.get(actorId) ?? null),
 			),
 			readCanonicalOccupantFx: Effect.fn("MainActorStore.readCanonicalOccupantFx")(
-				(location, interactionLayer = "content") =>
-					Effect.sync(() =>
-						readVisibleOccupantFn(canonicalOccupants, location, interactionLayer),
-					),
+				(location) =>
+					Effect.sync(() => {
+						const key = readCanonicalSlotKeyFn(location);
+						return key === null ? null : (canonicalOccupants.get(key) ?? null);
+					}),
 			),
 			readCanonicalOccupantsFx: Effect.fn("MainActorStore.readCanonicalOccupantsFx")(
-				(locations, interactionLayer = "content") =>
+				(locations) =>
 					Effect.sync(() => {
 						const seen = new Set<string>();
 						const occupants: PixiTileActor["item"][] = [];
 						for (const location of locations) {
-							const occupant = readVisibleOccupantFn(
-								canonicalOccupants,
-								location,
-								interactionLayer,
-							);
-							if (occupant === null || seen.has(occupant.id)) continue;
+							const key = readCanonicalSlotKeyFn(location);
+							if (key === null) continue;
+							const occupant = canonicalOccupants.get(key);
+							if (occupant === undefined || seen.has(occupant.id)) continue;
 							seen.add(occupant.id);
 							occupants.push(occupant);
 						}
@@ -101,7 +81,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 							);
 						}
 						nextCanonicalItems.set(item.id, item);
-						const key = readCanonicalSlotKeyFn(item.location, item.layer);
+						const key = readCanonicalSlotKeyFn(item.location);
 						if (key === null) continue;
 						const existing = nextCanonicalOccupants.get(key);
 						if (existing !== undefined && existing.id !== item.id) {

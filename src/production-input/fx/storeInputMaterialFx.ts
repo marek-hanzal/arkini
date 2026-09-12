@@ -1,6 +1,5 @@
 import { Effect, Option } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -30,11 +29,9 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
-import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
 
 export namespace storeInputMaterialFx {
 	export interface Props {
-		readonly interactionLayer?: BaseSchema.Type["layer"];
 		ownerItemId: IdSchema.Type;
 		ownerItemRevision?: RevisionSchema.Type;
 		expectedOwnerLocation?: GridLocationSchema.Type;
@@ -44,7 +41,6 @@ export namespace storeInputMaterialFx {
 		sourceItemRevision: RevisionSchema.Type;
 		expectedSourceLocation?: GridLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
-		interaction?: "drop";
 	}
 
 	export interface Result {
@@ -64,7 +60,6 @@ export namespace storeInputMaterialFx {
  * its pure remainder is delivered through canonical placement in the same commit.
  */
 export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* ({
-	interactionLayer,
 	ownerItemId,
 	ownerItemRevision,
 	expectedOwnerLocation,
@@ -74,7 +69,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 	sourceItemRevision,
 	expectedSourceLocation,
 	quantity,
-	interaction,
 }: storeInputMaterialFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
@@ -146,20 +140,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 						actualLocation: source.location,
 					}),
 				);
-			}
-			if (interaction === "drop") {
-				yield* assertGridItemExposedFx({
-					interactionLayer,
-					item: source,
-					runtime,
-				});
-				if (gridOwner !== undefined) {
-					yield* assertGridItemExposedFx({
-						interactionLayer,
-						item: gridOwner,
-						runtime,
-					});
-				}
 			}
 			const boardOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));
 			const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));

@@ -12,7 +12,6 @@
 			]
 		},
 		"scope": "any",
-		"layer": "content",
 		"maxStackSize": 1,
 		"type": "space",
 		"space": 753,

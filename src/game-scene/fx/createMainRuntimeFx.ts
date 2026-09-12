@@ -29,10 +29,8 @@ import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
 import type { MainRuntime } from "~/game-scene/service/MainRuntime";
-import type { BoardLayerControl } from "~/game-scene/fx/createBoardLayerControlFx";
 
 interface CreateMainRuntimeProps {
-	readonly boardLayer: BoardLayerControl;
 	readonly dragThreshold: number;
 	readonly game: GameEngine;
 	readonly host: HTMLElement;
@@ -53,7 +51,6 @@ interface CreateMainRuntimeProps {
  * dependency order on both partial initialization failure and normal teardown.
  */
 export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
-	boardLayer,
 	dragThreshold,
 	game,
 	host,
@@ -102,7 +99,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		});
 		registerRollbackFn(dropFeedback.closeFx);
 		const surface = yield* createMainSurfaceFx({
-			animationDriver,
 			actorStore,
 			application,
 			dropFeedback,
@@ -166,17 +162,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(drag.closeFx);
-		const applyBoardLayerFx = Effect.fn("MainRuntime.applyBoardLayerFx")(function* (
-			layer: TileActorItem["layer"],
-		) {
-			yield* drag.cancelInteractionFx;
-			yield* surface.setInteractionLayerFx(layer);
-		});
-		yield* applyBoardLayerFx(yield* boardLayer.readLayerFx);
-		const unsubscribeBoardLayerFn = yield* boardLayer.subscribeFx((layer) =>
-			RendererRuntime.runSync(applyBoardLayerFx(layer)),
-		);
-		registerRollbackFn(Effect.sync(unsubscribeBoardLayerFn));
 		const layout = readMainLayoutFn({
 			boardHeight: game.config.meta.board.height,
 			boardWidth: game.config.meta.board.width,

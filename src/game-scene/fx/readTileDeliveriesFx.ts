@@ -114,7 +114,6 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 						}),
 				id: current.id,
 				itemType: current.item.type,
-				layer: current.item.layer,
 				revision: current.revision,
 				quantity: current.quantity,
 				location: from,

@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -14,7 +13,6 @@ import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
 export namespace commitStoreInputDropFx {
 	export interface Props {
-		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -29,7 +27,6 @@ export namespace commitStoreInputDropFx {
 
 /** Commits one exact default-line input store and normalizes both actor identities. */
 export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -50,8 +47,6 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		);
 	return yield* Effect.gen(function* () {
 		const stored = yield* storeInputMaterialFx({
-			interactionLayer,
-			interaction: "drop",
 			ownerItemId: targetItemId,
 			ownerItemRevision: targetRevision,
 			expectedOwnerLocation: targetLocation,
@@ -81,15 +76,6 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		} satisfies DropItemResult;
 	}).pipe(
 		Effect.catchTags({
-			ItemCoveredError: (error) =>
-				Effect.succeed(
-					makeDropActorRejectedResultFn({
-						failedItemId: error.itemId,
-						failure: "invalid-location",
-						sourceItemId,
-						targetItemId,
-					}),
-				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropActorRejectedResultFn({

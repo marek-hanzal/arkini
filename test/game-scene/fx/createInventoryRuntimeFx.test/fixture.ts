@@ -516,7 +516,6 @@ export const inventoryItem = {
 	id: "runtime:water",
 	itemId: "water",
 	itemType: "simple",
-	layer: "content" as const,
 	location: {
 		scope: "inventory",
 		position: {

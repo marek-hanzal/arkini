@@ -15,7 +15,6 @@ const item = {
 		],
 	},
 	scope: "board",
-	layer: "content",
 	maxStackSize: 1,
 	type: "simple",
 } satisfies ItemSchema.Type;

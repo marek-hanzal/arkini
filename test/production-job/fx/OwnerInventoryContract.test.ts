@@ -31,7 +31,6 @@ const createInventoryOpenerJobConfig = () => {
 				type: "inventory",
 				title: "Backpack",
 				description: "Stores items.",
-				layer: "content",
 				asset: {
 					scale: 0.8,
 					default: [

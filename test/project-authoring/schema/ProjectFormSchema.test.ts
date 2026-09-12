@@ -4,7 +4,6 @@ import type { Project } from "~/project-authoring/type/Project";
 import { createProjectFormSchema } from "~/project-authoring/schema/createProjectFormSchema";
 import type { ProjectFormSchema } from "~/project-authoring/schema/ProjectFormSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { layeredBoardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (overrides?: Partial<Project>): Project => ({
@@ -44,7 +43,6 @@ const createInventoryProject = () =>
 							"item-water",
 						],
 					},
-					layer: "content",
 					scope: "board",
 					maxCount: 1,
 					maxStackSize: 1,
@@ -78,9 +76,45 @@ const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 });
 
 describe("ProjectFormSchema", () => {
-	it("allows colocated Board layers but rejects a second occupant of the same layer", () => {
-		const schema = createProjectFormSchema(layeredBoardSpaceProject);
-		const value = createValidFormValue(layeredBoardSpaceProject);
+	it("rejects two different items in one Board cell while the same coordinate in another Space stays available", () => {
+		const project = createProject();
+		const stone = {
+			...project.config.items.water!,
+			id: "stone",
+			uid: "stone",
+		};
+		const schema = createProjectFormSchema({
+			...project,
+			config: {
+				...project.config,
+				items: {
+					...project.config.items,
+					stone,
+				},
+			},
+		});
+		const value = {
+			...createValidFormValue(project),
+			start: {
+				...createValidFormValue(project).start,
+				board: [
+					{
+						itemId: "water",
+						quantity: 1,
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "stone",
+						quantity: 1,
+						space: 1,
+						x: 0,
+						y: 0,
+					},
+				],
+			},
+		};
 		expect(schema.safeParse(value).success).toBe(true);
 		const result = schema.safeParse({
 			...value,
@@ -89,7 +123,7 @@ describe("ProjectFormSchema", () => {
 				board: [
 					...value.start.board,
 					{
-						itemId: "path",
+						itemId: "stone",
 						quantity: 1,
 						space: 0,
 						x: 0,
@@ -99,15 +133,16 @@ describe("ProjectFormSchema", () => {
 			},
 		});
 		expect(result.success).toBe(false);
-		if (result.success) throw new Error("Expected same-layer collision.");
+		if (result.success) throw new Error("Expected occupied-cell rejection.");
 		expect(result.error.issues.map((issue) => issue.path)).toEqual([
 			[
 				"start",
 				"board",
-				3,
+				2,
 			],
 		]);
 	});
+
 	it("limits Editor-authored Board, Inventory and Toolbar sizes to 42", () => {
 		const project = createProject();
 		const validValue = createValidFormValue(project);

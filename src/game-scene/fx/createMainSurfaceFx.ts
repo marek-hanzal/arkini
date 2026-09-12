@@ -1,7 +1,5 @@
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
-import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -28,7 +26,6 @@ interface PixiSceneDropTarget {
 }
 
 interface CreateMainSurfaceProps {
-	readonly animationDriver: AnimationDriver;
 	readonly actorStore: MainActorStore;
 	readonly application: PixiApplicationOwner;
 	readonly dropFeedback: DropFeedback;
@@ -39,14 +36,13 @@ interface CreateMainSurfaceProps {
 /** Owns main-scene geometry, layers, masks, hit testing and drop feedback paint. */
 export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 	({
-		animationDriver,
 		actorStore,
 		application,
 		dropFeedback,
 		game,
 		palette: initialPalette,
 	}: CreateMainSurfaceProps) =>
-		Effect.gen(function* () {
+		Effect.sync((): MainSurface => {
 			let palette = initialPalette;
 			let latestTransition = game.getTransitionSnapshotFn();
 			let layoutRevision = 0;
@@ -62,10 +58,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			const gridLayer = new Container({
 				eventMode: "none",
 				label: "GridLayer",
-			});
-			const groundActorLayer = new Container({
-				eventMode: "passive",
-				label: "GroundActorLayer",
 			});
 			const boardActorLayer = new Container({
 				eventMode: "passive",
@@ -99,7 +91,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			gridLayer.addChild(boardGrid, toolbarGrid);
 			boardGrid.mask = boardMask;
 			toolbarGrid.mask = toolbarMask;
-			groundActorLayer.mask = boardMask;
 			boardActorLayer.mask = boardMask;
 			toolbarActorLayer.mask = toolbarMask;
 			application.stage.addChild(
@@ -107,39 +98,20 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				dropFeedback.container,
 				boardMask,
 				toolbarMask,
-				groundActorLayer,
 				boardActorLayer,
 				toolbarActorLayer,
 				transientActorLayer,
 			);
 			application.stage.eventMode = "static";
 			let closed = false;
-			let interactionLayer: TileActorItem["layer"] = "content";
-			// Keep painter order and Ground coverage stable; only Content recedes into a ghost.
-			const contentOpacity = yield* animationDriver.createSpringFx({
-				initialValue: 1,
-				onUpdateFn: (opacity) => {
-					boardActorLayer.alpha = opacity;
-				},
-				options: {
-					damping: 44,
-					mass: 1,
-					restDelta: 0.001,
-					restSpeed: 0.01,
-					stiffness: 480,
-				},
-			});
 
-			const readLocationPoseFn = (
-				location: TileActorItem["location"],
-				layer: TileActorItem["layer"] = "content",
-			) => {
+			const readLocationPoseFn = (location: TileActorItem["location"]) => {
 				if (
 					location.scope === LocationScopeEnumSchema.enum.Board &&
 					location.space === latestTransition.runtime.currentSpace
 				) {
 					return {
-						layer: layer === "ground" ? groundActorLayer : boardActorLayer,
+						layer: boardActorLayer,
 						size: layout.board.cellSize,
 						x: layout.board.x + location.position.x * layout.board.cellSize,
 						y: layout.board.y + location.position.y * layout.board.cellSize,
@@ -197,10 +169,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						};
 					}
 					const location = readTargetLocationFn(target);
-					const occupant = yield* actorStore.readCanonicalOccupantFx(
-						location,
-						interactionLayer,
-					);
+					const occupant = yield* actorStore.readCanonicalOccupantFx(location);
 					return {
 						commandTarget: {
 							kind: "slot" as const,
@@ -215,7 +184,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						},
 						occupant,
 						stableKey: JSON.stringify([
-							interactionLayer,
 							layoutRevision,
 							location.scope,
 							location.scope === LocationScopeEnumSchema.enum.Board
@@ -334,24 +302,14 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			};
 
 			return {
-				readInteractionLayerFx: Effect.sync(() => interactionLayer),
-				setInteractionLayerFx: Effect.fn("MainSurface.setInteractionLayerFx")((nextLayer) =>
-					Effect.gen(function* () {
-						if (closed || interactionLayer === nextLayer) return;
-						interactionLayer = nextLayer;
-						yield* contentOpacity.setTargetFx(nextLayer === "ground" ? 0.16 : 1);
-					}),
-				),
 				transientActorLayer,
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
-					RendererRuntime.runSync(contentOpacity.closeFx);
 					for (const displayObject of [
 						transientActorLayer,
 						toolbarActorLayer,
 						boardActorLayer,
-						groundActorLayer,
 						toolbarMask,
 						boardMask,
 						gridLayer,
@@ -363,23 +321,20 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					}
 				}),
 				readActorPoseFx: Effect.fn("MainSurface.readActorPoseFx")((item) =>
-					Effect.sync(() => readLocationPoseFn(item.location, item.layer)),
+					Effect.sync(() => readLocationPoseFn(item.location)),
 				),
 				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
 					readTargetFactsFromTargetFx(readDropTargetFn(x, y)),
 				),
-				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location, layer) =>
-					Effect.sync(() => readLocationPoseFn(location, layer)),
+				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
+					Effect.sync(() => readLocationPoseFn(location)),
 				),
 				readLocalActorIdsFx: Effect.fn("MainSurface.readLocalActorIdsFx")((bounds) =>
 					Effect.gen(function* () {
 						const locations: TileActorItem["location"][] = [];
 						appendIntersectingLocationsFn(locations, layout.board, bounds);
 						appendIntersectingLocationsFn(locations, layout.toolbar, bounds);
-						const occupants = yield* actorStore.readCanonicalOccupantsFx(
-							locations,
-							interactionLayer,
-						);
+						const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
 						return occupants
 							.filter(({ id }) => id !== bounds.excludeActorId)
 							.map(({ id }) => id);
@@ -454,6 +409,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						latestTransition = transition;
 					}),
 				),
-			} satisfies MainSurface;
+			};
 		}),
 );

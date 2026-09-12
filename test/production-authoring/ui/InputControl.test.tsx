@@ -111,7 +111,6 @@ const createSearchItem = (id: string, charged: boolean) =>
 				`asset:${id}`,
 			],
 		},
-		layer: "content",
 		scope: "any",
 		maxStackSize: 1,
 		...(charged

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { Container } from "pixi.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
+import { describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -20,7 +19,6 @@ interface FakeDisplayObject {
 
 vi.mock("pixi.js", () => {
 	class Container {
-		alpha = 1;
 		readonly children: Container[] = [];
 		destroyCalls = 0;
 		destroyed = false;
@@ -81,31 +79,6 @@ vi.mock("pixi.js", () => {
 	};
 });
 
-const springs: {
-	props: Parameters<AnimationDriver["createSpringFx"]>[0];
-	setTarget: ReturnType<typeof vi.fn>;
-	close: ReturnType<typeof vi.fn>;
-}[] = [];
-const animationDriver = {
-	createSpringFx: (props: Parameters<AnimationDriver["createSpringFx"]>[0]) =>
-		Effect.sync(() => {
-			const setTarget = vi.fn();
-			const close = vi.fn();
-			springs.push({
-				props,
-				setTarget,
-				close,
-			});
-			return {
-				setTargetFx: (value: number) => Effect.sync(() => setTarget(value)),
-				closeFx: Effect.sync(close),
-			};
-		}),
-} as AnimationDriver;
-beforeEach(() => {
-	springs.length = 0;
-});
-
 const palette = {
 	accent: 0x00ff00,
 	danger: 0xff0000,
@@ -152,7 +125,6 @@ const item = (
 	id,
 	itemId: id,
 	itemType: "simple",
-	layer: "content",
 	location,
 	primaryAction: {
 		kind: "none",
@@ -176,10 +148,6 @@ describe("main surface", () => {
 				y: 0,
 			},
 		});
-		const ground = {
-			...item("runtime:ground", boardFirst.location),
-			layer: "ground" as const,
-		};
 		const boardSecond = item("runtime:board-second", {
 			scope: "board",
 			space: 0,
@@ -209,7 +177,6 @@ describe("main surface", () => {
 				boardFar,
 				toolbarItem,
 				boardFirst,
-				ground,
 			]),
 		);
 		const stage = new Container();
@@ -229,7 +196,6 @@ describe("main surface", () => {
 		} as unknown as PixiApplicationOwner;
 		const surface = Effect.runSync(
 			createMainSurfaceFx({
-				animationDriver,
 				actorStore,
 				application,
 				dropFeedback: {
@@ -243,16 +209,6 @@ describe("main surface", () => {
 		);
 		const firstPose = Effect.runSync(surface.readActorPoseFx(boardFirst));
 		if (firstPose === null) throw new Error("Expected Board pose.");
-		const groundPose = Effect.runSync(surface.readActorPoseFx(ground));
-		if (groundPose === null) throw new Error("Expected ground pose.");
-		expect(groundPose).toMatchObject({
-			x: firstPose.x,
-			y: firstPose.y,
-			size: firstPose.size,
-		});
-		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
-			stage.children.indexOf(firstPose.layer),
-		);
 
 		const firstFacts = Effect.runSync(
 			surface.readTargetFactsFx(
@@ -275,52 +231,6 @@ describe("main surface", () => {
 			},
 		});
 
-		Effect.runSync(surface.setInteractionLayerFx("ground"));
-		expect(
-			Effect.runSync(surface.readTargetFactsFx(firstPose.x + 1, firstPose.y + 1)).occupant,
-		).toBe(ground);
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					x: firstPose.x,
-					y: firstPose.y,
-					width: firstPose.size,
-					height: firstPose.size,
-				}),
-			),
-		).toEqual([
-			ground.id,
-		]);
-		const opacity = springs[0]!;
-		const dimmedOpacity = opacity.setTarget.mock.calls[0]![0] as number;
-		expect(dimmedOpacity).toBeGreaterThan(0);
-		expect(dimmedOpacity).toBeLessThan(1);
-		opacity.props.onUpdateFn(dimmedOpacity);
-		expect(groundPose.layer.alpha).toBe(1);
-		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
-			stage.children.indexOf(firstPose.layer),
-		);
-		Effect.runSync(surface.setInteractionLayerFx("content"));
-		expect(opacity.setTarget).toHaveBeenLastCalledWith(1);
-		expect(firstPose.layer.alpha).toBe(dimmedOpacity);
-		opacity.props.onUpdateFn(0.5);
-		Effect.runSync(surface.setInteractionLayerFx("ground"));
-		expect(opacity.setTarget).toHaveBeenLastCalledWith(dimmedOpacity);
-		expect(firstPose.layer.alpha).toBe(0.5);
-		Effect.runSync(surface.setInteractionLayerFx("content"));
-		expect(firstPose.layer.alpha).toBe(0.5);
-		expect(springs).toHaveLength(1);
-		expect(opacity.close).not.toHaveBeenCalled();
-		expect(groundPose.layer.alpha).toBe(1);
-		expect(stage.children.indexOf(groundPose.layer)).toBeLessThan(
-			stage.children.indexOf(firstPose.layer),
-		);
-		expect(
-			Effect.runSync(surface.readTargetFactsFx(firstPose.x + 1, firstPose.y + 1)).occupant,
-		).toBe(boardFirst);
-		opacity.props.onUpdateFn(1);
-		expect(firstPose.layer.alpha).toBe(1);
-
 		const revisedFirst = {
 			...boardFirst,
 			quantity: 3,
@@ -332,7 +242,6 @@ describe("main surface", () => {
 				boardFar,
 				toolbarItem,
 				revisedFirst,
-				ground,
 			]),
 		);
 		const revisedFacts = Effect.runSync(
@@ -430,33 +339,6 @@ describe("main surface", () => {
 		expect(resizedFacts.occupant).toBe(revisedFirst);
 		expect(resizedFacts.stableKey).not.toBe(revisedFacts.stableKey);
 
-		Effect.runSync(
-			actorStore.replaceCanonicalItemsFx([
-				ground,
-				boardSecond,
-			]),
-		);
-		const uncoveredFacts = Effect.runSync(
-			surface.readTargetFactsFx(
-				resizedPose.x + resizedPose.size / 2,
-				resizedPose.y + resizedPose.size / 2,
-			),
-		);
-		expect(uncoveredFacts.occupant).toBe(ground);
-		expect(uncoveredFacts.stableKey).not.toBe(resizedFacts.stableKey);
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					height: resizedPose.size,
-					width: resizedPose.size,
-					x: resizedPose.x,
-					y: resizedPose.y,
-				}),
-			),
-		).toEqual([
-			ground.id,
-		]);
-
 		const nextSpaceItem = item("runtime:next-space", {
 			scope: "board",
 			space: 1,
@@ -511,7 +393,6 @@ describe("main surface", () => {
 		} as unknown as PixiApplicationOwner;
 		const surface = Effect.runSync(
 			createMainSurfaceFx({
-				animationDriver,
 				actorStore: Effect.runSync(createMainActorStoreFx()),
 				application,
 				dropFeedback,
@@ -523,11 +404,8 @@ describe("main surface", () => {
 
 		Effect.runSync(surface.closeFx);
 		Effect.runSync(surface.closeFx);
-		expect(springs[0]!.close).toHaveBeenCalledOnce();
-		Effect.runSync(surface.setInteractionLayerFx("ground"));
-		expect(springs[0]!.setTarget).not.toHaveBeenCalled();
 
-		expect(owned).toHaveLength(10);
+		expect(owned).toHaveLength(9);
 		for (const displayObject of owned) {
 			if (displayObject === dropFeedbackDisplayObject) {
 				expect(displayObject.destroyed).toBe(false);

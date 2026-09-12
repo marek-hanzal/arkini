@@ -39,7 +39,6 @@ const config = GameConfigSchema.parse({
 					"asset:craft",
 				],
 			},
-			layer: "content",
 			scope: "any",
 			maxStackSize: 10,
 			type: "craft",

@@ -18,7 +18,6 @@ export const item = {
 	id: "runtime:log",
 	itemId: "log",
 	itemType: "simple",
-	layer: "content",
 	location: {
 		scope: "board",
 		space: 0,

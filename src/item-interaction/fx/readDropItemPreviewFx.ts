@@ -7,9 +7,6 @@ import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationS
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputStoreFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import { readGridLocationOccupantFn } from "~/item-location/fn/readGridLocationOccupantFn";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
@@ -66,64 +63,8 @@ const storeInputPreviewFn = ({
 	quantity,
 });
 
-const readMovePreviewFx = Effect.fnUntraced(function* ({
-	source,
-	target,
-	runtime,
-}: {
-	readonly source: GridRuntimeItemSchema.Type;
-	readonly target: Extract<
-		DropItemCommand["target"],
-		{
-			kind: "slot";
-		}
-	>;
-	readonly runtime: RuntimeSchema.Type;
-}) {
-	const claim = readGridLocationClaimAtFn({
-		layer: source.item.layer,
-		claims: readGridLocationClaimsFn({
-			runtime,
-		}).filter((candidate) => candidate.itemId !== source.id),
-		location: target.location,
-	});
-	if (claim !== undefined) {
-		return rejectedFn(DropItemRejectedReason.Occupied);
-	}
-	if (
-		!isItemLocationScopeAllowedFn({
-			item: source.item,
-			locationScope: target.location.scope,
-		})
-	) {
-		return rejectedFn(DropItemRejectedReason.InvalidTarget);
-	}
-	const config = yield* GameConfigFx;
-	const targetSize = match(target.location.scope)
-		.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
-		.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
-		.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
-			width: config.meta.toolbarSize ?? 0,
-			height: 1,
-		}))
-		.exhaustive();
-	if (
-		target.location.position.x >= targetSize.width ||
-		target.location.position.y >= targetSize.height
-	) {
-		return rejectedFn(DropItemRejectedReason.InvalidTarget);
-	}
-	if (target.inputStore !== undefined) {
-		return rejectedFn(DropItemRejectedReason.Blocked);
-	}
-	return {
-		kind: DropItemResultKind.Move,
-	} satisfies readDropItemPreviewFx.Result;
-});
-
 /** Reads the current authoritative semantic kind of one prospective item drop without mutating runtime. */
 export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -160,30 +101,45 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejectedFn(DropItemRejectedReason.StaleSource);
 	}
-	if (
-		readGridLocationOccupantFn({
-			interactionLayer,
-			runtime,
-			location: source.location,
-		})?.id !== source.id
-	) {
-		return rejectedFn(DropItemRejectedReason.InvalidSource);
-	}
 	if (target.occupant === null) {
-		if (
-			readGridLocationOccupantFn({
-				interactionLayer,
+		const claim = readGridLocationClaimAtFn({
+			claims: readGridLocationClaimsFn({
 				runtime,
-				location: target.location,
-			}) !== undefined
-		) {
+			}).filter((candidate) => candidate.itemId !== sourceItemId),
+			location: target.location,
+		});
+		if (claim !== undefined) {
 			return rejectedFn(DropItemRejectedReason.Occupied);
 		}
-		return yield* readMovePreviewFx({
-			source,
-			target,
-			runtime,
-		});
+		if (
+			!isItemLocationScopeAllowedFn({
+				item: source.item,
+				locationScope: target.location.scope,
+			})
+		) {
+			return rejectedFn(DropItemRejectedReason.InvalidTarget);
+		}
+		const config = yield* GameConfigFx;
+		const targetSize = match(target.location.scope)
+			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
+			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
+			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
+				width: config.meta.toolbarSize ?? 0,
+				height: 1,
+			}))
+			.exhaustive();
+		if (
+			target.location.position.x >= targetSize.width ||
+			target.location.position.y >= targetSize.height
+		) {
+			return rejectedFn(DropItemRejectedReason.InvalidTarget);
+		}
+		if (target.inputStore !== undefined) {
+			return rejectedFn(DropItemRejectedReason.Blocked);
+		}
+		return {
+			kind: DropItemResultKind.Move,
+		} satisfies readDropItemPreviewFx.Result;
 	}
 
 	const targetOccupant = target.occupant;
@@ -200,15 +156,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			left: targetItem.location,
 			right: target.location,
 		})
-	) {
-		return rejectedFn(DropItemRejectedReason.StaleTarget);
-	}
-	if (
-		readGridLocationOccupantFn({
-			interactionLayer,
-			runtime,
-			location: targetItem.location,
-		})?.id !== targetItem.id
 	) {
 		return rejectedFn(DropItemRejectedReason.StaleTarget);
 	}
@@ -303,13 +250,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			}),
 		);
 	}
-	if (targetItem.location.scope === "board" && source.item.layer !== targetItem.item.layer) {
-		return yield* readMovePreviewFx({
-			source,
-			target,
-			runtime,
-		});
-	}
 	const sourceScopeAllowed = isItemLocationScopeAllowedFn({
 		item: source.item,
 		locationScope: targetItem.location.scope,
@@ -320,23 +260,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	});
 	if (!sourceScopeAllowed || !targetScopeAllowed) {
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
-	}
-	const claims = readGridLocationClaimsFn({
-		runtime,
-	}).filter((claim) => claim.itemId !== source.id && claim.itemId !== targetItem.id);
-	if (
-		readGridLocationClaimAtFn({
-			claims,
-			location: targetItem.location,
-			layer: source.item.layer,
-		}) !== undefined ||
-		readGridLocationClaimAtFn({
-			claims,
-			location: source.location,
-			layer: targetItem.item.layer,
-		}) !== undefined
-	) {
-		return rejectedFn(DropItemRejectedReason.Occupied);
 	}
 	return {
 		kind: DropItemResultKind.Swap,

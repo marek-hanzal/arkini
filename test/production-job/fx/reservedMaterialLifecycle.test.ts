@@ -22,7 +22,6 @@ const base = (id: string, scope: "any" | "board" = "board") => ({
 			`asset:${id}`,
 		],
 	},
-	layer: "content",
 	scope,
 	maxStackSize: 1,
 });

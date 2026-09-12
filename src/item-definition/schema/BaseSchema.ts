@@ -58,14 +58,6 @@ export const BaseSchema = z
 		 * Part of game state in which this item may be stored.
 		 */
 		scope: StorageSchema.describe("The part of game state in which this item may be stored."),
-		layer: z
-			.enum([
-				"content",
-				"ground",
-			])
-			.describe(
-				"The Board layer occupied by this item. Content covers ground at the same coordinate; both retain their gameplay behavior. Inventory and Toolbar remain single-layer storage.",
-			),
 		/**
 		 * Optional maximum number of this item allowed across the game state.
 		 */

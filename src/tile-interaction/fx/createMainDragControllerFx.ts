@@ -514,11 +514,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (drag.phase === "pressed") {
 			activeDrag = null;
 			const currentActor = actorStore.actors.get(drag.sourceItem.id);
-			if (
-				currentActor === undefined ||
-				RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag)) === null
-			)
-				return;
+			if (currentActor === undefined || currentActor.container.destroyed) return;
 			try {
 				RendererRuntime.runSync(
 					burstFeedbackParticlesFx({
@@ -533,13 +529,9 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
-					if (RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag)) === null)
-						return;
-					return onActivateFn(
-						drag.actor.item,
-						drag.activationIntent,
-						application.app.canvas,
-					);
+					const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
+					if (currentItem === undefined) return;
+					return onActivateFn(currentItem, drag.activationIntent, application.app.canvas);
 				})
 				.catch((cause) => {
 					if (closed) return;
@@ -704,29 +696,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					previewKind: null,
 					running: actor.item.running,
 				});
-				const boundActor = actor;
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
-					// Painter order can lag the layer intent during its fade. Route the hit to
-					// the canonical foreground occupant instead of swallowing a fast Alt+click.
-					const location =
-						actorStore.canonicalItems.get(boundActor.item.id)?.location ??
-						boundActor.item.location;
-					const occupant =
-						location.scope === "board"
-							? RendererRuntime.runSync(
-									actorStore.readCanonicalOccupantFx(
-										location,
-										RendererRuntime.runSync(surface.readInteractionLayerFx),
-									),
-								)
-							: null;
-					const actor =
-						location.scope === "board"
-							? occupant === null
-								? undefined
-								: actorStore.actors.get(occupant.id)
-							: boundActor;
-					if (actor === undefined) return;
 					const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
 					const motionClaim = motionSnapshot.interactionClaimByActorId.get(actor.item.id);
 					const needsMotionHandoff = motionClaim === "handoff";

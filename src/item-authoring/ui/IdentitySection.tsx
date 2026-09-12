@@ -20,17 +20,6 @@ const scopeOptions = [
 	},
 ] as const;
 
-const layerOptions = [
-	{
-		label: "Content",
-		value: "content",
-	},
-	{
-		label: "Ground",
-		value: "ground",
-	},
-] as const;
-
 export const IdentitySection = () => {
 	const { canonicalItem, form } = useFormSession();
 	return (
@@ -69,14 +58,6 @@ export const IdentitySection = () => {
 						)}
 					</form.AppField>
 				)}
-				<form.AppField name="layer">
-					{(field) => (
-						<field.ChoiceField
-							label="Board layer"
-							options={layerOptions}
-						/>
-					)}
-				</form.AppField>
 				{canonicalItem.type === "inventory" ? null : (
 					<form.AppField name="maxCount">
 						{(field) => (

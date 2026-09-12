@@ -36,32 +36,3 @@ export const boardSpaceProject = {
 	},
 	resources: editorTestPayload.resources,
 } satisfies Project;
-
-export const layeredBoardSpaceProject: Project = {
-	...boardSpaceProject,
-	config: {
-		...boardSpaceProject.config,
-		items: {
-			...boardSpaceProject.config.items,
-			path: {
-				...boardSpaceProject.config.items.water!,
-				id: "path",
-				uid: "path",
-				layer: "ground",
-			},
-		},
-		start: {
-			...boardSpaceProject.config.start,
-			board: [
-				...boardSpaceProject.config.start.board,
-				{
-					itemId: "path",
-					quantity: 1,
-					space: 0,
-					x: 0,
-					y: 0,
-				},
-			],
-		},
-	},
-};

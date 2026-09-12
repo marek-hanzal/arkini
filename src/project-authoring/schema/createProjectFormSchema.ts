@@ -122,12 +122,11 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 					],
 				});
 			}
-			const layer = project.config.items[startItem.itemId]?.layer;
-			const key = `${startItem.space}:${layer}:${startItem.x}:${startItem.y}`;
+			const key = `${startItem.space}:${startItem.x}:${startItem.y}`;
 			if (boardLocations.has(key)) {
 				context.addIssue({
 					code: "custom",
-					message: `Initial board slot ${startItem.x}, ${startItem.y} in space ${startItem.space} on layer ${layer} is used more than once.`,
+					message: `Initial board slot ${startItem.x}, ${startItem.y} in space ${startItem.space} is used more than once.`,
 					path,
 				});
 			}

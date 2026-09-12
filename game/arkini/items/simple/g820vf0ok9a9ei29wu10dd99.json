@@ -12,7 +12,6 @@
 			]
 		},
 		"scope": "any",
-		"layer": "content",
 		"maxStackSize": 2,
 		"type": "simple"
 	}

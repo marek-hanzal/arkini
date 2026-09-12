@@ -19,7 +19,6 @@ const simpleItem = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	layer: "content" as const,
 	scope: "any" as const,
 	maxStackSize: 10,
 });
@@ -81,7 +80,6 @@ const producer = ({
 			`asset:${id}`,
 		],
 	},
-	layer: "content" as const,
 	scope: "board" as const,
 	maxStackSize: 1,
 	maxQueueSize: 4,

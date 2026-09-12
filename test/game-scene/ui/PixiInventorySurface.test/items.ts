@@ -4,7 +4,6 @@ export const item = {
 	id: "runtime:water",
 	itemId: "water",
 	itemType: "simple",
-	layer: "content" as const,
 	location: {
 		scope: "inventory",
 		position: {
@@ -27,7 +26,6 @@ export const item = {
 export const spaceItem = {
 	...item,
 	itemType: "space",
-	layer: "content" as const,
 	primaryAction: {
 		currentSpace: 0,
 		kind: "activate-space",

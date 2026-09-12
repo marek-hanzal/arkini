@@ -6,9 +6,6 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
-import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
-import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
@@ -262,25 +259,6 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						runtime,
 						target,
 					});
-					if (
-						readGridLocationClaimAtFn({
-							claims: readGridLocationClaimsFn({
-								runtime,
-							}).filter((claim) => claim.itemId !== target.id),
-							location: target.location,
-							layer: resultItem.layer,
-						}) !== undefined
-					) {
-						return yield* Effect.fail(
-							new PlacementUnavailableError({
-								itemId: resultItem.id,
-								placement: PlacementSchema.enum.Drop,
-								quantity: 1,
-								reason: PlacementUnavailableError.Reason.BoardOriginUnavailable,
-								remainingQuantity: 1,
-							}),
-						);
-					}
 					const replacedTarget = yield* createRuntimeItemFx({
 						id: target.id,
 						item: resultItem,

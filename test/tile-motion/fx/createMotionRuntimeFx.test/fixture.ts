@@ -172,7 +172,6 @@ export const createItem = (
 	id,
 	itemId: id,
 	itemType: "simple",
-	layer: "content" as const,
 	location,
 	primaryAction: {
 		kind: "none",
@@ -369,19 +368,14 @@ export const createSurface = ({
 	transientActorLayer = new Container(),
 }: {
 	readonly readActorPose?: (item: TileActorItem) => ActorPose | null;
-	readonly readLocationPose?: (
-		location: TileActorItem["location"],
-		layer?: TileActorItem["layer"],
-	) => ActorPose | null;
+	readonly readLocationPose?: (location: TileActorItem["location"]) => ActorPose | null;
 	readonly transientActorLayer?: Container;
 } = {}): MainSurface => ({
-	readInteractionLayerFx: Effect.succeed("content"),
-	setInteractionLayerFx: () => Effect.void,
 	closeFx: Effect.void,
 	readActorPoseFx: (item) =>
-		Effect.succeed(readActorPose?.(item) ?? readLocationPose(item.location, item.layer)),
+		Effect.succeed(readActorPose?.(item) ?? readLocationPose(item.location)),
 	readLocalActorIdsFx: () => Effect.succeed([]),
-	readLocationPoseFx: (location, layer) => Effect.succeed(readLocationPose(location, layer)),
+	readLocationPoseFx: (location) => Effect.succeed(readLocationPose(location)),
 	readTargetFactsFx: () =>
 		Effect.succeed({
 			commandTarget: {
@@ -640,10 +634,7 @@ export const createMotionHarness = ({
 		readonly top: number;
 	};
 	readonly canonicalItems?: Map<string, TileActorItem>;
-	readonly readPose?: (
-		location: TileActorItem["location"],
-		layer?: TileActorItem["layer"],
-	) => ActorPose | null;
+	readonly readPose?: (location: TileActorItem["location"]) => ActorPose | null;
 	readonly transientActorLayer?: Container;
 } = {}) => {
 	const actorLayer = new Container();

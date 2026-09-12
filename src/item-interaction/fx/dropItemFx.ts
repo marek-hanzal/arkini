@@ -21,14 +21,12 @@ import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
  * of letting renderer-observed state decide the gameplay outcome.
  */
 export const dropItemFx = Effect.fn("dropItemFx")(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
 	target,
 }: DropItemCommand) {
 	const preflight = yield* readDropItemPreviewFx({
-		interactionLayer,
 		sourceItemId,
 		sourceRevision,
 		sourceLocation,
@@ -60,19 +58,18 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		);
 	}
 
-	if (preflight.kind === DropItemResultKind.Move) {
+	if (target.occupant === null) {
+		if (preflight.kind !== DropItemResultKind.Move) {
+			return yield* Effect.die(
+				new Error(`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`),
+			);
+		}
 		return yield* commitMoveDropFx({
-			interactionLayer,
 			sourceItemId,
 			sourceRevision,
 			sourceLocation,
 			targetLocation: target.location,
 		});
-	}
-	if (target.occupant === null) {
-		return yield* Effect.die(
-			new Error(`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`),
-		);
 	}
 
 	const targetItemId = target.occupant.itemId;
@@ -85,7 +82,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitMergeDropFx({
-					interactionLayer,
 					sourceItemId,
 					sourceRevision,
 					targetItemId,
@@ -98,7 +94,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitStoreInventoryDropFx({
-					interactionLayer,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -113,7 +108,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			(storeInput) =>
 				commitStoreInputDropFx({
-					interactionLayer,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -131,7 +125,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitStackDropFx({
-					interactionLayer,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -146,7 +139,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitSwapDropFx({
-					interactionLayer,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -159,7 +151,12 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			{
 				kind: DropItemResultKind.Move,
 			},
-			() => Effect.die(new Error("Move preview was already dispatched.")),
+			(unexpected) =>
+				Effect.die(
+					new Error(
+						`Occupied drop preview unexpectedly resolved as "${unexpected.kind}".`,
+					),
+				),
 		)
 		.exhaustive();
 });

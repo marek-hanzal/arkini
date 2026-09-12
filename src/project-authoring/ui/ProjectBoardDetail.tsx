@@ -4,12 +4,9 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import type { Project } from "~/project-authoring/type/Project";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 
 export const ProjectBoardDetail = ({ project }: { readonly project: Project }) => {
-	const [selectedLayer, setSelectedLayerFn] = useState<ItemSchema.Type["layer"]>("content");
 	const { board } = project.config.meta;
 	const spaces = [
 		...new Set([
@@ -42,51 +39,28 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 				</DetailSection>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectSpaceDetailCard">
-				<div className="flex flex-wrap items-center gap-4">
-					<SegmentedControl
-						dataUi="EditorProjectBoardLayer"
-						optionDataUi="EditorProjectBoardLayerOption"
-						options={[
-							{
-								label: "Content",
-								value: "content",
-							},
-							{
-								label: "Ground",
-								value: "ground",
-							},
-						]}
-						value={selectedLayer}
-						onChangeFn={setSelectedLayerFn}
-					/>
-					<EditorSearchCombobox
-						displaySelectedLabel
-						emptyLabel="No configured Space matches this search."
-						label="Space"
-						labelVisible={false}
-						options={spaces.map((space) => ({
-							id: String(space),
-							label: `Space · ${space}`,
-							terms: [
-								"Space",
-								String(space),
-							],
-						}))}
-						renderPreviewFn={() => null}
-						value={String(selectedSpace)}
-						onChangeFn={(space) => setRequestedSpaceFn(Number(space))}
-					/>
-				</div>
+				<EditorSearchCombobox
+					displaySelectedLabel
+					emptyLabel="No configured Space matches this search."
+					label="Space"
+					labelVisible={false}
+					options={spaces.map((space) => ({
+						id: String(space),
+						label: `Space · ${space}`,
+						terms: [
+							"Space",
+							String(space),
+						],
+					}))}
+					renderPreviewFn={() => null}
+					value={String(selectedSpace)}
+					onChangeFn={(space) => setRequestedSpaceFn(Number(space))}
+				/>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectSpacePreviewCard">
 				<ProjectStartGrid
 					cells={project.config.start.board
-						.filter(
-							(entry) =>
-								entry.space === selectedSpace &&
-								(project.config.items[entry.itemId]?.layer ?? "content") ===
-									selectedLayer,
-						)
+						.filter((entry) => entry.space === selectedSpace)
 						.map((entry) => ({
 							itemId: entry.itemId,
 							quantity: entry.quantity ?? 1,

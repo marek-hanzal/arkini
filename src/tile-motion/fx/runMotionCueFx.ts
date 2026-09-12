@@ -95,10 +95,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	surface,
 	textures,
 }: runMotionCueFx.Props) {
-	const targetActorId =
-		cue.kind === "spawn" || cue.kind === "swap" ? cue.actorId : cue.targetActorId;
-	const targetItem = actorStore.canonicalItems.get(targetActorId);
-	const target = yield* surface.readLocationPoseFx(cue.targetLocation, targetItem?.layer);
+	const target = yield* surface.readLocationPoseFx(cue.targetLocation);
 	const originActor = actorStore.actors.get(cue.originActorId) ?? null;
 	const origin = yield* readMotionOriginFx({
 		originActor,

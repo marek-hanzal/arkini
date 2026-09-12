@@ -60,6 +60,13 @@ vi.mock("~/ui/ui/Button", () => ({
 		createElement("a", null, children),
 }));
 
+vi.mock("~/ui/ui/LinkButton", async () => {
+	const { ButtonLink } = await import("~/ui/ui/Button");
+	return {
+		LinkButtonLink: ButtonLink,
+	};
+});
+
 import { MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
 
 (
@@ -78,7 +85,7 @@ afterEach(async () => {
 });
 
 describe("MergesDetail", () => {
-	it("opens the matching authored merge in the item form", async () => {
+	it("links preview merges to their authored indices and keeps the complete list reachable", async () => {
 		const item: ItemSchema.Type = {
 			...editorTestConfig.items.water,
 			merge: [
@@ -92,6 +99,14 @@ describe("MergesDetail", () => {
 				},
 				{
 					action: "use",
+					effect: "remove",
+					target: {
+						itemId: "water",
+						type: "item",
+					},
+				},
+				{
+					action: "consume",
 					effect: "remove",
 					target: {
 						itemId: "water",
@@ -115,6 +130,15 @@ describe("MergesDetail", () => {
 			),
 		);
 		expect(links).toHaveLength(2);
+		const more = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorItemMergesMoreCard"] a',
+		);
+		expect(more?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/form/$sectionId");
+		expect(JSON.parse(more?.dataset.params ?? "null")).toEqual({
+			itemUid: item.uid,
+			projectId: project.projectId,
+			sectionId: "merges",
+		});
 		for (const [index, link] of links.entries()) {
 			expect(link.dataset.to).toBe(
 				"/editor/$projectId/editor/items/$itemUid/form/$sectionId",

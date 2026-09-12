@@ -1,13 +1,14 @@
 import { Tx } from "~/translation/ui/Tx";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ArrowUpRight, BatteryCharging, Combine } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BatteryCharging, Combine } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ButtonLink } from "~/ui/ui/Button";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { DetailFact, DetailFacts } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
@@ -137,9 +138,10 @@ const MergeDetail = ({
 	);
 };
 
-/** Presents authored merge interactions or their explicit disabled state. */
+/** Shows two authored merge interactions with access to the complete merge editor. */
 export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
+	const project = useEditorProject();
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			{item.merge === undefined || item.merge.length === 0 ? (
@@ -154,7 +156,7 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				</EditorRootCard>
 			) : (
 				<div className="grid gap-3">
-					{item.merge.map((merge, index) => (
+					{item.merge.slice(0, 2).map((merge, index) => (
 						<MergeDetail
 							key={`${merge.effect}-${index}`}
 							index={index}
@@ -162,6 +164,27 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 							merge={merge}
 						/>
 					))}
+					{item.merge.length > 2 ? (
+						<EditorRootCard dataUi="EditorItemMergesMoreCard">
+							<div className="flex items-center justify-between gap-4 text-sm">
+								<p className="text-muted">
+									{translator.textFn("More entries are available.")}
+								</p>
+								<LinkButtonLink
+									className="inline-flex shrink-0 items-center gap-1.5"
+									to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+									params={{
+										projectId: project.projectId,
+										itemUid: item.uid,
+										sectionId: "merges",
+									}}
+								>
+									{translator.textFn("Show all")}
+									<ArrowRight className="size-4" />
+								</LinkButtonLink>
+							</div>
+						</EditorRootCard>
+					) : null}
 				</div>
 			)}
 		</div>

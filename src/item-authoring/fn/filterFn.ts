@@ -7,22 +7,19 @@ export namespace filterFn {
 	export interface Props {
 		readonly draft: boolean;
 		readonly itemType?: TypeSchema.Type;
-		readonly layer?: ItemSchema.Type["layer"];
 		readonly query: string;
 	}
 }
 
-/** Composes the Editor item collection's draft, layer, type, and fuzzy-search filters. */
+/** Composes the Editor item collection's draft, type, and fuzzy-search filters. */
 export const filterFn = (
 	items: ReadonlyArray<ItemSchema.Type>,
-	{ draft, itemType, layer, query }: filterFn.Props,
+	{ draft, itemType, query }: filterFn.Props,
 ): ReadonlyArray<ItemSchema.Type> =>
 	searchFn(
 		items.filter(
 			(item) =>
-				(!draft || readDraftFn(item)) &&
-				(itemType === undefined || item.type === itemType) &&
-				(layer === undefined || item.layer === layer),
+				(!draft || readDraftFn(item)) && (itemType === undefined || item.type === itemType),
 		),
 		query,
 	);

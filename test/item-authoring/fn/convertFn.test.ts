@@ -31,7 +31,6 @@ describe("convertFn", () => {
 		const craft = {
 			...createItem("craft"),
 			draft: true,
-			layer: "ground" as const,
 		};
 		if (craft.type !== "craft") throw new Error("Expected craft fixture.");
 		const producer = convertFn(craft, "producer");
@@ -44,7 +43,6 @@ describe("convertFn", () => {
 		expect(producer.id).toBe(craft.id);
 		expect(producer.uid).toBe(craft.uid);
 		expect(producer.draft).toBe(true);
-		expect(producer.layer).toBe("ground");
 	});
 
 	it("keeps the first producer line when converted to a single-line type", () => {

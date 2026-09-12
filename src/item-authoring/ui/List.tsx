@@ -5,8 +5,6 @@ import { filterFn } from "~/item-authoring/fn/filterFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemTypeMenu } from "~/item-authoring/ui/ItemTypeMenu";
 import { ListRow } from "~/item-authoring/ui/ListRow";
@@ -20,19 +18,15 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 export const List = ({
 	draft,
 	itemType,
-	layer,
 	onDraftChangeFn,
 	onItemTypeChangeFn,
-	onLayerChangeFn,
 	onQueryChangeFn,
 	query,
 }: {
 	readonly draft: boolean;
 	readonly itemType?: TypeSchema.Type;
-	readonly layer?: ItemSchema.Type["layer"];
 	readonly onDraftChangeFn: (draft: boolean) => void;
 	readonly onItemTypeChangeFn: (itemType: TypeSchema.Type | undefined) => void;
-	readonly onLayerChangeFn: (layer: ItemSchema.Type["layer"] | undefined) => void;
 	readonly onQueryChangeFn: (query: string) => void;
 	readonly query: string;
 }) => {
@@ -53,13 +47,11 @@ export const List = ({
 			filterFn(items, {
 				draft,
 				itemType,
-				layer,
 				query,
 			}),
 		[
 			draft,
 			itemType,
-			layer,
 			items,
 			query,
 		],
@@ -101,27 +93,6 @@ export const List = ({
 							<span>×</span>
 						</button>
 					)}
-					<SegmentedControl<ItemSchema.Type["layer"] | "all">
-						dataUi="EditorItemLayerFilter"
-						optionDataUi="EditorItemLayerFilterOption"
-						size="large"
-						options={[
-							{
-								label: "All",
-								value: "all",
-							},
-							{
-								label: "Content",
-								value: "content",
-							},
-							{
-								label: "Ground",
-								value: "ground",
-							},
-						]}
-						value={layer ?? "all"}
-						onChangeFn={(value) => onLayerChangeFn(value === "all" ? undefined : value)}
-					/>
 					<DraftFilterButton
 						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
 						onClick={() => onDraftChangeFn(!draft)}

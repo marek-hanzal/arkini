@@ -1,4 +1,3 @@
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { GridLocationClaim } from "./readGridLocationClaimsFn";
 import { readGridLocationKeyFn } from "./readGridLocationKeyFn";
@@ -7,15 +6,13 @@ import { readGridLocationKeyFn } from "./readGridLocationKeyFn";
 export const readGridLocationClaimAtFn = ({
 	claims,
 	location,
-	layer,
 }: {
 	readonly claims: ReadonlyArray<GridLocationClaim>;
 	readonly location: GridLocationSchema.Type;
-	readonly layer: ItemSchema.Type["layer"];
 }) => {
-	const key = readGridLocationKeyFn(location, layer);
+	const key = readGridLocationKeyFn(location);
 	for (const claim of claims) {
-		if (readGridLocationKeyFn(claim.location, claim.layer) === key) return claim;
+		if (readGridLocationKeyFn(claim.location) === key) return claim;
 	}
 	return undefined;
 };

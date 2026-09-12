@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -19,8 +18,6 @@ import { projectDropTransferActorFn } from "~/item-interaction/fn/projectDropTra
 import { StackItemsUnavailableError } from "~/item-interaction/error/StackItemsUnavailableError";
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
-import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
-import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 
 interface StackItemsResult {
 	readonly transferredQuantity: PositiveIntegerSchema.Type;
@@ -47,16 +44,6 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 				);
 			}
 
-			yield* assertGridItemExposedFx({
-				interactionLayer: props.interactionLayer,
-				item: resolution.source,
-				runtime,
-			});
-			yield* assertGridItemExposedFx({
-				interactionLayer: props.interactionLayer,
-				item: resolution.target,
-				runtime,
-			});
 			const sourceRemainingQuantity =
 				resolution.source.quantity - resolution.transferredQuantity;
 			const sourceAfter =
@@ -111,7 +98,6 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 
 export namespace commitStackDropFx {
 	export interface Props {
-		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -123,7 +109,6 @@ export namespace commitStackDropFx {
 
 /** Commits one exact pure-stack transfer and normalizes both actor identities. */
 export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -132,7 +117,6 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 	targetLocation,
 }: commitStackDropFx.Props) {
 	return yield* stackItemsFx({
-		interactionLayer,
 		sourceItemId,
 		sourceRevision,
 		sourceLocation,
@@ -177,15 +161,6 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			),
 		),
 		Effect.catchTags({
-			ItemCoveredError: (error) =>
-				Effect.succeed(
-					makeDropActorRejectedResultFn({
-						failedItemId: error.itemId,
-						failure: "invalid-location",
-						sourceItemId,
-						targetItemId,
-					}),
-				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

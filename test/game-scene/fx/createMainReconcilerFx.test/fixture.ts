@@ -160,7 +160,6 @@ export const createItem = (
 	id,
 	itemId: "water",
 	itemType: "simple",
-	layer: "content" as const,
 	location,
 	primaryAction: {
 		kind: "none",
@@ -495,7 +494,6 @@ export const createReconcilerHarness = ({
 	const layer = new Container();
 	const transientActorLayer = new Container();
 	const surface = {
-		readInteractionLayerFx: Effect.succeed("content" as const),
 		readActorPoseFx: () =>
 			Effect.succeed(
 				readPose
@@ -524,9 +522,6 @@ export const createReconcilerHarness = ({
 			actorStore: store,
 			animator: animatorHarness.animator,
 			application: {
-				app: {
-					renderer: {},
-				},
 				frames: {
 					invalidateFx: Effect.sync(invalidate),
 				},

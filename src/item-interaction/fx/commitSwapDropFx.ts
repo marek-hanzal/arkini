@@ -1,6 +1,5 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -20,12 +19,6 @@ import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/item-interaction/fn/makeDropRejectedResultFn";
-import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
-import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
-import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-
-/** A swap cannot overwrite a third occupant or delivery lease in either destination layer. */
-class SwapLocationOccupiedError extends Data.TaggedError("SwapLocationOccupiedError") {}
 
 /** A two-item swap requires two distinct runtime identities. */
 class SwapSameItemError extends Data.TaggedError("SwapSameItemError")<{
@@ -33,7 +26,6 @@ class SwapSameItemError extends Data.TaggedError("SwapSameItemError")<{
 }> {}
 
 interface SwapItemsProps {
-	readonly interactionLayer?: BaseSchema.Type["layer"];
 	readonly firstItemId: IdSchema.Type;
 	readonly firstItemRevision: RevisionSchema.Type;
 	readonly secondItemId: IdSchema.Type;
@@ -46,7 +38,6 @@ interface SwapItemsResult {
 }
 
 const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
-	interactionLayer,
 	firstItemId,
 	firstItemRevision,
 	secondItemId,
@@ -143,33 +134,6 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			yield* assertGridItemExposedFx({
-				interactionLayer,
-				item: first,
-				runtime,
-			});
-			yield* assertGridItemExposedFx({
-				interactionLayer,
-				item: second,
-				runtime,
-			});
-			const claims = readGridLocationClaimsFn({
-				runtime,
-			}).filter((claim) => claim.itemId !== first.id && claim.itemId !== second.id);
-			if (
-				readGridLocationClaimAtFn({
-					claims,
-					location: second.location,
-					layer: first.item.layer,
-				}) !== undefined ||
-				readGridLocationClaimAtFn({
-					claims,
-					location: first.location,
-					layer: second.item.layer,
-				}) !== undefined
-			) {
-				return yield* Effect.fail(new SwapLocationOccupiedError());
-			}
 			const swappedFirst = yield* reviseRuntimeItemFx({
 				item: {
 					...first,
@@ -202,7 +166,6 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 
 export namespace commitSwapDropFx {
 	export interface Props {
-		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -214,7 +177,6 @@ export namespace commitSwapDropFx {
 
 /** Commits one exact grid swap and normalizes both actor identities. */
 export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -223,7 +185,6 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 	targetLocation,
 }: commitSwapDropFx.Props) {
 	return yield* swapItemsFx({
-		interactionLayer,
 		firstItemId: sourceItemId,
 		firstItemRevision: sourceRevision,
 		secondItemId: targetItemId,
@@ -247,23 +208,6 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 			}),
 		),
 		Effect.catchTags({
-			ItemCoveredError: (error) =>
-				Effect.succeed(
-					makeDropActorRejectedResultFn({
-						failedItemId: error.itemId,
-						failure: "invalid-location",
-						sourceItemId,
-						targetItemId,
-					}),
-				),
-			SwapLocationOccupiedError: () =>
-				Effect.succeed(
-					makeDropRejectedResultFn({
-						reason: DropItemRejectedReason.Occupied,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropActorRejectedResultFn({

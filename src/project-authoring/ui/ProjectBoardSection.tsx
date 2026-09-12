@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValue";
@@ -14,13 +12,12 @@ import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSche
 const MaxEditorSpaceIndex = 31;
 
 export const ProjectBoardSection = () => {
-	const { form, project, validationIssues } = useProjectFormSession();
+	const { form, validationIssues } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.board.width);
 	const height = useStore(form.store, (state) => state.values.board.height);
 	const start = useStore(form.store, (state) => state.values.start);
 	const currentSpace = start.currentSpace;
 	const startBoard = start.board;
-	const [selectedLayer, setSelectedLayerFn] = useState<ItemSchema.Type["layer"]>("content");
 	const [selectedSpace, setSelectedSpaceFn] = useState(currentSpace);
 	const [spaceInput, setSpaceInputFn] = useState(String(currentSpace));
 	const invalidEntries = validationIssues.flatMap((issue) => {
@@ -34,25 +31,15 @@ export const ProjectBoardSection = () => {
 				];
 	});
 	const firstInvalidSpace = invalidEntries[0]?.space;
-	const firstInvalidLayer =
-		invalidEntries[0] === undefined
-			? undefined
-			: (project.config.items[invalidEntries[0].itemId]?.layer ?? "content");
 	useEffect(() => {
 		if (firstInvalidSpace === undefined) return;
 		setSelectedSpaceFn(firstInvalidSpace);
-		setSelectedLayerFn(firstInvalidLayer ?? "content");
 		setSpaceInputFn(String(firstInvalidSpace));
 	}, [
 		firstInvalidSpace,
-		firstInvalidLayer,
 	]);
 	const cells = startBoard
-		.filter(
-			(entry) =>
-				entry.space === selectedSpace &&
-				(project.config.items[entry.itemId]?.layer ?? "content") === selectedLayer,
-		)
+		.filter((entry) => entry.space === selectedSpace)
 		.map((entry) => ({
 			itemId: entry.itemId,
 			quantity: entry.quantity,
@@ -112,41 +99,15 @@ export const ProjectBoardSection = () => {
 								}}
 							/>
 						</label>
-						<div className="h-9 w-px shrink-0 bg-line-strong" />
-						<div className="self-end">
-							<SegmentedControl
-								dataUi="EditorProjectBoardLayer"
-								optionDataUi="EditorProjectBoardLayerOption"
-								options={[
-									{
-										label: "Content",
-										value: "content",
-									},
-									{
-										label: "Ground",
-										value: "ground",
-									},
-								]}
-								value={selectedLayer}
-								onChangeFn={setSelectedLayerFn}
-							/>
-						</div>
 					</div>
 				</EditorFormCard>
 			</EditorFormSection>
-
 			<ProjectStartGrid
-				key={`${selectedSpace}:${selectedLayer}`}
-				layer={selectedLayer}
+				key={selectedSpace}
 				cells={cells}
 				height={height}
 				invalidCells={invalidEntries
-					.filter(
-						(entry) =>
-							entry.space === selectedSpace &&
-							(project.config.items[entry.itemId]?.layer ?? "content") ===
-								selectedLayer,
-					)
+					.filter((entry) => entry.space === selectedSpace)
 					.map(({ x, y }) => ({
 						x,
 						y,
@@ -154,12 +115,7 @@ export const ProjectBoardSection = () => {
 				mode="edit"
 				onCellsChangeFn={(nextCells) =>
 					form.setFieldValue("start.board", [
-						...startBoard.filter(
-							(entry) =>
-								entry.space !== selectedSpace ||
-								(project.config.items[entry.itemId]?.layer ?? "content") !==
-									selectedLayer,
-						),
+						...startBoard.filter((entry) => entry.space !== selectedSpace),
 						...nextCells.map((cell) => ({
 							...cell,
 							space: selectedSpace,

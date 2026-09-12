@@ -18,7 +18,6 @@ export const createSimpleItem = (id: string) =>
 				`asset:${id}`,
 			],
 		},
-		layer: "content",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

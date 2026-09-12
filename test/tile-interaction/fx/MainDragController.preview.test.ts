@@ -10,41 +10,6 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: preview", () => {
-	it("drops cached ground attraction when content covers a still-active magnetic source", () => {
-		const ground = {
-			...createItem("runtime:ground", 1),
-			layer: "ground" as const,
-		};
-		const mounted = mountController({
-			targetItems: [
-				ground,
-			],
-		});
-		previewState.actorKinds.set(ground.id, "merge");
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.flushFrame();
-		expect(mounted.magneticUpdates.at(-1)?.eligibleAttractionActorIds.has(ground.id)).toBe(
-			true,
-		);
-		const previewReads = previewState.readsByActorId.get(ground.id);
-		mounted.canonicalItems.set("runtime:cover", {
-			...item,
-			id: "runtime:cover",
-			location: ground.location,
-		});
-		mounted.setLocalActorIds([]);
-		mounted.setActiveMagneticSourceActorIds([
-			ground.id,
-		]);
-		Effect.runSync(mounted.controller.requestRefreshFx);
-		mounted.flushFrame();
-		expect(mounted.magneticUpdates.at(-1)?.eligibleAttractionActorIds.has(ground.id)).toBe(
-			false,
-		);
-		expect(previewState.readsByActorId.get(ground.id)).toBe(previewReads);
-	});
-
 	it("derives neutral responders from engine previews before attracting the hovered target", () => {
 		const eligible = createItem("runtime:eligible", 1);
 		const invalid = createItem("runtime:invalid", 2);

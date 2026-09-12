@@ -1,6 +1,5 @@
 import { Data, Effect, Option } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
@@ -25,8 +24,6 @@ import { projectDropTransferActorFn } from "~/item-interaction/fn/projectDropTra
 import type { InventoryStoragePlan } from "~/item-interaction/fx/planInventoryStorageFx";
 import { planInventoryStorageFx } from "~/item-interaction/fx/planInventoryStorageFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
-import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
-import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 
 /** One canonical item cannot own a passive Inventory location. */
 class ItemInventoryStorageUnavailableError extends Data.TaggedError(
@@ -156,16 +153,6 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 					}),
 				);
 			}
-			yield* assertGridItemExposedFx({
-				interactionLayer: props.interactionLayer,
-				item: source,
-				runtime,
-			});
-			yield* assertGridItemExposedFx({
-				interactionLayer: props.interactionLayer,
-				item: inventory,
-				runtime,
-			});
 			const plan = yield* planInventoryStorageFx({
 				item: source,
 				runtime,
@@ -193,7 +180,6 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 
 export namespace commitStoreInventoryDropFx {
 	export interface Props {
-		readonly interactionLayer?: BaseSchema.Type["layer"];
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -224,15 +210,6 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 			};
 		}),
 		Effect.catchTags({
-			ItemCoveredError: (error) =>
-				Effect.succeed(
-					makeDropActorRejectedResultFn({
-						failedItemId: error.itemId,
-						failure: "invalid-location",
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

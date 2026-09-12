@@ -116,14 +116,6 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 		) {
 			return null;
 		}
-		if (
-			canonical.location.scope === "board" &&
-			(yield* actorStore.readCanonicalOccupantFx(
-				canonical.location,
-				yield* surface.readInteractionLayerFx,
-			))?.id !== canonical.id
-		)
-			return null;
 		return {
 			...drag.actor.item,
 			location: canonical.location,
@@ -139,16 +131,13 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 			readonly sourceItem: TileActorItem;
 			readonly targetFacts: TargetFacts;
 		}) =>
-			Effect.gen(function* () {
-				return (yield* readTileDropPreviewFx({
-					game,
-					interactionLayer: yield* surface.readInteractionLayerFx,
-					sourceItemId: sourceItem.id,
-					sourceLocation: sourceItem.location,
-					sourceRevision: sourceItem.revision,
-					target: targetFacts.commandTarget,
-				})).kind;
-			}),
+			readTileDropPreviewFx({
+				game,
+				sourceItemId: sourceItem.id,
+				sourceLocation: sourceItem.location,
+				sourceRevision: sourceItem.revision,
+				target: targetFacts.commandTarget,
+			}).pipe(Effect.map(({ kind }) => kind)),
 	);
 
 	const refreshAttractionEligibilityFx = Effect.fn(
@@ -174,15 +163,7 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 			if (actorId === sourceItem.id) continue;
 			const actor = actorStore.actors.get(actorId);
 			const canonical = actorStore.canonicalItems.get(actorId);
-			if (
-				actor === undefined ||
-				actor.container.destroyed ||
-				(canonical?.location.scope === "board" &&
-					(yield* actorStore.readCanonicalOccupantFx(
-						canonical.location,
-						yield* surface.readInteractionLayerFx,
-					))?.id !== canonical.id)
-			) {
+			if (actor === undefined || actor.container.destroyed) {
 				drag.attractionEligibilityByActorId.delete(actorId);
 				continue;
 			}
@@ -211,7 +192,6 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 					? drag.previewKind
 					: (yield* readTileDropPreviewFx({
 							game,
-							interactionLayer: yield* surface.readInteractionLayerFx,
 							sourceItemId: sourceItem.id,
 							sourceLocation: sourceItem.location,
 							sourceRevision: sourceItem.revision,

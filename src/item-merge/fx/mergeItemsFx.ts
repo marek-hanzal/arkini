@@ -1,6 +1,5 @@
 import { Effect, Option, Random } from "effect";
 
-import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -11,7 +10,6 @@ import { applyMergeRuntimeFx } from "~/item-merge/fx/applyMergeRuntimeFx";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { assertGridItemExposedFx } from "~/item-location/fx/assertGridItemExposedFx";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
@@ -68,7 +66,6 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 });
 
 interface MergeItemsProps {
-	readonly interactionLayer?: BaseSchema.Type["layer"];
 	readonly sourceItemId: IdSchema.Type;
 	readonly sourceRevision: RevisionSchema.Type;
 	readonly targetItemId: IdSchema.Type;
@@ -92,7 +89,6 @@ interface MergeItemsResult {
 
 /** Commits one directional merge and returns exact before/after actor identities. */
 export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
-	interactionLayer,
 	sourceItemId,
 	sourceRevision,
 	targetItemId,
@@ -154,16 +150,6 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				);
 			}
 
-			yield* assertGridItemExposedFx({
-				interactionLayer,
-				item: source,
-				runtime,
-			});
-			yield* assertGridItemExposedFx({
-				interactionLayer,
-				item: target,
-				runtime,
-			});
 			const resolved = yield* resolveMergeRuleFx({
 				source,
 				target,

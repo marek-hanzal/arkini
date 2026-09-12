@@ -37,7 +37,6 @@ export const createDraftFn = ({
 			],
 		},
 		scope: "any" as const,
-		layer: "content" as const,
 		maxStackSize: 1,
 	};
 	const lineBase = {

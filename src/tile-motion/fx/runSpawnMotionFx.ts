@@ -95,9 +95,8 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 			const settleFn = () => {
 				magneticProjector.releaseFn();
 				const currentTarget =
-					RendererRuntime.runSync(
-						surface.readLocationPoseFx(cue.targetLocation, actor.item.layer),
-					) ?? target;
+					RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ??
+					target;
 				if (!actor.container.destroyed) {
 					currentTarget.layer.addChild(actor.container);
 				}

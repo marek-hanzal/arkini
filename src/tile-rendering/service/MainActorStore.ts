@@ -12,15 +12,13 @@ export interface MainActorStore {
 	readonly readCanonicalItemFx: (
 		actorId: string,
 	) => Effect.Effect<TileActorItem | null, never, never>;
-	/** Reads the preferred Board layer, falling back to the other; Toolbar stays single-layer. */
+	/** Reads one canonical active-scene anchor without scanning the retained projection. */
 	readonly readCanonicalOccupantFx: (
 		location: TileActorItem["location"],
-		interactionLayer?: TileActorItem["layer"],
 	) => Effect.Effect<TileActorItem | null, never, never>;
-	/** Reads unique visible canonical occupants in caller-provided deterministic slot order. */
+	/** Reads unique canonical occupants in caller-provided deterministic slot order. */
 	readonly readCanonicalOccupantsFx: (
 		locations: ReadonlyArray<TileActorItem["location"]>,
-		interactionLayer?: TileActorItem["layer"],
 	) => Effect.Effect<ReadonlyArray<TileActorItem>, never, never>;
 	readonly releaseActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null, never, never>;
 	readonly replaceCanonicalItemsFx: (

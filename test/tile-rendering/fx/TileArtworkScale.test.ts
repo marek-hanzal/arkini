@@ -30,7 +30,6 @@ const createItemFn = (artworkScale: number): TileActorItem => ({
 	id: "runtime:tile",
 	itemId: "tile",
 	itemType: "simple",
-	layer: "content",
 	location: {
 		scope: "board",
 		space: 0,

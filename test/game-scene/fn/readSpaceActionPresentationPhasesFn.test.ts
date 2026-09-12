@@ -17,7 +17,6 @@ const chargedItem = {
 	},
 	scope: "board",
 	maxStackSize: 1,
-	layer: "content",
 	charges: {
 		amount: 2,
 	},

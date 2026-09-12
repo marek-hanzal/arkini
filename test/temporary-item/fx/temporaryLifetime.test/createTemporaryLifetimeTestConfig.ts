@@ -19,7 +19,6 @@ const baseItem = ({
 			`asset:${id}`,
 		],
 	},
-	layer: "content" as const,
 	scope: "board" as const,
 	maxStackSize,
 	maxCount,

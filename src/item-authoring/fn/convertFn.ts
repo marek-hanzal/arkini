@@ -23,7 +23,6 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 				}),
 		asset: item.asset,
 		scope: item.scope,
-		layer: item.layer,
 		...(item.maxCount === undefined
 			? {}
 			: {

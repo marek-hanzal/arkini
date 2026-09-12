@@ -1,11 +1,9 @@
 import { Effect } from "effect";
-import { Container, RenderTexture, Sprite, Texture, type Renderer } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/AnimationDriver";
 import { createActorAnimatorFx } from "~/tile-rendering/fx/createActorAnimatorFx";
-import { settleActorLayerFx } from "~/tile-rendering/fx/settleActorLayerFx";
 import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
 
 type TweenProps = Parameters<AnimationDriver["startTweenFx"]>[0];
@@ -136,93 +134,6 @@ const createAnimator = () => {
 };
 
 describe("actor animator", () => {
-	it.each([
-		"complete",
-		"move",
-		"retire",
-		"dimmed-content",
-	] as const)(
-		"releases a Board landing snapshot on %s without hiding or duplicating the live actor",
-		(ending) => {
-			const { animator, tweens } = createAnimator();
-			const actor = {
-				...createActor(),
-				container: new Container(),
-			};
-			actor.item = {
-				...actor.item,
-				layer: ending === "dimmed-content" ? "content" : "ground",
-				location: {
-					scope: "board",
-					position: {
-						x: 0,
-						y: 0,
-					},
-					space: 0,
-				},
-			};
-			actor.container.addChild(new Sprite(Texture.WHITE));
-			actor.container.position.set(512, 256);
-			actor.container.scale.set(0.8);
-			actor.container.pivot.set(4, 8);
-			const transient = new Container();
-			const ground = new Container();
-			ground.alpha = ending === "dimmed-content" ? 0.5 : 1;
-			transient.addChild(actor.container);
-			const texture = RenderTexture.create({
-				width: 1,
-				height: 1,
-			});
-			const destroy = vi.spyOn(texture, "destroy");
-			const renderer = {
-				generateTexture: () => texture,
-			} as unknown as Renderer;
-			Effect.runSync(
-				settleActorLayerFx({
-					actor,
-					animator,
-					layer: ground,
-					renderer,
-				}),
-			);
-			const outgoing = transient.children[0]!;
-			expect(ground.children).toEqual([
-				actor.container,
-			]);
-			expect(outgoing.eventMode).toBe("none");
-			expect(outgoing.position).toMatchObject({
-				x: 512,
-				y: 256,
-			});
-			expect(outgoing.scale.x).toBe(0.8);
-			expect(outgoing.pivot).toMatchObject({
-				x: 4,
-				y: 8,
-			});
-			tweens[0]!.update(0.5);
-			expect(outgoing.alpha).toBe(0.5);
-			expect(actor.container.alpha).toBe(1);
-			if (ending === "complete" || ending === "dimmed-content") tweens[0]!.complete();
-			else if (ending === "move")
-				Effect.runSync(
-					animator.setFx({
-						actor,
-						channel: "pose",
-						x: 10,
-						y: 20,
-					}),
-				);
-			else Effect.runSync(animator.cancelActorFx(actor));
-			tweens[0]!.complete();
-			expect(transient.children).toHaveLength(0);
-			expect(destroy).toHaveBeenCalledExactlyOnceWith(true);
-			expect(actor.container.destroyed).toBe(false);
-			actor.container.destroy({
-				children: true,
-			});
-		},
-	);
-
 	it("keeps pose, lifecycle, crowd, and activity-particle channels physically isolated", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();

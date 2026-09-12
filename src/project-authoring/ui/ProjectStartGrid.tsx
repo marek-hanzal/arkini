@@ -34,7 +34,6 @@ interface ProjectStartGridDetailProps extends ProjectStartGridCommonProps {
 }
 
 interface ProjectStartGridEditProps extends ProjectStartGridCommonProps {
-	readonly layer?: ItemSchema.Type["layer"];
 	readonly invalidCells?: ReadonlyArray<ProjectStartGridPosition>;
 	readonly mode: "edit";
 	readonly onCellsChangeFn: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
@@ -362,7 +361,6 @@ const ProjectStartGridEdit = ({
 	cells,
 	height,
 	invalidCells = [],
-	layer,
 	onCellsChangeFn,
 	scope,
 	start,
@@ -448,7 +446,6 @@ const ProjectStartGridEdit = ({
 			/>
 			{pickerCell === undefined ? null : (
 				<ProjectStartItemPicker
-					layer={layer}
 					onCloseFn={() => setPickerCellFn(undefined)}
 					onSelectFn={(itemId) =>
 						changeCellFn(pickerCell, () => ({

@@ -135,7 +135,6 @@ const item: ItemSchema.Type = {
 		],
 	},
 	scope: "any",
-	layer: "content",
 	maxStackSize: 1,
 };
 

@@ -16,7 +16,6 @@ describe("BaseSchema draft status", () => {
 				],
 			},
 			scope: "any",
-			layer: "content",
 			maxStackSize: 1,
 			type: "simple",
 		});

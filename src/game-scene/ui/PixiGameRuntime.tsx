@@ -9,17 +9,12 @@ import {
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import {
-	createBoardLayerControlFx,
-	type BoardLayerControl,
-} from "~/game-scene/fx/createBoardLayerControlFx";
-import {
 	createGameInteractionControlFx,
 	type GameInteractionControl,
 } from "~/tile-interaction/fx/createGameInteractionControlFx";
 import { createTextureStoreFx, type TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 
 interface GameRuntimeCapabilities {
-	readonly boardLayer: BoardLayerControl;
 	readonly interaction: GameInteractionControl;
 	readonly textures: TextureStore;
 }
@@ -34,7 +29,6 @@ const PixiGameRuntimeContext = createContext<GameRuntimeCapabilities | undefined
  * provider generation still uses.
  */
 export const PixiGameProvider = ({ children }: PropsWithChildren) => {
-	const boardLayer = useMemo(() => RendererRuntime.runSync(createBoardLayerControlFx()), []);
 	const interaction = useMemo(
 		() => RendererRuntime.runSync(createGameInteractionControlFx()),
 		[],
@@ -42,12 +36,10 @@ export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 	const textures = useMemo(() => RendererRuntime.runSync(createTextureStoreFx()), []);
 	const capabilities = useMemo(
 		() => ({
-			boardLayer,
 			interaction,
 			textures,
 		}),
 		[
-			boardLayer,
 			interaction,
 			textures,
 		],
@@ -58,7 +50,6 @@ export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 		return () => {
 			queueMicrotask(() => {
 				if (effectGeneration.current !== generation) return;
-				RendererRuntime.runSync(boardLayer.closeFx);
 				RendererRuntime.runSync(interaction.closeFx);
 				void RendererRuntime.runPromise(textures.closeFx).catch((cause) => {
 					console.error("Pixi texture store failed to close.", cause);
@@ -66,7 +57,6 @@ export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 			});
 		};
 	}, [
-		boardLayer,
 		interaction,
 		textures,
 	]);

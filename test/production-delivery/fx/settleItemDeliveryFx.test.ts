@@ -2,7 +2,6 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { settleItemDeliveryFx } from "~test/support/settleItemDeliveryFx";
-import { settleItemDeliveryRuntimeFx } from "~/production-delivery/fx/settleItemDeliveryRuntimeFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
 import { getItemFx } from "~test/support/getItemFx";
@@ -96,92 +95,6 @@ const spawnOwnerAndWaterFx = Effect.gen(function* () {
 });
 
 describe("settleItemDeliveryFx", () => {
-	it("retains a ground origin lease beneath content across hydration and remainder return", () => {
-		const config = GameConfigSchema.parse({
-			...inputRuntimeTestConfig,
-			items: {
-				...inputRuntimeTestConfig.items,
-				water: {
-					...inputRuntimeTestConfig.items.water,
-					layer: "ground",
-				},
-			},
-		});
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerAndWaterFx;
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				yield* spawnItemFx({
-					id: "runtime:cover",
-					itemId: "stone",
-					location: sourceLocation(1),
-					quantity: 1,
-				});
-				const sameLayerConflict = yield* Effect.result(
-					spawnItemFx({
-						id: "runtime:intruder",
-						itemId: "water",
-						location: sourceLocation(1),
-						quantity: 1,
-					}),
-				);
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
-				const hydrated = yield* fromStateFx({
-					state: fromRuntimeFn({
-						runtime: yield* readRuntimeFx(),
-					}),
-				});
-				const [settlement, returned] = yield* settleItemDeliveryRuntimeFx({
-					itemId: "runtime:water",
-					generation: 1,
-					runtime: hydrated,
-				});
-				const restored = yield* fromStateFx({
-					state: fromRuntimeFn({
-						runtime: returned,
-					}),
-				});
-				return {
-					sameLayerConflict,
-					settlement,
-					restored,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.sameLayerConflict)).toBe(true);
-		expect(result.settlement.status).toBe("returned");
-		expect(result.restored.items.find(({ id }) => id === "runtime:water")).toMatchObject({
-			item: {
-				layer: "ground",
-			},
-			location: sourceLocation(1),
-			quantity: 4,
-		});
-		expect(result.restored.items.find(({ id }) => id === "runtime:cover")).toMatchObject({
-			item: {
-				layer: "content",
-			},
-			location: sourceLocation(1),
-			quantity: 1,
-		});
-		expect(
-			result.restored.items
-				.filter(({ location }) => location.scope === "input")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(3);
-	});
-
 	it("stores only on outbound contact and returns the whole stack remainder to its lease", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -400,7 +313,7 @@ describe("settleItemDeliveryFx", () => {
 				});
 				const intruder = yield* spawnItemFx({
 					id: "runtime:mover",
-					itemId: "water",
+					itemId: "stone",
 					location: sourceLocation(2),
 					quantity: 1,
 				});

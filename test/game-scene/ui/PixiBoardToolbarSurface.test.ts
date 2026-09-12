@@ -91,9 +91,6 @@ vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 
 vi.mock("~/game-scene/ui/PixiGameRuntime", () => ({
 	usePixiGameRuntime: () => ({
-		boardLayer: {
-			setGroundHeldFx: () => Effect.void,
-		},
 		interaction: {
 			registerFx: (cancel: () => void) =>
 				Effect.sync(() => {
@@ -182,7 +179,6 @@ describe("PixiBoardToolbarSurface", () => {
 			id: "runtime:producer",
 			itemId: "producer",
 			itemType: "producer",
-			layer: "content" as const,
 			location: {
 				scope: "board",
 				space: 0,
@@ -245,7 +241,6 @@ describe("PixiBoardToolbarSurface", () => {
 			id: "runtime:stack",
 			itemId: "material",
 			itemType: "simple",
-			layer: "content" as const,
 			location: {
 				scope: "board",
 				space: 0,
@@ -285,7 +280,6 @@ describe("PixiBoardToolbarSurface", () => {
 			id: "runtime:producer",
 			itemId: "producer",
 			itemType: "producer",
-			layer: "content" as const,
 			location: {
 				scope: "board",
 				space: 0,
@@ -355,7 +349,6 @@ describe("PixiBoardToolbarSurface", () => {
 			id: "runtime:inventory",
 			itemId: "inventory",
 			itemType: "inventory",
-			layer: "content" as const,
 			location: {
 				scope: "board",
 				space: 0,

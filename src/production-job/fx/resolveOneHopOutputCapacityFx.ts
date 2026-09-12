@@ -90,7 +90,7 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 		const owner = Option.getOrUndefined(narrowLineOwnerItemFn(intermediate));
 		if (owner === undefined) continue;
 		const applicable = readLineOwnerLinesFn(owner).filter(
-			(candidate) => candidate.checkAhead === true && candidate.show && candidate.enable,
+			(candidate) => candidate.ahead === true && candidate.show && candidate.enable,
 		);
 		if (applicable.length === 0) continue;
 		const branchReserved = readOutputConditionalMaximumQuantitiesFn({

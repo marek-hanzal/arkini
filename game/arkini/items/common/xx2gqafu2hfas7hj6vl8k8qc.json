@@ -68,7 +68,7 @@
 					]
 				},
 				"rules": [],
-				"checkAhead": true
+				"ahead": true
 			}
 		]
 	}

@@ -1523,7 +1523,7 @@
 					"description": "The human-readable explanation of this product line's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
 				},
-				"checkAhead": {
+				"ahead": {
 					"description": "When producing this line owner, check whether one future run fits output count limits. Only marked visible, enabled lines participate; one fitting alternative is enough. Checks exactly one hop, without reserving future work.",
 					"type": "boolean"
 				},

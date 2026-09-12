@@ -110,7 +110,7 @@
 						"type": "enable"
 					}
 				],
-				"checkAhead": true
+				"ahead": true
 			}
 		]
 	}

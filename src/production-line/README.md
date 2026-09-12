@@ -91,7 +91,7 @@ Scheduled owners use the same line/default readers and one-intent admission. `it
 - Clearing pending work returns its unused line-input material without cancelling active work.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.
 - Active Jobs reserve the worst possible output quantity; queued requests reserve nothing.
-- Authored `checkAhead` lines opt their produced owner into exactly one downstream output-capacity check. The existing reservation projection accounts for committed intermediates; it does not recurse, schedule future work or reserve speculative output.
+- Authored `ahead` lines opt their produced owner into exactly one downstream output-capacity check. The existing reservation projection accounts for committed intermediates; it does not recurse, schedule future work or reserve speculative output.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.
 - Job, delivery and temporary-item advancement order belongs to Game Tick, not to any production root.

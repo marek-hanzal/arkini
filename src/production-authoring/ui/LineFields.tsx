@@ -60,7 +60,7 @@ export const LineFields = withFieldGroupFn({
 									/>
 								)}
 							</group.AppField>
-							<group.AppField name="checkAhead">
+							<group.AppField name="ahead">
 								{(field) => (
 									<field.BoolToggle
 										checkedIcon={CircleCheck}

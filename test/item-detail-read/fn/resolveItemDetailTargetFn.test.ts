@@ -35,7 +35,7 @@ describe("resolveItemDetailTargetFn", () => {
 				lines: [
 					{
 						...lines[0],
-						checkAhead: true,
+						ahead: true,
 					},
 				],
 				type: "common" as const,

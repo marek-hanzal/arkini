@@ -89,7 +89,7 @@ describe("line check-ahead capacity", () => {
 				blockedLine,
 				{
 					...safeLine,
-					checkAhead: undefined,
+					ahead: undefined,
 				},
 			]),
 		).toMatchObject({
@@ -100,10 +100,10 @@ describe("line check-ahead capacity", () => {
 	it("ignores unmarked, hidden, and disabled lines without using them as escape routes", () => {
 		for (const excluded of [
 			{
-				checkAhead: undefined,
+				ahead: undefined,
 			},
 			{
-				checkAhead: false,
+				ahead: false,
 			},
 			{
 				show: false,

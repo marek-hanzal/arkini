@@ -110,7 +110,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 						materialInput(3),
 						materialInput(3),
 					]),
-					checkAhead: true,
+					ahead: true,
 				},
 			],
 		},

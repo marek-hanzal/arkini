@@ -34,24 +34,7 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 						}) satisfies ItemLineEntrySchema.Type,
 				),
 		)
-		.with(
-			{
-				type: TypeSchema.enum.Deposit,
-			},
-			({ lines }) =>
-				(lines ?? []).map(
-					(line, index) =>
-						({
-							line,
-							path: [
-								"items",
-								itemId,
-								"lines",
-								index,
-							],
-						}) satisfies ItemLineEntrySchema.Type,
-				),
-		)
+
 		.with(
 			{
 				type: P.union(

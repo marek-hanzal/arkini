@@ -17,7 +17,7 @@
 			"amount": 24
 		},
 		"maxQueueSize": 4,
-		"type": "deposit",
+		"type": "producer",
 		"lines": [
 			{
 				"id": "iron-ore",

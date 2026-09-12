@@ -78,29 +78,12 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 							}
 						: {}),
 				};
-			case "deposit":
-				return {
-					...common,
-					type: fallback.type,
-					maxQueueSize:
-						item.type === "deposit" || item.type === "producer" || item.type === "clock"
-							? item.maxQueueSize
-							: fallback.maxQueueSize,
-					...(lines.length === 0
-						? {}
-						: {
-								lines: [
-									lines[0],
-									...lines.slice(1),
-								],
-							}),
-				};
 			case "producer":
 				return {
 					...common,
 					type: fallback.type,
 					maxQueueSize:
-						item.type === "deposit" || item.type === "producer" || item.type === "clock"
+						item.type === "producer" || item.type === "clock"
 							? item.maxQueueSize
 							: fallback.maxQueueSize,
 					lines:

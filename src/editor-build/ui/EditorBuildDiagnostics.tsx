@@ -50,8 +50,8 @@ const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): Readonl
 			return [
 				diagnostic.ownerItemId,
 			];
-		case "deposit:stochastic-softlock":
-		case "deposit:unsustainable":
+		case "charges:stochastic-renewal":
+		case "charges:missing-renewal":
 			return [
 				diagnostic.itemId,
 			];
@@ -83,9 +83,10 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 		case "input:acceptance-cycle":
 		case "line:duplicate-id":
 		case "line:multiple-defaults":
-		case "deposit:stochastic-softlock":
-		case "deposit:unsustainable":
 			return "production";
+		case "charges:stochastic-renewal":
+		case "charges:missing-renewal":
+			return "charges";
 		case "resource:missing":
 			return "artwork";
 		default:

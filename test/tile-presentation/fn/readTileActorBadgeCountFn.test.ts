@@ -35,20 +35,20 @@ describe("tile actor overlay projection", () => {
 			},
 			quantity: 120,
 		});
-		const freshDeposit = runtimeItem({
+		const freshProducer = runtimeItem({
 			item: {
 				charges: {
 					amount: 12,
 				},
-				type: TypeSchema.enum.Deposit,
+				type: TypeSchema.enum.Producer,
 			},
 		});
-		const usedDeposit = runtimeItem({
+		const usedProducer = runtimeItem({
 			item: {
 				charges: {
 					amount: 12,
 				},
-				type: TypeSchema.enum.Deposit,
+				type: TypeSchema.enum.Producer,
 			},
 			remainingCharges: 4,
 		});
@@ -72,8 +72,8 @@ describe("tile actor overlay projection", () => {
 
 		expect(readTileActorBadgeCountFn(single)).toBeUndefined();
 		expect(readTileActorBadgeCountFn(stack)).toBe(120);
-		expect(readTileActorBadgeCountFn(freshDeposit)).toBe(12);
-		expect(readTileActorBadgeCountFn(usedDeposit)).toBe(4);
+		expect(readTileActorBadgeCountFn(freshProducer)).toBe(12);
+		expect(readTileActorBadgeCountFn(usedProducer)).toBe(4);
 		expect(readTileActorBadgeCountFn(freshChargedItem)).toBe(8);
 		expect(readTileActorBadgeCountFn(usedChargedItem)).toBe(3);
 	});

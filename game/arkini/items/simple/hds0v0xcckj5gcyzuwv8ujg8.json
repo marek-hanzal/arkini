@@ -1,14 +1,14 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "fgt515l3fvcj1yqzhmb2xjkb",
-		"id": "clay-deposit",
-		"title": "Clay Deposit",
-		"description": "You can get some clay from here. Brick-mood?",
+		"uid": "hds0v0xcckj5gcyzuwv8ujg8",
+		"id": "stone-deposit",
+		"title": "Stone deposit",
+		"description": "So, next to the wood, we also need some stone to build the prospering civilization. Here you go, you're welcome!",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"clay-source"
+				"stone-source"
 			]
 		},
 		"scope": "any",
@@ -39,7 +39,6 @@
 				]
 			}
 		},
-		"maxQueueSize": 1,
-		"type": "deposit"
+		"type": "simple"
 	}
 }

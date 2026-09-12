@@ -67,32 +67,6 @@ export const validateInputChargesFn = ({ config, provenance }: validateInputChar
 					inputIndex,
 					"charges",
 				];
-				if (
-					input.type === TypeSchema.enum.Deposit &&
-					input.query.distance === DistanceSchema.enum.Self &&
-					input.charges?.from !== ChargeSourceSchema.enum.Self &&
-					item.type !== ItemTypeSchema.enum.Deposit
-				) {
-					diagnostics.push({
-						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
-						severity: DiagnosticSeverityEnumSchema.enum.Error,
-						path: [
-							...path,
-							"input",
-							inputIndex,
-							"query",
-							"distance",
-						],
-						source: provenance.items[itemId],
-						message: `Deposit input ${inputIndex} of action ${actionId} targets self, but owner ${itemId} is ${item.type}, not a deposit.`,
-						ownerItemId: itemId,
-						lineId: actionId,
-						inputIndex,
-						reason: InvalidInputChargesReasonEnumSchema.enum
-							.DepositSelfRequiresDepositOwner,
-					});
-					continue;
-				}
 				if (input.type === TypeSchema.enum.Deposit && input.charges === undefined) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,

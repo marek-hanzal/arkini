@@ -342,7 +342,7 @@ export const InputControl = ({
 				label="Input type"
 				description={
 					allowMaterials
-						? "Simple explicitly requires no consumable resource. Materials consume or reserve an item, while Deposit targets a matching board deposit."
+						? "Simple explicitly requires no consumable resource. Materials consume or reserve an item, while Deposit spends charges from a matching board item."
 						: "Simple adds no external item requirement. Deposit targets a matching item on the current board."
 				}
 				value={input.type}

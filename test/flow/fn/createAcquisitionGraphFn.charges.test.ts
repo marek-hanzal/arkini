@@ -413,7 +413,7 @@ describe("createAcquisitionGraphFn", () => {
 				}),
 			]),
 		);
-		expect(result.diagnostics).toEqual([]);
+		expect(result.diagnostics.filter(({ severity }) => severity === "error")).toEqual([]);
 		if (result.config === undefined) throw new Error("Expected validator-valid config.");
 
 		const graph = createAcquisitionGraphFn(result.config);

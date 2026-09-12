@@ -6,11 +6,11 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
-export const LimitedDepositWarningDiagnosticSchema = z
+export const MissingChargeRenewalWarningDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
 		code: DiagnosticCodeEnumSchema.extract([
-			"DepositUnsustainable",
+			"ChargeRenewalMissing",
 		]),
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Warning",
@@ -19,12 +19,13 @@ export const LimitedDepositWarningDiagnosticSchema = z
 	})
 	.strict()
 	.meta({
-		id: "LimitedDepositWarningDiagnosticSchema",
-		description: "A finite deposit has no configured output path that recreates it.",
+		id: "MissingChargeRenewalWarningDiagnosticSchema",
+		description: "A charged item has no configured output path that recreates it.",
 	});
 
-export type LimitedDepositWarningDiagnosticSchema = typeof LimitedDepositWarningDiagnosticSchema;
+export type MissingChargeRenewalWarningDiagnosticSchema =
+	typeof MissingChargeRenewalWarningDiagnosticSchema;
 
-export namespace LimitedDepositWarningDiagnosticSchema {
-	export type Type = z.infer<LimitedDepositWarningDiagnosticSchema>;
+export namespace MissingChargeRenewalWarningDiagnosticSchema {
+	export type Type = z.infer<MissingChargeRenewalWarningDiagnosticSchema>;
 }

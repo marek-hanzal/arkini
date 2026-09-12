@@ -16,7 +16,7 @@ export const DiagnosticCodeEnumSchema = z
 		SourceSchemaInvalid: "source:schema-invalid",
 		InputChargesInvalid: "input:charges-invalid",
 		MergeInvalid: "merge:invalid",
-		DepositStochasticSoftlock: "deposit:stochastic-softlock",
+		ChargeRenewalStochastic: "charges:stochastic-renewal",
 		InputAcceptanceCycle: "input:acceptance-cycle",
 		SourceSchemaReferenceConflict: "source:schema-reference-conflict",
 		ConfigSchema: "config:schema",
@@ -24,7 +24,7 @@ export const DiagnosticCodeEnumSchema = z
 		LineDuplicateId: "line:duplicate-id",
 		LineMultipleDefaults: "line:multiple-defaults",
 		ConfigKeyIdMismatch: "config:key-id-mismatch",
-		DepositUnsustainable: "deposit:unsustainable",
+		ChargeRenewalMissing: "charges:missing-renewal",
 	})
 	.meta({
 		id: "DiagnosticCodeEnumSchema",

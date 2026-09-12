@@ -393,7 +393,7 @@ export const chargesConfig = GameConfigSchema.parse({
 			...base({
 				id: "deposit:self-well",
 			}),
-			type: "deposit",
+			type: "producer",
 			charges: {
 				amount: 2,
 			},
@@ -431,7 +431,7 @@ export const chargesConfig = GameConfigSchema.parse({
 				id: "deposit:tree",
 				maxStackSize: 3,
 			}),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 2,
 			},
@@ -441,7 +441,7 @@ export const chargesConfig = GameConfigSchema.parse({
 				id: "deposit:sapling",
 				maxStackSize: 3,
 			}),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 1,
 				output: output("item:seed"),
@@ -451,7 +451,7 @@ export const chargesConfig = GameConfigSchema.parse({
 			...base({
 				id: "deposit:capped-sapling",
 			}),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 1,
 				output: output("item:capped-seed"),
@@ -461,7 +461,7 @@ export const chargesConfig = GameConfigSchema.parse({
 			...base({
 				id: "deposit:empty",
 			}),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 1,
 			},
@@ -470,7 +470,7 @@ export const chargesConfig = GameConfigSchema.parse({
 			...base({
 				id: "deposit:messy",
 			}),
-			type: "deposit",
+			type: "simple",
 			charges: {
 				amount: 1,
 				output: output("item:seed", "item:trash"),

@@ -5,7 +5,6 @@ import { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";
-import { DepositSchema } from "~/item-definition/schema/DepositSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
 import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
@@ -39,7 +38,6 @@ const editItemInputSchemaIds = {
 	clock: "urn:arkini:schema:mcp:edit-clock-item-input",
 	craft: "urn:arkini:schema:mcp:edit-craft-item-input",
 	blueprint: "urn:arkini:schema:mcp:edit-blueprint-item-input",
-	deposit: "urn:arkini:schema:mcp:edit-deposit-item-input",
 	stash: "urn:arkini:schema:mcp:edit-stash-item-input",
 	temporary: "urn:arkini:schema:mcp:edit-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:edit-inventory-item-input",
@@ -101,19 +99,6 @@ const blueprintPatch = requireReplacementFn(
 ).meta({
 	id: "BlueprintItemPatchSchema",
 	description: "Top-level replacements accepted for an existing blueprint item.",
-});
-const depositPatch = requireReplacementFn(
-	DepositSchema.omit(immutableItemFields)
-		.partial()
-		.extend({
-			...nullableBaseItemFields,
-			lines: DepositSchema.shape.lines.nullable(),
-			maxQueueSize: DepositSchema.shape.maxQueueSize.removeDefault().optional(),
-		})
-		.strict(),
-).meta({
-	id: "DepositItemPatchSchema",
-	description: "Top-level replacements accepted for an existing deposit item.",
 });
 const stashPatch = requireReplacementFn(
 	StashSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
@@ -218,11 +203,6 @@ export const EditItemInputSchemas = {
 		schemaId: editItemInputSchemaIds.blueprint,
 		title: "Edit blueprint item tool input",
 		description: "Identity, revision, and replacement patch for one blueprint item.",
-	}),
-	deposit: editItemInputFn(depositPatch, {
-		schemaId: editItemInputSchemaIds.deposit,
-		title: "Edit deposit item tool input",
-		description: "Identity, revision, and replacement patch for one deposit item.",
 	}),
 	stash: editItemInputFn(stashPatch, {
 		schemaId: editItemInputSchemaIds.stash,

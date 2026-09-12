@@ -1,4 +1,4 @@
-import { CircleCheck, CircleX, Factory, PackagePlus } from "lucide-react";
+import { CircleCheck, CircleX, PackagePlus } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -7,7 +7,6 @@ import { LineFields } from "~/production-authoring/ui/LineFields";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
-import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -27,7 +26,7 @@ const ProductionFields = withFieldGroupFn({
 	defaultValues: defaultProductionFieldValues,
 	props: {
 		invalidLineIndex: undefined as number | undefined,
-		kind: "producer" as "deposit" | "producer" | "clock",
+		kind: "producer" as "producer" | "clock",
 		ownerId: "",
 		selectedLineId: undefined as string | undefined,
 	},
@@ -38,19 +37,15 @@ const ProductionFields = withFieldGroupFn({
 					{(field) => (
 						<field.NumberField
 							label="Maximum parallel jobs"
-							description="Maximum number of jobs this item may run concurrently across its production lines."
+							description="Maximum accepted work count across this item’s production lines: one active job plus queued requests."
 							min={1}
 						/>
 					)}
 				</group.AppField>
 			</EditorFormCard>
 			<EditorFormSectionDivider
-				description={
-					kind === "deposit"
-						? "Optional self-consuming jobs exposed by this deposit. Each production line is an independent job contract with its own inputs, output, runtime and rules."
-						: "Each product line is an independent job contract owned by this item, with its own inputs, output, runtime and rules."
-				}
-				title={kind === "deposit" ? "Production lines" : "Product lines"}
+				description="Each product line is an independent job contract owned by this item, with its own inputs, output, runtime and rules."
+				title="Product lines"
 			/>
 			<group.AppField
 				name="lines"
@@ -92,18 +87,6 @@ const ProductionFields = withFieldGroupFn({
 						}
 						linesField.pushValue(line);
 					};
-					if (kind === "deposit" && lines.length === 0)
-						return (
-							<div>
-								<EditorCapabilityStatus
-									actionLabel="Enable production lines"
-									description="This deposit currently only supplies matching deposit inputs. Production lines add self-consuming jobs that can transform the deposit and emit outputs."
-									icon={Factory}
-									onEnableFn={addLineFn}
-									title="Production lines are disabled"
-								/>
-							</div>
-						);
 					return (
 						<EditorCollectionSelector
 							addLabel="Add line"
@@ -122,19 +105,13 @@ const ProductionFields = withFieldGroupFn({
 								lines.findIndex((line) => line.id === selectedLineId),
 							)}
 							selectedIndex={invalidLineIndex}
-							label={`${kind === "deposit" ? "Production" : "Product"} lines`}
+							label="Product lines"
 							navigationCard
 							onAddFn={addLineFn}
 							onRemoveFn={
-								kind !== "deposit" && lines.length === 1
+								lines.length === 1
 									? undefined
-									: (index) => {
-											if (kind === "deposit" && lines.length === 1) {
-												group.setFieldValue("lines", undefined);
-												return;
-											}
-											linesField.removeValue(index);
-										}
+									: (index) => linesField.removeValue(index)
 							}
 							removeLabel="Remove line"
 						>
@@ -262,24 +239,6 @@ export const ProductionSection = () => {
 		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
 	const content = match(canonicalItem)
-		.with(
-			{
-				type: "deposit",
-			},
-			() => (
-				<ProductionFields
-					form={form}
-					fields={{
-						maxQueueSize: "maxQueueSize",
-						lines: "lines",
-					}}
-					kind="deposit"
-					invalidLineIndex={invalidLineIndex}
-					ownerId={itemId}
-					selectedLineId={productionLineId}
-				/>
-			),
-		)
 		.with(
 			{
 				type: "producer",

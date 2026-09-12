@@ -85,7 +85,8 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
 - positive extra material capacity is supported for Producer and Clock lines;
-- `self` charge costs use the line owner, while `target` is valid only for a deposit input and its deterministic Board payer;
+- `charges` defines finite item use independently of item type: passive resources use Simple and resources with production lines use Producer or Clock;
+- `self` charge costs use the line owner, while `target` is valid only for a deposit input and its deterministic Board payer (including a charged owner selected at self distance);
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode;
 - directional merge rules belong to the source item and never imply a reverse rule;
 - Clock composes ordinary non-empty `lines`, `maxQueueSize`, Default selection and `onExpire` Output with `intervalMs`, optional `durationMs`, optional enable/disable `rules`, and `control` (`automatic-only` by default). Its authored `enable` defaults to true; no duration means unlimited active lifetime. The interactive manual switch is runtime/save state, not an authored rule override;
@@ -95,7 +96,7 @@ Do not repeat field catalogs in prose or weaken a schema to silence malformed da
 
 ## Validation
 
-Validation extends beyond Zod shape parsing. It owns source/path identity, duplicate providers and records, reference integrity, semantic relationships/cycles, charge payer and affordability constraints, scope/capability compatibility, resource existence/usage, completed config, and other runtime preconditions. Diagnostics preserve source and entity provenance.
+Validation extends beyond Zod shape parsing. It owns source/path identity, duplicate providers and records, reference integrity, semantic relationships/cycles, charge payer and affordability constraints, scope/capability compatibility, resource existence/usage, completed config, and other runtime preconditions. Diagnostics preserve source and entity provenance. Charged items without a configured recreation path, or with only stochastic recreation, receive non-blocking charge-renewal warnings regardless of item type.
 
 The compiler must reject an invalid project without producing a usable artifact.
 

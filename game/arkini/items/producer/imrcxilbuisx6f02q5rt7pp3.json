@@ -1,20 +1,20 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "m4j4yf9w0vdxvczjpmi0ruhv",
-		"id": "copper-mine",
-		"title": "Copper Mine",
-		"description": "Source of the raw copper",
+		"uid": "imrcxilbuisx6f02q5rt7pp3",
+		"id": "grain-field",
+		"title": "Grain Field",
+		"description": "A field. Of grain.",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"copper-mine"
+				"grain-field"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
 		"charges": {
-			"amount": 32,
+			"amount": 16,
 			"output": {
 				"set": [
 					{
@@ -24,7 +24,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "empty-mine",
+										"itemId": "empty-grain-field",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -39,17 +39,17 @@
 				]
 			}
 		},
-		"maxQueueSize": 1,
-		"type": "deposit",
+		"maxQueueSize": 4,
+		"type": "producer",
 		"lines": [
 			{
-				"id": "copper-ore",
-				"title": "Copper Ore",
-				"description": "Copper ore",
+				"id": "grain",
+				"title": "Grain",
+				"description": "Get some grain. You can eat it if you want.",
 				"default": true,
 				"show": true,
-				"enable": true,
-				"runtimeMs": 28000,
+				"enable": false,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"charges": {
@@ -60,11 +60,24 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "copper-mine"
+								"itemId": "grain-field"
 							},
 							"scope": "board",
 							"distance": "self"
 						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
 					}
 				],
 				"output": {
@@ -76,10 +89,10 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "copper-ore",
+											"itemId": "grain",
 											"quantity": {
-												"min": 1,
-												"max": 1
+												"min": 2,
+												"max": 4
 											},
 											"placement": "drop",
 											"rules": []
@@ -90,7 +103,25 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"hint": "If you want running field, it must be next to the farm.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
 			}
 		]
 	}

@@ -35,7 +35,6 @@ const itemTypes = [
 	"clock",
 	"craft",
 	"blueprint",
-	"deposit",
 	"stash",
 	"temporary",
 	"inventory",

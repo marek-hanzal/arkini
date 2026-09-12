@@ -1,20 +1,20 @@
 {
 	"$schema": "../../schema.json",
 	"item": {
-		"uid": "sy01gwgqbum87oa96usrv67x",
-		"id": "cotton-field",
-		"title": "Cotton Field",
-		"description": "Grows cotton",
+		"uid": "m4j4yf9w0vdxvczjpmi0ruhv",
+		"id": "copper-mine",
+		"title": "Copper Mine",
+		"description": "Source of the raw copper",
 		"asset": {
 			"scale": 1,
 			"default": [
-				"cotton-field"
+				"copper-mine"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
 		"charges": {
-			"amount": 24,
+			"amount": 32,
 			"output": {
 				"set": [
 					{
@@ -24,7 +24,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "empty-cotton-field",
+										"itemId": "empty-mine",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -39,31 +39,18 @@
 				]
 			}
 		},
-		"maxQueueSize": 4,
-		"type": "deposit",
+		"maxQueueSize": 1,
+		"type": "producer",
 		"lines": [
 			{
-				"id": "cotton",
-				"title": "Cotton",
-				"description": "Cotton",
+				"id": "copper-ore",
+				"title": "Copper Ore",
+				"description": "Copper ore",
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 24000,
+				"runtimeMs": 28000,
 				"input": [
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "water"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
 					{
 						"charges": {
 							"cost": 1,
@@ -73,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "cotton-field"
+								"itemId": "copper-mine"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -89,10 +76,10 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "cotton",
+											"itemId": "copper-ore",
 											"quantity": {
 												"min": 1,
-												"max": 3
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

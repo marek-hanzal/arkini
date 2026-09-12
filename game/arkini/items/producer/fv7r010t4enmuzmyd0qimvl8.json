@@ -40,7 +40,7 @@
 			}
 		},
 		"maxQueueSize": 8,
-		"type": "deposit",
+		"type": "producer",
 		"lines": [
 			{
 				"id": "emerald",

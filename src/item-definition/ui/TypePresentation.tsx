@@ -5,7 +5,6 @@ import {
 	Factory,
 	Hammer,
 	MapPinned,
-	Mountain,
 	PackageOpen,
 	ScrollText,
 	Timer,
@@ -24,9 +23,6 @@ const presentations = {
 	},
 	craft: {
 		icon: Hammer,
-	},
-	deposit: {
-		icon: Mountain,
 	},
 	inventory: {
 		icon: Backpack,

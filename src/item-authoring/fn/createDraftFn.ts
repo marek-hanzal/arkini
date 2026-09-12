@@ -81,11 +81,6 @@ export const createDraftFn = ({
 			maxStackSize: 1,
 			durationMs: 300_000,
 		}))
-		.with("deposit", (matchedType) => ({
-			...base,
-			type: matchedType,
-			maxQueueSize: 1,
-		}))
 		.with("producer", (matchedType) => ({
 			...base,
 			type: matchedType,

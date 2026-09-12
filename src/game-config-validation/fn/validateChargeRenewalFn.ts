@@ -6,7 +6,6 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
-import { TypeSchema as ItemTypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
@@ -15,7 +14,7 @@ import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
 
 type OutputRecreationCertainty = "guaranteed" | "stochastic" | "none";
 
-export namespace validateLimitedDepositsFn {
+export namespace validateChargeRenewalFn {
 	export interface Props {
 		config: GameConfigSchema.Type;
 		provenance: GameSourceProvenanceSchema.Type;
@@ -92,11 +91,8 @@ const strongerCertaintyFn = (
 	return "none";
 };
 
-/** Warns when a finite deposit lacks a deterministic configured recreation path. */
-export const validateLimitedDepositsFn = ({
-	config,
-	provenance,
-}: validateLimitedDepositsFn.Props) => {
+/** Warns when a charged item lacks a deterministic configured recreation path. */
+export const validateChargeRenewalFn = ({ config, provenance }: validateChargeRenewalFn.Props) => {
 	const certainty = new Map<IdSchema.Type, OutputRecreationCertainty>();
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
@@ -109,12 +105,12 @@ export const validateLimitedDepositsFn = ({
 			item,
 		});
 		for (const { output } of outputs) {
-			for (const depositId of Object.keys(config.items)) {
-				if (config.items[depositId]?.type !== ItemTypeSchema.enum.Deposit) continue;
-				const outputCertainty = readOutputRecreationCertaintyFn(output, depositId);
+			for (const chargedItemId of Object.keys(config.items)) {
+				if (config.items[chargedItemId]?.charges === undefined) continue;
+				const outputCertainty = readOutputRecreationCertaintyFn(output, chargedItemId);
 				certainty.set(
-					depositId,
-					strongerCertaintyFn(certainty.get(depositId) ?? "none", outputCertainty),
+					chargedItemId,
+					strongerCertaintyFn(certainty.get(chargedItemId) ?? "none", outputCertainty),
 				);
 			}
 		}
@@ -122,32 +118,32 @@ export const validateLimitedDepositsFn = ({
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type !== ItemTypeSchema.enum.Deposit || item.charges === undefined) continue;
+		if (item.charges === undefined) continue;
 		const itemCertainty = certainty.get(itemId) ?? "none";
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {
 			diagnostics.push({
-				code: DiagnosticCodeEnumSchema.enum.DepositStochasticSoftlock,
+				code: DiagnosticCodeEnumSchema.enum.ChargeRenewalStochastic,
 				severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				path: [
 					"items",
 					itemId,
 				],
 				source: provenance.items[itemId],
-				message: `Finite deposit ${itemId} is recreated only through probabilistic, weighted, or conditional output paths.`,
+				message: `Charged item ${itemId} is recreated only through probabilistic, weighted, or conditional output paths.`,
 				itemId,
 			});
 			continue;
 		}
 		diagnostics.push({
-			code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+			code: DiagnosticCodeEnumSchema.enum.ChargeRenewalMissing,
 			severity: DiagnosticSeverityEnumSchema.enum.Warning,
 			path: [
 				"items",
 				itemId,
 			],
 			source: provenance.items[itemId],
-			message: `Finite deposit ${itemId} has no configured output or merge path that recreates it.`,
+			message: `Charged item ${itemId} has no configured output or merge path that recreates it.`,
 			itemId,
 		});
 	}

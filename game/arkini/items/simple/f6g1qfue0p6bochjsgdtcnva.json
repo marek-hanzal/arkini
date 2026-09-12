@@ -16,7 +16,6 @@
 		"charges": {
 			"amount": 8
 		},
-		"maxQueueSize": 1,
-		"type": "deposit"
+		"type": "simple"
 	}
 }

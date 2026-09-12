@@ -118,17 +118,17 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				</section>
 				<section
 					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemActionDetail"
+					data-ui="EditorItemClockDetail"
 				>
 					<ItemDetailSectionHeader
 						itemUid={item.uid}
-						sectionId="action"
-						title={translator.textFn("Action")}
+						sectionId="clock"
+						title={translator.textFn("Clock")}
 						description={translator.textFn(
-							"Clicking this item can enter a space or open Inventory after its requirements pass.",
+							"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
 						)}
 					/>
-					<ActionDetail item={item} />
+					<ClockDetail item={item} />
 				</section>
 				<section
 					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
@@ -160,17 +160,17 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				</section>
 				<section
 					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemClockDetail"
+					data-ui="EditorItemActionDetail"
 				>
 					<ItemDetailSectionHeader
 						itemUid={item.uid}
-						sectionId="clock"
-						title={translator.textFn("Clock")}
+						sectionId="action"
+						title={translator.textFn("Action")}
 						description={translator.textFn(
-							"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
+							"Clicking this item can enter a space or open Inventory after its requirements pass.",
 						)}
 					/>
-					<ClockDetail item={item} />
+					<ActionDetail item={item} />
 				</section>
 			</div>
 		</div>

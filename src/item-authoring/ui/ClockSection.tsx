@@ -8,8 +8,7 @@ import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStat
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Button } from "~/ui/ui/Button";
-import { Status } from "~/ui/ui/Status";
+import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 /** Composes shared time, rule, and output controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
@@ -27,6 +26,7 @@ const ClockFields = () => {
 						{(field) => (
 							<field.SecondsField
 								label={translator.textFn("Interval (seconds)")}
+								clearLabel={translator.textFn("Clear interval")}
 								description={translator.textFn(
 									"Leave empty for a one-shot lifetime without periodic production.",
 								)}
@@ -40,6 +40,7 @@ const ClockFields = () => {
 						{(field) => (
 							<field.SecondsField
 								label={translator.textFn("Lifetime (seconds)")}
+								clearLabel={translator.textFn("Clear lifetime")}
 								description={translator.textFn(
 									"Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.",
 								)}
@@ -142,18 +143,12 @@ export const ClockSection = () => {
 						data-ui="EditorClockSection"
 					>
 						<ClockFields />
-						<Status
-							icon={Clock}
+						<EditorCapabilityDisable
 							title={translator.textFn("Clock configured")}
 							description={translator.textFn(
 								"Disable removes timing, rules and expiry output from this item.",
 							)}
-							variant="flat"
-							action={
-								<Button onClick={() => form.setFieldValue("clock", undefined)}>
-									{translator.textFn("Disable")}
-								</Button>
-							}
+							onDisableFn={() => form.setFieldValue("clock", undefined)}
 						/>
 					</div>
 				)

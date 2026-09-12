@@ -123,12 +123,11 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const translator = useTranslator();
 	const { form, productionLineId, validationIssues } = useFormSession();
 	const invalidLineIndex = validationIssues.find(
 		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
-	const content = (
+	return (
 		<ProductionFields
 			form={form}
 			fields={{
@@ -138,16 +137,5 @@ export const ProductionSection = () => {
 			invalidLineIndex={invalidLineIndex}
 			selectedLineId={productionLineId}
 		/>
-	);
-	return (
-		<div className="grid gap-[var(--ak-viewport-gap)]">
-			<EditorFormSectionDivider
-				description={translator.textFn(
-					"Defines this item's production lines, inputs, outputs, runtime and rules.",
-				)}
-				title={translator.textFn("Production")}
-			/>
-			{content}
-		</div>
 	);
 };

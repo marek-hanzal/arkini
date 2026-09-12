@@ -1,6 +1,6 @@
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
 
-const Sections = [
+const FormSections = [
 	{
 		id: "identity",
 		label: "Item",
@@ -29,6 +29,21 @@ const Sections = [
 		id: "production",
 		label: "Production",
 	},
+] as const satisfies ReadonlyArray<SectionDescriptor>;
+
+const DetailSections = [
+	{
+		id: "identity",
+		label: "Item",
+	},
+	{
+		id: "interactions",
+		label: "Interactions",
+	},
+	{
+		id: "production",
+		label: "Production",
+	},
 	{
 		id: "estimate",
 		label: "Estimate",
@@ -41,24 +56,9 @@ const Sections = [
 		id: "notes",
 		label: "Notes",
 	},
-	{
-		id: "delete",
-		label: "Delete",
-	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
-/** Returns the explicit sections supported by the item surface. */
+/** Detail groups related capabilities; authoring retains exact validation destinations. */
 export const readSectionsFn = (
 	mode: "detail" | "form" = "detail",
-): ReadonlyArray<SectionDescriptor> =>
-	Sections.filter((section) => {
-		if (
-			mode === "form" &&
-			(section.id === "estimate" ||
-				section.id === "connections" ||
-				section.id === "delete" ||
-				section.id === "notes")
-		)
-			return false;
-		return true;
-	});
+): ReadonlyArray<SectionDescriptor> => (mode === "form" ? FormSections : DetailSections);

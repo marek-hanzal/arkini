@@ -1,3 +1,4 @@
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import type { LucideIcon } from "lucide-react";
 
 import { PrimaryButton } from "~/ui/ui/Button";
@@ -24,9 +25,13 @@ export const EditorCapabilityStatus = ({
 	<Status
 		action={<PrimaryButton onClick={onEnableFn}>{actionLabel}</PrimaryButton>}
 		dataUi={dataUi}
-		description={description}
 		icon={icon}
-		title={title}
+		title={
+			<span className="inline-flex items-center gap-1.5">
+				{title}
+				<EditorInfoTooltip content={description} />
+			</span>
+		}
 		variant="flat"
 	/>
 );

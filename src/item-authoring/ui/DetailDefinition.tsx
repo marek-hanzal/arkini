@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+
 import { Fact, FactList } from "~/ui/ui/FactList";
 
 export const DetailSection = ({
@@ -12,12 +15,10 @@ export const DetailSection = ({
 	readonly title: string;
 }) => (
 	<section className="grid gap-2 border-t border-line pt-5 first:border-t-0 first:pt-0">
-		<header>
-			<h2 className="text-lg font-semibold">{title}</h2>
-			{description === undefined ? null : (
-				<p className="mt-1 text-sm text-muted">{description}</p>
-			)}
-		</header>
+		<EditorFormSectionDivider
+			title={title}
+			description={description}
+		/>
 		{children}
 	</section>
 );
@@ -31,16 +32,21 @@ export const DetailFacts = ({
 }) => <FactList columns={columns}>{children}</FactList>;
 
 export const DetailFact = ({
+	description,
 	label,
 	mono = false,
 	value,
 }: {
+	readonly description?: string;
 	readonly label: string;
 	readonly mono?: boolean;
 	readonly value: ReactNode;
 }) => (
 	<Fact
 		label={label}
+		labelSuffix={
+			description === undefined ? undefined : <EditorInfoTooltip content={description} />
+		}
 		mono={mono}
 		value={value}
 	/>

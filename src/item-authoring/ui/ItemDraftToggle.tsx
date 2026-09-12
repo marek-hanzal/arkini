@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
@@ -31,7 +32,7 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 					},
 				})}
 			>
-				Draft
+				<Tx label="Draft" />
 			</DraftButton>
 			{controller.error === undefined ? null : (
 				<p

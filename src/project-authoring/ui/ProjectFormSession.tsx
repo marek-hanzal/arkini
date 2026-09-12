@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, type PropsWithChildren, type ReactNode } from "react";
+import { useCallback, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -10,46 +10,7 @@ import { ProjectFormProvider } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { useProjectFormController } from "~/project-authoring/ui/useProjectFormController";
-import { Mx } from "~/translation/ui/Mx";
-import { Tx } from "~/translation/ui/Tx";
-
-const ProjectFormHelpBySection: Partial<
-	Record<
-		ProjectSectionId,
-		{
-			readonly content: ReactNode;
-			readonly title: ReactNode;
-		}
-	>
-> = {
-	board: {
-		content: (
-			<>
-				<Mx label="Board editing help" />
-				<Mx label="Starting layout controls help" />
-			</>
-		),
-		title: <Tx label="Board editing" />,
-	},
-	toolbar: {
-		content: (
-			<>
-				<Mx label="Toolbar editing help" />
-				<Mx label="Starting layout controls help" />
-			</>
-		),
-		title: <Tx label="Toolbar editing" />,
-	},
-	inventory: {
-		content: (
-			<>
-				<Mx label="Inventory editing help" />
-				<Mx label="Starting layout controls help" />
-			</>
-		),
-		title: <Tx label="Inventory editing" />,
-	},
-};
+import { ProjectSectionHelp } from "~/project-authoring/ui/ProjectSectionHelp";
 
 export const ProjectFormSession = ({
 	children,
@@ -117,7 +78,7 @@ export const ProjectFormSession = ({
 				<EditorFormSectionPage
 					discardFn={discardFn}
 					error={controller.error}
-					help={ProjectFormHelpBySection[sectionId]}
+					help={ProjectSectionHelp[sectionId]}
 					leading={
 						<EditorHistoryBackButton
 							params={{

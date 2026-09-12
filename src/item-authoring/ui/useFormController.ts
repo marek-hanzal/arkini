@@ -1,3 +1,5 @@
+import { createLineFn } from "~/production-authoring/fn/createLineFn";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
@@ -184,6 +186,7 @@ export const useFormController = ({
 	onSavedFn,
 }: useFormController.Props) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const formValues = useMemo<FormValues>(
 		() => readFormValuesFn(initialItem),
 		[
@@ -239,11 +242,43 @@ export const useFormController = ({
 	}, [
 		form,
 	]);
+	const enableActionFn = useCallback(() => {
+		if (form.state.values.action !== undefined) return;
+		form.setFieldValue("lines", []);
+		form.setFieldValue("clock", undefined);
+		form.setFieldValue("action", {
+			type: "space",
+			space: 0,
+			input: [],
+			rules: [],
+		});
+	}, [
+		form,
+	]);
+	const newLineTitle = translator.textFn("New production line");
+	const newLineDescription = translator.textFn("Describe what this line consumes and produces.");
+	const enableProductionFn = useCallback(() => {
+		if ((form.state.values.lines ?? []).length > 0) return;
+		form.setFieldValue("action", undefined);
+		form.setFieldValue("lines", [
+			createLineFn(form.state.values.id, [], newLineTitle, newLineDescription),
+		]);
+	}, [
+		form,
+		newLineTitle,
+		newLineDescription,
+	]);
 	const initializedCapability = useRef(false);
 	useLayoutEffect(() => {
 		if (initializedCapability.current || enableCapability === undefined) return;
 		initializedCapability.current = true;
 		switch (enableCapability) {
+			case "action":
+				enableActionFn();
+				break;
+			case "production":
+				enableProductionFn();
+				break;
 			case "clock":
 				enableClockFn();
 				break;
@@ -264,6 +299,8 @@ export const useFormController = ({
 		}
 	}, [
 		enableCapability,
+		enableActionFn,
+		enableProductionFn,
 		enableClockFn,
 		form,
 	]);
@@ -362,6 +399,8 @@ export const useFormController = ({
 			canonicalItem: initialItem,
 			discardFn,
 			enableClockFn,
+			enableActionFn,
+			enableProductionFn,
 			error,
 			isDirty: dirty,
 			isSaving: submitting,
@@ -375,6 +414,8 @@ export const useFormController = ({
 		[
 			discardFn,
 			enableClockFn,
+			enableActionFn,
+			enableProductionFn,
 			dirty,
 			error,
 			form,

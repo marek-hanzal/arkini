@@ -1,4 +1,5 @@
-import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
+import { Mx } from "~/translation/ui/Mx";
+import { EditorChoiceControl, EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
 import { useStore } from "@tanstack/react-form";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -32,28 +33,37 @@ export const IdentitySection = () => {
 				<form.AppField name="id">
 					{(field) => (
 						<field.TextField
-							label="Item ID"
-							description="Renaming updates exact project references."
+							label={translator.textFn("Item ID")}
+							description={translator.textFn(
+								"Renaming updates exact project references.",
+							)}
 							placeholder="item:example"
 						/>
 					)}
 				</form.AppField>
 				<form.AppField name="title">
-					{(field) => <field.TextField label="Title" />}
+					{(field) => <field.TextField label={translator.textFn("Title")} />}
 				</form.AppField>
 				{clock !== undefined ? (
 					<div className="grid content-start gap-1.5 text-sm">
-						<span className="font-semibold text-foreground">Storage scope</span>
+						<EditorValueLabel
+							label={translator.textFn("Storage scope")}
+							description={<Mx label="Item storage scope help" />}
+						/>
 						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
-							{translator.textFn("Board — required by this item’s lifetime")}
+							{translator.textFn("Board — required by Clock")}
 						</span>
 					</div>
 				) : (
 					<form.AppField name="scope">
 						{(field) => (
 							<field.ChoiceField
-								label="Storage scope"
-								options={scopeOptions}
+								label={translator.textFn("Storage scope")}
+								description={<Mx label="Item storage scope help" />}
+								options={scopeOptions.map((option) => ({
+									...option,
+									label: translator.textFn(option.label),
+								}))}
 							/>
 						)}
 					</form.AppField>
@@ -65,9 +75,7 @@ export const IdentitySection = () => {
 								value={field.state.value ?? "interactive"}
 								onChangeFn={field.handleChange}
 								label={translator.textFn("Player controls")}
-								description={translator.textFn(
-									"Interactive allows manual production. Automatic only uses authored automation.",
-								)}
+								description={<Mx label="Item player controls help" />}
 								options={[
 									{
 										label: translator.textFn("Interactive"),
@@ -86,8 +94,8 @@ export const IdentitySection = () => {
 					<form.AppField name="maxCount">
 						{(field) => (
 							<field.NumberField
-								label="Maximum global count"
-								description="Leave empty for no global limit."
+								label={translator.textFn("Maximum global count")}
+								description={<Mx label="Item global count help" />}
 								min={1}
 								optional
 							/>
@@ -98,7 +106,8 @@ export const IdentitySection = () => {
 					<form.AppField name="maxStackSize">
 						{(field) => (
 							<field.NumberField
-								label="Maximum stack size"
+								label={translator.textFn("Maximum stack size")}
+								description={<Mx label="Item stack size help" />}
 								min={1}
 							/>
 						)}
@@ -109,7 +118,7 @@ export const IdentitySection = () => {
 				{(field) => (
 					<field.TextAreaField
 						fill
-						label="Description"
+						label={translator.textFn("Description")}
 						optional
 					/>
 				)}

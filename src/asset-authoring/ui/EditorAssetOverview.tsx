@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useState } from "react";
 
 import { Fact, FactList } from "~/ui/ui/FactList";
@@ -5,6 +6,7 @@ import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
 export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: string }) => {
+	const translator = useTranslator();
 	const resource = useEditorAssetById(resourceId);
 	const url = useResourceUrl(resourceId);
 	const [dimensions, setDimensionsFn] = useState<{
@@ -18,7 +20,9 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 		<section className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(16rem,0.6fr)]">
 			<div className="grid min-h-72 place-items-center overflow-hidden p-5">
 				{url === undefined ? (
-					<p className="text-sm text-muted">Preparing asset preview…</p>
+					<p className="text-sm text-muted">
+						{translator.textFn("Preparing asset preview…")}
+					</p>
 				) : (
 					<img
 						src={url}
@@ -37,15 +41,15 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 			</div>
 			<FactList>
 				<Fact
-					label="Resource ID"
+					label={translator.textFn("Resource ID")}
 					mono
 					value={resource.id}
 				/>
 				<Fact
-					label="Dimensions"
+					label={translator.textFn("Dimensions")}
 					value={
 						currentDimensions === undefined
-							? "Reading image…"
+							? translator.textFn("Reading image…")
 							: `${currentDimensions.width} × ${currentDimensions.height} px`
 					}
 				/>

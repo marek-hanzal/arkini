@@ -1,3 +1,4 @@
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 // @vitest-environment jsdom
 
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -87,7 +88,11 @@ describe("ItemDraftToggle", () => {
 		roots.push(root);
 		const renderFn = async (candidate = item) => {
 			await act(async () => {
-				root.render(<ItemDraftToggle item={candidate} />);
+				root.render(
+					<TranslationTestProvider>
+						<ItemDraftToggle item={candidate} />
+					</TranslationTestProvider>,
+				);
 			});
 		};
 		await renderFn();

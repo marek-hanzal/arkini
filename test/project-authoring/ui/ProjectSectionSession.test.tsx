@@ -210,7 +210,7 @@ describe("project section form session", () => {
 		await act(async () =>
 			root.render(
 				<TranslationTestProvider>
-					{createElement(EditorProjectForm)}
+					{createElement(TranslationTestProvider, null, createElement(EditorProjectForm))}
 				</TranslationTestProvider>,
 			),
 		);
@@ -232,7 +232,7 @@ describe("project section form session", () => {
 		await act(async () =>
 			root.render(
 				<TranslationTestProvider>
-					{createElement(EditorProjectForm)}
+					{createElement(TranslationTestProvider, null, createElement(EditorProjectForm))}
 				</TranslationTestProvider>,
 			),
 		);
@@ -253,7 +253,7 @@ describe("project section form session", () => {
 		await act(async () =>
 			root.render(
 				<TranslationTestProvider>
-					{createElement(EditorProjectForm)}
+					{createElement(TranslationTestProvider, null, createElement(EditorProjectForm))}
 				</TranslationTestProvider>,
 			),
 		);
@@ -290,8 +290,16 @@ describe("project section form session", () => {
 		const root = createRoot(container);
 		roots.push(root);
 
-		await act(async () => root.render(createElement(EditorProjectForm)));
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 
 		expect(consumerRenders).toBe(1);
 	});
@@ -317,7 +325,9 @@ describe("project section form session", () => {
 		const renderSection = async (section: ReactNode) => {
 			state.section = section;
 			await act(async () => {
-				root.render(createElement(EditorProjectForm));
+				root.render(
+					createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+				);
 			});
 		};
 
@@ -382,7 +392,9 @@ describe("project section form session", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => {
-			root.render(createElement(EditorProjectForm));
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			);
 		});
 
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
@@ -440,7 +452,11 @@ describe("project section form session", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
@@ -474,7 +490,11 @@ describe("project section form session", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null || state.unsavedSession === undefined)
@@ -495,7 +515,11 @@ describe("project section form session", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
@@ -530,7 +554,9 @@ describe("project section form session", () => {
 
 		state.section = <ProjectBoardSection />;
 		await act(async () => {
-			root.render(createElement(EditorProjectForm));
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			);
 		});
 
 		const spaceInput = container.querySelector<HTMLInputElement>(
@@ -567,9 +593,17 @@ describe("project section form session", () => {
 		expect(readGridCells()).toBe("water:3:1:1");
 
 		state.section = <ProjectGeneralSection />;
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 		state.section = <ProjectBoardSection />;
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 		expect(
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");
@@ -604,7 +638,7 @@ describe("project section form session", () => {
 		await act(async () =>
 			root.render(
 				<TranslationTestProvider>
-					{createElement(EditorProjectForm)}
+					{createElement(TranslationTestProvider, null, createElement(EditorProjectForm))}
 				</TranslationTestProvider>,
 			),
 		);
@@ -637,7 +671,11 @@ describe("project section form session", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => root.render(createElement(EditorProjectForm)));
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
 
 		const widthInput = container.querySelector<HTMLInputElement>('input[name="board.width"]');
 		const grid = container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]');
@@ -683,7 +721,7 @@ describe("project section form session", () => {
 		await act(async () =>
 			root.render(
 				<TranslationTestProvider>
-					{createElement(EditorProjectForm)}
+					{createElement(TranslationTestProvider, null, createElement(EditorProjectForm))}
 				</TranslationTestProvider>,
 			),
 		);
@@ -735,7 +773,15 @@ describe("project section form session", () => {
 			const root = createRoot(container);
 			roots.push(root);
 			const renderProject = async () => {
-				await act(async () => root.render(createElement(EditorProjectForm)));
+				await act(async () =>
+					root.render(
+						createElement(
+							TranslationTestProvider,
+							null,
+							createElement(EditorProjectForm),
+						),
+					),
+				);
 			};
 			const publishConfig = async (config: Project["config"]) => {
 				project = {

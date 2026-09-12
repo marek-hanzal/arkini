@@ -3,7 +3,9 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
-import { ItemOverview } from "~/item-authoring/ui/ItemOverview";
+import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
+import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -25,14 +27,16 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							label={translator.textFn("Stack capacity")}
 							value={
 								item.maxStackSize === 1
-									? "Single item"
-									: `${item.maxStackSize} items`
+									? translator.textFn("Single item")
+									: item.maxStackSize
 							}
 						/>
 						<Fact
 							label={translator.textFn("Game limit")}
 							value={
-								item.maxCount === undefined ? "No configured limit" : item.maxCount
+								item.maxCount === undefined
+									? translator.textFn("No configured limit")
+									: item.maxCount
 							}
 						/>
 						<Fact
@@ -56,7 +60,26 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					)}
 				</div>
 			</EditorRootCard>
-			<ItemOverview item={item} />
+			<ItemDetailSectionHeader
+				itemUid={item.uid}
+				sectionId="artwork"
+				title={translator.textFn("Artwork")}
+				description={translator.textFn(
+					"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
+				)}
+			/>
+			<EditorRootCard dataUi="EditorItemArtworkDetailCard">
+				<ArtworkDetail item={item} />
+			</EditorRootCard>
+			<ItemDetailSectionHeader
+				itemUid={item.uid}
+				sectionId="units"
+				title={translator.textFn("Units")}
+				description={translator.textFn(
+					"Units are the supply inside each item, independently of how many items are stacked.",
+				)}
+			/>
+			<UnitsDetail item={item} />
 		</div>
 	);
 };

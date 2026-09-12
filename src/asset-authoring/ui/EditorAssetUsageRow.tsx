@@ -48,7 +48,7 @@ export const EditorAssetUsageRow = ({
 				params={{
 					itemUid: usage.ownerUid,
 					projectId: project.projectId,
-					sectionId: "artwork",
+					sectionId: "identity",
 				}}
 				className={className}
 				data-ui={dataUi}

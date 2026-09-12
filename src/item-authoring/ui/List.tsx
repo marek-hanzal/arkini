@@ -1,3 +1,6 @@
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { Mx } from "~/translation/ui/Mx";
 import { FilePenLine, PackageOpen, Plus } from "lucide-react";
 import { useMemo } from "react";
 
@@ -101,9 +104,13 @@ export const List = ({
 						})}
 					>
 						<FilePenLine className="size-4" />
-						Draft
+						{translator.textFn("Draft")}
 					</DraftFilterButton>
 					{empty ? null : newItemMenu}
+					<EditorPageHelp
+						title={translator.textFn("Items")}
+						content={<Mx label="Item list help" />}
+					/>
 				</header>
 			}
 			scrollRestorationId="editor-item-list"
@@ -115,9 +122,17 @@ export const List = ({
 				{empty ? (
 					<Status
 						dataUi="EditorItemsEmpty"
-						description="Create the first item to start authoring this game."
 						icon={PackageOpen}
-						title="No items yet"
+						title={
+							<span className="inline-flex items-center gap-1.5">
+								{translator.textFn("No items yet")}
+								<EditorInfoTooltip
+									content={translator.textFn(
+										"Create the first item to start authoring this game.",
+									)}
+								/>
+							</span>
+						}
 						action={newItemMenu}
 					/>
 				) : null}
@@ -126,7 +141,7 @@ export const List = ({
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemSearchEmpty"
 					>
-						No items match the active filters.
+						{translator.textFn("No items match the active filters.")}
 					</p>
 				) : null}
 				{rows}

@@ -112,7 +112,7 @@ export const ConnectionsSection = ({
 
 	return (
 		<div
-			className="grid gap-[var(--ak-viewport-gap)]"
+			className="grid gap-3"
 			data-ui="EditorItemConnections"
 		>
 			<EditorRootCard dataUi="EditorItemConnectionsControls">

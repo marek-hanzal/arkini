@@ -79,9 +79,9 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					)}
 				</div>
 			</EditorRootCard>
-			<div className="grid items-start gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
+			<div className="grid gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
 				<section
-					className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
 					data-ui="EditorItemArtworkDetail"
 				>
 					<ItemDetailSectionHeader
@@ -92,12 +92,15 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
 						)}
 					/>
-					<EditorRootCard dataUi="EditorItemArtworkDetailCard">
+					<EditorRootCard
+						className="content-start"
+						dataUi="EditorItemArtworkDetailCard"
+					>
 						<ArtworkDetail item={item} />
 					</EditorRootCard>
 				</section>
 				<section
-					className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
 					data-ui="EditorItemUnitsDetail"
 				>
 					<ItemDetailSectionHeader

@@ -13,7 +13,6 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"type": "simple",
 		"merge": [
 			{
 				"target": {
@@ -140,6 +139,7 @@
 				"effect": "replace",
 				"result": "toilet"
 			}
-		]
+		],
+		"type": "simple"
 	}
 }

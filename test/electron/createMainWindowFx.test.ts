@@ -255,12 +255,17 @@ describe("createMainWindowFx", () => {
 		expect(window.options).toMatchObject({
 			fullscreen: false,
 			fullscreenable: true,
-			resizable: false,
+			resizable: true,
 			width: 1_360,
 			height: 765,
 		});
 		expect(window.maximize).not.toHaveBeenCalled();
 		expect(window.show).toHaveBeenCalledOnce();
+		const preventResize = vi.fn();
+		window.emit("will-resize", {
+			preventDefault: preventResize,
+		});
+		expect(preventResize).toHaveBeenCalledOnce();
 		expect(window.webContents.send).toHaveBeenCalledWith(
 			ArkiniElectronApi.channels.windowVisible,
 		);

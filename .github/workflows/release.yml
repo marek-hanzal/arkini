@@ -46,6 +46,8 @@ jobs:
         run: ./Argcfile.sh install
       - name: Use tag version for release checks
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
+      - name: Prepare Community Arkpack cache
+        uses: ./.github/actions/arkpack-cache
       - name: Run repository gate
         run: ./Argcfile.sh "${{ matrix.command }}"
 

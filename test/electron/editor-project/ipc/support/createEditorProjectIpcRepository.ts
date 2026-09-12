@@ -53,6 +53,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	saveBuildVersionFx: vi.fn(({ version }) => Effect.succeed(version)),
 	buildProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcBuild)),
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	dismissInvalidProjectFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
 	createNoteFx: vi.fn(({ projectId, content, itemUids, resourceIds }) =>
 		Effect.succeed({

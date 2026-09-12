@@ -11,6 +11,9 @@ import type { EditorBuildRepositoryService } from "~/editor-build/service/Editor
 export interface OwnedEditorProjectRepository
 	extends ProjectRepositoryService,
 		EditorBuildRepositoryService {
+	readonly dismissInvalidProjectFx: (
+		root: string,
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly openProjectFx: (
 		props: ProjectRepository.OpenProjectProps,

@@ -94,6 +94,7 @@ const installEditorApi = () => {
 			]),
 		),
 		listNotesFn: vi.fn(async () => success([])),
+		dismissInvalidProjectFn: vi.fn(async () => success(undefined)),
 		openProjectDirectoryFn: vi.fn(async () => success(undefined)),
 		readProjectFn: vi.fn(async () => success(project)),
 		refreshProjectFn: vi.fn(async () => success(project)),

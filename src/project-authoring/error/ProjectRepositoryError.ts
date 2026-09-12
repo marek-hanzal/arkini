@@ -8,6 +8,7 @@ export type ProjectRepositoryOperation =
 	| "save-build-version"
 	| "create-project"
 	| "create-note"
+	| "dismiss-invalid-project"
 	| "delete-project"
 	| "delete-item"
 	| "delete-resource"

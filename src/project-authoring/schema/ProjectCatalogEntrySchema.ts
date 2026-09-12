@@ -7,6 +7,7 @@ export const ProjectCatalogEntrySchema = z
 	.object({
 		root: z.string().min(1),
 		ownership: ProjectOwnershipSchema,
+		dismissed: z.literal(true).optional(),
 		createdAtMs: z.number().int().nonnegative(),
 	})
 	.strict()

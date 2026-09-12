@@ -79,121 +79,165 @@ afterEach(async () => {
 	deletion.run.mockReset();
 	navigation.invalidate.mockReset();
 	navigation.navigate.mockClear();
+	vi.unstubAllGlobals();
 	document.body.replaceChildren();
 });
 
 describe("editor project deletion lifecycle", () => {
-	it("keeps a committed deletion final when Recent refresh fails and retries only refresh", async () => {
-		const refreshFailure = new Error("Recent loader failed");
-		deletion.run
-			.mockImplementationOnce(() => undefined)
-			.mockImplementationOnce(() => {
-				throw new Error("Second delete failed");
+	it.each([
+		"delete",
+		"dismiss",
+	] as const)(
+		"keeps a committed %s final when Recent refresh fails and retries only refresh",
+		async (mode) => {
+			vi.stubGlobal("arkini", {
+				editor: {
+					dismissInvalidProjectFn: async (root: string) => {
+						try {
+							deletion.run(root);
+							return {
+								type: "success",
+								value: undefined,
+							};
+						} catch {
+							return {
+								type: "failure",
+								error: {
+									operation: "dismiss-invalid-project",
+									message: "Second dismissal failed",
+								},
+							};
+						}
+					},
+				},
 			});
-		navigation.invalidate
-			.mockRejectedValueOnce(refreshFailure)
-			.mockResolvedValueOnce(undefined);
-		const registry = AtomRegistry.make({
-			defaultIdleTTL: 400,
-			scheduleTask,
-		});
-		registries.push(registry);
-		registry.mount(EditorWelcomeCommandAtom);
+			const refreshFailure = new Error("Recent loader failed");
+			deletion.run
+				.mockImplementationOnce(() => undefined)
+				.mockImplementationOnce(() => {
+					throw new Error("Second delete failed");
+				});
+			navigation.invalidate
+				.mockRejectedValueOnce(refreshFailure)
+				.mockResolvedValueOnce(undefined);
+			const registry = AtomRegistry.make({
+				defaultIdleTTL: 400,
+				scheduleTask,
+			});
+			registries.push(registry);
+			registry.mount(EditorWelcomeCommandAtom);
 
-		const Probe = () => {
-			const actions = useEditorWelcomeActions();
-			return createElement(
-				Fragment,
-				null,
-				createElement(
-					"button",
-					{
-						id: "delete-project",
-						onClick: () => actions.deleteProjectFn("project-one"),
-						type: "button",
-					},
-					"Delete",
-				),
-				createElement(
-					"button",
-					{
-						id: "delete-second-project",
-						onClick: () => actions.deleteProjectFn("project-two"),
-						type: "button",
-					},
-					"Delete second",
-				),
-				createElement(
-					"button",
-					{
-						disabled: actions.refreshingProjects,
-						id: "refresh-projects",
-						onClick: () => void actions.refreshProjectsFn(),
-						type: "button",
-					},
-					"Refresh",
-				),
-				createElement(
-					"output",
+			const Probe = () => {
+				const actions = useEditorWelcomeActions();
+				return createElement(
+					Fragment,
 					null,
-					[
-						actions.active ?? "idle",
-						actions.deletedProjectIds.has("project-one") ? "hidden" : "visible",
-						actions.projectRefreshError === undefined ? "clean" : "refresh-error",
-						actions.error === undefined ? "command-clean" : "command-error",
-					].join("|"),
+					createElement(
+						"button",
+						{
+							id: "delete-project",
+							onClick: () =>
+								mode === "delete"
+									? actions.deleteProjectFn("project-one")
+									: actions.dismissInvalidProjectFn("/projects/one"),
+							type: "button",
+						},
+						"Delete",
+					),
+					createElement(
+						"button",
+						{
+							id: "delete-second-project",
+							onClick: () =>
+								mode === "delete"
+									? actions.deleteProjectFn("project-two")
+									: actions.dismissInvalidProjectFn("/projects/two"),
+							type: "button",
+						},
+						"Delete second",
+					),
+					createElement(
+						"button",
+						{
+							disabled: actions.refreshingProjects,
+							id: "refresh-projects",
+							onClick: () => void actions.refreshProjectsFn(),
+							type: "button",
+						},
+						"Refresh",
+					),
+					createElement(
+						"output",
+						null,
+						[
+							actions.active ?? "idle",
+							(
+								mode === "delete"
+									? actions.deletedProjectIds.has("project-one")
+									: actions.dismissedProjectRoots.has("/projects/one")
+							)
+								? "hidden"
+								: "visible",
+							actions.projectRefreshError === undefined ? "clean" : "refresh-error",
+							actions.error === undefined ? "command-clean" : "command-error",
+						].join("|"),
+					),
+				);
+			};
+			const container = document.createElement("div");
+			document.body.append(container);
+			const root = createRoot(container);
+			roots.push(root);
+			await act(async () => {
+				root.render(
+					createElement(
+						RegistryContext.Provider,
+						{
+							value: registry,
+						},
+						createElement(Probe),
+					),
+				);
+			});
+
+			const deleteButton = container.querySelector("#delete-project");
+			if (!(deleteButton instanceof HTMLButtonElement)) throw new Error("Delete missing.");
+			await act(async () => deleteButton.click());
+			await vi.waitFor(() =>
+				expect(container.querySelector("output")?.textContent).toBe(
+					"idle|hidden|refresh-error|command-clean",
 				),
 			);
-		};
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				createElement(
-					RegistryContext.Provider,
-					{
-						value: registry,
-					},
-					createElement(Probe),
+			expect(deletion.run).toHaveBeenCalledOnce();
+			expect(deletion.run).toHaveBeenCalledWith(
+				mode === "delete" ? "project-one" : "/projects/one",
+			);
+			expect(navigation.invalidate).toHaveBeenCalledOnce();
+			const deleteSecondButton = container.querySelector("#delete-second-project");
+			if (!(deleteSecondButton instanceof HTMLButtonElement))
+				throw new Error("Second delete missing.");
+			await act(async () => deleteSecondButton.click());
+			await vi.waitFor(() =>
+				expect(container.querySelector("output")?.textContent).toBe(
+					"idle|hidden|refresh-error|command-error",
 				),
 			);
-		});
+			expect(deletion.run).toHaveBeenCalledTimes(2);
+			expect(deletion.run).toHaveBeenLastCalledWith(
+				mode === "delete" ? "project-two" : "/projects/two",
+			);
+			expect(navigation.invalidate).toHaveBeenCalledOnce();
 
-		const deleteButton = container.querySelector("#delete-project");
-		if (!(deleteButton instanceof HTMLButtonElement)) throw new Error("Delete missing.");
-		await act(async () => deleteButton.click());
-		await vi.waitFor(() =>
-			expect(container.querySelector("output")?.textContent).toBe(
-				"idle|hidden|refresh-error|command-clean",
-			),
-		);
-		expect(deletion.run).toHaveBeenCalledOnce();
-		expect(deletion.run).toHaveBeenCalledWith("project-one");
-		expect(navigation.invalidate).toHaveBeenCalledOnce();
-		const deleteSecondButton = container.querySelector("#delete-second-project");
-		if (!(deleteSecondButton instanceof HTMLButtonElement))
-			throw new Error("Second delete missing.");
-		await act(async () => deleteSecondButton.click());
-		await vi.waitFor(() =>
-			expect(container.querySelector("output")?.textContent).toBe(
-				"idle|hidden|refresh-error|command-error",
-			),
-		);
-		expect(deletion.run).toHaveBeenCalledTimes(2);
-		expect(deletion.run).toHaveBeenLastCalledWith("project-two");
-		expect(navigation.invalidate).toHaveBeenCalledOnce();
-
-		const refreshButton = container.querySelector("#refresh-projects");
-		if (!(refreshButton instanceof HTMLButtonElement)) throw new Error("Refresh missing.");
-		await act(async () => refreshButton.click());
-		await vi.waitFor(() =>
-			expect(container.querySelector("output")?.textContent).toBe(
-				"idle|visible|clean|command-error",
-			),
-		);
-		expect(navigation.invalidate).toHaveBeenCalledTimes(2);
-		expect(deletion.run).toHaveBeenCalledTimes(2);
-	});
+			const refreshButton = container.querySelector("#refresh-projects");
+			if (!(refreshButton instanceof HTMLButtonElement)) throw new Error("Refresh missing.");
+			await act(async () => refreshButton.click());
+			await vi.waitFor(() =>
+				expect(container.querySelector("output")?.textContent).toBe(
+					"idle|visible|clean|command-error",
+				),
+			);
+			expect(navigation.invalidate).toHaveBeenCalledTimes(2);
+			expect(deletion.run).toHaveBeenCalledTimes(2);
+		},
+	);
 });

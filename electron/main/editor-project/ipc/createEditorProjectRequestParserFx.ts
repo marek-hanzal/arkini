@@ -120,6 +120,12 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
 			parseDeleteProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("delete-project", IdSchema, candidate),
+			parseDismissInvalidProjectRootFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx(
+					"dismiss-invalid-project",
+					z.string().min(1),
+					candidate,
+				),
 			parseProjectRootFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx(
 					"open-project-directory",

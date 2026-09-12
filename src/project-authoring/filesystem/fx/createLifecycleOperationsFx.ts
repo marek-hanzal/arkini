@@ -25,6 +25,10 @@ import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
 interface LifecycleOperations {
+	readonly dismissInvalidProjectFx: (
+		root: string,
+	) => Effect.Effect<void, ProjectRepositoryError, never>;
+
 	readonly createProjectFx: (
 		props: ProjectRepository.CreateProjectProps,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
@@ -87,6 +91,7 @@ const encodeManagedProjectDirectoryStemFn = (projectId: string) =>
 const errorFn = (
 	operation:
 		| "create-project"
+		| "dismiss-invalid-project"
 		| "delete-project"
 		| "list-projects"
 		| "import-json-directory"
@@ -205,6 +210,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 		const candidates: Array<ProjectCandidate> = [];
 		const listedRoots = new Set<string>();
 		for (const entry of catalog.listFn()) {
+			if (entry.dismissed) continue;
 			const mounted = [
 				...states.values(),
 			].find(
@@ -419,10 +425,11 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 					...states.values(),
 				].find((state) => state.catalog.root === root);
 				if (existing !== undefined) return cloneProjectFn(existing.project);
+				const catalogEntry = catalog.listFn().find((entry) => entry.root === root);
 				const provisionalEntry = ProjectCatalogEntrySchema.parse({
 					root,
-					ownership: "external",
-					createdAtMs: 0,
+					ownership: catalogEntry?.ownership ?? "external",
+					createdAtMs: catalogEntry?.createdAtMs ?? 0,
 				});
 				const provisionalState = yield* materializeFx(provisionalEntry);
 				const projectId = provisionalState.project.projectId;
@@ -506,6 +513,31 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			),
 		);
 
+	const dismissInvalidProjectFx: LifecycleOperations["dismissInvalidProjectFx"] = (root) =>
+		operations.withPermits(1)(
+			Effect.gen(function* () {
+				const candidate = (yield* readCandidatesFx).find(
+					(entry) => entry.type === "invalid" && entry.root === root,
+				);
+				if (candidate === undefined)
+					return yield* Effect.fail(
+						errorFn(
+							"dismiss-invalid-project",
+							"The Editor project folder is not a currently blocked project.",
+						),
+					);
+				yield* catalog.dismissFx(root);
+			}).pipe(
+				Effect.mapError((cause) =>
+					errorFn(
+						"dismiss-invalid-project",
+						"The blocked Editor project could not be removed from Recent.",
+						cause,
+					),
+				),
+			),
+		);
+
 	const deleteProjectFx: LifecycleOperations["deleteProjectFx"] = (projectId) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
@@ -549,6 +581,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 
 	return {
 		createProjectFx,
+		dismissInvalidProjectFx,
 		deleteProjectFx,
 		listProjectsFx,
 		openProjectFx,

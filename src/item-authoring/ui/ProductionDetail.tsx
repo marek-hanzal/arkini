@@ -1,53 +1,21 @@
-import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { LinkButtonLink } from "~/ui/ui/LinkButton";
-import { Factory, Pencil } from "lucide-react";
+import { Factory } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
 import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
-import { DetailFacts, DetailFact } from "~/item-authoring/ui/DetailDefinition";
+import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 /** Presents shared production settings, scheduling and the authored input/output flows. */
 export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
-	const project = useEditorProject();
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorItemProductionDetail"
 		>
-			<EditorRootCard dataUi="EditorProductionSettings">
-				<div className="flex items-center justify-between gap-3">
-					<DetailFacts>
-						<DetailFact
-							label={translator.textFn("Player controls")}
-							description={translator.textFn(
-								"Player controls govern manual production, material management, queue changes and line selection.",
-							)}
-							value={translator.textFn(
-								item.control === "automatic-only"
-									? "Automatic only"
-									: "Interactive",
-							)}
-						/>
-					</DetailFacts>
-					<LinkButtonLink
-						className="inline-flex items-center gap-1.5"
-						to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-						params={{
-							projectId: project.projectId,
-							itemUid: item.uid,
-							sectionId: "identity",
-						}}
-					>
-						<Pencil className="size-4" />
-						{translator.textFn("Edit")}
-					</LinkButtonLink>
-				</div>
-			</EditorRootCard>
 			<ItemDetailSectionHeader
 				itemUid={item.uid}
 				sectionId="clock"

@@ -6,6 +6,7 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
+import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -19,6 +20,17 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						size="xl"
 					/>
 					<FactList>
+						<DetailFact
+							label={translator.textFn("Player controls")}
+							description={translator.textFn(
+								"Player controls govern manual production, material management, queue changes and line selection.",
+							)}
+							value={translator.textFn(
+								item.control === "automatic-only"
+									? "Automatic only"
+									: "Interactive",
+							)}
+						/>
 						<Fact
 							label={translator.textFn("Storage")}
 							value={translator.textFn(`Item storage scope - ${item.scope}`)}
@@ -60,26 +72,38 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					)}
 				</div>
 			</EditorRootCard>
-			<ItemDetailSectionHeader
-				itemUid={item.uid}
-				sectionId="artwork"
-				title={translator.textFn("Artwork")}
-				description={translator.textFn(
-					"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
-				)}
-			/>
-			<EditorRootCard dataUi="EditorItemArtworkDetailCard">
-				<ArtworkDetail item={item} />
-			</EditorRootCard>
-			<ItemDetailSectionHeader
-				itemUid={item.uid}
-				sectionId="units"
-				title={translator.textFn("Units")}
-				description={translator.textFn(
-					"Units are the supply inside each item, independently of how many items are stacked.",
-				)}
-			/>
-			<UnitsDetail item={item} />
+			<div className="grid items-start gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
+				<section
+					className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemArtworkDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="artwork"
+						title={translator.textFn("Artwork")}
+						description={translator.textFn(
+							"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
+						)}
+					/>
+					<EditorRootCard dataUi="EditorItemArtworkDetailCard">
+						<ArtworkDetail item={item} />
+					</EditorRootCard>
+				</section>
+				<section
+					className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemUnitsDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="units"
+						title={translator.textFn("Units")}
+						description={translator.textFn(
+							"Units are the supply inside each item, independently of how many items are stacked.",
+						)}
+					/>
+					<UnitsDetail item={item} />
+				</section>
+			</div>
 		</div>
 	);
 };

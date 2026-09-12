@@ -46,7 +46,7 @@ One process-lifetime repository owns:
 - One in-memory `ProjectState` per opened project, derived from disk.
 - Current Project, Note and Build operations.
 
-The catalog never copies canonical project identity or mutable project fields. `game.json.meta.id` remains project/package identity. Invalid catalog entries stay independently visible with their concrete error.
+The catalog never copies canonical project identity or mutable project fields. `game.json.meta.id` remains project/package identity. Invalid catalog entries stay independently visible with their concrete error until explicitly dismissed by exact root. Dismissal preserves files and persists in the catalog so managed discovery does not restore the row. Explicitly reopening a repaired folder clears dismissal and retains its catalog ownership.
 
 Managed roots may be deleted only by explicit managed-project deletion. External roots are edited in place; deletion only unregisters them. Arkini writes only allowlisted owned paths and preserves `.git` plus unrelated files.
 

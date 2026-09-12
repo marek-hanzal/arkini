@@ -504,7 +504,7 @@ Item player controls help:
     **Automatic only** disables those production controls and leaves authored automation in charge. It does not change movement, merge or removal rules.
 Item production help:
   value: |
-    Production combines the item's queue, player controls, Clock and production lines. Each line has its own runtime, visibility, availability rules, inputs and optional output.
+    Production combines the item's queue, Clock and production lines. Player controls are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
 
     **Default** selects the manual click line. **Clock** independently selects the line attempted at every timer pulse. Selecting either role clears only that role on the other lines. Without a Clock line, the timer continues without adding work.
 
@@ -690,6 +690,8 @@ One weighted alternative is selected, then its guaranteed, chance, and weighted 
   value: One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.
 Only items with Units enabled are shown because the target pays the unit cost.:
   value: Only items with Units enabled are shown because the target pays the unit cost.
+Open folder:
+  value: Open folder
 Open the inventory after all requirements and rules pass.:
   value: Open the inventory after all requirements and rules pass.
 Optional items emitted after this merge resolves.:
@@ -785,6 +787,8 @@ Reading image…:
   value: Reading image…
 Remove:
   value: Remove
+Remove from Recent:
+  value: Remove from Recent
 Remove line:
   value: Remove line
 Remove merge:

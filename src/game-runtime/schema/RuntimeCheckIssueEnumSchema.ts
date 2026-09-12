@@ -18,7 +18,6 @@ export const RuntimeCheckIssueEnumSchema = z
 		ItemUnits: "item:units",
 		ItemStackSize: "item:stack-size",
 		ItemSchedule: "item:schedule",
-		ItemTemporaryDuration: "item:temporary-duration",
 		InputOwnerMissing: "input:owner-missing",
 		InputLineMissing: "input:line-missing",
 		InputSlotInvalid: "input:slot-invalid",

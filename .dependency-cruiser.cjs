@@ -211,10 +211,10 @@ module.exports = {
 		{
 			name: "tick-lifecycle-owners-stay-upstream",
 			comment:
-				"Production delivery/jobs and temporary-item lifecycle provide behavior to Game Tick and never import its clock, replay, or loop implementation.",
+				"Production delivery/jobs and item-schedule lifecycle provide behavior to Game Tick and never import its clock, replay, or loop implementation.",
 			severity: "error",
 			from: {
-				path: "^src/(?:production-(?:delivery|job)|temporary-item)(?:/|$)",
+				path: "^src/(?:production-(?:delivery|job)|item-schedule)(?:/|$)",
 			},
 			to: {
 				path: "^src/game-tick(?:/|$)",

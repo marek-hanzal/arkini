@@ -1,7 +1,6 @@
 import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 
 /** Converts one canonical item while retaining every field understood by the target type. */
 export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): ItemSchema.Type => {
@@ -40,7 +39,6 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					merge: item.merge,
 				}),
 	};
-	const lines = readAuthoredItemLinesFn(item);
 	const candidate: ItemSchema.Type = (() => {
 		switch (fallback.type) {
 			case "inventory":
@@ -51,29 +49,12 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					maxCount: fallback.maxCount,
 					maxStackSize: fallback.maxStackSize,
 				};
-			case "temporary":
-				return {
-					...common,
-					type: fallback.type,
-					scope: fallback.scope,
-					maxStackSize: fallback.maxStackSize,
-					durationMs: item.type === "temporary" ? item.durationMs : fallback.durationMs,
-					...(item.type === "temporary" && item.output !== undefined
-						? {
-								output: item.output,
-							}
-						: {}),
-				};
 			case "common":
 				return {
 					...common,
 					type: fallback.type,
-					maxQueueSize:
-						item.type === "common" ? item.maxQueueSize : fallback.maxQueueSize,
-					control: fallback.control,
-					lines: [
-						...lines,
-					],
+					maxQueueSize: fallback.maxQueueSize,
+					lines: [],
 				};
 		}
 	})();

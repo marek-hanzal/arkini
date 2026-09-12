@@ -19,11 +19,6 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 		: {
 				remainingUnits: item.remainingUnits,
 			}),
-	...(item.remainingDurationMs === undefined
-		? {}
-		: {
-				remainingDurationMs: item.remainingDurationMs,
-			}),
 });
 interface Props {
 	runtime: RuntimeSchema.Type;

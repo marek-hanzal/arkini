@@ -1,0 +1,48 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "lfxtap8427k9e4nn6uwjgxyo",
+		"id": "wolf",
+		"title": "Wolf",
+		"description": "He is dangerous. But he may walk away",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"wolf"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 1200000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

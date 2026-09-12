@@ -12,7 +12,7 @@ const itemFn = ({
 	readonly draft: boolean;
 	readonly id: string;
 	readonly title: string;
-	readonly type?: "common" | "temporary";
+	readonly type?: "common" | "inventory";
 }) => ({
 	...createDraftFn({
 		draft,
@@ -41,8 +41,8 @@ describe("filterFn", () => {
 			itemFn({
 				draft: true,
 				id: "producer:draft-herb",
-				title: "Draft Herb Temporary",
-				type: "temporary",
+				title: "Draft Herb Inventory",
+				type: "inventory",
 			}),
 			itemFn({
 				draft: true,

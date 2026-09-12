@@ -1,0 +1,48 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "mjbxqmby78jqjupba6id0m40",
+		"id": "fertilized-field",
+		"title": "Fertilized Field",
+		"description": "Now you can put seed on it",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"fertilized-field"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

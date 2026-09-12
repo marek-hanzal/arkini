@@ -1,0 +1,48 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "e4u0hep343mib8is2x1g8fbx",
+		"id": "coffee-plant",
+		"title": "Coffee Plant",
+		"description": "You need caffeine",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"coffee-plant"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-coffee-plant",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

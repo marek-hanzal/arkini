@@ -132,7 +132,7 @@ const resolveMergeReplacementUnitsFx = Effect.fn("resolveMergeReplacementUnitsFx
 		item: {
 			...target,
 			remainingUnits: undefined,
-			remainingDurationMs: undefined,
+			schedule: undefined,
 		},
 		runtime,
 	});

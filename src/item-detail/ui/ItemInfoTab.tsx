@@ -147,7 +147,10 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 			: [
 					{
 						label: translator.textFn("Interval"),
-						value: formatDurationFn(schedule.intervalMs),
+						value:
+							schedule.intervalMs === undefined
+								? translator.textFn("Once")
+								: formatDurationFn(schedule.intervalMs),
 					},
 					{
 						label: translator.textFn("Lifetime"),
@@ -175,7 +178,8 @@ export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail })
 												? translator.textFn("Running")
 												: translator.textFn("Paused"),
 								},
-								...(schedule.runtime.status === "draining"
+								...(schedule.runtime.remainingIntervalMs === undefined ||
+								schedule.runtime.status === "draining"
 									? []
 									: [
 											{

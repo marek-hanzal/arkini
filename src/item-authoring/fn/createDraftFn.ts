@@ -50,12 +50,5 @@ export const createDraftFn = ({
 			maxCount: 1,
 			maxStackSize: 1,
 		}))
-		.with("temporary", (matchedType) => ({
-			...base,
-			type: matchedType,
-			scope: "board" as const,
-			maxStackSize: 1,
-			durationMs: 300_000,
-		}))
 		.exhaustive();
 };

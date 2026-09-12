@@ -16,7 +16,6 @@ export const isItemPureWithIndexFn = ({
 	if (
 		item.schedule !== undefined ||
 		item.remainingUnits !== undefined ||
-		item.remainingDurationMs !== undefined ||
 		Object.hasOwn(runtime.defaultLineByOwnerItemId, item.id)
 	) {
 		return false;

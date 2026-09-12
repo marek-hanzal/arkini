@@ -4,7 +4,7 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 const ItemTypeSchema = z.enum(TypeSchema.options).meta({
 	id: "ItemTypeSchema",
-	description: "A canonical Arkini item type: common, temporary, or inventory.",
+	description: "A canonical Arkini item type: common or inventory.",
 });
 
 export const ItemCollectionInputSchema = z

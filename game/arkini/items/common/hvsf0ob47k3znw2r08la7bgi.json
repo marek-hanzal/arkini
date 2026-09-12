@@ -1,0 +1,82 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hvsf0ob47k3znw2r08la7bgi",
+		"id": "cauldron-with-corn",
+		"title": "Cauldron With Corn",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"cauldron-with-corn"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "campfire-burning"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cauldron-with-popcorn",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "campfire-extinguished"
+			}
+		],
+		"type": "common",
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-cauldron",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

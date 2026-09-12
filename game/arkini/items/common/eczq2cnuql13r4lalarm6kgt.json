@@ -1,0 +1,48 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "eczq2cnuql13r4lalarm6kgt",
+		"id": "eggs",
+		"title": "Eggs",
+		"description": "Some eggs you may cook.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"eggs"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-eggs",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

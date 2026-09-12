@@ -116,14 +116,19 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		},
 		temporary: {
 			...itemBase("temporary", "board"),
-			type: "temporary",
+			maxStackSize: 1,
+			type: "common",
+			lines: [],
+			maxQueueSize: 1,
 			asset: {
 				scale: 0.8,
 				default: [
 					"asset:temporary",
 				],
 			},
-			durationMs: 1_000,
+			clock: {
+				durationMs: 1_000,
+			},
 		},
 	},
 });
@@ -222,7 +227,9 @@ export const createTemporaryTileActorRuntime = ({
 				item: tileActorTestConfig.items.temporary,
 				location: boardLocation,
 				quantity: 1,
-				remainingDurationMs,
+				schedule: {
+					remainingDurationMs,
+				},
 			},
 		],
 		jobs: [],

@@ -6,7 +6,6 @@ import { z } from "zod";
 export const TypeSchema = z
 	.enum({
 		Common: "common",
-		Temporary: "temporary",
 		Inventory: "inventory",
 	})
 	.meta({

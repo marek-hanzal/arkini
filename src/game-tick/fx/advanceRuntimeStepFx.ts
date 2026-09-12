@@ -15,9 +15,6 @@ import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import { advanceTemporaryItemDurationsFx } from "~/temporary-item/fx/advanceTemporaryItemDurationsFx";
-import { attemptTemporaryItemExpiryFx } from "~/temporary-item/fx/attemptTemporaryItemExpiryFx";
 
 interface RuntimeStepResult {
 	readonly events: readonly GameEventSchema.Type[];
@@ -29,17 +26,11 @@ const sortJobsFn = (jobs: readonly JobSchema.Type[]) =>
 		...jobs,
 	].sort((first, second) => first.id.localeCompare(second.id));
 
-const sortTemporaryItemsFn = (runtime: RuntimeSchema.Type) =>
-	runtime.items
-		.filter((item) => item.item.type === TypeSchema.enum.Temporary)
-		.sort((first, second) => first.id.localeCompare(second.id));
-
-const readReadyTemporaryJobIdsFn = (runtime: RuntimeSchema.Type) =>
+const readReadyMaterialJobIdsFn = (runtime: RuntimeSchema.Type) =>
 	new Set(
 		runtime.items.flatMap((item) => {
 			if (
-				item.item.type !== TypeSchema.enum.Temporary ||
-				item.remainingDurationMs !== 0 ||
+				item.schedule?.remainingDurationMs !== 0 ||
 				(item.location.scope !== LocationScopeEnumSchema.enum.Job &&
 					item.location.scope !== LocationScopeEnumSchema.enum.Reserved)
 			) {
@@ -109,7 +100,7 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 /**
  * Advances one canonical fixed simulation step from one shared step-start snapshot.
  *
- * Temporary eligibility is frozen at step start. Queue-only owners then dispatch
+ * Schedule eligibility is frozen at step start. Queue-only owners then dispatch
  * before job identities and runnable decisions are frozen in stable id order.
  * Later completions may remove those identities but cannot change who earned
  * this step. A completion tied with newly ready material wins; material that was
@@ -118,16 +109,15 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {
-	// Queue admission may emit external unit-depletion output. New temporary
+	// Queue admission may emit external unit-depletion output. New scheduled
 	// identities earn time only from the next boundary, regardless of that output path.
-	const temporaryItems = sortTemporaryItemsFn(stepStart);
 	const boundaryStart = yield* dispatchIdleQueueRequestsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesRuntimeFx(boundaryStart.runtime);
 	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime: deliveryStart.runtime,
 	});
 	const jobs = sortJobsFn(deliveryStart.runtime.jobs);
-	const readyTemporaryJobIds = readReadyTemporaryJobIdsFn(deliveryStart.runtime);
+	const readyMaterialJobIds = readReadyMaterialJobIdsFn(deliveryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
 	for (const job of jobs) {
 		runnableByJobId.set(
@@ -141,10 +131,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		);
 	}
 
-	let draft = yield* advanceTemporaryItemDurationsFx({
-		items: temporaryItems,
-		runtime: deliveryStart.runtime,
-	});
+	let draft = deliveryStart.runtime;
 	for (const job of jobs) {
 		if (job.remainingMs === 0 || runnableByJobId.get(job.id) !== true) continue;
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
@@ -159,19 +146,13 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		...boundaryStart.events,
 		...deliveryStart.events,
 	];
-	const scheduled = yield* advanceItemSchedulesFx({
-		stepStart,
-		runtime: draft,
-	});
-	draft = scheduled.runtime;
-	events.push(...scheduled.events);
 	const completedOwnerItemIds: IdSchema.Type[] = [];
 	for (const job of jobs) {
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
 		if (
 			liveJob === undefined ||
 			liveJob.remainingMs !== 0 ||
-			readyTemporaryJobIds.has(liveJob.id)
+			readyMaterialJobIds.has(liveJob.id)
 		)
 			continue;
 		const owner = draft.items.find((item) => item.id === liveJob.ownerItemId);
@@ -192,36 +173,18 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		completedOwnerItemIds.push(liveJob.ownerItemId);
 	}
 
-	if (completedOwnerItemIds.length > 0) {
+	const scheduled = yield* advanceItemSchedulesFx({
+		stepStart,
+		runtime: draft,
+	});
+	draft = scheduled.runtime;
+	events.push(...scheduled.events);
+	if (completedOwnerItemIds.length > 0 || scheduled.dispatched) {
 		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);
 	}
 
-	let didExpireTemporaryItem = false;
-	for (const temporaryItem of temporaryItems) {
-		const liveItem = draft.items.find((candidate) => candidate.id === temporaryItem.id);
-		if (liveItem?.item.type !== TypeSchema.enum.Temporary || liveItem.remainingDurationMs !== 0)
-			continue;
-		const expiry = yield* attemptTemporaryItemExpiryFx({
-			itemId: liveItem.id,
-			runtime: draft,
-		});
-		if (expiry.type === "blocked") continue;
-		draft = expiry.runtime;
-		events.push(...expiry.events);
-		didExpireTemporaryItem = true;
-	}
-	if (didExpireTemporaryItem) {
-		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
-		draft = dispatched.runtime;
-		events.push(...dispatched.events);
-	}
-	if (scheduled.dispatched) {
-		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
-		draft = dispatched.runtime;
-		events.push(...dispatched.events);
-	}
 	const expired = yield* expireIdleScheduledItemsFx(draft);
 	draft = expired.runtime;
 	events.push(...expired.events);

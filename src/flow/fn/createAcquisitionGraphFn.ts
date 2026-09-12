@@ -175,7 +175,9 @@ const readLineExecutionConstraintFn = (
 	if (clock === undefined) return owner.control === "automatic-only" ? "unavailable" : undefined;
 	if (
 		owner.control === "automatic-only" &&
-		(!line.clock || (!clock.enable && !clock.rules.some(({ type }) => type === "enable")))
+		(clock.intervalMs === undefined ||
+			!line.clock ||
+			(!clock.enable && !clock.rules.some(({ type }) => type === "enable")))
 	)
 		return "unavailable";
 	return clock.durationMs === undefined ? undefined : "finite-owner-lifetime";
@@ -567,22 +569,21 @@ const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 
 const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 	const clock = item.type === "common" ? item.clock : undefined;
-	const durationMs = item.type === "temporary" ? item.durationMs : clock?.durationMs;
-	if (durationMs === undefined) return [];
-	const kind = item.type === "temporary" ? "temporary-expiry" : "clock-expiry";
-	const outputModel = readAcquisitionOutputOccurrencesFn(
-		item.type === "temporary" ? item.output : clock?.onExpire,
-	);
+	const durationMs = clock?.durationMs;
+	if (clock === undefined || durationMs === undefined) return [];
+	const kind = "clock-expiry";
+	const outputModel = readAcquisitionOutputOccurrencesFn(clock.onExpire);
 	return outputModel.occurrences.map(
 		(output): AcquisitionRoute => ({
-			...(clock !== undefined
+			...(!clock.enable && !clock.rules.some(({ type }) => type === "enable")
 				? {
-						executionConstraint:
-							!clock.enable && !clock.rules.some(({ type }) => type === "enable")
-								? ("unavailable" as const)
-								: ("finite-owner-lifetime" as const),
+						executionConstraint: "unavailable" as const,
 					}
-				: {}),
+				: item.type === "common" && item.lines.length > 0
+					? {
+							executionConstraint: "finite-owner-lifetime" as const,
+						}
+					: {}),
 			durationMs,
 			id: readAcquisitionIdentityFn(kind, item.id, output.id, output.factId),
 			metadata: {
@@ -611,7 +612,7 @@ const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 						{
 							factId: item.id,
 							quantity: 1,
-							source: item.type === "temporary" ? "temporary-item" : "expiring-item",
+							source: "expiring-item",
 							usage: "consume",
 						},
 						...output.requirements.allOf,
@@ -619,15 +620,10 @@ const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 					anyOf: output.requirements.anyOf,
 					unsupported: output.requirements.unsupported ?? [],
 				},
-				clock !== undefined
-					? readAcquisitionAvailabilityRequirementsFn({
-							rules: clock.rules,
-							source: "line-condition",
-						})
-					: {
-							allOf: [],
-							anyOf: [],
-						},
+				readAcquisitionAvailabilityRequirementsFn({
+					rules: clock.rules,
+					source: "line-condition",
+				}),
 			),
 			runMultiplier: 1,
 		}),

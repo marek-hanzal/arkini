@@ -59,7 +59,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 						item.location.ownerItemId === ownerItemId &&
 						item.location.lineId === lineId &&
 						item.location.inputIndex === inputIndex &&
-						item.remainingDurationMs !== 0,
+						item.schedule?.remainingDurationMs !== 0,
 				);
 				return resolveInputMaterialRunFx({
 					input,

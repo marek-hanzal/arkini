@@ -1,0 +1,57 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "cf8209303pp8iwepp1vkpxjj",
+		"id": "clay-mug-with-milk",
+		"title": "Clay Mug With Milk",
+		"description": "A mini-milk",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"clay-mug-with-milk"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "clay-mug",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

@@ -1,0 +1,48 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wgmee4fsxq9pwljx0gcbucom",
+		"id": "sick-cow",
+		"title": "Sick Cow",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sick-cow"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-raw-game-meat",
+										"quantity": {
+											"min": 2,
+											"max": 4
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

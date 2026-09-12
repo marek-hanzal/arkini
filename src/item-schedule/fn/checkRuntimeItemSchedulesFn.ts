@@ -23,9 +23,12 @@ export const checkRuntimeItemSchedulesFn = (
 		)
 			reason = "invalid-location";
 		else if (
-			!Number.isSafeInteger(state.remainingIntervalMs) ||
-			state.remainingIntervalMs <= 0 ||
-			state.remainingIntervalMs > config.intervalMs
+			config.intervalMs === undefined
+				? state.remainingIntervalMs !== undefined
+				: state.remainingIntervalMs === undefined ||
+					!Number.isSafeInteger(state.remainingIntervalMs) ||
+					state.remainingIntervalMs <= 0 ||
+					state.remainingIntervalMs > config.intervalMs
 		)
 			reason = "invalid-phase";
 		else if (

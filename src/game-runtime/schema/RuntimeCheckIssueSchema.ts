@@ -21,7 +21,6 @@ import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
 import { ItemUnitsIssueSchema } from "./ItemUnitsIssueSchema";
 import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
-import { ItemTemporaryDurationIssueSchema } from "./ItemTemporaryDurationIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
 import { DefaultLineIssueSchema } from "~/production-line/schema/DefaultLineIssueSchema";
@@ -47,7 +46,6 @@ export const RuntimeCheckIssueSchema = z
 		ItemMaxCountIssueSchema,
 		ItemUnitsIssueSchema,
 		ItemStackSizeIssueSchema,
-		ItemTemporaryDurationIssueSchema,
 		ItemScheduleIssueSchema,
 		InputOwnerMissingIssueSchema,
 		InputLineMissingIssueSchema,

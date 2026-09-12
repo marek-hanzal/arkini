@@ -243,9 +243,15 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "temporary",
 				scope: "board",
 			}),
-			type: "temporary",
-			durationMs: 600,
-			output: guaranteedOutput("log"),
+			type: "common",
+			lines: [],
+			maxQueueSize: 1,
+			clock: {
+				durationMs: 600,
+				enable: true,
+				rules: [],
+				onExpire: guaranteedOutput("log"),
+			},
 		},
 	},
 });

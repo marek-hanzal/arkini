@@ -74,8 +74,12 @@ const config = GameConfigSchema.parse({
 		},
 		temporary: {
 			...baseItem("temporary"),
-			type: "temporary",
-			durationMs: 600,
+			type: "common",
+			lines: [],
+			maxQueueSize: 1,
+			clock: {
+				durationMs: 600,
+			},
 		},
 	},
 });
@@ -138,7 +142,9 @@ describe("temporary material input eligibility", () => {
 					lineId: "line:owner",
 					inputIndex: 0,
 				},
-				remainingDurationMs: 600,
+				schedule: {
+					remainingDurationMs: 600,
+				},
 			});
 		} finally {
 			await Effect.runPromise(session.disposeFx);

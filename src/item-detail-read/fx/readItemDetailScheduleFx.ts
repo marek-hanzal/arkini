@@ -6,11 +6,11 @@ import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemSche
 
 export namespace readItemDetailScheduleFx {
 	export interface Schedule {
-		readonly intervalMs: number;
+		readonly intervalMs?: number;
 		readonly durationMs?: number;
 		readonly control: "automatic-only" | "interactive";
 		readonly runtime?: {
-			readonly remainingIntervalMs: number;
+			readonly remainingIntervalMs?: number;
 			readonly remainingDurationMs?: number;
 			readonly status: "running" | "paused" | "draining";
 		};

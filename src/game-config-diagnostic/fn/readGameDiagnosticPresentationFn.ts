@@ -10,7 +10,6 @@ const diagnosticTitles = {
 	"resource:unused": "Unused asset",
 	"source:duplicate-provider": "Duplicate source provider",
 	"config:missing-reference": "Missing item reference",
-	"input:material-ineligible": "Ineligible material input",
 	"source:schema-invalid": "Invalid source value",
 	"input:units-invalid": "Invalid input unit contract",
 	"merge:invalid": "Invalid merge",
@@ -27,7 +26,6 @@ const diagnosticTitles = {
 
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
 	switch (diagnostic.code) {
-		case "input:material-ineligible":
 		case "input:units-invalid":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineId} · input ${diagnostic.inputIndex + 1}`;
 		case "merge:invalid":

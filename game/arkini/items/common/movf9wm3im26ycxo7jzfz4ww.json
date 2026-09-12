@@ -1,0 +1,47 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "movf9wm3im26ycxo7jzfz4ww",
+		"id": "fertilized-sugar-beet-field",
+		"title": "Fertilized Sugar Beet Field",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"fertilized-sugar-beet-field"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "common",
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-sugar-beet-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

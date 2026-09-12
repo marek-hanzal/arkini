@@ -1,0 +1,59 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "s1wctb1su03hgfe6gzekwmqq",
+		"id": "pancake",
+		"title": "Pancake",
+		"description": "You can make it better",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"pancake"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "clay-plate"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "clay-plate-with-pancake"
+			}
+		],
+		"type": "common",
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-pancake",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"lines": [],
+		"maxQueueSize": 1
+	}
+}

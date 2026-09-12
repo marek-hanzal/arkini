@@ -11,7 +11,6 @@ export const DiagnosticCodeEnumSchema = z
 		ResourceUnused: "resource:unused",
 		SourceDuplicateProvider: "source:duplicate-provider",
 		ConfigMissingReference: "config:missing-reference",
-		InputMaterialIneligible: "input:material-ineligible",
 		SourceSchemaInvalid: "source:schema-invalid",
 		InputUnitsInvalid: "input:units-invalid",
 		MergeInvalid: "merge:invalid",

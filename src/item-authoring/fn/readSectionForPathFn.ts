@@ -18,10 +18,8 @@ export const readSectionForPathFn = (path: ReadonlyArray<PropertyKey>): SectionI
 			return "clock";
 		case "control":
 			return "identity";
-		case "durationMs":
 		case "lines":
 		case "maxQueueSize":
-		case "output":
 			return "production";
 		default:
 			return "identity";

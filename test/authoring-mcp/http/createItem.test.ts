@@ -13,17 +13,16 @@ afterEach(cleanupMcpHarnesses);
 
 const typeGroups = [
 	{
-		name: "creates Common and Clock items through dedicated tools",
+		name: "creates Common items through its dedicated tool",
 		projectId: "common-space-clock-types-project",
 		types: [
 			"common",
 		],
 	},
 	{
-		name: "creates Temporary and Inventory items through dedicated tools",
+		name: "creates Inventory items through its dedicated tool",
 		projectId: "special-item-types-project",
 		types: [
-			"temporary",
 			"inventory",
 		],
 	},

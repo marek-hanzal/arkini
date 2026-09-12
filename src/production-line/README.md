@@ -65,8 +65,8 @@ Tick: ready Job in stable ID order
 → relocate reserved material
 → commit all or nothing
 
-Tick: ready temporary material after completion settlement
-→ remove the temporary identity and place expiry output from the visible owner origin
+Tick: ready expired material after completion settlement
+→ remove the expired identity and place expiry output from the visible owner origin
 → keep the Job when every material minimum still holds
 → otherwise remove the Job and consumed roots, then relocate reservations
 → retry idle owners' queued requests in global intent order
@@ -94,7 +94,7 @@ Scheduled owners use the same selected-line reader and one-intent admission. `Co
 - Authored `ahead` lines opt their produced owner into exactly one downstream output-capacity check. The existing reservation projection accounts for committed intermediates; it does not recurse, schedule future work or reserve speculative output.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.
-- Job, delivery and temporary-item advancement order belongs to Game Tick, not to any production root.
+- Job, delivery and item-schedule advancement order belongs to Game Tick, not to any production root.
 
 ## Changing this island?
 

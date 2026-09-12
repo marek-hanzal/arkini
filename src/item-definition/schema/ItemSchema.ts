@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { InventorySchema } from "./InventorySchema";
 import { CommonSchema } from "./CommonSchema";
-import { TemporarySchema } from "./TemporarySchema";
 
 /**
  * An item configuration, resolved by its `type` discriminator.
@@ -13,7 +12,6 @@ import { TemporarySchema } from "./TemporarySchema";
 export const ItemSchema = z
 	.discriminatedUnion("type", [
 		CommonSchema,
-		TemporarySchema,
 		InventorySchema,
 	])
 	.superRefine((item, context) => {
@@ -28,11 +26,6 @@ export const ItemSchema = z
 					"maxStackSize",
 					item.maxStackSize === 1,
 					"Clock items cannot stack.",
-				],
-				[
-					"lines",
-					item.lines.length > 0,
-					"Clock requires at least one production line.",
 				],
 				[
 					"action",

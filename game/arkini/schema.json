@@ -459,8 +459,7 @@
 			},
 			"then": {
 				"required": [
-					"scope",
-					"lines"
+					"scope"
 				],
 				"properties": {
 					"scope": {
@@ -468,9 +467,6 @@
 					},
 					"maxStackSize": {
 						"const": 1
-					},
-					"lines": {
-						"minItems": 1
 					}
 				},
 				"not": {
@@ -1343,10 +1339,8 @@
 			"type": "object",
 			"properties": {
 				"intervalMs": {
-					"type": "integer",
+					"description": "Optional active milliseconds between attempts to enqueue the effective Clock line; omission creates no pulses.",
 					"minimum": 100,
-					"maximum": 9007199254740991,
-					"description": "Active milliseconds between attempts to enqueue the effective Clock line.",
 					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
 				},
 				"durationMs": {
@@ -1371,12 +1365,23 @@
 				}
 			},
 			"required": [
-				"intervalMs",
 				"enable",
 				"rules"
 			],
 			"additionalProperties": false,
-			"description": "Periodic Clock-line admission with optional active lifetime, availability rules and expiry output."
+			"anyOf": [
+				{
+					"required": [
+						"intervalMs"
+					]
+				},
+				{
+					"required": [
+						"durationMs"
+					]
+				}
+			],
+			"description": "Clock-line admission, finite lifetime, or both, with availability rules and expiry output."
 		},
 		"TimeSchema": {
 			"type": "integer",
@@ -1917,100 +1922,6 @@
 			"exclusiveMinimum": 0,
 			"description": "A number greater than zero."
 		},
-		"item.TemporarySchema": {
-			"type": "object",
-			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"default": "board",
-					"description": "Restricts temporary items to board storage.",
-					"type": "string",
-					"enum": [
-						"board"
-					]
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"default": 1,
-					"description": "Fixes temporary item stacks to one instance.",
-					"maximum": 1,
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"temporary"
-					],
-					"description": "Identifies this item as a temporary board item."
-				},
-				"durationMs": {
-					"type": "integer",
-					"minimum": 500,
-					"maximum": 9007199254740991,
-					"description": "The authored lifetime in milliseconds; must be at least 500 ms.",
-					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
-				},
-				"output": {
-					"description": "The optional output placed from the temporary identity's visible Board origin after expiry.",
-					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
-				}
-			},
-			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"type",
-				"durationMs"
-			],
-			"additionalProperties": false,
-			"description": "A Board-authored, non-stackable item configuration with lifetime and optional expiry output."
-		},
 		"item.InventorySchema": {
 			"type": "object",
 			"properties": {
@@ -2100,9 +2011,6 @@
 			"oneOf": [
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.CommonSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.TemporarySchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.InventorySchema"

@@ -25,8 +25,7 @@ export interface AcquisitionRequirement {
 		| "merge-target"
 		| "output-condition"
 		| "owner"
-		| "expiring-item"
-		| "temporary-item";
+		| "expiring-item";
 	readonly usage: AcquisitionRequirementUsage;
 }
 
@@ -93,7 +92,7 @@ export type AcquisitionRouteMetadata =
 	  }
 	| {
 			readonly itemId: string;
-			readonly kind: "temporary-expiry" | "clock-expiry";
+			readonly kind: "clock-expiry";
 	  };
 
 export interface AcquisitionRoute {

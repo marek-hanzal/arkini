@@ -7,7 +7,6 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 interface CreateRuntimeItemProps<Location extends LocationSchema.Type> {
 	id: IdSchema.Type;
@@ -15,7 +14,6 @@ interface CreateRuntimeItemProps<Location extends LocationSchema.Type> {
 	location: Location;
 	quantity: PositiveIntegerSchema.Type;
 	remainingUnits?: number;
-	remainingDurationMs?: number;
 }
 
 type CreateRuntimeItemResult<Location extends LocationSchema.Type> = Omit<
@@ -30,14 +28,7 @@ type CreateRuntimeItemResult<Location extends LocationSchema.Type> = Omit<
  */
 export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 	Location extends LocationSchema.Type,
->({
-	id,
-	item,
-	location,
-	quantity,
-	remainingUnits,
-	remainingDurationMs,
-}: CreateRuntimeItemProps<Location>) {
+>({ id, item, location, quantity, remainingUnits }: CreateRuntimeItemProps<Location>) {
 	const revision = yield* createRevisionFx();
 	const schedule = readItemScheduleFn(item);
 	return {
@@ -53,9 +44,6 @@ export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 						remainingDurationMs: schedule.durationMs,
 					},
 		remainingUnits,
-		remainingDurationMs:
-			remainingDurationMs ??
-			(item.type === TypeSchema.enum.Temporary ? item.durationMs : undefined),
 		revision,
 	} satisfies CreateRuntimeItemResult<Location>;
 });

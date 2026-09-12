@@ -5,7 +5,6 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { MergeField } from "~/item-authoring/ui/MergeField";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -56,10 +55,6 @@ const MergeFields = ({
 				</EditorFormCard>
 			) : (
 				<>
-					<EditorFormSectionDivider
-						description="Interactions triggered when this item is dropped onto a matching target."
-						title="Merges"
-					/>
 					<EditorCollectionSelector
 						addLabel="Add merge"
 						count={merges.length}

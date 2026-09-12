@@ -4,7 +4,7 @@ import type { PropsWithChildren } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import {
 	EditorSectionNavigation,
 	EditorSectionNavigationSeparator,
@@ -19,19 +19,7 @@ import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
-import { Mx } from "~/translation/ui/Mx";
-import { Tx } from "~/translation/ui/Tx";
-
-const ItemDetailHelpBySection: Partial<Record<SectionId, EditorPageHelpContent>> = {
-	estimate: {
-		content: <Mx label="Item estimate help" />,
-		title: <Tx label="Estimate" />,
-	},
-	connections: {
-		content: <Mx label="Item connections help" />,
-		title: <Tx label="Connections" />,
-	},
-};
+import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
 export const Detail = ({
@@ -57,7 +45,7 @@ export const Detail = ({
 		sectionId === "notes"
 			? "identity"
 			: sectionId;
-	const help = ItemDetailHelpBySection[sectionId];
+	const help = ItemSectionHelp[sectionId];
 	const sections = readSectionsFn();
 	return (
 		<EditorSectionPage
@@ -118,6 +106,7 @@ export const Detail = ({
 		>
 			{sectionId === "identity" ||
 			sectionId === "units" ||
+			sectionId === "clock" ||
 			sectionId === "delete" ||
 			sectionId === "notes" ||
 			sectionId === "estimate" ||

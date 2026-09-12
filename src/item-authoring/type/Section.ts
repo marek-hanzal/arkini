@@ -14,7 +14,7 @@ export const SectionIds = [
 
 export type SectionId = (typeof SectionIds)[number];
 
-export type OptionalCapability = Extract<SectionId, "units" | "merges">;
+export type OptionalCapability = Extract<SectionId, "units" | "merges" | "clock">;
 
 export interface SectionDescriptor {
 	readonly id: SectionId;

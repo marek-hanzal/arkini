@@ -22,13 +22,6 @@ const ClockFields = () => {
 			data-ui="EditorClockFields"
 		>
 			<EditorFormCard>
-				<EditorFormSectionDivider
-					title={translator.textFn("Clock")}
-					description={translator.textFn(
-						"Set an interval, a lifetime, or both. Without an interval, the clock expires once. Without a lifetime, it runs indefinitely.",
-					)}
-					variant="secondary"
-				/>
 				<div className="grid w-1/2 gap-4">
 					<form.AppField name="clock.intervalMs">
 						{(field) => (
@@ -126,7 +119,7 @@ const ClockFields = () => {
 
 /** Authors an optional schedule independently of the item's manual production controls. */
 export const ClockSection = () => {
-	const { form } = useFormSession();
+	const { form, enableClockFn } = useFormSession();
 	const translator = useTranslator();
 	return (
 		<form.Subscribe selector={(state) => state.values.clock}>
@@ -140,17 +133,7 @@ export const ClockSection = () => {
 							description={translator.textFn(
 								"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
 							)}
-							onEnableFn={() => {
-								form.setFieldValue("action", undefined);
-								form.setFieldValue("scope", "board");
-								form.setFieldValue("maxStackSize", 1);
-								form.setFieldValue("clock", {
-									intervalMs: 300_000,
-									durationMs: 3_600_000,
-									enable: true,
-									rules: [],
-								});
-							}}
+							onEnableFn={enableClockFn}
 						/>
 					</EditorFormCard>
 				) : (

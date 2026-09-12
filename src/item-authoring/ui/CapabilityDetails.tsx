@@ -1,59 +1,16 @@
+import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ArrowUpRight, BatteryCharging, Combine, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, BatteryCharging, Combine } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
+import { ButtonLink } from "~/ui/ui/Button";
+import { DetailFact, DetailFacts } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
-import type { OptionalCapability } from "~/item-authoring/type/Section";
-import { Status } from "~/ui/ui/Status";
-
-const DisabledCapabilityDetail = ({
-	actionLabel,
-	capability,
-	description,
-	icon,
-	itemUid,
-	title,
-}: {
-	readonly actionLabel: string;
-	readonly capability: OptionalCapability;
-	readonly description: string;
-	readonly icon: LucideIcon;
-	readonly itemUid: string;
-	readonly title: string;
-}) => {
-	const project = useEditorProject();
-	return (
-		<Status
-			action={
-				<PrimaryButtonLink
-					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-					params={{
-						projectId: project.projectId,
-						itemUid,
-						sectionId: capability,
-					}}
-					search={{
-						enable: capability,
-					}}
-				>
-					{actionLabel}
-				</PrimaryButtonLink>
-			}
-			description={description}
-			icon={icon}
-			title={title}
-			variant="flat"
-		/>
-	);
-};
 
 /** Presents the optional unit capability or its explicit disabled state. */
 export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -74,12 +31,10 @@ export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	) : (
 		<div className="grid gap-3">
 			<EditorRootCard dataUi="EditorItemUnitsCard">
-				<DetailSection title={translator.textFn("Units")}>
-					<DetailFact
-						label={translator.textFn("Initial units")}
-						value={item.units.amount}
-					/>
-				</DetailSection>
+				<DetailFact
+					label={translator.textFn("Initial units")}
+					value={item.units.amount}
+				/>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorItemDepletionOutputCard">
 				<OutputDetail
@@ -155,10 +110,6 @@ const MergeDetail = ({
 /** Presents authored merge interactions or their explicit disabled state. */
 export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
 	<div className="grid gap-[var(--ak-viewport-gap)]">
-		<EditorFormSectionDivider
-			description="Interactions triggered when this item is dropped onto a matching target."
-			title="Merges"
-		/>
 		{item.merge === undefined || item.merge.length === 0 ? (
 			<EditorRootCard dataUi="EditorItemMergesDisabledCard">
 				<DisabledCapabilityDetail

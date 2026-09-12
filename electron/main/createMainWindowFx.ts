@@ -39,6 +39,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				backgroundColor: "#000000",
 				fullscreen: windowMode === "fullscreen",
 				fullscreenable: true,
+				resizable: false,
 				webPreferences: {
 					preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
 					contextIsolation: true,

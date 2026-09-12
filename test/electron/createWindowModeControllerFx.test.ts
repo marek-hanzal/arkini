@@ -80,10 +80,10 @@ describe("createWindowModeControllerFx", () => {
 
 		expect(harness.unmaximize).toHaveBeenCalledOnce();
 		expect(harness.setBounds).toHaveBeenCalledWith({
-			x: 300,
-			y: 175,
-			width: 1_200,
-			height: 750,
+			x: 220,
+			y: 125,
+			width: 1_360,
+			height: 850,
 		});
 		expect(harness.writes).toEqual([
 			"default",

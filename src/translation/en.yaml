@@ -1,5 +1,5 @@
-A clock periodically attempts the line marked Clock. Enabling it removes the action, fixes this item to the board with a stack size of one, and adds a line when needed.:
-  value: A clock periodically attempts the line marked Clock. Enabling it removes the action, fixes this item to the board with a stack size of one, and adds a line when needed.
+A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.:
+  value: A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.
 Action:
   value: Action
 Action is disabled:
@@ -60,6 +60,8 @@ Clock:
   value: Clock
 Clock is disabled:
   value: Clock is disabled
+Clock mode:
+  value: Clock mode
 Close:
   value: Close
 Connection search empty:
@@ -85,6 +87,8 @@ Current stack:
   value: Current stack
 Default:
   value: Default
+Defines this item's production lines, inputs, outputs, runtime and rules.:
+  value: Defines this item's production lines, inputs, outputs, runtime and rules.
 Delete:
   value: Delete
 Depletion output:
@@ -103,8 +107,6 @@ Disabled:
   value: Disabled
 Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.:
   value: Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.
-Each enabled interval attempts to queue the line marked Clock. Accepted production keeps its ordinary line rules.:
-  value: Each enabled interval attempts to queue the line marked Clock. Accepted production keeps its ordinary line rules.
 Edit:
   value: Edit
 Editor Board:
@@ -149,8 +151,8 @@ Enable Units on this item before selecting Spend.:
   value: Enable Units on this item before selecting Spend.
 Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.:
   value: Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.
-Enable a clock to attempt a production line periodically.:
-  value: Enable a clock to attempt a production line periodically.
+Enable a clock for periodic production or a one-time lifetime.:
+  value: Enable a clock for periodic production or a one-time lifetime.
 Enable action:
   value: Enable action
 Enable clock:
@@ -227,6 +229,8 @@ Interval:
   value: Interval
 Interval (seconds):
   value: Interval (seconds)
+Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.:
+  value: Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
@@ -290,17 +294,11 @@ Item type - inventory:
 Item type - missing:
   value: Missing item
   dynamic: true
-Item type - temporary:
-  value: Temporary item
-  dynamic: true
 Item type description - common:
   value: An item with optional production or an immediate action, finite units, and merge rules.
   dynamic: true
 Item type description - inventory:
   value: The singleton item that opens the shared inventory.
-  dynamic: true
-Item type description - temporary:
-  value: A board-only effect that expires after an authored duration.
   dynamic: true
 Keep:
   value: Keep
@@ -363,6 +361,10 @@ Notes help:
     Write them in **Markdown**. Notes stay with the Editor project, but **they are not versioned with it**: creating or restoring a Version does not capture or roll back your notes. They are also excluded from the built Arkpack, so they never affect the game.
 Notes unavailable:
   value: Notes are unavailable.
+Once:
+  value: Once
+Once requires a lifetime. When it ends, accepted production settles before the expiry output is emitted.:
+  value: Once requires a lifetime. When it ends, accepted production settles before the expiry output is emitted.
 Only items with Units enabled are shown because the target pays the unit cost.:
   value: Only items with Units enabled are shown because the target pays the unit cost.
 Optional items emitted after this merge resolves.:
@@ -391,6 +393,8 @@ Player controls:
   value: Player controls
 Product lines:
   value: Product lines
+Production:
+  value: Production
 Production line:
   value: Production line
 Project ID:

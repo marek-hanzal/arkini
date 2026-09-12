@@ -895,12 +895,7 @@ describe("item section form session", () => {
 			clock: {
 				intervalMs: 1000,
 			},
-			lines: [
-				{
-					clock: true,
-					default: true,
-				},
-			],
+			lines: [],
 		});
 	});
 
@@ -949,28 +944,88 @@ describe("item section form session", () => {
 		);
 	});
 
-	it("names and focuses the invalid temporary duration", async () => {
-		const temporary: ItemSchema.Type = {
+	it("switches clock modes while preserving the edited lifetime and expiry output", async () => {
+		const onExpire = createOutput([
+			{
+				itemId: item.id,
+			},
+		]);
+		const scheduled = ItemSchema.parse({
 			...item,
-			type: "temporary",
 			scope: "board",
-			durationMs: 2_000,
+			clock: {
+				intervalMs: 1500,
+				onExpire,
+			},
+		});
+		state.persisted = scheduled;
+		(state.project as Project).config.items[item.id] = scheduled;
+		const { container } = await render(<ClockSection />);
+		const selectMode = async (label: string) => {
+			const button = [
+				...container.querySelectorAll("button"),
+			].find((candidate) => candidate.textContent === label);
+			if (button === undefined) throw new Error(`Missing ${label} clock mode.`);
+			await act(async () => button.click());
 		};
-		state.persisted = temporary;
+		await selectMode("Interval");
+		expect(
+			container.querySelector<HTMLInputElement>('input[name="clock.intervalMs"]')?.value,
+		).toBe("1.5");
+		await selectMode("Once");
+		expect(container.querySelector('input[name="clock.intervalMs"]')).toBeNull();
+		const duration = container.querySelector<HTMLInputElement>(
+			'input[name="clock.durationMs"]',
+		);
+		if (duration === null) throw new Error("Missing Once lifetime.");
+		await changeInput(duration, "5");
+		await selectMode("Interval");
+		expect(
+			container.querySelector<HTMLInputElement>('input[name="clock.intervalMs"]')?.value,
+		).toBe("1");
+		await selectMode("Once");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		const saved = state.saveItem.mock.lastCall?.[0].item;
+		expect(saved).toMatchObject({
+			lines: [],
+			clock: {
+				durationMs: 5000,
+				onExpire,
+			},
+		});
+		expect(saved.clock.intervalMs).toBeUndefined();
+	});
+
+	it("names and focuses the invalid Once lifetime", async () => {
+		const once: ItemSchema.Type = {
+			...item,
+			type: "common",
+			scope: "board",
+			clock: {
+				durationMs: 2000,
+				enable: true,
+				rules: [],
+			},
+		};
+		state.persisted = once;
 		(
 			state.project as {
 				config: {
 					items: Record<string, ItemSchema.Type>;
 				};
 			}
-		).config.items[item.id] = temporary;
-		const { container } = await render(<ProductionSection />);
-		const duration = container.querySelector<HTMLInputElement>('input[name="durationMs"]');
+		).config.items[item.id] = once;
+		const { container } = await render(<ClockSection />);
+		const duration = container.querySelector<HTMLInputElement>(
+			'input[name="clock.durationMs"]',
+		);
 		const saveButton = [
 			...container.querySelectorAll("button"),
 		].find((button) => button.textContent === "Save");
 		if (duration === null || saveButton === undefined)
-			throw new Error("Missing temporary duration form.");
+			throw new Error("Missing Once lifetime form.");
 
 		await changeInput(duration, "");
 		await act(async () => {

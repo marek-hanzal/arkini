@@ -4,7 +4,6 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
-import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 
 const requireReplacementFn = <Schema extends z.ZodType<Record<string, unknown>>>(patch: Schema) =>
 	patch
@@ -27,7 +26,6 @@ const nullableBaseItemFields = {
 
 const editItemInputSchemaIds = {
 	common: "urn:arkini:schema:mcp:edit-common-item-input",
-	temporary: "urn:arkini:schema:mcp:edit-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:edit-inventory-item-input",
 } as const;
 
@@ -46,22 +44,6 @@ const commonPatch = requireReplacementFn(
 ).meta({
 	id: "CommonItemPatchSchema",
 	description: "Top-level replacements accepted for an existing common item.",
-});
-const temporaryPatch = requireReplacementFn(
-	TemporarySchema.omit({
-		...immutableItemFields,
-		maxStackSize: true,
-		scope: true,
-	})
-		.partial()
-		.extend({
-			...nullableBaseItemFields,
-			output: TemporarySchema.shape.output.nullable(),
-		})
-		.strict(),
-).meta({
-	id: "TemporaryItemPatchSchema",
-	description: "Top-level replacements accepted for an existing temporary item.",
 });
 const inventoryPatch = requireReplacementFn(
 	InventorySchema.omit({
@@ -119,11 +101,6 @@ export const EditItemInputSchemas = {
 		schemaId: editItemInputSchemaIds.common,
 		title: "Edit common item tool input",
 		description: "Identity, revision, and replacement patch for one common item.",
-	}),
-	temporary: editItemInputFn(temporaryPatch, {
-		schemaId: editItemInputSchemaIds.temporary,
-		title: "Edit temporary item tool input",
-		description: "Identity, revision, and replacement patch for one temporary item.",
 	}),
 	inventory: editItemInputFn(inventoryPatch, {
 		schemaId: editItemInputSchemaIds.inventory,

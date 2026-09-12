@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
@@ -97,11 +97,11 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 
 	expect(result.first.runtime.items.some((item) => item.item.id === "blocker")).toBe(false);
 	expect(
-		result.first.runtime.items.find((item) => item.item.id === "temporaryPlain")
+		result.first.runtime.items.find((item) => item.item.id === "temporaryPlain")?.schedule
 			?.remainingDurationMs,
 	).toBe(600);
 	expect(
-		result.second.runtime.items.find((item) => item.item.id === "temporaryPlain")
+		result.second.runtime.items.find((item) => item.item.id === "temporaryPlain")?.schedule
 			?.remainingDurationMs,
 	).toBe(500);
 });

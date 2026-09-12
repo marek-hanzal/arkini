@@ -18,7 +18,7 @@ const waterOutput = createOutput([
 ]);
 
 describe("forceDeleteFx", () => {
-	it("clears Clock timer references and expiry output, deleting owners only when their final line is removed", () => {
+	it("clears Clock timer references and expiry output, retaining owners after their final line is removed", () => {
 		const clock = {
 			...createProducerItem({
 				id: "clock",
@@ -78,9 +78,13 @@ describe("forceDeleteFx", () => {
 			lines: clock.lines,
 		});
 		expect(result.config.items.clock).toHaveProperty("clock.onExpire", undefined);
-		expect(result.config.items["clock-with-line"]).toBeUndefined();
+		expect(result.config.items["clock-with-line"]).toMatchObject({
+			lines: [],
+			clock: {
+				intervalMs: 1000,
+			},
+		});
 		expect(result.impact.removedExpiryOutputOwnerIds).toContain("clock");
-		expect(result.impact.deletedOwnerItemIds).toContain("clock-with-line");
 	});
 
 	it("removes every directly referencing structure and keeps unrelated authoring intact", () => {
@@ -164,7 +168,6 @@ describe("forceDeleteFx", () => {
 			],
 		});
 		expect(result.impact).toEqual({
-			deletedOwnerItemIds: [],
 			removedActionInputs: [],
 			removedActionRules: [],
 			removedUnitOutputOwnerIds: [
@@ -314,7 +317,6 @@ describe("forceDeleteFx", () => {
 			type: "common",
 			lines: [],
 		});
-		expect(result.impact.deletedOwnerItemIds).toEqual([]);
 		expect(result.config.start.board).toEqual(config.start.board);
 		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 	});

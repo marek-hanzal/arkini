@@ -1,6 +1,5 @@
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { Array, Effect } from "effect";
-import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
@@ -36,36 +35,17 @@ const readProgressRatioFn = ({
 }: {
 	readonly activeJob?: JobSchema.Type;
 	readonly item: RuntimeItemSchema.Type;
-}) =>
-	match({
-		activeJob,
-		item,
-	})
-		.with(
-			{
-				activeJob: P.nonNullable,
-			},
-			({ activeJob: job }) =>
-				job.durationMs <= 0 ? 1 : clampRatioFn(1 - job.remainingMs / job.durationMs),
-		)
-		.with(
-			{
-				activeJob: P.nullish,
-				item: {
-					item: {
-						type: TypeSchema.enum.Temporary,
-					},
-				},
-			},
-			({ item: temporary }) =>
-				temporary.item.durationMs <= 0
-					? 0
-					: clampRatioFn(
-							(temporary.remainingDurationMs ?? temporary.item.durationMs) /
-								temporary.item.durationMs,
-						),
-		)
-		.otherwise(() => undefined);
+}) => {
+	if (activeJob !== undefined)
+		return activeJob.durationMs <= 0
+			? 1
+			: clampRatioFn(1 - activeJob.remainingMs / activeJob.durationMs);
+	const durationMs = readItemScheduleFn(item.item)?.durationMs;
+	if (durationMs === undefined) return undefined;
+	return durationMs <= 0
+		? 0
+		: clampRatioFn((item.schedule?.remainingDurationMs ?? durationMs) / durationMs);
+};
 
 /** Projects only exact live grid identities visible to one Pixi scene. */
 export const readTileActorsFx = Effect.fnUntraced(function* ({

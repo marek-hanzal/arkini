@@ -7,7 +7,7 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 export const ScheduleStateSchema = z
 	.object({
 		lineId: IdSchema.nullable().optional(),
-		remainingIntervalMs: PositiveIntegerSchema,
+		remainingIntervalMs: PositiveIntegerSchema.optional(),
 		remainingDurationMs: TimeSchema.optional(),
 	})
 	.strict()

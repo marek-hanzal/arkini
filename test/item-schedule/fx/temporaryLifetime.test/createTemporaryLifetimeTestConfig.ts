@@ -131,43 +131,59 @@ export const createTemporaryLifetimeTestConfig = () =>
 				...baseItem({
 					id: "temporaryPlain",
 				}),
-				type: "temporary",
-				durationMs: 600,
+				type: "common",
+				lines: [],
+				maxQueueSize: 1,
+				clock: {
+					durationMs: 600,
+				},
 			},
 			temporaryOutput: {
 				...baseItem({
 					id: "temporaryOutput",
 				}),
-				type: "temporary",
-				durationMs: 600,
-				output: guaranteedOutput({
-					itemId: "result",
-				}),
+				type: "common",
+				lines: [],
+				maxQueueSize: 1,
+				clock: {
+					durationMs: 600,
+					onExpire: guaranteedOutput({
+						itemId: "result",
+					}),
+				},
 			},
 			temporaryRandomOutput: {
 				...baseItem({
 					id: "temporaryRandomOutput",
 				}),
-				type: "temporary",
-				durationMs: 600,
-				output: guaranteedOutput({
-					itemId: "result",
-					placement: "random",
-					quantity: {
-						min: 2,
-						max: 3,
-					},
-				}),
+				type: "common",
+				lines: [],
+				maxQueueSize: 1,
+				clock: {
+					durationMs: 600,
+					onExpire: guaranteedOutput({
+						itemId: "result",
+						placement: "random",
+						quantity: {
+							min: 2,
+							max: 3,
+						},
+					}),
+				},
 			},
 			temporaryCappedOutput: {
 				...baseItem({
 					id: "temporaryCappedOutput",
 				}),
-				type: "temporary",
-				durationMs: 600,
-				output: guaranteedOutput({
-					itemId: "cappedResult",
-				}),
+				type: "common",
+				lines: [],
+				maxQueueSize: 1,
+				clock: {
+					durationMs: 600,
+					onExpire: guaranteedOutput({
+						itemId: "cappedResult",
+					}),
+				},
 			},
 			producer: {
 				...baseItem({

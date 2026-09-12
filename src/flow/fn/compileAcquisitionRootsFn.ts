@@ -30,11 +30,7 @@ const readItemOutputsFn = (item: ItemSchema.Type) => {
 		...readAuthoredItemLinesFn(item).map(({ output }) => output),
 		item.units?.output,
 		...(item.merge ?? []).map(({ output }) => output),
-		item.type === "temporary"
-			? item.output
-			: item.type === "common"
-				? item.clock?.onExpire
-				: undefined,
+		item.type === "common" ? item.clock?.onExpire : undefined,
 	];
 };
 

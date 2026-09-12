@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
-import { isMaterialInputEligibleFn } from "~/production-input/fn/isMaterialInputEligibleFn";
 import { isLineInputAutofillSourceLocationFn } from "~/production-input/fn/isLineInputAutofillSourceLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -49,7 +48,6 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		if (
 			candidate.id === ownerItemId ||
 			busyOwnerItemIds.has(candidate.id) ||
-			!isMaterialInputEligibleFn(candidate.item) ||
 			!matchesItemSelectorFn({
 				item: candidate.item,
 				selector,
@@ -103,7 +101,6 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	const matchingDefinitionIds: IdSchema.Type[] = [];
 	for (const item of Object.values(config.items)) {
 		if (
-			isMaterialInputEligibleFn(item) &&
 			matchesItemSelectorFn({
 				item,
 				selector,

@@ -11,7 +11,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
-import { createTemporaryMaterialLifecycleTestConfig } from "~test/temporary-item/fx/temporaryMaterialLifecycle.test/createTemporaryMaterialLifecycleTestConfig";
+import { createTemporaryMaterialLifecycleTestConfig } from "~test/item-schedule/fx/temporaryMaterialLifecycle.test/createTemporaryMaterialLifecycleTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,
@@ -251,7 +251,9 @@ describe("temporary material lifecycle", () => {
 			expect(blocked.runtime.items).toContainEqual(
 				expect.objectContaining({
 					id: "runtime:temporary",
-					remainingDurationMs: 0,
+					schedule: {
+						remainingDurationMs: 0,
+					},
 				}),
 			);
 		}

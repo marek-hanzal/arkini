@@ -1,5 +1,5 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 
 export type OutputPath = "expiry" | "line" | "deferred-depletion" | "immediate-depletion";
 
@@ -56,13 +56,17 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			...base.items,
 			temporaryPlain: {
 				...base.items.temporaryPlain,
-				durationMs: markerDuration,
-				output: output("blocker"),
+				clock: {
+					durationMs: markerDuration,
+					onExpire: output("blocker"),
+				},
 			},
 			temporaryOutput: {
 				...base.items.temporaryOutput,
-				durationMs: 600,
-				output: output("result", true),
+				clock: {
+					durationMs: 600,
+					onExpire: output("result", true),
+				},
 			},
 			payer: {
 				...base.items.blocker,

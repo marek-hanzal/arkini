@@ -1,11 +1,9 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
-import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 const draftAsset = AssetSchema.optional().describe(
@@ -23,7 +21,6 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 
 const createItemInputSchemaIds = {
 	common: "urn:arkini:schema:mcp:create-common-item-input",
-	temporary: "urn:arkini:schema:mcp:create-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:create-inventory-item-input",
 } as const;
 
@@ -59,27 +56,6 @@ export const CreateItemInputSchemas = {
 			$id: createItemInputSchemaIds.common,
 			title: "Create common item tool input",
 			description: "Authoring fields accepted when creating one common item.",
-		}),
-	temporary: TemporarySchema.omit({
-		asset: true,
-		durationMs: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			durationMs: TimeSchema.min(500)
-				.optional()
-				.describe("Optional lifetime in milliseconds; defaults to 500."),
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.temporary,
-			$id: createItemInputSchemaIds.temporary,
-			title: "Create temporary item tool input",
-			description: "Authoring fields accepted when creating one temporary item.",
 		}),
 	inventory: InventorySchema.omit({
 		asset: true,

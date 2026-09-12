@@ -42,9 +42,7 @@ export const IdentitySection = () => {
 				<form.AppField name="title">
 					{(field) => <field.TextField label="Title" />}
 				</form.AppField>
-				{canonicalItem.type === "inventory" ||
-				canonicalItem.type === "temporary" ||
-				clock !== undefined ? (
+				{canonicalItem.type === "inventory" || clock !== undefined ? (
 					<div className="grid content-start gap-1.5 text-sm">
 						<span className="font-semibold text-foreground">Storage scope</span>
 						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
@@ -101,9 +99,7 @@ export const IdentitySection = () => {
 						)}
 					</form.AppField>
 				)}
-				{canonicalItem.type === "inventory" ||
-				canonicalItem.type === "temporary" ||
-				clock !== undefined ? null : (
+				{canonicalItem.type === "inventory" || clock !== undefined ? null : (
 					<form.AppField name="maxStackSize">
 						{(field) => (
 							<field.NumberField

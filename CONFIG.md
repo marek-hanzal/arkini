@@ -82,18 +82,18 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
-- Common has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Empty Common items expose no runtime production controls; adding lines enables the ordinary production contract. Common with `clock` requires at least one line;
+- Common has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Empty Common items expose no runtime production controls; adding lines enables the ordinary production contract. Common with `clock` may also have no lines;
 - Common may author one optional `action`, a strict discriminated union currently containing `space` with its target `space`, optional `input` and `rules` collections defaulting to empty. Action rules alone determine availability; no `enable` field exists. Inventory remains a dedicated item type;
 - canonical Item validation rejects simultaneous `action` and nonempty `lines`. Editor capability switches clear the opposing capability in one form update with advance help; JSON and MCP reject conflicting data without silently deleting authored fields;
 - optional line `ahead` opts its owner into one-hop future output-capacity checks when produced; omitted or false leaves that line out of the check. This capability works on every Common line;
 - line input is passive; Enqueue and Tick own execution;
-- material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
+- material selectors may name any canonical item, including finite-lifetime Board identities whose lifetime continues in input and job storage;
 - positive extra material capacity is supported for Common lines;
 - `units` defines a finite supply inside each item instance (health, resource stock, or uses), independently of item type and separately from stack `quantity`: passive and manually operated resources use Common; scheduled production adds Common.clock;
 - `self` unit costs use the line owner, while `target` is valid only for a units input and its deterministic Board payer (including an owner with units selected at self distance);
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode;
 - directional merge rules belong to the source item and never imply a reverse rule;
-- optional Common `clock` groups `intervalMs`, optional `durationMs`, `enable`, `rules`, and `onExpire`. It requires Board scope, `maxStackSize: 1`, nonempty lines and no Action. Its authored `enable` defaults to true; missing duration means unlimited active lifetime;
+- optional Common `clock` groups optional `intervalMs`, optional `durationMs`, `enable`, `rules`, and `onExpire`. At least one timer is required. It requires Board scope, `maxStackSize: 1` and no Action; lines may be empty. Its authored `enable` defaults to true; missing duration means unlimited active lifetime. Missing interval gives a one-shot lifetime without pulses. Editor Interval / Once controls this same shape without a separate mode field;
 - Common `control` is optional and defaults to interactive behavior; `automatic-only` restricts player production independently of the Clock capability;
 - line `default` and optional `clock` independently select the manual and automatic line. At most one authored line per role is allowed; Editor controls clear the same flag on siblings. Clock without a selected line still ages normally and creates no work;
 - an item type, field, or schema variant is not runtime-backed until an owned command/Tick path and focused behavior proof implement it.

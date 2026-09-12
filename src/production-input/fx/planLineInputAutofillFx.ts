@@ -4,7 +4,6 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import { isLineInputAutofillSourceLocationFn } from "~/production-input/fn/isLineInputAutofillSourceLocationFn";
-import { readMaterialInputEligibilityFn } from "~/production-input/fn/readMaterialInputEligibilityFn";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
@@ -122,9 +121,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		candidates.push(gridCandidate);
 	}
 	candidates.sort(compareCandidatesFn(owner));
-	const eligibleCandidateItems = readMaterialInputEligibilityFn({
-		items: candidates.map((candidate) => candidate.item),
-	}).eligibleItems;
+	const eligibleCandidateItems = candidates.map((candidate) => candidate.item);
 	const remainingByItemId = new Map(
 		candidates.map((candidate) => [
 			candidate.id,

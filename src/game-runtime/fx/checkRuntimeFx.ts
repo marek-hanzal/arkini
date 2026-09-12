@@ -15,8 +15,6 @@ import { ItemUnitsIssueReasonEnumSchema } from "~/game-runtime/schema/ItemUnitsI
 import type { ItemUnitsIssueSchema } from "~/game-runtime/schema/ItemUnitsIssueSchema";
 import type { ItemMaxCountIssueSchema } from "~/game-runtime/schema/ItemMaxCountIssueSchema";
 import type { ItemStackSizeIssueSchema } from "~/game-runtime/schema/ItemStackSizeIssueSchema";
-import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/game-runtime/schema/ItemTemporaryDurationIssueReasonEnumSchema";
-import type { ItemTemporaryDurationIssueSchema } from "~/game-runtime/schema/ItemTemporaryDurationIssueSchema";
 import type { LocationOccupiedIssueSchema } from "~/game-runtime/schema/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/game-runtime/schema/LocationOutOfBoundsIssueSchema";
 import type { LocationScopeIssueSchema } from "~/game-runtime/schema/LocationScopeIssueSchema";
@@ -27,7 +25,6 @@ import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationS
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
 import { checkRuntimeInputLocationsFn } from "~/production-input/fn/checkRuntimeInputLocationsFn";
 import { checkRuntimeJobsFn } from "~/production-job/fn/checkRuntimeJobsFn";
@@ -190,61 +187,6 @@ const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitiesFx")(f
 	];
 });
 
-const checkRuntimeItemTemporaryDurationsFn = (runtime: RuntimeSchema.Type) => {
-	const issues: ItemTemporaryDurationIssueSchema.Type[] = [];
-
-	for (const item of runtime.items) {
-		if (item.item.type !== TypeSchema.enum.Temporary) {
-			if (item.remainingDurationMs !== undefined) {
-				issues.push({
-					type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-					itemId: item.id,
-					remainingDurationMs: item.remainingDurationMs,
-					location: item.location,
-					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnexpectedState,
-				});
-			}
-			continue;
-		}
-
-		if (
-			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
-		) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-				itemId: item.id,
-				durationMs: item.item.durationMs,
-				remainingDurationMs: item.remainingDurationMs,
-				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnsupportedLocation,
-			});
-		}
-		if (item.remainingDurationMs === undefined) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-				itemId: item.id,
-				durationMs: item.item.durationMs,
-				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.MissingState,
-			});
-			continue;
-		}
-		if (item.remainingDurationMs > item.item.durationMs) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-				itemId: item.id,
-				durationMs: item.item.durationMs,
-				remainingDurationMs: item.remainingDurationMs,
-				location: item.location,
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.ExceedsDuration,
-			});
-		}
-	}
-
-	return issues;
-};
-
 const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: RuntimeSchema.Type) => {
 	const items: {
 		readonly item: RuntimeItemSchema.Type;
@@ -335,7 +277,6 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const itemUnitIssues = checkRuntimeItemUnitsFn(runtime);
 	const itemIdIssues = checkRuntimeItemIdsFn(runtime);
 	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx(runtime);
-	const itemTemporaryDurationIssues = checkRuntimeItemTemporaryDurationsFn(runtime);
 	const defaultLineIssues = checkRuntimeDefaultLinesFn({
 		runtime,
 	});
@@ -355,7 +296,6 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 			...itemUnitIssues,
 			...itemIdIssues,
 			...itemQuantityIssues,
-			...itemTemporaryDurationIssues,
 			...checkRuntimeItemSchedulesFn(runtime),
 			...defaultLineIssues,
 			...inputLocationIssues,

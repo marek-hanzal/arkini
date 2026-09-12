@@ -19,46 +19,52 @@ const createClockGraph = async ({
 	enable = true,
 	control = "automatic-only",
 	runtimeMs = 300,
+	once = false,
+	passive = false,
 }: {
 	durationMs?: number;
 	enable?: boolean;
 	control?: "automatic-only" | "interactive";
 	runtimeMs?: number;
+	once?: boolean;
+	passive?: boolean;
 } = {}) => {
 	const clock = CommonSchema.parse({
 		...createProducerItem({
 			id: "clock",
-			lines: [
-				{
-					...createLine({
-						id: "default",
-						default: false,
-						clock: true,
-						output: createOutput([
-							{
-								itemId: "target",
-							},
-						]),
-					}),
-					runtimeMs,
-				},
-				createLine({
-					id: "manual",
-					default: true,
-					output: createOutput([
+			lines: passive
+				? []
+				: [
 						{
-							itemId: "other",
+							...createLine({
+								id: "default",
+								default: false,
+								clock: true,
+								output: createOutput([
+									{
+										itemId: "target",
+									},
+								]),
+							}),
+							runtimeMs,
 						},
-					]),
-				}),
-			],
+						createLine({
+							id: "manual",
+							default: true,
+							output: createOutput([
+								{
+									itemId: "other",
+								},
+							]),
+						}),
+					],
 		}),
 		type: "common",
 		scope: "board",
 		maxStackSize: 1,
 		control,
 		clock: {
-			intervalMs: 1000,
+			intervalMs: once ? undefined : 1000,
 			durationMs,
 			enable,
 			onExpire: createOutput([
@@ -100,6 +106,64 @@ const createClockGraph = async ({
 };
 
 describe("Clock authored acquisition boundaries", () => {
+	it("keeps one-shot expiry fully estimable when the owner has no production to drain", async () => {
+		const graph = await createClockGraph({
+			durationMs: 2000,
+			once: true,
+			passive: true,
+		});
+		expect(
+			estimateRequestsFn({
+				graph,
+				requests: [
+					{
+						factId: "expired",
+					},
+				],
+			})[0],
+		).toMatchObject({
+			status: "complete",
+			durationMs: 2000,
+		});
+		const disabled = await createClockGraph({
+			durationMs: 2000,
+			once: true,
+			passive: true,
+			enable: false,
+		});
+		expect(
+			estimateRequestsFn({
+				graph: disabled,
+				requests: [
+					{
+						factId: "expired",
+					},
+				],
+			})[0],
+		).toMatchObject({
+			status: "unreachable",
+		});
+	});
+
+	it("does not invent automatic production pulses for a lifetime-only owner", async () => {
+		const graph = await createClockGraph({
+			durationMs: 2000,
+			once: true,
+		});
+		expect(
+			estimateRequestsFn({
+				graph,
+				requests: [
+					{
+						factId: "target",
+					},
+				],
+			})[0],
+		).toMatchObject({
+			status: "unreachable",
+		});
+	});
+
 	it("keeps ordinary lines and expiry in Flow while finite capacity and settlement stay indeterminate", async () => {
 		const graph = await createClockGraph({
 			durationMs: 2000,

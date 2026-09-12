@@ -154,10 +154,12 @@ const createLifecycleConfig = ({
 					...baseItem({
 						id: "target",
 					}),
-					durationMs: targetDurationMs,
+					clock: {
+						durationMs: targetDurationMs,
+					},
 					maxStackSize: 1,
 					scope: "board" as const,
-					type: "temporary" as const,
+					type: "common" as const,
 				};
 
 	return GameConfigSchema.parse({
@@ -206,10 +208,12 @@ const createLifecycleConfig = ({
 							...baseItem({
 								id: "result",
 							}),
-							durationMs: resultDurationMs,
+							clock: {
+								durationMs: resultDurationMs,
+							},
 							maxStackSize: 1,
 							scope: "board",
-							type: "temporary",
+							type: "common",
 						},
 			material: {
 				maxQueueSize: 1,
@@ -698,7 +702,9 @@ describe("mergeItemsFx participant lifecycle", () => {
 				boardItem("source", 0),
 				{
 					...boardItem("target", 1),
-					remainingDurationMs: 123_000,
+					schedule: {
+						remainingDurationMs: 123_000,
+					},
 				},
 			],
 			jobQueue: [],
@@ -718,7 +724,9 @@ describe("mergeItemsFx participant lifecycle", () => {
 			item: {
 				id: "result",
 			},
-			remainingDurationMs: 10_000,
+			schedule: {
+				remainingDurationMs: 10_000,
+			},
 		});
 	});
 

@@ -7,7 +7,7 @@ import {
 	guaranteedMergeOutput,
 } from "~test/item-merge/support/createMergeTestConfig";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 
 const readIdsFn = (
 	config: GameConfigSchema.Type,

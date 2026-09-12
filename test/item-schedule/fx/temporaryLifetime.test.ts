@@ -14,10 +14,9 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
-import { createTemporaryLifetimeTestConfig } from "~test/temporary-item/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
+import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
-import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/game-runtime/schema/ItemTemporaryDurationIssueReasonEnumSchema";
 
 const config = createTemporaryLifetimeTestConfig();
 
@@ -34,7 +33,7 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 			itemId: item.item.id,
 			location: item.location,
 			quantity: item.quantity,
-			remainingDurationMs: item.remainingDurationMs,
+			remainingDurationMs: item.schedule?.remainingDurationMs,
 		}))
 		.sort((first, second) => first.id.localeCompare(second.id)),
 	jobs: runtime.jobs,
@@ -109,13 +108,13 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(result.spawned.remainingDurationMs).toBe(600);
-		expect(result.first.runtime.items[0]?.remainingDurationMs).toBe(500);
+		expect(result.spawned.schedule?.remainingDurationMs).toBe(600);
+		expect(result.first.runtime.items[0]?.schedule?.remainingDurationMs).toBe(500);
 		expect(result.first.runtime.items[0]?.revision).toBe(result.spawned.revision);
-		expect(result.second.runtime.items[0]?.remainingDurationMs).toBe(400);
-		expect(result.third.runtime.items[0]?.remainingDurationMs).toBe(300);
-		expect(result.fourth.runtime.items[0]?.remainingDurationMs).toBe(200);
-		expect(result.fifth.runtime.items[0]?.remainingDurationMs).toBe(100);
+		expect(result.second.runtime.items[0]?.schedule?.remainingDurationMs).toBe(400);
+		expect(result.third.runtime.items[0]?.schedule?.remainingDurationMs).toBe(300);
+		expect(result.fourth.runtime.items[0]?.schedule?.remainingDurationMs).toBe(200);
+		expect(result.fifth.runtime.items[0]?.schedule?.remainingDurationMs).toBe(100);
 		expect(result.sixth.runtime.items).toEqual([]);
 		expect(result.sixth.events).toEqual([
 			{
@@ -211,7 +210,7 @@ describe("temporary item lifetime", () => {
 				},
 			},
 		});
-		expect(result.runtime.items[0]?.remainingDurationMs).toBe(500);
+		expect(result.runtime.items[0]?.schedule?.remainingDurationMs).toBe(500);
 	});
 
 	it("persists and restores the remaining duration with a fresh revision", () => {
@@ -240,8 +239,8 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(result.state?.remainingDurationMs).toBe(400);
-		expect(result.restored?.remainingDurationMs).toBe(400);
+		expect(result.state?.schedule?.remainingDurationMs).toBe(400);
+		expect(result.restored?.schedule?.remainingDurationMs).toBe(400);
 		expect(result.restored?.revision).not.toBe(result.spawned.revision);
 	});
 
@@ -377,7 +376,9 @@ describe("temporary item lifetime", () => {
 		expect(blocked.first.items).toContainEqual(
 			expect.objectContaining({
 				id: "runtime:random-temporary",
-				remainingDurationMs: 0,
+				schedule: {
+					remainingDurationMs: 0,
+				},
 			}),
 		);
 		const summarizeResults = (runtime: RuntimeSchema.Type) =>
@@ -424,7 +425,9 @@ describe("temporary item lifetime", () => {
 		expect(runtime.items).toContainEqual(
 			expect.objectContaining({
 				id: "runtime:b",
-				remainingDurationMs: 0,
+				schedule: {
+					remainingDurationMs: 0,
+				},
 			}),
 		);
 		expect(runtime.items.filter((item) => item.item.id === "cappedResult")).toHaveLength(1);
@@ -466,7 +469,9 @@ describe("temporary item lifetime", () => {
 				item: expect.objectContaining({
 					id: "temporaryPlain",
 				}),
-				remainingDurationMs: 600,
+				schedule: {
+					remainingDurationMs: 600,
+				},
 			}),
 		);
 	});
@@ -512,7 +517,9 @@ describe("temporary item lifetime", () => {
 				id: "temporaryPlain",
 			},
 			location: result.target.location,
-			remainingDurationMs: 600,
+			schedule: {
+				remainingDurationMs: 600,
+			},
 		});
 		expect(replaced?.revision).not.toBe(result.target.revision);
 	});
@@ -551,18 +558,9 @@ describe("temporary item lifetime", () => {
 		expect(result.issues).toEqual(
 			expect.arrayContaining([
 				{
-					type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
+					type: RuntimeCheckIssueEnumSchema.enum.ItemSchedule,
 					itemId: "runtime:temporary",
-					durationMs: 600,
-					remainingDurationMs: 600,
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnsupportedLocation,
+					reason: "invalid-location",
 				},
 			]),
 		);
@@ -580,7 +578,9 @@ describe("temporary item lifetime", () => {
 							item.id === blocker.id
 								? {
 										...item,
-										remainingDurationMs: 400,
+										schedule: {
+											remainingDurationMs: 400,
+										},
 									}
 								: item,
 						),
@@ -595,18 +595,9 @@ describe("temporary item lifetime", () => {
 
 		expect(result.issues).toEqual([
 			{
-				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
+				type: RuntimeCheckIssueEnumSchema.enum.ItemSchedule,
 				itemId: "runtime:blocker",
-				remainingDurationMs: 400,
-				location: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnexpectedState,
+				reason: "unexpected-state",
 			},
 		]);
 	});

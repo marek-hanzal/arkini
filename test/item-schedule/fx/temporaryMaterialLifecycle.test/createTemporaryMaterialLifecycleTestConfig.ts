@@ -91,9 +91,13 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 			},
 			temporary: {
 				...baseItem("temporary"),
-				type: "temporary",
-				durationMs: 600,
-				output: guaranteedOutput("residue"),
+				type: "common",
+				lines: [],
+				maxQueueSize: 1,
+				clock: {
+					durationMs: 600,
+					onExpire: guaranteedOutput("residue"),
+				},
 			},
 			residue: {
 				maxQueueSize: 1,

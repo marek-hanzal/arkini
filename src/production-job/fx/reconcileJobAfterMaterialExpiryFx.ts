@@ -14,7 +14,7 @@ import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 
 import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
 
-export namespace reconcileJobAfterTemporaryMaterialExpiryFx {
+export namespace reconcileJobAfterMaterialExpiryFx {
 	export interface Props {
 		readonly jobId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
@@ -53,59 +53,59 @@ const hasRequiredJobMaterialsFn = ({
 	});
 
 /** Keeps a viable job running or atomically discards its consumed work and returns reservations. */
-export const reconcileJobAfterTemporaryMaterialExpiryFx = Effect.fn(
-	"reconcileJobAfterTemporaryMaterialExpiryFx",
-)(function* ({ jobId, runtime }: reconcileJobAfterTemporaryMaterialExpiryFx.Props) {
-	const job = runtime.jobs.find((candidate) => candidate.id === jobId);
-	if (job === undefined) return yield* Effect.die(new Error(`Job ${jobId} is missing.`));
-	const { line, owner } = yield* readBoardItemLineFx({
-		lineId: job.lineId,
-		ownerItemId: job.ownerItemId,
-		runtime,
-	});
-	if (
-		hasRequiredJobMaterialsFn({
-			job,
-			line,
+export const reconcileJobAfterMaterialExpiryFx = Effect.fn("reconcileJobAfterMaterialExpiryFx")(
+	function* ({ jobId, runtime }: reconcileJobAfterMaterialExpiryFx.Props) {
+		const job = runtime.jobs.find((candidate) => candidate.id === jobId);
+		if (job === undefined) return yield* Effect.die(new Error(`Job ${jobId} is missing.`));
+		const { line, owner } = yield* readBoardItemLineFx({
+			lineId: job.lineId,
+			ownerItemId: job.ownerItemId,
 			runtime,
-		})
-	) {
-		return {
-			events: [],
-			runtime,
-			status: "continued",
-		} satisfies reconcileJobAfterTemporaryMaterialExpiryFx.Result;
-	}
+		});
+		if (
+			hasRequiredJobMaterialsFn({
+				job,
+				line,
+				runtime,
+			})
+		) {
+			return {
+				events: [],
+				runtime,
+				status: "continued",
+			} satisfies reconcileJobAfterMaterialExpiryFx.Result;
+		}
 
-	const consumedItems = runtime.items.filter(
-		(item): item is JobRuntimeItemSchema.Type =>
-			item.location.scope === LocationScopeEnumSchema.enum.Job &&
-			item.location.jobId === job.id,
-	);
-	const reservations = runtime.items.filter(
-		(item): item is ReservedRuntimeItemSchema.Type =>
-			item.location.scope === LocationScopeEnumSchema.enum.Reserved &&
-			item.location.jobId === job.id,
-	);
-	let draft = {
-		...runtime,
-		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
-	} satisfies RuntimeSchema.Type;
-	for (const consumedItem of consumedItems) {
-		draft = yield* removeRuntimeItemIdentityFx({
-			item: consumedItem,
+		const consumedItems = runtime.items.filter(
+			(item): item is JobRuntimeItemSchema.Type =>
+				item.location.scope === LocationScopeEnumSchema.enum.Job &&
+				item.location.jobId === job.id,
+		);
+		const reservations = runtime.items.filter(
+			(item): item is ReservedRuntimeItemSchema.Type =>
+				item.location.scope === LocationScopeEnumSchema.enum.Reserved &&
+				item.location.jobId === job.id,
+		);
+		let draft = {
+			...runtime,
+			jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
+		} satisfies RuntimeSchema.Type;
+		for (const consumedItem of consumedItems) {
+			draft = yield* removeRuntimeItemIdentityFx({
+				item: consumedItem,
+				runtime: draft,
+			});
+		}
+		const released = yield* releaseJobReservationsFx({
+			origin: owner.location,
+			originItemId: owner.id,
+			reservations,
 			runtime: draft,
 		});
-	}
-	const released = yield* releaseJobReservationsFx({
-		origin: owner.location,
-		originItemId: owner.id,
-		reservations,
-		runtime: draft,
-	});
-	return {
-		events: released.events,
-		runtime: released.runtime,
-		status: "aborted",
-	} satisfies reconcileJobAfterTemporaryMaterialExpiryFx.Result;
-});
+		return {
+			events: released.events,
+			runtime: released.runtime,
+			status: "aborted",
+		} satisfies reconcileJobAfterMaterialExpiryFx.Result;
+	},
+);

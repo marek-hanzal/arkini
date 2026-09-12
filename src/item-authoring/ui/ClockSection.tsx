@@ -1,7 +1,8 @@
 import { CircleCheck, CircleX, Clock, PackagePlus, Trash2 } from "lucide-react";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
-import { createLineFn } from "~/production-authoring/fn/createLineFn";
+import { useStore } from "@tanstack/react-form";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
@@ -13,6 +14,9 @@ import { Button } from "~/ui/ui/Button";
 const ClockFields = () => {
 	const translator = useTranslator();
 	const { form } = useFormSession();
+	const clock = useStore(form.store, (state) => state.values.clock);
+	if (clock === undefined) return null;
+	const once = clock.intervalMs === undefined;
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
@@ -22,28 +26,61 @@ const ClockFields = () => {
 				<EditorFormSectionDivider
 					title={translator.textFn("Clock")}
 					description={translator.textFn(
-						"Each enabled interval attempts to queue the line marked Clock. Accepted production keeps its ordinary line rules.",
+						"Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.",
 					)}
 					variant="secondary"
 				/>
+				<EditorChoiceControl
+					label={translator.textFn("Clock mode")}
+					value={once ? "once" : "interval"}
+					options={[
+						{
+							value: "interval",
+							label: translator.textFn("Interval"),
+						},
+						{
+							value: "once",
+							label: translator.textFn("Once"),
+						},
+					]}
+					onChangeFn={(mode) =>
+						form.setFieldValue(
+							"clock",
+							mode === "once"
+								? {
+										...clock,
+										intervalMs: undefined,
+										durationMs: clock.durationMs ?? 300_000,
+									}
+								: {
+										...clock,
+										intervalMs: clock.intervalMs ?? 1000,
+									},
+						)
+					}
+				/>
 				<div className="grid grid-cols-2 gap-4">
-					<form.AppField name="clock.intervalMs">
-						{(field) => (
-							<field.SecondsField
-								label={translator.textFn("Interval (seconds)")}
-								min={0.1}
-							/>
-						)}
-					</form.AppField>
+					{once ? null : (
+						<form.AppField name="clock.intervalMs">
+							{(field) => (
+								<field.SecondsField
+									label={translator.textFn("Interval (seconds)")}
+									min={0.1}
+								/>
+							)}
+						</form.AppField>
+					)}
 					<form.AppField name="clock.durationMs">
 						{(field) => (
 							<field.SecondsField
 								label={translator.textFn("Lifetime (seconds)")}
 								description={translator.textFn(
-									"Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.",
+									once
+										? "Once requires a lifetime. When it ends, accepted production settles before the expiry output is emitted."
+										: "Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.",
 								)}
 								min={0.1}
-								optional
+								optional={!once}
 							/>
 						)}
 					</form.AppField>
@@ -122,27 +159,12 @@ export const ClockSection = () => {
 							title={translator.textFn("Clock is disabled")}
 							actionLabel={translator.textFn("Enable clock")}
 							description={translator.textFn(
-								"A clock periodically attempts the line marked Clock. Enabling it removes the action, fixes this item to the board with a stack size of one, and adds a line when needed.",
+								"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
 							)}
 							onEnableFn={() => {
-								const lines = form.state.values.lines ?? [];
 								form.setFieldValue("action", undefined);
 								form.setFieldValue("scope", "board");
 								form.setFieldValue("maxStackSize", 1);
-								if (lines.length === 0)
-									form.setFieldValue("lines", [
-										{
-											...createLineFn(
-												form.state.values.id,
-												[],
-												translator.textFn("New production line"),
-												translator.textFn(
-													"Describe what this line consumes and produces.",
-												),
-											),
-											clock: true,
-										},
-									]);
 								form.setFieldValue("clock", {
 									intervalMs: 1000,
 									enable: true,

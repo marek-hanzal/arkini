@@ -8,7 +8,6 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
 export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"> & {
@@ -21,14 +20,12 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 	};
 	readonly description: string;
 	readonly type: TypeSchema.Type;
-	readonly durationMs?: number;
 	readonly clock?: ItemScheduleSchema.Type;
 	readonly control?: "automatic-only" | "interactive";
 	readonly action?: ActionSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
 	readonly merge?: MergeSchema.Type[];
-	readonly output?: OutputSchema.Type;
 };
 
 /** Removes empty optional artwork slots from the local form representation. */

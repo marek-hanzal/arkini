@@ -1,4 +1,4 @@
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -37,7 +37,7 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 
 		.with(
 			{
-				type: P.union(TypeSchema.enum.Temporary, TypeSchema.enum.Inventory),
+				type: TypeSchema.enum.Inventory,
 			},
 			() => [] as ItemLineEntrySchema.Type[],
 		)

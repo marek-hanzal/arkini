@@ -57,7 +57,6 @@ export const CommonSchema = z
 		then: {
 			required: [
 				"scope",
-				"lines",
 			],
 			properties: {
 				scope: {
@@ -65,9 +64,6 @@ export const CommonSchema = z
 				},
 				maxStackSize: {
 					const: 1,
-				},
-				lines: {
-					minItems: 1,
 				},
 			},
 			not: {

@@ -17,7 +17,6 @@ interface ItemCleanup {
 
 export namespace forceDeleteFx {
 	export interface Impact {
-		readonly deletedOwnerItemIds: ReadonlyArray<string>;
 		readonly removedActionInputs: ReadonlyArray<{
 			readonly ownerItemId: string;
 			readonly inputNumber: number;
@@ -116,9 +115,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			case "units":
 				cleanup.removeUnitsOutput = true;
 				break;
-			case "output":
-				cleanup.removeExpiryOutput = true;
-				break;
 			default:
 				throw new Error(
 					`Unsupported item delete reference path ${blocker.path.join(".")}.`,
@@ -126,7 +122,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		}
 	}
 
-	const deletedOwnerItemIds: string[] = [];
 	const removedActionInputs: Array<{
 		ownerItemId: string;
 		inputNumber: number;
@@ -154,16 +149,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	for (const [ownerItemId, cleanup] of itemCleanups) {
 		const owner = config.items[ownerItemId];
 		if (owner === undefined) continue;
-		const mustDeleteOwner =
-			owner.type === "common" &&
-			owner.clock !== undefined &&
-			cleanup.lineIndexes.size === owner.lines.length;
-		if (mustDeleteOwner) {
-			delete items[ownerItemId];
-			deletedOwnerItemIds.push(ownerItemId);
-			continue;
-		}
-
 		const candidate: Record<string, unknown> = {
 			...owner,
 		};
@@ -243,7 +228,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					...(candidate.clock as typeof owner.clock),
 					onExpire: undefined,
 				};
-			else candidate.output = undefined;
 			removedExpiryOutputOwnerIds.push(ownerItemId);
 		}
 		items[ownerItemId] = candidate;
@@ -265,7 +249,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			items,
 		}),
 		impact: {
-			deletedOwnerItemIds,
 			removedActionInputs,
 			removedActionRules,
 			removedUnitOutputOwnerIds,

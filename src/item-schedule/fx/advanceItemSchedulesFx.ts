@@ -1,3 +1,4 @@
+import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { Effect } from "effect";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -16,6 +17,9 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 	readonly stepStart: RuntimeSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
+	const instantGameplay = isInstantGameplayEnabledFn({
+		runtime,
+	});
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
 	let dispatched = false;
@@ -28,7 +32,6 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 		const state = item?.schedule;
 		if (
 			item === undefined ||
-			item.location.scope !== LocationScopeEnumSchema.enum.Board ||
 			config === undefined ||
 			state === undefined ||
 			state.remainingDurationMs === 0 ||
@@ -39,10 +42,17 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 		)
 			continue;
 		const elapsed = Math.min(SimulationStepMs, state.remainingDurationMs ?? SimulationStepMs);
-		const phase = state.remainingIntervalMs - elapsed;
+		const phase =
+			state.remainingIntervalMs === undefined
+				? undefined
+				: item.location.scope === LocationScopeEnumSchema.enum.Board &&
+						snapshot.location.scope === LocationScopeEnumSchema.enum.Board
+					? state.remainingIntervalMs - elapsed
+					: state.remainingIntervalMs;
 		const expired =
-			state.remainingDurationMs !== undefined && state.remainingDurationMs <= elapsed;
-		if (phase <= 0) {
+			state.remainingDurationMs !== undefined &&
+			(instantGameplay || state.remainingDurationMs <= elapsed);
+		if (phase !== undefined && phase <= 0) {
 			// Only expected admission rejection consumes the pulse without state, randomness or delivery side effects.
 			const attempt = yield* Effect.gen(function* () {
 				if (item.item.type !== "common") return undefined;
@@ -81,11 +91,18 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 							...candidate,
 							schedule: {
 								...state,
-								remainingIntervalMs: phase <= 0 ? phase + config.intervalMs : phase,
+								remainingIntervalMs:
+									phase !== undefined &&
+									phase <= 0 &&
+									config.intervalMs !== undefined
+										? phase + config.intervalMs
+										: phase,
 								remainingDurationMs:
 									state.remainingDurationMs === undefined
 										? undefined
-										: Math.max(0, state.remainingDurationMs - elapsed),
+										: instantGameplay
+											? 0
+											: Math.max(0, state.remainingDurationMs - elapsed),
 							},
 						},
 			),

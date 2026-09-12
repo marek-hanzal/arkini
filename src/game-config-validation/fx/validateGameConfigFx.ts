@@ -11,7 +11,6 @@ import { validateInputAcceptanceCyclesFn } from "../fn/validateInputAcceptanceCy
 import { validateInputUnitsFn } from "../fn/validateInputUnitsFn";
 import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
 import { validateItemUidsFn } from "../fn/validateItemUidsFn";
-import { validateMaterialInputEligibilityFn } from "../fn/validateMaterialInputEligibilityFn";
 import { validateUnitRenewalFn } from "../fn/validateUnitRenewalFn";
 import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "./validateStartStateFx";
@@ -76,10 +75,6 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateItemUidsFn({
-			config,
-			provenance,
-		}),
-		validateMaterialInputEligibilityFn({
 			config,
 			provenance,
 		}),

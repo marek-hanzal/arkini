@@ -37,17 +37,6 @@ const groups = [
 			],
 		],
 	},
-	{
-		name: "edits Temporary items through their dedicated tools",
-		cases: [
-			[
-				"temporary",
-				{
-					durationMs: 1000,
-				},
-			],
-		],
-	},
 ] as const;
 
 const itemId = (type: TypeSchema.Type) => `${type === "common" ? "common" : "item"}:edit-${type}`;
@@ -192,24 +181,13 @@ describe.sequential("editor MCP typed item editing", () => {
 			expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length);
 		}
 	});
-	it("requires an explicit clock removal before clearing its final production lines", async () => {
-		const rejected = await client.callTool({
-			name: "edit_common_item",
-			arguments: jsonToolInputFn({
-				itemId: itemId("common"),
-				patch: {
-					lines: [],
-				},
-			}),
-		});
-		expect(rejected.isError).toBe(true);
+	it("retains the clock when its final production line is explicitly removed", async () => {
 		const edited = await client.callTool({
 			name: "edit_common_item",
 			arguments: jsonToolInputFn({
 				itemId: itemId("common"),
 				patch: {
 					lines: [],
-					clock: null,
 				},
 			}),
 		});
@@ -219,7 +197,29 @@ describe.sequential("editor MCP typed item editing", () => {
 			lines: [],
 			maxQueueSize: 4,
 		});
-		expect(project?.config.items[itemId("common")]).not.toHaveProperty("clock");
+		expect(project?.config.items[itemId("common")]).toHaveProperty("clock.intervalMs", 1000);
+		const once = await client.callTool({
+			name: "edit_common_item",
+			arguments: jsonToolInputFn({
+				itemId: itemId("common"),
+				patch: {
+					clock: {
+						durationMs: 2000,
+					},
+				},
+			}),
+		});
+		expect(once.isError).not.toBe(true);
+		const saved = (await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
+			itemId("common")
+		];
+		expect(saved).toMatchObject({
+			lines: [],
+			clock: {
+				durationMs: 2000,
+			},
+		});
+		expect(saved).not.toHaveProperty("clock.intervalMs");
 	});
 	it("rejects conflicting action production and preserves or clears the optional action explicitly", async () => {
 		const action = {
@@ -249,6 +249,7 @@ describe.sequential("editor MCP typed item editing", () => {
 			(
 				await edit({
 					action,
+					clock: null,
 					lines: [],
 				})
 			).isError,

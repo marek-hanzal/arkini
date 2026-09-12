@@ -58,10 +58,7 @@ const ForceDeleteImpactList = ({
 		);
 	for (const ownerItemId of impact.removedExpiryOutputOwnerIds)
 		entries.push(`Remove the expiry output from ${readItemTitleFn(project, ownerItemId)}`);
-	for (const ownerItemId of impact.deletedOwnerItemIds)
-		entries.push(
-			`Delete ${readItemTitleFn(project, ownerItemId)} because its required production structure is removed`,
-		);
+
 	return (
 		<div className="mt-4 rounded-xl border border-line bg-surface/70 p-4">
 			<p className="text-sm font-semibold">This will also:</p>

@@ -43,7 +43,7 @@ The stable graph-wide constraints are:
 - `src/game-value` owns only immutable scalar schemas and imports no aggregate, runtime, authoring or platform owner.
 - `src/filesystem-write` owns only mechanical lock/path/durable-write capability and imports no product consumer.
 - `src/item-revision` stays upstream of Runtime and command owners except for its exact type-only Game Value ID contract.
-- Game Tick may orchestrate Job, Delivery, temporary-item and item-schedule lifecycle; those owners never import Tick clock, replay or loop.
+- Game Tick may orchestrate Job, Delivery and item-schedule lifecycle; those owners never import Tick clock, replay or loop.
 - Game Session stays package-independent; `installed-game → playable-game → game-session` is the live capability direction.
 - Exact schemas stay upstream from operations inside a concrete module path even when the domain-level graph has a return edge.
 

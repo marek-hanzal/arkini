@@ -21,7 +21,6 @@ const readOwnerItemIdFn = (route: AcquisitionRoute) => {
 			return route.metadata.sourceItemId;
 		case "merge-unit-depletion":
 			return route.metadata.unitOwnerItemId;
-		case "temporary-expiry":
 		case "clock-expiry":
 			return route.metadata.itemId;
 	}
@@ -47,7 +46,6 @@ const readReferenceFn = (route: AcquisitionRoute): ItemOriginSourceReference => 
 			return {
 				type: "units",
 			};
-		case "temporary-expiry":
 		case "clock-expiry":
 			return {
 				type: "expiry",
@@ -115,7 +113,6 @@ const readLabelFn = (route: AcquisitionRoute) => {
 			return "Merge";
 		case "merge-unit-depletion":
 			return "Depletion";
-		case "temporary-expiry":
 		case "clock-expiry":
 			return "Expiry";
 	}
@@ -131,7 +128,6 @@ const readKindFn = (route: AcquisitionRoute): ItemOriginSource["kind"] => {
 			return "merge";
 		case "merge-unit-depletion":
 			return "units";
-		case "temporary-expiry":
 		case "clock-expiry":
 			return "expiry";
 	}

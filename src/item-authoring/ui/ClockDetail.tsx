@@ -19,7 +19,7 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				icon={Clock}
 				title={translator.textFn("Clock is disabled")}
 				description={translator.textFn(
-					"Enable a clock to attempt a production line periodically.",
+					"Enable a clock for periodic production or a one-time lifetime.",
 				)}
 			/>
 		);
@@ -29,8 +29,14 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				<DetailSection title={translator.textFn("Clock")}>
 					<DetailFacts>
 						<DetailFact
-							label={translator.textFn("Interval")}
-							value={formatDurationFn(clock.intervalMs)}
+							label={translator.textFn(
+								clock.intervalMs === undefined ? "Clock mode" : "Interval",
+							)}
+							value={
+								clock.intervalMs === undefined
+									? translator.textFn("Once")
+									: formatDurationFn(clock.intervalMs)
+							}
 						/>
 						<DetailFact
 							label={translator.textFn("Lifetime")}

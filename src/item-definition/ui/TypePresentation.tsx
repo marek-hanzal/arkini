@@ -1,4 +1,4 @@
-import { Backpack, Box, Timer, type LucideIcon } from "lucide-react";
+import { Backpack, Box, type LucideIcon } from "lucide-react";
 
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -9,9 +9,6 @@ const presentations = {
 	},
 	common: {
 		icon: Box,
-	},
-	temporary: {
-		icon: Timer,
 	},
 } as const satisfies Record<
 	TypeSchema.Type,

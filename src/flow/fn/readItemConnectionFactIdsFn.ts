@@ -93,7 +93,10 @@ const readItemConnectionFactsFn = (item: ItemSchema.Type): ItemConnectionFacts =
 		addOutputFactsFn(facts, merge.output);
 	}
 	addOutputFactsFn(facts, item.units?.output);
-	if (item.type === "temporary") addOutputFactsFn(facts, item.output);
+	if (item.type === "common" && item.clock !== undefined) {
+		addOutputFactsFn(facts, item.clock.onExpire);
+		for (const factId of readAvailabilityFactIdsFn(item.clock.rules)) facts.inputs.add(factId);
+	}
 	return facts;
 };
 

@@ -1,13 +1,11 @@
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { PackagePlus } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { LineFields } from "~/production-authoring/ui/LineFields";
-import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -95,11 +93,7 @@ const ProductionFields = withFieldGroupFn({
 								label={translator.textFn("Product lines")}
 								navigationCard
 								onAddFn={addLineFn}
-								onRemoveFn={
-									form.state.values.clock !== undefined && lines.length === 1
-										? undefined
-										: (index) => linesField.removeValue(index)
-								}
+								onRemoveFn={(index) => linesField.removeValue(index)}
 								removeLabel={translator.textFn("Remove line")}
 							>
 								{(index) => (
@@ -130,6 +124,7 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
+	const translator = useTranslator();
 	const { canonicalItem, form, productionLineId, validationIssues } = useFormSession();
 	const invalidLineIndex = validationIssues.find(
 		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
@@ -153,63 +148,19 @@ export const ProductionSection = () => {
 		)
 		.with(
 			{
-				type: "temporary",
-			},
-			() => (
-				<div className="grid gap-[var(--ak-viewport-gap)]">
-					<EditorFormCard>
-						<EditorFormSectionDivider
-							description="How long this temporary item remains active before expiring."
-							title="Temporary lifetime"
-							variant="secondary"
-						/>
-						<form.AppField name="durationMs">
-							{(field) => <field.SecondsField label="Duration (seconds)" />}
-						</form.AppField>
-					</EditorFormCard>
-					<EditorFormSectionDivider
-						description="Optional items emitted when the temporary item expires."
-						title="Expiry output"
-					/>
-					<EditorFormCard>
-						<form.Subscribe
-							selector={(state) =>
-								state.values.type === "temporary" ? state.values.output : undefined
-							}
-						>
-							{(output) => (
-								<OptionalOutputControl
-									addLabel="Enable expiry output"
-									emptyDescription="Without an output, the temporary item simply disappears when its duration ends. Enable one to emit configured items at expiry."
-									emptyIcon={PackagePlus}
-									emptyTitle="No expiry output"
-									value={output}
-									onChangeFn={(next) => form.setFieldValue("output", next)}
-								/>
-							)}
-						</form.Subscribe>
-					</EditorFormCard>
-				</div>
-			),
-		)
-		.with(
-			{
 				type: "inventory",
 			},
 			() => null,
 		)
 		.exhaustive();
 	if (content === null) return null;
-	const temporary = canonicalItem.type === "temporary";
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormSectionDivider
-				description={
-					temporary
-						? "Defines how long this temporary item remains active and what it emits when it expires."
-						: "Defines this item's timed behavior, including concurrency, production lines, inputs, outputs, runtime and rules where supported."
-				}
-				title={temporary ? "Temporary" : "Production"}
+				description={translator.textFn(
+					"Defines this item's production lines, inputs, outputs, runtime and rules.",
+				)}
+				title={translator.textFn("Production")}
 			/>
 			{content}
 		</div>

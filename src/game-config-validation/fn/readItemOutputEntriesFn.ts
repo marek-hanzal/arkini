@@ -44,17 +44,6 @@ export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesF
 		});
 	}
 
-	if (item.type === TypeSchema.enum.Temporary && item.output !== undefined) {
-		entries.push({
-			output: item.output,
-			path: [
-				"items",
-				itemId,
-				"output",
-			],
-		});
-	}
-
 	if (item.type === TypeSchema.enum.Common && item.clock?.onExpire !== undefined) {
 		entries.push({
 			output: item.clock.onExpire,

@@ -11,7 +11,6 @@ import { DuplicateResourceDiagnosticSchema } from "./DuplicateResourceDiagnostic
 import { DuplicateRecordDiagnosticSchema } from "./DuplicateRecordDiagnosticSchema";
 import { InputAcceptanceCycleDiagnosticSchema } from "./InputAcceptanceCycleDiagnosticSchema";
 import { InvalidInputUnitsDiagnosticSchema } from "./InvalidInputUnitsDiagnosticSchema";
-import { IneligibleMaterialInputDiagnosticSchema } from "./IneligibleMaterialInputDiagnosticSchema";
 import { InvalidMergeDiagnosticSchema } from "./InvalidMergeDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./KeyIdMismatchDiagnosticSchema";
 import { MissingUnitRenewalWarningDiagnosticSchema } from "./MissingUnitRenewalWarningDiagnosticSchema";
@@ -35,7 +34,6 @@ export const GameDiagnosticSchema = z
 		MissingReferenceDiagnosticSchema,
 		InputAcceptanceCycleDiagnosticSchema,
 		InvalidInputUnitsDiagnosticSchema,
-		IneligibleMaterialInputDiagnosticSchema,
 		InvalidMergeDiagnosticSchema,
 		MissingUnitRenewalWarningDiagnosticSchema,
 		StochasticUnitRenewalWarningDiagnosticSchema,

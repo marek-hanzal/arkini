@@ -24,8 +24,8 @@ describe("convertFn", () => {
 				).toBe(true);
 	});
 	it("keeps passive Common conversions empty", () => {
-		const temporary = createItem("temporary");
-		expect(convertFn(temporary, "common")).toMatchObject({
+		const inventory = createItem("inventory");
+		expect(convertFn(inventory, "common")).toMatchObject({
 			type: "common",
 			lines: [],
 			maxQueueSize: 1,

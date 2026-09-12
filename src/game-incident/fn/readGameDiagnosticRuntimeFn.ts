@@ -30,10 +30,10 @@ export const readGameDiagnosticRuntimeFn = ({
 				: {
 						remainingUnits: item.remainingUnits,
 					}),
-			...(item.remainingDurationMs === undefined
+			...(item.schedule?.remainingDurationMs === undefined
 				? {}
 				: {
-						remainingDurationMs: item.remainingDurationMs,
+						remainingDurationMs: item.schedule?.remainingDurationMs,
 					}),
 			location: toDiagnosticValueFn(item.location),
 		})),

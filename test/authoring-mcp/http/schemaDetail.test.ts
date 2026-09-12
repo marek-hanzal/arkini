@@ -163,7 +163,6 @@ describe("editor MCP authoring schema registry", () => {
 		}
 		const itemTypes = [
 			"common",
-			"temporary",
 			"inventory",
 		];
 		const pending = [
@@ -304,9 +303,6 @@ describe("editor MCP authoring schema registry", () => {
 				scope: "inventory",
 			},
 			{
-				lines: [],
-			},
-			{
 				maxStackSize: 2,
 			},
 			{
@@ -326,6 +322,24 @@ describe("editor MCP authoring schema registry", () => {
 			}),
 			JSON.stringify(validatePatch.errors),
 		).toBe(true);
+
+		expect(
+			validateCreate({
+				...scheduled,
+				clock: {
+					durationMs: 2000,
+				},
+				lines: [],
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		expect(
+			validateCreate({
+				...scheduled,
+				clock: {},
+				lines: [],
+			}),
+		).toBe(false);
 
 		const wrongCase = await client.callTool({
 			name: "schema_detail",

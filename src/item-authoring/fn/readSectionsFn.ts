@@ -1,5 +1,4 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
 
 const Sections = [
@@ -49,11 +48,6 @@ const Sections = [
 	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
-const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
-	"common",
-	"temporary",
-]);
-
 /** Returns the explicit sections supported by one item discriminator and surface. */
 export const readSectionsFn = (
 	item: Pick<ItemSchema.Type, "type">,
@@ -73,18 +67,11 @@ export const readSectionsFn = (
 			case "merges":
 				return item.type !== "inventory";
 			case "production":
-				return ProductionItemTypes.has(item.type);
+				return item.type === "common";
 			case "clock":
 			case "action":
 				return item.type === "common";
 			default:
 				return true;
 		}
-	}).map((section) =>
-		section.id === "production" && item.type === "temporary"
-			? {
-					...section,
-					label: "Temporary",
-				}
-			: section,
-	);
+	});

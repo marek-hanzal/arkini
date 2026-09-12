@@ -25,11 +25,43 @@ build_desktop() {
 	electron-vite build
 }
 
+# @cmd Print the canonical SHA-256 key for the repository game build
+arkpack-fingerprint() {
+	# Hash paths as well as bytes; Notes, Git state and generated builds are excluded.
+	# Builder sources are deliberately conservative instead of maintaining an import graph.
+	{
+		find src shared electron scripts -type f ! -name _route.ts -print0 || return $?
+		find game/arkini/items -type f -name '*.json' -print0 || return $?
+		find game/arkini/assets game/arkini/resources -type f -name '*.png' -print0 || return $?
+		printf '%s\0' game/arkini/game.json game/arkini/project.json game/arkini/schema.json \
+			Argcfile.sh mise.toml package.json package-lock.json electron.vite.config.ts tsconfig*.json
+	} | LC_ALL=C coreutils sort -z | xargs -0 coreutils sha256sum --binary --zero |
+		{ printf '%s\0' "$OSTYPE" "$HOSTTYPE"; cat; } |
+		coreutils sha256sum | coreutils cut -d ' ' -f 1
+}
+
 install_game_arkpack() {
-	local source source_dir target verdict
+	local source source_dir target verdict fingerprint current_fingerprint cache record
 	target=game/arkini/build/arkini.arkpack
+	cache=$target.cache
 	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" ]]; then
-		node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini || return $?
+		fingerprint=$(arkpack-fingerprint) || return $?
+		record=
+		if [[ -f "$target" ]]; then
+			record=$(printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target") || return $?
+		fi
+		if [[ "${ARKINI_RELEASE_SIGN:-}" != 1 && -f "$cache" && -n "$record" &&
+			! -e game/arkini/editor.lock && ! -e game/arkini/editor.lock.write &&
+			"$record" == "$(cat "$cache")" ]]; then
+			echo "Arkpack unchanged; reusing $target."
+		else
+			node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini || return $?
+		fi
+		current_fingerprint=$(arkpack-fingerprint) || return $?
+		if [[ "$fingerprint" != "$current_fingerprint" ]]; then
+			echo "Build sources changed; Arkpack cache was not updated." >&2
+			return 1
+		fi
 	else
 		source_dir=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd) || return $?
 		source=$source_dir/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
@@ -45,6 +77,10 @@ install_game_arkpack() {
 	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
 	node .out/desktop/build/main/cli/arkini.js arkpack verify "$target" |
 		grep -Fx "{\"type\":\"$verdict\"}" || return $?
+	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" && "${ARKINI_RELEASE_SIGN:-}" != 1 ]]; then
+		{ printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target"; } > "$cache.pending" || return $?
+		mv "$cache.pending" "$cache" || return $?
+	fi
 }
 
 install_preview_game_arkpack() {
@@ -401,6 +437,7 @@ platform-check() {
 		test/electron \
 		test/project-authoring/filesystem \
 		test/arkpack-artifact \
+		test/scripts/arkpackBuild.test.ts \
 		test/arkini-cli/command/ArkiniCli.test.ts \
 		test/game-config-source \
 		test/game-config-compiler/fx/readGameSourceFilesFx.test.ts

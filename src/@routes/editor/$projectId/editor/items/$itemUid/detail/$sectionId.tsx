@@ -41,11 +41,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		filter: ItemConnectionFilters.find((filter) => filter === search.filter),
 	}),
 	beforeLoad: ({ params }) => {
-		if (
-			params.sectionId === "delete" ||
-			readSectionsFn().some((section) => section.id === params.sectionId)
-		)
-			return;
+		if (readSectionsFn().some((section) => section.id === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 			params: {

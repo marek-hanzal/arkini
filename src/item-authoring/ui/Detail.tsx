@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -11,7 +11,6 @@ import {
 } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
-import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { NotFound } from "~/item-authoring/ui/NotFound";
@@ -85,7 +84,9 @@ export const Detail = ({
 								</>
 							)}
 							<ItemDraftToggle item={item} />
-							<EditorSectionNavigationSeparator />
+							{editableSectionId === undefined ? null : (
+								<EditorSectionNavigationSeparator />
+							)}
 							{editableSectionId === undefined ? null : (
 								<PrimaryButtonLink
 									ref={editActionRef}
@@ -100,16 +101,6 @@ export const Detail = ({
 									{translator.textFn("Edit")}
 								</PrimaryButtonLink>
 							)}
-							<LinkButtonLink
-								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-								params={{
-									...params,
-									sectionId: "delete",
-								}}
-								title={translator.textFn("Delete item")}
-							>
-								<Trash2 className="size-4" />
-							</LinkButtonLink>
 						</div>
 					}
 				/>

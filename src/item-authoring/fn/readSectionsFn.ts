@@ -56,6 +56,10 @@ const DetailSections = [
 		id: "notes",
 		label: "Notes",
 	},
+	{
+		id: "delete",
+		label: "Delete",
+	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
 /** Detail groups related capabilities; authoring retains exact validation destinations. */

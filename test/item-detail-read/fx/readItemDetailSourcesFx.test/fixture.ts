@@ -201,23 +201,27 @@ export const config = GameConfigSchema.parse({
 		blueprint: {
 			...createItemBase("blueprint"),
 			title: "Blueprint",
-			type: "blueprint",
+			maxQueueSize: 1,
+			type: "common",
 			units: {
 				amount: 1,
 			},
 			maxStackSize: 1,
-			line: {
-				...acquisitionLine("line:blueprint", "product"),
-				input: [
-					{
-						type: "simple",
-						units: {
-							from: "self",
-							cost: 1,
+			lines: [
+				{
+					checkAhead: true,
+					...acquisitionLine("line:blueprint", "product"),
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
 						},
-					},
-				],
-			},
+					],
+				},
+			],
 		},
 		"town-hall": producer("town-hall", "Town Hall", [
 			acquisitionLine("line:town-hall:blueprint", "blueprint"),

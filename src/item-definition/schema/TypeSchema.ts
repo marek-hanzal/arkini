@@ -5,7 +5,6 @@ import { z } from "zod";
  */
 export const TypeSchema = z
 	.enum({
-		Blueprint: "blueprint",
 		Common: "common",
 		Clock: "clock",
 		Temporary: "temporary",

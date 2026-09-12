@@ -332,18 +332,6 @@ export const ProductionSection = () => {
 		)
 		.with(
 			{
-				type: "blueprint",
-			},
-			() => (
-				<LineFields
-					form={form}
-					fields="line"
-					label="Product line"
-				/>
-			),
-		)
-		.with(
-			{
 				type: "inventory",
 			},
 			() => null,

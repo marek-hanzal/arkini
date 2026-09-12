@@ -1,5 +1,6 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 
+import { Tx } from "~/translation/ui/Tx";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
@@ -52,6 +53,11 @@ export const ProductionLineDetail = ({
 					{line.default ? (
 						<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
 							Default
+						</span>
+					) : null}
+					{line.checkAhead === true ? (
+						<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
+							<Tx label="Check ahead" />
 						</span>
 					) : null}
 				</div>

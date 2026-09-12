@@ -13,7 +13,6 @@ import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 const ownerKinds = [
 	"producer",
 	"craft",
-	"blueprint",
 ] as const;
 
 const baseItem = (id: string) => ({
@@ -108,11 +107,6 @@ const config = GameConfigSchema.parse({
 			lines: [
 				makeLine("line:craft"),
 			],
-		},
-		blueprint: {
-			...baseItem("blueprint"),
-			type: "blueprint",
-			line: makeLine("line:blueprint"),
 		},
 	},
 });

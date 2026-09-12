@@ -41,7 +41,6 @@ const readItemIdFromPathFn = (path: ReadonlyArray<PropertyKey>) =>
 
 const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): ReadonlyArray<string> => {
 	switch (diagnostic.code) {
-		case "input:capacity-unsupported":
 		case "input:material-ineligible":
 		case "input:units-invalid":
 		case "merge:invalid":
@@ -77,7 +76,6 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 	switch (diagnostic.code) {
 		case "merge:invalid":
 			return "merges";
-		case "input:capacity-unsupported":
 		case "input:material-ineligible":
 		case "input:units-invalid":
 		case "input:acceptance-cycle":

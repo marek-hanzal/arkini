@@ -3,7 +3,6 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
-import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
@@ -26,7 +25,6 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 const createItemInputSchemaIds = {
 	common: "urn:arkini:schema:mcp:create-common-item-input",
 	clock: "urn:arkini:schema:mcp:create-clock-item-input",
-	blueprint: "urn:arkini:schema:mcp:create-blueprint-item-input",
 	temporary: "urn:arkini:schema:mcp:create-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:create-inventory-item-input",
 } as const;
@@ -94,31 +92,6 @@ export const CreateItemInputSchemas = {
 			description: "Authoring fields accepted when creating one clock item.",
 		}),
 
-	blueprint: BlueprintSchema.omit({
-		asset: true,
-		line: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			scope: draftScope,
-			maxStackSize: draftMaxStackSize,
-			line: BlueprintSchema.shape.line
-				.optional()
-				.describe(
-					"Optional product line; defaults to the Editor's initial blueprint line.",
-				),
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.blueprint,
-			$id: createItemInputSchemaIds.blueprint,
-			title: "Create blueprint item tool input",
-			description: "Authoring fields accepted when creating one blueprint item.",
-		}),
 	temporary: TemporarySchema.omit({
 		asset: true,
 		durationMs: true,

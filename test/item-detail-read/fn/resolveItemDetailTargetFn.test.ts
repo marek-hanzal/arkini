@@ -32,8 +32,13 @@ describe("resolveItemDetailTargetFn", () => {
 			lineRunTestConfig.items.workshop,
 			{
 				...base,
-				line: lines[0],
-				type: "blueprint" as const,
+				lines: [
+					{
+						...lines[0],
+						checkAhead: true,
+					},
+				],
+				type: "common" as const,
 			},
 		];
 		for (const [index, item] of lineOwners.entries()) {

@@ -185,26 +185,30 @@ const lifecycleConfig = GameConfigSchema.parse({
 		},
 		"blueprint:empty": {
 			...base("blueprint:empty"),
-			type: "blueprint",
+			maxQueueSize: 1,
+			type: "common",
 			units: {
 				amount: 1,
 			},
-			line: {
-				id: "line:blueprint:empty",
-				title: "Build nothing",
-				description: "Completes without output.",
-				runtimeMs: 200,
-				input: [
-					{
-						type: "simple",
-						units: {
-							from: "self",
-							cost: 1,
+			lines: [
+				{
+					checkAhead: true,
+					id: "line:blueprint:empty",
+					title: "Build nothing",
+					description: "Completes without output.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
 						},
-					},
-				],
-				rules: [],
-			},
+					],
+					rules: [],
+				},
+			],
 		},
 		"craft:repeatable": {
 			maxQueueSize: 1,

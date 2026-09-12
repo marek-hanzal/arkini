@@ -33,12 +33,10 @@ describe("editor MCP server", () => {
 			"schema_detail",
 			"create_common_item",
 			"create_clock_item",
-			"create_blueprint_item",
 			"create_temporary_item",
 			"create_inventory_item",
 			"edit_common_item",
 			"edit_clock_item",
-			"edit_blueprint_item",
 			"edit_temporary_item",
 			"edit_inventory_item",
 			"project_config",
@@ -120,7 +118,6 @@ describe("editor MCP server", () => {
 			...[
 				"common",
 				"clock",
-				"blueprint",
 				"temporary",
 				"inventory",
 			].flatMap((type) => [

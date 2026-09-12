@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseSchema } from "~/item-definition/schema/BaseSchema";
-import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
@@ -30,7 +29,6 @@ const nullableBaseItemFields = {
 const editItemInputSchemaIds = {
 	common: "urn:arkini:schema:mcp:edit-common-item-input",
 	clock: "urn:arkini:schema:mcp:edit-clock-item-input",
-	blueprint: "urn:arkini:schema:mcp:edit-blueprint-item-input",
 	temporary: "urn:arkini:schema:mcp:edit-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:edit-inventory-item-input",
 } as const;
@@ -69,12 +67,6 @@ const clockPatch = requireReplacementFn(
 ).meta({
 	id: "ClockItemPatchSchema",
 	description: "Top-level replacements accepted for an existing clock item.",
-});
-const blueprintPatch = requireReplacementFn(
-	BlueprintSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
-).meta({
-	id: "BlueprintItemPatchSchema",
-	description: "Top-level replacements accepted for an existing blueprint item.",
 });
 const temporaryPatch = requireReplacementFn(
 	TemporarySchema.omit({
@@ -153,11 +145,6 @@ export const EditItemInputSchemas = {
 		schemaId: editItemInputSchemaIds.clock,
 		title: "Edit clock item tool input",
 		description: "Identity, revision, and replacement patch for one clock item.",
-	}),
-	blueprint: editItemInputFn(blueprintPatch, {
-		schemaId: editItemInputSchemaIds.blueprint,
-		title: "Edit blueprint item tool input",
-		description: "Identity, revision, and replacement patch for one blueprint item.",
 	}),
 	temporary: editItemInputFn(temporaryPatch, {
 		schemaId: editItemInputSchemaIds.temporary,

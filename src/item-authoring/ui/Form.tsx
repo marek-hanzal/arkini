@@ -33,33 +33,7 @@ const useDraft = (
 						...draft,
 						title: defaultTitle,
 					};
-		if (namedDraft.type !== "blueprint") return namedDraft;
-		return {
-			...namedDraft,
-			units: {
-				amount: 1,
-			},
-			line: {
-				...namedDraft.line,
-				input: [
-					{
-						type: "units",
-						units: {
-							cost: 1,
-							from: "self",
-						},
-						query: {
-							scope: "board",
-							distance: "self",
-							selector: {
-								type: "item",
-								itemId: namedDraft.id,
-							},
-						},
-					},
-				],
-			},
-		} satisfies ItemSchema.Type;
+		return namedDraft;
 	}, [
 		defaultDraft,
 		defaultItemId,

@@ -93,7 +93,7 @@ describe("Form", () => {
 		});
 	});
 
-	it("seeds asset entry-point defaults through the complete blueprint draft", async () => {
+	it("seeds asset entry-point defaults through the complete Clock draft", async () => {
 		state.project = project;
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -105,7 +105,7 @@ describe("Form", () => {
 					defaultDraft: true,
 					defaultItemId: "selected_asset-name",
 					defaultTitle: "Selected Asset Name",
-					itemType: "blueprint",
+					itemType: "clock",
 					resourceId: "selected_asset-name",
 					uid: "draft-with-selected-asset",
 				}),
@@ -123,20 +123,13 @@ describe("Form", () => {
 			},
 			draft: true,
 			id: "selected_asset-name",
-			line: {
-				id: "line:selected_asset-name:default",
-				input: [
-					{
-						query: {
-							selector: {
-								itemId: "selected_asset-name",
-							},
-						},
-					},
-				],
-			},
+			lines: [
+				{
+					id: "line:selected_asset-name:default",
+				},
+			],
 			title: "Selected Asset Name",
-			type: "blueprint",
+			type: "clock",
 		});
 	});
 });

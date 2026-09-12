@@ -21,10 +21,9 @@ const typeGroups = [
 		],
 	},
 	{
-		name: "creates Blueprint, Temporary, and Inventory items through dedicated tools",
+		name: "creates Temporary and Inventory items through dedicated tools",
 		projectId: "special-item-types-project",
 		types: [
-			"blueprint",
 			"temporary",
 			"inventory",
 		],

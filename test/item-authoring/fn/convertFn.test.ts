@@ -23,22 +23,6 @@ describe("convertFn", () => {
 					ItemSchema.safeParse(convertFn(createItem(sourceType), targetType)).success,
 				).toBe(true);
 	});
-	it("preserves a Blueprint line and identity when converted to Common", () => {
-		const blueprint = {
-			...createItem("blueprint"),
-			draft: true,
-		};
-		if (blueprint.type !== "blueprint") throw new Error("Expected Blueprint fixture.");
-		expect(convertFn(blueprint, "common")).toMatchObject({
-			type: "common",
-			lines: [
-				blueprint.line,
-			],
-			id: blueprint.id,
-			uid: blueprint.uid,
-			draft: true,
-		});
-	});
 	it("retains every production line and queue capacity through Clock conversion", () => {
 		const clock = createItem("clock");
 		if (clock.type !== "clock") throw new Error("Expected Clock fixture.");
@@ -77,11 +61,6 @@ describe("convertFn", () => {
 			maxStackSize: 1,
 			maxQueueSize: 4,
 			lines: source.lines,
-		});
-		const blueprint = convertFn(common, "blueprint");
-		expect(blueprint).toMatchObject({
-			type: "blueprint",
-			line: source.lines[0],
 		});
 	});
 	it("keeps passive Common conversions empty and supplies a line only for Clock", () => {

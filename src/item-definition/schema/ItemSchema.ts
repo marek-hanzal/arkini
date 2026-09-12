@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { BlueprintSchema } from "./BlueprintSchema";
 import { ClockSchema } from "./ClockSchema";
 import { InventorySchema } from "./InventorySchema";
 import { CommonSchema } from "./CommonSchema";
@@ -14,7 +13,6 @@ import { TemporarySchema } from "./TemporarySchema";
  */
 export const ItemSchema = z
 	.discriminatedUnion("type", [
-		BlueprintSchema,
 		CommonSchema,
 		ClockSchema,
 		TemporarySchema,

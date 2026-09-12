@@ -13,7 +13,6 @@ import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
 import { validateItemUidsFn } from "../fn/validateItemUidsFn";
 import { validateMaterialInputEligibilityFn } from "../fn/validateMaterialInputEligibilityFn";
 import { validateUnitRenewalFn } from "../fn/validateUnitRenewalFn";
-import { validateLineInputCapacityFn } from "../fn/validateLineInputCapacityFn";
 import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "./validateStartStateFx";
 
@@ -81,10 +80,6 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateMaterialInputEligibilityFn({
-			config,
-			provenance,
-		}),
-		validateLineInputCapacityFn({
 			config,
 			provenance,
 		}),

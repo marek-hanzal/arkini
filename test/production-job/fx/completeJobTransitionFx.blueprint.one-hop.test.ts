@@ -85,7 +85,7 @@ describe("blueprint one-hop capacity", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("limits one-hop traversal to Blueprint children and exactly one edge", () => {
+	it("limits one-hop traversal to marked child lines and exactly one edge", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {
 				yield* spawnItemFx({

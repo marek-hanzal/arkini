@@ -22,10 +22,4 @@ export const readItemLineFn = ({ item, lineId }: readItemLineFn.Props) =>
 			({ lines }) => lines.find((line) => line.id === lineId),
 		)
 
-		.with(
-			{
-				type: TypeSchema.enum.Blueprint,
-			},
-			({ line }) => (line.id === lineId ? line : undefined),
-		)
 		.otherwise(() => undefined) satisfies LineSchema.Type | undefined;

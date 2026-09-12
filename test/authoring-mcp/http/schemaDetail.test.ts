@@ -164,7 +164,6 @@ describe("editor MCP authoring schema registry", () => {
 		const itemTypes = [
 			"common",
 			"clock",
-			"blueprint",
 			"temporary",
 			"inventory",
 		];

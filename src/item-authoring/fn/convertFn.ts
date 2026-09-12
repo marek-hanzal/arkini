@@ -102,12 +102,6 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 									...lines.slice(1),
 								],
 				};
-			case "blueprint":
-				return {
-					...common,
-					type: fallback.type,
-					line: lines[0] ?? fallback.line,
-				};
 		}
 	})();
 	return candidate;

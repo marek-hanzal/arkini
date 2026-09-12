@@ -21,32 +21,34 @@ describe("renameFx", () => {
 					...createProducerItem({
 						id: "clock",
 					}),
-					type: "clock",
+					type: "common",
 					scope: "board",
 					maxStackSize: 1,
-					intervalMs: 1000,
-					rules: [
-						{
-							type: "enable",
-							when: [
-								{
-									type: "exists",
-									query: {
-										scope: "any",
-										selector: {
-											type: "item",
-											itemId: "water",
+					clock: {
+						intervalMs: 1000,
+						rules: [
+							{
+								type: "enable",
+								when: [
+									{
+										type: "exists",
+										query: {
+											scope: "any",
+											selector: {
+												type: "item",
+												itemId: "water",
+											},
 										},
 									},
-								},
-							],
-						},
-					],
-					onExpire: createOutput([
-						{
-							itemId: "water",
-						},
-					]),
+								],
+							},
+						],
+						onExpire: createOutput([
+							{
+								itemId: "water",
+							},
+						]),
+					},
 				},
 			},
 		});
@@ -58,22 +60,25 @@ describe("renameFx", () => {
 			}),
 		);
 		expect(result.config.items.clock).toMatchObject({
-			rules: [
-				{
-					when: [
-						{
-							query: {
-								selector: {
-									itemId: "fresh-water",
+			clock: {
+				rules: [
+					{
+						when: [
+							{
+								query: {
+									selector: {
+										itemId: "fresh-water",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		});
 		expect(result.updatedReferencePaths).toContainEqual([
 			"items",
+			"clock",
 			"clock",
 			"onExpire",
 			"set",

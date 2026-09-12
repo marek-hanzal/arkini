@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 import { ActionSchema } from "~/item-action/schema/ActionSchema";
 
 import { LineSchema } from "~/production-line/schema/LineSchema";
@@ -8,11 +9,19 @@ import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
 
 /**
- * An ordinary item with optional production or one immediate action.
+ * An ordinary item with optional production, Clock scheduling, or one immediate action.
  */
 export const CommonSchema = z
 	.object({
 		...BaseSchema.shape,
+		clock: ItemScheduleSchema.optional(),
+		control: z
+			.enum([
+				"automatic-only",
+				"interactive",
+			])
+			.optional()
+			.describe("Player production control; omission means interactive."),
 		action: ActionSchema.optional().describe(
 			"An optional immediate action; mutually exclusive with production lines.",
 		),
@@ -40,6 +49,33 @@ export const CommonSchema = z
 	.meta({
 		id: "item.CommonSchema",
 		// JSON Schema clients must enforce the same capability conflict as canonical Item validation.
+		if: {
+			required: [
+				"clock",
+			],
+		},
+		then: {
+			required: [
+				"scope",
+				"lines",
+			],
+			properties: {
+				scope: {
+					const: "board",
+				},
+				maxStackSize: {
+					const: 1,
+				},
+				lines: {
+					minItems: 1,
+				},
+			},
+			not: {
+				required: [
+					"action",
+				],
+			},
+		},
 		not: {
 			required: [
 				"action",
@@ -51,7 +87,8 @@ export const CommonSchema = z
 				},
 			},
 		},
-		description: "An ordinary item with optional production or one immediate action.",
+		description:
+			"An ordinary item with optional production, Clock scheduling, or one immediate action.",
 	});
 
 export type CommonSchema = typeof CommonSchema;

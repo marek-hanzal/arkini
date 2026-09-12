@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
@@ -109,7 +109,8 @@ const setupFx = ({ quantity }: { readonly quantity: number }) =>
 			location: sourceLocation(1),
 			quantity,
 		});
-		yield* setDefaultLineFx({
+		yield* setLineSelectionFx({
+			selection: "default",
 			ownerItemId: "runtime:workshop",
 			lineId,
 		});

@@ -55,12 +55,13 @@ export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesF
 		});
 	}
 
-	if (item.type === TypeSchema.enum.Clock && item.onExpire !== undefined) {
+	if (item.type === TypeSchema.enum.Common && item.clock?.onExpire !== undefined) {
 		entries.push({
-			output: item.onExpire,
+			output: item.clock.onExpire,
 			path: [
 				"items",
 				itemId,
+				"clock",
 				"onExpire",
 			],
 		});

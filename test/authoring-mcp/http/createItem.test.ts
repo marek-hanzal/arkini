@@ -17,7 +17,6 @@ const typeGroups = [
 		projectId: "common-space-clock-types-project",
 		types: [
 			"common",
-			"clock",
 		],
 	},
 	{

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { ClockSchema } from "~/item-definition/schema/ClockSchema";
+import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import {
 	lineRunRuntime,
@@ -10,23 +10,23 @@ import {
 } from "~test/production-line/support/lineRunTestRuntime";
 
 const readSchedule = ({
-	running = true,
 	remainingDurationMs = 300,
 	enable = true,
 }: {
-	readonly running?: boolean;
 	readonly remainingDurationMs?: number;
 	readonly enable?: boolean;
 }) => {
-	const item = ClockSchema.parse({
+	const item = CommonSchema.parse({
 		...lineRunTestConfig.items.workshop,
-		type: "clock",
+		type: "common",
 		scope: "board",
 		maxStackSize: 1,
-		intervalMs: 100,
-		durationMs: 300,
 		control: "interactive",
-		enable,
+		clock: {
+			intervalMs: 100,
+			durationMs: 300,
+			enable,
+		},
 	});
 	const base = lineRunRuntime({});
 	const runtime = {
@@ -37,7 +37,6 @@ const readSchedule = ({
 						...owner,
 						item,
 						schedule: {
-							running,
 							remainingIntervalMs: 50,
 							remainingDurationMs,
 						},
@@ -54,12 +53,11 @@ const readSchedule = ({
 };
 
 describe("readItemDetailScheduleFx", () => {
-	it("separates a manually enabled timer from its rule gate and finished lifetime", () => {
+	it("projects the rule gate and finished lifetime", () => {
 		expect(readSchedule({})).toMatchObject({
 			intervalMs: 100,
 			durationMs: 300,
 			runtime: {
-				running: true,
 				remainingIntervalMs: 50,
 				status: "running",
 			},
@@ -70,24 +68,12 @@ describe("readItemDetailScheduleFx", () => {
 			}),
 		).toMatchObject({
 			runtime: {
-				running: true,
-				status: "paused",
-			},
-		});
-		expect(
-			readSchedule({
-				running: false,
-			}),
-		).toMatchObject({
-			runtime: {
-				running: false,
 				status: "paused",
 			},
 		});
 		expect(
 			readSchedule({
 				remainingDurationMs: 0,
-				running: false,
 			}),
 		).toMatchObject({
 			runtime: {

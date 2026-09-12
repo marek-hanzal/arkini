@@ -24,6 +24,10 @@ const Sections = [
 		label: "Action",
 	},
 	{
+		id: "clock",
+		label: "Clock",
+	},
+	{
 		id: "production",
 		label: "Production",
 	},
@@ -47,7 +51,6 @@ const Sections = [
 
 const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
 	"common",
-	"clock",
 	"temporary",
 ]);
 
@@ -71,6 +74,7 @@ export const readSectionsFn = (
 				return item.type !== "inventory";
 			case "production":
 				return ProductionItemTypes.has(item.type);
+			case "clock":
 			case "action":
 				return item.type === "common";
 			default:

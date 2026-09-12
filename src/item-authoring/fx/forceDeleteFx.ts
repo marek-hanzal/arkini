@@ -97,10 +97,11 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					fifth,
 				);
 				break;
-			case "rules":
-				if (typeof fourth !== "number")
-					throw new Error(`Invalid action rule path ${blocker.path.join(".")}.`);
-				cleanup.actionRuleIndexes.add(fourth);
+			case "clock":
+				if (fourth === "onExpire") cleanup.removeExpiryOutput = true;
+				else if (fourth === "rules" && typeof fifth === "number")
+					cleanup.actionRuleIndexes.add(fifth);
+				else throw new Error(`Invalid clock reference path ${blocker.path.join(".")}.`);
 				break;
 			case "merge":
 				if (typeof fourth !== "number")
@@ -115,7 +116,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			case "units":
 				cleanup.removeUnitsOutput = true;
 				break;
-			case "onExpire":
 			case "output":
 				cleanup.removeExpiryOutput = true;
 				break;
@@ -155,7 +155,9 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		const owner = config.items[ownerItemId];
 		if (owner === undefined) continue;
 		const mustDeleteOwner =
-			owner.type === "clock" && cleanup.lineIndexes.size === owner.lines.length;
+			owner.type === "common" &&
+			owner.clock !== undefined &&
+			cleanup.lineIndexes.size === owner.lines.length;
 		if (mustDeleteOwner) {
 			delete items[ownerItemId];
 			deletedOwnerItemIds.push(ownerItemId);
@@ -180,10 +182,17 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 				),
 			};
 		}
-		if (owner.type === "clock" && cleanup.actionRuleIndexes.size > 0)
-			candidate.rules = owner.rules.filter(
-				(_rule, index) => !cleanup.actionRuleIndexes.has(index),
-			);
+		if (
+			owner.type === "common" &&
+			owner.clock !== undefined &&
+			cleanup.actionRuleIndexes.size > 0
+		)
+			candidate.clock = {
+				...owner.clock,
+				rules: owner.clock.rules.filter(
+					(_rule, index) => !cleanup.actionRuleIndexes.has(index),
+				),
+			};
 		for (const index of cleanup.actionInputIndexes)
 			removedActionInputs.push({
 				ownerItemId,
@@ -229,7 +238,12 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			removedUnitOutputOwnerIds.push(ownerItemId);
 		}
 		if (cleanup.removeExpiryOutput) {
-			candidate[owner.type === "clock" ? "onExpire" : "output"] = undefined;
+			if (owner.type === "common" && owner.clock !== undefined)
+				candidate.clock = {
+					...(candidate.clock as typeof owner.clock),
+					onExpire: undefined,
+				};
+			else candidate.output = undefined;
 			removedExpiryOutputOwnerIds.push(ownerItemId);
 		}
 		items[ownerItemId] = candidate;

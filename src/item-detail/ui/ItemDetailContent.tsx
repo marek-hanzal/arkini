@@ -21,7 +21,6 @@ interface RuntimeItemDetailContentProps {
 	readonly disabled: boolean;
 	readonly identity?: useRuntimeItemDetailSceneController.IdentityProjection;
 	readonly info?: useRuntimeItemDetailSceneController.Output["info"];
-	readonly scheduleControl: useRuntimeItemDetailSceneController.ScheduleControl;
 	readonly linesSearchQuery?: string;
 	readonly lines?: useRuntimeItemDetailSceneController.Output["lines"];
 	readonly queue?: ItemDetailQueueProjection;
@@ -61,13 +60,11 @@ const ItemInfoContent = ({
 	disabled,
 	identity,
 	info,
-	scheduleControl,
 	stale,
 }: {
 	readonly disabled: boolean;
 	readonly identity?: useRuntimeItemDetailSceneController.IdentityProjection;
 	readonly info?: useRuntimeItemDetailSceneController.Output["info"];
-	readonly scheduleControl: useRuntimeItemDetailSceneController.ScheduleControl;
 	readonly stale: boolean;
 }) => {
 	if (identity?.kind !== "available" || info?.kind !== "available") {
@@ -89,7 +86,6 @@ const ItemInfoContent = ({
 			})}
 		>
 			<ItemInfoTab
-				scheduleControl={stale ? undefined : scheduleControl}
 				detail={{
 					description: info.description,
 					schedule:
@@ -226,7 +222,6 @@ const RuntimeItemDetailContent = ({
 	disabled,
 	identity,
 	info,
-	scheduleControl,
 	linesSearchQuery,
 	lines,
 	queue,
@@ -244,7 +239,6 @@ const RuntimeItemDetailContent = ({
 				disabled={disabled}
 				identity={identity}
 				info={info}
-				scheduleControl={scheduleControl}
 				stale={stale}
 			/>
 		))
@@ -298,7 +292,6 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 				disabled={props.disabled}
 				identity={props.identity}
 				info={props.info}
-				scheduleControl={props.scheduleControl}
 				linesSearchQuery={props.linesSearchQuery}
 				lines={props.lines}
 				queue={props.queue}

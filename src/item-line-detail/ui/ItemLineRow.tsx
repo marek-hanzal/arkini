@@ -85,10 +85,9 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 						disabled={disabled}
 						enqueueFn={commands.enqueueFn}
 						line={line}
-						pendingDefault={commands.pending.default}
+						pendingSelection={commands.pending.selection}
 						pendingEnqueue={commands.pending.enqueue}
-						setDefaultFn={commands.setDefaultFn}
-						unsetDefaultFn={commands.unsetDefaultFn}
+						selectFn={commands.selectFn}
 					/>
 				)}
 			</div>

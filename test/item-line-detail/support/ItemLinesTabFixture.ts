@@ -26,8 +26,7 @@ const control = vi.hoisted(() => ({
 
 const commandSpies = vi.hoisted(() => ({
 	enqueue: vi.fn(),
-	setDefault: vi.fn(),
-	unsetDefault: vi.fn(),
+	select: vi.fn(),
 	withdraw: vi.fn(),
 }));
 
@@ -54,16 +53,9 @@ vi.mock("~/production-job/fx/enqueueLineFx", () => ({
 	},
 }));
 
-vi.mock("~/production-line/fx/setDefaultLineFx", () => ({
-	setDefaultLineFx: (command: unknown) => {
-		commands.setDefault(command);
-		return command;
-	},
-}));
-
-vi.mock("~/production-line/fx/unsetDefaultLineFx", () => ({
-	unsetDefaultLineFx: (command: unknown) => {
-		commands.unsetDefault(command);
+vi.mock("~/production-line/fx/setLineSelectionFx", () => ({
+	setLineSelectionFx: (command: unknown) => {
+		commands.select(command);
 		return command;
 	},
 }));

@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -63,7 +63,8 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 				kind: "none" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		const defaultLine = readEffectiveDefaultLineFn({
+		const defaultLine = readEffectiveLineFn({
+			selection: "default",
 			ownerItemId: item.id,
 			ownerItem: lineOwnerItem,
 			runtime,

@@ -45,7 +45,7 @@ const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): Readonl
 		case "input:units-invalid":
 		case "merge:invalid":
 		case "line:duplicate-id":
-		case "line:multiple-defaults":
+		case "line:multiple-selections":
 			return [
 				diagnostic.ownerItemId,
 			];
@@ -80,7 +80,7 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 		case "input:units-invalid":
 		case "input:acceptance-cycle":
 		case "line:duplicate-id":
-		case "line:multiple-defaults":
+		case "line:multiple-selections":
 			return "production";
 		case "units:stochastic-renewal":
 		case "units:missing-renewal":
@@ -107,9 +107,7 @@ const readEditorGameDiagnosticTargetsFn = (
 					{
 						kind: "item",
 						itemUid: item.uid,
-						sectionId:
-							itemSection ??
-							readSectionForPathFn(diagnostic.path.slice(2), item.type),
+						sectionId: itemSection ?? readSectionForPathFn(diagnostic.path.slice(2)),
 						label: item.title,
 					} satisfies EditorDiagnosticTarget,
 				];

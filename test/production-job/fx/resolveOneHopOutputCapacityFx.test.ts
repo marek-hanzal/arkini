@@ -28,11 +28,14 @@ const checkCapacity = (type: "common" | "clock", lines: LineSchema.Type[]) => {
 			...blueprintConfig.items,
 			[intermediate.id]: {
 				...intermediate,
-				type,
+				type: "common",
 				lines,
 				...(type === "clock"
 					? {
-							intervalMs: 100,
+							scope: "board",
+							clock: {
+								intervalMs: 100,
+							},
 						}
 					: {}),
 			},

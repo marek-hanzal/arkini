@@ -30,7 +30,6 @@ import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
 const itemTypes = [
 	"common",
-	"clock",
 	"temporary",
 	"inventory",
 ] as const;

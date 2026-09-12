@@ -49,7 +49,6 @@ export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 			schedule === undefined
 				? undefined
 				: {
-						running: true,
 						remainingIntervalMs: schedule.intervalMs,
 						remainingDurationMs: schedule.durationMs,
 					},

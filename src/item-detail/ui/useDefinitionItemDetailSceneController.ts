@@ -78,11 +78,11 @@ const useItemDefinitionDetail = (
 						}),
 				description: item.description,
 				schedule:
-					"intervalMs" in item
+					item.type === "common" && item.clock !== undefined
 						? {
-								intervalMs: item.intervalMs,
-								durationMs: item.durationMs,
-								control: item.control,
+								intervalMs: item.clock.intervalMs,
+								durationMs: item.clock.durationMs,
+								control: item.control ?? "interactive",
 							}
 						: undefined,
 				itemType: item.type,

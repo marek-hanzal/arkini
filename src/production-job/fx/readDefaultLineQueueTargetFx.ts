@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { DefaultLineQueueUnavailableError } from "~/production-job/error/DefaultLineQueueUnavailableError";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -31,7 +31,8 @@ export const readDefaultLineQueueTargetFx = Effect.fn("readDefaultLineQueueTarge
 			}),
 		);
 	}
-	const line = readEffectiveDefaultLineFn({
+	const line = readEffectiveLineFn({
+		selection: "default",
 		ownerItemId,
 		ownerItem,
 		runtime,

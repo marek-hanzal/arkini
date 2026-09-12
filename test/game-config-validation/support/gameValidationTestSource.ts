@@ -28,6 +28,7 @@ export const createSimpleItem = (id: string) =>
 
 export const createLine = ({
 	default: isDefault = false,
+	clock,
 	id = "line:test",
 	input = [
 		{
@@ -37,6 +38,7 @@ export const createLine = ({
 	output,
 }: {
 	default?: boolean;
+	clock?: boolean;
 	id?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	output?: OutputSchema.Type;
@@ -46,6 +48,7 @@ export const createLine = ({
 		title: id,
 		description: id,
 		default: isDefault,
+		clock,
 		runtimeMs: 0,
 		input,
 		output,

@@ -35,11 +35,12 @@ export const ActionSection = () => {
 								actionLabel={translator.textFn("Enable action")}
 								dataUi="EditorActionDisabled"
 								description={translator.textFn(
-									"An action activates immediately when the player uses this item. Enabling an action removes all production lines.",
+									"An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.",
 								)}
 								icon={MapPinned}
 								onEnableFn={() => {
 									form.setFieldValue("lines", []);
+									form.setFieldValue("clock", undefined);
 									form.setFieldValue("action", {
 										type: "space",
 										space: 0,

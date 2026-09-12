@@ -4,11 +4,12 @@ import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn"
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-export namespace readEffectiveDefaultLineFn {
+export namespace readEffectiveLineFn {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
 		readonly ownerItem: narrowLineOwnerItemFn.Result;
-		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId">;
+		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId" | "items">;
+		readonly selection: "default" | "clock";
 	}
 
 	export type Result = LineSchema.Type | undefined;
@@ -20,15 +21,21 @@ export namespace readEffectiveDefaultLineFn {
  * A present `null` override deliberately disables the fallback. Invalid persisted
  * line IDs do not silently fall back; runtime validation owns reporting that stale state.
  */
-export const readEffectiveDefaultLineFn = ({
+export const readEffectiveLineFn = ({
 	ownerItemId,
 	ownerItem,
 	runtime,
-}: readEffectiveDefaultLineFn.Props) => {
+	selection,
+}: readEffectiveLineFn.Props) => {
 	const lines = readLineOwnerLinesFn(ownerItem);
-	if (Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)) {
-		const override = runtime.defaultLineByOwnerItemId[ownerItemId];
+	const override =
+		selection === "default"
+			? Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
+				? runtime.defaultLineByOwnerItemId[ownerItemId]
+				: undefined
+			: runtime.items.find((item) => item.id === ownerItemId)?.schedule?.lineId;
+	if (override !== undefined) {
 		return override === null ? undefined : lines.find((line) => line.id === override);
 	}
-	return lines.find((line) => line.default);
+	return lines.find((line) => line[selection]);
 };

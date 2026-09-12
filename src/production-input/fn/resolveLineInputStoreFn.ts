@@ -9,7 +9,7 @@ import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotIte
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
@@ -56,7 +56,8 @@ export const resolveLineInputStoreFn = ({
 	if (boardOwner === undefined) return undefined;
 	const effectiveDefaultLine =
 		requestedLineId === undefined
-			? readEffectiveDefaultLineFn({
+			? readEffectiveLineFn({
+					selection: "default",
 					ownerItemId: boardOwner.id,
 					ownerItem: narrowedLineOwnerItem,
 					runtime,

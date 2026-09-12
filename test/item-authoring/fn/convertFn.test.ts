@@ -23,66 +23,12 @@ describe("convertFn", () => {
 					ItemSchema.safeParse(convertFn(createItem(sourceType), targetType)).success,
 				).toBe(true);
 	});
-	it("retains every production line and queue capacity through Clock conversion", () => {
-		const clock = createItem("clock");
-		if (clock.type !== "clock") throw new Error("Expected Clock fixture.");
-		const source = {
-			...clock,
-			maxQueueSize: 4,
-			lines: [
-				clock.lines[0],
-				{
-					...clock.lines[0],
-					id: "line:second",
-					default: false,
-				},
-			] as typeof clock.lines,
-		};
-		const common = convertFn(source, "common");
-		if (common.type !== "common") throw new Error("Expected Common conversion.");
-		expect(common).toMatchObject({
-			type: "common",
-			lines: source.lines,
-			maxQueueSize: 4,
-		});
-		expect("intervalMs" in common).toBe(false);
-		expect(
-			convertFn(
-				{
-					...common,
-					scope: "inventory",
-					maxStackSize: 9,
-				},
-				"clock",
-			),
-		).toMatchObject({
-			type: "clock",
-			scope: "board",
-			maxStackSize: 1,
-			maxQueueSize: 4,
-			lines: source.lines,
-		});
-	});
-	it("keeps passive Common conversions empty and supplies a line only for Clock", () => {
+	it("keeps passive Common conversions empty", () => {
 		const temporary = createItem("temporary");
-		if (temporary.type !== "temporary") throw new Error("Expected Temporary fixture.");
 		expect(convertFn(temporary, "common")).toMatchObject({
 			type: "common",
 			lines: [],
 			maxQueueSize: 1,
-		});
-		const common = createItem("common");
-		expect(common).toMatchObject({
-			type: "common",
-			lines: [],
-		});
-		const clock = convertFn(common, "clock");
-		expect(clock.type).toBe("clock");
-		if (clock.type !== "clock") throw new Error("Expected Clock conversion.");
-		expect(clock.lines).toHaveLength(1);
-		expect(clock.lines[0].default).toBe(true);
-		expect(convertFn(temporary, "clock")).toMatchObject({
-			durationMs: temporary.durationMs,
 		});
 	});
 	it("enforces target invariants while retaining shared data", () => {

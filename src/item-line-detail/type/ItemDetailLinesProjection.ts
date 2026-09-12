@@ -140,6 +140,10 @@ export namespace ItemDetailLinesProjection {
 		readonly availability: Availability;
 		readonly activeRuleHints: readonly string[];
 		readonly isDefault: boolean;
+		readonly clock?: {
+			readonly selected: boolean;
+			readonly canChange: boolean;
+		};
 		readonly queuedRequestCount: number;
 		readonly actions: LineActions;
 		readonly input: readonly Input[];

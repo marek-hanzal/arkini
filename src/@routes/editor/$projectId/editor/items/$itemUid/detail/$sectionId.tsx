@@ -1,3 +1,4 @@
+import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
@@ -86,6 +87,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <MergesDetail item={item} />;
 			case "action":
 				return <ActionDetail item={item} />;
+			case "clock":
+				return <ClockDetail item={item} />;
 			case "production":
 				return <ProductionDetail item={item} />;
 			case "estimate":

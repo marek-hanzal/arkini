@@ -2,9 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
-import { setItemScheduleRunningFx } from "~/item-schedule/fx/setItemScheduleRunningFx";
-import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
@@ -13,18 +11,20 @@ import { createClockConfig, spawnClockItemFx, tickClockFx } from "./clockSchedul
 const ownerItemId = "runtime:clock";
 
 describe("Clock schedule boundaries", () => {
-	it("retains a 250 ms phase and freezes the selected default per request without retroactive job time", () => {
+	it("retains a 250 ms phase and freezes the selected Clock line per request without retroactive job time", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnClockItemFx();
 				const before = yield* tickClockFx(200);
 				const pulse = yield* tickClockFx(100);
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "clock",
 					ownerItemId,
 					lineId: "b",
 				});
 				const second = yield* tickClockFx(200);
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "clock",
 					ownerItemId,
 					lineId: "a",
 				});
@@ -69,16 +69,18 @@ describe("Clock schedule boundaries", () => {
 
 	it("pauses phase and lifetime through rules while previously accepted production continues", () => {
 		const config = createClockConfig({
-			durationMs: 1000,
-			enable: false,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						existsWhen("permit"),
-					],
-				},
-			],
+			clock: {
+				durationMs: 1000,
+				enable: false,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							existsWhen("permit"),
+						],
+					},
+				],
+			},
 		});
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -126,75 +128,72 @@ describe("Clock schedule boundaries", () => {
 		expect(result.resumed.jobs).toHaveLength(0);
 	});
 
-	it("persists manual off with phase and lifetime across hydration and bypasses rule evaluation", () => {
-		const config = createClockConfig({
-			durationMs: 1000,
-		});
+	it("persists an empty Clock selection while timers age and keeps Default independent", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnClockItemFx();
 				yield* tickClockFx(100);
-				yield* setItemScheduleRunningFx({
+				yield* setLineSelectionFx({
 					ownerItemId,
-					running: false,
+					selection: "default",
+					lineId: "b",
 				});
-				const off = yield* tickClockFx(300);
+				yield* setLineSelectionFx({
+					ownerItemId,
+					selection: "clock",
+					lineId: null,
+				});
+				const silent = yield* tickClockFx(300);
 				const hydrated = yield* fromStateFx({
 					state: fromRuntimeFn({
-						runtime: off,
+						runtime: silent,
 					}),
 				});
-				const owner = hydrated.items[0];
-				if (owner.item.type !== "clock") throw new Error("Expected Clock");
-				// This deliberately invalid rule would fail if manual off did not short-circuit evaluation.
-				const malformed = {
-					...owner,
-					item: {
-						...owner.item,
-						rules: [
-							{
-								type: "enable" as const,
-								when: [
-									{
-										type: "invalid",
-									},
-								],
-							},
-						],
-					},
-				};
-				const enabled = yield* resolveItemScheduleEnabledFx({
-					item: malformed as unknown as typeof owner,
-					runtime: hydrated,
-				});
-				yield* setItemScheduleRunningFx({
+				yield* setLineSelectionFx({
 					ownerItemId,
-					running: true,
+					selection: "clock",
+					lineId: "b",
 				});
-				const resumed = yield* tickClockFx(200);
+				yield* setLineSelectionFx({
+					ownerItemId,
+					selection: "default",
+					lineId: "a",
+				});
+				const selected = yield* tickClockFx(100);
 				return {
-					off,
+					silent,
 					hydrated,
-					enabled,
-					resumed,
+					selected,
 				};
 			}).pipe(
 				useGameFx({
-					config,
+					config: createClockConfig({
+						clock: {
+							durationMs: 1000,
+						},
+					}),
 				}),
 			),
 		);
-		expect(result.off.items[0].schedule).toEqual({
-			running: false,
-			remainingIntervalMs: 150,
-			remainingDurationMs: 900,
+		expect(result.silent.items[0].schedule).toEqual({
+			lineId: null,
+			remainingIntervalMs: 100,
+			remainingDurationMs: 600,
 		});
-		expect(result.hydrated.items[0].schedule).toEqual(result.off.items[0].schedule);
-		expect(result.enabled).toBe(false);
-		expect(result.resumed.jobs).toMatchObject([
+		expect(result.silent.jobs).toHaveLength(0);
+		expect(result.silent.jobQueue).toHaveLength(0);
+		expect(result.hydrated.items[0].schedule).toEqual(result.silent.items[0].schedule);
+		expect(result.hydrated.defaultLineByOwnerItemId[ownerItemId]).toBe("b");
+		expect(result.selected.defaultLineByOwnerItemId[ownerItemId]).toBe("a");
+		expect(result.selected.items[0].schedule).toEqual({
+			lineId: "b",
+			remainingIntervalMs: 250,
+			remainingDurationMs: 500,
+		});
+		expect(result.selected.jobs).toMatchObject([
 			{
-				lineId: "a",
-				remainingMs: 400,
+				lineId: "b",
+				remainingMs: 100,
 			},
 		]);
 	});

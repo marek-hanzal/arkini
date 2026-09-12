@@ -7,16 +7,20 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 import { DiagnosticPathSchema } from "./DiagnosticPathSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
-export const MultipleDefaultLinesDiagnosticSchema = z
+export const MultipleLineSelectionsDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
 		code: DiagnosticCodeEnumSchema.extract([
-			"LineMultipleDefaults",
+			"LineMultipleSelections",
 		]),
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
 		ownerItemId: IdSchema,
+		selection: z.enum([
+			"default",
+			"clock",
+		]),
 		lineIds: z.tuple([
 			IdSchema,
 			IdSchema,
@@ -28,11 +32,12 @@ export const MultipleDefaultLinesDiagnosticSchema = z
 	})
 	.strict()
 	.meta({
-		id: "MultipleDefaultLinesDiagnosticSchema",
-		description: "Two product lines owned by one item are both marked as authored defaults.",
+		id: "MultipleLineSelectionsDiagnosticSchema",
+		description:
+			"Two product lines owned by one item are both marked for the same authored selection.",
 	});
 
-export type MultipleDefaultLinesDiagnosticSchema = typeof MultipleDefaultLinesDiagnosticSchema;
-export namespace MultipleDefaultLinesDiagnosticSchema {
-	export type Type = z.infer<MultipleDefaultLinesDiagnosticSchema>;
+export type MultipleLineSelectionsDiagnosticSchema = typeof MultipleLineSelectionsDiagnosticSchema;
+export namespace MultipleLineSelectionsDiagnosticSchema {
+	export type Type = z.infer<MultipleLineSelectionsDiagnosticSchema>;
 }

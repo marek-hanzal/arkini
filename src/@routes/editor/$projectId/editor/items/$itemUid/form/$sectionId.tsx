@@ -1,3 +1,4 @@
+import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
@@ -53,6 +54,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				return <MergesSection />;
 			case "action":
 				return <ActionSection />;
+			case "clock":
+				return <ClockSection />;
 			case "production":
 				return <ProductionSection />;
 		}

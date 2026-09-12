@@ -6,7 +6,7 @@ import { DuplicateLineIdDiagnosticSchema } from "./DuplicateLineIdDiagnosticSche
 import { DuplicateProviderDiagnosticSchema } from "./DuplicateProviderDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./UnusedResourceDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./MissingResourceDiagnosticSchema";
-import { MultipleDefaultLinesDiagnosticSchema } from "./MultipleDefaultLinesDiagnosticSchema";
+import { MultipleLineSelectionsDiagnosticSchema } from "./MultipleLineSelectionsDiagnosticSchema";
 import { DuplicateResourceDiagnosticSchema } from "./DuplicateResourceDiagnosticSchema";
 import { DuplicateRecordDiagnosticSchema } from "./DuplicateRecordDiagnosticSchema";
 import { InputAcceptanceCycleDiagnosticSchema } from "./InputAcceptanceCycleDiagnosticSchema";
@@ -44,7 +44,7 @@ export const GameDiagnosticSchema = z
 		SourceSchemaDiagnosticSchema,
 		DuplicateItemUidDiagnosticSchema,
 		DuplicateLineIdDiagnosticSchema,
-		MultipleDefaultLinesDiagnosticSchema,
+		MultipleLineSelectionsDiagnosticSchema,
 	])
 	.meta({
 		id: "GameDiagnosticSchema",

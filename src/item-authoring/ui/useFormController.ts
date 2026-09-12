@@ -279,10 +279,7 @@ export const useFormController = ({
 			const issue = result.error.issues[0];
 			if (issue === undefined) return false;
 
-			await onInvalidSectionFn(
-				readSectionForPathFn(issue.path, form.state.values.type),
-				issue.path,
-			);
+			await onInvalidSectionFn(readSectionForPathFn(issue.path), issue.path);
 			const focusInvalidFieldFn = () =>
 				document
 					.querySelector<HTMLElement>(

@@ -9,7 +9,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 type JobCompletionItem = Extract<
 	ItemSchema.Type,
 	{
-		readonly type: typeof TypeSchema.enum.Clock | typeof TypeSchema.enum.Common;
+		readonly type: typeof TypeSchema.enum.Common;
 	}
 >;
 

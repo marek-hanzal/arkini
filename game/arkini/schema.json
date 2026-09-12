@@ -405,6 +405,17 @@
 					},
 					"minItems": 1
 				},
+				"clock": {
+					"$ref": "urn:arkini:schema:project#/$defs/ItemScheduleSchema"
+				},
+				"control": {
+					"description": "Player production control; omission means interactive.",
+					"type": "string",
+					"enum": [
+						"automatic-only",
+						"interactive"
+					]
+				},
 				"action": {
 					"description": "An optional immediate action; mutually exclusive with production lines.",
 					"$ref": "urn:arkini:schema:project#/$defs/itemAction.ActionSchema"
@@ -441,6 +452,33 @@
 				"lines"
 			],
 			"additionalProperties": false,
+			"if": {
+				"required": [
+					"clock"
+				]
+			},
+			"then": {
+				"required": [
+					"scope",
+					"lines"
+				],
+				"properties": {
+					"scope": {
+						"const": "board"
+					},
+					"maxStackSize": {
+						"const": 1
+					},
+					"lines": {
+						"minItems": 1
+					}
+				},
+				"not": {
+					"required": [
+						"action"
+					]
+				}
+			},
 			"not": {
 				"required": [
 					"action",
@@ -452,7 +490,7 @@
 					}
 				}
 			},
-			"description": "An ordinary item with optional production or one immediate action."
+			"description": "An ordinary item with optional production, Clock scheduling, or one immediate action."
 		},
 		"DescriptionSchema": {
 			"type": "string",
@@ -1301,6 +1339,130 @@
 			"additionalProperties": false,
 			"description": "A merge that replaces its selected receiving item with an explicit result."
 		},
+		"ItemScheduleSchema": {
+			"type": "object",
+			"properties": {
+				"intervalMs": {
+					"type": "integer",
+					"minimum": 100,
+					"maximum": 9007199254740991,
+					"description": "Active milliseconds between attempts to enqueue the effective Clock line.",
+					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
+				},
+				"durationMs": {
+					"description": "Optional active lifetime; accepted work can outlive the schedule.",
+					"minimum": 100,
+					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
+				},
+				"enable": {
+					"default": true,
+					"type": "boolean"
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/action.RuleSchema"
+					}
+				},
+				"onExpire": {
+					"description": "Output emitted atomically when the expired owner finishes settling production.",
+					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
+				}
+			},
+			"required": [
+				"intervalMs",
+				"enable",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "Periodic Clock-line admission with optional active lifetime, availability rules and expiry output."
+		},
+		"TimeSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A non-negative whole time value expressed in milliseconds."
+		},
+		"action.RuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/action.EnableRuleSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/action.DisableRuleSchema"
+				}
+			],
+			"description": "Enable gates and disable vetoes evaluated for an immediate item action."
+		},
+		"action.EnableRuleSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this action rule applies.",
+					"$ref": "urn:arkini:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this action rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"enable"
+					]
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that enables an immediate item action when its conditions pass."
+		},
+		"action.DisableRuleSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this action rule applies.",
+					"$ref": "urn:arkini:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this action rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"disable"
+					]
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that disables an immediate item action when its conditions pass."
+		},
 		"itemAction.ActionSchema": {
 			"oneOf": [
 				{
@@ -1429,85 +1591,6 @@
 			"additionalProperties": false,
 			"description": "A board query that resolves one Board item that can pay units."
 		},
-		"action.RuleSchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/action.EnableRuleSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/action.DisableRuleSchema"
-				}
-			],
-			"description": "Enable gates and disable vetoes evaluated for an immediate item action."
-		},
-		"action.EnableRuleSchema": {
-			"type": "object",
-			"properties": {
-				"hint": {
-					"description": "Player-facing explanation shown while this action rule applies.",
-					"$ref": "urn:arkini:schema:project#/$defs/NonEmptyStringSchema"
-				},
-				"when": {
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
-					},
-					"minItems": 1,
-					"description": "Conditions that must all pass for this action rule to apply."
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"enable"
-					]
-				}
-			},
-			"required": [
-				"when",
-				"type"
-			],
-			"additionalProperties": false,
-			"description": "A rule that enables an immediate item action when its conditions pass."
-		},
-		"action.DisableRuleSchema": {
-			"type": "object",
-			"properties": {
-				"hint": {
-					"description": "Player-facing explanation shown while this action rule applies.",
-					"$ref": "urn:arkini:schema:project#/$defs/NonEmptyStringSchema"
-				},
-				"when": {
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
-					},
-					"minItems": 1,
-					"description": "Conditions that must all pass for this action rule to apply."
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"disable"
-					]
-				}
-			},
-			"required": [
-				"when",
-				"type"
-			],
-			"additionalProperties": false,
-			"description": "A rule that disables an immediate item action when its conditions pass."
-		},
 		"LineSchema": {
 			"type": "object",
 			"properties": {
@@ -1522,6 +1605,10 @@
 				"description": {
 					"description": "The human-readable explanation of this product line's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
+				},
+				"clock": {
+					"description": "Whether this is the authored line selected for Clock impulses, independently of Default.",
+					"type": "boolean"
 				},
 				"ahead": {
 					"description": "When producing this line owner, check whether one future run fits output count limits. Only marked visible, enabled lines participate; one fitting alternative is enough. Checks exactly one hop, without reserving future work.",
@@ -1584,12 +1671,6 @@
 			],
 			"additionalProperties": false,
 			"description": "A single product line with its accepted inputs and produced output."
-		},
-		"TimeSchema": {
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 9007199254740991,
-			"description": "A non-negative whole time value expressed in milliseconds."
 		},
 		"InputSchema": {
 			"oneOf": [
@@ -1836,140 +1917,6 @@
 			"exclusiveMinimum": 0,
 			"description": "A number greater than zero."
 		},
-		"item.ClockSchema": {
-			"type": "object",
-			"properties": {
-				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"title": {
-					"description": "The human-readable title of this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
-				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
-				"description": {
-					"description": "The optional human-readable explanation of this item's purpose.",
-					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
-				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
-				},
-				"scope": {
-					"default": "board",
-					"type": "string",
-					"enum": [
-						"board"
-					]
-				},
-				"maxCount": {
-					"description": "The optional maximum number of this item allowed across the game state.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"maxStackSize": {
-					"default": 1,
-					"maximum": 1,
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
-					"$ref": "urn:arkini:schema:project#/$defs/UnitsSchema"
-				},
-				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					},
-					"minItems": 1
-				},
-				"maxQueueSize": {
-					"default": 1,
-					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"clock"
-					]
-				},
-				"lines": {
-					"minItems": 1,
-					"type": "array",
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-					},
-					"description": "One or more production lines available to the schedule."
-				},
-				"intervalMs": {
-					"type": "integer",
-					"minimum": 100,
-					"maximum": 9007199254740991,
-					"description": "Active milliseconds between attempts to enqueue one effective default line.",
-					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
-				},
-				"durationMs": {
-					"description": "Optional active lifetime; accepted work can outlive the schedule.",
-					"minimum": 100,
-					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
-				},
-				"enable": {
-					"default": true,
-					"type": "boolean"
-				},
-				"rules": {
-					"default": [],
-					"type": "array",
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/action.RuleSchema"
-					}
-				},
-				"onExpire": {
-					"description": "Output emitted atomically when the expired owner finishes settling production.",
-					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
-				},
-				"control": {
-					"default": "automatic-only",
-					"description": "Whether the player can operate production controls in addition to automatic impulses.",
-					"type": "string",
-					"enum": [
-						"automatic-only",
-						"interactive"
-					]
-				}
-			},
-			"required": [
-				"uid",
-				"id",
-				"title",
-				"asset",
-				"scope",
-				"maxStackSize",
-				"maxQueueSize",
-				"type",
-				"lines",
-				"intervalMs",
-				"enable",
-				"rules",
-				"control"
-			],
-			"additionalProperties": false,
-			"description": "A scheduled producer with ordinary lines and optional active lifetime."
-		},
 		"item.TemporarySchema": {
 			"type": "object",
 			"properties": {
@@ -2153,9 +2100,6 @@
 			"oneOf": [
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.CommonSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/item.ClockSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/item.TemporarySchema"

@@ -6,9 +6,8 @@ import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDeta
 export type ItemDetailPendingAction =
 	| "autofill"
 	| "clear-queue"
-	| "default"
+	| "selection"
 	| "enqueue"
-	| "schedule"
 	| "withdraw";
 
 export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unknown> {

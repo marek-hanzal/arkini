@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseSchema } from "~/item-definition/schema/BaseSchema";
-import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
@@ -28,7 +27,6 @@ const nullableBaseItemFields = {
 
 const editItemInputSchemaIds = {
 	common: "urn:arkini:schema:mcp:edit-common-item-input",
-	clock: "urn:arkini:schema:mcp:edit-clock-item-input",
 	temporary: "urn:arkini:schema:mcp:edit-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:edit-inventory-item-input",
 } as const;
@@ -39,6 +37,8 @@ const commonPatch = requireReplacementFn(
 		.extend({
 			...nullableBaseItemFields,
 			action: CommonSchema.shape.action.nullable(),
+			clock: CommonSchema.shape.clock.nullable(),
+			control: CommonSchema.shape.control,
 			lines: CommonSchema.shape.lines.removeDefault().optional(),
 			maxQueueSize: CommonSchema.shape.maxQueueSize.removeDefault().optional(),
 		})
@@ -46,27 +46,6 @@ const commonPatch = requireReplacementFn(
 ).meta({
 	id: "CommonItemPatchSchema",
 	description: "Top-level replacements accepted for an existing common item.",
-});
-const clockPatch = requireReplacementFn(
-	ClockSchema.omit({
-		...immutableItemFields,
-		scope: true,
-		maxStackSize: true,
-	})
-		.partial()
-		.extend({
-			...nullableBaseItemFields,
-			durationMs: ClockSchema.shape.durationMs.nullable(),
-			onExpire: ClockSchema.shape.onExpire.nullable(),
-			maxQueueSize: ClockSchema.shape.maxQueueSize.removeDefault().optional(),
-			enable: ClockSchema.shape.enable.removeDefault().optional(),
-			rules: ClockSchema.shape.rules.removeDefault().optional(),
-			control: ClockSchema.shape.control.removeDefault().optional(),
-		})
-		.strict(),
-).meta({
-	id: "ClockItemPatchSchema",
-	description: "Top-level replacements accepted for an existing clock item.",
 });
 const temporaryPatch = requireReplacementFn(
 	TemporarySchema.omit({
@@ -140,11 +119,6 @@ export const EditItemInputSchemas = {
 		schemaId: editItemInputSchemaIds.common,
 		title: "Edit common item tool input",
 		description: "Identity, revision, and replacement patch for one common item.",
-	}),
-	clock: editItemInputFn(clockPatch, {
-		schemaId: editItemInputSchemaIds.clock,
-		title: "Edit clock item tool input",
-		description: "Identity, revision, and replacement patch for one clock item.",
 	}),
 	temporary: editItemInputFn(temporaryPatch, {
 		schemaId: editItemInputSchemaIds.temporary,

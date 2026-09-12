@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import type { ActionSchema } from "~/item-action/schema/ActionSchema";
-import type { RuleSchema } from "~/production-action/schema/RuleSchema";
+import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -22,16 +22,13 @@ export type FormValues = Omit<BaseSchema.Type, "asset" | "description" | "merge"
 	readonly description: string;
 	readonly type: TypeSchema.Type;
 	readonly durationMs?: number;
-	readonly intervalMs?: number;
-	readonly onExpire?: OutputSchema.Type;
+	readonly clock?: ItemScheduleSchema.Type;
 	readonly control?: "automatic-only" | "interactive";
-	readonly enable?: boolean;
 	readonly action?: ActionSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
 	readonly merge?: MergeSchema.Type[];
 	readonly output?: OutputSchema.Type;
-	readonly rules?: RuleSchema.Type[];
 };
 
 /** Removes empty optional artwork slots from the local form representation. */

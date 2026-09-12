@@ -21,7 +21,7 @@ export const DiagnosticCodeEnumSchema = z
 		ConfigSchema: "config:schema",
 		ItemDuplicateUid: "item:duplicate-uid",
 		LineDuplicateId: "line:duplicate-id",
-		LineMultipleDefaults: "line:multiple-defaults",
+		LineMultipleSelections: "line:multiple-selections",
 		ConfigKeyIdMismatch: "config:key-id-mismatch",
 		UnitRenewalMissing: "units:missing-renewal",
 	})

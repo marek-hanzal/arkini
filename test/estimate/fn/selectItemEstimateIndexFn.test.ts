@@ -44,9 +44,9 @@ const entries: ReadonlyArray<ItemEstimateIndexEntry> = [
 ];
 
 const items = [
-	item("bakery", "Bakery", "clock"),
+	item("bakery", "Bakery", "inventory"),
 	item("water", "Water"),
-	item("well", "Well", "clock"),
+	item("well", "Well", "inventory"),
 	item("unused", "Unused"),
 ];
 
@@ -92,11 +92,11 @@ describe("selectItemEstimateIndexFn", () => {
 	});
 
 	it("filters estimates by authored item type before ordering", () => {
-		expect(readItemIds("slowest", "", "clock")).toEqual([
+		expect(readItemIds("slowest", "", "inventory")).toEqual([
 			"bakery",
 			"well",
 		]);
-		expect(readItemIds("incomplete", "", "clock")).toEqual([
+		expect(readItemIds("incomplete", "", "inventory")).toEqual([
 			"well",
 		]);
 	});

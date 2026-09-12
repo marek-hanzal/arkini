@@ -14,11 +14,7 @@ export const isMaterialInputEligibleFn = (item: ItemSchema.Type) =>
 		)
 		.with(
 			{
-				type: P.union(
-					TypeSchema.enum.Inventory,
-					TypeSchema.enum.Clock,
-					TypeSchema.enum.Common,
-				),
+				type: P.union(TypeSchema.enum.Inventory, TypeSchema.enum.Common),
 			},
 			() => true,
 		)

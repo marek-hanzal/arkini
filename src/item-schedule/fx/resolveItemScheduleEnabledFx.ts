@@ -17,7 +17,6 @@ export const resolveItemScheduleEnabledFx = Effect.fn("resolveItemScheduleEnable
 }) {
 	const schedule = readItemScheduleFn(item.item);
 	if (
-		item.schedule?.running === false ||
 		item.schedule?.remainingDurationMs === 0 ||
 		schedule === undefined ||
 		item.location.scope !== LocationScopeEnumSchema.enum.Board

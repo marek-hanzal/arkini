@@ -151,9 +151,11 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 				anyOf: [],
 			},
 			availability,
-			owner.type === "clock" && owner.control === "automatic-only"
+			owner.type === "common" &&
+				owner.clock !== undefined &&
+				owner.control === "automatic-only"
 				? readAcquisitionAvailabilityRequirementsFn({
-						rules: owner.rules,
+						rules: owner.clock.rules,
 						source: "line-condition",
 					})
 				: {
@@ -168,13 +170,15 @@ const readLineExecutionConstraintFn = (
 	owner: ItemSchema.Type,
 	line: LineSchema.Type,
 ): AcquisitionRoute["executionConstraint"] => {
-	if (owner.type !== "clock") return undefined;
+	if (owner.type !== "common") return undefined;
+	const clock = owner.clock;
+	if (clock === undefined) return owner.control === "automatic-only" ? "unavailable" : undefined;
 	if (
 		owner.control === "automatic-only" &&
-		(!line.default || (!owner.enable && !owner.rules.some(({ type }) => type === "enable")))
+		(!line.clock || (!clock.enable && !clock.rules.some(({ type }) => type === "enable")))
 	)
 		return "unavailable";
-	return owner.durationMs === undefined ? undefined : "finite-owner-lifetime";
+	return clock.durationMs === undefined ? undefined : "finite-owner-lifetime";
 };
 
 const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescriptor) => {
@@ -199,8 +203,10 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	}
 	const executionConstraint = readLineExecutionConstraintFn(descriptor.owner, descriptor.line);
 	const minimumActionIntervalMs =
-		descriptor.owner.type === "clock" && descriptor.owner.control === "automatic-only"
-			? descriptor.owner.intervalMs
+		descriptor.owner.type === "common" &&
+		descriptor.owner.clock !== undefined &&
+		descriptor.owner.control === "automatic-only"
+			? descriptor.owner.clock.intervalMs
 			: undefined;
 	const execution = {
 		...(executionConstraint === undefined
@@ -560,19 +566,19 @@ const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 };
 
 const readExpiryRoutesFn = (item: ItemSchema.Type) => {
-	if (item.type !== "temporary" && item.type !== "clock") return [];
-	if (item.durationMs === undefined) return [];
-	const durationMs = item.durationMs;
+	const clock = item.type === "common" ? item.clock : undefined;
+	const durationMs = item.type === "temporary" ? item.durationMs : clock?.durationMs;
+	if (durationMs === undefined) return [];
 	const kind = item.type === "temporary" ? "temporary-expiry" : "clock-expiry";
 	const outputModel = readAcquisitionOutputOccurrencesFn(
-		item.type === "temporary" ? item.output : item.onExpire,
+		item.type === "temporary" ? item.output : clock?.onExpire,
 	);
 	return outputModel.occurrences.map(
 		(output): AcquisitionRoute => ({
-			...(item.type === "clock"
+			...(clock !== undefined
 				? {
 						executionConstraint:
-							!item.enable && !item.rules.some(({ type }) => type === "enable")
+							!clock.enable && !clock.rules.some(({ type }) => type === "enable")
 								? ("unavailable" as const)
 								: ("finite-owner-lifetime" as const),
 					}
@@ -613,9 +619,9 @@ const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 					anyOf: output.requirements.anyOf,
 					unsupported: output.requirements.unsupported ?? [],
 				},
-				item.type === "clock"
+				clock !== undefined
 					? readAcquisitionAvailabilityRequirementsFn({
-							rules: item.rules,
+							rules: clock.rules,
 							source: "line-condition",
 						})
 					: {

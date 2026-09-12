@@ -4,7 +4,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
-import { readDefaultLineQueueTargetFx } from "~/production-job/fx/readDefaultLineQueueTargetFx";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
@@ -45,10 +45,14 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 		if (phase <= 0) {
 			// Only expected admission rejection consumes the pulse without state, randomness or delivery side effects.
 			const attempt = yield* Effect.gen(function* () {
-				const line = yield* readDefaultLineQueueTargetFx({
+				if (item.item.type !== "common") return undefined;
+				const line = readEffectiveLineFn({
 					ownerItemId: item.id,
+					ownerItem: item.item,
 					runtime: draft,
+					selection: "clock",
 				});
+				if (line === undefined) return undefined;
 				return yield* enqueueLineRuntimeFx({
 					ownerItemId: item.id,
 					lineId: line.id,
@@ -56,7 +60,6 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 				});
 			}).pipe(
 				Effect.catchTags({
-					DefaultLineQueueUnavailableError: () => Effect.succeed(undefined),
 					JobQueueFullError: () => Effect.succeed(undefined),
 					LineRunUnavailableError: () => Effect.succeed(undefined),
 					OutputCapacityError: () => Effect.succeed(undefined),

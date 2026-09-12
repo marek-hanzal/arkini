@@ -18,7 +18,7 @@ export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Pr
 	match(item)
 		.with(
 			{
-				type: P.union(TypeSchema.enum.Common, TypeSchema.enum.Clock),
+				type: TypeSchema.enum.Common,
 			},
 			({ lines }) =>
 				lines.map(

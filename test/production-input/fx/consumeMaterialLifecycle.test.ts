@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -173,7 +173,8 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		quantity: 1,
 	});
 
-	yield* setDefaultLineFx({
+	yield* setLineSelectionFx({
+		selection: "default",
 		ownerItemId: inner.id,
 		lineId: "line:inner:load",
 	});

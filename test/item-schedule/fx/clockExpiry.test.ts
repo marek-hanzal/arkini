@@ -18,6 +18,7 @@ const expiryOutput = createOutput([
 const materialLine = createLine({
 	id: "material",
 	default: true,
+	clock: true,
 	input: [
 		{
 			type: "materials",
@@ -51,9 +52,11 @@ describe("Clock expiry settlement", () => {
 			}).pipe(
 				useGameFx({
 					config: createClockConfig({
-						durationMs: 500,
 						maxQueueSize: 2,
-						onExpire: expiryOutput,
+						clock: {
+							durationMs: 500,
+							onExpire: expiryOutput,
+						},
 					}),
 				}),
 			),
@@ -93,9 +96,11 @@ describe("Clock expiry settlement", () => {
 			}).pipe(
 				useGameFx({
 					config: createClockConfig({
-						durationMs: 500,
 						maxQueueSize: 1,
-						onExpire: expiryOutput,
+						clock: {
+							durationMs: 500,
+							onExpire: expiryOutput,
+						},
 					}),
 				}),
 			),
@@ -119,11 +124,13 @@ describe("Clock expiry settlement", () => {
 			}).pipe(
 				useGameFx({
 					config: createClockConfig({
-						intervalMs: 100,
-						durationMs: 100,
 						lines: [
 							materialLine,
 						],
+						clock: {
+							intervalMs: 100,
+							durationMs: 100,
+						},
 					}),
 				}),
 			),
@@ -151,11 +158,13 @@ describe("Clock expiry settlement", () => {
 			}).pipe(
 				useGameFx({
 					config: createClockConfig({
-						intervalMs: 100,
-						durationMs: 200,
 						lines: [
 							materialLine,
 						],
+						clock: {
+							intervalMs: 100,
+							durationMs: 200,
+						},
 					}),
 				}),
 			),
@@ -239,14 +248,16 @@ describe("Clock expiry settlement", () => {
 			}).pipe(
 				useGameFx({
 					config: createClockConfig({
-						intervalMs: 100,
-						durationMs: 100,
 						lines: [
 							createLine({
 								id: "unused",
 							}),
 						],
-						onExpire: output,
+						clock: {
+							intervalMs: 100,
+							durationMs: 100,
+							onExpire: output,
+						},
 					}),
 				}),
 			),

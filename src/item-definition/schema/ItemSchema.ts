@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { ClockSchema } from "./ClockSchema";
 import { InventorySchema } from "./InventorySchema";
 import { CommonSchema } from "./CommonSchema";
 import { TemporarySchema } from "./TemporarySchema";
@@ -14,11 +13,43 @@ import { TemporarySchema } from "./TemporarySchema";
 export const ItemSchema = z
 	.discriminatedUnion("type", [
 		CommonSchema,
-		ClockSchema,
 		TemporarySchema,
 		InventorySchema,
 	])
 	.superRefine((item, context) => {
+		if (item.type === "common" && item.clock !== undefined) {
+			for (const [field, valid, message] of [
+				[
+					"scope",
+					item.scope === "board",
+					"Clock requires Board storage.",
+				],
+				[
+					"maxStackSize",
+					item.maxStackSize === 1,
+					"Clock items cannot stack.",
+				],
+				[
+					"lines",
+					item.lines.length > 0,
+					"Clock requires at least one production line.",
+				],
+				[
+					"action",
+					item.action === undefined,
+					"An item cannot have both Clock and Action.",
+				],
+			] as const) {
+				if (!valid)
+					context.addIssue({
+						code: "custom",
+						path: [
+							field,
+						],
+						message,
+					});
+			}
+		}
 		if (item.type === "common" && item.action !== undefined && item.lines.length > 0) {
 			context.addIssue({
 				code: "custom",

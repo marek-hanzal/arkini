@@ -20,7 +20,7 @@ const lineDiagnostics = async (items: Record<string, unknown>) =>
 		)
 	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineDuplicateId);
 
-const defaultDiagnostics = async (items: Record<string, unknown>) =>
+const selectionDiagnostics = async (items: Record<string, unknown>) =>
 	(
 		await Effect.runPromise(
 			compileGameSourcesFx([
@@ -29,7 +29,9 @@ const defaultDiagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineMultipleDefaults);
+	).diagnostics.filter(
+		({ code }) => code === DiagnosticCodeEnumSchema.enum.LineMultipleSelections,
+	);
 
 describe("validateItemLineIdsFn", () => {
 	it("rejects duplicate line IDs within one owner", async () => {
@@ -99,51 +101,57 @@ describe("validateItemLineIdsFn", () => {
 		).toEqual([]);
 	});
 
-	it("rejects two authored defaults on one owner with both line identities", async () => {
-		const owner = createProducerItem({
-			id: "producer:sawmill",
-			lines: [
-				createLine({
-					default: true,
-					id: "line:plank",
-				}),
-				createLine({
-					default: true,
-					id: "line:beam",
-				}),
-			],
-		});
+	it.each([
+		"default",
+		"clock",
+	] as const)(
+		"rejects two authored %s selections with both line identities",
+		async (selection) => {
+			const owner = createProducerItem({
+				id: "producer:sawmill",
+				lines: [
+					createLine({
+						[selection]: true,
+						id: "line:plank",
+					}),
+					createLine({
+						[selection]: true,
+						id: "line:beam",
+					}),
+				],
+			});
 
-		expect(
-			await defaultDiagnostics({
-				[owner.id]: owner,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				ownerItemId: owner.id,
-				lineIds: [
-					"line:plank",
-					"line:beam",
-				],
-				paths: [
-					[
-						"items",
-						owner.id,
-						"lines",
-						0,
-						"default",
+			expect(
+				await selectionDiagnostics({
+					[owner.id]: owner,
+				}),
+			).toEqual([
+				expect.objectContaining({
+					ownerItemId: owner.id,
+					lineIds: [
+						"line:plank",
+						"line:beam",
 					],
-					[
-						"items",
-						owner.id,
-						"lines",
-						1,
-						"default",
+					paths: [
+						[
+							"items",
+							owner.id,
+							"lines",
+							0,
+							selection,
+						],
+						[
+							"items",
+							owner.id,
+							"lines",
+							1,
+							selection,
+						],
 					],
-				],
-			}),
-		]);
-	});
+				}),
+			]);
+		},
+	);
 
 	it("reports the authored-default conflict independently from duplicate line identity", async () => {
 		const owner = createProducerItem({
@@ -161,7 +169,7 @@ describe("validateItemLineIdsFn", () => {
 		});
 
 		expect(
-			await defaultDiagnostics({
+			await selectionDiagnostics({
 				[owner.id]: owner,
 			}),
 		).toEqual([

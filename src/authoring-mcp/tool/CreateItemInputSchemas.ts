@@ -3,7 +3,6 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
-import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
 import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
@@ -24,7 +23,6 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 
 const createItemInputSchemaIds = {
 	common: "urn:arkini:schema:mcp:create-common-item-input",
-	clock: "urn:arkini:schema:mcp:create-clock-item-input",
 	temporary: "urn:arkini:schema:mcp:create-temporary-item-input",
 	inventory: "urn:arkini:schema:mcp:create-inventory-item-input",
 } as const;
@@ -55,43 +53,13 @@ export const CreateItemInputSchemas = {
 		.strict()
 		.meta({
 			not: CommonSchema.meta()?.not,
+			if: CommonSchema.meta()?.if,
+			then: CommonSchema.meta()?.then,
 			id: createItemInputSchemaIds.common,
 			$id: createItemInputSchemaIds.common,
 			title: "Create common item tool input",
 			description: "Authoring fields accepted when creating one common item.",
 		}),
-	clock: ClockSchema.omit({
-		asset: true,
-		lines: true,
-		intervalMs: true,
-		enable: true,
-		rules: true,
-		control: true,
-		maxQueueSize: true,
-		maxStackSize: true,
-		scope: true,
-		type: true,
-		uid: true,
-	})
-		.extend({
-			asset: draftAsset,
-			maxQueueSize: draftMaxQueueSize,
-			lines: ClockSchema.shape.lines.optional(),
-			intervalMs: ClockSchema.shape.intervalMs
-				.optional()
-				.describe("Pulse interval in whole milliseconds; defaults to 1000."),
-			enable: ClockSchema.shape.enable.removeDefault().optional(),
-			rules: ClockSchema.shape.rules.removeDefault().optional(),
-			control: ClockSchema.shape.control.removeDefault().optional(),
-		})
-		.strict()
-		.meta({
-			id: createItemInputSchemaIds.clock,
-			$id: createItemInputSchemaIds.clock,
-			title: "Create clock item tool input",
-			description: "Authoring fields accepted when creating one clock item.",
-		}),
-
 	temporary: TemporarySchema.omit({
 		asset: true,
 		durationMs: true,

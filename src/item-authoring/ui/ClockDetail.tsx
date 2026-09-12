@@ -18,7 +18,7 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				<DisabledCapabilityDetail
 					capability="clock"
 					itemUid={item.uid}
-					actionLabel={translator.textFn("Enable clock")}
+					actionLabel={translator.textFn("Enable")}
 					icon={Clock}
 					title={translator.textFn("Item clock empty title")}
 					description={translator.textFn(

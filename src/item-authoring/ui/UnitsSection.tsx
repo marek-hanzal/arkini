@@ -18,7 +18,7 @@ export const UnitsSection = () => {
 					units === undefined ? (
 						<EditorFormCard>
 							<EditorCapabilityStatus
-								actionLabel={translator.textFn("Enable units")}
+								actionLabel={translator.textFn("Enable")}
 								dataUi="EditorUnitsDisabled"
 								icon={BatteryCharging}
 								onEnableFn={() =>
@@ -52,7 +52,7 @@ export const UnitsSection = () => {
 							/>
 							<EditorFormCard>
 								<OptionalOutputControl
-									addLabel={translator.textFn("Enable depletion output")}
+									addLabel={translator.textFn("Enable")}
 									emptyDescription={translator.textFn(
 										"Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.",
 									)}

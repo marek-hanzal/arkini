@@ -16,7 +16,7 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 				capability="production"
 				itemUid={item.uid}
 				title={translator.textFn("Item production empty title")}
-				actionLabel={translator.textFn("Enable production")}
+				actionLabel={translator.textFn("Enable")}
 				icon={Factory}
 			/>
 		</EditorRootCard>

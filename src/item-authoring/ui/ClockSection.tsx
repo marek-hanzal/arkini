@@ -98,7 +98,7 @@ const ClockFields = () => {
 						<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
 							{(output) => (
 								<OptionalOutputControl
-									addLabel={translator.textFn("Enable expiry output")}
+									addLabel={translator.textFn("Enable")}
 									emptyDescription={translator.textFn(
 										"Without an output, the clock disappears after expiry and production settlement.",
 									)}
@@ -130,7 +130,7 @@ export const ClockSection = () => {
 						<EditorCapabilityStatus
 							icon={Clock}
 							title={translator.textFn("Item clock empty title")}
-							actionLabel={translator.textFn("Enable clock")}
+							actionLabel={translator.textFn("Enable")}
 							onEnableFn={enableClockFn}
 						/>
 					</EditorFormCard>

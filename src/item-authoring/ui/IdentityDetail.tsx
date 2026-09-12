@@ -1,3 +1,5 @@
+import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
@@ -171,6 +173,16 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						)}
 					/>
 					<ActionDetail item={item} />
+				</section>
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemEstimateDetail"
+				>
+					<EditorFormSectionDivider title={translator.textFn("Estimate")} />
+					<ItemEstimateSection
+						itemId={item.id}
+						previewItemUid={item.uid}
+					/>
 				</section>
 			</div>
 		</div>

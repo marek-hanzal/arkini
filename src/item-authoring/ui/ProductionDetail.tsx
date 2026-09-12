@@ -1,3 +1,6 @@
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { Factory } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
@@ -9,6 +12,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 /** Presents the authored production lines and their input/output flows. */
 export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
+	const project = useEditorProject();
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
@@ -23,15 +27,27 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 				)}
 			/>
 			{item.lines.length > 0 ? (
-				<div className="ak-list grid gap-3">
-					{item.lines.map((line) => (
+				<EditorCollectionSelector
+					key={item.uid}
+					count={item.lines.length}
+					itemLabelFn={(index) => item.lines[index].title}
+					itemSearchTermsFn={(index) => [
+						item.lines[index].id,
+						item.lines[index].description,
+					]}
+					itemRelatedSearchTermsFn={(index) =>
+						readCapabilityRelatedTermsFn(item.lines[index], project.config.items)
+					}
+					label={translator.textFn("Product lines")}
+					navigationCard
+				>
+					{(index) => (
 						<ProductionLineDetail
 							itemUid={item.uid}
-							key={line.id}
-							line={line}
+							line={item.lines[index]}
 						/>
-					))}
-				</div>
+					)}
+				</EditorCollectionSelector>
 			) : (
 				<EditorRootCard dataUi="EditorProductionDisabledCard">
 					<DisabledCapabilityDetail

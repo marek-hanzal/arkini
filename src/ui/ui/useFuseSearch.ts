@@ -5,6 +5,7 @@ import { createFuzzySearchFn } from "~/fuzzy-search/fn/createFuzzySearchFn";
 export interface FuseSearchCandidate<Identity extends string> {
 	readonly identity: Identity;
 	readonly terms: readonly string[];
+	readonly relatedTerms?: readonly string[];
 }
 
 /** Searches explicit authorized presentation terms while retaining a stable Fuse corpus by identity. */
@@ -15,9 +16,10 @@ export const useFuseSearch = <Identity extends string>(
 	const corpusKey = useMemo(
 		() =>
 			JSON.stringify(
-				candidates.map(({ identity, terms }) => [
+				candidates.map(({ identity, terms, relatedTerms }) => [
 					identity,
 					terms,
+					relatedTerms,
 				]),
 			),
 		[
@@ -27,8 +29,9 @@ export const useFuseSearch = <Identity extends string>(
 	const fuzzyFn = useMemo(
 		() =>
 			createFuzzySearchFn({
-				candidates: candidates.map(({ identity, terms }) => ({
+				candidates: candidates.map(({ identity, terms, relatedTerms }) => ({
 					terms,
+					relatedTerms,
 					value: identity,
 				})),
 			}),

@@ -52,7 +52,7 @@ export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	);
 };
 
-const MergeDetail = ({
+export const MergeDetail = ({
 	index,
 	itemUid,
 	merge,
@@ -138,7 +138,7 @@ const MergeDetail = ({
 	);
 };
 
-/** Shows the first authored merge interaction with access to the complete merge editor. */
+/** Shows the first authored merge interaction with access to the complete read-only collection. */
 export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
@@ -172,7 +172,7 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 								</p>
 								<LinkButtonLink
 									className="inline-flex shrink-0 items-center gap-1.5"
-									to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+									to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 									params={{
 										projectId: project.projectId,
 										itemUid: item.uid,

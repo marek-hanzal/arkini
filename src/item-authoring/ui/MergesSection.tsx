@@ -1,3 +1,4 @@
+import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Combine } from "lucide-react";
 import { useStore } from "@tanstack/react-form";
@@ -69,7 +70,12 @@ const MergeFields = ({
 						}}
 						itemSearchTermsFn={(index) => [
 							merges[index].target.itemId,
+							merges[index].action,
+							merges[index].effect,
 						]}
+						itemRelatedSearchTermsFn={(index) =>
+							readCapabilityRelatedTermsFn(merges[index], targetItems)
+						}
 						label={translator.textFn("Merges")}
 						key={initialSelectedIndex}
 						navigationCard

@@ -41,6 +41,10 @@ const DetailSections = [
 		label: "Production",
 	},
 	{
+		id: "merges",
+		label: "Merges",
+	},
+	{
 		id: "estimate",
 		label: "Estimate",
 	},

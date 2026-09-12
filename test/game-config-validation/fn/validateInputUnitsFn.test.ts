@@ -229,20 +229,24 @@ describe("validateInputUnitsFn", () => {
 	it("counts only authored Space Action self costs", async () => {
 		const portal = {
 			...createItemBase("space:cumulative"),
-			type: "space" as const,
-			space: 1,
+			type: "common" as const,
+			action: {
+				type: "space" as const,
+				space: 1,
+				input: [
+					{
+						type: "simple" as const,
+						units: {
+							from: "self" as const,
+							cost: 2,
+						},
+					},
+				],
+			},
+
 			units: {
 				amount: 2,
 			},
-			input: [
-				{
-					type: "simple" as const,
-					units: {
-						from: "self" as const,
-						cost: 2,
-					},
-				},
-			],
 		};
 
 		expect(
@@ -315,16 +319,20 @@ describe("validateInputUnitsFn", () => {
 	it("allows a Space units requirement to unit its action owner", async () => {
 		const portal = {
 			...createItemBase("space:owner-paid"),
-			type: "space" as const,
-			space: 1,
+			type: "common" as const,
+			action: {
+				type: "space" as const,
+				space: 1,
+				input: [
+					unitsInput("payer", {
+						from: "self",
+					}),
+				],
+			},
+
 			units: {
 				amount: 2,
 			},
-			input: [
-				unitsInput("payer", {
-					from: "self",
-				}),
-			],
 		};
 		const payer = {
 			...createSimpleItem("payer"),

@@ -10,7 +10,7 @@ import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 import { type ItemConnectionFilter, ItemConnectionFilters } from "~/flow/type/ItemConnectionFilter";
 import { type SectionId, SectionIds } from "~/item-authoring/type/Section";
-import { SpaceActionDetail } from "~/item-authoring/ui/SpaceActionDetail";
+import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
@@ -85,7 +85,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 			case "merges":
 				return <MergesDetail item={item} />;
 			case "action":
-				return <SpaceActionDetail item={item} />;
+				return <ActionDetail item={item} />;
 			case "production":
 				return <ProductionDetail item={item} />;
 			case "estimate":

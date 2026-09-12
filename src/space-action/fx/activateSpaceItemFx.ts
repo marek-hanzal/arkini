@@ -59,7 +59,11 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 		runtime,
 	});
 	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
-	if (owner === undefined || owner.item.type !== TypeSchema.enum.Space) {
+	if (
+		owner === undefined ||
+		owner.item.type !== TypeSchema.enum.Common ||
+		owner.item.action?.type !== "space"
+	) {
 		return yield* Effect.fail(
 			new SpaceActionUnavailableError({
 				itemId,
@@ -75,14 +79,14 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 		);
 	}
 
-	const rules = yield* Effect.forEach(owner.item.rules, (rule) =>
+	const rules = yield* Effect.forEach(owner.item.action.rules, (rule) =>
 		resolveActionRuleFx({
 			origin: owner.location,
 			rule,
 		}),
 	);
 	const enabled = resolveActionEnableFn({
-		enable: owner.item.enable,
+		enable: true,
 		rules,
 	});
 	if (!enabled) {
@@ -95,7 +99,7 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 
 	const reservedUnits = new Map<IdSchema.Type, number>();
 	const units: InputRun.UnitPlan[] = [];
-	for (const input of owner.item.input) {
+	for (const input of owner.item.action.input) {
 		const resolution = yield* resolveActionInputFx({
 			input,
 			ownerItemId: owner.id,
@@ -120,7 +124,7 @@ const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
 
 	return {
 		ownerItemId: owner.id,
-		space: owner.item.space,
+		space: owner.item.action.space,
 		units,
 	} satisfies SpaceActionPlan;
 });

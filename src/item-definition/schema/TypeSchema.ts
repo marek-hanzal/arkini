@@ -7,7 +7,6 @@ export const TypeSchema = z
 	.enum({
 		Blueprint: "blueprint",
 		Common: "common",
-		Space: "space",
 		Clock: "clock",
 		Temporary: "temporary",
 		Inventory: "inventory",

@@ -29,8 +29,6 @@ const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["t
 		case "missing":
 		case "temporary":
 			return palette.danger;
-		case "space":
-			return palette.lineStrong;
 	}
 };
 

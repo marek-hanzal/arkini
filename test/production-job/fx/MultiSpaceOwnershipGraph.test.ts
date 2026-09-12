@@ -30,8 +30,11 @@ const createConfig = (scope: "any" | "universe") => {
 				id: "portal",
 				title: "Portal",
 				description: "Moves the active board to the destination space.",
-				type: "space",
-				space: 1,
+				type: "common",
+				action: {
+					type: "space" as const,
+					space: 1,
+				},
 			},
 			permit: {
 				...base.items.tool,

@@ -25,7 +25,7 @@ When a Board operation first attaches state to a stacked identity, the original 
 
 ## Lines, intent, and delivery
 
-Common items with production lines, Clock, and Blueprint share one line lifecycle. Common owns zero or more `lines`; an empty collection is passive. Production uses `maxQueueSize` (default `1`) and ordinary optional material buffers. A default line selects the click action; it does not schedule work automatically. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units, output capacity, and queue capacity. Missing concrete material may wait.
+Common items with production lines, Clock, and Blueprint share one line lifecycle. Common owns zero or more `lines`; without lines or an immediate action it is passive. Production uses `maxQueueSize` (default `1`) and ordinary optional material buffers. A default line selects the click action; it does not schedule work automatically. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units, output capacity, and queue capacity. Missing concrete material may wait.
 
 A queued request is not a job. It owns no time, material, unit, or reservation. The persisted global queue retains accepted intent order. Each queue pass traverses that array in order against the latest Runtime draft and selects the earliest actionable request for each idle Board owner. A request makes progress by starting a Job or scheduling useful canonical Autofill delivery while its rules, non-material requirements, units and output limits hold. Only progress marks its owner as handled for that pass; blocked requests may be overtaken. Other owners compete for shared resources in the same global traversal order.
 
@@ -36,6 +36,14 @@ The player may clear all pending requests for one owner without affecting its ac
 At a fixed-step boundary, queue playback may Autofill useful concrete material through canonical deliveries while retaining the request. Delivery travel is persisted engine state with fixed-step remaining duration. The material becomes available only when Tick settles delivery into input storage. Renderer geometry/contact never admits material or starts work. A missing or invalid soft target returns the same leased actor, including a partial remainder, to its persisted origin.
 
 Only after required material has settled may a later queue pass create the job and remove its request. Start re-resolves every live fact and commits input ownership, unit spending, stateful-stack isolation, output reservations, and the job atomically.
+
+## Immediate item actions
+
+Common may own one optional `action`, discriminated by `type`. An action and nonempty production `lines` are mutually exclusive. Action availability is determined only by its `rules`: every Enable rule must pass, any matching Disable rule vetoes activation, and no rules means available. There is no authored action enable flag. Optional `input` requirements reuse immediate-action unit admission and settlement.
+
+The `space` action selects its authored `space`. Activation verifies the clicked identity, revision, location and current-space snapshot, then settles requirements and navigation in one transaction. Rejection or blocked depletion output changes neither units nor navigation. Space actions reuse existing Board/Inventory/Toolbar origin policies and never invent a Board origin for a passive payer.
+
+Inventory remains a specialized physical opener: opening, accepting inventory drops, release origins and placement restrictions keep their existing contract.
 
 ## Tick, jobs, and temporary items
 

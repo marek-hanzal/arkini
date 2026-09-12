@@ -1,9 +1,21 @@
+Action:
+  value: Action
+Action is disabled:
+  value: Action is disabled
+Action type:
+  value: Action type
+Activating this item settles its requirements and unit costs, then enters the target space.:
+  value: Activating this item settles its requirements and unit costs, then enters the target space.
+Activation settles every requirement before entering the target.:
+  value: Activation settles every requirement before entering the target.
 Add line:
   value: Add line
-Add lines to enable production. An item without lines is passive. Each line has its own inputs, output, runtime and rules.:
-  value: Add lines to enable production. An item without lines is passive. Each line has its own inputs, output, runtime and rules.
+Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.:
+  value: Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.
 Adds no item or units requirement. The action may start without delivering or targeting another item.:
   value: Adds no item or units requirement. The action may start without delivering or targeting another item.
+An action activates immediately when the player uses this item. Enabling an action removes all production lines.:
+  value: An action activates immediately when the player uses this item. Enabling an action removes all production lines.
 Asset notes empty description:
   value: Create a note here to keep art direction and decisions linked to this asset.
 Asset notes empty title:
@@ -65,8 +77,12 @@ Describe what this line consumes and produces.:
   value: Describe what this line consumes and produces.
 Description:
   value: Description
+Disable action:
+  value: Disable action
 Disable units:
   value: Disable units
+Disabled:
+  value: Disabled
 Edit:
   value: Edit
 Editor Board:
@@ -109,14 +125,20 @@ Enable Units on this item before selecting Spend.:
   value: Enable Units on this item before selecting Spend.
 Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.:
   value: Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.
+Enable action:
+  value: Enable action
 Enable depletion output:
   value: Enable depletion output
 Enable merge output:
   value: Enable merge output
 Enable units:
   value: Enable units
+Enter the configured space after all requirements and rules pass.:
+  value: Enter the configured space after all requirements and rules pass.
 Estimate:
   value: Estimate
+Every Enable rule must pass, and any matching Disable rule prevents activation.:
+  value: Every Enable rule must pass, and any matching Disable rule prevents activation.
 Finishing accepted work:
   value: Finishing accepted work
 Flow:
@@ -234,9 +256,6 @@ Item type - inventory:
 Item type - missing:
   value: Missing item
   dynamic: true
-Item type - space:
-  value: Space item
-  dynamic: true
 Item type - temporary:
   value: Temporary item
   dynamic: true
@@ -247,13 +266,10 @@ Item type description - clock:
   value: A board item that periodically starts its default production line, with an optional lifetime.
   dynamic: true
 Item type description - common:
-  value: An item with optional production lines, finite units, and merge rules.
+  value: An item with optional production or an immediate action, finite units, and merge rules.
   dynamic: true
 Item type description - inventory:
   value: The singleton item that opens the shared inventory.
-  dynamic: true
-Item type description - space:
-  value: An immediately activated item that moves play to an authored space.
   dynamic: true
 Item type description - temporary:
   value: A board-only effect that expires after an authored duration.
@@ -282,6 +298,10 @@ New production line:
   value: New production line
 Next pulse:
   value: Next pulse
+No action configured. Enable an action in the Editor to give this item an immediate interaction.:
+  value: No action configured. Enable an action in the Editor to give this item an immediate interaction.
+No additional action requirements.:
+  value: No additional action requirements.
 No depletion output:
   value: No depletion output
 No depletion output configured.:
@@ -327,6 +347,8 @@ Paused:
   value: "Permanently removes one source quantity instead of returning it. This consumes the item itself, not one unit. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears."
 "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action.":
   value: "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action."
+Pick random space:
+  value: Pick random space
 Product lines:
   value: Product lines
 Production line:
@@ -362,6 +384,8 @@ Required:
   value: Required
 Required units:
   value: Required units
+Requirements:
+  value: Requirements
 Requires:
   value: Requires
 Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.:
@@ -370,6 +394,8 @@ Retry loading notes:
   value: Retry loading notes
 "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged.":
   value: "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged."
+Rules:
+  value: Rules
 Running:
   value: Running
 Save:
@@ -400,6 +426,10 @@ Simple requires no consumable resource. Materials consume or reserve an item, wh
   value: Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.
 Source action:
   value: Source action
+Space:
+  value: Space
+Space action:
+  value: Space action
 Spend:
   value: Spend
 "Spends one unit from the selected target. Spending its last unit depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill.":
@@ -424,8 +454,12 @@ Target:
   value: Target
 Target effect:
   value: Target effect
+Target space:
+  value: Target space
 The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.:
   value: The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.
+The board space entered after successful activation. One-way navigation is allowed.:
+  value: The board space entered after successful activation. One-way navigation is allowed.
 The item that owns this action pays the unit cost. It must define enough available units.:
   value: The item that owns this action pays the unit cost. It must define enough available units.
 The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.:

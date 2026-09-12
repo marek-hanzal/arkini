@@ -15,18 +15,12 @@ import {
 const projectId = "edit-item-types-project";
 const groups = [
 	{
-		name: "edits Common and Space items through their dedicated tools",
+		name: "edits Common items through their dedicated tools",
 		cases: [
 			[
 				"common",
 				{
 					title: "Edited Common",
-				},
-			],
-			[
-				"space",
-				{
-					title: "Edited Space",
 				},
 			],
 		],
@@ -221,5 +215,65 @@ describe.sequential("editor MCP typed item editing", () => {
 			lines: [],
 			maxQueueSize: 4,
 		});
+	});
+	it("rejects conflicting action production and preserves or clears the optional action explicitly", async () => {
+		const action = {
+			type: "space",
+			space: 4,
+			input: [],
+			rules: [],
+		};
+		const edit = (patch: Record<string, unknown>) =>
+			client.callTool({
+				name: "edit_common_item",
+				arguments: jsonToolInputFn({
+					itemId: itemId("common"),
+					patch,
+				}),
+			});
+		const before = await Effect.runPromise(repository.readProjectFx(projectId));
+		const conflict = await edit({
+			action,
+			lines: productionLines,
+		});
+		expect(conflict.isError).toBe(true);
+		expect((await Effect.runPromise(repository.readProjectFx(projectId)))?.revision).toBe(
+			before?.revision,
+		);
+		expect(
+			(
+				await edit({
+					action,
+					lines: [],
+				})
+			).isError,
+		).not.toBe(true);
+		expect(
+			(
+				await edit({
+					title: "Action owner",
+				})
+			).isError,
+		).not.toBe(true);
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
+				itemId("common")
+			],
+		).toMatchObject({
+			action,
+			lines: [],
+		});
+		expect(
+			(
+				await edit({
+					action: null,
+				})
+			).isError,
+		).not.toBe(true);
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
+				itemId("common")
+			],
+		).not.toHaveProperty("action");
 	});
 });

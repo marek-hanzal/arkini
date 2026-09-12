@@ -5,7 +5,6 @@ import { ClockSchema } from "./ClockSchema";
 import { InventorySchema } from "./InventorySchema";
 import { CommonSchema } from "./CommonSchema";
 import { TemporarySchema } from "./TemporarySchema";
-import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 
 /**
  * An item configuration, resolved by its `type` discriminator.
@@ -17,11 +16,21 @@ export const ItemSchema = z
 	.discriminatedUnion("type", [
 		BlueprintSchema,
 		CommonSchema,
-		SpaceSchema,
 		ClockSchema,
 		TemporarySchema,
 		InventorySchema,
 	])
+	.superRefine((item, context) => {
+		if (item.type === "common" && item.action !== undefined && item.lines.length > 0) {
+			context.addIssue({
+				code: "custom",
+				path: [
+					"action",
+				],
+				message: "An item cannot have both an action and production lines.",
+			});
+		}
+	})
 	.meta({
 		id: "ItemSchema",
 		description: "A game item selected by its type discriminator.",

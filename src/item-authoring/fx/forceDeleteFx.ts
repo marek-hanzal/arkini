@@ -78,7 +78,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	};
 	const itemCleanups = new Map<string, ItemCleanup>();
 	for (const blocker of blockers) {
-		const [root, second, third, fourth] = blocker.path;
+		const [root, second, third, fourth, fifth] = blocker.path;
 		if (
 			root === "start" &&
 			(second === "board" || second === "inventory" || second === "toolbar") &&
@@ -92,10 +92,12 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		const cleanup = itemCleanups.get(second) ?? createItemCleanupFn();
 		itemCleanups.set(second, cleanup);
 		switch (third) {
-			case "input":
-				if (typeof fourth !== "number")
-					throw new Error(`Invalid action input path ${blocker.path.join(".")}.`);
-				cleanup.actionInputIndexes.add(fourth);
+			case "action":
+				if (typeof fifth !== "number" || (fourth !== "input" && fourth !== "rules"))
+					throw new Error(`Invalid action reference path ${blocker.path.join(".")}.`);
+				(fourth === "input" ? cleanup.actionInputIndexes : cleanup.actionRuleIndexes).add(
+					fifth,
+				);
 				break;
 			case "rules":
 				if (typeof fourth !== "number")
@@ -169,29 +171,36 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		const candidate: Record<string, unknown> = {
 			...owner,
 		};
-		if (owner.type === "space" && cleanup.actionInputIndexes.size > 0) {
-			candidate.input = owner.input.filter(
-				(_input, index) => !cleanup.actionInputIndexes.has(index),
-			);
-			for (const index of cleanup.actionInputIndexes)
-				removedActionInputs.push({
-					ownerItemId,
-					inputNumber: index + 1,
-				});
-		}
 		if (
-			(owner.type === "space" || owner.type === "clock") &&
-			cleanup.actionRuleIndexes.size > 0
+			owner.type === "common" &&
+			owner.action !== undefined &&
+			(cleanup.actionInputIndexes.size > 0 || cleanup.actionRuleIndexes.size > 0)
 		) {
+			candidate.action = {
+				...owner.action,
+				input: owner.action.input.filter(
+					(_input, index) => !cleanup.actionInputIndexes.has(index),
+				),
+				rules: owner.action.rules.filter(
+					(_rule, index) => !cleanup.actionRuleIndexes.has(index),
+				),
+			};
+		}
+		if (owner.type === "clock" && cleanup.actionRuleIndexes.size > 0)
 			candidate.rules = owner.rules.filter(
 				(_rule, index) => !cleanup.actionRuleIndexes.has(index),
 			);
-			for (const index of cleanup.actionRuleIndexes)
-				removedActionRules.push({
-					ownerItemId,
-					ruleNumber: index + 1,
-				});
-		}
+		for (const index of cleanup.actionInputIndexes)
+			removedActionInputs.push({
+				ownerItemId,
+				inputNumber: index + 1,
+			});
+		for (const index of cleanup.actionRuleIndexes)
+			removedActionRules.push({
+				ownerItemId,
+				ruleNumber: index + 1,
+			});
+
 		if (cleanup.mergeIndexes.size > 0) {
 			const merge = (owner.merge ?? []).filter(
 				(_rule, index) => !cleanup.mergeIndexes.has(index),

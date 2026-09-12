@@ -70,8 +70,11 @@ describe("packDirectoryFx game-project contract", () => {
 			expect(payload.config.items.water?.asset.scale).toBe(0.65);
 			expect(payload.config.items.portal?.asset.scale).toBe(1);
 			expect(payload.config.items.portal).toMatchObject({
-				type: "space",
-				space: 9,
+				type: "common",
+				action: {
+					type: "space" as const,
+					space: 9,
+				},
 			});
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);

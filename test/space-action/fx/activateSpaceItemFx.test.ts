@@ -48,7 +48,13 @@ describe("Space item activation", () => {
 			expect(result.runtime.currentSpace).toBe(7);
 			expect(result.state.currentSpace).toBe(7);
 			expect(result.restored.currentSpace).toBe(7);
-			expect(result.restored.items[0]?.item.type).toBe("space");
+			expect(result.restored.items[0]?.item).toMatchObject({
+				type: "common",
+				action: {
+					type: "space",
+					space: 7,
+				},
+			});
 			expect(result.restored.items[0]?.location.scope).toBe(location.scope);
 			if (location.scope === "board") {
 				expect(result.state.items[0]?.location).toEqual(location);

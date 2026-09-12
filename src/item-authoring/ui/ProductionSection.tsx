@@ -33,6 +33,7 @@ const ProductionFields = withFieldGroupFn({
 	},
 	render: ({ group, invalidLineIndex, kind, ownerId, selectedLineId }) => {
 		const translator = useTranslator();
+		const { form } = useFormSession();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormCard>
@@ -50,7 +51,7 @@ const ProductionFields = withFieldGroupFn({
 				</EditorFormCard>
 				<EditorFormSectionDivider
 					description={translator.textFn(
-						"Add lines to enable production. An item without lines is passive. Each line has its own inputs, output, runtime and rules.",
+						"Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.",
 					)}
 					title={translator.textFn("Product lines")}
 				/>
@@ -61,6 +62,7 @@ const ProductionFields = withFieldGroupFn({
 					{(linesField) => {
 						const lines = linesField.state.value ?? [];
 						const addLineFn = () => {
+							if (lines.length === 0) form.setFieldValue("action", undefined);
 							const lineOwnerId = ownerId.replace(/^item:/, "") || "new-item";
 							const lineIdPrefix = `line:${lineOwnerId}`;
 							const existingIds = new Set(lines.map((line) => line.id));
@@ -343,9 +345,6 @@ export const ProductionSection = () => {
 		.with(
 			{
 				type: "inventory",
-			},
-			{
-				type: "space",
 			},
 			() => null,
 		)

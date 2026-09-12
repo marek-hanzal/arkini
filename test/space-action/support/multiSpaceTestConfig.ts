@@ -71,8 +71,11 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "portal",
 				scope: "board",
 			}),
-			type: "space",
-			space: 1,
+			type: "common",
+			action: {
+				type: "space" as const,
+				space: 1,
+			},
 		},
 		origin: {
 			maxQueueSize: 1,

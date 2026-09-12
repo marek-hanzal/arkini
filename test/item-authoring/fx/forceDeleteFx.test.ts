@@ -196,42 +196,45 @@ describe("forceDeleteFx", () => {
 		} = createSimpleItem("portal");
 		const portal = {
 			...portalBase,
-			type: "space" as const,
-			space: 1,
-			input: [
-				{
-					type: "units" as const,
-					query: {
-						scope: "board" as const,
-						distance: "close" as const,
-						selector: {
-							type: "item" as const,
-							itemId: "water",
-						},
-					},
-					units: {
-						from: "target" as const,
-						cost: 1,
-					},
-				},
-			],
-			rules: [
-				{
-					type: "enable" as const,
-					when: [
-						{
-							type: "exists" as const,
-							query: {
-								scope: "universe" as const,
-								selector: {
-									type: "item" as const,
-									itemId: "water",
-								},
+			type: "common" as const,
+			action: {
+				type: "space" as const,
+				space: 1,
+				input: [
+					{
+						type: "units" as const,
+						query: {
+							scope: "board" as const,
+							distance: "close" as const,
+							selector: {
+								type: "item" as const,
+								itemId: "water",
 							},
 						},
-					],
-				},
-			],
+						units: {
+							from: "target" as const,
+							cost: 1,
+						},
+					},
+				],
+				rules: [
+					{
+						type: "enable" as const,
+						when: [
+							{
+								type: "exists" as const,
+								query: {
+									scope: "universe" as const,
+									selector: {
+										type: "item" as const,
+										itemId: "water",
+									},
+								},
+							},
+						],
+					},
+				],
+			},
 		};
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
@@ -252,8 +255,12 @@ describe("forceDeleteFx", () => {
 		);
 
 		expect(result.config.items.portal).toMatchObject({
-			input: [],
-			rules: [],
+			action: {
+				type: "space",
+				space: 1,
+				input: [],
+				rules: [],
+			},
 		});
 		expect(result.impact.removedActionInputs).toEqual([
 			{

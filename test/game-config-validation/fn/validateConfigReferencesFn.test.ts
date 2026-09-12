@@ -135,28 +135,31 @@ describe("completed config reference validation", () => {
 	it("reports selectors authored by Space requirements and availability rules", async () => {
 		const portal = {
 			...createItemBase("item:portal"),
-			type: "space" as const,
-			space: 1,
-			input: [
-				unitsInput("item:missing-units"),
-			],
-			rules: [
-				{
-					type: "enable" as const,
-					when: [
-						{
-							type: "exists" as const,
-							query: {
-								scope: "universe" as const,
-								selector: {
-									type: "item" as const,
-									itemId: "item:missing-rule",
+			type: "common" as const,
+			action: {
+				type: "space" as const,
+				space: 1,
+				input: [
+					unitsInput("item:missing-units"),
+				],
+				rules: [
+					{
+						type: "enable" as const,
+						when: [
+							{
+								type: "exists" as const,
+								query: {
+									scope: "universe" as const,
+									selector: {
+										type: "item" as const,
+										itemId: "item:missing-rule",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
+						],
+					},
+				],
+			},
 		};
 		const result = await compileItems({
 			[portal.id]: portal,

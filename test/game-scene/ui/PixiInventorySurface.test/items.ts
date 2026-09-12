@@ -25,7 +25,7 @@ export const item = {
 
 export const spaceItem = {
 	...item,
-	itemType: "space",
+	itemType: "common",
 	primaryAction: {
 		currentSpace: 0,
 		kind: "activate-space",

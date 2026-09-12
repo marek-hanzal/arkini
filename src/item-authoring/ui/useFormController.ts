@@ -130,6 +130,10 @@ const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
 	let dropCollectionIndex = 0;
 	for (let index = 0; index < path.length; index += 1) {
 		const segment = path[index];
+		if (index === 0 && segment === "action") {
+			labels.push("Action");
+			continue;
+		}
 		const nestedIndex = path[index + 1];
 		const indexedLabel =
 			typeof segment === "string" && typeof nestedIndex === "number"

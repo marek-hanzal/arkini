@@ -55,7 +55,12 @@ const ItemOverviewCard = ({
 }) => {
 	const translator = useTranslator();
 	if (section.id === "identity") return null;
-	const label = section.id === "units" ? translator.textFn("Units") : section.label;
+	const label =
+		section.id === "units"
+			? translator.textFn("Units")
+			: section.id === "action"
+				? translator.textFn("Action")
+				: section.label;
 	return (
 		<EditorOverviewCard
 			body={children}
@@ -91,6 +96,7 @@ const ItemOverviewCard = ({
 
 /** Presents a compact, routed summary for every detail section supported by one item. */
 export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const estimate = useItemEstimate(project, item.id);
 	const requiredByItems = useMemo(
@@ -121,7 +127,12 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				? "Calculating…"
 				: "Unavailable";
 	const summaries = {
-		action: item.type === "space" ? (item.enable ? "Enabled" : "Disabled") : null,
+		action:
+			item.type === "common"
+				? item.action === undefined
+					? translator.textFn("Disabled")
+					: translator.textFn("Space")
+				: null,
 		artwork: (
 			<div className="flex items-center gap-3">
 				<EditorItemThumbnail

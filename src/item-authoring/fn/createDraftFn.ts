@@ -1,6 +1,5 @@
 import { match } from "ts-pattern";
 
-import type { InputSchema as ImmediateInputSchema } from "~/production-action/schema/InputSchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -60,14 +59,6 @@ export const createDraftFn = ({
 			type: matchedType,
 			lines: [],
 			maxQueueSize: 1,
-		}))
-		.with("space", (matchedType) => ({
-			...base,
-			type: matchedType,
-			space: 0,
-			enable: true,
-			input: [] as ImmediateInputSchema.Type[],
-			rules: [],
 		}))
 		.with("inventory", (matchedType) => ({
 			...base,

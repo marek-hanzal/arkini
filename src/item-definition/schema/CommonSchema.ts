@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ActionSchema } from "~/item-action/schema/ActionSchema";
 
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -7,11 +8,14 @@ import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
 
 /**
- * An item that provides zero or more selectable product lines.
+ * An ordinary item with optional production or one immediate action.
  */
 export const CommonSchema = z
 	.object({
 		...BaseSchema.shape,
+		action: ActionSchema.optional().describe(
+			"An optional immediate action; mutually exclusive with production lines.",
+		),
 		/**
 		 * Maximum accepted work count: one active job plus pending requests.
 		 */
@@ -30,12 +34,24 @@ export const CommonSchema = z
 		lines: z
 			.array(LineSchema)
 			.default([])
-			.describe("Optional production lines; an empty collection leaves the item passive."),
+			.describe("Optional production lines; an item without lines or an action is passive."),
 	})
 	.strict()
 	.meta({
 		id: "item.CommonSchema",
-		description: "An item that provides zero or more selectable product lines.",
+		// JSON Schema clients must enforce the same capability conflict as canonical Item validation.
+		not: {
+			required: [
+				"action",
+				"lines",
+			],
+			properties: {
+				lines: {
+					minItems: 1,
+				},
+			},
+		},
+		description: "An ordinary item with optional production or one immediate action.",
 	});
 
 export type CommonSchema = typeof CommonSchema;

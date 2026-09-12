@@ -1,4 +1,5 @@
 import { Effect, Option } from "effect";
+import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
@@ -38,11 +39,18 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click interaction of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
-		if (item.item.type === TypeSchema.enum.Space) {
-			return {
-				currentSpace: runtime.currentSpace,
-				kind: "activate-space" as const,
-			} satisfies readRuntimeItemPrimaryActionFx.Result;
+		if (item.item.type === TypeSchema.enum.Common && item.item.action !== undefined) {
+			return match(item.item.action)
+				.with(
+					{
+						type: "space",
+					},
+					() => ({
+						currentSpace: runtime.currentSpace,
+						kind: "activate-space" as const,
+					}),
+				)
+				.exhaustive();
 		}
 		if (item.item.type === TypeSchema.enum.Inventory) {
 			return {

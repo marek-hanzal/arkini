@@ -79,12 +79,12 @@ const readItemConnectionFactsFn = (item: ItemSchema.Type): ItemConnectionFacts =
 			facts.inputs.add(conditionFactId);
 		addOutputFactsFn(facts, line.output);
 	}
-	if (item.type === "space") {
-		for (const input of item.input) {
+	if (item.type === "common" && item.action !== undefined) {
+		for (const input of item.action.input) {
 			const inputItemId = readInputItemIdFn(input);
 			if (inputItemId !== undefined) facts.inputs.add(inputItemId);
 		}
-		for (const conditionFactId of readAvailabilityFactIdsFn(item.rules))
+		for (const conditionFactId of readAvailabilityFactIdsFn(item.action.rules))
 			facts.inputs.add(conditionFactId);
 	}
 	for (const merge of item.merge ?? []) {

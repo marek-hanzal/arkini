@@ -375,21 +375,30 @@ export const validateConfigReferencesFn = ({
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		if (item.type === "space" || item.type === "clock") {
+		const action = item.type === "common" ? item.action : undefined;
+		if (action !== undefined || item.type === "clock") {
+			const rules = action?.rules ?? (item.type === "clock" ? item.rules : []);
 			diagnostics.push(
 				...validateActionReferencesFn({
 					config,
-					inputs: (item.type === "space" ? item.input : []).map((input, index) => ({
+					inputs: (action?.input ?? []).map((input, index) => ({
 						input,
 						index,
 					})),
-					path: [
-						"items",
-						itemId,
-					],
-					rules: item.rules.map((rule, index) => ({
-						index,
+					path:
+						action === undefined
+							? [
+									"items",
+									itemId,
+								]
+							: [
+									"items",
+									itemId,
+									"action",
+								],
+					rules: rules.map((rule, index) => ({
 						rule,
+						index,
 					})),
 					source,
 				}),

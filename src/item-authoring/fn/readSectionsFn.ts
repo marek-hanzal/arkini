@@ -73,7 +73,7 @@ export const readSectionsFn = (
 			case "production":
 				return ProductionItemTypes.has(item.type);
 			case "action":
-				return item.type === "space";
+				return item.type === "common";
 			default:
 				return true;
 		}

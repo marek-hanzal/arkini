@@ -413,7 +413,7 @@ Item artwork help:
 
     **Base tile scale** changes the artwork size within its tile. A value of 1 fills the tile with the artwork canvas; transparent PNG padding remains visible. Scale does not change occupied cells, storage, interaction reach, or image resolution.
 
-    The artwork preview in Item detail marks the complete tile.
+    The preview below the form updates as you change the base asset, overlay, or scale. Its frame marks the complete tile. The same composition is shown in Item detail.
 Item clock empty title:
   value: Automate production or give this item a limited lifetime.
 Item clock help:

@@ -1,3 +1,4 @@
+import { ArtworkTilePreview } from "~/item-authoring/ui/ArtworkTilePreview";
 import { Trash2 } from "lucide-react";
 
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -71,11 +72,41 @@ const ArtworkFields = withFieldGroupFn({
 export const ArtworkSection = () => {
 	const { form } = useFormSession();
 	return (
-		<EditorFormCard>
-			<ArtworkFields
-				form={form}
-				fields="asset"
-			/>
-		</EditorFormCard>
+		<section
+			className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-3"
+			data-ui="EditorArtworkForm"
+		>
+			<EditorFormCard>
+				<ArtworkFields
+					form={form}
+					fields="asset"
+				/>
+			</EditorFormCard>
+			<div
+				className="grid min-h-0 min-w-0 place-items-center [container-type:size]"
+				data-ui="EditorArtworkPreviewArea"
+			>
+				<form.Subscribe selector={(state) => state.values.asset}>
+					{(asset) =>
+						asset.default[0] ? (
+							<ArtworkTilePreview
+								className="size-[min(80cqh,100cqw)] rounded-2xl border-2 border-accent"
+								resourceIds={
+									asset.default[1]
+										? [
+												asset.default[0],
+												asset.default[1],
+											]
+										: [
+												asset.default[0],
+											]
+								}
+								scale={asset.scale}
+							/>
+						) : null
+					}
+				</form.Subscribe>
+			</div>
+		</section>
 	);
 };

@@ -173,6 +173,7 @@ export const FormSession = ({
 				data-ui="EditorItemForm"
 			>
 				<EditorFormSectionPage
+					contentMode={sectionId === "artwork" ? "viewport" : "scroll"}
 					help={ItemSectionHelp[sectionId]}
 					discardFn={discardFn}
 					error={controller.error}

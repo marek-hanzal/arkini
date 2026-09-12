@@ -4,6 +4,7 @@ import { basename, dirname, join } from "node:path";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -19,7 +20,7 @@ describe("repository note asset relationships", () => {
 	it("validates mixed links and rewrites only the affected resource relationship", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
-		const hero = project.resources.find((resource) => resource.id === "hero");
+		const hero = editorTestPayload.resources.find((resource) => resource.id === "hero");
 		if (hero === undefined) throw new Error("Expected the hero fixture resource.");
 		await Effect.runPromise(
 			repository.upsertResourcesFx({
@@ -107,7 +108,7 @@ describe("repository note asset relationships", () => {
 				expectedRevision: restored.revision,
 				projectId: project.projectId,
 				resource: {
-					...hero,
+					mime: "image/png",
 					id: "cover",
 				},
 			}),
@@ -188,7 +189,7 @@ describe("repository note asset relationships", () => {
 		};
 		const repository = await harness.openRepository(fileSystem);
 		const project = await harness.createProject(repository);
-		const hero = project.resources.find((resource) => resource.id === "hero");
+		const hero = editorTestPayload.resources.find((resource) => resource.id === "hero");
 		if (hero === undefined) throw new Error("Expected the hero fixture resource.");
 		const prepared =
 			operation === "rename"
@@ -223,6 +224,12 @@ describe("repository note asset relationships", () => {
 		const beforeProject = await Effect.runPromise(repository.readProjectFx(project.projectId));
 		const beforeNotes = await Effect.runPromise(repository.listNotesFx(project.projectId));
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		const linkedResourcePath = join(
+			root!,
+			operation === "rename" ? "resources" : "assets",
+			`${linkedResourceId}.png`,
+		);
+		const beforeResourceBytes = await readFile(linkedResourcePath);
 		const beforeNoteBytes = await Promise.all(
 			beforeNotes.map((note) =>
 				readFile(join(root!, "notes", `${note.noteId}.json`), "utf8"),
@@ -243,7 +250,7 @@ describe("repository note asset relationships", () => {
 						expectedRevision: prepared.revision,
 						projectId: project.projectId,
 						resource: {
-							...hero,
+							mime: "image/png",
 							id: "cover",
 						},
 					})
@@ -254,6 +261,7 @@ describe("repository note asset relationships", () => {
 					});
 		await expect(Effect.runPromise(mutationFx)).rejects.toBeDefined();
 		expect(publishedNotes).toBe(2);
+		expect(await readFile(linkedResourcePath)).toEqual(beforeResourceBytes);
 		expect(await Effect.runPromise(repository.readProjectFx(project.projectId))).toEqual(
 			beforeProject,
 		);
@@ -269,9 +277,13 @@ describe("repository note asset relationships", () => {
 		).toEqual(beforeNoteBytes);
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
-		expect(await Effect.runPromise(reopened.readProjectFx(project.projectId))).toEqual(
-			beforeProject,
-		);
+		expect(await Effect.runPromise(reopened.readProjectFx(project.projectId))).toEqual({
+			...beforeProject,
+			resources: beforeProject!.resources.map((resource) => ({
+				...resource,
+				version: expect.any(String),
+			})),
+		});
 		expect(await Effect.runPromise(reopened.listNotesFx(project.projectId))).toEqual(
 			beforeNotes,
 		);

@@ -75,11 +75,7 @@ export const SectionLink = ({
 			inactiveProps={inactiveProps}
 			className={editorSectionTabClassName}
 		>
-			{section.id === "units"
-				? translator.textFn("Units")
-				: section.id === "action"
-					? translator.textFn("Action")
-					: section.label}
+			{translator.textFn(section.label)}
 		</ButtonLink>
 	);
 };

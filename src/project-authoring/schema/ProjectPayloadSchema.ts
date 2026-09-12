@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { ProjectCommit } from "~/project-authoring/type/Project";
 import { ProjectDescriptorSchema } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import { ProjectRecordSchema } from "~/project-authoring/schema/ProjectRecordSchema";
-import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const projectTransportSchema = z
@@ -65,14 +65,13 @@ export const ProjectCommitPayloadSchema = commitTransportSchema.transform(materi
 
 export const ProjectPayloadSchema = projectTransportSchema
 	.extend({
-		resources: ResourceSchema.array(),
+		resources: ProjectResourceSchema.array(),
 	})
 	.transform((project) => ({
 		...materializeProjectRecordFn(project),
 		resources: project.resources
 			.map((resource) => ({
 				...resource,
-				bytes: new Uint8Array(resource.bytes),
 			}))
 			.sort((left, right) => left.id.localeCompare(right.id)),
 	}));

@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Save, Trash2, X } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
@@ -12,6 +13,7 @@ const EditorUnsavedChangesPrompt = ({
 }: {
 	readonly state: EditorUnsavedChangesSnapshot;
 }) => {
+	const translator = useTranslator();
 	const owner = useEditorUnsavedChangesOwner();
 	const focus = useOverlayFocus({
 		onCloseFn: () => void owner.decideFn("cancel"),
@@ -25,11 +27,11 @@ const EditorUnsavedChangesPrompt = ({
 				data-ui="EditorUnsavedChangesDialog"
 				onKeyDown={focus.onKeyDownFn}
 			>
-				<h2 className="text-lg font-semibold">Unsaved changes</h2>
+				<h2 className="text-lg font-semibold">{translator.textFn("Unsaved changes")}</h2>
 				<p className="mt-2 text-sm leading-6 text-muted">
-					{state.canSave
-						? "Save or discard this draft before leaving the editor surface."
-						: "This draft is invalid. Discard it or stay here and fix the highlighted fields."}
+					{translator.textFn(
+						"Save or discard this draft before leaving the editor surface.",
+					)}
 				</p>
 				{state.error === undefined ? null : (
 					<p className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
@@ -43,7 +45,7 @@ const EditorUnsavedChangesPrompt = ({
 						onClick={() => void owner.decideFn("discard")}
 					>
 						<Trash2 className="size-4" />
-						Discard
+						{translator.textFn("Discard")}
 					</LinkButton>
 					<div className="flex items-center gap-2">
 						<Button
@@ -52,19 +54,22 @@ const EditorUnsavedChangesPrompt = ({
 							onClick={() => void owner.decideFn("cancel")}
 						>
 							<X className="size-4" />
-							Cancel
+							{translator.textFn("Cancel")}
 						</Button>
-						{state.canSave ? (
-							<PrimaryButton
-								className="gap-1.5"
-								disabled={state.saving}
-								cursorIntent={state.saving ? "progress" : undefined}
-								onClick={() => void owner.decideFn("save")}
-							>
-								<Save className="size-4" />
-								Save
-							</PrimaryButton>
-						) : null}
+						<PrimaryButton
+							className="gap-1.5"
+							disabled={state.saving || !state.canSave}
+							title={
+								state.canSave
+									? undefined
+									: translator.textFn("Fix the highlighted fields before saving.")
+							}
+							cursorIntent={state.saving ? "progress" : undefined}
+							onClick={() => void owner.decideFn("save")}
+						>
+							<Save className="size-4" />
+							{translator.textFn("Save")}
+						</PrimaryButton>
 					</div>
 				</div>
 			</div>

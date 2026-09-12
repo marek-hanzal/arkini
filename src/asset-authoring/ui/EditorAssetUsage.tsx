@@ -1,3 +1,6 @@
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -7,16 +10,27 @@ import { EditorAssetUsageRow } from "~/asset-authoring/ui/EditorAssetUsageRow";
 
 export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const usages = useEditorResourceUsages().filter((usage) => usage.resourceId === resourceId);
 	if (usages.length === 0) {
 		return (
-			<Status
-				dataUi="EditorAssetUnused"
-				description="No saved project or item currently references this asset."
-				icon={Unlink}
-				title="This asset is not used"
-				variant="flat"
-			/>
+			<EditorRootCard dataUi="EditorAssetUnusedCard">
+				<Status
+					dataUi="EditorAssetUnused"
+					icon={Unlink}
+					title={
+						<span className="inline-flex items-center gap-1.5">
+							{translator.textFn("This asset is not used")}
+							<EditorInfoTooltip
+								content={translator.textFn(
+									"No saved project or item currently references this asset.",
+								)}
+							/>
+						</span>
+					}
+					variant="flat"
+				/>
+			</EditorRootCard>
 		);
 	}
 	return (

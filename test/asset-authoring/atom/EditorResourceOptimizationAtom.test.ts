@@ -3,7 +3,10 @@ import { Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import type {
 	ProjectRepository as ProjectRepositoryContext,
 	ProjectRepositoryService,
@@ -61,7 +64,7 @@ const project = {
 		minor: 0,
 	},
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 beforeEach(() => {

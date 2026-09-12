@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Combine } from "lucide-react";
 import { useStore } from "@tanstack/react-form";
 
@@ -28,6 +29,7 @@ const MergeFields = ({
 	readonly targetItems: GameConfigSchema.Type["items"];
 	readonly value: MergeSchema.Type[] | undefined;
 }) => {
+	const translator = useTranslator();
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const merges = value ?? [];
 	const updateFn = (index: number, merge: MergeSchema.Type) => {
@@ -42,34 +44,33 @@ const MergeFields = ({
 			{merges.length === 0 ? (
 				<EditorFormCard>
 					<EditorCapabilityStatus
-						actionLabel="Enable merges"
-						description="Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output."
+						actionLabel={translator.textFn("Enable merges")}
 						icon={Combine}
 						onEnableFn={() =>
 							onChangeFn([
 								structuredClone(MergeDraftDefault),
 							])
 						}
-						title="Merges are disabled"
+						title={translator.textFn("Item merges empty title")}
 					/>
 				</EditorFormCard>
 			) : (
 				<>
 					<EditorCollectionSelector
-						addLabel="Add merge"
+						addLabel={translator.textFn("Add merge")}
 						count={merges.length}
 						initialSelectedIndex={initialSelectedIndex}
 						itemLabelFn={(index) => {
 							const itemId = merges[index].target.itemId;
-							return `Merge ${index + 1} — ${readItemLabelFn(
+							return `${translator.textFn("Merge")} ${index + 1} — ${readItemLabelFn(
 								itemId,
-								"No item selected",
+								translator.textFn("No item selected"),
 							)}`;
 						}}
 						itemSearchTermsFn={(index) => [
 							merges[index].target.itemId,
 						]}
-						label="Merges"
+						label={translator.textFn("Merges")}
 						key={initialSelectedIndex}
 						navigationCard
 						onAddFn={() =>
@@ -82,7 +83,7 @@ const MergeFields = ({
 							const next = merges.filter((_merge, candidate) => candidate !== index);
 							onChangeFn(next.length === 0 ? undefined : next);
 						}}
-						removeLabel="Remove merge"
+						removeLabel={translator.textFn("Remove merge")}
 						selectedIndex={invalidMergeIndex}
 					>
 						{(index) => (

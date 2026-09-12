@@ -1,5 +1,8 @@
 import type { Project } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 export const boardSpaceProject = {
 	projectId: "project",
@@ -34,5 +37,5 @@ export const boardSpaceProject = {
 			],
 		},
 	},
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 } satisfies Project;

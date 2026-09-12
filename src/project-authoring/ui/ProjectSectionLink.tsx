@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { ButtonLink } from "~/ui/ui/Button";
 import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { ProjectSectionDescriptor } from "~/project-authoring/type/ProjectSections";
@@ -29,6 +30,6 @@ export const ProjectSectionLink = ({
 		}}
 		className={editorSectionTabClassName}
 	>
-		{section.label}
+		<Tx label={section.label} />
 	</ButtonLink>
 );

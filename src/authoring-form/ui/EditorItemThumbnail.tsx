@@ -4,6 +4,7 @@ import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { twMerge } from "tailwind-merge";
 
 const thumbnailSizeClassName = {
+	input: "size-[var(--ak-control-min-height)]",
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-11",
@@ -22,9 +23,9 @@ const EditorItemSelectedThumbnail = ({
 	resourceIds,
 }: Pick<EditorItemThumbnailProps, "resourceIds">) => (
 	<EditorItemThumbnail
-		className="size-10 rounded-lg border-line-strong"
+		className="rounded-lg border-line-strong"
 		resourceIds={resourceIds}
-		size="sm"
+		size="input"
 	/>
 );
 
@@ -36,12 +37,18 @@ export const EditorItemSearchThumbnail = ({
 	readonly item: ItemSchema.Type | undefined;
 	readonly selected?: boolean;
 }) =>
-	item === undefined ? null : selected ? (
-		<EditorItemSelectedThumbnail resourceIds={item.asset.default} />
-	) : (
+	selected ? (
+		<EditorItemSelectedThumbnail
+			resourceIds={
+				item?.asset.default ?? [
+					"",
+				]
+			}
+		/>
+	) : item === undefined ? null : (
 		<EditorItemThumbnail
 			resourceIds={item.asset.default}
-			size="sm"
+			size="lg"
 		/>
 	);
 
@@ -80,7 +87,9 @@ export const EditorItemThumbnail = ({
 			)}
 			data-ui="EditorItemThumbnail"
 		>
-			<span className="text-xl font-semibold text-subtle">?</span>
+			{resourceIds[0] === "" ? null : (
+				<span className="text-xl font-semibold text-subtle">?</span>
+			)}
 		</div>
 	);
 };

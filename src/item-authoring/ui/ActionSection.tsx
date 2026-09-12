@@ -1,8 +1,9 @@
 import { match } from "ts-pattern";
-import { MapPinned, Trash2 } from "lucide-react";
+import { MapPinned } from "lucide-react";
 
 import type { InputSchema as ActionInputSchema } from "~/production-action/schema/InputSchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
+import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -19,7 +20,7 @@ const RandomSpaceMaximum = 1_024;
 /** Authors the optional immediate action; production and action never coexist. */
 export const ActionSection = () => {
 	const translator = useTranslator();
-	const { form } = useFormSession();
+	const { form, enableActionFn } = useFormSession();
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
@@ -32,21 +33,9 @@ export const ActionSection = () => {
 							<EditorCapabilityStatus
 								actionLabel={translator.textFn("Enable action")}
 								dataUi="EditorActionDisabled"
-								description={translator.textFn(
-									"An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.",
-								)}
 								icon={MapPinned}
-								onEnableFn={() => {
-									form.setFieldValue("lines", []);
-									form.setFieldValue("clock", undefined);
-									form.setFieldValue("action", {
-										type: "space",
-										space: 0,
-										input: [],
-										rules: [],
-									});
-								}}
-								title={translator.textFn("Action is disabled")}
+								onEnableFn={enableActionFn}
+								title={translator.textFn("Item action empty title")}
 							/>
 						</EditorFormCard>
 					) : (
@@ -90,13 +79,6 @@ export const ActionSection = () => {
 											)
 										}
 									/>
-									<LinkButton
-										className="flex h-[var(--ak-control-min-height)] items-center"
-										title={translator.textFn("Disable action")}
-										onClick={() => form.setFieldValue("action", undefined)}
-									>
-										<Trash2 className="size-4" />
-									</LinkButton>
 								</div>
 							</EditorFormCard>
 							<EditorFormSectionDivider
@@ -197,6 +179,13 @@ export const ActionSection = () => {
 									}
 								/>
 							</EditorFormCard>
+							<EditorCapabilityDisable
+								title={translator.textFn("Action configured")}
+								description={translator.textFn(
+									"Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.",
+								)}
+								onDisableFn={() => form.setFieldValue("action", undefined)}
+							/>
 						</>
 					)
 				}

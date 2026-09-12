@@ -3,7 +3,10 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
-import { ItemOverview } from "~/item-authoring/ui/ItemOverview";
+import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
+import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
+import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -17,6 +20,24 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						size="xl"
 					/>
 					<FactList>
+						<DetailFact
+							label={translator.textFn("Player controls")}
+							description={translator.textFn(
+								"Player controls govern manual production, material management, queue changes and line selection.",
+							)}
+							value={translator.textFn(
+								item.control === "automatic-only"
+									? "Automatic only"
+									: "Interactive",
+							)}
+						/>
+						<DetailFact
+							label={translator.textFn("Queue capacity")}
+							description={translator.textFn(
+								"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
+							)}
+							value={item.maxQueueSize}
+						/>
 						<Fact
 							label={translator.textFn("Storage")}
 							value={translator.textFn(`Item storage scope - ${item.scope}`)}
@@ -25,14 +46,16 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							label={translator.textFn("Stack capacity")}
 							value={
 								item.maxStackSize === 1
-									? "Single item"
-									: `${item.maxStackSize} items`
+									? translator.textFn("Single item")
+									: item.maxStackSize
 							}
 						/>
 						<Fact
 							label={translator.textFn("Game limit")}
 							value={
-								item.maxCount === undefined ? "No configured limit" : item.maxCount
+								item.maxCount === undefined
+									? translator.textFn("No configured limit")
+									: item.maxCount
 							}
 						/>
 						<Fact
@@ -56,7 +79,41 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					)}
 				</div>
 			</EditorRootCard>
-			<ItemOverview item={item} />
+			<div className="grid gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemArtworkDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="artwork"
+						title={translator.textFn("Artwork")}
+						description={translator.textFn(
+							"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
+						)}
+					/>
+					<EditorRootCard
+						className="content-start"
+						dataUi="EditorItemArtworkDetailCard"
+					>
+						<ArtworkDetail item={item} />
+					</EditorRootCard>
+				</section>
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemUnitsDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="units"
+						title={translator.textFn("Units")}
+						description={translator.textFn(
+							"Units are the supply inside each item, independently of how many items are stacked.",
+						)}
+					/>
+					<UnitsDetail item={item} />
+				</section>
+			</div>
 		</div>
 	);
 };

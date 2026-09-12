@@ -80,7 +80,12 @@ describe("importEditorArkpackFileFx", () => {
 					updatedAtMs: 100,
 					revision: 0,
 					config,
-					resources,
+					resources: resources.map(({ id, mime, bytes }) => ({
+						id,
+						mime,
+						size: bytes.byteLength,
+						version: "1",
+					})),
 				}),
 		);
 		const descriptor = await runImport(

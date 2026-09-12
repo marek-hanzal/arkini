@@ -85,6 +85,7 @@ export namespace useEditorAssetEditController {
 		readonly assetIdError?: string;
 		readonly currentUrl?: string;
 		readonly dirty: boolean;
+		readonly discardFn: () => Promise<void>;
 		readonly error: unknown;
 		readonly file?: File;
 		readonly fileError?: string;
@@ -285,14 +286,42 @@ export const useEditorAssetEditController = ({
 		project.projectId,
 		query,
 	]);
+	const resetDraftFn = useCallback(() => {
+		invalidateSaveFn();
+		dirtyRef.current = false;
+		setNextIdStateFn(resourceId);
+		setFileStateFn(undefined);
+		setValidationIssueFn(undefined);
+	}, [
+		invalidateSaveFn,
+		resourceId,
+	]);
+	const discardFn = useCallback(async () => {
+		if (pendingSaveRef.current !== undefined || result.waiting) return;
+		resetDraftFn();
+		await navigateFn({
+			to: "/editor/$projectId/assets/$resourceId/detail/overview",
+			params: {
+				projectId: project.projectId,
+				resourceId,
+			},
+			search: {
+				filter,
+				query,
+			},
+			replace: true,
+		});
+	}, [
+		filter,
+		navigateFn,
+		project.projectId,
+		query,
+		resetDraftFn,
+		resourceId,
+		result.waiting,
+	]);
 	useEditorUnsavedChangesRegistration({
-		discardFn: () => {
-			invalidateSaveFn();
-			dirtyRef.current = false;
-			setNextIdStateFn(resourceId);
-			setFileStateFn(undefined);
-			setValidationIssueFn(undefined);
-		},
+		discardFn: resetDraftFn,
 		id: `asset:${project.projectId}:${resourceId}`,
 		isDirtyFn: () => dirtyRef.current,
 		isValidFn: async () =>
@@ -323,6 +352,7 @@ export const useEditorAssetEditController = ({
 		assetIdError: validationIssue?.field === "assetId" ? validationIssue.message : undefined,
 		currentUrl,
 		dirty,
+		discardFn,
 		error,
 		file,
 		fileError: validationIssue?.field === "file" ? validationIssue.message : undefined,

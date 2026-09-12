@@ -1,3 +1,4 @@
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 // @vitest-environment jsdom
 
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -42,7 +43,10 @@ vi.mock("~/ui/ui/Button", () => {
 });
 
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -66,7 +70,7 @@ beforeEach(() => {
 		updatedAtMs: 2,
 		revision: 7,
 		config: editorTestPayload.config,
-		resources: editorTestPayload.resources,
+		resources: editorTestResources,
 	};
 });
 
@@ -87,7 +91,11 @@ describe("ItemDraftToggle", () => {
 		roots.push(root);
 		const renderFn = async (candidate = item) => {
 			await act(async () => {
-				root.render(<ItemDraftToggle item={candidate} />);
+				root.render(
+					<TranslationTestProvider>
+						<ItemDraftToggle item={candidate} />
+					</TranslationTestProvider>,
+				);
 			});
 		};
 		await renderFn();

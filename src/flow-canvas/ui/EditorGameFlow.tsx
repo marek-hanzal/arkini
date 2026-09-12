@@ -40,7 +40,7 @@ const EditorItemFlowSearch = ({ items, onChangeFn, options, value }: EditorItemF
 				renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items[option.id]} />}
 				renderSelectedPreviewFn={(option) => (
 					<EditorItemSearchThumbnail
-						item={items[option.id]}
+						item={option === undefined ? undefined : items[option.id]}
 						selected
 					/>
 				)}

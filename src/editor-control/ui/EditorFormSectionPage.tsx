@@ -1,3 +1,5 @@
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Tx } from "~/translation/ui/Tx";
 import { Save, Trash2 } from "lucide-react";
 import type { PropsWithChildren, ReactNode } from "react";
 
@@ -30,7 +32,7 @@ const EditorFormActions = ({
 			onClick={() => void discardFn().catch(() => undefined)}
 		>
 			<Trash2 className="size-4" />
-			Discard
+			<Tx label="Discard" />
 		</LinkButton>
 		<PrimaryButton
 			type="button"
@@ -40,7 +42,7 @@ const EditorFormActions = ({
 			onClick={() => void saveFn().catch(() => undefined)}
 		>
 			<Save className="size-4" />
-			Save
+			<Tx label="Save" />
 		</PrimaryButton>
 	</div>
 );
@@ -48,6 +50,7 @@ const EditorFormActions = ({
 /** Keeps routed form chrome mounted while only the active form section changes. */
 export const EditorFormSectionPage = ({
 	children,
+	contentMode = "scroll",
 	discardFn,
 	error,
 	help,
@@ -60,6 +63,7 @@ export const EditorFormSectionPage = ({
 	tabs,
 	title,
 }: PropsWithChildren<{
+	readonly contentMode?: "scroll" | "viewport";
 	readonly discardFn: () => Promise<void>;
 	readonly error: unknown;
 	readonly help?: EditorPageHelpContent;
@@ -73,6 +77,7 @@ export const EditorFormSectionPage = ({
 	readonly title?: ReactNode;
 }>) => (
 	<EditorSectionPage
+		contentMode={contentMode}
 		header={
 			<EditorSectionNavigation
 				leading={leading}
@@ -97,10 +102,19 @@ export const EditorFormSectionPage = ({
 			/>
 		}
 	>
-		<div className="grid gap-3">
+		<div
+			className="mx-auto grid w-4/5 min-w-0 gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
+			{...readDataUiFn({
+				dataUi: "EditorFormViewport",
+				state: {
+					contentMode,
+				},
+			})}
+		>
 			{notice}
 			<EditorFormContent
 				error={error}
+				fill={contentMode === "viewport"}
 				rootCard={rootCard}
 				saveFn={saveFn}
 			>

@@ -1,11 +1,21 @@
 import { useMatchRoute } from "@tanstack/react-router";
-import { ChevronRight, FolderKanban, FolderX, LoaderCircle, Trash2 } from "lucide-react";
+import {
+	ChevronRight,
+	FolderKanban,
+	FolderOpen,
+	FolderX,
+	LoaderCircle,
+	Trash2,
+} from "lucide-react";
 
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
-import { Button, ButtonLink } from "~/ui/ui/Button";
+import { ButtonLink } from "~/ui/ui/Button";
+
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -18,6 +28,7 @@ interface EditorRecentProjectsProps {
 		project: ProjectDescriptor,
 		ownership: ProjectOwnershipSchema.Type,
 	) => void;
+	readonly onDismissInvalidProjectFn: (root: string) => void;
 	readonly onOpenProjectFolderFn: (root: string) => void;
 	readonly projects: ReadonlyArray<ProjectCandidate>;
 }
@@ -27,8 +38,10 @@ export const EditorRecentProjects = ({
 	blocked,
 	onDeleteProjectFn,
 	onOpenProjectFolderFn,
+	onDismissInvalidProjectFn,
 	projects,
 }: EditorRecentProjectsProps) => {
+	const translator = useTranslator();
 	const matchRouteFn = useMatchRoute();
 	const openingProject = matchRouteFn({
 		to: "/editor/$projectId",
@@ -68,13 +81,22 @@ export const EditorRecentProjects = ({
 									{candidate.validationError}
 								</span>
 							</span>
-							<Button
+							<LinkButton
 								disabled={blocked}
-								className="min-h-0 shrink-0 px-3 py-2"
+								className="inline-flex shrink-0 items-center gap-1.5"
 								onClick={() => onOpenProjectFolderFn(candidate.root)}
 							>
-								Open folder
-							</Button>
+								<FolderOpen className="size-4" />
+								{translator.textFn("Open folder")}
+							</LinkButton>
+							<LinkButton
+								disabled={blocked}
+								className="shrink-0"
+								title={translator.textFn("Remove from Recent")}
+								onClick={() => onDismissInvalidProjectFn(candidate.root)}
+							>
+								<Trash2 className="size-4" />
+							</LinkButton>
 						</div>
 					) : (
 						<div

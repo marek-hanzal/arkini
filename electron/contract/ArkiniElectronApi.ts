@@ -51,6 +51,7 @@ export namespace ArkiniElectronApi {
 		editorProjectBuildRead: "arkini:editor:project:build:read",
 		editorProjectBuildSave: "arkini:editor:project:build:save",
 		editorProjectCreate: "arkini:editor:project:create",
+		editorProjectDismissInvalid: "arkini:editor:project:dismiss-invalid",
 		editorProjectDelete: "arkini:editor:project:delete",
 		editorProjectDeleteItem: "arkini:editor:project:delete-item",
 		editorProjectDeleteResource: "arkini:editor:project:delete-resource",
@@ -195,6 +196,9 @@ export namespace ArkiniElectronApi {
 					ReadonlyArray<EditorProjectTransport.ProjectCandidate>
 				>
 			>;
+			readonly dismissInvalidProjectFn: (
+				root: string,
+			) => Promise<EditorProjectTransport.Result<void>>;
 			readonly openProjectDirectoryFn: (
 				root: string,
 			) => Promise<EditorProjectTransport.Result<void>>;

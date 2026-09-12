@@ -1,3 +1,4 @@
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { ChevronRight, Unlink } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -143,7 +144,11 @@ export const ConnectionsSection = ({
 							)}
 							renderSelectedPreviewFn={(option) => (
 								<EditorItemSearchThumbnail
-									item={project.config.items[option.id]}
+									item={
+										option === undefined
+											? undefined
+											: project.config.items[option.id]
+									}
 									selected
 								/>
 							)}
@@ -151,9 +156,12 @@ export const ConnectionsSection = ({
 						/>
 					</div>
 					<EditorSelect
-						label="Connection type"
+						label={translator.textFn("Connection type")}
 						onChangeFn={onFilterChangeFn}
-						options={ConnectionFilterOptions}
+						options={ConnectionFilterOptions.map((option) => ({
+							...option,
+							label: translator.textFn(option.label),
+						}))}
 						size="control"
 						value={filter}
 					/>
@@ -163,9 +171,15 @@ export const ConnectionsSection = ({
 			{connectionItems.length === 0 ? (
 				<Status
 					dataUi="EditorItemConnectionsEmpty"
-					description={emptyState.description}
 					icon={Unlink}
-					title={emptyState.title}
+					title={
+						<span className="inline-flex items-center gap-1.5">
+							{translator.textFn(emptyState.title)}
+							<EditorInfoTooltip
+								content={translator.textFn(emptyState.description)}
+							/>
+						</span>
+					}
 				/>
 			) : (
 				<section

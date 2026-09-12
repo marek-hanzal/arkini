@@ -1,4 +1,4 @@
-import { access, mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem } from "effect";
@@ -18,6 +18,87 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project deletion", () => {
+	it("dismisses the exact duplicate root without deleting either project's files", async () => {
+		const seed = await harness.openRepository();
+		const healthy = await harness.createProject(seed, "same-id");
+		const healthyRoot = await Effect.runPromise(seed.readProjectRootFx(healthy.projectId));
+		const duplicateRoot = await harness.createExternalProject("same-id");
+		await harness.closeRepository(seed);
+		const catalog = JSON.parse(await readFile(harness.catalogPath, "utf8"));
+		catalog.projects.push({
+			root: duplicateRoot,
+			ownership: "external",
+			createdAtMs: 1,
+		});
+		await writeFile(harness.catalogPath, JSON.stringify(catalog));
+		const repository = await harness.openRepository();
+		expect(await Effect.runPromise(repository.listProjectsFx)).toContainEqual(
+			expect.objectContaining({
+				type: "invalid",
+				root: duplicateRoot,
+			}),
+		);
+		for (const root of [
+			healthyRoot!,
+			"/unregistered",
+		]) {
+			await expect(
+				Effect.runPromise(repository.dismissInvalidProjectFx(root)),
+			).rejects.toThrow("not a currently blocked project");
+		}
+		await Effect.runPromise(repository.dismissInvalidProjectFx(duplicateRoot));
+		await expect(access(join(duplicateRoot, "game.json"))).resolves.toBeUndefined();
+		await expect(access(join(healthyRoot!, "game.json"))).resolves.toBeUndefined();
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([
+			expect.objectContaining({
+				type: "valid",
+				project: expect.objectContaining({
+					projectId: "same-id",
+				}),
+			}),
+		]);
+	});
+
+	it("keeps a dismissed managed folder off Recent across discovery and allows explicit reopen after repair", async () => {
+		const seed = await harness.openRepository();
+		const project = await harness.createProject(seed);
+		const root = await Effect.runPromise(seed.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed root missing.");
+		const manifest = join(root, "game.json");
+		const original = await readFile(manifest, "utf8");
+		await harness.closeRepository(seed);
+		await writeFile(manifest, "{broken");
+		const repository = await harness.openRepository();
+		await Effect.runPromise(repository.dismissInvalidProjectFx(root));
+		// A separate catalog update also reconciles managed directories.
+		await harness.createProject(repository, "another-project");
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toHaveLength(1);
+		expect(await readFile(manifest, "utf8")).toBe("{broken");
+		await writeFile(manifest, original);
+		await Effect.runPromise(
+			reopened.openProjectFx({
+				root,
+			}),
+		);
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toContainEqual(
+			expect.objectContaining({
+				ownership: "managed",
+				project: expect.objectContaining({
+					projectId: project.projectId,
+				}),
+			}),
+		);
+		await Effect.runPromise(reopened.deleteProjectFx(project.projectId));
+		await expect(access(root)).rejects.toBeDefined();
+		await harness.closeRepository(reopened);
+		const restored = await harness.openRepository();
+		expect(await Effect.runPromise(restored.listProjectsFx)).toHaveLength(1);
+	});
+
 	it("permanently removes a managed project root", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository);

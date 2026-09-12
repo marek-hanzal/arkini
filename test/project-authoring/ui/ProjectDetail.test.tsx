@@ -59,6 +59,7 @@ vi.mock("~/ui/ui/Button", () => ({
 	),
 }));
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 import { ProjectDetail } from "~/project-authoring/ui/ProjectDetail";
 
 (
@@ -94,9 +95,11 @@ describe("project detail", () => {
 		});
 		await act(async () => {
 			root.render(
-				<ProjectDetail sectionId="general">
-					<div>General detail</div>
-				</ProjectDetail>,
+				<TranslationTestProvider>
+					<ProjectDetail sectionId="general">
+						<div>General detail</div>
+					</ProjectDetail>
+				</TranslationTestProvider>,
 			);
 		});
 

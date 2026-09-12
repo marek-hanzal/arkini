@@ -137,6 +137,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
+	// Authored identity is pinned here; packDirectoryFx snapshots and verifies live PNG bytes.
 	const assertCurrentFx = (state: ProjectState) =>
 		readProjectFilesFx(state.paths.root).pipe(
 			Effect.mapError(projectChangedBeforeBuildFn),
@@ -145,7 +146,16 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 					files.marker.revision === state.project.revision &&
 					isDeepStrictEqual(files.arkpack, state.project.version) &&
 					isDeepStrictEqual(files.config, state.project.config) &&
-					isDeepStrictEqual(files.resources, state.project.resources),
+					isDeepStrictEqual(
+						files.resources.map(({ id, mime }) => ({
+							id,
+							mime,
+						})),
+						state.project.resources.map(({ id, mime }) => ({
+							id,
+							mime,
+						})),
+					),
 				projectChangedBeforeBuildFn,
 			),
 			Effect.asVoid,

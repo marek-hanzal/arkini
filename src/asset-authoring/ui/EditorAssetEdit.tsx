@@ -1,12 +1,16 @@
 import { FileQuestion } from "lucide-react";
 import { type DragEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { PrimaryButton } from "~/ui/ui/Button";
+import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
+import { EditorAssetSectionHelp } from "~/asset-authoring/ui/EditorAssetSectionHelp";
+import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";
 import { Status } from "~/ui/ui/Status";
@@ -24,6 +28,7 @@ const EditorAssetImageDropZone = ({
 	readonly file?: File;
 	readonly onFileFn: (file: File | undefined) => void;
 }) => {
+	const translator = useTranslator();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [dragging, setDraggingFn] = useState(false);
 	const [selectedUrl, setSelectedUrlFn] = useState<string>();
@@ -78,7 +83,9 @@ const EditorAssetImageDropZone = ({
 			>
 				<span className="pointer-events-none grid w-full justify-items-center gap-3">
 					{previewUrl === undefined ? (
-						<span className="text-sm text-muted">Preparing asset preview…</span>
+						<span className="text-sm text-muted">
+							<Tx label="Preparing asset preview…" />
+						</span>
 					) : (
 						<img
 							src={previewUrl}
@@ -87,9 +94,8 @@ const EditorAssetImageDropZone = ({
 							draggable={false}
 						/>
 					)}
-					<span className="font-semibold">{file?.name ?? "Replace image"}</span>
-					<span className="text-sm text-muted">
-						Drop a PNG here or click to choose one
+					<span className="font-semibold">
+						{file?.name ?? translator.textFn("Replace image")}
 					</span>
 				</span>
 			</button>
@@ -101,6 +107,7 @@ const EditorAssetImageDropZone = ({
 };
 
 export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditProps) => {
+	const translator = useTranslator();
 	const controller = useEditorAssetEditController({
 		filter,
 		query,
@@ -124,74 +131,70 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 							/>
 						}
 						title={
-							<h1 className="truncate text-xl font-semibold">Edit {resourceId}</h1>
+							<h1 className="truncate text-xl font-semibold">
+								<Tx label="Edit" /> {resourceId}
+							</h1>
 						}
 					/>
 				}
 			>
 				<Status
 					dataUi="EditorAssetNotFound"
-					description={`Resource ${resourceId} is not present in this project.`}
+					description={translator.textFn("This asset is not present in this project.")}
 					icon={FileQuestion}
-					title="Asset not found"
+					title={translator.textFn("Asset not found")}
 				/>
 			</EditorSectionPage>
 		);
 	return (
-		<EditorSectionPage
-			header={
-				<EditorSectionNavigation
-					leading={
-						<EditorHistoryBackButton
-							to="/editor/$projectId/assets/$resourceId/detail/overview"
-							params={{
-								projectId: controller.projectId,
-								resourceId,
-							}}
-							search={{
-								filter,
-								query,
-							}}
-						/>
-					}
-					title={<h1 className="truncate text-xl font-semibold">Edit {resourceId}</h1>}
-					action={
-						<PrimaryButton
-							disabled={!controller.dirty || controller.saving}
-							cursorIntent={controller.saving ? "progress" : undefined}
-							className="min-h-0 px-4 py-2 text-sm"
-							onClick={() => void controller.saveFn()}
-						>
-							Save
-						</PrimaryButton>
-					}
+		<EditorFormSectionPage
+			discardFn={controller.discardFn}
+			error={controller.error}
+			help={EditorAssetSectionHelp.edit}
+			saveEnabled={controller.dirty}
+			saveFn={controller.saveFn}
+			saving={controller.saving}
+			tabs={undefined}
+			title={
+				<h1 className="truncate text-xl font-semibold">
+					<Tx label="Edit" /> {resourceId}
+				</h1>
+			}
+			leading={
+				<EditorHistoryBackButton
+					to="/editor/$projectId/assets/$resourceId/detail/overview"
+					params={{
+						projectId: controller.projectId,
+						resourceId,
+					}}
+					search={{
+						filter,
+						query,
+					}}
 				/>
 			}
 		>
-			<div className="mx-auto w-full max-w-3xl">
-				<EditorFormContent
-					error={controller.error}
-					saveFn={controller.saveFn}
-				>
-					<fieldset
-						disabled={controller.saving}
-						className="contents"
-					>
-						<EditorTextControl
-							error={controller.assetIdError}
-							label="Asset ID"
-							onChangeFn={controller.setNextIdFn}
-							value={controller.nextId}
-						/>
-						<EditorAssetImageDropZone
-							currentUrl={controller.currentUrl}
-							error={controller.fileError}
-							file={controller.file}
-							onFileFn={controller.setFileFn}
-						/>
-					</fieldset>
-				</EditorFormContent>
+			<div className="grid w-full max-w-3xl gap-6">
+				<EditorTextControl
+					error={controller.assetIdError}
+					label={translator.textFn("Asset ID")}
+					description={<Mx label="Asset ID help" />}
+					onChangeFn={controller.setNextIdFn}
+					value={controller.nextId}
+				/>
+				<div className="grid gap-2">
+					<EditorValueLabel
+						label={translator.textFn("Image")}
+						description={<Mx label="Asset image replacement help" />}
+					/>
+					<EditorAssetImageDropZone
+						currentUrl={controller.currentUrl}
+						error={controller.fileError}
+						file={controller.file}
+						onFileFn={controller.setFileFn}
+					/>
+				</div>
 			</div>
-		</EditorSectionPage>
+		</EditorFormSectionPage>
 	);
 };

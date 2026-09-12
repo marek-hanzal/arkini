@@ -12,6 +12,9 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 	const [deletedProjectIds, setDeletedProjectIdsFn] = useState<ReadonlySet<string>>(
 		() => new Set(),
 	);
+	const [dismissedProjectRoots, setDismissedProjectRootsFn] = useState<ReadonlySet<string>>(
+		() => new Set(),
+	);
 	const [projectRefreshError, setProjectRefreshErrorFn] = useState<unknown>();
 	const [refreshingProjects, setRefreshingProjectsFn] = useState(false);
 	const active =
@@ -25,6 +28,7 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		try {
 			await router.invalidate();
 			setDeletedProjectIdsFn(new Set());
+			setDismissedProjectRootsFn(new Set());
 			setProjectRefreshErrorFn(undefined);
 		} catch (error) {
 			setProjectRefreshErrorFn(error);
@@ -40,8 +44,10 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		runCommandFn({
 			action: "navigation-started",
 		});
-		if (state.action === "delete-project") {
-			setDeletedProjectIdsFn((current) => new Set(current).add(state.projectId));
+		if (state.action === "delete-project" || state.action === "dismiss-invalid-project") {
+			if (state.action === "delete-project")
+				setDeletedProjectIdsFn((current) => new Set(current).add(state.projectId));
+			else setDismissedProjectRootsFn((current) => new Set(current).add(state.root));
 			void refreshProjectsFn().finally(() =>
 				runCommandFn({
 					action: "navigation-complete",
@@ -138,6 +144,20 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		],
 	);
 
+	const dismissInvalidProjectFn = useCallback(
+		(root: string) => {
+			if (blocked) return;
+			runCommandFn({
+				action: "dismiss-invalid-project",
+				root,
+			});
+		},
+		[
+			blocked,
+			runCommandFn,
+		],
+	);
+
 	const openProjectFolderFn = useCallback(
 		(root: string) => {
 			if (blocked) return;
@@ -182,6 +202,8 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		createProjectFn,
 		deletedProjectIds,
 		deleteProjectFn,
+		dismissInvalidProjectFn,
+		dismissedProjectRoots,
 		error: state.kind === "error" ? state.error : undefined,
 		exitFn,
 		importArkpackFileFn,

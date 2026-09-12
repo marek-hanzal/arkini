@@ -1,48 +1,108 @@
 A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.:
   value: A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.
+About avatars:
+  value: About avatars
 Action:
   value: Action
-Action is disabled:
-  value: Action is disabled
+Action configured:
+  value: Action configured
 Action type:
   value: Action type
 Activating this item settles its requirements and unit costs, then enters the target space.:
   value: Activating this item settles its requirements and unit costs, then enters the target space.
 Activation settles every requirement before entering the target.:
   value: Activation settles every requirement before entering the target.
+Add avatars:
+  value: Add avatars
 Add line:
   value: Add line
 Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.:
   value: Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.
+Add merge:
+  value: Add merge
 Adds no item or units requirement. The action may start without delivering or targeting another item.:
   value: Adds no item or units requirement. The action may start without delivering or targeting another item.
 Allows the timer to run before availability rules are applied.:
   value: Allows the timer to run before availability rules are applied.
-An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.:
-  value: An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.
+Alternative:
+  value: Alternative
+Any local:
+  value: Any local
+  dynamic: true
 Artwork:
   value: Artwork
+Asset:
+  value: Asset
+Asset ID:
+  value: Asset ID
+Asset ID help:
+  value: |
+    A unique resource name within this project. Renaming updates saved item, project and note references when you **Save**.
+Asset catalog help:
+  value: |
+    Assets contains reusable PNG images in the project. Search by asset ID and filter by current usage. Open an asset to preview it, inspect its uses, replace it or create an item from it.
+
+    **Import** adds PNG files or imports images from an Arkpack. **Optimize** losslessly re-encodes project PNGs at their original dimensions; it does not resize the artwork.
+
+    Replacing a saved image changes every use of that asset. Creating an item starts an unsaved draft with artwork and a title derived from the asset; Save publishes the item.
+Asset delete help:
+  value: |
+    Delete an unused asset from the project. Saved item or project references block deletion; open **Usage** and remove or replace those references first.
+
+    Deleting an asset removes its note links while preserving the notes themselves. The confirmation applies to this saved resource.
+Asset editing help:
+  value: |
+    Rename this asset or replace its PNG image. **Save** validates and writes both changes together; **Discard** abandons this draft and returns to the saved asset.
+
+    Renaming updates saved item, project and note references. Replacing the image changes every use of this asset. The source remains unchanged until Save succeeds.
+Asset image replacement help:
+  value: |
+    Drop a **PNG** onto the preview or click it to choose a file. The replacement affects every use of this asset after **Save**. Leaving it unchanged preserves the current image.
+Asset not found:
+  value: Asset not found
 Asset notes empty description:
   value: Create a note here to keep art direction and decisions linked to this asset.
 Asset notes empty title:
   value: No notes for this asset yet
+Asset overview help:
+  value: |
+    Inspect this project asset before using it in artwork. **Create item** starts a new item draft using this asset. **Edit** lets you rename the asset or replace its PNG image.
+
+    The asset is shared: replacing its image changes every saved reference. **Usage** lists those references; **Notes** keeps linked authoring notes.
+Asset technical help:
+  value: |
+    Inspect the MIME type, file size, resource identity and project revision. This is the saved source image, shared by all project references.
+
+    Use **Edit** to replace the image; technical properties are read from the resource and cannot be changed individually here.
+Asset usage help:
+  value: |
+    Find saved item and project artwork that refers to this asset. Open a reference to inspect its owner.
+
+    The list reflects saved content, so unsaved edits are not included. Linked authoring notes appear under **Notes**, separately from game artwork usage.
+Assets:
+  value: Assets
 Automatic only:
   value: Automatic only
+Base and overlay assets share one tile scale. Artwork does not change occupied cells.:
+  value: Base and overlay assets share one tile scale. Artwork does not change occupied cells.
+Base asset:
+  value: Base asset
+Base duration of one job on this line before runtime multiplier and adjustment rules are applied.:
+  value: Base duration of one job on this line before runtime multiplier and adjustment rules are applied.
 Base tile scale:
   value: Base tile scale
 Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.:
   value: Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.
 Board:
   value: Board
-Board editing:
-  value: Board editing
+  dynamic: true
 Board editing help:
   value: |
     Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
 
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
-Board — required by this item’s lifetime:
-  value: Board — required by this item’s lifetime
+Board — required by Clock:
+  value: Board — required by Clock
 Build:
   value: Build
 Build help:
@@ -52,6 +112,8 @@ Build help:
     Choose the output **Major**, **Minor** and optional **Suffix**. Build remembers valid settings even if compilation fails; these settings do not change the live Editor Board. You decide when a major change makes older saves incompatible. Blocking diagnostics link back to the exact Editor surface that needs fixing; non-blocking diagnostics remain attached to the finished artifact.
 
     After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
+Byte size:
+  value: Byte size
 Cancel:
   value: Cancel
 Cancel edit:
@@ -60,26 +122,45 @@ Check ahead:
   value: Check ahead
 Choose a different Project ID.:
   value: Choose a different Project ID.
+Clear interval:
+  value: Clear interval
+Clear lifetime:
+  value: Clear lifetime
+Clear overlay asset:
+  value: Clear overlay asset
+Clicking this item can enter a space or open Inventory after its requirements pass.:
+  value: Clicking this item can enter a space or open Inventory after its requirements pass.
 Clock:
   value: Clock
+Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.:
+  value: Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.
 Clock configured:
   value: Clock configured
-Clock is disabled:
-  value: Clock is disabled
 Close:
   value: Close
+  dynamic: true
 Connection search empty:
   value: No connection matches this search.
 Connection search placeholder:
   value: Search connections…
+Connection type:
+  value: Connection type
 Connections:
   value: Connections
 Consume:
   value: Consume
+Consumed:
+  value: Consumed
+Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.:
+  value: Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.
 Control:
   value: Control
 Cost:
   value: Cost
+Count range:
+  value: Count range
+Create item:
+  value: Create item
 Create note:
   value: Create note
 Create project:
@@ -87,34 +168,54 @@ Create project:
 Create project help:
   value: |
     Choose the package identity used by builds and gameplay saves. It can be renamed later, which makes the project a different game to existing saves.
+Create the first item to start authoring this game.:
+  value: Create the first item to start authoring this game.
 Current stack:
   value: Current stack
 Default:
   value: Default
-Defines this item's production lines, inputs, outputs, runtime and rules.:
-  value: Defines this item's production lines, inputs, outputs, runtime and rules.
 Delete:
   value: Delete
+Delete asset:
+  value: Delete asset
+Delete item:
+  value: Delete item
 Depletion output:
   value: Depletion output
 Describe what this line consumes and produces.:
   value: Describe what this line consumes and produces.
 Description:
   value: Description
+Dimensions:
+  value: Dimensions
 Disable:
   value: Disable
-Disable action:
-  value: Disable action
+Disable removes the unit supply and depletion output from this item.:
+  value: Disable removes the unit supply and depletion output from this item.
+Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.:
+  value: Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.
 Disable removes timing, rules and expiry output from this item.:
   value: Disable removes timing, rules and expiry output from this item.
-Disable units:
-  value: Disable units
 Disabled:
   value: Disabled
+Disabled before rules are evaluated. Enable rules can make this line available; a matching Disable rule vetoes availability.:
+  value: Disabled before rules are evaluated. Enable rules can make this line available; a matching Disable rule vetoes availability.
+Discard:
+  value: Discard
+Draft:
+  value: Draft
+Drop:
+  value: Drop
+Dropping this item onto a matching target applies its source action, target effect and optional output.:
+  value: Dropping this item onto a matching target applies its source action, target effect and optional output.
 Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.:
   value: Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.
+Each line owns its inputs, outputs, runtime and rules. Manual and Clock requests share the same queue.:
+  value: Each line owns its inputs, outputs, runtime and rules. Manual and Clock requests share the same queue.
 Edit:
   value: Edit
+Edit asset:
+  value: Edit asset
 Editor Board:
   value: Editor Board
 Editor Board help:
@@ -149,6 +250,8 @@ Editor MCP help:
     On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
 Emitted once after the finite lifetime ends and accepted production has settled.:
   value: Emitted once after the finite lifetime ends and accepted production has settled.
+Enable:
+  value: Enable
 Enable Units on this item before selecting Self to pay the unit cost.:
   value: Enable Units on this item before selecting Self to pay the unit cost.
 Enable Units on this item before selecting Self.:
@@ -165,12 +268,20 @@ Enable depletion output:
   value: Enable depletion output
 Enable expiry output:
   value: Enable expiry output
+Enable line output:
+  value: Enable line output
 Enable merge output:
   value: Enable merge output
+Enable merges:
+  value: Enable merges
+Enable production:
+  value: Enable production
 Enable units:
   value: Enable units
 Enabled:
   value: Enabled
+Enabled lines can accept production jobs before runtime rules alter their availability.:
+  value: Enabled lines can accept production jobs before runtime rules alter their availability.
 Enqueue:
   value: Enqueue
 Enter the configured space after all requirements and rules pass.:
@@ -179,10 +290,31 @@ Estimate:
   value: Estimate
 Every Enable rule must pass, and any matching Disable rule prevents activation.:
   value: Every Enable rule must pass, and any matching Disable rule prevents activation.
+Every condition of a rule must pass. Enable rules gate this selected drop; a matching Disable rule suppresses it without disabling the line or other drops.:
+  value: Every condition of a rule must pass. Enable rules gate this selected drop; a matching Disable rule suppresses it without disabling the line or other drops.
+Every condition of a rule must pass. Every Enable rule gates activation; a matching Disable rule vetoes it. Requirements settle before the action opens its destination.:
+  value: Every condition of a rule must pass. Every Enable rule gates activation; a matching Disable rule vetoes it. Requirements settle before the action opens its destination.
+Every condition of a rule must pass. Every Enable rule gates the timer; a matching Disable rule pauses it. Accepted production can finish while the clock is paused.:
+  value: Every condition of a rule must pass. Every Enable rule gates the timer; a matching Disable rule pauses it. Accepted production can finish while the clock is paused.
+Every condition of a rule must pass. Show and Hide control visibility; Enable rules must all pass and Disable vetoes availability. Runtime multipliers apply before signed runtime adjustments.:
+  value: Every condition of a rule must pass. Show and Hide control visibility; Enable rules must all pass and Disable vetoes availability. Runtime multipliers apply before signed runtime adjustments.
+Exact count:
+  value: Exact count
+Exists:
+  value: Exists
 Expiry output:
   value: Expiry output
+Extra output:
+  value: Extra output
+Far:
+  value: Far
+  dynamic: true
 Finishing accepted work:
   value: Finishing accepted work
+Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.:
+  value: Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.
+Fix the highlighted fields before saving.:
+  value: Fix the highlighted fields before saving.
 Flow:
   value: Flow
 Flow help:
@@ -221,24 +353,40 @@ Global estimate help:
     Use **Fastest first** and **Slowest first** to find pacing outliers, **Highest demand first** to spot heavily reused ingredients or prerequisites, and **Incomplete only** to find broken or unusually complex paths.
 
     Open an item to see its selected route and the quantities and time behind the estimate.
+Guaranteed:
+  value: Guaranteed
+Hero image:
+  value: Hero image
+Hidden:
+  value: Hidden
+Hidden before rules are evaluated. Show rules can reveal this line; a matching Hide rule vetoes visibility.:
+  value: Hidden before rules are evaluated. Show rules can reveal this line; a matching Hide rule vetoes visibility.
+Hide:
+  value: Hide
+Image:
+  value: Image
+Included in current project:
+  value: Included in current project
 Initial units:
   value: Initial units
 Input type:
   value: Input type
+Inputs:
+  value: Inputs
+  dynamic: true
+Interactions:
+  value: Interactions
 Interactive:
   value: Interactive
-Interactive allows manual production. Automatic only uses authored automation.:
-  value: Interactive allows manual production. Automatic only uses authored automation.
 Interval:
   value: Interval
 Interval (seconds):
   value: Interval (seconds)
 Inventory:
   value: Inventory
+  dynamic: true
 Inventory action:
   value: Inventory action
-Inventory editing:
-  value: Inventory editing
 Inventory editing help:
   value: |
     Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
@@ -246,13 +394,26 @@ Item:
   value: Item
 Item ID:
   value: Item ID
+Item action empty title:
+  value: Let a click open Inventory or move to another space.
+Item action help:
+  value: |
+    Action is the item's immediate click handler. Choose **Space** to enter a target board space or **Inventory** to open Inventory.
+
+    All input costs and rules must pass before activation. Every Enable rule must pass; any matching Disable rule prevents the action. Switching action kind keeps shared inputs and rules.
+
+    Enabling Action removes production lines and Clock from the draft. **Save** applies the change; **Discard** keeps the saved configuration.
+
+    Inside Inventory, clicking always releases the item to the first free compatible Board or Toolbar cell. It never runs that item's action. This also lets an inventory-opening item be stored and released normally.
 Item artwork help:
   value: |
     Artwork combines a base asset with an optional overlay, drawn back to front.
 
     **Base tile scale** changes the artwork size within its tile. A value of 1 fills the tile with the artwork canvas; transparent PNG padding remains visible. Scale does not change occupied cells, storage, interaction reach, or image resolution.
 
-    The preview frame marks the complete tile.
+    The preview below the form updates as you change the base asset, overlay, or scale. Its frame marks the complete tile. The same composition is shown in Item detail.
+Item clock empty title:
+  value: Automate production or give this item a limited lifetime.
 Item clock help:
   value: |
     A Clock adds periodic production, a finite lifetime, or both.
@@ -273,6 +434,15 @@ Item connections help:
     - **Produces** lists the direct outputs of authored operations owned by the selected item.
 
     Use the search to find an item in the active relationship list. Open any result to inspect that item without losing the selected relationship.
+Item delete help:
+  value: |
+    Delete checks the saved project for references to this item. Follow a blocker to inspect its owner before deleting.
+
+    Ordinary deletion requires those references to be removed. **Force delete** also removes the listed starting entries, operations and outputs that depend on this item; review the concrete impact in the confirmation dialog.
+
+    Asset files remain in the project. Linked Notes remain, with this item's link removed. Deletion is applied only after confirmation.
+Item depletion output empty title:
+  value: Create items when the last unit is spent.
 Item estimate help:
   value: |
     Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.
@@ -289,6 +459,39 @@ Item estimate help:
     Arkini uses authored runtimes, output quantities and chances. Random outputs are converted into an expected number of attempts. Independent work can happen in parallel, so its time is not blindly added together.
 
     Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
+Item expiry output empty title:
+  value: Create items when this item's lifetime ends.
+Item global count help:
+  value: |
+    Limits the total quantity of this item across the game. Stack quantities contribute to the same global limit. Leave empty for no global limit.
+Item identity help:
+  value: |
+    Item brings together identity, artwork, storage limits and the optional unit supply. Use each section's **Edit** action to open its exact settings.
+
+    **Storage scope** controls placement on Board, Toolbar and Inventory. **Stack capacity** counts separate items in one stack; **Units** are the supply inside each item. **Game limit** limits the item across the game.
+
+    Item IDs can be renamed with their project references. The UID remains the item's stable identity. Artwork changes appearance without changing occupied cells.
+
+    **Draft** is saved immediately as an Editor organization flag. Draft items still participate in the game and the built Arkpack. Other edits are applied with **Save**; **Discard** leaves the saved item unchanged.
+Item interactions help:
+  value: |
+    Interactions describes what happens when a player clicks this item or drops it onto another item.
+
+    - **Action** is an immediate click interaction: enter a Space or open Inventory after its inputs and rules pass.
+    - **Merges** are directional drop interactions. Their source action and target effect are independent, with an optional extra output.
+
+    Action cannot coexist with production lines or Clock. Merges are configured independently. Use the local **Edit** links to change either interaction.
+Item list help:
+  value: |
+    Browse the project's saved items by title or ID. Open an item to inspect its capabilities, acquisition estimate, connections and Notes.
+
+    **Draft** filters to items marked as drafts. This is an Editor organization flag: drafts still participate in the game and Arkpack builds.
+
+    **New item** opens an unsaved draft. You can also create an item from an asset, which supplies its initial artwork and title. Save applies changes to the project.
+Item merge output empty title:
+  value: Create extra items when this merge completes.
+Item merges empty title:
+  value: Define what happens when this item is dropped onto another.
 Item merges help:
   value: |
     Merges trigger when this item is dropped onto a matching target.
@@ -300,6 +503,27 @@ Item notes empty description:
   value: Create a note here to keep ideas and decisions linked to this item.
 Item notes empty title:
   value: No notes for this item yet
+Item player controls help:
+  value: |
+    **Interactive** allows players to start production, store or withdraw input materials, change the queue, and select the **Default** and **Clock** lines.
+
+    **Automatic only** disables those production controls and leaves authored automation in charge. It does not change movement, merge or removal rules.
+Item production empty title:
+  value: Let this item produce other items.
+Item production help:
+  value: |
+    Production combines the item's queue, Clock and production lines. Queue capacity and player controls are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
+
+    **Default** selects the manual click line. **Clock** independently selects the line attempted at every timer pulse. Selecting either role clears only that role on the other lines. Without a Clock line, the timer continues without adding work.
+
+    Manual and automatic requests use the same queue in admission order. Queue capacity includes the active job. A blocked or full queue skips a Clock pulse without storing missed work.
+
+    **Interactive** allows manual production, material management, queue changes and line selection. **Automatic only** removes those player controls.
+
+    Clock can also give an item a finite lifetime without any lines. Accepted production may outlive that lifetime; expiry output waits for settlement. Adding a production line removes the configured Action when the draft is saved.
+Item stack size help:
+  value: |
+    The maximum quantity that can share one cell as a stack. This is separate from **Units**, the finite supply inside one item. A configured **Clock** requires a stack size of one.
 Item storage scope - any:
   value: Board, Inventory & Toolbar
   dynamic: true
@@ -312,13 +536,24 @@ Item storage scope - inventory:
 Item storage scope - toolbar:
   value: Toolbar only
   dynamic: true
+Item storage scope help:
+  value: |
+    Controls where this item can be placed: **Board**, **Toolbar**, **Inventory**, or **Any** of these locations. Normal placement rules still need a compatible free cell or stack.
+
+    A configured **Clock** requires Board scope and a stack size of one.
+Item units empty title:
+  value: Give this item health, resources, or another finite supply.
 Item units help:
   value: |
     Units are a finite amount inside one item, such as health, resource stock, or uses. **Quantity** counts separate items in a stack.
 
     **Initial units** sets the supply of each new instance. Spending the final unit depletes the item and may emit its configured **Depletion output**.
+Items:
+  value: Items
 Keep:
   value: Keep
+Keep leaves the receiving item unchanged, Remove takes one item from its stack, Spend removes one unit, and Replace swaps one item for the configured result.:
+  value: Keep leaves the receiving item unchanged, Remove takes one item from its stack, Spend removes one unit, and Replace swaps one item for the configured result.
 Leave empty for a one-shot lifetime without periodic production.:
   value: Leave empty for a one-shot lifetime without periodic production.
 Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.:
@@ -331,46 +566,96 @@ Lifetime (seconds):
   value: Lifetime (seconds)
 Lifetime remaining:
   value: Lifetime remaining
+Line ID:
+  value: Line ID
+Line description:
+  value: Line description
 Line selection could not be changed.:
   value: Line selection could not be changed.
+Line title:
+  value: Line title
 Loading notes…:
   value: Loading notes…
 Location:
   value: Location
+MIME type:
+  value: MIME type
+Matches any positive board distance and excludes only Self.:
+  value: Matches any positive board distance and excludes only Self.
+  dynamic: true
+Matches items exactly 1 cell away, including diagonals.:
+  value: Matches items exactly 1 cell away, including diagonals.
+  dynamic: true
+Matches items exactly 2 cells away, including diagonals.:
+  value: Matches items exactly 2 cells away, including diagonals.
+  dynamic: true
+Matches only the origin itself at board distance 0.:
+  value: Matches only the origin itself at board distance 0.
+  dynamic: true
 Materials:
   value: Materials
 Max count reached:
   value: Max count reached
 "Maximum accepted work count across this item’s production lines: one active job plus queued requests.":
   value: "Maximum accepted work count across this item’s production lines: one active job plus queued requests."
+Maximum global count:
+  value: Maximum global count
+Maximum stack size:
+  value: Maximum stack size
+Merge:
+  value: Merge
 Merge output:
   value: Merge output
 Merges:
   value: Merges
 Missing item:
   value: Missing item
+Near:
+  value: Near
+  dynamic: true
 New item:
   value: New item
 New production line:
   value: New production line
 Next pulse:
   value: Next pulse
-No action configured. Enable an action in the Editor to give this item an immediate interaction.:
-  value: No action configured. Enable an action in the Editor to give this item an immediate interaction.
-No additional action requirements.:
-  value: No additional action requirements.
-No depletion output:
-  value: No depletion output
+No About avatars configured.:
+  value: No About avatars configured.
+No authored item directly inputs or positively requires this item.:
+  value: No authored item directly inputs or positively requires this item.
+  dynamic: true
+No authored operation owned by this item directly inputs or positively requires another item.:
+  value: No authored operation owned by this item directly inputs or positively requires another item.
+  dynamic: true
+No authored operation owned by this item outputs another item.:
+  value: No authored operation owned by this item outputs another item.
+  dynamic: true
+No configured limit:
+  value: No configured limit
 No depletion output configured.:
   value: No depletion output configured.
-No expiry output:
-  value: No expiry output
 No expiry output configured.:
   value: No expiry output configured.
+No extra output configured.:
+  value: No extra output configured.
+No inputs:
+  value: No inputs
+No item selected:
+  value: No item selected
 No item with Units enabled matches this search.:
   value: No item with Units enabled matches this search.
-No merge output:
-  value: No merge output
+No items match the active filters.:
+  value: No items match the active filters.
+No items yet:
+  value: No items yet
+No output:
+  value: No output
+No output configured.:
+  value: No output configured.
+No rules:
+  value: No rules
+No saved project or item currently references this asset.:
+  value: No saved project or item currently references this asset.
 None:
   value: None
 None available:
@@ -383,27 +668,54 @@ Notes empty title:
   value: Your notes will live here
 Notes help:
   value: |
-    Notes are a free-form space for ideas, design thoughts, reminders, rough plans, and any other useful project stuff.
+    Keep project ideas, reminders and design decisions in **Markdown**.
 
-    Write them in **Markdown**. Notes stay with the Editor project, but **they are not versioned with it**: creating or restoring a Version does not capture or roll back your notes. They are also excluded from the built Arkpack, so they never affect the game.
+    Notes are stored once and can link to several items or assets. An Item or Asset **Notes** page shows the notes linked to that entry; the global **Notes** page shows the whole collection. A note created from an Item or Asset starts linked to it.
+
+    Removing a link keeps the note and its other links. Deleting a note removes it from the whole project. Renaming an asset preserves its note links; deleting an item or asset removes only that entry's links.
+
+    Notes travel with the portable Editor project, but are excluded from **Build** and **Arkpack** output. Use Git to version the project and its notes.
 Notes unavailable:
   value: Notes are unavailable.
+Nothing requires this item:
+  value: Nothing requires this item
+  dynamic: true
 Once:
   value: Once
+One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.:
+  value: One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.
 Only items with Units enabled are shown because the target pays the unit cost.:
   value: Only items with Units enabled are shown because the target pays the unit cost.
+Open folder:
+  value: Open folder
 Open the inventory after all requirements and rules pass.:
   value: Open the inventory after all requirements and rules pass.
 Optional items emitted after this merge resolves.:
   value: Optional items emitted after this merge resolves.
 Optional items emitted when the final unit is spent.:
   value: Optional items emitted when the final unit is spent.
+Optional output resolved after the source action and target effect complete.:
+  value: Optional output resolved after the source action and target effect complete.
+Optional portraits used on the game About screen.:
+  value: Optional portraits used on the game About screen.
 Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.:
   value: Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.
+Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.:
+  value: Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.
+Output:
+  value: Output
+Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.:
+  value: Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.
+Outputs:
+  value: Outputs
+Overlay asset:
+  value: Overlay asset
 Owned:
   value: Owned
 Owner units:
   value: Owner units
+Package status:
+  value: Package status
 Page help:
   value: Page help
 Paid by:
@@ -416,26 +728,67 @@ Paused:
   value: "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action."
 Pick random space:
   value: Pick random space
+Placement:
+  value: Placement
 Player controls:
   value: Player controls
+Player controls govern manual production, material management, queue changes and line selection.:
+  value: Player controls govern manual production, material management, queue changes and line selection.
+Player hint:
+  value: Player hint
+Preparing asset preview…:
+  value: Preparing asset preview…
+Produces:
+  value: Produces
+  dynamic: true
+Product line:
+  value: Product line
 Product lines:
   value: Product lines
 Production:
   value: Production
 Production line:
   value: Production line
+Production line output empty title:
+  value: Create items when this production line completes.
+Production lines:
+  value: Production lines
+Project:
+  value: Project
 Project ID:
   value: Project ID
 Project ID example:
   value: project:example
 Project ID is required.:
   value: Project ID is required.
+Project artwork help:
+  value: |
+    Choose the project-wide **Hero image** used by the launcher and game shell, and the ordered **About avatars** shown on the About page. These references use assets from this project.
+
+    Artwork changes apply after **Save** and do not change item artwork or placement.
+Project general help:
+  value: |
+    Inspect the project title, identity and storage dimensions. **Edit** changes the title. The **Project ID** identifies the game and its save namespace; changing it creates a different game identity.
+
+    Board, Toolbar and Inventory links open their shared dimensions and authored starting layouts. Use **Export** to save the portable project sources.
+Project revision:
+  value: Project revision
 Queue capacity:
   value: Queue capacity
+Random:
+  value: Random
+Ratio from 0.25 to 1. The default 1 fills the tile at 100%.:
+  value: Ratio from 0.25 to 1. The default 1 fills the tile at 100%.
+Reading image…:
+  value: Reading image…
 Remove:
   value: Remove
+Remove from Recent:
+  value: Remove from Recent
 Remove line:
   value: Remove line
+Remove merge:
+  value: Remove merge
 Rename project:
   value: Rename project
 Rename project ID:
@@ -445,14 +798,21 @@ Rename project ID help:
     The new ID makes this a different game to existing saves.
 
     The current project content and its last output version settings stay unchanged.
+Renaming updates exact project references.:
+  value: Renaming updates exact project references.
 Replace:
   value: Replace
+Replace image:
+  value: Replace image
 Replacement item:
   value: Replacement item
 "Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent units carry over only to a compatible replacement with units; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle.":
   value: "Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent units carry over only to a compatible replacement with units; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle."
 Required:
   value: Required
+Required by:
+  value: Required by
+  dynamic: true
 Required units:
   value: Required units
 Requirements:
@@ -461,6 +821,12 @@ Requires:
   value: Requires
 Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.:
   value: Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.
+Reserved:
+  value: Reserved
+Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.:
+  value: Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.
+Resource ID:
+  value: Resource ID
 Retry loading notes:
   value: Retry loading notes
 "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged.":
@@ -469,14 +835,41 @@ Rules:
   value: Rules
 Running:
   value: Running
+Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Accepted production finishes before the item disappears.:
+  value: Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Accepted production finishes before the item disappears.
+Runtime:
+  value: Runtime
+Runtime (seconds):
+  value: Runtime (seconds)
+Runtime adjustment:
+  value: Runtime adjustment
+Runtime multiplier:
+  value: Runtime multiplier
 Save:
   value: Save
+Save or discard this draft before leaving the editor surface.:
+  value: Save or discard this draft before leaving the editor surface.
 Schedule:
   value: Schedule
 Search assets…:
   value: Search assets…
 Search item title or ID…:
   value: Search item title or ID…
+Searches matching items on the current board at the selected distance from the action owner.:
+  value: Searches matching items on the current board at the selected distance from the action owner.
+  dynamic: true
+Searches matching items stored anywhere in the inventory.:
+  value: Searches matching items stored anywhere in the inventory.
+  dynamic: true
+Searches matching items stored anywhere in the toolbar.:
+  value: Searches matching items stored anywhere in the toolbar.
+  dynamic: true
+Searches the inventory, toolbar, and every board space in the current game.:
+  value: Searches the inventory, toolbar, and every board space in the current game.
+  dynamic: true
+Searches the inventory, toolbar, and the current board space without a board-distance limit.:
+  value: Searches the inventory, toolbar, and the current board space without a board-distance limit.
+  dynamic: true
 Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.:
   value: Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.
 Select an item with Units enabled.:
@@ -487,18 +880,23 @@ Selected target must have Units enabled.:
   value: Selected target must have Units enabled.
 Self:
   value: Self
+  dynamic: true
 Self-paid units input:
   value: Self-paid units input
 Set clock:
   value: Set clock
 Set default:
   value: Set default
+Show:
+  value: Show
 Simple:
   value: Simple
 Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.:
   value: Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.
 Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.:
   value: Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.
+Single item:
+  value: Single item
 Source action:
   value: Source action
 Space:
@@ -523,30 +921,69 @@ Starting layout controls help:
     - **Right-click** a stack to remove it.
     - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack. Anything at the destination is replaced.
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
+Status:
+  value: Status
 Storage:
   value: Storage
+Storage scope:
+  value: Storage scope
 Target:
   value: Target
 Target effect:
   value: Target effect
 Target space:
   value: Target space
+Technical:
+  value: Technical
+The authored line selected for automatic Clock impulses. Selecting Default does not change this selection.:
+  value: The authored line selected for automatic Clock impulses. Selecting Default does not change this selection.
+The authored line selected for ordinary item activation. The player can change Default independently of Clock.:
+  value: The authored line selected for ordinary item activation. The player can change Default independently of Clock.
 The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.:
   value: The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.
 The board space entered after successful activation. One-way navigation is allowed.:
   value: The board space entered after successful activation. One-way navigation is allowed.
+The finite supply held by each new item, independently of its stack quantity.:
+  value: The finite supply held by each new item, independently of its stack quantity.
 The item that owns this action pays the unit cost. It must define enough available units.:
   value: The item that owns this action pays the unit cost. It must define enough available units.
 The line selected by default for manual production. Selecting this line clears Default on sibling lines.:
   value: The line selected by default for manual production. Selecting this line clears Default on sibling lines.
 The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.:
   value: The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.
+The project image shown by the launcher.:
+  value: The project image shown by the launcher.
+The receiving item must match this selector for the merge to apply.:
+  value: The receiving item must match this selector for the merge to apply.
+These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected.:
+  value: These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected.
 These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.:
   value: These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.
+This asset is not present in this project.:
+  value: This asset is not present in this project.
+This asset is not used:
+  value: This asset is not used
+This item has no inputs:
+  value: This item has no inputs
+  dynamic: true
+This item produces nothing:
+  value: This item produces nothing
+  dynamic: true
+This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.:
+  value: This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.
+This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.:
+  value: This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.
+Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.:
+  value: Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.
+Time for one production cycle before runtime rules. Zero completes immediately.:
+  value: Time for one production cycle before runtime rules. Zero completes immediately.
 Timer:
   value: Timer
-Toolbar editing:
-  value: Toolbar editing
+Title:
+  value: Title
+Toolbar:
+  value: Toolbar
+  dynamic: true
 Toolbar editing help:
   value: |
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
@@ -557,10 +994,10 @@ Unit cost:
 Units:
   value: Units
   dynamic: true
-Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.:
-  value: Units are a finite amount inside one item, such as health, resources, or uses. Spending the last unit depletes the item and may emit an output.
-Units are disabled:
-  value: Units are disabled
+Units are the supply inside each item, independently of how many items are stacked.:
+  value: Units are the supply inside each item, independently of how many items are stacked.
+Units configured:
+  value: Units configured
 Units input:
   value: Units input
 Units per item:
@@ -570,22 +1007,51 @@ Units spent by the item that owns this action when it starts.:
   value: Units spent by the item that owns this action when it starts.
 Units spent by the selected target when the action starts.:
   value: Units spent by the selected target when the action starts.
+Universe:
+  value: Universe
+  dynamic: true
 Unlimited:
   value: Unlimited
+Unsaved changes:
+  value: Unsaved changes
 Unset clock:
   value: Unset clock
 Unset default:
   value: Unset default
+Usage:
+  value: Usage
 Use:
   value: Use
+Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.:
+  value: Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.
+Visible:
+  value: Visible
+Visible lines are shown to the player before runtime rules alter their visibility.:
+  value: Visible lines are shown to the player before runtime rules alter their visibility.
+Weight:
+  value: Weight
+Weighted selections:
+  value: Weighted selections
 Without an output, the clock disappears after expiry and production settlement.:
   value: Without an output, the clock disappears after expiry and production settlement.
 Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.:
   value: Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.
 Write a note…:
   value: Write a note…
+automatic-only:
+  value: automatic-only
+chance:
+  value: chance
+keep:
+  value: keep
+random:
+  value: random
+remove:
+  value: remove
 space:
   value: space
+spend:
+  value: spend
 unit available:
   value: unit available
 unit from owner:
@@ -598,3 +1064,5 @@ units from owner:
   value: units from owner
 units from target:
   value: units from target
+use:
+  value: use

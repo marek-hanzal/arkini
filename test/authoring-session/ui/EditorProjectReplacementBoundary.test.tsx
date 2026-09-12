@@ -11,7 +11,10 @@ import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
 import { EditorProjectProvider, useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -58,7 +61,7 @@ const createProject = (revision: number): Project => ({
 	updatedAtMs: 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 describe("EditorProjectReplacementBoundary", () => {

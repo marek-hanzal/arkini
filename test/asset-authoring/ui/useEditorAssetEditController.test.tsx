@@ -9,7 +9,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const state = vi.hoisted(() => ({
 	navigate: vi.fn(async () => undefined),
@@ -95,7 +98,7 @@ describe("useEditorAssetEditController", () => {
 			updatedAtMs: 2,
 			revision: 3,
 			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		};
 		const registry = AtomRegistry.make({
 			scheduleTask,

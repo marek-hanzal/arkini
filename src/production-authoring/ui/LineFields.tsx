@@ -38,93 +38,107 @@ export const LineFields = withFieldGroupFn({
 			value: boolean,
 		) => void,
 	},
-	render: ({ group, label = "Product line", onMarkerChangeFn }) => {
+	render: ({ group, label, onMarkerChangeFn }) => {
 		const translator = useTranslator();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormCard>
 					{label === null ? null : (
 						<EditorFormSectionDivider
-							title={label}
+							title={label ?? translator.textFn("Product line")}
 							variant="secondary"
 						/>
 					)}
 					<div className="grid grid-cols-2 items-stretch gap-4">
 						<div className="grid content-start gap-3">
 							<group.AppField name="id">
-								{(field) => <field.TextField label="Line ID" />}
+								{(field) => (
+									<field.TextField label={translator.textFn("Line ID")} />
+								)}
 							</group.AppField>
 							<group.AppField name="title">
-								{(field) => <field.TextField label="Line title" />}
+								{(field) => (
+									<field.TextField label={translator.textFn("Line title")} />
+								)}
 							</group.AppField>
 							<group.AppField name="runtimeMs">
 								{(field) => (
 									<field.SecondsField
-										label="Runtime (seconds)"
-										description="Base duration of one job on this line before runtime multiplier and adjustment rules are applied."
-									/>
-								)}
-							</group.AppField>
-							<group.AppField name="ahead">
-								{(field) => (
-									<field.BoolToggle
-										checkedIcon={CircleCheck}
-										uncheckedIcon={CircleX}
-										label={translator.textFn("Check ahead")}
+										label={translator.textFn("Runtime (seconds)")}
 										description={translator.textFn(
-											"Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.",
+											"Base duration of one job on this line before runtime multiplier and adjustment rules are applied.",
 										)}
 									/>
 								)}
 							</group.AppField>
-							<div className="flex min-w-0 flex-wrap items-center gap-4">
-								<group.AppField name="default">
-									{(field) => (
-										<EditorBooleanToggleBadge
-											checked={field.state.value}
-											checkedIcon={Star}
-											uncheckedIcon={StarOff}
-											label={translator.textFn("Default")}
-											description={translator.textFn(
-												"The line selected by default for manual production. Selecting this line clears Default on sibling lines.",
-											)}
-											onChangeFn={(value) =>
-												onMarkerChangeFn("default", value)
-											}
-										/>
-									)}
-								</group.AppField>
-								<group.AppField name="clock">
-									{(field) => (
-										<EditorBooleanToggleBadge
-											checked={field.state.value === true}
-											checkedIcon={Clock}
-											uncheckedIcon={Clock}
-											label={translator.textFn("Clock")}
-											description={translator.textFn(
-												"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
-											)}
-											onChangeFn={(value) => onMarkerChangeFn("clock", value)}
-										/>
-									)}
-								</group.AppField>
-								<group.AppField name="show">
-									{(field) => (
-										<field.BoolToggle
-											checkedIcon={Eye}
-											description="Visible lines are shown to the player before runtime rules alter their visibility."
-											label="Visible"
-											uncheckedIcon={EyeOff}
-										/>
-									)}
-								</group.AppField>
-								<group.AppField name="enable">
+							<div className="flex min-w-0 items-center justify-between gap-4">
+								<div className="flex min-w-0 flex-wrap items-center gap-4">
+									<group.AppField name="default">
+										{(field) => (
+											<EditorBooleanToggleBadge
+												checked={field.state.value}
+												checkedIcon={Star}
+												uncheckedIcon={StarOff}
+												label={translator.textFn("Default")}
+												description={translator.textFn(
+													"The line selected by default for manual production. Selecting this line clears Default on sibling lines.",
+												)}
+												onChangeFn={(value) =>
+													onMarkerChangeFn("default", value)
+												}
+											/>
+										)}
+									</group.AppField>
+									<group.AppField name="clock">
+										{(field) => (
+											<EditorBooleanToggleBadge
+												checked={field.state.value === true}
+												checkedIcon={Clock}
+												uncheckedIcon={Clock}
+												label={translator.textFn("Clock")}
+												description={translator.textFn(
+													"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
+												)}
+												onChangeFn={(value) =>
+													onMarkerChangeFn("clock", value)
+												}
+											/>
+										)}
+									</group.AppField>
+									<group.AppField name="show">
+										{(field) => (
+											<field.BoolToggle
+												checkedIcon={Eye}
+												description={translator.textFn(
+													"Visible lines are shown to the player before runtime rules alter their visibility.",
+												)}
+												label={translator.textFn("Visible")}
+												uncheckedIcon={EyeOff}
+											/>
+										)}
+									</group.AppField>
+									<group.AppField name="enable">
+										{(field) => (
+											<field.BoolToggle
+												checkedIcon={CircleCheck}
+												description={translator.textFn(
+													"Enabled lines can accept production jobs before runtime rules alter their availability.",
+												)}
+												label={translator.textFn("Enabled")}
+												uncheckedIcon={CircleX}
+											/>
+										)}
+									</group.AppField>
+								</div>
+								<group.AppField name="ahead">
 									{(field) => (
 										<field.BoolToggle
 											checkedIcon={CircleCheck}
-											description="Enabled lines can accept production jobs before runtime rules alter their availability."
-											label="Enabled"
 											uncheckedIcon={CircleX}
+											label={translator.textFn("Check ahead")}
+											description={translator.textFn(
+												"Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.",
+											)}
 										/>
 									)}
 								</group.AppField>
@@ -134,7 +148,7 @@ export const LineFields = withFieldGroupFn({
 							{(field) => (
 								<field.TextAreaField
 									fill
-									label="Line description"
+									label={translator.textFn("Line description")}
 								/>
 							)}
 						</group.AppField>
@@ -146,7 +160,9 @@ export const LineFields = withFieldGroupFn({
 							<RulesControl
 								rules={rules}
 								target="line"
-								description="These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected."
+								description={translator.textFn(
+									"These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected.",
+								)}
 								allowedTypes={[
 									"show",
 									"hide",
@@ -187,8 +203,10 @@ export const LineFields = withFieldGroupFn({
 								<section className="grid min-w-0 content-start gap-3">
 									{output === undefined ? (
 										<EditorCapabilityStatus
-											actionLabel="Enable line output"
-											description="This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes."
+											actionLabel={translator.textFn("Enable line output")}
+											description={translator.textFn(
+												"This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.",
+											)}
 											icon={PackagePlus}
 											onEnableFn={() =>
 												group.setFieldValue(
@@ -196,13 +214,17 @@ export const LineFields = withFieldGroupFn({
 													structuredClone(DraftDefaults.output),
 												)
 											}
-											title="Line output is disabled"
+											title={translator.textFn(
+												"Production line output empty title",
+											)}
 										/>
 									) : (
 										<>
 											<EditorFormSectionDivider
-												description="Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops."
-												title="Output"
+												description={translator.textFn(
+													"Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.",
+												)}
+												title={translator.textFn("Output")}
 												variant="secondary"
 											/>
 											<OutputControl

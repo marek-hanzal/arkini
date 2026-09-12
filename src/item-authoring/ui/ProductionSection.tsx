@@ -1,11 +1,13 @@
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Factory } from "lucide-react";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { LineFields } from "~/production-authoring/ui/LineFields";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -71,6 +73,18 @@ const ProductionFields = withFieldGroupFn({
 							]);
 						};
 
+						if (lines.length === 0)
+							return (
+								<EditorFormCard>
+									<EditorCapabilityStatus
+										actionLabel={translator.textFn("Enable production")}
+										icon={Factory}
+										onEnableFn={addLineFn}
+										title={translator.textFn("Item production empty title")}
+									/>
+								</EditorFormCard>
+							);
+
 						return (
 							<EditorCollectionSelector
 								addLabel={translator.textFn("Add line")}
@@ -123,12 +137,11 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const translator = useTranslator();
 	const { form, productionLineId, validationIssues } = useFormSession();
 	const invalidLineIndex = validationIssues.find(
 		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
-	const content = (
+	return (
 		<ProductionFields
 			form={form}
 			fields={{
@@ -138,16 +151,5 @@ export const ProductionSection = () => {
 			invalidLineIndex={invalidLineIndex}
 			selectedLineId={productionLineId}
 		/>
-	);
-	return (
-		<div className="grid gap-[var(--ak-viewport-gap)]">
-			<EditorFormSectionDivider
-				description={translator.textFn(
-					"Defines this item's production lines, inputs, outputs, runtime and rules.",
-				)}
-				title={translator.textFn("Production")}
-			/>
-			{content}
-		</div>
 	);
 };

@@ -1,3 +1,4 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Check, Search } from "lucide-react";
 
 import {
@@ -51,7 +52,7 @@ interface EditorSearchComboboxProps {
 	readonly optionContentLayout?: "inline" | "stacked";
 	readonly renderOptionContentFn?: (option: EditorSearchOption) => ReactNode;
 	readonly renderPreviewFn: (option: EditorSearchOption) => ReactNode;
-	readonly renderSelectedPreviewFn?: (option: EditorSearchOption) => ReactNode;
+	readonly renderSelectedPreviewFn?: (option: EditorSearchOption | undefined) => ReactNode;
 }
 
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
@@ -75,8 +76,7 @@ export const EditorSearchCombobox = ({
 	value,
 }: EditorSearchComboboxProps) => {
 	const selectedOption = options.find((option) => option.id === value);
-	const selectedPreview =
-		selectedOption === undefined ? undefined : renderSelectedPreviewFn?.(selectedOption);
+	const selectedPreview = renderSelectedPreviewFn?.(selectedOption);
 	const selectedLabel = displaySelectedLabel
 		? (options.find((option) => option.id === value)?.label ?? value)
 		: value;
@@ -161,9 +161,42 @@ export const EditorSearchCombobox = ({
 			optionsById,
 		],
 	);
+	// Small result sets retain natural flow; large catalogs mount only the menu viewport.
+	const virtualized = matches.length > 20;
+	const getScrollElementFn = useCallback(
+		() => elements.floating,
+		[
+			elements.floating,
+		],
+	);
+	const getOptionKeyFn = useCallback(
+		(index: number) => matches[index]?.id ?? index,
+		[
+			matches,
+		],
+	);
+	const virtualizer = useVirtualizer({
+		count: matches.length,
+		enabled: open && virtualized,
+		getScrollElement: getScrollElementFn,
+		getItemKey: getOptionKeyFn,
+		estimateSize: () => 80,
+		gap: 4,
+		paddingStart: 6,
+		paddingEnd: 6,
+		overscan: 3,
+	});
+	const virtualOptions = virtualizer.getVirtualItems();
 	useLayoutEffect(() => {
 		const menu = elements.floating;
 		if (!open || menu === null || !keyboardScrollPendingRef.current) return;
+		if (virtualized) {
+			keyboardScrollPendingRef.current = false;
+			virtualizer.scrollToIndex(activeIndex, {
+				align: "auto",
+			});
+			return;
+		}
 		const activeOption = menu.querySelector<HTMLElement>(
 			'[data-ui="EditorSearchComboboxOption"][data-ui-active="true"]',
 		);
@@ -182,6 +215,8 @@ export const EditorSearchCombobox = ({
 		activeIndex,
 		elements.floating,
 		open,
+		virtualized,
+		virtualizer,
 	]);
 
 	useEffect(() => {
@@ -191,8 +226,11 @@ export const EditorSearchCombobox = ({
 	]);
 	useEffect(() => {
 		setActiveIndexFn(0);
+		if (virtualized) virtualizer.scrollToOffset(0);
 	}, [
 		searchQuery,
+		virtualized,
+		virtualizer,
 	]);
 
 	const chooseFn = useCallback(
@@ -222,63 +260,83 @@ export const EditorSearchCombobox = ({
 	const resultOptions = useMemo(
 		() =>
 			open
-				? matches.map((option, index) => (
-						<button
-							key={option.id}
-							type="button"
-							disabled={searchPending}
-							className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised data-[ui-active=true]:bg-surface-raised"
-							onMouseDown={(event) => event.preventDefault()}
-							onMouseEnter={() => {
-								keyboardScrollPendingRef.current = false;
-								setActiveIndexFn(index);
-							}}
-							onClick={() => chooseFn(option)}
-							{...readDataUiFn({
-								dataUi: "EditorSearchComboboxOption",
-								state: {
-									active: index === activeIndex,
-									selected: option.id === value,
-								},
-							})}
-						>
-							{renderPreviewFn(option)}
-							{renderOptionContentFn === undefined ? (
-								<span
-									className="min-w-0 flex-1 data-[ui-layout=inline]:flex data-[ui-layout=inline]:items-center data-[ui-layout=inline]:gap-1.5"
-									data-ui-layout={optionContentLayout}
-								>
+				? (virtualized
+						? virtualOptions
+						: matches.map((_, index) => ({
+								index,
+							}))
+					).map((row) => {
+						const index = row.index;
+						const option = matches[index];
+						if (option === undefined) return null;
+						return (
+							<button
+								key={option.id}
+								ref={virtualized ? virtualizer.measureElement : undefined}
+								data-index={index}
+								style={
+									"start" in row
+										? {
+												transform: `translateY(${row.start}px)`,
+											}
+										: undefined
+								}
+								type="button"
+								disabled={searchPending}
+								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised data-[ui-active=true]:bg-surface-raised data-[ui-virtual=true]:absolute data-[ui-virtual=true]:top-0 data-[ui-virtual=true]:left-1.5 data-[ui-virtual=true]:w-[calc(100%-0.75rem)]"
+								onMouseDown={(event) => event.preventDefault()}
+								onMouseEnter={() => {
+									keyboardScrollPendingRef.current = false;
+									setActiveIndexFn(index);
+								}}
+								onClick={() => chooseFn(option)}
+								{...readDataUiFn({
+									dataUi: "EditorSearchComboboxOption",
+									state: {
+										active: index === activeIndex,
+										virtual: virtualized,
+										selected: option.id === value,
+									},
+								})}
+							>
+								{renderPreviewFn(option)}
+								{renderOptionContentFn === undefined ? (
 									<span
-										className="block truncate text-sm font-semibold text-foreground data-[ui-layout=inline]:shrink-0"
+										className="min-w-0 flex-1 data-[ui-layout=inline]:flex data-[ui-layout=inline]:items-center data-[ui-layout=inline]:gap-1.5"
 										data-ui-layout={optionContentLayout}
 									>
-										{option.label}
+										<span
+											className="block truncate text-sm font-semibold text-foreground data-[ui-layout=inline]:shrink-0"
+											data-ui-layout={optionContentLayout}
+										>
+											{option.label}
+										</span>
+										{option.meta === undefined ? null : (
+											<>
+												<span
+													className="hidden shrink-0 text-subtle data-[ui-layout=inline]:inline"
+													data-ui-layout={optionContentLayout}
+												>
+													·
+												</span>
+												<span
+													className="mt-0.5 block truncate text-xs text-subtle data-[ui-layout=inline]:mt-0 data-[ui-layout=inline]:min-w-0 data-[ui-layout=inline]:flex-1 data-[ui-layout=inline]:text-sm"
+													data-ui-layout={optionContentLayout}
+												>
+													{option.meta}
+												</span>
+											</>
+										)}
 									</span>
-									{option.meta === undefined ? null : (
-										<>
-											<span
-												className="hidden shrink-0 text-subtle data-[ui-layout=inline]:inline"
-												data-ui-layout={optionContentLayout}
-											>
-												·
-											</span>
-											<span
-												className="mt-0.5 block truncate text-xs text-subtle data-[ui-layout=inline]:mt-0 data-[ui-layout=inline]:min-w-0 data-[ui-layout=inline]:flex-1 data-[ui-layout=inline]:text-sm"
-												data-ui-layout={optionContentLayout}
-											>
-												{option.meta}
-											</span>
-										</>
-									)}
-								</span>
-							) : (
-								renderOptionContentFn(option)
-							)}
-							{option.id === value ? (
-								<Check className="size-4 shrink-0 text-accent" />
-							) : null}
-						</button>
-					))
+								) : (
+									renderOptionContentFn(option)
+								)}
+								{option.id === value ? (
+									<Check className="size-4 shrink-0 text-accent" />
+								) : null}
+							</button>
+						);
+					})
 				: null,
 		[
 			open,
@@ -290,6 +348,9 @@ export const EditorSearchCombobox = ({
 			renderPreviewFn,
 			renderOptionContentFn,
 			optionContentLayout,
+			virtualized,
+			virtualOptions,
+			virtualizer,
 		],
 	);
 
@@ -368,7 +429,13 @@ export const EditorSearchCombobox = ({
 					<span
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
+						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
+						{...readDataUiFn({
+							dataUi: "EditorSearchComboboxMenu",
+							state: {
+								virtual: virtualized,
+							},
+						})}
 						{...getFloatingPropsFn()}
 					>
 						{matches.length === 0 && !searchPending ? (
@@ -376,7 +443,18 @@ export const EditorSearchCombobox = ({
 								{emptyLabel}
 							</span>
 						) : null}
-						{resultOptions}
+						{virtualized ? (
+							<span
+								className="relative block w-full"
+								style={{
+									height: virtualizer.getTotalSize(),
+								}}
+							>
+								{resultOptions}
+							</span>
+						) : (
+							resultOptions
+						)}
 					</span>
 				</FloatingPortal>
 			) : null}

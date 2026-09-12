@@ -11,7 +11,10 @@ import {
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -27,7 +30,7 @@ const createProject = (revision = 0): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 afterEach(() => {
@@ -95,7 +98,7 @@ describe("saveProjectConfigFx", () => {
 		});
 		expect(registry.get(projectAtom)?.revision).toBe(1);
 		expect(registry.get(projectAtom)?.config.meta.title).toBe("Edited project");
-		expect(registry.get(projectAtom)?.resources).toBe(editorTestPayload.resources);
+		expect(registry.get(projectAtom)?.resources).toBe(editorTestResources);
 	});
 
 	it("does not publish a fake revision when the repository rejects a stale save", async () => {

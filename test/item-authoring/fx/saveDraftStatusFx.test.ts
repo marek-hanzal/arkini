@@ -13,7 +13,10 @@ import {
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
 import { saveDraftStatusFx } from "~/item-authoring/fx/saveDraftStatusFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -29,7 +32,7 @@ const createProject = (revision: number): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 afterEach(() => {

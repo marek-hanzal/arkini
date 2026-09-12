@@ -1,90 +1,72 @@
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
-import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { projectAuthoredOutputFn } from "~/production-output/fn/projectAuthoredOutputFn";
 import { Outputs } from "~/production-output/ui/Outputs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
-import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
+import { RulesDetail } from "~/item-authoring/ui/RulesDetail";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 
-const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
-	<li className="grid gap-1">
-		<p className="font-medium">
-			{when.type === "exists"
-				? "Exists"
-				: when.type === "count"
-					? `Exact count · ${when.count}`
-					: `Count range · ${when.min}–${when.max}`}
-		</p>
-		<QueryDetail query={when.query} />
-	</li>
-);
-
-const RuleDetail = ({ rule }: { readonly rule: DropRuleSchema.Type }) => (
-	<li className="py-2 first:pt-0 last:pb-0">
-		<p className="font-medium capitalize">
-			{rule.type}
-			{"multiplier" in rule ? ` × ${rule.multiplier}` : ""}
-		</p>
-		{rule.hint === undefined ? null : (
-			<p className="mt-1 text-sm text-muted">Player hint: {rule.hint}</p>
-		)}
-		<ul className="mt-1 grid gap-1 pl-4 text-sm text-muted">
-			{rule.when.map((when, index) => (
-				<WhenDetail
-					key={`${when.type}-${index}`}
-					when={when}
-				/>
-			))}
-		</ul>
-	</li>
-);
-
-const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.AuthoredItem }) =>
-	item.placement === "drop" && item.rules.length === 0 ? null : (
+const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.AuthoredItem }) => {
+	const translator = useTranslator();
+	return item.placement === "drop" && item.rules.length === 0 ? null : (
 		<div className="grid gap-2 text-xs text-muted">
 			{item.placement === "drop" ? null : (
 				<p>
-					<span className="font-medium uppercase tracking-[0.08em]">Placement</span> ·{" "}
-					{item.placement}
+					<span className="font-medium uppercase tracking-[0.08em]">
+						<Tx label="Placement" />
+					</span>{" "}
+					· <Tx label={item.placement === "random" ? "Random" : "Drop"} />
 				</p>
 			)}
 			{item.rules.length === 0 ? null : (
-				<div>
-					<p className="font-medium uppercase tracking-[0.08em]">Rules</p>
-					<ul className="mt-1 divide-y divide-line/60">
-						{item.rules.map((rule, index) => (
-							<RuleDetail
-								key={`${rule.type}-${index}`}
-								rule={rule}
-							/>
-						))}
-					</ul>
-				</div>
+				<RulesDetail
+					rules={item.rules}
+					description={translator.textFn(
+						"Every condition of a rule must pass. Enable rules gate this selected drop; a matching Disable rule suppresses it without disabling the line or other drops.",
+					)}
+				/>
 			)}
 		</div>
 	);
+};
 
 /** Renders canonical authored output through the shared output presentation. */
 export const OutputDetail = ({
-	emptyLabel = "No output configured.",
+	emptyLabel,
 	output,
-	title = "Outputs",
+	title,
+	description,
 }: {
 	readonly emptyLabel?: string;
 	readonly output?: OutputSchema.Type;
 	readonly title?: string;
+	readonly description?: string;
 }) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const items = project.config.items;
 	return (
 		<Outputs
-			emptyLabel={emptyLabel}
+			emptyLabel={emptyLabel ?? translator.textFn("No output configured.")}
 			output={projectAuthoredOutputFn(output, items)}
 			renderItemDetailFn={(item) => <AuthoredOutputItemDetail item={item} />}
 			renderItemFn={(item) => <DetailReference itemId={item.itemId} />}
-			title={title}
+			title={
+				<span className="flex items-center gap-1">
+					{title ?? translator.textFn("Outputs")}
+					<EditorInfoTooltip
+						content={
+							description ??
+							translator.textFn(
+								"One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.",
+							)
+						}
+					/>
+				</span>
+			}
 		/>
 	);
 };

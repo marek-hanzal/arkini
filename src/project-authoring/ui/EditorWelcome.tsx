@@ -131,11 +131,12 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 							project,
 						});
 					}}
+					onDismissInvalidProjectFn={actions.dismissInvalidProjectFn}
 					onOpenProjectFolderFn={actions.openProjectFolderFn}
-					projects={recentProjects.filter(
-						(candidate) =>
-							candidate.type === "invalid" ||
-							!actions.deletedProjectIds.has(candidate.project.projectId),
+					projects={recentProjects.filter((candidate) =>
+						candidate.type === "invalid"
+							? !actions.dismissedProjectRoots.has(candidate.root)
+							: !actions.deletedProjectIds.has(candidate.project.projectId),
 					)}
 				/>
 

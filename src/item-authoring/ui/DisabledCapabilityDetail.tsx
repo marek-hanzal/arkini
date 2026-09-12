@@ -1,3 +1,4 @@
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import type { LucideIcon } from "lucide-react";
 import type { OptionalCapability } from "~/item-authoring/type/Section";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -15,7 +16,7 @@ export const DisabledCapabilityDetail = ({
 }: {
 	readonly actionLabel: string;
 	readonly capability: OptionalCapability;
-	readonly description: string;
+	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly itemUid: string;
 	readonly title: string;
@@ -38,9 +39,13 @@ export const DisabledCapabilityDetail = ({
 					{actionLabel}
 				</PrimaryButtonLink>
 			}
-			description={description}
 			icon={icon}
-			title={title}
+			title={
+				<span className="inline-flex items-center gap-1.5">
+					{title}
+					{description === undefined ? null : <EditorInfoTooltip content={description} />}
+				</span>
+			}
 			variant="flat"
 		/>
 	);

@@ -110,7 +110,7 @@ import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import { ActionSection } from "~/item-authoring/ui/ActionSection";
-import type { SectionId } from "~/item-authoring/type/Section";
+import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import {
 	createLine,
 	createOutput,
@@ -203,7 +203,7 @@ const render = async (
 	children: ReactNode,
 	newItem = false,
 	defaultDraft?: boolean,
-	enableClock = false,
+	enableCapability?: OptionalCapability,
 ) => {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -222,7 +222,7 @@ const render = async (
 							}
 						: {})}
 					sectionId={sectionId}
-					enableCapability={enableClock ? "clock" : undefined}
+					enableCapability={enableCapability}
 					uid={item.uid}
 				>
 					{section}
@@ -251,9 +251,111 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it.each([
+		[
+			"units",
+			"identity",
+		],
+		[
+			"action",
+			"interactions",
+		],
+		[
+			"clock",
+			"production",
+		],
+	] as const)(
+		"returns %s edits to the %s detail after Save and Discard",
+		async (sectionId, destination) => {
+			const { container, renderSection } = await render(<IdentitySection />);
+			await renderSection(<IdentitySection />, sectionId);
+			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+			if (title === null) throw new Error("Missing title input");
+			await changeInput(title, "Changed");
+			const buttonFn = (label: string) =>
+				[
+					...container.querySelectorAll("button"),
+				].find((button) => button.textContent === label);
+			await act(async () => {
+				buttonFn("Save")?.click();
+			});
+			expect(state.navigate).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
+					params: expect.objectContaining({
+						sectionId: destination,
+					}),
+				}),
+			);
+			const saves = state.saveItem.mock.calls.length;
+			await changeInput(title, "Discarded");
+			await act(async () => {
+				buttonFn("Discard")?.click();
+			});
+			expect(state.navigate).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					params: expect.objectContaining({
+						sectionId: destination,
+					}),
+				}),
+			);
+			expect(state.saveItem).toHaveBeenCalledTimes(saves);
+		},
+	);
+	it.each([
+		"action",
+		"production",
+	] as const)("keeps the detail %s enable intent local until Save", async (capability) => {
+		const configured = ItemSchema.parse({
+			...item,
+			lines: [],
+			...(capability === "production"
+				? {
+						action: {
+							type: "inventory",
+							input: [],
+							rules: [],
+						},
+					}
+				: {
+						clock: {
+							intervalMs: 300000,
+						},
+						scope: "board",
+						maxStackSize: 1,
+					}),
+		});
+		state.persisted = configured;
+		(state.project as Project).config.items[item.id] = configured;
+		const { container } = await render(<IdentitySection />, false, undefined, capability);
+		expect(state.saveItem).not.toHaveBeenCalled();
+		await act(async () => {
+			[
+				...container.querySelectorAll("button"),
+			]
+				.find((button) => button.textContent === "Save")
+				?.click();
+		});
+		const saved = state.saveItem.mock.lastCall?.[0].item;
+		if (capability === "action") {
+			expect(saved.action.type).toBe("space");
+			expect(saved.clock).toBeUndefined();
+			expect(saved.lines).toEqual([]);
+		} else {
+			expect(saved.action).toBeUndefined();
+			expect(saved.lines).toHaveLength(1);
+		}
+	});
+
 	it("keeps an asset-origin draft seed in routed section links", async () => {
 		state.persisted = undefined;
 		const { container } = await render(<IdentitySection />, true, true);
+		expect(container.querySelector("h1")?.textContent).toBe("Dirty Bucket");
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing seeded title field");
+		await changeInput(title, "Washed Bucket");
+		expect(container.querySelector("h1")?.textContent).toBe("Washed Bucket");
+		expect(state.saveItem).not.toHaveBeenCalled();
 		const artworkLink = [
 			...container.querySelectorAll<HTMLAnchorElement>("a"),
 		].find((link) => link.textContent === "Artwork");
@@ -758,8 +860,10 @@ describe("item section form session", () => {
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
 		const { container } = await render(<ProductionSection />);
-		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
-		if (add === null) throw new Error("Missing add line control.");
+		const add = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable production");
+		if (add === undefined) throw new Error("Missing enable production control.");
 		await act(async () => add.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -791,10 +895,10 @@ describe("item section form session", () => {
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
 		const { container } = await render(<ActionSection />);
-		const disable = container.querySelector<HTMLButtonElement>(
-			'button[title="Disable action"]',
-		);
-		if (disable === null) throw new Error("Missing disable action control.");
+		const disable = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Disable");
+		if (disable === undefined) throw new Error("Missing disable action control.");
 		await act(async () => disable.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -812,8 +916,10 @@ describe("item section form session", () => {
 
 	it("adds production to a passive Common through the ordinary line editor", async () => {
 		const { container } = await render(<ProductionSection />);
-		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
-		if (addLine === null) throw new Error("Missing add line control.");
+		const addLine = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable production");
+		if (addLine === undefined) throw new Error("Missing enable production control.");
 		await act(async () => addLine.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -955,7 +1061,12 @@ describe("item section form session", () => {
 		};
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
-		const { container } = await render(<ClockSection />, false, undefined, entry === "detail");
+		const { container } = await render(
+			<ClockSection />,
+			false,
+			undefined,
+			entry === "detail" ? "clock" : undefined,
+		);
 		if (entry === "form") {
 			const enable = [
 				...container.querySelectorAll("button"),
@@ -1006,7 +1117,10 @@ describe("item section form session", () => {
 			'input[name="clock.durationMs"]',
 		);
 		if (duration === null) throw new Error("Missing clock lifetime field.");
-		await changeInput(duration, "");
+		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear lifetime"]');
+		if (clear === null) throw new Error("Missing lifetime clear action");
+		await act(async () => clear.click());
+		expect(duration.value).toBe("");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});

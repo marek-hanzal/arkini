@@ -48,7 +48,17 @@ describe("Asset Authoring importEditorAssetsFx from Arkpack", () => {
 		});
 		registries.push(registry);
 		const upsertResourcesFx = vi.fn<ProjectRepositoryService["upsertResourcesFx"]>(
-			({ resources }) => Effect.succeed(createProject(resources)),
+			({ resources }) =>
+				Effect.succeed(
+					createProject(
+						resources.map(({ id, mime, bytes }) => ({
+							id,
+							mime,
+							size: bytes.byteLength,
+							version: "1",
+						})),
+					),
+				),
 		);
 		const repository: ProjectRepositoryService = {
 			...UnusedEditorProjectRepository,

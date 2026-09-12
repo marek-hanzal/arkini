@@ -1,4 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Cause, Effect, Exit, FileSystem } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -92,7 +93,7 @@ describe("filesystem Editor project writes", () => {
 		expect(await Effect.runPromise(repository.readProjectFx(created.projectId))).not.toBeNull();
 	});
 
-	it("publishes an item update through only the changed item and project metadata files", async () => {
+	it("saves item drafts and config without PNG I/O or reading unrelated JSON bodies", async () => {
 		const seedingRepository = await harness.openRepository();
 		const created = await harness.createProject(seedingRepository);
 		const root = await Effect.runPromise(
@@ -105,8 +106,31 @@ describe("filesystem Editor project writes", () => {
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
 		);
 		const publishedTargets = new Set<string>();
+		const pngOperations: string[] = [];
+		const jsonReads = new Set<string>();
+		const recordReadFn = (target: string) => {
+			if (target.endsWith(".png")) pngOperations.push(target);
+			if (
+				target.startsWith(`${root}/`) &&
+				target.endsWith(".json") &&
+				!target.includes("editor.lock.write/")
+			)
+				jsonReads.add(target);
+		};
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
+			readFile: (target) => {
+				recordReadFn(target);
+				return nodeFileSystem.readFile(target);
+			},
+			readFileString: (target, encoding) => {
+				recordReadFn(target);
+				return nodeFileSystem.readFileString(target, encoding);
+			},
+			stat: (target) => {
+				if (target.endsWith(".png")) pngOperations.push(target);
+				return nodeFileSystem.stat(target);
+			},
 			rename: (from, to) => {
 				if (String(from) === `${String(to)}.arkini-replace`)
 					publishedTargets.add(String(to));
@@ -115,14 +139,17 @@ describe("filesystem Editor project writes", () => {
 		};
 		const repository = await harness.openRepository(fileSystem);
 		publishedTargets.clear();
+		pngOperations.length = 0;
+		jsonReads.clear();
 		const water = created.config.items.water;
-		await Effect.runPromise(
+		const itemCommit = await Effect.runPromise(
 			repository.upsertItemFx({
 				projectId: created.projectId,
 				expectedRevision: created.revision,
 				item: {
 					...water,
 					title: "Fresh Water",
+					draft: true,
 					asset: {
 						...water.asset,
 						scale: 0.65,
@@ -141,12 +168,59 @@ describe("filesystem Editor project writes", () => {
 				join(root, "project.json"),
 			].sort(),
 		);
+		expect(pngOperations).toEqual([]);
+		expect(
+			[
+				...jsonReads,
+			].sort(),
+		).toEqual(
+			[
+				...publishedTargets,
+			].sort(),
+		);
 		const savedItem = JSON.parse(
 			await Effect.runPromise(
 				nodeFileSystem.readFileString(join(root, "items", `${water.uid}.json`)),
 			),
 		);
 		expect(savedItem.item.asset.scale).toBe(0.65);
+		expect(savedItem.item.draft).toBe(true);
+		publishedTargets.clear();
+		pngOperations.length = 0;
+		jsonReads.clear();
+		await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: created.projectId,
+				expectedRevision: itemCommit.revision,
+				config: {
+					...itemCommit.config,
+					meta: {
+						...itemCommit.config.meta,
+						title: "Renamed project",
+					},
+				},
+			}),
+		);
+		expect(pngOperations).toEqual([]);
+		expect(
+			[
+				...publishedTargets,
+			].sort(),
+		).toEqual(
+			[
+				join(root, "game.json"),
+				join(root, "project.json"),
+			].sort(),
+		);
+		expect(
+			[
+				...jsonReads,
+			].sort(),
+		).toEqual(
+			[
+				...publishedTargets,
+			].sort(),
+		);
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
 		const project = await Effect.runPromise(reopened.readProjectFx(created.projectId));
@@ -217,7 +291,12 @@ describe("filesystem Editor project writes", () => {
 				],
 			}),
 		);
-		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual(resource);
+		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual({
+			id: resource.id,
+			mime: resource.mime,
+			size: resource.bytes.byteLength,
+			version: expect.any(String),
+		});
 		expect(resourceCommit.version).toEqual({
 			major: 1,
 			minor: 0,
@@ -256,9 +335,12 @@ describe("filesystem Editor project writes", () => {
 
 		const canonical = await Effect.runPromise(repository.readProjectFx(created.projectId));
 		expect(canonical?.config.items.water?.title).toBe("Fresh Water");
-		expect(canonical?.resources.find(({ id }) => id === resource.id)?.bytes).toEqual(
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		expect(new Uint8Array(await readFile(join(root, "assets", `${resource.id}.png`)))).toEqual(
 			resource.bytes,
 		);
+		expect(canonical?.resources).toEqual(resourceCommit.resources);
 	});
 
 	it("returns a typed repository failure when a write targets an unknown project", async () => {

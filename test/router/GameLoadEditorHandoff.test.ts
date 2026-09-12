@@ -13,7 +13,10 @@ import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorB
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import {
 	createGame,
 	createGameFxMock,
@@ -41,7 +44,7 @@ describe("game load editor handoff", () => {
 			updatedAtMs: 1,
 			revision: 1,
 			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		};
 		const installedGame = createGame();
 		createGameFxMock.mockReturnValue(Effect.succeed(installedGame));

@@ -33,9 +33,6 @@ export const ActionSection = () => {
 							<EditorCapabilityStatus
 								actionLabel={translator.textFn("Enable action")}
 								dataUi="EditorActionDisabled"
-								description={translator.textFn(
-									"An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.",
-								)}
 								icon={MapPinned}
 								onEnableFn={enableActionFn}
 								title={translator.textFn("Item action empty title")}

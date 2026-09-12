@@ -31,7 +31,7 @@ export const ActionSection = () => {
 					action === undefined ? (
 						<EditorFormCard>
 							<EditorCapabilityStatus
-								actionLabel={translator.textFn("Enable action")}
+								actionLabel={translator.textFn("Enable")}
 								dataUi="EditorActionDisabled"
 								icon={MapPinned}
 								onEnableFn={enableActionFn}

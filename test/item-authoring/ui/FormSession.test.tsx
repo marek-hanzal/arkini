@@ -755,7 +755,7 @@ describe("item section form session", () => {
 		const { container } = await render(<ActionSection />);
 		const enable = [
 			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable action");
+		].find((button) => button.textContent === "Enable");
 		if (enable === undefined) throw new Error("Missing enable action control.");
 		await act(async () => enable.click());
 		// Persist the action and empty lines as one canonical item.
@@ -862,7 +862,7 @@ describe("item section form session", () => {
 		const { container } = await render(<ProductionSection />);
 		const add = [
 			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable production");
+		].find((button) => button.textContent === "Enable");
 		if (add === undefined) throw new Error("Missing enable production control.");
 		await act(async () => add.click());
 		await act(async () => {
@@ -918,7 +918,7 @@ describe("item section form session", () => {
 		const { container } = await render(<ProductionSection />);
 		const addLine = [
 			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable production");
+		].find((button) => button.textContent === "Enable");
 		if (addLine === undefined) throw new Error("Missing enable production control.");
 		await act(async () => addLine.click());
 		await act(async () => {
@@ -1070,7 +1070,7 @@ describe("item section form session", () => {
 		if (entry === "form") {
 			const enable = [
 				...container.querySelectorAll("button"),
-			].find((button) => button.textContent === "Enable clock");
+			].find((button) => button.textContent === "Enable");
 			if (enable === undefined) throw new Error("Missing clock enable control.");
 			await act(async () => enable.click());
 		}

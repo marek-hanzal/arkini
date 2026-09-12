@@ -260,24 +260,6 @@ Enable Units on this item before selecting Spend.:
   value: Enable Units on this item before selecting Spend.
 Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.:
   value: Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.
-Enable action:
-  value: Enable action
-Enable clock:
-  value: Enable clock
-Enable depletion output:
-  value: Enable depletion output
-Enable expiry output:
-  value: Enable expiry output
-Enable line output:
-  value: Enable line output
-Enable merge output:
-  value: Enable merge output
-Enable merges:
-  value: Enable merges
-Enable production:
-  value: Enable production
-Enable units:
-  value: Enable units
 Enabled:
   value: Enabled
 Enabled lines can accept production jobs before runtime rules alter their availability.:

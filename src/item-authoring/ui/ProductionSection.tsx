@@ -77,7 +77,7 @@ const ProductionFields = withFieldGroupFn({
 							return (
 								<EditorFormCard>
 									<EditorCapabilityStatus
-										actionLabel={translator.textFn("Enable production")}
+										actionLabel={translator.textFn("Enable")}
 										icon={Factory}
 										onEnableFn={addLineFn}
 										title={translator.textFn("Item production empty title")}

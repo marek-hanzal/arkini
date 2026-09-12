@@ -19,7 +19,7 @@ export const ActionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					itemUid={item.uid}
 					icon={MousePointerClick}
 					title={translator.textFn("Item action empty title")}
-					actionLabel={translator.textFn("Enable action")}
+					actionLabel={translator.textFn("Enable")}
 				/>
 			</EditorRootCard>
 		);

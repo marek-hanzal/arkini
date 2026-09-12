@@ -19,7 +19,7 @@ export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	return item.units === undefined ? (
 		<EditorRootCard dataUi="EditorItemUnitsDisabledCard">
 			<DisabledCapabilityDetail
-				actionLabel={translator.textFn("Enable units")}
+				actionLabel={translator.textFn("Enable")}
 				capability="units"
 				icon={BatteryCharging}
 				itemUid={item.uid}
@@ -145,7 +145,7 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 			{item.merge === undefined || item.merge.length === 0 ? (
 				<EditorRootCard dataUi="EditorItemMergesDisabledCard">
 					<DisabledCapabilityDetail
-						actionLabel={translator.textFn("Enable merges")}
+						actionLabel={translator.textFn("Enable")}
 						capability="merges"
 						icon={Combine}
 						itemUid={item.uid}

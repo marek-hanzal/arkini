@@ -53,8 +53,8 @@ vi.mock("electron", async () => {
 		readonly getBounds = vi.fn(() => ({
 			x: 0,
 			y: 0,
-			width: 1_200,
-			height: 675,
+			width: 1_360,
+			height: 765,
 		}));
 		readonly isFullScreen = vi.fn(() => false);
 		readonly loadURL = vi.fn(() =>
@@ -254,11 +254,18 @@ describe("createMainWindowFx", () => {
 		window.emit("ready-to-show");
 		expect(window.options).toMatchObject({
 			fullscreen: false,
-			width: 1_200,
-			height: 675,
+			fullscreenable: true,
+			resizable: true,
+			width: 1_360,
+			height: 765,
 		});
 		expect(window.maximize).not.toHaveBeenCalled();
 		expect(window.show).toHaveBeenCalledOnce();
+		const preventResize = vi.fn();
+		window.emit("will-resize", {
+			preventDefault: preventResize,
+		});
+		expect(preventResize).toHaveBeenCalledOnce();
 		expect(window.webContents.send).toHaveBeenCalledWith(
 			ArkiniElectronApi.channels.windowVisible,
 		);

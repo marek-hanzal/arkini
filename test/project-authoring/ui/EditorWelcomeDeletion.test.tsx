@@ -19,6 +19,8 @@ const actions = vi.hoisted(() => ({
 	createProjectFn: vi.fn(),
 	deletedProjectIds: new Set<string>() as ReadonlySet<string>,
 	deleteProjectFn: vi.fn(),
+	dismissInvalidProjectFn: vi.fn(),
+	dismissedProjectRoots: new Set<string>(),
 	error: undefined as unknown,
 	exitFn: vi.fn(),
 	importArkpackFileFn: vi.fn(),
@@ -65,6 +67,7 @@ afterEach(async () => {
 	});
 	actions.createProjectFn.mockReset();
 	actions.deleteProjectFn.mockReset();
+	actions.dismissInvalidProjectFn.mockReset();
 	actions.openProjectFolderFn.mockReset();
 	actions.refreshProjectsFn.mockReset();
 	document.body.replaceChildren();
@@ -233,6 +236,13 @@ describe("EditorWelcome project rows", () => {
 
 		await act(async () => findButton(invalidRow!, "Open folder").click());
 		expect(actions.openProjectFolderFn).toHaveBeenCalledWith("/projects/broken");
+		const dismiss = invalidRow?.querySelector<HTMLButtonElement>(
+			'button[title="Remove from Recent"]',
+		);
+		if (!dismiss) throw new Error("Dismiss action missing.");
+		await act(async () => dismiss.click());
+		expect(actions.dismissInvalidProjectFn).toHaveBeenCalledWith("/projects/broken");
+		expect(actions.deleteProjectFn).not.toHaveBeenCalled();
 		await act(async () => findButton(container, "Refresh").click());
 		expect(actions.refreshProjectsFn).toHaveBeenCalledOnce();
 	});

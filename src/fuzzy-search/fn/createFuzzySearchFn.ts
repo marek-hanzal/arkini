@@ -3,6 +3,7 @@ import type { FuseResult, IFuseOptions } from "fuse.js";
 
 export interface FuzzySearchCandidate<Value> {
 	readonly terms: readonly string[];
+	readonly relatedTerms?: readonly string[];
 	readonly value: Value;
 }
 
@@ -46,8 +47,16 @@ export const createFuzzySearchFn = <Value>({
 		useTokenSearch: true,
 		tokenMatch: "all",
 		...options,
+		// Direct identity and description outweigh incidental related-item matches four to one.
 		keys: [
-			"terms",
+			{
+				name: "terms",
+				weight: 0.8,
+			},
+			{
+				name: "relatedTerms",
+				weight: 0.2,
+			},
 		],
 		includeScore: true,
 	});

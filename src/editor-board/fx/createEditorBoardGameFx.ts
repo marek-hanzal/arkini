@@ -2,10 +2,7 @@ import { Effect } from "effect";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
-import {
-	createGameResourceUrlsFx,
-	type GameResourceUrls,
-} from "~/playable-game/fx/createGameResourceUrlsFx";
+import { readProjectResourceUrlFn } from "~/project-authoring/fn/readProjectResourceUrlFn";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { startFx } from "~/game-start/fx/startFx";
@@ -25,17 +22,16 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 	const session = yield* createGameSessionFx({
 		config: project.config,
 	});
-	let resourceUrls: GameResourceUrls | undefined;
-	const discardFailedBootstrapFx = discardGameBootstrapFx(
-		session,
-		Effect.suspend(() => resourceUrls?.releaseFx ?? Effect.void),
+	const resourcesById = new Map(
+		project.resources.map((resource) => [
+			resource.id,
+			resource,
+		]),
 	);
+	const releaseResourcesFx = Effect.sync(() => resourcesById.clear());
+	const discardFailedBootstrapFx = discardGameBootstrapFx(session, releaseResourcesFx);
 
 	return yield* Effect.gen(function* () {
-		resourceUrls = yield* createGameResourceUrlsFx({
-			owner: "Editor game",
-			resources: project.resources,
-		});
 		yield* session.runFx(startFx());
 		yield* session.runFx(
 			setCheatEnabledFx({
@@ -43,7 +39,6 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			}),
 		);
 
-		const liveResourceUrls = resourceUrls;
 		const diagnostics = yield* installGameDiagnosticsFx({
 			projectId: project.projectId,
 			projectRevision: project.revision,
@@ -54,7 +49,7 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 		});
 		const disposeFx = session.disposeWithoutSaveFx.pipe(
 			Effect.tap(() => Effect.sync(() => diagnostics.close("discarded"))),
-			Effect.andThen(liveResourceUrls.releaseFx),
+			Effect.andThen(releaseResourcesFx),
 		);
 		const game: EditorBoardGame = {
 			...session,
@@ -64,7 +59,16 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			disposeWithoutSaveFx: disposeFx,
 			projectId: project.projectId,
 			projectRevision: project.revision,
-			getResourceUrlFn: liveResourceUrls.getFn,
+			getResourceUrlFn: (resourceId) => {
+				const resource = resourcesById.get(resourceId);
+				if (resource === undefined)
+					throw new Error(`Editor game resource ${resourceId} is unavailable.`);
+				return readProjectResourceUrlFn({
+					projectId: project.projectId,
+					resourceId,
+					version: resource.version,
+				});
+			},
 		};
 		return game;
 	}).pipe(Effect.onError(() => discardFailedBootstrapFx));

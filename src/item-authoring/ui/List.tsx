@@ -1,5 +1,10 @@
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { Mx } from "~/translation/ui/Mx";
 import { FilePenLine, PackageOpen, Plus } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import { filterFn } from "~/item-authoring/fn/filterFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -13,6 +18,8 @@ import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+
+const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
@@ -51,17 +58,14 @@ export const List = ({
 			settledQuery,
 		],
 	);
-	const rows = useMemo(
-		() =>
-			filteredItems.map((item) => (
-				<ListRow
-					key={item.uid}
-					item={item}
-					projectId={project.projectId}
-				/>
-			)),
+	const renderItemFn = useCallback(
+		(item: ItemSchema.Type) => (
+			<ListRow
+				item={item}
+				projectId={project.projectId}
+			/>
+		),
 		[
-			filteredItems,
 			project.projectId,
 		],
 	);
@@ -101,9 +105,13 @@ export const List = ({
 						})}
 					>
 						<FilePenLine className="size-4" />
-						Draft
+						{translator.textFn("Draft")}
 					</DraftFilterButton>
 					{empty ? null : newItemMenu}
+					<EditorPageHelp
+						title={translator.textFn("Items")}
+						content={<Mx label="Item list help" />}
+					/>
 				</header>
 			}
 			scrollRestorationId="editor-item-list"
@@ -115,9 +123,17 @@ export const List = ({
 				{empty ? (
 					<Status
 						dataUi="EditorItemsEmpty"
-						description="Create the first item to start authoring this game."
 						icon={PackageOpen}
-						title="No items yet"
+						title={
+							<span className="inline-flex items-center gap-1.5">
+								{translator.textFn("No items yet")}
+								<EditorInfoTooltip
+									content={translator.textFn(
+										"Create the first item to start authoring this game.",
+									)}
+								/>
+							</span>
+						}
 						action={newItemMenu}
 					/>
 				) : null}
@@ -126,10 +142,16 @@ export const List = ({
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemSearchEmpty"
 					>
-						No items match the active filters.
+						{translator.textFn("No items match the active filters.")}
 					</p>
 				) : null}
-				{rows}
+				<EditorVirtualCollection
+					items={filteredItems}
+					itemKeyFn={readItemKeyFn}
+					renderItemFn={renderItemFn}
+					estimatedRowHeight={88}
+					gapRem={0.5}
+				/>
 			</div>
 		</EditorSectionPage>
 	);

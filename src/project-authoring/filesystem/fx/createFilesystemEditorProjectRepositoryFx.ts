@@ -69,6 +69,44 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	});
 	const repository = {
 		awaitIdleFx: operations.withPermits(1)(Effect.void),
+		readResourceLocationFx: ({
+			projectId,
+			resourceId,
+		}: {
+			readonly projectId: string;
+			readonly resourceId: string;
+		}) =>
+			operations
+				.withPermits(1)(
+					Effect.gen(function* () {
+						const state = states.get(projectId);
+						const resource = state?.project.resources.find(
+							(resource) => resource.id === resourceId,
+						);
+						if (state === undefined || resource === undefined) return null;
+						const target = yield* new Set(
+							Object.values(state.project.config.resources),
+						).has(resourceId)
+							? state.paths.resourceFileFx(resourceId)
+							: state.paths.assetFileFx(resourceId);
+						return {
+							root: state.paths.root,
+							path: target,
+							version: resource.version,
+							size: resource.size,
+						};
+					}),
+				)
+				.pipe(
+					Effect.mapError(
+						(cause) =>
+							new ProjectRepositoryError({
+								operation: "read-project",
+								message: "Editor asset location could not be resolved.",
+								cause,
+							}),
+					),
+				),
 		...projects,
 		...builds,
 		...commits,
@@ -83,9 +121,11 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 
 	return {
 		awaitIdleFx: provideFx(repository.awaitIdleFx),
+		readResourceLocationFx: (props) => provideFx(repository.readResourceLocationFx(props)),
 		saveBuildVersionFx: (props) => provideFx(repository.saveBuildVersionFx(props)),
 		buildProjectFx: (props) => provideFx(repository.buildProjectFx(props)),
 		createProjectFx: (props) => provideFx(repository.createProjectFx(props)),
+		dismissInvalidProjectFx: (root) => provideFx(repository.dismissInvalidProjectFx(root)),
 		deleteProjectFx: (projectId) => provideFx(repository.deleteProjectFx(projectId)),
 		openProjectFx: (props) => provideFx(repository.openProjectFx(props)),
 		readProjectFx: (projectId) => provideFx(repository.readProjectFx(projectId)),

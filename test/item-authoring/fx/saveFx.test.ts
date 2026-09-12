@@ -10,7 +10,10 @@ import {
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
 import { saveFx } from "~/item-authoring/fx/saveFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -26,7 +29,7 @@ const createProject = (revision = 0): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 const createFixture = () => {
@@ -83,7 +86,7 @@ afterEach(() => {
 describe("saveFx", () => {
 	it("validates, commits and publishes one explicit item save", async () => {
 		const fixture = createFixture();
-		const resources = editorTestPayload.resources;
+		const resources = editorTestResources;
 		const projectAtom = EditorProjectAtom("project");
 		fixture.registry.mount(projectAtom);
 		fixture.registry.set(projectAtom, {

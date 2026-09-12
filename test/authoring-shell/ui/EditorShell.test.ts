@@ -15,6 +15,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -219,9 +220,13 @@ const renderRouter = async (router: ReturnType<typeof createTestRouter>) => {
 				{
 					value: registry,
 				},
-				createElement(RouterProvider, {
-					router,
-				}),
+				createElement(
+					TranslationTestProvider,
+					null,
+					createElement(RouterProvider, {
+						router,
+					}),
+				),
 			),
 		);
 	});

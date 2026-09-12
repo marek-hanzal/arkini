@@ -1,38 +1,32 @@
-import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 
-/** Keeps Editor overview summaries visually consistent across authored domains. */
+/** Uses the same section header and content surface as authored item details. */
 export const EditorOverviewCard = ({
+	action,
 	body,
-	dataUi,
-	footerLeft,
-	footerRight,
-	icon: Icon,
+	dataUi = "EditorOverviewCard",
 	title,
 }: {
+	readonly action: ReactNode;
 	readonly body: ReactNode;
 	readonly dataUi?: string;
-	readonly footerLeft?: ReactNode;
-	readonly footerRight?: ReactNode;
-	readonly icon?: LucideIcon;
-	readonly title: ReactNode;
+	readonly title: string;
 }) => (
-	<EditorRootCard
-		className="gap-4"
-		dataUi={dataUi}
+	<section
+		className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+		data-ui={dataUi}
 	>
-		<h2 className="flex items-center gap-2 text-lg font-semibold">
-			{Icon === undefined ? null : <Icon className="size-4" />}
-			{title}
-		</h2>
-		<div className="text-sm font-medium leading-snug text-foreground">{body}</div>
-		{footerLeft === undefined && footerRight === undefined ? null : (
-			<div className="flex items-end justify-between gap-4">
-				<div>{footerLeft}</div>
-				<div className="ml-auto">{footerRight}</div>
+		<div className="flex items-center gap-3">
+			<div className="min-w-0 flex-1">
+				<EditorFormSectionDivider title={title} />
 			</div>
-		)}
-	</EditorRootCard>
+			<div className="shrink-0">{action}</div>
+		</div>
+		<EditorRootCard className="content-start">
+			<div className="text-sm font-medium leading-snug text-foreground">{body}</div>
+		</EditorRootCard>
+	</section>
 );

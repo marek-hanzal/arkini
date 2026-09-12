@@ -36,7 +36,7 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 	});
 	return (
 		<>
-			<div className="grid gap-6">
+			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorRootCard dataUi="EditorProjectGeneralDetailCard">
 					<DetailSection title="General">
 						<DetailFacts columns={3}>

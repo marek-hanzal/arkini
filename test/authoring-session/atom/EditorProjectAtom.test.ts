@@ -4,7 +4,10 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const createRegistry = () => {
@@ -30,7 +33,7 @@ const createProject = (revision: number): Project => ({
 	updatedAtMs: 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 describe("EditorProjectAtom", () => {
@@ -97,13 +100,11 @@ describe("EditorProjectAtom", () => {
 		const registry = createRegistry();
 		const atom = EditorProjectAtom("project");
 		registry.mount(atom);
-		const changedResources = editorTestPayload.resources.map((resource, index) =>
+		const changedResources = editorTestResources.map((resource, index) =>
 			index === 0
 				? {
 						...resource,
-						bytes: new Uint8Array([
-							9,
-						]),
+						version: "2",
 					}
 				: resource,
 		);

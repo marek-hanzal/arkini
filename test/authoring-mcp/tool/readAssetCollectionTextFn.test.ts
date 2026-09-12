@@ -17,12 +17,14 @@ describe("readAssetCollectionTextFn", () => {
 			},
 			resources: [
 				{
-					bytes: new Uint8Array(),
+					size: 0,
+					version: "1",
 					id: "hero",
 					mime: "image/png" as const,
 				},
 				{
-					bytes: new Uint8Array(),
+					size: 0,
+					version: "1",
 					id: "forge-image",
 					mime: "image/png" as const,
 				},

@@ -1,12 +1,16 @@
 // @vitest-environment jsdom
 
+import { detectPlatform } from "@tanstack/react-hotkeys";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectIdentityRenameDialog } from "~/project-authoring/ui/ProjectIdentityRenameDialog";
 import type { Project } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 
@@ -45,7 +49,7 @@ describe("ProjectIdentityRenameDialog", () => {
 					id: "project-old",
 				},
 			},
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		} satisfies Project;
 		const controller = {
 			cancelFn: vi.fn(),
@@ -94,7 +98,18 @@ describe("ProjectIdentityRenameDialog", () => {
 				}),
 			);
 		});
-		await act(async () => submit.click());
+		await act(async () => {
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "s",
+					code: "KeyS",
+					bubbles: true,
+					cancelable: true,
+					metaKey: detectPlatform() === "mac",
+					ctrlKey: detectPlatform() !== "mac",
+				}),
+			);
+		});
 
 		expect(renameFn).toHaveBeenCalledWith("project-new");
 

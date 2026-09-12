@@ -1,11 +1,16 @@
+import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
+import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
+import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Factory } from "lucide-react";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { LineFields } from "~/production-authoring/ui/LineFields";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -28,7 +33,7 @@ const ProductionFields = withFieldGroupFn({
 	},
 	render: ({ group, invalidLineIndex, selectedLineId }) => {
 		const translator = useTranslator();
-		const { form } = useFormSession();
+		const { form, project } = useFormSession();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormCard>
@@ -71,49 +76,83 @@ const ProductionFields = withFieldGroupFn({
 							]);
 						};
 
-						return (
-							<EditorCollectionSelector
-								addLabel={translator.textFn("Add line")}
-								count={lines.length}
-								itemLabelFn={(index) => {
-									const line = lines[index];
-									return line.title.length === 0
-										? `${translator.textFn("Production line")} ${index + 1}`
-										: line.title;
-								}}
-								itemSearchTermsFn={(index) => [
-									lines[index].id,
-								]}
-								initialSelectedIndex={Math.max(
-									0,
-									lines.findIndex((line) => line.id === selectedLineId),
-								)}
-								selectedIndex={invalidLineIndex}
-								label={translator.textFn("Product lines")}
-								navigationCard
-								onAddFn={addLineFn}
-								onRemoveFn={(index) => linesField.removeValue(index)}
-								removeLabel={translator.textFn("Remove line")}
-							>
-								{(index) => (
-									<LineFields
-										form={group}
-										fields={`lines[${index}]`}
-										label={null}
-										onMarkerChangeFn={(marker, value) =>
-											form.setFieldValue(
-												"lines",
-												setLineMarkerFn(
-													form.state.values.lines ?? [],
-													index,
-													marker,
-													value,
-												),
-											)
-										}
+						if (lines.length === 0)
+							return (
+								<EditorFormCard>
+									<EditorCapabilityStatus
+										actionLabel={translator.textFn("Enable")}
+										icon={Factory}
+										onEnableFn={addLineFn}
+										title={translator.textFn("Item production empty title")}
 									/>
-								)}
-							</EditorCollectionSelector>
+								</EditorFormCard>
+							);
+
+						return (
+							<>
+								<EditorCollectionSelector
+									addLabel={translator.textFn("Add line")}
+									count={lines.length}
+									itemLabelFn={(index) => {
+										const line = lines[index];
+										return line.title.length === 0
+											? `${translator.textFn("Production line")} ${index + 1}`
+											: line.title;
+									}}
+									renderItemContentFn={(index, label) => (
+										<ProductionLineOption
+											line={lines[index]}
+											label={label}
+										/>
+									)}
+									itemSearchTermsFn={(index) => [
+										lines[index].id,
+										lines[index].description,
+									]}
+									itemRelatedSearchTermsFn={(index) =>
+										readCapabilityRelatedTermsFn(
+											lines[index],
+											project.config.items,
+										)
+									}
+									initialSelectedIndex={Math.max(
+										0,
+										lines.findIndex((line) => line.id === selectedLineId),
+									)}
+									selectedIndex={invalidLineIndex}
+									label={translator.textFn("Product lines")}
+									navigationCard
+									onAddFn={addLineFn}
+									onRemoveFn={(index) => linesField.removeValue(index)}
+									removeLabel={translator.textFn("Remove line")}
+								>
+									{(index) => (
+										<LineFields
+											form={group}
+											fields={`lines[${index}]`}
+											label={null}
+											onMarkerChangeFn={(marker, value) =>
+												form.setFieldValue(
+													"lines",
+													setLineMarkerFn(
+														form.state.values.lines ?? [],
+														index,
+														marker,
+														value,
+													),
+												)
+											}
+										/>
+									)}
+								</EditorCollectionSelector>
+								<EditorCapabilityDisable
+									title={translator.textFn("Production configured")}
+									description={translator.textFn(
+										"Disable removes all production lines from this item.",
+									)}
+									onDisableFn={() => form.setFieldValue("lines", [])}
+								/>
+							</>
 						);
 					}}
 				</group.AppField>
@@ -123,12 +162,11 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const translator = useTranslator();
 	const { form, productionLineId, validationIssues } = useFormSession();
 	const invalidLineIndex = validationIssues.find(
 		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
-	const content = (
+	return (
 		<ProductionFields
 			form={form}
 			fields={{
@@ -138,16 +176,5 @@ export const ProductionSection = () => {
 			invalidLineIndex={invalidLineIndex}
 			selectedLineId={productionLineId}
 		/>
-	);
-	return (
-		<div className="grid gap-[var(--ak-viewport-gap)]">
-			<EditorFormSectionDivider
-				description={translator.textFn(
-					"Defines this item's production lines, inputs, outputs, runtime and rules.",
-				)}
-				title={translator.textFn("Production")}
-			/>
-			{content}
-		</div>
 	);
 };

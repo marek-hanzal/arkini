@@ -10,7 +10,10 @@ import {
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const createPng = () =>
@@ -31,7 +34,7 @@ const createProject = (revision = 0): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 const bitmapClose = vi.fn();
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -46,8 +49,13 @@ const createFixture = () => {
 			Effect.succeed({
 				...createProject(1),
 				resources: [
-					...editorTestPayload.resources,
-					...resources,
+					...editorTestResources,
+					...resources.map(({ id, mime, bytes }) => ({
+						id,
+						mime,
+						size: bytes.byteLength,
+						version: "1",
+					})),
 				],
 			}),
 	);

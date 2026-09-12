@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 import type { ReactNode } from "react";
@@ -80,7 +81,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					data-roll-kind="guaranteed"
 				>
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						Guaranteed
+						<Tx label="Guaranteed" />
 					</p>
 					<OutputItems
 						items={guaranteed.item}
@@ -101,7 +102,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					data-roll-kind="chance"
 				>
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						{Math.round(chance.chance * 100)}% chance
+						{Math.round(chance.chance * 100)}% <Tx label="chance" />
 					</p>
 					<OutputItems
 						items={chance.item}
@@ -122,15 +123,17 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					data-roll-kind="weight"
 				>
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						<QuantityValue quantity={weight.selections} /> weighted selection
-						{weight.selections.max === 1 ? "" : "s"}
+						<QuantityValue quantity={weight.selections} />{" "}
+						<Tx label="Weighted selections" />
 					</p>
 					{weight.option.map((option, index) => (
 						<div
 							key={`${index}:${option.weight}`}
 							className="border-l border-line pl-3"
 						>
-							<p className="mb-1.5 text-xs text-muted">Weight {option.weight}</p>
+							<p className="mb-1.5 text-xs text-muted">
+								<Tx label="Weight" /> {option.weight}
+							</p>
 							<OutputItems
 								items={option.item}
 								renderItemDetailFn={renderItemDetailFn}
@@ -145,17 +148,17 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 
 /** Renders every authored output alternative and roll for one visible product line. */
 export const Outputs = <Item extends OutputProjection.Item>({
-	emptyLabel = "Consumes inputs without producing an item.",
+	emptyLabel = <Tx label="No output" />,
 	output,
 	renderItemDetailFn,
 	renderItemFn,
-	title = "Outputs",
+	title = <Tx label="Outputs" />,
 }: {
-	readonly emptyLabel?: string;
+	readonly emptyLabel?: ReactNode;
 	readonly output: readonly OutputProjection.Set<Item>[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
-	readonly title?: string;
+	readonly title?: ReactNode;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -172,7 +175,8 @@ export const Outputs = <Item extends OutputProjection.Item>({
 					>
 						{output.length > 1 ? (
 							<p className="pt-2 text-xs font-medium text-muted">
-								Alternative {setIndex + 1} · weight {set.weight}
+								<Tx label="Alternative" /> {setIndex + 1} · <Tx label="Weight" />{" "}
+								{set.weight}
 							</p>
 						) : null}
 						<div className="divide-y divide-line/60">

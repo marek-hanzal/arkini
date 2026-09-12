@@ -11,11 +11,11 @@ import {
 } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
-import type { SectionId } from "~/item-authoring/type/Section";
+import type { DetailSectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
@@ -27,10 +27,11 @@ export const Detail = ({
 	sectionId,
 	uid,
 }: PropsWithChildren<{
-	readonly sectionId: SectionId;
+	readonly sectionId: DetailSectionId;
 	readonly uid: string;
 }>) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const editActionRef = useEditorEditShortcut();
 	const item = useItemByUid(uid);
 	if (item === undefined) return <NotFound uid={uid} />;
@@ -39,12 +40,9 @@ export const Detail = ({
 		itemUid: item.uid,
 	};
 	const editableSectionId =
-		sectionId === "estimate" ||
-		sectionId === "connections" ||
-		sectionId === "delete" ||
-		sectionId === "notes"
-			? "identity"
-			: sectionId;
+		sectionId === "identity" || sectionId === "production" || sectionId === "merges"
+			? sectionId
+			: undefined;
 	const help = ItemSectionHelp[sectionId];
 	const sections = readSectionsFn();
 	return (
@@ -86,37 +84,29 @@ export const Detail = ({
 								</>
 							)}
 							<ItemDraftToggle item={item} />
-							<EditorSectionNavigationSeparator />
-							<PrimaryButtonLink
-								ref={editActionRef}
-								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-								params={{
-									...params,
-									sectionId: editableSectionId,
-								}}
-								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
-							>
-								<Pencil className="size-4" />
-								Edit
-							</PrimaryButtonLink>
+							{editableSectionId === undefined ? null : (
+								<EditorSectionNavigationSeparator />
+							)}
+							{editableSectionId === undefined ? null : (
+								<PrimaryButtonLink
+									ref={editActionRef}
+									to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+									params={{
+										...params,
+										sectionId: editableSectionId,
+									}}
+									className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+								>
+									<Pencil className="size-4" />
+									{translator.textFn("Edit")}
+								</PrimaryButtonLink>
+							)}
 						</div>
 					}
 				/>
 			}
 		>
-			{sectionId === "identity" ||
-			sectionId === "units" ||
-			sectionId === "clock" ||
-			sectionId === "delete" ||
-			sectionId === "notes" ||
-			sectionId === "estimate" ||
-			sectionId === "merges" ||
-			sectionId === "connections" ||
-			sectionId === "production" ? (
-				children
-			) : (
-				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>
-			)}
+			{children}
 		</EditorSectionPage>
 	);
 };

@@ -39,6 +39,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				backgroundColor: "#000000",
 				fullscreen: windowMode === "fullscreen",
 				fullscreenable: true,
+				resizable: true,
 				webPreferences: {
 					preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
 					contextIsolation: true,
@@ -47,6 +48,8 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 					navigateOnDragDrop: false,
 				},
 			});
+			// Keep native zoom/fullscreen available while rejecting manual edge and corner dragging.
+			window.on("will-resize", (event) => event.preventDefault());
 
 			const onReadyToShowFn = () => {
 				window.show();

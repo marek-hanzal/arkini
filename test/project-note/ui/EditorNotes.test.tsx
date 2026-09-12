@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { detectPlatform } from "@tanstack/react-hotkeys";
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement, type ReactNode } from "react";
@@ -204,10 +205,20 @@ describe("EditorNotes", () => {
 		await click(
 			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteUnlinkItem"]'),
 		);
-		const saveTooltip = [
-			...container.querySelectorAll("span[hidden]"),
-		].find((element) => element.textContent === "Save");
-		await click(saveTooltip?.parentElement?.querySelector("button") ?? null);
+		const editor = container.querySelector('[data-ui="EditorNote"] textarea');
+		if (editor === null) throw new Error("Expected the mounted note editor.");
+		await act(async () => {
+			editor.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "s",
+					code: "KeyS",
+					bubbles: true,
+					cancelable: true,
+					metaKey: detectPlatform() === "mac",
+					ctrlKey: detectPlatform() !== "mac",
+				}),
+			);
+		});
 		expect(state.notes[0]).toMatchObject({
 			itemUids: [],
 			resourceIds: [],

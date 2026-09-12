@@ -18,6 +18,9 @@ import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcu
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
 import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
+import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Status } from "~/ui/ui/Status";
 
 type EditorAssetDetailPath =
@@ -63,7 +66,7 @@ const EditorAssetDetailTab = ({
 		}}
 		className={editorSectionTabClassName}
 	>
-		{label}
+		<Tx label={label} />
 	</ButtonLink>
 );
 
@@ -71,15 +74,18 @@ export const EditorAssetDetail = ({
 	children,
 	contentVariant = "card",
 	filter,
+	help,
 	query,
 	resourceId,
 }: PropsWithChildren<{
+	readonly help: EditorPageHelpContent;
 	readonly contentVariant?: "card" | "flat";
 	readonly filter: "all" | "unused";
 	readonly query: string;
 	readonly resourceId: string;
 }>) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const editActionRef = useEditorEditShortcut();
 	const resource = useEditorAssetById(resourceId);
 	if (resource === undefined) {
@@ -105,9 +111,9 @@ export const EditorAssetDetail = ({
 			>
 				<Status
 					dataUi="EditorAssetNotFound"
-					description={`Resource ${resourceId} is not present in this project.`}
+					description={translator.textFn("This asset is not present in this project.")}
 					icon={FileQuestion}
-					title="Asset not found"
+					title={translator.textFn("Asset not found")}
 				/>
 			</EditorSectionPage>
 		);
@@ -175,6 +181,8 @@ export const EditorAssetDetail = ({
 					}
 					action={
 						<div className="flex items-center gap-2">
+							<EditorPageHelp {...help} />
+							<EditorSectionNavigationSeparator />
 							<CreateItemLink
 								dataUi="EditorAssetCreateItem"
 								defaultDraft
@@ -184,7 +192,7 @@ export const EditorAssetDetail = ({
 								resourceId={resource.id}
 								className="h-10 min-h-10 gap-2"
 							>
-								<PackagePlus className="size-4" /> Create item
+								<PackagePlus className="size-4" /> <Tx label="Create item" />
 							</CreateItemLink>
 							<EditorSectionNavigationSeparator />
 							<PrimaryButtonLink
@@ -201,7 +209,7 @@ export const EditorAssetDetail = ({
 								className="min-h-0 gap-2 px-4 py-2 text-sm"
 							>
 								<Pencil className="size-4" />
-								Edit
+								<Tx label="Edit" />
 							</PrimaryButtonLink>
 						</div>
 					}

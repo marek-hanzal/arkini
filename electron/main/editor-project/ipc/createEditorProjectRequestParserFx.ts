@@ -1,3 +1,4 @@
+import { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
 import { Effect } from "effect";
 import { z } from "zod";
 
@@ -85,7 +86,7 @@ const replaceResourceSchema = z
 		currentId: IdSchema,
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		resource: ResourceSchema,
+		resource: ProjectResourceReplacementSchema,
 	})
 	.strict();
 const upsertResourcesSchema = z
@@ -120,6 +121,12 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
 			parseDeleteProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("delete-project", IdSchema, candidate),
+			parseDismissInvalidProjectRootFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx(
+					"dismiss-invalid-project",
+					z.string().min(1),
+					candidate,
+				),
 			parseProjectRootFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx(
 					"open-project-directory",

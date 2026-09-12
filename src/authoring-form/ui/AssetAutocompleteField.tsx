@@ -91,11 +91,16 @@ export const EditorAssetReferenceControl = ({
 			value={value}
 			onBlurFn={onBlurFn}
 			onChangeFn={onChangeFn}
-			renderPreviewFn={(option) => <EditorAssetThumbnail resourceId={option.id} />}
-			renderSelectedPreviewFn={(option) => (
+			renderPreviewFn={(option) => (
 				<EditorAssetThumbnail
 					resourceId={option.id}
-					size="sm"
+					size="xl"
+				/>
+			)}
+			renderSelectedPreviewFn={(option) => (
+				<EditorAssetThumbnail
+					resourceId={option?.id}
+					size="input"
 				/>
 			)}
 		/>

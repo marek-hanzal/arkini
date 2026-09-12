@@ -1,3 +1,5 @@
+import { readDetailSectionFn } from "~/item-authoring/fn/readDetailSectionFn";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
@@ -41,6 +43,8 @@ export const FormSession = ({
 	readonly sectionId: SectionId;
 }>) => {
 	const navigateFn = useNavigate();
+	const translator = useTranslator();
+	const detailSectionId = readDetailSectionFn(sectionId);
 	const project = useEditorProject();
 	const onInvalidSectionFn = useCallback(
 		(nextSectionId: SectionId, path: ReadonlyArray<PropertyKey>) =>
@@ -106,7 +110,7 @@ export const FormSession = ({
 				params: {
 					projectId: project.projectId,
 					itemUid: saved.uid,
-					sectionId,
+					sectionId: detailSectionId,
 				},
 				replace: true,
 			}).catch(() => undefined);
@@ -129,7 +133,7 @@ export const FormSession = ({
 			params: {
 				projectId: project.projectId,
 				itemUid: initialItem.uid,
-				sectionId,
+				sectionId: detailSectionId,
 			},
 			replace: true,
 		});
@@ -139,7 +143,7 @@ export const FormSession = ({
 		isNew,
 		navigateFn,
 		project.projectId,
-		sectionId,
+		detailSectionId,
 	]);
 	const context = useMemo(
 		() => ({
@@ -162,7 +166,6 @@ export const FormSession = ({
 		projectId: project.projectId,
 		itemUid: initialItem.uid,
 	};
-	const title = isNew ? "New item" : initialItem.title || initialItem.id;
 	return (
 		<FormProvider value={context}>
 			<section
@@ -170,6 +173,7 @@ export const FormSession = ({
 				data-ui="EditorItemForm"
 			>
 				<EditorFormSectionPage
+					contentMode={sectionId === "artwork" ? "viewport" : "scroll"}
 					help={ItemSectionHelp[sectionId]}
 					discardFn={discardFn}
 					error={controller.error}
@@ -197,12 +201,21 @@ export const FormSession = ({
 								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 								params={{
 									...params,
-									sectionId,
+									sectionId: detailSectionId,
 								}}
 							/>
 						)
 					}
-					title={<h1 className="truncate text-xl font-semibold">{title}</h1>}
+					title={
+						<controller.form.Subscribe selector={(state) => state.values.title}>
+							{(title) => (
+								<h1 className="truncate text-xl font-semibold">
+									{title.trim() ||
+										(isNew ? translator.textFn("New item") : initialItem.id)}
+								</h1>
+							)}
+						</controller.form.Subscribe>
+					}
 					tabs={
 						<EditorSectionTabs>
 							{sections.map((candidate) => (

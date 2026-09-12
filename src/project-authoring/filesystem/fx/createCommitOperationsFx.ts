@@ -1,7 +1,7 @@
+import { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
@@ -13,14 +13,15 @@ import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
-import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { optimizePngResourceFx } from "~/game-config-resource/fx/optimizePngResourceFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
-import { writeProjectFilesFx } from "./writeProjectFilesFx";
+import { writeProjectChangesFx } from "./writeProjectChangesFx";
+import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
+import type { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
 
 type Operations = Pick<
 	ProjectRepositoryService,
@@ -47,6 +48,10 @@ const asCommitFn = (
 	previousRevision: number,
 ): ProjectCommit => ({
 	...project,
+	version: {
+		...project.version,
+	},
+	config: GameConfigSchema.parse(project.config),
 	previousRevision,
 });
 
@@ -83,8 +88,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 }: createCommitOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const writeProjectFx = (props: Parameters<typeof writeProjectFilesFx>[0]) =>
-		writeProjectFilesFx(props).pipe(
+	const writeProjectFx = (props: Parameters<typeof writeProjectChangesFx>[0]) =>
+		writeProjectChangesFx(props).pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
@@ -94,6 +99,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		state,
 		config,
 		resources,
+		resourceWrites,
 		resourceDelete,
 		resourceRename,
 		nowMs,
@@ -101,7 +107,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		readonly allowProjectIdChange?: boolean;
 		readonly state: ProjectState;
 		readonly config: GameConfigSchema.Type;
-		readonly resources: ReadonlyArray<ResourceSchema.Type>;
+		readonly resources: ReadonlyArray<ProjectResourceSchema.Type>;
+		readonly resourceWrites?: ReadonlyArray<ResourceSchema.Type>;
 		readonly resourceDelete?: string;
 		readonly resourceRename?: {
 			readonly from: string;
@@ -125,10 +132,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				errorFn("replace-config", `Editor project ID ${nextProjectId} is already open.`),
 			);
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
-		const marker = GameProjectManifestSchema.parse({
-			arkini: ArkiniAppVersion,
-			revision: updatedAtMs,
-		});
+
 		const nextProject: Project = {
 			...state.project,
 			projectId: nextProjectId,
@@ -137,12 +141,9 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			updatedAtMs,
 			revision: updatedAtMs,
 			config: canonicalConfig,
-			resources: resources
-				.map((resource) => ({
-					...resource,
-					bytes: resource.bytes.slice(),
-				}))
-				.sort((left, right) => left.id.localeCompare(right.id)),
+			resources: [
+				...resources,
+			].sort((left, right) => left.id.localeCompare(right.id)),
 		};
 		// Reconcile against the completed config: force cleanup may remove additional owners.
 		// Notes and the item tree share the journal and become visible only after it commits.
@@ -179,25 +180,15 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					};
 		});
 		const noteUpdates = notes.filter((note, index) => note !== state.notes[index]);
-		yield* writeProjectFx({
+		const committedResources = yield* writeProjectFx({
 			root: state.paths.root,
-			previous: {
-				arkpack: state.project.version,
-				marker: GameProjectManifestSchema.parse({
-					arkini: ArkiniAppVersion,
-					revision: state.project.revision,
-				}),
-				config: state.project.config,
-				resources: state.project.resources,
-			},
-			next: {
-				arkpack: state.project.version,
-				marker,
-				config: canonicalConfig,
-				resources,
-			},
+			previous: state.project,
+			next: nextProject,
+			resourceWrites,
+			resourceRename,
 			noteUpdates,
 		});
+
 		const nextState: ProjectState = {
 			...state,
 			notes: notes
@@ -216,11 +207,14 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						right.updatedAtMs - left.updatedAtMs ||
 						right.noteId.localeCompare(left.noteId),
 				),
-			project: nextProject,
+			project: {
+				...nextProject,
+				resources: committedResources,
+			},
 		};
 		if (projectIdChanged) states.delete(previousProjectId);
 		states.set(nextProjectId, nextState);
-		return cloneProjectFn(nextProject);
+		return nextState.project;
 	});
 
 	const upsertItemFx: Operations["upsertItemFx"] = ({
@@ -395,7 +389,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		changeFx: (state: ProjectState) => Effect.Effect<
 			{
 				readonly config: GameConfigSchema.Type;
-				readonly resources: ReadonlyArray<ResourceSchema.Type>;
+				readonly resources: ReadonlyArray<ProjectResourceSchema.Type>;
+				readonly resourceWrites?: ReadonlyArray<ResourceSchema.Type>;
 				readonly resourceDelete?: string;
 				readonly resourceRename?: {
 					readonly from: string;
@@ -414,22 +409,25 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					if (expectedRevision !== undefined)
 						yield* assertExpectedRevisionFx(state, expectedRevision, operation);
 					const next = yield* changeFx(state);
-					return yield* commitFx({
-						state,
-						config: next.config,
-						resources: next.resources,
-						...(next.resourceDelete === undefined
-							? {}
-							: {
-									resourceDelete: next.resourceDelete,
-								}),
-						...(next.resourceRename === undefined
-							? {}
-							: {
-									resourceRename: next.resourceRename,
-								}),
-						nowMs,
-					});
+					return cloneProjectFn(
+						yield* commitFx({
+							state,
+							config: next.config,
+							resources: next.resources,
+							resourceWrites: next.resourceWrites,
+							...(next.resourceDelete === undefined
+								? {}
+								: {
+										resourceDelete: next.resourceDelete,
+									}),
+							...(next.resourceRename === undefined
+								? {}
+								: {
+										resourceRename: next.resourceRename,
+									}),
+							nowMs,
+						}),
+					);
 				}),
 			);
 		});
@@ -457,8 +455,14 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					config: state.project.config,
 					resources: [
 						...state.project.resources.filter(({ id }) => !ids.has(id)),
-						...resources,
+						...resources.map((resource) => ({
+							id: resource.id,
+							mime: resource.mime,
+							size: resource.bytes.byteLength,
+							version: "pending",
+						})),
 					],
+					resourceWrites: resources,
 				});
 			});
 		}).pipe(
@@ -526,7 +530,17 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					const results = yield* Effect.forEach(
 						resources,
 						(resource) =>
-							optimizePngResourceFx(resource).pipe(
+							Effect.gen(function* () {
+								const target = yield* new Set(
+									Object.values(state.project.config.resources),
+								).has(resource.id)
+									? state.paths.resourceFileFx(resource.id)
+									: state.paths.assetFileFx(resource.id);
+								const body = yield* readPngResourceFx({
+									path: target,
+								});
+								return yield* optimizePngResourceFx(body);
+							}).pipe(
 								Effect.tap(() =>
 									Effect.sync(() => {
 										completedResourceCount += 1;
@@ -573,10 +587,18 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							: yield* commitFx({
 									state,
 									config: state.project.config,
-									resources: state.project.resources.map(
-										(resource) =>
-											optimizedResources.get(resource.id) ?? resource,
+									resources: state.project.resources.map((resource) =>
+										optimizedResources.has(resource.id)
+											? {
+													...resource,
+													size: optimizedResources.get(resource.id)!.bytes
+														.byteLength,
+												}
+											: resource,
 									),
+									resourceWrites: results
+										.filter((result) => result.changed)
+										.map((result) => result.resource),
 									nowMs: yield* Clock.currentTimeMillis,
 								});
 					return {
@@ -584,11 +606,13 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						originalBytes,
 						optimizedBytes,
 						processedResourceCount: results.length,
-						project,
+						project: cloneProjectFn(project),
 					};
 				}),
 			)
 			.pipe(
+				Effect.provideService(FileSystem.FileSystem, fileSystem),
+				Effect.provideService(Path.Path, path),
 				Effect.mapError((cause) =>
 					errorFn(
 						"optimize-resources",
@@ -650,7 +674,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					errorFn("replace-resource", "The resource references are invalid.", cause),
 			});
 			const resource = yield* Effect.try({
-				try: () => ResourceSchema.parse(candidateResource),
+				try: () => ProjectResourceReplacementSchema.parse(candidateResource),
 				catch: (cause) =>
 					errorFn("replace-resource", "The replacement resource is invalid.", cause),
 			});
@@ -659,7 +683,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				projectId,
 				expectedRevision,
 				(state) => {
-					if (!state.project.resources.some(({ id }) => id === currentId))
+					const previousResource = state.project.resources.find(
+						({ id }) => id === currentId,
+					);
+					if (previousResource === undefined)
 						return Effect.fail(
 							errorFn("replace-resource", `Resource ${currentId} does not exist.`),
 						);
@@ -677,8 +704,23 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						config,
 						resources: [
 							...state.project.resources.filter(({ id }) => id !== currentId),
-							resource,
+							{
+								id: resource.id,
+								mime: resource.mime,
+								size: resource.bytes?.byteLength ?? previousResource.size,
+								version: previousResource.version,
+							},
 						],
+						resourceWrites:
+							resource.bytes === undefined
+								? []
+								: [
+										{
+											id: resource.id,
+											mime: resource.mime,
+											bytes: resource.bytes,
+										},
+									],
 						...(resource.id === currentId
 							? {}
 							: {

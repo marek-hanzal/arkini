@@ -7,7 +7,10 @@ import {
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
 import { readProjectFx as readCanonicalProjectFx } from "~/project-authoring/fx/readProjectFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const project: Project = {
@@ -21,7 +24,7 @@ const project: Project = {
 	updatedAtMs: 124,
 	revision: 2,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 const createRepository = (

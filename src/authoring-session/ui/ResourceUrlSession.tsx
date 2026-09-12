@@ -8,16 +8,11 @@ import {
 	useState,
 } from "react";
 
+import { readProjectResourceUrlFn } from "~/project-authoring/fn/readProjectResourceUrlFn";
 import type { Project } from "~/project-authoring/type/Project";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
 type ResourceUrlListener = () => void;
-
-interface ResourceUrlEntry {
-	bytes: Uint8Array;
-	mime: string;
-	url: string;
-}
 
 interface ResourceUrlStore {
 	readonly readFn: (resourceId: string) => string | undefined;
@@ -32,40 +27,27 @@ const emptyResourceUrls: ReadonlyMap<string, string> = new Map();
 const ResourceUrlProvider = ({
 	children,
 	resources,
+	projectId,
 }: PropsWithChildren<{
+	readonly projectId: string;
 	readonly resources: Project["resources"];
 }>) => {
 	const storeRef = useRef<ResourceUrlStore | undefined>(undefined);
 	if (storeRef.current === undefined) {
 		let resourcesById = new Map<string, Project.Resource>();
-		const entries = new Map<string, ResourceUrlEntry>();
+		const urls = new Map<string, string>();
 		const listenersById = new Map<string, Set<ResourceUrlListener>>();
-		const revokeEntryFn = (resourceId: string) => {
-			const entry = entries.get(resourceId);
-			if (entry === undefined) return;
-			entries.delete(resourceId);
-			URL.revokeObjectURL(entry.url);
-		};
-		const createEntryFn = (resource: Project.Resource) => {
-			const entry: ResourceUrlEntry = {
-				bytes: resource.bytes,
-				mime: resource.mime,
-				url: URL.createObjectURL(
-					new Blob(
-						[
-							resource.bytes.slice().buffer,
-						],
-						{
-							type: resource.mime,
-						},
-					),
-				),
-			};
-			entries.set(resource.id, entry);
-			return entry;
+		const createUrlFn = (resource: Project.Resource) => {
+			const url = readProjectResourceUrlFn({
+				projectId,
+				resourceId: resource.id,
+				version: resource.version,
+			});
+			urls.set(resource.id, url);
+			return url;
 		};
 		storeRef.current = {
-			readFn: (resourceId) => entries.get(resourceId)?.url,
+			readFn: (resourceId) => urls.get(resourceId),
 			subscribeFn: (resourceId, listenerFn) => {
 				let listeners = listenersById.get(resourceId);
 				if (listeners === undefined) {
@@ -73,16 +55,16 @@ const ResourceUrlProvider = ({
 					listenersById.set(resourceId, listeners);
 				}
 				listeners.add(listenerFn);
-				if (!entries.has(resourceId)) {
+				if (!urls.has(resourceId)) {
 					const resource = resourcesById.get(resourceId);
-					if (resource !== undefined) createEntryFn(resource);
+					if (resource !== undefined) createUrlFn(resource);
 				}
 				return () => {
 					const currentListeners = listenersById.get(resourceId);
 					currentListeners?.delete(listenerFn);
 					if (currentListeners !== undefined && currentListeners.size > 0) return;
 					listenersById.delete(resourceId);
-					revokeEntryFn(resourceId);
+					urls.delete(resourceId);
 				};
 			},
 			syncFn: (nextResources) => {
@@ -95,37 +77,35 @@ const ResourceUrlProvider = ({
 				const changedListeners = new Set<ResourceUrlListener>();
 				for (const [resourceId, listeners] of listenersById) {
 					const resource = resourcesById.get(resourceId);
-					const entry = entries.get(resourceId);
+					const url = urls.get(resourceId);
 					if (resource === undefined) {
-						if (entry === undefined) continue;
-						revokeEntryFn(resourceId);
+						if (url === undefined) continue;
+						urls.delete(resourceId);
 						for (const listenerFn of listeners) changedListeners.add(listenerFn);
 						continue;
 					}
-					if (entry === undefined) {
-						createEntryFn(resource);
+					if (url === undefined) {
+						createUrlFn(resource);
 						for (const listenerFn of listeners) changedListeners.add(listenerFn);
 						continue;
 					}
-					const equalBytes =
-						entry.bytes === resource.bytes ||
-						(entry.bytes.byteLength === resource.bytes.byteLength &&
-							entry.bytes.every((byte, index) => byte === resource.bytes[index]));
-					if (entry.mime === resource.mime && equalBytes) {
-						entry.bytes = resource.bytes;
+					if (
+						url ===
+						readProjectResourceUrlFn({
+							projectId,
+							resourceId: resource.id,
+							version: resource.version,
+						})
+					)
 						continue;
-					}
-					revokeEntryFn(resourceId);
-					createEntryFn(resource);
+					urls.delete(resourceId);
+					createUrlFn(resource);
 					for (const listenerFn of listeners) changedListeners.add(listenerFn);
 				}
 				for (const listenerFn of changedListeners) listenerFn();
 			},
 			disposeFn: () => {
-				for (const resourceId of [
-					...entries.keys(),
-				])
-					revokeEntryFn(resourceId);
+				urls.clear();
 				listenersById.clear();
 				resourcesById.clear();
 			},
@@ -149,10 +129,18 @@ const ResourceUrlProvider = ({
 	return <ResourceUrlContext value={store}>{children}</ResourceUrlContext>;
 };
 
-/** Binds object-URL ownership to the current canonical project snapshot. */
+/** Keeps versioned file URLs stable so browser and Pixi caches share unchanged artwork. */
 export const ProjectResourceUrlProvider = ({ children }: PropsWithChildren) => {
-	const { resources } = useEditorProject();
-	return <ResourceUrlProvider resources={resources}>{children}</ResourceUrlProvider>;
+	const { resources, projectId } = useEditorProject();
+	return (
+		<ResourceUrlProvider
+			key={projectId}
+			projectId={projectId}
+			resources={resources}
+		>
+			{children}
+		</ResourceUrlProvider>
+	);
 };
 
 /** Resolves one lazily acquired project-scoped resource URL. */

@@ -1,7 +1,8 @@
-import { ArrowRight, NotebookPen } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Tx } from "~/translation/ui/Tx";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { Markdown } from "~/ui/ui/Markdown";
@@ -13,6 +14,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 
 /** Presents the newest project Note as a bounded Markdown preview. */
 export const ProjectNotesOverview = ({ projectId }: { readonly projectId: string }) => {
+	const translator = useTranslator();
 	const notes = useProjectNotes(projectId);
 	const latest = notes.notes[0];
 	return (
@@ -43,7 +45,7 @@ export const ProjectNotesOverview = ({ projectId }: { readonly projectId: string
 				)
 			}
 			dataUi="EditorProjectNotesOverview"
-			footerRight={
+			action={
 				<LinkButtonLink
 					className="inline-flex items-center gap-1.5"
 					data-overview-id="notes"
@@ -53,12 +55,11 @@ export const ProjectNotesOverview = ({ projectId }: { readonly projectId: string
 					}}
 					to="/editor/$projectId/notes"
 				>
-					<Tx label="Notes" />
+					<Tx label="Open" />
 					<ArrowRight className="size-4" />
 				</LinkButtonLink>
 			}
-			icon={NotebookPen}
-			title={<Tx label="Notes" />}
+			title={translator.textFn("Notes")}
 		/>
 	);
 };

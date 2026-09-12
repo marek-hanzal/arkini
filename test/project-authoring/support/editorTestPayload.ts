@@ -72,3 +72,11 @@ export const editorTestPayload: PayloadSchema.Type = {
 		},
 	],
 };
+
+/** Renderer/repository projection of the same fixture's disk-backed PNG files. */
+export const editorTestResources = editorTestPayload.resources.map(({ id, mime, bytes }) => ({
+	id,
+	mime,
+	size: bytes.byteLength,
+	version: "1",
+}));

@@ -3,7 +3,7 @@ import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchem
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 
-/** Canonical current-tree data backed by one Editor project directory. */
+/** Complete source payload for initial project creation or import, including PNG bodies. */
 export interface ProjectFiles {
 	readonly arkpack: VersionPartsSchema.Type;
 	readonly marker: GameProjectManifestSchema.Type;

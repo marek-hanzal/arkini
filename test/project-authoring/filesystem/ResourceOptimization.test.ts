@@ -113,8 +113,14 @@ describe("filesystem Editor PNG optimization", () => {
 				width: 2,
 			});
 			expect(decoded).toEqual(Buffer.from(Uint8Array.of(0, 0, 0, 0, 20, 40, 60, 255)));
-			expect(new Uint8Array(bytes)).toEqual(
-				result.project.resources.find(({ id }) => id === resourceId)?.bytes,
+			expect(result.project.resources.find(({ id }) => id === resourceId)).toEqual({
+				id: resourceId,
+				mime: "image/png",
+				size: bytes.byteLength,
+				version: expect.any(String),
+			});
+			expect(result.project.resources.find(({ id }) => id === resourceId)?.version).not.toBe(
+				created.resources.find(({ id }) => id === resourceId)?.version,
 			);
 		}
 

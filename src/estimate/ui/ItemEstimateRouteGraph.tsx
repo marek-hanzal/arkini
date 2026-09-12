@@ -18,9 +18,11 @@ export const ItemEstimateRouteGraph = ({
 	config,
 	header,
 	routeSteps,
+	limit,
 }: {
 	readonly config: Project["config"];
 	readonly header: ReactNode;
+	readonly limit?: number;
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
 	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
@@ -63,7 +65,7 @@ export const ItemEstimateRouteGraph = ({
 				className="ak-list grid min-h-0 gap-2 overflow-y-auto pr-1"
 				data-ui="EditorItemEstimateBreakdown"
 			>
-				{sortedRouteSteps.map((route) => {
+				{sortedRouteSteps.slice(0, limit).map((route) => {
 					const item = config.items[route.factId];
 					return (
 						<article

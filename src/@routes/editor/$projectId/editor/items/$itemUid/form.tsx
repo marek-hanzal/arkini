@@ -32,7 +32,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						defaultTitle: search.defaultTitle,
 					}
 				: {}),
-			...(search.enable === "units" || search.enable === "merges" || search.enable === "clock"
+			...(search.enable === "units" ||
+			search.enable === "merges" ||
+			search.enable === "clock" ||
+			search.enable === "action" ||
+			search.enable === "production"
 				? {
 						enable: search.enable,
 					}

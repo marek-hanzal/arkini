@@ -3,7 +3,7 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 import type { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import type { Project } from "~/project-authoring/type/Project";
 import { ButtonLink, DangerButton } from "~/ui/ui/Button";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Status } from "~/ui/ui/Status";
 import { DeleteDialog } from "~/item-authoring/ui/DeleteDialog";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useDeleteController } from "~/item-authoring/ui/useDeleteController";
@@ -83,7 +83,6 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 		item,
 	});
 	const blocked = controller.blockers.length > 0;
-	const StateIcon = blocked ? ShieldAlert : ShieldCheck;
 	return (
 		<>
 			<section
@@ -91,76 +90,50 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 				data-ui="EditorItemDeleteSection"
 			>
 				<EditorRootCard dataUi="EditorItemDeleteStateCard">
-					<div className="flex items-start gap-3">
-						<StateIcon
-							className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
-							{...readDataUiFn({
-								dataUi: "EditorItemDeleteStateIcon",
-								state: {
-									blocked,
-								},
-							})}
-						/>
-						<div>
-							<h2 className="text-lg font-semibold">
-								{blocked
-									? "This item cannot be deleted yet"
-									: "This item can be deleted"}
-							</h2>
-							<p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
-								{blocked
-									? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
-									: "No other game configuration references this item. Its asset files will remain available in the project."}
-							</p>
-						</div>
-					</div>
+					<Status
+						icon={blocked ? ShieldAlert : ShieldCheck}
+						title={
+							blocked ? "This item cannot be deleted yet" : "This item can be deleted"
+						}
+						description={
+							blocked
+								? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
+								: "No other game configuration references this item. Its asset files will remain available in the project."
+						}
+						action={
+							blocked ? (
+								<DangerButton
+									data-ui="EditorItemForceDeleteOpen"
+									onClick={() => controller.openFn(true)}
+								>
+									Force delete…
+								</DangerButton>
+							) : (
+								<DangerButton
+									data-ui="EditorItemDeleteOpen"
+									onClick={() => controller.openFn(false)}
+								>
+									Delete
+								</DangerButton>
+							)
+						}
+						variant="flat"
+					/>
 				</EditorRootCard>
-
 				{blocked ? (
-					<>
-						<div
-							className="ak-list grid gap-2"
-							data-ui="EditorItemDeleteBlockers"
-						>
-							{controller.blockers.map((blocker, index) => (
-								<DeleteBlockerLink
-									blocker={blocker}
-									key={`${blocker.path.join(".")}:${index}`}
-									project={controller.project}
-								/>
-							))}
-						</div>
-						<EditorRootCard
-							className="border-danger/35 bg-danger/10"
-							dataUi="EditorItemForceDeleteCard"
-						>
-							<p className="text-sm leading-6 text-muted">
-								Need this item gone anyway? Force Delete removes every starting
-								entry, merge rule, production line, and owned output that directly
-								references it. The game can remain logically broken afterward.
-							</p>
-							<DangerButton
-								className="mt-3"
-								data-ui="EditorItemForceDeleteOpen"
-								onClick={() => controller.openFn(true)}
-							>
-								Force delete item…
-							</DangerButton>
-						</EditorRootCard>
-					</>
-				) : (
-					<EditorRootCard
-						className="border-danger/35 bg-danger/10"
-						dataUi="EditorItemDeleteActionCard"
+					<div
+						className="ak-list grid gap-2"
+						data-ui="EditorItemDeleteBlockers"
 					>
-						<DangerButton
-							data-ui="EditorItemDeleteOpen"
-							onClick={() => controller.openFn(false)}
-						>
-							Delete item
-						</DangerButton>
-					</EditorRootCard>
-				)}
+						{controller.blockers.map((blocker, index) => (
+							<DeleteBlockerLink
+								blocker={blocker}
+								key={`${blocker.path.join(".")}:${index}`}
+								project={controller.project}
+							/>
+						))}
+					</div>
+				) : null}
 			</section>
 			{controller.confirming === null ? null : (
 				<DeleteDialog

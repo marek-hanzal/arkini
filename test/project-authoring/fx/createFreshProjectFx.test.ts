@@ -49,7 +49,12 @@ describe("createFreshProjectFx", () => {
 					updatedAtMs: 100,
 					revision: 0,
 					config,
-					resources,
+					resources: resources.map(({ id, mime, bytes }) => ({
+						id,
+						mime,
+						size: bytes.byteLength,
+						version: "1",
+					})),
 				}),
 		);
 
@@ -105,7 +110,7 @@ describe("createFreshProjectFx", () => {
 			id: "hero",
 			mime: "image/png",
 		});
-		expect(project.resources[0]?.bytes.slice(0, 8)).toEqual(
+		expect(createProjectFx.mock.calls[0]?.[0].resources[0]?.bytes.slice(0, 8)).toEqual(
 			Uint8Array.from([
 				137,
 				80,
@@ -122,7 +127,7 @@ describe("createFreshProjectFx", () => {
 				validateArkpackPayloadFx({
 					config: project.config,
 					resources: [
-						...project.resources,
+						...createProjectFx.mock.calls[0]![0].resources,
 					],
 				}),
 			),

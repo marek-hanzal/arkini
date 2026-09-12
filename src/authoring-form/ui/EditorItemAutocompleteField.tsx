@@ -32,7 +32,7 @@ export const EditorItemAutocompleteField = ({
 			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
 			renderSelectedPreviewFn={(option) => (
 				<EditorItemSearchThumbnail
-					item={items?.[option.id]}
+					item={option === undefined ? undefined : items?.[option.id]}
 					selected
 				/>
 			)}
@@ -73,7 +73,7 @@ export const EditorItemReferenceControl = ({
 			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
 			renderSelectedPreviewFn={(option) => (
 				<EditorItemSearchThumbnail
-					item={items?.[option.id]}
+					item={option === undefined ? undefined : items?.[option.id]}
 					selected
 				/>
 			)}

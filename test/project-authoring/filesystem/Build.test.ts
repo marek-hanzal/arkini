@@ -3,7 +3,10 @@ import { readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createTestPngBytes } from "~/../test/arkpack-support/fn/createTestPngBytes";
+import {
+	createTestPngBytes,
+	createAlternateTestPngBytes,
+} from "~/../test/arkpack-support/fn/createTestPngBytes";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -68,6 +71,58 @@ describe("filesystem Editor project build", () => {
 			version: "1.0",
 			revision: dirty.revision,
 		});
+	});
+
+	it("builds after replacing an early-sorting resource and adding an earlier asset without Refresh", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		await Effect.runPromise(
+			repository.replaceResourceFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+				currentId: "hero",
+				config: project.config,
+				resource: {
+					id: "hero",
+					mime: "image/png",
+					bytes: createAlternateTestPngBytes(),
+				},
+			}),
+		);
+		const updated = await Effect.runPromise(
+			repository.upsertResourcesFx({
+				projectId: project.projectId,
+				resources: [
+					{
+						id: "aa",
+						mime: "image/png",
+						bytes: createTestPngBytes(),
+					},
+				],
+			}),
+		);
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+					expectedRevision: updated.revision,
+					expectedVersion: updated.version,
+				}),
+			),
+		).resolves.toMatchObject({
+			revision: updated.revision,
+			version: "1.0",
+		});
+		expect(updated.resources.map(({ id }) => id)).toEqual([
+			"aa",
+			"hero",
+			"item-water",
+		]);
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(
+			(await Effect.runPromise(reopened.readProjectFx(project.projectId)))?.resources,
+		).toEqual(updated.resources);
 	});
 
 	it("publishes and reads the one canonical artifact while ignoring build output", async () => {

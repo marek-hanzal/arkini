@@ -1,3 +1,23 @@
+/* Include Editor dialogs and selectors portaled outside the shell. */
+@media (forced-colors: none) {
+	body:has([data-ui="EditorShell"]) * {
+		scrollbar-color: auto;
+		scrollbar-width: auto;
+	}
+}
+
+@utility overflow-auto {
+	body:has([data-ui="EditorShell"]) & {
+		scrollbar-gutter: stable;
+	}
+}
+
+@utility overflow-y-auto {
+	body:has([data-ui="EditorShell"]) & {
+		scrollbar-gutter: stable;
+	}
+}
+
 .ak-editor-workspace-tab {
 	transition: none;
 }

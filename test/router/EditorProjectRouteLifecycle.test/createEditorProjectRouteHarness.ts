@@ -12,7 +12,10 @@ import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGame
 import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
@@ -55,7 +58,7 @@ const createProject = (projectId: string, revision = 1): Project => ({
 	updatedAtMs: revision,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 const createRepository = (projects: ReadonlyMap<string, Project>): ProjectRepositoryService => ({

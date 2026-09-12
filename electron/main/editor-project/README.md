@@ -1,6 +1,6 @@
 # Editor persistence map
 
-One GUI Electron main or Node CLI process owns the physical Editor project repository. The portable current tree is canonical; renderer Atoms, form drafts, object URLs, Build descriptors and the Editor Board are projections.
+One GUI Electron main or Node CLI process owns the physical Editor project repository. The portable current tree is canonical; renderer Atoms, form drafts, versioned asset URLs, Build descriptors and the Editor Board are projections.
 
 [`CONFIG.md`](../../../CONFIG.md) owns portable layout and authoring semantics. [`VERSION.md`](../../../VERSION.md) owns external payload compatibility. This README maps ownership, I/O and replacement lifecycle.
 
@@ -46,7 +46,7 @@ One process-lifetime repository owns:
 - One in-memory `ProjectState` per opened project, derived from disk.
 - Current Project, Note and Build operations.
 
-The catalog never copies canonical project identity or mutable project fields. `game.json.meta.id` remains project/package identity. Invalid catalog entries stay independently visible with their concrete error.
+The catalog never copies canonical project identity or mutable project fields. `game.json.meta.id` remains project/package identity. Invalid catalog entries stay independently visible with their concrete error until explicitly dismissed by exact root. Dismissal preserves files and persists in the catalog so managed discovery does not restore the row. Explicitly reopening a repaired folder clears dismissal and retains its catalog ownership.
 
 Managed roots may be deleted only by explicit managed-project deletion. External roots are edited in place; deletion only unregisters them. Arkini writes only allowlisted owned paths and preserves `.git` plus unrelated files.
 
@@ -68,6 +68,14 @@ recover any prior journal
 ```
 
 Unowned, ambiguous, escaped or missing durable artifacts fail closed. Recovery restores an old-or-new complete portable tree; it never guesses a partial state. Item/config commits reconcile Note links against the final item UIDs; resource rename/delete rewrites Note resource IDs. Each operation includes affected Note files in the same transaction, and a failed Note rewrite rolls back the project tree plus every earlier Note rewrite before repository state is published. Single-file mechanics belong to `src/filesystem-write`; the multi-file journal belongs here.
+
+## Asset bodies and incremental saves
+
+Project projections carry resource ID, MIME type, byte size and a filesystem version token, never PNG bodies. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged PNGs. Asset import/replacement and explicit Optimize supply only their changed bodies. Renames and shell-resource moves read only the affected disk file. New resource metadata is verified inside the journal before its committed marker and repository publication.
+
+[`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same current-tree journal and Note reconciliation.
+
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned asset URLs to image consumers, including Editor Board. It admits the URL against the registered resource and checks the contained path. The actual disk stat token keys the body cache independently of the admitted URL; a rollback can restore identical bytes with new filesystem timestamps. A process-local 64 MiB LRU shares concurrent requests and admits at most four cold disk reads at once. Unrequested images never enter the cache; ordinary saves do not touch it. Replacement changes only that resource's URL. Build continues to read and verify actual source bytes when compiling the Arkpack.
 
 ## Renderer replacement flow
 
@@ -101,7 +109,7 @@ Project Write Admission rejects replacement during an already pending route tran
 
 An identity rename first resolves the current draft leave decision, then holds the same admission authority from its revision-pinned write through navigation to the new project ID. This excludes replacement and unrelated navigation; ordinary writes keep repository revision checks. Only the rename's terminal route bypasses the navigation guard while its lease is live. Failure releases admission and remains visible in the rename dialog.
 
-External changes are ignored while mounted. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
+External authored JSON and resource catalog changes are ignored while mounted. Requested image bodies come directly from their registered disk paths; already mounted image/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Output version and Build admission
 

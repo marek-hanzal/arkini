@@ -42,7 +42,10 @@ vi.mock("~/ui/ui/LinkButton", () => ({
 
 import { ProjectGeneralDetail } from "~/project-authoring/ui/ProjectGeneralDetail";
 import type { Project } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -77,7 +80,7 @@ describe("ProjectGeneralDetail", () => {
 			updatedAtMs: 2,
 			revision: 3,
 			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		} satisfies Project;
 
 		await act(async () => root.render(<ProjectGeneralDetail project={project} />));

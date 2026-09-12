@@ -135,6 +135,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectBuildRead,
 	ArkiniElectronApi.channels.editorProjectBuildSave,
 	ArkiniElectronApi.channels.editorProjectCreate,
+	ArkiniElectronApi.channels.editorProjectDismissInvalid,
 	ArkiniElectronApi.channels.editorProjectDelete,
 	ArkiniElectronApi.channels.editorProjectDeleteItem,
 	ArkiniElectronApi.channels.editorProjectDeleteResource,
@@ -416,6 +417,32 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		});
 		expect(repository.deleteProjectFx).toHaveBeenCalledOnce();
+	});
+
+	it("validates dismissal roots before dispatching the exact catalog identity", async () => {
+		const repository = createEditorProjectIpcRepository();
+		register({
+			type: "ready",
+			repository,
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, ""),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				operation: "dismiss-invalid-project",
+			},
+		});
+		expect(repository.dismissInvalidProjectFx).not.toHaveBeenCalled();
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, "/projects/duplicate"),
+		).resolves.toEqual({
+			type: "success",
+			value: undefined,
+		});
+		expect(repository.dismissInvalidProjectFx).toHaveBeenCalledExactlyOnceWith(
+			"/projects/duplicate",
+		);
 	});
 
 	it("opens only an exact project root currently listed as invalid", async () => {

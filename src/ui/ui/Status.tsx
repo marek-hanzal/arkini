@@ -5,10 +5,10 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 interface StatusProps {
 	readonly action?: ReactNode;
 	readonly dataUi?: string;
-	readonly description: string;
+	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly iconSpin?: boolean;
-	readonly title: string;
+	readonly title: ReactNode;
 	readonly variant?: "card" | "flat";
 }
 
@@ -45,7 +45,9 @@ export const Status = ({
 				/>
 				<div className="grid gap-1.5">
 					<h2 className="text-base font-semibold text-foreground">{title}</h2>
-					<p className="text-sm text-muted">{description}</p>
+					{description === undefined ? null : (
+						<p className="text-sm text-muted">{description}</p>
+					)}
 				</div>
 				{action === undefined ? null : <div className="pt-1">{action}</div>}
 			</div>

@@ -1,5 +1,8 @@
 import type { Project } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 /** Small project used to isolate failed Board game creation and release. */
 export const failedCreationProject: Project = {
@@ -13,5 +16,5 @@ export const failedCreationProject: Project = {
 	updatedAtMs: 1,
 	revision: 1,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };

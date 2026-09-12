@@ -1,9 +1,11 @@
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
 const thumbnailSizeClassName = {
+	input: "size-[var(--ak-control-min-height)]",
 	lg: "size-16",
 	md: "size-12",
 	sm: "size-8",
+	xl: "size-18",
 } as const;
 
 /** Renders one project asset inside compact authoring selectors and fields. */
@@ -20,7 +22,9 @@ export const EditorAssetThumbnail = ({
 			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-canvas/70`}
 		>
 			{url === undefined ? (
-				<span className="text-sm font-semibold text-subtle">?</span>
+				resourceId ? (
+					<span className="text-sm font-semibold text-subtle">?</span>
+				) : null
 			) : (
 				<img
 					src={url}

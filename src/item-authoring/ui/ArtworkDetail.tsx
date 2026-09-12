@@ -8,7 +8,7 @@ import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLin
 export const ArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
-		<div className="flex min-w-0 items-center gap-5">
+		<div className="flex min-w-0 items-start gap-5">
 			<ArtworkTilePreview
 				resourceIds={item.asset.default}
 				scale={item.asset.scale}

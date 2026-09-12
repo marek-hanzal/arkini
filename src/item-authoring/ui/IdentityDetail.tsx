@@ -3,6 +3,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
@@ -154,20 +155,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							"Production is enabled when at least one line is configured. Each line keeps its own availability rules.",
 						)}
 					/>
-					<EditorRootCard dataUi="EditorItemProductionSummaryCard">
-						<FactList>
-							<Fact
-								label={translator.textFn("Status")}
-								value={translator.textFn(
-									item.lines.length > 0 ? "Enabled" : "Disabled",
-								)}
-							/>
-							<Fact
-								label={translator.textFn("Line count")}
-								value={item.lines.length}
-							/>
-						</FactList>
-					</EditorRootCard>
+					<ProductionSummaryDetail item={item} />
 				</section>
 			</div>
 		</div>

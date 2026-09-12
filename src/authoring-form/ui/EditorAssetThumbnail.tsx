@@ -21,7 +21,9 @@ export const EditorAssetThumbnail = ({
 			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-canvas/70`}
 		>
 			{url === undefined ? (
-				<span className="text-sm font-semibold text-subtle">?</span>
+				resourceId ? (
+					<span className="text-sm font-semibold text-subtle">?</span>
+				) : null
 			) : (
 				<img
 					src={url}

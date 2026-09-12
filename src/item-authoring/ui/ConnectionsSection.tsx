@@ -144,7 +144,11 @@ export const ConnectionsSection = ({
 							)}
 							renderSelectedPreviewFn={(option) => (
 								<EditorItemSearchThumbnail
-									item={project.config.items[option.id]}
+									item={
+										option === undefined
+											? undefined
+											: project.config.items[option.id]
+									}
 									selected
 								/>
 							)}

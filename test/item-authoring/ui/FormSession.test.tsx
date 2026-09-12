@@ -860,8 +860,10 @@ describe("item section form session", () => {
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
 		const { container } = await render(<ProductionSection />);
-		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
-		if (add === null) throw new Error("Missing add line control.");
+		const add = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable production");
+		if (add === undefined) throw new Error("Missing enable production control.");
 		await act(async () => add.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -914,8 +916,10 @@ describe("item section form session", () => {
 
 	it("adds production to a passive Common through the ordinary line editor", async () => {
 		const { container } = await render(<ProductionSection />);
-		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
-		if (addLine === null) throw new Error("Missing add line control.");
+		const addLine = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable production");
+		if (addLine === undefined) throw new Error("Missing enable production control.");
 		await act(async () => addLine.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();

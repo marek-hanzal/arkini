@@ -467,11 +467,11 @@ const RollControl = ({
 								value={readChancePercentFn(roll.chance)}
 								min={0}
 								max={100}
-								step={0.01}
+								step={5}
 								onChangeFn={(chancePercent) =>
 									onChangeFn({
 										...roll,
-										chance: chancePercent / 100,
+										chance: Math.round(chancePercent) / 100,
 									})
 								}
 							/>

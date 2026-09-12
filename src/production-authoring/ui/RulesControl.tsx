@@ -361,6 +361,7 @@ const RuleControl = ({
 				<EditorSecondsControl
 					error={readEditorFormValidationErrorFn(validationIssues, "adjustMs")}
 					label="Runtime adjustment (seconds)"
+					step={5}
 					value={rule.adjustMs / 1_000}
 					onChangeFn={(adjustSeconds) =>
 						onChangeFn({

@@ -12,16 +12,14 @@ import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 
 const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.AuthoredItem }) => {
 	const translator = useTranslator();
-	return item.placement === "drop" && item.rules.length === 0 ? null : (
+	return (
 		<div className="grid gap-2 text-xs text-muted">
-			{item.placement === "drop" ? null : (
-				<p>
-					<span className="font-medium uppercase tracking-[0.08em]">
-						<Tx label="Placement" />
-					</span>{" "}
-					· <Tx label={item.placement === "random" ? "Random" : "Drop"} />
-				</p>
-			)}
+			<p>
+				<span className="font-medium uppercase tracking-[0.08em]">
+					<Tx label="Placement" />
+				</span>{" "}
+				· <Tx label={item.placement === "random" ? "Random" : "Drop"} />
+			</p>
 			{item.rules.length === 0 ? null : (
 				<RulesDetail
 					rules={item.rules}

@@ -103,6 +103,8 @@ Board editing help:
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
 Board — required by Clock:
   value: Board — required by Clock
+Buffer:
+  value: Buffer
 Build:
   value: Build
 Build help:
@@ -202,8 +204,6 @@ Disable removes timing, rules and expiry output from this item.:
   value: Disable removes timing, rules and expiry output from this item.
 Disabled:
   value: Disabled
-Disabled before rules are evaluated. Enable rules can make this line available; a matching Disable rule vetoes availability.:
-  value: Disabled before rules are evaluated. Enable rules can make this line available; a matching Disable rule vetoes availability.
 Discard:
   value: Discard
 Draft:
@@ -341,10 +341,6 @@ Guaranteed:
   value: Guaranteed
 Hero image:
   value: Hero image
-Hidden:
-  value: Hidden
-Hidden before rules are evaluated. Show rules can reveal this line; a matching Hide rule vetoes visibility.:
-  value: Hidden before rules are evaluated. Show rules can reveal this line; a matching Hide rule vetoes visibility.
 Hide:
   value: Hide
 Image:

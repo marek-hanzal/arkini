@@ -1,5 +1,7 @@
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { ArrowUpRight, ChevronRight } from "lucide-react";
+import type { ReactNode } from "react";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { ArrowUpRight, ChevronRight, Square, SquareCheck } from "lucide-react";
 
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { RulesDetail } from "~/item-authoring/ui/RulesDetail";
@@ -10,6 +12,33 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
+
+const LineFlag = ({
+	checked,
+	label,
+	description,
+}: {
+	readonly checked: boolean;
+	readonly label: ReactNode;
+	readonly description: ReactNode;
+}) => {
+	const Icon = checked ? SquareCheck : Square;
+	return (
+		<span
+			className="inline-flex items-center gap-1 rounded-full border border-line bg-secondary-subtle px-2.5 py-1 text-xs font-semibold text-muted data-[ui-selected=true]:border-secondary-border data-[ui-selected=true]:bg-secondary-selected data-[ui-selected=true]:text-secondary-foreground"
+			{...readDataUiFn({
+				dataUi: "EditorProductionLineFlag",
+				state: {
+					selected: checked,
+				},
+			})}
+		>
+			<Icon className="size-3.5" />
+			{label}
+			<EditorInfoTooltip content={description} />
+		</span>
+	);
+};
 
 const LineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 	<div className="grid min-w-32 gap-1 text-right">
@@ -56,57 +85,41 @@ export const ProductionLineDetail = ({
 								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 							</LineEditLink>
 						</h3>
-						{!line.enable ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-danger/35 bg-danger/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-								<Tx label="Disabled" />
-								<EditorInfoTooltip
-									content={
-										<Tx label="Disabled before rules are evaluated. Enable rules can make this line available; a matching Disable rule vetoes availability." />
-									}
-								/>
-							</span>
-						) : null}
-						{line.default ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-								<Tx label="Default" />
-								<EditorInfoTooltip
-									content={
-										<Tx label="The authored line selected for ordinary item activation. The player can change Default independently of Clock." />
-									}
-								/>
-							</span>
-						) : null}
-						{line.clock === true ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-								<Tx label="Clock" />
-								<EditorInfoTooltip
-									content={
-										<Tx label="The authored line selected for automatic Clock impulses. Selecting Default does not change this selection." />
-									}
-								/>
-							</span>
-						) : null}
-						{!line.show ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-line px-2.5 py-1 text-xs font-semibold text-foreground">
-								<Tx label="Hidden" />
-								<EditorInfoTooltip
-									content={
-										<Tx label="Hidden before rules are evaluated. Show rules can reveal this line; a matching Hide rule vetoes visibility." />
-									}
-								/>
-							</span>
-						) : null}
-
-						{line.ahead === true ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-								<Tx label="Check ahead" />
-								<EditorInfoTooltip
-									content={
-										<Tx label="Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output." />
-									}
-								/>
-							</span>
-						) : null}
+						<LineFlag
+							checked={line.default}
+							label={<Tx label="Default" />}
+							description={
+								<Tx label="The authored line selected for ordinary item activation. The player can change Default independently of Clock." />
+							}
+						/>
+						<LineFlag
+							checked={line.clock === true}
+							label={<Tx label="Clock" />}
+							description={
+								<Tx label="The authored line selected for automatic Clock impulses. Selecting Default does not change this selection." />
+							}
+						/>
+						<LineFlag
+							checked={line.show}
+							label={<Tx label="Visible" />}
+							description={
+								<Tx label="Visible lines are shown to the player before runtime rules alter their visibility." />
+							}
+						/>
+						<LineFlag
+							checked={line.enable}
+							label={<Tx label="Enabled" />}
+							description={
+								<Tx label="Enabled lines can accept production jobs before runtime rules alter their availability." />
+							}
+						/>
+						<LineFlag
+							checked={line.ahead === true}
+							label={<Tx label="Check ahead" />}
+							description={
+								<Tx label="Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output." />
+							}
+						/>
 					</div>
 					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
 						{line.description}

@@ -65,6 +65,7 @@ export const LineFields = withFieldGroupFn({
 							<group.AppField name="runtimeMs">
 								{(field) => (
 									<field.SecondsField
+										step={5}
 										label={translator.textFn("Runtime (seconds)")}
 										description={translator.textFn(
 											"Base duration of one job on this line before runtime multiplier and adjustment rules are applied.",

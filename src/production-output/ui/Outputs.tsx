@@ -173,12 +173,10 @@ export const Outputs = <Item extends OutputProjection.Item>({
 						key={`${setIndex}:${set.weight}`}
 						className="py-1"
 					>
-						{output.length > 1 ? (
-							<p className="pt-2 text-xs font-medium text-muted">
-								<Tx label="Alternative" /> {setIndex + 1} · <Tx label="Weight" />{" "}
-								{set.weight}
-							</p>
-						) : null}
+						<p className="pt-2 text-xs font-medium text-muted">
+							<Tx label="Alternative" /> {setIndex + 1} · <Tx label="Weight" />{" "}
+							{set.weight}
+						</p>
 						<div className="divide-y divide-line/60">
 							{set.roll.map((roll, rollIndex) => (
 								<OutputRoll

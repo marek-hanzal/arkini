@@ -503,7 +503,7 @@ Item stack size help:
   value: |
     The maximum quantity that can share one cell as a stack. This is separate from **Units**, the finite supply inside one item. A configured **Clock** requires a stack size of one.
 Item storage scope - any:
-  value: Board, Inventory & Toolbar
+  value: Any
   dynamic: true
 Item storage scope - board:
   value: Board only
@@ -610,8 +610,6 @@ No authored operation owned by this item directly inputs or positively requires 
 No authored operation owned by this item outputs another item.:
   value: No authored operation owned by this item outputs another item.
   dynamic: true
-No configured limit:
-  value: No configured limit
 No depletion output configured.:
   value: No depletion output configured.
 No expiry output configured.:

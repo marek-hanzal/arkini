@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "uqo1r28kmlewdx8hz6da2juq",
+		"id": "ground-boulders-02",
+		"title": "Ground Boulders 02",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"ground-boulders-02"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

@@ -31,6 +31,15 @@
 				"action": "use",
 				"effect": "replace",
 				"result": "hunted-game"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wood"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "firewood"
 			}
 		],
 		"type": "simple"

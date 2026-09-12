@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "pdt5vs0bi176w3n5ernkygiq",
+		"id": "ground-meadow-04",
+		"title": "Ground Meadow 04",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"ground-meadow-04"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

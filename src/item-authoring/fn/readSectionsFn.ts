@@ -37,10 +37,6 @@ const DetailSections = [
 		label: "Item",
 	},
 	{
-		id: "interactions",
-		label: "Interactions",
-	},
-	{
 		id: "production",
 		label: "Production",
 	},

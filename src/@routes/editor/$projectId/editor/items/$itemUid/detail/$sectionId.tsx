@@ -3,7 +3,6 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
 import { DeleteSection } from "~/item-authoring/ui/DeleteSection";
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
-import { InteractionsDetail } from "~/item-authoring/ui/InteractionsDetail";
 import { IdentityDetail } from "~/item-authoring/ui/IdentityDetail";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
@@ -67,8 +66,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		switch (section) {
 			case "identity":
 				return <IdentityDetail item={item} />;
-			case "interactions":
-				return <InteractionsDetail item={item} />;
 			case "production":
 				return <ProductionDetail item={item} />;
 			case "estimate":

@@ -1,13 +1,15 @@
-import { ArrowRight, Boxes, Images, LoaderCircle, TriangleAlert } from "lucide-react";
+import { ArrowRight, LoaderCircle, TriangleAlert } from "lucide-react";
 
 import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectNotesOverview } from "~/project-note/ui/ProjectNotesOverview";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 /** Presents project-wide repository, content, Estimate, and asset summaries. */
 export const ProjectOverview = ({ project }: { readonly project: Project }) => {
+	const translator = useTranslator();
 	const estimateState = useItemEstimateIndex(project, {
 		query: "",
 		view: "incomplete",
@@ -46,7 +48,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 
 	return (
 		<section
-			className="flex flex-col gap-[var(--ak-viewport-gap)]"
+			className="grid gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2"
 			data-ui="EditorProjectOverview"
 		>
 			<ProjectNotesOverview projectId={project.projectId} />
@@ -60,7 +62,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						{unreachableSummary}
 					</div>
 				}
-				footerRight={
+				action={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5"
 						data-overview-id="items"
@@ -70,16 +72,15 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						}}
 						to="/editor/$projectId/editor/items/list"
 					>
-						Items
+						{translator.textFn("Open")}
 						<ArrowRight className="size-4" />
 					</LinkButtonLink>
 				}
-				icon={Boxes}
-				title="Items"
+				title={translator.textFn("Items")}
 			/>
 			<EditorOverviewCard
 				body={`${project.resources.length} ${project.resources.length === 1 ? "asset" : "assets"}`}
-				footerRight={
+				action={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5"
 						data-overview-id="assets"
@@ -89,12 +90,11 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 						}}
 						to="/editor/$projectId/assets"
 					>
-						Assets
+						{translator.textFn("Open")}
 						<ArrowRight className="size-4" />
 					</LinkButtonLink>
 				}
-				icon={Images}
-				title="Assets"
+				title={translator.textFn("Assets")}
 			/>
 		</section>
 	);

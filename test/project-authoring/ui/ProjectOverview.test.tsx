@@ -43,6 +43,7 @@ vi.mock("~/ui/ui/LinkButton", () => ({
 		),
 }));
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 import { ProjectOverview } from "~/project-authoring/ui/ProjectOverview";
 import type { Project } from "~/project-authoring/type/Project";
 import {
@@ -88,7 +89,13 @@ describe("ProjectOverview", () => {
 		const root = createRoot(container);
 		roots.push(root);
 
-		await act(async () => root.render(<ProjectOverview project={project} />));
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					<ProjectOverview project={project} />
+				</TranslationTestProvider>,
+			),
+		);
 
 		const links = Array.from(
 			container.querySelectorAll<HTMLAnchorElement>('[data-ui="EditorProjectOverviewLink"]'),
@@ -139,7 +146,13 @@ describe("ProjectOverview", () => {
 		const root = createRoot(container);
 		roots.push(root);
 
-		await act(async () => root.render(<ProjectOverview project={project} />));
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					<ProjectOverview project={project} />
+				</TranslationTestProvider>,
+			),
+		);
 
 		const link = container.querySelector<HTMLAnchorElement>(
 			'[data-overview-id="unreachable-items"]',

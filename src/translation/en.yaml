@@ -664,6 +664,8 @@ One weighted alternative is selected, then its guaranteed, chance, and weighted 
   value: One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.
 Only items with Units enabled are shown because the target pays the unit cost.:
   value: Only items with Units enabled are shown because the target pays the unit cost.
+Open:
+  value: Open
 Open folder:
   value: Open folder
 Open the inventory after all requirements and rules pass.:

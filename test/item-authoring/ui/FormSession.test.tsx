@@ -960,7 +960,8 @@ describe("item section form session", () => {
 			maxStackSize: 1,
 			action: undefined,
 			clock: {
-				intervalMs: 1000,
+				intervalMs: 300_000,
+				durationMs: 3_600_000,
 			},
 			lines: [],
 		});

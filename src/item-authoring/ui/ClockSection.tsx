@@ -37,7 +37,8 @@ const ClockFields = () => {
 								description={translator.textFn(
 									"Leave empty for a one-shot lifetime without periodic production.",
 								)}
-								min={0.1}
+								min={5}
+								step={5}
 								optional
 							/>
 						)}
@@ -49,7 +50,8 @@ const ClockFields = () => {
 								description={translator.textFn(
 									"Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.",
 								)}
-								min={0.1}
+								min={5}
+								step={5}
 								optional
 							/>
 						)}
@@ -143,7 +145,8 @@ export const ClockSection = () => {
 								form.setFieldValue("scope", "board");
 								form.setFieldValue("maxStackSize", 1);
 								form.setFieldValue("clock", {
-									intervalMs: 1000,
+									intervalMs: 300_000,
+									durationMs: 3_600_000,
 									enable: true,
 									rules: [],
 								});

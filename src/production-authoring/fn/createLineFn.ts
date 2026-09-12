@@ -22,7 +22,7 @@ export const createLineFn = (
 		default: lines.length === 0,
 		show: true,
 		enable: true,
-		runtimeMs: 0,
+		runtimeMs: 30_000,
 		input: [
 			{
 				type: "simple",

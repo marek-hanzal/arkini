@@ -4,7 +4,6 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
 import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
@@ -19,11 +18,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorRootCard dataUi="EditorItemDetailCard">
-				<div className="grid gap-x-8 gap-y-5 min-[64rem]:grid-cols-[auto_minmax(0,2fr)_minmax(0,1fr)]">
-					<EditorItemThumbnail
-						resourceIds={item.asset.default}
-						size="xl"
-					/>
+				<div className="grid gap-x-8 gap-y-5 min-[64rem]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
 					<FactList>
 						<DetailFact
 							label={translator.textFn("Player controls")}

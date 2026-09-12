@@ -58,10 +58,10 @@ Choose a different Project ID.:
   value: Choose a different Project ID.
 Clock:
   value: Clock
+Clock configured:
+  value: Clock configured
 Clock is disabled:
   value: Clock is disabled
-Clock mode:
-  value: Clock mode
 Close:
   value: Close
 Connection search empty:
@@ -97,10 +97,12 @@ Describe what this line consumes and produces.:
   value: Describe what this line consumes and produces.
 Description:
   value: Description
+Disable:
+  value: Disable
 Disable action:
   value: Disable action
-Disable clock:
-  value: Disable clock
+Disable removes timing, rules and expiry output from this item.:
+  value: Disable removes timing, rules and expiry output from this item.
 Disable units:
   value: Disable units
 Disabled:
@@ -229,8 +231,6 @@ Interval:
   value: Interval
 Interval (seconds):
   value: Interval (seconds)
-Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.:
-  value: Interval attempts the line marked Clock periodically. Once expires after its lifetime and emits the expiry output. Accepted production keeps its ordinary line rules.
 Inventory:
   value: Inventory
 Inventory action:
@@ -287,6 +287,8 @@ Item storage scope - toolbar:
   dynamic: true
 Keep:
   value: Keep
+Leave empty for a one-shot lifetime without periodic production.:
+  value: Leave empty for a one-shot lifetime without periodic production.
 Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.:
   value: Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.
 "Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged.":
@@ -335,6 +337,8 @@ No item with Units enabled matches this search.:
   value: No item with Units enabled matches this search.
 No merge output:
   value: No merge output
+None:
+  value: None
 None available:
   value: None available
 Notes:
@@ -352,8 +356,6 @@ Notes unavailable:
   value: Notes are unavailable.
 Once:
   value: Once
-Once requires a lifetime. When it ends, accepted production settles before the expiry output is emitted.:
-  value: Once requires a lifetime. When it ends, accepted production settles before the expiry output is emitted.
 Only items with Units enabled are shown because the target pays the unit cost.:
   value: Only items with Units enabled are shown because the target pays the unit cost.
 Open the inventory after all requirements and rules pass.:
@@ -453,6 +455,8 @@ Self:
   value: Self
 Self-paid units input:
   value: Self-paid units input
+Set an interval, a lifetime, or both. Without an interval, the clock expires once. Without a lifetime, it runs indefinitely.:
+  value: Set an interval, a lifetime, or both. Without an interval, the clock expires once. Without a lifetime, it runs indefinitely.
 Set clock:
   value: Set clock
 Set default:

@@ -1010,7 +1010,7 @@ describe("item section form session", () => {
 		);
 	});
 
-	it("switches clock modes while preserving the edited lifetime and expiry output", async () => {
+	it("clears the Clock interval while preserving the edited lifetime and expiry output", async () => {
 		const onExpire = createOutput([
 			{
 				itemId: item.id,
@@ -1027,29 +1027,17 @@ describe("item section form session", () => {
 		state.persisted = scheduled;
 		(state.project as Project).config.items[item.id] = scheduled;
 		const { container } = await render(<ClockSection />);
-		const selectMode = async (label: string) => {
-			const button = [
-				...container.querySelectorAll("button"),
-			].find((candidate) => candidate.textContent === label);
-			if (button === undefined) throw new Error(`Missing ${label} clock mode.`);
-			await act(async () => button.click());
-		};
-		await selectMode("Interval");
-		expect(
-			container.querySelector<HTMLInputElement>('input[name="clock.intervalMs"]')?.value,
-		).toBe("1.5");
-		await selectMode("Once");
-		expect(container.querySelector('input[name="clock.intervalMs"]')).toBeNull();
+		const interval = container.querySelector<HTMLInputElement>(
+			'input[name="clock.intervalMs"]',
+		);
 		const duration = container.querySelector<HTMLInputElement>(
 			'input[name="clock.durationMs"]',
 		);
-		if (duration === null) throw new Error("Missing Once lifetime.");
+		if (interval === null || duration === null) throw new Error("Missing Clock timer fields.");
 		await changeInput(duration, "5");
-		await selectMode("Interval");
-		expect(
-			container.querySelector<HTMLInputElement>('input[name="clock.intervalMs"]')?.value,
-		).toBe("1");
-		await selectMode("Once");
+		await changeInput(interval, "");
+		await changeInput(interval, "2");
+		await changeInput(interval, "");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
@@ -1064,7 +1052,7 @@ describe("item section form session", () => {
 		expect(saved.clock.intervalMs).toBeUndefined();
 	});
 
-	it("names and focuses the invalid Once lifetime", async () => {
+	it("marks both missing Clock timers invalid and focuses the first field", async () => {
 		const once: ItemSchema.Type = {
 			...item,
 
@@ -1087,10 +1075,13 @@ describe("item section form session", () => {
 		const duration = container.querySelector<HTMLInputElement>(
 			'input[name="clock.durationMs"]',
 		);
+		const interval = container.querySelector<HTMLInputElement>(
+			'input[name="clock.intervalMs"]',
+		);
 		const saveButton = [
 			...container.querySelectorAll("button"),
 		].find((button) => button.textContent === "Save");
-		if (duration === null || saveButton === undefined)
+		if (interval === null || duration === null || saveButton === undefined)
 			throw new Error("Missing Once lifetime form.");
 
 		await changeInput(duration, "");
@@ -1099,15 +1090,25 @@ describe("item section form session", () => {
 			await Promise.resolve();
 		});
 
-		expect(container.textContent).toContain("Duration: Enter a valid number.");
+		expect(state.saveItem).not.toHaveBeenCalled();
 		expect(duration.dataset.uiInvalid).toBe("true");
+		expect(interval.dataset.uiInvalid).toBe("true");
 		await act(
 			() =>
 				new Promise<void>((resolve) => {
 					requestAnimationFrame(() => resolve());
 				}),
 		);
-		expect(document.activeElement).toBe(duration);
+		expect(document.activeElement).toBe(interval);
+		await changeInput(interval, "1");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.clock).toMatchObject({
+			intervalMs: 1000,
+		});
+		expect(duration.dataset.uiInvalid).not.toBe("true");
+		expect(interval.dataset.uiInvalid).not.toBe("true");
 	});
 
 	it.each([

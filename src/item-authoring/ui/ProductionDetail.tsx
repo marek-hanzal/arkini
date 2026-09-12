@@ -31,6 +31,7 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 				<EditorCollectionSelector
 					key={item.uid}
 					count={item.lines.length}
+					initialSelectedIndex={null}
 					clearSelectionLabel={translator.textFn("Clear filter")}
 					unselectedContent={item.lines.map((line) => (
 						<ProductionLineDetail

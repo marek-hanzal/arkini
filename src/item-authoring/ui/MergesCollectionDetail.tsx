@@ -10,7 +10,7 @@ import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapability
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** Keeps one authored merge visible while the shared selector navigates the complete collection. */
+/** Shows all authored merges until the shared selector filters to one entry. */
 export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
@@ -42,6 +42,16 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 				<EditorCollectionSelector
 					key={item.uid}
 					count={merges.length}
+					initialSelectedIndex={null}
+					clearSelectionLabel={translator.textFn("Clear filter")}
+					unselectedContent={merges.map((merge, index) => (
+						<MergeDetail
+							key={index}
+							itemUid={item.uid}
+							index={index}
+							merge={merge}
+						/>
+					))}
 					itemLabelFn={(index) => {
 						const targetId = merges[index].target.itemId;
 						return `${translator.textFn("Merge")} ${index + 1} — ${project.config.items[targetId]?.title || targetId}`;

@@ -75,6 +75,7 @@ describe("EditorCollectionSelector", () => {
 			root.render(
 				<EditorCollectionSelector
 					count={2}
+					initialSelectedIndex={null}
 					clearSelectionLabel="Clear filter"
 					unselectedContent={<div data-ui="AllLines">All lines</div>}
 					itemLabelFn={(index) =>
@@ -98,6 +99,8 @@ describe("EditorCollectionSelector", () => {
 		});
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (input === null) throw new Error("Expected collection search input.");
+		expect(input.value).toBe("");
+		expect(container.querySelector('[data-ui="AllLines"]')).not.toBeNull();
 		await act(async () => input.click());
 		await changeInput(input, "copper");
 		await act(async () => vi.advanceTimersByTime(250));

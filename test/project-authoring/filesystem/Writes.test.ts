@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import { Cause, Effect, Exit, FileSystem } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -111,9 +111,9 @@ describe("filesystem Editor project writes", () => {
 		const recordReadFn = (target: string) => {
 			if (target.endsWith(".png")) pngOperations.push(target);
 			if (
-				target.startsWith(`${root}/`) &&
+				target.startsWith(`${root}${sep}`) &&
 				target.endsWith(".json") &&
-				!target.includes("editor.lock.write/")
+				!target.includes(`editor.lock.write${sep}`)
 			)
 				jsonReads.add(target);
 		};

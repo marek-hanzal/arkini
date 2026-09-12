@@ -4,6 +4,7 @@ import {
 	type RefObject,
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -38,6 +39,8 @@ export namespace useItemSpotlightController {
 
 	export interface Output {
 		readonly inputRef: RefObject<HTMLInputElement | null>;
+		readonly resultsRef: RefObject<HTMLDivElement | null>;
+		readonly navigateSelectionFn: (index: number) => void;
 		readonly onKeyDownFn: (event: KeyboardEvent<HTMLDivElement>) => void;
 		readonly query: string;
 		readonly searchPending: boolean;
@@ -59,6 +62,8 @@ export const useItemSpotlightController = ({
 	resultLimit,
 }: useItemSpotlightController.Props): useItemSpotlightController.Output => {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const resultsRef = useRef<HTMLDivElement>(null);
+	const keyboardScrollPendingRef = useRef(false);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
 	const [query, setQueryFn] = useState("");
 	const [selectedIndex, setSelectedIndexFn] = useState(0);
@@ -103,10 +108,32 @@ export const useItemSpotlightController = ({
 		resultLimit,
 	]);
 	const updateQueryFn = (value: string) => {
+		keyboardScrollPendingRef.current = true;
 		setQueryFn(value);
 		setSelectedIndexFn(0);
 		onQueryChangeFn?.(value);
 	};
+	const navigateSelectionFn = (index: number) => {
+		keyboardScrollPendingRef.current = true;
+		setSelectedIndexFn(index);
+	};
+	useLayoutEffect(() => {
+		const menu = resultsRef.current;
+		if (menu === null || searchPending || !keyboardScrollPendingRef.current) return;
+		const selected = menu.querySelector<HTMLElement>('[data-ui-selected="true"]');
+		if (selected === null) return;
+		keyboardScrollPendingRef.current = false;
+		// Scroll only the result list; scrollIntoView can also move the underlying page.
+		const top = menu.getBoundingClientRect().top + menu.clientTop;
+		const bottom = top + menu.clientHeight;
+		const bounds = selected.getBoundingClientRect();
+		if (bounds.top < top) menu.scrollTop -= top - bounds.top;
+		else if (bounds.bottom > bottom) menu.scrollTop += bounds.bottom - bottom;
+	}, [
+		results,
+		searchPending,
+		selectedIndex,
+	]);
 	const selectItemFn = useCallback(
 		({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
 			if (searchPending) return;
@@ -158,6 +185,8 @@ export const useItemSpotlightController = ({
 
 	return {
 		inputRef,
+		resultsRef,
+		navigateSelectionFn,
 		onKeyDownFn,
 		query,
 		searchPending,

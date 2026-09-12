@@ -115,6 +115,7 @@ const applyProjectFileSetFx = Effect.fn("applyProjectFileSetFx")(function* ({
 			yield* fileSystem.remove(target, {
 				force: true,
 			});
+		yield* plan.verifyFx ?? Effect.void;
 		yield* writeSyncedFileFx({
 			target: path.join(active, "committed"),
 			bytes: Uint8Array.of(1),
@@ -144,6 +145,8 @@ const applyProjectFileSetFx = Effect.fn("applyProjectFileSetFx")(function* ({
 });
 
 interface ProjectFileSetPlan {
+	/** Verify newly written metadata before committing; failure restores the journal. */
+	readonly verifyFx?: Effect.Effect<void, unknown, never>;
 	readonly writes: ReadonlyArray<{
 		readonly target: string;
 		readonly bytes: Uint8Array;

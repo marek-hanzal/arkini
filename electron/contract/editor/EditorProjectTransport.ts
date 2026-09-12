@@ -88,7 +88,8 @@ export namespace EditorProjectTransport {
 	export interface Resource {
 		readonly id: string;
 		readonly mime: string;
-		readonly bytes: Uint8Array;
+		readonly size: number;
+		readonly version: string;
 	}
 
 	export interface Project extends Descriptor {

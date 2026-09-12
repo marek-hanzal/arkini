@@ -136,6 +136,12 @@ install() {
 	npm ci
 }
 
+# @cmd Add exact production dependencies and update the lockfile
+# @arg packages+ Dependency packages
+add() {
+	npm install --save-exact "${argc_packages[@]}"
+}
+
 # @cmd Refresh the offline Sigstore trusted-root snapshot through TUF
 signing:update-trusted-root() {
 	tsx scripts/updateArkpackTrustedRoot.ts

@@ -14,6 +14,19 @@ export interface OwnedEditorProjectRepository
 	readonly dismissInvalidProjectFx: (
 		root: string,
 	) => Effect.Effect<void, ProjectRepositoryError, never>;
+	readonly readResourceLocationFx: (props: {
+		readonly projectId: string;
+		readonly resourceId: string;
+	}) => Effect.Effect<
+		{
+			readonly root: string;
+			readonly path: string;
+			readonly version: string;
+			readonly size: number;
+		} | null,
+		ProjectRepositoryError,
+		never
+	>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 	readonly openProjectFx: (
 		props: ProjectRepository.OpenProjectProps,

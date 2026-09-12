@@ -3,7 +3,7 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
+import { readProjectResourceMetadataFx } from "./readProjectResourceMetadataFx";
 import { readResourceDescriptorsFx } from "~/game-config-resource/fx/readResourceDescriptorsFx";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
@@ -12,7 +12,6 @@ import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProje
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 import type { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import { createProjectPathsFx } from "../createProjectPathsFx";
-import type { ProjectFiles } from "./ProjectFiles";
 
 const parseJsonFx = <Value>(file: string, parseFn: (candidate: unknown) => Value, label: string) =>
 	Effect.gen(function* () {
@@ -153,15 +152,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 				? left.path.localeCompare(right.path)
 				: left.id.localeCompare(right.id),
 		),
-		({ path: resourcePath }) =>
-			readPngResourceFx({
-				path: resourcePath,
-			}).pipe(
-				Effect.map((resource) => ({
-					...resource,
-					bytes: new Uint8Array(resource.bytes),
-				})),
-			),
+		({ id, path: resourcePath }) => readProjectResourceMetadataFx(id, resourcePath),
 	);
 	yield* admitArkiniVersionFx("Editor project", marker.arkini);
 
@@ -170,5 +161,5 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 		marker,
 		config,
 		resources,
-	} satisfies ProjectFiles;
+	};
 });

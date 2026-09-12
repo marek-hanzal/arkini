@@ -8,7 +8,10 @@ import {
 	ProjectRepository,
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
@@ -27,7 +30,7 @@ const project: Project = {
 	updatedAtMs: 100,
 	revision: 0,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 const createRepository = (
@@ -91,7 +94,7 @@ describe("openEditorArkpackFx", () => {
 					arkini: ArkiniAppVersion,
 					config: project.config,
 					resources: [
-						...project.resources,
+						...editorTestPayload.resources,
 					],
 				},
 			}),
@@ -106,7 +109,7 @@ describe("openEditorArkpackFx", () => {
 		expect(createProjectFx).toHaveBeenCalledWith({
 			version: project.version,
 			config: project.config,
-			resources: project.resources,
+			resources: editorTestPayload.resources,
 		});
 	});
 });

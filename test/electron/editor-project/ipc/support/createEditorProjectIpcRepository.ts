@@ -4,7 +4,10 @@ import { vi } from "vitest";
 
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 export const editorProjectIpcDescriptor = {
 	projectId: "project-one",
@@ -25,7 +28,7 @@ export const editorProjectIpcProject = {
 	...editorProjectIpcDescriptor,
 	revision: editorProjectIpcCommit.revision,
 	config: editorProjectIpcCommit.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 export const editorProjectIpcBuild = {
@@ -50,6 +53,7 @@ export const editorProjectIpcNote = {
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
 export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
+	readResourceLocationFx: () => Effect.die("Unexpected resource location read."),
 	saveBuildVersionFx: vi.fn(({ version }) => Effect.succeed(version)),
 	buildProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcBuild)),
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),

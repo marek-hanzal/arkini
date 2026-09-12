@@ -17,5 +17,5 @@ export const createRendererDevelopmentContentSecurityPolicyFn = ({
 		RendererContentSecurityPolicy.commonDirectives[0],
 		`script-src 'self' 'nonce-${nonce}'`,
 		...RendererContentSecurityPolicy.commonDirectives.slice(1),
-		`connect-src 'self' blob: data: ${developmentUrl.webSocketEndpoint}`,
+		`connect-src 'self' blob: data: ${developmentUrl.webSocketEndpoint} arkini://editor`,
 	].join("; ");

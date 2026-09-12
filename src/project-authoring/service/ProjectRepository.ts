@@ -1,3 +1,4 @@
+import type { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
 import { Context, type Effect } from "effect";
 
 import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
@@ -51,7 +52,7 @@ export namespace ProjectRepository {
 		readonly currentId: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly resource: ResourceSchema.Type;
+		readonly resource: ProjectResourceReplacementSchema.Type;
 	}
 
 	export interface UpsertResourcesProps {

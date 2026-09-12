@@ -59,7 +59,10 @@ vi.mock("~/ui/ui/Button", () => {
 	};
 });
 
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { EditorAssetDeleteSection } from "~/asset-authoring/ui/EditorAssetDeleteSection";
 
 (
@@ -85,11 +88,12 @@ beforeEach(() => {
 		revision: 0,
 		config: editorTestPayload.config,
 		resources: [
-			...editorTestPayload.resources,
+			...editorTestResources,
 			{
 				id: "unused",
 				mime: "image/png",
-				bytes: Uint8Array.of(9),
+				size: 1,
+				version: "1",
 			},
 		],
 	};

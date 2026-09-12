@@ -8,7 +8,10 @@ import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGame
 import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (revision: number): Project => ({
 	projectId: "editor-board",
@@ -21,7 +24,7 @@ const createProject = (revision: number): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 afterEach(() => {
@@ -286,7 +289,7 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 					1,
 					2,
 				]);
-				expect(revokeObjectUrl).toHaveBeenCalledTimes(2);
+				expect(revokeObjectUrl).not.toHaveBeenCalled();
 
 				yield* owner.releaseCurrentFx;
 			}),

@@ -8,7 +8,10 @@ import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProj
 import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
@@ -23,7 +26,7 @@ const createProject = (revision: number): Project => ({
 	updatedAtMs: revision + 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 const createCommit = (previousRevision: number, revision: number): ProjectCommit => {

@@ -17,7 +17,10 @@ import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProj
 import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const project = {
@@ -31,7 +34,7 @@ const project = {
 	updatedAtMs: 9,
 	revision: 9,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 const runRefresh = async (

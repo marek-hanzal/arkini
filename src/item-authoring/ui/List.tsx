@@ -2,7 +2,9 @@ import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { Mx } from "~/translation/ui/Mx";
 import { FilePenLine, PackageOpen, Plus } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import { filterFn } from "~/item-authoring/fn/filterFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -16,6 +18,8 @@ import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+
+const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
@@ -54,17 +58,14 @@ export const List = ({
 			settledQuery,
 		],
 	);
-	const rows = useMemo(
-		() =>
-			filteredItems.map((item) => (
-				<ListRow
-					key={item.uid}
-					item={item}
-					projectId={project.projectId}
-				/>
-			)),
+	const renderItemFn = useCallback(
+		(item: ItemSchema.Type) => (
+			<ListRow
+				item={item}
+				projectId={project.projectId}
+			/>
+		),
 		[
-			filteredItems,
 			project.projectId,
 		],
 	);
@@ -144,7 +145,13 @@ export const List = ({
 						{translator.textFn("No items match the active filters.")}
 					</p>
 				) : null}
-				{rows}
+				<EditorVirtualCollection
+					items={filteredItems}
+					itemKeyFn={readItemKeyFn}
+					renderItemFn={renderItemFn}
+					estimatedRowHeight={88}
+					gapRem={0.5}
+				/>
 			</div>
 		</EditorSectionPage>
 	);

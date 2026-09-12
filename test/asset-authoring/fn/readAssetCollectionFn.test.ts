@@ -2,16 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import { readAssetCollectionFn } from "~/asset-authoring/fn/readAssetCollectionFn";
 import {
+	editorTestResources,
 	editorTestConfig,
-	editorTestPayload,
 } from "~test/project-authoring/support/editorTestPayload";
 
 describe("readAssetCollectionFn", () => {
 	it("applies the canonical usage filter before fuzzy search", () => {
 		const resources = [
-			...editorTestPayload.resources,
+			...editorTestResources,
 			{
-				bytes: new Uint8Array(),
+				size: 0,
+				version: "1",
 				id: "forge-image",
 				mime: "image/png" as const,
 			},

@@ -20,7 +20,10 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { Project } from "~/project-authoring/type/Project";
 import { useProjectIdentityRenameController } from "~/project-authoring/ui/useProjectIdentityRenameController";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const project: Project = {
 	projectId: "project-one",
@@ -36,7 +39,7 @@ const project: Project = {
 			id: "project-one",
 		},
 	},
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 };
 
 /** Keeps only Electron responses and route completion controllable; the controller and admission are real. */

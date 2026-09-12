@@ -23,7 +23,10 @@ import {
 	ProjectWriteAdmission,
 	type ProjectWriteAdmissionService,
 } from "~/project-authoring/service/ProjectWriteAdmission";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
@@ -58,7 +61,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 		updatedAtMs: 2,
 		revision: 2,
 		config: editorTestPayload.config,
-		resources: editorTestPayload.resources,
+		resources: editorTestResources,
 	};
 	const releaseGate = Effect.runSync(Deferred.make<void>());
 	const releaseStarted = Effect.runSync(Deferred.make<void>());

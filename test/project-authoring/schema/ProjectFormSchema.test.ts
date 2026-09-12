@@ -4,7 +4,10 @@ import type { Project } from "~/project-authoring/type/Project";
 import { createProjectFormSchema } from "~/project-authoring/schema/createProjectFormSchema";
 import type { ProjectFormSchema } from "~/project-authoring/schema/ProjectFormSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (overrides?: Partial<Project>): Project => ({
 	projectId: "project",
@@ -17,7 +20,7 @@ const createProject = (overrides?: Partial<Project>): Project => ({
 	updatedAtMs: 2,
 	revision: 0,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 	...overrides,
 });
 

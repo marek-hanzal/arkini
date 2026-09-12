@@ -10,7 +10,10 @@ import type { Project } from "~/project-authoring/type/Project";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { EditorProjectProvider, useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -70,7 +73,7 @@ const createProject = (revision: number, projectId = "project"): Project => ({
 	updatedAtMs: 1,
 	revision,
 	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
+	resources: editorTestResources,
 });
 
 describe("EditorProjectProvider", () => {

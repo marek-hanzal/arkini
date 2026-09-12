@@ -9,7 +9,10 @@ import { createElectronProjectRepositoryFx } from "~/project-authoring/fx/create
 import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => ({
 	type: "success",
@@ -35,10 +38,7 @@ const project: EditorProjectTransport.Project = {
 	...descriptor,
 	revision: commit.revision,
 	config: commit.config,
-	resources: editorTestPayload.resources.map((resource) => ({
-		...resource,
-		bytes: new Uint8Array(resource.bytes),
-	})),
+	resources: editorTestResources,
 };
 
 const installEditorApi = () => {
@@ -273,7 +273,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		});
 	});
 
-	it("keeps resource bytes typed across request and response boundaries", async () => {
+	it("sends uploaded bytes but receives only asset metadata", async () => {
 		const editor = installEditorApi();
 		const { repository } = createRepository();
 		const requestBytes = new Uint8Array([
@@ -310,8 +310,8 @@ describe("createElectronProjectRepositoryFx", () => {
 			mime: "image/png",
 			bytes: expect.any(Uint8Array),
 		});
-		expect(saved.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
-		expect(saved.resources[0]?.bytes).not.toBe(project.resources[0]?.bytes);
+		expect(saved.resources).toEqual(editorTestResources);
+		expect(saved.resources[0]).not.toHaveProperty("bytes");
 		expect(editor.optimizeResourcesFn).toHaveBeenCalledWith({
 			expectedRevision: project.revision,
 			projectId: project.projectId,
@@ -319,7 +319,8 @@ describe("createElectronProjectRepositoryFx", () => {
 				"hero",
 			],
 		});
-		expect(optimized.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
+		expect(optimized.project.resources).toEqual(editorTestResources);
+		expect(optimized.project.resources[0]).not.toHaveProperty("bytes");
 	});
 
 	it("forwards matching resource optimization progress and releases the listener", async () => {

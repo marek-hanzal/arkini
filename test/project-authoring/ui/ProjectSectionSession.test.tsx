@@ -152,7 +152,10 @@ import { ProjectBoardSection } from "~/project-authoring/ui/ProjectBoardSection"
 import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSection";
 import { ProjectToolbarSection } from "~/project-authoring/ui/ProjectToolbarSection";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
@@ -276,7 +279,7 @@ describe("project section form session", () => {
 			updatedAtMs: 2,
 			revision: 0,
 			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		} satisfies Project;
 		let consumerRenders = 0;
 		const Probe = memo(() => {
@@ -316,7 +319,7 @@ describe("project section form session", () => {
 			updatedAtMs: 2,
 			revision: 0,
 			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
+			resources: editorTestResources,
 		} satisfies Project;
 		const container = document.createElement("div");
 		document.body.append(container);

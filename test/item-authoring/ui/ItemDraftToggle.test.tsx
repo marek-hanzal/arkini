@@ -43,7 +43,10 @@ vi.mock("~/ui/ui/Button", () => {
 });
 
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
-import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import {
+	editorTestResources,
+	editorTestPayload,
+} from "~test/project-authoring/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -67,7 +70,7 @@ beforeEach(() => {
 		updatedAtMs: 2,
 		revision: 7,
 		config: editorTestPayload.config,
-		resources: editorTestPayload.resources,
+		resources: editorTestResources,
 	};
 });
 

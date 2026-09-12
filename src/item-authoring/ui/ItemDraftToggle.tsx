@@ -20,7 +20,7 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 	return (
 		<div className="grid justify-items-end gap-1">
 			<DraftButton
-				className="h-10 min-h-10 px-3 py-2 text-sm"
+				className="h-10 min-h-10 border px-3 py-2 text-sm data-[ui-active=true]:border-transparent"
 				cursorIntent={controller.pending ? "wait" : "pointer"}
 				disabled={controller.pending}
 				onClick={() => void controller.toggleFn()}

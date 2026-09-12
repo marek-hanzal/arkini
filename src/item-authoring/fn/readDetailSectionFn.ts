@@ -7,9 +7,8 @@ export const readDetailSectionFn = (section: SectionId): DetailSectionId => {
 		case "units":
 		case "action":
 		case "merges":
-			return "identity";
 		case "clock":
-			return "production";
+			return "identity";
 		default:
 			return section;
 	}

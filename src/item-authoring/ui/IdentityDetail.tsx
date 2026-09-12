@@ -4,6 +4,7 @@ import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
+import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
@@ -156,6 +157,20 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						)}
 					/>
 					<ProductionSummaryDetail item={item} />
+				</section>
+				<section
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemClockDetail"
+				>
+					<ItemDetailSectionHeader
+						itemUid={item.uid}
+						sectionId="clock"
+						title={translator.textFn("Clock")}
+						description={translator.textFn(
+							"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
+						)}
+					/>
+					<ClockDetail item={item} />
 				</section>
 			</div>
 		</div>

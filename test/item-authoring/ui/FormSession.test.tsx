@@ -262,7 +262,7 @@ describe("item section form session", () => {
 		],
 		[
 			"clock",
-			"production",
+			"identity",
 		],
 	] as const)(
 		"returns %s edits to the %s detail after Save and Discard",

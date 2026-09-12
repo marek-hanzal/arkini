@@ -446,13 +446,15 @@ Item global count help:
     Limits the total quantity of this item across the game. Stack quantities contribute to the same global limit. Leave empty for no global limit.
 Item identity help:
   value: |
-    Item brings together identity, artwork, storage limits, units, actions, merges and a production summary. Use each section's **Edit** action to open its exact settings.
+    Item brings together identity, artwork, storage limits, units, actions, merges, Clock and a production summary. Use each section's **Edit** action to open its exact settings.
 
     **Storage scope** controls placement on Board, Toolbar and Inventory. **Stack capacity** counts separate items in one stack; **Units** are the supply inside each item. **Game limit** limits the item across the game.
 
     **Action** opens a Space or Inventory after its inputs and rules pass. **Merges** apply a source action, target effect and optional output when this item is dropped onto a matching target. Action cannot coexist with production lines or Clock; Merges are independent.
 
-    **Production** shows whether lines are configured and how many there are. Open the Production page for their full details and Clock settings.
+    **Production** previews the first two lines and their outputs. Open a line to edit it, or use **Show all** for the complete Production page.
+
+    **Clock** has its own section for periodic production, a finite lifetime and expiry output. A lifetime works without production lines.
 
     Item IDs can be renamed with their project references. The UID remains the item's stable identity. Artwork changes appearance without changing occupied cells.
 
@@ -488,7 +490,7 @@ Item production empty title:
   value: Let this item produce other items.
 Item production help:
   value: |
-    Production combines the item's queue, Clock and production lines. Queue capacity and player controls are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
+    Production shows the authored production lines. Queue capacity, player controls and Clock settings are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
 
     **Default** selects the manual click line. **Clock** independently selects the line attempted at every timer pulse. Selecting either role clears only that role on the other lines. Without a Clock line, the timer continues without adding work.
 

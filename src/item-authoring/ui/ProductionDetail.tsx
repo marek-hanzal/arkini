@@ -1,13 +1,12 @@
 import { Factory } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
-import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** Presents shared production settings, scheduling and the authored input/output flows. */
+/** Presents the authored production lines and their input/output flows. */
 export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
@@ -15,15 +14,6 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 			className="grid gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorItemProductionDetail"
 		>
-			<ItemDetailSectionHeader
-				itemUid={item.uid}
-				sectionId="clock"
-				title={translator.textFn("Clock")}
-				description={translator.textFn(
-					"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
-				)}
-			/>
-			<ClockDetail item={item} />
 			<ItemDetailSectionHeader
 				itemUid={item.uid}
 				sectionId="production"

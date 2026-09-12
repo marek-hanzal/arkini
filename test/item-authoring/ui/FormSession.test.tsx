@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 
 import type { Project } from "~/project-authoring/type/Project";
-import { ClockSchema } from "~/item-definition/schema/ClockSchema";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -108,10 +107,12 @@ import { Form } from "~/item-authoring/ui/Form";
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
+import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import type { SectionId } from "~/item-authoring/type/Section";
 import {
+	createLine,
 	createOutput,
 	createProducerItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
@@ -782,17 +783,140 @@ describe("item section form session", () => {
 		);
 	});
 
-	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
-		const clock = ClockSchema.parse({
+	it("selects Default and Clock exclusively across sibling lines through the saved form", async () => {
+		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
+			state.persisted = item;
+			(state.project as Project).config.items[item.id] = item;
+			return item;
+		});
+		const common = {
 			...createProducerItem({
 				id: item.id,
 			}),
 			uid: item.uid,
-			type: "clock",
+			lines: [
+				createLine({
+					id: "line:first",
+					default: false,
+				}),
+				createLine({
+					id: "line:second",
+					default: true,
+					clock: true,
+				}),
+			],
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container, renderSection } = await render(<ProductionSection />);
+		const toggle = async (label: string) => {
+			const button = [
+				...container.querySelectorAll("button"),
+			].find((candidate) => candidate.textContent === label);
+			if (button === undefined) throw new Error(`Missing ${label} toggle.`);
+			await act(async () => button.click());
+			await act(async () => {
+				await state.unsavedSession?.saveFn();
+			});
+			// The repository hook mock needs an explicit render to publish the saved canonical item.
+			await renderSection(<ProductionSection />);
+			return state.saveItem.mock.lastCall?.[0].item.lines;
+		};
+		expect(await toggle("Default")).toMatchObject([
+			{
+				default: true,
+			},
+			{
+				default: false,
+				clock: true,
+			},
+		]);
+		expect(await toggle("Clock")).toMatchObject([
+			{
+				default: true,
+				clock: true,
+			},
+			{
+				default: false,
+				clock: false,
+			},
+		]);
+		expect(await toggle("Default")).toMatchObject([
+			{
+				default: false,
+				clock: true,
+			},
+			{
+				default: false,
+				clock: false,
+			},
+		]);
+		expect(await toggle("Clock")).toMatchObject([
+			{
+				default: false,
+				clock: false,
+			},
+			{
+				default: false,
+				clock: false,
+			},
+		]);
+	});
+
+	it("enables a clock on an action item as one valid saved Common", async () => {
+		const common = {
+			...item,
+			type: "common" as const,
+			scope: "inventory" as const,
+			maxStackSize: 9,
+			action: {
+				type: "space" as const,
+				space: 2,
+				input: [],
+				rules: [],
+			},
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ClockSection />);
+		const enable = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Enable clock");
+		if (enable === undefined) throw new Error("Missing clock enable control.");
+		await act(async () => enable.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
+			type: "common",
 			scope: "board",
 			maxStackSize: 1,
-			intervalMs: 1500,
-			durationMs: 2000,
+			action: undefined,
+			clock: {
+				intervalMs: 1000,
+			},
+			lines: [
+				{
+					clock: true,
+					default: true,
+				},
+			],
+		});
+	});
+
+	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
+		const clock = ItemSchema.parse({
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+			type: "common",
+			scope: "board",
+			maxStackSize: 1,
+			clock: {
+				intervalMs: 1500,
+				durationMs: 2000,
+			},
 		});
 		state.persisted = clock;
 		(
@@ -802,9 +926,11 @@ describe("item section form session", () => {
 				};
 			}
 		).config.items[item.id] = clock;
-		const { container } = await render(<ProductionSection />);
-		expect(container.querySelector('button[title="Remove line"]')).toBeNull();
-		const duration = container.querySelector<HTMLInputElement>('input[name="durationMs"]');
+		if (clock.type !== "common") throw new Error("Expected Common clock fixture.");
+		const { container } = await render(<ClockSection />);
+		const duration = container.querySelector<HTMLInputElement>(
+			'input[name="clock.durationMs"]',
+		);
 		if (duration === null) throw new Error("Missing clock lifetime field.");
 		await changeInput(duration, "");
 		await act(async () => {
@@ -813,9 +939,11 @@ describe("item section form session", () => {
 		expect(state.saveItem).toHaveBeenCalledWith(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					intervalMs: 1500,
+					clock: expect.objectContaining({
+						intervalMs: 1500,
+						durationMs: undefined,
+					}),
 					lines: clock.lines,
-					durationMs: undefined,
 				}),
 			}),
 		);

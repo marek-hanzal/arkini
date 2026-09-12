@@ -1,9 +1,8 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
-import { setItemScheduleRunningFx } from "~/item-schedule/fx/setItemScheduleRunningFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import {
@@ -21,6 +20,7 @@ it("rejects player production commands atomically for automatic-only owners whil
 				...createLine({
 					id: "a",
 					default: true,
+					clock: true,
 				}),
 				runtimeMs: 400,
 			},
@@ -55,7 +55,8 @@ it("rejects player production commands atomically for automatic-only owners whil
 				}),
 			);
 			const setDefault = yield* Effect.result(
-				setDefaultLineFx({
+				setLineSelectionFx({
+					selection: "default",
 					ownerItemId: owner.id,
 					lineId: "material",
 				}),
@@ -119,12 +120,12 @@ it("rejects player production commands atomically for automatic-only owners whil
 
 it("does not age a Clock created by a job completion until the next simulation boundary", () => {
 	const config = createClockConfig({
-		intervalMs: 1000,
 		lines: [
 			{
 				...createLine({
 					id: "a",
 					default: true,
+					clock: true,
 					output: createOutput([
 						{
 							itemId: "clock",
@@ -134,6 +135,9 @@ it("does not age a Clock created by a job completion until the next simulation b
 				runtimeMs: 100,
 			},
 		],
+		clock: {
+			intervalMs: 1000,
+		},
 	});
 	const result = Effect.runSync(
 		Effect.gen(function* () {
@@ -157,16 +161,15 @@ it("does not age a Clock created by a job completion until the next simulation b
 	).toBe(1000);
 });
 
-it("runs a manually chosen line ahead of the next pulse without shifting cadence, including manual production while paused", () => {
+it("runs a manually chosen line ahead of the next pulse without shifting cadence, including manual production with no automated line", () => {
 	const config = createClockConfig({
-		intervalMs: 500,
-		durationMs: 2000,
 		maxQueueSize: 2,
 		lines: [
 			{
 				...createLine({
 					id: "automatic",
 					default: true,
+					clock: true,
 				}),
 				runtimeMs: 100,
 			},
@@ -177,6 +180,10 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 				runtimeMs: 700,
 			},
 		],
+		clock: {
+			intervalMs: 500,
+			durationMs: 2000,
+		},
 	});
 	const result = Effect.runSync(
 		Effect.gen(function* () {
@@ -188,11 +195,11 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 			});
 			const admitted = yield* readRuntimeFx();
 			const pulse = yield* tickClockFx(400);
-			yield* setItemScheduleRunningFx({
+			yield* setLineSelectionFx({
+				selection: "clock",
+				lineId: null,
 				ownerItemId: owner.id,
-				running: false,
 			});
-			const paused = yield* readRuntimeFx();
 			const drained = yield* tickClockFx(400);
 			yield* enqueueLineFx({
 				ownerItemId: owner.id,
@@ -203,7 +210,6 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 				before,
 				admitted,
 				pulse,
-				paused,
 				drained,
 				manualWhilePaused,
 			};
@@ -232,12 +238,20 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 	});
 	expect(result.drained.jobs).toHaveLength(0);
 	expect(result.drained.jobQueue).toHaveLength(0);
-	expect(result.drained.items[0].schedule).toEqual(result.paused.items[0].schedule);
+	expect(result.drained.items[0].schedule).toMatchObject({
+		lineId: null,
+		remainingIntervalMs: 100,
+		remainingDurationMs: 1100,
+	});
 	expect(result.manualWhilePaused.jobs).toMatchObject([
 		{
 			lineId: "manual",
 			remainingMs: 600,
 		},
 	]);
-	expect(result.manualWhilePaused.items[0].schedule).toEqual(result.paused.items[0].schedule);
+	expect(result.manualWhilePaused.items[0].schedule).toMatchObject({
+		lineId: null,
+		remainingIntervalMs: 500,
+		remainingDurationMs: 1000,
+	});
 });

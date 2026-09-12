@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ClockSchema } from "~/item-definition/schema/ClockSchema";
+import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
+import type { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -11,7 +12,11 @@ import {
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
-export const createClockConfig = (clock: Partial<ClockSchema.Type> = {}) =>
+export const createClockConfig = (
+	overrides: Omit<Partial<CommonSchema.Type>, "clock"> & {
+		clock?: Partial<ItemScheduleSchema.Type>;
+	} = {},
+) =>
 	GameConfigSchema.parse({
 		resources: {
 			hero: "hero",
@@ -40,6 +45,7 @@ export const createClockConfig = (clock: Partial<ClockSchema.Type> = {}) =>
 							...createLine({
 								id: "a",
 								default: true,
+								clock: true,
 								output: createOutput([
 									{
 										itemId: "result",
@@ -61,13 +67,16 @@ export const createClockConfig = (clock: Partial<ClockSchema.Type> = {}) =>
 						},
 					],
 				}),
-				type: "clock",
+				type: "common",
 				scope: "board",
 				maxStackSize: 1,
 				maxQueueSize: 3,
-				intervalMs: 250,
 				control: "interactive",
-				...clock,
+				...overrides,
+				clock: {
+					intervalMs: 250,
+					...overrides.clock,
+				},
 			},
 			permit: {
 				...createSimpleItem("permit"),

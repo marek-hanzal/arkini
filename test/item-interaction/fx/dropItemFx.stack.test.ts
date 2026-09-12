@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
@@ -324,7 +324,8 @@ describe("dropItemFx pure stack integration", () => {
 					location: board(1),
 					quantity: 1,
 				});
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "default",
 					ownerItemId: target.id,
 					lineId: "line:producer:zero",
 				});
@@ -398,7 +399,8 @@ describe("dropItemFx pure stack integration", () => {
 					location: board(1),
 					quantity: 1,
 				});
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "default",
 					ownerItemId: target.id,
 					lineId: "line:producer:zero",
 				});

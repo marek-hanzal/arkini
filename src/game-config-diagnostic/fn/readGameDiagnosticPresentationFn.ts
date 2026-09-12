@@ -20,7 +20,7 @@ const diagnosticTitles = {
 	"config:schema": "Invalid project value",
 	"item:duplicate-uid": "Duplicate item UID",
 	"line:duplicate-id": "Duplicate production line ID",
-	"line:multiple-defaults": "Multiple default production lines",
+	"line:multiple-selections": "Multiple selected production lines",
 	"config:key-id-mismatch": "Item key and ID differ",
 	"units:missing-renewal": "Finite item cannot be recreated",
 } satisfies Record<DiagnosticCodeEnumSchema.Type, string>;
@@ -34,7 +34,7 @@ const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string 
 			return `${diagnostic.ownerItemId} · merge ${diagnostic.mergeIndex + 1}`;
 		case "line:duplicate-id":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineId}`;
-		case "line:multiple-defaults":
+		case "line:multiple-selections":
 			return `${diagnostic.ownerItemId} · ${diagnostic.lineIds.join(" / ")}`;
 		case "item:duplicate-uid":
 			return diagnostic.itemIds.join(" / ");

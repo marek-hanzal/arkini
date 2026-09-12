@@ -1,5 +1,6 @@
-import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
+import { CircleCheck, CircleX, Clock, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
+import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
@@ -32,8 +33,12 @@ export const LineFields = withFieldGroupFn({
 	defaultValues: defaultLine,
 	props: {
 		label: undefined as string | null | undefined,
+		onMarkerChangeFn: undefined as unknown as (
+			marker: "default" | "clock",
+			value: boolean,
+		) => void,
 	},
-	render: ({ group, label = "Product line" }) => {
+	render: ({ group, label = "Product line", onMarkerChangeFn }) => {
 		const translator = useTranslator();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
@@ -75,11 +80,31 @@ export const LineFields = withFieldGroupFn({
 							<div className="flex min-w-0 flex-wrap items-center gap-4">
 								<group.AppField name="default">
 									{(field) => (
-										<field.BoolToggle
+										<EditorBooleanToggleBadge
+											checked={field.state.value}
 											checkedIcon={Star}
-											description="The default line is selected first when this item starts production."
-											label="Default"
 											uncheckedIcon={StarOff}
+											label={translator.textFn("Default")}
+											description={translator.textFn(
+												"The line selected by default for manual production. Selecting this line clears Default on sibling lines.",
+											)}
+											onChangeFn={(value) =>
+												onMarkerChangeFn("default", value)
+											}
+										/>
+									)}
+								</group.AppField>
+								<group.AppField name="clock">
+									{(field) => (
+										<EditorBooleanToggleBadge
+											checked={field.state.value === true}
+											checkedIcon={Clock}
+											uncheckedIcon={Clock}
+											label={translator.textFn("Clock")}
+											description={translator.textFn(
+												"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
+											)}
+											onChangeFn={(value) => onMarkerChangeFn("clock", value)}
 										/>
 									)}
 								</group.AppField>

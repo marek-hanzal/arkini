@@ -5,7 +5,7 @@ import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { ClockSchema } from "~/item-definition/schema/ClockSchema";
+import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import {
 	createLine,
 	createOutput,
@@ -25,14 +25,15 @@ const createClockGraph = async ({
 	control?: "automatic-only" | "interactive";
 	runtimeMs?: number;
 } = {}) => {
-	const clock = ClockSchema.parse({
+	const clock = CommonSchema.parse({
 		...createProducerItem({
 			id: "clock",
 			lines: [
 				{
 					...createLine({
 						id: "default",
-						default: true,
+						default: false,
+						clock: true,
 						output: createOutput([
 							{
 								itemId: "target",
@@ -43,6 +44,7 @@ const createClockGraph = async ({
 				},
 				createLine({
 					id: "manual",
+					default: true,
 					output: createOutput([
 						{
 							itemId: "other",
@@ -51,18 +53,20 @@ const createClockGraph = async ({
 				}),
 			],
 		}),
-		type: "clock",
+		type: "common",
 		scope: "board",
 		maxStackSize: 1,
-		intervalMs: 1000,
-		durationMs,
-		enable,
 		control,
-		onExpire: createOutput([
-			{
-				itemId: "expired",
-			},
-		]),
+		clock: {
+			intervalMs: 1000,
+			durationMs,
+			enable,
+			onExpire: createOutput([
+				{
+					itemId: "expired",
+				},
+			]),
+		},
 	});
 	const result = await Effect.runPromise(
 		compileGameSourcesFx([

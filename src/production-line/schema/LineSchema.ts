@@ -29,6 +29,12 @@ export const LineSchema = z
 		description: DescriptionSchema.describe(
 			"The human-readable explanation of this product line's purpose.",
 		),
+		clock: z
+			.boolean()
+			.optional()
+			.describe(
+				"Whether this is the authored line selected for Clock impulses, independently of Default.",
+			),
 		ahead: z
 			.boolean()
 			.optional()

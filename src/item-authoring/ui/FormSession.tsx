@@ -174,6 +174,7 @@ export const FormSession = ({
 					error={controller.error}
 					rootCard={
 						sectionId !== "action" &&
+						sectionId !== "clock" &&
 						sectionId !== "artwork" &&
 						sectionId !== "units" &&
 						sectionId !== "merges" &&

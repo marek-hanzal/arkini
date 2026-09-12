@@ -7,7 +7,7 @@ import { OutputSchema } from "~/production-output/schema/OutputSchema";
 export const ItemScheduleSchema = z
 	.object({
 		intervalMs: TimeSchema.min(100).describe(
-			"Active milliseconds between attempts to enqueue one effective default line.",
+			"Active milliseconds between attempts to enqueue the effective Clock line.",
 		),
 		durationMs: TimeSchema.min(100)
 			.optional()
@@ -21,6 +21,8 @@ export const ItemScheduleSchema = z
 	.strict()
 	.meta({
 		id: "ItemScheduleSchema",
+		description:
+			"Periodic Clock-line admission with optional active lifetime, availability rules and expiry output.",
 	});
 export type ItemScheduleSchema = typeof ItemScheduleSchema;
 export namespace ItemScheduleSchema {

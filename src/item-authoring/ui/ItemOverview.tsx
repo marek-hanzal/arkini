@@ -30,6 +30,7 @@ import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
 const OverviewIconBySection = {
 	action: MapPinned,
+	clock: Clock3,
 	artwork: ImageIcon,
 	units: BatteryCharging,
 	delete: ShieldCheck,
@@ -148,6 +149,7 @@ export const ItemOverview = ({ item }: { readonly item: ItemSchema.Type }) => {
 				</div>
 			</div>
 		),
+		clock: item.type === "common" && item.clock !== undefined ? "Enabled" : "Disabled",
 		notes: "Ideas and decisions linked to this item",
 		units: item.units === undefined ? "Disabled" : "Enabled",
 		delete:

@@ -11,7 +11,6 @@ const CanvasColorToken = {
 	itemCommon: "--ak-flow-item-common-surface",
 	itemInventory: "--ak-flow-item-inventory-surface",
 	itemMissing: "--ak-flow-item-missing-surface",
-	itemClock: "--ak-flow-item-clock-surface",
 	itemTemporary: "--ak-flow-item-temporary-surface",
 	line: "--ak-line",
 	lineStrong: "--ak-line-strong",
@@ -83,7 +82,6 @@ export const useCanvasPalette = (scheduleDrawRef: RefObject<() => void>) => {
 				foreground: colors.foreground,
 				info: colors.info,
 				itemSurfaces: {
-					clock: colors.itemClock,
 					common: colors.itemCommon,
 					inventory: colors.itemInventory,
 					missing: colors.itemMissing,

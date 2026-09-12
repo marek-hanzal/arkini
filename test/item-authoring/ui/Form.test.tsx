@@ -93,7 +93,7 @@ describe("Form", () => {
 		});
 	});
 
-	it("seeds asset entry-point defaults through the complete Clock draft", async () => {
+	it("seeds asset entry-point defaults through the Common draft", async () => {
 		state.project = project;
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -105,7 +105,7 @@ describe("Form", () => {
 					defaultDraft: true,
 					defaultItemId: "selected_asset-name",
 					defaultTitle: "Selected Asset Name",
-					itemType: "clock",
+					itemType: "common",
 					resourceId: "selected_asset-name",
 					uid: "draft-with-selected-asset",
 				}),
@@ -123,13 +123,9 @@ describe("Form", () => {
 			},
 			draft: true,
 			id: "selected_asset-name",
-			lines: [
-				{
-					id: "line:selected_asset-name:default",
-				},
-			],
+			lines: [],
 			title: "Selected Asset Name",
-			type: "clock",
+			type: "common",
 		});
 	});
 });

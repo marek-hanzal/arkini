@@ -1,4 +1,4 @@
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -17,7 +17,7 @@ export const readItemLineFn = ({ item, lineId }: readItemLineFn.Props) =>
 	match(item)
 		.with(
 			{
-				type: P.union(TypeSchema.enum.Common, TypeSchema.enum.Clock),
+				type: TypeSchema.enum.Common,
 			},
 			({ lines }) => lines.find((line) => line.id === lineId),
 		)

@@ -23,28 +23,30 @@ describe("forceDeleteFx", () => {
 			...createProducerItem({
 				id: "clock",
 			}),
-			type: "clock",
+			type: "common",
 			scope: "board",
 			maxStackSize: 1,
-			intervalMs: 1000,
-			rules: [
-				{
-					type: "enable",
-					when: [
-						{
-							type: "exists",
-							query: {
-								scope: "any",
-								selector: {
-									type: "item",
-									itemId: "water",
+			clock: {
+				intervalMs: 1000,
+				rules: [
+					{
+						type: "enable",
+						when: [
+							{
+								type: "exists",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "water",
+									},
 								},
 							},
-						},
-					],
-				},
-			],
-			onExpire: waterOutput,
+						],
+					},
+				],
+				onExpire: waterOutput,
+			},
 		};
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
@@ -70,10 +72,12 @@ describe("forceDeleteFx", () => {
 			}),
 		);
 		expect(result.config.items.clock).toMatchObject({
-			rules: [],
+			clock: expect.objectContaining({
+				rules: [],
+			}),
 			lines: clock.lines,
 		});
-		expect(result.config.items.clock).toHaveProperty("onExpire", undefined);
+		expect(result.config.items.clock).toHaveProperty("clock.onExpire", undefined);
 		expect(result.config.items["clock-with-line"]).toBeUndefined();
 		expect(result.impact.removedExpiryOutputOwnerIds).toContain("clock");
 		expect(result.impact.deletedOwnerItemIds).toContain("clock-with-line");

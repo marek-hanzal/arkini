@@ -15,7 +15,7 @@ import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
@@ -47,12 +47,14 @@ const readLineDisabledHintFn = (
 const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
 	activeJob,
 	defaultLineId,
+	clockLineId,
 	line,
 	ownerItemId,
 	runtime,
 }: {
 	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
 	readonly defaultLineId: IdSchema.Type | undefined;
+	readonly clockLineId: IdSchema.Type | undefined;
 	readonly line: LineSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
@@ -165,6 +167,13 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 				: [];
 		}),
 		isDefault: line.id === defaultLineId,
+		clock:
+			owner.schedule === undefined
+				? undefined
+				: {
+						selected: line.id === clockLineId,
+						canChange: canControl && isItemProductionAdmissionOpenFn(owner),
+					},
 		queuedRequestCount: runtime.jobQueue.filter(
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
@@ -268,10 +277,17 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	if (ownerItem === undefined) return unavailable;
 
 	const lines = readLineOwnerLinesFn(ownerItem);
-	const defaultLineId = readEffectiveDefaultLineFn({
+	const defaultLineId = readEffectiveLineFn({
+		selection: "default",
 		ownerItemId: owner.id,
 		ownerItem,
 		runtime,
+	})?.id;
+	const clockLineId = readEffectiveLineFn({
+		ownerItemId: owner.id,
+		ownerItem,
+		runtime,
+		selection: "clock",
 	})?.id;
 	const projected: ItemDetailLines.Line[] = [];
 
@@ -296,6 +312,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		const boardLine = yield* readBoardItemDetailLineFx({
 			activeJob,
 			defaultLineId,
+			clockLineId,
 			line,
 			ownerItemId: owner.id,
 			runtime,

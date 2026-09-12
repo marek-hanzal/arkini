@@ -1,4 +1,4 @@
-import { ClockSchema } from "~/item-definition/schema/ClockSchema";
+import { CommonSchema } from "~/item-definition/schema/CommonSchema";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import {
 	Effect,
@@ -11,14 +11,16 @@ import {
 	readLines,
 } from "../support/readItemDetailLinesFxFixture";
 
-const readControlledOwner = (control: ClockSchema.Type["control"], remainingDurationMs = 300) => {
-	const item = ClockSchema.parse({
+const readControlledOwner = (control: CommonSchema.Type["control"], remainingDurationMs = 300) => {
+	const item = CommonSchema.parse({
 		...lineRunTestConfig.items.workshop,
-		type: "clock",
+		type: "common",
 		scope: "board",
 		maxStackSize: 1,
-		intervalMs: 100,
-		durationMs: 300,
+		clock: {
+			intervalMs: 100,
+			durationMs: 300,
+		},
 		control,
 	});
 	const base = lineRunRuntime({
@@ -35,7 +37,6 @@ const readControlledOwner = (control: ClockSchema.Type["control"], remainingDura
 						...owner,
 						item,
 						schedule: {
-							running: true,
 							remainingIntervalMs: 100,
 							remainingDurationMs,
 						},
@@ -68,6 +69,10 @@ describe("Item Detail production control", () => {
 			kind: "available",
 			line: [
 				{
+					clock: {
+						selected: false,
+						canChange: false,
+					},
 					availability: {
 						kind: "available",
 					},
@@ -96,6 +101,10 @@ describe("Item Detail production control", () => {
 		expect(interactive.lines).toMatchObject({
 			line: [
 				{
+					clock: {
+						selected: false,
+						canChange: true,
+					},
 					actions: {
 						canChangeDefault: true,
 						canWithdraw: true,
@@ -119,6 +128,10 @@ describe("Item Detail production control", () => {
 		expect(draining.lines).toMatchObject({
 			line: [
 				{
+					clock: {
+						selected: false,
+						canChange: false,
+					},
 					actions: {
 						canChangeDefault: true,
 						canWithdraw: true,

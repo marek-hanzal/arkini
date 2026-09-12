@@ -4,8 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
-import { setDefaultLineFx } from "~/production-line/fx/setDefaultLineFx";
-import { unsetDefaultLineFx } from "~/production-line/fx/unsetDefaultLineFx";
+import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
@@ -144,7 +143,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 		},
 	});
 
-describe("setDefaultLineFx", () => {
+describe("setLineSelectionFx", () => {
 	it("reads the authored fallback without creating runtime state", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -192,7 +191,8 @@ describe("setDefaultLineFx", () => {
 				const started = yield* startFx();
 				const owner = started.items[0];
 				if (owner === undefined) throw new Error("Missing producer.");
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "default",
 					ownerItemId: owner.id,
 					lineId: "line:second",
 				});
@@ -257,11 +257,14 @@ describe("setDefaultLineFx", () => {
 				const started = yield* startFx();
 				const owner = started.items[0];
 				if (owner === undefined) throw new Error("Missing producer.");
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "default",
 					ownerItemId: owner.id,
 					lineId: "line:second",
 				});
-				yield* unsetDefaultLineFx({
+				yield* setLineSelectionFx({
+					lineId: null,
+					selection: "default",
 					ownerItemId: owner.id,
 				});
 				const runtime = yield* readRuntimeFx();
@@ -325,7 +328,8 @@ describe("setDefaultLineFx", () => {
 				const owner = runtime.items[0];
 				if (owner === undefined) throw new Error("Missing producer.");
 				const rejected = yield* Effect.result(
-					setDefaultLineFx({
+					setLineSelectionFx({
+						selection: "default",
 						ownerItemId: owner.id,
 						lineId: "line:missing",
 					}),
@@ -413,7 +417,8 @@ describe("setDefaultLineFx", () => {
 					},
 					quantity: 3,
 				});
-				yield* setDefaultLineFx({
+				yield* setLineSelectionFx({
+					selection: "default",
 					ownerItemId: owner.id,
 					lineId: "line:only",
 				});
@@ -433,7 +438,9 @@ describe("setDefaultLineFx", () => {
 					item: remainder,
 					runtime,
 				});
-				yield* unsetDefaultLineFx({
+				yield* setLineSelectionFx({
+					lineId: null,
+					selection: "default",
 					ownerItemId: owner.id,
 				});
 				const clearedRuntime = yield* readRuntimeFx();
@@ -514,7 +521,8 @@ describe("setDefaultLineFx", () => {
 				});
 				const before = yield* readRuntimeFx();
 				const selected = yield* Effect.result(
-					setDefaultLineFx({
+					setLineSelectionFx({
+						selection: "default",
 						ownerItemId: "runtime:producer",
 						lineId: "line:only",
 					}),

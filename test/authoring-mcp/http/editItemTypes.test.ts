@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
 import {
 	cleanupMcpHarnesses,
@@ -37,17 +38,8 @@ const groups = [
 		],
 	},
 	{
-		name: "edits Clock and Temporary items through their dedicated tools",
+		name: "edits Temporary items through their dedicated tools",
 		cases: [
-			[
-				"clock",
-				{
-					intervalMs: 500,
-					control: "interactive",
-					durationMs: null,
-					onExpire: null,
-				},
-			],
 			[
 				"temporary",
 				{
@@ -60,13 +52,11 @@ const groups = [
 
 const itemId = (type: TypeSchema.Type) => `${type === "common" ? "common" : "item"}:edit-${type}`;
 const resourceId = editorTestPayload.resources[0]?.id ?? "missing-asset";
-const clockDraft = createDraftFn({
-	resourceId,
-	type: "clock",
-	uid: "uid:line-template",
-});
-if (clockDraft.type !== "clock") throw new Error("Expected Clock draft.");
-const productionLines = clockDraft.lines;
+const productionLines = JSON.parse(
+	JSON.stringify([
+		createLine({}),
+	]),
+);
 const types = groups.flatMap(({ cases }) => cases.map(([type]) => type));
 const seededConfig = GameConfigSchema.parse({
 	...editorTestPayload.config,
@@ -93,6 +83,11 @@ const seededConfig = GameConfigSchema.parse({
 						...(type === "common"
 							? {
 									maxQueueSize: 4,
+									scope: "board",
+									clock: {
+										intervalMs: 1000,
+									},
+									control: "automatic-only",
 									lines: productionLines,
 								}
 							: {}),
@@ -167,6 +162,10 @@ describe.sequential("editor MCP typed item editing", () => {
 		if (cases.some(([type]) => type === "common"))
 			expect(project.config.items[itemId("common")]).toMatchObject({
 				maxQueueSize: 4,
+				clock: {
+					intervalMs: 1000,
+				},
+				control: "automatic-only",
 				lines: productionLines,
 			});
 		expect(project.revision).toBeGreaterThan(revisionBefore);
@@ -193,13 +192,24 @@ describe.sequential("editor MCP typed item editing", () => {
 			expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length);
 		}
 	});
-	it("clears Common production only through an explicit empty lines replacement", async () => {
+	it("requires an explicit clock removal before clearing its final production lines", async () => {
+		const rejected = await client.callTool({
+			name: "edit_common_item",
+			arguments: jsonToolInputFn({
+				itemId: itemId("common"),
+				patch: {
+					lines: [],
+				},
+			}),
+		});
+		expect(rejected.isError).toBe(true);
 		const edited = await client.callTool({
 			name: "edit_common_item",
 			arguments: jsonToolInputFn({
 				itemId: itemId("common"),
 				patch: {
 					lines: [],
+					clock: null,
 				},
 			}),
 		});
@@ -209,6 +219,7 @@ describe.sequential("editor MCP typed item editing", () => {
 			lines: [],
 			maxQueueSize: 4,
 		});
+		expect(project?.config.items[itemId("common")]).not.toHaveProperty("clock");
 	});
 	it("rejects conflicting action production and preserves or clears the optional action explicitly", async () => {
 		const action = {

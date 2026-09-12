@@ -78,7 +78,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	});
 	if (line === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
-	if (owner.item.type !== TypeSchema.enum.Common && owner.item.type !== TypeSchema.enum.Clock) {
+	if (owner.item.type !== TypeSchema.enum.Common) {
 		return yield* Effect.die(
 			new Error(`Job ${job.id} owner ${owner.id} does not expose a product line.`),
 		);

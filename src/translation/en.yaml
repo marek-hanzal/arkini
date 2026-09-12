@@ -1,3 +1,5 @@
+A clock periodically attempts the line marked Clock. Enabling it removes the action, fixes this item to the board with a stack size of one, and adds a line when needed.:
+  value: A clock periodically attempts the line marked Clock. Enabling it removes the action, fixes this item to the board with a stack size of one, and adds a line when needed.
 Action:
   value: Action
 Action is disabled:
@@ -14,8 +16,10 @@ Add lines to enable production. Adding a line removes the configured action. Eac
   value: Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.
 Adds no item or units requirement. The action may start without delivering or targeting another item.:
   value: Adds no item or units requirement. The action may start without delivering or targeting another item.
-An action activates immediately when the player uses this item. Enabling an action removes all production lines.:
-  value: An action activates immediately when the player uses this item. Enabling an action removes all production lines.
+Allows the timer to run before availability rules are applied.:
+  value: Allows the timer to run before availability rules are applied.
+An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.:
+  value: An action activates immediately when the player uses this item. Enabling an action removes all production lines and the clock.
 Asset notes empty description:
   value: Create a note here to keep art direction and decisions linked to this asset.
 Asset notes empty title:
@@ -33,6 +37,8 @@ Board editing help:
     Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
 
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
+Board — required by this item’s lifetime:
+  value: Board — required by this item’s lifetime
 Build:
   value: Build
 Build help:
@@ -50,6 +56,10 @@ Check ahead:
   value: Check ahead
 Choose a different Project ID.:
   value: Choose a different Project ID.
+Clock:
+  value: Clock
+Clock is disabled:
+  value: Clock is disabled
 Close:
   value: Close
 Connection search empty:
@@ -73,6 +83,8 @@ Create project help:
     Choose the package identity used by builds and gameplay saves. It can be renamed later, which makes the project a different game to existing saves.
 Current stack:
   value: Current stack
+Default:
+  value: Default
 Delete:
   value: Delete
 Depletion output:
@@ -83,10 +95,16 @@ Description:
   value: Description
 Disable action:
   value: Disable action
+Disable clock:
+  value: Disable clock
 Disable units:
   value: Disable units
 Disabled:
   value: Disabled
+Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.:
+  value: Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.
+Each enabled interval attempts to queue the line marked Clock. Accepted production keeps its ordinary line rules.:
+  value: Each enabled interval attempts to queue the line marked Clock. Accepted production keeps its ordinary line rules.
 Edit:
   value: Edit
 Editor Board:
@@ -121,6 +139,8 @@ Editor MCP help:
     Open **Settings**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
 
     On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
+Emitted once after the finite lifetime ends and accepted production has settled.:
+  value: Emitted once after the finite lifetime ends and accepted production has settled.
 Enable Units on this item before selecting Self to pay the unit cost.:
   value: Enable Units on this item before selecting Self to pay the unit cost.
 Enable Units on this item before selecting Self.:
@@ -129,20 +149,32 @@ Enable Units on this item before selecting Spend.:
   value: Enable Units on this item before selecting Spend.
 Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.:
   value: Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.
+Enable a clock to attempt a production line periodically.:
+  value: Enable a clock to attempt a production line periodically.
 Enable action:
   value: Enable action
+Enable clock:
+  value: Enable clock
 Enable depletion output:
   value: Enable depletion output
+Enable expiry output:
+  value: Enable expiry output
 Enable merge output:
   value: Enable merge output
 Enable units:
   value: Enable units
+Enabled:
+  value: Enabled
+Enqueue:
+  value: Enqueue
 Enter the configured space after all requirements and rules pass.:
   value: Enter the configured space after all requirements and rules pass.
 Estimate:
   value: Estimate
 Every Enable rule must pass, and any matching Disable rule prevents activation.:
   value: Every Enable rule must pass, and any matching Disable rule prevents activation.
+Expiry output:
+  value: Expiry output
 Finishing accepted work:
   value: Finishing accepted work
 Flow:
@@ -189,8 +221,12 @@ Input type:
   value: Input type
 Interactive:
   value: Interactive
+Interactive allows manual production. Automatic only uses authored automation.:
+  value: Interactive allows manual production. Automatic only uses authored automation.
 Interval:
   value: Interval
+Interval (seconds):
+  value: Interval (seconds)
 Inventory editing:
   value: Inventory editing
 Inventory editing help:
@@ -245,9 +281,6 @@ Item storage scope - inventory-control:
 Item storage scope - toolbar:
   value: Toolbar only
   dynamic: true
-Item type - clock:
-  value: Clock
-  dynamic: true
 Item type - common:
   value: Common item
   dynamic: true
@@ -260,9 +293,6 @@ Item type - missing:
 Item type - temporary:
   value: Temporary item
   dynamic: true
-Item type description - clock:
-  value: A board item that periodically starts its default production line, with an optional lifetime.
-  dynamic: true
 Item type description - common:
   value: An item with optional production or an immediate action, finite units, and merge rules.
   dynamic: true
@@ -274,12 +304,18 @@ Item type description - temporary:
   dynamic: true
 Keep:
   value: Keep
+Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.:
+  value: Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.
 "Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged.":
   value: "Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged."
 Lifetime:
   value: Lifetime
+Lifetime (seconds):
+  value: Lifetime (seconds)
 Lifetime remaining:
   value: Lifetime remaining
+Line selection could not be changed.:
+  value: Line selection could not be changed.
 Loading notes…:
   value: Loading notes…
 Location:
@@ -304,6 +340,10 @@ No depletion output:
   value: No depletion output
 No depletion output configured.:
   value: No depletion output configured.
+No expiry output:
+  value: No expiry output
+No expiry output configured.:
+  value: No expiry output configured.
 No item with Units enabled matches this search.:
   value: No item with Units enabled matches this search.
 No merge output:
@@ -347,6 +387,8 @@ Paused:
   value: "Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action."
 Pick random space:
   value: Pick random space
+Player controls:
+  value: Player controls
 Product lines:
   value: Product lines
 Production line:
@@ -416,6 +458,10 @@ Self:
   value: Self
 Self-paid units input:
   value: Self-paid units input
+Set clock:
+  value: Set clock
+Set default:
+  value: Set default
 Simple:
   value: Simple
 Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.:
@@ -460,19 +506,19 @@ The board space entered after successful activation. One-way navigation is allow
   value: The board space entered after successful activation. One-way navigation is allowed.
 The item that owns this action pays the unit cost. It must define enough available units.:
   value: The item that owns this action pays the unit cost. It must define enough available units.
+The line selected by default for manual production. Selecting this line clears Default on sibling lines.:
+  value: The line selected by default for manual production. Selecting this line clears Default on sibling lines.
 The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.:
   value: The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.
-Timer control:
-  value: Timer control
+These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.:
+  value: These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.
+Timer:
+  value: Timer
 Toolbar editing:
   value: Toolbar editing
 Toolbar editing help:
   value: |
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
-Turn off:
-  value: Turn off
-Turn on:
-  value: Turn on
 Type:
   value: Type
 UID:
@@ -501,8 +547,14 @@ Units spent by the selected target when the action starts.:
   value: Units spent by the selected target when the action starts.
 Unlimited:
   value: Unlimited
+Unset clock:
+  value: Unset clock
+Unset default:
+  value: Unset default
 Use:
   value: Use
+Without an output, the clock disappears after expiry and production settlement.:
+  value: Without an output, the clock disappears after expiry and production settlement.
 Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.:
   value: Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.
 Write a note…:

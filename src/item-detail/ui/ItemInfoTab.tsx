@@ -1,5 +1,3 @@
-import { Button } from "~/ui/ui/Button";
-import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import type { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { match } from "ts-pattern";
@@ -86,16 +84,9 @@ const readLocationLabelFn = (location: readItemDetailInfoFn.Location) =>
 		.exhaustive();
 
 /** Renders the canonical description-and-facts presentation for configured and live items. */
-export const ItemInfoTab = ({
-	detail,
-	scheduleControl,
-}: {
-	readonly detail: ItemInfoTab.Detail;
-	readonly scheduleControl?: useRuntimeItemDetailSceneController.ScheduleControl;
-}) => {
+export const ItemInfoTab = ({ detail }: { readonly detail: ItemInfoTab.Detail }) => {
 	const translator = useTranslator();
 	const schedule = detail.schedule;
-	const scheduleRuntime = schedule?.runtime;
 	const fact = [
 		{
 			label: translator.textFn("Type"),
@@ -244,39 +235,6 @@ export const ItemInfoTab = ({
 							value={entry.value}
 						/>
 					))}
-					{schedule?.control === "interactive" &&
-					scheduleRuntime !== undefined &&
-					scheduleControl !== undefined ? (
-						<Fact
-							label={translator.textFn("Timer control")}
-							value={
-								<div className="flex flex-col items-start gap-2">
-									<Button
-										data-ui="ItemScheduleRunningButton"
-										disabled={
-											scheduleControl.pending ||
-											scheduleRuntime.status === "draining"
-										}
-										cursorIntent={
-											scheduleControl.pending ? "progress" : undefined
-										}
-										onClick={() =>
-											scheduleControl.setRunningFn(!scheduleRuntime.running)
-										}
-									>
-										{scheduleRuntime.running
-											? translator.textFn("Turn off")
-											: translator.textFn("Turn on")}
-									</Button>
-									{scheduleControl.error === null ? null : (
-										<p className="text-sm text-danger">
-											{scheduleControl.error}
-										</p>
-									)}
-								</div>
-							}
-						/>
-					) : null}
 				</FactList>
 			</section>
 		</Scrollable>

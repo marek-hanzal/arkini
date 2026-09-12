@@ -4,6 +4,7 @@ export const SectionIds = [
 	"units",
 	"merges",
 	"action",
+	"clock",
 	"production",
 	"estimate",
 	"connections",

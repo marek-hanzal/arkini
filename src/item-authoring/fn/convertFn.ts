@@ -69,38 +69,11 @@ export const convertFn = (item: ItemSchema.Type, targetType: TypeSchema.Type): I
 					...common,
 					type: fallback.type,
 					maxQueueSize:
-						item.type === "common" || item.type === "clock"
-							? item.maxQueueSize
-							: fallback.maxQueueSize,
+						item.type === "common" ? item.maxQueueSize : fallback.maxQueueSize,
+					control: fallback.control,
 					lines: [
 						...lines,
 					],
-				};
-			case "clock":
-				return {
-					...common,
-					type: fallback.type,
-					scope: fallback.scope,
-					maxStackSize: fallback.maxStackSize,
-					intervalMs: fallback.intervalMs,
-					enable: fallback.enable,
-					rules: fallback.rules,
-					control: fallback.control,
-					...(item.type === "temporary"
-						? {
-								durationMs: item.durationMs,
-								onExpire: item.output,
-							}
-						: {}),
-					maxQueueSize:
-						"maxQueueSize" in item ? item.maxQueueSize : fallback.maxQueueSize,
-					lines:
-						lines.length === 0
-							? fallback.lines
-							: [
-									lines[0],
-									...lines.slice(1),
-								],
 				};
 		}
 	})();

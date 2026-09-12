@@ -13,6 +13,7 @@ export const ItemScheduleIssueSchema = z
 			"unexpected-state",
 			"missing-state",
 			"invalid-phase",
+			"invalid-line",
 			"invalid-lifetime",
 			"invalid-location",
 		]),

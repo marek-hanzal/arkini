@@ -23,8 +23,8 @@ describe("editor MCP item editing", () => {
 		const producer = {
 			...createDraftFn({
 				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
-				type: "clock",
-				uid: "clock-uid",
+				type: "inventory",
+				uid: "inventory-uid",
 			}),
 			id: "producer:test",
 			title: "Test Producer",
@@ -170,7 +170,7 @@ describe("editor MCP item editing", () => {
 			isError: true,
 			content: [
 				{
-					text: expect.stringContaining(`Item ${producer.id} is clock, not common.`),
+					text: expect.stringContaining(`Item ${producer.id} is inventory, not common.`),
 				},
 			],
 		});

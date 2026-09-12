@@ -119,6 +119,10 @@ export namespace ItemDetailLines {
 		readonly availability: Availability;
 		readonly activeRuleHints: readonly string[];
 		readonly isDefault: boolean;
+		readonly clock?: {
+			readonly selected: boolean;
+			readonly canChange: boolean;
+		};
 		readonly queuedRequestCount: number;
 		readonly actions: {
 			readonly canChangeDefault: boolean;

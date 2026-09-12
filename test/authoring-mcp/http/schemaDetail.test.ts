@@ -1,6 +1,6 @@
 import Ajv2020 from "ajv/dist/2020";
 import { Effect } from "effect";
-import { createDraftFn } from "~/item-authoring/fn/createDraftFn";
+import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -163,7 +163,6 @@ describe("editor MCP authoring schema registry", () => {
 		}
 		const itemTypes = [
 			"common",
-			"clock",
 			"temporary",
 			"inventory",
 		];
@@ -240,12 +239,6 @@ describe("editor MCP authoring schema registry", () => {
 		const validatePatch = ajv.getSchema(schemaUri("CommonItemPatchSchema"));
 		if (validateCreate === undefined || validatePatch === undefined)
 			throw new Error("Missing public Common schema.");
-		const clockDraft = createDraftFn({
-			type: "clock",
-			uid: "uid:template",
-			resourceId: "asset:template",
-		});
-		if (clockDraft.type !== "clock") throw new Error("Expected Clock draft.");
 		const action = {
 			type: "space",
 			space: 1,
@@ -266,14 +259,18 @@ describe("editor MCP authoring schema registry", () => {
 		expect(
 			validateCreate({
 				...input,
-				lines: clockDraft.lines,
+				lines: [
+					createLine({}),
+				],
 			}),
 		).toBe(false);
 		expect(
 			validateCreate({
 				id: "item:workshop",
 				title: "Workshop",
-				lines: clockDraft.lines,
+				lines: [
+					createLine({}),
+				],
 			}),
 			JSON.stringify(validateCreate.errors),
 		).toBe(true);
@@ -281,7 +278,51 @@ describe("editor MCP authoring schema registry", () => {
 		expect(
 			validatePatch({
 				action: null,
-				lines: clockDraft.lines,
+				lines: [
+					createLine({}),
+				],
+			}),
+			JSON.stringify(validatePatch.errors),
+		).toBe(true);
+
+		// The advertised Common graph must reject schedules that canonical saves reject.
+		const scheduled = {
+			id: "item:timer",
+			title: "Timer",
+			clock: {
+				intervalMs: 1000,
+			},
+			scope: "board",
+			maxStackSize: 1,
+			lines: [
+				createLine({}),
+			],
+		};
+		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);
+		for (const replacement of [
+			{
+				scope: "inventory",
+			},
+			{
+				lines: [],
+			},
+			{
+				maxStackSize: 2,
+			},
+			{
+				action,
+			},
+		])
+			expect(
+				validateCreate({
+					...scheduled,
+					...replacement,
+				}),
+			).toBe(false);
+		expect(
+			validatePatch({
+				clock: null,
+				lines: [],
 			}),
 			JSON.stringify(validatePatch.errors),
 		).toBe(true);

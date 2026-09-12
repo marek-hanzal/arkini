@@ -1,9 +1,7 @@
 import { match } from "ts-pattern";
 
-import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 interface CreateDraftFnProps {
 	readonly draft?: boolean;
@@ -38,21 +36,6 @@ export const createDraftFn = ({
 		scope: "any" as const,
 		maxStackSize: 1,
 	};
-	const lineBase = {
-		id: `line:${itemId.replace(/^item:/, "") || "new-item"}:default`,
-		default: true,
-		show: true,
-		enable: true,
-		runtimeMs: 0,
-		input: [
-			{
-				type: "simple",
-			},
-		] as [
-			LineInputSchema.Type,
-		],
-		rules: [],
-	} satisfies Omit<LineSchema.Type, "description" | "title">;
 	return match(type)
 		.with("common", (matchedType) => ({
 			...base,
@@ -73,25 +56,6 @@ export const createDraftFn = ({
 			scope: "board" as const,
 			maxStackSize: 1,
 			durationMs: 300_000,
-		}))
-		.with("clock", (matchedType) => ({
-			...base,
-			type: matchedType,
-			scope: "board" as const,
-			intervalMs: 1_000,
-			enable: true,
-			rules: [],
-			control: "automatic-only" as const,
-			maxQueueSize: 1,
-			lines: [
-				{
-					...lineBase,
-					title: `New ${matchedType} line`,
-					description: `Describe what this ${matchedType} line consumes and produces.`,
-				},
-			] as [
-				LineSchema.Type,
-			],
 		}))
 		.exhaustive();
 };

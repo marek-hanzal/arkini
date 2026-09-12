@@ -25,7 +25,7 @@ The production domain graph contains real behavior cycles even though the concre
 
 | Crossing | Outbound behavior | Return behavior | Interpretation |
 | --- | --- | --- | --- |
-| `game-runtime ↔ production-line` | Runtime validation checks default lines | Line reads and commands use the Runtime capability | Real aggregate integration |
+| `game-runtime ↔ production-line` | Runtime validation checks selected lines | Line reads and commands use the Runtime capability | Real aggregate integration |
 | `game-runtime ↔ production-input` | Runtime validation and Item removal release input state | Input plans read and mutate Runtime items | Real aggregate integration |
 | `game-runtime ↔ production-job` | Runtime validation and identity cleanup inspect jobs/reservations | Queue/start/completion use atomic Runtime mutation | Real aggregate integration |
 | `game-runtime ↔ production-delivery` | Runtime validation and identity cleanup reconcile deliveries | Delivery advance/settlement reads and revises Runtime | Real aggregate integration |
@@ -81,7 +81,7 @@ clear pending owner queue
 
 A queued request owns no time, material, units or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
-Scheduled owners use the same line/default readers and one-intent admission. `item-schedule` owns phase and lifetime, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally. Player-control admission is separate from autonomous work and shared by production commands and their projections.
+Scheduled owners use the same selected-line reader and one-intent admission. `Common.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally. Player-control admission is separate from autonomous work and shared by production commands and their projections.
 
 ## Important invariants
 

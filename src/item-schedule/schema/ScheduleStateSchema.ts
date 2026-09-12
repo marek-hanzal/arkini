@@ -1,3 +1,4 @@
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { z } from "zod";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -5,7 +6,7 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 /** Save-backed phase and lifetime; zero lifetime closes admission while production drains. */
 export const ScheduleStateSchema = z
 	.object({
-		running: z.boolean(),
+		lineId: IdSchema.nullable().optional(),
 		remainingIntervalMs: PositiveIntegerSchema,
 		remainingDurationMs: TimeSchema.optional(),
 	})

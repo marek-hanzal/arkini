@@ -89,6 +89,7 @@ describe("ItemOverview", () => {
 			"units",
 			"merges",
 			"action",
+			"clock",
 			"production",
 			"estimate",
 			"connections",

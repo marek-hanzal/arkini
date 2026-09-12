@@ -1,5 +1,3 @@
-import { setItemScheduleRunningFx } from "~/item-schedule/fx/setItemScheduleRunningFx";
-import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
 import { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { Equal } from "effect";
 import { useCallback, useEffect } from "react";
@@ -55,14 +53,7 @@ export namespace useRuntimeItemDetailSceneController {
 		readonly schedule?: readItemDetailScheduleFx.Schedule;
 	};
 
-	export interface ScheduleControl {
-		readonly pending: boolean;
-		readonly error: string | null;
-		readonly setRunningFn: (running: boolean) => void;
-	}
-
 	export interface Output {
-		readonly scheduleControl: ScheduleControl;
 		readonly identity?: IdentityProjection;
 		readonly info?: InfoProjection;
 		readonly lineCount?: number;
@@ -163,16 +154,6 @@ export const useRuntimeItemDetailSceneController = ({
 	target,
 }: useRuntimeItemDetailSceneController.Props): useRuntimeItemDetailSceneController.Output => {
 	const itemDetail = useItemDetailControl();
-	const scheduleCommand = useItemDetailPendingCommand({
-		action: "schedule",
-		failureMessage: "Schedule could not be changed.",
-		pendingKey: JSON.stringify([
-			"schedule",
-			target.itemId,
-		]),
-		runFx: (game, command: setItemScheduleRunningFx.Props) =>
-			game.runFx(setItemScheduleRunningFx(command)),
-	});
 	const liveIdentity = useItemDetailIdentity(target.itemId);
 	const liveInfo = useItemDetailInfo(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
@@ -233,15 +214,6 @@ export const useRuntimeItemDetailSceneController = ({
 	]);
 
 	return {
-		scheduleControl: {
-			pending: scheduleCommand.pending,
-			error: scheduleCommand.error,
-			setRunningFn: (running) =>
-				scheduleCommand.runFn({
-					ownerItemId: target.itemId,
-					running,
-				}),
-		},
 		identity: retainedIdentity.value,
 		info: retainedInfo.value,
 		lineCount:

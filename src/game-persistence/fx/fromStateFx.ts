@@ -23,6 +23,7 @@ const fromStateItemFx = Effect.fn("fromStateItemFx")(function* (state: StateItem
 		location: state.location,
 		quantity: state.quantity,
 		remainingCharges: state.remainingCharges,
+		schedule: state.schedule,
 		remainingDurationMs:
 			state.remainingDurationMs ??
 			(item.type === TypeSchema.enum.Temporary ? item.durationMs : undefined),

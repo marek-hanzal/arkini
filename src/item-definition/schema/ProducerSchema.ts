@@ -13,10 +13,10 @@ export const ProducerSchema = z
 	.object({
 		...BaseSchema.shape,
 		/**
-		 * Maximum number of this producer's product lines that may run in parallel.
+		 * Maximum accepted work count: one active job plus pending requests.
 		 */
 		maxQueueSize: PositiveIntegerSchema.default(1).describe(
-			"The maximum number of this producer's product lines that may run in parallel; defaults to one.",
+			"The maximum number of accepted active and queued runs for this producer; defaults to one.",
 		),
 		/**
 		 * Identifies this item as a producer with one or more product lines.

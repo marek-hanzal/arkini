@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { BlueprintSchema } from "./BlueprintSchema";
+import { ClockSchema } from "./ClockSchema";
 import { CraftSchema } from "./CraftSchema";
 import { DepositSchema } from "./DepositSchema";
 import { InventorySchema } from "./InventorySchema";
@@ -23,6 +24,7 @@ export const ItemSchema = z
 		SimpleSchema,
 		SpaceSchema,
 		ProducerSchema,
+		ClockSchema,
 		CraftSchema,
 		StashSchema,
 		TemporarySchema,

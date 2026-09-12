@@ -17,6 +17,7 @@ export const RuntimeCheckIssueEnumSchema = z
 		ItemMaxCount: "item:max-count",
 		ItemCharges: "item:charges",
 		ItemStackSize: "item:stack-size",
+		ItemSchedule: "item:schedule",
 		ItemTemporaryDuration: "item:temporary-duration",
 		InputOwnerMissing: "input:owner-missing",
 		InputLineMissing: "input:line-missing",

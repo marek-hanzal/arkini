@@ -25,6 +25,7 @@ export interface AcquisitionRequirement {
 		| "merge-target"
 		| "output-condition"
 		| "owner"
+		| "expiring-item"
 		| "temporary-item";
 	readonly usage: AcquisitionRequirementUsage;
 }
@@ -92,10 +93,14 @@ export type AcquisitionRouteMetadata =
 	  }
 	| {
 			readonly itemId: string;
-			readonly kind: "temporary-expiry";
+			readonly kind: "temporary-expiry" | "clock-expiry";
 	  };
 
 export interface AcquisitionRoute {
+	/** Authored lifecycle restrictions retained for static analysis without hiding Flow relations. */
+	readonly executionConstraint?: "unavailable" | "finite-owner-lifetime";
+	/** Optimistic action cadence; owner startup and runtime queue delays remain outside the model. */
+	readonly minimumActionIntervalMs?: number;
 	readonly chargeUses?: ReadonlyArray<{
 		/** Signals when concrete payer-identity packing cannot be summarized statically. */
 		readonly accounting?: "multi-payer-unsupported" | "single-payer-exact";

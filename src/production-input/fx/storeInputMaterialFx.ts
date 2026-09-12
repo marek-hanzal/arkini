@@ -1,3 +1,4 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -190,7 +191,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				lineId,
 				runtime,
 			});
-			if (closed) {
+			if (closed || !canControlItemProductionFn(owner.item)) {
 				return yield* Effect.fail(
 					new LineInputClosedError({
 						ownerItemId,

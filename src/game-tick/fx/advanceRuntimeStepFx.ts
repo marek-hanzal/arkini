@@ -1,3 +1,5 @@
+import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
+import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
 import { Effect } from "effect";
 
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
@@ -157,6 +159,12 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		...boundaryStart.events,
 		...deliveryStart.events,
 	];
+	const scheduled = yield* advanceItemSchedulesFx({
+		stepStart,
+		runtime: draft,
+	});
+	draft = scheduled.runtime;
+	events.push(...scheduled.events);
 	const completedOwnerItemIds: IdSchema.Type[] = [];
 	for (const job of jobs) {
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
@@ -205,6 +213,19 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		didExpireTemporaryItem = true;
 	}
 	if (didExpireTemporaryItem) {
+		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
+		draft = dispatched.runtime;
+		events.push(...dispatched.events);
+	}
+	if (scheduled.dispatched) {
+		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
+		draft = dispatched.runtime;
+		events.push(...dispatched.events);
+	}
+	const expired = yield* expireIdleScheduledItemsFx(draft);
+	draft = expired.runtime;
+	events.push(...expired.events);
+	if (expired.events.length > 0) {
 		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);

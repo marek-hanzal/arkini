@@ -1,3 +1,4 @@
+import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -23,6 +24,10 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 }: setDefaultLineFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
+			yield* assertItemProductionPlayerControlFx({
+				ownerItemId,
+				runtime,
+			});
 			const owner = runtime.items.find((item) => item.id === ownerItemId);
 			if (owner === undefined) {
 				return yield* Effect.fail(

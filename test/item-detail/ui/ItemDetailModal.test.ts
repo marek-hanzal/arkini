@@ -86,6 +86,8 @@ vi.mock("~/item-line-detail/ui/useItemDetailLines", () => ({
 vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		openItemDetailFx: (props: unknown) => state.openItemDetail(props),
+		readActionErrorFn: () => null,
+		readPendingActionFn: () => null,
 		state: {
 			generation: 1,
 			phase: "open",

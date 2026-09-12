@@ -1,9 +1,11 @@
-import { Factory, PackagePlus } from "lucide-react";
+import { CircleCheck, CircleX, Factory, PackagePlus } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { LineFields } from "~/production-authoring/ui/LineFields";
+import type { RuleSchema } from "~/production-action/schema/RuleSchema";
+import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
@@ -25,7 +27,7 @@ const ProductionFields = withFieldGroupFn({
 	defaultValues: defaultProductionFieldValues,
 	props: {
 		invalidLineIndex: undefined as number | undefined,
-		kind: "producer" as "deposit" | "producer",
+		kind: "producer" as "deposit" | "producer" | "clock",
 		ownerId: "",
 		selectedLineId: undefined as string | undefined,
 	},
@@ -46,7 +48,7 @@ const ProductionFields = withFieldGroupFn({
 				description={
 					kind === "deposit"
 						? "Optional self-consuming jobs exposed by this deposit. Each production line is an independent job contract with its own inputs, output, runtime and rules."
-						: "Each product line is an independent job contract owned by this producer, with its own inputs, output, runtime and rules."
+						: "Each product line is an independent job contract owned by this item, with its own inputs, output, runtime and rules."
 				}
 				title={kind === "deposit" ? "Production lines" : "Product lines"}
 			/>
@@ -124,7 +126,7 @@ const ProductionFields = withFieldGroupFn({
 							navigationCard
 							onAddFn={addLineFn}
 							onRemoveFn={
-								kind === "producer" && lines.length === 1
+								kind !== "deposit" && lines.length === 1
 									? undefined
 									: (index) => {
 											if (kind === "deposit" && lines.length === 1) {
@@ -150,6 +152,109 @@ const ProductionFields = withFieldGroupFn({
 		</div>
 	),
 });
+
+/** Composes shared time, rule, and output controls for the authored schedule. */
+const ClockFields = () => {
+	const { form } = useFormSession();
+	return (
+		<div
+			className="grid gap-[var(--ak-viewport-gap)]"
+			data-ui="EditorClockFields"
+		>
+			<EditorFormCard>
+				<EditorFormSectionDivider
+					title="Clock"
+					description="Each enabled interval attempts to queue the current default line. Pausing preserves elapsed time; accepted production keeps its ordinary line rules."
+					variant="secondary"
+				/>
+				<div className="grid grid-cols-2 gap-4">
+					<form.AppField name="intervalMs">
+						{(field) => (
+							<field.SecondsField
+								label="Interval (seconds)"
+								min={0.1}
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="durationMs">
+						{(field) => (
+							<field.SecondsField
+								label="Lifetime (seconds)"
+								description="Leave empty to run indefinitely. Expiry closes admission and waits for production to settle."
+								min={0.1}
+								optional
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="enable">
+						{(field) => (
+							<field.BoolToggle
+								checkedIcon={CircleCheck}
+								uncheckedIcon={CircleX}
+								label="Enabled"
+								description="Allows the timer to run before availability rules are applied."
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="control">
+						{(field) => (
+							<field.ChoiceField
+								label="Player controls"
+								description="Interactive permits timer and production controls. Automatic only uses authored settings."
+								options={[
+									{
+										label: "Automatic only",
+										value: "automatic-only",
+									},
+									{
+										label: "Interactive",
+										value: "interactive",
+									},
+								]}
+							/>
+						)}
+					</form.AppField>
+				</div>
+			</EditorFormCard>
+			<EditorFormCard>
+				<form.Subscribe selector={(state) => state.values.rules ?? []}>
+					{(rules) => (
+						<RulesControl
+							rules={rules}
+							target="action"
+							allowedTypes={[
+								"enable",
+								"disable",
+							]}
+							description="These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules."
+							onChangeFn={(next) =>
+								form.setFieldValue("rules", next as RuleSchema.Type[])
+							}
+						/>
+					)}
+				</form.Subscribe>
+			</EditorFormCard>
+			<EditorFormSectionDivider
+				title="Expiry output"
+				description="Emitted once after the finite lifetime ends and accepted production has settled."
+			/>
+			<EditorFormCard>
+				<form.Subscribe selector={(state) => state.values.onExpire}>
+					{(output) => (
+						<OptionalOutputControl
+							addLabel="Enable expiry output"
+							emptyDescription="Without an output, the clock disappears after expiry and production settlement."
+							emptyIcon={PackagePlus}
+							emptyTitle="No expiry output"
+							value={output}
+							onChangeFn={(next) => form.setFieldValue("onExpire", next)}
+						/>
+					)}
+				</form.Subscribe>
+			</EditorFormCard>
+		</div>
+	);
+};
 
 export const ProductionSection = () => {
 	const { canonicalItem, form, itemId, productionLineId, validationIssues } = useFormSession();
@@ -191,6 +296,27 @@ export const ProductionSection = () => {
 					ownerId={itemId}
 					selectedLineId={productionLineId}
 				/>
+			),
+		)
+		.with(
+			{
+				type: "clock",
+			},
+			() => (
+				<div className="grid gap-[var(--ak-viewport-gap)]">
+					<ClockFields />
+					<ProductionFields
+						form={form}
+						fields={{
+							maxQueueSize: "maxQueueSize",
+							lines: "lines",
+						}}
+						kind="clock"
+						invalidLineIndex={invalidLineIndex}
+						ownerId={itemId}
+						selectedLineId={productionLineId}
+					/>
+				</div>
 			),
 		)
 		.with(

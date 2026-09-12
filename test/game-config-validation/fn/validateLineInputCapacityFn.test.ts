@@ -68,6 +68,30 @@ describe("validateLineInputCapacityFn", () => {
 		).toEqual([]);
 	});
 
+	it("admits Clock material buffers through source compilation", async () => {
+		const clock = {
+			...createProducerItem({
+				id: "item:clock",
+				input: bufferedInput(2),
+			}),
+			type: "clock",
+			scope: "board",
+			maxStackSize: 1,
+			intervalMs: 1000,
+		};
+		const result = await Effect.runPromise(
+			compileGameSourcesFx([
+				createRootSource({
+					items: {
+						"item:material": createSimpleItem("item:material"),
+						[clock.id]: clock,
+					},
+				}),
+			]),
+		);
+		expect(result.diagnostics.filter(({ severity }) => severity === "error")).toEqual([]);
+	});
+
 	it.each([
 		"blueprint",
 		"craft",

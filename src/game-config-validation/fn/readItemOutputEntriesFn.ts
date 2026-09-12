@@ -12,7 +12,7 @@ export namespace readItemOutputEntriesFn {
 	}
 }
 
-/** Reads line, charge-depletion, temporary, and merge outputs owned by one canonical item. */
+/** Reads line, charge-depletion, lifetime-expiry, and merge outputs owned by one canonical item. */
 export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesFn.Props) => {
 	const lines = readItemLineEntriesFn({
 		itemId,
@@ -51,6 +51,17 @@ export const readItemOutputEntriesFn = ({ itemId, item }: readItemOutputEntriesF
 				"items",
 				itemId,
 				"output",
+			],
+		});
+	}
+
+	if (item.type === TypeSchema.enum.Clock && item.onExpire !== undefined) {
+		entries.push({
+			output: item.onExpire,
+			path: [
+				"items",
+				itemId,
+				"onExpire",
 			],
 		});
 	}

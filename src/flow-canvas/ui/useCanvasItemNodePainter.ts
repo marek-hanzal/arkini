@@ -20,6 +20,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 const readItemTypeColorFn = (palette: CanvasPalette, type: ItemOriginItemNode["type"]) => {
 	switch (type) {
 		case "blueprint":
+		case "clock":
 		case "producer":
 			return palette.accent;
 		case "craft":

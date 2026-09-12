@@ -1,5 +1,6 @@
 import { Order } from "effect";
 
+import { readEstimateRouteDurationFn } from "~/estimate/fn/readEstimateRouteDurationFn";
 import { groupEstimateRequirementsFn } from "~/estimate/fn/groupEstimateRequirementsFn";
 import type { EstimateTopology } from "~/estimate/fn/createEstimateTopologyFn";
 import { readEstimateMissingQuantityFn } from "~/estimate/fn/readEstimateMissingQuantityFn";
@@ -291,7 +292,7 @@ const readRouteCostFn = (
 		if (!Number.isFinite(groupCost)) return groupCost;
 		dependencyCost = Math.max(dependencyCost, groupCost);
 	}
-	return route.durationMs * actionRuns + dependencyCost;
+	return readEstimateRouteDurationFn(route, actionRuns) + dependencyCost;
 };
 
 function readFactCostFn(
@@ -436,7 +437,7 @@ export const createEstimateRoutePolicyFn = (topology: EstimateTopology): Estimat
 							}),
 						),
 					);
-				const cost = route.durationMs * actionRuns + dependencyCost;
+				const cost = readEstimateRouteDurationFn(route, actionRuns) + dependencyCost;
 				const current = unitCost.get(route.output.factId);
 				if (Number.isFinite(cost) && (current === undefined || cost < current - epsilon)) {
 					unitCost.set(route.output.factId, cost);

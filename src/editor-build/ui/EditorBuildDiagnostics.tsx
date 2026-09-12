@@ -97,8 +97,7 @@ const readEditorGameDiagnosticTargetsFn = (
 	diagnostic: GameDiagnosticSchema.Type,
 	project: Pick<Project, "config" | "resources">,
 ): ReadonlyArray<EditorDiagnosticTarget> => {
-	const itemSection =
-		readOwnedItemSectionFn(diagnostic) ?? readSectionForPathFn(diagnostic.path.slice(2));
+	const itemSection = readOwnedItemSectionFn(diagnostic);
 	const itemTargets = [
 		...new Set(readDiagnosticItemIdsFn(diagnostic)),
 	].flatMap((itemId) => {
@@ -109,7 +108,9 @@ const readEditorGameDiagnosticTargetsFn = (
 					{
 						kind: "item",
 						itemUid: item.uid,
-						sectionId: itemSection,
+						sectionId:
+							itemSection ??
+							readSectionForPathFn(diagnostic.path.slice(2), item.type),
 						label: item.title,
 					} satisfies EditorDiagnosticTarget,
 				];

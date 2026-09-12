@@ -31,7 +31,9 @@ export const ItemLineCommandPanel = ({
 					cursorIntent={pendingDefault ? "progress" : undefined}
 					data-ui="TileLineSetDefaultButton"
 					data-default={line.isDefault ? "true" : "false"}
-					disabled={disabled || pendingDefault || unavailable}
+					disabled={
+						disabled || pendingDefault || unavailable || !line.actions.canChangeDefault
+					}
 					onClick={() => {
 						if (line.isDefault) {
 							unsetDefaultFn();

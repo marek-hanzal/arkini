@@ -37,14 +37,16 @@ export const IdentitySection = () => {
 				<form.AppField name="title">
 					{(field) => <field.TextField label="Title" />}
 				</form.AppField>
-				{canonicalItem.type === "inventory" || canonicalItem.type === "temporary" ? (
+				{canonicalItem.type === "inventory" ||
+				canonicalItem.type === "temporary" ||
+				canonicalItem.type === "clock" ? (
 					<div className="grid content-start gap-1.5 text-sm">
 						<span className="font-semibold text-foreground">Storage scope</span>
 						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
 							{canonicalItem.type === "inventory" ? (
 								<Tx label="Inventory item storage scope form" />
 							) : (
-								"Board — fixed by temporary contract"
+								`Board — fixed by ${canonicalItem.type} contract`
 							)}
 						</span>
 					</div>
@@ -70,7 +72,9 @@ export const IdentitySection = () => {
 						)}
 					</form.AppField>
 				)}
-				{canonicalItem.type === "inventory" || canonicalItem.type === "temporary" ? null : (
+				{canonicalItem.type === "inventory" ||
+				canonicalItem.type === "temporary" ||
+				canonicalItem.type === "clock" ? null : (
 					<form.AppField name="maxStackSize">
 						{(field) => (
 							<field.NumberField

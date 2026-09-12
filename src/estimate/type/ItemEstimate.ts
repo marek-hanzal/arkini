@@ -6,6 +6,10 @@ import type {
 
 export type ItemEstimateDiagnostic =
 	| {
+			readonly kind: "finite-owner-lifetime-unsupported";
+			readonly routeId: string;
+	  }
+	| {
 			readonly kind: "joint-output-accounting-unsupported";
 			readonly reason: "state-space";
 			readonly routeId: string;

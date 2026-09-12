@@ -84,10 +84,11 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including temporary Board identities whose lifetime continues in input and job storage;
-- positive extra material capacity is supported only for producer-owned lines;
+- positive extra material capacity is supported for Producer and Clock lines;
 - `self` charge costs use the line owner, while `target` is valid only for a deposit input and its deterministic Board payer;
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode;
 - directional merge rules belong to the source item and never imply a reverse rule;
+- Clock composes ordinary non-empty `lines`, `maxQueueSize`, Default selection and `onExpire` Output with `intervalMs`, optional `durationMs`, optional enable/disable `rules`, and `control` (`automatic-only` by default). Its authored `enable` defaults to true; no duration means unlimited active lifetime. The interactive manual switch is runtime/save state, not an authored rule override;
 - an item type, field, or schema variant is not runtime-backed until an owned command/Tick path and focused behavior proof implement it.
 
 Do not repeat field catalogs in prose or weaken a schema to silence malformed data. Change the owning schema/behavior together and regenerate the project schema.

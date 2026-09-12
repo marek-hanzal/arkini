@@ -73,6 +73,7 @@ export const RuntimeItemDetailScene = ({
 					disabled={disabled}
 					identity={controller.identity}
 					info={controller.info}
+					scheduleControl={controller.scheduleControl}
 					linesSearchQuery={target.linesSearchQuery}
 					lines={controller.lines}
 					queue={controller.queue}

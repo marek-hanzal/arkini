@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseSchema } from "~/item-definition/schema/BaseSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
+import { ClockSchema } from "~/item-definition/schema/ClockSchema";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";
 import { DepositSchema } from "~/item-definition/schema/DepositSchema";
 import { InventorySchema } from "~/item-definition/schema/InventorySchema";
@@ -35,6 +36,7 @@ const editItemInputSchemaIds = {
 	simple: "urn:arkini:schema:mcp:edit-simple-item-input",
 	space: "urn:arkini:schema:mcp:edit-space-item-input",
 	producer: "urn:arkini:schema:mcp:edit-producer-item-input",
+	clock: "urn:arkini:schema:mcp:edit-clock-item-input",
 	craft: "urn:arkini:schema:mcp:edit-craft-item-input",
 	blueprint: "urn:arkini:schema:mcp:edit-blueprint-item-input",
 	deposit: "urn:arkini:schema:mcp:edit-deposit-item-input",
@@ -66,6 +68,27 @@ const producerPatch = requireReplacementFn(
 ).meta({
 	id: "ProducerItemPatchSchema",
 	description: "Top-level replacements accepted for an existing producer item.",
+});
+const clockPatch = requireReplacementFn(
+	ClockSchema.omit({
+		...immutableItemFields,
+		scope: true,
+		maxStackSize: true,
+	})
+		.partial()
+		.extend({
+			...nullableBaseItemFields,
+			durationMs: ClockSchema.shape.durationMs.nullable(),
+			onExpire: ClockSchema.shape.onExpire.nullable(),
+			maxQueueSize: ClockSchema.shape.maxQueueSize.removeDefault().optional(),
+			enable: ClockSchema.shape.enable.removeDefault().optional(),
+			rules: ClockSchema.shape.rules.removeDefault().optional(),
+			control: ClockSchema.shape.control.removeDefault().optional(),
+		})
+		.strict(),
+).meta({
+	id: "ClockItemPatchSchema",
+	description: "Top-level replacements accepted for an existing clock item.",
 });
 const craftPatch = requireReplacementFn(
 	CraftSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
@@ -180,6 +203,11 @@ export const EditItemInputSchemas = {
 		schemaId: editItemInputSchemaIds.producer,
 		title: "Edit producer item tool input",
 		description: "Identity, revision, and replacement patch for one producer item.",
+	}),
+	clock: editItemInputFn(clockPatch, {
+		schemaId: editItemInputSchemaIds.clock,
+		title: "Edit clock item tool input",
+		description: "Identity, revision, and replacement patch for one clock item.",
 	}),
 	craft: editItemInputFn(craftPatch, {
 		schemaId: editItemInputSchemaIds.craft,

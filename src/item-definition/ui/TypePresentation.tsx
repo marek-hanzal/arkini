@@ -1,6 +1,7 @@
 import {
 	Backpack,
 	Box,
+	Clock,
 	Factory,
 	Hammer,
 	MapPinned,
@@ -17,6 +18,9 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 const presentations = {
 	blueprint: {
 		icon: ScrollText,
+	},
+	clock: {
+		icon: Clock,
 	},
 	craft: {
 		icon: Hammer,

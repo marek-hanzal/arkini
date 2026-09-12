@@ -1,3 +1,4 @@
+import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItemSchedulesFn";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -358,6 +359,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 			...itemIdIssues,
 			...itemQuantityIssues,
 			...itemTemporaryDurationIssues,
+			...checkRuntimeItemSchedulesFn(runtime),
 			...defaultLineIssues,
 			...inputLocationIssues,
 			...deliveryIssues,

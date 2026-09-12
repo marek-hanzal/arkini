@@ -1,3 +1,4 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -48,7 +49,7 @@ export const resolveLineInputStoreFn = ({
 	source,
 }: resolveLineInputStoreFn.Props) => {
 	const lineOwnerItem = owner.item;
-	if (owner.id === source.id) return undefined;
+	if (owner.id === source.id || !canControlItemProductionFn(owner.item)) return undefined;
 	const narrowedLineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(lineOwnerItem));
 	if (narrowedLineOwnerItem === undefined) return undefined;
 	const boardOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));

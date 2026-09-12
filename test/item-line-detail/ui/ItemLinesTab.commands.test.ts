@@ -93,6 +93,7 @@ describe("ItemLinesTab command boundary", () => {
 				{
 					...projection.line[0],
 					actions: {
+						canChangeDefault: false,
 						canWithdraw: true,
 						enqueue: {
 							enabled: false,

@@ -83,6 +83,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		owner.item.type !== TypeSchema.enum.Craft &&
 		owner.item.type !== TypeSchema.enum.Deposit &&
 		owner.item.type !== TypeSchema.enum.Producer &&
+		owner.item.type !== TypeSchema.enum.Clock &&
 		owner.item.type !== TypeSchema.enum.Stash
 	) {
 		return yield* Effect.die(

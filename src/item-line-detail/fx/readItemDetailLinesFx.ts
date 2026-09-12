@@ -1,3 +1,5 @@
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -64,6 +66,7 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 		itemId: ownerItemId,
 		runtime,
 	});
+	const canControl = canControlItemProductionFn(owner.item);
 	const resolution = start.run;
 	if (!resolution.show && activeJob === undefined) return undefined;
 	const allInputsReady = resolution.input.every((input) => input.resolution.ready);
@@ -166,10 +169,15 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
+			canChangeDefault: canControl,
 			enqueue: {
-				enabled: availability.kind === "available" && start.queue.available,
+				enabled:
+					canControl &&
+					isItemProductionAdmissionOpenFn(owner) &&
+					availability.kind === "available" &&
+					start.queue.available,
 			},
-			canWithdraw,
+			canWithdraw: canControl && canWithdraw,
 		},
 		input,
 		output: yield* readItemDetailOutputFx({
@@ -222,6 +230,7 @@ const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx")(funct
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
+			canChangeDefault: false,
 			enqueue: {
 				enabled: false,
 			},

@@ -49,6 +49,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-event` | Ordered facts emitted by an already committed transition | [`src/game-event/schema/GameEventSchema.ts`](src/game-event/schema/GameEventSchema.ts) |
 | `simulation-time` | Immutable fixed simulation quantum | [`src/simulation-time/constant/SimulationStepMs.ts`](src/simulation-time/constant/SimulationStepMs.ts) |
 | `game-tick` | Fixed-step budget, replay and lifecycle advancement | [`src/game-tick/fx/advanceRuntimeStepFx.ts`](src/game-tick/fx/advanceRuntimeStepFx.ts) |
+| `item-schedule` | Periodic default-line admission, manual scheduling state and exhausted-owner settlement | [`src/item-schedule/fx/advanceItemSchedulesFx.ts`](src/item-schedule/fx/advanceItemSchedulesFx.ts) |
+| `item-expiry` | Atomic identity expiry and deterministic optional output shared by lifetime owners | [`src/item-expiry/fx/expireItemRuntimeFx.ts`](src/item-expiry/fx/expireItemRuntimeFx.ts) |
 | `temporary-item` | Temporary duration advancement and expiry transition | [`src/temporary-item/fx/attemptTemporaryItemExpiryFx.ts`](src/temporary-item/fx/attemptTemporaryItemExpiryFx.ts) |
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`src/game-persistence/schema/StateSchema.ts`](src/game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save execution scope and fail-stop lifecycle | [`src/game-session/fx/createGameSessionFx.ts`](src/game-session/fx/createGameSessionFx.ts) |

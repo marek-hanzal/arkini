@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ItemScheduleIssueSchema } from "~/item-schedule/schema/ItemScheduleIssueSchema";
 
 import { DeliveryTargetIssueSchema } from "~/production-delivery/schema/DeliveryTargetIssueSchema";
 import { DuplicateJobIdIssueSchema } from "~/production-job/schema/DuplicateJobIdIssueSchema";
@@ -47,6 +48,7 @@ export const RuntimeCheckIssueSchema = z
 		ItemChargesIssueSchema,
 		ItemStackSizeIssueSchema,
 		ItemTemporaryDurationIssueSchema,
+		ItemScheduleIssueSchema,
 		InputOwnerMissingIssueSchema,
 		InputLineMissingIssueSchema,
 		InputSlotInvalidIssueSchema,

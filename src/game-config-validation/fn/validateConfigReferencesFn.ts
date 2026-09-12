@@ -375,11 +375,11 @@ export const validateConfigReferencesFn = ({
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		if (item.type === "space") {
+		if (item.type === "space" || item.type === "clock") {
 			diagnostics.push(
 				...validateActionReferencesFn({
 					config,
-					inputs: item.input.map((input, index) => ({
+					inputs: (item.type === "space" ? item.input : []).map((input, index) => ({
 						input,
 						index,
 					})),

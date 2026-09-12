@@ -5,7 +5,7 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 const ItemTypeSchema = z.enum(TypeSchema.options).meta({
 	id: "ItemTypeSchema",
 	description:
-		"A canonical Arkini item type: deposit, blueprint, simple, space, producer, craft, stash, temporary, or inventory.",
+		"A canonical Arkini item type: deposit, blueprint, simple, space, producer, clock, craft, stash, temporary, or inventory.",
 });
 
 export const ItemCollectionInputSchema = z

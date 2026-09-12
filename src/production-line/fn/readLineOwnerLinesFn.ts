@@ -1,4 +1,4 @@
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 import type { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
@@ -14,7 +14,7 @@ export const readLineOwnerLinesFn = (item: narrowLineOwnerItemFn.Result) =>
 		)
 		.with(
 			{
-				type: TypeSchema.enum.Producer,
+				type: P.union(TypeSchema.enum.Producer, TypeSchema.enum.Clock),
 			},
 			({ lines }) => lines,
 		)

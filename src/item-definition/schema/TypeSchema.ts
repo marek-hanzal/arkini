@@ -10,6 +10,7 @@ export const TypeSchema = z
 		Simple: "simple",
 		Space: "space",
 		Producer: "producer",
+		Clock: "clock",
 		Craft: "craft",
 		Stash: "stash",
 		Temporary: "temporary",

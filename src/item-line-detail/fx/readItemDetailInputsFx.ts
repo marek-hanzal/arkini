@@ -1,3 +1,4 @@
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -78,6 +79,8 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 	readonly resolved?: readonly InputRun.Resolution[];
 	readonly runtime: RuntimeSchema.Type;
 }) {
+	const owner = runtime.items.find((item) => item.id === ownerItemId);
+	const canControl = owner !== undefined && canControlItemProductionFn(owner.item);
 	const materials = new Map<string, ItemDetailLines.MaterialInput>();
 	const deposits = new Map<string, ItemDetailLines.DepositInput>();
 	const simple = new Map<string, ItemDetailLines.SimpleInput>();
@@ -142,7 +145,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							missingQuantity,
 							availableCapacity,
 							ready: resolution?.ready ?? storedQuantity >= required.min,
-							canWithdraw: storedItems.length > 0,
+							canWithdraw: canControl && storedItems.length > 0,
 							...(materialInput.charges === undefined
 								? {}
 								: {

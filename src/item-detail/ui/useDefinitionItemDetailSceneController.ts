@@ -1,3 +1,4 @@
+import type { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { Equal } from "effect";
 import { useCallback, useEffect } from "react";
 
@@ -32,6 +33,7 @@ export namespace useDefinitionItemDetailSceneController {
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
 				readonly description?: string;
+				readonly schedule?: readItemDetailScheduleFx.Schedule;
 				readonly itemType: TypeSchema.Type;
 				readonly storageScope: StorageSchema.Type;
 				readonly maxStackSize: number;
@@ -75,6 +77,14 @@ const useItemDefinitionDetail = (
 							compositeUrl: game.getResourceUrlFn(item.asset.default[1]),
 						}),
 				description: item.description,
+				schedule:
+					"intervalMs" in item
+						? {
+								intervalMs: item.intervalMs,
+								durationMs: item.durationMs,
+								control: item.control,
+							}
+						: undefined,
 				itemType: item.type,
 				storageScope: item.scope,
 				maxStackSize: item.maxStackSize,

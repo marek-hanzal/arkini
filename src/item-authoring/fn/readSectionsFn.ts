@@ -50,6 +50,7 @@ const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
 	"craft",
 	"deposit",
 	"producer",
+	"clock",
 	"stash",
 	"temporary",
 ]);

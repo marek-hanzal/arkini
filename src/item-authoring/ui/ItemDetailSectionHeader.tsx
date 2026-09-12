@@ -13,7 +13,7 @@ export const ItemDetailSectionHeader = ({
 	description,
 }: {
 	readonly itemUid: string;
-	readonly sectionId: SectionId;
+	readonly sectionId?: SectionId;
 	readonly title: string;
 	readonly description?: string;
 }) => {
@@ -21,7 +21,7 @@ export const ItemDetailSectionHeader = ({
 	const translator = useTranslator();
 	return (
 		<div
-			className="flex items-center gap-3"
+			className="flex min-h-6 items-center gap-3"
 			data-ui="EditorItemDetailSectionHeader"
 		>
 			<div className="min-w-0 flex-1">
@@ -30,18 +30,20 @@ export const ItemDetailSectionHeader = ({
 					description={description}
 				/>
 			</div>
-			<LinkButtonLink
-				className="inline-flex shrink-0 items-center gap-1.5"
-				to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-				params={{
-					projectId: project.projectId,
-					itemUid,
-					sectionId,
-				}}
-			>
-				<Pencil className="size-4" />
-				{translator.textFn("Edit")}
-			</LinkButtonLink>
+			{sectionId === undefined ? null : (
+				<LinkButtonLink
+					className="inline-flex shrink-0 items-center gap-1.5"
+					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+					params={{
+						projectId: project.projectId,
+						itemUid,
+						sectionId,
+					}}
+				>
+					<Pencil className="size-4" />
+					{translator.textFn("Edit")}
+				</LinkButtonLink>
+			)}
 		</div>
 	);
 };

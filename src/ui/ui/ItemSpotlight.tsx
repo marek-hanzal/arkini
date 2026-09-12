@@ -98,7 +98,7 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 					inputRef={controller.inputRef}
 					onEnterFn={controller.requestSelectedFn}
 					onQueryChangeFn={controller.updateQueryFn}
-					onSelectedIndexChangeFn={controller.setSelectedIndexFn}
+					onSelectedIndexChangeFn={controller.navigateSelectionFn}
 					placeholder={props.placeholder}
 					query={controller.query}
 					resultCount={controller.results.length}
@@ -107,6 +107,7 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 				<div
 					className="grid max-h-[26rem] gap-1 overflow-y-auto"
 					data-ui={`${props.dataUi}Results`}
+					ref={controller.resultsRef}
 				>
 					{resultOptions}
 				</div>

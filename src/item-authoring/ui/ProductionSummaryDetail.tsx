@@ -6,6 +6,7 @@ import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapability
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
@@ -36,13 +37,16 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 					<OutputDetail
 						output={line.output}
 						title={
-							<LineEditLink
-								itemUid={item.uid}
-								lineId={line.id}
-							>
-								{line.title}
-								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
-							</LineEditLink>
+							<span className="inline-flex flex-wrap items-center gap-2">
+								<LineEditLink
+									itemUid={item.uid}
+									lineId={line.id}
+								>
+									{line.title}
+									<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+								</LineEditLink>
+								<ProductionLineBadges line={line} />
+							</span>
 						}
 						emptyLabel={translator.textFn("No output")}
 						description={translator.textFn(

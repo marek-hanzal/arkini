@@ -16,7 +16,7 @@ interface EditorCollectionSelectorProps {
 	readonly itemMetaFn?: (index: number) => string | undefined;
 	readonly itemRelatedSearchTermsFn?: (index: number) => ReadonlyArray<string>;
 	readonly itemSearchTermsFn?: (index: number) => ReadonlyArray<string>;
-	readonly initialSelectedIndex?: number;
+	readonly initialSelectedIndex?: number | null;
 	readonly label: string;
 	readonly navigationCard?: boolean;
 	readonly navigationHeader?: ReactNode;

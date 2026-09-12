@@ -28,12 +28,10 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 				<DetailSection title={translator.textFn("Clock")}>
 					<DetailFacts>
 						<DetailFact
-							label={translator.textFn(
-								clock.intervalMs === undefined ? "Clock mode" : "Interval",
-							)}
+							label={translator.textFn("Interval")}
 							value={
 								clock.intervalMs === undefined
-									? translator.textFn("Once")
+									? translator.textFn("None")
 									: formatDurationFn(clock.intervalMs)
 							}
 						/>
@@ -56,13 +54,15 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					</DetailFacts>
 				</DetailSection>
 			</EditorRootCard>
-			<EditorRootCard dataUi="EditorClockExpiryOutputCard">
-				<OutputDetail
-					emptyLabel={translator.textFn("No expiry output configured.")}
-					output={clock.onExpire}
-					title={translator.textFn("Expiry output")}
-				/>
-			</EditorRootCard>
+			{clock.durationMs === undefined ? null : (
+				<EditorRootCard dataUi="EditorClockExpiryOutputCard">
+					<OutputDetail
+						emptyLabel={translator.textFn("No expiry output configured.")}
+						output={clock.onExpire}
+						title={translator.textFn("Expiry output")}
+					/>
+				</EditorRootCard>
+			)}
 		</div>
 	);
 };

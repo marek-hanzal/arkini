@@ -21,11 +21,19 @@ export const ItemScheduleSchema = z
 		),
 	})
 	.strict()
-	.refine(({ intervalMs, durationMs }) => intervalMs !== undefined || durationMs !== undefined, {
-		message: "Clock requires an interval or a lifetime.",
-		path: [
+	.superRefine(({ intervalMs, durationMs }, context) => {
+		if (intervalMs !== undefined || durationMs !== undefined) return;
+		for (const field of [
+			"intervalMs",
 			"durationMs",
-		],
+		] as const)
+			context.addIssue({
+				code: "custom",
+				message: "Clock requires an interval or a lifetime.",
+				path: [
+					field,
+				],
+			});
 	})
 	.meta({
 		id: "ItemScheduleSchema",

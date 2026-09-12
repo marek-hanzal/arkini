@@ -81,7 +81,7 @@ const FormPathLabelBySegment = {
 	default: "Default",
 	description: "Description",
 	distance: "Board distance",
-	durationMs: "Duration",
+	durationMs: "Lifetime",
 	intervalMs: "Interval",
 	control: "Player controls",
 	onExpire: "Expiry output",

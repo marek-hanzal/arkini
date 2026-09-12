@@ -16,22 +16,25 @@ export const EditorCapabilityDisable = ({
 }) => {
 	const translator = useTranslator();
 	return (
-		<EditorFormCard>
-			<EditorFormSectionDivider
-				title={translator.textFn("Status")}
-				description={description}
-				variant="secondary"
-			/>
-			<div className="flex items-center justify-between gap-3">
-				<span className="text-sm font-medium">{title}</span>
-				<LinkButton
-					className="inline-flex items-center gap-1.5"
-					onClick={onDisableFn}
-				>
-					<Trash2 className="size-4" />
-					{translator.textFn("Disable")}
-				</LinkButton>
-			</div>
-		</EditorFormCard>
+		<>
+			<hr className="border-line-strong" />
+			<EditorFormCard>
+				<EditorFormSectionDivider
+					title={translator.textFn("Status")}
+					description={description}
+					variant="secondary"
+				/>
+				<div className="flex items-center justify-between gap-3">
+					<span className="text-sm font-medium">{title}</span>
+					<LinkButton
+						className="inline-flex items-center gap-1.5"
+						onClick={onDisableFn}
+					>
+						<Trash2 className="size-4" />
+						{translator.textFn("Disable")}
+					</LinkButton>
+				</div>
+			</EditorFormCard>
+		</>
 	);
 };

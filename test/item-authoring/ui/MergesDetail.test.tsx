@@ -123,7 +123,7 @@ describe("MergesDetail", () => {
 		);
 		expect(links).toHaveLength(1);
 		const more = container.querySelector<HTMLAnchorElement>(
-			'[data-ui="EditorItemMergesMoreCard"] a',
+			'[data-ui="EditorItemCollectionMoreCard"] a',
 		);
 		expect(more?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/detail/$sectionId");
 		expect(JSON.parse(more?.dataset.params ?? "null")).toEqual({

@@ -1,0 +1,42 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ghu0klwv171psxmegt3iaum0",
+		"id": "copper-pan-with-fried-chicken",
+		"title": "Copper Pan With Fried Chicken",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"copper-pan-with-fried-chicken"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"type": "temporary",
+		"durationMs": 300000,
+		"output": {
+			"set": [
+				{
+					"weight": 1,
+					"roll": [
+						{
+							"type": "guaranteed",
+							"drop": [
+								{
+									"itemId": "spoiled-copper-pan",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"placement": "drop",
+									"rules": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

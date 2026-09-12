@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "wghio94hagi36tpo2kejt1yh",
+		"id": "spoiled-rapeseed",
+		"title": "Spoiled Rapeseed",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-rapeseed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
+	}
+}

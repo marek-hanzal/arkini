@@ -31,8 +31,8 @@
 										{
 											"itemId": "bio-waste",
 											"quantity": {
-												"min": 48,
-												"max": 72
+												"min": 8,
+												"max": 16
 											},
 											"placement": "random",
 											"rules": []
@@ -185,6 +185,38 @@
 				},
 				"effect": "replace",
 				"result": "loose-ash"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "chicken"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "feather",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "roasted-chicken"
 			}
 		],
 		"maxQueueSize": 1,

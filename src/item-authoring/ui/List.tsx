@@ -140,11 +140,13 @@ export const List = ({
 					sectionId: "identity",
 				}}
 				preload="intent"
-				className="data-[ui-draft=true]:bg-accent/10 data-[ui-draft=true]:hover:bg-accent/15"
+				className="data-[ui-highlighted=true]:bg-accent/10 data-[ui-highlighted=true]:hover:bg-accent/15"
 				{...readDataUiFn({
 					dataUi: "EditorItemCard",
 					state: {
 						draft: readDraftFn(item),
+						highlighted:
+							readDraftFn(item) || estimatesByUid.get(item.uid)?.status === "unreachable",
 					},
 				})}
 				data-item-id={item.id}

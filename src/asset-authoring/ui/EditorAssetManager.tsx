@@ -262,17 +262,19 @@ const EditorAssetCard = ({
 				) : undefined
 			}
 			artwork={
-				url === undefined ? (
-					<ImageIcon className="size-8 text-subtle" />
-				) : (
-					<img
-						src={url}
-						alt=""
-						className="max-h-66 max-w-full object-contain"
-						draggable={false}
-						loading="lazy"
-					/>
-				)
+				<span className="relative grid aspect-square w-66 max-w-full place-items-center">
+					{url === undefined ? (
+						<ImageIcon className="size-8 text-subtle" />
+					) : (
+						<img
+							src={url}
+							alt=""
+							className="absolute inset-0 size-full object-contain"
+							draggable={false}
+							loading="lazy"
+						/>
+					)}
+				</span>
 			}
 		/>
 	);

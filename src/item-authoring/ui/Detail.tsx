@@ -43,7 +43,7 @@ export const Detail = ({
 	const editableSectionId =
 		sectionId === "identity" || sectionId === "production" || sectionId === "merges"
 			? sectionId
-			: undefined;
+			: "identity";
 	const help = ItemSectionHelp[sectionId];
 	const sections = readSectionsFn();
 	return (
@@ -87,23 +87,19 @@ export const Detail = ({
 								</>
 							)}
 							<ItemDraftToggle item={item} />
-							{editableSectionId === undefined ? null : (
-								<EditorSectionNavigationSeparator />
-							)}
-							{editableSectionId === undefined ? null : (
-								<PrimaryButtonLink
-									ref={editActionRef}
-									to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-									params={{
-										...params,
-										sectionId: editableSectionId,
-									}}
-									className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
-								>
-									<Pencil className="size-4" />
-									{translator.textFn("Edit")}
-								</PrimaryButtonLink>
-							)}
+							<EditorSectionNavigationSeparator />
+							<PrimaryButtonLink
+								ref={editActionRef}
+								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+								params={{
+									...params,
+									sectionId: editableSectionId,
+								}}
+								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+							>
+								<Pencil className="size-4" />
+								{translator.textFn("Edit")}
+							</PrimaryButtonLink>
 						</div>
 					}
 				/>

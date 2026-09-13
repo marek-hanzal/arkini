@@ -8,6 +8,8 @@ vi.mock("~/item-authoring/ui/FormContext", () => ({
 	useFormSession: () => ({
 		outputSetIndex: 1,
 		outputRollIndex: 2,
+		outputDropIndex: 1,
+		outputCandidateIndex: 1,
 	}),
 }));
 vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
@@ -55,7 +57,55 @@ import { OutputControl } from "~/production-authoring/ui/OutputControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-it("opens the requested output set and nested roll on first form render", async () => {
+it.each([
+	"guaranteed",
+	"chance",
+	"weight",
+] as const)("opens the exact drop in a %s roll on first form render", async (type) => {
+	const drop = (itemId: string) => ({
+		itemId,
+		quantity: {
+			min: 1,
+			max: 1,
+		},
+		placement: "drop",
+		rules: [],
+	});
+	const targetDrops = [
+		drop("meat"),
+		drop("bones"),
+	];
+	const roll =
+		type === "weight"
+			? {
+					type,
+					quantity: {
+						min: 1,
+						max: 1,
+					},
+					drop: [
+						{
+							weight: 1,
+							drop: [
+								drop("other"),
+							],
+						},
+						{
+							weight: 1,
+							drop: targetDrops,
+						},
+					],
+				}
+			: type === "chance"
+				? {
+						type,
+						chance: 0.5,
+						drop: targetDrops,
+					}
+				: {
+						type,
+						drop: targetDrops,
+					};
 	const value = OutputSchema.parse({
 		set: Array.from(
 			{
@@ -63,25 +113,11 @@ it("opens the requested output set and nested roll on first form render", async 
 			},
 			() => ({
 				weight: 1,
-				roll: Array.from(
-					{
-						length: 3,
-					},
-					() => ({
-						type: "guaranteed" as const,
-						drop: [
-							{
-								itemId: "material",
-								quantity: {
-									min: 1,
-									max: 1,
-								},
-								placement: "drop",
-								rules: [],
-							},
-						],
-					}),
-				),
+				roll: [
+					roll,
+					roll,
+					roll,
+				],
 			}),
 		),
 	});
@@ -99,6 +135,12 @@ it("opens the requested output set and nested roll on first form render", async 
 		);
 		expect(container.querySelector('[data-label="Output sets"]')?.textContent).toBe("1");
 		expect(container.querySelector('[data-label="Output set 2 rolls"]')?.textContent).toBe("2");
+		expect(container.querySelector('[data-label="Drops"]')?.textContent).toBe("1");
+		expect(container.querySelector('[data-label="Dropped item"]')?.textContent).toBe("bones");
+		if (type === "weight")
+			expect(container.querySelector('[data-label="Weighted candidates"]')?.textContent).toBe(
+				"1",
+			);
 	} finally {
 		await act(async () => root.unmount());
 		container.remove();

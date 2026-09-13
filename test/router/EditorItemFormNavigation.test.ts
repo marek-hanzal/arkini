@@ -24,6 +24,8 @@ describe("item form deep-link admission", () => {
 				merge: 2,
 				outputSet: -1,
 				outputRoll: Number.NaN,
+				outputDrop: -1,
+				outputCandidate: Number.NaN,
 			}),
 		).toEqual({
 			merge: 2,
@@ -33,11 +35,15 @@ describe("item form deep-link admission", () => {
 				lineId: "line-two",
 				outputSet: 1,
 				outputRoll: 2,
+				outputDrop: 1,
+				outputCandidate: 1,
 			}),
 		).toEqual({
 			lineId: "line-two",
 			outputSet: 1,
 			outputRoll: 2,
+			outputDrop: 1,
+			outputCandidate: 1,
 		});
 	});
 });

@@ -134,9 +134,11 @@ const DropControl = ({
 };
 
 const DropList = ({
+	initialDropIndex,
 	onChangeFn,
 	value,
 }: {
+	readonly initialDropIndex?: number;
 	readonly onChangeFn: (drops: DropListValue | undefined) => void;
 	readonly value: DropListValue;
 }) => {
@@ -156,6 +158,8 @@ const DropList = ({
 			<EditorCollectionSelector
 				addLabel="Add drop"
 				count={value.length}
+				initialSelectedIndex={initialDropIndex}
+				key={initialDropIndex}
 				itemLabelFn={(index) =>
 					`Drop ${index + 1} — ${readItemLabelFn(
 						value[index].itemId,
@@ -253,9 +257,13 @@ const WeightedSelectionsHelp = () => (
 );
 
 const WeightedRollControl = ({
+	initialDropIndex,
+	initialCandidateIndex,
 	onChangeFn,
 	roll,
 }: {
+	readonly initialDropIndex?: number;
+	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
 	readonly roll: WeightedRoll;
 }) => {
@@ -320,6 +328,8 @@ const WeightedRollControl = ({
 			<EditorCollectionSelector
 				addLabel="Add weighted candidate"
 				count={roll.drop.length}
+				initialSelectedIndex={initialCandidateIndex}
+				key={initialCandidateIndex}
 				itemLabelFn={(candidateIndex) => {
 					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
 					return `Candidate ${candidateIndex + 1} — ${readItemLabelFn(
@@ -402,6 +412,11 @@ const WeightedRollControl = ({
 							/>
 							<DropList
 								value={candidate.drop}
+								initialDropIndex={
+									candidateIndex === initialCandidateIndex
+										? initialDropIndex
+										: undefined
+								}
 								onChangeFn={(drop) =>
 									drop === undefined
 										? removeCandidateFn()
@@ -427,9 +442,13 @@ const WeightedRollControl = ({
 };
 
 const RollControl = ({
+	initialDropIndex,
+	initialCandidateIndex,
 	onChangeFn,
 	value,
 }: {
+	readonly initialDropIndex?: number;
+	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
 	readonly value: RollSchema.Type;
 }) => {
@@ -470,6 +489,7 @@ const RollControl = ({
 					(roll) => (
 						<DropList
 							value={roll.drop}
+							initialDropIndex={initialDropIndex}
 							onChangeFn={(drop) =>
 								drop === undefined
 									? onChangeFn(undefined)
@@ -504,6 +524,7 @@ const RollControl = ({
 							/>
 							<DropList
 								value={roll.drop}
+								initialDropIndex={initialDropIndex}
 								onChangeFn={(drop) =>
 									drop === undefined
 										? onChangeFn(undefined)
@@ -523,6 +544,8 @@ const RollControl = ({
 					(roll) => (
 						<WeightedRollControl
 							roll={roll}
+							initialDropIndex={initialDropIndex}
+							initialCandidateIndex={initialCandidateIndex}
 							onChangeFn={onChangeFn}
 						/>
 					),
@@ -535,11 +558,15 @@ const RollControl = ({
 export const RollSetControl = ({
 	index,
 	initialRollIndex,
+	initialDropIndex,
+	initialCandidateIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly index: number;
 	readonly initialRollIndex?: number;
+	readonly initialDropIndex?: number;
+	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (set: RollSetSchema.Type | undefined) => void;
 	readonly value: RollSetSchema.Type;
 }) => {
@@ -617,6 +644,12 @@ export const RollSetControl = ({
 				{(rollIndex) => (
 					<RollControl
 						value={value.roll[rollIndex]}
+						initialDropIndex={
+							rollIndex === initialRollIndex ? initialDropIndex : undefined
+						}
+						initialCandidateIndex={
+							rollIndex === initialRollIndex ? initialCandidateIndex : undefined
+						}
 						onChangeFn={(next) =>
 							next === undefined
 								? value.roll.length === 1

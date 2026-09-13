@@ -226,6 +226,7 @@ describe("readItemConnectionsFn", () => {
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,
+					dropIndex: 0,
 					rollType: "guaranteed",
 				},
 			},
@@ -237,6 +238,7 @@ describe("readItemConnectionsFn", () => {
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,
+					dropIndex: 0,
 					rollType: "guaranteed",
 				},
 			},
@@ -393,6 +395,7 @@ describe("readItemConnectionsFn", () => {
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,
+					dropIndex: 0,
 					rollType: "guaranteed",
 				},
 			})),

@@ -12,6 +12,8 @@ interface EditorItemFormSearch {
 	readonly merge?: number;
 	readonly outputSet?: number;
 	readonly outputRoll?: number;
+	readonly outputDrop?: number;
+	readonly outputCandidate?: number;
 	readonly resourceId?: string;
 }
 
@@ -20,7 +22,20 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		const merge = typeof search.merge === "number" ? search.merge : Number.NaN;
 		const outputSet = typeof search.outputSet === "number" ? search.outputSet : Number.NaN;
 		const outputRoll = typeof search.outputRoll === "number" ? search.outputRoll : Number.NaN;
+		const outputDrop = typeof search.outputDrop === "number" ? search.outputDrop : Number.NaN;
+		const outputCandidate =
+			typeof search.outputCandidate === "number" ? search.outputCandidate : Number.NaN;
 		return {
+			...(Number.isInteger(outputDrop) && outputDrop >= 0
+				? {
+						outputDrop,
+					}
+				: {}),
+			...(Number.isInteger(outputCandidate) && outputCandidate >= 0
+				? {
+						outputCandidate,
+					}
+				: {}),
 			...(Number.isInteger(outputSet) && outputSet >= 0
 				? {
 						outputSet,
@@ -89,6 +104,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			merge,
 			outputSet,
 			outputRoll,
+			outputDrop,
+			outputCandidate,
 			resourceId,
 		} = Route.useSearch();
 		const params = useParams({
@@ -107,6 +124,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				mergeIndex={merge}
 				outputSetIndex={outputSet}
 				outputRollIndex={outputRoll}
+				outputDropIndex={outputDrop}
+				outputCandidateIndex={outputCandidate}
 				productionLineId={lineId}
 				resourceId={resourceId}
 				sectionId={sectionId}

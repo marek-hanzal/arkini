@@ -121,6 +121,8 @@ const ConnectionOrigin = ({
 				merge: source.type === "merge" ? source.mergeIndex : undefined,
 				outputSet: roll?.setIndex,
 				outputRoll: roll?.rollIndex,
+				outputDrop: roll?.dropIndex,
+				outputCandidate: roll?.candidateIndex,
 			}}
 			data-ui="EditorItemConnectionOriginLink"
 			className="relative z-10 inline min-h-0 border-0 bg-transparent p-0 text-left text-xs font-normal text-accent underline-offset-4 shadow-none hover:bg-transparent hover:underline"

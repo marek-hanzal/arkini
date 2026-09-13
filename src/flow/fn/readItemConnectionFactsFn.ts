@@ -50,16 +50,26 @@ const addOutputFactsFn = (
 	if (output === undefined) return;
 	for (const [setIndex, set] of output.set.entries())
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			const position = {
-				setIndex,
-				rollIndex,
-				rollType: roll.type,
-			};
 			const drops =
 				roll.type === "weight"
-					? roll.drop.flatMap((candidate) => candidate.drop)
-					: roll.drop;
-			for (const drop of drops) {
+					? roll.drop.flatMap((candidate, candidateIndex) =>
+							candidate.drop.map((drop, dropIndex) => ({
+								drop,
+								dropIndex,
+								candidateIndex,
+							})),
+						)
+					: roll.drop.map((drop, dropIndex) => ({
+							drop,
+							dropIndex,
+						}));
+			for (const { drop, ...dropPosition } of drops) {
+				const position = {
+					setIndex,
+					rollIndex,
+					rollType: roll.type,
+					...dropPosition,
+				};
 				facts.push({
 					factId: drop.itemId,
 					origin: {
@@ -239,6 +249,8 @@ export namespace readItemConnectionFactsFn {
 		readonly roll?: {
 			readonly setIndex: number;
 			readonly rollIndex: number;
+			readonly dropIndex: number;
+			readonly candidateIndex?: number;
 			readonly rollType: RollSchema.Type["type"];
 		};
 	}

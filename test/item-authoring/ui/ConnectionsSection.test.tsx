@@ -255,6 +255,7 @@ it.each([
 		search: {
 			outputSet: 1,
 			outputRoll: 2,
+			outputDrop: 1,
 		},
 	},
 	{
@@ -270,6 +271,7 @@ it.each([
 			lineId: "specific-line",
 			outputSet: 1,
 			outputRoll: 2,
+			outputDrop: 1,
 		},
 	},
 	{
@@ -284,6 +286,7 @@ it.each([
 			merge: 2,
 			outputSet: 1,
 			outputRoll: 2,
+			outputDrop: 1,
 		},
 	},
 	{
@@ -299,6 +302,7 @@ it.each([
 			lineId: "specific-line",
 			outputSet: 1,
 			outputRoll: 2,
+			outputDrop: 1,
 		},
 	},
 ] as const)(
@@ -311,6 +315,7 @@ it.each([
 				roll: {
 					setIndex: 1,
 					rollIndex: 2,
+					dropIndex: 1,
 					rollType: "guaranteed",
 				},
 			},

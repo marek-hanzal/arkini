@@ -49,6 +49,8 @@ interface FormProps extends PropsWithChildren {
 	readonly mergeIndex?: number;
 	readonly outputSetIndex?: number;
 	readonly outputRollIndex?: number;
+	readonly outputDropIndex?: number;
+	readonly outputCandidateIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
 	readonly sectionId?: SectionId;
@@ -66,6 +68,8 @@ export const Form = ({
 	mergeIndex,
 	outputSetIndex,
 	outputRollIndex,
+	outputDropIndex,
+	outputCandidateIndex,
 	productionLineId,
 	resourceId,
 	sectionId = "identity",
@@ -89,6 +93,8 @@ export const Form = ({
 			mergeIndex={mergeIndex}
 			outputSetIndex={outputSetIndex}
 			outputRollIndex={outputRollIndex}
+			outputDropIndex={outputDropIndex}
+			outputCandidateIndex={outputCandidateIndex}
 			productionLineId={productionLineId}
 			resourceId={resourceId}
 			sectionId={sectionId}

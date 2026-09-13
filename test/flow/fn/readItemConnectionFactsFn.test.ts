@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 import { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
 import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
 
-it("keeps distinct output sets and rolls while deduplicating repeated weighted drops", () => {
+it("keeps exact drop positions including repeated identities in weighted candidates", () => {
 	const drop = {
 		itemId: "result",
 		placement: "drop" as const,
@@ -74,42 +74,46 @@ it("keeps distinct output sets and rolls while deduplicating repeated weighted d
 	});
 	const origins = [
 		{
-			source: {
-				type: "merge",
-				mergeIndex: 0,
-			},
-			role: "output",
-			roll: {
-				setIndex: 0,
-				rollIndex: 0,
-				rollType: "guaranteed",
-			},
+			setIndex: 0,
+			rollIndex: 0,
+			rollType: "guaranteed",
+			dropIndex: 0,
 		},
 		{
-			source: {
-				type: "merge",
-				mergeIndex: 0,
-			},
-			role: "output",
-			roll: {
-				setIndex: 0,
-				rollIndex: 1,
-				rollType: "weight",
-			},
+			setIndex: 0,
+			rollIndex: 1,
+			rollType: "weight",
+			candidateIndex: 0,
+			dropIndex: 0,
 		},
 		{
-			source: {
-				type: "merge",
-				mergeIndex: 0,
-			},
-			role: "output",
-			roll: {
-				setIndex: 1,
-				rollIndex: 0,
-				rollType: "chance",
-			},
+			setIndex: 0,
+			rollIndex: 1,
+			rollType: "weight",
+			candidateIndex: 0,
+			dropIndex: 1,
 		},
-	];
+		{
+			setIndex: 0,
+			rollIndex: 1,
+			rollType: "weight",
+			candidateIndex: 1,
+			dropIndex: 0,
+		},
+		{
+			setIndex: 1,
+			rollIndex: 0,
+			rollType: "chance",
+			dropIndex: 0,
+		},
+	].map((roll) => ({
+		source: {
+			type: "merge",
+			mergeIndex: 0,
+		},
+		role: "output",
+		roll,
+	}));
 	expect(readItemConnectionFactsFn(config, "source", "produces")).toEqual([
 		{
 			itemId: "result",

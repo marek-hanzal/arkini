@@ -49,6 +49,10 @@ const DetailSections = [
 		label: "Estimate",
 	},
 	{
+		id: "chain",
+		label: "Chain",
+	},
+	{
 		id: "connections",
 		label: "Connections",
 	},

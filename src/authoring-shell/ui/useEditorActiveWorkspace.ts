@@ -3,6 +3,7 @@ import {
 	Boxes,
 	FolderCog,
 	GitFork,
+	GitBranch,
 	Images,
 	LayoutGrid,
 	NotebookPen,
@@ -50,6 +51,14 @@ export const EditorWorkspaceRoutes = [
 		matchTo: "/editor/$projectId/flow",
 		shortcut: "Mod+Shift+F",
 		to: "/editor/$projectId/flow",
+	},
+	{
+		id: "chains",
+		icon: GitBranch,
+		label: "Chains · Experimental",
+		matchTo: "/editor/$projectId/chains",
+		shortcut: "Mod+Shift+C",
+		to: "/editor/$projectId/chains",
 	},
 	{
 		id: "mcp",

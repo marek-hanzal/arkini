@@ -22,10 +22,14 @@ Add merge:
   value: Add merge
 Adds no item or units requirement. The action may start without delivering or targeting another item.:
   value: Adds no item or units requirement. The action may start without delivering or targeting another item.
+After:
+  value: After
 Allows the timer to run before availability rules are applied.:
   value: Allows the timer to run before availability rules are applied.
 Alternative:
   value: Alternative
+Alternative set:
+  value: Alternative set
 Any local:
   value: Any local
   dynamic: true
@@ -119,12 +123,40 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
+Candidate:
+  value: Candidate
+Chain:
+  value: Chain
+Chain empty description:
+  value: This item owns no merge or Clock. Incoming merges belong to their source item's Chain.
+Chain help:
+  value: |
+    Chain is an experimental overview of an authored interaction and its automatic consequences.
+
+    - The starting item owns the merge direction. Dropping A onto B is separate from dropping B onto A; only the starting item's own merge rules are listed.
+    - The starting item's own Clock is also available. After the first operation, only Clock expiry and the output of its Clock-selected production line continue. Intermediate merge rules and production input chains are ignored.
+    - Each emitted item without a Clock ends its branch. Results include items emitted along the way. Explore from here explicitly starts a new investigation, including that item's own merges.
+    - Periodic output is shown once per admitted line run, with its interval, line duration and owner lifetime. It is not an accumulated yield or a promise of successful production.
+    - Show steps and quantities reveals each operation. Quantities belong to that operation, not the whole chain. Output sets are alternatives; rolls within a selected set run together; weighted candidates are alternatives per selection. Conditions and chance remain visible.
+    - Maximum steps counts one merge or one Clock operation as a step. Depth limits, manually stopped branches and Clock loops are unfinished paths, not final items. Stop here prunes one branch; Continue branch restores it. Reaching the safety limit explicitly reports incomplete exploration.
+    - Retained merge participants keep their existing runtime state; their Clock is not restarted. Spending a unit is marked separately, with conditional depletion output when configured.
+    - This is authored inspection, not runtime simulation. Disabled defaults, conditions, inputs, jobs and blocked placement may prevent or delay an outcome. Times are local configured durations, not guaranteed elapsed times.
+Chain introduction:
+  value: Explore this item's merges and Clock, then follow only Clock outcomes. Results include items emitted along the way.
+Chain pulse explanation:
+  value: Shown once per admitted run. The owner remains until expiry. Inputs, availability, queueing and output placement can delay or prevent production.
+Chain safety limit:
+  value: This exploration reached its safety limit. Some branches are omitted; reduce the maximum steps to inspect a smaller chain.
+Chains:
+  value: Chains
 Chance:
   value: Chance
 Check ahead:
   value: Check ahead
 Choose a different Project ID.:
   value: Choose a different Project ID.
+Choose a starting item:
+  value: Choose a starting item
 Clear interval:
   value: Clear interval
 Clear lifetime:
@@ -141,12 +173,19 @@ Clock configured:
   value: Clock configured
 Clock expiry:
   value: Clock expiry
+Clock line:
+  value: Clock line
+Clock loop:
+  value: Clock loop
+  dynamic: true
 Close:
   value: Close
   dynamic: true
 Condition:
   value: Condition
   dynamic: true
+Conditional or alternative:
+  value: Conditional or alternative
 Connection search empty:
   value: No connection matches this search.
 Connection search placeholder:
@@ -161,8 +200,20 @@ Consumed:
   value: Consumed
 Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.:
   value: Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.
+Continue branch:
+  value: Continue branch
 Control:
   value: Control
+Copy from:
+  value: Copy from
+Copy from…:
+  value: Copy from…
+Copying Clock also removes the destination action and sets Board storage with a stack size of one.:
+  value: Copying Clock also removes the destination action and sets Board storage with a stack size of one.
+Copying an action also removes destination production lines and Clock.:
+  value: Copying an action also removes destination production lines and Clock.
+Copying production also removes the destination action. All lines and queue capacity are replaced.:
+  value: Copying production also removes the destination action. All lines and queue capacity are replaced.
 Cost:
   value: Cost
 Could not load notes.:
@@ -190,8 +241,13 @@ Delete asset:
   value: Delete asset
 Delete item:
   value: Delete item
+Depends on conditions:
+  value: Depends on conditions
 Depletion output:
   value: Depletion output
+Depth limit:
+  value: Depth limit
+  dynamic: true
 Describe what this line consumes and produces.:
   value: Describe what this line consumes and produces.
 Description:
@@ -212,12 +268,16 @@ Disable removes timing, rules and expiry output from this item.:
   value: Disable removes timing, rules and expiry output from this item.
 Disabled:
   value: Disabled
+Disabled by default:
+  value: Disabled by default
 Discard:
   value: Discard
 Draft:
   value: Draft
 Drop:
   value: Drop
+Drop onto:
+  value: Drop onto
 Dropping this item onto a matching target applies its source action, target effect and optional output.:
   value: Dropping this item onto a matching target applies its source action, target effect and optional output.
 Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.:
@@ -284,6 +344,8 @@ Estimate calculation failed:
   value: Estimate calculation failed
 Estimates are out of date. Reopen Items to refresh them.:
   value: Estimates are out of date. Reopen Items to refresh them.
+Every:
+  value: Every
 Every Enable rule must pass, and any matching Disable rule prevents activation.:
   value: Every Enable rule must pass, and any matching Disable rule prevents activation.
 Every condition of a rule must pass. Enable rules gate this selected drop; a matching Disable rule suppresses it without disabling the line or other drops.:
@@ -298,8 +360,12 @@ Exact count:
   value: Exact count
 Exists:
   value: Exists
+Experimental:
+  value: Experimental
 Expiry output:
   value: Expiry output
+Explore from here:
+  value: Explore from here
 Extra output:
   value: Extra output
 Far:
@@ -307,6 +373,9 @@ Far:
   dynamic: true
 Fastest first:
   value: Fastest first
+Final item:
+  value: Final item
+  dynamic: true
 Finishing accepted work:
   value: Finishing accepted work
 Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.:
@@ -376,6 +445,8 @@ Item:
   value: Item
 Item ID:
   value: Item ID
+Item ID, UID and draft status stay unchanged. Clock keeps Board storage and a stack size of one.:
+  value: Item ID, UID and draft status stay unchanged. Clock keeps Board storage and a stack size of one.
 Item action empty title:
   value: Let a click open Inventory or move to another space.
 Item action help:
@@ -508,6 +579,19 @@ Item production help:
     **Interactive** allows manual production, material management, queue changes and line selection. **Automatic only** removes those player controls.
 
     Clock can also give an item a finite lifetime without any lines. Accepted production may outlive that lifetime; expiry output waits for settlement. Adding a production line removes the configured Action when the draft is saved.
+Item section copy help:
+  value: |
+    In the edit form, **Copy from** selects another saved item in this project. Confirm to replace the **entire active section**, including its unsaved changes. Collections are replaced in full, never merged; an absent optional section removes it from the destination. The source item stays unchanged.
+
+    **Save** persists the replacement together with the rest of your draft. **Discard** restores the saved destination item. Item references retain their authored targets; self-paid unit inputs bind to the destination when saved.
+
+    - **Item:** copies title, description, player controls, storage, stack and global limits. Item ID, UID and draft status stay unchanged. An existing Clock keeps Board storage and a stack size of one.
+    - **Artwork:** replaces base artwork, overlay and scale.
+    - **Production:** replaces all lines and queue capacity. Nonempty production removes the destination action.
+    - **Merges:** replaces all merge rules and their outputs.
+    - **Units:** replaces amount and depletion output.
+    - **Clock:** replaces timing, enabled state, rules and expiry output. A copied Clock removes the destination action and sets Board storage with a stack size of one.
+    - **Action:** replaces the complete action, inputs and rules. A copied action removes destination production lines and Clock.
 Item stack size help:
   value: |
     The maximum quantity that can share one cell as a stack. This is separate from **Units**, the finite supply inside one item. A configured **Clock** requires a stack size of one.
@@ -557,6 +641,8 @@ Line ID:
   value: Line ID
 Line description:
   value: Line description
+Line duration:
+  value: Line duration
 Line selection could not be changed.:
   value: Line selection could not be changed.
 Line title:
@@ -589,6 +675,8 @@ Maximum global count:
   value: Maximum global count
 Maximum stack size:
   value: Maximum stack size
+Maximum steps:
+  value: Maximum steps
 Merge:
   value: Merge
 Merge output:
@@ -623,25 +711,35 @@ No authored operation owned by this item directly inputs or positively requires 
 No authored operation owned by this item outputs another item.:
   value: No authored operation owned by this item outputs another item.
   dynamic: true
+No chains for this item:
+  value: No chains for this item
 No depletion output configured.:
   value: No depletion output configured.
 No expiry output configured.:
   value: No expiry output configured.
 No extra output configured.:
   value: No extra output configured.
+No finite lifetime:
+  value: No finite lifetime
 No inputs:
   value: No inputs
 No item selected:
   value: No item selected
 No item with Units enabled matches this search.:
   value: No item with Units enabled matches this search.
+No items emitted:
+  value: No items emitted
 No items yet:
   value: No items yet
+No matches.:
+  value: No matches.
 No matching items:
   value: No matching items
 No other authored item outputs this item through production, expiry, units, or merges.:
   value: No other authored item outputs this item through production, expiry, units, or merges.
   dynamic: true
+No other item matches this search.:
+  value: No other item matches this search.
 No output:
   value: No output
 No output configured.:
@@ -741,6 +839,8 @@ Player controls govern manual production, material management, queue changes and
   value: Player controls govern manual production, material management, queue changes and line selection.
 Player hint:
   value: Player hint
+Possible results:
+  value: Possible results
 Preparing asset preview…:
   value: Preparing asset preview…
 Produced by:
@@ -789,6 +889,9 @@ Ratio from 0.25 to 1. The default 1 fills the tile at 100%.:
   value: Ratio from 0.25 to 1. The default 1 fills the tile at 100%.
 Reading image…:
   value: Reading image…
+Remains:
+  value: Remains
+  dynamic: true
 Remove:
   value: Remove
 Remove from Recent:
@@ -808,6 +911,8 @@ Rename project ID help:
     The current project content and its last output version settings stay unchanged.
 Renaming updates exact project references.:
   value: Renaming updates exact project references.
+Repeated output:
+  value: Repeated output
 Replace:
   value: Replace
 Replace image:
@@ -832,8 +937,12 @@ Requires:
   value: Requires
 Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.:
   value: Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.
+Reserve:
+  value: Reserve
 Reserved:
   value: Reserved
+Reset branch stops:
+  value: Reset branch stops
 Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.:
   value: Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.
 Resource ID:
@@ -844,6 +953,8 @@ Retry loading notes:
   value: "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged."
 Roll:
   value: Roll
+Rule:
+  value: Rule
 Rules:
   value: Rules
 Running:
@@ -891,6 +1002,8 @@ Selected target must have Units enabled before choosing Spend.:
   value: Selected target must have Units enabled before choosing Spend.
 Selected target must have Units enabled.:
   value: Selected target must have Units enabled.
+Selections:
+  value: Selections
 Self:
   value: Self
   dynamic: true
@@ -904,6 +1017,8 @@ Show:
   value: Show
 Show all:
   value: Show all
+Show steps and quantities:
+  value: Show steps and quantities
 Simple:
   value: Simple
 Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.:
@@ -914,6 +1029,8 @@ Single item:
   value: Single item
 Slowest first:
   value: Slowest first
+Source:
+  value: Source
 Source action:
   value: Source action
 Space:
@@ -922,6 +1039,9 @@ Space action:
   value: Space action
 Spend:
   value: Spend
+Spends one unit:
+  value: Spends one unit
+  dynamic: true
 "Spends one unit from the selected target. Spending its last unit depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill.":
   value: "Spends one unit from the selected target. Spending its last unit depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill."
 "Spends one unit from the source item. Spending the last unit depletes one source item and emits its configured depletion output. Example: Flint And Steel + Unlit Candle → Candle; Flint And Steel loses one use.":
@@ -940,6 +1060,11 @@ Starting layout controls help:
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
 Status:
   value: Status
+Stop here:
+  value: Stop here
+Stopped here:
+  value: Stopped here
+  dynamic: true
 Storage:
   value: Storage
 Storage scope:
@@ -958,6 +1083,8 @@ The board item resolved by a Units input pays the unit cost in place. Units are 
   value: The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.
 The board space entered after successful activation. One-way navigation is allowed.:
   value: The board space entered after successful activation. One-way navigation is allowed.
+The entire current section will be replaced, including unsaved edits. An empty source section clears it. Nothing is merged. Save applies the change; Discard restores the saved item.:
+  value: The entire current section will be replaced, including unsaved edits. An empty source section clears it. Nothing is merged. Save applies the change; Discard restores the saved item.
 The finite supply held by each new item, independently of its stack quantity.:
   value: The finite supply held by each new item, independently of its stack quantity.
 The item that owns this action pays the unit cost. It must define enough available units.:
@@ -1073,10 +1200,16 @@ automatic-only:
   value: automatic-only
 chance:
   value: chance
+consume:
+  value: consume
 keep:
   value: keep
+manual:
+  value: manual
 negligible:
   value: negligible
+pulse:
+  value: pulse
 random:
   value: random
 remove:
@@ -1099,17 +1232,5 @@ units from target:
   value: units from target
 use:
   value: use
-
-Item section copy help:
-  value: |
-    In the edit form, **Copy from** selects another saved item in this project. Confirm to replace the **entire active section**, including its unsaved changes. Collections are replaced in full, never merged; an absent optional section removes it from the destination. The source item stays unchanged.
-
-    **Save** persists the replacement together with the rest of your draft. **Discard** restores the saved destination item. Item references retain their authored targets; self-paid unit inputs bind to the destination when saved.
-
-    - **Item:** copies title, description, player controls, storage, stack and global limits. Item ID, UID and draft status stay unchanged. An existing Clock keeps Board storage and a stack size of one.
-    - **Artwork:** replaces base artwork, overlay and scale.
-    - **Production:** replaces all lines and queue capacity. Nonempty production removes the destination action.
-    - **Merges:** replaces all merge rules and their outputs.
-    - **Units:** replaces amount and depletion output.
-    - **Clock:** replaces timing, enabled state, rules and expiry output. A copied Clock removes the destination action and sets Board storage with a stack size of one.
-    - **Action:** replaces the complete action, inputs and rules. A copied action removes destination production lines and Clock.
+weight:
+  value: weight

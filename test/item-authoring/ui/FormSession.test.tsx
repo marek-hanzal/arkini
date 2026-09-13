@@ -301,7 +301,9 @@ describe("item section form session", () => {
 		});
 		const headerResourcesFn = () =>
 			Array.from(
-				container.querySelectorAll<HTMLImageElement>('[data-ui="EditorItemHeaderTitle"] img'),
+				container.querySelectorAll<HTMLImageElement>(
+					'[data-ui="EditorItemHeaderTitle"] img',
+				),
 				(image) => new URL(image.src).searchParams.get("resourceId"),
 			);
 		expect(headerResourcesFn()).toEqual([

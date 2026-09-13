@@ -4,7 +4,7 @@
   <img src="game/arkini/resources/hero.png" alt="Arkini logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Flow, Estimate, Notes, and Assets.
+Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Flow, Estimate, Notes, and Assets. Experimental **Chains** inspect one item’s directional merges and their automatic Clock consequences; the same view is available in Item → Chain and the global Chains workspace.
 
 ## Start here
 

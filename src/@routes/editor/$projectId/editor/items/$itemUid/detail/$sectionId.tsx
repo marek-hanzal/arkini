@@ -1,3 +1,4 @@
+import { ItemChain } from "~/item-chain/ui/ItemChain";
 import { MergesCollectionDetail } from "~/item-authoring/ui/MergesCollectionDetail";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
@@ -67,6 +68,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <ProductionDetail item={item} />;
 			case "merges":
 				return <MergesCollectionDetail item={item} />;
+			case "chain":
+				return <ItemChain itemId={item.id} />;
 			case "estimate":
 				return <ItemEstimateSection itemId={item.id} />;
 			case "connections": {

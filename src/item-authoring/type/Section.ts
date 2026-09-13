@@ -8,6 +8,7 @@ export const SectionIds = [
 	"production",
 	"estimate",
 	"connections",
+	"chain",
 	"notes",
 	"delete",
 ] as const;
@@ -26,5 +27,5 @@ export interface SectionDescriptor {
 
 export type DetailSectionId = Extract<
 	SectionId,
-	"identity" | "production" | "merges" | "estimate" | "connections" | "notes" | "delete"
+	"identity" | "production" | "merges" | "estimate" | "connections" | "chain" | "notes" | "delete"
 >;

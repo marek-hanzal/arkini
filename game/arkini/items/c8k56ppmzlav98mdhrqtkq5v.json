@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "c8k56ppmzlav98mdhrqtkq5v",
+		"id": "dirty-laboratory-glassware",
+		"title": "Dirty Laboratory Glassware",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-laboratory-glassware"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

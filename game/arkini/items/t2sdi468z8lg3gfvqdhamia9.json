@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "t2sdi468z8lg3gfvqdhamia9",
+		"id": "laboratory-glassware-with-beer",
+		"title": "Laboratory Glassware With Beer",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware-with-beer"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

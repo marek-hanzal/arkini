@@ -1,0 +1,56 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "rw8on2o179fsgjw97v6bf7a3",
+		"id": "tummy-ache-british-shorthair-kitten",
+		"title": "Tummy Ache British Shorthair Kitten",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"tummy-ache-british-shorthair-kitten"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 15000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "british-shorthair-kitten",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 3,
+											"max": 5
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

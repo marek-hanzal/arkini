@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "r82pg04kiekxehr8bp8h4aqd",
+		"id": "laboratory-glassware-with-hot-chocolate",
+		"title": "Laboratory Glassware With Hot Chocolate",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware-with-hot-chocolate"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

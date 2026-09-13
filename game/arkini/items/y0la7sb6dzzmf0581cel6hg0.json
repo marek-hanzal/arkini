@@ -137,43 +137,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "clay-bowl-with-milk"
+					"itemId": "empty-sack"
 				},
 				"action": "consume",
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "sick-british-shorthair",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										},
-										{
-											"itemId": "bio-waste",
-											"quantity": {
-												"min": 6,
-												"max": 10
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
 				"effect": "replace",
-				"result": "dirty-clay-bowl"
+				"result": "british-shorthair-in-sack"
 			}
 		],
 		"maxQueueSize": 1,

@@ -72,6 +72,8 @@ Editor entry may warm one immutable Estimate revision. An Estimate surface captu
 
 Query, filtering, sorting and selection belong to [`fn/createItemEstimateIndexFn.ts`](fn/createItemEstimateIndexFn.ts) and [`fn/selectItemEstimateIndexFn.ts`](fn/selectItemEstimateIndexFn.ts). React binds controls and renders selected rows; it does not filter the raw catalog or recompute estimates per page.
 
+The Items grid is the single catalog for authoring and Estimate: it combines draft/search filtering with name or canonical Estimate ordering through [`selectItemCollectionFn`](../item-authoring/fn/selectItemCollectionFn.ts). Its timing and demand projection is keyed by item UID; the per-item Estimate tab remains the route detail. It shows placeholders while results are unavailable or its live config differs from the captured Estimate config.
+
 ## Changing this island?
 
 Likely affected:

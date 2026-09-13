@@ -10,7 +10,9 @@ import { ItemEstimateCacheAtom } from "~/estimate/atom/ItemEstimateCacheAtom";
 import type { ItemEstimateSnapshot } from "~/estimate/fn/createItemEstimateSnapshotFn";
 import { useItemEstimateEntrySnapshot } from "~/estimate/ui/useItemEstimateEntrySnapshot";
 
-export type ItemEstimateIndexState =
+export type ItemEstimateIndexState = {
+	readonly snapshot: ItemEstimateSnapshot;
+} & (
 	| {
 			readonly maximumDemand: number;
 			readonly rows: ReadonlyArray<ItemEstimateIndexRow>;
@@ -26,7 +28,8 @@ export type ItemEstimateIndexState =
 			readonly message: string;
 			readonly rows: ReadonlyArray<ItemEstimateIndexRow>;
 			readonly status: "error";
-	  };
+	  }
+);
 
 const sameSnapshotFn = (left: ItemEstimateSnapshot | undefined, right: ItemEstimateSnapshot) =>
 	left?.projectId === right.projectId && left.revision === right.revision;
@@ -73,6 +76,7 @@ export const useItemEstimateIndex = (
 	]);
 	if (!sameSnapshotFn(state.snapshot, snapshot))
 		return {
+			snapshot,
 			maximumDemand: 0,
 			rows: [],
 			status: "loading",
@@ -80,16 +84,19 @@ export const useItemEstimateIndex = (
 	if (state.status === "loading" || state.status === "idle")
 		return {
 			...selection,
+			snapshot,
 			status: "loading",
 		};
 	if (state.status === "error")
 		return {
 			...selection,
+			snapshot,
 			message: state.message ?? "Estimate calculation failed.",
 			status: "error",
 		};
 	return {
 		...selection,
+		snapshot,
 		status: "ready",
 	};
 };

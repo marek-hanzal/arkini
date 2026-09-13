@@ -157,7 +157,7 @@ describe("ProjectOverview", () => {
 		const link = container.querySelector<HTMLAnchorElement>(
 			'[data-overview-id="unreachable-items"]',
 		);
-		expect(link?.dataset.to).toBe("/editor/$projectId/estimate");
+		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/list");
 		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
 			view: "incomplete",
 		});

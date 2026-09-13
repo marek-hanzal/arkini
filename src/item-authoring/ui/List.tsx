@@ -1,17 +1,22 @@
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { Mx } from "~/translation/ui/Mx";
-import { FilePenLine, PackageOpen, Plus } from "lucide-react";
+import { FilePenLine, NotebookPen, PackageOpen, Plus, TriangleAlert } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
-import { filterFn } from "~/item-authoring/fn/filterFn";
+import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
+import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
+import { selectItemCollectionFn } from "~/item-authoring/fn/selectItemCollectionFn";
+import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { ItemEstimateMetrics } from "~/estimate/ui/ItemEstimateMetrics";
+import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
@@ -27,21 +32,81 @@ export const List = ({
 	draft,
 	onDraftChangeFn,
 	onQueryChangeFn,
+	onViewChangeFn,
 	query,
+	view,
 }: {
 	readonly draft: boolean;
 	readonly onDraftChangeFn: (draft: boolean) => void;
 	readonly onQueryChangeFn: (query: string) => void;
 	readonly query: string;
+	readonly view: selectItemCollectionFn.View;
+	readonly onViewChangeFn: (view: selectItemCollectionFn.View) => void;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
+	const notes = useProjectNotes(project.projectId);
+	const notedItemUids = useMemo(
+		() => new Set(notes.notes.flatMap((note) => note.itemUids)),
+		[
+			notes.notes,
+		],
+	);
+	const itemViewOptions = [
+		{
+			label: translator.textFn("Name"),
+			value: "name",
+		},
+		{
+			label: translator.textFn("Fastest first"),
+			value: "fastest",
+		},
+		{
+			label: translator.textFn("Slowest first"),
+			value: "slowest",
+		},
+		{
+			label: translator.textFn("Highest demand first"),
+			value: "demand",
+		},
+		{
+			label: translator.textFn("Unreachable"),
+			value: "incomplete",
+		},
+		{
+			label: translator.textFn("With note"),
+			value: "with-note",
+		},
+	] as const satisfies ReadonlyArray<EditorSelectOption<selectItemCollectionFn.View>>;
+
 	const settledQuery = useDebouncedSearchQuery(query);
-	const items = useMemo(
+	const estimates = useItemEstimateIndex(project, {
+		query: "",
+		view: view === "name" || view === "with-note" ? "fastest" : view,
+	});
+	const estimatesCurrent = estimates.snapshot.config === project.config;
+	// Item editing stays live; estimates belong to the captured entry config.
+	const currentEstimateRows = useMemo(
+		() => (estimatesCurrent ? estimates.rows : []),
+		[
+			estimates.rows,
+			estimatesCurrent,
+		],
+	);
+	const estimatesByUid = useMemo(
 		() =>
-			Object.values(project.config?.items ?? {}).sort((left, right) =>
-				left.title.localeCompare(right.title),
+			new Map(
+				currentEstimateRows.map(({ item, estimate }) => [
+					item.uid,
+					estimate,
+				]),
 			),
+		[
+			currentEstimateRows,
+		],
+	);
+	const items = useMemo(
+		() => Object.values(project.config.items),
 		[
 			project.config?.items,
 		],
@@ -49,14 +114,21 @@ export const List = ({
 	const empty = items.length === 0;
 	const filteredItems = useMemo(
 		() =>
-			filterFn(items, {
+			selectItemCollectionFn({
+				items,
+				orderedEstimates: currentEstimateRows,
+				notedItemUids,
 				draft,
 				query: settledQuery,
+				view,
 			}),
 		[
 			draft,
 			items,
 			settledQuery,
+			currentEstimateRows,
+			notedItemUids,
+			view,
 		],
 	);
 	const renderItemFn = useCallback(
@@ -69,11 +141,36 @@ export const List = ({
 					sectionId: "identity",
 				}}
 				preload="intent"
-				data-ui="EditorItemCard"
+				className="data-[ui-draft=true]:bg-accent/10 data-[ui-draft=true]:hover:bg-accent/15"
+				{...readDataUiFn({
+					dataUi: "EditorItemCard",
+					state: {
+						draft: readDraftFn(item),
+					},
+				})}
 				data-item-id={item.id}
 				data-item-uid={item.uid}
 				label={item.title}
-				description={item.id}
+				corner={
+					notedItemUids.has(item.uid) ? (
+						<span title={translator.textFn("Notes")}>
+							<NotebookPen className="size-5 text-accent" />
+						</span>
+					) : undefined
+				}
+				cornerEnd={
+					readDraftFn(item) ? (
+						<span className="text-xs font-medium text-accent">
+							{translator.textFn("(draft)")}
+						</span>
+					) : undefined
+				}
+				details={
+					<ItemEstimateMetrics
+						estimate={estimatesByUid.get(item.uid)}
+						maximumDemand={estimates.maximumDemand}
+					/>
+				}
 				artwork={
 					<EditorItemThumbnail
 						className="aspect-square h-auto w-66 max-w-full rounded-none border-0 bg-transparent"
@@ -84,6 +181,10 @@ export const List = ({
 		),
 		[
 			project.projectId,
+			estimatesByUid,
+			estimates.maximumDemand,
+			notedItemUids,
+			translator,
 		],
 	);
 	const newItemMenu = (
@@ -110,6 +211,12 @@ export const List = ({
 						className="h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder={`${translator.textFn("Search item title or ID…")} (${filteredItems.length})`}
 						onValueChangeFn={onQueryChangeFn}
+					/>
+					<EditorSelect
+						label={translator.textFn("View items")}
+						onChangeFn={onViewChangeFn}
+						options={itemViewOptions}
+						value={view}
 					/>
 					<DraftFilterButton
 						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
@@ -154,7 +261,33 @@ export const List = ({
 						action={newItemMenu}
 					/>
 				) : null}
-				{!empty && filteredItems.length === 0 ? (
+				{view === "with-note" && notes.loading ? (
+					<p className="text-sm text-muted">{translator.textFn("Loading notes…")}</p>
+				) : null}
+				{!empty && !estimatesCurrent ? (
+					<p className="text-sm text-muted">
+						{translator.textFn(
+							"Estimates are out of date. Reopen Items to refresh them.",
+						)}
+					</p>
+				) : null}
+				{!empty && estimatesCurrent && estimates.status === "loading" ? (
+					<p className="text-sm text-muted">
+						{translator.textFn("Calculating all item estimates")}
+					</p>
+				) : null}
+				{!empty && estimatesCurrent && estimates.status === "error" ? (
+					<Status
+						dataUi="EditorItemEstimatesError"
+						description={estimates.message}
+						icon={TriangleAlert}
+						title={translator.textFn("Estimate calculation failed")}
+					/>
+				) : null}
+				{!empty &&
+				filteredItems.length === 0 &&
+				(view !== "with-note" || notes.loaded) &&
+				(view !== "incomplete" || (estimatesCurrent && estimates.status === "ready")) ? (
 					<p
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemSearchEmpty"

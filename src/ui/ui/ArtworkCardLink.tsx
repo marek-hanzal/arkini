@@ -4,6 +4,8 @@ import { twMerge } from "tailwind-merge";
 
 interface ArtworkCardProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 	readonly artwork: ReactNode;
+	readonly corner?: ReactNode;
+	readonly cornerEnd?: ReactNode;
 	readonly label: string;
 	readonly description?: string;
 	readonly details?: ReactNode;
@@ -11,16 +13,22 @@ interface ArtworkCardProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 const ArtworkCardAnchor = forwardRef<HTMLAnchorElement, ArtworkCardProps>(
-	({ artwork, className, description, details, label, ...props }, ref) => (
+	({ artwork, className, corner, cornerEnd, description, details, label, ...props }, ref) => (
 		<a
 			{...props}
 			ref={ref}
 			data-ui={props["data-ui"] ?? "ArtworkCardLink"}
 			className={twMerge(
-				"group grid min-h-0 min-w-0 grid-rows-[minmax(12rem,1fr)_auto] cursor-pointer overflow-hidden rounded-xl border-l-2 border-line-strong bg-surface-raised/60 text-left text-foreground transition-colors hover:bg-surface-raised",
+				"group relative grid min-h-0 min-w-0 grid-rows-[minmax(12rem,1fr)_auto] cursor-pointer overflow-hidden rounded-xl border-l-2 border-line-strong bg-surface-raised/60 text-left text-foreground transition-colors hover:bg-surface-raised",
 				className,
 			)}
 		>
+			{corner === undefined ? null : (
+				<span className="absolute left-3 top-3 z-10">{corner}</span>
+			)}
+			{cornerEnd === undefined ? null : (
+				<span className="absolute right-3 top-3 z-10">{cornerEnd}</span>
+			)}
 			<span className="grid min-h-48 place-items-center overflow-hidden p-4">{artwork}</span>
 			<div className="flex min-w-0 items-end justify-between gap-3 px-3 py-2.5">
 				<span className="min-w-0">

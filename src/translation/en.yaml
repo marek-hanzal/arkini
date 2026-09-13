@@ -1,3 +1,5 @@
+(draft):
+  value: (draft)
 A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.:
   value: A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.
 About avatars:
@@ -113,6 +115,8 @@ Build help:
     After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
 Byte size:
   value: Byte size
+Calculating all item estimates:
+  value: Calculating all item estimates
 Cancel:
   value: Cancel
 Cancel edit:
@@ -179,8 +183,6 @@ Delete asset:
   value: Delete asset
 Delete item:
   value: Delete item
-Demand:
-  value: Demand
 Depletion output:
   value: Depletion output
 Describe what this line consumes and produces.:
@@ -271,6 +273,10 @@ Enter the configured space after all requirements and rules pass.:
   value: Enter the configured space after all requirements and rules pass.
 Estimate:
   value: Estimate
+Estimate calculation failed:
+  value: Estimate calculation failed
+Estimates are out of date. Reopen Items to refresh them.:
+  value: Estimates are out of date. Reopen Items to refresh them.
 Every Enable rule must pass, and any matching Disable rule prevents activation.:
   value: Every Enable rule must pass, and any matching Disable rule prevents activation.
 Every condition of a rule must pass. Enable rules gate this selected drop; a matching Disable rule suppresses it without disabling the line or other drops.:
@@ -292,6 +298,8 @@ Extra output:
 Far:
   value: Far
   dynamic: true
+Fastest first:
+  value: Fastest first
 Finishing accepted work:
   value: Finishing accepted work
 Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.:
@@ -321,27 +329,14 @@ Flow help:
     Press `?` to open the keyboard help inside the graph. It lists shortcuts for moving through items, showing more or less of a chain, returning to your selection and retracing recently visited items.
 Game limit:
   value: Game limit
-Global estimate help:
-  value: |
-    Global Estimate gives you two quick signals for every item: **how soon could a player obtain it, and how much does the rest of the economy rely on it?**
-
-    It reads the authored starting items and production rules and picks one complete route to each item. This is a planning preview, not a playthrough or a balance verdict.
-
-    ### Reading the list
-
-    - **Estimate** is the optimistic time to obtain one item. Independent work can happen in parallel, and random outputs are averaged across the expected number of attempts.
-    - **Demand** adds up how much of this item is needed to obtain one of every reachable item through the selected routes. The percentage compares it with the highest-demand item in this project, not with the total.
-    - **Partial** means the analysis hit a safety limit. **No path** means the authored data contains no complete route from the starting items.
-
-    Use **Fastest first** and **Slowest first** to find pacing outliers, **Highest demand first** to spot heavily reused ingredients or prerequisites, and **Incomplete only** to find broken or unusually complex paths.
-
-    Open an item to see its selected route and the quantities and time behind the estimate.
 Guaranteed:
   value: Guaranteed
 Hero image:
   value: Hero image
 Hide:
   value: Hide
+Highest demand first:
+  value: Highest demand first
 Image:
   value: Image
 Included in current project:
@@ -458,11 +453,15 @@ Item identity help:
     **Draft** is saved immediately as an Editor organization flag. Draft items still participate in the game and the built Arkpack. Other edits are applied with **Save**; **Discard** leaves the saved item unchanged.
 Item list help:
   value: |
-    Browse the project's saved items by title or ID. Open an item to inspect its capabilities, acquisition estimate, connections and Notes.
+    Browse the project's saved items by title or ID. Each card shows its artwork, title, acquisition estimate and demand. Draft cards have a subtle tint; a note icon marks linked item notes. Open a card for the item detail; its **Estimate** tab explains the selected route.
 
-    **Draft** filters to items marked as drafts. This is an Editor organization flag: drafts still participate in the game and Arkpack builds.
+    Use **Name**, **Fastest first**, **Slowest first** or **Highest demand first** to order the grid. **Unreachable** shows partial estimates and unreachable items. **With note** shows items with linked notes. **Draft** combines with search and the selected view; drafts still participate in the game and Arkpack builds.
 
-    **New item** opens an unsaved draft. You can also create an item from an asset, which supplies its initial artwork and title. Save applies changes to the project.
+    **Estimate** is the optimistic time to obtain one item. Independent work can happen in parallel, and random outputs are averaged across the expected number of attempts. **Demand** adds up how much of this item is needed to obtain one of every reachable item through the selected routes. Its percentage compares with the highest-demand item in the project.
+
+    **Partial** means analysis hit a safety limit. **Unreachable** means there is no complete authored route from the starting items. Unavailable results appear as a dash. This is a planning preview, not a playthrough or a balance verdict.
+
+    **New item** opens an unsaved draft. Creating an item from an asset supplies its initial artwork and title. Save applies changes to the project.
 Item merge output empty title:
   value: Create extra items when this merge completes.
 Item merges empty title:
@@ -589,6 +588,8 @@ Missing item:
   value: Missing item
 More entries are available.:
   value: More entries are available.
+Name:
+  value: Name
 Near:
   value: Near
   dynamic: true
@@ -701,6 +702,8 @@ Page help:
   value: Page help
 Paid by:
   value: Paid by
+Partial:
+  value: Partial
 Paused:
   value: Paused
 "Permanently removes one source quantity instead of returning it. This consumes the item itself, not one unit. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears.":
@@ -880,6 +883,8 @@ Simple requires no consumable resource. Materials consume or reserve an item, wh
   value: Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.
 Single item:
   value: Single item
+Slowest first:
+  value: Slowest first
 Source action:
   value: Source action
 Space:
@@ -993,6 +998,8 @@ Universe:
   dynamic: true
 Unlimited:
   value: Unlimited
+Unreachable:
+  value: Unreachable
 Unsaved changes:
   value: Unsaved changes
 Unset clock:
@@ -1009,6 +1016,8 @@ Use returns one source item after the merge, Consume removes one source item, an
   value: Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.
 Used:
   value: Used
+View items:
+  value: View items
 Visible:
   value: Visible
 Visible lines are shown to the player before runtime rules alter their visibility.:
@@ -1017,6 +1026,8 @@ Weight:
   value: Weight
 Weighted selections:
   value: Weighted selections
+With note:
+  value: With note
 Without an output, the clock disappears after expiry and production settlement.:
   value: Without an output, the clock disappears after expiry and production settlement.
 Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.:
@@ -1029,6 +1040,8 @@ chance:
   value: chance
 keep:
   value: keep
+negligible:
+  value: negligible
 random:
   value: random
 remove:

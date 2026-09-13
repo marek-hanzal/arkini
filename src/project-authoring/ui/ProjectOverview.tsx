@@ -39,7 +39,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				search={{
 					view: "incomplete",
 				}}
-				to="/editor/$projectId/estimate"
+				to="/editor/$projectId/editor/items/list"
 			>
 				<TriangleAlert className="size-4" />
 				{unreachableCount} unreachable {unreachableCount === 1 ? "item" : "items"}

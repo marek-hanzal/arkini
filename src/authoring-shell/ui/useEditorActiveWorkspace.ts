@@ -1,7 +1,6 @@
 import { useMatchRoute } from "@tanstack/react-router";
 import {
 	Boxes,
-	Calculator,
 	FolderCog,
 	GitFork,
 	Images,
@@ -44,14 +43,6 @@ export const EditorWorkspaceRoutes = [
 		separatorAfter: true,
 		shortcut: "Mod+Shift+N",
 		to: "/editor/$projectId/notes",
-	},
-	{
-		id: "estimate",
-		icon: Calculator,
-		label: "Estimate",
-		matchTo: "/editor/$projectId/estimate",
-		shortcut: "Mod+Shift+E",
-		to: "/editor/$projectId/estimate",
 	},
 	{
 		id: "flow",

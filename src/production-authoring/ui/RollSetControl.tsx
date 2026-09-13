@@ -46,10 +46,14 @@ const RollTypeLabelByType = {
 } as const satisfies Record<RollSchema.Type["type"], string>;
 
 const DropControl = ({
+	initialRuleIndex,
+	initialWhenIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly onChangeFn: (drop: DropSchema.Type) => void;
+	readonly initialRuleIndex?: number;
+	readonly initialWhenIndex?: number;
 	readonly value: DropSchema.Type;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
@@ -115,6 +119,8 @@ const DropControl = ({
 				/>
 			</div>
 			<RulesControl
+				initialRuleIndex={initialRuleIndex}
+				initialWhenIndex={initialWhenIndex}
 				rules={value.rules}
 				target="drop"
 				description="These rules belong only to this item drop. Every condition inside a rule must pass. Enable rules gate this drop and any matching disable rule vetoes it when the roll resolves."
@@ -134,12 +140,16 @@ const DropControl = ({
 };
 
 const DropList = ({
+	initialRuleIndex,
+	initialWhenIndex,
 	initialDropIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly initialDropIndex?: number;
 	readonly onChangeFn: (drops: DropListValue | undefined) => void;
+	readonly initialRuleIndex?: number;
+	readonly initialWhenIndex?: number;
 	readonly value: DropListValue;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
@@ -206,6 +216,8 @@ const DropList = ({
 			>
 				{(index) => (
 					<DropControl
+						initialRuleIndex={index === initialDropIndex ? initialRuleIndex : undefined}
+						initialWhenIndex={index === initialDropIndex ? initialWhenIndex : undefined}
 						value={value[index]}
 						onChangeFn={(next) =>
 							onChangeFn(
@@ -257,6 +269,8 @@ const WeightedSelectionsHelp = () => (
 );
 
 const WeightedRollControl = ({
+	initialRuleIndex,
+	initialWhenIndex,
 	initialDropIndex,
 	initialCandidateIndex,
 	onChangeFn,
@@ -265,6 +279,8 @@ const WeightedRollControl = ({
 	readonly initialDropIndex?: number;
 	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
+	readonly initialRuleIndex?: number;
+	readonly initialWhenIndex?: number;
 	readonly roll: WeightedRoll;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
@@ -411,6 +427,16 @@ const WeightedRollControl = ({
 								}
 							/>
 							<DropList
+								initialRuleIndex={
+									candidateIndex === initialCandidateIndex
+										? initialRuleIndex
+										: undefined
+								}
+								initialWhenIndex={
+									candidateIndex === initialCandidateIndex
+										? initialWhenIndex
+										: undefined
+								}
 								value={candidate.drop}
 								initialDropIndex={
 									candidateIndex === initialCandidateIndex
@@ -442,6 +468,8 @@ const WeightedRollControl = ({
 };
 
 const RollControl = ({
+	initialRuleIndex,
+	initialWhenIndex,
 	initialDropIndex,
 	initialCandidateIndex,
 	onChangeFn,
@@ -450,6 +478,8 @@ const RollControl = ({
 	readonly initialDropIndex?: number;
 	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (roll: RollSchema.Type | undefined) => void;
+	readonly initialRuleIndex?: number;
+	readonly initialWhenIndex?: number;
 	readonly value: RollSchema.Type;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
@@ -488,6 +518,8 @@ const RollControl = ({
 					},
 					(roll) => (
 						<DropList
+							initialRuleIndex={initialRuleIndex}
+							initialWhenIndex={initialWhenIndex}
 							value={roll.drop}
 							initialDropIndex={initialDropIndex}
 							onChangeFn={(drop) =>
@@ -523,6 +555,8 @@ const RollControl = ({
 								}
 							/>
 							<DropList
+								initialRuleIndex={initialRuleIndex}
+								initialWhenIndex={initialWhenIndex}
 								value={roll.drop}
 								initialDropIndex={initialDropIndex}
 								onChangeFn={(drop) =>
@@ -543,6 +577,8 @@ const RollControl = ({
 					},
 					(roll) => (
 						<WeightedRollControl
+							initialRuleIndex={initialRuleIndex}
+							initialWhenIndex={initialWhenIndex}
 							roll={roll}
 							initialDropIndex={initialDropIndex}
 							initialCandidateIndex={initialCandidateIndex}
@@ -556,6 +592,8 @@ const RollControl = ({
 };
 
 export const RollSetControl = ({
+	initialRuleIndex,
+	initialWhenIndex,
 	index,
 	initialRollIndex,
 	initialDropIndex,
@@ -568,6 +606,8 @@ export const RollSetControl = ({
 	readonly initialDropIndex?: number;
 	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (set: RollSetSchema.Type | undefined) => void;
+	readonly initialRuleIndex?: number;
+	readonly initialWhenIndex?: number;
 	readonly value: RollSetSchema.Type;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
@@ -643,6 +683,12 @@ export const RollSetControl = ({
 			>
 				{(rollIndex) => (
 					<RollControl
+						initialRuleIndex={
+							rollIndex === initialRollIndex ? initialRuleIndex : undefined
+						}
+						initialWhenIndex={
+							rollIndex === initialRollIndex ? initialWhenIndex : undefined
+						}
 						value={value.roll[rollIndex]}
 						initialDropIndex={
 							rollIndex === initialRollIndex ? initialDropIndex : undefined

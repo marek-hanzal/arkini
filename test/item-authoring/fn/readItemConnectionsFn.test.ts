@@ -367,6 +367,10 @@ describe("readItemConnectionsFn", () => {
 							type: "action",
 						},
 						role: "condition",
+						condition: {
+							ruleIndex: 0,
+							whenIndex: 0,
+						},
 					},
 				],
 			},
@@ -378,6 +382,7 @@ describe("readItemConnectionsFn", () => {
 							type: "action",
 						},
 						role: "input",
+						inputIndex: 0,
 					},
 				],
 			},
@@ -392,6 +397,10 @@ describe("readItemConnectionsFn", () => {
 					title: line.title,
 				},
 				role: "condition",
+				condition: {
+					ruleIndex: 0,
+					whenIndex: 0,
+				},
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,

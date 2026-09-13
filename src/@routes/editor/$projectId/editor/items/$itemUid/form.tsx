@@ -9,6 +9,9 @@ interface EditorItemFormSearch {
 	readonly enable?: OptionalCapability;
 	readonly create?: boolean;
 	readonly lineId?: string;
+	readonly input?: number;
+	readonly rule?: number;
+	readonly when?: number;
 	readonly merge?: number;
 	readonly outputSet?: number;
 	readonly outputRoll?: number;
@@ -19,6 +22,9 @@ interface EditorItemFormSearch {
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form")({
 	validateSearch: (search): EditorItemFormSearch => {
+		const input = typeof search.input === "number" ? search.input : Number.NaN;
+		const rule = typeof search.rule === "number" ? search.rule : Number.NaN;
+		const when = typeof search.when === "number" ? search.when : Number.NaN;
 		const merge = typeof search.merge === "number" ? search.merge : Number.NaN;
 		const outputSet = typeof search.outputSet === "number" ? search.outputSet : Number.NaN;
 		const outputRoll = typeof search.outputRoll === "number" ? search.outputRoll : Number.NaN;
@@ -26,6 +32,21 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		const outputCandidate =
 			typeof search.outputCandidate === "number" ? search.outputCandidate : Number.NaN;
 		return {
+			...(Number.isInteger(when) && when >= 0
+				? {
+						when,
+					}
+				: {}),
+			...(Number.isInteger(rule) && rule >= 0
+				? {
+						rule,
+					}
+				: {}),
+			...(Number.isInteger(input) && input >= 0
+				? {
+						input,
+					}
+				: {}),
 			...(Number.isInteger(outputDrop) && outputDrop >= 0
 				? {
 						outputDrop,
@@ -101,6 +122,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			enable,
 			create,
 			lineId,
+			input,
+			rule,
+			when,
 			merge,
 			outputSet,
 			outputRoll,
@@ -121,6 +145,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				defaultTitle={defaultTitle}
 				enableCapability={enable}
 				create={create}
+				inputIndex={input}
+				ruleIndex={rule}
+				whenIndex={when}
 				mergeIndex={merge}
 				outputSetIndex={outputSet}
 				outputRollIndex={outputRoll}

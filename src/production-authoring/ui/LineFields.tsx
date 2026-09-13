@@ -1,3 +1,4 @@
+import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { CircleCheck, CircleX, Clock, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
@@ -41,6 +42,7 @@ export const LineFields = withFieldGroupFn({
 	},
 	render: ({ group, label, onMarkerChangeFn }) => {
 		const translator = useTranslator();
+		const { ruleIndex, whenIndex, outputDropIndex } = useFormSession();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormCard>
@@ -169,6 +171,12 @@ export const LineFields = withFieldGroupFn({
 					<group.Subscribe selector={(state) => state.values.rules}>
 						{(rules) => (
 							<RulesControl
+								initialRuleIndex={
+									outputDropIndex === undefined ? ruleIndex : undefined
+								}
+								initialWhenIndex={
+									outputDropIndex === undefined ? whenIndex : undefined
+								}
 								rules={rules}
 								target="line"
 								description={translator.textFn(

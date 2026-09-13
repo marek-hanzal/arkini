@@ -10,6 +10,8 @@ vi.mock("~/item-authoring/ui/FormContext", () => ({
 		outputRollIndex: 2,
 		outputDropIndex: 1,
 		outputCandidateIndex: 1,
+		ruleIndex: 1,
+		whenIndex: 1,
 	}),
 }));
 vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
@@ -69,7 +71,41 @@ it.each([
 			max: 1,
 		},
 		placement: "drop",
-		rules: [],
+		rules: [
+			{
+				type: "enable",
+				when: [
+					{
+						type: "exists",
+						query: {
+							scope: "board",
+							distance: "far",
+							selector: {
+								type: "item",
+								itemId: "other",
+							},
+						},
+					},
+				],
+			},
+			{
+				type: "enable",
+				when: [
+					"other",
+					"permit",
+				].map((itemId) => ({
+					type: "exists",
+					query: {
+						scope: "board",
+						distance: "far",
+						selector: {
+							type: "item",
+							itemId,
+						},
+					},
+				})),
+			},
+		],
 	});
 	const targetDrops = [
 		drop("meat"),
@@ -137,6 +173,9 @@ it.each([
 		expect(container.querySelector('[data-label="Output set 2 rolls"]')?.textContent).toBe("2");
 		expect(container.querySelector('[data-label="Drops"]')?.textContent).toBe("1");
 		expect(container.querySelector('[data-label="Dropped item"]')?.textContent).toBe("bones");
+		expect(container.querySelector('[data-label="Rules"]')?.textContent).toBe("1");
+		expect(container.querySelector('[data-label="Rule 2 conditions"]')?.textContent).toBe("1");
+		expect(container.querySelector('[data-label="Selected item"]')?.textContent).toBe("permit");
 		if (type === "weight")
 			expect(container.querySelector('[data-label="Weighted candidates"]')?.textContent).toBe(
 				"1",

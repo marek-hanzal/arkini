@@ -51,7 +51,7 @@ authored acquisition graph
 → Canvas projection and painting
 ```
 
-Editor Connections uses [`readItemConnectionFactsFn`](../flow/fn/readItemConnectionFactsFn.ts) to project direct authored inputs and outputs in either direction. Each item retains its source paths (line, action, merge, Units, or Clock, plus output set/roll); this lookup does not evaluate runtime availability or Estimate reachability.
+Editor Connections uses [`readItemConnectionFactsFn`](../flow/fn/readItemConnectionFactsFn.ts) to project direct authored inputs and outputs in either direction. Each item retains its source paths (line, action, merge, Units, or Clock, plus exact input, rule/condition, and output set/roll/candidate/drop positions); this lookup does not evaluate runtime availability or Estimate reachability.
 
 ## Estimate semantics
 

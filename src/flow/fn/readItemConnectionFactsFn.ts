@@ -26,21 +26,45 @@ const readInputItemIdFn = (input: LineInputSchema.Type | ActionInputSchema.Type)
 	}
 };
 
-const readAvailabilityFactIdsFn = (
+const readAvailabilityFactsFn = (
 	rules: ReadonlyArray<{
 		readonly type: string;
 		readonly when: ReadonlyArray<WhenSchema.Type>;
 	}>,
-) => {
-	const requirements = readAcquisitionAvailabilityRequirementsFn({
-		rules,
-		source: "line-condition",
+) =>
+	rules.flatMap((rule, ruleIndex) => {
+		const requirements = readAcquisitionAvailabilityRequirementsFn({
+			rules: [
+				rule,
+			],
+			source: "line-condition",
+		});
+		// A disable rule with a fact-free escape has no positive dependency, even if another condition does.
+		if (requirements.allOf.length === 0 && requirements.anyOf.length === 0) return [];
+		return rule.when.flatMap((when, whenIndex) => {
+			const condition = readAcquisitionAvailabilityRequirementsFn({
+				rules: [
+					{
+						...rule,
+						when: [
+							when,
+						],
+					},
+				],
+				source: "line-condition",
+			});
+			return [
+				...condition.allOf,
+				...condition.anyOf.flat(),
+			].map(({ factId }) => ({
+				factId,
+				condition: {
+					ruleIndex,
+					whenIndex,
+				},
+			}));
+		});
 	});
-	return [
-		...requirements.allOf,
-		...requirements.anyOf.flat(),
-	].map(({ factId }) => factId);
-};
 
 const addOutputFactsFn = (
 	facts: ItemConnectionFact[],
@@ -78,12 +102,13 @@ const addOutputFactsFn = (
 						roll: position,
 					},
 				});
-				for (const factId of readAvailabilityFactIdsFn(drop.rules))
+				for (const { factId, condition } of readAvailabilityFactsFn(drop.rules))
 					facts.push({
 						factId,
 						origin: {
 							source,
 							role: "condition",
+							condition,
 							roll: position,
 						},
 					});
@@ -99,7 +124,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 			lineIndex,
 			title: line.title,
 		};
-		for (const input of line.input) {
+		for (const [inputIndex, input] of line.input.entries()) {
 			const factId = readInputItemIdFn(input);
 			if (factId !== undefined)
 				facts.push({
@@ -107,15 +132,17 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					origin: {
 						source,
 						role: "input",
+						inputIndex,
 					},
 				});
 		}
-		for (const factId of readAvailabilityFactIdsFn(line.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(line.rules))
 			facts.push({
 				factId,
 				origin: {
 					source,
 					role: "condition",
+					condition,
 				},
 			});
 		addOutputFactsFn(facts, line.output, source);
@@ -124,7 +151,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 		const source = {
 			type: "action",
 		} as const;
-		for (const input of item.action.input) {
+		for (const [inputIndex, input] of item.action.input.entries()) {
 			const factId = readInputItemIdFn(input);
 			if (factId !== undefined)
 				facts.push({
@@ -132,15 +159,17 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					origin: {
 						source,
 						role: "input",
+						inputIndex,
 					},
 				});
 		}
-		for (const factId of readAvailabilityFactIdsFn(item.action.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(item.action.rules))
 			facts.push({
 				factId,
 				origin: {
 					source,
 					role: "condition",
+					condition,
 				},
 			});
 	}
@@ -173,7 +202,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 		addOutputFactsFn(facts, item.clock.onExpire, {
 			type: "expiry",
 		});
-		for (const factId of readAvailabilityFactIdsFn(item.clock.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(item.clock.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -181,6 +210,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 						type: "clock",
 					},
 					role: "condition",
+					condition,
 				},
 			});
 	}
@@ -246,6 +276,11 @@ export namespace readItemConnectionFactsFn {
 	export interface Origin {
 		readonly source: Source;
 		readonly role: "input" | "condition" | "output" | "replacement";
+		readonly inputIndex?: number;
+		readonly condition?: {
+			readonly ruleIndex: number;
+			readonly whenIndex: number;
+		};
 		readonly roll?: {
 			readonly setIndex: number;
 			readonly rollIndex: number;

@@ -122,6 +122,9 @@ const ConnectionOrigin = ({
 				outputSet: roll?.setIndex,
 				outputRoll: roll?.rollIndex,
 				outputDrop: roll?.dropIndex,
+				input: origin.inputIndex,
+				rule: origin.condition?.ruleIndex,
+				when: origin.condition?.whenIndex,
 				outputCandidate: roll?.candidateIndex,
 			}}
 			data-ui="EditorItemConnectionOriginLink"
@@ -130,12 +133,21 @@ const ConnectionOrigin = ({
 			{label}
 			{" · "}
 			{translator.textFn(roleLabels[origin.role])}
+			{origin.inputIndex === undefined ? null : ` ${origin.inputIndex + 1}`}
 			{roll === undefined ? null : (
 				<>
 					{" · "}
 					{translator.textFn("Output set")} {roll.setIndex + 1}
 					{" / "}
 					{rollLabels[roll.rollType]} {translator.textFn("Roll")} {roll.rollIndex + 1}
+				</>
+			)}
+			{origin.condition === undefined ? null : (
+				<>
+					{" · "}
+					{translator.textFn("Rule")} {origin.condition.ruleIndex + 1}
+					{" / "}
+					{translator.textFn("Condition")} {origin.condition.whenIndex + 1}
 				</>
 			)}
 		</ButtonLink>

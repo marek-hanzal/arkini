@@ -4,6 +4,9 @@ import type { useFormController } from "~/item-authoring/ui/useFormController";
 type FormSession = useFormController.Output & {
 	readonly isNew: boolean;
 	readonly create?: boolean;
+	readonly inputIndex?: number;
+	readonly ruleIndex?: number;
+	readonly whenIndex?: number;
 	readonly mergeIndex?: number;
 	readonly outputSetIndex?: number;
 	readonly outputRollIndex?: number;

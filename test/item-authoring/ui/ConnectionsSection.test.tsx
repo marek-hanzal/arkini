@@ -404,3 +404,71 @@ it("opens each overview preview's complete collection on the current item", asyn
 		});
 	}
 });
+
+it("links each input or condition occurrence with its own selector coordinates", async () => {
+	state.origins = [
+		{
+			source: {
+				type: "action",
+			},
+			role: "input",
+			inputIndex: 2,
+		},
+		{
+			source: {
+				type: "clock",
+			},
+			role: "condition",
+			condition: {
+				ruleIndex: 1,
+				whenIndex: 3,
+			},
+		},
+	];
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () =>
+		root.render(
+			<ConnectionsSection
+				filter="required-by"
+				itemId="unrelated"
+				onFilterChangeFn={() => {}}
+			/>,
+		),
+	);
+	const row = container.querySelector('[data-ui="EditorItemConnectionsRow"]');
+	const links = row?.querySelectorAll<HTMLAnchorElement>(
+		'[data-ui="EditorItemConnectionOriginLink"]',
+	);
+	expect(links).toHaveLength(2);
+	expect(
+		Array.from(links ?? []).map((link) => ({
+			params: JSON.parse(link.dataset.params ?? "null"),
+			search: JSON.parse(link.dataset.search ?? "null"),
+		})),
+	).toEqual([
+		{
+			params: {
+				projectId: "project-one",
+				itemUid: "consumer-uid",
+				sectionId: "action",
+			},
+			search: {
+				input: 2,
+			},
+		},
+		{
+			params: {
+				projectId: "project-one",
+				itemUid: "consumer-uid",
+				sectionId: "clock",
+			},
+			search: {
+				rule: 1,
+				when: 3,
+			},
+		},
+	]);
+});

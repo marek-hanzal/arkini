@@ -20,8 +20,14 @@ interface OutputControlProps {
 
 /** Edits weighted output sets through their concrete RollSet domain. */
 export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
-	const { outputSetIndex, outputRollIndex, outputDropIndex, outputCandidateIndex } =
-		useFormSession();
+	const {
+		outputSetIndex,
+		outputRollIndex,
+		outputDropIndex,
+		outputCandidateIndex,
+		ruleIndex,
+		whenIndex,
+	} = useFormSession();
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const validationIssues = useFormValidationIssues(value);
 	const invalidSetIndex = validationIssues.find(
@@ -87,6 +93,8 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 			>
 				{(index) => (
 					<RollSetControl
+						initialRuleIndex={index === outputSetIndex ? ruleIndex : undefined}
+						initialWhenIndex={index === outputSetIndex ? whenIndex : undefined}
 						index={index}
 						initialRollIndex={index === outputSetIndex ? outputRollIndex : undefined}
 						initialDropIndex={index === outputSetIndex ? outputDropIndex : undefined}

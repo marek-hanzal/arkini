@@ -20,7 +20,7 @@ const RandomSpaceMaximum = 1_024;
 /** Authors the optional immediate action; production and action never coexist. */
 export const ActionSection = () => {
 	const translator = useTranslator();
-	const { form, enableActionFn } = useFormSession();
+	const { form, enableActionFn, ruleIndex, whenIndex, outputDropIndex } = useFormSession();
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
@@ -146,6 +146,12 @@ export const ActionSection = () => {
 								.exhaustive()}
 							<EditorFormCard>
 								<RulesControl
+									initialRuleIndex={
+										outputDropIndex === undefined ? ruleIndex : undefined
+									}
+									initialWhenIndex={
+										outputDropIndex === undefined ? whenIndex : undefined
+									}
 									allowedTypes={[
 										"enable",
 										"disable",

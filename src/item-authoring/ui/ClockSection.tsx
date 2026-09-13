@@ -12,7 +12,7 @@ import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDis
 /** Composes shared time, rule, and output controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
-	const { form } = useFormSession();
+	const { form, ruleIndex, whenIndex, outputDropIndex } = useFormSession();
 	const clock = useStore(form.store, (state) => state.values.clock);
 	const rulesDescription = translator.textFn(
 		"These rules gate the clock's timer. Every Enable rule must pass and any matching Disable rule vetoes it. Accepted production uses its own line rules.",
@@ -77,6 +77,8 @@ const ClockFields = () => {
 				<form.Subscribe selector={(state) => state.values.clock?.rules ?? []}>
 					{(rules) => (
 						<RulesControl
+							initialRuleIndex={outputDropIndex === undefined ? ruleIndex : undefined}
+							initialWhenIndex={outputDropIndex === undefined ? whenIndex : undefined}
 							headerVisible={false}
 							rules={rules}
 							target="action"

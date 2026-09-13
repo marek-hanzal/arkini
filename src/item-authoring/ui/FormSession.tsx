@@ -27,6 +27,9 @@ export const FormSession = ({
 	initialItem,
 	isNew,
 	create,
+	inputIndex,
+	ruleIndex,
+	whenIndex,
 	mergeIndex,
 	outputSetIndex,
 	outputRollIndex,
@@ -43,6 +46,9 @@ export const FormSession = ({
 	readonly initialItem: ItemSchema.Type;
 	readonly isNew: boolean;
 	readonly create?: boolean;
+	readonly inputIndex?: number;
+	readonly ruleIndex?: number;
+	readonly whenIndex?: number;
 	readonly mergeIndex?: number;
 	readonly outputSetIndex?: number;
 	readonly outputRollIndex?: number;
@@ -160,6 +166,9 @@ export const FormSession = ({
 			...controller,
 			isNew,
 			create,
+			inputIndex,
+			ruleIndex,
+			whenIndex,
 			mergeIndex,
 			outputSetIndex,
 			outputRollIndex,
@@ -171,6 +180,9 @@ export const FormSession = ({
 			controller,
 			isNew,
 			create,
+			inputIndex,
+			ruleIndex,
+			whenIndex,
 			mergeIndex,
 			outputSetIndex,
 			outputRollIndex,

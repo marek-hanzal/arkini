@@ -24,6 +24,9 @@ describe("item form deep-link admission", () => {
 				merge: 2,
 				outputSet: -1,
 				outputRoll: Number.NaN,
+				input: 1.5,
+				rule: "1",
+				when: -1,
 				outputDrop: -1,
 				outputCandidate: Number.NaN,
 			}),
@@ -32,6 +35,9 @@ describe("item form deep-link admission", () => {
 		});
 		expect(
 			validateSearch({
+				input: 2,
+				rule: 1,
+				when: 3,
 				lineId: "line-two",
 				outputSet: 1,
 				outputRoll: 2,
@@ -39,6 +45,9 @@ describe("item form deep-link admission", () => {
 				outputCandidate: 1,
 			}),
 		).toEqual({
+			input: 2,
+			rule: 1,
+			when: 3,
 			lineId: "line-two",
 			outputSet: 1,
 			outputRoll: 2,

@@ -89,17 +89,24 @@ export const ProductionLineOption = ({
 			label={label}
 			details={<ProductionLineBadges line={line} />}
 		>
-			<ItemImages
-				ids={inputs}
-				items={items}
-				emptyLabel={translator.textFn("No inputs")}
-			/>
-			<ArrowRight className="size-3.5 shrink-0 text-subtle" />
-			<ItemImages
-				ids={outputs}
-				items={items}
-				emptyLabel={translator.textFn("No outputs")}
-			/>
+			<span
+				className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4"
+				data-ui="ProductionLineOptionFlow"
+			>
+				<ItemImages
+					ids={inputs}
+					items={items}
+					emptyLabel={translator.textFn("No inputs")}
+				/>
+				<ArrowRight className="size-4 shrink-0 text-subtle" />
+				<span className="flex min-w-0 justify-end">
+					<ItemImages
+						ids={outputs}
+						items={items}
+						emptyLabel={translator.textFn("No outputs")}
+					/>
+				</span>
+			</span>
 		</EditorCollectionOption>
 	);
 };

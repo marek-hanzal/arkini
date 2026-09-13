@@ -1,0 +1,150 @@
+// @vitest-environment jsdom
+import { act, createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { expect, it, vi } from "vitest";
+import type { InputSchema } from "~/production-input/schema/InputSchema";
+
+const navigation = vi.hoisted(() => ({
+	inputIndex: 1,
+}));
+vi.mock("~/item-authoring/ui/FormContext", () => ({
+	useFormSession: () => ({
+		...navigation,
+		form: {
+			store: {},
+		},
+		itemId: "owner",
+	}),
+}));
+vi.mock("@tanstack/react-form", () => ({
+	useStore: () => false,
+}));
+vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
+	EditorItemThumbnail: () => null,
+}));
+vi.mock("~/item-authoring/ui/useFormValidationIssues", () => ({
+	useFormValidationIssues: () => [],
+}));
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
+	useEditorProject: () => ({
+		config: {
+			items: {},
+		},
+	}),
+}));
+vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", () => ({
+	useEditorItemOptionLabel: () => (id: string, fallback: string) => id || fallback,
+}));
+vi.mock("~/translation/ui/useTranslator", () => ({
+	useTranslator: () => ({
+		textFn: (text: string) => text,
+	}),
+}));
+vi.mock("~/production-authoring/ui/InputControl", () => ({
+	InputControl: ({ input }: { input: InputSchema.Type }) => (
+		<output data-input>
+			{input.type === "materials"
+				? input.selector.itemId
+				: input.type === "units"
+					? input.query.selector.itemId
+					: "simple"}
+		</output>
+	),
+}));
+vi.mock("~/editor-control/ui/EditorSearchCombobox", () => ({
+	EditorSearchCombobox: ({
+		value,
+		onChangeFn,
+	}: {
+		value: string;
+		onChangeFn: (value: string | undefined) => void;
+	}) =>
+		createElement(
+			"button",
+			{
+				"data-select-first": "",
+				onClick: () => onChangeFn("0"),
+			},
+			value,
+		),
+}));
+import { InputsControl } from "~/production-authoring/ui/InputsControl";
+
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+it.each([
+	true,
+	false,
+])(
+	"selects exact input for materials=%s without locking later selection",
+	async (allowMaterials) => {
+		const value: InputSchema.Type[] = [
+			"first",
+			"target",
+			"third",
+		].map((itemId) =>
+			allowMaterials
+				? {
+						type: "materials",
+						mode: "consume",
+						capacity: 0,
+						quantity: {
+							min: 1,
+							max: 1,
+						},
+						selector: {
+							type: "item",
+							itemId,
+						},
+					}
+				: {
+						type: "units",
+						query: {
+							scope: "board",
+							distance: "far",
+							selector: {
+								type: "item",
+								itemId,
+							},
+						},
+					},
+		);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		navigation.inputIndex = 1;
+		try {
+			await act(async () =>
+				root.render(
+					<InputsControl
+						allowMaterials={allowMaterials}
+						value={value}
+						onChangeFn={() => {}}
+					/>,
+				),
+			);
+			expect(container.querySelector("[data-input]")?.textContent).toBe("target");
+			await act(async () =>
+				container.querySelector<HTMLButtonElement>("[data-select-first]")?.click(),
+			);
+			expect(container.querySelector("[data-input]")?.textContent).toBe("first");
+			navigation.inputIndex = 2;
+			await act(async () =>
+				root.render(
+					<InputsControl
+						allowMaterials={allowMaterials}
+						value={value}
+						onChangeFn={() => {}}
+					/>,
+				),
+			);
+			expect(container.querySelector("[data-input]")?.textContent).toBe("third");
+		} finally {
+			await act(async () => root.unmount());
+			container.remove();
+		}
+	},
+);

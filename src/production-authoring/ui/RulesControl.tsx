@@ -275,6 +275,7 @@ const WhenControl = ({
 };
 
 const RuleControl = ({
+	initialWhenIndex,
 	allowedTypes,
 	createRuleFn,
 	onChangeFn,
@@ -286,6 +287,7 @@ const RuleControl = ({
 	readonly allowedTypes: ReadonlyArray<RuleType>;
 	readonly createRuleFn: (type: RuleType) => LineRuleSchema.Type;
 	readonly onChangeFn: (rule: RuleValue) => void;
+	readonly initialWhenIndex?: number;
 	readonly rule: RuleValue;
 	readonly ruleIndex: number;
 	readonly ruleTarget: RuleTarget;
@@ -374,6 +376,8 @@ const RuleControl = ({
 			)}
 			<EditorCollectionSelector
 				addLabel="Add condition"
+				initialSelectedIndex={initialWhenIndex}
+				key={initialWhenIndex}
 				count={rule.when.length}
 				itemLabelFn={(whenIndex) =>
 					`Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
@@ -423,6 +427,8 @@ const RuleControl = ({
 
 /** Assembles the shared conditional Rule collection used by lines and selected drops. */
 export const RulesControl = ({
+	initialRuleIndex,
+	initialWhenIndex,
 	allowedTypes,
 	description,
 	headerVisible = true,
@@ -434,6 +440,8 @@ export const RulesControl = ({
 	readonly description: string;
 	readonly headerVisible?: boolean;
 	readonly onChangeFn: (rules: RuleValue[]) => void;
+	readonly initialRuleIndex?: number;
+	readonly initialWhenIndex?: number;
 	readonly rules: ReadonlyArray<RuleValue>;
 	readonly target: RuleTarget;
 }) => {
@@ -467,6 +475,8 @@ export const RulesControl = ({
 			) : null}
 			<EditorCollectionSelector
 				addLabel="Add rule"
+				initialSelectedIndex={initialRuleIndex}
+				key={initialRuleIndex}
 				count={rules.length}
 				itemLabelFn={(ruleIndex) => `Rule ${ruleIndex + 1} — ${rules[ruleIndex].type}`}
 				label="Rules"
@@ -484,6 +494,9 @@ export const RulesControl = ({
 			>
 				{(ruleIndex) => (
 					<RuleControl
+						initialWhenIndex={
+							ruleIndex === initialRuleIndex ? initialWhenIndex : undefined
+						}
 						allowedTypes={allowedTypes}
 						createRuleFn={createRuleFn}
 						rule={rules[ruleIndex]}

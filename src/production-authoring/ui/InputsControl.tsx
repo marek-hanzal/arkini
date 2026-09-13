@@ -30,7 +30,7 @@ export const InputsControl = ({
 	const translator = useTranslator();
 	const project = useEditorProject();
 	const readItemLabelFn = useEditorItemOptionLabel();
-	const { form, itemId } = useFormSession();
+	const { form, itemId, inputIndex } = useFormSession();
 	const selfUnitsEnabled = useStore(form.store, (state) => state.values.units !== undefined);
 	const validationIssues = useFormValidationIssues(value);
 	const issuesByInput = value.map((_input, index) =>
@@ -60,6 +60,8 @@ export const InputsControl = ({
 			/>
 			<EditorCollectionSelector
 				addLabel="Add input"
+				initialSelectedIndex={inputIndex}
+				key={inputIndex}
 				count={value.length}
 				itemLabelFn={(index) => {
 					const input = value[index];

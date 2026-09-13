@@ -30,7 +30,7 @@ export const useGameMenuActions = ({
 	const navigateFn = useNavigate();
 	const commandAtom = gameMenuCommandAtom(game);
 	const [commandResult, runCommandFn] = useAtom(commandAtom);
-	const [confirmingDestroy, setConfirmingDestroyFn] = useState(false);
+	const [confirmingReset, setConfirmingResetFn] = useState(false);
 	const [navigationError, setNavigationErrorFn] = useState<unknown>();
 	const savePending = menu.activeAction === "save";
 	const saveAndExitPending = menu.activeAction === "save-and-exit";
@@ -179,8 +179,8 @@ export const useGameMenuActions = ({
 		status,
 		pending,
 		actionDisabled,
-		confirmingDestroy,
-		setConfirmingDestroyFn,
+		confirmingReset,
+		setConfirmingResetFn,
 		closeFn: menu.closeFn,
 		requestSettingsFn,
 		requestCheatsFn,

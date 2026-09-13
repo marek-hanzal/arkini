@@ -30,5 +30,5 @@ export const Route = createFileRoute("/game/$packageId/action/reset")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionLoadingScreen label="Destroying current progress…" />,
+	pendingComponent: () => <ActionLoadingScreen label="Starting a new game…" />,
 });

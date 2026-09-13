@@ -1,3 +1,4 @@
+import { RotateCcw } from "lucide-react";
 import { motion } from "motion/react";
 
 import type { Game } from "~/installed-game/type/Game";
@@ -121,22 +122,19 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 
 					<div className="my-2 border-t border-line" />
 
-					<section className="rounded-xl border border-danger/35 bg-danger/5 p-3">
-						<h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-danger">
-							Developer
-						</h3>
-						{actions.confirmingDestroy ? (
-							<div className="grid gap-2">
+					<section data-ui="GameMenuStartOver">
+						{actions.confirmingReset ? (
+							<div className="grid gap-2 rounded-xl border border-danger/35 bg-danger/5 p-3">
 								<p className="text-sm text-muted">
-									Current progress will be permanently deleted and the game will
-									restart from a fresh save.
+									Start a new game from the beginning? Your current progress will
+									be permanently lost.
 								</p>
 								<div className="grid grid-cols-2 gap-2">
 									<Button
 										className="min-h-0 px-3 py-2 shadow-none"
 										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
-										onClick={() => actions.setConfirmingDestroyFn(false)}
+										onClick={() => actions.setConfirmingResetFn(false)}
 									>
 										Cancel
 									</Button>
@@ -146,19 +144,20 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 										disabled={actions.actionDisabled}
 										onClick={actions.requestHardResetFn}
 									>
-										Destroy permanently
+										Start over
 									</DangerButton>
 								</div>
 							</div>
 						) : (
-							<DangerButton
-								className="w-full shadow-none"
+							<Button
+								className="w-full gap-2 border-danger/35 bg-danger/10 text-danger shadow-none hover:border-danger/60 hover:bg-danger/15"
 								cursorIntent={actionCursorIntent}
 								disabled={actions.actionDisabled}
-								onClick={() => actions.setConfirmingDestroyFn(true)}
+								onClick={() => actions.setConfirmingResetFn(true)}
 							>
-								Destroy
-							</DangerButton>
+								<RotateCcw className="size-5" />
+								Start over
+							</Button>
 						)}
 					</section>
 				</div>

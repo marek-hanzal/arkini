@@ -341,7 +341,7 @@ describe("GameMenu", () => {
 	it("reverses rapid Escape during enter without duplicate overlays", async () => {
 		const { container } = await renderMenu();
 		await pressEscape();
-		expect(buttonByText(container, "Destroy").disabled).toBe(true);
+		expect(buttonByText(container, "Start over").disabled).toBe(true);
 		expect(container.querySelectorAll('[data-ui="GameMenuBackdrop"]')).toHaveLength(1);
 		const enteringCompletion = motionTestRuntime.completions.length - 1;
 		await pressEscape();
@@ -472,8 +472,8 @@ describe("GameMenu", () => {
 		const { container, router } = await renderMenu();
 		await openMenu(container);
 
-		await act(async () => buttonByText(container, "Destroy").click());
-		await act(async () => buttonByText(container, "Destroy permanently").click());
+		await act(async () => buttonByText(container, "Start over").click());
+		await act(async () => buttonByText(container, "Start over").click());
 		await vi.waitFor(() =>
 			expect(router.state.location.pathname).toBe("/game/package%3Amenu/action/reset"),
 		);

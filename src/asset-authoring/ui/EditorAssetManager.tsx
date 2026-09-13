@@ -1,3 +1,4 @@
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
@@ -25,7 +26,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
-import { SegmentedControl } from "~/ui/ui/SegmentedControl";
+import { EditorSelect } from "~/editor-control/ui/EditorSelect";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
@@ -57,8 +58,12 @@ const assetFilters = [
 		value: "all",
 	},
 	{
-		label: "Unused assets",
+		label: "Unused",
 		value: "unused",
+	},
+	{
+		label: "With note",
+		value: "with-note",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly label: string;
@@ -74,7 +79,7 @@ const assetCatalogStatuses = {
 	},
 	"no-matches": {
 		dataUi: "EditorAssetsFilteredEmpty",
-		description: "No assets match the current search and usage filter.",
+		description: "Try a different search or change the active filters.",
 		icon: SearchX,
 		title: "No matching assets",
 	},
@@ -218,7 +223,7 @@ const EditorAssetCard = ({
 	resource,
 	unused,
 }: {
-	readonly filter: "all" | "unused";
+	readonly filter: AssetCatalogFilterSchema.Type;
 	readonly query: string;
 	readonly resource: Project.Resource;
 	readonly unused: boolean;
@@ -246,18 +251,15 @@ const EditorAssetCard = ({
 				},
 			})}
 			label={resource.id}
-			details={
-				<span
-					className="shrink-0 rounded-full border border-line-strong bg-surface px-2 py-0.5 text-xs font-medium text-muted data-[ui-unused=true]:border-accent/35 data-[ui-unused=true]:bg-accent/10 data-[ui-unused=true]:text-accent"
-					{...readDataUiFn({
-						dataUi: "EditorAssetUsageBadge",
-						state: {
-							unused,
-						},
-					})}
-				>
-					{unused ? translator.textFn("Unused") : translator.textFn("Used")}
-				</span>
+			cornerEnd={
+				unused ? (
+					<span
+						className="rounded-full border border-accent/35 bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent"
+						data-ui="EditorAssetUsageBadge"
+					>
+						{translator.textFn("Unused")}
+					</span>
+				) : undefined
 			}
 			artwork={
 				url === undefined ? (
@@ -277,7 +279,7 @@ const EditorAssetCard = ({
 };
 
 interface EditorAssetGridProps {
-	readonly filter: "all" | "unused";
+	readonly filter: AssetCatalogFilterSchema.Type;
 	readonly query: string;
 	readonly resources: Project["resources"];
 }
@@ -390,6 +392,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 
 	return (
 		<EditorSectionPage
+			fillContent={catalogStatus !== undefined}
 			header={
 				<header className="flex min-w-0 flex-wrap items-center gap-2">
 					<EditorHistoryBackButton
@@ -425,11 +428,13 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						placeholder={`${translator.textFn("Search assets…")} (${controller.resources.length})`}
 						onValueChangeFn={props.onQueryChangeFn}
 					/>
-					<SegmentedControl
-						dataUi="EditorAssetFilters"
+					<EditorSelect
+						label={translator.textFn("View assets")}
 						onChangeFn={props.onFilterChangeFn}
-						optionDataUi="EditorAssetFilter"
-						options={assetFilters}
+						options={assetFilters.map((option) => ({
+							...option,
+							label: translator.textFn(option.label),
+						}))}
 						size="large"
 						value={props.filter}
 					/>
@@ -469,7 +474,10 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 			}
 			scrollRestorationId="editor-asset-list"
 		>
-			<div data-ui="EditorAssetManager">
+			<div
+				className="flex flex-1 flex-col"
+				data-ui="EditorAssetManager"
+			>
 				{importError === undefined ? null : (
 					<p
 						className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
@@ -493,20 +501,32 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						tone={optimizationAlert.tone}
 					/>
 				)}
+				{controller.notesLoading ? (
+					<p className="mb-3 text-sm text-muted">{translator.textFn("Loading notes…")}</p>
+				) : null}
+				{controller.notesError === undefined ? null : (
+					<p className="mb-3 text-sm text-danger">
+						{translator.textFn("Could not load notes.")}
+					</p>
+				)}
 				{catalogStatus === undefined ? null : (
 					<Status
 						dataUi={catalogStatus.dataUi}
-						description={catalogStatus.description}
+						description={translator.textFn(catalogStatus.description)}
+						size="large"
+						variant="flat"
 						icon={catalogStatus.icon}
-						title={catalogStatus.title}
+						title={translator.textFn(catalogStatus.title)}
 						action={controller.catalogState === "empty" ? importButton : undefined}
 					/>
 				)}
-				<EditorAssetGrid
-					filter={props.filter}
-					query={settledQuery}
-					resources={controller.resources}
-				/>
+				{controller.resources.length === 0 ? null : (
+					<EditorAssetGrid
+						filter={props.filter}
+						query={settledQuery}
+						resources={controller.resources}
+					/>
+				)}
 			</div>
 		</EditorSectionPage>
 	);

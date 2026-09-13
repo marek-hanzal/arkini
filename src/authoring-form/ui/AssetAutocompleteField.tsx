@@ -40,6 +40,7 @@ export const AssetAutocompleteField = ({
 };
 
 interface EditorAssetReferenceControlProps extends AssetAutocompleteFieldProps {
+	readonly showSelectedPreview?: boolean;
 	readonly value: string;
 	readonly error?: string;
 	readonly includeResourceFn?: (resource: Project.Resource) => boolean;
@@ -57,6 +58,7 @@ export const EditorAssetReferenceControl = ({
 	includeResourceFn,
 	onBlurFn,
 	onChangeFn,
+	showSelectedPreview = true,
 }: EditorAssetReferenceControlProps) => {
 	const project = useEditorProject();
 	const options = useMemo(
@@ -97,12 +99,16 @@ export const EditorAssetReferenceControl = ({
 					size="xl"
 				/>
 			)}
-			renderSelectedPreviewFn={(option) => (
-				<EditorAssetThumbnail
-					resourceId={option?.id}
-					size="input"
-				/>
-			)}
+			renderSelectedPreviewFn={
+				showSelectedPreview
+					? (option) => (
+							<EditorAssetThumbnail
+								resourceId={option?.id}
+								size="input"
+							/>
+						)
+					: undefined
+			}
 		/>
 	);
 };

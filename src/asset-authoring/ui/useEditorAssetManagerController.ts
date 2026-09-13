@@ -11,11 +11,11 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
 import type { Project } from "~/project-authoring/type/Project";
-import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 
 export namespace useEditorAssetManagerController {
 	export type CatalogState = "empty" | "no-matches" | "unused-empty";
-	export type Filter = AssetCollectionFilterSchema.Type;
+	export type Filter = AssetCatalogFilterSchema.Type;
 
 	export interface Props {
 		readonly filter: Filter;
@@ -28,6 +28,8 @@ export namespace useEditorAssetManagerController {
 		readonly filesInputRef: RefObject<HTMLInputElement | null>;
 		readonly importError?: unknown;
 		readonly importPending: boolean;
+		readonly notesLoading: boolean;
+		readonly notesError?: unknown;
 		readonly importedCount?: number;
 		readonly onArkpackChangeFn: ChangeEventHandler<HTMLInputElement>;
 		readonly onFilesChangeFn: ChangeEventHandler<HTMLInputElement>;
@@ -95,7 +97,7 @@ export const useEditorAssetManagerController = ({
 		optimizationState.kind === "optimizing" ? optimizationState.progress : undefined;
 	const catalogState: useEditorAssetManagerController.CatalogState | undefined = library.empty
 		? "empty"
-		: library.resources.length > 0
+		: library.notesLoading || library.notesError !== undefined || library.resources.length > 0
 			? undefined
 			: filter === "unused" && query.trim() === ""
 				? "unused-empty"
@@ -146,6 +148,8 @@ export const useEditorAssetManagerController = ({
 		filesInputRef,
 		importError,
 		importPending,
+		notesLoading: library.notesLoading,
+		notesError: library.notesError,
 		importedCount,
 		onArkpackChangeFn,
 		onFilesChangeFn,

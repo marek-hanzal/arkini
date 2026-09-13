@@ -144,6 +144,7 @@ export const ConnectionsSection = ({
 							)}
 							renderSelectedPreviewFn={(option) => (
 								<EditorItemSearchThumbnail
+									className="size-[var(--ak-control-min-height)]"
 									item={
 										option === undefined
 											? undefined

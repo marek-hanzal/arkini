@@ -59,7 +59,8 @@ const ItemImages = ({
 			{ids.map((id) => (
 				<EditorItemThumbnail
 					key={id}
-					className="size-12 rounded-md"
+					className="rounded-md"
+					size="md"
 					resourceIds={
 						items[id]?.asset.default ?? [
 							"",

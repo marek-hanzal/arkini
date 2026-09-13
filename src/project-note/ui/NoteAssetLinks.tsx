@@ -1,12 +1,10 @@
-import { useCallback } from "react";
+import { Tx } from "~/translation/ui/Tx";
 import { Trash2 } from "lucide-react";
 
-import { EditorAssetReferenceControl } from "~/authoring-form/ui/AssetAutocompleteField";
 import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
-import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { Project } from "~/project-authoring/type/Project";
 import { Button } from "~/ui/ui/Button";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
@@ -14,7 +12,7 @@ interface NoteAssetLinksProps {
 	readonly resourceIds: ReadonlyArray<string>;
 	readonly requiredResourceId?: string;
 	readonly disabled: boolean;
-	readonly filter?: AssetCollectionFilterSchema.Type;
+	readonly filter?: AssetCatalogFilterSchema.Type;
 	readonly query?: string;
 	readonly onChangeFn?: (resourceIds: ReadonlyArray<string>) => void;
 	readonly onUnlinkFn?: (resourceId: string) => void;
@@ -31,18 +29,15 @@ export const NoteAssetLinks = ({
 	onUnlinkFn,
 }: NoteAssetLinksProps) => {
 	const project = useEditorProject();
-	const includeResourceFn = useCallback(
-		(resource: Project.Resource) => !resourceIds.includes(resource.id),
-		[
-			resourceIds,
-		],
-	);
-	if (resourceIds.length === 0 && onChangeFn === undefined) return null;
+	if (resourceIds.length === 0) return null;
 	return (
 		<div
-			className="grid gap-3"
+			className="grid min-w-0 gap-3"
 			data-ui="EditorNoteAssetLinks"
 		>
+			<span className="text-sm font-semibold">
+				<Tx label="Assets" />:
+			</span>
 			<div className="flex flex-wrap gap-2">
 				{resourceIds.map((resourceId) => {
 					const exists = project.resources.some((resource) => resource.id === resourceId);
@@ -102,28 +97,6 @@ export const NoteAssetLinks = ({
 					);
 				})}
 			</div>
-			{onChangeFn === undefined ? null : (
-				<fieldset disabled={disabled}>
-					<EditorAssetReferenceControl
-						key={resourceIds.length}
-						label="Link asset"
-						value=""
-						includeResourceFn={includeResourceFn}
-						onChangeFn={(resourceId) => {
-							if (
-								disabled ||
-								resourceIds.includes(resourceId) ||
-								!project.resources.some((resource) => resource.id === resourceId)
-							)
-								return;
-							onChangeFn([
-								...resourceIds,
-								resourceId,
-							]);
-						}}
-					/>
-				</fieldset>
-			)}
 		</div>
 	);
 };

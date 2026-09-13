@@ -29,19 +29,17 @@ export const ProjectToolbarSection = () => {
 	});
 	return (
 		<div className="grid gap-6">
-			<EditorFormSection title="Toolbar size">
-				<EditorFormCard>
-					<form.AppField name="toolbarSize">
-						{(field) => (
-							<field.NumberField
-								label="Slots"
-								min={0}
-								max={EditorProjectSizeMax}
-							/>
-						)}
-					</form.AppField>
-				</EditorFormCard>
-			</EditorFormSection>
+			<EditorFormCard>
+				<form.AppField name="toolbarSize">
+					{(field) => (
+						<field.NumberField
+							label="Slots"
+							min={0}
+							max={EditorProjectSizeMax}
+						/>
+					)}
+				</form.AppField>
+			</EditorFormCard>
 			<EditorFormSection title="Initial toolbar">
 				{size === 0 ? (
 					<p className="text-sm text-muted">Toolbar is disabled.</p>

@@ -20,10 +20,11 @@ interface EditorItemThumbnailProps {
 
 /** Renders the compact item preview placed beside editor search controls. */
 const EditorItemSelectedThumbnail = ({
+	className,
 	resourceIds,
-}: Pick<EditorItemThumbnailProps, "resourceIds">) => (
+}: Pick<EditorItemThumbnailProps, "className" | "resourceIds">) => (
 	<EditorItemThumbnail
-		className="rounded-lg border-line-strong"
+		className={twMerge("rounded-lg border-line-strong", className)}
 		resourceIds={resourceIds}
 		size="input"
 	/>
@@ -31,14 +32,17 @@ const EditorItemSelectedThumbnail = ({
 
 /** Resolves the appropriate item thumbnail used by shared search combobox slots. */
 export const EditorItemSearchThumbnail = ({
+	className,
 	item,
 	selected = false,
 }: {
+	readonly className?: string;
 	readonly item: ItemSchema.Type | undefined;
 	readonly selected?: boolean;
 }) =>
 	selected ? (
 		<EditorItemSelectedThumbnail
+			className={className}
 			resourceIds={
 				item?.asset.default ?? [
 					"",
@@ -47,6 +51,7 @@ export const EditorItemSearchThumbnail = ({
 		/>
 	) : item === undefined ? null : (
 		<EditorItemThumbnail
+			className={className}
 			resourceIds={item.asset.default}
 			size="lg"
 		/>

@@ -40,7 +40,7 @@ Asset ID help:
     A unique resource name within this project. Renaming updates saved item, project and note references when you **Save**.
 Asset catalog help:
   value: |
-    Assets contains reusable PNG images in the project. Search by asset ID and filter by current usage. Open an asset to preview it, inspect its uses, replace it or create an item from it.
+    Assets contains reusable PNG images in the project. Search by asset ID and choose All, Unused, or With note to show assets linked to project notes. Open an asset to preview it, inspect its uses, replace it or create an item from it.
 
     **Import** adds PNG files or imports images from an Arkpack. **Optimize** losslessly re-encodes project PNGs at their original dimensions; it does not resize the artwork.
 
@@ -158,6 +158,8 @@ Control:
   value: Control
 Cost:
   value: Cost
+Could not load notes.:
+  value: Could not load notes.
 Count range:
   value: Count range
 Create item:
@@ -620,10 +622,10 @@ No item selected:
   value: No item selected
 No item with Units enabled matches this search.:
   value: No item with Units enabled matches this search.
-No items match the active filters.:
-  value: No items match the active filters.
 No items yet:
   value: No items yet
+No matching items:
+  value: No matching items
 No output:
   value: No output
 No output configured.:
@@ -971,6 +973,8 @@ Toolbar:
 Toolbar editing help:
   value: |
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
+Try a different search or change the active filters.:
+  value: Try a different search or change the active filters.
 UID:
   value: UID
 Unit cost:
@@ -1012,8 +1016,8 @@ Use:
   value: Use
 Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.:
   value: Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.
-Used:
-  value: Used
+View assets:
+  value: View assets
 View items:
   value: View items
 Visible:

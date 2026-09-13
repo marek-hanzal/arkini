@@ -48,6 +48,7 @@ interface EditorItemReferenceControlProps {
 	readonly label: string;
 	readonly onChangeFn: (itemId: string) => void;
 	readonly value: string;
+	readonly showSelectedPreview?: boolean;
 }
 
 /** Reuses the canonical item autocomplete outside direct TanStack field bindings. */
@@ -58,6 +59,7 @@ export const EditorItemReferenceControl = ({
 	includeItemFn,
 	label,
 	onChangeFn,
+	showSelectedPreview = true,
 	value,
 }: EditorItemReferenceControlProps) => {
 	const { items, options } = useEditorItemSearchOptions(includeItemFn);
@@ -71,12 +73,16 @@ export const EditorItemReferenceControl = ({
 			value={value}
 			onChangeFn={onChangeFn}
 			renderPreviewFn={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
-			renderSelectedPreviewFn={(option) => (
-				<EditorItemSearchThumbnail
-					item={option === undefined ? undefined : items?.[option.id]}
-					selected
-				/>
-			)}
+			renderSelectedPreviewFn={
+				showSelectedPreview
+					? (option) => (
+							<EditorItemSearchThumbnail
+								item={option === undefined ? undefined : items?.[option.id]}
+								selected
+							/>
+						)
+					: undefined
+			}
 		/>
 	);
 };

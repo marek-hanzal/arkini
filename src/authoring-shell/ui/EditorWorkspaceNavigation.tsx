@@ -1,6 +1,5 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { LogOut, RefreshCw } from "lucide-react";
-import { Fragment } from "react";
 
 import {
 	EditorWorkspaceRoutes,
@@ -50,33 +49,29 @@ export const EditorWorkspaceNavigation = ({
 			{EditorWorkspaceRoutes.map((workspace) => {
 				const { icon: Icon, id, label, shortcut, to } = workspace;
 				return (
-					<Fragment key={id}>
-						<Tooltip
-							content={`${label} · ${formatForDisplay(shortcut)}`}
-							placement="right"
+					<Tooltip
+						key={id}
+						content={`${label} · ${formatForDisplay(shortcut)}`}
+						placement="right"
+					>
+						<ButtonLink
+							to={to}
+							params={{
+								projectId,
+							}}
+							className={tabClassName}
+							data-workspace-id={id}
+							{...readDataUiFn({
+								dataUi: "EditorWorkspaceTab",
+								state: {
+									current: activeWorkspace === id,
+									transitioning: transitioningWorkspace === id,
+								},
+							})}
 						>
-							<ButtonLink
-								to={to}
-								params={{
-									projectId,
-								}}
-								className={tabClassName}
-								data-workspace-id={id}
-								{...readDataUiFn({
-									dataUi: "EditorWorkspaceTab",
-									state: {
-										current: activeWorkspace === id,
-										transitioning: transitioningWorkspace === id,
-									},
-								})}
-							>
-								<Icon className="size-5" />
-							</ButtonLink>
-						</Tooltip>
-						{"separatorAfter" in workspace ? (
-							<div className="my-1 h-px w-8 shrink-0 bg-line" />
-						) : null}
-					</Fragment>
+							<Icon className="size-5" />
+						</ButtonLink>
+					</Tooltip>
 				);
 			})}
 		</nav>

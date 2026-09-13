@@ -1,7 +1,6 @@
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { Mx } from "~/translation/ui/Mx";
-import { FilePenLine, NotebookPen, PackageOpen, Plus, TriangleAlert } from "lucide-react";
+import { FilePenLine, NotebookPen, PackageOpen, Plus, SearchX, TriangleAlert } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -22,7 +21,7 @@ import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { Button } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
@@ -199,9 +198,9 @@ export const List = ({
 			{translator.textFn("New item")}
 		</CreateItemLink>
 	);
-	const DraftFilterButton = draft ? PrimaryButton : Button;
 	return (
 		<EditorSectionPage
+			fillContent={filteredItems.length === 0}
 			header={
 				<header className="flex min-w-0 flex-wrap items-center gap-2">
 					<EditorHistoryBackButton to="/editor/welcome" />
@@ -218,8 +217,8 @@ export const List = ({
 						options={itemViewOptions}
 						value={view}
 					/>
-					<DraftFilterButton
-						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
+					<Button
+						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm data-[ui-selected=true]:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:bg-accent/15 data-[ui-selected=true]:active:bg-accent/15"
 						onClick={() => onDraftChangeFn(!draft)}
 						{...readDataUiFn({
 							dataUi: "EditorItemDraftFilter",
@@ -230,7 +229,7 @@ export const List = ({
 					>
 						<FilePenLine className="size-4" />
 						{translator.textFn("Draft")}
-					</DraftFilterButton>
+					</Button>
 					{empty ? null : newItemMenu}
 					<EditorPageHelp
 						title={translator.textFn("Items")}
@@ -241,23 +240,19 @@ export const List = ({
 			scrollRestorationId="editor-item-list"
 		>
 			<div
-				className="ak-list grid content-start gap-2"
+				className="ak-list flex flex-1 flex-col gap-2"
 				data-ui="EditorItemList"
 			>
 				{empty ? (
 					<Status
 						dataUi="EditorItemsEmpty"
 						icon={PackageOpen}
-						title={
-							<span className="inline-flex items-center gap-1.5">
-								{translator.textFn("No items yet")}
-								<EditorInfoTooltip
-									content={translator.textFn(
-										"Create the first item to start authoring this game.",
-									)}
-								/>
-							</span>
-						}
+						title={translator.textFn("No items yet")}
+						description={translator.textFn(
+							"Create the first item to start authoring this game.",
+						)}
+						size="large"
+						variant="flat"
 						action={newItemMenu}
 					/>
 				) : null}
@@ -288,21 +283,27 @@ export const List = ({
 				filteredItems.length === 0 &&
 				(view !== "with-note" || notes.loaded) &&
 				(view !== "incomplete" || (estimatesCurrent && estimates.status === "ready")) ? (
-					<p
-						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
-						data-ui="EditorItemSearchEmpty"
-					>
-						{translator.textFn("No items match the active filters.")}
-					</p>
+					<Status
+						dataUi="EditorItemSearchEmpty"
+						icon={SearchX}
+						title={translator.textFn("No matching items")}
+						description={translator.textFn(
+							"Try a different search or change the active filters.",
+						)}
+						size="large"
+						variant="flat"
+					/>
 				) : null}
-				<EditorVirtualCollection
-					items={filteredItems}
-					itemKeyFn={readItemKeyFn}
-					renderItemFn={renderItemFn}
-					estimatedRowHeight={352}
-					gapRem={0.75}
-					minColumnWidthRem={19}
-				/>
+				{filteredItems.length === 0 ? null : (
+					<EditorVirtualCollection
+						items={filteredItems}
+						itemKeyFn={readItemKeyFn}
+						renderItemFn={renderItemFn}
+						estimatedRowHeight={352}
+						gapRem={0.75}
+						minColumnWidthRem={19}
+					/>
+				)}
 			</div>
 		</EditorSectionPage>
 	);

@@ -1,3 +1,4 @@
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Effect, Exit } from "effect";
@@ -76,7 +77,7 @@ const editEditorAssetCommandAtom = RendererRuntime.runSync(
 
 export namespace useEditorAssetEditController {
 	export interface Props {
-		readonly filter: "all" | "unused";
+		readonly filter: AssetCatalogFilterSchema.Type;
 		readonly query: string;
 		readonly resourceId: string;
 	}

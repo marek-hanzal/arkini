@@ -33,7 +33,7 @@ export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/deta
 		return (
 			<EditorAssetDetail
 				help={EditorAssetSectionHelp[section]}
-				contentMode={section === "overview" ? "viewport" : "scroll"}
+				contentMode={section === "overview" || section === "notes" ? "viewport" : "scroll"}
 				filter={search.filter ?? "all"}
 				query={search.query ?? ""}
 				resourceId={resourceId}

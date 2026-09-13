@@ -152,7 +152,11 @@ const setContentFn = async (container: HTMLElement, value: string) => {
 };
 
 const selectLinkFn = async (container: HTMLElement, kind: "Asset" | "Item", title: string) => {
-	await clickFn(container.querySelector(`[data-ui="EditorNote${kind}Links"] input`));
+	await clickFn(
+		container.querySelector(
+			`[data-ui="EditorNoteLinkPickers"] input[placeholder="Search link ${kind.toLowerCase()}…"]`,
+		),
+	);
 	await clickFn(
 		[
 			...document.querySelectorAll('[data-ui="EditorSearchComboboxOption"]'),

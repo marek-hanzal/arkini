@@ -2,7 +2,6 @@ import { useStore } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -48,60 +47,58 @@ export const ProjectBoardSection = () => {
 		}));
 	return (
 		<div className="grid gap-6">
-			<EditorFormSection title="Board size">
-				<EditorFormCard>
-					<div className="flex flex-wrap items-end gap-4">
-						<div className="grid min-w-72 flex-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem]">
-							<form.AppField name="board.width">
-								{(field) => (
-									<field.NumberField
-										label="Width"
-										max={EditorProjectSizeMax}
-										min={1}
-									/>
-								)}
-							</form.AppField>
-							<form.AppField name="board.height">
-								{(field) => (
-									<field.NumberField
-										label="Height"
-										max={EditorProjectSizeMax}
-										min={1}
-									/>
-								)}
-							</form.AppField>
-							<ProjectGridSizeValue
-								height={height}
-								width={width}
-							/>
-						</div>
-						<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
-						<label className="grid gap-1.5 text-sm">
-							<span className="font-semibold text-foreground">Space</span>
-							<input
-								type="number"
-								value={spaceInput}
-								className={`${editorInputClassName} w-56`}
-								max={MaxEditorSpaceIndex}
-								min={0}
-								step={1}
-								onChange={(event) => {
-									const value = event.currentTarget.value;
-									setSpaceInputFn(value);
-									const space = Number(value);
-									if (
-										value !== "" &&
-										Number.isInteger(space) &&
-										space >= 0 &&
-										space <= MaxEditorSpaceIndex
-									)
-										setSelectedSpaceFn(space);
-								}}
-							/>
-						</label>
+			<EditorFormCard>
+				<div className="flex flex-wrap items-end gap-4">
+					<div className="grid min-w-72 flex-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem]">
+						<form.AppField name="board.width">
+							{(field) => (
+								<field.NumberField
+									label="Width"
+									max={EditorProjectSizeMax}
+									min={1}
+								/>
+							)}
+						</form.AppField>
+						<form.AppField name="board.height">
+							{(field) => (
+								<field.NumberField
+									label="Height"
+									max={EditorProjectSizeMax}
+									min={1}
+								/>
+							)}
+						</form.AppField>
+						<ProjectGridSizeValue
+							height={height}
+							width={width}
+						/>
 					</div>
-				</EditorFormCard>
-			</EditorFormSection>
+					<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
+					<label className="grid gap-1.5 text-sm">
+						<span className="font-semibold text-foreground">Space</span>
+						<input
+							type="number"
+							value={spaceInput}
+							className={`${editorInputClassName} w-56`}
+							max={MaxEditorSpaceIndex}
+							min={0}
+							step={1}
+							onChange={(event) => {
+								const value = event.currentTarget.value;
+								setSpaceInputFn(value);
+								const space = Number(value);
+								if (
+									value !== "" &&
+									Number.isInteger(space) &&
+									space >= 0 &&
+									space <= MaxEditorSpaceIndex
+								)
+									setSelectedSpaceFn(space);
+							}}
+						/>
+					</label>
+				</div>
+			</EditorFormCard>
 			<ProjectStartGrid
 				key={selectedSpace}
 				cells={cells}

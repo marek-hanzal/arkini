@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { ButtonLink } from "~/ui/ui/Button";
 
 /** Opens one asset while preserving an Assets-list search scoped to that resource. */
@@ -15,7 +15,7 @@ export const EditorAssetDetailLink = ({
 }: PropsWithChildren<{
 	readonly className?: string;
 	readonly resourceId: string;
-	readonly filter?: AssetCollectionFilterSchema.Type;
+	readonly filter?: AssetCatalogFilterSchema.Type;
 	readonly query?: string;
 }>) => {
 	const project = useEditorProject();

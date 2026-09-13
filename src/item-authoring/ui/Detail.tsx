@@ -47,6 +47,7 @@ export const Detail = ({
 	const sections = readSectionsFn();
 	return (
 		<EditorSectionPage
+			contentMode={sectionId === "notes" ? "viewport" : "scroll"}
 			header={
 				<EditorSectionNavigation
 					leading={

@@ -15,6 +15,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 		const collection = useProjectNotes(project.projectId);
 		return (
 			<EditorSectionPage
+				contentMode="viewport"
 				header={
 					<EditorSectionNavigation
 						action={

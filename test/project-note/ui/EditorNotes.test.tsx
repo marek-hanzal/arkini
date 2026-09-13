@@ -477,15 +477,15 @@ describe("EditorNotes", () => {
 				expect(editor.value).toBe("Local draft");
 				const saveButton = [
 					...container.querySelectorAll<HTMLButtonElement>("button"),
-				].find((button) => button.parentElement?.textContent === "Save");
+				].find((button) => button.textContent === "Save");
 				expect(saveButton?.disabled).toBe(false);
 			}),
 		);
 
-		const saveTooltip = [
-			...container.querySelectorAll("span[hidden]"),
-		].find((element) => element.textContent === "Save");
-		await click(saveTooltip?.parentElement?.querySelector("button") ?? null);
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await click(saveButton ?? null);
 		await act(async () =>
 			vi.waitFor(() =>
 				expect(container.textContent).toContain(

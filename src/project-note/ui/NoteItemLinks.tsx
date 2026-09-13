@@ -1,9 +1,7 @@
-import { useCallback } from "react";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { Tx } from "~/translation/ui/Tx";
 import { Link } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 
-import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { Button } from "~/ui/ui/Button";
@@ -27,18 +25,15 @@ export const NoteItemLinks = ({
 }: NoteItemLinksProps) => {
 	const project = useEditorProject();
 	const items = Object.values(project.config.items);
-	const includeItemFn = useCallback(
-		(item: ItemSchema.Type) => !itemUids.includes(item.uid),
-		[
-			itemUids,
-		],
-	);
-	if (itemUids.length === 0 && onChangeFn === undefined) return null;
+	if (itemUids.length === 0) return null;
 	return (
 		<div
-			className="grid gap-3"
+			className="grid min-w-0 gap-3"
 			data-ui="EditorNoteItemLinks"
 		>
+			<span className="text-sm font-semibold">
+				<Tx label="Items" />:
+			</span>
 			<div className="flex flex-wrap gap-2">
 				{itemUids.map((itemUid) => {
 					const item = items.find((candidate) => candidate.uid === itemUid);
@@ -98,26 +93,6 @@ export const NoteItemLinks = ({
 					);
 				})}
 			</div>
-			{onChangeFn === undefined ? null : (
-				<fieldset disabled={disabled}>
-					{/* An attachment settles this single-value picker; begin a fresh search next. */}
-					<EditorItemReferenceControl
-						key={itemUids.length}
-						label="Link item"
-						value=""
-						includeItemFn={includeItemFn}
-						onChangeFn={(itemId) => {
-							const item = project.config.items[itemId];
-							if (disabled || item === undefined || itemUids.includes(item.uid))
-								return;
-							onChangeFn([
-								...itemUids,
-								item.uid,
-							]);
-						}}
-					/>
-				</fieldset>
-			)}
 		</div>
 	);
 };

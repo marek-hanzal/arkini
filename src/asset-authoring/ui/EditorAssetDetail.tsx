@@ -1,3 +1,4 @@
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { FileQuestion, PackagePlus, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
@@ -36,7 +37,7 @@ const EditorAssetDetailTab = ({
 	resourceId,
 	to,
 }: {
-	readonly filter: "all" | "unused";
+	readonly filter: AssetCatalogFilterSchema.Type;
 	readonly label: string;
 	readonly projectId: string;
 	readonly query: string;
@@ -78,7 +79,7 @@ export const EditorAssetDetail = ({
 }: PropsWithChildren<{
 	readonly help: EditorPageHelpContent;
 	readonly contentMode?: "scroll" | "viewport";
-	readonly filter: "all" | "unused";
+	readonly filter: AssetCatalogFilterSchema.Type;
 	readonly query: string;
 	readonly resourceId: string;
 }>) => {

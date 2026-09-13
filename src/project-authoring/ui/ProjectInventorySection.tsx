@@ -31,34 +31,32 @@ export const ProjectInventorySection = () => {
 	});
 	return (
 		<div className="grid gap-6">
-			<EditorFormSection title="Inventory size">
-				<EditorFormCard>
-					<div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem]">
-						<form.AppField name="inventory.width">
-							{(field) => (
-								<field.NumberField
-									label="Width"
-									max={EditorProjectSizeMax}
-									min={1}
-								/>
-							)}
-						</form.AppField>
-						<form.AppField name="inventory.height">
-							{(field) => (
-								<field.NumberField
-									label="Height"
-									max={EditorProjectSizeMax}
-									min={1}
-								/>
-							)}
-						</form.AppField>
-						<ProjectGridSizeValue
-							height={height}
-							width={width}
-						/>
-					</div>
-				</EditorFormCard>
-			</EditorFormSection>
+			<EditorFormCard>
+				<div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem]">
+					<form.AppField name="inventory.width">
+						{(field) => (
+							<field.NumberField
+								label="Width"
+								max={EditorProjectSizeMax}
+								min={1}
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="inventory.height">
+						{(field) => (
+							<field.NumberField
+								label="Height"
+								max={EditorProjectSizeMax}
+								min={1}
+							/>
+						)}
+					</form.AppField>
+					<ProjectGridSizeValue
+						height={height}
+						width={width}
+					/>
+				</div>
+			</EditorFormCard>
 			<EditorFormSection title="Initial inventory">
 				<ProjectStartGrid
 					cells={cells}

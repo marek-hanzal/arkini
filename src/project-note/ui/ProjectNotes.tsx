@@ -1,11 +1,8 @@
-import { useImperativeHandle, useRef, type PropsWithChildren, type Ref } from "react";
-import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
-import { ArrowLeft, NotebookPen, Pencil, Save, Trash2 } from "lucide-react";
+import { NoteForm } from "~/project-note/ui/NoteForm";
+import { NotebookPen, Pencil, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { NoteContentMaxLength } from "~/project-note/schema/NoteSchema";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
-import { EditorTextarea } from "~/editor-control/ui/EditorTextarea";
+import { Button } from "~/ui/ui/Button";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useNotesController } from "~/project-note/ui/useNotesController";
 import { Status } from "~/ui/ui/Status";
@@ -14,7 +11,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { Markdown } from "~/ui/ui/Markdown";
 
 import { NoteAssetLinks } from "~/project-note/ui/NoteAssetLinks";
-import type { AssetCollectionFilterSchema } from "~/asset-authoring/schema/AssetCollectionFilterSchema";
+import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { NoteItemLinks } from "~/project-note/ui/NoteItemLinks";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -51,102 +48,24 @@ const noteMotion = {
 	},
 } as const;
 
-/** Keeps the save shortcut attached to one stable card as its editor opens and closes. */
-const ProjectNoteCard = ({
-	children,
-	ref,
-	saveEnabled,
-	saveFn,
-}: PropsWithChildren<{
-	readonly ref?: Ref<HTMLElement>;
-	readonly saveEnabled: boolean;
-	readonly saveFn: () => void;
-}>) => {
-	const cardRef = useRef<HTMLElement>(null);
-	useImperativeHandle(ref, () => cardRef.current!, []);
-	useEditorSaveShortcut({
-		target: cardRef,
-		saveEnabled,
-		saveFn,
-	});
-	return (
-		<motion.article
-			ref={cardRef}
-			layout="position"
-			className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5"
-			data-ui="EditorNote"
-			{...noteMotion}
-		>
-			{children}
-		</motion.article>
-	);
-};
-
 interface ProjectNotesProps extends useNotesController.Props {
-	readonly assetFilter?: AssetCollectionFilterSchema.Type;
+	readonly assetFilter?: AssetCatalogFilterSchema.Type;
 	readonly assetQuery?: string;
 }
 
-/** Shared composer and list for the global collection and item-filtered Notes. */
+/** Shared two-column Notes workspace; the list and composer own independent scroll areas. */
 export const ProjectNotes = (props: ProjectNotesProps) => {
 	const controller = useNotesController(props);
 	const translator = useTranslator();
-	const composerRef = useRef<HTMLElement>(null);
-	useEditorSaveShortcut({
-		target: composerRef,
-		saveEnabled: controller.canCreate,
-		saveFn: controller.createFn,
-	});
 	return (
 		<div
-			className="mx-auto grid w-full max-w-3xl gap-6"
+			className="flex h-full min-h-0 min-w-0 flex-col gap-6 overflow-y-auto p-3 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden"
 			data-ui="EditorNotes"
 		>
 			<section
-				ref={composerRef}
-				className="grid gap-3 rounded-2xl border border-line bg-surface-raised/60 p-5"
+				className="relative grid min-h-0 min-w-0 shrink-0 content-start gap-4 lg:overflow-y-auto lg:overscroll-contain"
+				data-ui="EditorNotesList"
 			>
-				<EditorTextarea
-					maxLength={NoteContentMaxLength}
-					maxRows={12}
-					minRows={6}
-					placeholder={translator.textFn("Write a note…")}
-					disabled={controller.pending}
-					value={controller.newContent}
-					onChange={(event) => controller.setNewContentFn(event.currentTarget.value)}
-				/>
-				<NoteItemLinks
-					itemUids={controller.newItemUids}
-					requiredItemUid={props.requiredCurrentItemUid}
-					disabled={controller.pending}
-					onChangeFn={controller.setNewItemUidsFn}
-				/>
-				<NoteAssetLinks
-					resourceIds={controller.newResourceIds}
-					requiredResourceId={props.requiredCurrentResourceId}
-					disabled={controller.pending}
-					onChangeFn={controller.setNewResourceIdsFn}
-					filter={props.assetFilter}
-					query={props.assetQuery}
-				/>
-				<div className="flex items-center justify-end">
-					<PrimaryButton
-						disabled={!controller.canCreate}
-						cursorIntent={controller.pending ? "progress" : undefined}
-						onClick={controller.createFn}
-					>
-						<Tx label="Create note" />
-					</PrimaryButton>
-				</div>
-			</section>
-			{controller.error === undefined ? null : (
-				<p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
-					{controller.error instanceof Error
-						? controller.error.message
-						: String(controller.error)}
-				</p>
-			)}
-			<section className="grid gap-4">
 				{controller.loading ? (
 					<p className="text-sm text-muted">
 						<Tx label="Loading notes…" />
@@ -191,175 +110,143 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 							controller.notes.map((note) => {
 								const editing = controller.editingNoteId === note.noteId;
 								return (
-									<ProjectNoteCard
-										saveEnabled={editing && controller.canSaveEdit}
-										saveFn={controller.saveEditFn}
+									<motion.article
 										key={note.noteId}
+										layout="position"
+										className="grid min-w-0 gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5"
+										data-ui="EditorNote"
+										{...noteMotion}
 									>
 										<header className="flex items-center gap-3">
 											<time className="text-xs text-subtle">
 												{dateFormatter.format(note.updatedAtMs)}
 											</time>
-											<div className="ml-auto flex items-center gap-2">
-												{editing ? (
-													<>
-														<Tooltip
-															content={<Tx label="Cancel edit" />}
-															placement="top"
+											{editing ? null : (
+												<div className="ml-auto flex items-center gap-2">
+													<Tooltip
+														content={<Tx label="Edit" />}
+														placement="top"
+													>
+														<Button
+															className={iconButtonClassName}
+															disabled={
+																controller.editingNoteId !==
+																	undefined || controller.pending
+															}
+															onClick={() =>
+																controller.startEditFn(note)
+															}
 														>
-															<Button
-																className={iconButtonClassName}
-																disabled={controller.pending}
-																onClick={controller.cancelEditFn}
-															>
-																<ArrowLeft className="size-4" />
-															</Button>
-														</Tooltip>
-														<Tooltip
-															content={<Tx label="Save" />}
-															placement="top"
+															<Pencil className="size-4" />
+														</Button>
+													</Tooltip>
+													<Tooltip
+														content={<Tx label="Delete" />}
+														placement="top"
+													>
+														<Button
+															className={`${iconButtonClassName} hover:text-danger`}
+															disabled={
+																controller.editingNoteId !==
+																	undefined || controller.pending
+															}
+															onClick={() =>
+																controller.removeFn(note)
+															}
 														>
-															<Button
-																className={iconButtonClassName}
-																disabled={!controller.canSaveEdit}
-																cursorIntent={
-																	controller.pending
-																		? "progress"
-																		: undefined
-																}
-																onClick={controller.saveEditFn}
-															>
-																<Save className="size-4" />
-															</Button>
-														</Tooltip>
-													</>
-												) : (
-													<>
-														<Tooltip
-															content={<Tx label="Edit" />}
-															placement="top"
-														>
-															<Button
-																className={iconButtonClassName}
-																disabled={
-																	controller.editingNoteId !==
-																		undefined ||
-																	controller.pending
-																}
-																onClick={() =>
-																	controller.startEditFn(note)
-																}
-															>
-																<Pencil className="size-4" />
-															</Button>
-														</Tooltip>
-														<Tooltip
-															content={<Tx label="Delete" />}
-															placement="top"
-														>
-															<Button
-																className={`${iconButtonClassName} hover:text-danger`}
-																disabled={
-																	controller.editingNoteId !==
-																		undefined ||
-																	controller.pending
-																}
-																onClick={() =>
-																	controller.removeFn(note)
-																}
-															>
-																<Trash2 className="size-4" />
-															</Button>
-														</Tooltip>
-													</>
-												)}
-											</div>
+															<Trash2 className="size-4" />
+														</Button>
+													</Tooltip>
+												</div>
+											)}
 										</header>
 										{editing ? (
-											<EditorTextarea
-												maxLength={NoteContentMaxLength}
-												maxRows={12}
-												minRows={6}
-												disabled={controller.pending}
-												value={controller.editContent}
-												onChange={(event) =>
-													controller.setEditContentFn(
-														event.currentTarget.value,
-													)
+											<NoteForm
+												content={controller.editContent}
+												itemUids={controller.editItemUids}
+												resourceIds={controller.editResourceIds}
+												assetFilter={props.assetFilter}
+												assetQuery={props.assetQuery}
+												pending={controller.pending}
+												canSave={controller.canSaveEdit}
+												saveLabel="Save"
+												onContentChangeFn={controller.setEditContentFn}
+												onItemUidsChangeFn={controller.setEditItemUidsFn}
+												onResourceIdsChangeFn={
+													controller.setEditResourceIdsFn
 												}
+												onSaveFn={controller.saveEditFn}
+												onCancelFn={controller.cancelEditFn}
 											/>
 										) : (
-											<div className="min-w-0 break-words">
-												<Markdown>{note.content}</Markdown>
-											</div>
-										)}
-										{editing ||
-										note.itemUids.length > 0 ||
-										note.resourceIds.length > 0 ? (
-											<div className="flex flex-wrap items-start gap-3">
+											<>
+												<div className="min-w-0 break-words">
+													<Markdown>{note.content}</Markdown>
+												</div>
 												<NoteItemLinks
-													itemUids={
-														editing
-															? controller.editItemUids
-															: note.itemUids
-													}
+													itemUids={note.itemUids}
 													disabled={
 														controller.pending ||
-														(!editing &&
-															controller.editingNoteId !== undefined)
+														controller.editingNoteId !== undefined
 													}
-													onChangeFn={
-														editing
-															? controller.setEditItemUidsFn
-															: undefined
-													}
-													onUnlinkFn={
-														editing
-															? undefined
-															: (itemUid) =>
-																	controller.unlinkFn(
-																		note,
-																		itemUid,
-																	)
+													onUnlinkFn={(itemUid) =>
+														controller.unlinkFn(note, itemUid)
 													}
 												/>
 												<NoteAssetLinks
-													resourceIds={
-														editing
-															? controller.editResourceIds
-															: note.resourceIds
-													}
+													resourceIds={note.resourceIds}
 													disabled={
 														controller.pending ||
-														(!editing &&
-															controller.editingNoteId !== undefined)
+														controller.editingNoteId !== undefined
 													}
-													onChangeFn={
-														editing
-															? controller.setEditResourceIdsFn
-															: undefined
-													}
-													onUnlinkFn={
-														editing
-															? undefined
-															: (resourceId) =>
-																	controller.unlinkResourceFn(
-																		note,
-																		resourceId,
-																	)
+													onUnlinkFn={(resourceId) =>
+														controller.unlinkResourceFn(
+															note,
+															resourceId,
+														)
 													}
 													filter={props.assetFilter}
 													query={props.assetQuery}
 												/>
-											</div>
-										) : null}
-									</ProjectNoteCard>
+											</>
+										)}
+									</motion.article>
 								);
 							})
 						)}
 					</AnimatePresence>
 				)}
 			</section>
+			<div
+				className="min-h-0 min-w-0 shrink-0 space-y-3 lg:overflow-y-auto lg:overscroll-contain"
+				data-ui="EditorNotesComposer"
+			>
+				{controller.error === undefined ? null : (
+					<p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
+						{controller.error instanceof Error
+							? controller.error.message
+							: String(controller.error)}
+					</p>
+				)}
+				<div className="rounded-2xl border border-line bg-surface-raised/60 p-5">
+					<NoteForm
+						content={controller.newContent}
+						itemUids={controller.newItemUids}
+						resourceIds={controller.newResourceIds}
+						requiredItemUid={props.requiredCurrentItemUid}
+						requiredResourceId={props.requiredCurrentResourceId}
+						assetFilter={props.assetFilter}
+						assetQuery={props.assetQuery}
+						pending={controller.pending}
+						canSave={controller.canCreate}
+						saveLabel="Create note"
+						onContentChangeFn={controller.setNewContentFn}
+						onItemUidsChangeFn={controller.setNewItemUidsFn}
+						onResourceIdsChangeFn={controller.setNewResourceIdsFn}
+						onSaveFn={controller.createFn}
+					/>
+				</div>
+			</div>
 		</div>
 	);
 };

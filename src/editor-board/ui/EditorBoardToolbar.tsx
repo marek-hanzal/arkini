@@ -48,7 +48,9 @@ export const EditorBoardToolbar = ({
 			}}
 			to="/editor/$projectId/editor/items/list"
 		/>
-		<div className="flex-1" />
+		<h1 className="min-w-0 flex-1 truncate text-xl font-semibold">
+			<Tx label="Board" />
+		</h1>
 		{game === undefined ? null : <BoardGameplayModeControl game={game} />}
 		<EditorPageHelp
 			content={<Mx label="Editor Board help" />}

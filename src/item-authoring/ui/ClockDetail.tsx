@@ -32,17 +32,6 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 			<EditorRootCard dataUi="EditorClockScheduleCard">
 				<DetailFacts>
 					<DetailFact
-						label={translator.textFn("Interval")}
-						description={translator.textFn(
-							"Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.",
-						)}
-						value={
-							clock.intervalMs === undefined
-								? translator.textFn("None")
-								: formatDurationFn(clock.intervalMs)
-						}
-					/>
-					<DetailFact
 						label={translator.textFn("Lifetime")}
 						description={translator.textFn(
 							"Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Accepted production finishes before the item disappears.",
@@ -51,6 +40,17 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 							clock.durationMs === undefined
 								? translator.textFn("Unlimited")
 								: formatDurationFn(clock.durationMs)
+						}
+					/>
+					<DetailFact
+						label={translator.textFn("Interval")}
+						description={translator.textFn(
+							"Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.",
+						)}
+						value={
+							clock.intervalMs === undefined
+								? translator.textFn("None")
+								: formatDurationFn(clock.intervalMs)
 						}
 					/>
 					<DetailFact

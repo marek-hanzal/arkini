@@ -53,7 +53,7 @@ const ClockFields = () => {
 							/>
 						)}
 					</form.AppField>
-					<div className="w-fit pt-6">
+					<div className="mt-6.5 flex h-[var(--ak-control-min-height)] w-fit items-center">
 						<form.AppField name="clock.enable">
 							{(field) => (
 								<field.BoolToggle

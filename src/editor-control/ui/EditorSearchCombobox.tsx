@@ -368,8 +368,13 @@ export const EditorSearchCombobox = ({
 			<span className="flex min-w-0 items-center gap-2">
 				{selectedPreview === undefined || selectedPreview === null ? null : (
 					<span
-						className="shrink-0"
-						data-ui="EditorSearchSelectedPreview"
+						className="relative shrink-0 origin-center rounded-lg transition-[scale,box-shadow,background-color] duration-200 ease-out data-[ui-zoomable=true]:hover:z-40 data-[ui-zoomable=true]:hover:scale-[2.5] data-[ui-zoomable=true]:hover:bg-surface data-[ui-zoomable=true]:hover:shadow-xl"
+						{...readDataUiFn({
+							dataUi: "EditorSearchSelectedPreview",
+							state: {
+								zoomable: selectedOption !== undefined,
+							},
+						})}
 					>
 						{selectedPreview}
 					</span>

@@ -1,5 +1,5 @@
 import { TriangleAlert } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemEstimateViewSchema } from "~/estimate/schema/ItemEstimateViewSchema";
@@ -7,7 +7,9 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
-import { ItemEstimateListRow } from "~/estimate/ui/ItemEstimateListRow";
+import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
+import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
+import { ItemEstimateCard } from "~/estimate/ui/ItemEstimateCard";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { Mx } from "~/translation/ui/Mx";
@@ -35,6 +37,8 @@ const EstimateViewOptions: ReadonlyArray<EditorSelectOption<ItemEstimateViewSche
 	},
 ];
 
+const readItemKeyFn = ({ item }: ItemEstimateIndexRow) => item.uid;
+
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const ItemEstimateList = ({
 	onQueryChangeFn,
@@ -53,21 +57,18 @@ export const ItemEstimateList = ({
 		query: settledQuery,
 		view,
 	});
-	const rows = useMemo(
-		() =>
-			state.rows.map(({ estimate, item }) => (
-				<ItemEstimateListRow
-					estimate={estimate}
-					item={item}
-					key={item.uid}
-					maximumDemand={state.maximumDemand}
-					projectId={project.projectId}
-				/>
-			)),
+	const renderItemFn = useCallback(
+		({ estimate, item }: ItemEstimateIndexRow) => (
+			<ItemEstimateCard
+				estimate={estimate}
+				item={item}
+				maximumDemand={state.maximumDemand}
+				projectId={project.projectId}
+			/>
+		),
 		[
 			project.projectId,
 			state.maximumDemand,
-			state.rows,
 		],
 	);
 	return (
@@ -123,7 +124,14 @@ export const ItemEstimateList = ({
 						No item estimates match the current filters.
 					</p>
 				) : null}
-				{rows}
+				<EditorVirtualCollection
+					items={state.rows}
+					itemKeyFn={readItemKeyFn}
+					renderItemFn={renderItemFn}
+					estimatedRowHeight={352}
+					gapRem={0.75}
+					minColumnWidthRem={19}
+				/>
 			</div>
 		</EditorSectionPage>
 	);

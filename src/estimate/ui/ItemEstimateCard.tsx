@@ -1,7 +1,9 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ItemEstimateIndexEntry } from "~/estimate/type/ItemEstimateIndex";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { ListRow } from "~/item-authoring/ui/ListRow";
+import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { Tx } from "~/translation/ui/Tx";
 
 const runtimeLabelFn = (estimate: ItemEstimateIndexEntry) => {
 	if (estimate.status === "partial") return "Partial";
@@ -28,7 +30,7 @@ const demandLabelFn = (demand: number, maximumDemand: number) => {
 };
 
 /** Presents one compact projection of the cached static estimate. */
-export const ItemEstimateListRow = ({
+export const ItemEstimateCard = ({
 	estimate,
 	item,
 	maximumDemand,
@@ -39,19 +41,36 @@ export const ItemEstimateListRow = ({
 	readonly maximumDemand: number;
 	readonly projectId: string;
 }) => (
-	<ListRow
-		dataUi="EditorItemEstimateRow"
-		item={item}
-		projectId={projectId}
-		sectionId="estimate"
+	<ArtworkCardLink
+		to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+		params={{
+			projectId,
+			itemUid: item.uid,
+			sectionId: "estimate",
+		}}
+		preload="intent"
+		data-ui="EditorItemEstimateCard"
+		data-item-id={item.id}
+		data-item-uid={item.uid}
+		label={item.title}
+		artwork={
+			<EditorItemThumbnail
+				className="aspect-square h-auto w-66 max-w-full rounded-none border-0 bg-transparent"
+				resourceIds={item.asset.default}
+			/>
+		}
 		details={
-			<dl className="pointer-events-none grid shrink-0 gap-1 text-right text-sm tabular-nums">
+			<dl className="grid min-w-0 shrink-0 gap-1 text-right text-xs tabular-nums">
 				<div className="flex items-baseline justify-end gap-1.5">
-					<dt className="text-muted">Estimate:</dt>
+					<dt className="text-muted">
+						<Tx label="Estimate" />:
+					</dt>
 					<dd className="font-semibold text-foreground">{runtimeLabelFn(estimate)}</dd>
 				</div>
 				<div className="flex items-baseline justify-end gap-1.5">
-					<dt className="text-muted">Demand:</dt>
+					<dt className="text-muted">
+						<Tx label="Demand" />:
+					</dt>
 					<dd className="font-semibold text-foreground">
 						{demandLabelFn(estimate.demand, maximumDemand)}
 					</dd>

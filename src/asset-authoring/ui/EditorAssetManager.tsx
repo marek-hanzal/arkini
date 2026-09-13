@@ -1,3 +1,4 @@
+import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { Mx } from "~/translation/ui/Mx";
@@ -13,7 +14,7 @@ import {
 	SearchX,
 	Sparkles,
 } from "lucide-react";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -215,11 +216,14 @@ const EditorAssetCard = ({
 	filter,
 	query,
 	resource,
+	unused,
 }: {
 	readonly filter: "all" | "unused";
 	readonly query: string;
 	readonly resource: Project.Resource;
+	readonly unused: boolean;
 }) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const url = useResourceUrl(resource.id);
 	return (
@@ -236,6 +240,19 @@ const EditorAssetCard = ({
 			preload="intent"
 			data-ui="EditorAssetCard"
 			label={resource.id}
+			details={
+				<span
+					className="shrink-0 rounded-full border border-line-strong bg-surface px-2 py-0.5 text-xs font-medium text-muted data-[ui-unused=true]:border-accent/35 data-[ui-unused=true]:bg-accent/10 data-[ui-unused=true]:text-accent"
+					{...readDataUiFn({
+						dataUi: "EditorAssetUsageBadge",
+						state: {
+							unused,
+						},
+					})}
+				>
+					{unused ? translator.textFn("Unused") : translator.textFn("Used")}
+				</span>
+			}
 			artwork={
 				url === undefined ? (
 					<ImageIcon className="size-8 text-subtle" />
@@ -262,17 +279,26 @@ interface EditorAssetGridProps {
 const readAssetKeyFn = (resource: Project["resources"][number]) => resource.id;
 
 const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps) => {
+	const project = useEditorProject();
+	const usedResourceIds = useMemo(
+		() => new Set(readGameResourceUsagesFn(project.config).map(({ resourceId }) => resourceId)),
+		[
+			project.config,
+		],
+	);
 	const renderAssetFn = useCallback(
 		(resource: Project["resources"][number]) => (
 			<EditorAssetCard
 				filter={filter}
 				query={query}
 				resource={resource}
+				unused={!usedResourceIds.has(resource.id)}
 			/>
 		),
 		[
 			filter,
 			query,
+			usedResourceIds,
 		],
 	);
 	return (

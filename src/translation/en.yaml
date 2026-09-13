@@ -179,6 +179,8 @@ Delete asset:
   value: Delete asset
 Delete item:
   value: Delete item
+Demand:
+  value: Demand
 Depletion output:
   value: Depletion output
 Describe what this line consumes and produces.:
@@ -997,12 +999,16 @@ Unset clock:
   value: Unset clock
 Unset default:
   value: Unset default
+Unused:
+  value: Unused
 Usage:
   value: Usage
 Use:
   value: Use
 Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.:
   value: Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.
+Used:
+  value: Used
 Visible:
   value: Visible
 Visible lines are shown to the player before runtime rules alter their visibility.:

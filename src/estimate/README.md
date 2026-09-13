@@ -23,7 +23,7 @@ estimate/{fn,type} → flow/{fn,type}
 - Flow core reads authored config, Item and production contracts. Its only cross-domain behavior dependency in that set is the canonical authored-Line read from `production-line`.
 - Flow Layout consumes Flow values but owns no relation meaning. Flow Canvas consumes both and owns no graph or geometry truth.
 - Estimate core consumes Flow's acquisition graph. It imports no renderer, route, Electron or runtime gameplay owner.
-- The top-level `estimate ↔ item-authoring` pair is presentation/shared-search composition: Estimate reuses the Item search policy and list row, while Item detail embeds an Estimate section. It is not recursive analysis behavior.
+- The top-level `estimate ↔ item-authoring` pair is presentation/shared-search composition: Estimate reuses the Item search policy and the shared artwork catalog card, while Item detail embeds an Estimate section. It is not recursive analysis behavior.
 - Project Authoring warms or presents Estimate; Estimate worker contracts use the immutable Project type. Project persistence never depends on an Estimate result.
 
 Do not collapse the four roots into a `flow` superdomain. Their change reasons and platform boundaries are different.

@@ -66,14 +66,9 @@ Asset notes empty title:
   value: No notes for this asset yet
 Asset overview help:
   value: |
-    Inspect this project asset before using it in artwork. **Create item** starts a new item draft using this asset. **Edit** lets you rename the asset or replace its PNG image.
+    Inspect the source image, dimensions, MIME type, file size and package status before using this project asset in artwork. **Create item** starts a new item draft using this asset. **Edit** lets you rename the asset or replace its PNG image.
 
     The asset is shared: replacing its image changes every saved reference. **Usage** lists those references; **Notes** keeps linked authoring notes.
-Asset technical help:
-  value: |
-    Inspect the MIME type, file size, resource identity and project revision. This is the saved source image, shared by all project references.
-
-    Use **Edit** to replace the image; technical properties are read from the resource and cannot be changed individually here.
 Asset usage help:
   value: |
     Find saved item and project artwork that refers to this asset. Open a reference to inspect its owner.
@@ -757,8 +752,6 @@ Project general help:
     Inspect the project title, identity and storage dimensions. **Edit** changes the title. The **Project ID** identifies the game and its save namespace; changing it creates a different game identity.
 
     Board, Toolbar and Inventory links open their shared dimensions and authored starting layouts. Use **Export** to save the portable project sources.
-Project revision:
-  value: Project revision
 Queue capacity:
   value: Queue capacity
 Random:
@@ -921,8 +914,6 @@ Target effect:
   value: Target effect
 Target space:
   value: Target space
-Technical:
-  value: Technical
 The authored line selected for automatic Clock impulses. Selecting Default does not change this selection.:
   value: The authored line selected for automatic Clock impulses. Selecting Default does not change this selection.
 The authored line selected for ordinary item activation. The player can change Default independently of Clock.:

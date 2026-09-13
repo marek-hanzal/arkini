@@ -11,10 +11,6 @@ export const EditorAssetSectionHelp = {
 		title: <Tx label="Usage" />,
 		content: <Mx label="Asset usage help" />,
 	},
-	technical: {
-		title: <Tx label="Technical" />,
-		content: <Mx label="Asset technical help" />,
-	},
 	notes: {
 		title: <Tx label="Notes" />,
 		content: <Mx label="Notes help" />,

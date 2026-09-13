@@ -267,6 +267,22 @@ translations:sync() {
 	tsx scripts/translations.ts sync
 }
 
+# @cmd Regenerate the renderer route tree without building the application
+routes() {
+	node --input-type=module -e '
+		import { Generator, getConfig } from "@tanstack/router-generator";
+		const config = getConfig({
+			target: "react",
+			routesDirectory: "./src/@routes",
+			generatedRouteTree: "./src/_route.ts",
+			tmpDir: ".out/cache/tanstack",
+			autoCodeSplitting: false,
+			quoteStyle: "double",
+		});
+		await new Generator({ config, root: process.cwd() }).run();
+	'
+}
+
 # @cmd Check application translations without changing files
 translations:check() {
 	tsx scripts/translations.ts check

@@ -13,7 +13,6 @@ import {
 	editorSectionTabClassName,
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
@@ -26,7 +25,6 @@ import { Status } from "~/ui/ui/Status";
 type EditorAssetDetailPath =
 	| "/editor/$projectId/assets/$resourceId/detail/overview"
 	| "/editor/$projectId/assets/$resourceId/detail/usage"
-	| "/editor/$projectId/assets/$resourceId/detail/technical"
 	| "/editor/$projectId/assets/$resourceId/detail/delete"
 	| "/editor/$projectId/assets/$resourceId/detail/notes";
 
@@ -72,14 +70,14 @@ const EditorAssetDetailTab = ({
 
 export const EditorAssetDetail = ({
 	children,
-	contentVariant = "card",
+	contentMode = "scroll",
 	filter,
 	help,
 	query,
 	resourceId,
 }: PropsWithChildren<{
 	readonly help: EditorPageHelpContent;
-	readonly contentVariant?: "card" | "flat";
+	readonly contentMode?: "scroll" | "viewport";
 	readonly filter: "all" | "unused";
 	readonly query: string;
 	readonly resourceId: string;
@@ -120,6 +118,7 @@ export const EditorAssetDetail = ({
 	}
 	return (
 		<EditorSectionPage
+			contentMode={contentMode}
 			header={
 				<EditorSectionNavigation
 					leading={
@@ -153,14 +152,7 @@ export const EditorAssetDetail = ({
 								resourceId={resourceId}
 								to="/editor/$projectId/assets/$resourceId/detail/usage"
 							/>
-							<EditorAssetDetailTab
-								filter={filter}
-								label="Technical"
-								projectId={project.projectId}
-								query={query}
-								resourceId={resourceId}
-								to="/editor/$projectId/assets/$resourceId/detail/technical"
-							/>
+
 							<EditorAssetDetailTab
 								filter={filter}
 								label="Notes"
@@ -216,11 +208,7 @@ export const EditorAssetDetail = ({
 				/>
 			}
 		>
-			{contentVariant === "flat" ? (
-				children
-			) : (
-				<EditorRootCard dataUi="EditorAssetDetailCard">{children}</EditorRootCard>
-			)}
+			{children}
 		</EditorSectionPage>
 	);
 };

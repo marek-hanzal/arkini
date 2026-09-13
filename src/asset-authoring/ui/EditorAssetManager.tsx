@@ -1,3 +1,4 @@
+import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { Mx } from "~/translation/ui/Mx";
 import { FloatingPortal } from "@floating-ui/react";
@@ -20,7 +21,7 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import type { Project } from "~/project-authoring/type/Project";
-import { Button, ButtonLink, PrimaryButton } from "~/ui/ui/Button";
+import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
@@ -222,7 +223,7 @@ const EditorAssetCard = ({
 	const project = useEditorProject();
 	const url = useResourceUrl(resource.id);
 	return (
-		<ButtonLink
+		<ArtworkCardLink
 			to="/editor/$projectId/assets/$resourceId/detail/overview"
 			params={{
 				projectId: project.projectId,
@@ -232,11 +233,11 @@ const EditorAssetCard = ({
 				filter,
 				query,
 			}}
-			className="group grid min-h-0 min-w-0 grid-rows-[minmax(12rem,1fr)_auto] overflow-hidden rounded-xl border-0 border-l-2 border-line-strong bg-surface-raised/60 p-0 text-left shadow-none hover:bg-surface-raised"
+			preload="intent"
 			data-ui="EditorAssetCard"
-		>
-			<span className="grid min-h-48 place-items-center overflow-hidden p-4">
-				{url === undefined ? (
+			label={resource.id}
+			artwork={
+				url === undefined ? (
 					<ImageIcon className="size-8 text-subtle" />
 				) : (
 					<img
@@ -246,12 +247,9 @@ const EditorAssetCard = ({
 						draggable={false}
 						loading="lazy"
 					/>
-				)}
-			</span>
-			<span className="min-w-0 px-3 py-2.5">
-				<span className="block truncate font-semibold">{resource.id}</span>
-			</span>
-		</ButtonLink>
+				)
+			}
+		/>
 	);
 };
 

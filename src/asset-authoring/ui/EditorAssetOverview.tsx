@@ -1,6 +1,8 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useState } from "react";
 
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
@@ -17,43 +19,72 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 	if (resource === undefined) return null;
 	const currentDimensions = dimensions?.url === url ? dimensions : undefined;
 	return (
-		<section className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(16rem,0.6fr)]">
-			<div className="grid min-h-72 place-items-center overflow-hidden p-5">
+		<section
+			className="mx-auto flex h-full min-h-0 w-3/4 min-w-0 flex-col gap-3 overflow-y-auto p-3"
+			data-ui="EditorAssetOverview"
+		>
+			<div className="grid shrink-0 gap-3 lg:grid-cols-2">
+				<EditorRootCard dataUi="EditorAssetIdentityCard">
+					<FactList>
+						<Fact
+							label={translator.textFn("Resource ID")}
+							mono
+							value={resource.id}
+						/>
+						<Fact
+							label={translator.textFn("Package status")}
+							value={translator.textFn("Included in current project")}
+						/>
+					</FactList>
+				</EditorRootCard>
+				<EditorRootCard dataUi="EditorAssetImageDetailsCard">
+					<FactList columns={3}>
+						<Fact
+							label={translator.textFn("Dimensions")}
+							value={
+								currentDimensions === undefined
+									? translator.textFn("Reading image…")
+									: `${currentDimensions.width} × ${currentDimensions.height} px`
+							}
+						/>
+						<Fact
+							label={translator.textFn("MIME type")}
+							mono
+							value={resource.mime}
+						/>
+						<Fact
+							label={translator.textFn("Byte size")}
+							value={formatByteSizeFn(resource.size)}
+						/>
+					</FactList>
+				</EditorRootCard>
+			</div>
+			<div
+				className="grid min-h-48 min-w-0 flex-1 place-items-center [container-type:size]"
+				data-ui="EditorAssetPreviewArea"
+			>
 				{url === undefined ? (
 					<p className="text-sm text-muted">
 						{translator.textFn("Preparing asset preview…")}
 					</p>
 				) : (
-					<img
-						src={url}
-						alt={`${resource.id} preview`}
-						className="max-h-[32rem] max-w-full object-contain"
-						draggable={false}
-						onLoad={(event) =>
-							setDimensionsFn({
-								height: event.currentTarget.naturalHeight,
-								url,
-								width: event.currentTarget.naturalWidth,
-							})
-						}
-					/>
+					<div className="grid size-[min(80cqh,100cqw)] place-items-center overflow-hidden rounded-2xl border-2 border-accent bg-canvas/70">
+						<img
+							src={url}
+							alt={`${resource.id} preview`}
+							className="size-full object-contain"
+							draggable={false}
+							onLoad={(event) =>
+								setDimensionsFn({
+									height: event.currentTarget.naturalHeight,
+									url,
+									width: event.currentTarget.naturalWidth,
+								})
+							}
+						/>
+					</div>
 				)}
 			</div>
-			<FactList>
-				<Fact
-					label={translator.textFn("Resource ID")}
-					mono
-					value={resource.id}
-				/>
-				<Fact
-					label={translator.textFn("Dimensions")}
-					value={
-						currentDimensions === undefined
-							? translator.textFn("Reading image…")
-							: `${currentDimensions.width} × ${currentDimensions.height} px`
-					}
-				/>
-			</FactList>
 		</section>
 	);
 };

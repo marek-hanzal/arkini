@@ -11,7 +11,8 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
-import { ListRow } from "~/item-authoring/ui/ListRow";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
@@ -60,9 +61,25 @@ export const List = ({
 	);
 	const renderItemFn = useCallback(
 		(item: ItemSchema.Type) => (
-			<ListRow
-				item={item}
-				projectId={project.projectId}
+			<ArtworkCardLink
+				to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+				params={{
+					projectId: project.projectId,
+					itemUid: item.uid,
+					sectionId: "identity",
+				}}
+				preload="intent"
+				data-ui="EditorItemCard"
+				data-item-id={item.id}
+				data-item-uid={item.uid}
+				label={item.title}
+				description={item.id}
+				artwork={
+					<EditorItemThumbnail
+						className="aspect-square h-auto w-66 max-w-full rounded-none border-0 bg-transparent"
+						resourceIds={item.asset.default}
+					/>
+				}
 			/>
 		),
 		[
@@ -149,8 +166,9 @@ export const List = ({
 					items={filteredItems}
 					itemKeyFn={readItemKeyFn}
 					renderItemFn={renderItemFn}
-					estimatedRowHeight={120}
-					gapRem={0.5}
+					estimatedRowHeight={352}
+					gapRem={0.75}
+					minColumnWidthRem={19}
 				/>
 			</div>
 		</EditorSectionPage>

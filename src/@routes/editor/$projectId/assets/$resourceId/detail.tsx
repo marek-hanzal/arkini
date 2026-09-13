@@ -3,12 +3,6 @@ import { createFileRoute, Outlet, useMatchRoute, useSearch } from "@tanstack/rea
 import { EditorAssetSectionHelp } from "~/asset-authoring/ui/EditorAssetSectionHelp";
 import { EditorAssetDetail } from "~/asset-authoring/ui/EditorAssetDetail";
 
-const FlatAssetDetailRoutes = [
-	"/editor/$projectId/assets/$resourceId/detail/notes",
-	"/editor/$projectId/assets/$resourceId/detail/usage",
-	"/editor/$projectId/assets/$resourceId/detail/delete",
-] as const;
-
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail")({
 	component: () => {
 		const { projectId, resourceId } = Route.useParams();
@@ -20,20 +14,10 @@ export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/deta
 			projectId,
 			resourceId,
 		};
-		const flatContentActive = FlatAssetDetailRoutes.some(
-			(to) =>
-				matchRouteFn({
-					includeSearch: false,
-					params: detailParams,
-					pending: false,
-					to,
-				}) !== false,
-		);
 		const section =
 			(
 				[
 					"usage",
-					"technical",
 					"notes",
 					"delete",
 				] as const
@@ -49,7 +33,7 @@ export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/deta
 		return (
 			<EditorAssetDetail
 				help={EditorAssetSectionHelp[section]}
-				contentVariant={flatContentActive ? "flat" : "card"}
+				contentMode={section === "overview" ? "viewport" : "scroll"}
 				filter={search.filter ?? "all"}
 				query={search.query ?? ""}
 				resourceId={resourceId}

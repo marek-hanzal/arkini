@@ -160,8 +160,8 @@ export const List = ({
 				}
 				cornerEnd={
 					readDraftFn(item) ? (
-						<span className="text-xs font-medium text-accent">
-							{translator.textFn("(draft)")}
+						<span className="rounded-full border border-accent/35 bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+							{translator.textFn("Draft")}
 						</span>
 					) : undefined
 				}

@@ -238,7 +238,13 @@ const EditorAssetCard = ({
 				query,
 			}}
 			preload="intent"
-			data-ui="EditorAssetCard"
+			className="data-[ui-unused=true]:bg-accent/10 data-[ui-unused=true]:hover:bg-accent/15"
+			{...readDataUiFn({
+				dataUi: "EditorAssetCard",
+				state: {
+					unused,
+				},
+			})}
 			label={resource.id}
 			details={
 				<span

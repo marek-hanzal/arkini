@@ -64,6 +64,7 @@ export const updateActorProgressFx = Effect.fnUntraced(function* ({
 	const pulse = item.location.scope === "board" ? item.clockPulse : undefined;
 	ring.clear();
 	ring.visible = pulse !== undefined;
+	ring.alpha = pulse?.enabled === false ? 0.5 : 1;
 	if (pulse !== undefined) {
 		const inset = (size * (1 - item.artworkScale)) / 2;
 		const faceSize = Math.max(1, size * item.artworkScale);
@@ -71,8 +72,7 @@ export const updateActorProgressFx = Effect.fnUntraced(function* ({
 		const x = inset + radius + faceSize * 0.05;
 		const y = inset + radius + faceSize * 0.05;
 		const stroke = radius * 0.18;
-		const color = pulse.enabled ? palette.accent : palette.overlayForeground;
-		const alpha = pulse.enabled ? 0.9 : 0.4;
+		const color = palette.overlayForeground;
 		const ratio = Math.max(0, Math.min(1, 1 - pulse.remainingMs / pulse.intervalMs));
 		ring.circle(x, y, radius + stroke).fill({
 			color: palette.overlay,
@@ -88,7 +88,7 @@ export const updateActorProgressFx = Effect.fnUntraced(function* ({
 				.arc(x, y, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ratio)
 				.stroke({
 					color,
-					alpha,
+					alpha: 1,
 					width: stroke,
 				});
 		ring.moveTo(x, y - radius * 0.5)
@@ -96,7 +96,7 @@ export const updateActorProgressFx = Effect.fnUntraced(function* ({
 			.lineTo(x + radius * 0.35, y + radius * 0.2)
 			.stroke({
 				color,
-				alpha,
+				alpha: 1,
 				width: stroke,
 				cap: "round",
 				join: "round",

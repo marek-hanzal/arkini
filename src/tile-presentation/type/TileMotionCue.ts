@@ -11,6 +11,8 @@ interface TileMotionCueBase {
 
 export interface TileSpawnMotionCue extends TileMotionCueBase {
 	readonly kind: "spawn";
+	/** The removed source yields its own slot only after the rest of its output batch settles. */
+	readonly revealAtOriginExit?: true;
 	readonly actorId: string;
 }
 

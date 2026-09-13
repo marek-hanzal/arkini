@@ -116,6 +116,15 @@ const readSpawnCueFn = ({
 	if (originLocation === null || target === null) return null;
 	return {
 		kind: "spawn",
+		...(!transition.runtime.items.some((item) => item.id === event.originItemId) &&
+		isSameGridLocationFn({
+			left: originLocation,
+			right: target.location,
+		})
+			? {
+					revealAtOriginExit: true as const,
+				}
+			: {}),
 		sequence: transition.sequence,
 		eventIndex,
 		actorId: target.id,

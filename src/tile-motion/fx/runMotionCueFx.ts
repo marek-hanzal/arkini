@@ -28,6 +28,7 @@ export namespace runMotionCueFx {
 		readonly magneticField: MagneticField;
 		readonly isCueActiveFn: () => boolean;
 		readonly onCompleteFn: () => void;
+		readonly onSpawnRevealFn: () => void;
 		readonly onSwapLegSettledFn: (actorId: string) => void;
 		readonly onSwapLegStartedFn: (actorId: string) => void;
 		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
@@ -85,6 +86,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	magneticField,
 	isCueActiveFn,
 	onCompleteFn,
+	onSpawnRevealFn,
 	onSwapLegSettledFn,
 	onSwapLegStartedFn,
 	onPayloadCreatedFn,
@@ -124,11 +126,13 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									actorStore,
 									animator,
 									cue: spawn,
+									isCueActiveFn,
+									onRevealFn: onSpawnRevealFn,
 									cueKey,
-									delayMs,
+									delayMs: spawn.revealAtOriginExit ? 0 : delayMs,
 									magneticField,
 									onCompleteFn,
-									origin,
+									origin: spawn.revealAtOriginExit ? target : origin,
 									surface,
 									target,
 								}),

@@ -150,7 +150,21 @@ const settleTileMotionLanesFn = (
 	};
 	for (const cue of state.pending) {
 		const cueClaims = readTileMotionLaneClaimsFn(cue);
-		if (canActivateTileMotionCueFn(settlement, cueClaims)) {
+		// A local replacement must not occupy a bounded lane while waiting for outgoing drops.
+		const waitingForOutputs =
+			cue.kind === "spawn" &&
+			cue.revealAtOriginExit === true &&
+			[
+				...state.active,
+				...state.pending,
+			].some(
+				(other) =>
+					other.sequence === cue.sequence &&
+					other.originActorId === cue.originActorId &&
+					((other.kind === "stack" && other.targetActorId !== cue.actorId) ||
+						(other.kind === "spawn" && other.revealAtOriginExit !== true)),
+			);
+		if (!waitingForOutputs && canActivateTileMotionCueFn(settlement, cueClaims)) {
 			settlement.active.push(cue);
 			settlement.claims.push(...cueClaims);
 		} else {

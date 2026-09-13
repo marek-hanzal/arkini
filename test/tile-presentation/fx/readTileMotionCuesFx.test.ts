@@ -234,3 +234,44 @@ describe("readTileMotionCuesFx", () => {
 		expect(cues).toEqual([]);
 	});
 });
+
+it.each([
+	true,
+	false,
+])("marks a same-slot spawn for source exit only when the source is removed (%s)", (removed) => {
+	const cues = Effect.runSync(
+		readCues({
+			sequence: 50,
+			previousRuntime: runtime,
+			runtime: {
+				...runtime,
+				items: runtime.items
+					.filter((item) => !removed || item.id !== source.id)
+					.map((item) =>
+						item.id === target.id
+							? {
+									...item,
+									location: sourceLocation,
+								}
+							: item,
+					),
+			},
+			events: [
+				{
+					type: GameEventEnumSchema.enum.ItemSpawned,
+					itemId: target.id,
+					canonicalItemId: target.item.id,
+					originItemId: source.id,
+					location: sourceLocation,
+					quantity: 1,
+				},
+			],
+		}),
+	);
+	expect(cues).toHaveLength(1);
+	expect(cues[0]).toMatchObject({
+		kind: "spawn",
+		targetLocation: sourceLocation,
+	});
+	expect(cues[0]?.kind === "spawn" && cues[0].revealAtOriginExit === true).toBe(removed);
+});

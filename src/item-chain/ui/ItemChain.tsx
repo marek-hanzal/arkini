@@ -11,7 +11,6 @@ import { Status } from "~/ui/ui/Status";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 const stopLabels = {
-	final: "Final item",
 	retained: "Remains",
 	spent: "Spends one unit",
 	cycle: "Clock loop",
@@ -160,31 +159,34 @@ const ChainExplorer = ({ itemId }: { readonly itemId: string }) => {
 										data-ui="EditorChainOutcome"
 									>
 										{outcome.itemId === undefined ? null : (
-											<ItemReference itemId={outcome.itemId} />
+											<ItemReference
+												itemId={outcome.itemId}
+												sectionId="chain"
+											/>
 										)}
-										<p className="mt-1 text-xs text-muted">
-											{translator.textFn(stopLabels[outcome.stop])}
-											{outcome.periodic
-												? ` · ${translator.textFn("Repeated output")}`
-												: ""}
-											{outcome.conditional
-												? ` · ${translator.textFn("Conditional or alternative")}`
-												: ""}
-										</p>
-										{outcome.itemId === undefined ? null : (
-											<ButtonLink
-												className="mt-1 min-h-0 border-0 bg-transparent p-0 text-xs text-accent shadow-none"
-												to="/editor/$projectId/chains"
-												params={{
-													projectId: project.projectId,
-												}}
-												search={{
-													itemId: outcome.itemId,
-												}}
-											>
-												{translator.textFn("Explore from here")}
-											</ButtonLink>
-										)}
+										{outcome.stop !== "final" ||
+										outcome.periodic ||
+										outcome.conditional ? (
+											<p className="mt-1 text-xs text-muted">
+												{[
+													outcome.stop === "final"
+														? null
+														: translator.textFn(
+																stopLabels[outcome.stop],
+															),
+													outcome.periodic
+														? translator.textFn("Repeated output")
+														: null,
+													outcome.conditional
+														? translator.textFn(
+																"Conditional or alternative",
+															)
+														: null,
+												]
+													.filter(Boolean)
+													.join(" · ")}
+											</p>
+										) : null}
 									</div>
 								))}
 							</div>
@@ -213,7 +215,13 @@ const ChainExplorer = ({ itemId }: { readonly itemId: string }) => {
 	);
 };
 
-const ItemReference = ({ itemId }: { readonly itemId: string }) => {
+const ItemReference = ({
+	itemId,
+	sectionId = "identity",
+}: {
+	readonly itemId: string;
+	readonly sectionId?: "identity" | "chain";
+}) => {
 	const project = useEditorProject();
 	const item = project.config.items[itemId];
 	if (item === undefined) return <span className="text-muted">{itemId}</span>;
@@ -223,7 +231,7 @@ const ItemReference = ({ itemId }: { readonly itemId: string }) => {
 			params={{
 				projectId: project.projectId,
 				itemUid: item.uid,
-				sectionId: "identity",
+				sectionId,
 			}}
 			search={{}}
 			className="min-h-0 max-w-full justify-start gap-2 border-0 bg-transparent p-0 text-left text-sm shadow-none hover:bg-transparent hover:text-accent"
@@ -327,7 +335,7 @@ const ChainStep = ({
 				{step.branches.map((node) => (
 					<div
 						key={node.path}
-						className="border-l-2 border-line pl-3"
+						className="border-l-2 border-accent pl-24"
 						data-ui="EditorChainBranch"
 					>
 						<div className="flex flex-wrap items-center gap-2">
@@ -335,7 +343,7 @@ const ChainStep = ({
 							{node.quantity === undefined ? null : (
 								<span className="text-sm">{quantityFn(node.quantity)}</span>
 							)}
-							{node.stop === undefined ? null : (
+							{node.stop === undefined || node.stop === "final" ? null : (
 								<span className="text-xs text-muted">
 									{translator.textFn(stopLabels[node.stop])}
 								</span>

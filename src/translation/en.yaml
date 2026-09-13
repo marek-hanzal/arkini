@@ -135,7 +135,7 @@ Chain help:
 
     - The starting item owns the merge direction. Dropping A onto B is separate from dropping B onto A; only the starting item's own merge rules are listed.
     - The starting item's own Clock is also available. After the first operation, only Clock expiry and the output of its Clock-selected production line continue. Intermediate merge rules and production input chains are ignored.
-    - Each emitted item without a Clock ends its branch. Results include items emitted along the way. Explore from here explicitly starts a new investigation, including that item's own merges.
+    - Each emitted item without a Clock ends its branch. Results include items emitted along the way. Click a result item to open its Chain tab and start a new investigation, including that item's own merges.
     - Periodic output is shown once per admitted line run, with its interval, line duration and owner lifetime. It is not an accumulated yield or a promise of successful production.
     - Show steps and quantities reveals each operation. Quantities belong to that operation, not the whole chain. Output sets are alternatives; rolls within a selected set run together; weighted candidates are alternatives per selection. Conditions and chance remain visible.
     - Maximum steps counts one merge or one Clock operation as a step. Depth limits, manually stopped branches and Clock loops are unfinished paths, not final items. Stop here prunes one branch; Continue branch restores it. Reaching the safety limit explicitly reports incomplete exploration.
@@ -362,8 +362,6 @@ Exists:
   value: Exists
 Expiry output:
   value: Expiry output
-Explore from here:
-  value: Explore from here
 Extra output:
   value: Extra output
 Far:
@@ -371,9 +369,6 @@ Far:
   dynamic: true
 Fastest first:
   value: Fastest first
-Final item:
-  value: Final item
-  dynamic: true
 Finishing accepted work:
   value: Finishing accepted work
 Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.:

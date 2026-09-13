@@ -1,0 +1,96 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "k3p9zu3b6u3ax2qtzlmg6a2o",
+		"id": "steam-corn-processing",
+		"title": "Steam Corn Processing",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"steam-corn-processing"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 6,
+		"lines": [
+			{
+				"id": "corn",
+				"title": "Corn",
+				"description": "Automatic corn production",
+				"clock": true,
+				"default": true,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "order-corn"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "corn",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

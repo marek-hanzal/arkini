@@ -9,7 +9,7 @@
 		"title": "Arkini",
 		"board": {
 			"width": 17,
-			"height": 13
+			"height": 11
 		},
 		"inventory": {
 			"width": 15,
@@ -276,24 +276,24 @@
 				"quantity": 1
 			},
 			{
-				"x": 5,
-				"y": 0,
-				"space": 0,
-				"itemId": "stone-deposit",
-				"quantity": 1
-			},
-			{
 				"x": 8,
-				"y": 6,
+				"y": 4,
 				"space": 0,
-				"itemId": "base-camp",
+				"itemId": "foundation-chest",
 				"quantity": 1
 			},
 			{
 				"x": 8,
 				"y": 5,
 				"space": 0,
-				"itemId": "foundation-chest",
+				"itemId": "base-camp",
+				"quantity": 1
+			},
+			{
+				"x": 16,
+				"y": 0,
+				"space": 0,
+				"itemId": "stone-deposit",
 				"quantity": 1
 			}
 		],

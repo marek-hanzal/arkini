@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "sbje5sv1rl25l4uddi0kds2x",
+		"id": "order",
+		"title": "Order",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"order"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

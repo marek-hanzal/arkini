@@ -4,13 +4,23 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
+
+const state = vi.hoisted(() => ({
+	origins: [] as readItemConnectionFactsFn.Origin[],
+}));
+
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		config: {
 			items: {
 				consumer: {
 					maxQueueSize: 1,
-					lines: [],
+					lines: [
+						{
+							id: "specific-line",
+						},
+					],
 
 					asset: {
 						scale: 0.8,
@@ -24,7 +34,11 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 				},
 				peer: {
 					maxQueueSize: 1,
-					lines: [],
+					lines: [
+						{
+							id: "specific-line",
+						},
+					],
 
 					asset: {
 						scale: 0.8,
@@ -38,7 +52,11 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 				},
 				unrelated: {
 					maxQueueSize: 1,
-					lines: [],
+					lines: [
+						{
+							id: "specific-line",
+						},
+					],
 
 					asset: {
 						scale: 0.8,
@@ -67,7 +85,11 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 		[
 			{
 				maxQueueSize: 1,
-				lines: [],
+				lines: [
+					{
+						id: "specific-line",
+					},
+				],
 
 				asset: {
 					scale: 0.8,
@@ -81,7 +103,11 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 			},
 			{
 				maxQueueSize: 1,
-				lines: [],
+				lines: [
+					{
+						id: "specific-line",
+					},
+				],
 
 				asset: {
 					scale: 0.8,
@@ -95,7 +121,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 			},
 		].map((item) => ({
 			item,
-			origins: [],
+			origins: state.origins,
 		})),
 }));
 
@@ -152,6 +178,12 @@ vi.mock("~/ui/ui/Button", () => ({
 		),
 }));
 
+vi.mock("~/ui/ui/LinkButton", async () => ({
+	LinkButtonLink: (await import("~/ui/ui/Button")).ButtonLink,
+}));
+
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ConnectionsSummaryDetail } from "~/item-authoring/ui/ConnectionsSummaryDetail";
 import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
 
 (
@@ -167,10 +199,11 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	document.body.replaceChildren();
+	state.origins = [];
 });
 
 describe("ConnectionsSection", () => {
-	it("searches only the active connection list and preserves the filter through result navigation", async () => {
+	it("searches only the active connection list and opens result identity detail", async () => {
 		const onFilterChangeFn = vi.fn();
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -204,10 +237,165 @@ describe("ConnectionsSection", () => {
 		expect(JSON.parse(link?.dataset.params ?? "null")).toEqual({
 			itemUid: "consumer-uid",
 			projectId: "project-one",
+			sectionId: "identity",
+		});
+		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({});
+	});
+});
+
+// The origin belongs to the referenced owner for reverse views and the current owner for forward views.
+it.each([
+	{
+		filter: "produced-by",
+		source: {
+			type: "expiry",
+		},
+		sectionId: "clock",
+		ownerUid: "consumer-uid",
+		search: {
+			outputSet: 1,
+			outputRoll: 2,
+		},
+	},
+	{
+		filter: "required-by",
+		source: {
+			type: "line",
+			lineIndex: 0,
+			title: "Line",
+		},
+		sectionId: "production",
+		ownerUid: "consumer-uid",
+		search: {
+			lineId: "specific-line",
+			outputSet: 1,
+			outputRoll: 2,
+		},
+	},
+	{
+		filter: "produces",
+		source: {
+			type: "merge",
+			mergeIndex: 2,
+		},
+		sectionId: "merges",
+		ownerUid: "unrelated-uid",
+		search: {
+			merge: 2,
+			outputSet: 1,
+			outputRoll: 2,
+		},
+	},
+	{
+		filter: "inputs",
+		source: {
+			type: "line",
+			lineIndex: 0,
+			title: "Line",
+		},
+		sectionId: "production",
+		ownerUid: "unrelated-uid",
+		search: {
+			lineId: "specific-line",
+			outputSet: 1,
+			outputRoll: 2,
+		},
+	},
+] as const)(
+	"links $filter provenance to its exact owner independently of the row",
+	async ({ filter, source, sectionId, ownerUid, search }) => {
+		state.origins = [
+			{
+				source,
+				role: "output",
+				roll: {
+					setIndex: 1,
+					rollIndex: 2,
+					rollType: "guaranteed",
+				},
+			},
+		];
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () =>
+			root.render(
+				<ConnectionsSection
+					filter={filter}
+					itemId="unrelated"
+					onFilterChangeFn={() => {}}
+				/>,
+			),
+		);
+		const row = container.querySelector('[data-ui="EditorItemConnectionsRow"]');
+		const originLink = row?.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorItemConnectionOriginLink"]',
+		);
+		const detailLink = row?.querySelector<HTMLAnchorElement>("a");
+		expect(JSON.parse(detailLink?.dataset.params ?? "null")).toEqual({
+			projectId: "project-one",
+			itemUid: "consumer-uid",
+			sectionId: "identity",
+		});
+		expect(JSON.parse(originLink?.dataset.params ?? "null")).toEqual({
+			projectId: "project-one",
+			itemUid: ownerUid,
+			sectionId,
+		});
+		expect(JSON.parse(originLink?.dataset.search ?? "null")).toEqual(search);
+		expect(originLink?.dataset.to).toBe(
+			"/editor/$projectId/editor/items/$itemUid/form/$sectionId",
+		);
+		expect(detailLink?.contains(originLink ?? null)).toBe(false);
+		expect(originLink?.parentElement?.closest("a")).toBeNull();
+	},
+);
+
+it("opens each overview preview's complete collection on the current item", async () => {
+	const item = ItemSchema.parse({
+		id: "overview",
+		uid: "overview-uid",
+		title: "Overview",
+		scope: "any",
+		maxStackSize: 1,
+		asset: {
+			scale: 0.8,
+			default: [
+				"overview",
+			],
+		},
+		lines: [],
+	});
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => root.render(<ConnectionsSummaryDetail item={item} />));
+	const links = [
+		...container.querySelectorAll<HTMLAnchorElement>(
+			'[data-ui="EditorItemCollectionMoreCard"] a',
+		),
+	];
+	expect(links.map((link) => JSON.parse(link.dataset.search ?? "null"))).toEqual([
+		{
+			filter: "required-by",
+		},
+		{
+			filter: "inputs",
+		},
+		{
+			filter: "produces",
+		},
+		{
+			filter: "produced-by",
+		},
+	]);
+	for (const link of links) {
+		expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
+			projectId: "project-one",
+			itemUid: "overview-uid",
 			sectionId: "connections",
 		});
-		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
-			filter: "inputs",
-		});
-	});
+	}
 });

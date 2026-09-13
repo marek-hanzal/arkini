@@ -20,6 +20,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 export interface EditorSelectOption<Value extends string> {
 	readonly disabled?: boolean;
 	readonly label: string;
+	readonly trailingLabel?: string;
 	readonly value: Value;
 }
 
@@ -79,6 +80,11 @@ export const EditorSelect = <Value extends string>({
 				})}
 			>
 				<span>{selected?.label ?? value}</span>
+				{selected?.trailingLabel === undefined ? null : (
+					<span className="ml-auto text-subtle tabular-nums">
+						{selected.trailingLabel}
+					</span>
+				)}
 				<ChevronDown className="size-4 shrink-0 text-muted" />
 			</Button>
 			{open ? (
@@ -107,8 +113,19 @@ export const EditorSelect = <Value extends string>({
 									},
 								})}
 							>
-								{option.label}
-								{option.value === value ? (
+								<span>{option.label}</span>
+								{option.trailingLabel === undefined ? null : (
+									<span className="ml-auto text-subtle tabular-nums">
+										{option.trailingLabel}
+									</span>
+								)}
+								{option.trailingLabel !== undefined ? (
+									<span className="size-4 shrink-0">
+										{option.value === value ? (
+											<Check className="size-4" />
+										) : null}
+									</span>
+								) : option.value === value ? (
 									<Check className="size-4 shrink-0" />
 								) : null}
 							</button>

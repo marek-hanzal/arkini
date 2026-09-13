@@ -47,6 +47,8 @@ interface FormProps extends PropsWithChildren {
 	readonly enableCapability?: OptionalCapability;
 	readonly create?: boolean;
 	readonly mergeIndex?: number;
+	readonly outputSetIndex?: number;
+	readonly outputRollIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
 	readonly sectionId?: SectionId;
@@ -62,6 +64,8 @@ export const Form = ({
 	enableCapability,
 	create,
 	mergeIndex,
+	outputSetIndex,
+	outputRollIndex,
 	productionLineId,
 	resourceId,
 	sectionId = "identity",
@@ -83,6 +87,8 @@ export const Form = ({
 			isNew={isNew}
 			create={create}
 			mergeIndex={mergeIndex}
+			outputSetIndex={outputSetIndex}
+			outputRollIndex={outputRollIndex}
 			productionLineId={productionLineId}
 			resourceId={resourceId}
 			sectionId={sectionId}

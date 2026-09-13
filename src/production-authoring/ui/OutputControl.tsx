@@ -1,3 +1,4 @@
+import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
@@ -19,6 +20,7 @@ interface OutputControlProps {
 
 /** Edits weighted output sets through their concrete RollSet domain. */
 export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
+	const { outputSetIndex, outputRollIndex } = useFormSession();
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const validationIssues = useFormValidationIssues(value);
 	const invalidSetIndex = validationIssues.find(
@@ -34,6 +36,8 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 			<EditorCollectionSelector
 				addLabel="Add output set"
 				count={value.set.length}
+				initialSelectedIndex={outputSetIndex}
+				key={outputSetIndex}
 				itemLabelFn={(index) => {
 					const roll = value.set[index].roll[0];
 					const itemId = roll === undefined ? undefined : readFirstRollItemIdFn(roll);
@@ -83,6 +87,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 				{(index) => (
 					<RollSetControl
 						index={index}
+						initialRollIndex={index === outputSetIndex ? outputRollIndex : undefined}
 						value={value.set[index]}
 						onChangeFn={(next) =>
 							next === undefined

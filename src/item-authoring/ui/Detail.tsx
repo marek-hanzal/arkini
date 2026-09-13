@@ -49,6 +49,7 @@ export const Detail = ({
 	return (
 		<EditorSectionPage
 			contentMode={sectionId === "notes" ? "viewport" : "scroll"}
+			fillContent={sectionId === "connections"}
 			header={
 				<EditorSectionNavigation
 					leading={

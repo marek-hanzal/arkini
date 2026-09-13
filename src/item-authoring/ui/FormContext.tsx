@@ -5,6 +5,8 @@ type FormSession = useFormController.Output & {
 	readonly isNew: boolean;
 	readonly create?: boolean;
 	readonly mergeIndex?: number;
+	readonly outputSetIndex?: number;
+	readonly outputRollIndex?: number;
 	readonly productionLineId?: string;
 };
 

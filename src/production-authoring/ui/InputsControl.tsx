@@ -1,4 +1,7 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -25,6 +28,7 @@ export const InputsControl = ({
 	value,
 }: InputsControlProps) => {
 	const translator = useTranslator();
+	const project = useEditorProject();
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const { form, itemId } = useFormSession();
 	const selfUnitsEnabled = useStore(form.store, (state) => state.values.units !== undefined);
@@ -86,6 +90,37 @@ export const InputsControl = ({
 					return [];
 				}}
 				label={allowMaterials ? "Line inputs" : "Action inputs"}
+				renderItemContentFn={(index, label) => {
+					const input = value[index];
+					if (input.type !== "materials") return label;
+					const { min, max } = input.quantity;
+					return (
+						<EditorCollectionOption
+							label={label}
+							details={
+								<span className="text-xs text-subtle">
+									{min === max ? `×${min}` : `×${min}–${max}`}
+									{" · "}
+									{translator.textFn(
+										input.mode === "consume" ? "Consume" : "Reserve",
+									)}
+									{" · "}
+									{translator.textFn("Buffer")}: {input.capacity}
+								</span>
+							}
+						>
+							<EditorItemThumbnail
+								size="md"
+								className="rounded-md"
+								resourceIds={
+									project.config.items[input.selector.itemId]?.asset.default ?? [
+										"",
+									]
+								}
+							/>
+						</EditorCollectionOption>
+					);
+				}}
 				onAddFn={() =>
 					onChangeFn([
 						...value,

@@ -28,6 +28,8 @@ export const FormSession = ({
 	isNew,
 	create,
 	mergeIndex,
+	outputSetIndex,
+	outputRollIndex,
 	productionLineId,
 	resourceId,
 	sectionId,
@@ -40,6 +42,8 @@ export const FormSession = ({
 	readonly isNew: boolean;
 	readonly create?: boolean;
 	readonly mergeIndex?: number;
+	readonly outputSetIndex?: number;
+	readonly outputRollIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
 	readonly sectionId: SectionId;
@@ -153,6 +157,8 @@ export const FormSession = ({
 			isNew,
 			create,
 			mergeIndex,
+			outputSetIndex,
+			outputRollIndex,
 			productionLineId,
 		}),
 		[
@@ -160,6 +166,8 @@ export const FormSession = ({
 			isNew,
 			create,
 			mergeIndex,
+			outputSetIndex,
+			outputRollIndex,
 			productionLineId,
 		],
 	);

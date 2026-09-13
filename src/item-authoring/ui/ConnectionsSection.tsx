@@ -1,5 +1,3 @@
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
-import { ChevronRight, Unlink } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -10,12 +8,11 @@ import {
 	EditorSearchCombobox,
 } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorSelect } from "~/editor-control/ui/EditorSelect";
-import type { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
-import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Status } from "~/ui/ui/Status";
+import { ItemConnectionRow } from "~/item-authoring/ui/ItemConnectionRow";
+import { ItemConnectionsEmpty } from "~/item-authoring/ui/ItemConnectionsEmpty";
 
 const ConnectionFilterOptions = [
 	{
@@ -36,33 +33,6 @@ const ConnectionFilterOptions = [
 	},
 ] as const;
 
-const EmptyStateByFilter = {
-	"required-by": {
-		description: "No authored item directly inputs or positively requires this item.",
-		title: "Nothing requires this item",
-	},
-	inputs: {
-		description:
-			"No authored operation owned by this item directly inputs or positively requires another item.",
-		title: "This item has no inputs",
-	},
-	produces: {
-		description: "No authored operation owned by this item outputs another item.",
-		title: "This item produces nothing",
-	},
-	"produced-by": {
-		description:
-			"No other authored item outputs this item through production, expiry, units, or merges.",
-		title: "Nothing produces this item",
-	},
-} as const satisfies Record<
-	ItemConnectionFilter,
-	{
-		readonly description: string;
-		readonly title: string;
-	}
->;
-
 interface ConnectionsSectionProps {
 	readonly filter: ItemConnectionFilter;
 	readonly itemId: string;
@@ -77,14 +47,19 @@ export const ConnectionsSection = ({
 }: ConnectionsSectionProps) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const connectionItems = useMemo(
-		() => readItemConnectionsFn(project.config, itemId, filter),
+	const connectionsByFilter = useMemo(
+		() => ({
+			"required-by": readItemConnectionsFn(project.config, itemId, "required-by"),
+			inputs: readItemConnectionsFn(project.config, itemId, "inputs"),
+			produces: readItemConnectionsFn(project.config, itemId, "produces"),
+			"produced-by": readItemConnectionsFn(project.config, itemId, "produced-by"),
+		}),
 		[
-			filter,
 			itemId,
 			project.config,
 		],
 	);
+	const connectionItems = connectionsByFilter[filter];
 	const searchScope = `${itemId}:${filter}`;
 	const [searchSelection, setSearchSelectionFn] = useState({
 		itemId: "",
@@ -117,11 +92,10 @@ export const ConnectionsSection = ({
 		selectedConnectionId.length === 0
 			? connectionItems
 			: connectionItems.filter(({ item }) => item.id === selectedConnectionId);
-	const emptyState = EmptyStateByFilter[filter];
 
 	return (
 		<div
-			className="grid gap-3"
+			className="flex flex-1 flex-col gap-3"
 			data-ui="EditorItemConnections"
 		>
 			<EditorRootCard dataUi="EditorItemConnectionsControls">
@@ -170,6 +144,10 @@ export const ConnectionsSection = ({
 						options={ConnectionFilterOptions.map((option) => ({
 							...option,
 							label: translator.textFn(option.label),
+							trailingLabel:
+								connectionsByFilter[option.value].length === 0
+									? translator.textFn("None")
+									: String(connectionsByFilter[option.value].length),
 						}))}
 						size="control"
 						value={filter}
@@ -178,17 +156,9 @@ export const ConnectionsSection = ({
 			</EditorRootCard>
 
 			{connectionItems.length === 0 ? (
-				<Status
-					dataUi="EditorItemConnectionsEmpty"
-					icon={Unlink}
-					title={
-						<span className="inline-flex items-center gap-1.5">
-							{translator.textFn(emptyState.title)}
-							<EditorInfoTooltip
-								content={translator.textFn(emptyState.description)}
-							/>
-						</span>
-					}
+				<ItemConnectionsEmpty
+					filter={filter}
+					expanded
 				/>
 			) : (
 				<section
@@ -196,88 +166,19 @@ export const ConnectionsSection = ({
 					data-ui="EditorItemConnectionsList"
 				>
 					{visibleConnectionItems.map(({ item, origins }) => (
-						<article
-							className="ak-list-row ak-list-row-interactive relative flex min-h-16 min-w-0 items-center gap-4 rounded-xl p-3"
-							data-ui="EditorItemConnectionsRow"
+						<ItemConnectionRow
 							key={item.id}
-						>
-							<DetailReference
-								description={
-									<span className="flex flex-wrap gap-x-4 gap-y-1">
-										{origins.map((origin, index) => (
-											<ConnectionOrigin
-												key={index}
-												origin={origin}
-											/>
-										))}
-									</span>
-								}
-								itemId={item.id}
-								search={{
-									filter,
-								}}
-								sectionId="connections"
-								stretched
-							/>
-							<ChevronRight className="pointer-events-none relative z-10 size-5 shrink-0 text-subtle" />
-						</article>
+							item={item}
+							origins={origins}
+							owner={
+								filter === "required-by" || filter === "produced-by"
+									? item
+									: project.config.items[itemId]
+							}
+						/>
 					))}
 				</section>
 			)}
 		</div>
-	);
-};
-
-/** A compact authored path; the source belongs to the owner in either connection direction. */
-const ConnectionOrigin = ({ origin }: { readonly origin: readItemConnectionFactsFn.Origin }) => {
-	const translator = useTranslator();
-	const source = origin.source;
-	let label: string;
-	switch (source.type) {
-		case "line":
-			label = `${translator.textFn("Product line")} ${source.lineIndex + 1}: ${source.title}`;
-			break;
-		case "merge":
-			label = `${translator.textFn("Merge")} ${source.mergeIndex + 1}`;
-			break;
-		case "action":
-			label = translator.textFn("Action");
-			break;
-		case "units":
-			label = translator.textFn("Unit depletion");
-			break;
-		case "expiry":
-			label = translator.textFn("Clock expiry");
-			break;
-		case "clock":
-			label = translator.textFn("Clock");
-			break;
-	}
-	const roleLabels = {
-		input: "Input",
-		condition: "Condition",
-		output: "Output",
-		replacement: "Replacement",
-	} as const;
-	const rollLabels = {
-		guaranteed: translator.textFn("Guaranteed"),
-		chance: translator.textFn("Chance"),
-		weight: translator.textFn("Weighted"),
-	};
-	const roll = origin.roll;
-	return (
-		<span>
-			{label}
-			{" · "}
-			{translator.textFn(roleLabels[origin.role])}
-			{roll === undefined ? null : (
-				<>
-					{" · "}
-					{translator.textFn("Output set")} {roll.setIndex + 1}
-					{" / "}
-					{rollLabels[roll.rollType]} {translator.textFn("Roll")} {roll.rollIndex + 1}
-				</>
-			)}
-		</span>
 	);
 };

@@ -534,10 +534,12 @@ const RollControl = ({
 
 export const RollSetControl = ({
 	index,
+	initialRollIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly index: number;
+	readonly initialRollIndex?: number;
 	readonly onChangeFn: (set: RollSetSchema.Type | undefined) => void;
 	readonly value: RollSetSchema.Type;
 }) => {
@@ -568,6 +570,8 @@ export const RollSetControl = ({
 			<EditorCollectionSelector
 				addLabel="Add roll"
 				count={value.roll.length}
+				initialSelectedIndex={initialRollIndex}
+				key={initialRollIndex}
 				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
 					return `${RollTypeLabelByType[roll.type]} roll ${rollIndex + 1} — ${readItemLabelFn(

@@ -11,6 +11,7 @@ import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
+import { ConnectionsSummaryDetail } from "~/item-authoring/ui/ConnectionsSummaryDetail";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -207,6 +208,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					previewItemUid={item.uid}
 				/>
 			</section>
+			<ConnectionsSummaryDetail item={item} />
 		</div>
 	);
 };

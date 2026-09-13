@@ -10,13 +10,27 @@ interface EditorItemFormSearch {
 	readonly create?: boolean;
 	readonly lineId?: string;
 	readonly merge?: number;
+	readonly outputSet?: number;
+	readonly outputRoll?: number;
 	readonly resourceId?: string;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form")({
 	validateSearch: (search): EditorItemFormSearch => {
 		const merge = typeof search.merge === "number" ? search.merge : Number.NaN;
+		const outputSet = typeof search.outputSet === "number" ? search.outputSet : Number.NaN;
+		const outputRoll = typeof search.outputRoll === "number" ? search.outputRoll : Number.NaN;
 		return {
+			...(Number.isInteger(outputSet) && outputSet >= 0
+				? {
+						outputSet,
+					}
+				: {}),
+			...(Number.isInteger(outputRoll) && outputRoll >= 0
+				? {
+						outputRoll,
+					}
+				: {}),
 			...(typeof search.defaultDraft === "boolean"
 				? {
 						defaultDraft: search.defaultDraft,
@@ -73,6 +87,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			create,
 			lineId,
 			merge,
+			outputSet,
+			outputRoll,
 			resourceId,
 		} = Route.useSearch();
 		const params = useParams({
@@ -89,6 +105,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				enableCapability={enable}
 				create={create}
 				mergeIndex={merge}
+				outputSetIndex={outputSet}
+				outputRollIndex={outputRoll}
 				productionLineId={lineId}
 				resourceId={resourceId}
 				sectionId={sectionId}

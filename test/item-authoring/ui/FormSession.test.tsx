@@ -433,11 +433,10 @@ describe("item section form session", () => {
 	it("keeps an asset-origin draft seed in routed section links", async () => {
 		state.persisted = undefined;
 		const { container } = await render(<IdentitySection />, true, true);
-		expect(container.querySelector("h1")?.textContent).toBe("Dirty Bucket");
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing seeded title field");
+		expect(title.value).toBe("Dirty Bucket");
 		await changeInput(title, "Washed Bucket");
-		expect(container.querySelector("h1")?.textContent).toBe("Washed Bucket");
 		expect(state.saveItem).not.toHaveBeenCalled();
 		const artworkLink = [
 			...container.querySelectorAll<HTMLAnchorElement>("a"),

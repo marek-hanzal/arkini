@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -84,27 +85,21 @@ export const ProductionLineOption = ({
 	const translator = useTranslator();
 	const { inputs, outputs } = readItemSidesFn(line);
 	return (
-		<span
-			className="grid min-w-0 flex-1 gap-1.5"
-			data-ui="EditorProductionLineOption"
+		<EditorCollectionOption
+			label={label}
+			details={<ProductionLineBadges line={line} />}
 		>
-			<span className="flex min-w-0 flex-wrap items-center gap-2">
-				<span className="truncate text-sm font-semibold text-foreground">{label}</span>
-				<ProductionLineBadges line={line} />
-			</span>
-			<span className="flex min-w-0 flex-wrap items-center gap-2">
-				<ItemImages
-					ids={inputs}
-					items={items}
-					emptyLabel={translator.textFn("No inputs")}
-				/>
-				<ArrowRight className="size-3.5 shrink-0 text-subtle" />
-				<ItemImages
-					ids={outputs}
-					items={items}
-					emptyLabel={translator.textFn("No outputs")}
-				/>
-			</span>
-		</span>
+			<ItemImages
+				ids={inputs}
+				items={items}
+				emptyLabel={translator.textFn("No inputs")}
+			/>
+			<ArrowRight className="size-3.5 shrink-0 text-subtle" />
+			<ItemImages
+				ids={outputs}
+				items={items}
+				emptyLabel={translator.textFn("No outputs")}
+			/>
+		</EditorCollectionOption>
 	);
 };

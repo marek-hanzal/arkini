@@ -1,4 +1,5 @@
-import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -26,23 +27,27 @@ export const MergeOption = ({
 		spend: translator.textFn("Spend"),
 	};
 	return (
-		<span
-			className="flex min-w-0 flex-1 items-center gap-3"
-			data-ui="EditorMergeOption"
-		>
-			<EditorItemSearchThumbnail item={target} />
-			<span className="min-w-0 flex-1">
-				<span className="block truncate text-sm font-semibold text-foreground">
-					{label}
-				</span>
-				<span className="mt-0.5 block text-xs text-subtle">
+		<EditorCollectionOption
+			label={label}
+			details={
+				<span className="text-xs text-subtle">
 					{translator.textFn("Target effect")}:{" "}
 					<strong className="font-bold text-foreground">{effects[merge.effect]}</strong>
 					{" · "}
 					{translator.textFn("Source action")}:{" "}
 					<strong className="font-bold text-foreground">{actions[merge.action]}</strong>
 				</span>
-			</span>
-		</span>
+			}
+		>
+			<EditorItemThumbnail
+				size="md"
+				className="rounded-md"
+				resourceIds={
+					target?.asset.default ?? [
+						"",
+					]
+				}
+			/>
+		</EditorCollectionOption>
 	);
 };

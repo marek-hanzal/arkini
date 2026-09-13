@@ -8,10 +8,14 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { OutputDropOption } from "~/production-authoring/ui/OutputDropOption";
+import { readRollDropsFn } from "~/production-output/fn/readRollDropsFn";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
+import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
@@ -28,8 +32,13 @@ type WeightedRoll = Extract<
 >;
 
 const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
-const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
-	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
+const readDropSummaryFn = (drop: DropSchema.Type) => {
+	const { min, max } = drop.quantity;
+	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
+	const placement = drop.placement === "drop" ? "Local drop" : "Random";
+	const rules = drop.rules.length;
+	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${rules === 1 ? "rule" : "rules"}`}`;
+};
 const RollTypeLabelByType = {
 	chance: "Chance",
 	guaranteed: "Guaranteed",
@@ -132,6 +141,8 @@ const DropList = ({
 	readonly value: DropListValue;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const project = useEditorProject();
+	const items = project.config?.items ?? {};
 	const validationIssues = useFormValidationIssues(value);
 	const invalidDropIndex = validationIssues.find((issue) => typeof issue.path[0] === "number")
 		?.path[0] as number | undefined;
@@ -155,6 +166,22 @@ const DropList = ({
 					value[index].itemId,
 				]}
 				label="Drops"
+				itemMetaFn={(index) => readDropSummaryFn(value[index])}
+				renderItemContentFn={(index, label) => (
+					<OutputDropOption
+						label={label}
+						drops={[
+							value[index],
+						]}
+						summary={readDropSummaryFn(value[index])}
+					/>
+				)}
+				renderSelectedItemPreviewFn={(index) => (
+					<EditorItemSearchThumbnail
+						item={index === undefined ? undefined : items[value[index].itemId]}
+						selected
+					/>
+				)}
 				onAddFn={() =>
 					onChangeFn([
 						...value,
@@ -543,20 +570,23 @@ export const RollSetControl = ({
 				count={value.roll.length}
 				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
-					const itemId = readFirstRollItemIdFn(roll);
 					return `${RollTypeLabelByType[roll.type]} roll ${rollIndex + 1} — ${readItemLabelFn(
-						itemId ?? "",
+						readRollDropsFn(roll)[0]?.itemId ?? "",
 						"No item selected",
 					)}`;
 				}}
-				itemSearchTermsFn={(rollIndex) => {
-					const itemId = readFirstRollItemIdFn(value.roll[rollIndex]);
-					return itemId === undefined
-						? []
-						: [
-								itemId,
-							];
-				}}
+				itemSearchTermsFn={(rollIndex) =>
+					readRollDropsFn(value.roll[rollIndex]).flatMap((drop) => [
+						drop.itemId,
+						readItemLabelFn(drop.itemId, ""),
+					])
+				}
+				renderItemContentFn={(rollIndex, label) => (
+					<OutputDropOption
+						label={label}
+						drops={readRollDropsFn(value.roll[rollIndex])}
+					/>
+				)}
 				label={`Output set ${index + 1} rolls`}
 				onAddFn={() =>
 					onChangeFn({

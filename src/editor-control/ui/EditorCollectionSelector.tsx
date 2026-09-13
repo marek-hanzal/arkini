@@ -23,6 +23,7 @@ interface EditorCollectionSelectorProps {
 	readonly removeLabel?: string;
 	readonly renderItemContentFn?: (index: number, label: string) => ReactNode;
 	readonly renderItemPreviewFn?: (index: number) => ReactNode;
+	readonly renderSelectedItemPreviewFn?: (index: number | undefined) => ReactNode;
 	readonly selectedIndex?: number;
 }
 
@@ -45,6 +46,7 @@ export const EditorCollectionSelector = ({
 	removeLabel = "Remove item",
 	renderItemContentFn,
 	renderItemPreviewFn,
+	renderSelectedItemPreviewFn,
 	selectedIndex,
 }: EditorCollectionSelectorProps) => {
 	const [internalSelectedIndex, selectIndexFn] = useState(initialSelectedIndex);
@@ -96,6 +98,14 @@ export const EditorCollectionSelector = ({
 						}
 						renderPreviewFn={(option) =>
 							renderItemPreviewFn?.(Number(option.id)) ?? null
+						}
+						renderSelectedPreviewFn={
+							renderSelectedItemPreviewFn === undefined
+								? undefined
+								: (option) =>
+										renderSelectedItemPreviewFn(
+											option === undefined ? undefined : Number(option.id),
+										)
 						}
 						value={activeIndex === undefined ? "" : String(activeIndex)}
 						onChangeFn={(index) => selectIndexFn(Number(index))}

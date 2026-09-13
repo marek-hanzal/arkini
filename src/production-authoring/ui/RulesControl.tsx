@@ -221,6 +221,7 @@ const WhenControl = ({
 										onChangeFn({
 											...when,
 											min,
+											max: min > when.max ? min : when.max,
 										})
 									}
 								/>

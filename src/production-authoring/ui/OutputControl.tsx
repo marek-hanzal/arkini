@@ -4,6 +4,8 @@ import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSe
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
+import { OutputDropOption } from "~/production-authoring/ui/OutputDropOption";
+import { readRollDropsFn } from "~/production-output/fn/readRollDropsFn";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 
@@ -40,15 +42,18 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 						"No item selected",
 					)}`;
 				}}
-				itemSearchTermsFn={(index) => {
-					const roll = value.set[index].roll[0];
-					const itemId = roll === undefined ? undefined : readFirstRollItemIdFn(roll);
-					return itemId === undefined
-						? []
-						: [
-								itemId,
-							];
-				}}
+				itemSearchTermsFn={(index) =>
+					value.set[index].roll.flatMap(readRollDropsFn).flatMap((drop) => [
+						drop.itemId,
+						readItemLabelFn(drop.itemId, ""),
+					])
+				}
+				renderItemContentFn={(index, label) => (
+					<OutputDropOption
+						label={label}
+						drops={value.set[index].roll.flatMap(readRollDropsFn)}
+					/>
+				)}
 				label="Output sets"
 				onAddFn={() =>
 					onChangeFn({

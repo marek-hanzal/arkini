@@ -33,6 +33,7 @@ export const QuantityFields = ({
 				onChangeFn({
 					...value,
 					min,
+					max: min > value.max ? min : value.max,
 				})
 			}
 		/>

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
+import { readItemConnectionFactIdsFn } from "~/flow/fn/readItemConnectionFactIdsFn";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,
@@ -102,6 +103,10 @@ describe("readItemConnectionsFn", () => {
 				...base.items,
 				producer: {
 					...producer,
+					clock: {
+						durationMs: 1_000,
+						onExpire: output,
+					},
 					lines: [
 						line,
 					],
@@ -186,6 +191,20 @@ describe("readItemConnectionsFn", () => {
 		expect(readIdsFn(config, "mergeSource", "produces")).toEqual([
 			"cappedResult",
 			"result",
+		]);
+		expect(readItemConnectionFactIdsFn(config, "result", "produced-by")).toEqual([
+			"blueprint",
+			"craft",
+			"mergeSource",
+			"producer",
+			"spent",
+			"stash",
+			"temporaryOutput",
+			"temporaryRandomOutput",
+		]);
+		expect(readItemConnectionFactIdsFn(config, "cappedResult", "produced-by")).toEqual([
+			"mergeSource",
+			"temporaryCappedOutput",
 		]);
 	});
 
@@ -292,5 +311,6 @@ describe("readItemConnectionsFn", () => {
 		expect(readIdsFn(config, "output-permit", "required-by")).toEqual([
 			"forge",
 		]);
+		expect(readItemConnectionFactIdsFn(config, "output-permit", "produced-by")).toEqual([]);
 	});
 });

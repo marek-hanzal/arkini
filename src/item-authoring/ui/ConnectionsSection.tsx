@@ -29,6 +29,10 @@ const ConnectionFilterOptions = [
 		label: "Produces",
 		value: "produces",
 	},
+	{
+		label: "Produced by",
+		value: "produced-by",
+	},
 ] as const;
 
 const EmptyStateByFilter = {
@@ -44,6 +48,11 @@ const EmptyStateByFilter = {
 	produces: {
 		description: "No authored operation owned by this item outputs another item.",
 		title: "This item produces nothing",
+	},
+	"produced-by": {
+		description:
+			"No other authored item outputs this item through production, expiry, units, or merges.",
+		title: "Nothing produces this item",
 	},
 } as const satisfies Record<
 	ItemConnectionFilter,

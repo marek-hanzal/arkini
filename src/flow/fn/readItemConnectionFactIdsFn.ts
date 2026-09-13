@@ -115,6 +115,9 @@ export const readItemConnectionFactIdsFn = (
 	if (filter === "required-by") {
 		for (const [ownerItemId, facts] of factsByOwnerId)
 			if (facts.inputs.has(factId)) connectedFactIds.add(ownerItemId);
+	} else if (filter === "produced-by") {
+		for (const [ownerItemId, facts] of factsByOwnerId)
+			if (facts.outputs.has(factId)) connectedFactIds.add(ownerItemId);
 	} else {
 		const facts = factsByOwnerId.get(factId);
 		for (const connectedFactId of filter === "inputs"

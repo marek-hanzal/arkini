@@ -404,6 +404,7 @@ Item connections help:
     - **Required by** lists authored owners that directly input this item or positively require it in a production condition.
     - **Inputs** shows those same direct inputs and positive conditions from the selected owner's side.
     - **Produces** lists the direct outputs of authored operations owned by the selected item.
+    - **Produced by** lists owners that emit this item through production lines, Clock expiry, unit depletion, or merges. These are authored possibilities, regardless of current availability.
 
     Use the search to find an item in the active relationship list. Open any result to inspect that item without losing the selected relationship.
 Item delete help:
@@ -660,6 +661,12 @@ Notes unavailable:
 Nothing requires this item:
   value: Nothing requires this item
   dynamic: true
+Nothing produces this item:
+  value: Nothing produces this item
+  dynamic: true
+No other authored item outputs this item through production, expiry, units, or merges.:
+  value: No other authored item outputs this item through production, expiry, units, or merges.
+  dynamic: true
 Once:
   value: Once
 One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.:
@@ -724,6 +731,9 @@ Preparing asset preview…:
   value: Preparing asset preview…
 Produces:
   value: Produces
+  dynamic: true
+Produced by:
+  value: Produced by
   dynamic: true
 Product line:
   value: Product line

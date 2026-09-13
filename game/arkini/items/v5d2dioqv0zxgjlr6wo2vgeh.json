@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "v5d2dioqv0zxgjlr6wo2vgeh",
+		"id": "animal-bones",
+		"title": "Animal Bones",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"animal-bones"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "bnkd4ndcnhsoge5e7s4uenm0",
+		"id": "grass-field",
+		"title": "Grass Field",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"grass-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ilbwt5g7ougy6iu73pgiw7py",
+		"id": "homeland-portal",
+		"title": "Homeland Portal",
+		"description": "Somebody calls home!",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"homeland-portal"
+			]
+		},
+		"scope": "toolbar",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"action": {
+			"input": [],
+			"rules": [],
+			"type": "space",
+			"space": 0
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

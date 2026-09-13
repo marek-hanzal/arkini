@@ -1,0 +1,102 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "tozm3fcjcdk5vo2i3f3vuke7",
+		"id": "faith",
+		"title": "Faith",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"faith"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bio-waste"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "holy-shit"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "toilet"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "faith-toilet"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bear"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "teddy-bear"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wolf"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-puppy"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "faith-cow"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cotton-field"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cotton",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "cotton-field"
+			}
+		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "dlou40mod7l8b6d93dt9cwzy",
+		"id": "spoiled-cutting-board-with-fruit",
+		"title": "Spoiled Cutting Board With Fruit",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-cutting-board-with-fruit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

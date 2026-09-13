@@ -1,0 +1,125 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xkbphl0biiu4d5ar1s6hecvn",
+		"id": "basecamp-on-fire",
+		"title": "Basecamp on Fire",
+		"draft": false,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"base-camp",
+				"fire"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 3,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "base-camp",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"clock": {
+			"intervalMs": 5000,
+			"durationMs": 30000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "loose-ash",
+										"quantity": {
+											"min": 3,
+											"max": 4
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "clutter",
+										"quantity": {
+											"min": 2,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"control": "automatic-only",
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "air-pollution",
+				"title": "Air Pollution",
+				"description": "It's burning, bro",
+				"clock": true,
+				"default": true,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "air-pollution",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

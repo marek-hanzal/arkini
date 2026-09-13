@@ -1,0 +1,68 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "yqu4itfme4lohxp6bxbito07",
+		"id": "composting-workshop",
+		"title": "Composting Workshop",
+		"description": "Clean things up",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"composting-workshop"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "compost",
+				"title": "Compost",
+				"description": "Stuff flowers wanna eat",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 32000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "bio-waste"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 4
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "compost",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

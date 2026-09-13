@@ -1,0 +1,182 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "l5iztjxbdrt1zv7zh1drirkw",
+		"id": "gardener",
+		"title": "Gardener",
+		"description": "Source of various seeds.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"gardener"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 8,
+		"lines": [
+			{
+				"id": "Empty Field",
+				"title": "Empty Field",
+				"description": "Empty field ready to grow something",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 32000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-field",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "grain-seed",
+				"title": "Grain Seed",
+				"description": "Grain seed",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grain-seed",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "grape-seed",
+				"title": "Grape Seed",
+				"description": "Grapes. Wine?",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 32000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grape-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "coffee-seed",
+				"title": "Coffee Seed",
+				"description": "Coffee?",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "coffee-seed",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

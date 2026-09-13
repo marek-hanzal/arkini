@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xsy4q5tb13eivk2tmqhtrj4q",
+		"id": "spoiled-animal-bones",
+		"title": "Spoiled Animal Bones",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-animal-bones"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

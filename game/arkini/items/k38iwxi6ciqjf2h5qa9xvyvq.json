@@ -1,0 +1,56 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "k38iwxi6ciqjf2h5qa9xvyvq",
+		"id": "sick-wolf",
+		"title": "Sick Wolf",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sick-wolf"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-raw-game-meat",
+										"quantity": {
+											"min": 4,
+											"max": 8
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "spoiled-animal-bones",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

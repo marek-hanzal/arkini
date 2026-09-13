@@ -1,0 +1,56 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "usw9wmorxa8p3tl3wchthc6q",
+		"id": "lit-base-camp",
+		"title": "Lit Base Camp",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"lit-base-camp"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "base-camp",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "empty-lantern",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

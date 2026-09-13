@@ -1,0 +1,56 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "a2hrbbn05j5g5f01as0sipp7",
+		"id": "sick-bear",
+		"title": "Sick Bear",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"sick-bear"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-raw-game-meat",
+										"quantity": {
+											"min": 4,
+											"max": 6
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "spoiled-animal-bones",
+										"quantity": {
+											"min": 2,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "e2pone4zse5ngt9nass0nzfy",
+		"id": "animal-feed",
+		"title": "Animal Feed",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"animal-feed"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 900000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-sack",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

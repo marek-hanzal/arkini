@@ -1,17 +1,21 @@
 {
 	"$schema": "./schema.json",
+	"version": {
+		"major": 1,
+		"minor": 0
+	},
 	"meta": {
 		"id": "arkini",
 		"title": "Arkini",
 		"board": {
-			"width": 15,
-			"height": 9
+			"width": 17,
+			"height": 13
 		},
 		"inventory": {
 			"width": 15,
 			"height": 9
 		},
-		"toolbarSize": 15
+		"toolbarSize": 17
 	},
 	"resources": {
 		"hero": "hero",
@@ -28,102 +32,329 @@
 		"board": [
 			{
 				"x": 1,
-				"y": 0,
-				"space": 0,
-				"itemId": "item:tree",
-				"quantity": 1
-			},
-			{
-				"x": 0,
 				"y": 1,
-				"space": 0,
-				"itemId": "item:tree",
+				"space": 1,
+				"itemId": "tree",
 				"quantity": 1
 			},
 			{
 				"x": 1,
 				"y": 2,
-				"space": 0,
-				"itemId": "item:tree",
+				"space": 1,
+				"itemId": "tree",
 				"quantity": 1
 			},
 			{
 				"x": 1,
-				"y": 1,
-				"space": 0,
-				"itemId": "producer:lumberjack-t1",
-				"quantity": 1
-			},
-			{
-				"x": 4,
 				"y": 3,
-				"space": 0,
-				"itemId": "producer:townhall-t1",
+				"space": 1,
+				"itemId": "tree",
 				"quantity": 1
 			},
 			{
-				"x": 6,
-				"y": 0,
-				"space": 0,
-				"itemId": "item:rock",
+				"x": 1,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
 				"quantity": 1
 			},
 			{
-				"x": 6,
-				"y": 1,
-				"space": 0,
-				"itemId": "producer:quarry-t1",
-				"quantity": 1
-			},
-			{
-				"x": 8,
+				"x": 1,
 				"y": 5,
-				"space": 0,
-				"itemId": "item:tree",
-				"quantity": 1
-			},
-			{
-				"x": 9,
-				"y": 5,
-				"space": 0,
-				"itemId": "jump",
+				"space": 1,
+				"itemId": "tree",
 				"quantity": 1
 			},
 			{
 				"x": 2,
 				"y": 1,
 				"space": 1,
-				"itemId": "producer:armory-t1",
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
 				"quantity": 1
 			},
 			{
 				"x": 5,
 				"y": 2,
 				"space": 1,
-				"itemId": "back-to-0",
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 7,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 0,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 1,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 0,
+				"space": 0,
+				"itemId": "forest",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 0,
+				"space": 0,
+				"itemId": "stone-deposit",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 6,
+				"space": 0,
+				"itemId": "base-camp",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 0,
+				"itemId": "foundation-chest",
 				"quantity": 1
 			}
 		],
-		"inventory": [
+		"inventory": [],
+		"toolbar": [
 			{
-				"itemId": "item:magnifying-glass",
+				"itemId": "homeland-portal",
+				"quantity": 1,
 				"position": {
 					"x": 0,
 					"y": 0
-				},
-				"quantity": 1
-			}
-		],
-		"toolbar": [
+				}
+			},
 			{
-				"itemId": "item:inventory",
+				"itemId": "farmland-portal",
 				"quantity": 1,
 				"position": {
-					"x": 14,
+					"x": 1,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "forest-portal",
+				"quantity": 1,
+				"position": {
+					"x": 2,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "industrial-portal",
+				"quantity": 1,
+				"position": {
+					"x": 3,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "mining-portal",
+				"quantity": 1,
+				"position": {
+					"x": 4,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "workshop-portal",
+				"quantity": 1,
+				"position": {
+					"x": 5,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "inventory",
+				"quantity": 1,
+				"position": {
+					"x": 16,
 					"y": 0
 				}
 			}
 		]
-	},
-	"version": "2.4"
+	}
 }

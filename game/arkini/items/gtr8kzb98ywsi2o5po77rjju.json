@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "gtr8kzb98ywsi2o5po77rjju",
+		"id": "spoiled-chopped-fruit",
+		"title": "Spoiled Chopped Fruit",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-chopped-fruit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

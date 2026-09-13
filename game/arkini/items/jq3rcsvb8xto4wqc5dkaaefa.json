@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "jq3rcsvb8xto4wqc5dkaaefa",
+		"id": "spoiled-hay",
+		"title": "Spoiled Hay",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"spoiled-hay"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

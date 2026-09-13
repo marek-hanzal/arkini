@@ -1,0 +1,53 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "sedm9fb8symnti4s3w25u751",
+		"id": "candle",
+		"title": "Candle",
+		"description": "Warm, nice light source; be careful, it will fade over time.",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"candle"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-lantern"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "lantern"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "base-camp"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "basecamp-on-fire"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "lit-base-camp"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "basecamp-on-fire"
+			}
+		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

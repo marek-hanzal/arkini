@@ -1,0 +1,85 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "fn1c807rr3m75hnrkdc3ik92",
+		"id": "scythe",
+		"title": "Scythe",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"scythe"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "corn-field"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "corn",
+											"quantity": {
+												"min": 2,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "empty-corn-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "flax-field"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "flax",
+											"quantity": {
+												"min": 2,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "empty-flax-field"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

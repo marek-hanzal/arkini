@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "p6wks4iknyp8b8v5qxhilm1x",
+		"id": "empty-grass-field",
+		"title": "Empty Grass Field",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"empty-grass-field"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

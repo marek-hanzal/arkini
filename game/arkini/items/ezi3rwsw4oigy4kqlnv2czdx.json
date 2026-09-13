@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ezi3rwsw4oigy4kqlnv2czdx",
+		"id": "gold-ore",
+		"title": "Gold Ore",
+		"description": "Wanna be goldish?",
+		"asset": {
+			"scale": 1,
+			"default": [
+				"gold-ore"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

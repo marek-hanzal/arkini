@@ -1,0 +1,68 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ujbr1vgj1ymehr3gedjdajug",
+		"id": "burning-paper",
+		"title": "Burning Paper",
+		"draft": false,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"paper",
+				"fire"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "base-camp"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "basecamp-on-fire"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "lit-base-camp"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "basecamp-on-fire"
+			}
+		],
+		"clock": {
+			"durationMs": 10000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "loose-ash",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

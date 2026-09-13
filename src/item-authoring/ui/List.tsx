@@ -146,7 +146,8 @@ export const List = ({
 					state: {
 						draft: readDraftFn(item),
 						highlighted:
-							readDraftFn(item) || estimatesByUid.get(item.uid)?.status === "unreachable",
+							readDraftFn(item) ||
+							estimatesByUid.get(item.uid)?.status === "unreachable",
 					},
 				})}
 				data-item-id={item.id}

@@ -51,6 +51,7 @@ const EditorFormActions = ({
 /** Keeps routed form chrome mounted while only the active form section changes. */
 export const EditorFormSectionPage = ({
 	children,
+	headerActions,
 	contentMode = "scroll",
 	discardFn,
 	error,
@@ -64,6 +65,7 @@ export const EditorFormSectionPage = ({
 	tabs,
 	title,
 }: PropsWithChildren<{
+	readonly headerActions?: ReactNode;
 	readonly contentMode?: "scroll" | "viewport";
 	readonly discardFn: () => Promise<void>;
 	readonly error: unknown;
@@ -91,6 +93,7 @@ export const EditorFormSectionPage = ({
 					tabs={tabs}
 					action={
 						<div className="flex items-center gap-3">
+							{headerActions}
 							{help === undefined ? null : (
 								<>
 									<EditorPageHelp {...help} />

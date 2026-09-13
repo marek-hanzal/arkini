@@ -1489,3 +1489,54 @@ vi.mock("~/translation/ui/useTranslator", () => ({
 		textFn: (key: string) => key,
 	}),
 }));
+
+it("keeps copied sections in the draft until Save and lets Discard restore the destination", async () => {
+	let session: ReturnType<typeof useFormSession> | undefined;
+	const CopyProbe = () => {
+		session = useFormSession();
+		return null;
+	};
+	await render(<CopyProbe />);
+	const source = ItemSchema.parse({
+		...item,
+		uid: "source-uid",
+		id: "source",
+		title: "Source",
+		scope: "board",
+		clock: {
+			durationMs: 300000,
+			enable: true,
+			rules: [],
+		},
+	});
+	await act(async () => {
+		session?.form.setFieldValue("description", "Keep my other edit");
+		session?.copySectionFn(source, "clock");
+	});
+	expect(session?.isDirty).toBe(true);
+	expect(session?.form.state.values.clock).toEqual(source.clock);
+	expect(session?.form.state.values.description).toBe("Keep my other edit");
+	expect(state.saveItem).not.toHaveBeenCalled();
+	await act(async () => session?.discardFn());
+	expect(session?.form.state.values.clock).toBeUndefined();
+	expect(session?.form.state.values.description).toBe(item.description);
+	expect(session?.isDirty).toBe(false);
+	await act(async () => session?.copySectionFn(source, "clock"));
+	state.saveItem.mockImplementation(async ({ item: saved }: { item: ItemSchema.Type }) => saved);
+	await act(async () => {
+		expect(await session?.saveFn()).toBe(true);
+	});
+	expect(state.saveItem).toHaveBeenCalledExactlyOnceWith(
+		expect.objectContaining({
+			item: expect.objectContaining({
+				id: item.id,
+				uid: item.uid,
+				title: item.title,
+				clock: source.clock,
+				scope: "board",
+				maxStackSize: 1,
+			}),
+		}),
+	);
+	expect(session?.isDirty).toBe(false);
+});

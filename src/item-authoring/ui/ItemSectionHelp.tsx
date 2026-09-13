@@ -7,15 +7,30 @@ import { Tx } from "~/translation/ui/Tx";
 export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 	identity: {
 		title: <Tx label="Item" />,
-		content: <Mx label="Item identity help" />,
+		content: (
+			<>
+				<Mx label="Item identity help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	action: {
 		title: <Tx label="Action" />,
-		content: <Mx label="Item action help" />,
+		content: (
+			<>
+				<Mx label="Item action help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	production: {
 		title: <Tx label="Production" />,
-		content: <Mx label="Item production help" />,
+		content: (
+			<>
+				<Mx label="Item production help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	notes: {
 		title: <Tx label="Notes" />,
@@ -27,19 +42,39 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 	},
 	merges: {
 		title: <Tx label="Merges" />,
-		content: <Mx label="Item merges help" />,
+		content: (
+			<>
+				<Mx label="Item merges help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	units: {
 		title: <Tx label="Units" />,
-		content: <Mx label="Item units help" />,
+		content: (
+			<>
+				<Mx label="Item units help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	clock: {
 		title: <Tx label="Clock" />,
-		content: <Mx label="Item clock help" />,
+		content: (
+			<>
+				<Mx label="Item clock help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	artwork: {
 		title: <Tx label="Artwork" />,
-		content: <Mx label="Item artwork help" />,
+		content: (
+			<>
+				<Mx label="Item artwork help" />
+				<Mx label="Item section copy help" />
+			</>
+		),
 	},
 	estimate: {
 		title: <Tx label="Estimate" />,

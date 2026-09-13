@@ -1,3 +1,4 @@
+import { ItemSectionCopyControl } from "~/item-authoring/ui/ItemSectionCopyControl";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
 import { readDetailSectionFn } from "~/item-authoring/fn/readDetailSectionFn";
@@ -203,6 +204,12 @@ export const FormSession = ({
 				data-ui="EditorItemForm"
 			>
 				<EditorFormSectionPage
+					headerActions={
+						<ItemSectionCopyControl
+							key={sectionId}
+							sectionId={sectionId}
+						/>
+					}
 					contentMode={sectionId === "artwork" ? "viewport" : "scroll"}
 					help={ItemSectionHelp[sectionId]}
 					discardFn={discardFn}

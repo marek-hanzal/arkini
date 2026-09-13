@@ -1,3 +1,4 @@
+import { copyItemSectionFn } from "~/item-authoring/fn/copyItemSectionFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -228,6 +229,33 @@ export const useFormController = ({
 			if (notifyOnSaved.current) await onSavedFn?.(saved);
 		},
 	});
+	const copySectionFn = useCallback(
+		(source: ItemSchema.Type, section: copyItemSectionFn.Section) => {
+			if (form.state.isSubmitting || source.uid === initialItem.uid) return;
+			const current = form.state.values;
+			const next = copyItemSectionFn(current, source, section);
+			if (current.title !== next.title) form.setFieldValue("title", next.title);
+			if (current.description !== next.description)
+				form.setFieldValue("description", next.description);
+			if (current.control !== next.control) form.setFieldValue("control", next.control);
+			if (current.scope !== next.scope) form.setFieldValue("scope", next.scope);
+			if (current.maxStackSize !== next.maxStackSize)
+				form.setFieldValue("maxStackSize", next.maxStackSize);
+			if (current.maxCount !== next.maxCount) form.setFieldValue("maxCount", next.maxCount);
+			if (current.asset !== next.asset) form.setFieldValue("asset", next.asset);
+			if (current.lines !== next.lines) form.setFieldValue("lines", next.lines);
+			if (current.maxQueueSize !== next.maxQueueSize)
+				form.setFieldValue("maxQueueSize", next.maxQueueSize);
+			if (current.merge !== next.merge) form.setFieldValue("merge", next.merge);
+			if (current.units !== next.units) form.setFieldValue("units", next.units);
+			if (current.clock !== next.clock) form.setFieldValue("clock", next.clock);
+			if (current.action !== next.action) form.setFieldValue("action", next.action);
+		},
+		[
+			form,
+			initialItem.uid,
+		],
+	);
 	const enableClockFn = useCallback(() => {
 		if (form.state.values.clock !== undefined) return;
 		form.setFieldValue("action", undefined);
@@ -396,6 +424,7 @@ export const useFormController = ({
 	return useMemo(
 		() => ({
 			canonicalItem: initialItem,
+			copySectionFn,
 			discardFn,
 			enableClockFn,
 			enableActionFn,
@@ -411,6 +440,7 @@ export const useFormController = ({
 			validationIssues,
 		}),
 		[
+			copySectionFn,
 			discardFn,
 			enableClockFn,
 			enableActionFn,

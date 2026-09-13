@@ -105,6 +105,7 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 		),
 }));
 import { Form } from "~/item-authoring/ui/Form";
+import { ProjectResourceUrlProvider } from "~/authoring-session/ui/ResourceUrlSession";
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
@@ -253,6 +254,75 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it("renders artwork on direct Clock entry and follows unsaved overlay changes", async () => {
+		state.project = {
+			...(state.project as Project),
+			resources: [
+				"asset:water",
+				"asset:overlay",
+			].map((id) => ({
+				id,
+				mime: "image/png" as const,
+				size: 1,
+				version: "1",
+			})),
+		};
+		const ArtworkEditProbe = () => {
+			const { form } = useFormSession();
+			return (
+				<button
+					type="button"
+					onClick={() =>
+						form.setFieldValue(
+							"asset.default[1]",
+							form.state.values.asset.default[1] === "" ? "asset:overlay" : "",
+						)
+					}
+				>
+					Toggle overlay
+				</button>
+			);
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				<ProjectResourceUrlProvider>
+					<Form
+						uid={item.uid}
+						sectionId="clock"
+					>
+						<ArtworkEditProbe />
+					</Form>
+				</ProjectResourceUrlProvider>,
+			);
+		});
+		const headerResourcesFn = () =>
+			Array.from(
+				container.querySelectorAll<HTMLImageElement>('[data-ui="EditorItemHeaderTitle"] img'),
+				(image) => new URL(image.src).searchParams.get("resourceId"),
+			);
+		expect(headerResourcesFn()).toEqual([
+			"asset:water",
+		]);
+		const toggle = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Toggle overlay",
+		);
+		if (toggle === undefined) throw new Error("Missing artwork edit probe.");
+		await act(async () => toggle.click());
+		expect(headerResourcesFn()).toEqual([
+			"asset:water",
+			"asset:overlay",
+		]);
+		await act(async () => toggle.click());
+		expect(headerResourcesFn()).toEqual([
+			"asset:water",
+		]);
+		expect(state.saveItem).not.toHaveBeenCalled();
+	});
+
 	it.each([
 		[
 			"units",

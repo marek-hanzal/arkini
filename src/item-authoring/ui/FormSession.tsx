@@ -1,4 +1,5 @@
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
+import { readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
 import { readDetailSectionFn } from "~/item-authoring/fn/readDetailSectionFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -212,13 +213,13 @@ export const FormSession = ({
 							selector={(state) =>
 								[
 									state.values.title,
-									state.values.asset.default,
+									state.values.asset,
 								] as const
 							}
 						>
-							{([title, resourceIds]) => (
+							{([title, asset]) => (
 								<ItemHeaderTitle
-									resourceIds={resourceIds}
+									resourceIds={readCanonicalItemArtworkFn(asset).default}
 									title={
 										title.trim() ||
 										(isNew ? translator.textFn("New item") : initialItem.id)

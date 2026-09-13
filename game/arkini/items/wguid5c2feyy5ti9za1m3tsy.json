@@ -370,6 +370,38 @@
 				},
 				"effect": "replace",
 				"result": "dirty-cutting-board"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bear"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "dirty-kitchen-knife",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "sick-bear"
 			}
 		],
 		"maxQueueSize": 1,

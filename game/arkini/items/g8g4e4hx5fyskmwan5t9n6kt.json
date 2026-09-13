@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "g8g4e4hx5fyskmwan5t9n6kt",
+		"id": "explosive-egg",
+		"title": "Explosive Egg",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"explosive-egg"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "b8r8k2te7o8bpd9hm7y2fo2s",
+		"id": "bear-chased-by-bees",
+		"title": "Bear Chased By Bees",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"bear-chased-by-bees"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 60000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "sick-bear",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

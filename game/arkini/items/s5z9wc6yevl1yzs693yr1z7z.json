@@ -22,6 +22,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "piggy-bank"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "paper"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "arkini-banknote"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "well"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "wishing-well"
 			}
 		],
 		"maxQueueSize": 1,

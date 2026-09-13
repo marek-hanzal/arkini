@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zh4bs97fyw6n0a82zw1mgtvp",
+		"id": "golden-egg",
+		"title": "Golden Egg",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"golden-egg"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

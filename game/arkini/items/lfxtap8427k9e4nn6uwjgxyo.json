@@ -13,34 +13,49 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"clock": {
-			"durationMs": 1200000,
-			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "bio-waste",
-										"quantity": {
-											"min": 1,
-											"max": 2
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sheep"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
 										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "wolf-in-sheeps-clothing"
 			}
-		},
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

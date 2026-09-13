@@ -1,0 +1,47 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "vnm48dyk7vw7v1ljbs0vfjhc",
+		"id": "well-fed-bear",
+		"title": "Well Fed Bear",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"well-fed-bear"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 2,
+											"max": 4
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

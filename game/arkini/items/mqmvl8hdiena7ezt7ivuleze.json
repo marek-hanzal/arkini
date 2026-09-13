@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "mqmvl8hdiena7ezt7ivuleze",
+		"id": "flying-pig",
+		"title": "Flying Pig",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"flying-pig"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

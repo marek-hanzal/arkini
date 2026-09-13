@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle-puppy"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-puppy-tearing-pillow-with-coins"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

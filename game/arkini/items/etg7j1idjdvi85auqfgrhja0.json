@@ -31,6 +31,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "silenced-bow"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle-puppy"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-puppy-tearing-pillow"
 			}
 		],
 		"maxQueueSize": 1,

@@ -12,7 +12,7 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 6,
+		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

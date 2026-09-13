@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "gold-ingot"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "golden-goose"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

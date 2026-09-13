@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cheese"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "mouse-full-belly"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

@@ -1,0 +1,56 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "fj0lv7gedwxkby2myttgxdd5",
+		"id": "golden-goose",
+		"title": "Golden Goose",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"golden-goose"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "sick-goose",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "golden-egg",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

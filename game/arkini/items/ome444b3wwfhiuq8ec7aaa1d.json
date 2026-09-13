@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ome444b3wwfhiuq8ec7aaa1d",
+		"id": "arkini-banknote",
+		"title": "Arkini Banknote",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"arkini-banknote"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

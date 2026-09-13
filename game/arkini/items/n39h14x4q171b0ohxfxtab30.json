@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wolf"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "wolf-in-sheeps-clothing"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

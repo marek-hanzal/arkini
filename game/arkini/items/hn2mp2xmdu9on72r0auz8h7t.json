@@ -8,11 +8,22 @@
 		"asset": {
 			"scale": 1,
 			"default": [
-				"faith-bear"
+				"teddy-bear"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bear"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bear-with-teddy-bear"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

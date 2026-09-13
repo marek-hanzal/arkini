@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "dynamite"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "dynamite-fed-fawn"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

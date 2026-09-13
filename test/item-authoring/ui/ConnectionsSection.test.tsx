@@ -63,36 +63,40 @@ vi.mock("~/translation/ui/useTranslator", () => ({
 }));
 
 vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
-	readItemConnectionsFn: () => [
-		{
-			maxQueueSize: 1,
-			lines: [],
+	readItemConnectionsFn: () =>
+		[
+			{
+				maxQueueSize: 1,
+				lines: [],
 
-			asset: {
-				scale: 0.8,
-				default: [],
+				asset: {
+					scale: 0.8,
+					default: [],
+				},
+				description: "Consumes the selected item.",
+				id: "consumer",
+				title: "Consumer",
+
+				uid: "consumer-uid",
 			},
-			description: "Consumes the selected item.",
-			id: "consumer",
-			title: "Consumer",
+			{
+				maxQueueSize: 1,
+				lines: [],
 
-			uid: "consumer-uid",
-		},
-		{
-			maxQueueSize: 1,
-			lines: [],
+				asset: {
+					scale: 0.8,
+					default: [],
+				},
+				description: "Also consumes the selected item.",
+				id: "peer",
+				title: "Peer",
 
-			asset: {
-				scale: 0.8,
-				default: [],
+				uid: "peer-uid",
 			},
-			description: "Also consumes the selected item.",
-			id: "peer",
-			title: "Peer",
-
-			uid: "peer-uid",
-		},
-	],
+		].map((item) => ({
+			item,
+			origins: [],
+		})),
 }));
 
 vi.mock("~/editor-control/ui/EditorSearchCombobox", () => ({

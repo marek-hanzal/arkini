@@ -1,3 +1,4 @@
+import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { readDetailSectionFn } from "~/item-authoring/fn/readDetailSectionFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -207,12 +208,22 @@ export const FormSession = ({
 						)
 					}
 					title={
-						<controller.form.Subscribe selector={(state) => state.values.title}>
-							{(title) => (
-								<h1 className="truncate text-xl font-semibold">
-									{title.trim() ||
-										(isNew ? translator.textFn("New item") : initialItem.id)}
-								</h1>
+						<controller.form.Subscribe
+							selector={(state) =>
+								[
+									state.values.title,
+									state.values.asset.default,
+								] as const
+							}
+						>
+							{([title, resourceIds]) => (
+								<ItemHeaderTitle
+									resourceIds={resourceIds}
+									title={
+										title.trim() ||
+										(isNew ? translator.textFn("New item") : initialItem.id)
+									}
+								/>
 							)}
 						</controller.form.Subscribe>
 					}

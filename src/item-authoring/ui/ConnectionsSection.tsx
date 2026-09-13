@@ -10,6 +10,7 @@ import {
 	EditorSearchCombobox,
 } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorSelect } from "~/editor-control/ui/EditorSelect";
+import type { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
@@ -91,17 +92,16 @@ export const ConnectionsSection = ({
 	});
 	const selectedConnectionId =
 		searchSelection.scope === searchScope &&
-		connectionItems.some((item) => item.id === searchSelection.itemId)
+		connectionItems.some(({ item }) => item.id === searchSelection.itemId)
 			? searchSelection.itemId
 			: "";
 	const searchOptions = useMemo(
 		() =>
 			connectionItems.map(
-				(item) =>
+				({ item }) =>
 					({
 						id: item.id,
 						label: item.title,
-						meta: item.id,
 						terms: [
 							item.id,
 							item.title,
@@ -116,7 +116,7 @@ export const ConnectionsSection = ({
 	const visibleConnectionItems =
 		selectedConnectionId.length === 0
 			? connectionItems
-			: connectionItems.filter((item) => item.id === selectedConnectionId);
+			: connectionItems.filter(({ item }) => item.id === selectedConnectionId);
 	const emptyState = EmptyStateByFilter[filter];
 
 	return (
@@ -195,13 +195,23 @@ export const ConnectionsSection = ({
 					className="ak-list grid gap-2"
 					data-ui="EditorItemConnectionsList"
 				>
-					{visibleConnectionItems.map((item) => (
+					{visibleConnectionItems.map(({ item, origins }) => (
 						<article
 							className="ak-list-row ak-list-row-interactive relative flex min-h-16 min-w-0 items-center gap-4 rounded-xl p-3"
 							data-ui="EditorItemConnectionsRow"
 							key={item.id}
 						>
 							<DetailReference
+								description={
+									<span className="flex flex-wrap gap-x-4 gap-y-1">
+										{origins.map((origin, index) => (
+											<ConnectionOrigin
+												key={index}
+												origin={origin}
+											/>
+										))}
+									</span>
+								}
 								itemId={item.id}
 								search={{
 									filter,
@@ -215,5 +225,59 @@ export const ConnectionsSection = ({
 				</section>
 			)}
 		</div>
+	);
+};
+
+/** A compact authored path; the source belongs to the owner in either connection direction. */
+const ConnectionOrigin = ({ origin }: { readonly origin: readItemConnectionFactsFn.Origin }) => {
+	const translator = useTranslator();
+	const source = origin.source;
+	let label: string;
+	switch (source.type) {
+		case "line":
+			label = `${translator.textFn("Product line")} ${source.lineIndex + 1}: ${source.title}`;
+			break;
+		case "merge":
+			label = `${translator.textFn("Merge")} ${source.mergeIndex + 1}`;
+			break;
+		case "action":
+			label = translator.textFn("Action");
+			break;
+		case "units":
+			label = translator.textFn("Unit depletion");
+			break;
+		case "expiry":
+			label = translator.textFn("Clock expiry");
+			break;
+		case "clock":
+			label = translator.textFn("Clock");
+			break;
+	}
+	const roleLabels = {
+		input: "Input",
+		condition: "Condition",
+		output: "Output",
+		replacement: "Replacement",
+	} as const;
+	const rollLabels = {
+		guaranteed: translator.textFn("Guaranteed"),
+		chance: translator.textFn("Chance"),
+		weight: translator.textFn("Weighted"),
+	};
+	const roll = origin.roll;
+	return (
+		<span>
+			{label}
+			{" · "}
+			{translator.textFn(roleLabels[origin.role])}
+			{roll === undefined ? null : (
+				<>
+					{" · "}
+					{translator.textFn("Output set")} {roll.setIndex + 1}
+					{" / "}
+					{rollLabels[roll.rollType]} {translator.textFn("Roll")} {roll.rollIndex + 1}
+				</>
+			)}
+		</span>
 	);
 };

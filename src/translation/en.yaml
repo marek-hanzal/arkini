@@ -119,6 +119,8 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
+Chance:
+  value: Chance
 Check ahead:
   value: Check ahead
 Choose a different Project ID.:
@@ -137,8 +139,13 @@ Clock attempts the marked line at each interval and can also limit this item's l
   value: Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.
 Clock configured:
   value: Clock configured
+Clock expiry:
+  value: Clock expiry
 Close:
   value: Close
+  dynamic: true
+Condition:
+  value: Condition
   dynamic: true
 Connection search empty:
   value: No connection matches this search.
@@ -343,6 +350,9 @@ Included in current project:
   value: Included in current project
 Initial units:
   value: Initial units
+Input:
+  value: Input
+  dynamic: true
 Input type:
   value: Input type
 Inputs:
@@ -405,6 +415,8 @@ Item connections help:
     - **Inputs** shows those same direct inputs and positive conditions from the selected owner's side.
     - **Produces** lists the direct outputs of authored operations owned by the selected item.
     - **Produced by** lists owners that emit this item through production lines, Clock expiry, unit depletion, or merges. These are authored possibilities, regardless of current availability.
+
+    Each connection shows its authored source instead of an item ID: the production line, action, merge, unit depletion, or Clock, including output set and roll when applicable. Multiple sources share one item row.
 
     Use the search to find an item in the active relationship list. Open any result to inspect that item without losing the selected relationship.
 Item delete help:
@@ -627,6 +639,9 @@ No items yet:
   value: No items yet
 No matching items:
   value: No matching items
+No other authored item outputs this item through production, expiry, units, or merges.:
+  value: No other authored item outputs this item through production, expiry, units, or merges.
+  dynamic: true
 No output:
   value: No output
 No output configured.:
@@ -658,14 +673,11 @@ Notes help:
     Notes travel with the portable Editor project, but are excluded from **Build** and **Arkpack** output. Use Git to version the project and its notes.
 Notes unavailable:
   value: Notes are unavailable.
-Nothing requires this item:
-  value: Nothing requires this item
-  dynamic: true
 Nothing produces this item:
   value: Nothing produces this item
   dynamic: true
-No other authored item outputs this item through production, expiry, units, or merges.:
-  value: No other authored item outputs this item through production, expiry, units, or merges.
+Nothing requires this item:
+  value: Nothing requires this item
   dynamic: true
 Once:
   value: Once
@@ -695,6 +707,8 @@ Output:
   value: Output
 Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.:
   value: Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.
+Output set:
+  value: Output set
 Outputs:
   value: Outputs
 Overlay asset:
@@ -729,11 +743,11 @@ Player hint:
   value: Player hint
 Preparing asset preview…:
   value: Preparing asset preview…
-Produces:
-  value: Produces
-  dynamic: true
 Produced by:
   value: Produced by
+  dynamic: true
+Produces:
+  value: Produces
   dynamic: true
 Product line:
   value: Product line
@@ -798,6 +812,9 @@ Replace:
   value: Replace
 Replace image:
   value: Replace image
+Replacement:
+  value: Replacement
+  dynamic: true
 Replacement item:
   value: Replacement item
 "Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent units carry over only to a compatible replacement with units; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle.":
@@ -825,6 +842,8 @@ Retry loading notes:
   value: Retry loading notes
 "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged.":
   value: "Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged."
+Roll:
+  value: Roll
 Rules:
   value: Rules
 Running:
@@ -989,6 +1008,8 @@ UID:
   value: UID
 Unit cost:
   value: Unit cost
+Unit depletion:
+  value: Unit depletion
 Units:
   value: Units
   dynamic: true
@@ -1036,6 +1057,8 @@ Visible lines are shown to the player before runtime rules alter their visibilit
   value: Visible lines are shown to the player before runtime rules alter their visibility.
 Weight:
   value: Weight
+Weighted:
+  value: Weighted
 Weighted selections:
   value: Weighted selections
 With note:

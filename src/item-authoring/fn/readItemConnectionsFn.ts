@@ -1,5 +1,5 @@
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { readItemConnectionFactIdsFn } from "~/flow/fn/readItemConnectionFactIdsFn";
+import { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 
 /** Projects one canonical authored connection view to sorted items. */
@@ -8,16 +8,20 @@ export const readItemConnectionsFn = (
 	itemId: string,
 	filter: ItemConnectionFilter,
 ) =>
-	readItemConnectionFactIdsFn(config, itemId, filter)
-		.flatMap((connectionItemId) => {
+	readItemConnectionFactsFn(config, itemId, filter)
+		.flatMap(({ itemId: connectionItemId, origins }) => {
 			const item = config.items[connectionItemId];
 			return item === undefined
 				? []
 				: [
-						item,
+						{
+							item,
+							origins,
+						},
 					];
 		})
 		.sort(
 			(left, right) =>
-				left.title.localeCompare(right.title) || left.id.localeCompare(right.id),
+				left.item.title.localeCompare(right.item.title) ||
+				left.item.id.localeCompare(right.item.id),
 		);

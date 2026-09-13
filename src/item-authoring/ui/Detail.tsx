@@ -1,3 +1,4 @@
+import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
@@ -59,9 +60,10 @@ export const Detail = ({
 						/>
 					}
 					title={
-						<h1 className="flex min-w-0 items-center gap-2 text-xl font-semibold">
-							<span className="truncate">{item.title || item.id}</span>
-						</h1>
+						<ItemHeaderTitle
+							resourceIds={item.asset.default}
+							title={item.title || item.id}
+						/>
 					}
 					tabs={
 						<EditorSectionTabs>

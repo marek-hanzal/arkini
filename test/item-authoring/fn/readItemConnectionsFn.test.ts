@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
-import { readItemConnectionFactIdsFn } from "~/flow/fn/readItemConnectionFactIdsFn";
+import { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,
@@ -14,7 +14,7 @@ const readIdsFn = (
 	config: GameConfigSchema.Type,
 	itemId: string,
 	filter: "required-by" | "inputs" | "produces",
-) => readItemConnectionsFn(config, itemId, filter).map(({ id }) => id);
+) => readItemConnectionsFn(config, itemId, filter).map(({ item }) => item.id);
 
 const enableRuleFn = (itemId: string) => ({
 	type: "enable" as const,
@@ -192,7 +192,9 @@ describe("readItemConnectionsFn", () => {
 			"cappedResult",
 			"result",
 		]);
-		expect(readItemConnectionFactIdsFn(config, "result", "produced-by")).toEqual([
+		expect(
+			readItemConnectionFactsFn(config, "result", "produced-by").map(({ itemId }) => itemId),
+		).toEqual([
 			"blueprint",
 			"craft",
 			"mergeSource",
@@ -202,10 +204,48 @@ describe("readItemConnectionsFn", () => {
 			"temporaryOutput",
 			"temporaryRandomOutput",
 		]);
-		expect(readItemConnectionFactIdsFn(config, "cappedResult", "produced-by")).toEqual([
+		expect(
+			readItemConnectionFactsFn(config, "cappedResult", "produced-by").map(
+				({ itemId }) => itemId,
+			),
+		).toEqual([
 			"mergeSource",
 			"temporaryCappedOutput",
 		]);
+		const reverseOrigins = readItemConnectionFactsFn(config, "result", "produced-by").find(
+			(connection) => connection.itemId === "producer",
+		)?.origins;
+		expect(reverseOrigins).toEqual([
+			{
+				source: {
+					type: "line",
+					lineIndex: 0,
+					title: line.title,
+				},
+				role: "output",
+				roll: {
+					setIndex: 0,
+					rollIndex: 0,
+					rollType: "guaranteed",
+				},
+			},
+			{
+				source: {
+					type: "expiry",
+				},
+				role: "output",
+				roll: {
+					setIndex: 0,
+					rollIndex: 0,
+					rollType: "guaranteed",
+				},
+			},
+		]);
+		expect(
+			readItemConnectionFactsFn(config, "producer", "produces").find(
+				(connection) => connection.itemId === "result",
+			)?.origins,
+		).toEqual(reverseOrigins);
 	});
 
 	it("keeps positive line, output, and immediate-action conditions", () => {
@@ -311,6 +351,51 @@ describe("readItemConnectionsFn", () => {
 		expect(readIdsFn(config, "output-permit", "required-by")).toEqual([
 			"forge",
 		]);
-		expect(readItemConnectionFactIdsFn(config, "output-permit", "produced-by")).toEqual([]);
+		expect(
+			readItemConnectionFactsFn(config, "output-permit", "produced-by").map(
+				({ itemId }) => itemId,
+			),
+		).toEqual([]);
+		expect(readItemConnectionFactsFn(config, "portal", "inputs")).toEqual([
+			{
+				itemId: "line-permit",
+				origins: [
+					{
+						source: {
+							type: "action",
+						},
+						role: "condition",
+					},
+				],
+			},
+			{
+				itemId: "water",
+				origins: [
+					{
+						source: {
+							type: "action",
+						},
+						role: "input",
+					},
+				],
+			},
+		]);
+		expect(
+			readItemConnectionFactsFn(config, "output-permit", "required-by")[0]?.origins,
+		).toEqual(
+			forge.lines.map((line, lineIndex) => ({
+				source: {
+					type: "line",
+					lineIndex,
+					title: line.title,
+				},
+				role: "condition",
+				roll: {
+					setIndex: 0,
+					rollIndex: 0,
+					rollType: "guaranteed",
+				},
+			})),
+		);
 	});
 });

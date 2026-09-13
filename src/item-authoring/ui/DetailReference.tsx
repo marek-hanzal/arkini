@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ButtonLink } from "~/ui/ui/Button";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { SectionId } from "~/item-authoring/type/Section";
@@ -7,11 +8,13 @@ import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 /** Links one known item reference to the requested detail section. */
 export const DetailReference = ({
 	itemId,
+	description,
 	search = {},
 	sectionId = "identity",
 	stretched = false,
 }: {
 	readonly itemId: string;
+	readonly description?: ReactNode;
 	readonly search?: {
 		readonly filter?: ItemConnectionFilter;
 	};
@@ -47,9 +50,15 @@ export const DetailReference = ({
 				<span className="block truncate font-medium text-foreground transition-colors group-hover:text-accent">
 					{item.title}
 				</span>
-				<span className="mt-0.5 block truncate font-mono text-xs font-normal text-muted transition-colors group-hover:text-accent">
-					{item.id}
-				</span>
+				{description === undefined ? (
+					<span className="mt-0.5 block truncate font-mono text-xs font-normal text-muted transition-colors group-hover:text-accent">
+						{item.id}
+					</span>
+				) : (
+					<span className="mt-0.5 block whitespace-normal text-xs font-normal text-muted transition-colors group-hover:text-accent">
+						{description}
+					</span>
+				)}
 			</span>
 		</ButtonLink>
 	);

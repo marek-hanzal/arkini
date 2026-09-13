@@ -3,15 +3,7 @@ import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 
 export namespace readItemChainsFn {
-	export type Stop =
-		| "final"
-		| "retained"
-		| "spent"
-		| "cycle"
-		| "depth"
-		| "manual"
-		| "missing"
-		| "ongoing";
+	export type Stop = "final" | "retained" | "spent" | "cycle" | "depth" | "missing" | "ongoing";
 	export interface OutputPath {
 		readonly set: number;
 		readonly setWeight: number;
@@ -85,7 +77,6 @@ export const readItemChainsFn = (
 	items: Readonly<Record<string, ItemSchema.Type>>,
 	rootId: string,
 	maxDepth = 5,
-	stoppedPaths: ReadonlySet<string> = new Set(),
 ): readItemChainsFn.Result => {
 	const root = items[rootId];
 	if (root === undefined)
@@ -117,13 +108,11 @@ export const readItemChainsFn = (
 					? preserved
 					: item.clock === undefined
 						? "final"
-						: stoppedPaths.has(path)
-							? "manual"
-							: ancestors.includes(itemId)
-								? "cycle"
-								: depth >= depthLimit
-									? "depth"
-									: undefined;
+						: ancestors.includes(itemId)
+							? "cycle"
+							: depth >= depthLimit
+								? "depth"
+								: undefined;
 		return {
 			itemId,
 			path,

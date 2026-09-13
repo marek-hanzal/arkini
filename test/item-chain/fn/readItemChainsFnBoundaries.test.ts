@@ -11,7 +11,7 @@ import {
 } from "./readItemChainsFn.test/fixtures";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 describe("chain termination and authored output boundaries", () => {
-	it("distinguishes a truncated or manually stopped Clock from a final item", () => {
+	it("distinguishes a truncated Clock from a final item", () => {
 		const items = catalogFn(
 			itemFn("root", {
 				merge: [
@@ -28,16 +28,6 @@ describe("chain termination and authored output boundaries", () => {
 		expect(finalIdsFn(readItemChainsFn(items, "root", 2))).toEqual([
 			"end",
 		]);
-		const stopped = readItemChainsFn(
-			items,
-			"root",
-			5,
-			new Set([
-				"merge/0/replacement",
-			]),
-		);
-		expect(stopped.chains[0].outcomes[0].stop).toBe("manual");
-		expect(finalIdsFn(stopped)).toEqual([]);
 	});
 
 	it("cuts same-branch Clock cycles while preserving independent branches", () => {

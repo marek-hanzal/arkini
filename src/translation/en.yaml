@@ -137,26 +137,20 @@ Chain help:
     - The starting item's own Clock is also available. After the first operation, only Clock expiry and the output of its Clock-selected production line continue. Intermediate merge rules and production input chains are ignored.
     - Each emitted item without a Clock ends its branch. Results include items emitted along the way. Click a result item to open its Chain tab and start a new investigation, including that item's own merges.
     - Periodic output is shown once per admitted line run, with its interval, line duration and owner lifetime. It is not an accumulated yield or a promise of successful production.
-    - Show steps and quantities reveals each operation. Quantities belong to that operation, not the whole chain. Output sets are alternatives; rolls within a selected set run together; weighted candidates are alternatives per selection. Conditions and chance remain visible.
-    - Maximum steps counts one merge or one Clock operation as a step. Depth limits, manually stopped branches and Clock loops are unfinished paths, not final items. Stop here prunes one branch; Continue branch restores it. Reaching the safety limit explicitly reports incomplete exploration.
+    - Details reveals each operation. Quantities belong to that operation, not the whole chain. Output sets are alternatives; rolls within a selected set run together; weighted candidates are alternatives per selection. Conditions and chance remain visible.
+    - Exploration follows up to five steps. Each merge or Clock operation counts as one step. Depth limits and Clock loops are unfinished paths, not final items. Reaching the safety limit explicitly reports incomplete exploration.
     - Retained merge participants keep their existing runtime state; their Clock is not restarted. Spending a unit is marked separately, with conditional depletion output when configured.
     - This is authored inspection, not runtime simulation. Disabled defaults, conditions, inputs, jobs and blocked placement may prevent or delay an outcome. Times are local configured durations, not guaranteed elapsed times.
-Chain introduction:
-  value: Explore this item's merges and Clock, then follow only Clock outcomes. Results include items emitted along the way.
 Chain pulse explanation:
   value: Shown once per admitted run. The owner remains until expiry. Inputs, availability, queueing and output placement can delay or prevent production.
 Chain safety limit:
-  value: This exploration reached its safety limit. Some branches are omitted; reduce the maximum steps to inspect a smaller chain.
-Chains:
-  value: Chains
+  value: This exploration reached its safety limit. Some branches are omitted.
 Chance:
   value: Chance
 Check ahead:
   value: Check ahead
 Choose a different Project ID.:
   value: Choose a different Project ID.
-Choose a starting item:
-  value: Choose a starting item
 Clear interval:
   value: Clear interval
 Clear lifetime:
@@ -200,8 +194,6 @@ Consumed:
   value: Consumed
 Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.:
   value: Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.
-Continue branch:
-  value: Continue branch
 Control:
   value: Control
 Copy from:
@@ -252,6 +244,8 @@ Describe what this line consumes and produces.:
   value: Describe what this line consumes and produces.
 Description:
   value: Description
+Details:
+  value: Details
 Dimensions:
   value: Dimensions
 Disable:
@@ -369,6 +363,9 @@ Far:
   dynamic: true
 Fastest first:
   value: Fastest first
+Final item:
+  value: Final item
+  dynamic: true
 Finishing accepted work:
   value: Finishing accepted work
 Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.:
@@ -668,8 +665,6 @@ Maximum global count:
   value: Maximum global count
 Maximum stack size:
   value: Maximum stack size
-Maximum steps:
-  value: Maximum steps
 Merge:
   value: Merge
 Merge output:
@@ -832,8 +827,6 @@ Player controls govern manual production, material management, queue changes and
   value: Player controls govern manual production, material management, queue changes and line selection.
 Player hint:
   value: Player hint
-Possible results:
-  value: Possible results
 Preparing asset preview…:
   value: Preparing asset preview…
 Produced by:
@@ -934,8 +927,6 @@ Reserve:
   value: Reserve
 Reserved:
   value: Reserved
-Reset branch stops:
-  value: Reset branch stops
 Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.:
   value: Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.
 Resource ID:
@@ -1010,8 +1001,6 @@ Show:
   value: Show
 Show all:
   value: Show all
-Show steps and quantities:
-  value: Show steps and quantities
 Simple:
   value: Simple
 Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.:
@@ -1053,11 +1042,6 @@ Starting layout controls help:
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
 Status:
   value: Status
-Stop here:
-  value: Stop here
-Stopped here:
-  value: Stopped here
-  dynamic: true
 Storage:
   value: Storage
 Storage scope:

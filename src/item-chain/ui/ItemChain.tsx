@@ -1,21 +1,19 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ArrowRight, Clock, GitBranch } from "lucide-react";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { EditorSelect } from "~/editor-control/ui/EditorSelect";
 import { readItemChainsFn } from "~/item-chain/fn/readItemChainsFn";
 import { ButtonLink } from "~/ui/ui/Button";
-import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 const stopLabels = {
+	final: "Final item",
 	retained: "Remains",
 	spent: "Spends one unit",
 	cycle: "Clock loop",
 	depth: "Depth limit",
-	manual: "Stopped here",
 	missing: "Missing item",
 	ongoing: "No finite lifetime",
 	"no-output": "No items emitted",
@@ -25,93 +23,21 @@ const quantityFn = (quantity: { readonly min: number; readonly max: number }) =>
 const durationFn = (ms: number) =>
 	ms >= 60000 ? `${Math.round(ms / 600) / 100} min` : `${Math.round(ms / 10) / 100} s`;
 
-/** Shared item/global Chain exploration; changing the root resets branch-local decisions. */
-export const ItemChain = ({ itemId }: { readonly itemId: string }) => (
-	<ChainExplorer
-		key={itemId}
-		itemId={itemId}
-	/>
-);
-
-const ChainExplorer = ({ itemId }: { readonly itemId: string }) => {
+export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const [depth, setDepthFn] = useState("5");
-	const [stopSelection, setStopSelectionFn] = useState({
-		items: project.config.items,
-		paths: new Set<string>(),
-	});
-	const stopped = useMemo(
-		() =>
-			stopSelection.items === project.config.items ? stopSelection.paths : new Set<string>(),
-		[
-			stopSelection,
-			project.config.items,
-		],
-	);
 	const projection = useMemo(
-		() => readItemChainsFn(project.config.items, itemId, Number(depth), stopped),
+		() => readItemChainsFn(project.config.items, itemId),
 		[
 			project.config.items,
 			itemId,
-			depth,
-			stopped,
 		],
 	);
-	const toggleStopFn = (path: string) =>
-		setStopSelectionFn(() => {
-			const next = new Set(stopped);
-			if (next.has(path)) next.delete(path);
-			else next.add(path);
-			return {
-				items: project.config.items,
-				paths: next,
-			};
-		});
 	return (
 		<section
 			data-ui="EditorItemChain"
 			className="flex flex-col gap-4"
 		>
-			<EditorRootCard dataUi="EditorChainControls">
-				<div className="flex flex-wrap items-center justify-between gap-4">
-					<div className="min-w-0 flex-1">
-						<p className="font-semibold">{translator.textFn("Chain")}</p>
-						<p className="mt-1 text-sm text-muted">
-							{translator.textFn("Chain introduction")}
-						</p>
-					</div>
-					<EditorSelect
-						label={translator.textFn("Maximum steps")}
-						value={depth}
-						onChangeFn={setDepthFn}
-						options={[
-							1,
-							2,
-							3,
-							4,
-							5,
-							8,
-							12,
-						].map((value) => ({
-							value: String(value),
-							label: String(value),
-						}))}
-					/>
-					{stopped.size === 0 ? null : (
-						<LinkButton
-							onClick={() =>
-								setStopSelectionFn({
-									items: project.config.items,
-									paths: new Set(),
-								})
-							}
-						>
-							{translator.textFn("Reset branch stops")}
-						</LinkButton>
-					)}
-				</div>
-			</EditorRootCard>
 			{projection.truncated ? (
 				<p className="text-sm text-muted">{translator.textFn("Chain safety limit")}</p>
 			) : null}
@@ -148,47 +74,38 @@ const ChainExplorer = ({ itemId }: { readonly itemId: string }) => {
 						</div>
 						<ArrowRight className="size-5 text-muted" />
 						<div className="min-w-0 max-w-full justify-self-end">
-							<p className="mb-2 text-right text-sm font-semibold">
-								{translator.textFn("Possible results")}
-							</p>
 							<div className="flex flex-wrap justify-end gap-3">
-								{chain.outcomes.map((outcome, index) => (
-									<div
-										key={index}
-										className="rounded-lg border border-line p-2"
-										data-ui="EditorChainOutcome"
-									>
-										{outcome.itemId === undefined ? null : (
-											<ItemReference
-												itemId={outcome.itemId}
-												sectionId="chain"
-											/>
-										)}
-										{outcome.stop !== "final" ||
-										outcome.periodic ||
-										outcome.conditional ? (
+								{chain.outcomes.length > 0 &&
+								chain.outcomes.every((outcome) => outcome.stop === "no-output") ? (
+									<p className="text-sm font-bold">
+										{translator.textFn("No items emitted")}
+									</p>
+								) : null}
+								{chain.outcomes
+									.filter((outcome) => outcome.stop !== "no-output")
+									.map((outcome, index) => (
+										<div
+											key={index}
+											className="rounded-lg border border-line p-2"
+											data-ui="EditorChainOutcome"
+										>
+											{outcome.itemId === undefined ? null : (
+												<ItemReference
+													itemId={outcome.itemId}
+													sectionId="chain"
+												/>
+											)}
 											<p className="mt-1 text-xs text-muted">
-												{[
-													outcome.stop === "final"
-														? null
-														: translator.textFn(
-																stopLabels[outcome.stop],
-															),
-													outcome.periodic
-														? translator.textFn("Repeated output")
-														: null,
-													outcome.conditional
-														? translator.textFn(
-																"Conditional or alternative",
-															)
-														: null,
-												]
-													.filter(Boolean)
-													.join(" · ")}
+												{translator.textFn(stopLabels[outcome.stop])}
+												{outcome.periodic
+													? ` · ${translator.textFn("Repeated output")}`
+													: ""}
+												{outcome.conditional
+													? ` · ${translator.textFn("Conditional or alternative")}`
+													: ""}
 											</p>
-										) : null}
-									</div>
-								))}
+										</div>
+									))}
 							</div>
 						</div>
 					</div>
@@ -197,14 +114,13 @@ const ChainExplorer = ({ itemId }: { readonly itemId: string }) => {
 						data-ui="EditorChainSteps"
 					>
 						<summary className="cursor-pointer text-sm font-semibold text-accent">
-							{translator.textFn("Show steps and quantities")}
+							{translator.textFn("Details")}
 						</summary>
 						<div className="mt-3 flex flex-col gap-3">
 							{chain.steps.map((step) => (
 								<ChainStep
 									key={step.path}
 									step={step}
-									onStopFn={toggleStopFn}
 								/>
 							))}
 						</div>
@@ -245,13 +161,7 @@ const ItemReference = ({
 	);
 };
 
-const ChainStep = ({
-	step,
-	onStopFn,
-}: {
-	readonly step: readItemChainsFn.Step;
-	readonly onStopFn: (path: string) => void;
-}) => {
+const ChainStep = ({ step }: { readonly step: readItemChainsFn.Step }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const owner = project.config.items[step.ownerId];
@@ -343,20 +253,10 @@ const ChainStep = ({
 							{node.quantity === undefined ? null : (
 								<span className="text-sm">{quantityFn(node.quantity)}</span>
 							)}
-							{node.stop === undefined || node.stop === "final" ? null : (
+							{node.stop === undefined ? null : (
 								<span className="text-xs text-muted">
 									{translator.textFn(stopLabels[node.stop])}
 								</span>
-							)}
-							{node.steps.length === 0 && node.stop !== "manual" ? null : (
-								<LinkButton
-									className="min-h-0 p-0 text-xs"
-									onClick={() => onStopFn(node.path)}
-								>
-									{translator.textFn(
-										node.stop === "manual" ? "Continue branch" : "Stop here",
-									)}
-								</LinkButton>
 							)}
 						</div>
 						{node.output === undefined ? null : (
@@ -392,7 +292,6 @@ const ChainStep = ({
 								<ChainStep
 									key={child.path}
 									step={child}
-									onStopFn={onStopFn}
 								/>
 							))}
 						</div>

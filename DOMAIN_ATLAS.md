@@ -139,7 +139,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |
 | `project-note` | Ordered portable project Notes | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
 | `authoring-mcp` | MCP schemas, storage, HTTP/tools/tunnel lifecycle and Editor presentation | [`src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts`](src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts) |
-| `item-chain` | Root-owned merge and Clock consequence exploration, shared by Item and global Chains | [`src/item-chain/fn/readItemChainsFn.ts`](src/item-chain/fn/readItemChainsFn.ts), [`src/item-chain/ui/ItemChain.tsx`](src/item-chain/ui/ItemChain.tsx) |
+| `item-chain` | Root-owned merge and Clock consequence exploration in Item detail | [`src/item-chain/fn/readItemChainsFn.ts`](src/item-chain/fn/readItemChainsFn.ts), [`src/item-chain/ui/ItemChain.tsx`](src/item-chain/ui/ItemChain.tsx) |
 | `flow` | Authored acquisition graph and relation semantics | [`src/flow/fn/createAcquisitionGraphFn.ts`](src/flow/fn/createAcquisitionGraphFn.ts) |
 | `flow-layout` | Deterministic graph layout and worker lifecycle | [`src/flow-layout/fx/layoutInWorkerFx.ts`](src/flow-layout/fx/layoutInWorkerFx.ts) |
 | `flow-canvas` | Flow projections, Canvas painting and interaction | [`src/flow-canvas/ui/EditorGameFlow.tsx`](src/flow-canvas/ui/EditorGameFlow.tsx) |

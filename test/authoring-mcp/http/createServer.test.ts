@@ -56,6 +56,7 @@ describe("editor MCP server", () => {
 			"item_input",
 			"item_output",
 			"item_estimate",
+			"item_chain",
 		]);
 		const assetCollectionSchema = tools.tools.find(
 			({ name }) => name === "asset_collection",

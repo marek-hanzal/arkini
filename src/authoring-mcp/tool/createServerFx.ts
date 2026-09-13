@@ -20,6 +20,7 @@ import { readAssetCollectionTextFn } from "./fn/readAssetCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
+import { readItemChainTextFx } from "./readItemChainTextFx";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
@@ -79,6 +80,18 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 			title: `Item ${role} relation tool input`,
 			description: `The root item and traversal depth for the item ${role} relation tool.`,
 		});
+
+const ItemChainInputSchema = z
+	.object({
+		itemId: IdSchema.describe("The exact starting item ID returned by item_collection."),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:item-chain-input",
+		title: "Item Chain tool input",
+		description:
+			"The starting item for the Editor Chain projection; uses its fixed default depth.",
+	});
 
 const ItemEstimateInputSchema = z
 	.object({
@@ -449,6 +462,23 @@ const createServerFn = (
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemEstimateTextFx(project, itemId, quantity)),
+				),
+			),
+	);
+	server.registerTool(
+		"item_chain",
+		{
+			description:
+				"Explore what one item can turn into through its own directional merges and Clock. Returns the same bounded projection as Item → Chain, as readable text with all results and the complete Details tree: intermediate items, operation owners, merge/line identities, per-operation times and quantities, output sets, rolls, chances, weighted candidates, conditions and termination states. Uses the Editor default depth of 5; no depth argument. Only the root's merges initiate interaction; subsequent steps follow Clock expiry and Clock-selected line outputs. Reverse/intermediate merges, other production lines and production input acquisition are excluded. No-Clock items terminate branches. This is authored possibility analysis, not runtime simulation or accumulated periodic yield. Use item_input/item_output for general relations and item_estimate for acquisition planning.",
+			inputSchema: ItemChainInputSchema,
+			annotations: {
+				readOnlyHint: true,
+			},
+		},
+		async ({ itemId }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => readItemChainTextFx(project, itemId)),
 				),
 			),
 	);

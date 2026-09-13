@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "copper-bathtub-with-water"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "paper-boat-bath"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

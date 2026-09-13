@@ -31,6 +31,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "beagle-puppy-with-fawn"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-cuddling-puppy"
 			}
 		],
 		"maxQueueSize": 1,

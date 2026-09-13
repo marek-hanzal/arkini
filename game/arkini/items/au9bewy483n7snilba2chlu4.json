@@ -1,21 +1,23 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "hqrm0shkrcrp9i6d2m8ysr0t",
-		"id": "sugar-beet-field",
-		"title": "Sugar Beet Field",
-		"description": "Here you go",
+		"uid": "au9bewy483n7snilba2chlu4",
+		"id": "well-fed-cow",
+		"title": "Well Fed Cow",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"sugar-beet-field"
+				"well-fed-cow"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
-		"units": {
-			"amount": 32,
-			"output": {
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
 				"set": [
 					{
 						"weight": 1,
@@ -24,10 +26,19 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "empty-sugar-beet-field",
+										"itemId": "cow",
 										"quantity": {
 											"min": 1,
 											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 3,
+											"max": 5
 										},
 										"placement": "drop",
 										"rules": []

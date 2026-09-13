@@ -14,17 +14,6 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "fertilized-field"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sugar-beet-field"
-			}
-		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

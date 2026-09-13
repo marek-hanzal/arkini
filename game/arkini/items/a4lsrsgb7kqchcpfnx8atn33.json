@@ -17,15 +17,6 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-field"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "fertilized-field"
-			},
-			{
-				"target": {
-					"type": "item",
 					"itemId": "empty-grain-field"
 				},
 				"action": "consume",

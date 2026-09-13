@@ -1,0 +1,65 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "kqhuptuolwx1u0uy6opco9xt",
+		"id": "fighting-british-shorthairs",
+		"title": "Fighting British Shorthairs",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"fighting-british-shorthairs"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 20000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "british-shorthair-shorn",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "animal-bones",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "raw-game-meat",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

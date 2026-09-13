@@ -1,0 +1,65 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "o23a0lwo9dfdzakf4koxxjpj",
+		"id": "well-fed-chicken-dynamite",
+		"title": "Well Fed Chicken - Dynamite",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"well-fed-chicken"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "explosive-egg",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "sick-chicken",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

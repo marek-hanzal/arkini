@@ -78,6 +78,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sick-beagle"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle-puppy"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-cuddling-puppy"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagles-sniffing-each-other"
 			}
 		],
 		"maxQueueSize": 1,

@@ -31,6 +31,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "british-shorthair-kitten-in-sack"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "british-shorthair"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "british-shorthair-cuddling-kitten"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "british-shorthair-kitten"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "playing-british-shorthair-kittens"
 			}
 		],
 		"maxQueueSize": 1,

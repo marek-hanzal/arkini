@@ -1,14 +1,14 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "m3bp1730f21d2vwwevt41xlv",
-		"id": "empty-field",
-		"title": "Empty Field",
-		"description": "Wanna grow something?",
+		"uid": "b1ihh5z72i0b4twuntnoaonj",
+		"id": "dirty-pig",
+		"title": "Dirty Pig",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"empty-field"
+				"dirty-pig"
 			]
 		},
 		"scope": "any",

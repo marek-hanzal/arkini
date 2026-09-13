@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sick-cow"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

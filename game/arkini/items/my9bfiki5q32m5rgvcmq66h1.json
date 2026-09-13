@@ -45,6 +45,38 @@
 				},
 				"effect": "replace",
 				"result": "toilet"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "dirty-pig"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "dirty-scrubbing-brush",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "pig"
 			}
 		],
 		"maxQueueSize": 1,

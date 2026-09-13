@@ -1,31 +1,20 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "bttupkw06zzxn8xuvb4d27uu",
-		"id": "hay",
-		"title": "Hay",
+		"uid": "mj9yqliwdhhry83a7mnv3sop",
+		"id": "beagles-sniffing-each-other",
+		"title": "Beagles Sniffing Each Other",
 		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"hay"
+				"beagles-sniffing-each-other"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "cow"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "well-fed-cow"
-			}
-		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 120000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -37,7 +26,16 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-hay",
+										"itemId": "beagle",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "beagle-puppy",
 										"quantity": {
 											"min": 1,
 											"max": 1

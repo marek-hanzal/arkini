@@ -70,6 +70,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "recovering-bear"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-beagle"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-beagle"
 			}
 		],
 		"maxQueueSize": 1,

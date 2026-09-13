@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bio-waste"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "dirty-pig"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

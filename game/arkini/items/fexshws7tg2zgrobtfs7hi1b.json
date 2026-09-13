@@ -1,21 +1,23 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "hqrm0shkrcrp9i6d2m8ysr0t",
-		"id": "sugar-beet-field",
-		"title": "Sugar Beet Field",
-		"description": "Here you go",
+		"uid": "fexshws7tg2zgrobtfs7hi1b",
+		"id": "playing-british-shorthair-kittens",
+		"title": "Playing British Shorthair Kittens",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"sugar-beet-field"
+				"playing-british-shorthair-kittens"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
-		"units": {
-			"amount": 32,
-			"output": {
+		"clock": {
+			"durationMs": 15000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
 				"set": [
 					{
 						"weight": 1,
@@ -24,10 +26,10 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "empty-sugar-beet-field",
+										"itemId": "british-shorthair-kitten",
 										"quantity": {
-											"min": 1,
-											"max": 1
+											"min": 2,
+											"max": 2
 										},
 										"placement": "drop",
 										"rules": []

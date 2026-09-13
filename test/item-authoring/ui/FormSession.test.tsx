@@ -1168,11 +1168,11 @@ describe("item section form session", () => {
 			maxStackSize: 1,
 			action: undefined,
 			clock: {
-				intervalMs: 300_000,
-				durationMs: 3_600_000,
+				durationMs: 300_000,
 			},
 			lines: [],
 		});
+		expect(state.saveItem.mock.lastCall?.[0].item.clock.intervalMs).toBeUndefined();
 	});
 
 	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
@@ -1311,7 +1311,7 @@ describe("item section form session", () => {
 					requestAnimationFrame(() => resolve());
 				}),
 		);
-		expect(document.activeElement).toBe(interval);
+		expect(document.activeElement).toBe(duration);
 		await changeInput(interval, "1");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();

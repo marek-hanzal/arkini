@@ -63,6 +63,7 @@ Before delivery takes an existing actor's pose, reconciliation retires its activ
 - `TileActorVisual.artworkScale` projects the required authored `asset.scale` once. Retained faces, layers, badges, progress and activity geometry use it on Board, Inventory and Toolbar, including Editor Board. Every crossfade slot keeps its own revision's ratio. The slot anchor, hit area and placement geometry remain full-size; transient actor/container motion still settles to its own neutral scale.
 - Actor stores follow exact runtime identities within their canvas. Pure canonical placement may normalize identity; presentation never assumes continuity from intent.
 - Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
+- Board Clock rings project the canonical interval phase and Clock enable/rules independently of jobs and queue admission. They have no pointer interaction; the existing job/lifetime bar retains its precedence. Exhausted finite Clocks have no upcoming pulse ring.
 - Async texture completion is generation-guarded. A complete current visual remains until a complete replacement is ready; superseded work cannot publish or destroy the surviving generation.
 - Teardown cancels gestures, subscriptions, animation, and async readiness before destroying actors, layers, textures, or the application.
 

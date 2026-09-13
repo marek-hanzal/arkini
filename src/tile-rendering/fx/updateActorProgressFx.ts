@@ -46,7 +46,7 @@ const updateProgressBarFn = ({
 	});
 };
 
-/** Updates the 10 Hz job overlay without remeasuring or rebuilding either retained tile face. */
+/** Updates job/lifetime progress and periodic Clock independently from the retained tile faces. */
 export const updateActorProgressFx = Effect.fnUntraced(function* ({
 	actor,
 	frames,
@@ -60,5 +60,47 @@ export const updateActorProgressFx = Effect.fnUntraced(function* ({
 		palette,
 		size,
 	});
+	const ring = actor.clockRing;
+	const pulse = item.location.scope === "board" ? item.clockPulse : undefined;
+	ring.clear();
+	ring.visible = pulse !== undefined;
+	if (pulse !== undefined) {
+		const inset = (size * (1 - item.artworkScale)) / 2;
+		const faceSize = Math.max(1, size * item.artworkScale);
+		const radius = faceSize * 0.085;
+		const x = inset + radius + faceSize * 0.05;
+		const y = inset + radius + faceSize * 0.05;
+		const stroke = radius * 0.18;
+		const color = pulse.enabled ? palette.accent : palette.overlayForeground;
+		const alpha = pulse.enabled ? 0.9 : 0.4;
+		const ratio = Math.max(0, Math.min(1, 1 - pulse.remainingMs / pulse.intervalMs));
+		ring.circle(x, y, radius + stroke).fill({
+			color: palette.overlay,
+			alpha: 0.72,
+		});
+		ring.circle(x, y, radius).stroke({
+			color: palette.overlayForeground,
+			alpha: 0.2,
+			width: stroke,
+		});
+		if (ratio > 0)
+			ring.moveTo(x, y - radius)
+				.arc(x, y, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ratio)
+				.stroke({
+					color,
+					alpha,
+					width: stroke,
+				});
+		ring.moveTo(x, y - radius * 0.5)
+			.lineTo(x, y)
+			.lineTo(x + radius * 0.35, y + radius * 0.2)
+			.stroke({
+				color,
+				alpha,
+				width: stroke,
+				cap: "round",
+				join: "round",
+			});
+	}
 	yield* frames.invalidateFx;
 });

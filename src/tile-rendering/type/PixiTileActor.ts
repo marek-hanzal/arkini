@@ -13,6 +13,7 @@ export interface PixiTileActor {
 	readonly visualLayer: Container;
 	readonly activityParticles: ActivityParticles;
 	readonly progressBar: Graphics;
+	readonly clockRing: Graphics;
 	readonly visuals: Set<ActorVisual>;
 	currentVisual: ActorVisual;
 	pendingVisual: ActorVisual | null;

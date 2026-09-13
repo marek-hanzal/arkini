@@ -234,8 +234,7 @@ export const useFormController = ({
 		form.setFieldValue("scope", "board");
 		form.setFieldValue("maxStackSize", 1);
 		form.setFieldValue("clock", {
-			intervalMs: 300_000,
-			durationMs: 3_600_000,
+			durationMs: 300_000,
 			enable: true,
 			rules: [],
 		});

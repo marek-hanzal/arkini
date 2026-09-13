@@ -150,6 +150,11 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				label: `TileActorProgress:${item.id}:${instanceId}`,
 			});
 			progressBar.visible = false;
+			const clockRing = new Graphics({
+				eventMode: "none",
+				label: `TileActorClock:${item.id}:${instanceId}`,
+			});
+			clockRing.visible = false;
 			const currentVisual = yield* createActorVisualFx({
 				frames,
 				item,
@@ -162,7 +167,7 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 			]);
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
-			offsetLayer.addChild(crowdLayer, activityParticles.container, progressBar);
+			offsetLayer.addChild(crowdLayer, activityParticles.container, progressBar, clockRing);
 			lifecycleLayer.addChild(offsetLayer);
 			container.addChild(lifecycleLayer);
 
@@ -175,6 +180,7 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				visualLayer,
 				activityParticles,
 				progressBar,
+				clockRing,
 				visuals,
 				currentVisual,
 				pendingVisual: null,

@@ -261,6 +261,7 @@ export const createActor = (id: string): PixiTileActor => {
 		onPointerDownFn: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),
+		clockRing: new Graphics(),
 		size: 80,
 		visualLayer: new Container(),
 		visuals: new Set([

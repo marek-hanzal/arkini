@@ -25,20 +25,6 @@ const ClockFields = () => {
 		>
 			<EditorFormCard>
 				<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-4">
-					<form.AppField name="clock.intervalMs">
-						{(field) => (
-							<field.SecondsField
-								label={translator.textFn("Interval (seconds)")}
-								clearLabel={translator.textFn("Clear interval")}
-								description={translator.textFn(
-									"Leave empty for a one-shot lifetime without periodic production.",
-								)}
-								min={5}
-								step={5}
-								optional
-							/>
-						)}
-					</form.AppField>
 					<form.AppField name="clock.durationMs">
 						{(field) => (
 							<field.SecondsField
@@ -46,6 +32,20 @@ const ClockFields = () => {
 								clearLabel={translator.textFn("Clear lifetime")}
 								description={translator.textFn(
 									"Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.",
+								)}
+								min={5}
+								step={5}
+								optional
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="clock.intervalMs">
+						{(field) => (
+							<field.SecondsField
+								label={translator.textFn("Interval (seconds)")}
+								clearLabel={translator.textFn("Clear interval")}
+								description={translator.textFn(
+									"Leave empty for a one-shot lifetime without periodic production.",
 								)}
 								min={5}
 								step={5}

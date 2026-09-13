@@ -243,6 +243,7 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 			workingTint: 0xf05bb8,
 		},
 		progressBar,
+		clockRing: new Graphics(),
 		visuals: new Set([
 			currentVisual,
 		]),

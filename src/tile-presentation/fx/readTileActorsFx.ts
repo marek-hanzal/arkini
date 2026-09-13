@@ -1,4 +1,5 @@
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
+import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 import { Array, Effect } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
@@ -102,6 +103,20 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				activeJob,
 				item,
 			});
+			const intervalMs = readItemScheduleFn(item.item)?.intervalMs;
+			const clockPulse =
+				item.location.scope !== LocationScopeEnumSchema.enum.Board ||
+				intervalMs === undefined ||
+				item.schedule?.remainingDurationMs === 0
+					? undefined
+					: {
+							intervalMs,
+							remainingMs: item.schedule?.remainingIntervalMs ?? intervalMs,
+							enabled: yield* resolveItemScheduleEnabledFx({
+								item,
+								runtime,
+							}),
+						};
 
 			return {
 				...visual,
@@ -125,6 +140,11 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 							jobStatus: activeJobStatus,
 						}),
 				running,
+				...(clockPulse === undefined
+					? {}
+					: {
+							clockPulse,
+						}),
 				...(progressRatio === undefined
 					? {}
 					: {

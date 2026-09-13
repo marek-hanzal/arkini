@@ -86,7 +86,11 @@ export const classifyActorUpdateFn = ({
 		(actor.pendingVisual ?? actor.currentVisual).item,
 		displayItem,
 	);
-	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
+	const progressChanged =
+		actor.item.progressRatio !== displayItem.progressRatio ||
+		actor.item.clockPulse?.intervalMs !== displayItem.clockPulse?.intervalMs ||
+		actor.item.clockPulse?.remainingMs !== displayItem.clockPulse?.remainingMs ||
+		actor.item.clockPulse?.enabled !== displayItem.clockPulse?.enabled;
 	const sizeChanged = actor.size !== pose.size;
 	const poseOwned = actor.dragging || deliveryRetained || motionClaimed || poseChannelActive;
 	const nextCrowdAlpha = readCrowdAlphaFn(displayItem);

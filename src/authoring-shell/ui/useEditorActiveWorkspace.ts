@@ -55,7 +55,7 @@ export const EditorWorkspaceRoutes = [
 	{
 		id: "chains",
 		icon: GitBranch,
-		label: "Chains · Experimental",
+		label: "Chains",
 		matchTo: "/editor/$projectId/chains",
 		shortcut: "Mod+Shift+C",
 		to: "/editor/$projectId/chains",

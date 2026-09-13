@@ -131,7 +131,7 @@ Chain empty description:
   value: This item owns no merge or Clock. Incoming merges belong to their source item's Chain.
 Chain help:
   value: |
-    Chain is an experimental overview of an authored interaction and its automatic consequences.
+    Chain is an overview of an authored interaction and its automatic consequences.
 
     - The starting item owns the merge direction. Dropping A onto B is separate from dropping B onto A; only the starting item's own merge rules are listed.
     - The starting item's own Clock is also available. After the first operation, only Clock expiry and the output of its Clock-selected production line continue. Intermediate merge rules and production input chains are ignored.
@@ -360,8 +360,6 @@ Exact count:
   value: Exact count
 Exists:
   value: Exists
-Experimental:
-  value: Experimental
 Expiry output:
   value: Expiry output
 Explore from here:

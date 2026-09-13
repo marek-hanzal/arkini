@@ -77,9 +77,7 @@ const ChainExplorer = ({ itemId }: { readonly itemId: string }) => {
 			<EditorRootCard dataUi="EditorChainControls">
 				<div className="flex flex-wrap items-center justify-between gap-4">
 					<div className="min-w-0 flex-1">
-						<p className="font-semibold">
-							{translator.textFn("Chain")} · {translator.textFn("Experimental")}
-						</p>
+						<p className="font-semibold">{translator.textFn("Chain")}</p>
 						<p className="mt-1 text-sm text-muted">
 							{translator.textFn("Chain introduction")}
 						</p>
@@ -257,7 +255,7 @@ const ChainStep = ({
 				: `${translator.textFn("Clock line")} · ${step.lineTitle}`;
 	return (
 		<div
-			className="rounded-lg border border-line bg-canvas/40 p-3"
+			className="py-3"
 			data-ui="EditorChainStep"
 		>
 			<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
